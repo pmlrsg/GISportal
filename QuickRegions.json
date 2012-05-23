@@ -1,0 +1,79 @@
+{
+	"region":{
+		"name": "European Seas",
+		"W": -23.44,
+		"S": 20.14,
+		"E": 39.88,
+		"N": 68.82
+	},
+	"region":{
+		"name": "Adriatic",
+		"W": 11.83,
+		"S": 39,
+		"E": 20.67,
+		"N": 45.8
+	},
+	"region":{
+		"name": "Baltic",
+		"W": 9,
+		"S": 51.08,
+		"E": 30.5,
+		"N": 67.62
+	},
+	"region":{
+		"name": "Biscay",
+		"W": -7.1,
+		"S": 44,
+		"E": -0.6,
+		"N": 49
+	},
+	"region":{
+		"name": "Baltic",
+		"W": 9,
+		"S": 51.08,
+		"E": 30.5,
+		"N": 67.62
+	},
+	"region":{
+		"name": "Black Sea",
+		"W": 27.3,
+		"S": 38.5,
+		"E": 42,
+		"N": 49.8
+	},
+	"region":{
+		"name": "English Channel",
+		"W": -5,
+		"S": 46.67,
+		"E": 4.3,
+		"N": 53.83
+	},
+	"region":{
+		"name": "Eastern Med.",
+		"W": 20,
+		"S": 29.35,
+		"E": 36,
+		"N": 41.65
+	},
+	"region":{
+		"name": "North Sea",
+		"W": -4.5,
+		"S": 50.2,
+		"E": 8.9,
+		"N": 60.5
+	},
+	"region":{
+		"name": "Western Med.",
+		"W": -6,
+		"S": 30.8,
+		"E": 16.5,
+		"N": 48.1
+	},
+	"region":{
+		"name": "Mediterranean",
+		"W": -6,
+		"S": 29.35,
+		"E": 36,
+		"N": 48.1
+	}
+}
