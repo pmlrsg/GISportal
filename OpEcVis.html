@@ -66,9 +66,6 @@
 				displayProjection: lonlat,
 				controls: []
 		})
-		// Add permalink and mouse position controls 
-		map.addControl(new OpenLayers.Control.Permalink());
-		map.addControl(new OpenLayers.Control.MousePosition());			
 		
 		// Add a new property to the OpenLayers layer object to differentiate
 		// between reference and data layer types. Default refLayer is false.
@@ -98,84 +95,71 @@
 		)
 		map.addLayer(landsat);
 		
-		// Add vector layers for AMT Blog GeoRSS format feeds (18 to 21)
-		for (i=18;i<22;i++)	{
-			vectorLayers[i-18] = new OpenLayers.Layer.Vector('AMT Cruise ' + i , {
-				protocol: new OpenLayers.Protocol.HTTP({
-				url: 'http://www.amtblog.org.uk/index.php/category/amt' + i + '/feed',
-				params: {'format': 'GeoRSS', 'tags': 'AMT Cruise'},
-				format: new OpenLayers.Format.GeoRSS({})
-				}),
-				strategies: [new OpenLayers.Strategy.Fixed(), new OpenLayers.Strategy.Cluster({distance:20})],
-				projection: lonlat,
-			})
-			if (i!=19){
-				vectorLayers[i-18].visibility = false;
-			}
-			map.addLayer(vectorLayers[i-18]);
-		}
-	
-		// Add select feature capability to each AMT Vector layer
-		var select_feature_control = new OpenLayers.Control.SelectFeature(
-			vectorLayers,{}
-		)
-		map.addControl(select_feature_control);
-		select_feature_control.activate();			
+		// Add nitrate concentration layer
+		no3 = new OpenLayers.Layer.WMS(
+			'Nitrate Concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/no3',
+				transparent: true,
+				visibility: false,
+			}		
+		);
+		map.addLayer(no3);
+		no3.setVisibility(false);
+
+		// Add phosphate concentration layer
+		po4 = new OpenLayers.Layer.WMS(
+			'Phosphate Concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/no3',
+				transparent: true,
+			}		
+		);
+		map.addLayer(po4);
+		po4.setVisibility(false);
+
+		// Add a chlorophyl layer
+		chl = new OpenLayers.Layer.WMS(
+			'Chlorophyl-a',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/chl',
+				transparent: true,
+			}		
+		);
+		map.addLayer(chl);
+		chl.setVisibility(false);
+
+		// Add a zooplankton layer
+		zoo = new OpenLayers.Layer.WMS(
+			'Zooplankton Biomass',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/zoop',
+				transparent: true,
+			}		
+		);
+		map.addLayer(zoo);
+		zoo.setVisibility(false);
 		
-		// Style the AMT vector layers with different colours for each one
-		var vector_style = new OpenLayers.Style({
-		'fillColor': '${colour}',
-		'fillOpacity': .8,
-		'fontColor': '#f0f0f0',
-		'fontFamily': 'arial, sans-serif',
-		'fontSize': '0.9em',
-		'fontWeight': 'bold',
-		'label': '${num_points}',
-		'pointRadius': '${point_radius}',
-		'strokeColor': '#f0f0f0',
-		'strokeWidth': 3
-		},
-		{
-			context: {
-				num_points: function(feature){ return feature.attributes.count; },
-				point_radius: function(feature){return 9 + (feature.attributes.count)},
-				colour: function(feature){
-					switch(feature.layer.name){
-					case 'AMT Cruise 18':
-						return '#669933';
-						break;
-					case 'AMT Cruise 19':
-						return '#FFBF00';
-						break;
-					case 'AMT Cruise 20':
-						return '#1E37FF';
-						break;
-					case 'AMT Cruise 21':
-						return '#EA1526';
-						break;
-					default:
-					return '#669933';
-					}
-				}
-			}
-		});
-		var vector_style_select = new OpenLayers.Style({
-			'fillColor': '#cdcdcd',
-			'fillOpacity': .9,
-			'fontColor': '#232323',
-			'strokeColor': '#ffffff'
-		})
-	
-		// Create a style map object and set the 'default' and 'selected' intents
-		var vector_style_map = new OpenLayers.StyleMap({
-			'default': vector_style,
-			'select': vector_style_select
-		});
+		// Add a silicate concentration layer
+		si = new OpenLayers.Layer.WMS(
+			'Silicate concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/si',
+				transparent: true,
+			}		
+		);
+		map.addLayer(si);
+		si.setVisibility(false);
 		
-		// Add the stylemap to each AMT layer
-		for (i=0; i < vectorLayers.length; i++){
-			vectorLayers[i].styleMap = vector_style_map;
-		}		
+		// Add dissolved oxygen layer
+		o2 = new OpenLayers.Layer.WMS(
+			'Dissolved Oxygen',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'MRCS_ECOVARS/o2o',
+				transparent: true,
+			}		
+		);
+		map.addLayer(o2);		
 		
 		// Add AMT cruise track 19 as GML Formatted Vector layer
 		cruiseTrack = new OpenLayers.Layer.Vector('AMT19 Cruise Track', {
@@ -205,17 +189,6 @@
 		// Make this layer a reference layer
 		blackSea.isRefLayer = true;
 		map.addLayer(blackSea);
-
-		// Add a chlorophyl layer
-		chl = new OpenLayers.Layer.WMS(
-			'Chlorophyl-a',
-			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-				layers: 'MRCS_ECOVARS/chl',
-				transparent: true,
-				time: '2011-10-21T12:00:00.000Z',
-			}		
-		);
-		map.addLayer(chl);
 		
 		if(!map.getCenter()) {
 			map.zoomTo(3)
@@ -351,7 +324,9 @@
 			zoomOut: new OpenLayers.Control.ZoomBox(
 				{ out: true, alwaysZoom: true}
 			),
-			pan : new OpenLayers.Control.Navigation()
+			pan : new OpenLayers.Control.Navigation(),
+			mousePos : new OpenLayers.Control.MousePosition(),
+			permalink : new OpenLayers.Control.Permalink()
 		};
 		// Add the controls to the map
 		var control;
