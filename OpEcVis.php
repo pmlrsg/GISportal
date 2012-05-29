@@ -19,7 +19,7 @@
 <!-- Use custom PHP class to create some date caches for the various data layers -->
 <?php
 	require('wmsDateCache.php');
-    $chlCache = new wmsDateCache("MRCS_ECOVARS/chl",86400);
+    $chlCache = new wmsDateCache("MRCS_ECOVARS/zoop",86400);
 	$xml = $chlCache->createCache();
 ?>
 
