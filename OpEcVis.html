@@ -29,7 +29,6 @@
 	var vectorLayers = new Array();
 	var layers = new Array();
 	var chl;
-	var glayer;
 	var blackSea;
 	var clust;
 	var mapControls;
@@ -63,9 +62,8 @@
 	function mapInit()	{
 		map = new OpenLayers.Map(
 			'map', {
-				projection: googp,
+				projection: lonlat,
 				displayProjection: lonlat,
-				sphericalMercator: true,
 				controls: []
 		})
 		// Add permalink and mouse position controls 
@@ -76,52 +74,29 @@
 		// between reference and data layer types. Default refLayer is false.
 		OpenLayers.Layer.prototype.isRefLayer = false;
 
-		// Set up the google terrain layer
-		var gtlayer = new OpenLayers.Layer.Google(
-			'Google Terrain', {
-				sphericalMercator: true,
-				type: google.maps.MapTypeId.TERRAIN
-		});
-
-		// Set up the google standard layer
-		var glayer = new OpenLayers.Layer.Google(
-			'Google Maps', {
-				sphericalMercator: true
-		});
-
-		// Set up the google hybrid layer
-		var ghlayer = new OpenLayers.Layer.Google(
-			'Google Hybrid', {
-				sphericalMercator: true, 
-				type: google.maps.MapTypeId.HYBRID
-		});	
+		// Add GEBCO base layer
+		var gebco = new OpenLayers.Layer.WMS(
+			"GEBCO",
+			"http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
+			{layers: 'gebco_08_grid'}
+		)
+		map.addLayer(gebco);
 		
-		// set up the Open Street Map layer
-		var olayer = new OpenLayers.Layer.OSM('Open Street Map');
-
-		var apiKey = 'Ah_1d2i8U1jaNSHuO924RN09m5eTofmSw_iufWiXQwzzjdIfLhHqfLMWjMYF26yo';
-		var vlayer = new OpenLayers.Layer.Bing({
-			name: "Bing Maps",
-			key: apiKey,
-			type: "Road",
-			sphericalMercator: true
-		})
-
-		var vhlayer = new OpenLayers.Layer.Bing({
-			name: "Bing Hybrid",
-			key: apiKey,
-			type: "AerialWithLabels",
-			sphericalMercator: true
-		});
+		// Add Cubewerx layer
+		var cube = new OpenLayers.Layer.WMS(
+			'CubeWerx',
+			'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
+			{layers: 'Foundation.GTOPO30'}
+		)
+		map.addLayer(cube);	
 		
-		var valayer = new OpenLayers.Layer.Bing({
-			name: "Bing Aerial",
-			key: apiKey,
-			type: "Aerial",
-			sphericalMercator: true
-		});
-		
-		map.addLayers([gtlayer,glayer,ghlayer,vlayer,vhlayer,valayer,olayer]);
+		// Add NASA Landsat layer
+		var landsat = new OpenLayers.Layer.WMS(
+			'Landsat',
+			'http://irs.gis-lab.info/?',
+			{layers: 'landsat'}
+		)
+		map.addLayer(landsat);
 		
 		// Add vector layers for AMT Blog GeoRSS format feeds (18 to 21)
 		for (i=18;i<22;i++)	{
@@ -216,11 +191,11 @@
 		map.addLayer(cruiseTrack);
 		
 		// Setup Black sea outline layer (Vector)
-		blackSea = new OpenLayers.Layer.Vector("The Black Sea (KML)", {
+		blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
 			projection: lonlat,
 			strategies: [new OpenLayers.Strategy.Fixed()],
 			protocol: new OpenLayers.Protocol.HTTP({
-				url: "black_sea.kml",
+				url: 'black_sea.kml',
 				format: new OpenLayers.Format.KML({
 					extractStyles: true, 
 					extractAttributes: true
@@ -231,18 +206,16 @@
 		blackSea.isRefLayer = true;
 		map.addLayer(blackSea);
 
-		// *NEW* Let's try adding a chlorophyl layer
+		// Add a chlorophyl layer
 		chl = new OpenLayers.Layer.WMS(
 			'Chlorophyl-a',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/chl',
-				format: 'image/png'
+				transparent: true,
+				time: '2011-10-21T12:00:00.000Z',
 			}		
 		);
 		map.addLayer(chl);
-		// End *NEW*
-
 		
 		if(!map.getCenter()) {
 			map.zoomTo(3)
