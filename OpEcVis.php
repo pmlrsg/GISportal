@@ -19,29 +19,62 @@
 <!-- Use custom PHP class to create some date caches for the various data layers -->
 <?php
 	require('wmsDateCache.php');
-    $chlCache = new wmsDateCache("MRCS_ECOVARS/zoop",86400);
-	$xml = $chlCache->createCache();
+    $no3Cache = new wmsDateCache("MRCS_ECOVARS/no3","./json/no3WMSDateCache.json");
+	$no3Cache->createCache();
+	$po4Cache = new wmsDateCache("MRCS_ECOVARS/po4","./json/po4WMSDateCache.json");
+	$po4Cache->createCache();
+    $chlCache = new wmsDateCache("MRCS_ECOVARS/chl","./json/chlWMSDateCache.json");
+	$chlCache->createCache();
+	$zoopCache = new wmsDateCache("MRCS_ECOVARS/zoop","./json/zoopWMSDateCache.json");
+	$zoopCache->createCache();
+    $o2oCache = new wmsDateCache("MRCS_ECOVARS/o2o","./json/o2oWMSDateCache.json");
+	$o2oCache->createCache();
+    $uZooCache = new wmsDateCache("WECOP/Z5c","./json/uZooWMSDateCache.json");
+	$uZooCache->createCache();
 ?>
 
 <!-- Custom JavaScript -->
 <!-- OpenLayers Map Code-->
 <script type="text/javascript">
+
+	// Under development - experimenting with enablng specific dates for a layer
+	// Array of enabled days for the jQuery UI date picker - populate using json date cache
+	var enabledDays;
+	$.getJSON('./json/chlWMSDateCache.json', function(data) {
+		enabledDays = data.date;
+	});
+	
+	// Helper function for enabling an array (from global variable enabledDays)
+	// of dates in a jQuery UI datepicker control with all others disabled
+	function enableAllTheseDays(date) {
+		var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
+		m++;
+		if (m<10) {m="0"+ m;}
+		if (d<10) {d="0"+ d;}
+		var uidate = y + '-' + m + '-' + d;
+		if($.inArray(uidate, enabledDays) != -1) {
+			return [true];
+		}
+		else {
+			return [false];
+		}
+	}
+
 	/*
 	  ====================================================================================*/
 	/*
-		Initialise javascript variables and objects
+		Initialise javascript global variables and objects
 	*/
-	// Map objects
+	// Map variabes & objects
 	var map;
-	var vectorLayers = new Array();
-	var layers = new Array();
-	var chl;
-	var blackSea;
-	var clust;
+	var layers;
+	var dates;
 	var mapControls;
+	
 	// Predefined map coordinate systems
 	var googp = new OpenLayers.Projection("EPSG:900913");
 	var lonlat = new OpenLayers.Projection("EPSG:4326");
+	
 	// Quick regions array in the format "Name",W,S,E,N
 	var quickRegion = [
 		["European Seas",-23.44,20.14,39.88,68.82],
@@ -103,7 +136,7 @@
 		map.addLayer(landsat);
 		
 		// Add nitrate concentration layer
-		no3 = new OpenLayers.Layer.WMS(
+		var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/no3',
@@ -115,10 +148,10 @@
 		no3.setVisibility(false);
 
 		// Add phosphate concentration layer
-		po4 = new OpenLayers.Layer.WMS(
+		var po4 = new OpenLayers.Layer.WMS(
 			'Phosphate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-				layers: 'MRCS_ECOVARS/no3',
+				layers: 'MRCS_ECOVARS/po4',
 				transparent: true,
 			}		
 		);
@@ -126,7 +159,7 @@
 		po4.setVisibility(false);
 
 		// Add a chlorophyl layer
-		chl = new OpenLayers.Layer.WMS(
+		var chl = new OpenLayers.Layer.WMS(
 			'Chlorophyl-a',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/chl',
@@ -134,10 +167,11 @@
 			}		
 		);
 		map.addLayer(chl);
-		chl.setVisibility(false);
+		// show this layer by default
+		// chl.setVisibility(false);
 
 		// Add a zooplankton layer
-		zoo = new OpenLayers.Layer.WMS(
+		var zoo = new OpenLayers.Layer.WMS(
 			'Zooplankton Biomass',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/zoop',
@@ -148,7 +182,7 @@
 		zoo.setVisibility(false);
 		
 		// Add a silicate concentration layer
-		si = new OpenLayers.Layer.WMS(
+		var si = new OpenLayers.Layer.WMS(
 			'Silicate concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/si',
@@ -159,7 +193,7 @@
 		si.setVisibility(false);
 		
 		// Add dissolved oxygen layer
-		o2 = new OpenLayers.Layer.WMS(
+		var o2 = new OpenLayers.Layer.WMS(
 			'Dissolved Oxygen',
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'MRCS_ECOVARS/o2o',
@@ -167,9 +201,21 @@
 			}		
 		);
 		map.addLayer(o2);		
+		o2.setVisibility(false);
+		
+		// Add dissolved oxygen layer
+		var uZoo = new OpenLayers.Layer.WMS(
+			'Micro-Zooplankton C',
+			'http://rsg.pml.ac.uk/ncWMS/wms?', {
+				layers: 'WECOP/Z5c',
+				transparent: true,
+			}		
+		);
+		map.addLayer(uZoo);
+		uZoo.setVisibility(false);			
 		
 		// Add AMT cruise track 19 as GML Formatted Vector layer
-		cruiseTrack = new OpenLayers.Layer.Vector('AMT19 Cruise Track', {
+		var cruiseTrack = new OpenLayers.Layer.Vector('AMT19 Cruise Track', {
 			protocol: new OpenLayers.Protocol.HTTP({
 				url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT19&outputFormat=GML2',
 				format: new OpenLayers.Format.GML()
@@ -182,7 +228,7 @@
 		map.addLayer(cruiseTrack);
 		
 		// Setup Black sea outline layer (Vector)
-		blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
+		var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
 			projection: lonlat,
 			strategies: [new OpenLayers.Strategy.Fixed()],
 			protocol: new OpenLayers.Protocol.HTTP({
@@ -257,6 +303,8 @@
 	
 		// jQuery UI elements
 		$('#viewDate').datepicker({
+			dateFormat: 'dd-mm-yy',
+			beforeShowDay: enableAllTheseDays,
 			onSelect: function(dateText, inst) {changeViewDate(dateText, inst)}
 		});
 		$('#panZoom').buttonset();

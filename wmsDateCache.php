@@ -34,17 +34,21 @@ function array_searchRecursive( $needle, $haystack, $strict=false, $path=array()
 
 // WMS date cache class/object
 class wmsDateCache{
-	// Default cache file location as class variable
-	var $cacheFile="./json/cacheFileDate.json";
-	// Other class variables
-	var $wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
-	var $layer, $cacheLife;
+
+	// Class variables
+	var $layer, $cacheFile, $wmsURL, $cacheLife;
 	
-	// Default class constructor with default variables
-	public function __construct($layer="MRCS_ECOVARS/chl",$cacheLife=86400){
-		$this->layer=$layer;
-		$this->cacheLife=$cacheLife;
-		$this->cacheFile="./json/" . preg_replace("/[\/]/", "_", str_replace(" ", "", strtolower($layer))) . ".json";
+	// Default class constructor with default variables (can be changed to suit local environment)
+	public function __construct(
+		$layer,
+		$cacheFile="./json/WMSDateCache.json",
+		$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0",
+		$cacheLife=86400
+	){
+		$this->layer = $layer;
+		$this->cacheFile = $cacheFile;
+		$this->wmsURL = $wmsURL;
+		$this->cacheLife = $cacheLife;
 	}
 	
 	public function createCache(){
@@ -55,7 +59,9 @@ class wmsDateCache{
 			#$dataArray = $xml->ToArray(); 
 			//note text() at the end doesnt work
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class
-			$simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
+			$simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension[@name='time']/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
+			// $simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
+			
 			$timeDimension=trim($simpleXMLResult[0][0]);
 			
 			$timeDimensionArray=explode(",",$timeDimension);
