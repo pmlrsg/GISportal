@@ -217,6 +217,11 @@ ul li {
 	border-top-right-radius: 15px;
 }
 
+.lPanel .selectedLayer {
+	background: #333333;
+	color: #cccccc;
+} 
+
 .rPanel {
 	padding: 10px 10px 10px 10px;
 	right: 0;

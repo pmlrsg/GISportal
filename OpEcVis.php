@@ -7,29 +7,31 @@
 <!-- Now for the styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/OpEc/jquery-ui-1.8.18.custom.css" />
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css">
-<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">
+<!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <!-- JavaScript libraries -->
 <script type="text/javascript" src="js-libs/jquery/jquery-1.7.1.js"></script>
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
-<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>
+<!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Use custom PHP class to create some date caches for the various data layers -->
 <?php
 	require('wmsDateCache.php');
-    $no3Cache = new wmsDateCache("MRCS_ECOVARS/no3","./json/no3WMSDateCache.json");
+    $no3Cache = new wmsDateCache("MRCS_ECOVARS/no3","./json/no3_Dates.json");
 	$no3Cache->createCache();
-	$po4Cache = new wmsDateCache("MRCS_ECOVARS/po4","./json/po4WMSDateCache.json");
+	$po4Cache = new wmsDateCache("MRCS_ECOVARS/po4","./json/po4_Dates.json");
 	$po4Cache->createCache();
-    $chlCache = new wmsDateCache("MRCS_ECOVARS/chl","./json/chlWMSDateCache.json");
+    $chlCache = new wmsDateCache("MRCS_ECOVARS/chl","./json/chl_Dates.json");
 	$chlCache->createCache();
-	$zoopCache = new wmsDateCache("MRCS_ECOVARS/zoop","./json/zoopWMSDateCache.json");
+	$zoopCache = new wmsDateCache("MRCS_ECOVARS/zoop","./json/zoop_Dates.json");
 	$zoopCache->createCache();
-    $o2oCache = new wmsDateCache("MRCS_ECOVARS/o2o","./json/o2oWMSDateCache.json");
+    $o2oCache = new wmsDateCache("MRCS_ECOVARS/o2o","./json/o2o_Dates.json");
 	$o2oCache->createCache();
-    $uZooCache = new wmsDateCache("WECOP/Z5c","./json/uZooWMSDateCache.json");
+    $siCache = new wmsDateCache("MRCS_ECOVARS/si","./json/si_Dates.json");
+	$siCache->createCache();	
+    $uZooCache = new wmsDateCache("WECOP/Z5c","./json/Z5c_Dates.json");
 	$uZooCache->createCache();
 ?>
 
@@ -40,7 +42,7 @@
 	// Under development - experimenting with enablng specific dates for a layer
 	// Array of enabled days for the jQuery UI date picker - populate using json date cache
 	var enabledDays;
-	$.getJSON('./json/chlWMSDateCache.json', function(data) {
+	$.getJSON('./json/chl_Dates.json', function(data) {
 		enabledDays = data.date;
 	});
 	
@@ -69,9 +71,11 @@
 	var map;
 	var dates;
 	var mapControls;
+	var layer;
+	var selLayer;
 	
 	// Predefined map coordinate systems
-	var googp = new OpenLayers.Projection("EPSG:900913");
+/*	var googp = new OpenLayers.Projection("EPSG:900913");*/
 	var lonlat = new OpenLayers.Projection("EPSG:4326");
 	
 	// Quick regions array in the format "Name",W,S,E,N
@@ -270,7 +274,7 @@
 		
 		// Map layers elements
 		for (i=0; i<map.layers.length; i++){
-			var layer = map.layers[i];
+			layer = map.layers[i];
 			var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
 						
 			// Add map base layers to the baseLayer drop-down list from the map
@@ -279,12 +283,7 @@
 			}
 			// if not a base layer, populate the layers panel (left slide panel)
 			else if (layer.displayInLayerSwitcher && !layer.isBaseLayer){
-				if (layer.visibility){
-					$(selID).append('<li><input type="checkbox" checked="yes" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
-				}
-				else{
-					$(selID).append('<li><input type="checkbox" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
-				}
+				$(selID).append('<li><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
 			}
 		}
 	
@@ -295,7 +294,10 @@
 	
 		// jQuery UI elements
 		$('#viewDate').datepicker({
+			showButtonPanel: true,
 			dateFormat: 'dd-mm-yy',
+			changeMonth: true,
+			changeYear: true,
 			beforeShowDay: enableAllTheseDays,
 			onSelect: function(dateText, inst) {changeViewDate(dateText, inst)}
 		});
@@ -407,13 +409,52 @@
 
 		// Function which handles change of view date
 		function changeViewDate(dateText, inst){
+			// DEBUG LINE
 			alert('Date ' + dateText + ' selected');
 		}
 		
-		// Change of selected operational or reference layers event handler
+		// Function which handles selection of a new data layer and filters the date picker
+		function selectLayer(lyr){
+			layer==lyr;
+			if(layer.params['LAYERS']){
+				var layerID = layer.params['LAYERS'];
+				var dateCache = './json/' + layerID.split('/')[1] + '_Dates.json';
+				$.getJSON(dateCache, function(data) {
+					enabledDays = data.date;
+					// DEBUG LINE
+					alert('Dates recalculated: ' + layerID);				
+				});
+				// DEBUG LINE
+				alert('Active layer: ' + layerID);
+			}
+		}
+		
+		// Handle selection of visible layers
+		$('.lPanel li').click(function(e) {
+			var itm = $(this);
+			var child = itm.children('input').first();
+			$('.lPanel li').each(function(index) {
+				$(this).removeClass('selectedLayer');
+			});			
+			if(child.is(':checked')){
+				itm.addClass('selectedLayer');
+				selectLayer(map.getLayersByName(child.val())[0]);
+			}
+			else {
+				itm.removeClass('selectedLayer');				
+			}
+        });	
+		
+		// Toggle visibility of data layers
 		$('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
-			var v= $(this).val();
-			$(this).is(':checked') ? map.getLayersByName(v)[0].setVisibility(true) : map.getLayersByName(v)[0].setVisibility(false);
+			var v = $(this).val();
+			layer = map.getLayersByName(v)[0];
+			if($(this).is(':checked')){
+				layer.setVisibility(true);
+			}
+			else{
+				map.getLayersByName(v)[0].setVisibility(false);
+			}
 		})		
 
 		// Change of base layer event handler
