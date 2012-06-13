@@ -67,7 +67,6 @@
 	*/
 	// Map variabes & objects
 	var map;
-	var layers;
 	var dates;
 	var mapControls;
 	
@@ -87,7 +86,7 @@
 		["North Sea",-4.50,50.20,8.90,60.50],
 		["Western Med.",-6.00,30.80,16.50,48.10],
 		["Mediterranean",-6.00,29.35,36.00,48.10]
-	];		
+	];
 	// Define a proxy for the map to allow async javascript http protocol requests
 	// This will always need changing when swapping between Windows and Linux
 	//OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";	// Windows only using ASP.NET (C#) handler
@@ -107,9 +106,9 @@
 				controls: []
 		})
 		
-		// Add a new property to the OpenLayers layer object to differentiate
-		// between reference and data layer types. Default refLayer is false.
-		OpenLayers.Layer.prototype.isRefLayer = false;
+		// Add a new property to the OpenLayers layer object to tell the UI which <ul>
+		// control ID in the layers panel to assign it to - defualts to operational layer
+		OpenLayers.Layer.prototype.controlID = 'opLayers';
 
 		// Add GEBCO base layer
 		var gebco = new OpenLayers.Layer.WMS(
@@ -224,7 +223,7 @@
 			projection: lonlat,
 		});
 		// Make this layer a reference layer
-		cruiseTrack.isRefLayer = true;
+		cruiseTrack.controlID = "refLayers";
 		map.addLayer(cruiseTrack);
 		
 		// Setup Black sea outline layer (Vector)
@@ -240,7 +239,7 @@
 			})
 		})
 		// Make this layer a reference layer
-		blackSea.isRefLayer = true;
+		blackSea.controlID = "refLayers";
 		map.addLayer(blackSea);
 		
 		if(!map.getCenter()) {
@@ -268,34 +267,27 @@
 		/*
 		  Configure and generate the UI elements
 		*/
-		// Populate the layers panel (left slide panel)
-		layers = map.layers;			
-		for (i=0; i<layers.length; i++){
-			if (!layers[i].isBaseLayer && !layers[i].isRefLayer && layers[i].displayInLayerSwitcher){
-				if (layers[i].visibility){
-					$('#opLayers').append('<li><input type="checkbox" checked="yes" name="' + layers[i].name + '" value="' + i + '" />' + layers[i].name + '</li>');
-				}
-				else{
-					$('#opLayers').append('<li><input type="checkbox" name="' + layers[i].name + '" value="' + i + '" />' + layers[i].name + '</li>');
-				}
-			}
-			else if (!layers[i].isBaseLayer && layers[i].isRefLayer && layers[i].displayInLayerSwitcher) {
-				if (layers[i].visibility){
-					$('#refLayers').append('<li><input type="checkbox" checked="yes" name="' + layers[i].name + '" value="' + i + '" />' + layers[i].name + '</li>');
-				}
-				else{
-					$('#refLayers').append('<li><input type="checkbox" name="' + layers[i].name + '" value="' + i + '" />' + layers[i].name + '</li>');
-				}			
-			}
-		}
-
-		// Add map base layers to the baseLayer drop-down list from the map
-		for (i=0; i<layers.length; i++){
-			if (layers[i].isBaseLayer){
-				$('#baseLayer').append('<option value="' + i + '">' + layers[i].name + '</option>');
-			}
-		}
 		
+		// Map layers elements
+		for (i=0; i<map.layers.length; i++){
+			var layer = map.layers[i];
+			var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
+						
+			// Add map base layers to the baseLayer drop-down list from the map
+			if (layer.isBaseLayer){
+				$('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
+			}
+			// if not a base layer, populate the layers panel (left slide panel)
+			else if (layer.displayInLayerSwitcher && !layer.isBaseLayer){
+				if (layer.visibility){
+					$(selID).append('<li><input type="checkbox" checked="yes" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
+				}
+				else{
+					$(selID).append('<li><input type="checkbox" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
+				}
+			}
+		}
+	
 		// Populate Quick Regions from the quickRegions array
 		for (i=0; i<quickRegion.length ;i++){
 			$('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
@@ -421,12 +413,12 @@
 		// Change of selected operational or reference layers event handler
 		$('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
 			var v= $(this).val();
-			$(this).is(':checked') ? layers[v].setVisibility(true) : layers[v].setVisibility(false);
+			$(this).is(':checked') ? map.getLayersByName(v)[0].setVisibility(true) : map.getLayersByName(v)[0].setVisibility(false);
 		})		
 
 		// Change of base layer event handler
 		$('#baseLayer').change(function(e) {
-			map.setBaseLayer(layers[$('#baseLayer').val()]);
+			map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
 		});
 
 		// Change of quick region event handler
