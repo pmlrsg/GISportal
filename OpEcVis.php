@@ -54,19 +54,14 @@
 	// Array of ALL available date-times where data's available for the selected layer
 	// Populated using the json date caches when the current layer changes
 	var enabledDays = [];
-	// Available date-times for the selected layer in the current month of the datepicker
-	// Populated when the datepicker month changes by filetering the enabledDays array
-	var monthDateCache = [];
 
 	/*
 		Helper functions
 	*/
-	
 	// Function for enabling dates in the jQuery UI datepicker for the currently selected layer
 	// These dates are loaded into the enbaledDays array when the selected layer changes
 	function enableDays(date) {
-        var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
-        m++;
+        var m = date.getMonth()+1, d = date.getDate(), y = date.getFullYear();
         if(m < 10) { m = "0" + m; }
         if(d < 10) { d = "0" + d; }
         var uidate = y + '-' + m + '-' + d;
@@ -101,13 +96,6 @@
 			alert('Non date dependent layer: ' + selLayer.name);
 			enabledDays = null;
 		}	
-	}
-	
-	// Function which creates a month-cache of date-times of data availablility
-	// for the current layer, based on a month and a year.
-	function createMonthDateCache(m,y){
-		// DEBUG line
-		alert('Caching for month=' + m + ' and year=' + y);
 	}
 
 	// Predefined map coordinate systems
@@ -362,19 +350,22 @@
 		  Configure and generate the UI elements
 		*/
 		
-		// Map layers elements - add in reverse order to ensure last added appear topmost in the UI
-		// as they are the topmost layers
+		// Map layers elements - add data layers in reverse order to ensure
+		// last added appear topmost in the UI as they are the topmost layers
 		for (i=(map.layers.length-1); i>=0; i--){
 			var layer = map.layers[i];
-						
+			// if not a base layer, populate the layers panel (left slide panel)
+			if (layer.displayInLayerSwitcher && !layer.isBaseLayer){
+				var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
+				$(selID).append('<li><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
+			}
+		}
+
+		for (i=0; i<map.layers.length; i++){
+			var layer = map.layers[i];
 			// Add map base layers to the baseLayer drop-down list from the map
 			if (layer.isBaseLayer){
 				$('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
-			}
-			// if not a base layer, populate the layers panel (left slide panel)
-			else if (layer.displayInLayerSwitcher && !layer.isBaseLayer){
-				var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
-				$(selID).append('<li><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
 			}
 		}
 	
@@ -393,7 +384,6 @@
 			changeMonth: true,
 			changeYear: true,
 			beforeShowDay: enableDays,
-			onChangeMonthYear: function(year, month, inst) {createMonthDateCache(month,year)},
 			onSelect: function(dateText, inst) {changeViewDate(dateText, inst)}
 		});
 		$('#panZoom').buttonset();
@@ -416,7 +406,6 @@
 		/*
 			Hook up the other events for the general UI
 		*/
-				
 		// Left slide panel show-hide functionality		
 		$(".triggerL").click(function (e) {
 			$(".lPanel").toggle("fast");
@@ -506,10 +495,22 @@
 		// giving the initial set-up of mouse events and associated map controls
 		$('#pan').click();
 
-		// Function which handles change of view date
+		// Function which handles change of view date and filters available date-times to this date
 		function changeViewDate(dateText, inst){
 			// DEBUG LINE
-			alert('Date ' + dateText + ' selected');
+			var d = inst.selectedDay;
+			var m = inst.selectedMonth+1;
+			var y = inst.selectedYear;
+			if(m < 10) { m = "0" + m; }
+			if(d < 10) { d = "0" + d; }
+			var uidate = y + '-' + m + '-' + d;
+			// Flter the datetime array to see if it matches the date using jQuery grep utility
+			var filtArray = $.grep(enabledDays, function(dt, i) {
+				var datePart = dt.substring(0, 10);
+				return (datePart == uidate);
+			});
+			// DEBUG line
+			alert(filtArray);
 		}
 		
 		// Handle selection of visible layers
