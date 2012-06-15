@@ -19,6 +19,13 @@ p {
 	margin: 5px 0 5px 0;
 }
 
+h3 {
+margin-top: 0px;
+padding-top: 0px;
+margin-bottom: 5px;
+padding-bottom: 5px;
+}
+
 sup {
 	vertical-align: super;
 	font-size:x-small;
@@ -184,9 +191,9 @@ ul li {
 }
 
 .panel {
-	z-index:5;
-	position:fixed;
-	top: 55px;
+	z-index:9999;
+	position:absolute;
+	top: 50px;
 	display: none;
 	height: auto;
 	background: #333333;

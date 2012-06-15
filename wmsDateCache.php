@@ -7,12 +7,6 @@
 
 require './ParseXml.class.php';
 
-// Helper function for splitting out dates from date/times
-function splitTime(&$val){
-	$tmp = explode("T",$val);
-	$val=$tmp[0];
-}
-
 // Helper function
 function array_searchRecursive( $needle, $haystack, $strict=false, $path=array() )
 {
@@ -41,7 +35,7 @@ class wmsDateCache{
 	// Default class constructor with default variables (can be changed to suit local environment)
 	public function __construct(
 		$layer,
-		$cacheFile="./json/WMSDateCache.json",
+		$cacheFile="./json/WMSDateCache/WMSDateCache.json",
 		$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0",
 		$cacheLife=86400
 	){
@@ -65,7 +59,6 @@ class wmsDateCache{
 			$timeDimension=trim($simpleXMLResult[0][0]);
 			
 			$timeDimensionArray=explode(",",$timeDimension);
-			array_walk($timeDimensionArray, 'splitTime'); 
 			$fh=fopen($this->cacheFile,"w") or die("can't open file");
 			$jsonArr=json_encode($timeDimensionArray);
 			$outStr='{"date":'.$jsonArr.'}'; //atention to ' and " otherwise JSON is not valid

@@ -16,64 +16,100 @@
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.18.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
-<!-- Use custom PHP class to create some date caches for the various data layers -->
+<!-- Use custom PHP class to create some date caches for the required data layers
+	 See wmsDateCache.php for details. -->
 <?php
 	require('wmsDateCache.php');
-    $no3Cache = new wmsDateCache("MRCS_ECOVARS/no3","./json/no3_Dates.json");
-	$no3Cache->createCache();
-	$po4Cache = new wmsDateCache("MRCS_ECOVARS/po4","./json/po4_Dates.json");
-	$po4Cache->createCache();
-    $chlCache = new wmsDateCache("MRCS_ECOVARS/chl","./json/chl_Dates.json");
-	$chlCache->createCache();
-	$zoopCache = new wmsDateCache("MRCS_ECOVARS/zoop","./json/zoop_Dates.json");
-	$zoopCache->createCache();
-    $o2oCache = new wmsDateCache("MRCS_ECOVARS/o2o","./json/o2o_Dates.json");
-	$o2oCache->createCache();
-    $siCache = new wmsDateCache("MRCS_ECOVARS/si","./json/si_Dates.json");
-	$siCache->createCache();	
-    $uZooCache = new wmsDateCache("WECOP/Z5c","./json/Z5c_Dates.json");
-	$uZooCache->createCache();
+	// Ensure to put all the data layers in here that have date-ranged data
+	$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
+	$wmsGetCapabilites = $wmsURL."SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+	$wmsDateCache = array(
+		new wmsDateCache("MRCS_ECOVARS/no3","./json/WMSDateCache/no3_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("MRCS_ECOVARS/po4","./json/WMSDateCache/po4_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("MRCS_ECOVARS/chl","./json/WMSDateCache/chl_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("MRCS_ECOVARS/zoop","./json/WMSDateCache/zoop_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("MRCS_ECOVARS/o2o","./json/WMSDateCache/o2o_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("MRCS_ECOVARS/si","./json/WMSDateCache/si_Dates.json",$wmsGetCapabilites),
+		new wmsDateCache("WECOP/Z5c","./json/WMSDateCache/Z5c_Dates.json",$wmsGetCapabilites)
+	);
+	foreach ($wmsDateCache as $cache) {
+		$cache->createCache();
+	}
 ?>
 
 <!-- Custom JavaScript -->
 <!-- OpenLayers Map Code-->
 <script type="text/javascript">
-
-	// Under development - experimenting with enablng specific dates for a layer
-	// Array of enabled days for the jQuery UI date picker - populate using json date cache
-	var enabledDays;
-	$.getJSON('./json/chl_Dates.json', function(data) {
-		enabledDays = data.date;
-	});
-	
-	// Helper function for enabling an array (from global variable enabledDays)
-	// of dates in a jQuery UI datepicker control with all others disabled
-	function enableAllTheseDays(date) {
-		var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
-		m++;
-		if (m<10) {m="0"+ m;}
-		if (d<10) {d="0"+ d;}
-		var uidate = y + '-' + m + '-' + d;
-		if($.inArray(uidate, enabledDays) != -1) {
-			return [true];
-		}
-		else {
-			return [false];
-		}
-	}
-
 	/*
 	  ====================================================================================*/
 	/*
 		Initialise javascript global variables and objects
 	*/
-	// Map variabes & objects
+	// The OpenLayers map object
 	var map;
-	var dates;
+	// Array of the current map controls - useful for jQuery<-->OpenLayers event hookup
 	var mapControls;
-	var layer;
+	// Currently selected layer
 	var selLayer;
+	// Array of ALL available date-times where data's available for the selected layer
+	// Populated using the json date caches when the current layer changes
+	var enabledDays = [];
+	// Available date-times for the selected layer in the current month of the datepicker
+	// Populated when the datepicker month changes by filetering the enabledDays array
+	var monthDateCache = [];
+
+	/*
+		Helper functions
+	*/
 	
+	// Function for enabling dates in the jQuery UI datepicker for the currently selected layer
+	// These dates are loaded into the enbaledDays array when the selected layer changes
+	function enableDays(date) {
+        var m = date.getMonth(), d = date.getDate(), y = date.getFullYear();
+        m++;
+        if(m < 10) { m = "0" + m; }
+        if(d < 10) { d = "0" + d; }
+        var uidate = y + '-' + m + '-' + d;
+        // Flter the datetime array to see if it matches the date using jQuery grep utility
+        var filtArray = $.grep(enabledDays, function(dt, i) {
+            var datePart = dt.substring(0, 10);
+            return (datePart == uidate);
+        });
+        // If the filtered array has members it has matched this day one or more times
+        if(filtArray.length > 0) {
+            return [true];
+        }
+        else {
+            return [false];
+        }
+	}
+		
+	// Function which handles selection of a new data layer and filters the date picker
+	function selectLayer(lyr){
+		selLayer=lyr;
+		if(selLayer.dateCache){
+			$.getJSON(selLayer.dateCache, function(data) {
+				enabledDays = data.date;
+				// DEBUG LINE
+				alert('Dates recalculated: ' + selLayer.name);				
+			});
+			// DEBUG LINE
+			alert('Active layer: ' + selLayer.name);
+		}
+		else{
+			// DEBUG LINE
+			alert('Non date dependent layer: ' + selLayer.name);
+			enabledDays = null;
+		}	
+	}
+	
+	// Function which creates a month-cache of date-times of data availablility
+	// for the current layer, based on a month and a year.
+	function createMonthDateCache(m,y){
+		// DEBUG line
+		alert('Caching for month=' + m + ' and year=' + y);
+	}
+
 	// Predefined map coordinate systems
 /*	var googp = new OpenLayers.Projection("EPSG:900913");*/
 	var lonlat = new OpenLayers.Projection("EPSG:4326");
@@ -111,8 +147,10 @@
 		})
 		
 		// Add a new property to the OpenLayers layer object to tell the UI which <ul>
-		// control ID in the layers panel to assign it to - defualts to operational layer
+		// control ID in the layers panel to assign it to - defaults to operational layer
 		OpenLayers.Layer.prototype.controlID = 'opLayers';
+		// Also add the date cache location for date dependent layers. Default is null.
+		OpenLayers.Layer.prototype.dateCache = null;
 
 		// Add GEBCO base layer
 		var gebco = new OpenLayers.Layer.WMS(
@@ -148,6 +186,7 @@
 			}		
 		);
 		map.addLayer(no3);
+		no3.dateCache = './json/WMSDateCache/no3_Dates.json';
 		no3.setVisibility(false);
 
 		// Add phosphate concentration layer
@@ -159,6 +198,7 @@
 			}		
 		);
 		map.addLayer(po4);
+		po4.dateCache = './json/WMSDateCache/po4_Dates.json';
 		po4.setVisibility(false);
 
 		// Add a chlorophyl layer
@@ -170,8 +210,8 @@
 			}		
 		);
 		map.addLayer(chl);
-		// show this layer by default
-		// chl.setVisibility(false);
+		chl.dateCache = './json/WMSDateCache/chl_Dates.json';
+		chl.setVisibility(false);
 
 		// Add a zooplankton layer
 		var zoo = new OpenLayers.Layer.WMS(
@@ -182,6 +222,7 @@
 			}		
 		);
 		map.addLayer(zoo);
+		zoo.dateCache = './json/WMSDateCache/zoop_Dates.json';
 		zoo.setVisibility(false);
 		
 		// Add a silicate concentration layer
@@ -193,6 +234,7 @@
 			}		
 		);
 		map.addLayer(si);
+		si.dateCache = './json/WMSDateCache/si_Dates.json';
 		si.setVisibility(false);
 		
 		// Add dissolved oxygen layer
@@ -203,7 +245,8 @@
 				transparent: true,
 			}		
 		);
-		map.addLayer(o2);		
+		map.addLayer(o2);
+		o2.dateCache = './json/WMSDateCache/o2o_Dates.json';
 		o2.setVisibility(false);
 		
 		// Add dissolved oxygen layer
@@ -212,23 +255,70 @@
 			'http://rsg.pml.ac.uk/ncWMS/wms?', {
 				layers: 'WECOP/Z5c',
 				transparent: true,
+				time: '2010-04-15T12:00:00.000Z'
 			}		
 		);
 		map.addLayer(uZoo);
+		uZoo.dateCache = './json/WMSDateCache/Z5c_Dates.json';
 		uZoo.setVisibility(false);			
 		
-		// Add AMT cruise track 19 as GML Formatted Vector layer
-		var cruiseTrack = new OpenLayers.Layer.Vector('AMT19 Cruise Track', {
-			protocol: new OpenLayers.Protocol.HTTP({
-				url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT19&outputFormat=GML2',
-				format: new OpenLayers.Format.GML()
-			}),
-			strategies: [new OpenLayers.Strategy.Fixed()],
-			projection: lonlat,
-		});
-		// Make this layer a reference layer
-		cruiseTrack.controlID = "refLayers";
-		map.addLayer(cruiseTrack);
+		// Add AMT cruise tracks 12-19 as GML Formatted Vector layer
+		for (i=12;i<=19;i++){
+			// skip AMT18 as it isn't available
+			if (i==18) continue;
+			// Style the AMT vector layers with different colours for each one
+			var AMT_style = new OpenLayers.Style({
+			'strokeColor': '${colour}'
+			},
+			{
+				context: {
+					colour: function(feature){
+						switch(feature.layer.name){
+							case 'AMT12 Cruise Track':
+								return 'blue';
+								break;
+							case 'AMT13 Cruise Track':
+								return 'aqua';
+								break;				
+							case 'AMT14 Cruise Track':
+								return 'lime';
+								break;
+							case 'AMT15 Cruise Track':
+								return 'magenta';
+								break;
+							case 'AMT16 Cruise Track':
+								return 'red';
+								break;
+							case 'AMT17 Cruise Track':
+								return 'orange';
+								break;
+							case 'AMT19 Cruise Track':
+								return 'yellow';
+								break;	
+						}
+					}
+				}
+			});
+		
+			// Create a style map object and set the 'default' and 'selected' intents
+			var AMT_style_map = new OpenLayers.StyleMap({
+				'default': AMT_style,
+			});
+
+			var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + ' Cruise Track', {
+				protocol: new OpenLayers.Protocol.HTTP({
+					url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
+					format: new OpenLayers.Format.GML()
+				}),
+				strategies: [new OpenLayers.Strategy.Fixed()],
+				projection: lonlat,
+				styleMap: AMT_style_map
+			});
+			// Make this layer a reference layer
+			cruiseTrack.controlID = "refLayers";
+			cruiseTrack.setVisibility(false);
+			map.addLayer(cruiseTrack);
+		}
 		
 		// Setup Black sea outline layer (Vector)
 		var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
@@ -260,9 +350,9 @@
 		// Need to render the jQuery UI info dialog before the map due to z-index issues!
 		$('#info').dialog({
 			position: ['left', 'bottom'],
-			width: 240,
-			height: 250,
-			resizable: false,
+			width: 230,
+			height: 220,
+			resizable: false
 		});
 		
 		// set up the map and render it
@@ -272,10 +362,10 @@
 		  Configure and generate the UI elements
 		*/
 		
-		// Map layers elements
-		for (i=0; i<map.layers.length; i++){
-			layer = map.layers[i];
-			var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
+		// Map layers elements - add in reverse order to ensure last added appear topmost in the UI
+		// as they are the topmost layers
+		for (i=(map.layers.length-1); i>=0; i--){
+			var layer = map.layers[i];
 						
 			// Add map base layers to the baseLayer drop-down list from the map
 			if (layer.isBaseLayer){
@@ -283,6 +373,7 @@
 			}
 			// if not a base layer, populate the layers panel (left slide panel)
 			else if (layer.displayInLayerSwitcher && !layer.isBaseLayer){
+				var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
 				$(selID).append('<li><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
 			}
 		}
@@ -293,12 +384,16 @@
 		}
 	
 		// jQuery UI elements
+		
+		// Datepicker - note the events beforeShowDay and onChangeMonthYear which help handle
+		// display of dates that have data for the currently active layer
 		$('#viewDate').datepicker({
 			showButtonPanel: true,
 			dateFormat: 'dd-mm-yy',
 			changeMonth: true,
 			changeYear: true,
-			beforeShowDay: enableAllTheseDays,
+			beforeShowDay: enableDays,
+			onChangeMonthYear: function(year, month, inst) {createMonthDateCache(month,year)},
 			onSelect: function(dateText, inst) {changeViewDate(dateText, inst)}
 		});
 		$('#panZoom').buttonset();
@@ -306,10 +401,13 @@
 		$('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
 		$('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
 		$("#dataTabs" ).tabs();
-		$("#ROI" ).accordion({ collapsible: true, autoHeight: false , icons: { 'header': 'ui-icon-circle-plus', 'headerSelected': 'ui-icon-circle-minus' }});
-		$("#analyses" ).accordion({ collapsible: true, autoHeight: false, icons: { 'header': 'ui-icon-circle-plus', 'headerSelected': 'ui-icon-circle-minus' } });
-		$("#spatial" ).accordion({ collapsible: true, autoHeight: false, icons: { 'header': 'ui-icon-plus', 'headerSelected': 'ui-icon-minus' } });
-		$("#temporal" ).accordion({ collapsible: true, autoHeight: false, icons: { 'header': 'ui-icon-plus', 'headerSelected': 'ui-icon-minus' } });
+		// Must bind the creation of accordions under the tabs in this way to avoid messing things up
+		$('#dataTabs').bind('tabshow', function(event, ui) {
+			$("#ROI" ).accordion({ collapsible: true, autoHeight: false });
+			$("#analyses" ).accordion({ collapsible: true, autoHeight: false });
+			$("#spatial" ).accordion({ collapsible: true, autoHeight: false });
+			$("#temporal" ).accordion({ collapsible: true, autoHeight: false });
+		});
 
 		// Custom-made jQuery interface elements: multi-accordion sections (<h3>)
 		// for data layers (in left panel) and data analysis (in right panel)
@@ -318,6 +416,7 @@
 		/*
 			Hook up the other events for the general UI
 		*/
+				
 		// Left slide panel show-hide functionality		
 		$(".triggerL").click(function (e) {
 			$(".lPanel").toggle("fast");
@@ -413,32 +512,17 @@
 			alert('Date ' + dateText + ' selected');
 		}
 		
-		// Function which handles selection of a new data layer and filters the date picker
-		function selectLayer(lyr){
-			layer==lyr;
-			if(layer.params['LAYERS']){
-				var layerID = layer.params['LAYERS'];
-				var dateCache = './json/' + layerID.split('/')[1] + '_Dates.json';
-				$.getJSON(dateCache, function(data) {
-					enabledDays = data.date;
-					// DEBUG LINE
-					alert('Dates recalculated: ' + layerID);				
-				});
-				// DEBUG LINE
-				alert('Active layer: ' + layerID);
-			}
-		}
-		
 		// Handle selection of visible layers
 		$('.lPanel li').click(function(e) {
 			var itm = $(this);
 			var child = itm.children('input').first();
-			$('.lPanel li').each(function(index) {
-				$(this).removeClass('selectedLayer');
-			});			
 			if(child.is(':checked')){
+				$('.lPanel li').each(function(index) {
+					$(this).removeClass('selectedLayer');
+				});	
 				itm.addClass('selectedLayer');
-				selectLayer(map.getLayersByName(child.val())[0]);
+				var layer = map.getLayersByName(child.val())[0];
+				selectLayer(layer);
 			}
 			else {
 				itm.removeClass('selectedLayer');				
@@ -448,7 +532,7 @@
 		// Toggle visibility of data layers
 		$('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
 			var v = $(this).val();
-			layer = map.getLayersByName(v)[0];
+			var layer = map.getLayersByName(v)[0];
 			if($(this).is(':checked')){
 				layer.setVisibility(true);
 			}
