@@ -74,27 +74,26 @@
 		var layer = this;
 		$.getJSON(cacheFile, function(data) {
 			layer.DTCache = data.date;
-			// DEBUG LINE
 			map.enabledDays = map.enabledDays.concat(layer.DTCache);
 			map.enabledDays = map.enabledDays.deDupe();
 			// DEBUG
-			console.debug('Global date cache now has ' + map.enabledDays.length + ' members.');
+			console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
 		});		
 	};
-	// Filter all map layers with date-time dependencies by date
+	
+	// Extend Map to allow filtering of all map layers with date-time dependencies by ISO8601 date
 	OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
 		var d = isoDate;
 		$.each(map.layers, function(index, value) {
 			var layer = value;
-			// Add map base layers to the baseLayer drop-down list from the map
-			if(layer.DTCache.length) {
+			if(layer.DTCache.length>0) {
 				layer.mergeNewParams({time: d});
 				// DEBUG
-				console.debug('Filtering: ' + layer.name + ' to date ' + d);
+				console.info('Filtering: ' + layer.name + ' to date ' + d);
 			}
 		});		
 	};
-
+	
     /*
     Helper functions
     */
