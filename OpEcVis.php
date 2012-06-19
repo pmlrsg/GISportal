@@ -45,28 +45,68 @@
     /*
     Initialise javascript global variables and objects
     */
+	var temp = [];
     // The OpenLayers map object
     var map;
     // Array of the current map controls - useful for jQuery<-->OpenLayers event hookup
     var mapControls;
-    // Currently selected layer
-    var selLayer;
-    // Array of ALL available date-times where data's available for the selected layer
-    // Populated using the json date caches when the current layer changes
-    var enabledDays = [];
+    // Array of ALL available date-times for all date-time layers where data's available
+    // The array is populated once all the date-time layers have loaded
+    OpenLayers.Map.prototype.enabledDays = [];
+	// Add a new property to the OpenLayers layer object to tell the UI which <ul>
+	// control ID in the layers panel to assign it to - defaults to operational layer
+	OpenLayers.Layer.prototype.controlID = 'opLayers';
+	// Holds cached date-times as array of ISO8601 strings for each layer based on data availability
+	OpenLayers.Layer.prototype.DTCache = [];
+	// Extension to JavaScript Arrays to de-duplicate them
+	Array.prototype.deDupe = function() {
+		var arr = this;
+		var i,
+		len=arr.length,
+		out=[],
+		obj={};
+		for (i=0;i<len;i++) { obj[arr[i]]=0; }
+		for (i in obj) { out.push(i); }
+		return out;
+	}
+	// Layer function to create it's date-time cache based on a JSON cacheFile	
+	OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
+		var layer = this;
+		$.getJSON(cacheFile, function(data) {
+			layer.DTCache = data.date;
+			// DEBUG LINE
+			map.enabledDays = map.enabledDays.concat(layer.DTCache);
+			map.enabledDays = map.enabledDays.deDupe();
+			// DEBUG
+			console.debug('Global date cache now has ' + map.enabledDays.length + ' members.');
+		});		
+	};
+	// Filter all map layers with date-time dependencies by date
+	OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
+		var d = isoDate;
+		$.each(map.layers, function(index, value) {
+			var layer = value;
+			// Add map base layers to the baseLayer drop-down list from the map
+			if(layer.DTCache.length) {
+				layer.mergeNewParams({time: d});
+				// DEBUG
+				console.debug('Filtering: ' + layer.name + ' to date ' + d);
+			}
+		});		
+	};
 
     /*
     Helper functions
     */
     // Function for enabling dates in the jQuery UI datepicker for the currently selected layer
     // These dates are loaded into the enbaledDays array when the selected layer changes
-    function enableDays(date) {
+    function allowedDays(date) {
         var m = date.getMonth() + 1, d = date.getDate(), y = date.getFullYear();
         if(m < 10) { m = '0' + m; }
         if(d < 10) { d = '0' + d; }
         var uidate = y + '-' + m + '-' + d;
         // Flter the datetime array to see if it matches the date using jQuery grep utility
-        var filtArray = $.grep(enabledDays, function(dt, i) {
+        var filtArray = $.grep(map.enabledDays, function(dt, i) {
             var datePart = dt.substring(0, 10);
             return (datePart == uidate);
         });
@@ -76,25 +116,6 @@
         }
         else {
             return [false];
-        }
-    }
-
-    // Function which handles selection of a new data layer and filters the date picker
-    function selectLayer(lyr) {
-        selLayer = lyr;
-        if(selLayer.dateCache) {
-            $.getJSON(selLayer.dateCache, function(data) {
-                enabledDays = data.date;
-                // DEBUG LINE
-                alert('Dates recalculated: ' + selLayer.name);
-            });
-            // DEBUG LINE
-            alert('Active layer: ' + selLayer.name);
-        }
-        else {
-            // DEBUG LINE
-            alert('Non date dependent layer: ' + selLayer.name);
-            enabledDays = null;
         }
     }
 
@@ -134,123 +155,100 @@
                 			    controls: []
                 			})
 
-        // Add a new property to the OpenLayers layer object to tell the UI which <ul>
-        // control ID in the layers panel to assign it to - defaults to operational layer
-        OpenLayers.Layer.prototype.controlID = 'opLayers';
-        // Also add the date cache location for date dependent layers. Default is null.
-        OpenLayers.Layer.prototype.dateCache = null;
-		// Holds cached date-times as array of ISO8601 strings for each layer based on data availability
-		OpenLayers.Layer.prototype.DTCache = [];
-
         // Add GEBCO base layer
         var gebco = new OpenLayers.Layer.WMS(
-                			"GEBCO",
-                			"http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
-                			{ layers: 'gebco_08_grid' }
-                		)
-        map.addLayer(gebco);
+			"GEBCO",
+			"http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
+			{ layers: 'gebco_08_grid' }
+		)
+		map.addLayer(gebco);
 
         // Add Cubewerx layer
         var cube = new OpenLayers.Layer.WMS(
-                			'CubeWerx',
-                			'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
-                			{ layers: 'Foundation.GTOPO30' }
-                		)
+			'CubeWerx',
+			'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
+			{ layers: 'Foundation.GTOPO30' }
+		)
         map.addLayer(cube);
 
         // Add NASA Landsat layer
         var landsat = new OpenLayers.Layer.WMS(
-                			'Landsat',
-                			'http://irs.gis-lab.info/?',
-                			{ layers: 'landsat' }
-                		)
+			'Landsat',
+			'http://irs.gis-lab.info/?',
+			{ layers: 'landsat' }
+		)
         map.addLayer(landsat);
 
         // Add nitrate concentration layer
         var no3 = new OpenLayers.Layer.WMS(
-                			'Nitrate Concentration',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/no3',
-                			    transparent: true,
-                			    visibility: false
-    }
-                		);
-        map.addLayer(no3);
-        no3.dateCache = './json/WMSDateCache/no3_Dates.json';
+			'Nitrate Concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/no3', transparent: true, visibility: false }
+		);
+		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
         no3.setVisibility(false);
+        map.addLayer(no3);
 
         // Add phosphate concentration layer
         var po4 = new OpenLayers.Layer.WMS(
-                			'Phosphate Concentration',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/po4',
-                			    transparent: true
-    }
-                		);
-        map.addLayer(po4);
-        po4.dateCache = './json/WMSDateCache/po4_Dates.json';
+			'Phosphate Concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/po4', transparent: true	}
+		);
+		po4.createDateCache('./json/WMSDateCache/po4_Dates.json');
         po4.setVisibility(false);
+        map.addLayer(po4);
 
         // Add a chlorophyl layer
         var chl = new OpenLayers.Layer.WMS(
-                			'Chlorophyl-a',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/chl',
-                			    transparent: true
-    }
-                		);
-        map.addLayer(chl);
-        chl.dateCache = './json/WMSDateCache/chl_Dates.json';
+			'Chlorophyl-a',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/chl', transparent: true	}
+		);
+        chl.createDateCache('./json/WMSDateCache/chl_Dates.json');
         chl.setVisibility(false);
+        map.addLayer(chl);
 
         // Add a zooplankton layer
         var zoo = new OpenLayers.Layer.WMS(
-                			'Zooplankton Biomass',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/zoop',
-                			    transparent: true
-    }
-                		);
-        map.addLayer(zoo);
-        zoo.dateCache = './json/WMSDateCache/zoop_Dates.json';
+			'Zooplankton Biomass',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/zoop', transparent: true }
+		);
+        zoo.createDateCache('./json/WMSDateCache/zoop_Dates.json');
         zoo.setVisibility(false);
+        map.addLayer(zoo);
 
         // Add a silicate concentration layer
         var si = new OpenLayers.Layer.WMS(
-                			'Silicate concentration',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/si',
-                			    transparent: true
-    }
-                		);
-        map.addLayer(si);
-        si.dateCache = './json/WMSDateCache/si_Dates.json';
+			'Silicate concentration',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/si', transparent: true }
+		);
+        si.createDateCache('./json/WMSDateCache/si_Dates.json');
         si.setVisibility(false);
+        map.addLayer(si);
 
         // Add dissolved oxygen layer
         var o2 = new OpenLayers.Layer.WMS(
-                			'Dissolved Oxygen',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'MRCS_ECOVARS/o2o',
-                			    transparent: true
-    }
-                		);
-        map.addLayer(o2);
-        o2.dateCache = './json/WMSDateCache/o2o_Dates.json';
+			'Dissolved Oxygen',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'MRCS_ECOVARS/o2o', transparent: true	}
+		);
+        o2.createDateCache('./json/WMSDateCache/o2o_Dates.json');
         o2.setVisibility(false);
+        map.addLayer(o2);
 
-        // Add dissolved oxygen layer
+        // Add micro-zooplankton oxygen layer
         var uZoo = new OpenLayers.Layer.WMS(
-                			'Micro-Zooplankton C',
-                			'http://rsg.pml.ac.uk/ncWMS/wms?', {
-                			    layers: 'WECOP/Z5c',
-                			    transparent: true
-                			}
-                		);
-        map.addLayer(uZoo);
-        uZoo.dateCache = './json/WMSDateCache/Z5c_Dates.json';
+			'Micro-Zooplankton C',
+			'http://rsg.pml.ac.uk/ncWMS/wms?',
+			{ layers: 'WECOP/Z5c', transparent: true }
+		);
+        uZoo.createDateCache('./json/WMSDateCache/Z5c_Dates.json');
         uZoo.setVisibility(false);
-
+        map.addLayer(uZoo);
+		
         // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
         for(i = 12; i <= 19; i++) {
             // skip AMT18 as it isn't available
@@ -290,9 +288,7 @@
                 			});
 
             // Create a style map object and set the 'default' and 'selected' intents
-            var AMT_style_map = new OpenLayers.StyleMap({
-                'default': AMT_style,
-    });
+            var AMT_style_map = new OpenLayers.StyleMap({ 'default': AMT_style });
 
                 var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + ' Cruise Track', {
                     protocol: new OpenLayers.Protocol.HTTP({
@@ -346,13 +342,14 @@
 
             // set up the map and render it
             mapInit();
-
+			
             /*
             Configure and generate the UI elements
             */
 
             // Map layers elements - add data layers in reverse order to ensure
-            // last added appear topmost in the UI as they are the topmost layers
+            // last added appear topmost in the UI as they are topmost in the layer stack
+			// also populate the dates of data availability for all data layers
             for(i = (map.layers.length - 1); i >= 0; i--) {
                 var layer = map.layers[i];
                 // if not a base layer, populate the layers panel (left slide panel)
@@ -362,13 +359,14 @@
                 }
             }
 
-            for(i = 0; i < map.layers.length; i++) {
-                var layer = map.layers[i];
+			// Populate the base layers drop down menu
+            $.each(map.layers, function(index, value) {
+                var layer = value;
                 // Add map base layers to the baseLayer drop-down list from the map
                 if(layer.isBaseLayer) {
                     $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
                 }
-            }
+			});
 
             // Populate Quick Regions from the quickRegions array
             for(i = 0; i < quickRegion.length; i++) {
@@ -384,7 +382,7 @@
                 dateFormat: 'dd-mm-yy',
                 changeMonth: true,
                 changeYear: true,
-                beforeShowDay: enableDays,
+                beforeShowDay: allowedDays,
                 onSelect: function(dateText, inst) { changeViewDate(dateText, inst) }
             });
             $('#panZoom').buttonset();
@@ -506,13 +504,11 @@
                 if(d < 10) { d = '0' + d; }
                 var uidate = y + '-' + m + '-' + d;
                 // Flter the datetime array to see if it matches the date using jQuery grep utility
-                var filtArray = $.grep(enabledDays, function(dt, i) {
+                var filtArray = $.grep(map.enabledDays, function(dt, i) {
                     var datePart = dt.substring(0, 10);
                     return (datePart == uidate);
                 });
-                // DEBUG line
-                alert(filtArray);
-				selLayer.mergeNewParams({time: filtArray[0]});
+				map.filterLayersByDate(filtArray[0]);
             }
 
             // Handle selection of visible layers
@@ -524,8 +520,6 @@
                         $(this).removeClass('selectedLayer');
                     });
                     itm.addClass('selectedLayer');
-                    var layer = map.getLayersByName(child.val())[0];
-                    selectLayer(layer);
                 }
                 else {
                     itm.removeClass('selectedLayer');
