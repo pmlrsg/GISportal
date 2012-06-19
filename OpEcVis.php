@@ -139,6 +139,8 @@
         OpenLayers.Layer.prototype.controlID = 'opLayers';
         // Also add the date cache location for date dependent layers. Default is null.
         OpenLayers.Layer.prototype.dateCache = null;
+		// Holds cached date-times as array of ISO8601 strings for each layer based on data availability
+		OpenLayers.Layer.prototype.DTCache = [];
 
         // Add GEBCO base layer
         var gebco = new OpenLayers.Layer.WMS(
@@ -510,6 +512,7 @@
                 });
                 // DEBUG line
                 alert(filtArray);
+				selLayer.mergeNewParams({time: filtArray[0]});
             }
 
             // Handle selection of visible layers
