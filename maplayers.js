@@ -1,0 +1,1 @@
+// OpenLayers Map object and map layers handling

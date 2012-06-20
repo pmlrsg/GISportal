@@ -45,11 +45,8 @@
     /*
     Initialise javascript global variables and objects
     */
-	var temp = [];
     // The OpenLayers map object
     var map;
-    // Array of the current map controls - useful for jQuery<-->OpenLayers event hookup
-    var mapControls;
     // Array of ALL available date-times for all date-time layers where data's available
     // The array is populated once all the date-time layers have loaded
     OpenLayers.Map.prototype.enabledDays = [];
@@ -69,19 +66,16 @@
 		for (i in obj) { out.push(i); }
 		return out;
 	}
-	// Layer function to create it's date-time cache based on a JSON cacheFile	
+	// Layer function to create it's date-time cache based on a JSON cacheFile
+	// This is an asynchronous AJAX load of the JSON data
 	OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
 		var layer = this;
 		$.getJSON(cacheFile, function(data) {
 			layer.DTCache = data.date;
-			map.enabledDays = map.enabledDays.concat(layer.DTCache);
-			map.enabledDays = map.enabledDays.deDupe();
-			// DEBUG
-			console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
 		});		
 	};
 	
-	// Extend Map to allow filtering of all map layers with date-time dependencies by ISO8601 date
+	// Extend Map object allowing filtering of all map layers with date-time dependencies by ISO8601 date
 	OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
 		var d = isoDate;
 		$.each(map.layers, function(index, value) {
@@ -452,7 +446,7 @@
             mouse-based OpenLayers controls for jQuery UI buttons
             */
             // Create  map controls identified by key values which can be activated and deactivated
-            mapControls = {
+			var mapControls = {
                 zoomIn: new OpenLayers.Control.ZoomBox(
                 				{ out: false, alwaysZoom: true }
                 			),
@@ -495,7 +489,6 @@
 
             // Function which handles change of view date and filters available date-times to this date
             function changeViewDate(dateText, inst) {
-                // DEBUG LINE
                 var d = inst.selectedDay;
                 var m = inst.selectedMonth + 1;
                 var y = inst.selectedYear;
@@ -535,6 +528,17 @@
                 else {
                     map.getLayersByName(v)[0].setVisibility(false);
                 }
+				// Update available dates now selections have changed
+				map.enabledDays = [];
+				$.each(map.layers, function(index, value) {
+					var layer = value;
+					if(layer.visibility && layer.DTCache.length>0) {
+						map.enabledDays = map.enabledDays.concat(layer.DTCache);
+						map.enabledDays = map.enabledDays.deDupe();
+					}
+				});
+				// DEBUG
+				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');	
             })
 
             // Change of base layer event handler
