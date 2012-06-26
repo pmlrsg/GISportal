@@ -16,6 +16,8 @@
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.21.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
+<script type="text/javascript" src="maplayers.js"></script>
+<script type="text/javascript" src="custom.js"></script>
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
 <?php
@@ -47,47 +49,8 @@
     */
     // The OpenLayers map object
     var map;
-    // Array of ALL available date-times for all date-time layers where data's available
-    // The array is populated once all the date-time layers have loaded
-    OpenLayers.Map.prototype.enabledDays = [];
-	// Add a new property to the OpenLayers layer object to tell the UI which <ul>
-	// control ID in the layers panel to assign it to - defaults to operational layer
-	OpenLayers.Layer.prototype.controlID = 'opLayers';
-	// Holds cached date-times as array of ISO8601 strings for each layer based on data availability
-	OpenLayers.Layer.prototype.DTCache = [];
-	// Extension to JavaScript Arrays to de-duplicate them
-	Array.prototype.deDupe = function() {
-		var arr = this;
-		var i,
-		len=arr.length,
-		out=[],
-		obj={};
-		for (i=0;i<len;i++) { obj[arr[i]]=0; }
-		for (i in obj) { out.push(i); }
-		return out;
-	}
-	// Layer function to create it's date-time cache based on a JSON cacheFile
-	// This is an asynchronous AJAX load of the JSON data
-	OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
-		var layer = this;
-		$.getJSON(cacheFile, function(data) {
-			layer.DTCache = data.date;
-		});		
-	};
-	
-	// Extend Map object allowing filtering of all map layers with date-time dependencies by ISO8601 date
-	OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
-		var d = isoDate;
-		$.each(map.layers, function(index, value) {
-			var layer = value;
-			if(layer.DTCache.length>0) {
-				layer.mergeNewParams({time: d});
-				// DEBUG
-				console.info('Filtering: ' + layer.name + ' to date ' + d);
-			}
-		});		
-	};
-	
+
+
     /*
     Helper functions
     */
