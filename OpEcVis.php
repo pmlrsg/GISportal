@@ -5,19 +5,27 @@
 <meta charset="utf-8">
 <title>OpEc GIS Portal (jQuery + jQuery UI)</title>
 <!-- Now for the styling -->
+<!-- jQuery UI theming CSS -->
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.21.custom.css" />
+<!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css">
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
+<!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <!-- JavaScript libraries -->
+<!-- Latest jQuery from jQuery.com -->
 <script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.js"></script>
+<!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.21.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
+<!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
+<!-- Custom functions and extensions to exisiting JavaScript objects -->
 <script type="text/javascript" src="custom.js"></script>
+
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
 <?php
@@ -49,31 +57,10 @@
     */
     // The OpenLayers map object
     var map;
-
-
+	
     /*
     Helper functions
     */
-    // Function for enabling dates in the jQuery UI datepicker for the currently selected layer
-    // These dates are loaded into the enbaledDays array when the selected layer changes
-    function allowedDays(date) {
-        var m = date.getMonth() + 1, d = date.getDate(), y = date.getFullYear();
-        if(m < 10) { m = '0' + m; }
-        if(d < 10) { d = '0' + d; }
-        var uidate = y + '-' + m + '-' + d;
-        // Flter the datetime array to see if it matches the date using jQuery grep utility
-        var filtArray = $.grep(map.enabledDays, function(dt, i) {
-            var datePart = dt.substring(0, 10);
-            return (datePart == uidate);
-        });
-        // If the filtered array has members it has matched this day one or more times
-        if(filtArray.length > 0) {
-            return [true];
-        }
-        else {
-            return [false];
-        }
-    }
 
     // Predefined map coordinate systems
     /*	var googp = new OpenLayers.Projection("EPSG:900913");*/
@@ -333,20 +320,24 @@
 
             // Datepicker - note the events beforeShowDay and onChangeMonthYear which help handle
             // display of dates that have data for the currently active layer
+			function dispDays(date){
+				
+			};
+
             $('#viewDate').datepicker({
                 showButtonPanel: true,
                 dateFormat: 'dd-mm-yy',
                 changeMonth: true,
                 changeYear: true,
-                beforeShowDay: allowedDays,
-                onSelect: function(dateText, inst) { changeViewDate(dateText, inst) }
+                beforeShowDay: function(date) {return map.allowedDays(date);},
+                onSelect: function(dateText, inst) { return map.changeViewDate(dateText, inst); }
             });
             $('#panZoom').buttonset();
             $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
             $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
             $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
             $("#dataTabs").tabs();
-            // Must bind the creation of accordions under the tabs in this way to avoid messing things up
+            // Must bind the creation of accordions under the tabs in this way to avoid messing up nested controls
             $('#dataTabs').bind('tabshow', function(event, ui) {
                 $("#ROI").accordion({ collapsible: true, autoHeight: false });
                 $("#analyses").accordion({ collapsible: true, autoHeight: false });
@@ -449,22 +440,6 @@
             // The click action will also fire the $('.iconBtn').click() method above
             // giving the initial set-up of mouse events and associated map controls
             $('#pan').click();
-
-            // Function which handles change of view date and filters available date-times to this date
-            function changeViewDate(dateText, inst) {
-                var d = inst.selectedDay;
-                var m = inst.selectedMonth + 1;
-                var y = inst.selectedYear;
-                if(m < 10) { m = '0' + m; }
-                if(d < 10) { d = '0' + d; }
-                var uidate = y + '-' + m + '-' + d;
-                // Flter the datetime array to see if it matches the date using jQuery grep utility
-                var filtArray = $.grep(map.enabledDays, function(dt, i) {
-                    var datePart = dt.substring(0, 10);
-                    return (datePart == uidate);
-                });
-				map.filterLayersByDate(filtArray[0]);
-            }
 
             // Handle selection of visible layers
             $('.lPanel li').click(function(e) {

@@ -20,7 +20,7 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
 	});		
 };
 
-// Extend Map object allowing filtering of all map layers with date-time dependencies by ISO8601 date
+// Map function to filter of all map layers with date-time dependencies to an ISO8601 format date
 OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
 	var themap = this;
 	var d = isoDate;
@@ -33,3 +33,41 @@ OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
 		}
 	});		
 };
+
+// Map function which returns availability (boolean) of data for the given date across all layers
+OpenLayers.Map.prototype.allowedDays = function(date) {
+	var themap = this;
+	var m = date.getMonth() + 1, d = date.getDate(), y = date.getFullYear();
+	if(m < 10) { m = '0' + m; }
+	if(d < 10) { d = '0' + d; }
+	var uidate = y + '-' + m + '-' + d;
+	// Flter the datetime array to see if it matches the date using jQuery grep utility
+	var filtArray = $.grep(themap.enabledDays, function(dt, i) {
+		var datePart = dt.substring(0, 10);
+		return (datePart == uidate);
+	});
+	// If the filtered array has members it has matched this day one or more times
+	if(filtArray.length > 0) {
+		return [true];
+	}
+	else {
+		return [false];
+	}
+}
+
+// Map function which handles change of view date and filters available date-times to this date
+OpenLayers.Map.prototype.changeViewDate = function(dateText, inst) {
+	var themap = this;
+	var d = inst.selectedDay;
+	var m = inst.selectedMonth + 1;
+	var y = inst.selectedYear;
+	if(m < 10) { m = '0' + m; }
+	if(d < 10) { d = '0' + d; }
+	var uidate = y + '-' + m + '-' + d;
+	// Flter the datetime array to see if it matches the date using jQuery grep utility
+	var filtArray = $.grep(themap.enabledDays, function(dt, i) {
+		var datePart = dt.substring(0, 10);
+		return (datePart == uidate);
+	});
+	themap.filterLayersByDate(filtArray[0]);
+}
