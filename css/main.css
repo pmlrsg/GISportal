@@ -315,3 +315,9 @@ a.active.triggerR {
 .olMapViewport {
 	z-index: 0;
 }
+
+/* Override some basic jQuery UI Styles */
+.ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
+.ui-widget .ui-widget { font-size: 0.9em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
+.ui-accordion .ui-accordion-content { padding: 0.3em;}
