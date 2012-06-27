@@ -21,15 +21,29 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
 };
 
 // Map function to filter of all map layers with date-time dependencies to an ISO8601 format date
-OpenLayers.Map.prototype.filterLayersByDate = function(isoDate){
+OpenLayers.Map.prototype.filterLayersByDate = function(isoDates){
 	var themap = this;
-	var d = isoDate;
+	var dates = isoDates;
 	$.each(themap.layers, function(index, value) {
+		var matchDate = false;
 		var layer = value;
-		if(layer.DTCache.length>0) {
-			layer.mergeNewParams({time: d});
-			// DEBUG
-			console.info('Filtering: ' + layer.name + ' to date ' + d);
+		if(layer.DTCache.length > 0){
+			$.each(dates, function(index, value) {
+				var d = value;
+				if($.inArray(d,layer.DTCache) > -1){
+					layer.mergeNewParams({time: d});
+					// DEBUG
+					console.info('Filtered: ' + layer.name + ' to date ' + d);	
+					matchDate = true;
+					layer.display(true);
+				}
+			});
+			// If the layer does not have data for any of the dates, do not display it
+			if (!matchDate){
+				layer.display(false);
+				// DEBUG
+				console.info('No date match for  ' + layer.name);	
+			}
 		}
 	});		
 };
@@ -69,5 +83,5 @@ OpenLayers.Map.prototype.changeViewDate = function(dateText, inst) {
 		var datePart = dt.substring(0, 10);
 		return (datePart == uidate);
 	});
-	themap.filterLayersByDate(filtArray[0]);
+	themap.filterLayersByDate(filtArray);
 }

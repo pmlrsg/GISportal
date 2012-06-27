@@ -126,7 +126,7 @@
         var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/no3', transparent: true, visibility: false }
+			{ layers: 'MRCS_ECOVARS/no3', transparent: true }
 		);
 		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
         no3.setVisibility(false);
@@ -464,7 +464,7 @@
                     layer.setVisibility(true);
                 }
                 else {
-                    map.getLayersByName(v)[0].setVisibility(false);
+                    layer.setVisibility(false);
                 }
 				// Update available dates now selections have changed
 				map.enabledDays = [];
@@ -475,6 +475,7 @@
 						map.enabledDays = map.enabledDays.deDupe();
 					}
 				});
+				// Re-filter the layers by date now the date cache has changed
 				// DEBUG
 				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');	
             })
