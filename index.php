@@ -13,6 +13,8 @@
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 <!-- JavaScript libraries -->
+<!-- Custom functions and extensions to exisiting JavaScript objects -->
+<script type="text/javascript" src="custom.js"></script>
 <!-- Latest jQuery from jQuery.com -->
 <script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.js"></script>
 <!-- The latest jQuery UI from jqueryui.com -->
@@ -23,8 +25,7 @@
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
-<!-- Custom functions and extensions to exisiting JavaScript objects -->
-<script type="text/javascript" src="custom.js"></script>
+
 
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
@@ -126,77 +127,84 @@
         var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/no3', transparent: true, time: '0000-00-00T00:00:00.000Z' }
+			{ layers: 'MRCS_ECOVARS/no3', transparent: true }
 		);
 		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
         no3.setVisibility(false);
 		no3.temporal = true;
+		no3.selected = false;
         map.addLayer(no3);
 
         // Add phosphate concentration layer
         var po4 = new OpenLayers.Layer.WMS(
 			'Phosphate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/po4', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
+			{ layers: 'MRCS_ECOVARS/po4', transparent: true	}
 		);
 		po4.createDateCache('./json/WMSDateCache/po4_Dates.json');
         po4.setVisibility(false);
 		po4.temporal = true;
+		po4.selected = false;
         map.addLayer(po4);
 
         // Add a chlorophyl layer
         var chl = new OpenLayers.Layer.WMS(
 			'Chlorophyl-a',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/chl', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
+			{ layers: 'MRCS_ECOVARS/chl', transparent: true	}
 		);
         chl.createDateCache('./json/WMSDateCache/chl_Dates.json');
         chl.setVisibility(false);
 		chl.temporal = true;
+		chl.selected = false;
         map.addLayer(chl);
 
         // Add a zooplankton layer
         var zoo = new OpenLayers.Layer.WMS(
 			'Zooplankton Biomass',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/zoop', transparent: true, time: '0000-00-00T00:00:00.000Z' }
+			{ layers: 'MRCS_ECOVARS/zoop', transparent: true }
 		);
         zoo.createDateCache('./json/WMSDateCache/zoop_Dates.json');
         zoo.setVisibility(false);
 		zoo.temporal = true;
+		zoo.selected = false;
         map.addLayer(zoo);
 
         // Add a silicate concentration layer
         var si = new OpenLayers.Layer.WMS(
 			'Silicate concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/si', transparent: true, time: '0000-00-00T00:00:00.000Z' }
+			{ layers: 'MRCS_ECOVARS/si', transparent: true }
 		);
         si.createDateCache('./json/WMSDateCache/si_Dates.json');
         si.setVisibility(false);
 		si.temporal = true;
+		si.selected = false;
         map.addLayer(si);
 
         // Add dissolved oxygen layer
         var o2 = new OpenLayers.Layer.WMS(
 			'Dissolved Oxygen',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/o2o', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
+			{ layers: 'MRCS_ECOVARS/o2o', transparent: true	}
 		);
         o2.createDateCache('./json/WMSDateCache/o2o_Dates.json');
         o2.setVisibility(false);
-		o2.temporal = true;       
+		o2.temporal = true; 
+		o2.selected = false;      
 	    map.addLayer(o2);
 
         // Add micro-zooplankton oxygen layer
         var uZoo = new OpenLayers.Layer.WMS(
 			'Micro-Zooplankton C',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'WECOP/Z5c', transparent: true, time: '0000-00-00T00:00:00.000Z' }
+			{ layers: 'WECOP/Z5c', transparent: true }
 		);
         uZoo.createDateCache('./json/WMSDateCache/Z5c_Dates.json');
         uZoo.setVisibility(false);
 		uZoo.temporal = true;
+		uZoo.selected = false;
         map.addLayer(uZoo);
 		
         // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
@@ -337,7 +345,7 @@
                 changeMonth: true,
                 changeYear: true,
                 beforeShowDay: function(date) {return map.allowedDays(date);},
-                onSelect: function(dateText, inst) { return map.changeViewDate(dateText, inst); }
+                onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
             });
             $('#panZoom').buttonset();
             $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
@@ -468,20 +476,22 @@
                 var v = $(this).val();
                 var layer = map.getLayersByName(v)[0];
                 if($(this).is(':checked')) {
-                    layer.setVisibility(true);
+					layer.selected = true;
+					map.selectLayer(layer, $('#viewDate').datepicker('getDate'));
                 }
                 else {
+					layer.selected = false;
                     layer.setVisibility(false);
                 }
 				// Update available dates now selections have changed
 				map.enabledDays = [];
 				$.each(map.layers, function(index, value) {
 					var layer = value;
-					if(layer.visibility && layer.temporal) {
+					if(layer.selected && layer.temporal) {
 						map.enabledDays = map.enabledDays.concat(layer.DTCache);
-						map.enabledDays = map.enabledDays.deDupe();
 					}
 				});
+				map.enabledDays = map.enabledDays.deDupe();
 				// Re-filter the layers by date now the date cache has changed
 				// DEBUG
 				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
