@@ -4,6 +4,9 @@
 // The array is populated once all the date-time layers have loaded
 OpenLayers.Map.prototype.enabledDays = [];
 
+// Is the layer selected for display in the GUI
+OpenLayers.Layer.prototype.selected = false;
+
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
 OpenLayers.Layer.prototype.controlID = 'opLayers';
@@ -25,9 +28,9 @@ OpenLayers.Map.prototype.filterLayersByDate = function(isoDates){
 	var themap = this;
 	var dates = isoDates;
 	$.each(themap.layers, function(index, value) {
-		var matchDate = false;
 		var layer = value;
-		if(layer.DTCache.length > 0){
+		if(layer.DTCache.length > 0 && layer.selected){
+			var dummyDate = '0000-00-00T00:00:00.000Z';
 			$.each(dates, function(index, value) {
 				var d = value;
 				if($.inArray(d,layer.DTCache) > -1){
@@ -35,15 +38,17 @@ OpenLayers.Map.prototype.filterLayersByDate = function(isoDates){
 					// DEBUG
 					console.info('Filtered: ' + layer.name + ' to date ' + d);	
 					matchDate = true;
-					layer.display(true);
+					layer.setVisibility(true);
+					// DEBUG
+					console.info('Drawing: ' + layer.name);
+				}
+				// If the layer does not have data for any of the dates, do not display it
+				else {
+					layer.setVisibility(false);
+					// DEBUG
+					console.info('No date match for  ' + layer.name);						
 				}
 			});
-			// If the layer does not have data for any of the dates, do not display it
-			if (!matchDate){
-				layer.display(false);
-				// DEBUG
-				console.info('No date match for  ' + layer.name);	
-			}
 		}
 	});		
 };
@@ -78,7 +83,7 @@ OpenLayers.Map.prototype.changeViewDate = function(dateText, inst) {
 	if(m < 10) { m = '0' + m; }
 	if(d < 10) { d = '0' + d; }
 	var uidate = y + '-' + m + '-' + d;
-	// Flter the datetime array to see if it matches the date using jQuery grep utility
+	// Filter the datetime array to see if it matches the date using jQuery grep utility
 	var filtArray = $.grep(themap.enabledDays, function(dt, i) {
 		var datePart = dt.substring(0, 10);
 		return (datePart == uidate);

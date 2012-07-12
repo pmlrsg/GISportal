@@ -82,7 +82,7 @@
     // Define a proxy for the map to allow async javascript http protocol requests
     // This will always need changing when swapping between Windows and Linux
     //OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";	// Windows only using ASP.NET (C#) handler
-    OpenLayers.ProxyHost = "proxy.php?url="; // Linux or Windows using php proxy script
+    OpenLayers.ProxyHost = "Proxy.php?url="; // Linux or Windows using php proxy script
     //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';	// Linux using OpenLayers proxy
     /*
     ====================================================================================*/
@@ -461,23 +461,25 @@
                 var v = $(this).val();
                 var layer = map.getLayersByName(v)[0];
                 if($(this).is(':checked')) {
+					layer.selected = true;
                     layer.setVisibility(true);
                 }
                 else {
+					layer.selected = false;
                     layer.setVisibility(false);
                 }
 				// Update available dates now selections have changed
 				map.enabledDays = [];
 				$.each(map.layers, function(index, value) {
 					var layer = value;
-					if(layer.visibility && layer.DTCache.length>0) {
+					if(layer.selected && layer.DTCache.length>0) {
 						map.enabledDays = map.enabledDays.concat(layer.DTCache);
 						map.enabledDays = map.enabledDays.deDupe();
 					}
 				});
 				// Re-filter the layers by date now the date cache has changed
 				// DEBUG
-				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');	
+				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
             })
 
             // Change of base layer event handler
