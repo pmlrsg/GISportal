@@ -126,70 +126,77 @@
         var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/no3', transparent: true }
+			{ layers: 'MRCS_ECOVARS/no3', transparent: true, time: '0000-00-00T00:00:00.000Z' }
 		);
 		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
         no3.setVisibility(false);
+		no3.temporal = true;
         map.addLayer(no3);
 
         // Add phosphate concentration layer
         var po4 = new OpenLayers.Layer.WMS(
 			'Phosphate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/po4', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/po4', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
 		);
 		po4.createDateCache('./json/WMSDateCache/po4_Dates.json');
         po4.setVisibility(false);
+		po4.temporal = true;
         map.addLayer(po4);
 
         // Add a chlorophyl layer
         var chl = new OpenLayers.Layer.WMS(
 			'Chlorophyl-a',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/chl', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/chl', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
 		);
         chl.createDateCache('./json/WMSDateCache/chl_Dates.json');
         chl.setVisibility(false);
+		chl.temporal = true;
         map.addLayer(chl);
 
         // Add a zooplankton layer
         var zoo = new OpenLayers.Layer.WMS(
 			'Zooplankton Biomass',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/zoop', transparent: true }
+			{ layers: 'MRCS_ECOVARS/zoop', transparent: true, time: '0000-00-00T00:00:00.000Z' }
 		);
         zoo.createDateCache('./json/WMSDateCache/zoop_Dates.json');
         zoo.setVisibility(false);
+		zoo.temporal = true;
         map.addLayer(zoo);
 
         // Add a silicate concentration layer
         var si = new OpenLayers.Layer.WMS(
 			'Silicate concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/si', transparent: true }
+			{ layers: 'MRCS_ECOVARS/si', transparent: true, time: '0000-00-00T00:00:00.000Z' }
 		);
         si.createDateCache('./json/WMSDateCache/si_Dates.json');
         si.setVisibility(false);
+		si.temporal = true;
         map.addLayer(si);
 
         // Add dissolved oxygen layer
         var o2 = new OpenLayers.Layer.WMS(
 			'Dissolved Oxygen',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/o2o', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/o2o', transparent: true, time: '0000-00-00T00:00:00.000Z'	}
 		);
         o2.createDateCache('./json/WMSDateCache/o2o_Dates.json');
         o2.setVisibility(false);
-        map.addLayer(o2);
+		o2.temporal = true;       
+	    map.addLayer(o2);
 
         // Add micro-zooplankton oxygen layer
         var uZoo = new OpenLayers.Layer.WMS(
 			'Micro-Zooplankton C',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'WECOP/Z5c', transparent: true }
+			{ layers: 'WECOP/Z5c', transparent: true, time: '0000-00-00T00:00:00.000Z' }
 		);
         uZoo.createDateCache('./json/WMSDateCache/Z5c_Dates.json');
         uZoo.setVisibility(false);
+		uZoo.temporal = true;
         map.addLayer(uZoo);
 		
         // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
@@ -461,18 +468,16 @@
                 var v = $(this).val();
                 var layer = map.getLayersByName(v)[0];
                 if($(this).is(':checked')) {
-					layer.selected = true;
                     layer.setVisibility(true);
                 }
                 else {
-					layer.selected = false;
                     layer.setVisibility(false);
                 }
 				// Update available dates now selections have changed
 				map.enabledDays = [];
 				$.each(map.layers, function(index, value) {
 					var layer = value;
-					if(layer.selected && layer.DTCache.length>0) {
+					if(layer.visibility && layer.temporal) {
 						map.enabledDays = map.enabledDays.concat(layer.DTCache);
 						map.enabledDays = map.enabledDays.deDupe();
 					}
