@@ -279,6 +279,11 @@
             blackSea.controlID = "refLayers";
 			blackSea.selected = true;
             map.addLayer(blackSea);
+			
+			// Add a couple of useful map controls
+			var mousePos = new OpenLayers.Control.MousePosition();
+            var permalink =  new OpenLayers.Control.Permalink();
+			map.addControls([mousePos,permalink]);
 
             if(!map.getCenter()) {
                 map.zoomTo(3)
@@ -417,8 +422,6 @@
                 				{ out: true, alwaysZoom: true }
                 			),
                 pan: new OpenLayers.Control.Navigation(),
-                mousePos: new OpenLayers.Control.MousePosition(),
-                permalink: new OpenLayers.Control.Permalink()
             };
             // Add the controls to the map
             var control;
@@ -471,24 +474,23 @@
                 var layer = map.getLayersByName(v)[0];
                 if($(this).is(':checked')) {
 					layer.selected = true;
-					map.selectLayer(layer, $('#viewDate').datepicker('getDate'));
+					// If the layer has date-time data, use special select routine
+					// that checks for valid data on the current date to decide if to show data
+					if(layer.temporal){
+						map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
+						// Update map date cache now a new temporal layer has been added
+						map.refreshDateCache();
+					}
+					else{
+						layer.setVisibility(true);
+					}
                 }
                 else {
 					layer.selected = false;
                     layer.setVisibility(false);
+					// Update map date cache now a new temporal layer has been removed
+					if(layer.temporal){map.refreshDateCache();}
                 }
-				// Update available dates now selections have changed
-				map.enabledDays = [];
-				$.each(map.layers, function(index, value) {
-					var layer = value;
-					if(layer.selected && layer.temporal) {
-						map.enabledDays = map.enabledDays.concat(layer.DTCache);
-					}
-				});
-				map.enabledDays = map.enabledDays.deDupe();
-				// Re-filter the layers by date now the date cache has changed
-				// DEBUG
-				console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
             })
 
             // Change of base layer event handler

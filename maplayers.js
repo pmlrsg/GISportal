@@ -43,50 +43,17 @@ OpenLayers.Layer.prototype.matchDate = function (thedate){
 	}
 }
 
-/*// Map function to filter of all map layers with date-time dependencies to an ISO8601 format date
-OpenLayers.Map.prototype.filterLayersByDate = function(isoDates){
-	var themap = this;
-	var dates = isoDates;
-	$.each(themap.layers, function(index, value) {
-		var layer = value;
-		var display = false;
-		if(layer.temporal){
-			$.each(dates, function(index, value) {
-				var d = value;
-				// If we get a match, filter the layer to the exact date-time
-				if($.inArray(d,layer.DTCache) > -1){
-					layer.mergeNewParams({time: d});
-					display = true;
-					layer.setVisibility(layer.selected)
-					// DEBUG
-					console.info('Layer ' + layer.name + ' data available for date-time ' + d + '. Displaying layer: ' + layer.selected);
-				}
-			});
-		}
-	});		
-};*/
-
-// Map function to filter of all map layers with date-time dependencies to an yyyy-mm-dd format date
-OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
-	var themap = this;
-	var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
-	$.each(themap.layers, function(index, value) {
-		var layer = value;
-		themap.selectLayer(value, thedate);
-	});		
-};
-
-// Select the given layer on the Map method based on JavaScript date input 
-OpenLayers.Map.prototype.selectLayer = function(lyr, thedate){
+// Select the given temporal layer on the Map based on JavaScript date input 
+OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
 	var layer = lyr;
-	if(layer.temporal && thedate){
+	if(thedate){
 		var uidate = ISODateString(thedate);
 		var mDate = layer.matchDate(uidate);
 		if(mDate){
 			layer.mergeNewParams({time: mDate});
 			layer.setVisibility(layer.selected);
 			// DEBUG
-			console.info('Layer ' + layer.name + ' data available for date-time ' + mDate + '. Displaying layer: ' + layer.selected);
+			console.info('Layer ' + layer.name + ' data available for date-time ' + mDate + '. Layer selection and display: ' + layer.selected);
 		}
 		else{
 			layer.setVisibility(false);
@@ -94,12 +61,39 @@ OpenLayers.Map.prototype.selectLayer = function(lyr, thedate){
 			console.info('Layer ' + layer.name + ' no data available for date-time ' + mDate + '. Not displaying layer.');
 		}
 	}
-	else if(!layer.temporal && !layer.isBaseLayer){
-		layer.setVisibility(layer.selected);
-	}
 };
 
+// Map function to filter of layers with date-time dependencies to an yyyy-mm-dd format date
+OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
+	var themap = this;
+	var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
+	$.each(themap.layers, function(index, value) {
+		var layer = value;
+		// Only filter date-dependent layers
+		if (layer.temporal){
+			themap.selectDateTimeLayer(value, thedate);
+		}
+	});		
+};
+
+// Map function to re-generate the global date cache for selected layers
+OpenLayers.Map.prototype.refreshDateCache = function(){
+	var map = this;
+	map.enabledDays = [];
+	$.each(map.layers, function(index, value) {
+		var layer = value;
+		if(layer.selected && layer.temporal) {
+			map.enabledDays = map.enabledDays.concat(layer.DTCache);
+		}
+	});
+	map.enabledDays = map.enabledDays.deDupe();
+	// Re-filter the layers by date now the date cache has changed
+	// DEBUG
+	console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
+}
+
 // Map function which returns availability (boolean) of data for the given JavaScript date across all layers
+// using the map object's global date cache. Used in conjunction with the jQuery UI datepicker control
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
 	var themap = this;
 	var uidate = ISODateString(thedate);
@@ -116,20 +110,3 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
 		return [false];
 	}
 }
-
-/*// Map function which handles change of view date and filters available date-times to this date
-OpenLayers.Map.prototype.changeViewDate = function(dateText, inst) {
-	var themap = this;
-	var d = inst.selectedDay;
-	var m = inst.selectedMonth + 1;
-	var y = inst.selectedYear;
-	if(m < 10) { m = '0' + m; }
-	if(d < 10) { d = '0' + d; }
-	var uidate = y + '-' + m + '-' + d;
-	// Filter the datetime array to see if it matches the date using jQuery grep utility
-	var filtArray = $.grep(themap.enabledDays, function(dt, i) {
-		var datePart = dt.substring(0, 10);
-		return (datePart == uidate);
-	});
-	themap.filterLayersByDate(filtArray);
-}*/
