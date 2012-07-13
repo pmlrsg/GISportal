@@ -94,6 +94,9 @@ OpenLayers.Map.prototype.selectLayer = function(lyr, thedate){
 			console.info('Layer ' + layer.name + ' no data available for date-time ' + mDate + '. Not displaying layer.');
 		}
 	}
+	else if(!layer.temporal && !layer.isBaseLayer){
+		layer.setVisibility(layer.selected);
+	}
 };
 
 // Map function which returns availability (boolean) of data for the given JavaScript date across all layers

@@ -277,6 +277,7 @@
             })
             // Make this layer a reference layer
             blackSea.controlID = "refLayers";
+			blackSea.selected = true;
             map.addLayer(blackSea);
 
             if(!map.getCenter()) {
@@ -332,14 +333,7 @@
             }
 
             // jQuery UI elements
-
-            // Datepicker - note the events beforeShowDay and onChangeMonthYear which help handle
-            // display of dates that have data for the currently active layer
-			function dispDays(date){
-				
-			};
-
-            $('#viewDate').datepicker({
+	   		$('#viewDate').datepicker({
                 showButtonPanel: true,
                 dateFormat: 'dd-mm-yy',
                 changeMonth: true,
