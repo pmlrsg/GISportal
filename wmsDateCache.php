@@ -40,7 +40,8 @@ class wmsDateCache{
 		$layer,
 		$cacheFile="./json/WMSDateCache/WMSDateCache.json",
 		$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0",
-		$cacheLife=86400
+		$cacheLife=60
+		//$cacheLife=86400
 	){
 		$this->layer = $layer;
 		$this->cacheFile = $cacheFile;
@@ -52,7 +53,7 @@ class wmsDateCache{
 		// Proceed to create the JSON cache file
 		if (!file_exists($this->cacheFile) or (time() - filemtime($this->cacheFile) >= $this->cacheLife) ){
 			$xml = new ParseXml();
-			$xml->LoadRemote($this->wmsURL,$timeout=5); 
+			$xml->LoadRemote($this->wmsURL,$timeout=60); 
 			//$dataArray = $xml->ToArray(); 
 			//note text() at the end doesnt work
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class
