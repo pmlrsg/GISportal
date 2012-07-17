@@ -83,7 +83,7 @@
     // Define a proxy for the map to allow async javascript http protocol requests
     // This will always need changing when swapping between Windows and Linux
     //OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";	// Windows only using ASP.NET (C#) handler
-    OpenLayers.ProxyHost = "Proxy.php?url="; // Linux or Windows using php proxy script
+    OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
     //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';	// Linux using OpenLayers proxy
     /*
     ====================================================================================*/

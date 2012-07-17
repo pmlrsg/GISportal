@@ -6,6 +6,9 @@
 // $cacheLife=60*60*24 = 86400 as default - caching time in seconds,1 day cache
 
 require './ParseXml.class.php';
+// In case the PHP version is less than PHP 5.2x, we need to load a JSON wrapper
+// to give us the json_encode functionality
+require './jsonwrapper.php';
 
 // Helper function
 function array_searchRecursive( $needle, $haystack, $strict=false, $path=array() )
