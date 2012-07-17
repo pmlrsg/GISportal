@@ -44,6 +44,7 @@
 		new wmsDateCache("WECOP/Z5c","./json/WMSDateCache/Z5c_Dates.json",$wmsGetCapabilites)
 	);
 	foreach ($wmsDateCache as $cache) {
+		//echo(method_exists($cache,"createCache"));
 		$cache->createCache();
 	}
 ?>

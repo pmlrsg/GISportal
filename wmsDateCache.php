@@ -53,7 +53,7 @@ class wmsDateCache{
 		if (!file_exists($this->cacheFile) or (time() - filemtime($this->cacheFile) >= $this->cacheLife) ){
 			$xml = new ParseXml();
 			$xml->LoadRemote($this->wmsURL,$timeout=5); 
-			#$dataArray = $xml->ToArray(); 
+			//$dataArray = $xml->ToArray(); 
 			//note text() at the end doesnt work
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class
 			$simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension[@name='time']/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
