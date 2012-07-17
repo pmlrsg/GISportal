@@ -45,7 +45,7 @@
 	 * @param string $url URL of xml document.
 	 * @param int $timeout timeout  default:60s
 	 */
-	function LoadRemote ($url, $timeout=30) {
+	function LoadRemote ($url, $timeout=60) {
 		$this->xmlFile = $url;
 		$p=parse_url($url);
 		if($p['scheme']=='http'){
