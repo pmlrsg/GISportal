@@ -109,9 +109,7 @@
 			$this->Parse();
 		}
 		foreach ($namespaces as $key => $value){$this->obj->registerXPathNamespace($key, $value);}
-		return $this->obj->xpath($str);
-		
-		
+		return $this->obj->xpath($str);		
 	}
 	
 	/**
