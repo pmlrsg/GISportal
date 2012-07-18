@@ -54,6 +54,8 @@ class wmsDateCache{
 		if (!file_exists($this->cacheFile) or (time() - filemtime($this->cacheFile) >= $this->cacheLife) ){
 			$xml = new ParseXml();
 			$xml->LoadRemote($this->wmsURL,$timeout=30); 
+			// DEBUG
+			echo("Returned XML string has length ".strlen($xml->GetXmlStr())." characters<br />");
 			//$dataArray = $xml->ToArray(); 
 			//note text() at the end doesnt work
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class
@@ -69,7 +71,7 @@ class wmsDateCache{
 			echo("Time dimension array has ".count($timeDimensionArray)." members<br />");
 			$jsonArr=json_encode($timeDimensionArray);
 			//DEBUG
-			echo("The serialised JSON data array has a character count of ".strlen($jsonArr)."<br />");
+			echo("The serialised JSON data array has a character count of ".strlen($jsonArr)."<br /><hr />");
 			$outStr='{"date":'.$jsonArr.'}'; //atention to ' and " otherwise JSON is not valid
 			fwrite($fh,$outStr);
 			fclose($fh);
