@@ -173,12 +173,8 @@
 			fclose($fp);
 			
 			if ($info['timed_out']) {
-				//DEBUG
-				echo("Read XML async timed out...<br />");
 				return false;    	
 			}else{
-				//DEBUG
-				echo("XML has ".(strlen($res))." characters<br />");
 				return substr(strstr($res, "\r\n\r\n"),4);
 			}
 		}

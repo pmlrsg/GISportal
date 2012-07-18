@@ -32,7 +32,9 @@
 <?php
 	// PHP DEBUG SETTINGS
 	error_reporting(E_ALL);
-	ini_set('display_errors', '1');
+	ini_set('display_errors', '1');	
+	require_once('FirePHPCore/fb.php');
+	ob_start();
 
 	require('wmsDateCache.php');
 	// Ensure you put all the data layers in here that have date-ranged data
