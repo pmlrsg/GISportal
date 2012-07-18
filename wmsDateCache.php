@@ -59,12 +59,17 @@ class wmsDateCache{
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class
 			$simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension[@name='time']/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
 			// $simpleXMLResult=$xml->doXPath("//wms:Layer[wms:Name/text()='".$this->layer."']/wms:Dimension/text()",$namespaces=array('wms'=>'http://www.opengis.net/wms'));
-			
+			//DEBUG
+			echo("Got the XML time dimension with a character count of ".strlen($simpleXMLResult[0][0])."<br />");			
 			$timeDimension=trim($simpleXMLResult[0][0]);
 			
 			$timeDimensionArray=explode(",",$timeDimension);
 			$fh=fopen($this->cacheFile,"w") or die("can't open file");
+			//DEBUG
+			echo("Time dimension array has ".count($timeDimensionArray)." members<br />");
 			$jsonArr=json_encode($timeDimensionArray);
+			//DEBUG
+			echo("The serialised JSON data array has a character count of ".strlen($jsonArr)."<br />");
 			$outStr='{"date":'.$jsonArr.'}'; //atention to ' and " otherwise JSON is not valid
 			fwrite($fh,$outStr);
 			fclose($fh);
