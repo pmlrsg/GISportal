@@ -53,7 +53,7 @@ class wmsDateCache{
 		// Proceed to create the JSON cache file
 		if (!file_exists($this->cacheFile) or (time() - filemtime($this->cacheFile) >= $this->cacheLife) ){
 			$xml = new ParseXml();
-			$xml->LoadRemote($this->wmsURL,$timeout=60); 
+			$xml->LoadRemote($this->wmsURL,$timeout=30); 
 			//$dataArray = $xml->ToArray(); 
 			//note text() at the end doesnt work
 			//ATTENTION: WMS NAMESPACE REGISTED IN LINE 106 of ParseXML.class

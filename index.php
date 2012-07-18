@@ -30,6 +30,10 @@
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
 <?php
+	// PHP DEBUG SETTINGS
+	error_reporting(E_ALL);
+	ini_set('display_errors', '1');
+
 	require('wmsDateCache.php');
 	// Ensure you put all the data layers in here that have date-ranged data
 	$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
