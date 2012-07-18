@@ -36,7 +36,7 @@
 	require_once('FirePHPCore/fb.php');
 	ob_start();
 
-	require('wmsDateCache.php');
+	require('wmsDateCache.class.php');
 	// Ensure you put all the data layers in here that have date-ranged data
 	$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
 	$wmsGetCapabilites = $wmsURL."SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
