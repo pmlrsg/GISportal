@@ -95,21 +95,17 @@
 	 * &#35299;&#26512;xml
 	 */
 	function Parse () {
-		// DEBUG
-		fb("*PHP* XML string has length ".strlen($this->xmlStr)." characters", FirePHP::INFO);
-		
 		$this->obj = simplexml_load_string($this->xmlStr);
-		
-		// DEBUG
-		fb("*PHP* XML string after simplexml_load_string is ".strlen($this->obj), FirePHP::INFO);
 	}
 	
 	function doXPath($str,$namespaces){
 		if(empty($this->obj)){
 			$this->Parse();
 		}
-		foreach ($namespaces as $key => $value){$this->obj->registerXPathNamespace($key, $value);}
-		return $this->obj->xpath($str);		
+		foreach ($namespaces as $key => $value){
+			$this->obj->registerXPathNamespace($key, $value);
+		}		
+		return $this->obj->xpath($str);
 	}
 	
 	/**
