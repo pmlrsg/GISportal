@@ -165,7 +165,6 @@
 		if (!$fp) {
 			return false;		
 		}else{
-			echo("Socket opened to get XML..."); 
 			fwrite($fp, "GET $pos HTTP/1.0\r\n");
 			fwrite($fp, "Host: $site\r\n\r\n");
 			stream_set_timeout($fp, $timeout);
