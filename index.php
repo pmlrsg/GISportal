@@ -9,6 +9,8 @@
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.21.custom.css" />
 <!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css">
+<!-- Context Menu styling -->
+<Link rel="stylesheet" type="text/css" href="js-libs/jquery-contextMenu/css/jquery-contextMenu.css">
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -25,7 +27,6 @@
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
-
 
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
@@ -284,7 +285,7 @@
             })
             // Make this layer a reference layer
             blackSea.controlID = "refLayers";
-			blackSea.selected = true;
+			   blackSea.selected = true;
             map.addLayer(blackSea);
 			
 			// Add a couple of useful map controls
@@ -326,9 +327,19 @@
                 // if not a base layer, populate the layers panel (left slide panel)
                 if(layer.displayInLayerSwitcher && !layer.isBaseLayer) {
                     var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
-                    $(selID).append('<li><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
+                    $(selID).append('<li id="' + layer.name + '"><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
                 }
             }
+            
+            $("#opLayers").sortable({
+               update: function() {
+                  var order = $("#opLayers").sortable('toArray');                  
+                  $.each(order, function(index, value) {
+                     var layer = map.getLayersByName(value);
+                     map.setLayerIndex(layer[0], order.length - index - 1);
+                  });
+               }
+            });
 
 			// Populate the base layers drop down menu
             $.each(map.layers, function(index, value) {
@@ -369,6 +380,7 @@
             // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
             // for data layers (in left panel) and data analysis (in right panel)
             $("#layerAccordion, #dataAccordion").multiAccordion();
+
 
             /*
             Hook up the other events for the general UI
@@ -516,6 +528,7 @@
                 			).transform(map.displayProjection, map.projection);
                 map.zoomToExtent(bbox);
             });
+
         });
     </script>
 </head>

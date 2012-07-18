@@ -316,6 +316,15 @@ a.active.triggerR {
 	z-index: 0;
 }
 
+.context-menu {
+    display: none;
+    position: absolute;
+    padding: 10px;
+    background-color: #ddd;
+    border: 1px solid #000;
+   z-index: 9999999;
+}
+
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }
