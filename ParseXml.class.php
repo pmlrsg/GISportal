@@ -173,8 +173,10 @@
 			fclose($fp);
 			
 			if ($info['timed_out']) {
+				echo("oops, the XML request timed out...");
 				return false;    	
 			}else{
+				echo("Got the XML with character count of".strlen($res));
 				return substr(strstr($res, "\r\n\r\n"),4);
 			}
 		}
