@@ -27,6 +27,8 @@
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
+<!-- http://medialize.github.com/jQuery-contextMenu/ -->
+<script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
 
 <!-- Use custom PHP class to create some date caches for the required data layers
 	 See wmsDateCache.php for details. -->
@@ -135,7 +137,8 @@
         var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/no3', transparent: true }
+			{ layers: 'MRCS_ECOVARS/no3', transparent: true}, 
+         { opacity: 1 }
 		);
 		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
         no3.setVisibility(false);
@@ -147,7 +150,8 @@
         var po4 = new OpenLayers.Layer.WMS(
 			'Phosphate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/po4', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/po4', transparent: true}, 
+         { opacity: 1 }
 		);
 		po4.createDateCache('./json/WMSDateCache/po4_Dates.json');
         po4.setVisibility(false);
@@ -159,7 +163,8 @@
         var chl = new OpenLayers.Layer.WMS(
 			'Chlorophyl-a',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/chl', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/chl', transparent: true}, 
+         { opacity: 1 }
 		);
         chl.createDateCache('./json/WMSDateCache/chl_Dates.json');
         chl.setVisibility(false);
@@ -171,7 +176,8 @@
         var zoo = new OpenLayers.Layer.WMS(
 			'Zooplankton Biomass',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/zoop', transparent: true }
+			{ layers: 'MRCS_ECOVARS/zoop', transparent: true}, 
+         { opacity: 1 }
 		);
         zoo.createDateCache('./json/WMSDateCache/zoop_Dates.json');
         zoo.setVisibility(false);
@@ -183,7 +189,8 @@
         var si = new OpenLayers.Layer.WMS(
 			'Silicate concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/si', transparent: true }
+			{ layers: 'MRCS_ECOVARS/si', transparent: true}, 
+         { opacity: 1 }
 		);
         si.createDateCache('./json/WMSDateCache/si_Dates.json');
         si.setVisibility(false);
@@ -195,7 +202,8 @@
         var o2 = new OpenLayers.Layer.WMS(
 			'Dissolved Oxygen',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/o2o', transparent: true	}
+			{ layers: 'MRCS_ECOVARS/o2o', transparent: true}, 
+         {opacity: 1	}
 		);
         o2.createDateCache('./json/WMSDateCache/o2o_Dates.json');
         o2.setVisibility(false);
@@ -207,7 +215,8 @@
         var uZoo = new OpenLayers.Layer.WMS(
 			'Micro-Zooplankton C',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'WECOP/Z5c', transparent: true }
+			{ layers: 'WECOP/Z5c', transparent: true}, 
+         { opacity: 1 }
 		);
         uZoo.createDateCache('./json/WMSDateCache/Z5c_Dates.json');
         uZoo.setVisibility(false);
@@ -312,6 +321,24 @@
                 resizable: false
             });
 
+            // Show the scalebar for a selected layer
+            $('#scalebar').dialog({
+               position: ['center', 'center'],
+               width: 120,
+               height: 280,
+               resizable: true,
+               autoOpen: false
+            });
+
+            // Show metadata for a selected layer
+            $('#metadata').dialog({
+               position: ['center', 'center'],
+               width: 200,
+               height: 200,
+               resizable: true,
+               autoOpen: false
+            });
+
             // set up the map and render it
             mapInit();
 			
@@ -331,6 +358,7 @@
                 }
             }
             
+            // Makes each of the operational layers sortable
             $("#opLayers").sortable({
                update: function() {
                   var order = $("#opLayers").sortable('toArray');                  
@@ -529,7 +557,103 @@
                 map.zoomToExtent(bbox);
             });
 
-        });
+            // Setup the context menu and any custom controls
+            $(function() {
+
+               // Create the custom control for the slider
+               $.contextMenu.types.slider = function(item, opt, root) {
+                  $('<div id="' + item.id + '" class="context-menu slider"></div>').appendTo(this)
+                     .on('click', 'li', function() {
+                        root.$menu.trigger('contextmenu:hide');
+                     })
+                     // Setup the slider
+                     .slider({
+                        max: 1,
+                        min: 0,
+                        value: 1,
+                        step: 0.05,
+                        change: function(e, ui) {
+                           console.info(ui.value);
+                           var layer = map.getLayersByName($('.selectedLayer').text());
+                           layer[0].setOpacity($("#" + item.id).slider("value"));
+                           return true;
+                        }
+                     });
+ 
+                  this.on("contextmenu:show", function() {
+                     var layer = map.getLayersByName($('.selectedLayer').text());
+                     $("#" + item.id).slider("value", layer[0].opacity);        
+                  });
+               }
+               
+               // Create the context menu
+               $.contextMenu({
+                  // The class to activate on when right clicked
+                  selector: '.selectedLayer',
+                  // The items in the menu
+                  items: {
+                     fold1: {
+                        name: "Opacity",
+                        items: {
+                           opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
+                        }
+                     },
+                     fold2: {
+                        name: "Layer Styles",
+                        items: {
+                           alg: { 
+                              "name": "boxfill/alg",
+                              callback: function() {
+                                 var h = new Object(); 
+                                 h['STYLES'] = "boxfill/alg"; 
+                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
+                              }
+                           },
+                           greyscale: { 
+                              "name": "boxfill/greyscale",
+                              callback: function() {
+                                 var h = new Object(); 
+                                 h['STYLES'] = "boxfill/greyscale"; 
+                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
+                              }
+                           },
+                           ncview: { 
+                              "name": "boxfill/ncview",
+                              callback: function() {
+                                 var h = new Object(); 
+                                 h['STYLES'] = "boxfill/ncview"; 
+                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
+                              }
+                           },
+                        }
+                     },
+                     showScalebar: { 
+                        name: "Show Scalebar",
+                        callback: function() { 
+                           $('#scalebar').dialog('open');
+                        }
+                     },
+                     showMetadata: { 
+                        name: "Show Metadata",
+                        callback: function() {
+                           $('#metadata').dialog('open');
+                        }
+                     }
+                  },
+                  events: {
+                     show: function(opt) {
+                        //var $this = this;
+                        //$.contextMenu.setInputValues(opt, $this.data());
+                     },
+                     hide: function(opt) {
+                        //var $this = this;
+                        //$.contextMenu.getInputValues(opt, $this.data());
+                     }
+                  }
+               })
+            });
+
+         });
     </script>
 </head>
 <body>
@@ -683,6 +807,12 @@
         <p>&copy;2012 PML Applications Ltd<br />
         EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
         <div style="clear: both;"> </div>
+    </div>
+    <div id="scalebar" title="Scalebar Info">
+        <img src="http://maelstrom.npm.ac.uk:8080/ncWMS/wms?REQUEST=GetLegendGraphic&LAYER=MRCS_ECOVARS/si&PALETTE=nasa_rainbow" alt="Scalebar"/>
+    </div>
+    <div id="metadata" title="Metadata">
+        <span>No metadata to display yet!</span>
     </div>
 </body>
 </html>

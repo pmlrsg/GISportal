@@ -316,13 +316,13 @@ a.active.triggerR {
 	z-index: 0;
 }
 
-.context-menu {
-    display: none;
-    position: absolute;
-    padding: 10px;
-    background-color: #ddd;
-    border: 1px solid #000;
-   z-index: 9999999;
+.context-menu-list {
+   color: black;
+}
+
+.opacity-slider > div {
+   display: block;
+   border: 1px solid #CCC;
 }
 
 /* Override some basic jQuery UI Styles */
