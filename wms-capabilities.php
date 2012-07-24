@@ -11,7 +11,13 @@ $returnArray = array();
 
 foreach($xml->Capability->Layer->Layer as $child) {
    foreach($child->Layer as $innerChild) {
-      array_push($returnArray, array('name' => (string)$innerChild->Name, 'title' => (string)$innerChild->Title));
+		array_push($returnArray, 
+			array(
+				'Name' => (string)$innerChild->Name,
+				'Title' => (string)$innerChild->Title,
+				'Abstract' => (string)$innerChild->Abstract
+			)
+		);
    }
 }
 

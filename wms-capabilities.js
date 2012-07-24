@@ -7,19 +7,19 @@ function init() {
    url = "./wms-capabilities.php";
    $.getJSON(url, function(data) {
       $.each(data, function(i, item){
-         if(item.name && item.name!="") {
-            console.info("Layer--> Name:" + item.name + " Title: " + item.title);				
+         if(item.Name && item.Name!="") {
+            console.info("Layer--> Name:" + item.Name + " Title: " + item.Title + " Abstract: " + item.Abstract);				
          }
 	   });
    });
 
    console.info("---------------------------------------------------------------");
-/*   
+   
 	OpenLayers.ProxyHost= function(url) {
 		return './Proxy.php?url=' + encodeURIComponent(url);
     };
 	
-    format = new OpenLayers.Format.WMSCapabilities({
+/*    format = new OpenLayers.Format.WMSCapabilities({
     	version: "1.3.0"
     });
     OpenLayers.Request.GET({
