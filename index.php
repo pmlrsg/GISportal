@@ -198,6 +198,7 @@
 		si.selected = false;
         map.addLayer(si);
 
+
         // Add dissolved oxygen layer
         var o2 = new OpenLayers.Layer.WMS(
 			'Dissolved Oxygen',
@@ -325,7 +326,7 @@
             $('#scalebar').dialog({
                position: ['center', 'center'],
                width: 120,
-               height: 280,
+               height: 310,
                resizable: true,
                autoOpen: false
             });
@@ -573,7 +574,6 @@
                         value: 1,
                         step: 0.05,
                         change: function(e, ui) {
-                           console.info(ui.value);
                            var layer = map.getLayersByName($('.selectedLayer').text());
                            layer[0].setOpacity($("#" + item.id).slider("value"));
                            return true;
@@ -625,6 +625,14 @@
                                  map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
                               }
                            },
+                           normal: { 
+                              "name": "Remove Style",
+                              callback: function() {
+                                 var h = new Object(); 
+                                 h['STYLES'] = ""; 
+                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
+                              }
+                           },
                         }
                      },
                      showScalebar: { 
@@ -652,8 +660,8 @@
                   }
                })
             });
-
          });
+
     </script>
 </head>
 <body>

@@ -738,7 +738,7 @@ var // currently active contextMenu trigger
             }
 
             e.preventDefault();
-            e.stopImmediatePropagation();
+            //e.stopImmediatePropagation();
 
             if ($.isFunction(root.callbacks[key])) {
                 // item-specific callback

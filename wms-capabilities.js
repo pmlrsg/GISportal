@@ -3,7 +3,18 @@ var format;
 var WMSLayers;
 
 function init() {
-    
+
+   url = "./wms-capabilities.php";
+   $.getJSON(url, function(data) {
+      $.each(data, function(i, item){
+         if(item.name && item.name!="") {
+            console.info("Layer--> Name:" + item.name + " Title: " + item.title);				
+         }
+	   });
+   });
+
+   console.info("---------------------------------------------------------------");
+/*   
 	OpenLayers.ProxyHost= function(url) {
 		return './Proxy.php?url=' + encodeURIComponent(url);
     };
@@ -36,5 +47,5 @@ function init() {
         failure: function() {            
             OpenLayers.Console.error("...error...");
         }
-    });
+    });*/
 }
