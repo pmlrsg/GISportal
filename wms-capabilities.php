@@ -33,7 +33,7 @@ function getLayers($xml)
             'CRS'=>(string)$innerChild->BoundingBox->attributes()->CRS,
             'MinX'=>(string)$innerChild->BoundingBox->attributes()->minx,
             'MaxX'=>(string)$innerChild->BoundingBox->attributes()->maxx,
-            'Miny'=>(string)$innerChild->BoundingBox->attributes()->miny,
+            'MinY'=>(string)$innerChild->BoundingBox->attributes()->miny,
             'MaxY'=>(string)$innerChild->BoundingBox->attributes()->maxy
          );
 
@@ -100,6 +100,25 @@ function getLayers($xml)
    return $returnArray;
 }
 
+function createCache($cacheFile, $cacheLife, $arrayToStore)
+{
+   if (!file_exists($cacheFile) or (time() - filemtime($cacheFile) >= $cacheLife) )
+   {
+      $fh = fopen($cacheFile,"w") or die("can't open file");
+      $jsonArr = json_encode($arrayToStore);
+	   fwrite($fh, $jsonArr);
+		fclose($fh);
+		return $jsonArr;
+   }
+   else
+   {
+      $fh = fopen($cacheFile,"r") or die("can't open file");
+		$outStr = fread($fh, filesize($cacheFile));
+		fclose($fh);
+	   return $outStr;
+   }
+}
+
 $wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
 $wmsGetCapabilites = $wmsURL."SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
 
@@ -107,5 +126,6 @@ $str = file_get_contents($wmsGetCapabilites);
 $xml = simplexml_load_string( $str );
 
 $returnArray = getLayers($xml);
+$returnstring = createCache("./json/testLayerCache.json", 60, $returnArray);
 
 echo json_encode($returnArray);
