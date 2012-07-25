@@ -14,6 +14,12 @@ OpenLayers.Layer.prototype.temporal = false;
 // Holds cached date-times as array of ISO8601 strings for each layer based on data availability
 OpenLayers.Layer.prototype.DTCache = [];
 
+// Holds an array of the current date-times for the current date and layer as an array of ISO8601 strings
+OpenLayers.Layer.prototype.currentDateTimes = [];
+
+// Currently selected date-time for the current date and layer as an ISO8601 string
+OpenLayers.Layer.prototype.selectedDateTime = '';
+
 // Is the layer selected for display in the GUI or not
 OpenLayers.Layer.prototype.selected = false;
 
@@ -28,7 +34,7 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
 
 // Function which looks for a date within a layer.
 // The date passed is in the format yyyy-mm-dd or is an empty string
-// Returns the 1st date if there's a match or null if not.
+// Returns the array of date-times if there's a match or null if not.
 OpenLayers.Layer.prototype.matchDate = function (thedate){
 	var thelayer = this;
 	var filtArray = $.grep(thelayer.DTCache, function(dt, i) {
@@ -36,7 +42,7 @@ OpenLayers.Layer.prototype.matchDate = function (thedate){
 		return (datePart == thedate);
 	});
 	if (filtArray.length>0){
-		return filtArray[0];
+		return filtArray;
 	}
 	else{
 		return null;
@@ -50,15 +56,20 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
 		var uidate = ISODateString(thedate);
 		var mDate = layer.matchDate(uidate);
 		if(mDate){
-			layer.mergeNewParams({time: mDate});
+			lyr.currentDateTimes = mDate;
+			// Choose 1st date in the matched date-times for the moment - will expand functionality later
+			lyr.selectedDateTime = mDate[0];
+			layer.mergeNewParams({time: lyr.selectedDateTime});
 			layer.setVisibility(layer.selected);
 			// DEBUG
-			console.info('Layer ' + layer.name + ' data available for date-time ' + mDate + '. Layer selection and display: ' + layer.selected);
+			console.info('Layer ' + layer.name + ' data available for date-time ' + lyr.selectedDateTime + '. Layer selection and display: ' + layer.selected);
 		}
 		else{
+			lyr.currentDateTimes = [];
+			lyr.selectedDateTime = '';
 			layer.setVisibility(false);
 			// DEBUG
-			console.info('Layer ' + layer.name + ' no data available for date-time ' + mDate + '. Not displaying layer.');
+			console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
 		}
 	}
 };

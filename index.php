@@ -297,7 +297,7 @@
             blackSea.controlID = "refLayers";
 			   blackSea.selected = true;
             map.addLayer(blackSea);
-			
+				
 			// Add a couple of useful map controls
 			var mousePos = new OpenLayers.Control.MousePosition();
             var permalink =  new OpenLayers.Control.Permalink();
@@ -410,7 +410,6 @@
             // for data layers (in left panel) and data analysis (in right panel)
             $("#layerAccordion, #dataAccordion").multiAccordion();
 
-
             /*
             Hook up the other events for the general UI
             */
@@ -469,21 +468,52 @@
                 zoomOut: new OpenLayers.Control.ZoomBox(
                 				{ out: true, alwaysZoom: true }
                 			),
-                pan: new OpenLayers.Control.Navigation(),
+                pan: new OpenLayers.Control.Navigation()
             };
-            // Add the controls to the map
+			// Add the Vector drawing layers for POI drawing
+			var pointLayer = new OpenLayers.Layer.Vector("Point Layer"); pointLayer.displayInLayerSwitcher=false;
+			var lineLayer = new OpenLayers.Layer.Vector("Line Layer"); lineLayer.displayInLayerSwitcher=false;
+			var polygonLayer = new OpenLayers.Layer.Vector("Polygon Layer"); polygonLayer.displayInLayerSwitcher=false;
+			var boxLayer = new OpenLayers.Layer.Vector("Box layer"); boxLayer.displayInLayerSwitcher=false;
+			map.addLayers([pointLayer, lineLayer, polygonLayer, boxLayer]);
+			// Map drawing controls
+			var drawControls = {
+				// Drawing controls
+				point: new OpenLayers.Control.DrawFeature(pointLayer, OpenLayers.Handler.Point),
+				line: new OpenLayers.Control.DrawFeature(lineLayer, OpenLayers.Handler.Path),
+				polygon: new OpenLayers.Control.DrawFeature(polygonLayer, OpenLayers.Handler.Polygon),
+				box: new OpenLayers.Control.DrawFeature(boxLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }})		
+			};
+			
+            // Add all the controls to the map
             var control;
             for(var key in mapControls) {
                 control = mapControls[key];
                 map.addControl(control);
             }
-            // Function which can toggle OpenLayers controls based on the clicked jQuery UI icon button
+            for(var key in drawControls) {
+                control = drawControls[key];
+                map.addControl(control);
+            }
+            // Function which can toggle OpenLayers controls based on the clicked control
             // The value of the "for" attribute of the label which makes the button is used to match 
             // against the key value in the mapControls array so the right cotrol is toggled
             function toggleControl(element) {
                 for(key in mapControls) {
                     var control = mapControls[key];
                     if($(element).attr('for') == key && $(element).is('.ui-state-active')) {
+                        control.activate();
+                    }
+                    else {
+                        control.deactivate();
+                    }
+                }
+            }
+            // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
+            function toggleDrawingControl(element) {
+                for(key in drawControls) {
+                    var control = drawControls[key];
+                    if($(element).val() == key && $(element).attr('checked')) {
                         control.activate();
                     }
                     else {
@@ -500,6 +530,11 @@
             // The click action will also fire the $('.iconBtn').click() method above
             // giving the initial set-up of mouse events and associated map controls
             $('#pan').click();
+
+            // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
+            $('.drawCtrl').click(function(e) {
+                toggleDrawingControl(this);
+            });
 
             // Handle selection of visible layers
             $('.lPanel li').click(function(e) {
@@ -806,8 +841,29 @@
         </ul>
     </div>
     <div class="toolbar" id="mapOptions">
-    	<h2>Map Options</h2>
-        <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan.</p>
+    	<h2>Draw Region Of Interest (ROI)</h2>
+        <ul id="controlToggle">
+            <li>
+                <input class="drawCtrl" type="radio" name="type" value="none" id="noneToggle" checked="checked" />
+                <label for="noneToggle">navigate</label>
+            </li>
+            <li>
+                <input class="drawCtrl" type="radio" name="type" value="point" id="pointToggle" />
+                <label for="pointToggle">draw point</label>
+            </li>
+            <li>
+                <input class="drawCtrl" type="radio" name="type" value="line" id="lineToggle" />
+                <label for="lineToggle">draw line</label>
+            </li>
+            <li>
+                <input class="drawCtrl" type="radio" name="type" value="polygon" id="polygonToggle" />
+                <label for="polygonToggle">draw polygon</label>
+            </li>
+            <li>
+                <input class="drawCtrl" type="radio" name="type" value="box" id="boxToggle" />
+                <label for="boxToggle">draw box</label>
+            </li>
+        </ul> 
     </div>
     <div id="info" title="Information">
         <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>

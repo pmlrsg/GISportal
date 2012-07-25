@@ -40,8 +40,7 @@ class wmsDateCache{
 		$layer,
 		$cacheFile="./json/WMSDateCache/WMSDateCache.json",
 		$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0",
-		$cacheLife=60
-		//$cacheLife=86400
+		$cacheLife=86400
 	){
 		$this->layer = $layer;
 		$this->cacheFile = $cacheFile;
