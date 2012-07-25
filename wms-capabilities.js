@@ -6,18 +6,19 @@ function init() {
 
    url = "./wms-capabilities.php";
    $.getJSON(url, function(data) {
-      $.each(data, function(i, item){
-         if(item.Name && item.Name!="") {
-            console.info("Layer--> Name:" + item.Name + " Title: " + item.Title + " Abstract: " + item.Abstract);				
-         }
+      $.each(data, function(i, item) {
+         console.info("Sensor:" + item.Sensor + " --------------------------------------");
+         $.each(item.Layers, function(i, item) {
+            if(item.Name && item.Name!="") {
+               console.info("Layer--> Name:" + item.Name + " Title: " + item.Title + " Abstract: " + item.Abstract);
+               $.each(item.Styles, function(i, item) {
+                  //console.info("       Layer--> Style:" + item.Name + " Abstract: " + item.Abstract);
+               });	
+            }			
+         });
 	   });
    });
 
-   console.info("---------------------------------------------------------------");
-   
-	OpenLayers.ProxyHost= function(url) {
-		return './Proxy.php?url=' + encodeURIComponent(url);
-    };
 	
 /*    format = new OpenLayers.Format.WMSCapabilities({
     	version: "1.3.0"
