@@ -457,9 +457,17 @@
             })
 
             /* 
-            Set up event handling for the map including as well as
-            mouse-based OpenLayers controls for jQuery UI buttons
+            Set up event handling for the map including as well as mouse-based 
+            OpenLayers controls for jQuery UI buttons and drawing controls
             */
+			// Add the Vector drawing layer for POI drawing
+			var vectorLayer = new OpenLayers.Layer.Vector(
+				'POI Layer',
+				{preFeatureInsert: function(feature) {this.removeAllFeatures()}}
+			);
+			vectorLayer.displayInLayerSwitcher=false;
+			map.addLayer(vectorLayer);
+
             // Create  map controls identified by key values which can be activated and deactivated
 			var mapControls = {
                 zoomIn: new OpenLayers.Control.ZoomBox(
@@ -468,68 +476,48 @@
                 zoomOut: new OpenLayers.Control.ZoomBox(
                 				{ out: true, alwaysZoom: true }
                 			),
-                pan: new OpenLayers.Control.Navigation()
+                pan: new OpenLayers.Control.Navigation(),
+				point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
+				box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }}),
+				circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}}),
+				polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
             };
-			// Add the Vector drawing layers for POI drawing
-			var pointLayer = new OpenLayers.Layer.Vector("Point Layer"); pointLayer.displayInLayerSwitcher=false;
-			var lineLayer = new OpenLayers.Layer.Vector("Line Layer"); lineLayer.displayInLayerSwitcher=false;
-			var polygonLayer = new OpenLayers.Layer.Vector("Polygon Layer"); polygonLayer.displayInLayerSwitcher=false;
-			var boxLayer = new OpenLayers.Layer.Vector("Box layer"); boxLayer.displayInLayerSwitcher=false;
-			map.addLayers([pointLayer, lineLayer, polygonLayer, boxLayer]);
-			// Map drawing controls
-			var drawControls = {
-				// Drawing controls
-				point: new OpenLayers.Control.DrawFeature(pointLayer, OpenLayers.Handler.Point),
-				line: new OpenLayers.Control.DrawFeature(lineLayer, OpenLayers.Handler.Path),
-				polygon: new OpenLayers.Control.DrawFeature(polygonLayer, OpenLayers.Handler.Polygon),
-				box: new OpenLayers.Control.DrawFeature(boxLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }})		
-			};
 			
             // Add all the controls to the map
-            var control;
             for(var key in mapControls) {
-                control = mapControls[key];
+                var control = mapControls[key];
                 map.addControl(control);
             }
-            for(var key in drawControls) {
-                control = drawControls[key];
-                map.addControl(control);
-            }
+			
             // Function which can toggle OpenLayers controls based on the clicked control
-            // The value of the "for" attribute of the label which makes the button is used to match 
-            // against the key value in the mapControls array so the right cotrol is toggled
+            // The value of the value of the underlying radio button is used to match 
+            // against the key value in the mapControls array so the right control is toggled
             function toggleControl(element) {
-                for(key in mapControls) {
-                    var control = mapControls[key];
-                    if($(element).attr('for') == key && $(element).is('.ui-state-active')) {
+				for(key in mapControls) {
+					var control = mapControls[key];
+                    if($(element).val() == key && $('#'+key).is(':checked')) {
                         control.activate();
                     }
                     else {
                         control.deactivate();
+						$('#'+key).attr('checked', false);
                     }
                 }
             }
             // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
             function toggleDrawingControl(element) {
-                for(key in drawControls) {
-                    var control = drawControls[key];
-                    if($(element).val() == key && $(element).attr('checked')) {
-                        control.activate();
-                    }
-                    else {
-                        control.deactivate();
-                    }
-                }
+				toggleControl(element);
+				// Update the jQuery buttons to reflect the checked/unchecked status of the pan-zoom controls
+				$('#pan').button('refresh');
+				$('#zoomIn').button('refresh');
+				$('#zoomOut').button('refresh');
+				vectorLayer.removeAllFeatures();
             }
 
             // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
-            $('.iconBtn').click(function(e) {
+            $('#panZoom input:radio').click(function(e) {
                 toggleControl(this);
             });
-            // Select the pan button as default when page loads
-            // The click action will also fire the $('.iconBtn').click() method above
-            // giving the initial set-up of mouse events and associated map controls
-            $('#pan').click();
 
             // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
             $('.drawCtrl').click(function(e) {
@@ -707,11 +695,11 @@
         <form>
             <ul>
                 <li id="panZoom">
-                    <input type="radio" id="pan" name="radio" value="pan" />
+                    <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
                         <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
-                    <input type="radio" id="zoomIn" name="radio" value="+" />
+                    <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
                         <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
-                    <input type="radio" id="zoomOut" name="radio"  value="-" />
+                    <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
                         <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
                 </li>
                 <li class="divider"></li>
@@ -842,28 +830,16 @@
     </div>
     <div class="toolbar" id="mapOptions">
     	<h2>Draw Region Of Interest (ROI)</h2>
-        <ul id="controlToggle">
-            <li>
-                <input class="drawCtrl" type="radio" name="type" value="none" id="noneToggle" checked="checked" />
-                <label for="noneToggle">navigate</label>
-            </li>
-            <li>
-                <input class="drawCtrl" type="radio" name="type" value="point" id="pointToggle" />
-                <label for="pointToggle">draw point</label>
-            </li>
-            <li>
-                <input class="drawCtrl" type="radio" name="type" value="line" id="lineToggle" />
-                <label for="lineToggle">draw line</label>
-            </li>
-            <li>
-                <input class="drawCtrl" type="radio" name="type" value="polygon" id="polygonToggle" />
-                <label for="polygonToggle">draw polygon</label>
-            </li>
-            <li>
-                <input class="drawCtrl" type="radio" name="type" value="box" id="boxToggle" />
-                <label for="boxToggle">draw box</label>
-            </li>
-        </ul> 
+        <div id="drawingControls">
+            <input class="drawCtrl" type="radio" name="type" value="point" id="point" />
+            <label for="pointToggle">draw point</label><br />
+            <input class="drawCtrl" type="radio" name="type" value="box" id="box" />
+            <label for="boxToggle">draw box</label><br />
+            <input class="drawCtrl" type="radio" name="type" value="circle" id="circle" />
+            <label for="circleToggle">draw circle</label><br />
+            <input class="drawCtrl" type="radio" name="type" value="polygon" id="polygon" />
+            <label for="polygonToggle">draw polygon</label>
+        </div> 
     </div>
     <div id="info" title="Information">
         <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
