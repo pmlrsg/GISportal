@@ -48,23 +48,14 @@ function getLayers($xml)
                'Name'=>(string)$dimension->attributes()->name,
                'Units'=>(string)$dimension->attributes()->units,
                'Default'=>(string)$dimension->attributes()->default,
-               'Value'=>(string)$dimension
+               'Value'=>trim((string)$dimension)
                )             
             );
          }
 
          // Iterate over each style
          foreach($innerChild->Style as $style) 
-         {
-            //$url = (string)$style->LegendURL->OnlineResource->attributes('xlink', true)->href;
-            //$width = (string)$style->LegendURL->attributes()->width;
-            //$height = (string)$style->LegendURL->attributes()->height;
-
-            // DEBUG
-            //fb("*PHP* LegendURL: ".$url, FirePHP::INFO);
-            //fb("*PHP* Width: ".$width, FirePHP::INFO);
-            //fb("*PHP* Height: ".$height, FirePHP::INFO);
-         
+         {      
             // Add to the styles array
             array_push($styles, array(
                'Name'=>(string)$style->Name,
@@ -81,10 +72,10 @@ function getLayers($xml)
             'Name'=>$name, 
             'Title'=>$title, 
             'Abstract'=>$abstract,
-            'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
-            'BoundingBox'=>$boundingBox,
-            //'Dimensions'=>$dimensions, // Lags my computer
-            'Styles'=>$styles
+            //'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
+            //'BoundingBox'=>$boundingBox,
+            'Dimensions'=>$dimensions,
+            //'Styles'=>$styles
             )
          );
       }
@@ -100,22 +91,57 @@ function getLayers($xml)
    return $returnArray;
 }
 
-function createCache($cacheFile, $cacheLife, $arrayToStore)
+function createCache($cacheFile, $cacheLife, $encodedArray)
 {
    if (!file_exists($cacheFile) or (time() - filemtime($cacheFile) >= $cacheLife) )
    {
-      $fh = fopen($cacheFile,"w") or die("can't open file");
-      $jsonArr = json_encode($arrayToStore);
-	   fwrite($fh, $jsonArr);
+      $fh = fopen($cacheFile, "w") or die("can't open file");
+	   fwrite($fh, $encodedArray);
 		fclose($fh);
-		return $jsonArr;
+		return $encodedArray;
    }
    else
    {
-      $fh = fopen($cacheFile,"r") or die("can't open file");
+      $fh = fopen($cacheFile, "r") or die("can't open file");
 		$outStr = fread($fh, filesize($cacheFile));
 		fclose($fh);
 	   return $outStr;
+   }
+}
+
+function createDateCaches($array)
+{
+   $location = "./json/WMSDateCache/";
+   $extension = ".json";
+
+   // Iter over sensors
+   foreach($array as $i => $v) {
+      foreach($v['Layers'] as $key => $value) 
+      {
+         $name = str_replace("/", "_", $value['Name']);
+         $file = $location . $name . $extension;
+
+         foreach($value['Dimensions'] as $dimension)
+         {
+            if($dimension['Name'] == 'time')
+            {
+               $timeDimensionArray = explode(",", $dimension['Value']);
+               $jsonArray = json_encode($timeDimensionArray);
+               $outStr = '{"date":' . $jsonArray . '}'; // Atention to ' and " otherwise JSON is not valid
+               
+               // Create the cache file
+               createCache($file, 60, $outStr);
+            }
+         } 
+
+         // DEBUG
+         fb("*PHP* I: ".$i, FirePHP::INFO);
+         fb("*PHP* V: ".$v, FirePHP::INFO);
+         fb("*PHP* Key: ".$key, FirePHP::INFO);
+         fb("*PHP* Value: ".$layer, FirePHP::INFO);
+         fb("*PHP* Name: ".$name, FirePHP::INFO);
+      }
+
    }
 }
 
@@ -126,6 +152,7 @@ $str = file_get_contents($wmsGetCapabilites);
 $xml = simplexml_load_string( $str );
 
 $returnArray = getLayers($xml);
-$returnstring = createCache("./json/testLayerCache.json", 60, $returnArray);
+createDateCaches($returnArray);
+$returnstring = createCache("./json/testLayerCache.json", 60, json_encode($returnArray));
 
 echo json_encode($returnArray);
