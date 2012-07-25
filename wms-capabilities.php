@@ -1,9 +1,19 @@
 <?php 
-	// PHP DEBUG SETTINGS
-	error_reporting(E_ALL);
-	ini_set('display_errors', '1');	
-	require_once('FirePHPCore/fb.php');
-	ob_start();
+
+// PHP DEBUG SETTINGS
+error_reporting(E_ALL);
+ini_set('display_errors', '1');	
+require_once('FirePHPCore/fb.php');
+ob_start();
+
+// How long the cache files will last
+define('CACHELIFE', 60);
+// Path to store cache files in
+define('DATECACHEPATH', "./json/WMSDateCache/");
+// Path to master cache file
+define('MASTERCACHEPATH', "./json/MasterCache");
+// File extension to use
+define('FILEEXTENSION', ".json");
 
 function getLayers($xml)
 {
@@ -72,10 +82,10 @@ function getLayers($xml)
             'Name'=>$name, 
             'Title'=>$title, 
             'Abstract'=>$abstract,
-            //'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
-            //'BoundingBox'=>$boundingBox,
+            'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
+            'BoundingBox'=>$boundingBox,
             'Dimensions'=>$dimensions,
-            //'Styles'=>$styles
+            'Styles'=>$styles
             )
          );
       }
@@ -111,18 +121,14 @@ function createCache($cacheFile, $cacheLife, $encodedArray)
 
 function createDateCaches($array)
 {
-   $location = "./json/WMSDateCache/";
-   $extension = ".json";
-
    // Iter over sensors
    foreach($array as $i => $v) {
       foreach($v['Layers'] as $key => $value) 
       {
          $name = str_replace("/", "_", $value['Name']);
-         $file = $location . $name . $extension;
+         $file = DATECACHEPATH . $name . FILEEXTENSION;
 
-         foreach($value['Dimensions'] as $dimension)
-         {
+         foreach($value['Dimensions'] as $layer => $dimension) {
             if($dimension['Name'] == 'time')
             {
                $timeDimensionArray = explode(",", $dimension['Value']);
@@ -130,19 +136,23 @@ function createDateCaches($array)
                $outStr = '{"date":' . $jsonArray . '}'; // Atention to ' and " otherwise JSON is not valid
                
                // Create the cache file
-               createCache($file, 60, $outStr);
+               createCache($file, CACHELIFE, $outStr);
+
+               unset($array[$i]['Layers'][$key]['Dimensions'][$layer]);
             }
          } 
 
          // DEBUG
-         fb("*PHP* I: ".$i, FirePHP::INFO);
-         fb("*PHP* V: ".$v, FirePHP::INFO);
-         fb("*PHP* Key: ".$key, FirePHP::INFO);
-         fb("*PHP* Value: ".$layer, FirePHP::INFO);
-         fb("*PHP* Name: ".$name, FirePHP::INFO);
+         //fb("*PHP* I: ".$i, FirePHP::INFO);
+         //fb("*PHP* V: ".$v, FirePHP::INFO);
+         //fb("*PHP* Key: ".$key, FirePHP::INFO);
+         //fb("*PHP* Value: ".$layer, FirePHP::INFO);
+         //fb("*PHP* Name: ".$name, FirePHP::INFO);
       }
 
    }
+
+   return $array;
 }
 
 $wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
@@ -152,7 +162,7 @@ $str = file_get_contents($wmsGetCapabilites);
 $xml = simplexml_load_string( $str );
 
 $returnArray = getLayers($xml);
-createDateCaches($returnArray);
-$returnstring = createCache("./json/testLayerCache.json", 60, json_encode($returnArray));
+$returnArray = createDateCaches($returnArray);
+$returnstring = createCache(MASTERCACHEPATH . FILEEXTENSION, CACHELIFE, json_encode($returnArray));
 
 echo json_encode($returnArray);
