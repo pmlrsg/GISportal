@@ -4,6 +4,10 @@
 // The array is populated once all the date-time layers have loaded
 OpenLayers.Map.prototype.enabledDays = [];
 
+// Stores the data provided by the master cache file on the server. This includes
+// layer names, titles, abstracts, etc.
+OpenLayers.Map.prototype.getCapabilities = [];
+
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
 OpenLayers.Layer.prototype.controlID = 'opLayers';
@@ -120,4 +124,13 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
 	else {
 		return [false];
 	}
+}
+
+// Gets the master cache file from the server and stores it in the map object
+OpenLayers.Map.prototype.createMasterCache = function() {
+   var map = this;
+   var url = "./json/MasterCache.json";
+   $.getJSON(url, function(data) {
+      map.getCapabilities = data;
+   });
 }

@@ -7,13 +7,17 @@ require_once('FirePHPCore/fb.php');
 ob_start();
 
 // How long the cache files will last
-define('CACHELIFE', 60);
+define('CACHELIFE', 86400);
 // Path to store cache files in
 define('DATECACHEPATH', "./json/WMSDateCache/");
-// Path to master cache file
+// Path to master cache file, extension is added by FILEEXTENSION
 define('MASTERCACHEPATH', "./json/MasterCache");
 // File extension to use
 define('FILEEXTENSION', ".json");
+// Path to wmsGetCapabilites server
+define('GET_CAPABILITES_PATH', "http://rsg.pml.ac.uk/ncWMS/wms?");
+// wmsGetCapabilites params 
+define('GET_CAPABILITES_PARAMS', "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
 
 function getLayers($xml)
 {
@@ -31,6 +35,7 @@ function getLayers($xml)
 		   $name = (string)$innerChild->Name;
 	      $title = (string)$innerChild->Title;
 		   $abstract = (string)$innerChild->Abstract;
+         $temporal = false;
 
          $exGeographicBoundingBox = array(
             'WestBoundLongitude'=>(string)$innerChild->EX_GeographicBoundingBox->westBoundLongitude,
@@ -61,6 +66,11 @@ function getLayers($xml)
                'Value'=>trim((string)$dimension)
                )             
             );
+
+            if((string)$dimension->attributes()->name == 'time')
+            {
+               $temporal = true;
+            }
          }
 
          // Iterate over each style
@@ -76,18 +86,21 @@ function getLayers($xml)
                )             
             );
          }
-
-         // Add to the layers array
-         array_push($layers, array(
-            'Name'=>$name, 
-            'Title'=>$title, 
-            'Abstract'=>$abstract,
-            'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
-            'BoundingBox'=>$boundingBox,
-            'Dimensions'=>$dimensions,
-            'Styles'=>$styles
-            )
-         );
+         if(filterLayers($name))
+         {
+            // Add to the layers array
+            array_push($layers, array(
+               'Name'=>$name, 
+               'Title'=>$title, 
+               'Abstract'=>$abstract,
+               'Temporal'=>$temporal,
+               'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
+               'BoundingBox'=>$boundingBox,
+               'Dimensions'=>$dimensions,
+               'Styles'=>$styles
+               )
+            );
+         }
       }
 
       // Add to the sensor array
@@ -99,6 +112,29 @@ function getLayers($xml)
    }
 
    return $returnArray;
+}
+
+function filterLayers($layerName)
+{
+   $whiteList = array(
+      "WECOP/Z5c",
+      "MRCS_ECOVARS/o2o",
+      "MRCS_ECOVARS/si",
+      "MRCS_ECOVARS/zoop",
+      "MRCS_ECOVARS/chl",
+      "MRCS_ECOVARS/po4",
+      "MRCS_ECOVARS/no3",
+   );
+
+   foreach($whiteList as $value)
+   {
+      if($layerName == $value)
+      {
+         return true;
+      }
+   }
+
+   return false;
 }
 
 function createCache($cacheFile, $cacheLife, $encodedArray)
@@ -125,7 +161,7 @@ function createDateCaches($array)
    foreach($array as $i => $v) {
       foreach($v['Layers'] as $key => $value) 
       {
-         $name = str_replace("/", "_", $value['Name']);
+         $name = str_replace("/", "-", $value['Name']);
          $file = DATECACHEPATH . $name . FILEEXTENSION;
 
          foreach($value['Dimensions'] as $layer => $dimension) {
@@ -138,31 +174,25 @@ function createDateCaches($array)
                // Create the cache file
                createCache($file, CACHELIFE, $outStr);
 
+               // Remove the date data so we don't cache it twice
                unset($array[$i]['Layers'][$key]['Dimensions'][$layer]);
             }
          } 
-
-         // DEBUG
-         //fb("*PHP* I: ".$i, FirePHP::INFO);
-         //fb("*PHP* V: ".$v, FirePHP::INFO);
-         //fb("*PHP* Key: ".$key, FirePHP::INFO);
-         //fb("*PHP* Value: ".$layer, FirePHP::INFO);
-         //fb("*PHP* Name: ".$name, FirePHP::INFO);
       }
-
    }
 
+   // Return the array without the date data
    return $array;
 }
 
-$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
-$wmsGetCapabilites = $wmsURL."SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
+function updateCache()
+{
+   $str = file_get_contents(GET_CAPABILITES_PATH . GET_CAPABILITES_PARAMS);
+   $xml = simplexml_load_string($str);
 
-$str = file_get_contents($wmsGetCapabilites);
-$xml = simplexml_load_string( $str );
+   $returnArray = getLayers($xml);
+   $returnArray = createDateCaches($returnArray);
+   $returnstring = createCache(MASTERCACHEPATH . FILEEXTENSION, CACHELIFE, json_encode($returnArray));
 
-$returnArray = getLayers($xml);
-$returnArray = createDateCaches($returnArray);
-$returnstring = createCache(MASTERCACHEPATH . FILEEXTENSION, CACHELIFE, json_encode($returnArray));
-
-echo json_encode($returnArray);
+   //echo json_encode($returnArray);
+}

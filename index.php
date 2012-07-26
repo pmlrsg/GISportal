@@ -39,7 +39,12 @@
 	require_once('FirePHPCore/fb.php');
 	ob_start();
 
-	require('wmsDateCache.class.php');
+	require('wms-capabilities.php');
+
+   // Generate cache files
+   updateCache();
+
+/*
 	// Ensure you put all the data layers in here that have date-ranged data
 	$wmsURL="http://rsg.pml.ac.uk/ncWMS/wms?";
 	$wmsGetCapabilites = $wmsURL."SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0";
@@ -55,7 +60,7 @@
 	foreach ($wmsDateCache as $cache) {
 		//echo(method_exists($cache,"createCache"));
 		$cache->createCache();
-	}
+	}*/
 ?>
 
 <!-- Custom JavaScript -->
@@ -101,46 +106,53 @@
     Start mapInit() - the main function for setting up the map
     plus its controls, layers, styling and events.
     */
-    function mapInit() {
-        map = new OpenLayers.Map(
-                			'map', {
-                			    projection: lonlat,
-                			    displayProjection: lonlat,
-                			    controls: []
-                			})
+   function mapInit() 
+   {
+      map = new OpenLayers.Map('map', {
+         projection: lonlat,
+         displayProjection: lonlat,
+         controls: []
+      })
 
-        // Add GEBCO base layer
-        var gebco = new OpenLayers.Layer.WMS(
-			"GEBCO",
-			"http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
-			{ layers: 'gebco_08_grid' }
-		)
-		map.addLayer(gebco);
+      // Get the master cache file from the server. This file contains some of 
+      // the data from a getCapabilities query.
+      map.createMasterCache();
 
-        // Add Cubewerx layer
-        var cube = new OpenLayers.Layer.WMS(
-			'CubeWerx',
-			'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
-			{ layers: 'Foundation.GTOPO30' }
-		)
-        map.addLayer(cube);
+      // Add GEBCO base layer
+      var gebco = new OpenLayers.Layer.WMS(
+         "GEBCO",
+         "http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
+         { layers: 'gebco_08_grid' }
+      )
+      map.addLayer(gebco);
 
-        // Add NASA Landsat layer
-        var landsat = new OpenLayers.Layer.WMS(
-			'Landsat',
-			'http://irs.gis-lab.info/?',
-			{ layers: 'landsat' }
-		)
-        map.addLayer(landsat);
+      // Add Cubewerx layer
+      var cube = new OpenLayers.Layer.WMS(
+	      'CubeWerx',
+         'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
+         { layers: 'Foundation.GTOPO30' } 
+      )
+      map.addLayer(cube);
 
-        // Add nitrate concentration layer
-        var no3 = new OpenLayers.Layer.WMS(
+      // Add NASA Landsat layer
+      var landsat = new OpenLayers.Layer.WMS(
+         'Landsat',
+         'http://irs.gis-lab.info/?',
+         { layers: 'landsat' }
+      )
+      map.addLayer(landsat);
+
+      createLayers(map);
+
+/*
+   // Add nitrate concentration layer
+   var no3 = new OpenLayers.Layer.WMS(
 			'Nitrate Concentration',
 			'http://rsg.pml.ac.uk/ncWMS/wms?',
 			{ layers: 'MRCS_ECOVARS/no3', transparent: true}, 
          { opacity: 1 }
 		);
-		no3.createDateCache('./json/WMSDateCache/no3_Dates.json');
+		no3.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_no3.json');
         no3.setVisibility(false);
 		no3.temporal = true;
 		no3.selected = false;
@@ -153,7 +165,7 @@
 			{ layers: 'MRCS_ECOVARS/po4', transparent: true}, 
          { opacity: 1 }
 		);
-		po4.createDateCache('./json/WMSDateCache/po4_Dates.json');
+		po4.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_po4.json');
         po4.setVisibility(false);
 		po4.temporal = true;
 		po4.selected = false;
@@ -166,7 +178,7 @@
 			{ layers: 'MRCS_ECOVARS/chl', transparent: true}, 
          { opacity: 1 }
 		);
-        chl.createDateCache('./json/WMSDateCache/chl_Dates.json');
+        chl.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_chl.json');
         chl.setVisibility(false);
 		chl.temporal = true;
 		chl.selected = false;
@@ -179,7 +191,7 @@
 			{ layers: 'MRCS_ECOVARS/zoop', transparent: true}, 
          { opacity: 1 }
 		);
-        zoo.createDateCache('./json/WMSDateCache/zoop_Dates.json');
+        zoo.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_zoop.json');
         zoo.setVisibility(false);
 		zoo.temporal = true;
 		zoo.selected = false;
@@ -192,11 +204,12 @@
 			{ layers: 'MRCS_ECOVARS/si', transparent: true}, 
          { opacity: 1 }
 		);
-        si.createDateCache('./json/WMSDateCache/si_Dates.json');
+        si.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_si.json');
         si.setVisibility(false);
 		si.temporal = true;
 		si.selected = false;
         map.addLayer(si);
+
 
 
         // Add dissolved oxygen layer
@@ -206,7 +219,7 @@
 			{ layers: 'MRCS_ECOVARS/o2o', transparent: true}, 
          {opacity: 1	}
 		);
-        o2.createDateCache('./json/WMSDateCache/o2o_Dates.json');
+        o2.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_o2o.json');
         o2.setVisibility(false);
 		o2.temporal = true; 
 		o2.selected = false;      
@@ -219,94 +232,130 @@
 			{ layers: 'WECOP/Z5c', transparent: true}, 
          { opacity: 1 }
 		);
-        uZoo.createDateCache('./json/WMSDateCache/Z5c_Dates.json');
+        uZoo.createDateCache('./json/WMSDateCache/WECOP_Z5c.json');
         uZoo.setVisibility(false);
 		uZoo.temporal = true;
 		uZoo.selected = false;
         map.addLayer(uZoo);
+      */
 		
-        // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
-        for(i = 12; i <= 19; i++) {
-            // skip AMT18 as it isn't available
-            if(i == 18) continue;
-            // Style the AMT vector layers with different colours for each one
-            var AMT_style = new OpenLayers.Style({
-                'strokeColor': '${colour}'
-            },
-                			{
-                			    context: {
-                			        colour: function(feature) {
-                			            switch(feature.layer.name) {
-                			                case 'AMT12 Cruise Track':
-                			                    return 'blue';
-                			                    break;
-                			                case 'AMT13 Cruise Track':
-                			                    return 'aqua';
-                			                    break;
-                			                case 'AMT14 Cruise Track':
-                			                    return 'lime';
-                			                    break;
-                			                case 'AMT15 Cruise Track':
-                			                    return 'magenta';
-                			                    break;
-                			                case 'AMT16 Cruise Track':
-                			                    return 'red';
-                			                    break;
-                			                case 'AMT17 Cruise Track':
-                			                    return 'orange';
-                			                    break;
-                			                case 'AMT19 Cruise Track':
-                			                    return 'yellow';
-                			                    break;
-                			            }
-                			        }
-                			    }
-                			});
-
-            // Create a style map object and set the 'default' and 'selected' intents
-            var AMT_style_map = new OpenLayers.StyleMap({ 'default': AMT_style });
-
-                var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + ' Cruise Track', {
-                    protocol: new OpenLayers.Protocol.HTTP({
-                        url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
-                        format: new OpenLayers.Format.GML()
-                    }),
-                    strategies: [new OpenLayers.Strategy.Fixed()],
-                    projection: lonlat,
-                    styleMap: AMT_style_map
-                });
-                // Make this layer a reference layer
-                cruiseTrack.controlID = "refLayers";
-                cruiseTrack.setVisibility(false);
-                map.addLayer(cruiseTrack);
+      // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
+      for(i = 12; i <= 19; i++) {
+         // skip AMT18 as it isn't available
+         if(i == 18) continue;
+         // Style the AMT vector layers with different colours for each one
+         var AMT_style = new OpenLayers.Style({
+            'strokeColor': '${colour}'
+         },
+         {
+            context: {
+               colour: function(feature) {
+                  switch(feature.layer.name) {
+                     case 'AMT12 Cruise Track':
+                       return 'blue';
+                       break;
+                     case 'AMT13 Cruise Track':
+                       return 'aqua';
+                       break;
+                     case 'AMT14 Cruise Track':
+                       return 'lime';
+                       break;
+                     case 'AMT15 Cruise Track':
+                       return 'magenta';
+                       break;
+                     case 'AMT16 Cruise Track':
+                       return 'red';
+                       break;
+                     case 'AMT17 Cruise Track':
+                       return 'orange';
+                       break;
+                     case 'AMT19 Cruise Track':
+                       return 'yellow';
+                       break;
+                  }
+               }
             }
+         });
 
-            // Setup Black sea outline layer (Vector)
-            var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
-                projection: lonlat,
-                strategies: [new OpenLayers.Strategy.Fixed()],
-                protocol: new OpenLayers.Protocol.HTTP({
-                    url: 'black_sea.kml',
-                    format: new OpenLayers.Format.KML({
-                        extractStyles: true,
-                        extractAttributes: true
-                    })
-                })
+         // Create a style map object and set the 'default' and 'selected' intents
+         var AMT_style_map = new OpenLayers.StyleMap({ 'default': AMT_style });
+
+         var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + ' Cruise Track', {
+            protocol: new OpenLayers.Protocol.HTTP({
+               url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
+               format: new OpenLayers.Format.GML()
+            }),
+            strategies: [new OpenLayers.Strategy.Fixed()],
+            projection: lonlat,
+            styleMap: AMT_style_map
+         });
+
+         // Make this layer a reference layer         
+         cruiseTrack.controlID = "refLayers";
+         cruiseTrack.setVisibility(false);
+         map.addLayer(cruiseTrack);
+      }
+
+
+
+      // Setup Black sea outline layer (Vector)
+      var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
+         projection: lonlat,
+         strategies: [new OpenLayers.Strategy.Fixed()],
+         protocol: new OpenLayers.Protocol.HTTP({
+            url: 'black_sea.kml',
+            format: new OpenLayers.Format.KML({
+               extractStyles: true,
+               extractAttributes: true
             })
-            // Make this layer a reference layer
-            blackSea.controlID = "refLayers";
-			   blackSea.selected = true;
-            map.addLayer(blackSea);
-				
-			// Add a couple of useful map controls
-			var mousePos = new OpenLayers.Control.MousePosition();
-            var permalink =  new OpenLayers.Control.Permalink();
-			map.addControls([mousePos,permalink]);
+         })
+      });
 
-            if(!map.getCenter()) {
-                map.zoomTo(3)
+      // Make this layer a reference layer
+      blackSea.controlID = "refLayers";
+      blackSea.selected = true;
+      map.addLayer(blackSea);
+
+      // Add a couple of useful map controls
+      var mousePos = new OpenLayers.Control.MousePosition();
+      var permalink =  new OpenLayers.Control.Permalink();
+      map.addControls([mousePos,permalink]);
+
+      if(!map.getCenter()) {
+         map.zoomTo(3);
+      }
+   }
+
+   function createLayers(map)
+   {
+      var theMap = map;
+      $.each(theMap.getCapabilities, function(i, item) {
+         $.each(item.Layers, function(i, item) {
+            if(item.Name && item.Name!="") {
+               createLayer(item, theMap);
             }
-        }
+         });
+      });
+   }
+
+   function createLayer(item, map)
+   {
+      var layer = new OpenLayers.Layer.WMS (
+         item.Name.replace("-","/"),
+         'http://rsg.pml.ac.uk/ncWMS/wms?',
+         { layers: item.Name, transparent: true}, 
+         { opacity: 1 }
+      );
+
+      layer.temporal = item.Temporal; 
+      if(layer.temporal) {
+         layer.createDateCache('./json/WMSDateCache/' + layer.name.replace("/","-") + '.json');
+      }
+      layer.setVisibility(false);     
+      layer.selected = false;  
+      layer.controlID = "opLayers";    
+      map.addLayer(layer);
+   }
         /*
         ====================================================================================*/
         /*
@@ -349,7 +398,7 @@
 
             // Map layers elements - add data layers in reverse order to ensure
             // last added appear topmost in the UI as they are topmost in the layer stack
-			// also populate the dates of data availability for all data layers
+            // also populate the dates of data availability for all data layers
             for(i = (map.layers.length - 1); i >= 0; i--) {
                 var layer = map.layers[i];
                 // if not a base layer, populate the layers panel (left slide panel)
