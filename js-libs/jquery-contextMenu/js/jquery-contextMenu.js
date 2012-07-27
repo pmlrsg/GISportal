@@ -934,9 +934,13 @@ var // currently active contextMenu trigger
             
             // create contextMenu items
             $.each(opt.items, function(key, item){
+				if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
+					item = opt.items[key]['style' + key]
+				}
                 var $t = $('<li class="context-menu-item ' + (item.className || "") +'"></li>'),
                     $label = null,
                     $input = null;
+
                 
                 item.$node = $t.data({
                     'contextMenu': opt,
@@ -985,7 +989,7 @@ var // currently active contextMenu trigger
                     } else if (item.items) {
                         item.type = 'sub';
                     }
-                
+
                     switch (item.type) {
                         case 'text':
                             $input = $('<input type="text" value="1" name="context-menu-input-'+ key +'" value="">')

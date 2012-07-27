@@ -188,6 +188,4 @@ function updateCache()
    $returnArray = getLayers($xml);
    $returnArray = createDateCaches($returnArray);
    $returnstring = createCache(MASTERCACHEPATH . FILEEXTENSION, CACHELIFE, json_encode($returnArray));
-
-   //echo json_encode($returnArray);
 }
