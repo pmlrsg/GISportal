@@ -102,10 +102,75 @@
     //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';	// Linux using OpenLayers proxy
     /*
     ====================================================================================*/
-    /*
-    Start mapInit() - the main function for setting up the map
-    plus its controls, layers, styling and events.
-    */
+  
+   function createLayers(map) {
+      var theMap = map;
+      $.each(theMap.getCapabilities, function(i, item) {
+         $.each(item.Layers, function(i, item) {
+            if(item.Name && item.Name!="") {
+               createLayer(item, theMap);
+            }
+         });
+      });
+   }
+
+   function createLayer(item, map) {
+      var layer = new OpenLayers.Layer.WMS (
+         item.Name.replace("-","/"),
+         'http://rsg.pml.ac.uk/ncWMS/wms?',
+         { layers: item.Name, transparent: true}, 
+         { opacity: 1 }
+      );
+
+      layer.temporal = item.Temporal; 
+      if(layer.temporal) 
+      {
+         layer.createDateCache('./json/WMSDateCache/' + layer.name.replace("/","-") + '.json');
+      }
+   
+      layer.title = item.Title;
+      layer.abstract = item.Abstract;
+      layer.styles = item.Styles;
+      layer.exboundingbox = item.EX_GeographicBoundingBox;
+      layer.boundingbox = item.BoundingBox;
+      layer.setVisibility(false);     
+      layer.selected = false;     
+      map.addLayer(layer);
+   }
+
+   // Map layers elements - add data layers in reverse order to ensure
+   // last added appear topmost in the UI as they are topmost in the layer stack
+   // also populate the dates of data availability for all data layers
+   function updateLayerList(map)
+   {
+      for(i = (map.layers.length - 1); i >= 0; i--) {
+         var layer = map.layers[i];
+         // if not a base layer, populate the layers panel (left slide panel)
+         if(layer.displayInLayerSwitcher && !layer.isBaseLayer) {
+
+            var name, title;
+            var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
+
+            if(selID == '#opLayers') 
+            { 
+               name = layer.name;
+               title = layer.title;
+            } 
+            else 
+            {
+               name = layer.name;
+               title = layer.name; 
+            }
+
+            $(selID).append('<li id="' + name + '"><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + name + '" value="' + name + '" />' + title + '</li>');
+         }
+      }
+   }
+
+   /*
+   Start mapInit() - the main function for setting up the map
+   plus its controls, layers, styling and events.
+   */
    function mapInit() 
    {
       map = new OpenLayers.Map('map', {
@@ -143,101 +208,6 @@
       map.addLayer(landsat);
 
       createLayers(map);
-
-/*
-   // Add nitrate concentration layer
-   var no3 = new OpenLayers.Layer.WMS(
-			'Nitrate Concentration',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/no3', transparent: true}, 
-         { opacity: 1 }
-		);
-		no3.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_no3.json');
-        no3.setVisibility(false);
-		no3.temporal = true;
-		no3.selected = false;
-        map.addLayer(no3);
-
-        // Add phosphate concentration layer
-        var po4 = new OpenLayers.Layer.WMS(
-			'Phosphate Concentration',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/po4', transparent: true}, 
-         { opacity: 1 }
-		);
-		po4.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_po4.json');
-        po4.setVisibility(false);
-		po4.temporal = true;
-		po4.selected = false;
-        map.addLayer(po4);
-
-        // Add a chlorophyl layer
-        var chl = new OpenLayers.Layer.WMS(
-			'Chlorophyl-a',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/chl', transparent: true}, 
-         { opacity: 1 }
-		);
-        chl.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_chl.json');
-        chl.setVisibility(false);
-		chl.temporal = true;
-		chl.selected = false;
-        map.addLayer(chl);
-
-        // Add a zooplankton layer
-        var zoo = new OpenLayers.Layer.WMS(
-			'Zooplankton Biomass',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/zoop', transparent: true}, 
-         { opacity: 1 }
-		);
-        zoo.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_zoop.json');
-        zoo.setVisibility(false);
-		zoo.temporal = true;
-		zoo.selected = false;
-        map.addLayer(zoo);
-
-        // Add a silicate concentration layer
-        var si = new OpenLayers.Layer.WMS(
-			'Silicate concentration',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/si', transparent: true}, 
-         { opacity: 1 }
-		);
-        si.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_si.json');
-        si.setVisibility(false);
-		si.temporal = true;
-		si.selected = false;
-        map.addLayer(si);
-
-
-
-        // Add dissolved oxygen layer
-        var o2 = new OpenLayers.Layer.WMS(
-			'Dissolved Oxygen',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'MRCS_ECOVARS/o2o', transparent: true}, 
-         {opacity: 1	}
-		);
-        o2.createDateCache('./json/WMSDateCache/MRCS_ECOVARS_o2o.json');
-        o2.setVisibility(false);
-		o2.temporal = true; 
-		o2.selected = false;      
-	    map.addLayer(o2);
-
-        // Add micro-zooplankton oxygen layer
-        var uZoo = new OpenLayers.Layer.WMS(
-			'Micro-Zooplankton C',
-			'http://rsg.pml.ac.uk/ncWMS/wms?',
-			{ layers: 'WECOP/Z5c', transparent: true}, 
-         { opacity: 1 }
-		);
-        uZoo.createDateCache('./json/WMSDateCache/WECOP_Z5c.json');
-        uZoo.setVisibility(false);
-		uZoo.temporal = true;
-		uZoo.selected = false;
-        map.addLayer(uZoo);
-      */
 		
       // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
       for(i = 12; i <= 19; i++) {
@@ -284,7 +254,7 @@
             protocol: new OpenLayers.Protocol.HTTP({
                url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
                format: new OpenLayers.Format.GML()
-            }),
+               }),
             strategies: [new OpenLayers.Strategy.Fixed()],
             projection: lonlat,
             styleMap: AMT_style_map
@@ -295,8 +265,6 @@
          cruiseTrack.setVisibility(false);
          map.addLayer(cruiseTrack);
       }
-
-
 
       // Setup Black sea outline layer (Vector)
       var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
@@ -326,36 +294,7 @@
       }
    }
 
-   function createLayers(map)
-   {
-      var theMap = map;
-      $.each(theMap.getCapabilities, function(i, item) {
-         $.each(item.Layers, function(i, item) {
-            if(item.Name && item.Name!="") {
-               createLayer(item, theMap);
-            }
-         });
-      });
-   }
 
-   function createLayer(item, map)
-   {
-      var layer = new OpenLayers.Layer.WMS (
-         item.Name.replace("-","/"),
-         'http://rsg.pml.ac.uk/ncWMS/wms?',
-         { layers: item.Name, transparent: true}, 
-         { opacity: 1 }
-      );
-
-      layer.temporal = item.Temporal; 
-      if(layer.temporal) {
-         layer.createDateCache('./json/WMSDateCache/' + layer.name.replace("/","-") + '.json');
-      }
-      layer.setVisibility(false);     
-      layer.selected = false;  
-      layer.controlID = "opLayers";    
-      map.addLayer(layer);
-   }
         /*
         ====================================================================================*/
         /*
@@ -383,8 +322,8 @@
             // Show metadata for a selected layer
             $('#metadata').dialog({
                position: ['center', 'center'],
-               width: 200,
-               height: 200,
+               width: 300,
+               height: 300,
                resizable: true,
                autoOpen: false
             });
@@ -396,17 +335,7 @@
             Configure and generate the UI elements
             */
 
-            // Map layers elements - add data layers in reverse order to ensure
-            // last added appear topmost in the UI as they are topmost in the layer stack
-            // also populate the dates of data availability for all data layers
-            for(i = (map.layers.length - 1); i >= 0; i--) {
-                var layer = map.layers[i];
-                // if not a base layer, populate the layers panel (left slide panel)
-                if(layer.displayInLayerSwitcher && !layer.isBaseLayer) {
-                    var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
-                    $(selID).append('<li id="' + layer.name + '"><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + layer.name + '</li>');
-                }
-            }
+            updateLayerList(map);
             
             // Makes each of the operational layers sortable
             $("#opLayers").sortable({
@@ -419,14 +348,14 @@
                }
             });
 
-			// Populate the base layers drop down menu
+			   // Populate the base layers drop down menu
             $.each(map.layers, function(index, value) {
                 var layer = value;
                 // Add map base layers to the baseLayer drop-down list from the map
                 if(layer.isBaseLayer) {
                     $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
                 }
-			});
+			   });
 
             // Populate Quick Regions from the quickRegions array
             for(i = 0; i < quickRegion.length; i++) {
@@ -646,14 +575,14 @@
                         value: 1,
                         step: 0.05,
                         change: function(e, ui) {
-                           var layer = map.getLayersByName($('.selectedLayer').text());
+                           var layer = map.getLayersByName($('.selectedLayer').attr('id'));
                            layer[0].setOpacity($("#" + item.id).slider("value"));
                            return true;
                         }
                      });
  
                   this.on("contextmenu:show", function() {
-                     var layer = map.getLayersByName($('.selectedLayer').text());
+                     var layer = map.getLayersByName($('.selectedLayer').attr('id'));
                      $("#" + item.id).slider("value", layer[0].opacity);        
                   });
                }
@@ -662,6 +591,102 @@
                $.contextMenu({
                   // The class to activate on when right clicked
                   selector: '.selectedLayer',
+                  build: function($trigger, e) {
+                     var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+                     var menuOutput = '';
+                     var callbacks = [];
+
+                     $.each(layer.styles, function(index, value)
+                     {
+                        callbacks[callback.length] = function(layer) {
+                           var h = new Object;
+                           h['STYLES'] = value.Name;
+                           layer.mergeNewParams(h);
+                        };
+
+                        
+                        /*menuOutput = menuOutput + '"style' + index + '": {\n"name": "' + value.Name.replace("/", "") + 
+                           '",\n callback: function() { ' +
+                           '\nvar layer = map.getLayersByName($(".selectedLayer").attr("id"))[0];' +
+                           '\nvar h = new Object();' +
+                           '\nh["STYLES"] = "' + value.Name + '";' +
+                           '\nlayer.mergeNewParams(h); \n} \n},';*/
+                     });
+                     var callback = function() {
+                        $.each(callbacks, function(index, value) {
+                           value(layer);
+                        });
+                     }
+                     return {                  
+                        // The items in the menu
+                        items: {
+                           fold1: {
+                              name: "Opacity",
+                              items: {
+                                 opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
+                              }
+                           }, 
+                           fold2: {
+                              name: "Layer Styles", 
+                              items: callback()
+                           },
+                           showScalebar: { 
+                              name: "Show Scalebar",
+                              callback: function() { 
+
+                                 // Get the selected layer
+                                 var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+
+                                 var url = null;
+                                 $.each(layer.styles, function(index, value)
+                                 {      
+                                    if(value.Name == layer.params["STYLES"] && url == null)
+                                    {
+                                       url = value.LegendURL;
+                                    }
+                                 });
+                                 $('#scalebar').empty();
+
+                                 if(url != null) 
+                                 {
+                                    $('#scalebar').append('<img src="' + url + '" alt="Scalebar"/>');
+                                 }
+                                 else
+                                 { 
+                                    $('#scalebar').append('<img src="' + layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name + '" alt="Scalebar"/>');
+                                 }
+                                 $('#scalebar').dialog('open');
+                              }
+                           },
+                           showMetadata: { 
+                              name: "Show Metadata",
+                              callback: function() {
+                                 // Get the selected layer
+                                 var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+
+                                 // Clear the data from last time
+                                 $('#metadata').empty();
+                                 $('#metadata').dialog("option", "title", layer.title);
+
+                                 // Add new data
+                                 $('<div><span>Source: ' + '</span></div>' +
+                                    '<div><span>Name: ' + layer.title + '</span></div>' +
+                                    '<div><span>BoundingBox: ' + 
+                                       layer.exboundingbox.NorthBoundLatitude + 'N, ' +
+                                       layer.exboundingbox.EastBoundLongitude + 'E, ' +
+                                       layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
+                                       layer.exboundingbox.WestBoundLongitude + 'W ' + 
+                                    '</span></div>' +
+                                    '<div><span>Date Range:</span></div>' +
+                                    '<div><span>Abstract: ' + layer.abstract + '</span></div>'
+                                 ).appendTo('#metadata');
+
+                                 $('#metadata').dialog('open');
+                              }
+                           }
+                        }
+                     };                           
+                  },/*
                   // The items in the menu
                   items: {
                      fold1: {
@@ -672,54 +697,63 @@
                      },
                      fold2: {
                         name: "Layer Styles",
-                        items: {
-                           alg: { 
-                              "name": "boxfill/alg",
-                              callback: function() {
-                                 var h = new Object(); 
-                                 h['STYLES'] = "boxfill/alg"; 
-                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
-                              }
-                           },
-                           greyscale: { 
-                              "name": "boxfill/greyscale",
-                              callback: function() {
-                                 var h = new Object(); 
-                                 h['STYLES'] = "boxfill/greyscale"; 
-                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
-                              }
-                           },
-                           ncview: { 
-                              "name": "boxfill/ncview",
-                              callback: function() {
-                                 var h = new Object(); 
-                                 h['STYLES'] = "boxfill/ncview"; 
-                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
-                              }
-                           },
-                           normal: { 
-                              "name": "Remove Style",
-                              callback: function() {
-                                 var h = new Object(); 
-                                 h['STYLES'] = ""; 
-                                 map.getLayersByName($('.selectedLayer').text())[0].mergeNewParams(h);
-                              }
-                           },
-                        }
+
                      },
                      showScalebar: { 
                         name: "Show Scalebar",
                         callback: function() { 
+
+                           // Get the selected layer
+                           var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+
+                           var url = null;
+                           $.each(layer.styles, function(index, value)
+                           {      
+                              if(value.Name == layer.params["STYLES"] && url == null)
+                              {
+                                 url = value.LegendURL;
+                              }
+                           });
+                           $('#scalebar').empty();
+
+                           if(url != null) 
+                           {
+                              $('#scalebar').append('<img src="' + url + '" alt="Scalebar"/>');
+                           }
+                           else
+                           { 
+                              $('#scalebar').append('<img src="' + layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name + '" alt="Scalebar"/>');
+                           }
                            $('#scalebar').dialog('open');
                         }
                      },
                      showMetadata: { 
                         name: "Show Metadata",
                         callback: function() {
+                           // Get the selected layer
+                           var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+
+                           // Clear the data from last time
+                           $('#metadata').empty();
+                           $('#metadata').dialog("option", "title", layer.title);
+
+                           // Add new data
+                           $('<div><span>Source: ' + '</span></div>' +
+                              '<div><span>Name: ' + layer.title + '</span></div>' +
+                              '<div><span>BoundingBox: ' + 
+                                 layer.exboundingbox.NorthBoundLatitude + 'N, ' +
+                                 layer.exboundingbox.EastBoundLongitude + 'E, ' +
+                                 layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
+                                 layer.exboundingbox.WestBoundLongitude + 'W ' + 
+                              '</span></div>' +
+                              '<div><span>Date Range:</span></div>' +
+                              '<div><span>Abstract: ' + layer.abstract + '</span></div>'
+                           ).appendTo('#metadata');
+
                            $('#metadata').dialog('open');
                         }
                      }
-                  },
+                  },*/
                   events: {
                      show: function(opt) {
                         //var $this = this;
@@ -901,7 +935,6 @@
         <img src="http://maelstrom.npm.ac.uk:8080/ncWMS/wms?REQUEST=GetLegendGraphic&LAYER=MRCS_ECOVARS/si&PALETTE=nasa_rainbow" alt="Scalebar"/>
     </div>
     <div id="metadata" title="Metadata">
-        <span>No metadata to display yet!</span>
     </div>
 </body>
 </html>

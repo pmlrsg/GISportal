@@ -8,12 +8,27 @@ OpenLayers.Map.prototype.enabledDays = [];
 // layer names, titles, abstracts, etc.
 OpenLayers.Map.prototype.getCapabilities = [];
 
+// Layer title
+OpenLayers.Layer.prototype.title = '';
+
+// Layer abstract
+OpenLayers.Layer.prototype.abstract = '';
+
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
 OpenLayers.Layer.prototype.controlID = 'opLayers';
 
 // Set this to true of the layer is a temporal layer with date-time based data
 OpenLayers.Layer.prototype.temporal = false;
+
+// A list of styles available for the layer
+OpenLayers.Layer.prototype.styles = [];
+
+// The EX_GeographicBoundingBox for the layer
+OpenLayers.Layer.prototype.exboundingbox = [];
+
+// The BoundingBox for the layer
+OpenLayers.Layer.prototype.boundingbox = [];
 
 // Holds cached date-times as array of ISO8601 strings for each layer based on data availability
 OpenLayers.Layer.prototype.DTCache = [];
@@ -129,8 +144,16 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
 // Gets the master cache file from the server and stores it in the map object
 OpenLayers.Map.prototype.createMasterCache = function() {
    var map = this;
-   var url = "./json/MasterCache.json";
-   $.getJSON(url, function(data) {
-      map.getCapabilities = data;
+   $.ajax({
+      type: 'GET',
+      url: "./json/MasterCache.json", 
+      dataType: 'json',
+      async: false, 
+      success: function(data) {
+         map.getCapabilities = data;
+         updateLayerList(map);
+      }
    });
+      
+
 }

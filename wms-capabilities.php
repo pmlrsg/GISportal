@@ -74,9 +74,9 @@ function getLayers($xml)
             array_push($styles, array(
                'Name'=>(string)$style->Name,
                'Abstract'=>(string)$style->Abstract,
-               'LegendURL'=>(string)$style->LegendURL->OnlineResource[0]->attributes('xlink', true)->href,
-               'Width'=>(string)$style->LegendURL[0]->attributes()->width,
-               'Height'=>(string)$style->LegendURL[0]->attributes()->height
+               'LegendURL'=>(string)$style->LegendURL->OnlineResource->attributes('xlink', true)->href,
+               'Width'=>(string)$style->LegendURL->attributes()->width,
+               'Height'=>(string)$style->LegendURL->attributes()->height
                )             
             );
          }
@@ -118,7 +118,7 @@ function filterLayers($layerName)
       "MRCS_ECOVARS/zoop",
       "MRCS_ECOVARS/chl",
       "MRCS_ECOVARS/po4",
-      "MRCS_ECOVARS/no3"
+      "MRCS_ECOVARS/no3",
    );
 
    foreach($whiteList as $value)
