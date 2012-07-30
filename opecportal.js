@@ -35,6 +35,7 @@
  /*
  ====================================================================================*/
 
+// Create layers for the map from the getCapabilities request
 function createLayers(map) {
    var theMap = map;
    $.each(theMap.getCapabilities, function(i, item) {
@@ -46,9 +47,10 @@ function createLayers(map) {
    });
 }
 
+// Create a layer to be displayed on the map
 function createLayer(item, map) {
    var layer = new OpenLayers.Layer.WMS (
-      item.Name.replace("-","/"),
+      item.Name.replace("/","-"),
       'http://rsg.pml.ac.uk/ncWMS/wms?',
       { layers: item.Name, transparent: true}, 
       { opacity: 1 }
@@ -57,7 +59,7 @@ function createLayer(item, map) {
    layer.temporal = item.Temporal; 
    if(layer.temporal) 
    {
-      layer.createDateCache('./json/WMSDateCache/' + layer.name.replace("/","-") + '.json');
+      layer.createDateCache('./json/WMSDateCache/' + layer.name + '.json');
    }
 
    layer.title = item.Title;
@@ -79,22 +81,22 @@ function updateLayerList(map)
       var layer = map.layers[i];
       // if not a base layer, populate the layers panel (left slide panel)
       if(layer.displayInLayerSwitcher && !layer.isBaseLayer) {
-
-         var name, title;
          var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
 
-         if(selID == '#opLayers') 
-         { 
-            name = layer.name;
-            title = layer.title;
-         } 
-         else 
-         {
-            name = layer.name;
-            title = layer.name; 
-         }
+         $(selID).append(
+            '<li id="' + layer.name + '">' +
+               '<img src="img/ajax-loader.gif"/>' +
+               '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
+               layer.title +             
+            '</li>');
 
-         $(selID).append('<li id="' + name + '"><input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + name + '" value="' + name + '" />' + title + '</li>');
+         layer.events.register("loadstart", layer, function(e) {
+            $('#' + this.name).find('img').show();
+         });
+         layer.events.register("loadend", layer, function(e) {
+            $('#' + this.name).find('img').hide();
+         });
+         $('#' + layer.name).find('img').hide();
       }
    }
 }
@@ -152,7 +154,7 @@ function mapInit()
       {
          context: {
             colour: function(feature) {
-               switch(feature.layer.name) {
+               switch(feature.layer.title) {
                   case 'AMT12 Cruise Track':
                     return 'blue';
                     break;
@@ -182,7 +184,7 @@ function mapInit()
       // Create a style map object and set the 'default' and 'selected' intents
       var AMT_style_map = new OpenLayers.StyleMap({ 'default': AMT_style });
 
-      var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + ' Cruise Track', {
+      var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + '_Cruise_Track', {
          protocol: new OpenLayers.Protocol.HTTP({
             url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
             format: new OpenLayers.Format.GML()
@@ -195,11 +197,12 @@ function mapInit()
       // Make this layer a reference layer         
       cruiseTrack.controlID = "refLayers";
       cruiseTrack.setVisibility(false);
+      cruiseTrack.title = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
    }
 
    // Setup Black sea outline layer (Vector)
-   var blackSea = new OpenLayers.Layer.Vector('The Black Sea (KML)', {
+   var blackSea = new OpenLayers.Layer.Vector('The_Black_Sea_KML', {
       projection: lonlat,
       strategies: [new OpenLayers.Strategy.Fixed()],
       protocol: new OpenLayers.Protocol.HTTP({
@@ -214,6 +217,7 @@ function mapInit()
    // Make this layer a reference layer
    blackSea.controlID = "refLayers";
    blackSea.selected = true;
+   blackSea.title = "The Black Sea (KML)";
    map.addLayer(blackSea);
 
    // Add a couple of useful map controls
@@ -370,27 +374,27 @@ $(document).ready(function() {
    Set up event handling for the map including as well as mouse-based 
    OpenLayers controls for jQuery UI buttons and drawing controls
    */
-// Add the Vector drawing layer for POI drawing
-var vectorLayer = new OpenLayers.Layer.Vector(
-	'POI Layer',
-	{preFeatureInsert: function(feature) {this.removeAllFeatures()}}
-);
-vectorLayer.displayInLayerSwitcher=false;
-map.addLayer(vectorLayer);
+   // Add the Vector drawing layer for POI drawing
+   var vectorLayer = new OpenLayers.Layer.Vector(
+      'POI Layer',
+      {preFeatureInsert: function(feature) {this.removeAllFeatures()}}
+   );
+   vectorLayer.displayInLayerSwitcher=false;
+   map.addLayer(vectorLayer);
 
    // Create  map controls identified by key values which can be activated and deactivated
-var mapControls = {
-       zoomIn: new OpenLayers.Control.ZoomBox(
-       				{ out: false, alwaysZoom: true }
-       			),
-       zoomOut: new OpenLayers.Control.ZoomBox(
-       				{ out: true, alwaysZoom: true }
-       			),
-       pan: new OpenLayers.Control.Navigation(),
-	point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-	box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }}),
-	circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}}),
-	polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
+   var mapControls = {
+      zoomIn: new OpenLayers.Control.ZoomBox(
+         { out: false, alwaysZoom: true }
+      ),
+      zoomOut: new OpenLayers.Control.ZoomBox(
+         { out: true, alwaysZoom: true }
+      ),
+      pan: new OpenLayers.Control.Navigation(),
+	   point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
+	   box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }}),
+	   circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}}),
+	   polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
    };
 
    // Add all the controls to the map
@@ -451,27 +455,27 @@ var mapControls = {
 
    // Toggle visibility of data layers
    $('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
-       var v = $(this).val();
-       var layer = map.getLayersByName(v)[0];
-       if($(this).is(':checked')) {
-		layer.selected = true;
-		// If the layer has date-time data, use special select routine
-		// that checks for valid data on the current date to decide if to show data
-		if(layer.temporal){
-			map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
-			// Update map date cache now a new temporal layer has been added
-			map.refreshDateCache();
-		}
-		else{
-			layer.setVisibility(true);
-		}
-       }
-       else {
-		layer.selected = false;
-           layer.setVisibility(false);
-		// Update map date cache now a new temporal layer has been removed
-		if(layer.temporal){map.refreshDateCache();}
-       }
+      var v = $(this).val();
+      var layer = map.getLayersByName(v)[0];
+      if($(this).is(':checked')) {
+         layer.selected = true;
+         // If the layer has date-time data, use special select routine
+         // that checks for valid data on the current date to decide if to show data
+         if(layer.temporal) {
+            map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
+            // Update map date cache now a new temporal layer has been added
+            map.refreshDateCache();
+         }
+         else {
+            layer.setVisibility(true);
+		   }
+      }
+      else {
+         layer.selected = false;
+         layer.setVisibility(false);
+         // Update map date cache now a new temporal layer has been removed
+         if(layer.temporal){map.refreshDateCache();}
+      }
    })
 
    // Change of base layer event handler
@@ -523,18 +527,21 @@ var mapControls = {
       $.contextMenu({
          // The class to activate on when right clicked
          selector: '.selectedLayer',
+         // Dynamically creates the menu each time
          build: function($trigger, e) {
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
             var menuOutput = [];
             var styles = layer.styles.slice();
+            // Add a new style that will remove styles from the layer
             styles.push({
                Name: 'Remove Style',
                Abstract: '',
-               LegendURL: "",
+               LegendURL: '',
                Width: 0,
                Height: 0
             });
 
+            // Iter through each of the styles and create an array
             $.each(styles, function(index, value) 
             {
                var styleIndex = 'style' + index;
@@ -544,19 +551,18 @@ var mapControls = {
                   index: styleIndex,
                   name: value.Name,
                   callbackName: value.Name,
+                  // Create the callback for what happens when someone clicks on the menu button
                   callback: function() 
                   {
                      var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
                      var h = new Object();
-                     if(value.Name == 'Remove Style') 
-                        h['STYLES'] = ''; 
-                     else
-                        h['STYLES'] = value.Name;
+                     h['STYLES'] = value.Name == 'Remove Style' ? '' : value.Name;
                      layer.mergeNewParams(h);
 				      }
                }                       
             });
 
+            // Return the new menu
             return {
                // The items in the menu
                items: {
@@ -577,17 +583,25 @@ var mapControls = {
                         var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
 
                         var url = null;
+                        var width = 120;
+                        var height = 310;
                         $.each(layer.styles, function(index, value)
                         {      
                            if(value.Name == layer.params["STYLES"] && url == null)
+                           {
                               url = value.LegendURL;
+                              width = value.Width;
+                              height = value.Height;
+                           }
                         });
                         $('#scalebar').empty();
+                        $('#scalebar').css('width', width + 10);
+                        $('#scalebar').css('height', height + 20);
 
                         if(url != null) 
                            $('#scalebar').append('<img src="' + url + '" alt="Scalebar"/>');
                         else
-                           $('#scalebar').append('<img src="' + layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name + '" alt="Scalebar"/>');
+                           $('#scalebar').append('<img src="' + layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name.replace("-","/") + '" alt="Scalebar" />');
                         $('#scalebar').dialog('open');
                      }
                   },

@@ -224,6 +224,12 @@ ul li {
 	border-top-right-radius: 15px;
 }
 
+#opLayers
+{
+   max-height: 180px;
+   overflow-y: scroll; 
+}
+
 .lPanel .selectedLayer {
 	background: #333333;
 	color: #cccccc;
@@ -319,11 +325,12 @@ a.active.triggerR {
 .context-menu-list {
    color: black;
 }
-
+/*
 .opacity-slider > div {
    display: block;
    border: 1px solid #CCC;
 }
+*/
 
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }

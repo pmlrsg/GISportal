@@ -119,6 +119,11 @@ function filterLayers($layerName)
       "MRCS_ECOVARS/chl",
       "MRCS_ECOVARS/po4",
       "MRCS_ECOVARS/no3",
+      "MRCS_ECOVARS/p1c",
+      "MRCS_ECOVARS/p2c",
+      "MRCS_ECOVARS/p3c",
+      "MRCS_ECOVARS/p4c",
+      "MRCS_ECOVARS/vis01",
    );
 
    foreach($whiteList as $value)
