@@ -8,9 +8,11 @@
 <!-- jQuery UI theming CSS -->
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.21.custom.css" />
 <!-- Default OpenLayers styling -->
-<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css">
+<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
 <!-- Context Menu styling -->
-<Link rel="stylesheet" type="text/css" href="js-libs/jquery-contextMenu/css/jquery-contextMenu.css">
+<Link rel="stylesheet" type="text/css" href="js-libs/jquery-contextMenu/css/jquery-contextMenu.css" />
+<!-- Gritter styling -->
+<Link rel="stylesheet" type="text/css" href="js-libs/jquery-gritter/css/jquery.gritter.css" />
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -29,6 +31,8 @@
 <script type="text/javascript" src="maplayers.js"></script>
 <!-- http://medialize.github.com/jQuery-contextMenu/ -->
 <script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
+<!-- https://github.com/jboesch/Gritter -->
+<script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.min.js"></script>
 <!-- Custom JavaScript -->
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="opecportal.js"></script>

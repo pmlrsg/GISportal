@@ -264,6 +264,61 @@ $(document).ready(function() {
       autoOpen: false
    });
 
+   $.extend($.gritter.options, { 
+      position: 'custom',
+      fade_in_speed: 'medium',
+      fade_out_speed: 2000,
+      time: 6000
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Vis Portal',
+      text: 'Welcome to the Opec Vis portal.',
+      image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
    // set up the map and render it
    mapInit();
 
