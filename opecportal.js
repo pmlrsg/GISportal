@@ -265,7 +265,7 @@ $(document).ready(function() {
    });
 
    $.extend($.gritter.options, { 
-      position: 'custom',
+      position: 'bottom-right',
       fade_in_speed: 'medium',
       fade_out_speed: 2000,
       time: 6000
@@ -273,7 +273,7 @@ $(document).ready(function() {
 
    $.gritter.add({
       title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
+      text: '<a href=".">Welcome to the Opec Vis portal.</a>',
       image: 'img/OpEc_small.png',
       class_name: 'gritter-light',
       sticky: true, 
