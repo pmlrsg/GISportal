@@ -1,32 +1,32 @@
 /*
- ====================================================================================*/
- /*
- Initialise javascript global variables and objects
- */
- // The OpenLayers map object
- var map;
+====================================================================================*/
+/*
+Initialise javascript global variables and objects
+*/
+// The OpenLayers map object
+var map;
 
- /*
- Helper functions
- */
+/*
+Helper functions
+*/
 
- // Predefined map coordinate systems
- /*   var googp = new OpenLayers.Projection("EPSG:900913");*/
- var lonlat = new OpenLayers.Projection("EPSG:4326");
+// Predefined map coordinate systems
+/*   var googp = new OpenLayers.Projection("EPSG:900913");*/
+var lonlat = new OpenLayers.Projection("EPSG:4326");
 
- // Quick regions array in the format "Name",W,S,E,N
- var quickRegion = [
-                   ["European Seas", -23.44, 20.14, 39.88, 68.82],
-                   ["Adriatic", 11.83, 39.00, 20.67, 45.80],
-                   ["Baltic", 9.00, 51.08, 30.50, 67.62],
-                   ["Biscay", -7.10, 44.00, -0.60, 49.00],
-                   ["Black Sea", 27.30, 38.50, 42.00, 49.80],
-                   ["English Channel", -5.00, 46.67, 4.30, 53.83],
-                   ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
-                   ["North Sea", -4.50, 50.20, 8.90, 60.50],
-                   ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-                   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
-                ];
+// Quick regions array in the format "Name",W,S,E,N
+var quickRegion = [
+   ["European Seas", -23.44, 20.14, 39.88, 68.82],
+   ["Adriatic", 11.83, 39.00, 20.67, 45.80],
+   ["Baltic", 9.00, 51.08, 30.50, 67.62],
+   ["Biscay", -7.10, 44.00, -0.60, 49.00],
+   ["Black Sea", 27.30, 38.50, 42.00, 49.80],
+   ["English Channel", -5.00, 46.67, 4.30, 53.83],
+   ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
+   ["North Sea", -4.50, 50.20, 8.90, 60.50],
+   ["Western Med.", -6.00, 30.80, 16.50, 48.10],
+   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
+];
  // Define a proxy for the map to allow async javascript http protocol requests
  // This will always need changing when swapping between Windows and Linux
  //OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";   // Windows only using ASP.NET (C#) handler
@@ -464,14 +464,14 @@ $(document).ready(function() {
    function toggleControl(element) {
    for(key in mapControls) {
       var control = mapControls[key];
-           if($(element).val() == key && $('#'+key).is(':checked')) {
-               control.activate();
-           }
-           else {
-               control.deactivate();
+         if($(element).val() == key && $('#'+key).is(':checked')) {
+            control.activate();
+         }
+         else {
+            control.deactivate();
          $('#'+key).attr('checked', false);
-           }
-       }
+         }
+      }
    }
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
