@@ -17,10 +17,10 @@
    
     #layer-control
     {
-    	position: absolute;
-    	right: 10px;
-    	top: 300px;
-    	z-index: 1000;
+       position: absolute;
+       right: 10px;
+       top: 300px;
+       z-index: 1000;
     }
        
     
@@ -40,9 +40,9 @@
     
     #Help
     {
-    	z-index: 1000 !important;    	
-    	left: 100px;
-    	top: 100px;
+       z-index: 1000 !important;       
+       left: 100px;
+       top: 100px;
     }
     
     
@@ -81,11 +81,11 @@
         //finishGlobe won't be necessary
         olMap.setupGlobe();
         olMap.addLayer(layer);
-		olMap.finishGlobe();
-		
-		
-		
-		var markers = new OpenLayers.Layer.Markers( "Markers" );
+      olMap.finishGlobe();
+      
+      
+      
+      var markers = new OpenLayers.Layer.Markers( "Markers" );
         olMap.addLayer(markers);
 
         var size = new OpenLayers.Size(21,25);
@@ -97,7 +97,7 @@
         markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(0,45),halfIcon));
 
         marker = new OpenLayers.Marker(new OpenLayers.LonLat(90,10),icon.clone());        
-        markers.addMarker(marker); 			
+        markers.addMarker(marker);          
 
         //Zoom to the max extent
         olMap.zoomToMaxExtent();

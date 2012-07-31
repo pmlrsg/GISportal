@@ -26,9 +26,9 @@ function getLayers($xml)
       // Iterate over each layer
       foreach($child->Layer as $innerChild) 
       {
-		   $name = (string)$innerChild->Name;
-	      $title = (string)$innerChild->Title;
-		   $abstract = (string)$innerChild->Abstract;
+         $name = (string)$innerChild->Name;
+         $title = (string)$innerChild->Title;
+         $abstract = (string)$innerChild->Abstract;
          $temporal = false;
 
          $exGeographicBoundingBox = array(
@@ -142,16 +142,16 @@ function createCache($cacheFile, $cacheLife, $encodedArray)
    if (!file_exists($cacheFile) or (time() - filemtime($cacheFile) >= $cacheLife) )
    {
       $fh = fopen($cacheFile, "w") or die("can't open file");
-	   fwrite($fh, $encodedArray);
-		fclose($fh);
-		return $encodedArray;
+      fwrite($fh, $encodedArray);
+      fclose($fh);
+      return $encodedArray;
    }
    else
    {
       $fh = fopen($cacheFile, "r") or die("can't open file");
-		$outStr = fread($fh, filesize($cacheFile));
-		fclose($fh);
-	   return $outStr;
+      $outStr = fread($fh, filesize($cacheFile));
+      fclose($fh);
+      return $outStr;
    }
 }
 

@@ -1,22 +1,22 @@
 html {
-	height:100%;
-	min-width: 1000px;
+   height:100%;
+   min-width: 1000px;
 }
 
 body {
-	background:#000;
-	color:#CCC;
-	width:100%;
-	height:100%;
-	font-family:Tahoma, Geneva, sans-serif;
-	margin:0;
-	padding:0;
+   background:#000;
+   color:#CCC;
+   width:100%;
+   height:100%;
+   font-family:Tahoma, Geneva, sans-serif;
+   margin:0;
+   padding:0;
 }
 
 p {
-	line-height:20px;
-	padding: 0 0 5px;
-	margin: 5px 0 5px 0;
+   line-height:20px;
+   padding: 0 0 5px;
+   margin: 5px 0 5px 0;
 }
 
 h3 {
@@ -27,8 +27,8 @@ padding-bottom: 5px;
 }
 
 sup {
-	vertical-align: super;
-	font-size:x-small;
+   vertical-align: super;
+   font-size:x-small;
 }
 
 a {
@@ -36,192 +36,192 @@ a {
 }
 
 table {
-	height:100%;
-	width: 100%;
+   height:100%;
+   width: 100%;
 }
 
 
 ul {
-	padding: 0;
-	margin: 0;
+   padding: 0;
+   margin: 0;
 }
 
 ul li {
-	list-style-type: none;
+   list-style-type: none;
 }
 
 
 #map {
-	background: #1a1a1a;
-	z-index:-1;
-	clear: both;
-	width:100%;
-	height:100%;
-	margin: 0;
-	padding: 0;
+   background: #1a1a1a;
+   z-index:-1;
+   clear: both;
+   width:100%;
+   height:100%;
+   margin: 0;
+   padding: 0;
 }
 
 .toolbar {
-	/*display: none;*/
-	/* Note - jQuery will be used to display the toolbar at startup with a nice animation */
-	font-size:smaller;
-	overflow: hidden;
-	padding: 0 10px 0 10px;
-	height: 50px;
-	width: 500px;
-	left: 50%;
-	margin-left: -250px;
-	position: fixed;
-	background: #222222;
-	border:1px solid #666666;
-	filter: alpha(opacity=80);
-	opacity: .80;
-	color:#FFFFFF;
+   /*display: none;*/
+   /* Note - jQuery will be used to display the toolbar at startup with a nice animation */
+   font-size:smaller;
+   overflow: hidden;
+   padding: 0 10px 0 10px;
+   height: 50px;
+   width: 500px;
+   left: 50%;
+   margin-left: -250px;
+   position: fixed;
+   background: #222222;
+   border:1px solid #666666;
+   filter: alpha(opacity=80);
+   opacity: .80;
+   color:#FFFFFF;
 }
 
 .toolbar ul {
-	height:100%;
+   height:100%;
 }
 
 .toolbar ul li {
-	height:100%;
-	float:left;
+   height:100%;
+   float:left;
 }
 
 .toolbar input {
-	font-size: 1em;
+   font-size: 1em;
 }
 
 .toolbar fieldset {
-	border:0;
+   border:0;
 }
 
 .toolbar legend {
-	color:#BBB;
+   color:#BBB;
 }
 
 .toolbar select {
-   	width: 150px;
-   	padding: 2px;
-   	border:#FFF 1px solid;
-	background-color:#BBB;
+      width: 150px;
+      padding: 2px;
+      border:#FFF 1px solid;
+   background-color:#BBB;
 }
 
 .toolbar .divider {
-	border-right-style:solid;
-	border-width:thin;
-	border-color:#999;
-	width:1px;
-	margin:2px;
+   border-right-style:solid;
+   border-width:thin;
+   border-color:#999;
+   width:1px;
+   margin:2px;
 }
 
 .toolbar a {
-	margin:8px 3px 5px 5px;
-	display:block;	
-	overflow:hidden;
+   margin:8px 3px 5px 5px;
+   display:block;   
+   overflow:hidden;
 }
 
 .toolbar img {
- 	border:none;
+    border:none;
 }
 
 #mapOptionsBtn {
-	height:32px;
-	width:63px;
+   height:32px;
+   width:63px;
 }
 
 #mapOptionsBtn:hover {
-	text-indent:-63px;
+   text-indent:-63px;
 }
 
 #infoToggleBtn {
-	height:32px;
-	width:32px;
+   height:32px;
+   width:32px;
 }
 
 #infoToggleBtn:hover {
-	text-indent:-32px;
+   text-indent:-32px;
 }
 
 #topToolbar {
-	top: 0;
-	-moz-border-radius-bottomleft: 15px;
-	-moz-border-radius-bottomright: 15px;
-	-webkit-border-bottom-left-radius: 15px;
-	-webkit-border-bottom-right-radius: 15px;
-	border-bottom-left-radius: 15px;
-	border-bottom-right-radius: 15px;
+   top: 0;
+   -moz-border-radius-bottomleft: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-bottom-right-radius: 15px;
 }
 
 #bottomToolbar {
-	bottom: 0;
-	-moz-border-radius-topleft: 15px;
-	-moz-border-radius-topright: 15px;
-	-webkit-border-top-left-radius: 15px;
-	-webkit-border-top-right-radius: 15px;
-	border-top-left-radius: 15px;
-	border-top-right-radius: 15px;
+   bottom: 0;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-topright: 15px;
+   -webkit-border-top-left-radius: 15px;
+   -webkit-border-top-right-radius: 15px;
+   border-top-left-radius: 15px;
+   border-top-right-radius: 15px;
 }
 
 /* Map Options Panel */
 #mapOptions {
-	display:none;
-	bottom: 53px;
-	height:200px;
-	width:400px;
-	margin-left: -200px;
-	-moz-border-radius-topleft: 15px;
-	-moz-border-radius-topright: 15px;
-	-webkit-border-top-left-radius: 15px;
-	-webkit-border-top-right-radius: 15px;
-	border-top-left-radius: 15px;
-	border-top-right-radius: 15px;
+   display:none;
+   bottom: 53px;
+   height:200px;
+   width:400px;
+   margin-left: -200px;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-topright: 15px;
+   -webkit-border-top-left-radius: 15px;
+   -webkit-border-top-right-radius: 15px;
+   border-top-left-radius: 15px;
+   border-top-right-radius: 15px;
 }
 
 /* Toolbar buttons (overriding jQuery UI styling) */
 .iconBtn {
-	margin-top:9px;
+   margin-top:9px;
 }
 
 .iconBtn .ui-button-text {
-	margin:0;
-	padding:2px;
-	width:26px;
-	height:24px;
+   margin:0;
+   padding:2px;
+   width:26px;
+   height:24px;
 }
 
 .panel {
-	z-index:9999;
-	position:absolute;
-	top: 50px;
-	display: none;
-	height: auto;
-	background: #333333;
-	border:2px solid #666666;
-	max-width:300px;
+   z-index:9999;
+   position:absolute;
+   top: 50px;
+   display: none;
+   height: auto;
+   background: #333333;
+   border:2px solid #666666;
+   max-width:300px;
 }
 
 /* Layers icon for left panel */
 #layerLbl {
-	background:url(../img/layers.png) no-repeat;
-	padding-left: 30px;
+   background:url(../img/layers.png) no-repeat;
+   padding-left: 30px;
 }
 
 /* Layers icon for right panel */
 #dataLbl {
-	background:url(../img/data.png) no-repeat;
-	padding-left: 30px;
+   background:url(../img/data.png) no-repeat;
+   padding-left: 30px;
 }
 
 .lPanel {
-	padding: 10px 10px 10px 10px;
-	left: 0;
-	-moz-border-radius-topright: 15px;
-	-moz-border-radius-bottomright: 15px;
-	-webkit-border-bottom-right-radius: 15px;
-	-webkit-border-top-right-radius: 15px;
-	border-bottom-right-radius: 15px;
-	border-top-right-radius: 15px;
+   padding: 10px 10px 10px 10px;
+   left: 0;
+   -moz-border-radius-topright: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   -webkit-border-top-right-radius: 15px;
+   border-bottom-right-radius: 15px;
+   border-top-right-radius: 15px;
 }
 
 #opLayers
@@ -231,95 +231,95 @@ ul li {
 }
 
 .lPanel .selectedLayer {
-	background: #333333;
-	color: #cccccc;
+   background: #333333;
+   color: #cccccc;
 } 
 
 .rPanel {
-	padding: 10px 10px 10px 10px;
-	right: 0;
-	-moz-border-radius-topleft: 15px;
-	-moz-border-radius-bottomleft: 15px;
-	-webkit-border-bottom-left-radius: 15px;
-	-webkit-border-top-left-radius: 15px;
-	border-bottom-left-radius: 15px;
-	border-top-left-radius: 15px;
+   padding: 10px 10px 10px 10px;
+   right: 0;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-bottomleft: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-top-left-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-top-left-radius: 15px;
 }
 
 a.trigger {
-	z-index:10;
-	position: absolute;
-	text-decoration: none;
-	top: 0px;
-	color:#fff;
-	border:2px solid #555555;
-	display: block;
+   z-index:10;
+   position: absolute;
+   text-decoration: none;
+   top: 0px;
+   color:#fff;
+   border:2px solid #555555;
+   display: block;
 }
 
 a.triggerL {
-	left: 0;
-	padding: 10px 45px 10px 5px;
-	-moz-border-radius-topright: 15px;
-	-moz-border-radius-bottomright: 15px;
-	-webkit-border-top-right-radius: 15px;
-	-webkit-border-bottom-right-radius: 15px;
-	border-top-right-radius: 15px;
-	border-bottom-right-radius: 15px;
-	background:#333333 url(../img/Right_icn.png) 90% 50% no-repeat;
+   left: 0;
+   padding: 10px 45px 10px 5px;
+   -moz-border-radius-topright: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-top-right-radius: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   border-top-right-radius: 15px;
+   border-bottom-right-radius: 15px;
+   background:#333333 url(../img/Right_icn.png) 90% 50% no-repeat;
 }
 
 a.triggerR {
-	right: 0;
-	padding: 10px 5px 10px 48px;
-	-moz-border-radius-topleft: 15px;
-	-moz-border-radius-bottomleft: 15px;
-	-webkit-border-top-left-radius: 15px;
-	-webkit-border-bottom-left-radius: 15px;
-	border-top-left-radius: 15px;
-	border-bottom-left-radius: 15px;
-	background:#333333 url(../img/Left_icn.png) 10% 50% no-repeat;
+   right: 0;
+   padding: 10px 5px 10px 48px;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-bottomleft: 15px;
+   -webkit-border-top-left-radius: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   border-top-left-radius: 15px;
+   border-bottom-left-radius: 15px;
+   background:#333333 url(../img/Left_icn.png) 10% 50% no-repeat;
 }
 
 a.triggerL:hover {
-	background:#222222 url(../img/Right_icn.png) 95% 50% no-repeat;
+   background:#222222 url(../img/Right_icn.png) 95% 50% no-repeat;
 }
 
 a.triggerR:hover {
-	background:#222222 url(../img/Left_icn.png) 5% 50% no-repeat;
+   background:#222222 url(../img/Left_icn.png) 5% 50% no-repeat;
 }
 
 a.active.triggerL {
-	background:#222222 url(../img/Left_icn.png) 90% 50% no-repeat;
+   background:#222222 url(../img/Left_icn.png) 90% 50% no-repeat;
 }
 
 a.active.triggerR {
-	background:#222222 url(../img/Right_icn.png) 10% 50% no-repeat;
+   background:#222222 url(../img/Right_icn.png) 10% 50% no-repeat;
 }
 
 /* style the information dialogue */
 #info {
-	filter: alpha(opacity=70);
-	opacity: 0.7;
+   filter: alpha(opacity=70);
+   opacity: 0.7;
 }
 
 #info p {
-	color:#000;
-	text-align:center;
-	line-height: 1.3em;
-	font-size: 0.75em;
+   color:#000;
+   text-align:center;
+   line-height: 1.3em;
+   font-size: 0.75em;
 }
 
 #info img {
-	border:0;
+   border:0;
 }
 
 /* Override some OpenLayers and Google Maps Styling */
 .olLayerGooglePoweredBy, .olLayerGoogleCopyright {
-	visibility:hidden;
+   visibility:hidden;
 }
 
 .olMapViewport {
-	z-index: 0;
+   z-index: 0;
 }
 
 .context-menu-list {
