@@ -272,51 +272,18 @@ $(document).ready(function() {
    });
 
    $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: '<a href=".">Welcome to the Opec Vis portal.</a>',
-      image: 'img/OpEc_small.png',
+      title: 'Welcome to the Opec Portal',
+      text: 
+         'You can use the layers button on the left to open and close the ' +
+         '<a id="testopen" href="#">layers panel</a>. ' +
+         'The data button on the right allows you to specify regions of intreast (R.O.I). ',
+      //image: 'img/OpEc_small.png',
       class_name: 'gritter-light',
       sticky: true, 
    });
 
-   $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
-      image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
-      image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
-      image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
-      image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   $.gritter.add({
-      title: 'Welcome to the Opec Vis Portal',
-      text: 'Welcome to the Opec Vis portal.',
-      image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
+   $('#testopen').click(function(e) {
+      $('.triggerL').trigger('click');
    });
 
    // set up the map and render it
@@ -610,9 +577,7 @@ $(document).ready(function() {
                   callback: function() 
                   {
                      var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-                     var h = new Object();
-                     h['STYLES'] = value.Name == 'Remove Style' ? '' : value.Name;
-                     layer.mergeNewParams(h);
+                     layer.mergeNewParams({style: value.Name == 'Remove Style' ? '' : value.Name});
                   }
                }                       
             });
