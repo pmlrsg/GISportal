@@ -25,7 +25,7 @@ var quickRegion = [
    ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
    ["North Sea", -4.50, 50.20, 8.90, 60.50],
    ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
+   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]  
 ];
  // Define a proxy for the map to allow async javascript http protocol requests
  // This will always need changing when swapping between Windows and Linux
@@ -399,10 +399,30 @@ $(document).ready(function() {
    // Add the Vector drawing layer for POI drawing
    var vectorLayer = new OpenLayers.Layer.Vector(
       'POI Layer',
-      {preFeatureInsert: function(feature) {this.removeAllFeatures()}}
+      {
+         /*style: {
+                strokeColor: 'green',
+                fillColor : 'green',
+                strokeWidth: 2,
+                fillOpacity: 0.3,
+                cursor: 'pointer'
+         },*/
+         preFeatureInsert: function(feature) {
+            this.removeAllFeatures()
+         },
+         onFeatureInsert: function(feature) {
+            // DEBUG
+            ROIAdded(feature)
+         }
+      }
    );
    vectorLayer.displayInLayerSwitcher=false;
    map.addLayer(vectorLayer);
+   
+   // Function called once a ROI has been drawn on the map
+   function ROIAdded(feature){
+      console.info('Feature added ' + feature.geometry + ' with attributes ' + feature.attributes);
+   }
 
    // Create  map controls identified by key values which can be activated and deactivated
    var mapControls = {
@@ -429,25 +449,23 @@ $(document).ready(function() {
    // The value of the value of the underlying radio button is used to match 
    // against the key value in the mapControls array so the right control is toggled
    function toggleControl(element) {
-   for(key in mapControls) {
-      var control = mapControls[key];
-         if($(element).val() == key && $('#'+key).is(':checked')) {
+      for(key in mapControls) {
+         var control = mapControls[key];
+         if($(element).val() == key) {
+            $('#'+key).attr('checked', true);
             control.activate();
          }
          else {
+            $('#'+key).attr('checked', false);
             control.deactivate();
-         $('#'+key).attr('checked', false);
          }
       }
+      $('#panZoom input:radio').button('refresh');
    }
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
-   toggleControl(element);
-   // Update the jQuery buttons to reflect the checked/unchecked status of the pan-zoom controls
-   $('#pan').button('refresh');
-   $('#zoomIn').button('refresh');
-   $('#zoomOut').button('refresh');
-   vectorLayer.removeAllFeatures();
+      toggleControl(element);
+      vectorLayer.removeAllFeatures();
    }
 
    // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
@@ -456,7 +474,7 @@ $(document).ready(function() {
    });
 
    // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
-   $('.drawCtrl').click(function(e) {
+   $('#drawingControls input:radio').click(function(e) {
        toggleDrawingControl(this);
    });
 
