@@ -421,6 +421,7 @@ $(document).ready(function() {
    
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature){
+      var attribs = feature.attributes;    
       console.info('Feature added ' + feature.geometry + ' with attributes ' + feature.attributes);
    }
 
