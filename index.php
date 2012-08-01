@@ -59,26 +59,24 @@
    <div id="map"></div>
    <!-- The Top Toolbar -->
    <div id="topToolbar" class="toolbar">
-      <form>
-         <ul>
-            <li id="panZoom">
-               <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
-                  <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
-               <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
-                  <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
-               <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
-                  <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
-            </li>
-            <li class="divider"></li>
-            <li>
-               <fieldset>
-                  <legend>View Date</legend>
-                  <input size="10" type="text" name="viewDate" id="viewDate" />
-               </fieldset>
-            </li>
-            <li class="divider"></li>
-         </ul>
-      </form>
+      <ul>
+         <li id="panZoom">
+            <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
+               <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
+            <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
+               <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
+            <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
+               <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
+         </li>
+         <li class="divider"></li>
+         <li>
+            <fieldset>
+               <legend>View Date</legend>
+               <input size="10" type="text" name="viewDate" id="viewDate" />
+            </fieldset>
+         </li>
+         <li class="divider"></li>
+      </ul>
    </div>
    <!-- The Left Panels -->
    <a class="trigger triggerL" href="#">Layers</a>
@@ -198,14 +196,14 @@
    <div class="toolbar" id="mapOptions">
    	<h2>Draw Region Of Interest (ROI)</h2>
       <div id="drawingControls">
-         <input class="drawCtrl" type="radio" name="type" value="point" id="point" />
-         <label for="pointToggle">draw point</label><br />
-         <input class="drawCtrl" type="radio" name="type" value="box" id="box" />
-         <label for="boxToggle">draw box</label><br />
-         <input class="drawCtrl" type="radio" name="type" value="circle" id="circle" />
-         <label for="circleToggle">draw circle</label><br />
-         <input class="drawCtrl" type="radio" name="type" value="polygon" id="polygon" />
-         <label for="polygonToggle">draw polygon</label>
+         <input type="radio" name="type" value="point" id="point" />
+         <label class="iconBtn"  for="pointToggle">draw point</label><br />
+         <input type="radio" name="type" value="box" id="box" />
+         <label class="iconBtn" for="boxToggle">draw box</label><br />
+         <input type="radio" name="type" value="circle" id="circle" />
+         <label class="iconBtn" for="circleToggle">draw circle</label><br />
+         <input type="radio" name="type" value="polygon" id="polygon" />
+         <label class="iconBtn" for="polygonToggle">draw polygon</label>
       </div> 
    </div>
    <div id="info" title="Information">
