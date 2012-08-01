@@ -421,8 +421,7 @@ $(document).ready(function() {
    
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature){
-      var attribs = feature.attributes;    
-      console.info('Feature added ' + feature.geometry + ' with attributes ' + feature.attributes);
+      console.info('Feature added ' + feature.geometry);
    }
 
    // Create  map controls identified by key values which can be activated and deactivated
@@ -435,8 +434,8 @@ $(document).ready(function() {
       ),
       pan: new OpenLayers.Control.Navigation(),
       point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true }}),
-      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}}),
+      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: true }}),
+      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}, persist: true}),
       polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
    };
 
