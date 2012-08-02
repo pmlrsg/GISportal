@@ -325,12 +325,30 @@ a.active.triggerR {
 .context-menu-list {
    color: black;
 }
-/*
-.opacity-slider > div {
-   display: block;
-   border: 1px solid #CCC;
+
+#layer-exclamation {
+   padding: 0px 0px 0px 5px;
 }
-*/
+
+#layer-exclamation img {
+   border: 0;
+}
+
+#noscript-warning {
+   background-color: #C8142F;
+   position: fixed;
+   color: black;
+   text-align: center;
+   top: 60px;
+   left: 0;
+   width: 100%;
+}
+
+.css-check {
+   height: 2;
+   width: 2;
+   display: none;
+}
 
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }

@@ -41,11 +41,19 @@
    date caches for the required data layers.
    See wms-capabilities.php for details. -->
 <?php
-   // PHP DEBUG SETTINGS
-   error_reporting(E_ALL);
-   ini_set('display_errors', '1');   
+//--------PHP-DEBUG-SETTINGS--------
+   // Log file location
+   //define("LOG_FILE", "/errors.log");
+
+   ini_set('error_reporting', E_ALL);
+   ini_set('display_errors', '1');
+   //ini_set("log_errors", "1");
+   //ini_set('error_log', LOG_FILE)
+
+   // Setup firebug php  
    require_once('FirePHPCore/fb.php');
    ob_start();
+//----------------------------------
 
    require('wms-capabilities.php');
 
@@ -55,6 +63,17 @@
 
 </head>
 <body>
+   <div>
+      <h1>Opec</h1>
+      <span>fghjsk</span>
+      <noscript>
+         <div id="noscript-warning">
+            This website requires JavaScript to work. Please enable it in your browser.
+         </div>
+   </noscript>
+   </div>
+   <div class="css-check">
+   </div>
    <!-- The Map -->
    <div id="map"></div>
    <!-- The Top Toolbar -->
@@ -76,6 +95,9 @@
             </fieldset>
          </li>
          <li class="divider"></li>
+         <li>
+            <input type="button" title="Toggle Map Information Window"/>
+         </li>
       </ul>
    </div>
    <!-- The Left Panels -->

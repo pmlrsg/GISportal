@@ -1,8 +1,6 @@
-/*
-====================================================================================*/
-/*
-Initialise javascript global variables and objects
-*/
+/*====================================================================================*/
+//Initialise javascript global variables and objects
+
 // The OpenLayers map object
 var map;
 
@@ -32,91 +30,62 @@ var quickRegion = [
  //OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";   // Windows only using ASP.NET (C#) handler
  OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
  //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
- /*
- ====================================================================================*/
+/*====================================================================================*/
 
 // Create layers for the map from the getCapabilities request
-function createLayers(map) {
+function createOpLayers(map) 
+{
    var theMap = map;
-   $.each(theMap.getCapabilities, function(i, item) {
-      $.each(item.Layers, function(i, item) {
-         if(item.Name && item.Name!="") {
-            createLayer(item, theMap);
-         }
-      });
+   $.each(theMap.getCapabilities, function(i, item) 
+   {
+      // Add accordion for each sensor with layers
+      if(item.Layers.length)
+      {
+         var sensorName = item.Sensor;
+         // Create the accordion for the sensor
+         addSensorToPanel(sensorName, theMap);
+
+         $.each(item.Layers, function(i, item) {
+            if(item.Name && item.Name!="") {
+               createOpLayer(item, sensorName, theMap);
+            }
+         });
+      }
    });
 }
 
 // Create a layer to be displayed on the map
-function createLayer(item, map) {
+function createOpLayer(layerData, sensorName, map) 
+{
    var layer = new OpenLayers.Layer.WMS (
-      item.Name.replace("/","-"),
+      layerData.Name.replace("/","-"),
       'http://rsg.pml.ac.uk/ncWMS/wms?',
-      { layers: item.Name, transparent: true}, 
+      { layers: layerData.Name, transparent: true}, 
       { opacity: 1 }
    );
 
-   layer.temporal = item.Temporal; 
+   layer.temporal = layerData.Temporal; 
    if(layer.temporal) 
    {
       layer.createDateCache('./json/WMSDateCache/' + layer.name + '.json');
    }
 
-   layer.title = item.Title;
-   layer.abstract = item.Abstract;
-   layer.styles = item.Styles;
-   layer.exboundingbox = item.EX_GeographicBoundingBox;
-   layer.boundingbox = item.BoundingBox;
+   layer.title = layerData.Title;
+   layer.abstract = layerData.Abstract;
+   layer.sensor = sensorName.replace(/\s+/g, "");
+   layer.styles = layerData.Styles;
+   layer.exboundingbox = layerData.EX_GeographicBoundingBox;
+   layer.boundingbox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
    map.addLayer(layer);
+   addLayerToPanel(layer);
 }
 
-// Map layers elements - add data layers in reverse order to ensure
-// last added appear topmost in the UI as they are topmost in the layer stack
-// also populate the dates of data availability for all data layers
-function updateLayerList(map)
+// Creates the base layers for the map, add any
+// others you want here
+function createBaseLayers(map)
 {
-   for(i = (map.layers.length - 1); i >= 0; i--) {
-      var layer = map.layers[i];
-      // if not a base layer, populate the layers panel (left slide panel)
-      if(layer.displayInLayerSwitcher && !layer.isBaseLayer) {
-         var selID = '#' + layer.controlID;   // jQuery selector for the layer controlID
-
-         $(selID).append(
-            '<li id="' + layer.name + '">' +
-               '<img src="img/ajax-loader.gif"/>' +
-               '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
-               layer.title +             
-            '</li>');
-
-         layer.events.register("loadstart", layer, function(e) {
-            $('#' + this.name).find('img').show();
-         });
-         layer.events.register("loadend", layer, function(e) {
-            $('#' + this.name).find('img').hide();
-         });
-         $('#' + layer.name).find('img').hide();
-      }
-   }
-}
-
-/*
-Start mapInit() - the main function for setting up the map
-plus its controls, layers, styling and events.
-*/
-function mapInit() 
-{
-   map = new OpenLayers.Map('map', {
-      projection: lonlat,
-      displayProjection: lonlat,
-      controls: []
-   })
-
-   // Get the master cache file from the server. This file contains some of 
-   // the data from a getCapabilities query.
-   map.createMasterCache();
-
    // Add GEBCO base layer
    var gebco = new OpenLayers.Layer.WMS(
       "GEBCO",
@@ -140,9 +109,11 @@ function mapInit()
       { layers: 'landsat' }
    )
    map.addLayer(landsat);
+}
 
-   createLayers(map);
-   
+// Creates reference layers, add any others here
+function createRefLayers(map)
+{
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
    for(i = 12; i <= 19; i++) {
       // skip AMT18 as it isn't available
@@ -155,6 +126,7 @@ function mapInit()
          context: {
             colour: function(feature) {
                switch(feature.layer.title) {
+
                   case 'AMT12 Cruise Track':
                     return 'blue';
                     break;
@@ -199,6 +171,7 @@ function mapInit()
       cruiseTrack.setVisibility(false);
       cruiseTrack.title = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
+      addLayerToPanel(cruiseTrack);
    }
 
    // Setup Black sea outline layer (Vector)
@@ -219,6 +192,127 @@ function mapInit()
    blackSea.selected = true;
    blackSea.title = "The Black Sea (KML)";
    map.addLayer(blackSea);
+   addLayerToPanel(blackSea);
+}
+
+function addSensorToPanel(sensorName, map)
+{
+   var sensor = sensorName.replace(/\s+/g, "");
+
+   $('#opLayers').append(
+      '<h3><a href="#">' + sensor + '</a></h3>' +
+      '<div id="' + sensor + '" class="sensor-accordion"></div>'
+   );
+
+   // Makes each of the operational layers sortable
+   $('#' + sensor).sortable({
+      update: function() {
+         var order = $('#' + sensor).sortable('toArray');                  
+         $.each(order, function(index, value) {
+            var layer = map.getLayersByName(value)[0];
+            map.setLayerIndex(layer, order.length - index - 1);
+         });
+      }
+   });
+}
+
+/*------------------------------- Deprecated ----------------------------------
+// Map layers elements - add data layers in reverse order to ensure
+// last added appear topmost in the UI as they are topmost in the layer stack
+// also populate the dates of data availability for all data layers
+function updateLayerList(map)
+{
+   for(i = (map.layers.length - 1); i >= 0; i--) {
+      var layer = map.layers[i];
+      addLayerToPanel(layer);
+   }
+}
+-----------------------------------------------------------------------------*/
+
+function addLayerToPanel(layer)
+{
+   // if not already on list and not a base layer, populate the layers panel (left slide panel)
+   if(!$('#' + layer.name).length && layer.displayInLayerSwitcher && !layer.isBaseLayer) {
+      // jQuery selector for the layer controlID
+      var selID = layer.controlID == 'opLayers' ? '#' + layer.sensor : '#' + layer.controlID; 
+
+      $(selID).append(
+         '<li id="' + layer.name + '">' +
+            '<img src="img/ajax-loader.gif"/>' +
+            '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
+            layer.title + 
+            '<a id="layer-exclamation" href="#">' +
+               '<img src="img/exclamation_small.png"/>' +
+            '</a>' +           
+         '</li>');
+
+      // Show the img when we are loading data for the layer
+      layer.events.register("loadstart", layer, function(e) {
+         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').show();
+      });
+      // Hide the img when we have finished loading data
+      layer.events.register("loadend", layer, function(e) {
+         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
+      });
+      // Hide the ajax-loader initially
+      $('#' + layer.name).find('img[src="img/ajax-loader.gif"]').hide();
+   }
+}
+
+// Creates a list of custom args that will be added to the
+// permalink url.
+function customPermalinkArgs()
+{
+   var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
+      this, arguments
+   );
+}
+
+// Setup the options for the gritter and create opening 
+// welcome message.
+function setupGritter()
+{
+   $.extend($.gritter.options, { 
+      position: 'bottom-right',
+      fade_in_speed: 'medium',
+      fade_out_speed: 2000,
+      time: 6000
+   });
+
+   $.gritter.add({
+      title: 'Welcome to the Opec Portal',
+      text: 
+         'You can use the layers button on the left to open and close the ' +
+         '<a id="testopen" href="#">layers panel</a>. ' +
+         'The data button on the right allows you to specify regions of intreast (R.O.I). ',
+      //image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true, 
+   });
+
+   $('#testopen').click(function(e) {
+      $('.triggerL').trigger('click');
+   });
+}
+
+/*
+Start mapInit() - the main function for setting up the map
+plus its controls, layers, styling and events.
+*/
+function mapInit() 
+{
+   map = new OpenLayers.Map('map', {
+      projection: lonlat,
+      displayProjection: lonlat,
+      controls: []
+   })
+
+   // Get the master cache file from the server. This file contains some of 
+   // the data from a getCapabilities query.
+   map.createMasterCache();
+
+   createBaseLayers(map);
+   createRefLayers(map);
 
    // Add a couple of useful map controls
    var mousePos = new OpenLayers.Control.MousePosition();
@@ -230,13 +324,15 @@ function mapInit()
    }
 }
 
+/*====================================================================================*/
 
-/*
-====================================================================================*/
-/*
-This code runs once the page has loaded - jQuery initialised
-*/
+//This code runs once the page has loaded - jQuery initialised
 $(document).ready(function() {
+
+   if($('.css-check').height() == 3)
+   {
+      alert("hi");
+   }
 
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
    $('#info').dialog({
@@ -264,47 +360,13 @@ $(document).ready(function() {
       autoOpen: false
    });
 
-   $.extend($.gritter.options, { 
-      position: 'bottom-right',
-      fade_in_speed: 'medium',
-      fade_out_speed: 2000,
-      time: 6000
-   });
+   setupGritter();
 
-   $.gritter.add({
-      title: 'Welcome to the Opec Portal',
-      text: 
-         'You can use the layers button on the left to open and close the ' +
-         '<a id="testopen" href="#">layers panel</a>. ' +
-         'The data button on the right allows you to specify regions of intreast (R.O.I). ',
-      //image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   $('#testopen').click(function(e) {
-      $('.triggerL').trigger('click');
-   });
-
-   // set up the map and render it
+   // Set up the map and render it
    mapInit();
 
-   /*
-   Configure and generate the UI elements
-   */
-
-   updateLayerList(map);
-   
-   // Makes each of the operational layers sortable
-   $("#opLayers").sortable({
-      update: function() {
-         var order = $("#opLayers").sortable('toArray');                  
-         $.each(order, function(index, value) {
-            var layer = map.getLayersByName(value);
-            map.setLayerIndex(layer[0], order.length - index - 1);
-         });
-      }
-   });
+   /*====================================================================================*/
+   //Configure and generate the UI elements
 
    // Populate the base layers drop down menu
    $.each(map.layers, function(index, value) {
@@ -344,7 +406,7 @@ $(document).ready(function() {
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#layerAccordion, #dataAccordion").multiAccordion();
+   //$("#layerAccordion, #dataAccordion").multiAccordion();
 
    /*
    Hook up the other events for the general UI
@@ -684,4 +746,5 @@ $(document).ready(function() {
          }
       })
    });
+   /*====================================================================================*/
 });

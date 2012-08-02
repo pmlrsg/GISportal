@@ -112,7 +112,7 @@ function getLayers($xml)
 function filterLayers($layerName)
 {
    $whiteList = array(
-      "WECOP/Z5c",
+      //"WECOP/Z5c",
       "MRCS_ECOVARS/o2o",
       "MRCS_ECOVARS/si",
       "MRCS_ECOVARS/zoop",
@@ -187,10 +187,13 @@ function createDateCaches($array)
 
 function updateCache()
 {
-   $str = file_get_contents(GET_CAPABILITES_PATH . GET_CAPABILITES_PARAMS);
+   $str = file_get_contents(GET_CAPABILITES_PATH . GET_CAPABILITES_PARAMS) or
+      die("Can't contact getCapabilities Server");
+
    $xml = simplexml_load_string($str);
 
    $returnArray = getLayers($xml);
    $returnArray = createDateCaches($returnArray);
    $returnstring = createCache(MASTERCACHEPATH . FILEEXTENSION, CACHELIFE, json_encode($returnArray));
+
 }

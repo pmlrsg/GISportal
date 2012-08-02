@@ -14,6 +14,9 @@ OpenLayers.Layer.prototype.title = '';
 // Layer abstract
 OpenLayers.Layer.prototype.abstract = '';
 
+// Layer sensor
+OpenLayers.Layer.prototype.sensor = '';
+
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
 OpenLayers.Layer.prototype.controlID = 'opLayers';
@@ -148,10 +151,24 @@ OpenLayers.Map.prototype.createMasterCache = function() {
       type: 'GET',
       url: "./json/MasterCache.json", 
       dataType: 'json',
-      async: false, 
+      async: true, 
       success: function(data) {
          map.getCapabilities = data;
-         updateLayerList(map);
+         createOpLayers(map);
+
+         // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
+         // for data layers (in left panel) and data analysis (in right panel)
+         $("#layerAccordion, #dataAccordion").multiAccordion();
+      },
+      error: function(request, errorType, exception) {
+         $.gritter.add({
+            title: 'Error: Could not contact server',
+            text: 
+               'Could not contact the getCapabilities server. Error: ' + exception,
+            //image: 'img/OpEc_small.png',
+            class_name: 'gritter-light',
+            sticky: true, 
+         });
       }
    });
 }
