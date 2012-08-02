@@ -344,6 +344,10 @@ a.active.triggerR {
    width: 100%;
 }
 
+#nocss-info {
+   display: none;
+}
+
 .css-check {
    height: 2;
    width: 2;

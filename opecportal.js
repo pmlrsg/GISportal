@@ -329,7 +329,7 @@ function mapInit()
 //This code runs once the page has loaded - jQuery initialised
 $(document).ready(function() {
 
-   if($('.css-check').height() == 3)
+   if($('.css-check').height() == 2)
    {
       alert("hi");
    }
