@@ -63,9 +63,9 @@
 
 </head>
 <body>
-   <div>
-      <h1>Opec</h1>
-      <span>fghjsk</span>
+   <div id="nocss-info">
+      <h1>Opec Visualisation</h1>
+      <span>Operational Ecology Marine Ecosystem Forecasting</span>
       <noscript>
          <div id="noscript-warning">
             This website requires JavaScript to work. Please enable it in your browser.
