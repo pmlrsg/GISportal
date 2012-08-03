@@ -284,7 +284,7 @@ function setupGritter()
       text: 
          'You can use the layers button on the left to open and close the ' +
          '<a id="testopen" href="#">layers panel</a>. ' +
-         'The data button on the right allows you to specify regions of intreast (R.O.I). ',
+         'The data button on the right allows you to specify regions of interest (R.O.I). ',
       //image: 'img/OpEc_small.png',
       class_name: 'gritter-light',
       sticky: true, 

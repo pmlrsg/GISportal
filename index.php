@@ -63,17 +63,21 @@
 
 </head>
 <body>
+   <!-- CSS check and info for screen readers -->
    <div id="nocss-info">
       <h1>Opec Visualisation</h1>
       <span>Operational Ecology Marine Ecosystem Forecasting</span>
-      <noscript>
-         <div id="noscript-warning">
-            This website requires JavaScript to work. Please enable it in your browser.
-         </div>
+      <div class="css-check">
+         This website requires css to work. Please enable it in your browser.
+      </div>
+   </div>
+   <!-- JavaScript check -->
+   <noscript>
+      <div id="noscript-warning">
+         This website requires JavaScript to work. Please enable it in your browser.
+      </div>
    </noscript>
-   </div>
-   <div class="css-check">
-   </div>
+
    <!-- The Map -->
    <div id="map"></div>
    <!-- The Top Toolbar -->
