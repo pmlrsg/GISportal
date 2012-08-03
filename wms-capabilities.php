@@ -112,7 +112,13 @@ function getLayers($xml)
 function filterLayers($layerName)
 {
    $whiteList = array(
-      //"WECOP/Z5c",
+      "WECOP/Z5c",
+      "WECOP/Chl",
+      "WECOP/PAR_irradiance",
+      "WECOP/PAR_attenuation",
+      "WECOP/EIRg",
+      "WECOP/EIRb",
+      "WECOP/EIRr",
       "MRCS_ECOVARS/o2o",
       "MRCS_ECOVARS/si",
       "MRCS_ECOVARS/zoop",
@@ -124,6 +130,7 @@ function filterLayers($layerName)
       "MRCS_ECOVARS/p3c",
       "MRCS_ECOVARS/p4c",
       "MRCS_ECOVARS/vis01",
+      "AMT_NORTHERN/aot_869",
    );
 
    foreach($whiteList as $value)

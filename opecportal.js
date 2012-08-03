@@ -36,7 +36,7 @@ var quickRegion = [
 function createOpLayers(map) 
 {
    var theMap = map;
-   $.each(theMap.getCapabilities, function(i, item) 
+   $.each(theMap.getCapabilities.reverse(), function(i, item) 
    {
       // Add accordion for each sensor with layers
       if(item.Layers.length)
@@ -46,7 +46,7 @@ function createOpLayers(map)
          addSensorToPanel(sensorName, theMap);
 
          $.each(item.Layers, function(i, item) {
-            if(item.Name && item.Name!="") {
+            if(item.Name && item.Name != "") {
                createOpLayer(item, sensorName, theMap);
             }
          });
@@ -109,6 +109,8 @@ function createBaseLayers(map)
       { layers: 'landsat' }
    )
    map.addLayer(landsat);
+   map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
+   console.info(map.numBaseLayers);
 }
 
 // Creates reference layers, add any others here
@@ -193,24 +195,33 @@ function createRefLayers(map)
    blackSea.title = "The Black Sea (KML)";
    map.addLayer(blackSea);
    addLayerToPanel(blackSea);
+
+   map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+   console.info(map.numRefLayers);
 }
 
 function addSensorToPanel(sensorName, map)
 {
-   var sensor = sensorName.replace(/\s+/g, "");
-
-   $('#opLayers').append(
-      '<h3><a href="#">' + sensor + '</a></h3>' +
-      '<div id="' + sensor + '" class="sensor-accordion"></div>'
+   $('#opLayers').prepend(
+      '<h3><a href="#">' + sensorName + '</a></h3>' +
+      '<div id="' + sensorName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>'
    );
 
    // Makes each of the operational layers sortable
-   $('#' + sensor).sortable({
+   $('#' + sensorName.replace(/\s+/g, "")).sortable({
       update: function() {
-         var order = $('#' + sensor).sortable('toArray');                  
+         console.info('----------------------- New Sort -----------------------');
+         var offset = 0;
+         $.each($(this).nextAll('.sensor-accordion'), function(index, value) {
+            offset += $(this).children('li').size();
+            console.info('offset: ' + offset);
+         });
+         var order = $(this).sortable('toArray');                  
          $.each(order, function(index, value) {
             var layer = map.getLayersByName(value)[0];
-            map.setLayerIndex(layer, order.length - index - 1);
+            //var currentIndex = OpenLayers.Util.indexOf(map.layers, layer);
+            map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1);
+            console.info('numBaseLayers: ' + map.numBaseLayers + ' numRefLayers:' + map.numRefLayers + ' Offset: ' + offset + ' New position: ' + (map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1 + 1));
          });
       }
    });
@@ -236,7 +247,7 @@ function addLayerToPanel(layer)
       // jQuery selector for the layer controlID
       var selID = layer.controlID == 'opLayers' ? '#' + layer.sensor : '#' + layer.controlID; 
 
-      $(selID).append(
+      $(selID).prepend(
          '<li id="' + layer.name + '">' +
             '<img src="img/ajax-loader.gif"/>' +
             '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 

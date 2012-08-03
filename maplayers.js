@@ -8,6 +8,11 @@ OpenLayers.Map.prototype.enabledDays = [];
 // layer names, titles, abstracts, etc.
 OpenLayers.Map.prototype.getCapabilities = [];
 
+// Used as offsets when sorting layers in groups
+OpenLayers.Map.prototype.numBaseLayers = 0;
+OpenLayers.Map.prototype.numRefLayers = 0;
+OpenLayers.Map.prototype.numOpLayers = 0;
+
 // Layer title
 OpenLayers.Layer.prototype.title = '';
 
@@ -16,6 +21,9 @@ OpenLayers.Layer.prototype.abstract = '';
 
 // Layer sensor
 OpenLayers.Layer.prototype.sensor = '';
+
+// Current index position in the map's layers array
+OpenLayers.Layer.prototype.currentIndex = 0;
 
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer

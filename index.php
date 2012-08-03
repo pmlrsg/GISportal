@@ -100,7 +100,7 @@
          </li>
          <li class="divider"></li>
          <li>
-            <input type="button" title="Toggle Map Information Window"/>
+            <a href="#" id="mapInfoToggleBtn"><img src="img/mapLink.png" alt="Toggle Map Information Window"></a>
          </li>
       </ul>
    </div>

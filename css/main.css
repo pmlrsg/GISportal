@@ -143,6 +143,15 @@ ul li {
    text-indent:-32px;
 }
 
+#mapInfoToggleBtn {
+   height:32px;
+   width:32px;
+}
+
+#mapInfoToggleBtn:hover {
+   text-indent:-2px;
+}
+
 #topToolbar {
    top: 0;
    -moz-border-radius-bottomleft: 15px;
