@@ -209,6 +209,9 @@ function addSensorToPanel(sensorName, map)
 
    // Makes each of the operational layers sortable
    $('#' + sensorName.replace(/\s+/g, "")).sortable({
+      connectWith: ".sensor-accordion",
+      appendTo:".sensor-accordion",
+      helper:"clone",
       update: function() {
          console.info('----------------------- New Sort -----------------------');
          var offset = 0;
@@ -224,7 +227,7 @@ function addSensorToPanel(sensorName, map)
             console.info('numBaseLayers: ' + map.numBaseLayers + ' numRefLayers:' + map.numRefLayers + ' Offset: ' + offset + ' New position: ' + (map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1 + 1));
          });
       }
-   });
+   }).disableSelection();
 }
 
 /*------------------------------- Deprecated ----------------------------------
@@ -267,6 +270,11 @@ function addLayerToPanel(layer)
       });
       // Hide the ajax-loader initially
       $('#' + layer.name).find('img[src="img/ajax-loader.gif"]').hide();
+      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
+
+      layer.events.register("visibilitychanged", layer, function() {
+         checkLayerState(layer);
+      });
    }
 }
 
@@ -326,58 +334,94 @@ function mapInit()
    createRefLayers(map);
 
    // Add a couple of useful map controls
-   var mousePos = new OpenLayers.Control.MousePosition();
-   var permalink =  new OpenLayers.Control.Permalink();
-   map.addControls([mousePos,permalink]);
+   //var mousePos = new OpenLayers.Control.MousePosition();
+   //var permalink =  new OpenLayers.Control.Permalink();
+   //map.addControls([mousePos,permalink]);
 
    if(!map.getCenter()) {
       map.zoomTo(3);
    }
 }
 
-/*====================================================================================*/
+function layerDependent(data)
+{
+   map.getCapabilities = data;
+   createOpLayers(map);
 
-//This code runs once the page has loaded - jQuery initialised
-$(document).ready(function() {
+   // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
+   // for data layers (in left panel) and data analysis (in right panel)
+   $("#layerAccordion, #dataAccordion").multiAccordion();
 
-   if($('.css-check').height() == 2)
+   // Handle selection of visible layers
+   $('.lPanel li').click(function(e) {
+       var itm = $(this);
+       var child = itm.children('input').first();
+       if(child.is(':checked')) {
+           $('.lPanel li').each(function(index) {
+               $(this).removeClass('selectedLayer');
+           });
+           itm.addClass('selectedLayer');
+       }
+       else {
+           itm.removeClass('selectedLayer');
+       }
+   });
+
+   // Toggle visibility of data layers
+   $('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
+      var v = $(this).val();
+      var layer = map.getLayersByName(v)[0];
+      if($(this).is(':checked')) {
+         layer.selected = true;
+         // If the layer has date-time data, use special select routine
+         // that checks for valid data on the current date to decide if to show data
+         if(layer.temporal) {
+            map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
+            // Update map date cache now a new temporal layer has been added
+            map.refreshDateCache();
+         }
+         else {
+            layer.setVisibility(true);
+            checkLayerState(layer);
+         }
+      }
+      else {
+         layer.selected = false;
+         layer.setVisibility(false);
+         checkLayerState(layer);
+         // Update map date cache now a new temporal layer has been removed
+         if(layer.temporal){map.refreshDateCache();}
+      }
+   });
+
+   $('img[src="img/exclamation_small.png"]').click(function() 
    {
-      alert("hi");
-   }
+      var layerID = $(this).parent().parent().attr('id');
+      var layer = map.getLayersByName(layerID)[0];
 
-   // Need to render the jQuery UI info dialog before the map due to z-index issues!
-   $('#info').dialog({
-       position: ['left', 'bottom'],
-       width: 230,
-       height: 220,
-       resizable: false
+      
+      $.gritter.add({
+         title: 'Test Error Message',
+         text: 
+            'Test Error Message ',
+         //image: 'img/OpEc_small.png',
+         class_name: 'gritter-light',
+         sticky: true, 
+      });
    });
+}
 
-   // Show the scalebar for a selected layer
-   $('#scalebar').dialog({
-      position: ['center', 'center'],
-      width: 120,
-      height: 310,
-      resizable: true,
-      autoOpen: false
-   });
-
-   // Show metadata for a selected layer
-   $('#metadata').dialog({
-      position: ['center', 'center'],
-      width: 300,
-      height: 300,
-      resizable: true,
-      autoOpen: false
-   });
-
-   setupGritter();
-
-   // Set up the map and render it
-   mapInit();
-
+function nonLayerDependent()
+{
    /*====================================================================================*/
    //Configure and generate the UI elements
+
+   map.events.register("mousemove", map, function(e) 
+   { 
+      var position =  map.getLonLatFromPixel(e.xy);
+      if(position)
+         $('#latlng').text('Mouse Position: ' + position.lon.toFixed(3) + ', ' + position.lat.toFixed(3));
+   });
 
    // Populate the base layers drop down menu
    $.each(map.layers, function(index, value) {
@@ -402,10 +446,19 @@ $(document).ready(function() {
        beforeShowDay: function(date) {return map.allowedDays(date);},
        onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
    });
+
    $('#panZoom').buttonset();
    $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
    $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
    $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
+
+   // I just set up the basic buttons, you will need to set the icons and any css
+   $('#ROIButtonSet').buttonset();
+   $('#point').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
+   $('#box').button({ icons: { primary: 'ui-icon-circle-plus'} });
+   $('#circle').button({ icons: { primary: 'ui-icon-circle-minus'} });
+   $('#polygon').button({ icons: { primary: 'ui-icon-circle-minus'} });
+
    $("#dataTabs").tabs();
    // Must bind the creation of accordions under the tabs in this way to avoid messing up nested controls
    $('#dataTabs').bind('tabshow', function(event, ui) {
@@ -421,6 +474,7 @@ $(document).ready(function() {
 
    /*
    Hook up the other events for the general UI
+
    */
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
@@ -455,6 +509,10 @@ $(document).ready(function() {
        $(this).data('timeout', t);
    });
 
+   $('#shareMapToggleBtn').click(function() {
+       $('#shareOptions').toggle();
+   });
+
    // Add toggle info dialog functionality
    $('#infoToggleBtn').click(function(e) {
        if($('#info').dialog('isOpen')) {
@@ -465,7 +523,18 @@ $(document).ready(function() {
        }
    })
 
+   // Add toggle info dialog functionality
+   $('#mapInfoToggleBtn').click(function(e) {
+       if($('#mapInfo').dialog('isOpen')) {
+           $('#mapInfo').dialog('close');
+       }
+       else {
+           $('#mapInfo').dialog('open');
+       }
+   })
+
    /* 
+
    Set up event handling for the map including as well as mouse-based 
    OpenLayers controls for jQuery UI buttons and drawing controls
    */
@@ -474,10 +543,12 @@ $(document).ready(function() {
       'POI Layer',
       {
          /*style: {
+
                 strokeColor: 'green',
                 fillColor : 'green',
                 strokeWidth: 2,
                 fillOpacity: 0.3,
+
                 cursor: 'pointer'
          },*/
          preFeatureInsert: function(feature) {
@@ -550,46 +621,6 @@ $(document).ready(function() {
    $('#drawingControls input:radio').click(function(e) {
        toggleDrawingControl(this);
    });
-
-   // Handle selection of visible layers
-   $('.lPanel li').click(function(e) {
-       var itm = $(this);
-       var child = itm.children('input').first();
-       if(child.is(':checked')) {
-           $('.lPanel li').each(function(index) {
-               $(this).removeClass('selectedLayer');
-           });
-           itm.addClass('selectedLayer');
-       }
-       else {
-           itm.removeClass('selectedLayer');
-       }
-   });
-
-   // Toggle visibility of data layers
-   $('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
-      var v = $(this).val();
-      var layer = map.getLayersByName(v)[0];
-      if($(this).is(':checked')) {
-         layer.selected = true;
-         // If the layer has date-time data, use special select routine
-         // that checks for valid data on the current date to decide if to show data
-         if(layer.temporal) {
-            map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
-            // Update map date cache now a new temporal layer has been added
-            map.refreshDateCache();
-         }
-         else {
-            layer.setVisibility(true);
-         }
-      }
-      else {
-         layer.selected = false;
-         layer.setVisibility(false);
-         // Update map date cache now a new temporal layer has been removed
-         if(layer.temporal){map.refreshDateCache();}
-      }
-   })
 
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
@@ -727,16 +758,16 @@ $(document).ready(function() {
                         $('#metadata').dialog("option", "title", layer.title);
 
                         // Add new data
-                        $('<div><span>Source: ' + '</span></div>' +
-                           '<div><span>Name: ' + layer.title + '</span></div>' +
-                           '<div><span>BoundingBox: ' + 
+                        $('<div><label>Source: ' + '</label></div>' +
+                           '<div><label>Name: ' + layer.title + '</label></div>' +
+                           '<div><label>BoundingBox: ' + 
                               layer.exboundingbox.NorthBoundLatitude + 'N, ' +
                               layer.exboundingbox.EastBoundLongitude + 'E, ' +
                               layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
                               layer.exboundingbox.WestBoundLongitude + 'W ' + 
-                           '</span></div>' +
-                           '<div><span>Date Range:</span></div>' +
-                           '<div><span>Abstract: ' + layer.abstract + '</span></div>'
+                           '</label></div>' +
+                           '<div><label>Date Range:</label></div>' +
+                           '<div><label>Abstract: ' + layer.abstract + '</label></div>'
                         ).appendTo('#metadata');
 
                         $('#metadata').dialog('open');
@@ -758,4 +789,62 @@ $(document).ready(function() {
       })
    });
    /*====================================================================================*/
+}
+
+function checkLayerState(layer)
+{
+   if(!layer.visibility && layer.selected)
+      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
+   else
+      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
+}
+
+/*====================================================================================*/
+
+//This code runs once the page has loaded - jQuery initialised
+$(document).ready(function() {
+
+   // Need to render the jQuery UI info dialog before the map due to z-index issues!
+   $('#info').dialog({
+       position: ['left', 'bottom'],
+       width: 230,
+       height: 220,
+       resizable: false
+   });
+
+   // Show the scalebar for a selected layer
+   $('#scalebar').dialog({
+      position: ['center', 'center'],
+      width: 120,
+      height: 310,
+      resizable: true,
+      autoOpen: false
+   });
+
+   // Show metadata for a selected layer
+   $('#metadata').dialog({
+      position: ['center', 'center'],
+      width: 400,
+      height: 200,
+      resizable: true,
+      autoOpen: false
+   });
+
+   // Show metadata for a selected layer
+   $('#mapInfo').dialog({
+      position: ['center', 'center'],
+      width: 220,
+      height: 200,
+      resizable: true,
+      autoOpen: false
+   });
+
+   // Setup the gritter so we can use it for error messages
+   setupGritter();
+
+   // Set up the map and render it
+   mapInit();
+
+   // Start setting up anything that is not layer dependent
+   nonLayerDependent();
 });

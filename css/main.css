@@ -149,7 +149,7 @@ ul li {
 }
 
 #mapInfoToggleBtn:hover {
-   text-indent:-2px;
+   text-indent:-32px;
 }
 
 #topToolbar {
@@ -185,6 +185,21 @@ ul li {
    -webkit-border-top-right-radius: 15px;
    border-top-left-radius: 15px;
    border-top-right-radius: 15px;
+}
+
+/* Map Options Panel */
+#shareOptions {
+   display:none;
+   top: 53px;
+   height:100px;
+   width:150px;
+   margin-left: 100px;
+   -moz-border-radius-bottomleft: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-bottom-right-radius: 15px;
 }
 
 /* Toolbar buttons (overriding jQuery UI styling) */
@@ -322,6 +337,12 @@ a.active.triggerR {
    border:0;
 }
 
+#metadata label {
+   text-align: center;
+   line-height: 1.3em;
+   font-size: 1.1em;
+}
+
 /* Override some OpenLayers and Google Maps Styling */
 .olLayerGooglePoweredBy, .olLayerGoogleCopyright {
    visibility:hidden;
@@ -333,6 +354,11 @@ a.active.triggerR {
 
 .context-menu-list {
    color: black;
+}
+
+div .sensor-accordion {
+   position: static;
+   overflow: hidden;
 }
 
 #layer-exclamation {
@@ -363,8 +389,15 @@ a.active.triggerR {
    display: none;
 }
 
+#shareLink {
+   width: 140px;
+}
+
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
 .ui-accordion .ui-accordion-content { padding: 0.3em;}
+
+/* Override some accordion styles */
+.ui-accordion .ui-accordion-content { position: static; overflow: hidden; }

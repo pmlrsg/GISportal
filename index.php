@@ -99,8 +99,23 @@
             </fieldset>
          </li>
          <li class="divider"></li>
+         <!-- Placeholder ROI radio buttons -->
+         <li id="ROIButtonSet">
+            <input type="radio" id="point" name="radio" value="point" checked="checked" />
+               <label class="iconBtn" for="point" title="Point"></label>
+            <input type="radio" id="box" name="radio" value="box"/>
+               <label class="iconBtn" for="box" title="Box"></label>
+            <input type="radio" id="circle" name="radio" value="circle" />
+               <label class="iconBtn" for="circle" title="Circle"></label>
+            <input type="radio" id="polygon" name="radio" value="polygon" />
+               <label class="iconBtn" for="polygon" title="Polygon"></label>
+         </li>
+         <li class="divider"></li>
          <li>
-            <a href="#" id="mapInfoToggleBtn"><img src="img/mapLink.png" alt="Toggle Map Information Window"></a>
+            <a href="#" id="mapInfoToggleBtn"><img src="img/info32.png" alt="Toggle Map Information Window"></a>        
+         </li>
+         <li>
+            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"></a>
          </li>
       </ul>
    </div>
@@ -232,6 +247,13 @@
          <label class="iconBtn" for="polygonToggle">draw polygon</label>
       </div> 
    </div>
+   <div class="toolbar" id="shareOptions">
+   	<h3>Share</h3>
+      <div>
+         <input type="text" name="shareLink" value="link" id="shareLink" />
+         <label class="iconBtn" for="shareLink" />
+      </div> 
+   </div>
    <div id="info" title="Information">
       <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
       <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
@@ -243,6 +265,11 @@
       <img src="http://maelstrom.npm.ac.uk:8080/ncWMS/wms?REQUEST=GetLegendGraphic&LAYER=MRCS_ECOVARS/si&PALETTE=nasa_rainbow" alt="Scalebar"/>
    </div>
    <div id="metadata" title="Metadata">
+   </div>
+   <div id="mapInfo" title="MapInfo">
+      <div>
+         <span id="latlng"></span>
+      </div>
    </div>
 </body>
 </html>

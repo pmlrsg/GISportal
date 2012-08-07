@@ -13,6 +13,8 @@ OpenLayers.Map.prototype.numBaseLayers = 0;
 OpenLayers.Map.prototype.numRefLayers = 0;
 OpenLayers.Map.prototype.numOpLayers = 0;
 
+OpenLayers.Map.prototype.error;
+
 // Layer title
 OpenLayers.Layer.prototype.title = '';
 
@@ -57,8 +59,22 @@ OpenLayers.Layer.prototype.selected = false;
 // This is an asynchronous AJAX load of the JSON data
 OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
    var layer = this;
-   $.getJSON(cacheFile, function(data) {
-      layer.DTCache = data.date;
+   $.ajax({
+      type: 'GET',
+      url: cacheFile, 
+      dataType: 'json',
+      success: function(data) {
+            layer.DTCache = data.date;
+      },
+      error: function(request, errorType, exception) {
+         $.gritter.add({
+            title: 'Error: Could not get date cache',
+            text: 'Could not get the date cache from the server. Try refreshing the page',
+            //image: 'img/OpEc_small.png',
+            class_name: 'gritter-light',
+            sticky: true,
+         });
+      },
    });      
 };
 
@@ -91,6 +107,7 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
          lyr.selectedDateTime = mDate[0];
          layer.mergeNewParams({time: lyr.selectedDateTime});
          layer.setVisibility(layer.selected);
+         //checkLayerState(layer);
          // DEBUG
          console.info('Layer ' + layer.name + ' data available for date-time ' + lyr.selectedDateTime + '. Layer selection and display: ' + layer.selected);
       }
@@ -98,10 +115,13 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
          lyr.currentDateTimes = [];
          lyr.selectedDateTime = '';
          layer.setVisibility(false);
+         //checkLayerState(layer);
          // DEBUG
          console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
       }
    }
+
+   checkLayerState(layer)
 };
 
 // Map function to filter of layers with date-time dependencies to an yyyy-mm-dd format date
@@ -159,15 +179,7 @@ OpenLayers.Map.prototype.createMasterCache = function() {
       type: 'GET',
       url: "./json/MasterCache.json", 
       dataType: 'json',
-      async: true, 
-      success: function(data) {
-         map.getCapabilities = data;
-         createOpLayers(map);
-
-         // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
-         // for data layers (in left panel) and data analysis (in right panel)
-         $("#layerAccordion, #dataAccordion").multiAccordion();
-      },
+      success: layerDependent,
       error: function(request, errorType, exception) {
          $.gritter.add({
             title: 'Error: Could not contact server',
