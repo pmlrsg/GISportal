@@ -110,7 +110,6 @@ function createBaseLayers(map)
    )
    map.addLayer(landsat);
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
-   console.info(map.numBaseLayers);
 }
 
 // Creates reference layers, add any others here
@@ -197,7 +196,6 @@ function createRefLayers(map)
    addLayerToPanel(blackSea);
 
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
-   console.info(map.numRefLayers);
 }
 
 function addSensorToPanel(sensorName, map)
@@ -212,19 +210,17 @@ function addSensorToPanel(sensorName, map)
       connectWith: ".sensor-accordion",
       appendTo:".sensor-accordion",
       helper:"clone",
-      update: function() {
-         console.info('----------------------- New Sort -----------------------');
+      update: function() 
+      {
          var offset = 0;
          $.each($(this).nextAll('.sensor-accordion'), function(index, value) {
             offset += $(this).children('li').size();
-            console.info('offset: ' + offset);
          });
+
          var order = $(this).sortable('toArray');                  
          $.each(order, function(index, value) {
             var layer = map.getLayersByName(value)[0];
-            //var currentIndex = OpenLayers.Util.indexOf(map.layers, layer);
             map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1);
-            console.info('numBaseLayers: ' + map.numBaseLayers + ' numRefLayers:' + map.numRefLayers + ' Offset: ' + offset + ' New position: ' + (map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1 + 1));
          });
       }
    }).disableSelection();
@@ -294,30 +290,72 @@ function setupGritter()
    $.extend($.gritter.options, { 
       position: 'bottom-right',
       fade_in_speed: 'medium',
-      fade_out_speed: 2000,
+      fade_out_speed: 800,
       time: 6000
    });
 
+   // Add the opening message
    $.gritter.add({
       title: 'Welcome to the Opec Portal',
       text: 
-         'You can use the layers button on the left to open and close the ' +
-         '<a id="testopen" href="#">layers panel</a>. ' +
-         'The data button on the right allows you to specify regions of interest (R.O.I). ',
+         'You can use the ' +
+         '<a id="highlightLayersBtn" href="#">layers button</a>' +
+         ' on the left to open and close the ' +
+         '<a id="openLeftPanel" href="#">layers panel</a> ' +
+         ' which allows you to select the layers you want to view. ' + 
+         'The ' +
+         '<a id="highlightDataBtn" href="#">data button</a>' + 
+         ' on the right does the same for the ' +
+         '<a id="openRightPanel" href="#">data panel</a> ' +
+         ' which allows you to specify regions of interest (R.O.I)' +
+         ' and then get graphs for the selected area.',
       //image: 'img/OpEc_small.png',
       class_name: 'gritter-light',
       sticky: true, 
    });
 
-   $('#testopen').click(function(e) {
+   // Highlight the layer button with a red border on hover
+   $('#highlightLayersBtn').hover(function() {
+         $('.triggerL').css('border', '2px solid red');
+      },
+      function() {
+         $('.triggerL').css('border', '');
+   });
+
+   // Highlight the data button with a red border on hover
+   $('#highlightDataBtn').hover(function() {
+         $('.triggerR').css('border', '2px solid red');
+      },
+      function() {
+         $('.triggerR').css('border', '');
+   });
+
+   // Open the layer panel on click
+   $('#openLeftPanel').click(function(e) {
       $('.triggerL').trigger('click');
+      return false;
+   });
+
+   // Open the data panel on click
+   $('#openRightPanel').click(function(e) {
+      $('.triggerR').trigger('click');
+      return false;
    });
 }
 
-/*
-Start mapInit() - the main function for setting up the map
-plus its controls, layers, styling and events.
-*/
+function gritterErrorHandler(layer, request, errorType, exception)
+{
+   $.gritter.add({
+      title: 'Error: Could not get date cache',
+      text: 'Could not get the date cache from the server for ' + layer.name + '. Try refreshing the page',
+      //image: 'img/OpEc_small.png',
+      class_name: 'gritter-light',
+      sticky: true,
+   });
+}
+
+// Start mapInit() - the main function for setting up the map
+// plus its controls, layers, styling and events.
 function mapInit() 
 {
    map = new OpenLayers.Map('map', {
@@ -399,11 +437,9 @@ function layerDependent(data)
       var layerID = $(this).parent().parent().attr('id');
       var layer = map.getLayersByName(layerID)[0];
 
-      
       $.gritter.add({
          title: 'Test Error Message',
-         text: 
-            'Test Error Message ',
+         text: 'Test Error Message ',
          //image: 'img/OpEc_small.png',
          class_name: 'gritter-light',
          sticky: true, 
@@ -411,9 +447,10 @@ function layerDependent(data)
    });
 }
 
+/*====================================================================================*/
+
 function nonLayerDependent()
 {
-   /*====================================================================================*/
    //Configure and generate the UI elements
 
    map.events.register("mousemove", map, function(e) 
@@ -472,10 +509,8 @@ function nonLayerDependent()
    // for data layers (in left panel) and data analysis (in right panel)
    //$("#layerAccordion, #dataAccordion").multiAccordion();
 
-   /*
-   Hook up the other events for the general UI
+   //Hook up the other events for the general UI
 
-   */
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
        $(".lPanel").toggle("fast");
@@ -491,46 +526,49 @@ function nonLayerDependent()
 
    // Add map options panel rollover functionality
    $('#mapOptionsBtn').hover(function() {
-       clearTimeout($(this).data('timeout'));
-       $('#mapOptions').show('fast');
+      clearTimeout($(this).data('timeout'));
+      $('#mapOptions').show('fast');
    }, function() {
-       var t = setTimeout(function() {
-           $('#mapOptions').hide('fast');
-       }, 500);
-       $(this).data('timeout', t);
+      var t = setTimeout(function() {
+         $('#mapOptions').hide('fast');
+      }, 500);
+      $(this).data('timeout', t);
    });
    $('#mapOptions').hover(function() {
-       clearTimeout($('#mapOptionsBtn').data('timeout'));
-       $('#mapOptions').show();
+      clearTimeout($('#mapOptionsBtn').data('timeout'));
+      $('#mapOptions').show();
    }, function() {
-       var t = setTimeout(function() {
-           $('#mapOptions').hide('fast');
-       }, 300);
-       $(this).data('timeout', t);
+      var t = setTimeout(function() {
+         $('#mapOptions').hide('fast');
+      }, 300);
+      $(this).data('timeout', t);
    });
 
    $('#shareMapToggleBtn').click(function() {
-       $('#shareOptions').toggle();
+      $('#shareOptions').toggle();
+      return false;
    });
 
    // Add toggle info dialog functionality
    $('#infoToggleBtn').click(function(e) {
-       if($('#info').dialog('isOpen')) {
-           $('#info').dialog('close');
-       }
-       else {
-           $('#info').dialog('open');
-       }
+      if($('#info').dialog('isOpen')) {
+        $('#info').dialog('close');
+      }
+      else {
+        $('#info').dialog('open');
+      }
+      return false;
    })
 
    // Add toggle info dialog functionality
    $('#mapInfoToggleBtn').click(function(e) {
-       if($('#mapInfo').dialog('isOpen')) {
-           $('#mapInfo').dialog('close');
-       }
-       else {
-           $('#mapInfo').dialog('open');
-       }
+      if($('#mapInfo').dialog('isOpen')) {
+        $('#mapInfo').dialog('close');
+      }
+      else {
+        $('#mapInfo').dialog('open');
+      }
+      return false;
    })
 
    /* 
@@ -699,7 +737,7 @@ function nonLayerDependent()
                   callback: function() 
                   {
                      var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-                     layer.mergeNewParams({style: value.Name == 'Remove Style' ? '' : value.Name});
+                     layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});
                   }
                }                       
             });
@@ -788,8 +826,9 @@ function nonLayerDependent()
          }
       })
    });
-   /*====================================================================================*/
 }
+
+/*====================================================================================*/
 
 function checkLayerState(layer)
 {

@@ -393,6 +393,10 @@ div .sensor-accordion {
    width: 140px;
 }
 
+.highlighted {
+   border: 2px solid red;
+}
+
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }

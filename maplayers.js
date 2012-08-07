@@ -13,8 +13,6 @@ OpenLayers.Map.prototype.numBaseLayers = 0;
 OpenLayers.Map.prototype.numRefLayers = 0;
 OpenLayers.Map.prototype.numOpLayers = 0;
 
-OpenLayers.Map.prototype.error;
-
 // Layer title
 OpenLayers.Layer.prototype.title = '';
 
@@ -67,13 +65,7 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
             layer.DTCache = data.date;
       },
       error: function(request, errorType, exception) {
-         $.gritter.add({
-            title: 'Error: Could not get date cache',
-            text: 'Could not get the date cache from the server. Try refreshing the page',
-            //image: 'img/OpEc_small.png',
-            class_name: 'gritter-light',
-            sticky: true,
-         });
+         gritterErrorHandler(layer, request, errorType, exception);
       },
    });      
 };
