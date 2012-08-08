@@ -24,7 +24,7 @@
 <!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.22.custom.js"></script>
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.21.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
