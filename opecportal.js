@@ -201,8 +201,10 @@ function createRefLayers(map)
 function addSensorToPanel(sensorName, map)
 {
    $('#opLayers').prepend(
-      '<h3><a href="#">' + sensorName + '</a></h3>' +
-      '<div id="' + sensorName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>'
+      '<div>' +
+         '<h3><a href="#">' + sensorName + '</a></h3>' +
+         '<div id="' + sensorName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>' +
+      '</div>'
    );
 
    // Makes each of the operational layers sortable
@@ -212,16 +214,7 @@ function addSensorToPanel(sensorName, map)
       helper:"clone",
       update: function() 
       {
-         var offset = 0;
-         $.each($(this).nextAll('.sensor-accordion'), function(index, value) {
-            offset += $(this).children('li').size();
-         });
-
-         var order = $(this).sortable('toArray');                  
-         $.each(order, function(index, value) {
-            var layer = map.getLayersByName(value)[0];
-            map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + offset + order.length - index - 1);
-         });
+         updateLayerOrder($(this));
       }
    }).disableSelection();
 }
@@ -264,10 +257,11 @@ function addLayerToPanel(layer)
       layer.events.register("loadend", layer, function(e) {
          $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
       });
-      // Hide the ajax-loader initially
+      // Hide the ajax-loader and the exclamation mark initially
       $('#' + layer.name).find('img[src="img/ajax-loader.gif"]').hide();
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 
+      // Check the layer state when its visibility is changed
       layer.events.register("visibilitychanged", layer, function() {
          checkLayerState(layer);
       });
@@ -343,14 +337,64 @@ function setupGritter()
    });
 }
 
-function gritterErrorHandler(layer, request, errorType, exception)
+function gritterErrorHandler(layer, type, request, errorType, exception)
 {
-   $.gritter.add({
-      title: 'Error: Could not get date cache',
-      text: 'Could not get the date cache from the server for ' + layer.name + '. Try refreshing the page',
-      //image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true,
+   if(layer)
+   {
+      $.gritter.add({
+         title: errorType + ': ' + request.status + ' ' + exception,
+         text: 'Could not get the ' + type + ' from the server for ' + layer.name + '. Try refreshing the page',
+         //image: 'img/OpEc_small.png',
+         class_name: 'gritter-light',
+         sticky: true,
+      });
+   }
+   else
+   {
+      $.gritter.add({
+         title: errorType + ': ' + request.state + ' ' + exception,
+         text: 'Could not get the ' + type + ' from the server. Try refreshing the page',
+         //image: 'img/OpEc_small.png',
+         class_name: 'gritter-light',
+         sticky: true,
+      });
+   }
+}
+
+function updateSensorOrder()
+{
+/*
+   var layerOffset = 0;
+   $.each(ui.item.nextAll('div').children('.sensor-accordion'), function(index, value) {
+      layerOffset += $(this).children('li').size();
+   });
+   console.info('offset: ' + layerOffset);
+
+   var order = sensor.children('div').children('.sensor-accordion').sortable('toArray');                  
+   $.each(order, function(index, value) {
+      var layer = map.getLayersByName(value)[0];
+      // Adding one for the vector layer, will be replaced by an offset
+      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1 + 1);
+   });*/
+
+   $.each($('.sensor-accordion'), function(index, value) {
+      updateLayerOrder($(this));
+   });
+}
+
+function updateLayerOrder(layer)
+{
+   var layerOffset = 0;
+   $.each(layer.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
+      layerOffset += $(this).children('li').size();
+   });
+   console.info('offset: ' + layerOffset);
+
+   var order = layer.sortable('toArray');                  
+   $.each(order, function(index, value) {
+      var layer = map.getLayersByName(value)[0];
+      // Adding one for the vector layer, will be replaced by an offset
+      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1 + 1);
    });
 }
 
@@ -388,7 +432,36 @@ function layerDependent(data)
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#layerAccordion, #dataAccordion").multiAccordion();
+   $("#layerAccordion, #dataAccordion").multiAccordion({
+      header: '> div > h3'
+   });
+
+   $('#opLayers').bind('accordionchangestart', function(e, ui) {
+      if($(this).hasClass('test'))
+      {
+         e.stopPropagation();
+         return false;
+      }
+      
+      return true;
+   });
+
+   // Makes each of the sensor accordions sortable
+   $('#opLayers').sortable({
+      axis: 'y',
+      handle: 'h3',
+      update: function() 
+      {
+         updateSensorOrder();
+      },
+   })
+   .disableSelection()
+   .bind('sortstart', function(e, ui) {
+      $(this).addClass('test');
+   })
+   .bind('sortstop', function(e, ui) {
+      $(this).removeClass('test');
+   });
 
    // Handle selection of visible layers
    $('.lPanel li').click(function(e) {
@@ -453,6 +526,7 @@ function nonLayerDependent()
 {
    //Configure and generate the UI elements
 
+   // Update our latlng on the mousemove event
    map.events.register("mousemove", map, function(e) 
    { 
       var position =  map.getLonLatFromPixel(e.xy);
@@ -869,7 +943,7 @@ $(document).ready(function() {
       autoOpen: false
    });
 
-   // Show metadata for a selected layer
+   // Show map info such as latlng
    $('#mapInfo').dialog({
       position: ['center', 'center'],
       width: 220,

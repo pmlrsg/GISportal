@@ -65,7 +65,7 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
             layer.DTCache = data.date;
       },
       error: function(request, errorType, exception) {
-         gritterErrorHandler(layer, request, errorType, exception);
+         gritterErrorHandler(layer, 'date cache', request, errorType, exception);
       },
    });      
 };
@@ -173,14 +173,7 @@ OpenLayers.Map.prototype.createMasterCache = function() {
       dataType: 'json',
       success: layerDependent,
       error: function(request, errorType, exception) {
-         $.gritter.add({
-            title: 'Error: Could not contact server',
-            text: 
-               'Could not contact the getCapabilities server. Error: ' + exception,
-            //image: 'img/OpEc_small.png',
-            class_name: 'gritter-light',
-            sticky: true, 
-         });
+         gritterErrorHandler(null, 'master cache', request, errorType, exception);
       }
    });
 }
