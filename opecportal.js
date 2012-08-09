@@ -43,7 +43,7 @@ function createOpLayers(map)
       {
          var sensorName = item.Sensor;
          // Create the accordion for the sensor
-         addSensorToPanel(sensorName, theMap);
+         addAccordionToPanel(sensorName, theMap);
 
          $.each(item.Layers, function(i, item) {
             if(item.Name && item.Name != "") {
@@ -198,17 +198,17 @@ function createRefLayers(map)
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
 
-function addSensorToPanel(sensorName, map)
+function addAccordionToPanel(accordionName, map)
 {
    $('#opLayers').prepend(
       '<div>' +
-         '<h3><a href="#">' + sensorName + '</a></h3>' +
-         '<div id="' + sensorName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>' +
+         '<h3><a href="#">' + accordionName + '</a></h3>' +
+         '<div id="' + accordionName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>' +
       '</div>'
    );
 
    // Makes each of the operational layers sortable
-   $('#' + sensorName.replace(/\s+/g, "")).sortable({
+   $('#' + accordionName.replace(/\s+/g, "")).sortable({
       connectWith: ".sensor-accordion",
       appendTo:".sensor-accordion",
       helper:"clone",
@@ -463,6 +463,10 @@ function layerDependent(data)
       $(this).removeClass('test');
    });
 
+   $('#layerAccordion').css('max-height', $(window).height() - 120);
+   $('#opLayers').css('max-height', ($(window).height() - 60) / 2);
+   $('#refLayers').css('max-height', ($(window).height() - 60) / 2);
+
    // Handle selection of visible layers
    $('.lPanel li').click(function(e) {
        var itm = $(this);
@@ -587,15 +591,15 @@ function nonLayerDependent()
 
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
-       $(".lPanel").toggle("fast");
-       $(this).toggleClass("active");
-       return false;
+      $(".lPanel").toggle("fast");
+      $(this).toggleClass("active");
+      return false;
    });
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
-       $(".rPanel").toggle("fast");
-       $(this).toggleClass("active");
-       return false;
+      $(".rPanel").toggle("fast");
+      $(this).toggleClass("active");
+      return false;
    });
 
    // Add map options panel rollover functionality

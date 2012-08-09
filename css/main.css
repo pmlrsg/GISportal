@@ -248,10 +248,18 @@ ul li {
    border-top-right-radius: 15px;
 }
 
-#opLayers
-{
-   max-height: 180px;
+#layerAccordion {
+   overflow: hidden;
+}
+
+#opLayers {
+   height: auto;
    overflow-y: scroll; 
+}
+
+#refLayers {
+   height: auto;
+   overflow-y: scroll;
 }
 
 .lPanel .selectedLayer {
