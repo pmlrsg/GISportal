@@ -195,6 +195,46 @@ function createRefLayers(map)
    map.addLayer(blackSea);
    addLayerToPanel(blackSea);
 
+   // Setup Black sea outline layer (Vector)
+   var blackSea = new OpenLayers.Layer.Vector('The_Blue_Sea_KML', {
+      projection: lonlat,
+      strategies: [new OpenLayers.Strategy.Fixed()],
+      protocol: new OpenLayers.Protocol.HTTP({
+         url: 'black_sea.kml',
+         format: new OpenLayers.Format.KML({
+            extractStyles: true,
+            extractAttributes: true
+         })
+      })
+   });
+
+   // Make this layer a reference layer
+   blackSea.controlID = "refLayers";
+   blackSea.selected = true;
+   blackSea.title = "The Black Sea (KML)";
+   map.addLayer(blackSea);
+   addLayerToPanel(blackSea);
+
+   // Setup Black sea outline layer (Vector)
+   var blackSea = new OpenLayers.Layer.Vector('The_Green_Sea_KML', {
+      projection: lonlat,
+      strategies: [new OpenLayers.Strategy.Fixed()],
+      protocol: new OpenLayers.Protocol.HTTP({
+         url: 'black_sea.kml',
+         format: new OpenLayers.Format.KML({
+            extractStyles: true,
+            extractAttributes: true
+         })
+      })
+   });
+
+   // Make this layer a reference layer
+   blackSea.controlID = "refLayers";
+   blackSea.selected = true;
+   blackSea.title = "The Black Sea (KML)";
+   map.addLayer(blackSea);
+   addLayerToPanel(blackSea);
+
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
 
@@ -463,9 +503,17 @@ function layerDependent(data)
       $(this).removeClass('test');
    });
 
+   
+
    $('#layerAccordion').css('max-height', $(window).height() - 120);
-   $('#opLayers').css('max-height', ($(window).height() - 60) / 2);
-   $('#refLayers').css('max-height', ($(window).height() - 60) / 2);
+   $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+   $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+
+   $(window).resize(function() {
+      $('#layerAccordion').css('max-height', $(window).height() - 120);
+      $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+      $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+   });
 
    // Handle selection of visible layers
    $('.lPanel li').click(function(e) {
