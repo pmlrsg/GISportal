@@ -392,8 +392,8 @@ div .sensor-accordion {
 }
 
 .css-check {
-   height: 2;
-   width: 2;
+   height: 2px;
+   width: 2px;
    display: none;
 }
 

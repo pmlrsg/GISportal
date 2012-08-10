@@ -20,11 +20,11 @@
 <!-- Custom functions and extensions to exisiting JavaScript objects -->
 <script type="text/javascript" src="custom.js"></script>
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.min.js"></script>
 <!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.21.custom.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <script type="text/javascript" src="js-libs/multiAccordion.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
@@ -101,7 +101,7 @@
          <li class="divider"></li>
          <!-- Placeholder ROI radio buttons -->
          <li id="ROIButtonSet">
-            <input type="radio" id="point" name="radio" value="point" checked="checked" />
+            <input type="radio" id="point" name="radio" value="point" />
                <label class="iconBtn" for="point" title="Point"></label>
             <input type="radio" id="box" name="radio" value="box"/>
                <label class="iconBtn" for="box" title="Box"></label>

@@ -317,6 +317,28 @@ function customPermalinkArgs()
    );
 }
 
+function updateAccordionOrder()
+{
+   $.each($('.sensor-accordion'), function(index, value) {
+      updateLayerOrder($(this));
+   });
+}
+
+function updateLayerOrder(layer)
+{
+   var layerOffset = 0;
+   $.each(layer.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
+      layerOffset += $(this).children('li').length;
+   });
+   console.info('offset: ' + layerOffset);
+
+   var order = layer.sortable('toArray');                  
+   $.each(order, function(index, value) {
+      var layer = map.getLayersByName(value)[0];
+      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1);
+   });
+}
+
 // Setup the options for the gritter and create opening 
 // welcome message.
 function setupGritter()
@@ -401,43 +423,6 @@ function gritterErrorHandler(layer, type, request, errorType, exception)
    }
 }
 
-function updateSensorOrder()
-{
-/*
-   var layerOffset = 0;
-   $.each(ui.item.nextAll('div').children('.sensor-accordion'), function(index, value) {
-      layerOffset += $(this).children('li').size();
-   });
-   console.info('offset: ' + layerOffset);
-
-   var order = sensor.children('div').children('.sensor-accordion').sortable('toArray');                  
-   $.each(order, function(index, value) {
-      var layer = map.getLayersByName(value)[0];
-      // Adding one for the vector layer, will be replaced by an offset
-      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1 + 1);
-   });*/
-
-   $.each($('.sensor-accordion'), function(index, value) {
-      updateLayerOrder($(this));
-   });
-}
-
-function updateLayerOrder(layer)
-{
-   var layerOffset = 0;
-   $.each(layer.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
-      layerOffset += $(this).children('li').size();
-   });
-   console.info('offset: ' + layerOffset);
-
-   var order = layer.sortable('toArray');                  
-   $.each(order, function(index, value) {
-      var layer = map.getLayersByName(value)[0];
-      // Adding one for the vector layer, will be replaced by an offset
-      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1 + 1);
-   });
-}
-
 // Start mapInit() - the main function for setting up the map
 // plus its controls, layers, styling and events.
 function mapInit() 
@@ -446,7 +431,8 @@ function mapInit()
       projection: lonlat,
       displayProjection: lonlat,
       controls: []
-   })
+   });
+
 
    // Get the master cache file from the server. This file contains some of 
    // the data from a getCapabilities query.
@@ -486,13 +472,13 @@ function layerDependent(data)
       return true;
    });
 
-   // Makes each of the sensor accordions sortable
+   // Makes each of the accordions sortable
    $('#opLayers').sortable({
       axis: 'y',
       handle: 'h3',
       update: function() 
       {
-         updateSensorOrder();
+         updateAccordionOrder();
       },
    })
    .disableSelection()
@@ -503,8 +489,7 @@ function layerDependent(data)
       $(this).removeClass('test');
    });
 
-   
-
+   // set the max height of each of the accordions relative to the size of the window
    $('#layerAccordion').css('max-height', $(window).height() - 120);
    $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
    $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
@@ -570,6 +555,8 @@ function layerDependent(data)
          sticky: true, 
       });
    });
+
+   setupDrawingControl();
 }
 
 /*====================================================================================*/
@@ -660,6 +647,7 @@ function nonLayerDependent()
       }, 500);
       $(this).data('timeout', t);
    });
+
    $('#mapOptions').hover(function() {
       clearTimeout($('#mapOptionsBtn').data('timeout'));
       $('#mapOptions').show();
@@ -670,6 +658,7 @@ function nonLayerDependent()
       $(this).data('timeout', t);
    });
 
+   // Add permalink share panel click functionality
    $('#shareMapToggleBtn').click(function() {
       $('#shareOptions').toggle();
       return false;
@@ -686,7 +675,7 @@ function nonLayerDependent()
       return false;
    })
 
-   // Add toggle info dialog functionality
+   // Add toggle map info dialog functionality
    $('#mapInfoToggleBtn').click(function(e) {
       if($('#mapInfo').dialog('isOpen')) {
         $('#mapInfo').dialog('close');
@@ -696,95 +685,6 @@ function nonLayerDependent()
       }
       return false;
    })
-
-   /* 
-
-   Set up event handling for the map including as well as mouse-based 
-   OpenLayers controls for jQuery UI buttons and drawing controls
-   */
-   // Add the Vector drawing layer for POI drawing
-   var vectorLayer = new OpenLayers.Layer.Vector(
-      'POI Layer',
-      {
-         /*style: {
-
-                strokeColor: 'green',
-                fillColor : 'green',
-                strokeWidth: 2,
-                fillOpacity: 0.3,
-
-                cursor: 'pointer'
-         },*/
-         preFeatureInsert: function(feature) {
-            this.removeAllFeatures()
-         },
-         onFeatureInsert: function(feature) {
-            // DEBUG
-            ROIAdded(feature)
-         }
-      }
-   );
-   vectorLayer.displayInLayerSwitcher=false;
-   map.addLayer(vectorLayer);
-   
-   // Function called once a ROI has been drawn on the map
-   function ROIAdded(feature){
-      console.info('Feature added ' + feature.geometry);
-   }
-
-   // Create  map controls identified by key values which can be activated and deactivated
-   var mapControls = {
-      zoomIn: new OpenLayers.Control.ZoomBox(
-         { out: false, alwaysZoom: true }
-      ),
-      zoomOut: new OpenLayers.Control.ZoomBox(
-         { out: true, alwaysZoom: true }
-      ),
-      pan: new OpenLayers.Control.Navigation(),
-      point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: true }}),
-      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}, persist: true}),
-      polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
-   };
-
-   // Add all the controls to the map
-   for(var key in mapControls) {
-       var control = mapControls[key];
-       map.addControl(control);
-   }
-
-   // Function which can toggle OpenLayers controls based on the clicked control
-   // The value of the value of the underlying radio button is used to match 
-   // against the key value in the mapControls array so the right control is toggled
-   function toggleControl(element) {
-      for(key in mapControls) {
-         var control = mapControls[key];
-         if($(element).val() == key) {
-            $('#'+key).attr('checked', true);
-            control.activate();
-         }
-         else {
-            $('#'+key).attr('checked', false);
-            control.deactivate();
-         }
-      }
-      $('#panZoom input:radio').button('refresh');
-   }
-   // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
-   function toggleDrawingControl(element) {
-      toggleControl(element);
-      vectorLayer.removeAllFeatures();
-   }
-
-   // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
-   $('#panZoom input:radio').click(function(e) {
-       toggleControl(this);
-   });
-
-   // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
-   $('#drawingControls input:radio').click(function(e) {
-       toggleDrawingControl(this);
-   });
 
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
@@ -966,6 +866,105 @@ function checkLayerState(layer)
 
 /*====================================================================================*/
 
+function setupDrawingControl()
+{
+   /* 
+   Set up event handling for the map including as well as mouse-based 
+   OpenLayers controls for jQuery UI buttons and drawing controls
+   */
+   // Add the Vector drawing layer for POI drawing
+   var vectorLayer = new OpenLayers.Layer.Vector(
+      'POI Layer',
+      {
+         /*style: {
+
+                strokeColor: 'green',
+                fillColor : 'green',
+                strokeWidth: 2,
+                fillOpacity: 0.3,
+
+
+                cursor: 'pointer'
+         },*/
+         preFeatureInsert: function(feature) {
+            this.removeAllFeatures()
+         },
+         onFeatureInsert: function(feature) {
+            // DEBUG
+            ROIAdded(feature)
+         }
+      }
+   );
+   vectorLayer.displayInLayerSwitcher=false;
+   map.addLayer(vectorLayer);
+   
+   // Function called once a ROI has been drawn on the map
+   function ROIAdded(feature){
+      console.info('Feature added ' + feature.geometry);
+   }
+
+   // Function which can toggle OpenLayers controls based on the clicked control
+   // The value of the value of the underlying radio button is used to match 
+   // against the key value in the mapControls array so the right control is toggled
+   function toggleControl(element) {
+      for(key in mapControls) {
+         var control = mapControls[key];
+         if($(element).val() == key) {
+            $('#'+key).attr('checked', true);
+            control.activate();
+         }
+         else {
+            $('#'+key).attr('checked', false);
+            control.deactivate();
+         }
+      }
+      $('#panZoom input:radio').button('refresh');
+   }
+   // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
+   function toggleDrawingControl(element) {
+      toggleControl(element);
+      vectorLayer.removeAllFeatures();
+   }
+
+   // Create map controls identified by key values which can be activated and deactivated
+   var mapControls = {
+      zoomIn: new OpenLayers.Control.ZoomBox(
+         { out: false, alwaysZoom: true }
+      ),
+      zoomOut: new OpenLayers.Control.ZoomBox(
+         { out: true, alwaysZoom: true }
+      ),
+      pan: new OpenLayers.Control.Navigation(),
+      point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
+      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: true }}),
+      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}, persist: true}),
+      polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
+   };
+
+   // Add all the controls to the map
+   for(var key in mapControls) {
+       var control = mapControls[key];
+       map.addControl(control);
+   }
+
+   // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
+   $('#panZoom input:radio').click(function(e) {
+       toggleControl(this);
+   });
+
+   // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
+   $('#drawingControls input:radio').click(function(e) {
+       toggleDrawingControl(this);
+   });
+
+   // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
+   $('#ROIButtonSet input:radio').click(function(e) {
+       toggleDrawingControl(this);
+   });
+}
+
+/*====================================================================================*/
+
 //This code runs once the page has loaded - jQuery initialised
 $(document).ready(function() {
 
@@ -1007,7 +1006,8 @@ $(document).ready(function() {
    // Setup the gritter so we can use it for error messages
    setupGritter();
 
-   // Set up the map and render it
+   // Set up the map
+   // - any layer dependent code is called in a callback in mapInit
    mapInit();
 
    // Start setting up anything that is not layer dependent
