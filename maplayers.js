@@ -164,7 +164,7 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
    }
 }
 
-// Gets the master cache file from the server and stores it in the map object
+// Map function to get the master cache file from the server and stores it in the map object
 OpenLayers.Map.prototype.createMasterCache = function() {
    var map = this;
    $.ajax({

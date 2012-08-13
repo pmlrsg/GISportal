@@ -82,37 +82,41 @@ function createOpLayer(layerData, sensorName, map)
    addLayerToPanel(layer);
 }
 
-// Creates the base layers for the map, add any
-// others you want here
+// Create all the base layers for the map
 function createBaseLayers(map)
 {
    // Add GEBCO base layer
    var gebco = new OpenLayers.Layer.WMS(
       "GEBCO",
       "http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
-      { layers: 'gebco_08_grid' }
-   )
+      { layers: 'gebco_08_grid' },
+      { wrapDateLine: true }
+   );
    map.addLayer(gebco);
 
    // Add Cubewerx layer
    var cube = new OpenLayers.Layer.WMS(
       'CubeWerx',
       'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
-      { layers: 'Foundation.GTOPO30' } 
-   )
+      { layers: 'Foundation.GTOPO30' },
+      { wrapDateLine: true }
+   );
    map.addLayer(cube);
 
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
       'Landsat',
       'http://irs.gis-lab.info/?',
-      { layers: 'landsat' }
-   )
+      { layers: 'landsat' },
+      { wrapDateLine: true }
+   );
    map.addLayer(landsat);
+   
+   // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 }
 
-// Creates reference layers, add any others here
+// Create all the reference layers for the map
 function createRefLayers(map)
 {
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
@@ -235,11 +239,14 @@ function createRefLayers(map)
    map.addLayer(blackSea);
    addLayerToPanel(blackSea);
 
+   // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
 
+// Add a accordion to the layers panel
 function addAccordionToPanel(accordionName, map)
 {
+   // Add the accordion
    $('#opLayers').prepend(
       '<div>' +
          '<h3><a href="#">' + accordionName + '</a></h3>' +
@@ -272,6 +279,7 @@ function updateLayerList(map)
 }
 -----------------------------------------------------------------------------*/
 
+// Add a layer to the layers panel
 function addLayerToPanel(layer)
 {
    // if not already on list and not a base layer, populate the layers panel (left slide panel)
@@ -317,6 +325,7 @@ function customPermalinkArgs()
    );
 }
 
+// Updates all the layer index's in all the layer accordions
 function updateAccordionOrder()
 {
    $.each($('.sensor-accordion'), function(index, value) {
@@ -324,6 +333,7 @@ function updateAccordionOrder()
    });
 }
 
+// Updates the position of layers based on their new position on the stack
 function updateLayerOrder(layer)
 {
    var layerOffset = 0;
@@ -339,88 +349,13 @@ function updateLayerOrder(layer)
    });
 }
 
-// Setup the options for the gritter and create opening 
-// welcome message.
-function setupGritter()
+// Checks to see if a layer is not visible and selected
+function checkLayerState(layer)
 {
-   $.extend($.gritter.options, { 
-      position: 'bottom-right',
-      fade_in_speed: 'medium',
-      fade_out_speed: 800,
-      time: 6000
-   });
-
-   // Add the opening message
-   $.gritter.add({
-      title: 'Welcome to the Opec Portal',
-      text: 
-         'You can use the ' +
-         '<a id="highlightLayersBtn" href="#">layers button</a>' +
-         ' on the left to open and close the ' +
-         '<a id="openLeftPanel" href="#">layers panel</a> ' +
-         ' which allows you to select the layers you want to view. ' + 
-         'The ' +
-         '<a id="highlightDataBtn" href="#">data button</a>' + 
-         ' on the right does the same for the ' +
-         '<a id="openRightPanel" href="#">data panel</a> ' +
-         ' which allows you to specify regions of interest (R.O.I)' +
-         ' and then get graphs for the selected area.',
-      //image: 'img/OpEc_small.png',
-      class_name: 'gritter-light',
-      sticky: true, 
-   });
-
-   // Highlight the layer button with a red border on hover
-   $('#highlightLayersBtn').hover(function() {
-         $('.triggerL').css('border', '2px solid red');
-      },
-      function() {
-         $('.triggerL').css('border', '');
-   });
-
-   // Highlight the data button with a red border on hover
-   $('#highlightDataBtn').hover(function() {
-         $('.triggerR').css('border', '2px solid red');
-      },
-      function() {
-         $('.triggerR').css('border', '');
-   });
-
-   // Open the layer panel on click
-   $('#openLeftPanel').click(function(e) {
-      $('.triggerL').trigger('click');
-      return false;
-   });
-
-   // Open the data panel on click
-   $('#openRightPanel').click(function(e) {
-      $('.triggerR').trigger('click');
-      return false;
-   });
-}
-
-function gritterErrorHandler(layer, type, request, errorType, exception)
-{
-   if(layer)
-   {
-      $.gritter.add({
-         title: errorType + ': ' + request.status + ' ' + exception,
-         text: 'Could not get the ' + type + ' from the server for ' + layer.name + '. Try refreshing the page',
-         //image: 'img/OpEc_small.png',
-         class_name: 'gritter-light',
-         sticky: true,
-      });
-   }
+   if(!layer.visibility && layer.selected)
+      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
    else
-   {
-      $.gritter.add({
-         title: errorType + ': ' + request.state + ' ' + exception,
-         text: 'Could not get the ' + type + ' from the server. Try refreshing the page',
-         //image: 'img/OpEc_small.png',
-         class_name: 'gritter-light',
-         sticky: true,
-      });
-   }
+      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 }
 
 // Start mapInit() - the main function for setting up the map
@@ -438,7 +373,9 @@ function mapInit()
    // the data from a getCapabilities query.
    map.createMasterCache();
 
+   // Create the base layers and then add them to the map
    createBaseLayers(map);
+   // Create the reference layers and then add them to the map
    createRefLayers(map);
 
    // Add a couple of useful map controls
@@ -451,6 +388,7 @@ function mapInit()
    }
 }
 
+// Anything that needs to bne done after the layers are loaded goes here
 function layerDependent(data)
 {
    map.getCapabilities = data;
@@ -462,6 +400,8 @@ function layerDependent(data)
       header: '> div > h3'
    });
 
+   // Stop the accordion openning if it is being moved
+   // TODO: add events in accordion
    $('#opLayers').bind('accordionchangestart', function(e, ui) {
       if($(this).hasClass('test'))
       {
@@ -487,6 +427,17 @@ function layerDependent(data)
    })
    .bind('sortstop', function(e, ui) {
       $(this).removeClass('test');
+   });
+
+   // Makes each of the reference layers sortable
+   $("#refLayers").sortable({
+      update: function() {
+         var order = $("#refLayers").sortable('toArray');                 
+         $.each(order, function(index, value) {
+            var layer = map.getLayersByName(value);
+            map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
+         });
+      }
    });
 
    // set the max height of each of the accordions relative to the size of the window
@@ -542,19 +493,7 @@ function layerDependent(data)
       }
    });
 
-   $('img[src="img/exclamation_small.png"]').click(function() 
-   {
-      var layerID = $(this).parent().parent().attr('id');
-      var layer = map.getLayersByName(layerID)[0];
-
-      $.gritter.add({
-         title: 'Test Error Message',
-         text: 'Test Error Message ',
-         //image: 'img/OpEc_small.png',
-         class_name: 'gritter-light',
-         sticky: true, 
-      });
-   });
+   gritterLayerHelper();
 
    setupDrawingControl();
 }
@@ -703,6 +642,13 @@ function nonLayerDependent()
        map.zoomToExtent(bbox);
    });
 
+   createContextMenu();
+}
+
+/*====================================================================================*/
+
+function createContextMenu()
+{
    // Setup the context menu and any custom controls
    $(function() {
 
@@ -839,16 +785,6 @@ function nonLayerDependent()
                   }
                }
             };                           
-         },
-         events: {
-            show: function(opt) {
-               //var $this = this;
-               //$.contextMenu.setInputValues(opt, $this.data());
-            },
-            hide: function(opt) {
-               //var $this = this;
-               //$.contextMenu.getInputValues(opt, $this.data());
-            }
          }
       })
    });
@@ -856,22 +792,8 @@ function nonLayerDependent()
 
 /*====================================================================================*/
 
-function checkLayerState(layer)
-{
-   if(!layer.visibility && layer.selected)
-      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
-   else
-      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
-}
-
-/*====================================================================================*/
-
 function setupDrawingControl()
 {
-   /* 
-   Set up event handling for the map including as well as mouse-based 
-   OpenLayers controls for jQuery UI buttons and drawing controls
-   */
    // Add the Vector drawing layer for POI drawing
    var vectorLayer = new OpenLayers.Layer.Vector(
       'POI Layer',
@@ -920,11 +842,17 @@ function setupDrawingControl()
       }
       $('#panZoom input:radio').button('refresh');
    }
+
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
       toggleControl(element);
       vectorLayer.removeAllFeatures();
    }
+
+   /* 
+   Set up event handling for the map including as well as mouse-based 
+   OpenLayers controls for jQuery UI buttons and drawing controls
+   */
 
    // Create map controls identified by key values which can be activated and deactivated
    var mapControls = {
@@ -1005,9 +933,11 @@ $(document).ready(function() {
 
    // Setup the gritter so we can use it for error messages
    setupGritter();
+   // Set and display the welcome message
+   createWelcomeMessage();
 
    // Set up the map
-   // - any layer dependent code is called in a callback in mapInit
+   // any layer dependent code is called in a callback in mapInit
    mapInit();
 
    // Start setting up anything that is not layer dependent
