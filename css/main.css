@@ -108,11 +108,11 @@ ul li {
 }
 
 .toolbar .divider {
-   border-right-style:solid;
-   border-width:thin;
+   border-right-style:dotted;
+   border-width:1px;
    border-color:#999;
-   width:1px;
-   margin:2px;
+   width:2px;
+   margin: 0 4px 2px 0;
 }
 
 .toolbar a {
@@ -410,6 +410,10 @@ div .sensor-accordion {
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
 .ui-accordion .ui-accordion-content { padding: 0.3em;}
+.ui-icon-drawpoint  { background-image: url(../img/selectionPoint.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
+.ui-icon-drawbox  { background-image: url(../img/selectionBox.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
+.ui-icon-drawcircle  { background-image: url(../img/selectionCircle.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
+.ui-icon-drawpoly  { background-image: url(../img/selectionPoly.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
 
 /* Override some accordion styles */
 .ui-accordion .ui-accordion-content { position: static; overflow: hidden; }

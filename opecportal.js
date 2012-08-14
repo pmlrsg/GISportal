@@ -543,10 +543,10 @@ function nonLayerDependent()
 
    // I just set up the basic buttons, you will need to set the icons and any css
    $('#ROIButtonSet').buttonset();
-   $('#point').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
-   $('#box').button({ icons: { primary: 'ui-icon-circle-plus'} });
-   $('#circle').button({ icons: { primary: 'ui-icon-circle-minus'} });
-   $('#polygon').button({ icons: { primary: 'ui-icon-circle-minus'} });
+   $('#point').button({ icons: { primary: 'ui-icon-drawpoint'} });
+   $('#box').button({ icons: { primary: 'ui-icon-drawbox'} });
+   $('#circle').button({ icons: { primary: 'ui-icon-drawcircle'} });
+   $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
 
    $("#dataTabs").tabs();
    // Must bind the creation of accordions under the tabs in this way to avoid messing up nested controls
