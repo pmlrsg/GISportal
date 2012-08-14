@@ -147,25 +147,10 @@
          <div id="dataTools">
             <div id="dataTabs">
                <ul>
-                  <li><a href="#tabs-1">R.O.I.</a></li>
-                  <li><a href="#tabs-2">Analyses</a></li>
-                  <li><a href="#tabs-3">Export<br></a></li>
+                  <li><a href="#tabs-1">Analyses</a></li>
+                  <li><a href="#tabs-2">Export<br></a></li>
                </ul>
                <div id="tabs-1">
-                  <div id="ROI">
-                     <h3><a href="#">Point</a></h3>
-                     <div id="ROIPoint"></div>
-                     <h3><a href="#">Bounding Box</a></h3>
-                     <div id="ROIBox"></div> 
-                     <h3><a href="#">Custom Area</a></h3>
-                     <div id="ROICustom"></div> 
-                     <h3><a href="#">Dynamic Mask</a></h3>
-                     <div id="ROIMask"></div> 
-                     <h3><a href="#">Current ROI Description</a></h3>
-                     <div id="ROIBounds"></div> 
-                  </div>
-               </div>
-               <div id="tabs-2">
                   <div id="analyses">
                      <h3><a href="#">Basic Statistics</a></h3>
                         <table id="bStats">
@@ -204,7 +189,7 @@
                      <div id="risk"></div> 
                   </div>
                </div>
-               <div id="tabs-3">
+               <div id="tabs-2">
                   <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
                </div>
             </div>      

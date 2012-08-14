@@ -13,6 +13,9 @@ OpenLayers.Map.prototype.numBaseLayers = 0;
 OpenLayers.Map.prototype.numRefLayers = 0;
 OpenLayers.Map.prototype.numOpLayers = 0;
 
+// Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
+OpenLayers.Map.prototype.ROI_Type = '';
+
 // Layer title
 OpenLayers.Layer.prototype.title = '';
 

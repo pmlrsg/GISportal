@@ -554,7 +554,6 @@ function nonLayerDependent()
    $("#dataTabs").tabs();
    // Must bind the creation of accordions under the tabs in this way to avoid messing up nested controls
    $('#dataTabs').bind('tabshow', function(event, ui) {
-       $("#ROI").accordion({ collapsible: true, autoHeight: false });
        $("#analyses").accordion({ collapsible: true, autoHeight: false });
        $("#spatial").accordion({ collapsible: true, autoHeight: false });
        $("#temporal").accordion({ collapsible: true, autoHeight: false });
@@ -653,34 +652,45 @@ function nonLayerDependent()
 function setupDrawingControl()
 {
    // Add the Vector drawing layer for POI drawing
-   var vectorLayer = new OpenLayers.Layer.Vector(
-      'POI Layer',
-      {
-         /*style: {
-
-                strokeColor: 'green',
-                fillColor : 'green',
-                strokeWidth: 2,
-                fillOpacity: 0.3,
-
-
-                cursor: 'pointer'
-         },*/
-         preFeatureInsert: function(feature) {
-            this.removeAllFeatures()
-         },
-         onFeatureInsert: function(feature) {
-            // DEBUG
-            ROIAdded(feature)
-         }
+   var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
+      style : {
+         strokeColor : 'red',
+         fillColor : 'red',
+         strokeWidth : 2,
+         fillOpacity : 0.3,
+         pointRadius: 5
+      },
+      preFeatureInsert : function(feature) {
+         this.removeAllFeatures();
+      },
+      onFeatureInsert : function(feature) {
+         ROIAdded(feature);
       }
-   );
+   }); 
+
    vectorLayer.displayInLayerSwitcher=false;
    map.addLayer(vectorLayer);
-   
+
    // Function called once a ROI has been drawn on the map
-   function ROIAdded(feature){
-      console.info('Feature added ' + feature.geometry);
+   function ROIAdded(feature) {
+      $('#dispROI').html('<h3>ROI Details</h3>');
+      switch(map.ROI_Type) {
+         case 'point':
+            $('#dispROI').append('<h4>Point ROI</h4>');
+            $('#dispROI').append('<p>lat,lon=' + feature.geometry.x + ',' + feature.geometry.y + '</p>');
+            break;
+         case 'box':
+            $('#dispROI').append('<h4>Rectangular ROI</h4>');
+            break;
+         case 'circle':
+            $('#dispROI').append('<h4>Circular ROI</h4>');
+            $('#dispROI').append('<p>Radius (deg)=' + feature.geometry.getBounds().getWidth()/2 + ',' + feature.geometry.getBounds().getHeight()/2 + '</p>');
+            $('#dispROI').append('<p>Centre (lat, lon)=</p><p>(' + feature.geometry.getCentroid().x + ',' + feature.geometry.getCentroid().y + ')</p>');
+            break;
+         case 'polygon':
+            $('#dispROI').append('<h4>Custom Polygon ROI</h4>');
+            break;
+      }
    }
 
    // Function which can toggle OpenLayers controls based on the clicked control
@@ -705,6 +715,9 @@ function setupDrawingControl()
    function toggleDrawingControl(element) {
       toggleControl(element);
       vectorLayer.removeAllFeatures();
+      map.ROI_Type = element.value;
+      // DEBUG
+      console.info(map.ROI_Type);
    }
 
    /* 
@@ -722,8 +735,8 @@ function setupDrawingControl()
       ),
       pan: new OpenLayers.Control.Navigation(),
       point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: true }}),
-      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 40}, persist: true}),
+      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }}),
+      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false}),
       polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
    };
 
@@ -739,13 +752,8 @@ function setupDrawingControl()
    });
 
    // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
-   $('#drawingControls input:radio').click(function(e) {
-       toggleDrawingControl(this);
-   });
-
-   // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
    $('#ROIButtonSet input:radio').click(function(e) {
-       toggleDrawingControl(this);
+      toggleDrawingControl(this);
    });
 }
 
