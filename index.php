@@ -105,13 +105,13 @@
          <!-- Placeholder ROI radio buttons -->
          <li id="ROIButtonSet">
             <input type="radio" id="point" name="radio" value="point" />
-               <label class="iconBtn" for="point" title="Point"></label>
+               <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
             <input type="radio" id="box" name="radio" value="box"/>
-               <label class="iconBtn" for="box" title="Box"></label>
+               <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
             <input type="radio" id="circle" name="radio" value="circle" />
-               <label class="iconBtn" for="circle" title="Circle"></label>
+               <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
             <input type="radio" id="polygon" name="radio" value="polygon" />
-               <label class="iconBtn" for="polygon" title="Polygon"></label>
+               <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
          </li>
          <li class="divider"></li>
          <li>
@@ -238,17 +238,8 @@
       </ul>
    </div>
    <div class="toolbar" id="mapOptions">
-   	<h2>Draw Region Of Interest (ROI)</h2>
-      <div id="drawingControls">
-         <input type="radio" name="type" value="point" id="point" />
-         <label class="iconBtn"  for="pointToggle">draw point</label><br />
-         <input type="radio" name="type" value="box" id="box" />
-         <label class="iconBtn" for="boxToggle">draw box</label><br />
-         <input type="radio" name="type" value="circle" id="circle" />
-         <label class="iconBtn" for="circleToggle">draw circle</label><br />
-         <input type="radio" name="type" value="polygon" id="polygon" />
-         <label class="iconBtn" for="polygonToggle">draw polygon</label>
-      </div> 
+   	<h2>Some header text</h2>
+      <p>Some stuff can go here in the future...</p>
    </div>
    <div class="toolbar" id="shareOptions">
    	<h3>Share</h3>
