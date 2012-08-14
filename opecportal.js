@@ -396,20 +396,23 @@ function layerDependent(data)
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#layerAccordion, #dataAccordion").multiAccordion({
-      header: '> div > h3'
+   $("#layerAccordion, #dataAccordion").multiOpenAccordion({
+      active: [0, 1],
    });
 
-   // Stop the accordion openning if it is being moved
-   // TODO: add events in accordion
-   $('#opLayers').bind('accordionchangestart', function(e, ui) {
-      if($(this).hasClass('test'))
-      {
-         e.stopPropagation();
-         return false;
-      }
-      
-      return true;
+   $('#opLayers > div').multiOpenAccordion({
+      active: 0,
+      click: function(e) {
+         var parent = $(this).parent('div');
+         if(parent.hasClass('test')) {
+            parent.removeClass('test');
+            return false;
+         }
+      },
+   });
+
+   $('#refLayers').multiOpenAccordion({
+      active: 0,
    });
 
    // Makes each of the accordions sortable
@@ -424,10 +427,10 @@ function layerDependent(data)
    .disableSelection()
    .bind('sortstart', function(e, ui) {
       $(this).addClass('test');
-   })
-   .bind('sortstop', function(e, ui) {
-      $(this).removeClass('test');
    });
+   //.bind('sortstop', function(e, ui) {
+   //   $(this).removeClass('test');
+   //});
 
    // Makes each of the reference layers sortable
    $("#refLayers").sortable({

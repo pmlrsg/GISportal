@@ -26,7 +26,9 @@
 <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
-<script type="text/javascript" src="js-libs/multiAccordion.js"></script>
+<!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
+<!-- http://code.google.com/p/jquery-multi-open-accordion -->
+<script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.2.js"></script>
 <!-- Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
 <!-- http://medialize.github.com/jQuery-contextMenu/ -->
@@ -128,9 +130,9 @@
       <h3 id="layerLbl">Data Layers</h3>
       <div id="layerAccordion">
          <h3><a href="#">Operational Layers</a></h3>
-         <ul id="opLayers"></ul>
+         <div id="opLayers"></div>
          <h3><a href="#">Reference Layers</a></h3>
-         <ul id="refLayers"></ul> 
+         <div id="refLayers"></div> 
       </div>
       <div style="clear: both;"> </div>
    </div>
