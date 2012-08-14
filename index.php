@@ -37,6 +37,7 @@
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="opecportal.js"></script>
 <script type="text/javascript" src="gritter.js"></script>
+<script type="text/javascript" src="contextMenu.js"></script>
 
 <!-- Use custom PHP class to create cache the getCapabilities call and create some
    date caches for the required data layers.
