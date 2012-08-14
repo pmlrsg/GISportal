@@ -388,7 +388,7 @@ function mapInit()
    }
 }
 
-// Anything that needs to bne done after the layers are loaded goes here
+// Anything that needs to be done after the layers are loaded goes here
 function layerDependent(data)
 {
    map.getCapabilities = data;
