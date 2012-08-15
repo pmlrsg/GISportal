@@ -476,6 +476,7 @@ function layerDependent(data)
             map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
             // Update map date cache now a new temporal layer has been added
             map.refreshDateCache();
+            $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate))
          }
          else {
             layer.setVisibility(true);

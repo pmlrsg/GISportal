@@ -152,7 +152,8 @@ function gritterLayerHelper()
             });
 
             $('#datepickerBtn').click(function() {
-               $('#viewDate').datepicker("show");
+               var date = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
+               $('#viewDate').datepicker("option", "defaultDate", date).datepicker("show");
                return false;
             })
             .hover(function() {
