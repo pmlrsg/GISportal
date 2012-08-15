@@ -455,18 +455,13 @@ function layerDependent(data)
    });
 
    // Handle selection of visible layers
-   $('.lPanel li').click(function(e) {
+   $('.lPanel li').mousedown(function(e) {
        var itm = $(this);
        var child = itm.children('input').first();
-       if(child.is(':checked')) {
-           $('.lPanel li').each(function(index) {
-               $(this).removeClass('selectedLayer');
-           });
-           itm.addClass('selectedLayer');
-       }
-       else {
-           itm.removeClass('selectedLayer');
-       }
+        $('.lPanel li').each(function(index) {
+            $(this).removeClass('selectedLayer');
+        });
+        itm.addClass('selectedLayer');
    });
 
    // Toggle visibility of data layers
@@ -497,6 +492,9 @@ function layerDependent(data)
    });
 
    gritterLayerHelper();
+
+   //var ows = new OpenLayers.Format.OWSContext();
+   //var doc = ows.write(map);
 
    setupDrawingControl();
 }
