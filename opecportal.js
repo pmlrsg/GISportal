@@ -666,29 +666,59 @@ function setupDrawingControl()
 
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature) { 
-      var geom = new OpenLayers.Geometry;
-      geom = feature.geometry;   
+      // Get the geometry of the drawn feature
+      var geom = new OpenLayers.Geometry();
+      geom = feature.geometry;
+      
+      // Get bounds of the feature's geometry
+      var bounds = new OpenLayers.Bounds();
+      var bounds_m = new OpenLayers.Bounds();
+      bounds = geom.getBounds();
+      
+      // Create a copy of the bounds object to enable independent conversio to metres
+      bounds_m =  $.extend({}, bounds);
+      // Transform bounds_m from degress to metres via Google EPSG:900913 projection (measured in metres)
+      bounds_m.transform(lonlat, new OpenLayers.Projection('EPSG:900913'));
+      
+      // Some metrics for the ROI
+      var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
+      
+      // Get some values for non-point ROIs
+      if(map.ROI_Type != '' && map.ROI_Type != 'point'){
+         area_deg = geom.getArea().toPrecision(4);
+         area_km = (geom.getGeodesicArea()*1e-6).toPrecision(4);
+         height_deg = bounds.getHeight().toPrecision(4);
+         width_deg = bounds.getWidth().toPrecision(4);
+         height_km = (bounds_m.getHeight()/1000).toPrecision(4);
+         width_km = (bounds_m.getWidth()/1000).toPrecision(4);
+         radius_deg = ((bounds.getWidth() + bounds.getHeight())/4).toPrecision(4);
+         ctrLat = geom.getCentroid().x.toPrecision(4);
+         ctrLon = geom.getCentroid().y.toPrecision(4);
+      }
+        
       switch(map.ROI_Type) {
          case 'point':
             $('#dispROI').html('<h3>Point ROI</h3>');
-            $('#dispROI').append('<p>lat,lon=' + geom.x.toPrecision(4) + ',' + geom.y.toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>lat, lon = ' + geom.x.toPrecision(4) + ', ' + geom.y.toPrecision(4) + '</p>');
             break;
          case 'box':
             $('#dispROI').html('<h3>Rectangular ROI</h3>');
-            $('#dispROI').append('<p>Width=' + geom.getBounds().getWidth().toPrecision(4) + ' deg</p>');
-            $('#dispROI').append('<p>Height=' + geom.getBounds().getHeight().toPrecision(4) + ' deg</p>');
-            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Width = ' + width_deg + ' deg = ' + width_km + ' km</p>');
+            $('#dispROI').append('<p>Height = ' + height_deg + ' deg = ' + height_km + ' km</p>');
+            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km + '</p>');
             break;
          case 'circle':
             $('#dispROI').html('<h3>Circular ROI</h3>');
-            $('#dispROI').append('<p>Radius (deg)=' + (geom.getBounds().getWidth()/2).toPrecision(4) + '</p>');
-            $('#dispROI').append('<p>Centre (lat, lon)=(' + geom.getCentroid().x.toPrecision(4) + ',' + geom.getCentroid().y.toPrecision(4) + ')</p>');
-            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Radius (deg) = ' + radius_deg + '</p>');
+            $('#dispROI').append('<p>Centre lat, lon = ' + ctrLat + ', ' + ctrLon + '</p>');
+            $('#dispROI').append('<p>Width = ' + width_deg + ' deg = ' + width_km + ' km</p>');
+            $('#dispROI').append('<p>Height = ' + height_deg + ' deg = ' + height_km + ' km</p>');
+            $('#dispROI').append('<p>Projected Area (sq km) =' + area_km + '</p>');
             break;
          case 'polygon':
             $('#dispROI').html('<h3>Custom Polygon ROI</h3>');
-            $('#dispROI').append('<p>Centroid (lat, lon)=(' + geom.getCentroid().x.toPrecision(4) + ',' + geom.getCentroid().y.toPrecision(4) + ')</p>');
-            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Centroid lat, lon = ' + ctrLat + ', ' + ctrLon + '</p>');
+            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km + '</p>');
             break;
       }
    }
