@@ -127,7 +127,10 @@ function gritterLayerHelper()
             {
                $.gritter.add({
                   title: 'Select another date',
-                  text: 'The date you have selected is not avaliable for this layer. Try selecting another date that all layers share.',
+                  text: 'The date you have selected is not avaliable for this layer. ' +
+                        'This layer supports dates between ' +
+                        layer.firstDate + ' and ' + layer.lastDate + '.' +
+                        ' Try selecting another date that all layers share.',
                   //image: 'img/OpEc_small.png',
                   class_name: 'gritter-light',
                   sticky: true, 

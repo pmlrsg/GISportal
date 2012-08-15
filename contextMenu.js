@@ -127,7 +127,7 @@ function createContextMenu()
                               layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
                               layer.exboundingbox.WestBoundLongitude + 'W ' + 
                            '</label></div>' +
-                           '<div><label>Date Range:</label></div>' +
+                           '<div><label>Date Range: ' + layer.firstDate + ' to ' + layer.lastDate + '</label></div>' +
                            '<div><label>Abstract: ' + layer.abstract + '</label></div>'
                         ).appendTo('#metadata');
 

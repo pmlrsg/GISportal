@@ -52,19 +52,24 @@ function getLayers($xml)
          // Iterate over each dimension
          foreach($innerChild->Dimension as $dimension)
          {
+            if((string)$dimension->attributes()->name == 'time')
+            {
+               $temporal = true;
+               //$dimensionArray = explode(",", $dimension);
+               //$firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
+               //$lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
+            }
+
+            // DEBUG
+            //fb("first: ".$firstDate. " last: ". $lastDate, FirePHP::INFO);
+
             // Add to the dimensions array
             array_push($dimensions, array(
                'Name'=>(string)$dimension->attributes()->name,
                'Units'=>(string)$dimension->attributes()->units,
                'Default'=>(string)$dimension->attributes()->default,
-               'Value'=>trim((string)$dimension)
-               )             
+               'Value'=>trim((string)$dimension))         
             );
-
-            if((string)$dimension->attributes()->name == 'time')
-            {
-               $temporal = true;
-            }
          }
 
          // Iterate over each style
@@ -89,6 +94,8 @@ function getLayers($xml)
                'Title'=>$title, 
                'Abstract'=>$abstract,
                'Temporal'=>$temporal,
+               //'FirstDate'=>$firstDate,
+               //'LastDate'=>$lastDate,
                'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
                'BoundingBox'=>$boundingBox,
                'Dimensions'=>$dimensions,

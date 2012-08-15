@@ -25,6 +25,10 @@ OpenLayers.Layer.prototype.abstract = '';
 // Layer sensor
 OpenLayers.Layer.prototype.sensor = '';
 
+// Date Range
+OpenLayers.Layer.prototype.firstDate = '';
+OpenLayers.Layer.prototype.lastDate = '';
+
 // Current index position in the map's layers array
 OpenLayers.Layer.prototype.currentIndex = 0;
 
@@ -66,6 +70,8 @@ OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
       dataType: 'json',
       success: function(data) {
             layer.DTCache = data.date;
+            layer.firstDate = displayDateString(layer.DTCache[0]);
+            layer.lastDate = displayDateString(layer.DTCache[layer.DTCache.length - 1]);
       },
       error: function(request, errorType, exception) {
          gritterErrorHandler(layer, 'date cache', request, errorType, exception);

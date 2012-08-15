@@ -445,13 +445,13 @@ function layerDependent(data)
 
    // set the max height of each of the accordions relative to the size of the window
    $('#layerAccordion').css('max-height', $(window).height() - 120);
-   $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
-   $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+   $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
+   $('#refLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
 
    $(window).resize(function() {
       $('#layerAccordion').css('max-height', $(window).height() - 120);
-      $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
-      $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+      $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
+      $('#refLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
    });
 
    // Handle selection of visible layers
