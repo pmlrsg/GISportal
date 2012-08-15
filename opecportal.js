@@ -537,32 +537,26 @@ function nonLayerDependent()
        onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
    });
 
+   // Pan and zoom control buttons
    $('#panZoom').buttonset();
    $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
    $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
    $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
 
-   // I just set up the basic buttons, you will need to set the icons and any css
+   // Regions of interest drawing control buttons - with custom styling
    $('#ROIButtonSet').buttonset();
    $('#point').button({ icons: { primary: 'ui-icon-drawpoint'} });
    $('#box').button({ icons: { primary: 'ui-icon-drawbox'} });
    $('#circle').button({ icons: { primary: 'ui-icon-drawcircle'} });
    $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
 
+   // Data Analysis panel tabs and accordions
    $("#dataTabs").tabs();
-   // Must bind the creation of accordions under the tabs in this way to avoid messing up nested controls
-   $('#dataTabs').bind('tabshow', function(event, ui) {
-       $("#analyses").accordion({ collapsible: true, autoHeight: false });
-       $("#spatial").accordion({ collapsible: true, autoHeight: false });
-       $("#temporal").accordion({ collapsible: true, autoHeight: false });
-   });
-
-   // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
-   // for data layers (in left panel) and data analysis (in right panel)
-   //$("#layerAccordion, #dataAccordion").multiAccordion();
+   $("#analyses").accordion({ collapsible: true, autoHeight: false });
+   $("#spatial").accordion({ collapsible: true, autoHeight: false });
+   $("#temporal").accordion({ collapsible: true, autoHeight: false }); 
 
    //Hook up the other events for the general UI
-
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
       $(".lPanel").toggle("fast");
@@ -670,23 +664,30 @@ function setupDrawingControl()
    map.addLayer(vectorLayer);
 
    // Function called once a ROI has been drawn on the map
-   function ROIAdded(feature) {
-      $('#dispROI').html('<h3>ROI Details</h3>');
+   function ROIAdded(feature) { 
+      var geom = new OpenLayers.Geometry;
+      geom = feature.geometry;   
       switch(map.ROI_Type) {
          case 'point':
-            $('#dispROI').append('<h4>Point ROI</h4>');
-            $('#dispROI').append('<p>lat,lon=' + feature.geometry.x + ',' + feature.geometry.y + '</p>');
+            $('#dispROI').html('<h3>Point ROI</h3>');
+            $('#dispROI').append('<p>lat,lon=' + geom.x.toPrecision(4) + ',' + geom.y.toPrecision(4) + '</p>');
             break;
          case 'box':
-            $('#dispROI').append('<h4>Rectangular ROI</h4>');
+            $('#dispROI').html('<h3>Rectangular ROI</h3>');
+            $('#dispROI').append('<p>Width=' + geom.getBounds().getWidth().toPrecision(4) + ' deg</p>');
+            $('#dispROI').append('<p>Height=' + geom.getBounds().getHeight().toPrecision(4) + ' deg</p>');
+            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
             break;
          case 'circle':
-            $('#dispROI').append('<h4>Circular ROI</h4>');
-            $('#dispROI').append('<p>Radius (deg)=' + feature.geometry.getBounds().getWidth()/2 + ',' + feature.geometry.getBounds().getHeight()/2 + '</p>');
-            $('#dispROI').append('<p>Centre (lat, lon)=</p><p>(' + feature.geometry.getCentroid().x + ',' + feature.geometry.getCentroid().y + ')</p>');
+            $('#dispROI').html('<h3>Circular ROI</h3>');
+            $('#dispROI').append('<p>Radius (deg)=' + (geom.getBounds().getWidth()/2).toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Centre (lat, lon)=(' + geom.getCentroid().x.toPrecision(4) + ',' + geom.getCentroid().y.toPrecision(4) + ')</p>');
+            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
             break;
          case 'polygon':
-            $('#dispROI').append('<h4>Custom Polygon ROI</h4>');
+            $('#dispROI').html('<h3>Custom Polygon ROI</h3>');
+            $('#dispROI').append('<p>Centroid (lat, lon)=(' + geom.getCentroid().x.toPrecision(4) + ',' + geom.getCentroid().y.toPrecision(4) + ')</p>');
+            $('#dispROI').append('<p>Area (sq km)=' + (geom.getGeodesicArea()*1e-6).toPrecision(4) + '</p>');
             break;
       }
    }
