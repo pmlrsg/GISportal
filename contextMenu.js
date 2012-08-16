@@ -6,25 +6,24 @@ function createContextMenu()
       // Create the custom control for the slider
       $.contextMenu.types.slider = function(item, opt, root) {
          $('<div id="' + item.id + '" class="context-menu slider"></div>').appendTo(this)
-            .on('click', 'li', function() {
-               root.$menu.trigger('contextmenu:hide');
-            })
-            // Setup the slider
-            .slider({
-               max: 1,
-               min: 0,
-               value: 1,
-               step: 0.05,
-               change: function(e, ui) {
-                  var layer = map.getLayersByName($('.selectedLayer').attr('id'));
-                  layer[0].setOpacity($("#" + item.id).slider("value"));
-                  return true;
-               }
-            });
-
-         this.on("contextmenu:show", function() {
+         .on('click', '> li', function() {
+            root.$menu.trigger('contextmenu:hide');
+         })
+         .on("contextmenu:show", 'li', function() {
             var layer = map.getLayersByName($('.selectedLayer').attr('id'));
             $("#" + item.id).slider("value", layer[0].opacity);        
+         })
+         // Setup the slider
+         .slider({
+            max: 1,
+            min: 0,
+            value: 1,
+            step: 0.05,
+            change: function(e, ui) {
+               var layer = map.getLayersByName($('.selectedLayer').attr('id'));
+               layer[0].setOpacity($("#" + item.id).slider("value"));
+               return true;
+            }
          });
       }
       
