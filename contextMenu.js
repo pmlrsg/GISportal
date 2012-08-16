@@ -114,6 +114,10 @@ function createContextMenu()
                         // Get the selected layer
                         var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
 
+                        var dateRange = function() {
+                           return layer.temporal ? '<div><label>Date Range: ' + layer.firstDate + ' to ' + layer.lastDate + '</label></div>' : '';
+                        }
+
                         // Clear the data from last time
                         $('#metadata').empty();
                         $('#metadata').dialog("option", "title", layer.title);
@@ -127,7 +131,7 @@ function createContextMenu()
                               layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
                               layer.exboundingbox.WestBoundLongitude + 'W ' + 
                            '</label></div>' +
-                           '<div><label>Date Range: ' + layer.firstDate + ' to ' + layer.lastDate + '</label></div>' +
+                           dateRange() +
                            '<div><label>Abstract: ' + layer.abstract + '</label></div>'
                         ).appendTo('#metadata');
 

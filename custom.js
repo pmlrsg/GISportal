@@ -21,6 +21,7 @@ function ISODateString(d) {
    return datestring;
 }
 
+// Format date string so it can be displayed
 function displayDateString(date) 
 {
    var year = date.substring(0, 4);

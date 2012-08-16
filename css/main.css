@@ -246,6 +246,7 @@ ul li {
    -webkit-border-top-right-radius: 15px;
    border-bottom-right-radius: 15px;
    border-top-right-radius: 15px;
+   min-width: 200px;
 }
 
 #layerAccordion {
@@ -409,12 +410,13 @@ div .sensor-accordion {
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
-.ui-accordion .ui-accordion-content { padding: 0.3em; }
-.ui-accordion { width: auto; }
+
 .ui-icon-drawpoint  { background-image: url(../img/selectionPoint.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
 .ui-icon-drawbox  { background-image: url(../img/selectionBox.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
 .ui-icon-drawcircle  { background-image: url(../img/selectionCircle.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
 .ui-icon-drawpoly  { background-image: url(../img/selectionPoly.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
 
 /* Override some accordion styles */
-.ui-accordion .ui-accordion-content { position: static; overflow: hidden; }
+.ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
+.ui-accordion .ui-state-active { background: none repeat scroll 0 0 #F2F2F2;}
+.ui-accordion { width: auto; }

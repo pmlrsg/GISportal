@@ -13,6 +13,12 @@ OpenLayers.Map.prototype.numBaseLayers = 0;
 OpenLayers.Map.prototype.numRefLayers = 0;
 OpenLayers.Map.prototype.numOpLayers = 0;
 
+// Stores messages to be used by the gritter
+OpenLayers.Map.prototype.helperMessages = [];
+
+// The unique id of the last tutorial message
+OpenLayers.Map.prototype.tutUID = undefined;
+
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
 

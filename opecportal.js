@@ -32,56 +32,6 @@ var quickRegion = [
  //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
 /*====================================================================================*/
 
-// Create layers for the map from the getCapabilities request
-function createOpLayers(map) 
-{
-   var theMap = map;
-   $.each(theMap.getCapabilities.reverse(), function(i, item) 
-   {
-      // Add accordion for each sensor with layers
-      if(item.Layers.length)
-      {
-         var sensorName = item.Sensor;
-         // Create the accordion for the sensor
-         addAccordionToPanel(sensorName, theMap);
-
-         $.each(item.Layers, function(i, item) {
-            if(item.Name && item.Name != "") {
-               createOpLayer(item, sensorName, theMap);
-            }
-         });
-      }
-   });
-}
-
-// Create a layer to be displayed on the map
-function createOpLayer(layerData, sensorName, map) 
-{
-   var layer = new OpenLayers.Layer.WMS (
-      layerData.Name.replace("/","-"),
-      'http://rsg.pml.ac.uk/ncWMS/wms?',
-      { layers: layerData.Name, transparent: true}, 
-      { opacity: 1 }
-   );
-
-   layer.temporal = layerData.Temporal; 
-   if(layer.temporal) 
-   {
-      layer.createDateCache('./json/WMSDateCache/' + layer.name + '.json');
-   }
-
-   layer.title = layerData.Title;
-   layer.abstract = layerData.Abstract;
-   layer.sensor = sensorName.replace(/\s+/g, "");
-   layer.styles = layerData.Styles;
-   layer.exboundingbox = layerData.EX_GeographicBoundingBox;
-   layer.boundingbox = layerData.BoundingBox;
-   layer.setVisibility(false);     
-   layer.selected = false;     
-   map.addLayer(layer);
-   addLayerToPanel(layer);
-}
-
 // Create all the base layers for the map
 function createBaseLayers(map)
 {
@@ -243,19 +193,82 @@ function createRefLayers(map)
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
 
+// Create layers for the map from the getCapabilities request
+function createOpLayers(map) 
+{
+   var theMap = map;
+   $.each(theMap.getCapabilities.reverse(), function(i, item) 
+   {
+      // Add accordion for each sensor with layers
+      if(item.Layers.length)
+      {
+         var sensorName = item.Sensor;
+         // Create the accordion for the sensor
+         addAccordionToPanel(sensorName, theMap);
+
+         $.each(item.Layers, function(i, item) {
+            if(item.Name && item.Name != "") {
+               createOpLayer(item, sensorName, theMap);
+            }
+         });
+      }
+   });
+}
+
+// Create a layer to be displayed on the map
+function createOpLayer(layerData, sensorName, map) 
+{
+   var layer = new OpenLayers.Layer.WMS (
+      layerData.Name.replace("/","-"),
+      'http://rsg.pml.ac.uk/ncWMS/wms?',
+      { layers: layerData.Name, transparent: true}, 
+      { opacity: 1 }
+   );
+
+   layer.temporal = layerData.Temporal; 
+   if(layer.temporal) 
+   {
+      layer.createDateCache('./json/WMSDateCache/' + layer.name + '.json');
+   }
+
+   layer.title = layerData.Title;
+   layer.abstract = layerData.Abstract;
+   layer.sensor = sensorName.replace(/\s+/g, "");
+   layer.styles = layerData.Styles;
+   layer.exboundingbox = layerData.EX_GeographicBoundingBox;
+   layer.boundingbox = layerData.BoundingBox;
+   layer.setVisibility(false);     
+   layer.selected = false;     
+   map.addLayer(layer);
+   addLayerToPanel(layer);
+}
+
 // Add a accordion to the layers panel
 function addAccordionToPanel(accordionName, map)
 {
+   var id = accordionName.replace(/\s+/g, "");
+
    // Add the accordion
    $('#opLayers').prepend(
       '<div>' +
          '<h3><a href="#">' + accordionName + '</a></h3>' +
-         '<div id="' + accordionName.replace(/\s+/g, "") + '" class="sensor-accordion"></div>' +
+         '<div id="' + id + '" class="sensor-accordion"></div>' +
       '</div>'
    );
 
+   $('#' + id).parent('div').multiOpenAccordion({
+      active: 0,
+      click: function(e) {
+         var parent = $(this).parent('div');
+         if(parent.hasClass('test')) {
+            parent.removeClass('test');
+            return false;
+         }
+      },
+   });
+
    // Makes each of the operational layers sortable
-   $('#' + accordionName.replace(/\s+/g, "")).sortable({
+   $('#' + id).sortable({
       connectWith: ".sensor-accordion",
       appendTo:".sensor-accordion",
       helper:"clone",
@@ -394,21 +407,20 @@ function layerDependent(data)
    map.getCapabilities = data;
    createOpLayers(map);
 
+   //var ows = new OpenLayers.Format.OWSContext();
+   //var doc = ows.write(map);
+}
+
+/*====================================================================================*/
+
+function nonLayerDependent()
+{
+   //Configure and generate the UI elements
+
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
    $("#layerAccordion, #dataAccordion").multiOpenAccordion({
       active: [0, 1],
-   });
-
-   $('#opLayers > div').multiOpenAccordion({
-      active: 0,
-      click: function(e) {
-         var parent = $(this).parent('div');
-         if(parent.hasClass('test')) {
-            parent.removeClass('test');
-            return false;
-         }
-      },
    });
 
    $('#refLayers').multiOpenAccordion({
@@ -455,17 +467,18 @@ function layerDependent(data)
    });
 
    // Handle selection of visible layers
-   $('.lPanel li').mousedown(function(e) {
+   $('.lPanel').on('mousedown', 'li', function(e) {
        var itm = $(this);
        var child = itm.children('input').first();
         $('.lPanel li').each(function(index) {
             $(this).removeClass('selectedLayer');
         });
         itm.addClass('selectedLayer');
+
    });
 
    // Toggle visibility of data layers
-   $('#opLayers :checkbox, #refLayers :checkbox').click(function(e) {
+   $('#opLayers, #refLayers').on('click', ':checkbox', function(e) {
       var v = $(this).val();
       var layer = map.getLayersByName(v)[0];
       if($(this).is(':checked')) {
@@ -491,20 +504,6 @@ function layerDependent(data)
          if(layer.temporal){map.refreshDateCache();}
       }
    });
-
-   gritterLayerHelper();
-
-   //var ows = new OpenLayers.Format.OWSContext();
-   //var doc = ows.write(map);
-
-   setupDrawingControl();
-}
-
-/*====================================================================================*/
-
-function nonLayerDependent()
-{
-   //Configure and generate the UI elements
 
    // Update our latlng on the mousemove event
    map.events.register("mousemove", map, function(e) 
@@ -638,11 +637,13 @@ function nonLayerDependent()
    });
 
    createContextMenu();
+   setupDrawingControls();
+   gritterLayerHelper();
 }
 
 /*====================================================================================*/
 
-function setupDrawingControl()
+function setupDrawingControls()
 {
    // Add the Vector drawing layer for POI drawing
    var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
@@ -661,6 +662,12 @@ function setupDrawingControl()
       }
    }); 
 
+   // Keeps the vectorLayer at the top of the map
+   map.events.register("addLayer", map, function() 
+   { 
+      map.setLayerIndex(vectorLayer, map.layers.length - 1);
+   });
+
    vectorLayer.displayInLayerSwitcher=false;
    map.addLayer(vectorLayer);
 
@@ -675,7 +682,7 @@ function setupDrawingControl()
       var bounds_m = new OpenLayers.Bounds();
       bounds = geom.getBounds();
       
-      // Create a copy of the bounds object to enable independent conversio to metres
+      // Create a copy of the bounds object to enable independent conversion to metres
       bounds_m =  $.extend({}, bounds);
       // Transform bounds_m from degress to metres via Google EPSG:900913 projection (measured in metres)
       bounds_m.transform(lonlat, new OpenLayers.Projection('EPSG:900913'));
@@ -829,12 +836,16 @@ $(document).ready(function() {
 
    // Setup the gritter so we can use it for error messages
    setupGritter();
-   // Set and display the welcome message
-   createWelcomeMessage();
 
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
    mapInit();
+
+   // Create the help messages to be used by the gritter
+   createHelpMessages();
+
+   // Set and display the welcome message
+   createWelcomeMessage();
 
    // Start setting up anything that is not layer dependent
    nonLayerDependent();
