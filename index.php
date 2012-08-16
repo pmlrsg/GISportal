@@ -6,7 +6,7 @@
 <title>OpEc GIS Portal (jQuery + jQuery UI)</title>
 <!-- Now for the styling -->
 <!-- jQuery UI theming CSS -->
-<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.21.custom.css" />
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.23.custom.css" />
 <!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
 <!-- Context Menu styling -->
@@ -24,7 +24,7 @@
 <!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 <!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
 <!-- http://code.google.com/p/jquery-multi-open-accordion -->
