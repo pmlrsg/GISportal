@@ -221,7 +221,7 @@ function createOpLayer(layerData, sensorName, map)
 {
    var layer = new OpenLayers.Layer.WMS (
       layerData.Name.replace("/","-"),
-      'http://rsg.pml.ac.uk/ncWMS/wms?',
+      'http://vostok:8080/thredds/wms/PML-MODIS-q0-daily-pre-2012-05-28-AGGSLOW?',
       { layers: layerData.Name, transparent: true}, 
       { opacity: 1 }
    );
@@ -240,8 +240,12 @@ function createOpLayer(layerData, sensorName, map)
    layer.boundingbox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
+   //map.storeLayers[layer.name] = layer;
+   //addLayerToSelectionPanel(layer);
+
    map.addLayer(layer);
    addLayerToPanel(layer);
+   $('#layers').multiselect('addItem', {text: layer.title, selected: false});
 }
 
 // Add a accordion to the layers panel
@@ -372,6 +376,17 @@ function checkLayerState(layer)
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 }
 
+function addLayerToSelectionPanel(layer)
+{
+   $('#availableLayers').prepend(
+      '<li id="' + layer.name + '" class="ui-widget-content">' + layer.title + '</li>'
+   );   
+
+   $('#selectedLayers').prepend(
+      '<li id="' + layer.name + '" class="ui-widget-content">' + layer.title + '</li>'
+   );   
+}
+
 // Start mapInit() - the main function for setting up the map
 // plus its controls, layers, styling and events.
 function mapInit() 
@@ -407,6 +422,14 @@ function layerDependent(data)
 {
    map.getCapabilities = data;
    createOpLayers(map);
+
+   //$('#selectedLayers, #availableLayers').sortable({ 
+   //   connectWith: ".layer-list",
+   //   handle: ".handle",
+   //})
+   //.selectable()
+   //.find( "li" ).addClass( "ui-corner-all" )
+   //.prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
 
    //var ows = new OpenLayers.Format.OWSContext();
    //var doc = ows.write(map);
@@ -660,17 +683,18 @@ function setupDrawingControls()
       },
       onFeatureInsert : function(feature) {
          ROIAdded(feature);
-      }
+      },
+      rendererOptions: { zIndexing: true }
    }); 
+
+   vectorLayer.displayInLayerSwitcher=false;
+   map.addLayer(vectorLayer);
 
    // Keeps the vectorLayer at the top of the map
    map.events.register("addlayer", map, function() 
    { 
       map.setLayerIndex(vectorLayer, map.layers.length - 1);
    });
-
-   vectorLayer.displayInLayerSwitcher=false;
-   map.addLayer(vectorLayer);
 
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature) { 
@@ -805,24 +829,6 @@ $(document).ready(function() {
        resizable: false
    });
 
-   // Show the scalebar for a selected layer
-   $('#scalebar').dialog({
-      position: ['center', 'center'],
-      width: 120,
-      height: 310,
-      resizable: true,
-      autoOpen: false
-   });
-
-   // Show metadata for a selected layer
-   $('#metadata').dialog({
-      position: ['center', 'center'],
-      width: 400,
-      height: 200,
-      resizable: true,
-      autoOpen: false
-   });
-
    // Show map info such as latlng
    $('#mapInfo').dialog({
       position: ['center', 'center'],
@@ -830,6 +836,26 @@ $(document).ready(function() {
       height: 200,
       resizable: true,
       autoOpen: false
+   });
+
+   $('#layerSelection').dialog({
+      position: ['center', 'center'],
+      width: 500,
+      minWidth:455,
+      height: 400,
+      minHeight: 200,
+      resizable: true,
+      autoOpen: false,
+   });
+
+   $('#layers').multiselect({
+      dynamic: true,
+      itemConverter: function(option) {
+         var item = {};
+         item.text = option.text;
+         item.selected = option.selected;
+         return item;
+      },
    });
 
    // Setup the gritter so we can use it for error messages

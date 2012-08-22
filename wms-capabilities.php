@@ -9,7 +9,7 @@ define('MASTERCACHEPATH', "./json/MasterCache");
 // File extension to use
 define('FILEEXTENSION', ".json");
 // Path to wmsGetCapabilites server
-define('GET_CAPABILITES_PATH', "http://rsg.pml.ac.uk/ncWMS/wms?");
+define('GET_CAPABILITES_PATH', "http://vostok:8080/thredds/wms/PML-MODIS-q0-daily-pre-2012-05-28-AGGSLOW?");
 // wmsGetCapabilites params 
 define('GET_CAPABILITES_PARAMS', "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
 
@@ -86,7 +86,7 @@ function getLayers($xml)
             );
          }
 
-         if(filterLayers($name))
+         if(!filterLayers($name))
          {
             // Add to the layers array
             array_push($layers, array(
