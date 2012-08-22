@@ -3,6 +3,7 @@
 
 // The OpenLayers map object
 var map;
+var meas;
 
 /*
 Helper functions
@@ -663,7 +664,7 @@ function setupDrawingControls()
    }); 
 
    // Keeps the vectorLayer at the top of the map
-   map.events.register("addLayer", map, function() 
+   map.events.register("addlayer", map, function() 
    { 
       map.setLayerIndex(vectorLayer, map.layers.length - 1);
    });
@@ -679,53 +680,49 @@ function setupDrawingControls()
       
       // Get bounds of the feature's geometry
       var bounds = new OpenLayers.Bounds();
-      var bounds_m = new OpenLayers.Bounds();
       bounds = geom.getBounds();
-      
-      // Create a copy of the bounds object to enable independent conversion to metres
-      bounds_m =  $.extend({}, bounds);
-      // Transform bounds_m from degress to metres via Google EPSG:900913 projection (measured in metres)
-      bounds_m.transform(lonlat, new OpenLayers.Projection('EPSG:900913'));
-      
+       
       // Some metrics for the ROI
       var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
       
       // Get some values for non-point ROIs
       if(map.ROI_Type != '' && map.ROI_Type != 'point'){
-         area_deg = geom.getArea().toPrecision(4);
-         area_km = (geom.getGeodesicArea()*1e-6).toPrecision(4);
-         height_deg = bounds.getHeight().toPrecision(4);
-         width_deg = bounds.getWidth().toPrecision(4);
-         height_km = (bounds_m.getHeight()/1000).toPrecision(4);
-         width_km = (bounds_m.getWidth()/1000).toPrecision(4);
-         radius_deg = ((bounds.getWidth() + bounds.getHeight())/4).toPrecision(4);
-         ctrLat = geom.getCentroid().x.toPrecision(4);
-         ctrLon = geom.getCentroid().y.toPrecision(4);
+         area_deg = geom.getArea();
+         area_km = (geom.getGeodesicArea()*1e-6);
+         height_deg = bounds.getHeight();
+         width_deg = bounds.getWidth();
+         // Note - to get values in true ellipsoidal distances, we need to use Vincenty functions for measuring ellipsoidal
+         // distances instead of planar distances (http://www.movable-type.co.uk/scripts/latlong-vincenty.html)
+         ctrLon = geom.getCentroid().x;
+         ctrLat = geom.getCentroid().y;
+         height_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(ctrLon,bounds.top),new OpenLayers.LonLat(ctrLon,bounds.bottom));
+         width_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(bounds.left,ctrLat),new OpenLayers.LonLat(bounds.right,ctrLat));
+         radius_deg = ((bounds.getWidth() + bounds.getHeight())/4);
       }
         
       switch(map.ROI_Type) {
          case 'point':
             $('#dispROI').html('<h3>Point ROI</h3>');
-            $('#dispROI').append('<p>lat, lon = ' + geom.x.toPrecision(4) + ', ' + geom.y.toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>lat, lon = ' + geom.x.toFixed(3) + ', ' + geom.y.toFixed(3) + '</p>');
             break;
          case 'box':
             $('#dispROI').html('<h3>Rectangular ROI</h3>');
-            $('#dispROI').append('<p>Width = ' + width_deg + ' deg = ' + width_km + ' km</p>');
-            $('#dispROI').append('<p>Height = ' + height_deg + ' deg = ' + height_km + ' km</p>');
-            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km + '</p>');
+            $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
+            $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
+            $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
             break;
          case 'circle':
             $('#dispROI').html('<h3>Circular ROI</h3>');
-            $('#dispROI').append('<p>Radius (deg) = ' + radius_deg + '</p>');
-            $('#dispROI').append('<p>Centre lat, lon = ' + ctrLat + ', ' + ctrLon + '</p>');
-            $('#dispROI').append('<p>Width = ' + width_deg + ' deg = ' + width_km + ' km</p>');
-            $('#dispROI').append('<p>Height = ' + height_deg + ' deg = ' + height_km + ' km</p>');
-            $('#dispROI').append('<p>Projected Area (sq km) =' + area_km + '</p>');
+            $('#dispROI').append('<p>Radius = ' + radius_deg.toFixed(3) + ' deg</p>');
+            $('#dispROI').append('<p>Centre lat, lon = ' + ctrLat.toFixed(3) + ', ' + ctrLon.toFixed(3) + '</p>');
+            $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
+            $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
+            $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
             break;
          case 'polygon':
             $('#dispROI').html('<h3>Custom Polygon ROI</h3>');
-            $('#dispROI').append('<p>Centroid lat, lon = ' + ctrLat + ', ' + ctrLon + '</p>');
-            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km + '</p>');
+            $('#dispROI').append('<p>Centroid lat, lon = ' + ctrLat.toFixed(3) + ', ' + ctrLon.toFixed(3) + '</p>');
+            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km.toFixed(3) + '</p>');
             break;
       }
    }
@@ -778,20 +775,21 @@ function setupDrawingControls()
    };
 
    // Add all the controls to the map
-   for(var key in mapControls) {
-       var control = mapControls[key];
-       map.addControl(control);
+   for (var key in mapControls) {
+      var control = mapControls[key];
+      map.addControl(control);
    }
 
    // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
    $('#panZoom input:radio').click(function(e) {
-       toggleControl(this);
+      toggleControl(this);
    });
 
    // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
    $('#ROIButtonSet input:radio').click(function(e) {
       toggleDrawingControl(this);
-   });
+   }); 
+
 }
 
 /*====================================================================================*/
