@@ -19,8 +19,6 @@ OpenLayers.Map.prototype.helperMessages = [];
 // The unique id of the last tutorial message
 OpenLayers.Map.prototype.tutUID = undefined;
 
-OpenLayers.Map.prototype.storeLayers = [];
-
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
 
