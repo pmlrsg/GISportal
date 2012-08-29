@@ -3,7 +3,20 @@ var OPEC = {};
 
 /* Custom OpenLayers Map object, OPEC.Map as a subclass of OpenLayers.Map */
 OPEC.Map = function() {
- 
+
+   // Array of ALL available date-times for all date-time layers where data's available
+   // The array is populated once all the date-time layers have loaded
+   this.enabledDays = [];
+
+   // Stores the data provided by the master cache file on the server. This includes
+   // layer names, titles, abstracts, etc.
+   this.getCapabilities = [];
+
+   // Used as offsets when sorting layers in groups
+   this.numBaseLayers = 0;
+   this.numRefLayers = 0;
+   this.numOpLayers = 0;
+
    // Stores messages to be used by the gritter
    this.helperMessages = [];
 
@@ -12,9 +25,6 @@ OPEC.Map = function() {
 
    // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
    this.ROI_Type = '';
-
-   // Array of all available data layers
-   this.dataLayers = [];
 
    // Select the given temporal layer on the Map based on JavaScript date input
    this.selectDateTimeLayer = function(lyr, thedate) {
@@ -90,6 +100,34 @@ OPEC.Map = function() {
          return [false];
       }
    }
+   // Map function to get the master cache file from the server and stores it in the map object
+   this.createMasterCache = function() {
+      var map = this;
+      $.ajax({
+         type : 'GET',
+         url : "./cache/mastercache.json",
+         dataType : 'json',
+         asyc : true,
+         success : layerDependent,
+         error : function(request, errorType, exception) {
+            gritterErrorHandler(null, 'master cache', request, errorType, exception);
+         }
+      });
+   }
+
+   this.getLayerData = function(name, sensorName, url) {
+      $.ajax({
+         type : 'GET',
+         url : "./cache/layers/" + name,
+         dataType : 'json',
+         asyc : true,
+         success : function(data) {
+            createOpLayer(data, sensorName, url);
+         },
+         error : function(request, errorType, exception) {
+         }
+      });
+   }
 }
 // OPEC.Map extends OpenLayers.Map
 extend(OPEC.Map, OpenLayers.Map);
@@ -97,11 +135,8 @@ extend(OPEC.Map, OpenLayers.Map);
 /* Custom OpenLayers Layer object, OPEC.Layer as a subclass of OpenLayers.Layer */
 OPEC.Layer = function(lyr) {
 
-   // The layer name (a unique key for each data layer and OpenLayer.Layer)
-   this.name = lyr.name;
-
-   // Layer Title
-   this.title = 'Dummy';
+   // Layer title
+   this.title = '';
 
    // Layer abstract
    this.abstract = '';
@@ -144,26 +179,7 @@ OPEC.Layer = function(lyr) {
    // Is the layer selected for display in the GUI or not
    this.selected = false;
 
-   // DataLayer function to create it's date-time cache based on a JSON cacheFile
-   // This is an asynchronous AJAX load of the JSON data
-   this.createDateCache = function(cacheFile) {
-      var layer = this;
-      $.ajax({
-         type : 'GET',
-         url : cacheFile,
-         dataType : 'json',
-         success : function(data) {
-            layer.DTCache = data.date;
-            layer.firstDate = displayDateString(layer.DTCache[0]);
-            layer.lastDate = displayDateString(layer.DTCache[layer.DTCache.length - 1]);
-         },
-         error : function(request, errorType, exception) {
-            gritterErrorHandler(layer, 'date cache', request, errorType, exception);
-         },
-      });
-   };
-
-   // Function which looks for a date within a DataLayer.
+   // Function which looks for a date within a layer.
    // The date passed is in the format yyyy-mm-dd or is an empty string
    // Returns the array of date-times if there's a match or null if not.
    this.matchDate = function(thedate) {
@@ -179,6 +195,5 @@ OPEC.Layer = function(lyr) {
       }
    }
 }
-
 // OPEC.Layer extends OpenLayers.Layer
 extend(OPEC.Layer, OpenLayers.Layer);

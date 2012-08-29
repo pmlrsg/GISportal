@@ -128,7 +128,6 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
          console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
       }
    }
-
    checkLayerState(layer)
 };
 
