@@ -24,7 +24,6 @@ function createContextMenu()
          });
 
          root.$menu.on('contextmenu:focus', function() {
-            console.info('menu show');
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
             $("#" + item.id).slider("value", layer.opacity);        
          });
@@ -89,15 +88,17 @@ function createContextMenu()
                         var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
 
                         var url = null;
-                        var width = 120;
+                        var width = 110;
                         var height = 310;
+
                         $.each(layer.styles, function(index, value)
-                        {      
+                        {    
                            if(value.Name == layer.params["STYLES"] && url == null)
                            {
                               url = value.LegendURL;
-                              width = value.Width;
-                              height = value.Height;
+                              width = parseInt(value.Width);
+                              height = parseInt(value.Height);
+                              return false; // Break loop
                            }
                         });
 
@@ -108,16 +109,21 @@ function createContextMenu()
                            url = layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name.replace("-","/");
 
                         $(document.body).append(
-                           '<div id="scalebar-' + layer.name +'" title="Scalebar Info">' +
+                           '<div id="scalebar-' + layer.name +'" class="scalebar" title="Scalebar Info">' +
                               '<img src="' + url + '" alt="Scalebar"/>' +
+                              '<div id="' + layer.name + '-range-slider"></div>' +
+                              '<input id="' + layer.name + '-maxvalue" type="text" name="max"/>' +
+                              '<label for="' + layer.name + '-maxvalue" title="The maximum value to be used"></label>' +
+                              '<input id="' + layer.name + '-minvalue" type="text" name="min"/>' +
+                              '<label for="' + layer.name + '-minvalue" title="The minimum value to be used"></label>' +
                            '</div>'
                         );
 
                         // Show the scalebar for a selected layer
                         $('#scalebar-' + layer.name).dialog({
                            position: ['center', 'center'],
-                           width: 120,
-                           height: 310,
+                           //width: width,
+                           //height: height,
                            resizable: true,
                            autoOpen: false,
                            close: function() {
@@ -125,8 +131,16 @@ function createContextMenu()
                            }
                         });
 
-                        $('#scalebar-' + layer.name).css('width', width + 10);
-                        $('#scalebar-' + layer.name).css('height', height + 20);
+                        $('#' + layer.name + '-range-slider').slider({
+                           orientation: "vertical",
+                           range: true,
+                           values: [ 17, 67 ],
+                        });
+
+                        $('#' + layer.name + '-range-slider').css('height', 256);
+                        $('#' + layer.name + '-range-slider').css('margin', '5px 0px 0px ' + (10) + 'px');
+                        $('#' + layer.name + '-maxvalue').css('margin', '10px 0px 200px ' + (10) + 'px');
+                        $('#' + layer.name + '-minvalue').css('margin', '0px 0px 0px ' + (10) + 'px');
                         $('#scalebar-' + layer.name).dialog('open');
                      }
                   },
@@ -193,15 +207,16 @@ function updateScalebar(layer)
    if($('#scalebar-' + layer.name).length)
    {
       var url = null;
-      var width = 120;
+      var width = 110;
       var height = 310;
+
       $.each(layer.styles, function(index, value)
       {      
          if(value.Name == layer.params["STYLES"] && url == null)
          {
             url = value.LegendURL;
-            width = value.Width;
-            height = value.Height;
+            width = parseInt(value.Width);
+            height = parseInt(value.Height);
          }
       });
 
@@ -216,7 +231,9 @@ function updateScalebar(layer)
          console.info('url: ' + layer.url +'REQUEST=GetLegendGraphic&LAYER=' + layer.name.replace("-","/"));
       }
 
-      $('#scalebar-' + layer.name).css('width', width + 10);
-      $('#scalebar-' + layer.name).css('height', height + 20);
+      $('#' + layer.name + '-range-slider').css('height', 256);
+      $('#' + layer.name + '-range-slider').css('margin', '5px 0px 0px ' + (10) + 'px');
+      $('#' + layer.name + '-maxvalue').css('margin', '10px 0px 200px ' + (10) + 'px');
+      $('#' + layer.name + '-minvalue').css('margin', '0px 0px 0px ' + (10) + 'px');
    }
 }

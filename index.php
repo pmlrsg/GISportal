@@ -64,6 +64,7 @@
    ob_start();
 //----------------------------------
 
+   //require('old-wms-capabilities.php');
    require('wms-capabilities.php');
 
    // Generate cache files

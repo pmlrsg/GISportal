@@ -198,30 +198,36 @@ function createRefLayers(map)
 function createOpLayers(map) 
 {
    var theMap = map;
-   $.each(theMap.getCapabilities.reverse(), function(i, item) 
-   {
-      // Add accordion for each sensor with layers
-      if(item.Layers.length)
-      {
-         var sensorName = item.Sensor;
-         // Create the accordion for the sensor
-         addAccordionToPanel(sensorName, theMap);
+   $.each(theMap.getCapabilities, function(i, item) {
 
-         $.each(item.Layers, function(i, item) {
-            if(item.Name && item.Name != "") {
-               createOpLayer(item, sensorName, theMap);
-            }
-         });
-      }
+      var url = item.url;
+      var serverName = item.serverName;   
+      $.each(item.server, function(i, item) 
+      {
+         console.info(item);
+         // Add accordion for each sensor with layers
+         if(item.length)
+         {
+            var sensorName = i;
+            // Create the accordion for the sensor
+            addAccordionToPanel(sensorName, theMap);
+
+            $.each(item, function(i, item) {
+               if(item.Name && item.Name != "") {
+                  map.getLayerData(serverName + '_' + item.Name.replace("/","-") + '.json', sensorName, url);
+               }
+            });
+         }
+      });
    });
 }
 
 // Create a layer to be displayed on the map
-function createOpLayer(layerData, sensorName, map) 
+function createOpLayer(layerData, sensorName, url) 
 {
    var layer = new OpenLayers.Layer.WMS (
       layerData.Name.replace("/","-"),
-      'http://vostok:8080/thredds/wms/PML-MODIS-q0-daily-pre-2012-05-28-AGGSLOW?',
+      url,
       { layers: layerData.Name, transparent: true}, 
       { opacity: 1 }
    );
@@ -229,7 +235,7 @@ function createOpLayer(layerData, sensorName, map)
    layer.temporal = layerData.Temporal; 
    if(layer.temporal) 
    {
-      layer.createDateCache('./json/WMSDateCache/' + layer.name + '.json');
+      layer.createDateCache('./cache/layers/' + layer.name + '.json');
    }
 
    layer.title = layerData.Title;
@@ -261,6 +267,7 @@ function addAccordionToPanel(accordionName, map)
       '</div>'
    );
 
+   // Creates the accordion
    $('#' + id).parent('div').multiOpenAccordion({
       active: 0,
       click: function(e) {
@@ -376,6 +383,7 @@ function checkLayerState(layer)
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 }
 
+/*------------------------------- Deprecated ----------------------------------
 function addLayerToSelectionPanel(layer)
 {
    $('#availableLayers').prepend(
@@ -386,6 +394,7 @@ function addLayerToSelectionPanel(layer)
       '<li id="' + layer.name + '" class="ui-widget-content">' + layer.title + '</li>'
    );   
 }
+-----------------------------------------------------------------------------*/
 
 // Start mapInit() - the main function for setting up the map
 // plus its controls, layers, styling and events.
@@ -396,7 +405,6 @@ function mapInit()
       displayProjection: lonlat,
       controls: []
    });
-
 
    // Get the master cache file from the server. This file contains some of 
    // the data from a getCapabilities query.

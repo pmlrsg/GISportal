@@ -437,6 +437,19 @@ div .sensor-accordion {
    border: 2px solid red;
 }
 
+.scalebar img {
+   float: left;
+}
+
+.scalebar div {
+   float: left;
+}
+
+.scalebar input {
+   float: left;
+   width: 60px;
+}
+
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }

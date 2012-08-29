@@ -186,12 +186,26 @@ OpenLayers.Map.prototype.createMasterCache = function() {
    var map = this;
    $.ajax({
       type: 'GET',
-      url: "./json/MasterCache.json", 
+      url: "./cache/mastercache.json", 
       dataType: 'json',
       asyc: true,
       success: layerDependent,
       error: function(request, errorType, exception) {
          gritterErrorHandler(null, 'master cache', request, errorType, exception);
+      }
+   });
+}
+
+OpenLayers.Map.prototype.getLayerData = function(name, sensorName, url) {
+   $.ajax({
+      type: 'GET',
+      url: "./cache/layers/" + name,
+      dataType: 'json',
+      asyc: true,
+      success: function(data) {
+         createOpLayer(data, sensorName, url);
+      },
+      error: function(request, errorType, exception) {
       }
    });
 }
