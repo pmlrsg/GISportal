@@ -29,3 +29,29 @@ function displayDateString(date)
    var day = date.substring(8, 10);
    return day + '-' + month + '-' + year;
 }
+
+/* Function to extend existing classes taken from Yahoo the YUI JavaScript library */
+function extend(subc, superc, overrides) {
+   if (!superc || !subc) {
+      throw new Error("extend failed, please check that " + "all dependencies are included.");
+   }
+   var F = function() {
+   };
+   F.prototype = superc.prototype;
+   subc.prototype = new F();
+   subc.prototype.constructor = subc;
+   subc.superclass = superc.prototype;
+   if (superc.prototype.constructor == Object.prototype.constructor) {
+      superc.prototype.constructor = superc;
+   }
+
+   if (overrides) {
+      for (var i in overrides) {
+         if (L.hasOwnProperty(overrides, i)) {
+            subc.prototype[i] = overrides[i];
+         }
+      }
+
+      L._IEEnumFix(subc.prototype, overrides);
+   }
+}
