@@ -66,24 +66,25 @@ OpenLayers.Layer.prototype.selectedDateTime = '';
 // Is the layer selected for display in the GUI or not
 OpenLayers.Layer.prototype.selected = false;
 
-// Layer function to create it's date-time cache based on a JSON cacheFile
-// This is an asynchronous AJAX load of the JSON data
-OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
-   var layer = this;
-   $.ajax({
-      type: 'GET',
-      url: cacheFile, 
-      dataType: 'json',
-      success: function(data) {
-            layer.DTCache = data.date;
-            layer.firstDate = displayDateString(layer.DTCache[0]);
-            layer.lastDate = displayDateString(layer.DTCache[layer.DTCache.length - 1]);
-      },
-      error: function(request, errorType, exception) {
-         gritterErrorHandler(layer, 'date cache', request, errorType, exception);
-      },
-   });      
-};
+/* DEPRECATED FUNCTIONALITY */
+// // Layer function to create it's date-time cache based on a JSON cacheFile
+// // This is an asynchronous AJAX load of the JSON data
+// OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
+   // var layer = this;
+   // $.ajax({
+      // type: 'GET',
+      // url: cacheFile, 
+      // dataType: 'json',
+      // success: function(data) {
+            // layer.DTCache = data.date;
+            // layer.firstDate = displayDateString(layer.DTCache[0]);
+            // layer.lastDate = displayDateString(layer.DTCache[layer.DTCache.length - 1]);
+      // },
+      // error: function(request, errorType, exception) {
+         // gritterErrorHandler(layer, 'date cache', request, errorType, exception);
+      // },
+   // });      
+// };
 
 // Function which looks for a date within a layer.
 // The date passed is in the format yyyy-mm-dd or is an empty string

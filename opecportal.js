@@ -41,25 +41,25 @@ function createBaseLayers(map)
       "GEBCO",
       "http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
       { layers: 'gebco_08_grid' },
-      { wrapDateLine: true }
+      { projection: lonlat, wrapDateLine: true }
    );
    map.addLayer(gebco);
 
-   // Add Cubewerx layer
-   var cube = new OpenLayers.Layer.WMS(
-      'CubeWerx',
-      'http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi?',
-      { layers: 'Foundation.GTOPO30' },
-      { wrapDateLine: true }
+   // Add Metacarta basic vmap0 base layer
+   var meta = new OpenLayers.Layer.WMS(
+      'Metacarta Basic',
+      'http://labs.metacarta.com/wms/vmap0',
+      { layers: 'basic' },
+      { projection: lonlat, wrapDateLine: true }
    );
-   map.addLayer(cube);
+   map.addLayer(meta);
 
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
       'Landsat',
       'http://irs.gis-lab.info/?',
       { layers: 'landsat' },
-      { wrapDateLine: true }
+      { projection: lonlat, wrapDateLine: true}
    );
    map.addLayer(landsat);
    
@@ -232,11 +232,17 @@ function createOpLayer(layerData, sensorName, url)
       { opacity: 1 }
    );
 
-   layer.temporal = layerData.Temporal; 
-   if(layer.temporal) 
-   {
-      layer.createDateCache('./cache/layers/' + layer.name + '.json');
-   }
+   // Get the time dimension if this is a temporal layer
+   $.each(layerData.Dimensions, function(index, value) {
+      var dimension = value;
+      if (value.Name.toLowerCase() == 'time'){
+         layer.temporal = true;
+         datetimes = dimension.Value.split(',');
+         layer.DTCache = datetimes;
+         layer.firstDate = displayDateString(datetimes[0]);
+         layer.lastDate = displayDateString(datetimes[datetimes.length - 1]);
+      }
+   });
 
    layer.title = layerData.Title;
    layer.abstract = layerData.Abstract;
