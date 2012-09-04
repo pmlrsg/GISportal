@@ -181,10 +181,10 @@ function createContextMenu()
                         $('<div><label>Source: ' + '</label></div>' +
                            '<div><label>Name: ' + layer.title + '</label></div>' +
                            '<div><label>BoundingBox: ' + 
-                              layer.exboundingbox.NorthBoundLatitude + 'N, ' +
-                              layer.exboundingbox.EastBoundLongitude + 'E, ' +
-                              layer.exboundingbox.SouthBoundLatitude + 'S, ' + 
-                              layer.exboundingbox.WestBoundLongitude + 'W ' + 
+                              layer.exBoundingBox.NorthBoundLatitude + 'N, ' +
+                              layer.exBoundingBox.EastBoundLongitude + 'E, ' +
+                              layer.exBoundingBox.SouthBoundLatitude + 'S, ' + 
+                              layer.exBoundingBox.WestBoundLongitude + 'W ' + 
                            '</label></div>' +
                            dateRange() +
                            '<div><label>Abstract: ' + layer.abstract + '</label></div>'

@@ -3,7 +3,6 @@
 
 // The OpenLayers map object
 var map;
-var meas;
 
 /*
 Helper functions
@@ -150,46 +149,6 @@ function createRefLayers(map)
    map.addLayer(blackSea);
    addLayerToPanel(blackSea);
 
-   // Setup Black sea outline layer (Vector)
-   var blackSea = new OpenLayers.Layer.Vector('The_Blue_Sea_KML', {
-      projection: lonlat,
-      strategies: [new OpenLayers.Strategy.Fixed()],
-      protocol: new OpenLayers.Protocol.HTTP({
-         url: 'black_sea.kml',
-         format: new OpenLayers.Format.KML({
-            extractStyles: true,
-            extractAttributes: true
-         })
-      })
-   });
-
-   // Make this layer a reference layer
-   blackSea.controlID = "refLayers";
-   blackSea.selected = true;
-   blackSea.title = "The Black Sea (KML)";
-   map.addLayer(blackSea);
-   addLayerToPanel(blackSea);
-
-   // Setup Black sea outline layer (Vector)
-   var blackSea = new OpenLayers.Layer.Vector('The_Green_Sea_KML', {
-      projection: lonlat,
-      strategies: [new OpenLayers.Strategy.Fixed()],
-      protocol: new OpenLayers.Protocol.HTTP({
-         url: 'black_sea.kml',
-         format: new OpenLayers.Format.KML({
-            extractStyles: true,
-            extractAttributes: true
-         })
-      })
-   });
-
-   // Make this layer a reference layer
-   blackSea.controlID = "refLayers";
-   blackSea.selected = true;
-   blackSea.title = "The Black Sea (KML)";
-   map.addLayer(blackSea);
-   addLayerToPanel(blackSea);
-
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
@@ -198,23 +157,39 @@ function createRefLayers(map)
 function createOpLayers(map) 
 {
    var theMap = map;
-   $.each(theMap.getCapabilities, function(i, item) {
-
+   $.each(theMap.getCapabilities, function(i, item) 
+   {
       var url = item.url;
       var serverName = item.serverName;   
       $.each(item.server, function(i, item) 
       {
-         console.info(item);
          // Add accordion for each sensor with layers
          if(item.length)
          {
             var sensorName = i;
+            //console.info("---------------" + i + "---------------");
             // Create the accordion for the sensor
-            addAccordionToPanel(sensorName, theMap);
+            //addAccordionToPanel(sensorName, theMap);
 
+            // Go through each layer and load it
             $.each(item, function(i, item) {
-               if(item.Name && item.Name != "") {
-                  map.getLayerData(serverName + '_' + item.Name.replace("/","-") + '.json', sensorName, url);
+               if(item.Name && item.Name != "") 
+               {
+                  //console.info(item.Name);
+                  var microLayer = 
+                  { 
+                     name: item.Name,
+                     title: item.Title,
+                     abstract: item.Abstract,
+                     sensorName: sensorName.replace(/\s+/g, ""),
+                     exBoundingBox: item.EX_GeographicBoundingBox,
+                  };
+                  
+                  map.microLayers[microLayer.Name] = microLayer;
+                  
+                  $('#layers').multiselect('addItem', {text: item.Name, title: item.Title, selected: false}); // Temp
+                  //map.getLayerData(serverName + '_' + item.Name.replace("/","-") + '.json', sensorName, url);
+                     
                }
             });
          }
@@ -248,16 +223,18 @@ function createOpLayer(layerData, sensorName, url)
    layer.abstract = layerData.Abstract;
    layer.sensor = sensorName.replace(/\s+/g, "");
    layer.styles = layerData.Styles;
-   layer.exboundingbox = layerData.EX_GeographicBoundingBox;
-   layer.boundingbox = layerData.BoundingBox;
+   layer.exBoundingBox = layerData.EX_GeographicBoundingBox;
+   layer.boundingBox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
-   //map.storeLayers[layer.name] = layer;
-   //addLayerToSelectionPanel(layer);
 
+   // Add layer to map
    map.addLayer(layer);
+
+   // Increase the count of OpLayers
+   map.numOpLayers++;
+
    addLayerToPanel(layer);
-   $('#layers').multiselect('addItem', {text: layer.title, selected: false});
 }
 
 // Add a accordion to the layers panel
@@ -371,12 +348,11 @@ function updateLayerOrder(layer)
    $.each(layer.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
       layerOffset += $(this).children('li').length;
    });
-   console.info('offset: ' + layerOffset);
 
    var order = layer.sortable('toArray');                  
    $.each(order, function(index, value) {
       var layer = map.getLayersByName(value)[0];
-      map.setLayerIndex(layer, map.numBaseLayers + map.numRefLayers + layerOffset + order.length - index - 1);
+      map.setLayerIndex(layer, map.numBaseLayers + layerOffset + order.length - index - 1);
    });
 }
 
@@ -437,14 +413,6 @@ function layerDependent(data)
    map.getCapabilities = data;
    createOpLayers(map);
 
-   //$('#selectedLayers, #availableLayers').sortable({ 
-   //   connectWith: ".layer-list",
-   //   handle: ".handle",
-   //})
-   //.selectable()
-   //.find( "li" ).addClass( "ui-corner-all" )
-   //.prepend( "<div class='handle'><span class='ui-icon ui-icon-carat-2-n-s'></span></div>" );
-
    //var ows = new OpenLayers.Format.OWSContext();
    //var doc = ows.write(map);
 }
@@ -453,6 +421,22 @@ function layerDependent(data)
 
 function nonLayerDependent()
 {
+   // Keeps the vectorLayers at the top of the map
+   map.events.register("addlayer", map, function() 
+   { 
+       // Get and store the number of reference layers
+      var refLayers = map.getLayersBy('controlID', 'refLayers');
+      var poiLayers = map.getLayersBy('controlID', 'poiLayer');
+
+      $.each(refLayers, function(index, value) {
+         map.setLayerIndex(value, map.numBaseLayers + map.numOpLayers + index + 1);
+      });
+
+      $.each(poiLayers, function(index, value) {
+         map.setLayerIndex(value, map.layers.length - 1);
+      });
+   });
+
    //Configure and generate the UI elements
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
@@ -494,9 +478,9 @@ function nonLayerDependent()
    });
 
    // set the max height of each of the accordions relative to the size of the window
-   $('#layerAccordion').css('max-height', $(window).height() - 120);
-   $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
-   $('#refLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
+   $('#layerAccordion').css('max-height', $(document).height() - 120);
+   $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+   $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
 
    $(window).resize(function() {
       $('#layerAccordion').css('max-height', $(window).height() - 120);
@@ -701,14 +685,9 @@ function setupDrawingControls()
       rendererOptions: { zIndexing: true }
    }); 
 
+   vectorLayer.controlID = "poiLayer";
    vectorLayer.displayInLayerSwitcher=false;
    map.addLayer(vectorLayer);
-
-   // Keeps the vectorLayer at the top of the map
-   map.events.register("addlayer", map, function() 
-   { 
-      map.setLayerIndex(vectorLayer, map.layers.length - 1);
-   });
 
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature) { 
@@ -859,16 +838,23 @@ $(document).ready(function() {
       height: 400,
       minHeight: 200,
       resizable: true,
-      autoOpen: false,
+      autoOpen: true,
    });
 
    $('#layers').multiselect({
-      dynamic: true,
-      itemConverter: function(option) {
-         var item = {};
-         item.text = option.text;
-         item.selected = option.selected;
-         return item;
+      selected: function(e, ui) {
+         console.log("selected");
+         if(map.layerStore[ui.option.text])
+         {
+            console.log("found layer");
+         }
+      },
+      deselected: function(e, ui) {
+         console.log("deselected");
+         if(map.layerStore[ui.option.text])
+         {
+            console.log("found layer");
+         } 
       },
    });
 

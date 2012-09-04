@@ -16,6 +16,10 @@ OpenLayers.Map.prototype.numOpLayers = 0;
 // Stores messages to be used by the gritter
 OpenLayers.Map.prototype.helperMessages = [];
 
+// Temporary version of microLayer and layer storage.
+OpenLayers.Map.prototype.microLayers = [];
+OpenLayers.Map.prototype.layerStore = [];
+
 // The unique id of the last tutorial message
 OpenLayers.Map.prototype.tutUID = undefined;
 
@@ -49,10 +53,10 @@ OpenLayers.Layer.prototype.temporal = false;
 OpenLayers.Layer.prototype.styles = [];
 
 // The EX_GeographicBoundingBox for the layer
-OpenLayers.Layer.prototype.exboundingbox = [];
+OpenLayers.Layer.prototype.exBoundingBox = [];
 
 // The BoundingBox for the layer
-OpenLayers.Layer.prototype.boundingbox = [];
+OpenLayers.Layer.prototype.boundingBox = [];
 
 // Holds cached date-times as array of ISO8601 strings for each layer based on data availability
 OpenLayers.Layer.prototype.DTCache = [];
@@ -201,7 +205,7 @@ OpenLayers.Map.prototype.getLayerData = function(name, sensorName, url) {
       dataType: 'json',
       asyc: true,
       success: function(data) {
-         createOpLayer(data, sensorName, url);
+         //createOpLayer(data, sensorName, url);
       },
       error: function(request, errorType, exception) {
       }

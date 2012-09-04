@@ -14,6 +14,9 @@
    //ob_start();
 //----------------------------------
 
+// set socket timeout
+ini_set('default_socket_timeout', 120);
+
 // How long the cache files will last
 define('CACHELIFE', 10); // 86400
 // Path to store cache files in
@@ -36,15 +39,16 @@ function updateCache()
    // Get the list of servers from file
    $serverArray = csvToArray(GET_SERVERLIST_PATH, ',');
    $mastercache = array();
+   $change = FALSE;
 
    //DEBUG
-   fb($serverArray, FirePHP::INFO);
+   //fb($serverArray, FirePHP::INFO);
 
    foreach($serverArray as $i => $row)
    {
       // DEBUG
-      fb("server: ".$row['name'], FirePHP::INFO);
-      fb("url: ".$row['url'], FirePHP::INFO);
+      //fb("server: ".$row['name'], FirePHP::INFO);
+      //fb("url: ".$row['url'], FirePHP::INFO);
 
       if(!CheckCacheValid(SERVERCACHEPATH.$row['name'].FILEEXTENSIONXML, CACHELIFE))
       {
@@ -57,39 +61,46 @@ function updateCache()
          $oldMD5 = md5($oldXML);
 
          //DEBUG
-         fb("newMD5: ".$newMD5, FirePHP::INFO);
-         fb("oldMD5: ".$oldMD5, FirePHP::INFO);
+         //fb("newMD5: ".$newMD5, FirePHP::INFO);
+         //fb("oldMD5: ".$oldMD5, FirePHP::INFO);
 
          // If the checksum does not match then we should recreate the cache files
          if($oldMD5 != $newMD5)
          {
             //DEBUG
-            fb("creating xml cache...", FirePHP::INFO);
+            //fb("creating xml cache...", FirePHP::INFO);
             saveFile(SERVERCACHEPATH.$row['name'].FILEEXTENSIONXML, $newXML);
 
             //DEBUG
-            fb("xml cache created", FirePHP::INFO);
-            fb("creating cache...", FirePHP::INFO);
-            $mastercache[] = json_decode(createCache($row['name'], $row['url'], $newXML));
+            //fb("xml cache created", FirePHP::INFO);
+            //fb("creating cache...", FirePHP::INFO);
+            //$mastercache[] = json_decode(createCache($row['name'], $row['url'], $newXML));
+            createCache($row['name'], $row['url'], $newXML);
             //DEBUG
-            fb("cache created", FirePHP::INFO);
+            //fb("cache created", FirePHP::INFO);
 
             //--------------- Needed for editing files -----------------
             //$cmd = "chmod 777 ".SERVER_CACHE_PATH.$row['name'].".xml";
             //$return = `$cmd`;
             // ---------------------------------------------------------
-         }
-         else
-         {
-            $mastercache[] = json_decode(getFile(SERVERCACHEPATH.$row['name'].FILEEXTENSIONJSON));
+
+            $change = TRUE;
          }
       }
    }
 
    //DEBUG
-   fb($mastercache, FirePHP::INFO);
+   //fb($mastercache, FirePHP::INFO);
 
-   saveFile(MASTERCACHEPATH.FILEEXTENSIONJSON, json_encode($mastercache));
+   if($change)
+   {
+      foreach($serverArray as $i => $row)
+      {
+         $mastercache[] = json_decode(getFile(SERVERCACHEPATH.$row['name'].FILEEXTENSIONJSON));
+      }
+
+      saveFile(MASTERCACHEPATH.FILEEXTENSIONJSON, json_encode($mastercache));
+   }
 }
 
 function CheckCacheValid($cacheFile, $cacheLife)
@@ -147,7 +158,9 @@ function createCache($serverName, $serverURL, $xmlStr)
             'MaxY'=>(string)$innerChild->BoundingBox->attributes()->maxy
          );
 
-         $dimensions = createDimensionsArray($innerChild->Dimension);
+         $temp = createDimensionsArray($innerChild->Dimension);
+         $dimensions = $temp['dimensions'];
+         $temporal = $temp['temporal'];
          $styles = createStylesArray($innerChild->Style);
 
          if(!filterLayers($name))
@@ -159,9 +172,9 @@ function createCache($serverName, $serverURL, $xmlStr)
                'URL'=>$serverURL,
                'Title'=>$title, 
                'Abstract'=>$abstract,
-               'Temporal'=>$temporal,
-               //'FirstDate'=>$firstDate,
-               //'LastDate'=>$lastDate,
+               //'Temporal'=>$temporal,
+               'FirstDate'=>$temp['firstDate'],
+               'LastDate'=>$temp['lastDate'],
                'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
                'BoundingBox'=>$boundingBox,
                'Dimensions'=>$dimensions,
@@ -202,6 +215,10 @@ function createCache($serverName, $serverURL, $xmlStr)
 function createDimensionsArray($dimensions)
 {
    $returnArray = array();
+   $returnArray['dimensions'] = array();
+   $returnArray['temporal'] = FALSE;
+   $returnArray['firstDate'] = NULL;
+   $returnArray['lastDate'] = NULL;
 
    // Iterate over each dimension
    foreach($dimensions as $dimension)
@@ -212,10 +229,14 @@ function createDimensionsArray($dimensions)
          $dimensionArray = explode(",", $dimension);
          $firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
          $lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
+
+         $returnArray['temporal'] = $temporal;
+         $returnArray['firstDate'] = $firstDate;
+         $returnArray['lastDate'] = $lastDate;     
       }
 
       // Add to the dimensions array
-      array_push($returnArray, array(
+      array_push($returnArray['dimensions'], array(
          'Name'=>(string)$dimension->attributes()->name,
          'Units'=>(string)$dimension->attributes()->units,
          'Default'=>(string)$dimension->attributes()->default,
@@ -274,25 +295,25 @@ function csvToArray($filename='', $delimiter=',')
 function filterLayers($layerName)
 {
    $whiteList = array(
-      "WECOP/Z5c",
-      "WECOP/Chl",
-      "WECOP/PAR_irradiance",
-      "WECOP/PAR_attenuation",
-      "WECOP/EIRg",
-      "WECOP/EIRb",
-      "WECOP/EIRr",
-      "MRCS_ECOVARS/o2o",
-      "MRCS_ECOVARS/si",
-      "MRCS_ECOVARS/zoop",
-      "MRCS_ECOVARS/chl",
-      "MRCS_ECOVARS/po4",
-      "MRCS_ECOVARS/no3",
-      "MRCS_ECOVARS/p1c",
-      "MRCS_ECOVARS/p2c",
-      "MRCS_ECOVARS/p3c",
-      "MRCS_ECOVARS/p4c",
-      "MRCS_ECOVARS/vis01",
-      "AMT_NORTHERN/aot_869",
+      //"WECOP/Z5c",
+      //"WECOP/Chl",
+      //"WECOP/PAR_irradiance",
+      //"WECOP/PAR_attenuation",
+      //"WECOP/EIRg",
+      //"WECOP/EIRb",
+      //"WECOP/EIRr",
+      //"MRCS_ECOVARS/o2o",
+      //"MRCS_ECOVARS/si",
+      //"MRCS_ECOVARS/zoop",
+      //"MRCS_ECOVARS/chl",
+      //"MRCS_ECOVARS/po4",
+      //"MRCS_ECOVARS/no3",
+      //"MRCS_ECOVARS/p1c",
+      //"MRCS_ECOVARS/p2c",
+      //"MRCS_ECOVARS/p3c",
+      //"MRCS_ECOVARS/p4c",
+      //"MRCS_ECOVARS/vis01",
+      //"AMT_NORTHERN/aot_869",
    );
 
    foreach($whiteList as $value)
