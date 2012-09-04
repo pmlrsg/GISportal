@@ -1,3 +1,3 @@
 name,url
 pml,http://rsg.pml.ac.uk/ncWMS/wms?
-vostok,http://vostok:8080/ncWMS-1.0RC3/wms?
+vostok,http://earthserver.pml.ac.uk:8080/ncWMS-1.0RC3/wms?
