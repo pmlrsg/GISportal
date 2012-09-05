@@ -12,6 +12,13 @@ Array.prototype.deDupe = function() {
    return out;
 }
 
+Array.prototype.removeByElement = function removeByElement(arrayName,arrayElement) {
+   for(var i = 0; i < arrayName.length; i++ ) { 
+      if(arrayName[i] == arrayElement)
+         arrayName.splice(i, 1); 
+   } 
+}
+
 // Turn JavaScript date, d into ISO8601 date part (no time)
 function ISODateString(d) {
    function pad(n){

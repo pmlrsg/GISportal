@@ -206,6 +206,9 @@ OpenLayers.Map.prototype.getLayerData = function(name, sensorName, url) {
       asyc: true,
       success: function(data) {
          createOpLayer(data, sensorName, url);
+         console.log("Adding layer...");
+         addOpLayer(data.Name.replace("/","-"));
+         console.log("Added Layer");
       },
       error: function(request, errorType, exception) {
       }

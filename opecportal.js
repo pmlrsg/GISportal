@@ -160,14 +160,13 @@ function createOpLayers(map)
    $.each(theMap.getCapabilities, function(i, item) 
    {
       var url = item.url;
-      var serverName = item.serverName;   
+      var serverName = item.serverName;
       $.each(item.server, function(i, item) 
       {
          // Add accordion for each sensor with layers
          if(item.length)
          {
             var sensorName = i;
-            //console.info("---------------" + i + "---------------");
             // Create the accordion for the sensor
             addAccordionToPanel(sensorName, theMap);
 
@@ -175,10 +174,9 @@ function createOpLayers(map)
             $.each(item, function(i, item) {
                if(item.Name && item.Name != "") 
                {
-                  //console.info(item.Name);
                   var microLayer = 
                   { 
-                     name: item.Name,
+                     name: item.Name.replace("/","-"),
                      title: item.Title,
                      abstract: item.Abstract,
                      serverName: serverName,
@@ -189,7 +187,7 @@ function createOpLayers(map)
                   
                   map.microLayers[microLayer.name] = microLayer;
                   
-                  $('#layers').multiselect('addItem', {text: item.Name, title: item.Title, selected: false}); // Temp                      
+                  $('#layers').multiselect('addItem', {text: item.Name.replace("/","-"), title: item.Title, selected: false}); // Temp                      
                }
             });
          }
@@ -229,12 +227,54 @@ function createOpLayer(layerData, sensorName, url)
    layer.selected = false;     
 
    // Add layer to map
+   //map.addLayer(layer);
+
+   // Increase the count of OpLayers
+   //map.numOpLayers++;
+
+   //addLayerToPanel(layer);
+
+   map.layerStore[layer.name] = layer;
+}
+
+function addOpLayer(layerName)
+{
+   // Get layer from layerStore
+   var layer = map.layerStore[layerName];
+
+   if (typeof layer === 'undefined' || layer == 'null')
+   {
+      // Error: Could not get a layer object
+      console.log("Error: Could not get a layer object");
+      return;
+   }
+
+   // Remove the layer from the layerStore
+   map.layerStore.removeByElement(layerName);
+
+   // Add the layer to the map
    map.addLayer(layer);
+
+   // Add the layer to the panel
+   addLayerToPanel(layer);
 
    // Increase the count of OpLayers
    map.numOpLayers++;
+}
 
-   addLayerToPanel(layer);
+function removeOpLayer(layer)
+{
+   // Remove the layer from the panel
+   removeLayerFromPanel(layer);
+
+   // Remove the layer from the map
+   map.removeLayer(layer);
+
+   // Add the layer to the layerStore
+   map.layerStore[layer.name] = layer;
+
+   // Decrease the count of OpLayers
+   map.numOpLayers--;
 }
 
 // Add a accordion to the layers panel
@@ -272,6 +312,12 @@ function addAccordionToPanel(accordionName, map)
          updateLayerOrder($(this));
       }
    }).disableSelection();
+}
+
+function removeAccordionFromPanel(accordionName, map)
+{
+   var id = accordionName.replace(/\s+/g, "");
+   $('#' + id).remove();
 }
 
 /*------------------------------- Deprecated ----------------------------------
@@ -322,6 +368,11 @@ function addLayerToPanel(layer)
          checkLayerState(layer);
       });
    }
+}
+
+function removeLayerFromPanel(layer)
+{
+   $('#' + layer.name).remove();
 }
 
 // Creates a list of custom args that will be added to the
@@ -851,25 +902,34 @@ $(document).ready(function() {
 
             if(map.layerStore[ui.option.text])
             {
-               console.log("found layer");
+               console.log("Adding layer...");
+               addOpLayer(ui.option.text);
+               console.log("Added Layer");
             }
             else
-            {
                map.getLayerData(microlayer.serverName + '_' + microlayer.name.replace("/","-") + '.json', microlayer.sensorName, microlayer.url);
-            }
          }
          else
-         {
             console.log("no layer data to use");
-         }
       },
       deselected: function(e, ui) 
       {
          console.log("deselected");
-         if(map.layerStore[ui.option.text])
+         var layer = map.getLayersByName(ui.option.text)[0];
+
+         if(layer)
          {
-            console.log("found layer");
-         } 
+            // DEBUG
+            console.log("Removing layer...");
+            map.removeLayer(layer);
+            removeLayerFromPanel(layer);
+            // DEBUG
+            console.log("Layer removed");
+         }
+         else if(map.layerStore[ui.option.text])
+            var layer = map.layerStore[ui.option.text];
+         else
+            console.log("no layer data to use");
       },
    });
 
