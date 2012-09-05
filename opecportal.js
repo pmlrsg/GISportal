@@ -169,7 +169,7 @@ function createOpLayers(map)
             var sensorName = i;
             //console.info("---------------" + i + "---------------");
             // Create the accordion for the sensor
-            //addAccordionToPanel(sensorName, theMap);
+            addAccordionToPanel(sensorName, theMap);
 
             // Go through each layer and load it
             $.each(item, function(i, item) {
@@ -181,15 +181,15 @@ function createOpLayers(map)
                      name: item.Name,
                      title: item.Title,
                      abstract: item.Abstract,
+                     serverName: serverName,
+                     url: url,
                      sensorName: sensorName.replace(/\s+/g, ""),
                      exBoundingBox: item.EX_GeographicBoundingBox,
                   };
                   
-                  map.microLayers[microLayer.Name] = microLayer;
+                  map.microLayers[microLayer.name] = microLayer;
                   
-                  $('#layers').multiselect('addItem', {text: item.Name, title: item.Title, selected: false}); // Temp
-                  //map.getLayerData(serverName + '_' + item.Name.replace("/","-") + '.json', sensorName, url);
-                     
+                  $('#layers').multiselect('addItem', {text: item.Name, title: item.Title, selected: false}); // Temp                      
                }
             });
          }
@@ -842,14 +842,29 @@ $(document).ready(function() {
    });
 
    $('#layers').multiselect({
-      selected: function(e, ui) {
+      selected: function(e, ui) 
+      {
          console.log("selected");
-         if(map.layerStore[ui.option.text])
+         if(map.microLayers[ui.option.text])
          {
-            console.log("found layer");
+            var microlayer = map.microLayers[ui.option.text];
+
+            if(map.layerStore[ui.option.text])
+            {
+               console.log("found layer");
+            }
+            else
+            {
+               map.getLayerData(microlayer.serverName + '_' + microlayer.name.replace("/","-") + '.json', microlayer.sensorName, microlayer.url);
+            }
+         }
+         else
+         {
+            console.log("no layer data to use");
          }
       },
-      deselected: function(e, ui) {
+      deselected: function(e, ui) 
+      {
          console.log("deselected");
          if(map.layerStore[ui.option.text])
          {
