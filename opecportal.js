@@ -921,8 +921,7 @@ $(document).ready(function() {
          {
             // DEBUG
             console.log("Removing layer...");
-            map.removeLayer(layer);
-            removeLayerFromPanel(layer);
+            removeOpLayer(layer);
             // DEBUG
             console.log("Layer removed");
          }
