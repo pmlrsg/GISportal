@@ -4,7 +4,8 @@
 <head>
 <meta charset="utf-8">
 <title>OpEc GIS Portal (jQuery + jQuery UI)</title>
-<!-- Now for the styling -->
+
+<!-- ============================ Now for the styling ============================ -->
 <!-- jQuery UI theming CSS -->
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.23.custom.css" />
 <!-- Default OpenLayers styling -->
@@ -18,29 +19,42 @@
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
-<!-- JavaScript libraries -->
+
+<!-- ============================ JavaScript libraries ============================ -->
 <!-- Custom functions and extensions to exisiting JavaScript objects -->
 <script type="text/javascript" src="custom.js"></script>
+
 <!-- Latest jQuery from jQuery.com -->
 <script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.min.js"></script>
+
 <!-- The latest jQuery UI from jqueryui.com -->
-<script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
-<!--<script src="http://maps.google.com/maps/api/js?v=3.6&amp;sensor=false"></script>-->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
+
+<!-- OpenLayers Map Code-->
+<script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
+
+<!-- Flotr2 -->
+<script type="text/javascript" src="js-libs/Flotr2/js/flotr2.min.js"></script>
+
 <!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
 <!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
+
 <!-- http://code.google.com/p/jquery-multi-open-accordion -->
 <script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.2.js"></script>
+
 <!-- Old Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
+
 <!-- http://medialize.github.com/jQuery-contextMenu/ -->
 <script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
+
 <!-- https://github.com/jboesch/Gritter -->
 <script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.min.js"></script>
+
 <!-- https://github.com/michael/multiselect -->
 <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
+
 <!-- Custom JavaScript -->
-<!-- OpenLayers Map Code-->
 <script type="text/javascript" src="opecportal.js"></script>
 <script type="text/javascript" src="gritter.js"></script>
 <script type="text/javascript" src="contextMenu.js"></script>
