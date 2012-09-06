@@ -10,9 +10,9 @@ OPEC.LayerData = function(name_id) {
    // The layer name - must match the name of the OpenLayers.Layer object
    this.name = name_id;
    // The title of the layer (more descriptive)
-   this.title = '';
+   this.title = undefined;
    // The abstract information for the laye
-   this.abstract = '';
+   this.abstract = undefined;
    // Sensor name (used as name for accordion groupings of layers)
    this.sensorName = '';
    // The EX_GeographicBoundingBox for the layer
@@ -21,8 +21,8 @@ OPEC.LayerData = function(name_id) {
    this.boundingbox = [];
    
    // Date Range
-   this.firstDate = '';
-   this.lastDate = '';
+   this.firstDate = undefined;
+   this.lastDate = undefined;
 
    // Add a new property to the OpenLayers layer object to tell the UI which <ul>
    // control ID in the layers panel to assign it to - defaults to operational layer
@@ -41,7 +41,7 @@ OPEC.LayerData = function(name_id) {
    this.currentDateTimes = [];
 
    // Currently selected date-time for the current date and layer as an ISO8601 string
-   this.selectedDateTime = '';
+   this.selectedDateTime = undefined;
 
    // Is the layer selected for display in the GUI or not
    this.selected = false;
@@ -63,11 +63,14 @@ OPEC.LayerData = function(name_id) {
    }
 }
 // Add the OPEC.LayerData object to all OpenLayers.Layer objects
-OpenLayers.Layer.prototype.layerData = new OPEC.LayerData();
+OpenLayers.Layer.prototype.layerData = null;
 
 /* Custom OpenLayers MapData object */
-OPEC.MapData = function() {
-
+OPEC.MapData = function(map_id) {
+   
+   // This is the common unique map identified
+   this.id = map_id;
+   
    // Array of ALL available date-times for all date-time layers where data's available
    // The array is populated once all the date-time layers have loaded
    this.enabledDays = [];
@@ -92,7 +95,7 @@ OPEC.MapData = function() {
    this.tutUID = undefined;
 
    // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
-   this.ROI_Type = '';
+   this.ROI_Type = undefined;
 
    // Select the given temporal layer on the Map based on JavaScript date input
    this.selectDateTimeLayer = function(lyr, thedate) {
@@ -130,35 +133,35 @@ OPEC.MapData = function() {
          var lData = layer.layerData;
          // Only filter date-dependent layers
          if (lData.temporal) {
-            themap.selectDateTimeLayer(value, thedate);
+            map.mapData.selectDateTimeLayer(value, thedate);
          }
       });
    }
 
    // Map function to re-generate the global date cache for selected layers
    this.refreshDateCache = function() {
-      var mapdata = this;
-      mapdata.enabledDays = [];
+      var mData = this;
+      mData.enabledDays = [];
       $.each(map.layers, function(index, value) {
          var layer = value;
          var lData = layer.layerData;
          if (lData.selected && lData.temporal) {
-            mapdata.enabledDays = mapdata.enabledDays.concat(lData.DTCache);
+            mData.enabledDays = mData.enabledDays.concat(lData.DTCache);
          }
       });
-      mapdata.enabledDays = mapdata.enabledDays.deDupe();
+      mData.enabledDays = mData.enabledDays.deDupe();
       // Re-filter the layers by date now the date cache has changed
       // DEBUG
-      console.info('Global date cache now has ' + mapdata.enabledDays.length + ' members.');
+      console.info('Global date cache now has ' + mData.enabledDays.length + ' members.');
    }
    
    // Map function which returns availability (boolean) of data for the given JavaScript date across all layers
    // using the map object's global date cache. Used in conjunction with the jQuery UI datepicker control
    this.allowedDays = function(thedate) {
-      var mapdata = this;
+      var mData = this;
       var uidate = ISODateString(thedate);
       // Filter the datetime array to see if it matches the date using jQuery grep utility
-      var filtArray = $.grep(mapdata.enabledDays, function(dt, i) {
+      var filtArray = $.grep(mData.enabledDays, function(dt, i) {
          var datePart = dt.substring(0, 10);
          return (datePart == uidate);
       });
@@ -202,4 +205,4 @@ OPEC.MapData = function() {
    }
 }
 // Add the OPEC.MapData object to all OpenLayers.Map objects
-OpenLayers.Map.prototype.mapData = new OPEC.MapData();
+OpenLayers.Map.prototype.mapData = null;
