@@ -116,16 +116,12 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
          lyr.selectedDateTime = mDate[0];
          layer.mergeNewParams({time: lyr.selectedDateTime});
          layer.setVisibility(layer.selected);
-         //checkLayerState(layer);
-         // DEBUG
          console.info('Layer ' + layer.name + ' data available for date-time ' + lyr.selectedDateTime + '. Layer selection and display: ' + layer.selected);
       }
       else{
          lyr.currentDateTimes = [];
          lyr.selectedDateTime = '';
          layer.setVisibility(false);
-         //checkLayerState(layer);
-         // DEBUG
          console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
       }
    }

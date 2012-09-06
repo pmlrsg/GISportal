@@ -33,7 +33,7 @@ var quickRegion = [
 /*====================================================================================*/
 
 // Create all the base layers for the map
-function createBaseLayers(map)
+function createBaseLayers()
 {
    // Add GEBCO base layer
    var gebco = new OpenLayers.Layer.WMS(
@@ -67,7 +67,7 @@ function createBaseLayers(map)
 }
 
 // Create all the reference layers for the map
-function createRefLayers(map)
+function createRefLayers()
 {
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
    for(i = 12; i <= 19; i++) {
@@ -154,10 +154,9 @@ function createRefLayers(map)
 }
 
 // Create layers for the map from the getCapabilities request
-function createOpLayers(map) 
+function createOpLayers() 
 {
-   var theMap = map;
-   $.each(theMap.getCapabilities, function(i, item) 
+   $.each(map.getCapabilities, function(i, item) 
    {
       var url = item.url;
       var serverName = item.serverName;
@@ -168,13 +167,13 @@ function createOpLayers(map)
          {
             var sensorName = i;
             // Create the accordion for the sensor
-            addAccordionToPanel(sensorName, theMap);
+            addAccordionToPanel(sensorName);
 
             // Go through each layer and load it
             $.each(item, function(i, item) {
                if(item.Name && item.Name != "") 
                {
-                  var microLayer = 
+                  var microLayer =
                   { 
                      name: item.Name.replace("/","-"),
                      title: item.Title,
@@ -183,8 +182,7 @@ function createOpLayers(map)
                      url: url,
                      sensorName: sensorName.replace(/\s+/g, ""),
                      exBoundingBox: item.EX_GeographicBoundingBox,
-                  };
-                  
+                  };              
                   map.microLayers[microLayer.name] = microLayer;
                   
                   $('#layers').multiselect('addItem', {text: item.Name.replace("/","-"), title: item.Title, selected: false}); // Temp                      
@@ -225,15 +223,6 @@ function createOpLayer(layerData, sensorName, url)
    layer.boundingBox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
-
-   // Add layer to map
-   //map.addLayer(layer);
-
-   // Increase the count of OpLayers
-   //map.numOpLayers++;
-
-   //addLayerToPanel(layer);
-
    map.layerStore[layer.name] = layer;
 }
 
@@ -278,7 +267,7 @@ function removeOpLayer(layer)
 }
 
 // Add a accordion to the layers panel
-function addAccordionToPanel(accordionName, map)
+function addAccordionToPanel(accordionName)
 {
    var id = accordionName.replace(/\s+/g, "");
 
@@ -314,24 +303,11 @@ function addAccordionToPanel(accordionName, map)
    }).disableSelection();
 }
 
-function removeAccordionFromPanel(accordionName, map)
+function removeAccordionFromPanel(accordionName)
 {
    var id = accordionName.replace(/\s+/g, "");
    $('#' + id).remove();
 }
-
-/*------------------------------- Deprecated ----------------------------------
-// Map layers elements - add data layers in reverse order to ensure
-// last added appear topmost in the UI as they are topmost in the layer stack
-// also populate the dates of data availability for all data layers
-function updateLayerList(map)
-{
-   for(i = (map.layers.length - 1); i >= 0; i--) {
-      var layer = map.layers[i];
-      addLayerToPanel(layer);
-   }
-}
------------------------------------------------------------------------------*/
 
 // Add a layer to the layers panel
 function addLayerToPanel(layer)
@@ -416,19 +392,6 @@ function checkLayerState(layer)
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 }
 
-/*------------------------------- Deprecated ----------------------------------
-function addLayerToSelectionPanel(layer)
-{
-   $('#availableLayers').prepend(
-      '<li id="' + layer.name + '" class="ui-widget-content">' + layer.title + '</li>'
-   );   
-
-   $('#selectedLayers').prepend(
-      '<li id="' + layer.name + '" class="ui-widget-content">' + layer.title + '</li>'
-   );   
-}
------------------------------------------------------------------------------*/
-
 // Start mapInit() - the main function for setting up the map
 // plus its controls, layers, styling and events.
 function mapInit() 
@@ -444,9 +407,9 @@ function mapInit()
    map.createMasterCache();
 
    // Create the base layers and then add them to the map
-   createBaseLayers(map);
+   createBaseLayers();
    // Create the reference layers and then add them to the map
-   createRefLayers(map);
+   createRefLayers();
 
    // Add a couple of useful map controls
    //var mousePos = new OpenLayers.Control.MousePosition();
@@ -462,7 +425,7 @@ function mapInit()
 function layerDependent(data)
 {
    map.getCapabilities = data;
-   createOpLayers(map);
+   createOpLayers();
 
    //var ows = new OpenLayers.Format.OWSContext();
    //var doc = ows.write(map);
@@ -547,7 +510,6 @@ function nonLayerDependent()
             $(this).removeClass('selectedLayer');
         });
         itm.addClass('selectedLayer');
-
    });
 
    // Toggle visibility of data layers
