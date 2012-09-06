@@ -12,13 +12,6 @@ Array.prototype.deDupe = function() {
    return out;
 }
 
-Array.prototype.removeByElement = function removeByElement(arrayName,arrayElement) {
-   for(var i = 0; i < arrayName.length; i++ ) { 
-      if(arrayName[i] == arrayElement)
-         arrayName.splice(i, 1); 
-   } 
-}
-
 // Turn JavaScript date, d into ISO8601 date part (no time)
 function ISODateString(d) {
    function pad(n){
@@ -35,30 +28,4 @@ function displayDateString(date)
    var month = date.substring(5, 7);
    var day = date.substring(8, 10);
    return day + '-' + month + '-' + year;
-}
-
-/* Function to extend existing classes taken from Yahoo the YUI JavaScript library */
-function extend(subc, superc, overrides) {
-   if (!superc || !subc) {
-      throw new Error("extend failed, please check that " + "all dependencies are included.");
-   }
-   var F = function() {
-   };
-   F.prototype = superc.prototype;
-   subc.prototype = new F();
-   subc.prototype.constructor = subc;
-   subc.superclass = superc.prototype;
-   if (superc.prototype.constructor == Object.prototype.constructor) {
-      superc.prototype.constructor = superc;
-   }
-
-   if (overrides) {
-      for (var i in overrides) {
-         if (L.hasOwnProperty(overrides, i)) {
-            subc.prototype[i] = overrides[i];
-         }
-      }
-
-      L._IEEnumFix(subc.prototype, overrides);
-   }
 }

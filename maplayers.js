@@ -39,9 +39,6 @@ OpenLayers.Layer.prototype.sensor = '';
 OpenLayers.Layer.prototype.firstDate = '';
 OpenLayers.Layer.prototype.lastDate = '';
 
-// Current index position in the map's layers array
-OpenLayers.Layer.prototype.currentIndex = 0;
-
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
 OpenLayers.Layer.prototype.controlID = 'opLayers';

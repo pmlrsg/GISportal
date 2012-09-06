@@ -250,7 +250,7 @@ function addOpLayer(layerName)
    }
 
    // Remove the layer from the layerStore
-   map.layerStore.removeByElement(layerName);
+   delete map.layerStore[layerName];
 
    // Add the layer to the map
    map.addLayer(layer);

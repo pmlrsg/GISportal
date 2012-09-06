@@ -31,8 +31,6 @@
 <!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
 <!-- http://code.google.com/p/jquery-multi-open-accordion -->
 <script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.2.js"></script>
-<!-- Custom library of extensions and functions for OpenLayers objects under the OPEC name space -->
-<script type="text/javascript" src="OPEC.js"></script>
 <!-- Old Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
 <!-- http://medialize.github.com/jQuery-contextMenu/ -->
