@@ -33,7 +33,7 @@ OpenLayers.Layer.prototype.title = '';
 OpenLayers.Layer.prototype.abstract = '';
 
 // Layer sensor
-OpenLayers.Layer.prototype.sensor = '';
+OpenLayers.Layer.prototype.sensorName = '';
 
 // Date Range
 OpenLayers.Layer.prototype.firstDate = '';

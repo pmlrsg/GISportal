@@ -44,7 +44,7 @@ var defaultNodeComparator = function(node1, node2) {
 $.widget("ui.multiselect", {
   options: {
       // -- Sortable and droppable --
-      sortable: 'left',
+      sortable: 'none',
       droppable: 'both',
       // -- Search -- 
       searchable: true,
@@ -52,7 +52,7 @@ $.widget("ui.multiselect", {
       remoteUrl: null,
       remoteParams: {},
       // -- Animation --
-      animated: 'fast',
+      speed: 'fast',
       show: 'slideDown',
       hide: 'slideUp',
       // -- Ui --
@@ -80,7 +80,7 @@ $.widget("ui.multiselect", {
       this.availableList.data('multiselect.cache', {});
       this.selectedList.data('multiselect.cache', {});		
 
-      if ( !this.options.animated ) {
+      if ( !this.options.speed ) {
          this.options.show = 'show';
          this.options.hide = 'hide';
       }
@@ -116,7 +116,7 @@ $.widget("ui.multiselect", {
 
       this._resize(that);
 
-      $(window).unbind('resize').resize(function(e, ui) {
+      $(document).unbind('resize').resize(function(e, ui) {
          that._resize(e, ui);
       });
    },
@@ -364,8 +364,10 @@ $.widget("ui.multiselect", {
                else if (!opts[side].sortable) 
                {
                   setTimeout(function() {
-                     ui.draggable.hide();
-                     that._setSelected(ui.draggable, itemSelected);
+                     if(!ui.draggable.parent().hasClass(side)) {
+                        ui.draggable.hide();
+                        that._setSelected(ui.draggable, itemSelected);
+                     }
                   }, 10);
                }
             }
@@ -446,7 +448,7 @@ $.widget("ui.multiselect", {
          .attr('title', total + " " + $.ui.multiselect.locale.itemsTotal);
    },
    _getOptionNode: function(option) {     
-      var node = $('<li class="ui-state-default ui-element" title="'+ option.title +'"><span class="ui-icon"/>'+option.text+'<a href="#" class="action"><span class="ui-corner-all ui-icon"/></a></li>').hide();
+      var node = $('<li class="ui-state-default ui-element preloaderContextMenu" title="'+ option.title +'"><span class="ui-icon"/>'+option.text+'<a href="#" class="action"><span class="ui-corner-all ui-icon"/></a></li>').hide();
       node.data('multiselect.itemLink', option);
       return node;
    },
@@ -526,12 +528,12 @@ $.widget("ui.multiselect", {
       // do this async so the browser actually display the waiting message
       setTimeout(function() {
          var _backup = {
-            animated: that.options.animated,
+            speed: that.options.speed,
             hide: that.options.hide,
             show: that.options.show
          };
 
-         that.options.animated = null;
+         that.options.speed = null;
          that.options.hide = 'hide';
          that.options.show = 'show';
 
@@ -612,10 +614,10 @@ $.widget("ui.multiselect", {
          {
             // retrieve associated or cloned item
             otherItem = this._cloneWithData(item, 'selected', true).hide();
-            item.addClass('shadowed')[this.options.hide](this.options.animated, function() { that._updateCount(); });
+            item.addClass('shadowed')[this.options.hide](this.options.speed, function() { that._updateCount(); }).removeClass('preloaderContextMenu');//.css('background', 'red'); // DEBUG
             //item.remove();
          }
-         otherItem[this.options.show](this.options.animated);
+         otherItem[this.options.show](this.options.speed).addClass('preloaderContextMenu')//.css('background', 'blue'); // DEBUG
       } 
       else 
       {
@@ -630,18 +632,18 @@ $.widget("ui.multiselect", {
          {
             // retrieve associated or clone the item
             otherItem = this._cloneWithData(item, 'available', true).hide().removeClass('shadowed');
-            item[this.options.hide](this.options.animated, function() { that._updateCount() });
+            item[this.options.hide](this.options.speed, function() { that._updateCount() }).removeClass('preloaderContextMenu');//.css('background', 'yellow'); // DEBUG
          }
 
          if (!otherItem.is('.filtered')) 
-            otherItem[this.options.show](this.options.animated);
+            otherItem[this.options.show](this.options.speed).addClass('preloaderContextMenu');//.css('background', 'green'); // DEBUG
       }
 
       if (!this.busy) {
-         if (this.options.animated) {
+         if (this.options.speed) {
             // pulse
-            otherItem.effect("pulsate", { times: 1, mode: 'show' }, 400); // pulsate twice???
-            //otherItem.fadeTo('fast', 0.3, function() { $(this).fadeTo('fast', 1); });
+            //otherItem.effect("pulsate", { times: 1, mode: 'show' }, 400); // pulsate twice???
+            otherItem.fadeTo('fast', 0.3, function() { $(this).fadeTo('fast', 1); });
          }
       }
 

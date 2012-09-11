@@ -25,7 +25,7 @@
 <script type="text/javascript" src="custom.js"></script>
 
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="js-libs/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery/jquery-1.8.0.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
@@ -58,6 +58,7 @@
 <script type="text/javascript" src="opecportal.js"></script>
 <script type="text/javascript" src="gritter.js"></script>
 <script type="text/javascript" src="contextMenu.js"></script>
+<script type="text/javascript" src="graphing.js"></script>
 
 <!-- Use custom PHP class to create cache the getCapabilities call and create some
    date caches for the required data layers.
@@ -136,10 +137,13 @@
          </li>
          <li class="divider"></li>
          <li>
-            <a href="#" id="mapInfoToggleBtn"><img src="img/info32.png" alt="Toggle Map Information Window"></a>        
+            <a href="#" id="mapInfoToggleBtn"><img src="img/info32.png" alt="Toggle Map Information Window"/></a>        
          </li>
          <li>
-            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"></a>
+            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"/></a>
+         </li>
+         <li>
+            <a href="#" id="layerPreloader"><img src="img/info32.png" alt="Toggle Layer Preloader Window"/></a>
          </li>
       </ul>
    </div>

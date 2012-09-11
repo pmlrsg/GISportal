@@ -167,7 +167,7 @@ function createOpLayers()
          {
             var sensorName = i;
             // Create the accordion for the sensor
-            addAccordionToPanel(sensorName);
+            //addAccordionToPanel(sensorName);
 
             // Go through each layer and load it
             $.each(item, function(i, item) {
@@ -178,6 +178,8 @@ function createOpLayers()
                      name: item.Name.replace("/","-"),
                      title: item.Title,
                      abstract: item.Abstract,
+                     firstDate: item.FirstDate,
+                     lastDate: item.LastDate,
                      serverName: serverName,
                      url: url,
                      sensorName: sensorName.replace(/\s+/g, ""),
@@ -215,9 +217,9 @@ function createOpLayer(layerData, sensorName, url)
       }
    });
 
-   layer.title = layerData.Title;
+   layer.title = layerData.Title.replace(/_/g, " ");
    layer.abstract = layerData.Abstract;
-   layer.sensor = sensorName.replace(/\s+/g, "");
+   layer.sensorName = sensorName;
    layer.styles = layerData.Styles;
    layer.exBoundingBox = layerData.EX_GeographicBoundingBox;
    layer.boundingBox = layerData.BoundingBox;
@@ -241,6 +243,11 @@ function addOpLayer(layerName)
    // Remove the layer from the layerStore
    delete map.layerStore[layerName];
 
+   // Check if an accordion is there for us
+   if(!$('#' + layer.sensorName).length)
+   {
+      addAccordionToPanel(layer.sensorName);
+   }
    // Add the layer to the map
    map.addLayer(layer);
 
@@ -255,6 +262,12 @@ function removeOpLayer(layer)
 {
    // Remove the layer from the panel
    removeLayerFromPanel(layer);
+   
+   // Check if we were the last layer
+   if($('#' + layer.sensorName).children('li').length == 0)
+   {
+      removeAccordionFromPanel(layer.sensorName);
+   }
 
    // Remove the layer from the map
    map.removeLayer(layer);
@@ -267,14 +280,12 @@ function removeOpLayer(layer)
 }
 
 // Add a accordion to the layers panel
-function addAccordionToPanel(accordionName)
-{
-   var id = accordionName.replace(/\s+/g, "");
-
+function addAccordionToPanel(id)
+{ 
    // Add the accordion
    $('#opLayers').prepend(
       '<div>' +
-         '<h3><a href="#">' + accordionName + '</a></h3>' +
+         '<h3><a href="#">' + id + '</a></h3>' +
          '<div id="' + id + '" class="sensor-accordion"></div>' +
       '</div>'
    );
@@ -303,10 +314,9 @@ function addAccordionToPanel(accordionName)
    }).disableSelection();
 }
 
-function removeAccordionFromPanel(accordionName)
+function removeAccordionFromPanel(id)
 {
-   var id = accordionName.replace(/\s+/g, "");
-   $('#' + id).remove();
+   $('#' + id).parent('div').remove();
 }
 
 // Add a layer to the layers panel
@@ -315,17 +325,20 @@ function addLayerToPanel(layer)
    // if not already on list and not a base layer, populate the layers panel (left slide panel)
    if(!$('#' + layer.name).length && layer.displayInLayerSwitcher && !layer.isBaseLayer) {
       // jQuery selector for the layer controlID
-      var selID = layer.controlID == 'opLayers' ? '#' + layer.sensor : '#' + layer.controlID; 
+      var selID = layer.controlID == 'opLayers' ? '#' + layer.sensorName : '#' + layer.controlID; 
 
       $(selID).prepend(
          '<li id="' + layer.name + '">' +
             '<img src="img/ajax-loader.gif"/>' +
             '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
-            layer.title + 
+               layer.title +  
             '<a id="layer-exclamation" href="#">' +
                '<img src="img/exclamation_small.png"/>' +
             '</a>' +           
-         '</li>');
+         '</li>'
+      );
+
+      var $layer = $('#' + layer.name);
 
       // Show the img when we are loading data for the layer
       layer.events.register("loadstart", layer, function(e) {
@@ -336,8 +349,8 @@ function addLayerToPanel(layer)
          $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
       });
       // Hide the ajax-loader and the exclamation mark initially
-      $('#' + layer.name).find('img[src="img/ajax-loader.gif"]').hide();
-      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
+      $layer.find('img[src="img/ajax-loader.gif"]').hide();
+      $layer.find('img[src="img/exclamation_small.png"]').hide();
 
       // Check the layer state when its visibility is changed
       layer.events.register("visibilitychanged", layer, function() {
@@ -653,6 +666,18 @@ function nonLayerDependent()
       }
       return false;
    })
+   
+   // Add toggle map info dialog functionality
+   $('#layerPreloader').click(function(e) {
+      if($('#layerSelection').dialog('isOpen')) {
+        $('#layerSelection').dialog('close');
+      }
+      else {
+        $('#layerSelection').dialog('open');
+      }
+      return false;
+   })
+
 
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
@@ -847,9 +872,9 @@ $(document).ready(function() {
    $('#layerSelection').dialog({
       position: ['center', 'center'],
       width: 500,
-      minWidth:455,
+      minWidth:500,
       height: 400,
-      minHeight: 200,
+      minHeight: 400,
       resizable: true,
       autoOpen: true,
    });
@@ -857,6 +882,7 @@ $(document).ready(function() {
    $('#layers').multiselect({
       selected: function(e, ui) 
       {
+         // DEBUG
          console.log("selected");
          if(map.microLayers[ui.option.text])
          {
@@ -864,8 +890,10 @@ $(document).ready(function() {
 
             if(map.layerStore[ui.option.text])
             {
+               // DEBUG
                console.log("Adding layer...");
                addOpLayer(ui.option.text);
+               // DEBUG
                console.log("Added Layer");
             }
             else
@@ -876,6 +904,7 @@ $(document).ready(function() {
       },
       deselected: function(e, ui) 
       {
+         // DEBUG
          console.log("deselected");
          var layer = map.getLayersByName(ui.option.text)[0];
 
@@ -893,7 +922,7 @@ $(document).ready(function() {
             console.log("no layer data to use");
       },
    });
-
+   
    // Setup the gritter so we can use it for error messages
    setupGritter();
 

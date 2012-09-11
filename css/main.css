@@ -152,6 +152,15 @@ ul li {
    text-indent:-32px;
 }
 
+#layerPreloader {
+   height:32px;
+   width:32px;
+}
+
+#layerPreloader:hover {
+   text-indent:-32px;
+}
+
 #topToolbar {
    top: 0;
    -moz-border-radius-bottomleft: 15px;
@@ -255,12 +264,12 @@ ul li {
 
 #opLayers {
    height: auto;
-   overflow-y: scroll; 
+   overflow-y: auto; 
 }
 
 #refLayers {
    height: auto;
-   overflow-y: scroll;
+   overflow-y: auto;
 }
 
 .lPanel .selectedLayer {
@@ -377,36 +386,11 @@ div .sensor-accordion {
 #layer-exclamation img {
    border: 0;
 }
-/*
-#layerSelection {
-   overflow: auto;
-   display: block;
-   margin: 0;
-   padding: 0;
-   width: 100%;
-}
-
-#selectedLayers {
-   margin: 0;
-   padding: 0;
-}
-
-#availableLayers {
-   padding: 0;
-}
-
-.layer-selection .layer-list {
-   min-width: 200px;
-   min-height: 300px;
-   width: 49%;
-   float: left;
-   vertical-align: top;
-}
-*/
 
 #layers {
    width: 100%;
    height: 80%;
+   margin-top: 10px;
 }
 
 #noscript-warning {
