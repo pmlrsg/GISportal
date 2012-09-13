@@ -80,7 +80,7 @@ function createRefLayers()
       {
          context: {
             colour: function(feature) {
-               switch(feature.layer.title) {
+               switch(feature.layer.displayTitle) {
 
                   case 'AMT12 Cruise Track':
                     return 'blue';
@@ -124,7 +124,7 @@ function createRefLayers()
       // Make this layer a reference layer         
       cruiseTrack.controlID = "refLayers";
       cruiseTrack.setVisibility(false);
-      cruiseTrack.title = 'AMT' + i + ' Cruise Track';
+      cruiseTrack.displayTitle = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
       addLayerToPanel(cruiseTrack);
    }
@@ -145,7 +145,7 @@ function createRefLayers()
    // Make this layer a reference layer
    blackSea.controlID = "refLayers";
    blackSea.selected = true;
-   blackSea.title = "The Black Sea (KML)";
+   blackSea.displayTitle = "The Black Sea (KML)";
    map.addLayer(blackSea);
    addLayerToPanel(blackSea);
 
@@ -176,18 +176,22 @@ function createOpLayers()
                   var microLayer =
                   { 
                      name: item.Name.replace("/","-"),
+                     urlName: item.Name,
+                     displayTitle: item.Title.replace(/_/g, " "),
                      title: item.Title,
                      abstract: item.Abstract,
                      firstDate: item.FirstDate,
                      lastDate: item.LastDate,
                      serverName: serverName,
                      url: url,
-                     sensorName: sensorName.replace(/\s+/g, ""),
+                     sensorNameDisplay: sensorName.replace(/\s+/g, ""),
+                     sensorName: sensorName,
                      exBoundingBox: item.EX_GeographicBoundingBox,
-                  };              
+                  };
+                                
                   map.microLayers[microLayer.name] = microLayer;
                   
-                  $('#layers').multiselect('addItem', {text: item.Name.replace("/","-"), title: item.Title, selected: false}); // Temp                      
+                  $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: false});                
                }
             });
          }
@@ -217,8 +221,11 @@ function createOpLayer(layerData, sensorName, url)
       }
    });
 
-   layer.title = layerData.Title.replace(/_/g, " ");
+   layer.urlName = layerData.Name;
+   layer.displayTitle = layerData.Title.replace(/_/g, " ");
+   layer.title = layerData.Title;
    layer.abstract = layerData.Abstract;
+   layer.displaySensorName = sensorName.replace(/\s+/g, "");
    layer.sensorName = sensorName;
    layer.styles = layerData.Styles;
    layer.exBoundingBox = layerData.EX_GeographicBoundingBox;
@@ -226,6 +233,8 @@ function createOpLayer(layerData, sensorName, url)
    layer.setVisibility(false);     
    layer.selected = false;     
    map.layerStore[layer.name] = layer;
+   
+   map.getMetadata(layer);
 }
 
 function addOpLayer(layerName)
@@ -244,9 +253,9 @@ function addOpLayer(layerName)
    delete map.layerStore[layerName];
 
    // Check if an accordion is there for us
-   if(!$('#' + layer.sensorName).length)
+   if(!$('#' + layer.displaySensorName).length)
    {
-      addAccordionToPanel(layer.sensorName);
+      addAccordionToPanel(layer.displaySensorName);
    }
    // Add the layer to the map
    map.addLayer(layer);
@@ -264,9 +273,9 @@ function removeOpLayer(layer)
    removeLayerFromPanel(layer);
    
    // Check if we were the last layer
-   if($('#' + layer.sensorName).children('li').length == 0)
+   if($('#' + layer.displaySensorName).children('li').length == 0)
    {
-      removeAccordionFromPanel(layer.sensorName);
+      removeAccordionFromPanel(layer.displaySensorName);
    }
 
    // Remove the layer from the map
@@ -325,13 +334,13 @@ function addLayerToPanel(layer)
    // if not already on list and not a base layer, populate the layers panel (left slide panel)
    if(!$('#' + layer.name).length && layer.displayInLayerSwitcher && !layer.isBaseLayer) {
       // jQuery selector for the layer controlID
-      var selID = layer.controlID == 'opLayers' ? '#' + layer.sensorName : '#' + layer.controlID; 
+      var selID = layer.controlID == 'opLayers' ? '#' + layer.displaySensorName : '#' + layer.controlID; 
 
       $(selID).prepend(
          '<li id="' + layer.name + '">' +
             '<img src="img/ajax-loader.gif"/>' +
             '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
-               layer.title +  
+               layer.displayTitle +  
             '<a id="layer-exclamation" href="#">' +
                '<img src="img/exclamation_small.png"/>' +
             '</a>' +           
@@ -342,11 +351,11 @@ function addLayerToPanel(layer)
 
       // Show the img when we are loading data for the layer
       layer.events.register("loadstart", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').show();
+         $('#' + this.displayName).find('img[src="img/ajax-loader.gif"]').show();
       });
       // Hide the img when we have finished loading data
       layer.events.register("loadend", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
+         $('#' + this.displayName).find('img[src="img/ajax-loader.gif"]').hide();
       });
       // Hide the ajax-loader and the exclamation mark initially
       $layer.find('img[src="img/ajax-loader.gif"]').hide();
@@ -417,7 +426,7 @@ function mapInit()
 
    // Get the master cache file from the server. This file contains some of 
    // the data from a getCapabilities query.
-   map.createMasterCache();
+   map.getMasterCache();
 
    // Create the base layers and then add them to the map
    createBaseLayers();
@@ -883,43 +892,51 @@ $(document).ready(function() {
       selected: function(e, ui) 
       {
          // DEBUG
-         console.log("selected");
+         //console.log("selected");
          if(map.microLayers[ui.option.text])
          {
-            var microlayer = map.microLayers[ui.option.text];
+            var microLayer = map.microLayers[ui.option.text];
 
             if(map.layerStore[ui.option.text])
             {
                // DEBUG
-               console.log("Adding layer...");
+               //console.log("Adding layer...");
                addOpLayer(ui.option.text);
                // DEBUG
-               console.log("Added Layer");
+               //console.log("Added Layer");
             }
             else
-               map.getLayerData(microlayer.serverName + '_' + microlayer.name.replace("/","-") + '.json', microlayer.sensorName, microlayer.url);
+               map.getLayerData(microLayer.serverName + '_' + microLayer.name + '.json', microLayer.sensorName, microLayer.url);
          }
          else
+         {
+            // DEBUG
             console.log("no layer data to use");
+         }
       },
       deselected: function(e, ui) 
       {
          // DEBUG
-         console.log("deselected");
+         //console.log("deselected");
          var layer = map.getLayersByName(ui.option.text)[0];
 
          if(layer)
          {
             // DEBUG
-            console.log("Removing layer...");
+            //console.log("Removing layer...");
             removeOpLayer(layer);
             // DEBUG
-            console.log("Layer removed");
+            //console.log("Layer removed");
          }
          else if(map.layerStore[ui.option.text])
+         {
             var layer = map.layerStore[ui.option.text];
+         }
          else
+         {
+            // DEBUG
             console.log("no layer data to use");
+         }
       },
    });
    

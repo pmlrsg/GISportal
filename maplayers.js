@@ -26,18 +26,27 @@ OpenLayers.Map.prototype.tutUID = undefined;
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
 
+// Layer Name with /
+OpenLayers.Layer.prototype.urlName = '';
+
 // Layer title
+OpenLayers.Layer.prototype.displayTitle = '';
 OpenLayers.Layer.prototype.title = '';
 
 // Layer abstract
 OpenLayers.Layer.prototype.abstract = '';
 
 // Layer sensor
+OpenLayers.Layer.prototype.displaySensorName = '';
 OpenLayers.Layer.prototype.sensorName = '';
+
 
 // Date Range
 OpenLayers.Layer.prototype.firstDate = '';
 OpenLayers.Layer.prototype.lastDate = '';
+
+OpenLayers.Layer.prototype.maxScaleVal;
+OpenLayers.Layer.prototype.minScaleVal;
 
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
@@ -177,7 +186,7 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
 }
 
 // Map function to get the master cache file from the server and stores it in the map object
-OpenLayers.Map.prototype.createMasterCache = function() {
+OpenLayers.Map.prototype.getMasterCache = function() {
    var map = this;
    $.ajax({
       type: 'GET',
@@ -191,19 +200,38 @@ OpenLayers.Map.prototype.createMasterCache = function() {
    });
 }
 
-OpenLayers.Map.prototype.getLayerData = function(name, sensorName, url) {
+OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
    $.ajax({
       type: 'GET',
-      url: "./cache/layers/" + name,
+      url: "./cache/layers/" + fileName,
       dataType: 'json',
       asyc: true,
       success: function(data) {
          createOpLayer(data, sensorName, url);
-         console.log("Adding layer...");
+         // DEBUG
+         //console.log("Adding layer...");
          addOpLayer(data.Name.replace("/","-"));
-         console.log("Added Layer");
+         // DEBUG
+         //console.log("Added Layer");
       },
       error: function(request, errorType, exception) {
+         gritterErrorHandler(null, 'layer cache', request, errorType, exception);
+      }
+   });
+}
+
+OpenLayers.Map.prototype.getMetadata = function(layer) {
+   $.ajax({
+      type: 'GET',
+      url: OpenLayers.ProxyHost + layer.url + "request=GetMetadata&item=layerDetails&layerName=" + layer.urlName,
+      dataType: 'json',
+      asyc: true,
+      success: function(data) {
+         layer.minScaleVal = parseFloat(data.scaleRange[0]);
+         layer.maxScaleVal = parseFloat(data.scaleRange[1]);
+      },
+      error: function(request, errorType, exception) {
+         gritterErrorHandler(null, 'layer MetaData', request, errorType, exception);
       }
    });
 }

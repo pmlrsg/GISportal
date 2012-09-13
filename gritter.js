@@ -20,7 +20,7 @@ function gritterErrorHandler(layer, type, request, errorType, exception)
    if(layer)
    {
       $.gritter.add({
-         title: errorType + ': ' + request.status + ' ' + exception,
+         title: errorType.toUpperCase() + ': ' + request.status + ' (' + exception + ')',
          text: 'Could not get the ' + type + ' from the server for ' + layer.name + '. Try refreshing the page',
          //image: 'img/OpEc_small.png',
          class_name: 'gritter-light',
@@ -30,7 +30,7 @@ function gritterErrorHandler(layer, type, request, errorType, exception)
    else
    {
       $.gritter.add({
-         title: errorType + ': ' + request.state() + ' ' + exception,
+         title: errorType.toUpperCase() + ': ' + request.status + ' (' + exception + ')',
          text: 'Could not get the ' + type + ' from the server. Try refreshing the page',
          //image: 'img/OpEc_small.png',
          class_name: 'gritter-light',

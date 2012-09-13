@@ -933,15 +933,15 @@ var // currently active contextMenu trigger
             root.accesskeys || (root.accesskeys = {});
             
             // create contextMenu items
-            $.each(opt.items, function(key, item){
-				if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
-					item = opt.items[key]['style' + key]
-				}
+            $.each(opt.items, function(key, item) {
+                if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
+                   item = opt.items[key]['style' + key]
+                }
+               
                 var $t = $('<li class="context-menu-item ' + (item.className || "") +'"></li>'),
-                    $label = null,
-                    $input = null;
+                $label = null,
+                $input = null;
 
-                
                 item.$node = $t.data({
                     'contextMenu': opt,
                     'contextMenuRoot': root,

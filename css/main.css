@@ -355,11 +355,15 @@ a.active.triggerR {
    border:0;
 }
 
+/* ======== Metadata ======== */
+
 #metadata label {
    text-align: center;
    line-height: 1.3em;
    font-size: 1.1em;
 }
+
+/* ================================ */
 
 /* Override some OpenLayers and Google Maps Styling */
 .olLayerGooglePoweredBy, .olLayerGoogleCopyright {
@@ -370,9 +374,7 @@ a.active.triggerR {
    z-index: 0;
 }
 
-.context-menu-list {
-   color: black;
-}
+/* ======== Data Layers ======== */
 
 div .sensor-accordion {
    position: static;
@@ -387,11 +389,7 @@ div .sensor-accordion {
    border: 0;
 }
 
-#layers {
-   width: 100%;
-   height: 80%;
-   margin-top: 10px;
-}
+/* ======== CSS/NoScript Warning ======== */
 
 #noscript-warning {
    background-color: #C8142F;
@@ -413,15 +411,17 @@ div .sensor-accordion {
    display: none;
 }
 
+/* ======== Permalink Share Panel ======== */
+
 #shareLink {
    width: 140px;
 }
 
-.highlighted {
-   border: 2px solid red;
-}
+/* ======== Scalebar ======== */
 
 .scalebar img {
+   top: 0px;
+   left: 0px;
    float: left;
 }
 
@@ -429,10 +429,52 @@ div .sensor-accordion {
    float: left;
 }
 
-.scalebar input {
-   float: left;
-   width: 60px;
+.scalebar div input[type="text"] {
+   /*float: left;*/
+   width: 80px;
 }
+
+.scalebar div label {
+ margin: 0px 0px 0px 10px;
+}
+
+.scalebar-max {
+   margin: 5px 0px 75px 10px;
+}
+
+.scalebar-log {
+   margin: 5px 0px 75px 5px;
+}
+
+.scalebar-log label {
+   margin: 0px 0px 0px 5px;
+}
+
+.scalebar-min {
+   margin: 5px 0px 0px 10px;
+}
+
+/* ======== Layer Selector ======== */
+
+#layers {
+   width: 100%;
+   height: 80%;
+   margin-top: 10px;
+}
+
+/* ======== Context Menu ======== */
+
+/* Used to turn context menu text black */
+.context-menu-list {
+   color: black;
+}
+
+/* Used to bold the currently active item */
+.styleSelected span {
+   font-weight: bold;
+}
+
+/* ================================ */
 
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
