@@ -171,26 +171,9 @@ function createOpLayers()
 
             // Go through each layer and load it
             $.each(item, function(i, item) {
-               if(item.Name && item.Name != "") 
-               {
-                  var microLayer =
-                  { 
-                     name: item.Name.replace("/","-"),
-                     urlName: item.Name,
-                     displayTitle: item.Title.replace(/_/g, " "),
-                     title: item.Title,
-                     abstract: item.Abstract,
-                     firstDate: item.FirstDate,
-                     lastDate: item.LastDate,
-                     serverName: serverName,
-                     url: url,
-                     sensorNameDisplay: sensorName.replace(/\s+/g, ""),
-                     sensorName: sensorName,
-                     exBoundingBox: item.EX_GeographicBoundingBox,
-                  };
-                                
-                  map.microLayers[microLayer.name] = microLayer;
-                  
+               if(item.Name && item.Name != "") {
+                  var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, url, sensorName, item.EX_GeographicBoundingBox);           
+                  map.microLayers[microLayer.name] = microLayer;               
                   $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: false});                
                }
             });
@@ -864,7 +847,7 @@ $(document).ready(function() {
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
    $('#info').dialog({
        position: ['left', 'bottom'],
-       width: 230,
+       width: 245,
        height: 220,
        resizable: false
    });

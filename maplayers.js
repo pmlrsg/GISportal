@@ -1,4 +1,39 @@
-// OpenLayers Map object and map layers handling
+/* Map and map layers library - maplayers.js */
+
+// Create OPEC namespace object
+var OPEC = OPEC || {};
+
+/**
+ * Creates an OPEC.MicroLayer Object (layers in the selector but not yet map layers)
+ * 
+ * @param {String} name - The layer name (unescaped)
+ * @param {String} title - The title of the layer
+ * @param {String} abstract - The abstract information for the layer
+ * @param {String} firstDate - The first date for which data is available for the layer
+ * @param {String} lastDate - The last date for which data is available for the layer
+ * @param {String} serverName - The server name which serves the layer
+ * @param {String} url - The URL for the WMS service
+ * @param {String} sensorName - The name of the sensor for this layer (unescaped)
+ * @param {String} exBoundingBox - The geographic bounds for data in this layer
+ * 
+ * @return {Object} Returns the OPEC.MicroLayer object.
+ */
+OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, url, sensorName, exBoundingBox){
+   this.name = name.replace("/","-");
+   this.urlName = name;
+   this.displayTitle = title.replace(/_/g, " ");
+   this.title = title;
+   this.abstract = abstract;
+   this.firstDate = firstDate;
+   this.lastDate = lastDate;
+   this.serverName = serverName;
+   this.url = url;
+   this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
+   this.sensorName = sensorName;
+   this.exBoundingBox = exBoundingBox;
+}
+
+/* Extend existing OpenLayers.Map and OpenLayers.Layer objects */
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -78,26 +113,6 @@ OpenLayers.Layer.prototype.selectedDateTime = '';
 // Is the layer selected for display in the GUI or not
 OpenLayers.Layer.prototype.selected = false;
 
-/* DEPRECATED FUNCTIONALITY */
-// // Layer function to create it's date-time cache based on a JSON cacheFile
-// // This is an asynchronous AJAX load of the JSON data
-// OpenLayers.Layer.prototype.createDateCache = function(cacheFile){
-   // var layer = this;
-   // $.ajax({
-      // type: 'GET',
-      // url: cacheFile, 
-      // dataType: 'json',
-      // success: function(data) {
-            // layer.DTCache = data.date;
-            // layer.firstDate = displayDateString(layer.DTCache[0]);
-            // layer.lastDate = displayDateString(layer.DTCache[layer.DTCache.length - 1]);
-      // },
-      // error: function(request, errorType, exception) {
-         // gritterErrorHandler(layer, 'date cache', request, errorType, exception);
-      // },
-   // });      
-// };
-
 // Function which looks for a date within a layer.
 // The date passed is in the format yyyy-mm-dd or is an empty string
 // Returns the array of date-times if there's a match or null if not.
@@ -115,7 +130,13 @@ OpenLayers.Layer.prototype.matchDate = function (thedate){
    }
 }
 
-// Select the given temporal layer on the Map based on JavaScript date input 
+/**
+ * Select the given temporal layer on the Map based on JavaScript date input
+ * 
+ * @param {Object} lyr - The OpenLayers.Layer object to select
+ * @param {Date} thedate - The currently selected view data as a JavaScript Date object
+ *
+ */
 OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
    var layer = lyr;
    if(thedate){
@@ -139,7 +160,14 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
    checkLayerState(layer)
 };
 
-// Map function to filter of layers with date-time dependencies to an yyyy-mm-dd format date
+/**
+ * Map function to filter layers with date-time dependencies to given date
+ * Used as the onselect callback function for the jQuery UI current view date DatePicker control
+ * 
+ * @param {String} dateText - yyyy-mm-dd format date string to filter to
+ * @param {Object} inst - The instance of the jQuery UI DatePicker view date control
+ *
+ */
 OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
    var themap = this;
    var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
@@ -152,7 +180,9 @@ OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
    });      
 };
 
-// Map function to re-generate the global date cache for selected layers
+/**
+ * Map function to re-generate the global date cache for selected layers
+ */
 OpenLayers.Map.prototype.refreshDateCache = function(){
    var map = this;
    map.enabledDays = [];
@@ -168,8 +198,14 @@ OpenLayers.Map.prototype.refreshDateCache = function(){
    console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
 }
 
-// Map function which returns availability (boolean) of data for the given JavaScript date across all layers
-// using the map object's global date cache. Used in conjunction with the jQuery UI datepicker control
+/**
+ * Map function which returns availability (boolean) of data for the given JavaScript date for all layers.
+ * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
+ * 
+ * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
+ * 
+ * @return {Boolean} Returns true or false depending on if there is layer data available for the given date
+ */
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
    var themap = this;
    var uidate = ISODateString(thedate);
@@ -187,7 +223,9 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
    }
 }
 
-// Map function to get the master cache file from the server and stores it in the map object
+/**
+ * Map function to get the master cache JSON file from the server and then start layer dependent code asynchronously
+ */
 OpenLayers.Map.prototype.getMasterCache = function() {
    var map = this;
    $.ajax({
@@ -202,6 +240,14 @@ OpenLayers.Map.prototype.getMasterCache = function() {
    });
 }
 
+/**
+ * Map function which gets data layers asynchronously and creates operational layers for each one
+ * 
+ * @param {String} fileName - The file name for the specific JSON layer cache
+ * @param {String} sensorName - The sensor name
+ * @param {String} url - The URL of the WMS service for the layer
+ * 
+ */
 OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
    $.ajax({
       type: 'GET',
@@ -222,6 +268,12 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
    });
 }
 
+/**
+ * Map function which gets layers metadata asynchronously and sets up the map scale min and max parameters
+ * 
+ * @param {Object} layer - The OpenLayers.Layer object
+ * 
+ */
 OpenLayers.Map.prototype.getMetadata = function(layer) {
    $.ajax({
       type: 'GET',
