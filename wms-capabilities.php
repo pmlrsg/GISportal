@@ -10,8 +10,8 @@
    //ini_set('error_log', LOG_FILE)
 
    // Setup firebug php  
-   //require_once('FirePHPCore/fb.php');
-   //ob_start();
+   require_once('FirePHPCore/fb.php');
+   ob_start();
 //----------------------------------
 
 // set socket timeout
@@ -229,6 +229,11 @@ function createDimensionsArray($dimensions)
          $dimensionArray = explode(",", $dimension);
          $firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
          $lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
+         
+         if(!isISO8601Date($firstDate))
+         {
+            fb("First Date not in ISO8601 format: ".array_shift($dimensionArray), FirePHP::ERROR);
+         }
 
          $returnArray['temporal'] = $temporal;
          $returnArray['firstDate'] = $firstDate;
@@ -323,8 +328,20 @@ function filterLayers($layerName)
          return TRUE;
       }
    }
-
    return FALSE;
+}
+
+// Regex from http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/ 
+function isISO8601Date($dateStr)
+{
+   if (preg_match('/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/', $dateStr) > 0)
+   {
+      return TRUE;
+   }
+   else
+   {
+      return FALSE;
+   }
 }
 
 function getFile($filePath)
@@ -347,70 +364,3 @@ function saveFile($filePath, $data)
    fclose($fh);
    return $data;
 }
-
-/*
-function saveJsonCache($cacheFile, $cacheLife, $encodedArray)
-{
-   if (!file_exists($cacheFile) or (time() - filemtime($cacheFile) >= $cacheLife) )
-   {
-      $fh = fopen($cacheFile, "w") or die("can't open file");
-      fwrite($fh, $encodedArray);
-      fclose($fh);
-      return $encodedArray;
-   }
-   else
-   {
-      $fh = fopen($cacheFile, "r") or die("can't open file");
-      $outStr = fread($fh, filesize($cacheFile));
-      fclose($fh);
-      return $outStr;
-   }
-}
-*/
-
-/*
-function createDateCaches($array)
-{
-   // Iter over sensors
-   foreach($array as $i => $v) {
-      foreach($v['Layers'] as $key => $value) 
-      {
-         $name = str_replace("/", "-", $value['Name']);
-         $file = LAYERCACHEPATH . $name . FILEEXTENSIONJSON;
-
-         foreach($value['Dimensions'] as $layer => $dimension) {
-            if($dimension['Name'] == 'time')
-            {
-               $timeDimensionArray = explode(",", $dimension['Value']);
-               $jsonArray = json_encode($timeDimensionArray);
-               $outStr = '{"date":' . $jsonArray . '}'; // Atention to ' and " otherwise JSON is not valid
-               
-               // Create the cache file
-               saveJsonCache($file, CACHELIFE, $outStr);
-
-               // Remove the date data so we don't cache it twice
-               unset($array[$i]['Layers'][$key]['Dimensions'][$layer]);
-            }
-         } 
-      }
-   }
-
-   // Return the array without the date data
-   return $array;
-}
-*/
-
-/*
-function updateCache()
-{
-   $str = file_get_contents(GET_CAPABILITES_PATH . GET_CAPABILITES_PARAMS) or
-      die("Can't contact getCapabilities Server");
-
-   $xml = simplexml_load_string($str);
-
-   $returnArray = getLayers($xml);
-   $returnArray = createDateCaches($returnArray);
-   $returnstring = saveJsonCache(MASTERCACHEPATH . FILEEXTENSIONJSON, CACHELIFE, json_encode($returnArray));
-
-}
-*/
