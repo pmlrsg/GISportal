@@ -45,8 +45,10 @@ OpenLayers.Layer.prototype.sensorName = '';
 OpenLayers.Layer.prototype.firstDate = '';
 OpenLayers.Layer.prototype.lastDate = '';
 
+// The min and max scale range, used by the scalebar
 OpenLayers.Layer.prototype.maxScaleVal;
 OpenLayers.Layer.prototype.minScaleVal;
+OpenLayers.Layer.prototype.log = false;
 
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
 // control ID in the layers panel to assign it to - defaults to operational layer
@@ -223,12 +225,17 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
 OpenLayers.Map.prototype.getMetadata = function(layer) {
    $.ajax({
       type: 'GET',
-      url: OpenLayers.ProxyHost + layer.url + "request=GetMetadata&item=layerDetails&layerName=" + layer.urlName,
+      url: OpenLayers.ProxyHost + layer.url + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&request=GetMetadata'),
       dataType: 'json',
       asyc: true,
       success: function(data) {
          layer.minScaleVal = parseFloat(data.scaleRange[0]);
          layer.maxScaleVal = parseFloat(data.scaleRange[1]);
+         
+         if(data.log == 'true')
+            layer.log = true;
+         else
+            layer.log = false;
       },
       error: function(request, errorType, exception) {
          gritterErrorHandler(null, 'layer MetaData', request, errorType, exception);
