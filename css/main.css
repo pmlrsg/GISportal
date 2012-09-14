@@ -443,11 +443,15 @@ div .sensor-accordion {
 }
 
 .scalebar-log {
-   margin: 5px 0px 75px 5px;
+   margin: 5px 0px 5px 0px;
 }
 
 .scalebar-log label {
-   margin: 0px 0px 0px 5px;
+   margin: 0px 0px 0px 0px !important;
+}
+
+.scalebar-reset {
+   margin: 0px 0px 50px 5px;
 }
 
 .scalebar-min {

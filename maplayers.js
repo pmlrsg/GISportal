@@ -82,7 +82,9 @@ OpenLayers.Layer.prototype.lastDate = '';
 
 // The min and max scale range, used by the scalebar
 OpenLayers.Layer.prototype.maxScaleVal;
+OpenLayers.Layer.prototype.origMaxScaleVal;
 OpenLayers.Layer.prototype.minScaleVal;
+OpenLayers.Layer.prototype.origMinScaleVal;
 OpenLayers.Layer.prototype.log = false;
 
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
@@ -281,8 +283,10 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
       dataType: 'json',
       asyc: true,
       success: function(data) {
-         layer.minScaleVal = parseFloat(data.scaleRange[0]);
-         layer.maxScaleVal = parseFloat(data.scaleRange[1]);
+         layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
+         layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
+         layer.minScaleVal = layer.origMinScaleVal;
+         layer.maxScaleVal = layer.origMaxScaleVal;
          
          if(data.log == 'true')
             layer.log = true;

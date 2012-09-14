@@ -201,6 +201,9 @@ function showScalebar($trigger) {
                   '<input type="checkbox" name="' + layer.name + '-log-checkbox"/>' +
                   '<label for="' + layer.name + '-logarithmic" title="Logarithmic Scale">Logarithmic Scale </label>' +
                '</div>' +
+               '<div id="' + layer.name + '-reset">' +
+                  '<input type="button" name="' + layer.name + '-reset-button" value="Reset Scale" />' +
+               '</div>' +
                '<div>' +
                   '<label for="' + layer.name + '-min" title="The minimum value to be used">Minimum Value: </label>' +
                '</div>' +
@@ -242,6 +245,10 @@ function showScalebar($trigger) {
             validateScale(layer, null , null);
          });
          
+         $('#' + layer.name + '-reset').on('click', '[type="button"]', function(e) {                              
+            validateScale(layer, layer.origMinScaleVal , layer.origMaxScaleVal, true);
+         });
+         
          $('#' + layer.name + '-max').focusout(function(e) {          
             // Check to see if the value was changed
             var max = parseFloat($(this).val());
@@ -271,7 +278,7 @@ function showScalebar($trigger) {
             values: [ layer.minScaleVal, layer.maxScaleVal ],
             max: scaleRange.max,
             min: scaleRange.min,
-            step: 0.5,
+            step: 0.0001,
             change: function(e, ui) {
                //if(e.originalEvent) {
                   if($(this).slider("values", 0) != layer.minScaleVal || $(this).slider("values", 1) != layer.maxScaleVal) {      
@@ -288,6 +295,7 @@ function showScalebar($trigger) {
          });
          $('#' + layer.name + '-max').parent('div').addClass('scalebar-max');
          $('#' + layer.name + '-log').addClass('scalebar-log');
+         $('#' + layer.name + '-reset').addClass('scalebar-reset');
          $('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
          
          // Open the dialog box
@@ -408,19 +416,22 @@ function createGetLegendURL(layer, hasBase)
 function getScaleRange(min, max)
 {
    return {
-      max: Math.round(max + ((max / 100) * 25)),
-      min: Math.round(min - ((max / 100) * 25)),
+      max: max + ((max / 100) * 25),
+      min: min - ((max / 100) * 25),
    };
 }
 
 // Validates the entries for the scale bar
-function validateScale(layer, newMin, newMax)
+function validateScale(layer, newMin, newMax, reset)
 {  
-   if(newMin == null)
+   if(newMin == null || typeof newMin === undefined)
       newMin = layer.minScaleVal;
       
-   if(newMax == null)
+   if(newMax == null || typeof newMax === undefined)
       newMax = layer.maxScaleVal;
+      
+   if(reset == null || typeof reset === undefined)
+      reset = false;
    
    var min = parseFloat(newMin);
    var max = parseFloat(newMax);
@@ -452,9 +463,15 @@ function validateScale(layer, newMin, newMax)
       $('#' + layer.name + '-min').val(min);
       $('#' + layer.name + '-max').val(max);
       
-      //var scaleRange = getScaleRange(min, max);
-      //$('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
-      //$('#' + layer.name + '-range-slider').slider('option', 'max', scaleRange.max);
+      if(min < $('#' + layer.name + '-range-slider').slider('option', 'min') || 
+         max > $('#' + layer.name + '-range-slider').slider('option', 'max') ||
+         reset == true)
+      {
+         var scaleRange = getScaleRange(min, max);
+         $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
+         $('#' + layer.name + '-range-slider').slider('option', 'max', scaleRange.max);
+         console.log("scale changed");
+      }
       
       layer.minScaleVal = min;
       layer.maxScaleVal = max;     
