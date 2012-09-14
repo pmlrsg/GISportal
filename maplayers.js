@@ -294,6 +294,12 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
             layer.log = false;
       },
       error: function(request, errorType, exception) {
+         layer.origMinScaleVal = 0;
+         layer.origMaxScaleVal = 0;
+         layer.minScaleVal = layer.origMinScaleVal;
+         layer.maxScaleVal = layer.origMaxScaleVal;
+         layer.log = false;
+         
          gritterErrorHandler(null, 'layer MetaData', request, errorType, exception);
       }
    });
