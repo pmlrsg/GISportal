@@ -158,7 +158,7 @@ function createCache($serverName, $serverURL, $xmlStr)
             'MaxY'=>(string)$innerChild->BoundingBox->attributes()->maxy
          );
 
-         $temp = createDimensionsArray($innerChild->Dimension);
+         $temp = createDimensionsArray($innerChild->Dimension, $name);
          $dimensions = $temp['dimensions'];
          $temporal = $temp['temporal'];
          $styles = createStylesArray($innerChild->Style);
@@ -212,7 +212,7 @@ function createCache($serverName, $serverURL, $xmlStr)
    return saveFile(SERVERCACHEPATH.$serverName.FILEEXTENSIONJSON, json_encode($subMasterCache)); 
 }
 
-function createDimensionsArray($dimensions)
+function createDimensionsArray($dimensions, $layerName)
 {
    $returnArray = array();
    $returnArray['dimensions'] = array();
@@ -223,21 +223,32 @@ function createDimensionsArray($dimensions)
    // Iterate over each dimension
    foreach($dimensions as $dimension)
    {
+      $dimensionArray = explode(",", $dimension);
+      $dimensionValue = trim((string)$dimension);
+      // Tidy up temporal layer date-time values
       if((string)$dimension->attributes()->name == 'time')
       {
          $temporal = true;
-         $dimensionArray = explode(",", $dimension);
+         // Iterate through the date-time dimension array looking for errors and/or ISO8601 date ranges     
+         for ($i=0; $i < count($dimensionArray); $i++)
+         {
+            $date_time = trim($dimensionArray[$i]);
+            if(strpos($date_time,"/") !== FALSE){
+               fb("Date range found: [".$date_time."]  for layer ".$layerName, FirePHP::INFO);
+            }
+            if(strpos($date_time,"-") !== 4){
+               fb("Corrupted date found: [".$date_time."]  for layer ".$layerName, FirePHP::ERROR);
+               // Remove the corrupted date element from the dimension array
+               array_splice($dimensionArray, $i, 1);
+            }            
+         }
          $firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
          $lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
-         
-         if(!isISO8601Date($firstDate))
-         {
-            fb("First Date not in ISO8601 format: ".array_shift($dimensionArray), FirePHP::ERROR);
-         }
-
          $returnArray['temporal'] = $temporal;
          $returnArray['firstDate'] = $firstDate;
-         $returnArray['lastDate'] = $lastDate;     
+         $returnArray['lastDate'] = $lastDate;
+         // Re-create the tidied up dimension values
+         $dimensionValue = trim(implode(",", $dimensionArray));
       }
 
       // Add to the dimensions array
@@ -245,10 +256,9 @@ function createDimensionsArray($dimensions)
          'Name'=>(string)$dimension->attributes()->name,
          'Units'=>(string)$dimension->attributes()->units,
          'Default'=>(string)$dimension->attributes()->default,
-         'Value'=>trim((string)$dimension))         
+         'Value'=>$dimensionValue)      
       );
    }
-
    return $returnArray;
 }
 
@@ -329,19 +339,6 @@ function filterLayers($layerName)
       }
    }
    return FALSE;
-}
-
-// Regex from http://www.pelagodesign.com/blog/2009/05/20/iso-8601-date-validation-that-doesnt-suck/ 
-function isISO8601Date($dateStr)
-{
-   if (preg_match('/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?00)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/', $dateStr) > 0)
-   {
-      return TRUE;
-   }
-   else
-   {
-      return FALSE;
-   }
 }
 
 function getFile($filePath)
