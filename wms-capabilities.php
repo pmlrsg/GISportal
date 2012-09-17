@@ -90,9 +90,9 @@ function updateCache()
    }
 
    //DEBUG
-   //fb($mastercache, FirePHP::INFO);
+   fb($mastercache, FirePHP::INFO);
 
-   if($change)
+   if($change OR !file_exists(MASTERCACHEPATH.FILEEXTENSIONJSON))
    {
       foreach($serverArray as $i => $row)
       {

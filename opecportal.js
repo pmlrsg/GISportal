@@ -32,7 +32,9 @@ var quickRegion = [
  //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
 /*====================================================================================*/
 
-// Create all the base layers for the map
+/**
+ * Create all the base layers for the map.
+ */
 function createBaseLayers()
 {
    // Add GEBCO base layer
@@ -66,7 +68,9 @@ function createBaseLayers()
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 }
 
-// Create all the reference layers for the map
+/**
+ * Create all the reference layers for the map.
+ */
 function createRefLayers()
 {
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
@@ -153,7 +157,10 @@ function createRefLayers()
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 }
 
-// Create layers for the map from the getCapabilities request
+/** 
+ * Create MicroLayers from the getCapabilities request to 
+ * be used in the layer selector.
+ */
 function createOpLayers() 
 {
    $.each(map.getCapabilities, function(i, item) 
@@ -182,7 +189,9 @@ function createOpLayers()
    });
 }
 
-// Create a layer to be displayed on the map
+/**
+ * Create a layer to be displayed on the map.
+ */ 
 function createOpLayer(layerData, sensorName, url) 
 {
    var layer = new OpenLayers.Layer.WMS (
@@ -220,6 +229,9 @@ function createOpLayer(layerData, sensorName, url)
    map.getMetadata(layer);
 }
 
+/**
+ * Add a layer to the map from the layerStore. 
+ */
 function addOpLayer(layerName)
 {
    // Get layer from layerStore
@@ -250,6 +262,10 @@ function addOpLayer(layerName)
    map.numOpLayers++;
 }
 
+/**
+ * Remove a layer from the map and into the 
+ * layerStore. 
+ */
 function removeOpLayer(layer)
 {
    // Remove the layer from the panel
@@ -271,7 +287,9 @@ function removeOpLayer(layer)
    map.numOpLayers--;
 }
 
-// Add a accordion to the layers panel
+/**
+ * Add an accordion to the layers panel.
+ */
 function addAccordionToPanel(id)
 { 
    // Add the accordion
@@ -306,12 +324,17 @@ function addAccordionToPanel(id)
    }).disableSelection();
 }
 
+/**
+ * Remove an accordion from the layers panel. 
+ */
 function removeAccordionFromPanel(id)
 {
    $('#' + id).parent('div').remove();
 }
 
-// Add a layer to the layers panel
+/**
+ * Add a layer to the layers panel.
+ */ 
 function addLayerToPanel(layer)
 {
    // if not already on list and not a base layer, populate the layers panel (left slide panel)
@@ -351,13 +374,18 @@ function addLayerToPanel(layer)
    }
 }
 
+/**
+ * Remove a layer from the layers panel. 
+ */
 function removeLayerFromPanel(layer)
 {
    $('#' + layer.name).remove();
 }
 
-// Creates a list of custom args that will be added to the
-// permalink url.
+/**
+ * Creates a list of custom args that will be added to the
+ * permalink url.
+ */
 function customPermalinkArgs()
 {
    var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
@@ -365,7 +393,9 @@ function customPermalinkArgs()
    );
 }
 
-// Updates all the layer index's in all the layer accordions
+/**
+ * Updates all the layer indexes in all the layer accordions.
+ */ 
 function updateAccordionOrder()
 {
    $.each($('.sensor-accordion'), function(index, value) {
@@ -373,7 +403,10 @@ function updateAccordionOrder()
    });
 }
 
-// Updates the position of layers based on their new position on the stack
+/**
+ * Updates the position of layers based on their new 
+ * position on the stack.
+ */ 
 function updateLayerOrder(layer)
 {
    var layerOffset = 0;
@@ -388,7 +421,9 @@ function updateLayerOrder(layer)
    });
 }
 
-// Checks to see if a layer is not visible and selected
+/**
+ * Checks to see if a layer is not visible and selected.
+ */ 
 function checkLayerState(layer)
 {
    if(!layer.visibility && layer.selected)
@@ -397,8 +432,10 @@ function checkLayerState(layer)
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
 }
 
-// Start mapInit() - the main function for setting up the map
-// plus its controls, layers, styling and events.
+/**
+ * Start mapInit() - the main function for setting up the map
+ * plus its controls, layers, styling and events.
+ */
 function mapInit() 
 {
    map = new OpenLayers.Map('map', {
@@ -426,7 +463,9 @@ function mapInit()
    }
 }
 
-// Anything that needs to be done after the layers are loaded goes here
+/**
+ * Anything that needs to be done after the layers are loaded goes here.
+ */ 
 function layerDependent(data)
 {
    map.getCapabilities = data;
@@ -438,6 +477,9 @@ function layerDependent(data)
 
 /*====================================================================================*/
 
+/**
+ * Loads anything that is not dependent on layer data. 
+ */
 function nonLayerDependent()
 {
    // Keeps the vectorLayers at the top of the map
@@ -695,6 +737,10 @@ function nonLayerDependent()
 
 /*====================================================================================*/
 
+/**
+ * Sets up the drawing controls to allow for the selection 
+ * of ROI's. 
+ */
 function setupDrawingControls()
 {
    // Add the Vector drawing layer for POI drawing
@@ -841,7 +887,9 @@ function setupDrawingControls()
 
 /*====================================================================================*/
 
-//This code runs once the page has loaded - jQuery initialised
+/**
+ * This code runs once the page has loaded - jQuery initialised.
+ */
 $(document).ready(function() {
 
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
@@ -850,6 +898,10 @@ $(document).ready(function() {
        width: 245,
        height: 220,
        resizable: false
+   }).dialogExtend({
+      "help": true,
+      "minimize": true,
+      "dblclick": "collapse",
    });
 
    // Show map info such as latlng
@@ -859,6 +911,10 @@ $(document).ready(function() {
       height: 200,
       resizable: true,
       autoOpen: false
+   }).dialogExtend({
+      "help": true,
+      "minimize": true,
+      "dblclick": "collapse",
    });
 
    $('#layerSelection').dialog({
@@ -869,6 +925,19 @@ $(document).ready(function() {
       minHeight: 400,
       resizable: true,
       autoOpen: true,
+   }).dialogExtend({
+      "help": true,
+      "minimize": true,
+      "dblclick": "collapse",
+      "events": {
+         "restore": function(e, dlg) {
+            // Used to resize content on the dialog.
+            $(this).trigger("resize");
+         },
+         "help" : function(e, dlg) {
+            showMessage('layerSelector', null);
+         }
+      },
    });
 
    $('#layers').multiselect({

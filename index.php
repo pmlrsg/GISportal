@@ -8,15 +8,24 @@
 <!-- ============================ Now for the styling ============================ -->
 <!-- jQuery UI theming CSS -->
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.23.custom.css" />
+
 <!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
+
 <!-- Context Menu styling -->
 <Link rel="stylesheet" type="text/css" href="js-libs/jquery-contextMenu/css/jquery-contextMenu.css" />
+
 <!-- Gritter styling -->
 <Link rel="stylesheet" type="text/css" href="js-libs/jquery-gritter/css/jquery.gritter.css" />
+
 <!-- Multiselect styling -->
 <Link rel="stylesheet" type="text/css" href="js-libs/jquery-multiselect/css/jquery.multiselect.css" />
+
+<!-- jQuery UI dialog extension styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/>
+
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
+
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
 
@@ -53,6 +62,9 @@
 
 <!-- https://github.com/michael/multiselect -->
 <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
+
+<!-- jQuery UI dialog extension -->
+<script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.0.1.js"></script>
 
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="opecportal.js"></script>

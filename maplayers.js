@@ -288,10 +288,7 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
          layer.minScaleVal = layer.origMinScaleVal;
          layer.maxScaleVal = layer.origMaxScaleVal;
          
-         if(data.log == 'true')
-            layer.log = true;
-         else
-            layer.log = false;
+         layer.log = data.log == 'true' ? true : false;
       },
       error: function(request, errorType, exception) {
          layer.origMinScaleVal = 0;

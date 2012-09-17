@@ -140,7 +140,7 @@ function showMetadata($trigger) {
             }
          });
 
-         $('#metadata-' + layer.name).dialog();
+         //$('#metadata-' + layer.name).dialog();
 
          // Add new data
          $('<div><label>Source: ' + '</label></div>' +
@@ -166,7 +166,7 @@ function showMetadata($trigger) {
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
 
- * @return {object} Returns an object containing the display name to show on 
+ * @return {Object} Returns an object containing the display name to show on 
  * the menu and a callback to be executed when selected.
  */
 function showScalebar($trigger) {
