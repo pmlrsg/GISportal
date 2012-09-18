@@ -233,12 +233,30 @@ function createDimensionsArray($dimensions, $layerName)
          for ($i=0; $i < count($dimensionArray); $i++)
          {
             $date_time = trim($dimensionArray[$i]);
+            $dateFrom; $dateTo; $dateInterval;
+            // Is there a date range present? - usually datetime/datetime/interval
             if(strpos($date_time,"/") !== FALSE){
-               fb("Date range found: [".$date_time."]  for layer ".$layerName, FirePHP::INFO);
+               $debugString = "Date range [".$date_time."]  for layer ".$layerName;
+               fb($debugString, FirePHP::INFO);
+               $rangeArray = explode("/", $date_time);
+               // Check for corrupted or unexpected data range format and remove it if found
+               if(count($rangeArray)==3){
+                  $dateFrom = new DateTime($rangeArray[0]);
+                  $dateTo = new DateTime($rangeArray[1]);
+                  $dateInterval = new DateInterval($rangeArray[2]);
+                  // Generate an array of actual datetimes representing the date range
+                  $rangeDates = array();
+                  $currentDate = $dateFrom;
+                  //while(){}
+                  $debugString =    "Date Start:".$dateFrom->format("Y-m-d H:i:s").", 
+                                    Date End:".$dateTo->format("Y-m-d H:i:s").",
+                                    Interval:".$rangeArray[2];
+                  fb($dateInterval, FirePHP::INFO);
+               }
             }
+            // Is there a corrupted date present - if so, remove it
             if(strpos($date_time,"-") !== 4){
                fb("Corrupted date found: [".$date_time."]  for layer ".$layerName, FirePHP::ERROR);
-               // Remove the corrupted date element from the dimension array
                array_splice($dimensionArray, $i, 1);
             }            
          }
@@ -360,4 +378,9 @@ function saveFile($filePath, $data)
    fwrite($fh, $data);
    fclose($fh);
    return $data;
+}
+
+function genDateRange(DateTime $startDate , DateTime $endDate, DateInterval $interval)
+{
+   $data = array();
 }
