@@ -90,7 +90,7 @@ function updateCache()
    }
 
    //DEBUG
-   fb($mastercache, FirePHP::INFO);
+   //fb($mastercache, FirePHP::INFO);
 
    if($change OR !file_exists(MASTERCACHEPATH.FILEEXTENSIONJSON))
    {
@@ -229,44 +229,57 @@ function createDimensionsArray($dimensions, $layerName)
       if((string)$dimension->attributes()->name == 'time')
       {
          $temporal = true;
+         // The following array will be built up with modified values as needed
+         $newDateArray = array();
          // Iterate through the date-time dimension array looking for errors and/or ISO8601 date ranges     
          for ($i=0; $i < count($dimensionArray); $i++)
-         {
+         { 
             $date_time = trim($dimensionArray[$i]);
-            $dateFrom; $dateTo; $dateInterval;
+            array_push($newDateArray, $date_time);
+            
             // Is there a date range present? - usually datetime/datetime/interval
-            if(strpos($date_time,"/") !== FALSE){
-               $debugString = "Date range [".$date_time."]  for layer ".$layerName;
-               fb($debugString, FirePHP::INFO);
+            if(strpos($date_time,"/") !== FALSE)
+            {
+               $debugString = "Date range found [".$date_time."]  for layer ".$layerName;
+               //fb($debugString, FirePHP::INFO);
                $rangeArray = explode("/", $date_time);
+               
                // Check for corrupted or unexpected data range format and remove it if found
-               if(count($rangeArray)==3){
-                  $dateFrom = new DateTime($rangeArray[0]);
-                  $dateTo = new DateTime($rangeArray[1]);
-                  $dateInterval = new DateInterval($rangeArray[2]);
-                  // Generate an array of actual datetimes representing the date range
-                  $rangeDates = array();
-                  $currentDate = $dateFrom;
-                  //while(){}
-                  $debugString =    "Date Start:".$dateFrom->format("Y-m-d H:i:s").", 
-                                    Date End:".$dateTo->format("Y-m-d H:i:s").",
-                                    Interval:".$rangeArray[2];
-                  fb($dateInterval, FirePHP::INFO);
+               if(count($rangeArray)==3)
+               {
+                  $dateTimeRange = genDateRange($rangeArray[0], $rangeArray[1], $rangeArray[2]);
+                  array_pop($newDateArray);
+                  $newDateArray = array_merge($newDateArray, $dateTimeRange);
                }
             }
+            
             // Is there a corrupted date present - if so, remove it
-            if(strpos($date_time,"-") !== 4){
-               fb("Corrupted date found: [".$date_time."]  for layer ".$layerName, FirePHP::ERROR);
-               array_splice($dimensionArray, $i, 1);
-            }            
+            if(strpos($date_time,"-") !== 4)
+            {
+               //fb("Corrupted date found: [".$date_time."]  for layer ".$layerName, FirePHP::ERROR);
+               array_pop($newDateArray);
+            }    
          }
-         $firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
-         $lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
+         // DEBUG LINES COMPARING OROIGINAL AND MODIFIED DATE-TIME DIMENSIONS
+         // fb("==========================BEFORE============================", FirePHP::INFO);
+         // fb($dimensionArray, FirePHP::INFO);
+         // fb($newDateArray, FirePHP::INFO);
+         // fb("==========================AFTER=============================", FirePHP::INFO);         
+         $firstDate = substr(trim((string)$newDateArray[0]), 0, 10);
+         $lastDate = substr(trim((string)$newDateArray[count($newDateArray) - 1]), 0, 10);
          $returnArray['temporal'] = $temporal;
          $returnArray['firstDate'] = $firstDate;
          $returnArray['lastDate'] = $lastDate;
          // Re-create the tidied up dimension values
-         $dimensionValue = trim(implode(",", $dimensionArray));
+         $dimensionValue = trim(implode(",", $newDateArray));
+         
+         // $firstDate = substr(trim((string)$dimensionArray[0]), 0, 10);
+         // $lastDate = substr(trim((string)$dimensionArray[count($dimensionArray) - 1]), 0, 10);
+         // $returnArray['temporal'] = $temporal;
+         // $returnArray['firstDate'] = $firstDate;
+         // $returnArray['lastDate'] = $lastDate;
+         // // Re-create the tidied up dimension values
+         // $dimensionValue = trim(implode(",", $dimensionArray));
       }
 
       // Add to the dimensions array
@@ -380,7 +393,28 @@ function saveFile($filePath, $data)
    return $data;
 }
 
-function genDateRange(DateTime $startDate , DateTime $endDate, DateInterval $interval)
+/**
+ * Function which returns an array of date-times, given a start date-time, end date-time and interval.
+ * 
+ * @param {String} $startDate - The start date-time in ISO8601 format
+ * @param {String} $endDate - The end date-time in ISO8601 format
+ * @param {String} $interval - The date-time interval in ISO8601 format
+ * 
+ */
+function genDateRange($startDate , $endDate, $interval)
 {
+   $dateFrom = new DateTime($startDate);
+   $dateTo = new DateTime($endDate);
+   $dateInterval = new DateInterval($interval);
    $data = array();
+   $currentDate = $dateFrom;
+   while($currentDate <= $dateTo)
+   {
+      $theDateTime = $currentDate->format(DateTime::ISO8601);
+      // CARE - PHP formats ISO8601 dates as +0000 for UTC instead of .000Z as is common for our data
+      $theDateTime = str_replace("+0000", ".000Z", $theDateTime);
+      array_push($data, $theDateTime);
+      date_add($currentDate, $dateInterval);
+   }
+   return $data;
 }
