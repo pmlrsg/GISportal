@@ -155,7 +155,7 @@
             <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"/></a>
          </li>
          <li>
-            <a href="#" id="layerPreloader"><img src="img/info32.png" alt="Toggle Layer Preloader Window"/></a>
+            <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window"/></a>
          </li>
       </ul>
    </div>
