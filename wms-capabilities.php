@@ -10,8 +10,8 @@
    //ini_set('error_log', LOG_FILE)
 
    // Setup firebug php  
-   require_once('FirePHPCore/fb.php');
-   ob_start();
+   //require_once('FirePHPCore/fb.php');
+   //ob_start();
 //----------------------------------
 
 // set socket timeout
@@ -33,6 +33,8 @@ define('FILEEXTENSIONXML', ".xml");
 define('GET_CAPABILITES_PARAMS', "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0");
 // Server list path
 define('GET_SERVERLIST_PATH', "serverlist.csv");
+// Set the default timezone
+date_default_timezone_set("Europe/London");
 
 function updateCache()
 {
