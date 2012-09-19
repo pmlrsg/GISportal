@@ -3,7 +3,7 @@
 <!-- http://spyrestudios.com/demos/sliding-panel-left/ -->
 <head>
 <meta charset="utf-8">
-<title>OpEc GIS Portal (jQuery + jQuery UI)</title>
+<title>OPEC Visualisation Portal Prototype</title>
 
 <!-- ============================ Now for the styling ============================ -->
 <!-- jQuery UI theming CSS -->
