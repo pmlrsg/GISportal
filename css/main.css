@@ -152,6 +152,15 @@ ul li {
    text-indent:-32px;
 }
 
+#shareMapToggleBtn {
+   height:32px;
+   width:32px;
+}
+
+#shareMapToggleBtn:hover {
+   text-indent:-32px;
+}
+
 #layerPreloader {
    height:32px;
    width:32px;
