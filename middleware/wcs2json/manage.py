@@ -1,3 +1,4 @@
+import urllib
 import urllib2
 import tempfile
 import numpy as np
@@ -7,83 +8,126 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-   baseUrl = ''
+def root():
    return 'Something'
 
-@app.route('/wcs/test', methods=['GET'])
-def area_point():
-   import urllib2
-   import urllib
-   baseUrl = request.args.get('url')
-   requestType = 'GetCoverage'
-   service = 'WCS'
-   version = request.args.get('version', '1.0.0')
-   format = 'NetCDF3'
-   coverage = request.args.get('coverage')
-   time = request.args.get('time', None)
-   bbox = request.args.get('bbox')
-   query = urllib.urlencode({'service': service, 'request': requestType, 'version': version, 'format': format, 'coverage': coverage, 'bbox': bbox})
-   url = baseUrl + query
-   resp = urllib2.urlopen(url)
-   return resp.read()
+#===============================================================================
+# @app.route('/wcs/test', methods=['GET'])
+# def areaPoint():
+#   import urllib2
+#   import urllib
+#   baseUrl = request.args.get('url')
+#   requestType = 'GetCoverage'
+#   service = 'WCS'
+#   version = request.args.get('version', '1.0.0')
+#   format = 'NetCDF3'
+#   coverage = request.args.get('coverage')
+#   time = request.args.get('time', None)
+#   bbox = request.args.get('bbox')
+#   query = urllib.urlencode({'service': service, 'request': requestType, 'version': version, 'format': format, 'coverage': coverage, 'bbox': bbox})
+#   url = baseUrl + query
+#   resp = urllib2.urlopen(url)
+#   return resp.read()
+#===============================================================================
 
 @app.route('/wcs/wcs2json', methods=['GET'])
-def get_area():
+def getWcsData():
    from netCDF4 import Dataset
-   url = request.args.get('url', None)
+   
+   params = getParams()
+   status, resp = checkRequiredParams(params)
+   
+   if(not status):
+      return resp
+   
+   urlParams = params.copy()
+   urlParams.pop('type')
+   params['url'] = createURL(urlParams)
+   
+   type = params['type']
+   if type == 'histogram':
+      output = openNetCDF(params, histogram)
+   elif type == 'basic':
+      output = openNetCDF(params, basic)
+   else:
+      return badRequest('required parameter "type" is set to an invalid value')
+   
+   return jsonify(output = output)
+
+def getParams():
+   baseURL = request.args.get('baseurl', None)
+   service = 'WCS'
+   requestType = 'GetCoverage'
+   version = request.args.get('version', '1.0.0')
+   format = 'NetCDF3'
    coverage = request.args.get('coverage', None)
    type = request.args.get('type', None)
-   if url == None or coverage == None or type == None:
-      return 'Error: param missing'
+   return {'baseURL': baseURL, 
+           'service': service, 
+           'request': requestType, 
+           'version': version, 
+           'format': format, 
+           'coverage': coverage, 
+           'type': type}
    
-   resp = urllib2.urlopen(url)
+def checkRequiredParams(params):
+   for key in params.iterkeys():
+      if(params[key] == None):
+         return False, badRequest('required parameter "%s" is missing or is not set to a invalid value' % key)
+      
+   return True, None
+
+def createURL(params):
+   baseURL = params.pop('baseURL')
+   query = urllib.urlencode(params)
+   url = baseURL + query
+   return url
+
+def openNetCDF(params, method):
+   from netCDF4 import Dataset
+   resp = urllib2.urlopen(params['url'])
    temp = tempfile.NamedTemporaryFile()
    temp.seek(0)
    temp.write(resp.read())
-   
+   resp.close()
    rootgrp = Dataset(temp.name, 'r', format='NETCDF3')
-   var = np.array(rootgrp.variables[coverage])
-   
-   if type == 'mean':
-      output = get_mean(var)
-   elif type == 'histogram':
-      output = get_histogram(var)
-   elif type == 'basic':
-      mean = get_mean(var)
-      median = get_median(var)
-      std = get_std(var)
-      min = get_min(var)
-      max = get_max(var)
-      output = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
-   else:
-      return 'type not valid'
-     
+   output = method(rootgrp, params)
    rootgrp.close()
    temp.close()
-   
-   return jsonify(data = var.tolist(),                
-                  output = output)
+   return output
 
-def get_median(arr):
+def basic(dataset, params):
+   var = np.array(dataset.variables[params['coverage']])
+   mean = getMean(var)
+   median = getMedian(var)
+   std = getStd(var)
+   min = getMin(var)
+   max = getMax(var)
+   return {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+
+def histogram(dataset, params):
+   var = np.array(dataset.variables[params['coverage']])
+   return {'histogram': getHistogram(var)}
+   
+def getMedian(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
    return np.ma.median(maskedarr)
 
-def get_mean(arr):
+def getMean(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
    return np.mean(maskedarr)
 
-def get_std(arr):
+def getStd(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
    return np.std(maskedarr)
 
-def get_min(arr):
+def getMin(arr):
    return float(np.nanmin(arr))
 
-def get_max(arr):
+def getMax(arr):
    return float(np.nanmax(arr))
 
-def get_histogram(arr):
+def getHistogram(arr):
    bins = request.args.get('bins', None)
    if bins == None:
       return 'Error: missing bins param'
@@ -93,8 +137,19 @@ def get_histogram(arr):
          values[i] = float(values[i])
       bins = np.array(values)
    
+   numbers = []
    N,bins = np.histogram(arr, bins)
-   return {'Numbers': N.tolist(), 'Bins': bins.tolist()}
+   for i in range(len(bins)-1):
+      numbers.append((bins[i] + (bins[i+1] - bins[i])/2, N[i]))
+   return {'Numbers': numbers, 'Bins': bins.tolist()}
+
+@app.errorhandler(400)
+def badRequest(error):
+   return error, 400
+
+#def close_netcdf(dataset):
+#   from netCDF4 import Dataset
+#   dataset.close()
 
 if __name__ == '__main__':
    app.run(debug=True)
