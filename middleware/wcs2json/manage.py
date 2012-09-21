@@ -30,16 +30,45 @@ def root():
 #   return resp.read()
 #===============================================================================
 
+@app.route('/wcs/wcs2json/thredds')
+def getThreddsCatalog():
+   datasets = [open_url(url) for url in crawlCatalog(catalog)]
+   print datasets
+   return jsonify(datasets = datasets)
+
+catalog = 'http://rsg.pml.ac.uk/thredds/catalog.xml'
+NAMESPACE = 'http://www.unidata.ucar.edu/namespaces/thredds/InvCatalog/v1.0'
+   
+def crawlCatalog(url):
+   from lxml import etree
+   from httplib2 import Http
+   import urlparse
+   from pydap.client import open_url
+   resp, content = Http().request(catalog)
+   xml = etree.fromstring(content)
+   base = xml.find('.//{%s}service % NAMESPACE')
+   print base
+   for dataset in xml.iterfind('.//{%s}dataset[@urlPath]' % NAMESPACE):
+      yield urlparse.urljoin(base.attrib['base'], dataset.attrib['urlPath'])
+   for subdir in xml.iterfind('.//{%s}catalogRef' % NAMESPACE):
+      print subdir
+      for url in crawlCatalog(subdir.attrib['{http://www.w3.org/1999/xlink}href']):
+         print url
+         yield url
+
 @app.route('/wcs/wcs2json', methods=['GET'])
 def getWcsData():
    from netCDF4 import Dataset
    
    params = getParams()
-   status, resp = checkRequiredParams(params)
+   params = checkParams(params)
+   requiredParams = getRequiredParams()
+   status, resp = checkRequiredParams(requiredParams)
    
    if(not status):
       return resp
    
+   params = dict(params.items() + requiredParams.items())
    urlParams = params.copy()
    urlParams.pop('type')
    params['url'] = createURL(urlParams)
@@ -55,6 +84,13 @@ def getWcsData():
    return jsonify(output = output)
 
 def getParams():
+   time = request.args.get('time', None)
+   bbox = request.args.get('bbox', None)
+   print time
+   return {'time': time,
+           'bbox': bbox}
+
+def getRequiredParams():
    baseURL = request.args.get('baseurl', None)
    service = 'WCS'
    requestType = 'GetCoverage'
@@ -70,9 +106,20 @@ def getParams():
            'coverage': coverage, 
            'type': type}
    
+def checkParams(params):
+   
+   checkedParams = {}
+   
+   for key in params.iterkeys():
+      if params[key] != None:
+         checkedParams[key] = params[key]
+         print key
+         
+   return checkedParams
+         
 def checkRequiredParams(params):
    for key in params.iterkeys():
-      if(params[key] == None):
+      if params[key] == None:
          return False, badRequest('required parameter "%s" is missing or is not set to a invalid value' % key)
       
    return True, None
@@ -81,6 +128,7 @@ def createURL(params):
    baseURL = params.pop('baseURL')
    query = urllib.urlencode(params)
    url = baseURL + query
+   print url
    return url
 
 def openNetCDF(params, method):
