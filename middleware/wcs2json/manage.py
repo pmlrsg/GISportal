@@ -113,7 +113,6 @@ def checkParams(params):
    for key in params.iterkeys():
       if params[key] != None:
          checkedParams[key] = params[key]
-         print key
          
    return checkedParams
          

@@ -1,6 +1,6 @@
 function createGraph(graphOptions) {
    $(document.body).append(
-      '<div id="' + graphOptions.id + '-graph" title="' + graphOptions.title + '">' +
+      '<div id="' + graphOptions.id + '-graph" class="unselectable" title="' + graphOptions.title + '">' +
          '<div class="graph"></div>' +
       '</div>'
    );

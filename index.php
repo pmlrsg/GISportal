@@ -118,7 +118,7 @@
    <!-- The Map -->
    <div id="map"></div>
    <!-- The Top Toolbar -->
-   <div id="topToolbar" class="toolbar">
+   <div id="topToolbar" class="toolbar unselectable">
       <ul>
          <li id="panZoom">
             <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
@@ -160,8 +160,8 @@
       </ul>
    </div>
    <!-- The Left Panels -->
-   <a class="trigger triggerL" href="#">Layers</a>
-   <div class="panel lPanel">
+   <a class="trigger triggerL unselectable" href="#">Layers</a>
+   <div class="panel lPanel unselectable">
       <h3 id="layerLbl">Data Layers</h3>
       <div id="layerAccordion">
          <h3><a href="#">Operational Layers</a></h3>
@@ -172,8 +172,8 @@
       <div style="clear: both;"> </div>
    </div>
    <!-- The Right Panels -->
-   <a class="trigger triggerR" href="#">Data</a>
-   <div class="panel rPanel">
+   <a class="trigger triggerR unselectable" href="#">Data</a>
+   <div class="panel rPanel unselectable">
       <h3 id="dataLbl">Data Analysis</h3>
       <div id="dataAccordion">
          <h3><a href="#">Current R.O.I.</a></h3>
@@ -232,7 +232,7 @@
       </div>
       <div style="clear: both;"> </div>
    </div>
-   <div id="bottomToolbar" class="toolbar">
+   <div id="bottomToolbar" class="toolbar unselectable">
       <ul>
          <li>
             <fieldset>
@@ -270,7 +270,7 @@
          <label class="iconBtn" for="shareLink" />
       </div> 
    </div>
-   <div id="info" title="Information">
+   <div id="info" class="unselectable" title="Information">
       <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
       <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
       <p>&copy;2012 PML Applications Ltd<br />
@@ -282,7 +282,7 @@
          <span id="latlng"></span>
       </div>
    </div>
-   <div id="layerSelection" class="layer-selection" title="Layer Selection">
+   <div id="layerSelection" class="layer-selection unselectable" title="Layer Selection">
       <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
       <div id="layers"></div>
    </div>

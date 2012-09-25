@@ -125,7 +125,7 @@ function showMetadata($trigger) {
             $('#metadata-' + layer.name).dialog('close');
 
          $(document.body).append(
-            '<div id="metadata-' + layer.name + '" title="' + layer.displayTitle + '">' +
+            '<div id="metadata-' + layer.name + '" class="unselectable" title="' + layer.displayTitle + '">' +
             '</div>'
          );
 
@@ -189,7 +189,7 @@ function showScalebar($trigger) {
 
          // Add the html to the document
          $(document.body).append(
-            '<div id="scalebar-' + layer.name +'" class="scalebar" title="Scalebar Info">' +
+            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable" title="Scalebar Info">' +
                '<img src="' + scalebarDetails.url + '" alt="Scalebar"/>' +
                '<div id="' + layer.name + '-range-slider"></div>' +
                '<div>' +
@@ -593,7 +593,7 @@ function showGraphCreator()
          
          // Add the html to the document
          $(document.body).append(
-            '<div id="graphCreator" title="Graph Creator">' +
+            '<div id="graphCreator" class="unselectable" title="Graph Creator">' +
                '<div>' +
                   '<label for="graphcreator-baseurl-label" title="BaseUrl">BaseUrl:</label>' +
                '</div>' +

@@ -250,7 +250,7 @@ function addOpLayer(layerName)
    // Check if an accordion is there for us
    if(!$('#' + layer.displaySensorName).length)
    {
-      addAccordionToPanel(layer.displaySensorName);
+      addAccordionToPanel(layer.sensorName, layer.displaySensorName);
    }
    // Add the layer to the map
    map.addLayer(layer);
@@ -290,12 +290,12 @@ function removeOpLayer(layer)
 /**
  * Add an accordion to the layers panel.
  */
-function addAccordionToPanel(id)
+function addAccordionToPanel(id, displayName)
 { 
    // Add the accordion
    $('#opLayers').prepend(
       '<div>' +
-         '<h3><a href="#">' + id + '</a></h3>' +
+         '<h3><a href="#">' + displayName + '</a></h3>' +
          '<div id="' + id + '" class="sensor-accordion"></div>' +
       '</div>'
    );
@@ -329,9 +329,12 @@ function addAccordionToPanel(id)
  */
 function removeAccordionFromPanel(id)
 {
-   
-   // Remove the accordion we were asked to remove
-   $('#' + id).parent('div').remove();
+
+   if($('#' + id).length)
+   {        
+      // Remove the accordion we were asked to remove
+      $('#' + id).parent('div').remove();
+   }
    
    // Do a search for any others that need to be removed
    $.each($('.sensor-accordion'), function(index, value) {
@@ -379,6 +382,9 @@ function addLayerToPanel(layer)
       layer.events.register("visibilitychanged", layer, function() {
          checkLayerState(layer);
       });
+      
+      // Remove the dummy layer
+      removeDummyHelpLayer()
    }
 }
 
@@ -387,7 +393,38 @@ function addLayerToPanel(layer)
  */
 function removeLayerFromPanel(layer)
 {
-   $('#' + layer.name).remove();
+   if($('#' + layer.name).length)
+      $('#' + layer.name).remove();
+}
+
+/**
+ * Adds a dummy layer to help the user. 
+ */
+function addDummyHelpLayer()
+{
+   addAccordionToPanel("Need-Help", "Need Help?");
+   
+   $('#Need-Help').prepend(
+   '<li id="Help" class="notSelectable">' +
+      'You Need to add some layers! Use the ' +      
+      '<a id="dmhLayerSelection" href="#">Layer Selection</a>' +  
+      ' panel.' +
+   '</li>'
+   );
+   
+   // Open the layer panel on click
+   $('#dmhLayerSelection').click(function(e) {
+      $('#layerPreloader').trigger('click');
+         return false;
+   });
+}
+
+/**
+ * Removes dummy layer 
+ */
+function removeDummyHelpLayer()
+{
+   removeAccordionFromPanel("Need-Help");
 }
 
 /**
@@ -566,13 +603,18 @@ function nonLayerDependent()
 
    // Handle selection of visible layers
    $('.lPanel').on('mousedown', 'li', function(e) {
-       var itm = $(this);
-       var child = itm.children('input').first();
-        $('.lPanel li').each(function(index) {
+      var itm = $(this);
+      if(!itm.hasClass('notSelectable')) {
+         var child = itm.children('input').first();
+         $('.lPanel li').each(function(index) {
             $(this).removeClass('selectedLayer');
-        });
-        itm.addClass('selectedLayer');
+         });
+         itm.addClass('selectedLayer');
+      }
    });
+   
+   // Add Dummy Layer
+   addDummyHelpLayer();
 
    // Toggle visibility of data layers
    $('#opLayers, #refLayers').on('click', ':checkbox', function(e) {

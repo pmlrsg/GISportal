@@ -496,13 +496,26 @@ div .sensor-accordion {
    font-weight: bold;
 }
 
-/* ======== Graph Creator======= */
+/* ======= Graph Creator ======= */
 
 #graphcreator-baseurl {
    width: 300px;
 }
 
+/* ===== Dummy Help Layer ===== */
+
+#Need-Help {
+   font-weight: bold;
+}
+
 /* ============================= */
+
+.unselectable {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
 
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
