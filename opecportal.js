@@ -329,7 +329,15 @@ function addAccordionToPanel(id)
  */
 function removeAccordionFromPanel(id)
 {
+   
+   // Remove the accordion we were asked to remove
    $('#' + id).parent('div').remove();
+   
+   // Do a search for any others that need to be removed
+   $.each($('.sensor-accordion'), function(index, value) {
+      if($(this).children('li').length == 0)
+         $(this).parent('div').remove();
+   });
 }
 
 /**
@@ -399,7 +407,10 @@ function customPermalinkArgs()
 function updateAccordionOrder()
 {
    $.each($('.sensor-accordion'), function(index, value) {
-      updateLayerOrder($(this));
+      if($(this).children('li').length == 0)
+         removeAccordionFromPanel($(this).attr('id'));
+      else    
+         updateLayerOrder($(this));
    });
 }
 
@@ -407,18 +418,22 @@ function updateAccordionOrder()
  * Updates the position of layers based on their new 
  * position on the stack.
  */ 
-function updateLayerOrder(layer)
+function updateLayerOrder(accordion)
 {
    var layerOffset = 0;
-   $.each(layer.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
+   $.each(accordion.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
       layerOffset += $(this).children('li').length;
    });
 
-   var order = layer.sortable('toArray');                  
-   $.each(order, function(index, value) {
-      var layer = map.getLayersByName(value)[0];
-      map.setLayerIndex(layer, map.numBaseLayers + layerOffset + order.length - index - 1);
-   });
+   var order = accordion.sortable('toArray');   
+   if(order.length > 0) {         
+      $.each(order, function(index, value) {
+         var layer = map.getLayersByName(value)[0];
+         map.setLayerIndex(layer, map.numBaseLayers + layerOffset + order.length - index - 1);
+      });
+   }
+   else
+      removeAccordionFromPanel(accordion.attr('id'));
 }
 
 /**
