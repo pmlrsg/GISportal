@@ -143,12 +143,6 @@ function showMetadata($trigger) {
             "help": true,
             "minimize": true,
             "dblclick": "collapse",
-            "events": {
-               "restore": function(e, dlg) {
-                  // Used to resize content on the dialog.
-                  $(this).trigger("resize");
-               },
-            },
          });
 
          //$('#metadata-' + layer.name).dialog();
@@ -250,6 +244,16 @@ function showScalebar($trigger) {
             "help": true,
             "minimize": true,
             "dblclick": "collapse",
+            "events": {
+               "restore": function(e, dlg) {
+                  // Used to resize content on the dialog.
+                  $(this).trigger("resize");
+               },
+               "help" : function(e, dlg) {
+                  showMessage('scalebar', null);
+               },
+            },
+
          });
          
          $('#' + layer.name + '-log').on('click', ':checkbox', function(e) {          
@@ -649,10 +653,10 @@ function showGraphCreator()
             '</div>'
          );
          
-         // Show the scalebar for a selected layer
+         // Turn it into a dialog box
          $('#graphCreator').dialog({
             position: ['center', 'center'],
-            width:320,
+            width:340,
             resizable: false,
             autoOpen: false,
             close: function() {
@@ -665,6 +669,7 @@ function showGraphCreator()
             "dblclick": "collapse",
          });
          
+         // Set default value
          $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
          
          // When selecting the bounding box text field, request user to draw the box to populate values
@@ -672,6 +677,7 @@ function showGraphCreator()
             showMessage('bbox', null);
          });
          
+         // Create and display the graph
          $('#graphcreator-generate').click(function(e) {          
             $.ajax({
                type: 'GET',
