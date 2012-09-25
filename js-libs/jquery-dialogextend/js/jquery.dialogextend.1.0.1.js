@@ -171,8 +171,8 @@
 			return self;
 		},
 
-		"minimize" : function(){
-			var self = this;
+      "minimize" : function(){
+         var self = this;
 			// caculate new dimension
 			var newHeight = $(this).dialog("widget").find(".ui-dialog-titlebar").height()+15;
 			var newWidth = 200;
@@ -317,6 +317,13 @@
 				.find(".ui-dialog-titlebar-close")
 					.toggle(settings.close)
 				.end()
+				.find(".ui-dialog-titlebar-help")
+				  .toggle(settings.help)
+              .click(function(e) {
+                 e.preventDefault();
+                 $(self).dialogExtend("help");
+              })
+            .end()
 				.find(".ui-dialog-titlebar-maximize")
 					.toggle(settings.maximize)
 					.click(function(e) {
@@ -337,12 +344,6 @@
 						e.preventDefault();
 						$(self).dialogExtend("restore");
 					})
-				.end()
-				.find(".ui-dialog-titlebar-help")
-				  .click(function(e) {
-				     e.preventDefault();
-				     $(self).dialogExtend("help");
-				  })
 				.end();
 			// other titlebar behaviors
 			$(titlebar)

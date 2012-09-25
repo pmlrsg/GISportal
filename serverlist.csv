@@ -1,3 +1,4 @@
 name,url
 pml,http://rsg.pml.ac.uk/ncWMS/wms?
 vostok,http://earthserver.pml.ac.uk:8080/ncWMS-1.0RC3/wms?
+motherlodeAlaka,http://motherlode.ucar.edu:8080/thredds/wms/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?

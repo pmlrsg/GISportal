@@ -241,9 +241,10 @@ function createHelpMessages()
       },
    };
    
+   // Layer Selector Tutorial
    map.helperMessages['layerSelector'] = {
       title: function() {
-         return 'Layer Selection';
+         return 'Layer Selection Tutorial';
       },
       text: function() {
          return 'The layer selector is made up of two parts. The ' +
@@ -264,7 +265,17 @@ function createHelpMessages()
             $('#layers .available').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
          });
       }
-   }
+   };
+   
+   // Scalebar Tutorial
+   map.helperMessages['scalebar'] = {
+      title: function() {
+         return 'Scalebar Tutorial';
+      },
+      text: function() {
+        return 'With the scalebar you can change the range of values used.';
+      },
+   };
 }
 
 /**

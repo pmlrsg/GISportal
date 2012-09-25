@@ -448,7 +448,11 @@ div .sensor-accordion {
 }
 
 .scalebar-max {
-   margin: 5px 0px 75px 10px;
+   margin: 5px 0px 45px 10px;
+}
+
+.scalebar-scale {
+   margin: 0px 0px 0px 5px;
 }
 
 .scalebar-log {
@@ -492,7 +496,13 @@ div .sensor-accordion {
    font-weight: bold;
 }
 
-/* ================================ */
+/* ======== Graph Creator======= */
+
+#graphcreator-baseurl {
+   width: 300px;
+}
+
+/* ============================= */
 
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }

@@ -79,7 +79,8 @@ function createContextMenu()
                // The items in the menu
                items: {
                   showMetadata: showMetadata($trigger),
-                  showGraphs: createGraphs()
+                  showGraphs: createGraphs(),
+                  showGraphCreator: showGraphCreator()
                }
             };                           
          }
@@ -197,6 +198,9 @@ function showScalebar($trigger) {
                '<div>' +
                   '<input id="' + layer.name + '-max" type="text" name="' + layer.name + '-max"/>' +
                '</div>' +
+               '<div id="' + layer.name + '-scale">' +
+                  '<input type="button" name="' + layer.name + '-scale-button" value="Recalculate Scale" />' +
+               '</div>' +
                '<div id="' + layer.name + '-log">' +
                   '<input type="checkbox" name="' + layer.name + '-log-checkbox"/>' +
                   '<label for="' + layer.name + '-logarithmic" title="Logarithmic Scale">Logarithmic Scale </label>' +
@@ -249,6 +253,13 @@ function showScalebar($trigger) {
             validateScale(layer, layer.origMinScaleVal , layer.origMaxScaleVal, true);
          });
          
+         $('#' + layer.name + '-scale').on('click', '[type="button"]', function(e) {                              
+            var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);
+            $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
+            $('#' + layer.name + '-range-slider').slider('option', 'max', scaleRange.max);
+            validateScale(layer, layer.minScaleVal , layer.maxScaleVal);
+         });
+         
          $('#' + layer.name + '-max').focusout(function(e) {          
             // Check to see if the value was changed
             var max = parseFloat($(this).val());
@@ -278,7 +289,7 @@ function showScalebar($trigger) {
             values: [ layer.minScaleVal, layer.maxScaleVal ],
             max: scaleRange.max,
             min: scaleRange.min,
-            step: 0.0001,
+            step: 0.00000001,
             change: function(e, ui) {
                //if(e.originalEvent) {
                   if($(this).slider("values", 0) != layer.minScaleVal || $(this).slider("values", 1) != layer.maxScaleVal) {      
@@ -294,6 +305,7 @@ function showScalebar($trigger) {
             'margin': '5px 0px 0px 10px', 
          });
          $('#' + layer.name + '-max').parent('div').addClass('scalebar-max');
+         $('#' + layer.name + '-scale').addClass('scalebar-scale');
          $('#' + layer.name + '-log').addClass('scalebar-log');
          $('#' + layer.name + '-reset').addClass('scalebar-reset');
          $('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
@@ -520,6 +532,221 @@ function createGraphs()
          };
          
          createGraph(graphData);
+         
+         $.ajax({
+            type: 'GET',
+            url: OpenLayers.ProxyHost + 'http://127.0.0.1:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
+            dataType: 'json',
+            asyc: true,
+            success: function(data) {
+               var num = data.output.histogram.Numbers
+               
+               var graphData = {
+                  id: 'wcsgraphPressure_reduced_to_MSL',
+                  title: 'WCS Test Graph - Pressure_reduced_to_MSL',
+                  data: [num],
+                  options: barOptions(),
+                  selectable: true
+               };
+               
+               createGraph(graphData);
+            },
+            error: function(request, errorType, exception) {            
+               gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+            }
+         });
+         
+         $.ajax({
+            type: 'GET',
+            url: OpenLayers.ProxyHost + 'http://127.0.0.1:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
+            dataType: 'json',
+            asyc: true,
+            success: function(data) {
+               var num = data.output.histogram.Numbers
+               
+               var graphData = {
+                  id: 'wcsgraphv_wind_tropopause',
+                  title: 'WCS Test Graph - v_wind_tropopause',
+                  data: [num],
+                  options: barOptions(),
+                  selectable: true
+               };
+               
+               createGraph(graphData);
+            },
+            error: function(request, errorType, exception) {            
+               gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+            }
+         });
+      }
+   };
+}
+
+function showGraphCreator()
+{
+   return {
+      name: 'Show Graph Creator',
+      callback: function() {
+         // If there is an open version, close it
+         if($('#graphCreator').length)
+            $('#graphCreator').dialog('close');
+         
+         // Add the html to the document
+         $(document.body).append(
+            '<div id="graphCreator" title="Graph Creator">' +
+               '<div>' +
+                  '<label for="graphcreator-baseurl-label" title="BaseUrl">BaseUrl:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-baseurl" type="text" name="graphcreator-path"/>' +
+               '</div>' +
+               '<div>' +
+                  '<label for="graphcreator-coverage-label" title="Coverage">Coverage:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-coverage" type="text" name="graphcreator-coverage"/>' +
+               '</div>' +
+               '<div>' +
+                  '<label for="graphcreator-type-label" title="Type">Type:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-type" type="text" name="graphcreator-type"/>' +
+               '</div>' +
+               '<div>' +
+                  '<label for="graphcreator-bins-label" title="Bins">Bins:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-bins" type="text" name="graphcreator-bins"/>' +
+               '</div>' +
+               '<div>' +
+                  '<label for="graphcreator-time-label" title="Time">Time:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-time" type="text" name="graphcreator-time"/>' +
+               '</div>' +
+               '<div>' +
+                  '<label for="graphcreator-bbox-label" title="Bbox">Bbox:</label>' +
+               '</div>' +
+               '<div>' +
+                  '<input id="graphcreator-bbox" type="text" name="graphcreator-bbox"/>' +
+               '</div>' +
+               '<div id="graphcreator-generate">' +
+                  '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+               '</div>' +
+            '</div>'
+         );
+         
+         // Show the scalebar for a selected layer
+         $('#graphCreator').dialog({
+            position: ['center', 'center'],
+            width:320,
+            resizable: false,
+            autoOpen: false,
+            close: function() {
+               // Remove on close
+               $('#graphCreator').remove(); 
+            }
+         });
+         
+         $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
+         
+         $('#graphcreator-generate').click(function(e) {          
+            $.ajax({
+               type: 'GET',
+               url: OpenLayers.ProxyHost + 'http://pmpc1313.npm.ac.uk:5000/wcs/wcs2json?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
+                  '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
+                  '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val()),
+               dataType: 'json',
+               asyc: true,
+               success: function(data) {
+                  if($('#graphcreator-type').val() == 'basic')
+                  {                                    
+                     var start = new Date(data.output.time).getTime(),
+                        d1 = [],
+                        d2 = [], 
+                        d3 = [],
+                        d4 = [], 
+                        d5 = [];
+                     
+                     $.each(data.output, function(i, value) {
+                        d1.push([new Date(i).getTime(), value.std]);
+                        d2.push([new Date(i).getTime(), value.max]);
+                        d3.push([new Date(i).getTime(), value.min]);
+                        d4.push([new Date(i).getTime(), value.median]);
+                        d5.push([new Date(i).getTime(), value.mean]);
+                     });
+                     
+                     var options = {
+                        xaxis: { min: 0, max: d1.length + 1 },
+                        yaxis: { min: data.output.min, max: data.output.max },
+                        title: 'Example Graph',
+                        mouse : {
+                          track           : true, // Enable mouse tracking
+                          lineColor       : 'purple',
+                          relative        : true,
+                          position        : 'ne',
+                          sensibility     : 1,
+                          trackDecimals   : 2,
+                          trackFormatter  : function (o) { return 'x = ' + o.x +', y = ' + o.y; }
+                        },
+                     };
+                     
+                     var graphData = {
+                        id: 'wcsgraph' + Date.now(),
+                        title: 'WCS Test Graph',
+                        data: [{
+                           data: d1.sort(),
+                           lines: { show: true },
+                           points: { show: true }
+                        },
+                        {
+                           data: d2.sort(),
+                           lines: { show: true },
+                           points: { show: true }
+                        },
+                        {
+                           data: d3.sort(),
+                           lines: { show: true },
+                           points: { show: true }
+                        },
+                        {
+                           data: d4.sort(),
+                           lines: { show: true },
+                           points: { show: true }
+                        },
+                        {
+                           data: d5.sort(),
+                           lines: { show: true },
+                           points: { show: true }
+                        }],
+                        options: basicTimeOptions(),
+                        selectable: true
+                     };
+                  }
+                  else if ($('#graphcreator-type').val() == 'histogram')
+                  {
+                     var num = data.output.histogram.Numbers
+                  
+                     var graphData = {
+                        id: 'wcsgraph' + Date.now(),
+                        title: 'WCS Test Graph',
+                        data: [num],
+                        options: barOptions(),
+                        selectable: true
+                     };
+                  }
+                
+                  createGraph(graphData);
+               },
+               error: function(request, errorType, exception) {            
+                  gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+               }
+            });
+         });
+         
+                  
+         // Open the dialog box
+         $('#graphCreator').dialog('open');
       }
    };
 }

@@ -14,8 +14,12 @@ function createGraph(graphOptions) {
       close: function() {
          $('#' + graphOptions.id + '-graph').remove();
       }
+   }).dialogExtend({
+      "help": false,
+      "minimize": true,
+      "dblclick": "collapse",
    });
-   
+
    $('#' + graphOptions.id + '-graph').children('.graph').width(600).height(384);
    
    var 
@@ -170,6 +174,23 @@ function lineOptions()
         trackDecimals   : 2,
         trackFormatter  : function (o) { return 'x = ' + o.x +', y = ' + o.y; }
       },
+   };
+}
+
+function barOptions()
+{
+   return {
+      bars: {
+         show: true,
+         horizontal: false,
+         shadowsize: 0,
+         barwidth: 25
+      },
+      title: 'Example Graph',
+      yaxis: {
+         min: 0,
+         autoscaleMargin: 1
+      }
    };
 }
 

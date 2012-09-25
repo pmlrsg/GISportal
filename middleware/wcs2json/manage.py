@@ -2,6 +2,7 @@ import urllib
 import urllib2
 import tempfile
 import numpy as np
+import netCDF4 as netCDF
 
 from flask import Flask, request, jsonify
 
@@ -9,7 +10,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def root():
-   return 'Something'
+   return '/wcs/wcs2json/thredds - get thredds catalog - not working,<br> /wcs/wcs2json - get WCS data - working'
 
 #===============================================================================
 # @app.route('/wcs/test', methods=['GET'])
@@ -57,9 +58,7 @@ def crawlCatalog(url):
          yield url
 
 @app.route('/wcs/wcs2json', methods=['GET'])
-def getWcsData():
-   from netCDF4 import Dataset
-   
+def getWcsData(): 
    params = getParams()
    params = checkParams(params)
    requiredParams = getRequiredParams()
@@ -78,6 +77,8 @@ def getWcsData():
       output = openNetCDF(params, histogram)
    elif type == 'basic':
       output = openNetCDF(params, basic)
+   elif type == 'raw':
+      output = openNetCDF(params, raw)
    else:
       return badRequest('required parameter "type" is set to an invalid value')
    
@@ -86,7 +87,6 @@ def getWcsData():
 def getParams():
    time = request.args.get('time', None)
    bbox = request.args.get('bbox', None)
-   print time
    return {'time': time,
            'bbox': bbox}
 
@@ -132,13 +132,12 @@ def createURL(params):
    return url
 
 def openNetCDF(params, method):
-   from netCDF4 import Dataset
    resp = urllib2.urlopen(params['url'])
    temp = tempfile.NamedTemporaryFile()
    temp.seek(0)
    temp.write(resp.read())
    resp.close()
-   rootgrp = Dataset(temp.name, 'r', format='NETCDF3')
+   rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
    output = method(rootgrp, params)
    rootgrp.close()
    temp.close()
@@ -146,16 +145,37 @@ def openNetCDF(params, method):
 
 def basic(dataset, params):
    var = np.array(dataset.variables[params['coverage']])
+   time = dataset.variables['time']
+   times = np.array(time)
+   
    mean = getMean(var)
    median = getMedian(var)
    std = getStd(var)
    min = getMin(var)
    max = getMax(var)
-   return {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+   start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+   
+   output = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+   
+   for i,row in enumerate(var):
+      date = netCDF.num2date(times[i], time.units, calendar='standard')
+      mean = getMean(row)
+      median = getMedian(row)
+      std = getStd(row)
+      min = getMin(row)
+      max = getMax(row)
+      output[date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+
+
+   return output
 
 def histogram(dataset, params):
    var = np.array(dataset.variables[params['coverage']])
    return {'histogram': getHistogram(var)}
+
+def raw(dataset, params):
+   var = np.array(dataset.variables[params['coverage']])
+   return {'rawdata': var.tolist()}
    
 def getMedian(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
@@ -200,4 +220,4 @@ def badRequest(error):
 #   dataset.close()
 
 if __name__ == '__main__':
-   app.run(debug=True)
+   app.run(debug=True, host='0.0.0.0')

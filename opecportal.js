@@ -357,11 +357,11 @@ function addLayerToPanel(layer)
 
       // Show the img when we are loading data for the layer
       layer.events.register("loadstart", layer, function(e) {
-         $('#' + this.displayName).find('img[src="img/ajax-loader.gif"]').show();
+         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').show();
       });
       // Hide the img when we have finished loading data
       layer.events.register("loadend", layer, function(e) {
-         $('#' + this.displayName).find('img[src="img/ajax-loader.gif"]').hide();
+         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
       });
       // Hide the ajax-loader and the exclamation mark initially
       $layer.find('img[src="img/ajax-loader.gif"]').hide();
@@ -899,7 +899,7 @@ $(document).ready(function() {
        height: 220,
        resizable: false
    }).dialogExtend({
-      "help": true,
+      "help": false,
       "minimize": true,
       "dblclick": "collapse",
    });
