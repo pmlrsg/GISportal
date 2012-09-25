@@ -139,6 +139,16 @@ function showMetadata($trigger) {
             close: function() {
                $('#metadata-' + layer.name).remove();
             }
+         }).dialogExtend({
+            "help": true,
+            "minimize": true,
+            "dblclick": "collapse",
+            "events": {
+               "restore": function(e, dlg) {
+                  // Used to resize content on the dialog.
+                  $(this).trigger("resize");
+               },
+            },
          });
 
          //$('#metadata-' + layer.name).dialog();
@@ -229,14 +239,17 @@ function showScalebar($trigger) {
          // Show the scalebar for a selected layer
          $('#scalebar-' + layer.name).dialog({
             position: ['center', 'center'],
-            //width: width,
-            //height: height,
+            width: 310,
             resizable: false,
             autoOpen: false,
             close: function() {
                // Remove on close
                $('#scalebar-' + layer.name).remove(); 
             }
+         }).dialogExtend({
+            "help": true,
+            "minimize": true,
+            "dblclick": "collapse",
          });
          
          $('#' + layer.name + '-log').on('click', ':checkbox', function(e) {          
@@ -646,6 +659,10 @@ function showGraphCreator()
                // Remove on close
                $('#graphCreator').remove(); 
             }
+         }).dialogExtend({
+            "help": true,
+            "minimize": true,
+            "dblclick": "collapse",
          });
          
          $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')

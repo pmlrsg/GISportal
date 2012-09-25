@@ -34,7 +34,7 @@
 <script type="text/javascript" src="custom.js"></script>
 
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="js-libs/jquery/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery/jquery-1.8.2.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
 <script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>

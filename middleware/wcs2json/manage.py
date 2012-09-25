@@ -71,6 +71,7 @@ def getWcsData():
    urlParams = params.copy()
    urlParams.pop('type')
    params['url'] = createURL(urlParams)
+   print 'before type'
    
    type = params['type']
    if type == 'histogram':
@@ -81,6 +82,8 @@ def getWcsData():
       output = openNetCDF(params, raw)
    else:
       return badRequest('required parameter "type" is set to an invalid value')
+   
+   print 'before json'
    
    return jsonify(output = output)
 
@@ -97,6 +100,7 @@ def getRequiredParams():
    version = request.args.get('version', '1.0.0')
    format = 'NetCDF3'
    coverage = request.args.get('coverage', None)
+   crs = 'OGC:CRS84'
    type = request.args.get('type', None)
    return {'baseURL': baseURL, 
            'service': service, 
@@ -104,7 +108,8 @@ def getRequiredParams():
            'version': version, 
            'format': format, 
            'coverage': coverage, 
-           'type': type}
+           'type': type,
+           'crs': crs}
    
 def checkParams(params):
    
@@ -127,7 +132,7 @@ def createURL(params):
    baseURL = params.pop('baseURL')
    query = urllib.urlencode(params)
    url = baseURL + query
-   print url
+   print 'URL: ' + url
    return url
 
 def openNetCDF(params, method):
@@ -136,11 +141,18 @@ def openNetCDF(params, method):
    temp.seek(0)
    temp.write(resp.read())
    resp.close()
-   rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
-   output = method(rootgrp, params)
-   rootgrp.close()
-   temp.close()
-   return output
+   print 'before opening netcdf'
+   try:
+      rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+   except:
+      return 'failed'
+   finally:
+      print 'netcdf file open'
+      output = method(rootgrp, params)
+      print 'method run'
+      rootgrp.close()
+      temp.close()
+      return output
 
 def basic(dataset, params):
    var = np.array(dataset.variables[params['coverage']])
