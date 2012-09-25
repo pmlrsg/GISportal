@@ -276,6 +276,22 @@ function createHelpMessages()
         return 'With the scalebar you can change the range of values used.';
       },
    };
+   
+   // Bounding box selection for graphs
+   map.helperMessages['bbox'] = {
+      title: function(){
+         return 'Select a bounding box';         
+      },
+      text: function(){
+         return   'Now select a bouding box on the map using the '+
+                  '<a id="rect-bbox" href="#">rectangular bounding box drawing tool</a>.';
+      },
+      afterOpen: function(data) {
+         $('#rect-bbox').click(function() {
+            $('#box').next().effect("highlight", {}, 3000);
+         });
+      }
+   };
 }
 
 /**

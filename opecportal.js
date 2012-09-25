@@ -11,6 +11,7 @@ Helper functions
 // Predefined map coordinate systems
 /*   var googp = new OpenLayers.Projection("EPSG:900913");*/
 var lonlat = new OpenLayers.Projection("EPSG:4326");
+var CRS84 = new OpenLayers.Projection("CRS:84");
 
 // Quick regions array in the format "Name",W,S,E,N
 var quickRegion = [
@@ -856,9 +857,18 @@ function setupDrawingControls()
             $('#dispROI').append('<p>lat, lon = ' + geom.x.toFixed(3) + ', ' + geom.y.toFixed(3) + '</p>');
             break;
          case 'box':
+            var bbox = bounds;
+            bbox.transform(lonlat, CRS84);
+            // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
+            if ($('#graphcreator-bbox').size()){
+               alert('stuff');
+               $('#graphcreator-bbox').val(bbox.toBBOX());
+            }
             $('#dispROI').html('<h3>Rectangular ROI</h3>');
             $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
             $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
+            $('#dispROI').append('<p>BBOX (latlon) = ' + bounds.toBBOX() + '</p>');       
+            $('#dispROI').append('<p>BBOX (CRS84) = ' + bbox.toBBOX() + '</p>');            
             $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
             break;
          case 'circle':

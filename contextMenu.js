@@ -650,6 +650,11 @@ function showGraphCreator()
          
          $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
          
+         // When selecting the bounding box text field, request user to draw the box to populate values
+         $('#graphcreator-bbox').click(function() {
+            showMessage('bbox', null);
+         });
+         
          $('#graphcreator-generate').click(function(e) {          
             $.ajax({
                type: 'GET',
