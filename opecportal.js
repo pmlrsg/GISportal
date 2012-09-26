@@ -9,12 +9,11 @@ Helper functions
 */
 
 // Predefined map coordinate systems
-/*   var googp = new OpenLayers.Projection("EPSG:900913");*/
 var lonlat = new OpenLayers.Projection("EPSG:4326");
-var CRS84 = new OpenLayers.Projection("CRS:84");
 
 // Quick regions array in the format "Name",W,S,E,N
 var quickRegion = [
+   ["World View", -160, -90, 160, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
    ["Adriatic", 11.83, 39.00, 20.67, 45.80],
    ["Baltic", 9.00, 51.08, 30.50, 67.62],
@@ -858,17 +857,15 @@ function setupDrawingControls()
             break;
          case 'box':
             var bbox = bounds;
-            bbox.transform(lonlat, CRS84);
             // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
             if ($('#graphcreator-bbox').size()){
-               alert('stuff');
-               $('#graphcreator-bbox').val(bbox.toBBOX());
+               $('#graphcreator-bbox').val(bbox.toBBOX(4, false));
             }
             $('#dispROI').html('<h3>Rectangular ROI</h3>');
             $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
             $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
-            $('#dispROI').append('<p>BBOX (latlon) = ' + bounds.toBBOX() + '</p>');       
-            $('#dispROI').append('<p>BBOX (CRS84) = ' + bbox.toBBOX() + '</p>');            
+            $('#dispROI').append('<p>BBOX (lat,lon,lat,lon) = ' + bbox.toBBOX(4,true) + '</p>');       
+            $('#dispROI').append('<p>BBOX (lon,lat,lon,lat) = ' + bbox.toBBOX(4, false) + '</p>');            
             $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
             break;
          case 'circle':
