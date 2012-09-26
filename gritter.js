@@ -289,6 +289,7 @@ function createHelpMessages()
       afterOpen: function(data) {
          $('#rect-bbox').click(function() {
             $('#box').next().effect("highlight", {}, 3000);
+            return false;
          });
       }
    };

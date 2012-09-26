@@ -80,6 +80,8 @@ def getWcsData():
       output = openNetCDF(params, basic)
    elif type == 'raw':
       output = openNetCDF(params, raw)
+   elif type == 'test':
+      output = openNetCDF(params, test)
    else:
       return badRequest('required parameter "type" is set to an invalid value')
    
@@ -136,27 +138,28 @@ def createURL(params):
    return url
 
 def openNetCDF(params, method):
-   resp = urllib2.urlopen(params['url'])
-   temp = tempfile.NamedTemporaryFile()
-   temp.seek(0)
-   temp.write(resp.read())
-   resp.close()
-   print 'before opening netcdf'
    try:
+      resp = urllib2.urlopen(params['url'])
+      temp = tempfile.NamedTemporaryFile()
+      temp.seek(0)
+      temp.write(resp.read())
+      resp.close()
+      print 'before opening netcdf'
       rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
-   except:
-      return 'failed'
-   finally:
       print 'netcdf file open'
       output = method(rootgrp, params)
       print 'method run'
       rootgrp.close()
       temp.close()
+   except:
+      output = 'failed'
+   finally:
       return output
+
 
 def basic(dataset, params):
    var = np.array(dataset.variables[params['coverage']])
-   time = dataset.variables['time']
+   time = getTimeDimension(dataset)
    times = np.array(time)
    
    mean = getMean(var)
@@ -221,6 +224,73 @@ def getHistogram(arr):
    for i in range(len(bins)-1):
       numbers.append((bins[i] + (bins[i+1] - bins[i])/2, N[i]))
    return {'Numbers': numbers, 'Bins': bins.tolist()}
+
+@app.route('/wcs/wcs2json/dev', methods=['GET'])
+def getWcsDataDev(): 
+   params = getParams()
+   params = checkParams(params)
+   requiredParams = getRequiredParams()
+   status, resp = checkRequiredParams(requiredParams)
+   
+   if(not status):
+      return resp
+   
+   params = dict(params.items() + requiredParams.items())
+   urlParams = params.copy()
+   urlParams.pop('type')
+   params['url'] = createURL(urlParams)
+   print 'before type'
+   
+   type = params['type']
+   if type == 'histogram':
+      output = openNetCDF(params, histogram)
+   elif type == 'basic':
+      output = openNetCDF(params, basic)
+   elif type == 'raw':
+      output = openNetCDF(params, raw)
+   else:
+      return badRequest('required parameter "type" is set to an invalid value')
+   
+   print 'before json'
+   
+   return jsonify(output = output)
+
+def test(dataset, params):
+   var = np.array(dataset.variables[params['coverage']])
+   time = getTimeDimension(dataset)
+   times = np.array(time)
+   
+   mean = getMean(var)
+   median = getMedian(var)
+   std = getStd(var)
+   min = getMin(var)
+   max = getMax(var)
+   start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+   
+   output = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+   
+   for i,row in enumerate(var):
+      date = netCDF.num2date(times[i], time.units, calendar='standard')
+      mean = getMean(row)
+      median = getMedian(row)
+      std = getStd(row)
+      min = getMin(row)
+      max = getMax(row)
+      output[date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+
+
+   return output
+
+def getTimeDimension(dataset):
+   for i, key in enumerate(dataset.variables):
+      var = dataset.variables[key]
+      print "========== key:" + key + " ==========="
+      for name in var.ncattrs():
+         print name
+         if name == "_CoordinateAxisType" and var._CoordinateAxisType == 'Time':
+            return var
+   
+   return None
 
 @app.errorhandler(400)
 def badRequest(error):
