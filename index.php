@@ -58,7 +58,7 @@
 <script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
 
 <!-- https://github.com/jboesch/Gritter -->
-<script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.js"></script>
 
 <!-- https://github.com/michael/multiselect -->
 <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>

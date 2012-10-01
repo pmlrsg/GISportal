@@ -187,8 +187,8 @@
 				"position" : ( $.browser.mise && parseInt($.browser.version) <= 6 ) ? "absolute" : "fixed",
 				"bottom" : 1,
 				"left" : 1,
-				"z-index" : 9999
-				// TODO add width here.
+				"z-index" : 9999,
+				"width" : 1, // TODO add width here.
 			});
 			// start!
 			$(self)
@@ -605,7 +605,7 @@
 				$(self)
 					.data("original-config-resizable", $(self).dialog("option", "resizable"))
 					.data("original-config-draggable", $(self).dialog("option", "draggable"))
-					.data("original-size-height", $(self).dialog("widget").height())
+					.data("original-size-height", $(self).dialog("option", "height"))
 					.data("original-size-width", $(self).dialog("option", "width"))
 					.data("original-size-maxHeight", $(self).dialog("option", "maxHeight"))
 					.data("original-position-mode", $(self).dialog("widget").css("position"))

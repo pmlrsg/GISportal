@@ -200,7 +200,7 @@ function showScalebar($trigger) {
                   '<label for="' + layer.name + '-max" title="The maximum value to be used">Maximum Value: </label>' +
                '</div>' +
                '<div>' +
-                  '<input id="' + layer.name + '-max" type="text" name="' + layer.name + '-max"/>' +
+                  '<input id="' + layer.name + '-max" type="text" name="' + layer.name + '-max" />' +
                '</div>' +
                '<div id="' + layer.name + '-scale">' +
                   '<input type="button" name="' + layer.name + '-scale-button" value="Recalculate Scale" />' +
@@ -442,6 +442,12 @@ function createGetLegendURL(layer, hasBase)
       return layer.url + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
 }
 
+/**
+ * Calculates a scale range based on the provided values.
+ * @param {Float} min - The lower end of the scale.
+ * @param {Float} max - The higher end of the scale.
+ * @return {Object} Returns two values min and max in an object.
+ */
 function getScaleRange(min, max)
 {
    return {
@@ -450,7 +456,13 @@ function getScaleRange(min, max)
    };
 }
 
-// Validates the entries for the scale bar
+/**
+ * Validates the entries for the scale bar
+ * @param {Object} layer - The layer who's scalebar you wish to validate
+ * @param {Float} newMin - The new minimum value to be used for the scale
+ * @param {Float} newMax - The new maximum value to be used for the scale
+ * @param {Boolean} reset - Resets the scale if true
+ */ 
 function validateScale(layer, newMin, newMax, reset)
 {  
    if(newMin == null || typeof newMin === undefined)
@@ -599,6 +611,9 @@ function createGraphs()
    };
 }
 
+/**
+ * Creates and shows the graph creator dialog box
+ */
 function showGraphCreator()
 {
    return {
@@ -611,44 +626,75 @@ function showGraphCreator()
          // Add the html to the document
          $(document.body).append(
             '<div id="graphCreator" class="unselectable" title="Graph Creator">' +
-               '<div>' +
-                  '<label for="graphcreator-baseurl-label" title="BaseUrl">BaseUrl:</label>' +
+               '<div class="ui-control">' +
+                  '<h3 id="basic-inputs-header" class="ui-control-header ui-helper-reset">' +
+                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
+                     '<a href="#">Basic Inputs</a>' + 
+                  '</h3>' +
+                  '<div id="basic-inputs">' +
+                     '<div>' +
+                        '<label for="graphcreator-baseurl-label" title="BaseUrl">BaseUrl:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-baseurl" type="text" name="graphcreator-path"/>' +
+                     '</div>' +
+                     '<div>' +
+                        '<label for="graphcreator-coverage-label" title="Coverage">Coverage:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-coverage" type="text" name="graphcreator-coverage"/>' +
+                        '<input id="graphcreator-coverage-button" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />' +
+                     '</div>' +
+                     '<div>' +
+                        '<label for="graphcreator-type-label" title="Type">Type:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<select id="graphcreator-type" name="graphcreator-type">' +
+                           '<option value="basic">basic</option>' +
+                           '<option value="histogram">histogram</option>' +
+                           '<option value="raw">raw (Not Working)</option>' +
+                           '<option value="test">test</option>' +
+                        '</select>' +
+                        //'<input id="graphcreator-type" type="text" name="graphcreator-type"/>' +
+                     '</div>' +
+                  '</div>' +
                '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-baseurl" type="text" name="graphcreator-path"/>' +
+               '<div class="ui-control">' +
+                  '<h3 id="histogram-inputs-header" class="ui-control-header ui-helper-reset">' +
+                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
+                     '<a href="#">Histogram Inputs</a>' + 
+                  '</h3>' +
+                  '<div id="histogram-inputs">' +
+                     '<div>' +
+                        '<label for="graphcreator-bins-label" title="Bins">Bins:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-bins" type="text" name="graphcreator-bins"/>' +
+                     '</div>' +
+                  '</div>' +
                '</div>' +
-               '<div>' +
-                  '<label for="graphcreator-coverage-label" title="Coverage">Coverage:</label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-coverage" type="text" name="graphcreator-coverage"/>' +
-               '</div>' +
-               '<div>' +
-                  '<label for="graphcreator-type-label" title="Type">Type:</label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-type" type="text" name="graphcreator-type"/>' +
-               '</div>' +
-               '<div>' +
-                  '<label for="graphcreator-bins-label" title="Bins">Bins:</label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-bins" type="text" name="graphcreator-bins"/>' +
-               '</div>' +
-               '<div>' +
-                  '<label for="graphcreator-time-label" title="Time">Time:</label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-time" type="text" name="graphcreator-time"/>' +
-               '</div>' +
-               '<div>' +
-                  '<label for="graphcreator-bbox-label" title="Bbox">Bbox:</label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="graphcreator-bbox" type="text" name="graphcreator-bbox"/>' +
-               '</div>' +
-               '<div id="graphcreator-generate">' +
-                  '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+               '<div class="ui-control">' +
+                  '<h3 id="advanced-inputs-header" class="ui-control-header ui-helper-reset">' +
+                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
+                     '<a href="#">Advanced Inputs</a>' + 
+                  '</h3>' +
+                  '<div id="advanced-inputs">' +
+                     '<div>' +
+                        '<label for="graphcreator-time-label" title="Time">Time:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-time" type="text" name="graphcreator-time"/>' +
+                     '</div>' +
+                     '<div>' +
+                        '<label for="graphcreator-bbox-label" title="Bbox">Bbox:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-bbox" type="text" name="graphcreator-bbox"/>' +
+                     '</div>' +
+                  '</div>' +
+                  '<div id="graphcreator-generate">' +
+                     '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+                  '</div>' +
                '</div>' +
             '</div>'
          );
@@ -677,6 +723,30 @@ function showGraphCreator()
             showMessage('bbox', null);
          });
          
+         // Event to open and close the panels when clicked
+         $('.ui-control-header').click(function() {
+            $(this)
+               .toggleClass("ui-control-header-active")
+               .find("> .ui-icon").toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
+               .next().toggleClass("ui-control-content-active").slideToggle();
+            return false;
+         });
+         
+         // Gets the top layer that's checkbox is checked and puts it's ID into the coverage box
+         $('#graphcreator-coverage-button').click(function() {
+            $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
+               if($(this).is(':checked')) {
+                  $('#graphcreator-coverage').val($(this).parent('li').attr('id'));
+               }
+            });
+   
+            return false;
+         });
+         
+         // Close histogram and advanced panels
+         $('#histogram-inputs-header').trigger('click');
+         $('#advanced-inputs-header').trigger('click');
+         
          // Create and display the graph
          $('#graphcreator-generate').click(function(e) {          
             $.ajax({
@@ -687,7 +757,8 @@ function showGraphCreator()
                dataType: 'json',
                asyc: true,
                success: function(data) {
-                  if($('#graphcreator-type').val() == 'basic')
+                  console.log(data.output);
+                  if(data.type == 'basic')
                   {                                    
                      var start = new Date(data.output.time).getTime(),
                         d1 = [],
@@ -704,20 +775,26 @@ function showGraphCreator()
                         d5.push([new Date(i).getTime(), value.mean]);
                      });
                      
+                     /*
                      var options = {
                         xaxis: { min: 0, max: d1.length + 1 },
                         yaxis: { min: data.output.min, max: data.output.max },
                         title: 'Example Graph',
-                        mouse : {
-                          track           : true, // Enable mouse tracking
-                          lineColor       : 'purple',
-                          relative        : true,
-                          position        : 'ne',
-                          sensibility     : 1,
-                          trackDecimals   : 2,
-                          trackFormatter  : function (o) { return 'x = ' + o.x +', y = ' + o.y; }
+                        mouse: {
+                          track: true, // Enable mouse tracking
+                          lineColor: 'purple',
+                          relative: true,
+                          position: 'ne',
+                          sensibility: 1,
+                          trackDecimals: 2,
+                          trackFormatter: function (o) { return 'x = ' + o.x +', y = ' + o.y; }
                         },
-                     };
+                        legend: {
+                           position: 'se', // Position the legend 'south-east'.
+                           backgroundColor: '#D2E8FF', // A light blue background color.
+                        },
+                        HtmlText : false
+                     };*/
                      
                      var graphData = {
                         id: 'wcsgraph' + Date.now(),
@@ -725,33 +802,38 @@ function showGraphCreator()
                         data: [{
                            data: d1.sort(),
                            lines: { show: true },
-                           points: { show: true }
+                           points: { show: true },
+                           label: 'STD',
                         },
                         {
                            data: d2.sort(),
                            lines: { show: true },
-                           points: { show: true }
+                           points: { show: true },
+                           label: 'max',
                         },
                         {
                            data: d3.sort(),
                            lines: { show: true },
-                           points: { show: true }
+                           points: { show: true },
+                           label: 'min',
                         },
                         {
                            data: d4.sort(),
                            lines: { show: true },
-                           points: { show: true }
+                           points: { show: true },
+                           label: 'median',
                         },
                         {
                            data: d5.sort(),
                            lines: { show: true },
-                           points: { show: true }
+                           points: { show: true },
+                           label: 'mean',
                         }],
                         options: basicTimeOptions(),
                         selectable: true
                      };
                   }
-                  else if ($('#graphcreator-type').val() == 'histogram')
+                  else if(data.type == 'histogram')
                   {
                      var num = data.output.histogram.Numbers
                   

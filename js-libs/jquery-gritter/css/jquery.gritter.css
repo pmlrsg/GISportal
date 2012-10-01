@@ -47,7 +47,7 @@
 	background:url(../images/gritter.png) no-repeat left -40px;
 	color:#eee;
 	padding:2px 11px 8px 11px;
-	font-size: 11px;
+	font-size: 13px;
 	font-family:verdana;
 }
 .hover .gritter-item {
@@ -62,14 +62,14 @@
 	display:none;
 	position:absolute;
 	top:5px;
-	left:3px;
+	right:3px;
 	background:url(../images/gritter.png) no-repeat left top;
 	cursor:pointer;
 	width:30px;
 	height:30px;
 }
 .gritter-title {
-	font-size:14px;
+	font-size:16px;
 	font-weight:bold;
 	padding:0 0 7px 0;
 	display:block;

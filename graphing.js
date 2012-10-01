@@ -184,12 +184,12 @@ function barOptions()
          show: true,
          horizontal: false,
          shadowsize: 0,
-         barwidth: 25
+         barwidth: 0.5
       },
       title: 'Example Graph',
       yaxis: {
          min: 0,
-         autoscaleMargin: 1
+         //autoscaleMargin: 1
       }
    };
 }
@@ -212,6 +212,10 @@ function basicTimeOptions()
       },
       selection: {
          mode: 'x'
+      },
+      legend: {
+         position: 'se', // Position the legend 'south-east'.
+         backgroundColor: '#D2E8FF', // A light blue background color.
       },
       HtmlText: false,
       title: 'Time'

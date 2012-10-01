@@ -502,6 +502,28 @@ div .sensor-accordion {
    width: 300px;
 }
 
+.ui-control {
+   width: 100%;
+   padding-bottom: 5px;
+}
+
+.ui-control .ui-control-header {
+   padding-bottom: 5px;
+}
+
+.ui-control .ui-control-header a {
+   padding-left: 0.8em;
+   text-decoration: none;
+   padding-bottom: 5px;
+}
+
+.ui-control .ui-control-header .ui-icon {
+   position: absolute;
+   left: .5em; 
+   /*top: 50%; */
+   /*margin-top: -8px; */
+}
+
 /* ===== Dummy Help Layer ===== */
 
 #Need-Help {

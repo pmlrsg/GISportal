@@ -42,25 +42,24 @@
 				console.error(err, params) : 
 				alert(err);
 				
-		}
-		
+		}	
 	}
 	
-	/**
-	* Remove a gritter notification from the screen
-	* @see Gritter#removeSpecific();
-	*/
-	$.gritter.remove = function(id, params){
-		Gritter.removeSpecific(id, params || {});
-	}
+   /**
+   * Remove a gritter notification from the screen
+   * @see Gritter#removeSpecific();
+   */
+   $.gritter.remove = function(group, params) {
+   	Gritter.removeSpecific(group, params || {});
+   }
 	
-	/**
-	* Remove all notifications
-	* @see Gritter#stop();
-	*/
-	$.gritter.removeAll = function(params){
-		Gritter.stop(params || {});
-	}
+   /**
+   * Remove all notifications
+   * @see Gritter#stop();
+   */
+   $.gritter.removeAll = function(params){
+   	Gritter.stop(params || {});
+   }
 	
 	/**
 	* Big fat Gritter object
@@ -76,6 +75,7 @@
 		
 		// Private - no touchy the private parts
 		_custom_timer: 0,
+		_groups: [],
 		_item_count: 0,
 		_is_setup: 0,
 		_tpl_close: '<div class="gritter-close"></div>',
@@ -114,6 +114,19 @@
 				time_alive = params.time || '';
 
 			this._verifyWrapper();
+			
+			if(!this._groups[params.group]) {
+			   this._groups[params.group] = {};
+			   this._groups[params.group].count = 1;
+			   this._groups[params.group].uid = []
+			}
+			else
+			   this._groups[params.group].count++;
+			   
+         if(this._groups[params.group].count > params.max) {
+            this._groups[params.group].count--;
+            return null;
+         }
 			
 			this._item_count++;
 			var number = this._item_count, 
@@ -181,10 +194,12 @@
 			
 			// Clicking (X) makes the perdy thing close
 			$(item).find('.gritter-close').click(function(){
-				Gritter.removeSpecific(number, {}, null, true);
+				Gritter.removeSpecific(params.group, {}, null, true);
 			});
 			
-			return number;
+			this._groups[params.group].uid.push(number);
+			
+			return params.group;
 		
 		},
 		
@@ -286,7 +301,10 @@
 		* @param {Object} e The jQuery element that we're "fading" then removing
 		* @param {Boolean} unbind_events If we clicked on the (X) we set this to true to unbind mouseenter/mouseleave
 		*/
-		removeSpecific: function(unique_id, params, e, unbind_events){
+		removeSpecific: function(group, params, e, unbind_events){
+			
+			unique_id = this._groups[group].uid.shift();
+         this._groups[group].count--;
 			
 			if(!e){
 				var e = $('#gritter-item-' + unique_id);
@@ -309,6 +327,8 @@
 			clearTimeout(this['_int_id_' + unique_id]);
 			e.stop().css({ opacity: '', height: '' });
 			
+			//this._groups[group].uid.push(unique_id);
+         //this._groups[group].count++;			
 		},
 		
 		/**

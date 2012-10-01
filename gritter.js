@@ -154,6 +154,7 @@ function createHelpMessages()
             return false;
          });
       },
+      max: 1,
    };
    
    // Date Tutorial
@@ -189,6 +190,7 @@ function createHelpMessages()
             }
          );
       },
+      max: 1,
    };
 
    // To be Continued
@@ -199,6 +201,7 @@ function createHelpMessages()
       text: function() {
          return 'To be continued';
       },
+      max: 1,
    };
 
    // No date selected on date picker
@@ -226,6 +229,7 @@ function createHelpMessages()
             }
          );
       },
+      max: 1,
    };
 
    // The selected date is not supported by this layer
@@ -239,6 +243,7 @@ function createHelpMessages()
             data.layer.firstDate + ' and ' + data.layer.lastDate + '.' +
             ' Try selecting another date that all layers share.';
       },
+      max: 3,
    };
    
    // Layer Selector Tutorial
@@ -264,7 +269,8 @@ function createHelpMessages()
          $('#help-availableLayers').click(function() {
             $('#layers .available').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
          });
-      }
+      },
+      max: 1,
    };
    
    // Scalebar Tutorial
@@ -275,6 +281,7 @@ function createHelpMessages()
       text: function() {
         return 'With the scalebar you can change the range of values used.';
       },
+      max: 1,
    };
    
    // Bounding box selection for graphs
@@ -291,7 +298,8 @@ function createHelpMessages()
             $('#box').next().effect("highlight", {}, 3000);
             return false;
          });
-      }
+      },
+      max: 1,
    };
 }
 
@@ -301,25 +309,31 @@ function createHelpMessages()
  * @param {Object} messageName - The message object to use for the message.
  * @param {Object} data - Any data needed for the message.
  * 
- * @return {int} Returns the unique ID of the message created. 
+ * @return {Int} Returns the unique ID of the message created. 
  */
 function showMessage(messageName, data)
 {
    var uid;
    
    var message = map.helperMessages[messageName];
+   // Check for a title
    if(typeof(message.title) == 'undefined')
       message.title = function() {
-         return 'No' + type + 'Message Found';
+         return 'Sorry, No Help Message Found';
       };
-
+   // Check for some text
    if(typeof(message.text) == 'undefined')
       message.text = function() {
          return 'Sorry, we could not find a help message for your problem. Please refer to any help documentation you have.'; 
       };
+   // Check for an afterOpen method
    if(typeof(message.afterOpen) == 'undefined')
       message.afterOpen = function() {};
+      
+   if(typeof(message.max) == 'undefined')
+      message.max = 1;
 
+   // Add the gritter message
    uid = $.gritter.add({
       title: message.title(data),
       text: message.text(data),
@@ -329,6 +343,8 @@ function showMessage(messageName, data)
       //image: 'img/OpEc_small.png',
       class_name: 'gritter-light',
       sticky: true, 
+      group: messageName,
+      max: message.max,
    });
    
    return uid;
@@ -337,7 +353,7 @@ function showMessage(messageName, data)
 /**
  * Removes the message found from the unique ID.
  * 
- * @param {Object} uid - The unique ID of the message to remove.
+ * @param {String} messageName - The messageName of the message type to remove.
  */
 function removeMessage(uid)
 {

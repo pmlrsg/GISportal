@@ -25,11 +25,12 @@ var quickRegion = [
    ["Western Med.", -6.00, 30.80, 16.50, 48.10],
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]  
 ];
- // Define a proxy for the map to allow async javascript http protocol requests
- // This will always need changing when swapping between Windows and Linux
- //OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";   // Windows only using ASP.NET (C#) handler
- OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
- //OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
+
+// Define a proxy for the map to allow async javascript http protocol requests
+// This will always need changing when swapping between Windows and Linux
+//OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";   // Windows only using ASP.NET (C#) handler
+OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
+//OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
 /*====================================================================================*/
 
 /**

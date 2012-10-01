@@ -4,7 +4,7 @@ import tempfile
 import numpy as np
 import netCDF4 as netCDF
 
-from flask import Flask, request, jsonify
+from flask import Flask, abort, request, jsonify, make_response
 
 app = Flask(__name__)
 
@@ -83,11 +83,11 @@ def getWcsData():
    elif type == 'test':
       output = openNetCDF(params, test)
    else:
-      return badRequest('required parameter "type" is set to an invalid value')
+      return abort(400)
    
    print 'before json'
    
-   return jsonify(output = output)
+   return jsonify(output = output, type = params['type'])
 
 def getParams():
    time = request.args.get('time', None)
@@ -96,14 +96,14 @@ def getParams():
            'bbox': bbox}
 
 def getRequiredParams():
-   baseURL = request.args.get('baseurl', None)
+   baseURL = request.args.get('baseurl')
    service = 'WCS'
    requestType = 'GetCoverage'
    version = request.args.get('version', '1.0.0')
    format = 'NetCDF3'
-   coverage = request.args.get('coverage', None)
+   coverage = request.args.get('coverage')
    crs = 'OGC:CRS84'
-   type = request.args.get('type', None)
+   type = request.args.get('type')
    return {'baseURL': baseURL, 
            'service': service, 
            'request': requestType, 
@@ -126,7 +126,7 @@ def checkParams(params):
 def checkRequiredParams(params):
    for key in params.iterkeys():
       if params[key] == None:
-         return False, badRequest('required parameter "%s" is missing or is not set to a invalid value' % key)
+         return False, badRequest('required parameter "%s" is missing or is set to an invalid value' % key)
       
    return True, None
 
@@ -135,27 +135,28 @@ def createURL(params):
    query = urllib.urlencode(params)
    url = baseURL + query
    print 'URL: ' + url
+   if "wcs/wcs2json" in baseURL:
+      return 'Error: possible infinite recursion detected, cancelled request'
    return url
 
-def openNetCDF(params, method):
+def openNetCDF(params, method):   
    try:
-      resp = urllib2.urlopen(params['url'])
-      temp = tempfile.NamedTemporaryFile()
-      temp.seek(0)
-      temp.write(resp.read())
-      resp.close()
-      print 'before opening netcdf'
-      rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
-      print 'netcdf file open'
-      output = method(rootgrp, params)
-      print 'method run'
-      rootgrp.close()
-      temp.close()
+     resp = urllib2.urlopen(params['url'])
+     temp = tempfile.NamedTemporaryFile()
+     temp.seek(0)
+     temp.write(resp.read())
+     resp.close()
+     print 'before opening netcdf'
+     rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+     print 'netcdf file open'
+     output = method(rootgrp, params)
+     print 'method run'
+     rootgrp.close()
+     temp.close()
    except:
-      output = 'failed'
+     output = 'OpenNetCDF failed'
    finally:
-      return output
-
+     return output
 
 def basic(dataset, params):
    var = np.array(dataset.variables[params['coverage']])
@@ -211,16 +212,26 @@ def getMax(arr):
 
 def getHistogram(arr):
    bins = request.args.get('bins', None)
-   if bins == None:
-      return 'Error: missing bins param'
+   numbers = []
+   print 'before bins'
+   
+   if bins == None or not bins:
+      #max = getMax(arr)
+      #min = getMin(arr)
+      #bins = arange(min, max, 10)
+      print 'bins generated'
+      N,bins = np.histogram(arr, bins=10)
+      
    else:
       values = bins.split(',')
       for i,v in enumerate(values):
          values[i] = float(values[i])
       bins = np.array(values)
+      print 'bins converted'
+      N,bins = np.histogram(arr, bins)
+      
    
-   numbers = []
-   N,bins = np.histogram(arr, bins)
+   print 'histogram created'  
    for i in range(len(bins)-1):
       numbers.append((bins[i] + (bins[i+1] - bins[i])/2, N[i]))
    return {'Numbers': numbers, 'Bins': bins.tolist()}
@@ -294,11 +305,9 @@ def getTimeDimension(dataset):
 
 @app.errorhandler(400)
 def badRequest(error):
-   return error, 400
-
-#def close_netcdf(dataset):
-#   from netCDF4 import Dataset
-#   dataset.close()
+   resp = make_response(error, 400)
+   resp.headers['MESSAGE'] = error
+   return resp
 
 if __name__ == '__main__':
-   app.run(debug=True, host='0.0.0.0')
+   app.run(debug = True, host = '0.0.0.0')
