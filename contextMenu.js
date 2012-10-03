@@ -751,7 +751,7 @@ function showGraphCreator()
          $('#graphcreator-generate').click(function(e) {          
             $.ajax({
                type: 'GET',
-               url: OpenLayers.ProxyHost + 'http://pmpc1313.npm.ac.uk:5000/wcs/wcs2json?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
+               url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
                   '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
                   '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val()),
                dataType: 'json',

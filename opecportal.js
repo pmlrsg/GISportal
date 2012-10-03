@@ -13,11 +13,11 @@ var lonlat = new OpenLayers.Projection("EPSG:4326");
 
 // Quick regions array in the format "Name",W,S,E,N
 var quickRegion = [
-   ["World View", -160, -90, 160, 90],
+   ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
    ["Adriatic", 11.83, 39.00, 20.67, 45.80],
    ["Baltic", 9.00, 51.08, 30.50, 67.62],
-   ["Biscay", -7.10, 44.00, -0.60, 49.00],
+   ["Biscay", -10, 43.00, 0, 49.00],
    ["Black Sea", 27.30, 38.50, 42.00, 49.80],
    ["English Channel", -5.00, 46.67, 4.30, 53.83],
    ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
@@ -28,9 +28,8 @@ var quickRegion = [
 
 // Define a proxy for the map to allow async javascript http protocol requests
 // This will always need changing when swapping between Windows and Linux
-//OpenLayers.ProxyHost = "xDomainProxy.ashx?url=";   // Windows only using ASP.NET (C#) handler
-OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
-//OpenLayers.ProxyHost = '/cgi-bin/proxy.cgi?url=';   // Linux using OpenLayers proxy
+// OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
+OpenLayers.ProxyHost = './middleware/proxy.py?url=';   // Linux using OpenLayers proxy
 /*====================================================================================*/
 
 /**
@@ -662,6 +661,7 @@ function nonLayerDependent()
        }
    });
 
+
    // Populate Quick Regions from the quickRegions array
    for(i = 0; i < quickRegion.length; i++) {
        $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
@@ -775,9 +775,9 @@ function nonLayerDependent()
    $('#baseLayer').change(function(e) {
        map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
    });
-
-   // Change of quick region event handler
-   $('#quickRegion').change(function(e) {
+   
+   // Change of quick region event handler - happens even if the selection isn't changed
+   $('#quickRegion option').click(function(e) {
        var qr_id = $('#quickRegion').val();
        var bbox = new OpenLayers.Bounds(
                    quickRegion[qr_id][1],

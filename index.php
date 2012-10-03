@@ -244,8 +244,8 @@
          <li class="divider"></li>
          <li>
             <fieldset>
-               <legend>Quick Region</legend>
-               <select id="quickRegion" name="Quick Region">
+               <legend class="ui-widget-header">Quick Region</legend>
+               <select class="ui-corner-all" id="quickRegion" name="Quick Region">
                </select>
             </fieldset>
          </li>
