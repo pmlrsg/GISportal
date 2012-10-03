@@ -15,7 +15,9 @@ import sys, os
 
 # Designed to prevent Open Proxy type stuff - white list of allowed hostnames
 allowedHosts = ['localhost','localhost:8080',
-                '127.0.0.1','127.0.0.1:8080',
+                '127.0.0.1','127.0.0.1:8080','127.0.0.1:5000',
+                'pmpc1313.npm.ac.uk','pmpc1313.npm.ac.uk:8080','pmpc1313.npm.ac.uk:5000',
+                'fedora-mja.npm.ac.uk:5000','fedora-mja:5000'
                 'earthserver.pml.ac.uk','earthserver.pml.ac.uk:8080',
                 'vostok.pml.ac.uk','vostok.pml.ac.uk:8080',
                 'rsg.pml.ac.uk','rsg.pml.ac.uk:8080',

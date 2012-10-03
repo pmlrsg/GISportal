@@ -564,7 +564,7 @@ function createGraphs()
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + 'http://127.0.0.1:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
+            url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
             dataType: 'json',
             asyc: true,
             success: function(data) {
@@ -587,7 +587,7 @@ function createGraphs()
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + 'http://127.0.0.1:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
+            url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
             dataType: 'json',
             asyc: true,
             success: function(data) {
