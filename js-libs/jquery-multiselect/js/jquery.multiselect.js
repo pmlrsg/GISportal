@@ -27,7 +27,7 @@
 var defaultItemParser = function(item) {
    return option = {
       text: item.text,
-      selected: item.selected,
+      selected: item.selected(item.text),
       title: item.title ? item.title : item.text,
    };
 };
@@ -389,6 +389,12 @@ $.widget("ui.multiselect", {
             list.data('multiselect.cache')[item.data('multiselect.itemLink').text] = item;
 
             that._insertToList(item, list);
+            
+               
+            if (this.selected) {
+               var optionLink = item.data('multiselect.itemLink');
+               that._trigger('selected', null, that._ui('selection', optionLink));
+            };
          }));
 
          // update count

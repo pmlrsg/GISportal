@@ -35,6 +35,12 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
 
 /* Extend existing OpenLayers.Map and OpenLayers.Layer objects */
 
+// Flask host
+OpenLayers.Map.prototype.host = "http://pmpc1313.npm.ac.uk";
+
+// A list of layer names that will be selected by default
+OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind"];
+
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
 OpenLayers.Map.prototype.enabledDays = [];
@@ -237,7 +243,14 @@ OpenLayers.Map.prototype.getMasterCache = function() {
       asyc: true,
       success: layerDependent,
       error: function(request, errorType, exception) {
-         gritterErrorHandler(null, 'master cache', request, errorType, exception);
+         var data = {
+            type: 'master cache',
+            request: request,
+            errorType: errorType,
+            exception: exception,
+            url: this.url,
+         };          
+         gritterErrorHandler(data);
       }
    });
 }
@@ -265,7 +278,14 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
          //console.log("Added Layer");
       },
       error: function(request, errorType, exception) {
-         gritterErrorHandler(null, 'layer cache', request, errorType, exception);
+         var data = {
+            type: 'layer cache',
+            request: request,
+            errorType: errorType,
+            exception: exception,
+            url: this.url,
+         };          
+         gritterErrorHandler(data);
       }
    });
 }
@@ -297,7 +317,18 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
          layer.maxScaleVal = layer.origMaxScaleVal;
          layer.log = false;
          
-         gritterErrorHandler(null, 'layer MetaData', request, errorType, exception);
+         var data = {
+            type: 'layer MetaData',
+            request: request,
+            errorType: errorType,
+            exception: exception,
+            url: this.url,
+         };          
+         gritterErrorHandler(data);
       }
    });
+}
+
+OpenLayers.Map.prototype.isSelected = function(name) {
+   return $.inArray(name, map.sampleLayers) > -1 ? true : false;
 }

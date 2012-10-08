@@ -29,7 +29,7 @@ var quickRegion = [
 // Define a proxy for the map to allow async javascript http protocol requests
 // This will always need changing when swapping between Windows and Linux
 // OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
-OpenLayers.ProxyHost = './middleware/proxy.py?url=';   // Linux using OpenLayers proxy
+OpenLayers.ProxyHost = '/service/proxy?url=';   // Linux using OpenLayers proxy
 /*====================================================================================*/
 
 /**
@@ -85,7 +85,6 @@ function createRefLayers()
          context: {
             colour: function(feature) {
                switch(feature.layer.displayTitle) {
-
                   case 'AMT12 Cruise Track':
                     return 'blue';
                     break;
@@ -167,21 +166,15 @@ function createOpLayers()
    {
       var url = item.url;
       var serverName = item.serverName;
-      $.each(item.server, function(i, item) 
-      {
-         // Add accordion for each sensor with layers
-         if(item.length)
-         {
-            var sensorName = i;
-            // Create the accordion for the sensor
-            //addAccordionToPanel(sensorName);
-
+      $.each(item.server, function(index, item) {
+         if(item.length) {
+            var sensorName = index;
             // Go through each layer and load it
             $.each(item, function(i, item) {
                if(item.Name && item.Name != "") {
                   var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, url, sensorName, item.EX_GeographicBoundingBox);           
                   map.microLayers[microLayer.name] = microLayer;               
-                  $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: false});                
+                  $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
                }
             });
          }
@@ -204,7 +197,7 @@ function createOpLayer(layerData, sensorName, url)
    // Get the time dimension if this is a temporal layer
    $.each(layerData.Dimensions, function(index, value) {
       var dimension = value;
-      if (value.Name.toLowerCase() == 'time'){
+      if (value.Name.toLowerCase() == 'time') {
          layer.temporal = true;
          datetimes = dimension.Value.split(',');
          layer.DTCache = datetimes;
@@ -237,8 +230,7 @@ function addOpLayer(layerName)
    // Get layer from layerStore
    var layer = map.layerStore[layerName];
 
-   if (typeof layer === 'undefined' || layer == 'null')
-   {
+   if (typeof layer === 'undefined' || layer == 'null') {
       // Error: Could not get a layer object
       console.log("Error: Could not get a layer object");
       return;
@@ -249,9 +241,8 @@ function addOpLayer(layerName)
 
    // Check if an accordion is there for us
    if(!$('#' + layer.displaySensorName).length)
-   {
       addAccordionToPanel(layer.sensorName, layer.displaySensorName);
-   }
+   
    // Add the layer to the map
    map.addLayer(layer);
 
@@ -273,9 +264,7 @@ function removeOpLayer(layer)
    
    // Check if we were the last layer
    if($('#' + layer.displaySensorName).children('li').length == 0)
-   {
       removeAccordionFromPanel(layer.displaySensorName);
-   }
 
    // Remove the layer from the map
    map.removeLayer(layer);
@@ -305,8 +294,8 @@ function addAccordionToPanel(id, displayName)
       active: 0,
       click: function(e) {
          var parent = $(this).parent('div');
-         if(parent.hasClass('test')) {
-            parent.removeClass('test');
+         if(parent.hasClass('sort-start')) {
+            parent.removeClass('sort-start');
             return false;
          }
       },
@@ -317,8 +306,7 @@ function addAccordionToPanel(id, displayName)
       connectWith: ".sensor-accordion",
       appendTo:".sensor-accordion",
       helper:"clone",
-      update: function() 
-      {
+      update: function() {
          updateLayerOrder($(this));
       }
    }).disableSelection();
@@ -329,9 +317,7 @@ function addAccordionToPanel(id, displayName)
  */
 function removeAccordionFromPanel(id)
 {
-
-   if($('#' + id).length)
-   {        
+   if($('#' + id).length) {        
       // Remove the accordion we were asked to remove
       $('#' + id).parent('div').remove();
    }
@@ -510,9 +496,8 @@ function mapInit()
    //var permalink =  new OpenLayers.Control.Permalink();
    //map.addControls([mousePos,permalink]);
 
-   if(!map.getCenter()) {
+   if(!map.getCenter())
       map.zoomTo(3);
-   }
 }
 
 /**
@@ -535,8 +520,7 @@ function layerDependent(data)
 function nonLayerDependent()
 {
    // Keeps the vectorLayers at the top of the map
-   map.events.register("addlayer", map, function() 
-   { 
+   map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
       var refLayers = map.getLayersBy('controlID', 'refLayers');
       var poiLayers = map.getLayersBy('controlID', 'poiLayer');
@@ -566,18 +550,14 @@ function nonLayerDependent()
    $('#opLayers').sortable({
       axis: 'y',
       handle: 'h3',
-      update: function() 
-      {
+      update: function() {
          updateAccordionOrder();
       },
    })
    .disableSelection()
    .bind('sortstart', function(e, ui) {
-      $(this).addClass('test');
+      $(this).addClass('sort-start');
    });
-   //.bind('sortstop', function(e, ui) {
-   //   $(this).removeClass('test');
-   //});
 
    // Makes each of the reference layers sortable
    $("#refLayers").sortable({
@@ -640,13 +620,13 @@ function nonLayerDependent()
          layer.setVisibility(false);
          checkLayerState(layer);
          // Update map date cache now a new temporal layer has been removed
-         if(layer.temporal){map.refreshDateCache();}
+         if(layer.temporal)
+            map.refreshDateCache();
       }
    });
 
    // Update our latlng on the mousemove event
-   map.events.register("mousemove", map, function(e) 
-   { 
+   map.events.register("mousemove", map, function(e) { 
       var position =  map.getLonLatFromPixel(e.xy);
       if(position)
          $('#latlng').text('Mouse Position: ' + position.lon.toFixed(3) + ', ' + position.lat.toFixed(3));
@@ -660,7 +640,6 @@ function nonLayerDependent()
            $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
        }
    });
-
 
    // Populate Quick Regions from the quickRegions array
    for(i = 0; i < quickRegion.length; i++) {
@@ -703,6 +682,7 @@ function nonLayerDependent()
       $(this).toggleClass("active");
       return false;
    });
+   
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
       $(".rPanel").toggle("fast");
@@ -746,7 +726,7 @@ function nonLayerDependent()
         $('#info').dialog('open');
       }
       return false;
-   })
+   });
 
    // Add toggle map info dialog functionality
    $('#mapInfoToggleBtn').click(function(e) {
@@ -757,7 +737,7 @@ function nonLayerDependent()
         $('#mapInfo').dialog('open');
       }
       return false;
-   })
+   });
    
    // Add toggle map info dialog functionality
    $('#layerPreloader').click(function(e) {
@@ -768,7 +748,7 @@ function nonLayerDependent()
         $('#layerSelection').dialog('open');
       }
       return false;
-   })
+   });
 
 
    // Change of base layer event handler
@@ -837,7 +817,7 @@ function setupDrawingControls()
       var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
       
       // Get some values for non-point ROIs
-      if(map.ROI_Type != '' && map.ROI_Type != 'point'){
+      if(map.ROI_Type != '' && map.ROI_Type != 'point') {
          area_deg = geom.getArea();
          area_km = (geom.getGeodesicArea()*1e-6);
          height_deg = bounds.getHeight();
@@ -849,7 +829,7 @@ function setupDrawingControls()
          height_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(ctrLon,bounds.top),new OpenLayers.LonLat(ctrLon,bounds.bottom));
          width_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(bounds.left,ctrLat),new OpenLayers.LonLat(bounds.right,ctrLat));
          radius_deg = ((bounds.getWidth() + bounds.getHeight())/4);
-      }
+      };
         
       switch(map.ROI_Type) {
          case 'point':
@@ -882,8 +862,8 @@ function setupDrawingControls()
             $('#dispROI').append('<p>Centroid lat, lon = ' + ctrLat.toFixed(3) + ', ' + ctrLon.toFixed(3) + '</p>');
             $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km.toFixed(3) + '</p>');
             break;
-      }
-   }
+      };
+   };
 
    // Function which can toggle OpenLayers controls based on the clicked control
    // The value of the value of the underlying radio button is used to match 
@@ -901,7 +881,7 @@ function setupDrawingControls()
          }
       }
       $('#panZoom input:radio').button('refresh');
-   }
+   };
 
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
@@ -910,7 +890,7 @@ function setupDrawingControls()
       map.ROI_Type = element.value;
       // DEBUG
       console.info(map.ROI_Type);
-   }
+   };
 
    /* 
    Set up event handling for the map including as well as mouse-based 
@@ -936,7 +916,7 @@ function setupDrawingControls()
    for (var key in mapControls) {
       var control = mapControls[key];
       map.addControl(control);
-   }
+   };
 
    // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
    $('#panZoom input:radio').click(function(e) {
@@ -1006,16 +986,13 @@ $(document).ready(function() {
    });
 
    $('#layers').multiselect({
-      selected: function(e, ui) 
-      {
+      selected: function(e, ui) {
          // DEBUG
          //console.log("selected");
-         if(map.microLayers[ui.option.text])
-         {
+         if(map.microLayers[ui.option.text]) {
             var microLayer = map.microLayers[ui.option.text];
 
-            if(map.layerStore[ui.option.text])
-            {
+            if(map.layerStore[ui.option.text]) {
                // DEBUG
                //console.log("Adding layer...");
                addOpLayer(ui.option.text);
@@ -1025,20 +1002,17 @@ $(document).ready(function() {
             else
                map.getLayerData(microLayer.serverName + '_' + microLayer.name + '.json', microLayer.sensorName, microLayer.url);
          }
-         else
-         {
+         else {
             // DEBUG
             console.log("no layer data to use");
          }
       },
-      deselected: function(e, ui) 
-      {
+      deselected: function(e, ui) {
          // DEBUG
          //console.log("deselected");
          var layer = map.getLayersByName(ui.option.text)[0];
 
-         if(layer)
-         {
+         if(layer) {
             // DEBUG
             //console.log("Removing layer...");
             removeOpLayer(layer);
@@ -1046,14 +1020,10 @@ $(document).ready(function() {
             //console.log("Layer removed");
          }
          else if(map.layerStore[ui.option.text])
-         {
             var layer = map.layerStore[ui.option.text];
-         }
          else
-         {
             // DEBUG
             console.log("no layer data to use");
-         }
       },
    });
    

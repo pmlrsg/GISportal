@@ -205,21 +205,6 @@ ul li {
    border-top-right-radius: 15px;
 }
 
-/* Map Options Panel */
-#shareOptions {
-   display:none;
-   top: 53px;
-   height:100px;
-   width:150px;
-   margin-left: 100px;
-   -moz-border-radius-bottomleft: 15px;
-   -moz-border-radius-bottomright: 15px;
-   -webkit-border-bottom-left-radius: 15px;
-   -webkit-border-bottom-right-radius: 15px;
-   border-bottom-left-radius: 15px;
-   border-bottom-right-radius: 15px;
-}
-
 /* Toolbar buttons (overriding jQuery UI styling) */
 .iconBtn {
    margin-top:9px;
@@ -422,8 +407,27 @@ div .sensor-accordion {
 
 /* ======== Permalink Share Panel ======== */
 
+/* Map Options Panel */
+#shareOptions {
+   display:none;
+   top: 51px;
+   height:75px;
+   width:150px;
+   margin-left: 90px;
+   -moz-border-radius-bottomleft: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-bottom-right-radius: 15px;
+}
+
+#shareOptions h3 {
+   margin-top: 5px; 
+}
+
 #shareLink {
-   width: 140px;
+   width: 145px;
 }
 
 /* ======== Scalebar ======== */
@@ -500,6 +504,12 @@ div .sensor-accordion {
 
 #graphcreator-baseurl {
    width: 300px;
+}
+
+#graphcreator-generate img {
+   position: relative;
+   top: 3px;
+   padding-left: 5px;
 }
 
 .ui-control {

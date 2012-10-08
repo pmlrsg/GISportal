@@ -135,9 +135,9 @@ function createCache($serverName, $serverURL, $xmlStr)
    foreach($xml->Capability->Layer->Layer as $child) 
    {
       $sensorName = (string)$child->Title;
-      $sensorName = str_replace(" ", "_", $sensorName);
-      $sensorName = str_replace("(", "_", $sensorName);
-      $sensorName = str_replace(")", "_", $sensorName);
+      $sensorName = str_replace(array(" ", "(", ")","/"), "_", $sensorName);
+      //$sensorName = str_replace("(", "_", $sensorName);
+      //$sensorName = str_replace(")", "_", $sensorName);
       $layers = array();
       
       // Iterate over each layer

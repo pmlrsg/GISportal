@@ -125,7 +125,7 @@ function showMetadata($trigger) {
             $('#metadata-' + layer.name).dialog('close');
 
          $(document.body).append(
-            '<div id="metadata-' + layer.name + '" class="unselectable" title="' + layer.displayTitle + '">' +
+            '<div id="metadata-' + layer.name + '" class="" title="' + layer.displayTitle + '">' +
             '</div>'
          );
 
@@ -150,12 +150,14 @@ function showMetadata($trigger) {
          // Add new data
          $('<div><label>Source: ' + '</label></div>' +
             '<div><label>Name: ' + layer.displayTitle + '</label></div>' +
-            '<div><label>BoundingBox: ' + 
-               layer.exBoundingBox.NorthBoundLatitude + 'N, ' +
-               layer.exBoundingBox.EastBoundLongitude + 'E, ' +
-               layer.exBoundingBox.SouthBoundLatitude + 'S, ' + 
-               layer.exBoundingBox.WestBoundLongitude + 'W ' + 
-            '</label></div>' +
+            '<div>' +
+               '<span>BoundingBox:' +
+               '<label style="color: green">' + layer.exBoundingBox.NorthBoundLatitude + '</label>' + 'N, ' +
+               '<label style="color: blue">' + layer.exBoundingBox.EastBoundLongitude + '</label>' + 'E, ' +
+               '<label style="color: green">' + layer.exBoundingBox.SouthBoundLatitude + '</label>' + 'S, ' + 
+               '<label style="color: blue">' + layer.exBoundingBox.WestBoundLongitude + '</label>' + 'W ' + 
+               '</label></span>' +
+            '</div>' +
             dateRange() +
             '<div><label>Abstract: ' + layer.abstract + '</label></div>'
          ).appendTo('#metadata-' + layer.name);
@@ -564,7 +566,7 @@ function createGraphs()
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
+            url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
             dataType: 'json',
             asyc: true,
             success: function(data) {
@@ -581,13 +583,20 @@ function createGraphs()
                createGraph(graphData);
             },
             error: function(request, errorType, exception) {            
-               gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+               var data = {
+                  type: 'wcs data',
+                  request: request,
+                  errorType: errorType,
+                  exception: exception,
+                  url: this.url,
+               };          
+               gritterErrorHandler(data);
             }
          });
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
+            url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?baseurl%3Dhttp://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
             dataType: 'json',
             asyc: true,
             success: function(data) {
@@ -603,8 +612,15 @@ function createGraphs()
                
                createGraph(graphData);
             },
-            error: function(request, errorType, exception) {            
-               gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+            error: function(request, errorType, exception) {    
+               var data = {
+                  type: 'wcs data',
+                  request: request,
+                  errorType: errorType,
+                  exception: exception,
+                  url: this.url,
+               };          
+               gritterErrorHandler(data);        
             }
          });
       }
@@ -652,8 +668,9 @@ function showGraphCreator()
                         '<select id="graphcreator-type" name="graphcreator-type">' +
                            '<option value="basic">basic</option>' +
                            '<option value="histogram">histogram</option>' +
-                           '<option value="raw">raw (Not Working)</option>' +
+                           '<option value="raw">raw</option>' +
                            '<option value="test">test</option>' +
+                           '<option value="error">error</option>' +
                         '</select>' +
                         //'<input id="graphcreator-type" type="text" name="graphcreator-type"/>' +
                      '</div>' +
@@ -692,9 +709,25 @@ function showGraphCreator()
                         '<input id="graphcreator-bbox" type="text" name="graphcreator-bbox"/>' +
                      '</div>' +
                   '</div>' +
-                  '<div id="graphcreator-generate">' +
-                     '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+               '</div>' +
+               '<div class="ui-control">' +
+                  '<h3 id="graph-format-header" class="ui-control-header ui-helper-reset">' +
+                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
+                     '<a href="#">Graph Format</a>' + 
+                  '</h3>' +
+                  '<div id="graph-format">' +
+                     '<div>' +
+                        '<label for="graphcreator-barwidth-label" title="Barwidth">Barwidth:</label>' +
+                     '</div>' +
+                     '<div>' +
+                        '<input id="graphcreator-barwidth" type="text" name="graphcreator-barwidth"/>' +
+                        '<input id="graphcreator-barwidth-button" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />' +                    
+                     '</div>' +
                   '</div>' +
+               '</div>' +
+               '<div id="graphcreator-generate">' +
+                  '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+                  '<img src="img/ajax-loader.gif"/>' +  
                '</div>' +
             '</div>'
          );
@@ -718,6 +751,14 @@ function showGraphCreator()
          // Set default value
          $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
          
+         $('#graphcreator-generate').ajaxStart(function() {
+           $(this).find('img[src="img/ajax-loader.gif"]').show();
+         });
+         $('#graphcreator-generate').ajaxStop(function() {
+           $(this).find('img[src="img/ajax-loader.gif"]').hide();
+         });
+         $('#graphcreator-generate').find('img[src="img/ajax-loader.gif"]').hide();
+                           
          // When selecting the bounding box text field, request user to draw the box to populate values
          $('#graphcreator-bbox').click(function() {
             showMessage('bbox', null);
@@ -743,21 +784,25 @@ function showGraphCreator()
             return false;
          });
          
-         // Close histogram and advanced panels
+         $('#graphcreator-barwidth-button').click(function() {
+            return false;
+         });
+         
+         // Close histogram, advanced and format panels
          $('#histogram-inputs-header').trigger('click');
          $('#advanced-inputs-header').trigger('click');
+         $('#graph-format-header').trigger('click');
          
          // Create and display the graph
          $('#graphcreator-generate').click(function(e) {          
             $.ajax({
                type: 'GET',
-               url: OpenLayers.ProxyHost + 'http://fedora-mja.npm.ac.uk:5000/wcs/wcs2json?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
+               url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
                   '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
                   '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val()),
                dataType: 'json',
                asyc: true,
                success: function(data) {
-                  console.log(data.output);
                   if(data.type == 'basic')
                   {                                    
                      var start = new Date(data.output.time).getTime(),
@@ -830,30 +875,38 @@ function showGraphCreator()
                            label: 'mean',
                         }],
                         options: basicTimeOptions(),
-                        selectable: true
+                        selectable: true,
+                        selectSeries: true,
                      };
                   }
                   else if(data.type == 'histogram')
                   {
                      var num = data.output.histogram.Numbers
+                     var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
                   
                      var graphData = {
                         id: 'wcsgraph' + Date.now(),
                         title: 'WCS Test Graph',
                         data: [num],
-                        options: barOptions(),
-                        selectable: true
+                        options: barOptions(barwidth),
+                        selectable: false,
                      };
                   }
                 
                   createGraph(graphData);
                },
-               error: function(request, errorType, exception) {            
-                  gritterErrorHandler(null, 'wcs data', request, errorType, exception);
+               error: function(request, errorType, exception) {
+                  var data = {
+                     type: 'wcs data',
+                     request: request,
+                     errorType: errorType,
+                     exception: exception,
+                     url: this.url,
+                  };          
+                  gritterErrorHandler(data);
                }
             });
-         });
-         
+         }); 
                   
          // Open the dialog box
          $('#graphCreator').dialog('open');

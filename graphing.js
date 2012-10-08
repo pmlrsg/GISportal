@@ -1,10 +1,14 @@
 function createGraph(graphOptions) {
+   
+   // Append html code
    $(document.body).append(
       '<div id="' + graphOptions.id + '-graph" class="unselectable" title="' + graphOptions.title + '">' +
          '<div class="graph"></div>' +
+         '<div class="choices">Show:</div>' + 
       '</div>'
    );
    
+   // Create the dialog
    $('#' + graphOptions.id + '-graph').dialog({
       position: ['center', 'center'],
       width: 700,
@@ -20,13 +24,52 @@ function createGraph(graphOptions) {
       "dblclick": "collapse",
    });
 
+   // TODO: Tidy up css into a class
    $('#' + graphOptions.id + '-graph').children('.graph').width(600).height(384);
    
    var 
-      container = $('#' + graphOptions.id + '-graph').children('.graph').get(0), 
-      start, graph;
+   container = $('#' + graphOptions.id + '-graph').children('.graph').get(0), 
+   start, graph;
    
-   graph = drawGraph(container, graphOptions.data, graphOptions.options);
+   // Set each colour so they don't change
+   var i = 0;
+   $.each(graphOptions.data, function(key, val) {
+      val.color = i;
+      ++i;
+   });
+   
+   if(graphOptions.selectSeries && graphOptions.selectSeries == true)
+   {
+      // TODO: Tidy up css into a class
+      var choiceContainer = $('#' + graphOptions.id + '-graph').children('.choices').css({"left": 620, "top": 20, "position": "absolute"});
+      $.each(graphOptions.data, function(key, val) {
+        choiceContainer.append('<br/>' +
+         '<input type="checkbox" name="' + key + '" checked="checked" id="id' + key + '">' +
+         '<label for="id' + key + '">' + val.label + '</label>');
+      });
+      
+      // Update the graph when checkboxes are changed
+      choiceContainer.find("input").click(function()
+      {
+         graph = drawGraph(container, plotAccordingToChoices());
+      });
+      
+      // Draws the graph with only the datasets that have checks in their checkboxes
+      function plotAccordingToChoices() {     
+         var data = [];
+         
+         choiceContainer.find("input:checked").each(function() {
+            var key = $(this).attr("name");
+            if(key && graphOptions.data[key])
+               data.push(graphOptions.data[key])
+         });
+         
+         return data;
+      }
+   }
+   
+   // Initial call
+   graph = drawGraph(container, graphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data, graphOptions.options);
    
    if(graphOptions.draggable && graphOptions.draggable == true) {
       Flotr.EventAdapter.observe(graph.overlay, 'mousedown', initDrag);
@@ -34,15 +77,15 @@ function createGraph(graphOptions) {
    
    if(graphOptions.selectable && graphOptions.selectable == true) {
       Flotr.EventAdapter.observe(container, 'flotr:select', function(area) {
-         // Draw selected area
-         graph = drawGraph(container, graphOptions.data, {
+         // Draw selected area            
+         graph = drawGraph(container, pgraphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data, {
             xaxis : { min : area.x1, max : area.x2, mode : 'time', labelsAngle : 45 },
             yaxis : { min : area.y1, max : area.y2 }
          });
       });
            
       // When graph is clicked, draw the graph with default area.
-      Flotr.EventAdapter.observe(container, 'flotr:click', function () { graph = drawGraph(container, graphOptions.data); });
+      Flotr.EventAdapter.observe(container, 'flotr:click', function () { graph = drawGraph(container, graphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data); });
    }
    
    function drawGraph(container, data, opts)
@@ -66,7 +109,7 @@ function createGraph(graphOptions) {
          xaxis = graph.axes.x,
          offset = start.x - end.x;
          
-      graph = drawGraph(container, graphOptions.data, {
+      graph = drawGraph(container, graphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data, {
          xaxis: {
             min: xaxis.min + offset,
             max: xaxis.max + offset
@@ -177,19 +220,19 @@ function lineOptions()
    };
 }
 
-function barOptions()
+function barOptions(barwidth)
 {
    return {
       bars: {
          show: true,
          horizontal: false,
          shadowsize: 0,
-         barwidth: 0.5
+         barWidth: barwidth
       },
       title: 'Example Graph',
       yaxis: {
          min: 0,
-         //autoscaleMargin: 1
+         autoscaleMargin: 1
       }
    };
 }

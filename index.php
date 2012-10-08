@@ -266,7 +266,7 @@
    <div class="toolbar" id="shareOptions">
    	<h3>Share</h3>
       <div>
-         <input type="text" name="shareLink" value="link" id="shareLink" />
+         <input type="text" name="shareLink" value="Permalink would go here!" id="shareLink" />
          <label class="iconBtn" for="shareLink" />
       </div> 
    </div>
