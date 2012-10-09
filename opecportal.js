@@ -27,10 +27,7 @@ var quickRegion = [
 ];
 
 // Define a proxy for the map to allow async javascript http protocol requests
-// This will always need changing when swapping between Windows and Linux
-// OpenLayers.ProxyHost = 'Proxy.php?url='; // Linux or Windows using php proxy script
-//OpenLayers.ProxyHost = 'http://pmpc1313.npm.ac.uk/service/proxy?url=';   // Rob's OpenLayers proxy
-OpenLayers.ProxyHost = 'http://fedora-mja.npm.ac.uk/service/proxy?url=';   // Martyn's OpenLayers proxy
+OpenLayers.ProxyHost = '/service/proxy?url=';   // Martyn's OpenLayers proxy
 /*====================================================================================*/
 
 /**
