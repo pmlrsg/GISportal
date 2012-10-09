@@ -878,6 +878,8 @@ function showGraphCreator()
                         selectable: true,
                         selectSeries: true,
                      };
+                     
+                     createGraph(graphData);
                   }
                   else if(data.type == 'histogram')
                   {
@@ -891,9 +893,11 @@ function showGraphCreator()
                         options: barOptions(barwidth),
                         selectable: false,
                      };
+                     
+                     createGraph(graphData);
                   }
                 
-                  createGraph(graphData);
+                  
                },
                error: function(request, errorType, exception) {
                   var data = {

@@ -78,7 +78,7 @@ function createGraph(graphOptions) {
    if(graphOptions.selectable && graphOptions.selectable == true) {
       Flotr.EventAdapter.observe(container, 'flotr:select', function(area) {
          // Draw selected area            
-         graph = drawGraph(container, pgraphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data, {
+         graph = drawGraph(container, graphOptions.selectSeries ? plotAccordingToChoices() : graphOptions.data, {
             xaxis : { min : area.x1, max : area.x2, mode : 'time', labelsAngle : 45 },
             yaxis : { min : area.y1, max : area.y2 }
          });

@@ -324,7 +324,8 @@ function createHelpMessages()
          return 'Error: Bad Request';         
       },
       text: function(data){
-         return 'A bad request was made to "' + data.url +'".';
+         return 'A bad request was made ' + 
+         '<a id="url400" href="' + data.url + '">here</a>' + '.';
       },
       max: 1,
    }
@@ -334,7 +335,9 @@ function createHelpMessages()
          return 'Error: Internal Server Error';         
       },
       text: function(data){
-         return 'The server at "' + data.url +'" has had an internal server error.';
+         return 'The server ' + 
+         '<a id="url500" href="' + data.url + '">here</a>' + 
+         ' has had an internal server error.';
       },
       max: 1,
    }
@@ -344,7 +347,9 @@ function createHelpMessages()
          return 'Parse Error: Unexpected character';         
       },
       text: function(data){
-         return 'An unexpected character was received from "' + data.url + '".';
+         return 'An unexpected character was received from "' + 
+         '<a id="urlParserError" href="' + data.url + '">this</a>' +
+         '" address.';
       },
       max: 1,
    }

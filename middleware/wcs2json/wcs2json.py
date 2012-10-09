@@ -60,10 +60,13 @@ def proxy():
          y.close()
          return resp
       else:
+         g.error = "Failed to access url"
          abort(400)
    
    except Exception, e:
       #print E
+      if e.code == 400:
+         g.error = "Failed to access url"
       abort(e.code)
 
 
@@ -109,15 +112,12 @@ def getWcsData():
    params = getParams()
    params = checkParams(params)
    requiredParams = getRequiredParams()
-   status, resp = checkRequiredParams(requiredParams)
-   
-   if(not status):
-      return resp
+   checkRequiredParams(requiredParams)
    
    params = dict(params.items() + requiredParams.items())
-   urlParams = params.copy()
-   urlParams.pop('type')
-   params['url'] = createURL(urlParams)
+   #urlParams = params.copy()
+   #urlParams.pop('type')
+   params['url'] = createURL(params)
    app.logger.debug('before type') # DEBUG
    
    type = params['type']
@@ -130,15 +130,16 @@ def getWcsData():
    elif type == 'test': # Used to test new code
       output = openNetCDF(params, test)
    elif type == 'error': # Used to test error handling client-side
-      choice = random.randrange(1,6)
+      choice = random.randrange(1,5)
       if choice == 1:
+         g.error = "help"
          abort(400)
       elif choice == 2:
          abort(401)
       elif choice == 3:
          abort(404)
       elif choice == 4:
-         return jsonify(output = "edfwefwrfewf")
+         return jsonify(outpu = "edfwefwrfewf")
       elif choice == 5:
          x = y # Should create a 500 from apache
    else:
@@ -187,8 +188,6 @@ def checkRequiredParams(params):
       if params[key] == None:
          g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
          abort(400)
-      
-   return True, None
 
 def createURL(params):
    baseURL = params.pop('baseURL')
