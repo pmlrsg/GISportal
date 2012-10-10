@@ -232,7 +232,7 @@
          <li class="divider"></li>
          <li>
             <fieldset>
-               <legend class="ui-widget-header">Quick Region</legend>
+               <legend>Quick Region</legend>
                <select class="ui-corner-all" id="quickRegion" name="Quick Region">
                </select>
             </fieldset>

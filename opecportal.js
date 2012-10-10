@@ -755,7 +755,7 @@ function nonLayerDependent()
    });
    
    // Change of quick region event handler - happens even if the selection isn't changed
-   $('#quickRegion option').click(function(e) {
+   $('#quickRegion').change(function(e) {
        var qr_id = $('#quickRegion').val();
        var bbox = new OpenLayers.Bounds(
                    quickRegion[qr_id][1],
