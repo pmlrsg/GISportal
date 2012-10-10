@@ -1,17 +1,19 @@
 <?php 
-
 //--------PHP-DEBUG-SETTINGS--------
-   // Log file location
-   //define("LOG_FILE", "/errors.log");
+   // What level of errors to report
+   ini_set("error_reporting", E_ALL);
+   
+   // LOG to a custom PHP error log for production systems
+   // This log must have correct write permissions (chown apache:apache)
+   ini_set("log_errors", "On");
+   ini_set("error_log", "/var/log/php-error.log");
+   
+   // NO LOGGING to the output stream for production systems
+   ini_set("display_errors", "Off");
 
-   //ini_set('error_reporting', E_ALL);
-   //ini_set('display_errors', '1');
-   //ini_set("log_errors", "1");
-   //ini_set('error_log', LOG_FILE);
-
-   // Setup firebug php  
-   //require_once('FirePHPCore/fb.php');
-   //ob_start();
+   // Firebug for PHP debugging set-up 
+   // require_once('FirePHPCore/fb.php');
+   // ob_start();
 //----------------------------------
 
 // set socket timeout

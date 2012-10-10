@@ -77,21 +77,9 @@
    See wms-capabilities.php for details. -->
 
 <?php
-//--------PHP-DEBUG-SETTINGS--------
-   // Log file location
-   //define("LOG_FILE", "/errors.log");
-
-   ini_set('error_reporting', E_ALL);
-   ini_set('display_errors', '1');
-   //ini_set("log_errors", "1");
-   //ini_set('error_log', LOG_FILE)
-
-   // Setup firebug php  
-   require_once('FirePHPCore/fb.php');
-   ob_start();
-//----------------------------------
-
-   //require('old-wms-capabilities.php');
+//--------PHP-DEBUG-SETTINGS-------------
+   // DEFINED in wms-capabilities.php
+//---------------------------------------
    require('wms-capabilities.php');
 
    // Generate cache files
