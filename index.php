@@ -225,7 +225,7 @@
          <li>
             <fieldset>
                <legend>Base Layer</legend>
-               <select id="baseLayer" name="Base Layer">
+               <select class="ui-corner-all" id="baseLayer" name="Base Layer">
                </select>
             </fieldset>
          </li>
