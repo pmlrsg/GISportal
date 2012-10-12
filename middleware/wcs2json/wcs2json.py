@@ -194,9 +194,6 @@ def create_app(config='config.yaml'):
          return abort(400)
       
       app.logger.debug('before json') # DEBUG
-      app.logger.debug(output)
-      app.logger.debug(params['type'])
-      app.logger.debug(params['coverage'])
       
       return jsonify(output = output, type = params['type'], coverage = params['coverage'])
    
