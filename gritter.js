@@ -125,6 +125,47 @@ function createHelpMessages()
          return 'Welcome to the Opec Portal';
       },
       text: function(layer) { 
+         return 'It\'s great to have you here! First thing you need to do is decided what layers you want to use. You can do that from the ' +
+         '<a id="wtHelp-layerSelectionPanel" href="#">layer selection panel</a>.' +
+         'If you have any trouble, you can always just hit the ' + 
+         '<a id="wtHelp-questionMark" href="#">question mark</a>' + 
+         ' at the top of most windows. When you are ready for the next step just click ' +
+         '<a id="wtHelp-next" href="#">next</a>';    
+      },
+      afterOpen: function(layer) {
+         
+         $('#wtHelp-layerSelectionPanel').click(function(e) {
+            if($('#layerSelection').dialog('isOpen')) {
+               $('#layerSelection').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            }
+            else {
+               $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            }
+            
+            return false;
+         });
+         
+         $('#wtHelp-questionMark').click(function(e) {
+            $('.ui-dialog-titlebar-help:visible').effect("highlight", {}, 3000);  
+            return false;
+         });
+
+         $('#wtHelp-next').click(function(e) {
+            removeMessage(map.tutUID);
+            map.tutUID = showMessage('layerTutorial', null);
+
+            return false;
+         });
+      },
+      max: 1,
+   };
+   
+   // Opening welcome message
+   map.helperMessages['oldWelcomeTutorial'] = {
+      title: function() {
+         return 'Welcome to the Opec Portal';
+      },
+      text: function(layer) { 
          return 'You can use the ' +
          '<a id="wtOpenLeftPanel" href="#">layers button</a>' +
          ' on the left to open and close the layers panel ' +
@@ -133,7 +174,7 @@ function createHelpMessages()
          ' on the right does the same for the data panel ' +
          'which allows you to specify regions of interest (R.O.I) ' +
          'and then get graphs for the selected area. ' +
-         '<a id="wtNext" href="#">Next</a>';
+         '<a id="wtNext" href="#">Next</a>';         
       },
       afterOpen: function(layer) {
          // Open the layer panel on click
@@ -166,13 +207,41 @@ function createHelpMessages()
          $('#wtNext').click(function(e) {
 
             removeMessage(map.tutUID);
-            map.tutUID = showMessage('dateTutorial', null);
+            map.tutUID = showMessage('layerTutorial', null);
 
             return false;
          });
       },
       max: 1,
    };
+   
+   // Layer panels
+   map.helperMessages['layerTutorial'] = {
+      title: function() {
+         return 'Viewing Layers';
+      },
+      text: function() {
+         return 'To view the layers you just selected, you need to use the ' +
+         '<a id="ltHelp-layersPanel" href="#">layers panel</a> .' +
+         'If you want to see a layer displayed on the map you need to select it\'s checkbox ' +
+         'and then select a date (We will cover dates next!). When you are done with a layer just uncheck it. ' +
+         'You can also right click on layers for further options. When you are ready for the next step just click ' +
+         '<a id="wtHelp-next" href="#">next</a>';
+      },
+      afterOpen: function() {
+         $('ltHelp-layerPanel').click(function() {
+            $('.triggerL').trigger('click');
+            return false;
+         });
+         
+         $('#wtHelp-next').click(function(e) {
+            removeMessage(map.tutUID);
+            map.tutUID = showMessage('dateTutorial', null);
+
+            return false;
+         });
+      }
+   }
    
    // Date Tutorial
    map.helperMessages['dateTutorial'] = {
@@ -235,16 +304,9 @@ function createHelpMessages()
       afterOpen: function(data) {
          $('#datepickerBtn').click(function() {
             var date = $.datepicker.parseDate('dd-mm-yy', data.layer.lastDate);
-            $('#viewDate').datepicker("option", "defaultDate", date).datepicker("show");
+            $('#viewDate').datepicker("option", "defaultDate", date).datepicker("show").effect("highlight", {}, 3000);
             return false;
-         })
-         .hover(function() { 
-               $('#viewDate').css('border', '2px solid red'); 
-            },
-            function() {
-               $('#viewDate').css('border', '');
-            }
-         );
+         });
       },
       max: 1,
    };
@@ -281,10 +343,12 @@ function createHelpMessages()
       afterOpen: function(data) {
          $('#help-selectedLayers').click(function() {
             $('#layers .selected').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            return false;
          });
          
          $('#help-availableLayers').click(function() {
             $('#layers .available').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            return false;
          });
       },
       max: 1,

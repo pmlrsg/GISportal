@@ -38,6 +38,10 @@ var defaultNodeComparator = function(node1, node2) {
    return text1 == text2 ? 0 : (text1 < text2 ? -1 : 1);
 };
 
+var defaultAddAll = function (that, func) {
+   func(that);
+};
+
 
 (function($) {
 
@@ -61,6 +65,7 @@ $.widget("ui.multiselect", {
       nodeComparator: defaultNodeComparator,
       itemParser: defaultItemParser,
       nodeInserted: null,
+      addall: defaultAddAll,
    },
 	_create: function() {
       //this.element.hide();
@@ -165,7 +170,8 @@ $.widget("ui.multiselect", {
    },
    selectAll: function() {
       if (this.enabled()) {
-         this._batchSelect(this.availableList.children('li.ui-element:visible'), true);
+         var func = function(that) {that._batchSelect(that.availableList.children('li.ui-element:visible'), true);};
+         this.options.addall(this, func);           
       }
    },
    selectNone: function() {

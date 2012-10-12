@@ -36,7 +36,7 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
 /* Extend existing OpenLayers.Map and OpenLayers.Layer objects */
 
 // Flask host
-OpenLayers.Map.prototype.host = "/";
+OpenLayers.Map.prototype.host = "http://pmpc1313.npm.ac.uk";
 
 // A list of layer names that will be selected by default
 OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind"];

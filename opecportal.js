@@ -1023,6 +1023,36 @@ $(document).ready(function() {
             // DEBUG
             console.log("no layer data to use");
       },
+      addall: function (that, func) {
+         if(that.availableList.children('li.ui-element:visible').length > 50) {
+            var warning = $('<div id="warning"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Adding lots of layers may cause the browser to slow down. Are you sure you want to proceed?</p></div>');
+            $(document.body).append(warning);          
+            $('#warning').dialog({
+               position: ['center', 'center'],
+               width: 300,
+               height: 200,
+               resizable: false,
+               autoOpen: true,
+               modal: true,
+               buttons: {
+                  "Add Layers": function() {
+                     $(this).dialog("close");
+                     func(that);
+                  },
+                  "Stop Adding Layers": function() {
+                     $(this).dialog("close");
+                  }
+               },
+               close: function() {
+                  // Remove on close
+                  $('#warning').remove(); 
+               }
+            });
+         }
+         else
+            func(that);
+         
+      }
    });
    
    // Setup the gritter so we can use it for error messages

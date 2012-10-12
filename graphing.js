@@ -3,8 +3,7 @@ function createGraph(graphOptions) {
    // Append html code
    $(document.body).append(
       '<div id="' + graphOptions.id + '-graph" class="unselectable" title="' + graphOptions.title + '">' +
-         '<div class="graph"></div>' +
-         '<div class="choices">Show:</div>' + 
+         '<div class="graph"></div>' + 
       '</div>'
    );
    
@@ -41,6 +40,7 @@ function createGraph(graphOptions) {
    if(graphOptions.selectSeries && graphOptions.selectSeries == true)
    {
       // TODO: Tidy up css into a class
+      $('#' + graphOptions.id + '-graph').append('<div class="choices">Show:</div>');
       var choiceContainer = $('#' + graphOptions.id + '-graph').children('.choices').css({"left": 620, "top": 20, "position": "absolute"});
       $.each(graphOptions.data, function(key, val) {
         choiceContainer.append('<br/>' +

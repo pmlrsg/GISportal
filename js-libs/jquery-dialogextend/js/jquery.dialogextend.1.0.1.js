@@ -100,7 +100,7 @@
 				.dialog("option", {
 					"resizable" : false,
 					"height" : newHeight,
-					"maxHeight" : newHeight
+					"maxHeight" : newHeight,
 				})
 				// hide content
 				// hide button-pane
@@ -211,7 +211,9 @@
 					"resizable" : false,
 					//"draggable" : false,
 					"height" : newHeight,
-					"width" : newWidth
+					"minHeight": newHeight,
+					"width" : newWidth,
+					"minWidth": newWidth
 				})
 				// avoid title text overlap buttons
 				.dialog("widget")
@@ -459,7 +461,10 @@
 				"size" : {
 					"height" : $(self).data("original-size-height"),
 					"width"  : $(self).data("original-size-width"),
-					"maxHeight" : $(self).data("original-size-maxHeight")
+					"maxHeight" : $(self).data("original-size-maxHeight"),
+					"minHeight": $(self).data("original-size-minHeight"),
+					"maxWidth" : $(self).data("original-size-maxWidth"),
+               "minWidth": $(self).data("original-size-minWidth")
 				},
 				"position" : {
 					"mode" : $(self).data("original-position-mode"),
@@ -567,7 +572,10 @@
 					"draggable" : original.config.draggable,
 					"height" : original.size.height,
 					"width" : original.size.width,
-					"maxHeight" : original.size.maxHeight
+					"maxHeight" : original.size.maxHeight,
+					"minHeight": original.size.minHeight,
+               "maxWidth": original.size.maxWidth,
+               "minWidth": original.size.minWidth
 				})
 				// restore position *AFTER* size restored
 				.dialog("option", {
@@ -608,6 +616,9 @@
 					.data("original-size-height", $(self).dialog("option", "height"))
 					.data("original-size-width", $(self).dialog("option", "width"))
 					.data("original-size-maxHeight", $(self).dialog("option", "maxHeight"))
+					.data("original-size-minHeight", $(self).dialog("option", "minHeight"))
+					.data("original-size-maxWidth", $(self).dialog("option", "maxWidth"))
+               .data("original-size-minWidth", $(self).dialog("option", "minWidth"))
 					.data("original-position-mode", $(self).dialog("widget").css("position"))
 					.data("original-position-left", $(self).dialog("widget").offset().left)
 					.data("original-position-top", $(self).dialog("widget").offset().top)

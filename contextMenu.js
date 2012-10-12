@@ -566,17 +566,18 @@ function createGraphs()
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3DPressure_reduced_to_MSL%26type%3Dhistogram%26bins%3D500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,105500',
+            url: map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?&version=1.0.0&coverage=Pressure_reduced_to_MSL&type=histogram&bins=500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,110500,120500,130500,140500,150500',
             dataType: 'json',
             asyc: true,
             success: function(data) {
                var num = data.output.histogram.Numbers
+               var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
                
                var graphData = {
                   id: 'wcsgraphPressure_reduced_to_MSL',
                   title: 'WCS Test Graph - Pressure_reduced_to_MSL',
                   data: [num],
-                  options: barOptions(),
+                  options: barOptions(barwidth),
                   selectable: true
                };
                
@@ -596,17 +597,18 @@ function createGraphs()
          
          $.ajax({
             type: 'GET',
-            url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?baseurl%3Dhttp://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?%26version%3D1.0.0%26coverage%3Dv_wind_tropopause%26type%3Dhistogram%26bins%3D-100,-80,-60,-40,-20,0,20,40,60,80,100',
+            url: map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?&version=1.0.0&coverage=v_wind_tropopause&type=histogram&bins=-100,-80,-60,-40,-20,0,20,40,60,80,100',
             dataType: 'json',
             asyc: true,
             success: function(data) {
                var num = data.output.histogram.Numbers
+               var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
                
                var graphData = {
                   id: 'wcsgraphv_wind_tropopause',
                   title: 'WCS Test Graph - v_wind_tropopause',
                   data: [num],
-                  options: barOptions(),
+                  options: barOptions(barwidth),
                   selectable: true
                };
                
@@ -794,17 +796,16 @@ function showGraphCreator()
          $('#graph-format-header').trigger('click');
          
          // Create and display the graph
-         $('#graphcreator-generate').click(function(e) {          
+         $('#graphcreator-generate').on('click', ':button', function(e) {          
             $.ajax({
                type: 'GET',
-               url: OpenLayers.ProxyHost + map.host + '/service/wcs2json/wcs?' + encodeURIComponent('baseurl=' + $('#graphcreator-baseurl').val() + 
+               url: map.host + '/service/wcs2json/wcs?' + 'baseurl=' + $('#graphcreator-baseurl').val() + 
                   '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
-                  '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val()),
+                  '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val(),
                dataType: 'json',
                asyc: true,
                success: function(data) {
-                  if(data.type == 'basic')
-                  {                                    
+                  if(data.type == 'basic') {                                    
                      var start = new Date(data.output.time).getTime(),
                         d1 = [],
                         d2 = [], 
@@ -881,8 +882,7 @@ function showGraphCreator()
                      
                      createGraph(graphData);
                   }
-                  else if(data.type == 'histogram')
-                  {
+                  else if(data.type == 'histogram') {
                      var num = data.output.histogram.Numbers
                      var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
                   
@@ -895,9 +895,7 @@ function showGraphCreator()
                      };
                      
                      createGraph(graphData);
-                  }
-                
-                  
+                  }  
                },
                error: function(request, errorType, exception) {
                   var data = {

@@ -137,7 +137,7 @@
          </li>
          <li class="divider"></li>
          <li>
-            <a href="#" id="mapInfoToggleBtn"><img src="img/info32.png" alt="Toggle Map Information Window"/></a>        
+            <a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window"/></a>        
          </li>
          <li>
             <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"/></a>

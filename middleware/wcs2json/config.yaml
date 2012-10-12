@@ -1,0 +1,4 @@
+FLASK:
+  DEBUG: False
+  DEBUG_WITH_APTANA: False
+  LOG_LEVEL: "DEBUG"
