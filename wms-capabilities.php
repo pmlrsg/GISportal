@@ -12,8 +12,8 @@
    ini_set("display_errors", "Off");
 
    // Firebug for PHP debugging set-up 
-    require_once('FirePHPCore/fb.php');
-    ob_start();
+   // require_once('FirePHPCore/fb.php');
+   // ob_start();
 //----------------------------------
 
 // set socket timeout
