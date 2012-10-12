@@ -12,8 +12,8 @@
    ini_set("display_errors", "Off");
 
    // Firebug for PHP debugging set-up 
-   // require_once('FirePHPCore/fb.php');
-   // ob_start();
+    require_once('FirePHPCore/fb.php');
+    ob_start();
 //----------------------------------
 
 // set socket timeout
@@ -135,78 +135,81 @@ function createCache($serverName, $serverURL, $xmlStr)
 
    // Iterate over each sensor
    foreach($xml->Capability->Layer->Layer as $child) 
-   {
+   { 
       $sensorName = (string)$child->Title;
-      $sensorName = str_replace(array(" ", "(", ")","/"), "_", $sensorName);
-      //$sensorName = str_replace("(", "_", $sensorName);
-      //$sensorName = str_replace(")", "_", $sensorName);
-      $layers = array();
-      
-      // Iterate over each layer
-      foreach($child->Layer as $innerChild) 
-      {
-         $name = (string)$innerChild->Name;
-         $title = (string)$innerChild->Title;
-         $abstract = (string)$innerChild->Abstract;
-         $temporal = FALSE;
-
-         $exGeographicBoundingBox = array(
-            'WestBoundLongitude'=>(string)$innerChild->EX_GeographicBoundingBox->westBoundLongitude,
-            'EastBoundLongitude'=>(string)$innerChild->EX_GeographicBoundingBox->eastBoundLongitude,
-            'SouthBoundLatitude'=>(string)$innerChild->EX_GeographicBoundingBox->southBoundLatitude,
-            'NorthBoundLatitude'=>(string)$innerChild->EX_GeographicBoundingBox->northBoundLatitude
-         );
-
-         $boundingBox = array(
-            'CRS'=>(string)$innerChild->BoundingBox->attributes()->CRS,
-            'MinX'=>(string)$innerChild->BoundingBox->attributes()->minx,
-            'MaxX'=>(string)$innerChild->BoundingBox->attributes()->maxx,
-            'MinY'=>(string)$innerChild->BoundingBox->attributes()->miny,
-            'MaxY'=>(string)$innerChild->BoundingBox->attributes()->maxy
-         );
-
-         $temp = createDimensionsArray($innerChild->Dimension, $name);
-         $dimensions = $temp['dimensions'];
-         $temporal = $temp['temporal'];
-         $styles = createStylesArray($innerChild->Style);
-
-         if(!filterLayers($name))
+      // Filter out the k-01 sensors - Will Use whitelist/blacklist for sensors and layers
+      if($sensorName!="k-01"){
+         $sensorName = str_replace(array(" ", "(", ")","/"), "_", $sensorName);
+         //$sensorName = str_replace("(", "_", $sensorName);
+         //$sensorName = str_replace(")", "_", $sensorName);
+         $layers = array();
+         
+         // Iterate over each layer
+         foreach($child->Layer as $innerChild) 
          {
-            // Add to the layers array
-            $layer = array(
-               //'SensorName'=>$sensorName,
-               'Name'=>$name,
-               'URL'=>$serverURL,
-               'Title'=>$title, 
-               'Abstract'=>$abstract,
-               //'Temporal'=>$temporal,
-               'FirstDate'=>$temp['firstDate'],
-               'LastDate'=>$temp['lastDate'],
-               'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
-               'BoundingBox'=>$boundingBox,
-               'Dimensions'=>$dimensions,
-               'Styles'=>$styles
+            $name = (string)$innerChild->Name;
+            $title = (string)$innerChild->Title;
+            $abstract = (string)$innerChild->Abstract;
+            $temporal = FALSE;
+   
+            $exGeographicBoundingBox = array(
+               'WestBoundLongitude'=>(string)$innerChild->EX_GeographicBoundingBox->westBoundLongitude,
+               'EastBoundLongitude'=>(string)$innerChild->EX_GeographicBoundingBox->eastBoundLongitude,
+               'SouthBoundLatitude'=>(string)$innerChild->EX_GeographicBoundingBox->southBoundLatitude,
+               'NorthBoundLatitude'=>(string)$innerChild->EX_GeographicBoundingBox->northBoundLatitude
             );
-
-            $ln = str_replace("/", "-", $name);
-            $sn = str_replace("/", "-", $serverName);
-            saveFile(LAYERCACHEPATH.$sn."_".$ln.FILEEXTENSIONJSON, json_encode($layer));
-
-            // Add to the layers array
-            array_push($layers, array(
-               //'SensorName'=>$sensorName,
-               'Name'=>$name,
-               'Title'=>$title, 
-               'Abstract'=>$abstract,
-               //'Temporal'=>$temporal,
-               //'FirstDate'=>$firstDate,
-               //'LastDate'=>$lastDate,
-               'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
-               //'BoundingBox'=>$boundingBox,
-               //'Dimensions'=>$dimensions,
-               //'Styles'=>$styles
-               )
+   
+            $boundingBox = array(
+               'CRS'=>(string)$innerChild->BoundingBox->attributes()->CRS,
+               'MinX'=>(string)$innerChild->BoundingBox->attributes()->minx,
+               'MaxX'=>(string)$innerChild->BoundingBox->attributes()->maxx,
+               'MinY'=>(string)$innerChild->BoundingBox->attributes()->miny,
+               'MaxY'=>(string)$innerChild->BoundingBox->attributes()->maxy
             );
+   
+            $temp = createDimensionsArray($innerChild->Dimension, $name);
+            $dimensions = $temp['dimensions'];
+            $temporal = $temp['temporal'];
+            $styles = createStylesArray($innerChild->Style);
+   
+            if(!filterLayers($name))
+            {
+               // Add to the layers array
+               $layer = array(
+                  //'SensorName'=>$sensorName,
+                  'Name'=>$name,
+                  'URL'=>$serverURL,
+                  'Title'=>$title, 
+                  'Abstract'=>$abstract,
+                  //'Temporal'=>$temporal,
+                  'FirstDate'=>$temp['firstDate'],
+                  'LastDate'=>$temp['lastDate'],
+                  'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
+                  'BoundingBox'=>$boundingBox,
+                  'Dimensions'=>$dimensions,
+                  'Styles'=>$styles
+               );
+   
+               $ln = str_replace("/", "-", $name);
+               $sn = str_replace("/", "-", $serverName);
+               saveFile(LAYERCACHEPATH.$sn."_".$ln.FILEEXTENSIONJSON, json_encode($layer));
+   
+               // Add to the layers array
+               array_push($layers, array(
+                  //'SensorName'=>$sensorName,
+                  'Name'=>$name,
+                  'Title'=>$title, 
+                  'Abstract'=>$abstract,
+                  //'Temporal'=>$temporal,
+                  //'FirstDate'=>$firstDate,
+                  //'LastDate'=>$lastDate,
+                  'EX_GeographicBoundingBox'=>$exGeographicBoundingBox,
+                  //'BoundingBox'=>$boundingBox,
+                  //'Dimensions'=>$dimensions,
+                  //'Styles'=>$styles
+                  )
+               );
+            }
          }
       }  
 

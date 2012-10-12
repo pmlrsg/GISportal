@@ -27,7 +27,7 @@ var quickRegion = [
 ];
 
 // Define a proxy for the map to allow async javascript http protocol requests
-OpenLayers.ProxyHost = '/service/proxy?url=';   // Martyn's OpenLayers proxy
+OpenLayers.ProxyHost = '/service/proxy?url=';   // Flask (Python) service OpenLayers proxy
 /*====================================================================================*/
 
 /**

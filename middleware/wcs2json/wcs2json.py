@@ -9,8 +9,8 @@ import netCDF4 as netCDF
 from flask import Flask, abort, request, jsonify, make_response, g
 
 def create_app(config='config.yaml'):
-   app = Flask(__name__, instance_path='/var/www/html/rbb/opecvis/middleware/wcs2json') # must be absolute
-   #app = Flask(__name__, instance_path='/var/www/html/middleware/wcs2json')
+   #app = Flask(__name__, instance_path='/var/www/html/rbb/opecvis/middleware/wcs2json') # Rob
+   app = Flask(__name__, instance_path='/var/www/html/opecvis/middleware/wcs2json') # Martyn
    
    import yaml
    import os
