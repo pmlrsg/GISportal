@@ -56,8 +56,8 @@ function createBaseLayers()
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
       'Landsat',
-      'http://irs.gis-lab.info/?',
-      { layers: 'landsat' },
+      'http://wms.jpl.nasa.gov/wms.cgi',
+      { layers: 'global_mosaic', exceptions: 'application/vnd.ogc.se_inimage?' },
       { projection: lonlat, wrapDateLine: true}
    );
    map.addLayer(landsat);
@@ -629,6 +629,8 @@ function nonLayerDependent()
       if(position)
          $('#latlng').text('Mouse Position: ' + position.lon.toFixed(3) + ', ' + position.lat.toFixed(3));
    });
+   
+   $('#mapInfo-Projection').text('Map Projection: ' + map.projection);
 
    // Populate the base layers drop down menu
    $.each(map.layers, function(index, value) {
@@ -934,6 +936,8 @@ function setupDrawingControls()
  * This code runs once the page has loaded - jQuery initialised.
  */
 $(document).ready(function() {
+   
+
 
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
    $('#info').dialog({
@@ -955,7 +959,7 @@ $(document).ready(function() {
       resizable: true,
       autoOpen: false
    }).dialogExtend({
-      "help": true,
+      "help": false,
       "minimize": true,
       "dblclick": "collapse",
    });
@@ -1025,7 +1029,7 @@ $(document).ready(function() {
       },
       addall: function (that, func) {
          if(that.availableList.children('li.ui-element:visible').length > 50) {
-            var warning = $('<div id="warning"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Adding lots of layers may cause the browser to slow down. Are you sure you want to proceed?</p></div>');
+            var warning = $('<div id="warning" title="You sure about this?"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Adding lots of layers may cause the browser to slow down. Are you sure you want to proceed?</p></div>');
             $(document.body).append(warning);          
             $('#warning').dialog({
                position: ['center', 'center'],
@@ -1052,6 +1056,25 @@ $(document).ready(function() {
          else
             func(that);
          
+      }
+   });
+   
+   $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
+   $('#this-Is-A-Prototype').dialog({
+      position: ['center', 'center'],
+      width: 300,
+      height: 230,
+      resizable: false,
+      autoOpen: true,
+      modal: true,
+      buttons: {
+         "Ok": function() {
+            $(this).dialog("close");
+         }
+      },
+      close: function() {
+         // Remove on close
+         $('#this-Is-A-Prototype').remove(); 
       }
    });
    

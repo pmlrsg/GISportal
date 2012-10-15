@@ -5,12 +5,13 @@ import urllib2
 import tempfile
 import numpy as np
 import netCDF4 as netCDF
+import settings
 
 from flask import Flask, abort, request, jsonify, make_response, g
 
 def create_app(config='config.yaml'):
-   #app = Flask(__name__, instance_path='/var/www/html/rbb/opecvis/middleware/wcs2json') # Rob
-   app = Flask(__name__, instance_path='/var/www/html/opecvis/middleware/wcs2json') # Martyn
+   app = Flask(__name__, instance_path='/var/www/html/rbb/opecvis/middleware/wcs2json') # Rob
+   #app = Flask(__name__, instance_path='/var/www/html/opecvis/middleware/wcs2json') # Martyn
    
    import yaml
    import os
@@ -19,7 +20,7 @@ def create_app(config='config.yaml'):
     file = f.read()
    
    config = yaml.load(file)
-   app.config.from_object(config)
+   app.config.from_object(settings)
    
    import logging
    from logging.handlers import RotatingFileHandler
@@ -30,8 +31,10 @@ def create_app(config='config.yaml'):
        '[in %(filename)s:%(lineno)d]'
    ))
    app.logger.addHandler(f_handler)
-   app.logger.setLevel(config['FLASK']['LOG_LEVEL'])
+   app.logger.setLevel(config['LOG_LEVEL'])
+   app.logger.debug(app.debug)
    
+   # Designed to prevent Open Proxy type stuff - white list of allowed hostnames
    allowedHosts = ['localhost','localhost:8080',
             '127.0.0.1','127.0.0.1:8080','127.0.0.1:5000',
             'pmpc1313.npm.ac.uk','pmpc1313.npm.ac.uk:8080','pmpc1313.npm.ac.uk:5000',
@@ -45,7 +48,7 @@ def create_app(config='config.yaml'):
    """
    Nothing yet. Maybe return info plus admin login page?
    """
-   @app.route('/wcs2json')
+   @app.route('/wcs2json/')
    def root():
       return 'Nothing here just yet.'
    
@@ -58,8 +61,6 @@ def create_app(config='config.yaml'):
    """
    @app.route('/proxy', methods = ['GET', 'POST'])
    def proxy():  
-      # Designed to prevent Open Proxy type stuff - white list of allowed hostnames
-     
       url = request.args.get('url', 'http://www.openlayers.org')
       
       app.logger.debug(url)
@@ -154,7 +155,6 @@ def create_app(config='config.yaml'):
    @app.route('/wcs2json/wcs', methods = ['GET'])
    def getWcsData():
       import random
-      app.logger.setLevel("DEBUG")
       
       params = getParams() # Gets any optional parameters
       params = checkParams(params) # Checks what parameters where entered
@@ -244,7 +244,7 @@ def create_app(config='config.yaml'):
    """        
    def checkRequiredParams(params):
       for key in params.iterkeys():
-         if params[key] == None:
+         if params[key] == None or len(params[key]) == 0:
             g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
             abort(400)
    
@@ -289,7 +289,7 @@ def create_app(config='config.yaml'):
          return output
       except Exception, e:
          g.error = "Request aborted, exception encountered: %s" % e
-         abort(400)    
+         abort(400)   
    
    """
    Performs a basic set of statistical functions on the provided data.
@@ -393,7 +393,8 @@ def create_app(config='config.yaml'):
       
       app.logger.debug('histogram created') # DEBUG
       for i in range(len(bins)-1): # Iter over the bins
-         numbers.append((bins[i] + (bins[i+1] - bins[i])/2, N[i])) # Get a number halfway between this bin and the next
+         numbers.append((bins[i] + (bins[i+1] - bins[i])/2, float(N[i]))) # Get a number halfway between this bin and the next
+         app.logger.debug(type(N[i]))
       return {'Numbers': numbers, 'Bins': bins.tolist()}
    
    """
@@ -427,6 +428,7 @@ if __name__ == '__main__':
       use_debugger = not(app.config.get('DEBUG_WITH_APTANA'))
    except:
       pass
+   app.logger.debug(app.debug)
    app.run(use_debugger=use_debugger, debug=app.debug,
            use_reloader=use_debugger, host='0.0.0.0')
    

@@ -84,25 +84,22 @@ function gritterLayerHelper()
       var helpMessage = 'none';
       
       // Is the layer temporal?
-      if(layer.temporal)
-      {     
+      if(layer.temporal) {     
          var inst = $('#viewDate').datepicker('getDate'); // Get the selected date
         
-         if(inst != null) // If the date is set...
-         {
+         // If the date is set...
+         if(inst != null) { 
             var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
             var uidate = ISODateString(thedate);
             var mDate = layer.matchDate(uidate);
 
             // Can the layer display the selected date?
-            if(mDate == null)
-            {
+            if(mDate == null) {
                helpMessage = 'dateNotInRange';
             }
          }
          // If the date is not set...
-         else if(inst == null)
-         {
+         else if(inst == null) {
             helpMessage = 'noDate';
          }
       }
@@ -127,10 +124,10 @@ function createHelpMessages()
       text: function(layer) { 
          return 'It\'s great to have you here! First thing you need to do is decided what layers you want to use. You can do that from the ' +
          '<a id="wtHelp-layerSelectionPanel" href="#">layer selection panel</a>.' +
-         'If you have any trouble, you can always just hit the ' + 
+         ' If you have any trouble, you can always just hit the ' + 
          '<a id="wtHelp-questionMark" href="#">question mark</a>' + 
          ' at the top of most windows. When you are ready for the next step just click ' +
-         '<a id="wtHelp-next" href="#">next</a>';    
+         '<a id="wtHelp-next" href="#">next</a>.';    
       },
       afterOpen: function(layer) {
          
@@ -160,61 +157,6 @@ function createHelpMessages()
       max: 1,
    };
    
-   // Opening welcome message
-   map.helperMessages['oldWelcomeTutorial'] = {
-      title: function() {
-         return 'Welcome to the Opec Portal';
-      },
-      text: function(layer) { 
-         return 'You can use the ' +
-         '<a id="wtOpenLeftPanel" href="#">layers button</a>' +
-         ' on the left to open and close the layers panel ' +
-         ' which allows you to select the layers you want to view. The ' +
-         '<a id="wtOpenRightPanel" href="#">data button</a>' + 
-         ' on the right does the same for the data panel ' +
-         'which allows you to specify regions of interest (R.O.I) ' +
-         'and then get graphs for the selected area. ' +
-         '<a id="wtNext" href="#">Next</a>';         
-      },
-      afterOpen: function(layer) {
-         // Open the layer panel on click
-         $('#wtOpenLeftPanel').click(function(e) {
-            $('.triggerL').trigger('click');
-            return false;
-         })
-         // Highlight the layer button with a red border on hover
-         .hover(function() {
-               $('.triggerL').css('border', '2px solid red');
-            },
-            function() {
-               $('.triggerL').css('border', '');
-         });
-
-         // Open the data panel on click
-         $('#wtOpenRightPanel').click(function(e) {
-            $('.triggerR').trigger('click');
-            return false;
-         })
-         // Highlight the data button with a red border on hover
-         .hover(function() {
-               $('.triggerR').css('border', '2px solid red');
-            },
-            function() {
-               $('.triggerR').css('border', '');
-         });
-
-         // Open the data panel on click
-         $('#wtNext').click(function(e) {
-
-            removeMessage(map.tutUID);
-            map.tutUID = showMessage('layerTutorial', null);
-
-            return false;
-         });
-      },
-      max: 1,
-   };
-   
    // Layer panels
    map.helperMessages['layerTutorial'] = {
       title: function() {
@@ -226,10 +168,10 @@ function createHelpMessages()
          'If you want to see a layer displayed on the map you need to select it\'s checkbox ' +
          'and then select a date (We will cover dates next!). When you are done with a layer just uncheck it. ' +
          'You can also right click on layers for further options. When you are ready for the next step just click ' +
-         '<a id="wtHelp-next" href="#">next</a>';
+         '<a id="wtHelp-next" href="#">next</a>.';
       },
       afterOpen: function() {
-         $('ltHelp-layerPanel').click(function() {
+         $('#ltHelp-layersPanel').click(function() {
             $('.triggerL').trigger('click');
             return false;
          });
@@ -240,7 +182,8 @@ function createHelpMessages()
 
             return false;
          });
-      }
+      },
+      max: 1,
    }
    
    // Date Tutorial
@@ -253,7 +196,7 @@ function createHelpMessages()
             '<a id="dtDatepickerBtn" href="#">datepicker</a>' +
             ' at the top of the screen. Then use the left and right arrows to ' +
             'change the month or use the dropdown boxes. You can also type a date into the textbox. ' +
-            '<a id="dtNext" href="#">Next</a>';
+            '<a id="dtNext" href="#">Next</a>.';
       },
       afterOpen: function() {
          // Open the data panel on click
@@ -265,16 +208,9 @@ function createHelpMessages()
          });
 
          $('#dtDatepickerBtn').click(function() {
-            $('#viewDate').datepicker("show");
+            $('#viewDate').datepicker("show").datepicker("show").effect("highlight", {}, 3000);
             return false;
          })
-         .hover(function() { 
-               $('#viewDate').css('border', '2px solid red'); 
-            },
-            function() {
-               $('#viewDate').css('border', '');
-            }
-         );
       },
       max: 1,
    };
@@ -285,7 +221,9 @@ function createHelpMessages()
          return 'To Be Continued';
       },
       text: function() {
-         return 'To be continued';
+         return 'Be sure to provide any feedback about these tutorials ' +
+         '<a id="give-some-feedback" href="http://trac.marineopec.eu/wiki" target="_blank">here</a>. ' +
+         'Are they useful? Easy to follow? Too long? Too short?';
       },
       max: 1,
    };
@@ -354,13 +292,29 @@ function createHelpMessages()
       max: 1,
    };
    
+   // Graph Creator Tutorial
+   map.helperMessages['graphCreatorTutorial'] = {
+      title: function() {
+         return 'Lets Create A Graph!';
+      },
+      text: function() {
+         return 'To create a graph we need three things. The wcs server ' +
+         'to query (BaseURL), the coverage to get and the type of graph ' +
+         'we want to create. You can also provide a bbox and/or a time range. ' +
+         'If you\'re creating a histogram you can also provide some bins, but ' +
+         'if you don\'t some will be created for you.';
+      }
+   }
+   
    // Scalebar Tutorial
-   map.helperMessages['scalebar'] = {
+   map.helperMessages['scalebarTutorial'] = {
       title: function() {
          return 'Scalebar Tutorial';
       },
       text: function() {
-        return 'With the scalebar you can change the range of values used.';
+        return 'The scalebar allows you to change the range of values used using ' +
+        'the slider or if you prefer the min and max boxes. If you need to increase ' +
+        'the range just enter a bigger number in any of the text boxes.';
       },
       max: 1,
    };
@@ -389,7 +343,7 @@ function createHelpMessages()
       },
       text: function(data){
          return 'A bad request was made ' + 
-         '<a id="url400" href="' + data.url + '">here</a>' + '.';
+         '<a id="url400" href="' + data.url + '" target="_blank">here</a>' + '.';
       },
       max: 1,
    }
@@ -400,7 +354,7 @@ function createHelpMessages()
       },
       text: function(data){
          return 'The server ' + 
-         '<a id="url500" href="' + data.url + '">here</a>' + 
+         '<a id="url500" href="' + data.url + '" target="_blank">here</a>' + 
          ' has had an internal server error.';
       },
       max: 1,
@@ -412,7 +366,7 @@ function createHelpMessages()
       },
       text: function(data){
          return 'An unexpected character was received from "' + 
-         '<a id="urlParserError" href="' + data.url + '">this</a>' +
+         '<a id="urlParserError" href="' + data.url + '" target="_blank">this</a>' +
          '" address.';
       },
       max: 1,

@@ -140,7 +140,7 @@ function showMetadata($trigger) {
                $('#metadata-' + layer.name).remove();
             }
          }).dialogExtend({
-            "help": true,
+            "help": false,
             "minimize": true,
             "dblclick": "collapse",
          });
@@ -151,7 +151,7 @@ function showMetadata($trigger) {
          $('<div><label>Source: ' + '</label></div>' +
             '<div><label>Name: ' + layer.displayTitle + '</label></div>' +
             '<div>' +
-               '<span>BoundingBox:' +
+               '<span>BoundingBox: ' +
                '<label style="color: green">' + layer.exBoundingBox.NorthBoundLatitude + '</label>' + 'N, ' +
                '<label style="color: blue">' + layer.exBoundingBox.EastBoundLongitude + '</label>' + 'E, ' +
                '<label style="color: green">' + layer.exBoundingBox.SouthBoundLatitude + '</label>' + 'S, ' + 
@@ -252,7 +252,7 @@ function showScalebar($trigger) {
                   $(this).trigger("resize");
                },
                "help" : function(e, dlg) {
-                  showMessage('scalebar', null);
+                  showMessage('scalebarTutorial', null);
                },
             },
 
@@ -637,9 +637,10 @@ function showGraphCreator()
    return {
       name: 'Show Graph Creator',
       callback: function() {
+         var graphCreator = $('#graphCreator');
          // If there is an open version, close it
-         if($('#graphCreator').length)
-            $('#graphCreator').dialog('close');
+         if(graphCreator.length)
+            graphCreator.dialog('close');
          
          // Add the html to the document
          $(document.body).append(
@@ -734,8 +735,11 @@ function showGraphCreator()
             '</div>'
          );
          
+         var graphCreator = $('#graphCreator'),
+             graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
+         
          // Turn it into a dialog box
-         $('#graphCreator').dialog({
+         graphCreator.dialog({
             position: ['center', 'center'],
             width:340,
             resizable: false,
@@ -748,18 +752,17 @@ function showGraphCreator()
             "help": true,
             "minimize": true,
             "dblclick": "collapse",
+            "events": {
+               "help" : function(e, dlg) {
+                  showMessage('graphCreatorTutorial', null);
+               }
+            },
          });
          
          // Set default value
          $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
          
-         $('#graphcreator-generate').ajaxStart(function() {
-           $(this).find('img[src="img/ajax-loader.gif"]').show();
-         });
-         $('#graphcreator-generate').ajaxStop(function() {
-           $(this).find('img[src="img/ajax-loader.gif"]').hide();
-         });
-         $('#graphcreator-generate').find('img[src="img/ajax-loader.gif"]').hide();
+         graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
                            
          // When selecting the bounding box text field, request user to draw the box to populate values
          $('#graphcreator-bbox').click(function() {
@@ -786,6 +789,12 @@ function showGraphCreator()
             return false;
          });
          
+         graphCreator.unbind('.loadGraph').bind('ajaxStart.loadGraph', function() {
+            $(this).find('img[src="img/ajax-loader.gif"]').show();
+         }).bind('ajaxStop.loadGraph', function() {
+            $(this).find('img[src="img/ajax-loader.gif"]').hide();
+         });
+         
          $('#graphcreator-barwidth-button').click(function() {
             return false;
          });
@@ -796,7 +805,8 @@ function showGraphCreator()
          $('#graph-format-header').trigger('click');
          
          // Create and display the graph
-         $('#graphcreator-generate').on('click', ':button', function(e) {          
+         graphCreatorGenerate.on('click', ':button', function(e) {
+            
             $.ajax({
                type: 'GET',
                url: map.host + '/service/wcs2json/wcs?' + 'baseurl=' + $('#graphcreator-baseurl').val() + 
@@ -911,7 +921,7 @@ function showGraphCreator()
          }); 
                   
          // Open the dialog box
-         $('#graphCreator').dialog('open');
+         graphCreator.dialog('open');
       }
    };
 }

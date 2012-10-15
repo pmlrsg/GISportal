@@ -269,6 +269,9 @@
       <div>
          <span id="latlng"></span>
       </div>
+      <div>
+         <span id="mapInfo-Projection"></span>
+      </div>
    </div>
    <div id="layerSelection" class="layer-selection unselectable" title="Layer Selection">
       <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>

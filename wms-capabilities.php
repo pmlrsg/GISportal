@@ -20,7 +20,7 @@
 ini_set('default_socket_timeout', 120);
 
 // How long the cache files will last
-define('CACHELIFE', 10); // 86400
+define('CACHELIFE', 86400); // 86400
 // Path to store cache files in
 define('LAYERCACHEPATH', "./cache/layers/");
 // Server cache path
