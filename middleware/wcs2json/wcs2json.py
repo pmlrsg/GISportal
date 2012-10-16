@@ -50,7 +50,7 @@ def create_app(config='config.yaml'):
             'vostok.pml.ac.uk','vostok.pml.ac.uk:8080',
             'rsg.pml.ac.uk','rsg.pml.ac.uk:8080',
             'motherlode.ucar.edu','motherlode.ucar.edu:8080',
-            'bbc.co.uk', 'www.openlayers.org']
+            'www.openlayers.org']
    
    """
    Nothing yet. Maybe return info plus admin login page?
