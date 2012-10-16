@@ -138,7 +138,7 @@ function createCache($serverName, $serverURL, $xmlStr)
    { 
       $sensorName = (string)$child->Title;
       // Filter out the k-01 sensors - Will Use whitelist/blacklist for sensors and layers
-      if($sensorName!="k-01"){
+      if(!filterSensors($sensorName)){
          $sensorName = str_replace(array(" ", "(", ")","/"), "_", $sensorName);
          //$sensorName = str_replace("(", "_", $sensorName);
          //$sensorName = str_replace(")", "_", $sensorName);
@@ -348,9 +348,16 @@ function csvToArray($filename='', $delimiter=',')
     return $data;
 }
 
+/**
+ * Function which allows filtering of layer names based on a black list.
+ * If the layer name begins with the blacklist string, it returns true
+ * 
+ * @param {String} $layerName - The layer name as a string
+ * 
+ */
 function filterLayers($layerName)
 {
-   $whiteList = array(
+   $blackList = array(
       //"WECOP/Z5c",
       //"WECOP/Chl",
       //"WECOP/PAR_irradiance",
@@ -372,9 +379,52 @@ function filterLayers($layerName)
       //"AMT_NORTHERN/aot_869",
    );
 
-   foreach($whiteList as $value)
+   foreach($blackList as $value)
    {
-      if($layerName == $value)
+      // Test to see if the layer name begins with the blacklist string
+      if(strpos($layerName, $value) === 0)
+      {
+         return TRUE;
+      }
+   }
+   return FALSE;
+}
+
+/**
+ * Function which allows filtering of sensor names based on a black list.
+ * If the sensor name begins with the blacklist string, it returns true
+ * 
+ * @param {String} $sensorName - The layer name as a string
+ * 
+ */
+function filterSensors($sensorName)
+{
+   $blackList = array(
+      "k-01",
+      //"WECOP/Chl",
+      //"WECOP/PAR_irradiance",
+      //"WECOP/PAR_attenuation",
+      //"WECOP/EIRg",
+      //"WECOP/EIRb",
+      //"WECOP/EIRr",
+      //"MRCS_ECOVARS/o2o",
+      //"MRCS_ECOVARS/si",
+      //"MRCS_ECOVARS/zoop",
+      //"MRCS_ECOVARS/chl",
+      //"MRCS_ECOVARS/po4",
+      //"MRCS_ECOVARS/no3",
+      //"MRCS_ECOVARS/p1c",
+      //"MRCS_ECOVARS/p2c",
+      //"MRCS_ECOVARS/p3c",
+      //"MRCS_ECOVARS/p4c",
+      //"MRCS_ECOVARS/vis01",
+      //"AMT_NORTHERN/aot_869",
+   );
+
+   foreach($blackList as $value)
+   {
+      // Test to see if the sensor name begins with the blacklist string
+      if(strpos($sensorName,$value) === 0)
       {
          return TRUE;
       }
