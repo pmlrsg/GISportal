@@ -5,13 +5,12 @@ import urllib2
 import tempfile
 import numpy as np
 import netCDF4 as netCDF
-import settings
 
 from flask import Flask, abort, request, jsonify, make_response, g
 
 def create_app(config='config.yaml'):
-   app = Flask(__name__, instance_path='/var/www/html/rbb/opecvis/middleware/wcs2json') # Rob
-   #app = Flask(__name__, instance_path='/var/www/html/opecvis/middleware/wcs2json') # Martyn
+   import settings
+   app = Flask(__name__, instance_path=settings.PATH)
    
    import yaml
    import os
@@ -22,17 +21,25 @@ def create_app(config='config.yaml'):
    config = yaml.load(file)
    app.config.from_object(settings)
    
-   import logging
-   from logging.handlers import RotatingFileHandler
-   f_handler = RotatingFileHandler(os.path.join(app.instance_path, 'python-flask.log'))
-   f_handler.setLevel(logging.DEBUG)
-   f_handler.setFormatter(logging.Formatter(
-       '[%(asctime)s] [%(levelname)s]: %(message)s '
-       '[in %(filename)s:%(lineno)d]'
-   ))
-   app.logger.addHandler(f_handler)
-   app.logger.setLevel(config['LOG_LEVEL'])
-   app.logger.debug(app.debug)
+   try:  
+      import logging
+      from logging.handlers import RotatingFileHandler
+   
+      if 'LOG_PATH' in config and len(config['LOG_PATH']) != 0 and os.path.exists(config['LOG_PATH']):
+         f_handler = RotatingFileHandler(os.path.join(config['LOG_PATH'], 'python-flask.log'))
+      else:
+         f_handler = RotatingFileHandler(os.path.join(app.instance_path, 'python-flask.log'))
+         
+      f_handler.setLevel(logging.DEBUG)
+      f_handler.setFormatter(logging.Formatter(
+          '[%(asctime)s] [%(levelname)s]: %(message)s '
+          '[in %(filename)s:%(lineno)d]'
+      ))
+      app.logger.addHandler(f_handler)
+      app.logger.setLevel(config['LOG_LEVEL'])
+      app.logger.debug(app.debug)
+   except:
+      print 'Failed to setup logging'
    
    # Designed to prevent Open Proxy type stuff - white list of allowed hostnames
    allowedHosts = ['localhost','localhost:8080',
@@ -394,7 +401,6 @@ def create_app(config='config.yaml'):
       app.logger.debug('histogram created') # DEBUG
       for i in range(len(bins)-1): # Iter over the bins
          numbers.append((bins[i] + (bins[i+1] - bins[i])/2, float(N[i]))) # Get a number halfway between this bin and the next
-         app.logger.debug(type(N[i]))
       return {'Numbers': numbers, 'Bins': bins.tolist()}
    
    """
