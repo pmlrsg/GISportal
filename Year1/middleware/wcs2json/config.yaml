@@ -1,0 +1,2 @@
+LOG_LEVEL: "WARNING"
+LOG_PATH: /var/www/html/rbb/opecvis/middleware/wcs2json
