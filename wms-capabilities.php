@@ -138,7 +138,8 @@ function createCache($serverName, $serverURL, $xmlStr)
    { 
       $sensorName = (string)$child->Title;
       // Filter out the k-01 sensors - Will Use whitelist/blacklist for sensors and layers
-      if(!filterSensors($sensorName)){
+      if(!filterSensors($sensorName))
+      {
          $sensorName = str_replace(array(" ", "(", ")","/"), "_", $sensorName);
          //$sensorName = str_replace("(", "_", $sensorName);
          //$sensorName = str_replace(")", "_", $sensorName);
@@ -211,9 +212,8 @@ function createCache($serverName, $serverURL, $xmlStr)
                );
             }
          }
-      }  
-
       $subMasterCache['server'][$sensorName] = $layers;
+      }
    }
 
    $subMasterCache['url'] = $serverURL;
