@@ -882,12 +882,18 @@ function setupDrawingControls()
             ctx.fillStyle = '#CCCCCC';
             var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
             ctx.beginPath();
-            ctx.moveTo(vertices[i].x*scale, vertices[i].y*scale);
+            x0= 5 + (vertices[0].x-bounds.left)*scale;
+            y0= 5 + (bounds.top-vertices[0].y)*scale;
+            ctx.moveTo(x0,y0);
             for(var i=1,j=vertices.length; i<j; i++){
-               ctx.moveTo(vertices[i].x*scale, vertices[i].y*scale);
+               x= 5 + (vertices[i].x-bounds.left)*scale;
+               y= 5 + (bounds.top-vertices[i].y)*scale;
+               ctx.lineTo(x, y);
             };
-            ctx.closePath();
+            ctx.lineTo(x0,y0);
+            ctx.stroke();
             ctx.fill();
+            ctx.closePath();
             //
             $('#dispROI').append('<p>Centroid Lat, Lon:' + ctrLat.toPrecision(4) + d + ', ' + ctrLon.toPrecision(4) + d + '</p>');
             $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</p>');
