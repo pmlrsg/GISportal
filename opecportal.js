@@ -808,7 +808,6 @@ function setupDrawingControls()
       // Get the geometry of the drawn feature
       var geom = new OpenLayers.Geometry();
       geom = feature.geometry;
-      var vertices = geom.getVertices
       
       // Special HTML character for the degree symbol
       var d = '&deg;';
@@ -848,18 +847,18 @@ function setupDrawingControls()
                $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
             }
             $('#dispROI').html('<h3>Rectangular ROI</h4>');
-            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
             // Setup the JavaScript canvas object and draw our ROI on it
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
             var c = document.getElementById('ROIC');
             var ctx = c.getContext('2d');
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 4;
             ctx.fillStyle = '#CCCCCC';
             var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
             ctx.fillRect(5,5,width_deg*scale,height_deg*scale);
             ctx.strokeRect(5,5,width_deg*scale,height_deg*scale);
+            //
             $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
-            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');    
-            $('#dispROI').append('<p>BBOX (Lon,Lat,Lon,Lat): ' + d + ': ' + bbox.toBBOX(4, false) + '</p>');            
+            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');           
             $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
             break;
          case 'circle':
@@ -872,8 +871,24 @@ function setupDrawingControls()
             $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
             break;
          case 'polygon':
-            $('#dispROI').html('<h3>Custom Polygon ROI</h4>');
+            // Get the polygon vertices
+            var vertices = geom.getVertices();
+            $('#dispROI').html('<h3>Custom Polygon ROI</h4>');     
+            // Setup the JavaScript canvas object and draw our ROI on it
             $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            var c = document.getElementById('ROIC');
+            var ctx = c.getContext('2d');
+            ctx.lineWidth = 4;
+            ctx.fillStyle = '#CCCCCC';
+            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
+            ctx.beginPath();
+            ctx.moveTo(vertices[i].x*scale, vertices[i].y*scale);
+            for(var i=1,j=vertices.length; i<j; i++){
+               ctx.moveTo(vertices[i].x*scale, vertices[i].y*scale);
+            };
+            ctx.closePath();
+            ctx.fill();
+            //
             $('#dispROI').append('<p>Centroid Lat, Lon:' + ctrLat.toPrecision(4) + d + ', ' + ctrLon.toPrecision(4) + d + '</p>');
             $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</p>');
             break;
