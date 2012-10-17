@@ -281,26 +281,27 @@ def create_app(config='config.yaml'):
             g.error = 'Received %s from %s' % resp.code, params['url']
             abort(400)
          
-         app.logger.debug('opening file...') # DEBUG
-         file = open((os.path.join(app.instance_path, "test.nc")), "w")
-         app.logger.debug('writing to file...') # DEBUG
-         file.write(resp.read())
-         app.logger.debug('closing file..') # DEBUG
-         file.close()
+         #app.logger.debug('opening file...') # DEBUG
+         #file = open((os.path.join(app.instance_path, "test.nc")), "w")
+         #app.logger.debug('writing to file...') # DEBUG
+         #file.write(resp.read())
+         #app.logger.debug('closing file..') # DEBUG
+         #file.close()
          
          app.logger.debug('after code check') # DEBUG
-         #temp = tempfile.NamedTemporaryFile()
-         #temp.write(resp.read())
+         temp = tempfile.NamedTemporaryFile('w+b', True)
+         #temp.seek(0)
+         temp.write(resp.read())
          resp.close()
               
          app.logger.debug('before opening netcdf') # DEBUG
-         #rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
-         rootgrp = netCDF.Dataset((os.path.join(app.instance_path, "test.nc")), 'r', format='NETCDF3')
+         rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+         #rootgrp = netCDF.Dataset((os.path.join(app.instance_path, "test.nc")), 'r', format='NETCDF3')
          app.logger.debug('netcdf file open') # DEBUG
          output = method(rootgrp, params)   
          app.logger.debug('method run') # DEBUG
          rootgrp.close()
-         #temp.close()
+         temp.close()
          return output
       except Exception, e:
          g.error = "Request aborted, exception encountered: %s" % e
