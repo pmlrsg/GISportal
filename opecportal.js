@@ -808,6 +808,7 @@ function setupDrawingControls()
       // Get the geometry of the drawn feature
       var geom = new OpenLayers.Geometry();
       geom = feature.geometry;
+      var vertices = geom.getVertices
       
       // Special HTML character for the degree symbol
       var d = '&deg;';
@@ -853,10 +854,7 @@ function setupDrawingControls()
             var ctx = c.getContext('2d');
             ctx.lineWidth = 2;
             ctx.fillStyle = '#CCCCCC';
-            var scale = 90/height_deg;
-            if (width_deg > height_deg){
-               scale = 90/width_deg;
-            }
+            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
             ctx.fillRect(5,5,width_deg*scale,height_deg*scale);
             ctx.strokeRect(5,5,width_deg*scale,height_deg*scale);
             $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
@@ -866,7 +864,7 @@ function setupDrawingControls()
             break;
          case 'circle':
             $('#dispROI').html('<h3>Circular ROI</h4>');
-            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            $('#dispROI').append('<img src="./img/circleROI.png" title ="Circular Region Of Interest" alt="Map Point" />');
             $('#dispROI').append('<p>Radius: ' + radius_deg.toPrecision(4) + d + '</p>');
             $('#dispROI').append('<p>Centre lat, lon: ' + ctrLat.toPrecision(4) + ', ' + ctrLon.toPrecision(4) + '</p>');
             $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
