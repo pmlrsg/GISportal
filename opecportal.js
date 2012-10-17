@@ -627,7 +627,7 @@ function nonLayerDependent()
    map.events.register("mousemove", map, function(e) { 
       var position =  map.getLonLatFromPixel(e.xy);
       if(position)
-         $('#latlng').text('Mouse Position: ' + position.lon.toFixed(3) + ', ' + position.lat.toFixed(3));
+         $('#latlng').text('Mouse Position: ' + position.lon.toPrecision(4) + ', ' + position.lat.toPrecision(4));
    });
    
    $('#mapInfo-Projection').text('Map Projection: ' + map.projection);
@@ -804,10 +804,13 @@ function setupDrawingControls()
    map.addLayer(vectorLayer);
 
    // Function called once a ROI has been drawn on the map
-   function ROIAdded(feature) { 
+   function ROIAdded(feature) {
       // Get the geometry of the drawn feature
       var geom = new OpenLayers.Geometry();
       geom = feature.geometry;
+      
+      // Special HTML character for the degree symbol
+      var d = '&deg;';
       
       // Get bounds of the feature's geometry
       var bounds = new OpenLayers.Bounds();
@@ -833,34 +836,48 @@ function setupDrawingControls()
         
       switch(map.ROI_Type) {
          case 'point':
-            $('#dispROI').html('<h3>Point ROI</h3>');
-            $('#dispROI').append('<p>lat, lon = ' + geom.x.toFixed(3) + ', ' + geom.y.toFixed(3) + '</p>');
+            $('#dispROI').html('<h3>Point ROI</h4>');
+            $('#dispROI').append('<img src="./img/pointROI.png" title ="Point Region Of Interest" alt="Map Point" />');
+            $('#dispROI').append('<p>Lon, Lat: ' + geom.x.toPrecision(4) + d + ', ' + geom.y.toPrecision(4) + d + '</p>');
             break;
          case 'box':
             var bbox = bounds;
             // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
             if ($('#graphcreator-bbox').size()){
-               $('#graphcreator-bbox').val(bbox.toBBOX(4, false));
+               $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
             }
-            $('#dispROI').html('<h3>Rectangular ROI</h3>');
-            $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
-            $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
-            $('#dispROI').append('<p>BBOX (lat,lon,lat,lon) = ' + bbox.toBBOX(4,true) + '</p>');       
-            $('#dispROI').append('<p>BBOX (lon,lat,lon,lat) = ' + bbox.toBBOX(4, false) + '</p>');            
-            $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
+            $('#dispROI').html('<h3>Rectangular ROI</h4>');
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            // Setup the JavaScript canvas object and draw our ROI on it
+            var c = document.getElementById('ROIC');
+            var ctx = c.getContext('2d');
+            ctx.lineWidth = 2;
+            ctx.fillStyle = '#CCCCCC';
+            var scale = 90/height_deg;
+            if (width_deg > height_deg){
+               scale = 90/width_deg;
+            }
+            ctx.fillRect(5,5,width_deg*scale,height_deg*scale);
+            ctx.strokeRect(5,5,width_deg*scale,height_deg*scale);
+            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');    
+            $('#dispROI').append('<p>BBOX (Lon,Lat,Lon,Lat): ' + d + ': ' + bbox.toBBOX(4, false) + '</p>');            
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
             break;
          case 'circle':
-            $('#dispROI').html('<h3>Circular ROI</h3>');
-            $('#dispROI').append('<p>Radius = ' + radius_deg.toFixed(3) + ' deg</p>');
-            $('#dispROI').append('<p>Centre lat, lon = ' + ctrLat.toFixed(3) + ', ' + ctrLon.toFixed(3) + '</p>');
-            $('#dispROI').append('<p>Width = ' + width_deg.toFixed(3) + ' deg = ' + width_km.toFixed(3) + ' km</p>');
-            $('#dispROI').append('<p>Height = ' + height_deg.toFixed(3) + ' deg = ' + height_km.toFixed(3) + ' km</p>');
-            $('#dispROI').append('<p>Projected Area = ' + area_km.toFixed(3) + ' km<sup>2</sup></p>');
+            $('#dispROI').html('<h3>Circular ROI</h4>');
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            $('#dispROI').append('<p>Radius: ' + radius_deg.toPrecision(4) + d + '</p>');
+            $('#dispROI').append('<p>Centre lat, lon: ' + ctrLat.toPrecision(4) + ', ' + ctrLon.toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
             break;
          case 'polygon':
-            $('#dispROI').html('<h3>Custom Polygon ROI</h3>');
-            $('#dispROI').append('<p>Centroid lat, lon = ' + ctrLat.toFixed(3) + ', ' + ctrLon.toFixed(3) + '</p>');
-            $('#dispROI').append('<p>Projected Area (sq km) = ' + area_km.toFixed(3) + '</p>');
+            $('#dispROI').html('<h3>Custom Polygon ROI</h4>');
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            $('#dispROI').append('<p>Centroid Lat, Lon:' + ctrLat.toPrecision(4) + d + ', ' + ctrLon.toPrecision(4) + d + '</p>');
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</p>');
             break;
       };
    };

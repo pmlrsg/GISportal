@@ -26,6 +26,10 @@ h3 {
    padding-bottom: 5px;
 }
 
+/* style the ROI canvas */
+canvas { 
+}
+
 sup {
    vertical-align: super;
    font-size:x-small;
