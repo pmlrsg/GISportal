@@ -50,7 +50,8 @@ def create_app(config='config.yaml'):
             'vostok.pml.ac.uk','vostok.pml.ac.uk:8080',
             'rsg.pml.ac.uk','rsg.pml.ac.uk:8080',
             'motherlode.ucar.edu','motherlode.ucar.edu:8080',
-            'www.openlayers.org']
+            'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
+            'www.gebco.net']
    
    """
    Nothing yet. Maybe return info plus admin login page?
@@ -280,19 +281,26 @@ def create_app(config='config.yaml'):
             g.error = 'Received %s from %s' % resp.code, params['url']
             abort(400)
          
+         app.logger.debug('opening file...') # DEBUG
+         file = open((os.path.join(app.instance_path, "test.nc")), "w")
+         app.logger.debug('writing to file...') # DEBUG
+         file.write(resp.read())
+         app.logger.debug('closing file..') # DEBUG
+         file.close()
+         
          app.logger.debug('after code check') # DEBUG
-         temp = tempfile.NamedTemporaryFile()
-         temp.seek(0)
-         temp.write(resp.read())
+         #temp = tempfile.NamedTemporaryFile()
+         #temp.write(resp.read())
          resp.close()
               
          app.logger.debug('before opening netcdf') # DEBUG
-         rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+         #rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+         rootgrp = netCDF.Dataset((os.path.join(app.instance_path, "test.nc")), 'r', format='NETCDF3')
          app.logger.debug('netcdf file open') # DEBUG
          output = method(rootgrp, params)   
          app.logger.debug('method run') # DEBUG
          rootgrp.close()
-         temp.close()
+         #temp.close()
          return output
       except Exception, e:
          g.error = "Request aborted, exception encountered: %s" % e
