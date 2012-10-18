@@ -42,13 +42,17 @@ function gritterErrorHandler(data)
       showMessage('error500', data);
       return
    }
+   else if (data.request.status == 502)
+   {
+      showMessage('error502');
+      return
+   }
    else if (data.errorType == 'parsererror')
    {
       showMessage('errorParserError', data);
       return
    }
-   
-   
+     
    if(data.layer)
    {
       $.gritter.add({
@@ -122,7 +126,7 @@ function createHelpMessages()
          return 'Welcome to the Opec Portal';
       },
       text: function(layer) { 
-         return 'It\'s great to have you here! First thing you need to do is decided what layers you want to use. You can do that from the ' +
+         return 'It\'s great to have you here! First thing you need to do is decide which layers you want to use. You can do that from the ' +
          '<a id="wtHelp-layerSelectionPanel" href="#">layer selection panel</a>.' +
          ' If you have any trouble, you can always just hit the ' + 
          '<a id="wtHelp-questionMark" href="#">question mark</a>' + 
@@ -133,7 +137,7 @@ function createHelpMessages()
          
          $('#wtHelp-layerSelectionPanel').click(function(e) {
             if($('#layerSelection').dialog('isOpen')) {
-               $('#layerSelection').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+               $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); })
             }
             else {
                $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
@@ -164,9 +168,9 @@ function createHelpMessages()
       },
       text: function() {
          return 'To view the layers you just selected, you need to use the ' +
-         '<a id="ltHelp-layersPanel" href="#">layers panel</a> .' +
+         '<a id="ltHelp-layersPanel" href="#">layers panel</a>. ' +
          'If you want to see a layer displayed on the map you need to select it\'s checkbox ' +
-         'and then select a date (We will cover dates next!). When you are done with a layer just uncheck it. ' +
+         'and then select a date (We will cover dates next). When you are done with a layer just uncheck it. ' +
          'You can also right click on layers for further options. When you are ready for the next step just click ' +
          '<a id="wtHelp-next" href="#">next</a>.';
       },
@@ -199,7 +203,6 @@ function createHelpMessages()
             '<a id="dtNext" href="#">Next</a>.';
       },
       afterOpen: function() {
-         // Open the data panel on click
          $('#dtNext').click(function(e) {
             removeMessage(map.tutUID);
             map.tutUID = showMessage('tbdTutorial', null);
@@ -303,7 +306,8 @@ function createHelpMessages()
          'we want to create. You can also provide a bbox and/or a time range. ' +
          'If you\'re creating a histogram you can also provide some bins, but ' +
          'if you don\'t some will be created for you.';
-      }
+      },
+      max: 1,
    }
    
    // Scalebar Tutorial
@@ -337,25 +341,67 @@ function createHelpMessages()
       max: 1,
    };
    
-   map.helperMessages['error400'] = {
-      title: function(){
-         return 'Error: Bad Request';         
+   map.helperMessages['badRequestHelp'] = {
+      title: function() {
+         return 'Dealing With Bad Requests';
       },
-      text: function(data){
-         return 'A bad request was made ' + 
-         '<a id="url400" href="' + data.url + '" target="_blank">here</a>' + '.';
+      text: function() {
+         return 'Some things to try when dealing with bad requests:' + 
+         '<ol>' +
+            '<li>Check the parameters are valid. BaseURL, Coverage, Type, etc..</li>' +
+            '<li>Using a Bbox? Is it inside the area covered by the layer? Have you tried it in a different spot?</li>' + 
+            '<li>Using a date? Is it correctly formated? Does the layer have data for that time?</li>' + 
+            '<li>Is the baseURL the correct one for that layer?</li>' + 
+            '<li>View the query yourself in a browser, it may have more information as to what is wrong.</li>' + 
+         '</ol>';
+      },
+      max: 1,
+   }
+   
+   map.helperMessages['error400'] = {
+      title: function() {
+         return 'Sorry what was that? Could you say that again?';         
+      },
+      text: function(data) {
+         return 'We had a little trouble understanding what you wanted as a bad request was made. ' + 
+         'You can view the request for yourself ' + 
+         '<a id="url400" href="' + data.url + '" target="_blank">here</a>' + '. ' +
+         'Make sure you have entered all the required parameters (baseURL, coverage and type) ' +
+         'and that each of them is valid before trying again. If you still have trouble it may be ' + 
+         'that there is no data available for your selection. Do you need some further help? ' +
+         '<a id="error400-next" href="#">Yes</a>';
+      },
+      afterOpen: function(data) {
+         $('#error400-next').click(function(e) {
+            map.tutUID = showMessage('badRequestHelp', null);
+            return false;
+         });
       },
       max: 1,
    }
    
    map.helperMessages['error500'] = {
-      title: function(){
-         return 'Error: Internal Server Error';         
+      title: function() {
+         return 'We\'re Sorry...Something Went Wrong';         
       },
-      text: function(data){
-         return 'The server ' + 
-         '<a id="url500" href="' + data.url + '" target="_blank">here</a>' + 
-         ' has had an internal server error.';
+      text: function(data) {
+         return 'The server had some trouble while performing your query. You can view the query ' + 
+         '<a id="url500" href="' + data.url + '" target="_blank">here</a>. ' + 
+         'This is a server-side error meaning the problem is not with your computer or ' +
+         'Internet connection, but with the server. We apologise for the inconvenience. ' +
+         'While we fix this maybe you would like to try a different query?';
+      },
+      max: 1,
+   }
+   
+   map.helperMessages['error502'] = {
+      title: function() {
+         return 'Failed To Contact Server: Bad Gateway';
+      },
+      text: function(data) {
+         return 'Sorry, looks like one of the proxies that handles requests ' +
+         'to other domains is unable to fulfil a request that was made. This proxy is required ' +
+         'to perform most functions due to security restrictions in Javascript.'; 
       },
       max: 1,
    }

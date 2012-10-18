@@ -78,6 +78,9 @@
 					// trigger custom event when done
 					.dialogExtend("_trigger", "load");
 			});
+			$(self).bind("dialogclose", function(e) {
+			   $(self).dialogExtend("close");
+			});
 			// maintain chainability
 			return self;
 		},
@@ -268,6 +271,24 @@
 			return self;
 		},
 		
+		"close": function() {
+		   var self = this;
+		   var state = $(self).dialogExtend("state");
+		   
+		   if(state != "normal")
+            $(self)
+               // trigger custom event
+               .dialogExtend("_trigger", "beforeRestore")
+               // restore to normal
+               .dialogExtend("_restoreWithoutTriggerEvent")
+               // mark new state ===> must set state *AFTER* restore because '_restoreWithoutTriggerEvent' will check 'beforeState'
+               .dialogExtend("_setState", "normal")
+               // modify dialog buttons according to new state
+               .dialogExtend("_toggleButtons");
+            // maintain chainability
+         return self;
+		},
+		
       "help": function() {
          var self = this;
          $(self)
@@ -318,6 +339,9 @@
 				// on-click-button
 				.find(".ui-dialog-titlebar-close")
 					.toggle(settings.close)
+					.click(function(e) {
+					  $(self).dialogExtend("close");
+					})
 				.end()
 				.find(".ui-dialog-titlebar-help")
 				  .toggle(settings.help)

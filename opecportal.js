@@ -973,8 +973,6 @@ function setupDrawingControls()
  */
 $(document).ready(function() {
    
-
-
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
    $('#info').dialog({
        position: ['left', 'bottom'],

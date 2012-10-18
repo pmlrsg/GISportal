@@ -567,13 +567,3 @@ div .sensor-accordion {
 .ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
 .ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9;}
 .ui-accordion { width: auto; }
-
-/* Selectable style 
-.ui-widget-content { list-style-type: none; margin: 0; padding: 0; }
-.ui-widget-content li { margin: 3px; padding: 0.4em; height: 13px; text-indent: 20px; }
-.ui-widget-content li .handle { background: #f8f8f8; position: absolute;}
-.ui-widget-content .ui-selecting { background: #FECA40; }
-.ui-widget-content .ui-selecting .handle { background: #FECA40; }
-.ui-widget-content .ui-selected { background: #F39814; color: white; }
-.ui-widget-content .ui-selected .handle { background: #F39814; } */
-

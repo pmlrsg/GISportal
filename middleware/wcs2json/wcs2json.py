@@ -185,7 +185,7 @@ def create_app(config='config.yaml'):
       elif type == 'test': # Used to test new code
          output = openNetCDF(params, test)
       elif type == 'error': # Used to test error handling client-side
-         choice = random.randrange(1,5)
+         choice = random.randrange(1,7)
          if choice == 1:
             g.error = "test 404"
             abort(400)
@@ -196,6 +196,8 @@ def create_app(config='config.yaml'):
          elif choice == 4:
             return jsonify(outpu = "edfwefwrfewf")
          elif choice == 5:
+            abort(502)
+         elif choice == 6:
             x = y # Should create a 500 from apache
       else:
          g.error = '"%s" is not a valid option' % type
