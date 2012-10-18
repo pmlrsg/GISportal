@@ -56,8 +56,8 @@ function createBaseLayers()
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
       'Landsat',
-      'http://wms.jpl.nasa.gov/wms.cgi',
-      { layers: 'global_mosaic', exceptions: 'application/vnd.ogc.se_inimage?' },
+      'http://irs.gis-lab.info/?',
+      { layers: 'landsat' },
       { projection: lonlat, wrapDateLine: true}
    );
    map.addLayer(landsat);
