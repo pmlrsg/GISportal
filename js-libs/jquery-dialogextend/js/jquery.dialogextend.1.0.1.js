@@ -275,7 +275,7 @@
 		   var self = this;
 		   var state = $(self).dialogExtend("state");
 		   
-		   if(state != "normal")
+		   if(typeof state != 'undefined' && state != "normal")
             $(self)
                // trigger custom event
                .dialogExtend("_trigger", "beforeRestore")

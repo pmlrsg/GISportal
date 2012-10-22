@@ -140,12 +140,10 @@ $.widget("ui.multiselect", {
       return !!this.busy;
    },
    isSelected: function(item) {
-      if (this.enabled()) 
-      {
+      if (this.enabled()) {
          return !!this._findItem(item, this.selectedList);
       } 
-      else 
-      {
+      else {
          return null;
       }
    },
@@ -160,8 +158,7 @@ $.widget("ui.multiselect", {
             this.container.unblock();
             this.element.removeAttr('disabled');
          } 
-         else 
-         {
+         else {
             this.container.block({message:msg||null,overlayCSS:{backgroundColor:'#fff',opacity:0.4,cursor:'default'}});
             this.element.attr('disabled', true);
          }

@@ -282,7 +282,7 @@ function addAccordionToPanel(id, displayName)
    // Add the accordion
    $('#opLayers').prepend(
       '<div>' +
-         '<h3><a href="#">' + displayName + '</a></h3>' +
+         '<h3>' + displayName + '</h3>' +
          '<div id="' + id + '" class="sensor-accordion"></div>' +
       '</div>'
    );
@@ -645,15 +645,17 @@ function nonLayerDependent()
    for(i = 0; i < quickRegion.length; i++) {
        $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
    }
-
+   
    // jQuery UI elements
    $('#viewDate').datepicker({
-       showButtonPanel: true,
-       dateFormat: 'dd-mm-yy',
-       changeMonth: true,
-       changeYear: true,
-       beforeShowDay: function(date) {return map.allowedDays(date);},
-       onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
+      showButtonPanel: true,
+      dateFormat: 'dd-mm-yy',
+      changeMonth: true,
+      changeYear: true,
+      beforeShowDay: function(date) { return map.allowedDays(date); },
+      onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); },
+      nextText: "",
+      prevText: "",
    });
 
    // Pan and zoom control buttons
@@ -671,9 +673,9 @@ function nonLayerDependent()
 
    // Data Analysis panel tabs and accordions
    $("#dataTabs").tabs();
-   $("#analyses").accordion({ collapsible: true, autoHeight: false });
-   $("#spatial").accordion({ collapsible: true, autoHeight: false });
-   $("#temporal").accordion({ collapsible: true, autoHeight: false }); 
+   $("#analyses").accordion({ collapsible: true, heightStyle: 'content' });
+   $("#spatial").accordion({ collapsible: true, heightStyle: 'content' });
+   $("#temporal").accordion({ collapsible: true, heightStyle: 'content' }); 
 
    //Hook up the other events for the general UI
    // Left slide panel show-hide functionality      
@@ -971,7 +973,30 @@ function setupDrawingControls()
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
-$(document).ready(function() {
+$(document).ready(function() 
+{
+   // Need to put this early so that tooltips
+   // work at the start to make the page feel
+   // responsive. 
+   
+   $(document).tooltip({
+      track: true,
+      position: { my: "left+5 center", at: "right center", collision: "flipfit" },
+      tooltipClass: 'ui-tooltip-info',
+   });
+   
+   $(document).click(function() {
+      $(this).tooltip('close');
+   });
+   /*
+   $(document).on('mouseenter', '.tt', function() {
+      $(this).tooltip({
+         track: true,
+         position: { my: "left+5 center", at: "right center", collision: "flipfit" }
+      });
+   }).on('mouseleave', '.tt', function() {
+      $(this).tooltip('destroy');
+   });*/
    
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
    $('#info').dialog({

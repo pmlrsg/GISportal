@@ -366,7 +366,7 @@ function createHelpMessages()
          return 'We had a little trouble understanding what you wanted as a bad request was made. ' + 
          'You can view the request for yourself ' + 
          '<a id="url400" href="' + data.url + '" target="_blank">here</a>' + '. ' +
-         'Make sure you have entered all the required parameters (baseURL, coverage and type) ' +
+         'Make sure you have entered all the required parameters (base URL, coverage and type) ' +
          'and that each of them is valid before trying again. If you still have trouble it may be ' + 
          'that there is no data available for your selection. Do you need some further help? ' +
          '<a id="error400-next" href="#">Yes</a>';

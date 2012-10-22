@@ -7,7 +7,7 @@
 
 <!-- ============================ Now for the styling ============================ -->
 <!-- jQuery UI theming CSS -->
-<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.8.23.custom.css" />
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.9.0.custom.min.css" />
 
 <!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
@@ -37,7 +37,7 @@
 <script type="text/javascript" src="js-libs/jquery/jquery-1.8.2.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.8.23.custom.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.9.0.custom.min.js"></script>
 
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
@@ -49,7 +49,7 @@
 <!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
 
 <!-- http://code.google.com/p/jquery-multi-open-accordion -->
-<script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.2.js"></script>
+<script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.3.js"></script>
 
 <!-- Old Custom library of extensions and functions for OpenLayers Map and Layer objects -->
 <script type="text/javascript" src="maplayers.js"></script>
@@ -106,7 +106,7 @@
    <!-- The Map -->
    <div id="map"></div>
    <!-- The Top Toolbar -->
-   <div id="topToolbar" class="toolbar unselectable">
+   <div id="topToolbar" class="toolbar unselectable tt">
       <ul>
          <li id="panZoom">
             <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
@@ -120,7 +120,7 @@
          <li>
             <fieldset>
                <legend>View Date</legend>
-               <input size="10" type="text" name="viewDate" id="viewDate" />
+               <input size="10" type="text" name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
             </fieldset>
          </li>
          <li class="divider"></li>
@@ -137,13 +137,13 @@
          </li>
          <li class="divider"></li>
          <li>
-            <a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window"/></a>        
+            <a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window" title="Map Information"/></a>        
          </li>
          <li>
-            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window"/></a>
+            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window" title="Share Links"/></a>
          </li>
          <li>
-            <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window"/></a>
+            <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window" title="Select Layers"/></a>
          </li>
       </ul>
    </div>
@@ -220,7 +220,7 @@
       </div>
       <div style="clear: both;"> </div>
    </div>
-   <div id="bottomToolbar" class="toolbar unselectable">
+   <div id="bottomToolbar" class="toolbar unselectable tt">
       <ul>
          <li>
             <fieldset>
@@ -243,7 +243,7 @@
          </li>
          <li class="divider"></li>
          <li>
-            <a href="#" id="infoToggleBtn"><img src="img/info32.png" alt="Toggle Information Window"></a>
+            <a href="#" id="infoToggleBtn"><img src="img/info32.png" alt="Toggle Information Window" title="Information"></a>
          </li>   
       </ul>
    </div>
@@ -273,7 +273,7 @@
          <span id="mapInfo-Projection"></span>
       </div>
    </div>
-   <div id="layerSelection" class="layer-selection unselectable" title="Layer Selection">
+   <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
       <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
       <div id="layers"></div>
    </div>

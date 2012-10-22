@@ -125,7 +125,7 @@ function showMetadata($trigger) {
             $('#metadata-' + layer.name).dialog('close');
 
          $(document.body).append(
-            '<div id="metadata-' + layer.name + '" class="" title="' + layer.displayTitle + '">' +
+            '<div id="metadata-' + layer.name + '" class="tt" title="' + layer.displayTitle + '">' +
             '</div>'
          );
 
@@ -195,30 +195,30 @@ function showScalebar($trigger) {
 
          // Add the html to the document
          $(document.body).append(
-            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable" title="Scalebar Info">' +
+            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable tt" title="Scalebar Info">' +
                '<img src="' + scalebarDetails.url + '" alt="Scalebar"/>' +
                '<div id="' + layer.name + '-range-slider"></div>' +
                '<div>' +
-                  '<label for="' + layer.name + '-max" title="The maximum value to be used">Maximum Value: </label>' +
+                  '<label for="' + layer.name + '-max">Maximum Value: </label>' +
                '</div>' +
                '<div>' +
-                  '<input id="' + layer.name + '-max" type="text" name="' + layer.name + '-max" />' +
+                  '<input id="' + layer.name + '-max" title="The maximum value to be used" type="text" name="' + layer.name + '-max" />' +
                '</div>' +
                '<div id="' + layer.name + '-scale">' +
-                  '<input type="button" name="' + layer.name + '-scale-button" value="Recalculate Scale" />' +
+                  '<input type="button" name="' + layer.name + '-scale-button" title="Add 25% to top and bottom of the slider" value="Recalculate Scale" />' +
                '</div>' +
                '<div id="' + layer.name + '-log">' +
-                  '<input type="checkbox" name="' + layer.name + '-log-checkbox"/>' +
-                  '<label for="' + layer.name + '-logarithmic" title="Logarithmic Scale">Logarithmic Scale </label>' +
+                  '<input type="checkbox" name="' + layer.name + '-log-checkbox" title="Use Logarithmic Scale"/>' +
+                  '<label for="' + layer.name + '-logarithmic">Logarithmic Scale </label>' +
                '</div>' +
                '<div id="' + layer.name + '-reset">' +
-                  '<input type="button" name="' + layer.name + '-reset-button" value="Reset Scale" />' +
+                  '<input type="button" name="' + layer.name + '-reset-button" title="Reset the scale to the default values" value="Reset Scale" />' +
                '</div>' +
                '<div>' +
-                  '<label for="' + layer.name + '-min" title="The minimum value to be used">Minimum Value: </label>' +
+                  '<label for="' + layer.name + '-min">Minimum Value: </label>' +
                '</div>' +
                '<div>' +
-                  '<input id="' + layer.name + '-min" type="text" name="min"/>' +
+                  '<input id="' + layer.name + '-min" title="The minimum value to be used" type="text" name="min"/>' +
                '</div>' +
             '</div>'
          );
@@ -310,11 +310,9 @@ function showScalebar($trigger) {
             min: scaleRange.min,
             step: 0.00000001,
             change: function(e, ui) {
-               //if(e.originalEvent) {
-                  if($(this).slider("values", 0) != layer.minScaleVal || $(this).slider("values", 1) != layer.maxScaleVal) {      
-                     validateScale(layer, $(this).slider("values", 0), $(this).slider("values", 1));
-                  }
-               //}
+               if($(this).slider("values", 0) != layer.minScaleVal || $(this).slider("values", 1) != layer.maxScaleVal) {      
+                  validateScale(layer, $(this).slider("values", 0), $(this).slider("values", 1));
+               }
             }
          });
 
@@ -453,8 +451,8 @@ function createGetLegendURL(layer, hasBase)
 function getScaleRange(min, max)
 {
    return {
-      max: max + ((max / 100) * 25),
-      min: min - ((max / 100) * 25),
+      max: max + Math.abs((max / 100) * 25),
+      min: min - Math.abs((max / 100) * 25),
    };
 }
 
@@ -644,7 +642,7 @@ function showGraphCreator()
          
          // Add the html to the document
          $(document.body).append(
-            '<div id="graphCreator" class="unselectable" title="Graph Creator">' +
+            '<div id="graphCreator" class="unselectable tt" title="Graph Creator">' +
                '<div class="ui-control">' +
                   '<h3 id="basic-inputs-header" class="ui-control-header ui-helper-reset">' +
                      '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
@@ -652,30 +650,29 @@ function showGraphCreator()
                   '</h3>' +
                   '<div id="basic-inputs">' +
                      '<div>' +
-                        '<label for="graphcreator-baseurl-label" title="BaseUrl">BaseUrl:</label>' +
+                        '<label for="graphcreator-baseurl-label">Base URL:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-baseurl" type="text" name="graphcreator-path"/>' +
+                        '<input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path"/>' +
                      '</div>' +
                      '<div>' +
-                        '<label for="graphcreator-coverage-label" title="Coverage">Coverage:</label>' +
+                        '<label for="graphcreator-coverage-label">Coverage:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-coverage" type="text" name="graphcreator-coverage"/>' +
-                        '<input id="graphcreator-coverage-button" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />' +
+                        '<input id="graphcreator-coverage" title="Name of the Coverage" placeholder="Name of the Coverage" type="text" name="graphcreator-coverage"/>' +
+                        '<input id="graphcreator-coverage-button" title="Get the top selected layer" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />' +
                      '</div>' +
                      '<div>' +
-                        '<label for="graphcreator-type-label" title="Type">Type:</label>' +
+                        '<label for="graphcreator-type-label">Type:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<select id="graphcreator-type" name="graphcreator-type">' +
-                           '<option value="basic">basic</option>' +
-                           '<option value="histogram">histogram</option>' +
-                           '<option value="raw">raw</option>' +
-                           '<option value="test">test</option>' +
-                           '<option value="error">error</option>' +
+                        '<select id="graphcreator-type" title="Type of query you want to make" name="graphcreator-type">' +
+                           '<option value="basic" title="Returns a time series with mean, median, max, min and STD">basic</option>' +
+                           '<option value="histogram" title="Returns a histogram">histogram</option>' +
+                           '<option value="raw" title="Not for normal use (gets the raw data)">raw</option>' +
+                           '<option value="test" title="Not for normal use (test new queries)">test</option>' +
+                           '<option value="error" title="Generates errors, used testing error handling">error</option>' +
                         '</select>' +
-                        //'<input id="graphcreator-type" type="text" name="graphcreator-type"/>' +
                      '</div>' +
                   '</div>' +
                '</div>' +
@@ -686,10 +683,10 @@ function showGraphCreator()
                   '</h3>' +
                   '<div id="histogram-inputs">' +
                      '<div>' +
-                        '<label for="graphcreator-bins-label" title="Bins">Bins:</label>' +
+                        '<label for="graphcreator-bins-label">Bins:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-bins" type="text" name="graphcreator-bins"/>' +
+                        '<input id="graphcreator-bins" title="Comma Separated Bins" placeholder="example: 0,2.5,5,7.5,10" type="text" name="graphcreator-bins"/>' +
                      '</div>' +
                   '</div>' +
                '</div>' +
@@ -700,16 +697,16 @@ function showGraphCreator()
                   '</h3>' +
                   '<div id="advanced-inputs">' +
                      '<div>' +
-                        '<label for="graphcreator-time-label" title="Time">Time:</label>' +
+                        '<label for="graphcreator-time-label">Time:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-time" type="text" name="graphcreator-time"/>' +
+                        '<input id="graphcreator-time" title="You can use &quot/&quot for ranges" placeholder="dd-mm-yyyy" type="text" name="graphcreator-time"/>' +
                      '</div>' +
                      '<div>' +
-                        '<label for="graphcreator-bbox-label" title="Bbox">Bbox:</label>' +
+                        '<label for="graphcreator-bbox-label">Bbox:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-bbox" type="text" name="graphcreator-bbox"/>' +
+                        '<input id="graphcreator-bbox" title="Bbox in lon,lat,lon,lat format" placeholder="lon,lat,lon,lat" type="text" name="graphcreator-bbox"/>' +
                      '</div>' +
                   '</div>' +
                '</div>' +
@@ -720,16 +717,16 @@ function showGraphCreator()
                   '</h3>' +
                   '<div id="graph-format">' +
                      '<div>' +
-                        '<label for="graphcreator-barwidth-label" title="Barwidth">Barwidth:</label>' +
+                        '<label for="graphcreator-barwidth-label">Barwidth:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-barwidth" type="text" name="graphcreator-barwidth"/>' +
-                        '<input id="graphcreator-barwidth-button" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />' +                    
+                        '<input id="graphcreator-barwidth" title="This does nothing at present" placeholder="This does nothing at present" type="text" name="graphcreator-barwidth"/>' +
+                        '<input id="graphcreator-barwidth-button" title="This does nothing at present" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />' +                    
                      '</div>' +
                   '</div>' +
                '</div>' +
                '<div id="graphcreator-generate">' +
-                  '<input type="button" name="graphcreator-generate-button" value="Generate Graph" />' +
+                  '<input type="button" title="Generate a graph from a WCS request" name="graphcreator-generate-button" value="Generate Graph" />' +
                   '<img src="img/ajax-loader.gif"/>' +  
                '</div>' +
             '</div>'

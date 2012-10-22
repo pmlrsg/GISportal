@@ -13,11 +13,11 @@
 			showAll: null,
 			hideAll: null,
 			_classes: {
-				accordion: 'ui-accordion ui-widget ui-helper-reset ui-accordion-icons',
-				h3: 'ui-accordion-header ui-helper-reset ui-state-default ui-corner-all',
+				accordion: 'ui-accordion ui-widget ui-helper-reset',
+				h3: 'ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ui-accordion-icons',
 				div: 'ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom',
 				divActive: 'ui-accordion-content-active',
-				span: 'ui-icon ui-icon-triangle-1-e',
+				span: 'ui-accordion-header-icon ui-icon ui-icon-triangle-1-e',
 				stateDefault: 'ui-state-default',
 				stateHover: 'ui-state-hover'
 			} 
@@ -149,11 +149,10 @@
 		// return object contain currently opened tabs
 		_getActiveTabs: function() {
 			var $this = this.element;
-			var ui;
+			var ui = [];
 			$this.children('div').each(function(index){
 				var $content = $(this);
 				if($content.is(':visible')) {
-					ui = ui ? ui : [];
 					ui.push({
 						index: index,
 						tab: $content.prev('h3'),
@@ -161,15 +160,14 @@
 					});
 				}
 			});
-			return ui;
+			return (ui.length == 0 ? undefined : ui);
 		},
 		
 		getActiveTabs: function() {
 			var el = this.element;
-			var tabs;
+			var tabs = [];
 			el.children('div').each(function(index){
 				if($(this).is(':visible')) {
-					tabs = tabs ? tabs : [];
 					tabs.push(index);
 				}
 			});

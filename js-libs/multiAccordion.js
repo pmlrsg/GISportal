@@ -13,7 +13,7 @@
 		// Chained selectors
 		$(this).addClass("ui-accordion ui-accordion-icons ui-widget ui-helper-reset")
 			.find("h3")
-				.addClass("ui-accordion-header ui-helper-reset ui-state-default ui-corner-top ui-corner-bottom")
+				.addClass("ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ui-accordion-icons")
 				.hover(function() {
 					$(this).toggleClass("ui-state-hover");
 				})

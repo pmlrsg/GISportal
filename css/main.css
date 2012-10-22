@@ -336,10 +336,12 @@ a.active.triggerR {
    background:#222222 url(../img/Right_icn.png) 10% 50% no-repeat;
 }
 
+/* ======== Info Dialog Box ========
 /* style the information dialogue */
 #info {
    filter: alpha(opacity=70);
    opacity: 0.7;
+   overflow: hidden;
 }
 
 #info p {
@@ -544,13 +546,19 @@ div .sensor-accordion {
    font-weight: bold;
 }
 
-/* ============================= */
+/* ======= Unselectable ======= */
 
 .unselectable {
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* ===== Prototype Modal ===== */
+
+#this-Is-A-Prototype {
+   overflow: hidden;
 }
 
 /* Override some basic jQuery UI Styles */
@@ -567,3 +575,32 @@ div .sensor-accordion {
 .ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
 .ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9;}
 .ui-accordion { width: auto; }
+
+/* Override tooltip style */
+.ui-tooltip-info {
+   padding:4px;
+   position:absolute;
+   z-index:9999;
+   -o-box-shadow: 0 0 5px #aaa;
+   -moz-box-shadow: 0 0 5px #aaa;
+   -webkit-box-shadow: 0 0 5px #aaa;
+   box-shadow: 0 0 5px #aaa;
+   background: white;
+   color: black;
+   border-color: black;
+   opacity: .9;
+}
+
+/*
+.ui-tooltip {
+   padding:4px;
+   position:absolute;
+   z-index:9999;
+   -o-box-shadow: 0 0 5px #aaa;
+   -moz-box-shadow: 0 0 5px #aaa;
+   -webkit-box-shadow: 0 0 5px #aaa;
+   box-shadow: 0 0 5px #aaa;
+   background: #363636;
+   color: white;
+   border-color: white;
+}*/
