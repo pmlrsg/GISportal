@@ -700,7 +700,7 @@ function showGraphCreator()
                         '<label for="graphcreator-time-label">Time:</label>' +
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-time" title="You can use &quot/&quot for ranges" placeholder="dd-mm-yyyy" type="text" name="graphcreator-time"/>' +
+                        '<input id="graphcreator-time" title="You can use &quot/&quot for ranges" placeholder="yyyy-mm-dd" type="text" name="graphcreator-time"/>' +
                      '</div>' +
                      '<div>' +
                         '<label for="graphcreator-bbox-label">Bbox:</label>' +

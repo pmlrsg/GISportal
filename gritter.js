@@ -373,7 +373,7 @@ function createHelpMessages()
       },
       afterOpen: function(data) {
          $('#error400-next').click(function(e) {
-            map.tutUID = showMessage('badRequestHelp', null);
+            showMessage('badRequestHelp', null);
             return false;
          });
       },
@@ -396,12 +396,14 @@ function createHelpMessages()
    
    map.helperMessages['error502'] = {
       title: function() {
-         return 'Failed To Contact Server: Bad Gateway';
+         return 'Well That Wasn\'t Supposed To Happen';
       },
       text: function(data) {
-         return 'Sorry, looks like one of the proxies that handles requests ' +
-         'to other domains is unable to fulfil a request that was made. This proxy is required ' +
-         'to perform most functions due to security restrictions in Javascript.'; 
+         return 'Sorry, looks like we had some trouble talking to one of our ' +
+         'servers. It was a \"Bad Gateway\", if that means anything to anyone? ' +
+         'This in most cases is a temporary error, so you can keep trying or come back and try later. ' +
+         'The problem could be on your end, so you may need to contact your local administrator or if at home, ' +
+         'just check that other sites work.'; 
       },
       max: 1,
    }
