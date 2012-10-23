@@ -566,14 +566,14 @@ div .sensor-accordion {
 .ui-widget .ui-widget { font-size: 0.9em; }
 .ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
 
-.ui-icon-drawpoint  { background-image: url(../img/selectionPoint.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
-.ui-icon-drawbox  { background-image: url(../img/selectionBox.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
-.ui-icon-drawcircle  { background-image: url(../img/selectionCircle.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
-.ui-icon-drawpoly  { background-image: url(../img/selectionPoly.png) !important; height: 26px; width: 26px;margin: -12px -2px !important;}
+.ui-icon-drawpoint  { background-image: url(../img/selectionPoint.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }
+.ui-icon-drawbox  { background-image: url(../img/selectionBox.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }
+.ui-icon-drawcircle  { background-image: url(../img/selectionCircle.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }
+.ui-icon-drawpoly  { background-image: url(../img/selectionPoly.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }
 
 /* Override some accordion styles */
 .ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
-.ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9;}
+.ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9; }
 .ui-accordion { width: auto; }
 
 /* Override tooltip style */
@@ -590,17 +590,3 @@ div .sensor-accordion {
    border-color: black;
    opacity: .9;
 }
-
-/*
-.ui-tooltip {
-   padding:4px;
-   position:absolute;
-   z-index:9999;
-   -o-box-shadow: 0 0 5px #aaa;
-   -moz-box-shadow: 0 0 5px #aaa;
-   -webkit-box-shadow: 0 0 5px #aaa;
-   box-shadow: 0 0 5px #aaa;
-   background: #363636;
-   color: white;
-   border-color: white;
-}*/
