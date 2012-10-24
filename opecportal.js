@@ -13,6 +13,7 @@ var lonlat = new OpenLayers.Projection("EPSG:4326");
 
 // Quick regions array in the format "Name",W,S,E,N
 var quickRegion = [
+   ["Choose a Region",-150, -90, 150, 90],
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
    ["Adriatic", 11.83, 39.00, 20.67, 45.80],
@@ -532,6 +533,12 @@ function nonLayerDependent()
       });
    });
 
+   // Handles re-set of the quick region selector after zooming in or out on the map or panning
+   function quickRegionReset(e){
+      $('#quickRegion').val('Choose a Region');
+   }
+   map.events.register('moveend', map, quickRegionReset);
+  
    //Configure and generate the UI elements
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
@@ -767,7 +774,12 @@ function nonLayerDependent()
                    quickRegion[qr_id][3],
                    quickRegion[qr_id][4]
                 ).transform(map.displayProjection, map.projection);
+       // Prevent the quick region selection being reset after the zoomtToExtent event         
+       map.events.unregister('moveend', map, quickRegionReset);
+       // Do the zoom to the quick region bounds
        map.zoomToExtent(bbox);
+       // Re-enable quick region reset on map pan/zoom
+       map.events.register('moveend', map, quickRegionReset);
    });
 
    createContextMenu();
