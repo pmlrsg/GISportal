@@ -4,3 +4,4 @@ vostok,http://earthserver.pml.ac.uk:8080/ncWMS-1.0RC3/wms?
 motherlodeAlaska,http://motherlode.ucar.edu:8080/thredds/wms/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?
 pml-modis-pre,http://earthserver.pml.ac.uk:8080/thredds/wms/PML-MODIS-q0-daily-pre-2012-05-28-AGGSLOW?
 hawaii,http://oos.soest.hawaii.edu/thredds/wms/hioos/satellite/dhw?
+met-no,http://thredds.met.no/thredds/wms/osisaf_test/met.no/ice/conc_nh_agg?

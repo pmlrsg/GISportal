@@ -51,7 +51,8 @@ def create_app(config='config.yaml'):
             'rsg.pml.ac.uk','rsg.pml.ac.uk:8080',
             'motherlode.ucar.edu','motherlode.ucar.edu:8080',
             'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
-            'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu']
+            'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu',
+            'thredds.met.no','thredds.met.no:8080']
    
    """
    Nothing yet. Maybe return info plus admin login page?
