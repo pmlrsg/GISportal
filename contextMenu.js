@@ -757,7 +757,7 @@ function showGraphCreator()
          });
          
          // Set default value
-         $('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
+         //$('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
          
          graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
                            
@@ -779,7 +779,16 @@ function showGraphCreator()
          $('#graphcreator-coverage-button').click(function() {
             $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
                if($(this).is(':checked')) {
-                  $('#graphcreator-coverage').val($(this).parent('li').attr('id'));
+                  var layerID = $(this).parent('li').attr('id');
+                  $('#graphcreator-coverage').val(layerID);
+                  var layer = map.getLayersByName(layerID)[0];
+                  if(layer.url.indexOf("ncWMS") == -1) {
+                     var path = layer.url.replace("wms", 'wcs')
+                     $('#graphcreator-baseurl').val(path);
+                  }
+                  else {
+                     $('#graphcreator-baseurl').val("");
+                  }          
                }
             });
    

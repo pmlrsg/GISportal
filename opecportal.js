@@ -63,6 +63,13 @@ function createBaseLayers()
    );
    map.addLayer(landsat);
    
+   var blueMarble = new OpenLayers.Layer.WMS(
+      'Blue Marble',
+      'http://demonstrator.vegaspace.com/wmspub', 
+      {layers: "BlueMarble" }
+   );
+   map.addLayer(blueMarble);
+   
    // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 }

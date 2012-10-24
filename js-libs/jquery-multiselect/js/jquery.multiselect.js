@@ -769,7 +769,8 @@ $.widget("ui.multiselect", {
       var that = this;
       elements.unbind('click.multiselect').bind('click.multiselect', function() {
          // ignore if busy...
-         if (!this.busy) {
+         if (!this.busy) {            
+            $(this).trigger('mouseout'); // Fix for tooltips taking titles          
             that._setSelected($(this).parent(), true);
          }
          return false;

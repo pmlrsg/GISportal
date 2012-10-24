@@ -324,27 +324,39 @@ def create_app(config='config.yaml'):
    Performs a basic set of statistical functions on the provided data.
    """
    def basic(dataset, params):
-      var = np.array(dataset.variables[params['coverage']])
+      arr = np.array(dataset.variables[params['coverage']])
+      # Create a masked array ignoring nan's
+      maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
       time = getTimeDimension(dataset)
       times = np.array(time)
       
-      mean = getMean(var)
-      median = getMedian(var)
-      std = getStd(var)
-      min = getMin(var)
-      max = getMax(var)
+      app.logger.debug('starting basic calc') # DEBUG
+      
+      mean = getMean(maskedArray)
+      median = getMedian(maskedArray)
+      std = getStd(maskedArray)
+      min = getMin(maskedArray)
+      max = getMax(maskedArray)
       start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
       
       output = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
       
-      for i,row in enumerate(var):
+      app.logger.debug('starting iter of dates') # DEBUG
+      
+      for i,row in enumerate(maskedArray):
          date = netCDF.num2date(times[i], time.units, calendar='standard')
          mean = getMean(row)
          median = getMedian(row)
          std = getStd(row)
          min = getMin(row)
          max = getMax(row)
-         output[date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+         
+         if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+            pass
+         else:
+            output[date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+         
+      app.logger.debug('Finished basic') # DEBUG
    
       return output
    
@@ -366,34 +378,31 @@ def create_app(config='config.yaml'):
    Returns the median value from the provided array.
    """
    def getMedian(arr):
-      maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr]) # Create a masked array ignoring nan's
-      return np.ma.median(maskedarr)
+      return float(np.ma.median(arr))
    
    """
    Returns the mean value from the provided array.
    """
    def getMean(arr):
-      maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr]) # Create a masked array ignoring nan's
-      return np.mean(maskedarr)
+      return float(np.mean(arr))
    
    """
    Returns the std value from the provided array.
    """
    def getStd(arr):
-      maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr]) # Create a masked array ignoring nan's
-      return np.std(maskedarr)
+      return float(np.std(arr))
    
    """
    Returns the minimum value from the provided array. 
    """
    def getMin(arr):
-      return float(np.nanmin(arr)) # Get the min ignoring nan's, then cast to float
+      return float(np.min(arr)) # Get the min ignoring nan's, then cast to float
    
    """
    Returns the maximum value from the provided array.
    """
    def getMax(arr):
-      return float(np.nanmax(arr)) # Get the max ignoring nan's, then cast to float
+      return float(np.max(arr)) # Get the max ignoring nan's, then cast to float
    
    """
    Returns a histogram created from the provided array. If no bins
