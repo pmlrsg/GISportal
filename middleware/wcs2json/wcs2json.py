@@ -165,6 +165,8 @@ def create_app(config='config.yaml'):
    def getWcsData():
       import random
       
+      g.graphError = "";
+      
       params = getParams() # Gets any optional parameters
       params = checkParams(params) # Checks what parameters where entered
       requiredParams = getRequiredParams() # Gets any required parameters
@@ -206,7 +208,7 @@ def create_app(config='config.yaml'):
       
       app.logger.debug('before json') # DEBUG
       
-      return jsonify(output = output, type = params['type'], coverage = params['coverage'])
+      return jsonify(output = output, type = params['type'], coverage = params['coverage'], error = g.graphError)
    
    """
    Gets any optional parameters.
@@ -329,6 +331,7 @@ def create_app(config='config.yaml'):
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
       time = getTimeDimension(dataset)
       times = np.array(time)
+      output = {}
       
       app.logger.debug('starting basic calc') # DEBUG
       
@@ -339,9 +342,15 @@ def create_app(config='config.yaml'):
       max = getMax(maskedArray)
       start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
       
-      output = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+      if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+         output = {}
+         g.graphError = "no valid data available to use"
+      else:
+         output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
       
       app.logger.debug('starting iter of dates') # DEBUG
+      
+      output['data'] = {}
       
       for i,row in enumerate(maskedArray):
          date = netCDF.num2date(times[i], time.units, calendar='standard')
@@ -354,7 +363,7 @@ def create_app(config='config.yaml'):
          if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
             pass
          else:
-            output[date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+            output['data'][date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
          
       app.logger.debug('Finished basic') # DEBUG
    
@@ -415,8 +424,8 @@ def create_app(config='config.yaml'):
       app.logger.debug('before bins') # DEBUG
       
       if bins == None or not bins:
-         max = getMax(arr)
-         min = getMin(arr)
+         max = getMax(maskedarr)
+         min = getMin(maskedarr)
          bins = np.linspace(min, max, 10) # Create ten evenly spaced bins 
          app.logger.debug('bins generated') # DEBUG
          N,bins = np.histogram(maskedarr, bins) # Create the histogram

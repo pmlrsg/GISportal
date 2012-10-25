@@ -409,15 +409,25 @@ function createHelpMessages()
    }
    
    map.helperMessages['errorParserError'] = {
-      title: function(){
+      title: function() {
          return 'Parse Error: Unexpected character';         
       },
-      text: function(data){
+      text: function(data) {
          return 'An unexpected character was received from "' + 
          '<a id="urlParserError" href="' + data.url + '" target="_blank">this</a>' +
          '" address.';
       },
       max: 1,
+   }
+   
+   map.helperMessages['graphError'] = {
+      title: function() {
+         return 'Sorry, we failed to create a graph';
+      },
+      text: function(data) {
+         return 'The server informed us that it failed to make a graph for your selection with the message "' +
+         data.error + '".';
+      }
    }
 }
 

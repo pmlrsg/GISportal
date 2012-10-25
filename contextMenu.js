@@ -821,15 +821,23 @@ function showGraphCreator()
                dataType: 'json',
                asyc: true,
                success: function(data) {
+                  if(data.error != "") {
+                     d = {
+                        error: data.error
+                     };
+                     showMessage('graphError', d);
+                     return;
+                  }
+                                  
                   if(data.type == 'basic') {                                    
-                     var start = new Date(data.output.time).getTime(),
+                     var start = new Date(data.output.global.time).getTime(),
                         d1 = [],
                         d2 = [], 
                         d3 = [],
                         d4 = [], 
                         d5 = [];
                      
-                     $.each(data.output, function(i, value) {
+                     $.each(data.output.data, function(i, value) {
                         d1.push([new Date(i).getTime(), value.std]);
                         d2.push([new Date(i).getTime(), value.max]);
                         d3.push([new Date(i).getTime(), value.min]);
@@ -837,56 +845,35 @@ function showGraphCreator()
                         d5.push([new Date(i).getTime(), value.mean]);
                      });
                      
-                     /*
-                     var options = {
-                        xaxis: { min: 0, max: d1.length + 1 },
-                        yaxis: { min: data.output.min, max: data.output.max },
-                        title: 'Example Graph',
-                        mouse: {
-                          track: true, // Enable mouse tracking
-                          lineColor: 'purple',
-                          relative: true,
-                          position: 'ne',
-                          sensibility: 1,
-                          trackDecimals: 2,
-                          trackFormatter: function (o) { return 'x = ' + o.x +', y = ' + o.y; }
-                        },
-                        legend: {
-                           position: 'se', // Position the legend 'south-east'.
-                           backgroundColor: '#D2E8FF', // A light blue background color.
-                        },
-                        HtmlText : false
-                     };*/
-                     
                      var graphData = {
                         id: 'wcsgraph' + Date.now(),
                         title: 'WCS Test Graph',
                         data: [{
-                           data: d1.sort(),
+                           data: d1.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
                            label: 'STD',
                         },
                         {
-                           data: d2.sort(),
+                           data: d2.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
                            label: 'max',
                         },
                         {
-                           data: d3.sort(),
+                           data: d3.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
                            label: 'min',
                         },
                         {
-                           data: d4.sort(),
+                           data: d4.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
                            label: 'median',
                         },
                         {
-                           data: d5.sort(),
+                           data: d5.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
                            label: 'mean',
@@ -930,4 +917,8 @@ function showGraphCreator()
          graphCreator.dialog('open');
       }
    };
+}
+
+function sortDates(a, b) {
+   return a[0] - b[0];
 }
