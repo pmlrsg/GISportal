@@ -246,12 +246,15 @@ function candleOptions()
    };
 }
 
-function basicTimeOptions()
+function basicTimeOptions(yaxisTitle)
 {
    return {
       xaxis: {
          mode: 'time',
          labelsAngle: 45
+      },
+      yaxis: {
+         title: yaxisTitle, 
       },
       selection: {
          mode: 'x'

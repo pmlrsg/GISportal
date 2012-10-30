@@ -878,7 +878,7 @@ function showGraphCreator()
                            points: { show: true },
                            label: 'mean',
                         }],
-                        options: basicTimeOptions(),
+                        options: basicTimeOptions(data.output.units),
                         selectable: true,
                         selectSeries: true,
                      };

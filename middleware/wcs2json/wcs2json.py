@@ -208,7 +208,13 @@ def create_app(config='config.yaml'):
       
       app.logger.debug('before json') # DEBUG
       
-      return jsonify(output = output, type = params['type'], coverage = params['coverage'], error = g.graphError)
+      try:
+         jsonData = jsonify(output = output, type = params['type'], coverage = params['coverage'], error = g.graphError)
+      except Exception, e:
+         g.error = "Request aborted, exception encountered: %s" % e
+         abort(500) # If we fail to jsonify the data return 500
+      
+      return jsonData
    
    """
    Gets any optional parameters.
@@ -330,29 +336,40 @@ def create_app(config='config.yaml'):
       # Create a masked array ignoring nan's
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
       time = getTimeDimension(dataset)
+         
+      if time == None:
+         g.graphError = "could not find time dimension"
+         return
+      
       times = np.array(time)
       output = {}
       
+      units = getUnits(dataset.variables[params['coverage']])
+      output['units'] = units
+      
       app.logger.debug('starting basic calc') # DEBUG
       
-      mean = getMean(maskedArray)
-      median = getMedian(maskedArray)
-      std = getStd(maskedArray)
-      min = getMin(maskedArray)
-      max = getMax(maskedArray)
+      #mean = getMean(maskedArray)
+      #median = getMedian(maskedArray)
+      #std = getStd(maskedArray)
+      #min = getMin(maskedArray)
+      #max = getMax(maskedArray)
       start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
       
-      if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
-         output = {}
-         g.graphError = "no valid data available to use"
-      else:
-         output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+      #=========================================================================
+      # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+      #   output = {}
+      #   g.graphError = "no valid data available to use"
+      # else:
+      #   output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+      #=========================================================================
       
+      output['global'] = {'time': start}
       app.logger.debug('starting iter of dates') # DEBUG
       
       output['data'] = {}
       
-      for i,row in enumerate(maskedArray):
+      for i, row in enumerate(maskedArray):
          date = netCDF.num2date(times[i], time.units, calendar='standard')
          mean = getMean(row)
          median = getMedian(row)
@@ -364,11 +381,15 @@ def create_app(config='config.yaml'):
             pass
          else:
             output['data'][date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+      
+      if len(output['data']) < 1:
+         g.graphError = "no valid data available to use"
+         return output
          
       app.logger.debug('Finished basic') # DEBUG
-   
+      
       return output
-   
+      
    """
    Creates a histogram from the provided data. If no bins are created it creates its own.
    """
@@ -436,10 +457,13 @@ def create_app(config='config.yaml'):
          bins = np.array(values)
          app.logger.debug('bins converted') # DEBUG
          N,bins = np.histogram(maskedarr, bins) # Create the histogram
-         
       
       app.logger.debug('histogram created') # DEBUG
-      for i in range(len(bins)-1): # Iter over the bins
+      for i in range(len(bins)-1): # Iter over the bins       
+         if np.isnan(bins[i]) or np.isnan(bins[i+1] or np.isnan(N[i])):
+            g.graphError = 'no valid data available to use'
+            return       
+         
          numbers.append((bins[i] + (bins[i+1] - bins[i])/2, float(N[i]))) # Get a number halfway between this bin and the next
       return {'Numbers': numbers, 'Bins': bins.tolist()}
    
@@ -457,6 +481,13 @@ def create_app(config='config.yaml'):
                return var
       
       return None
+   
+   def getUnits(coverage):
+      for name in coverage.ncattrs():
+         if name == "units":
+            return coverage.units
+         
+      return ''
    
    @app.errorhandler(400)
    def badRequest(error):
