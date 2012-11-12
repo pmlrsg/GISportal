@@ -65,6 +65,16 @@ ul li {
    padding: 0;
 }
 
+.fullsize {
+   display: block;
+   top: 0;
+   left: 0;
+   border: none;
+   width: 100%;
+   height: 100%;
+   z-index: -1;
+}
+
 .toolbar {
    /*display: none;*/
    /* Note - jQuery will be used to display the toolbar at startup with a nice animation */

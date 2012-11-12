@@ -302,7 +302,7 @@ function createHelpMessages()
       },
       text: function() {
          return 'To create a graph we need three things. The wcs server ' +
-         'to query (BaseURL), the coverage to get and the type of graph ' +
+         'to query (Base URL), the coverage to get and the type of graph ' +
          'we want to create. You can also provide a bbox and/or a time range. ' +
          'If you\'re creating a histogram you can also provide some bins, but ' +
          'if you don\'t some will be created for you.';
@@ -445,20 +445,20 @@ function showMessage(messageName, data)
    
    var message = map.helperMessages[messageName];
    // Check for a title
-   if(typeof(message.title) == 'undefined')
+   if(typeof message.title === 'undefined')
       message.title = function() {
          return 'Sorry, No Help Message Found';
       };
    // Check for some text
-   if(typeof(message.text) == 'undefined')
+   if(typeof message.text === 'undefined')
       message.text = function() {
          return 'Sorry, we could not find a help message for your problem. Please refer to any help documentation you have.'; 
       };
    // Check for an afterOpen method
-   if(typeof(message.afterOpen) == 'undefined')
+   if(typeof message.afterOpen === 'undefined')
       message.afterOpen = function() {};
       
-   if(typeof(message.max) == 'undefined')
+   if(typeof message.max === 'undefined')
       message.max = 1;
 
    // Add the gritter message

@@ -52,7 +52,8 @@ def create_app(config='config.yaml'):
             'motherlode.ucar.edu','motherlode.ucar.edu:8080',
             'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
             'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu',
-            'thredds.met.no','thredds.met.no:8080']
+            'thredds.met.no','thredds.met.no:8080', 'irs.gis-lab.info',
+            'demonstrator.vegaspace.com']
    
    """
    Nothing yet. Maybe return info plus admin login page?
@@ -82,12 +83,13 @@ def create_app(config='config.yaml'):
             
          if url.startswith("http://") or url.startswith("https://"):      
             if request.method == "POST":
-                headers = {"Content-Type": request.environ["CONTENT_TYPE"]}
-                body = request
-                r = urllib2.Request(url, body, headers)
-                y = urllib2.urlopen(r)
+               contentType = request.environ["CONTENT_TYPE"]
+               headers = {"Content-Type": request.environ["CONTENT_TYPE"]}
+               body = request
+               r = urllib2.Request(url, body, headers)
+               y = urllib2.urlopen(r)
             else:
-                y = urllib2.urlopen(url)
+               y = urllib2.urlopen(url)
             
             # print content type header
             i = y.info()
@@ -99,15 +101,28 @@ def create_app(config='config.yaml'):
             
             #resp = y.read()
             resp = make_response(y.read(), y.code)
+            if i.has_key("Content-Type"):
+               resp.headers.add('Content-Type', i['Content-Type'])
+               
             #for key in y.headers.dict.iterkeys():
                #resp.headers[key] = y.headers.dict[key]
             
             y.close()
             return resp
          else:
-            g.error = "Failed to access url"
+            g.error = 'Missing protocol. Add "http://" or "https://" to the front of your request url.'
             abort(400)
       
+      except urllib2.URLError as e:
+         if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+            if e.code == 400:
+               g.error = "Failed to access url, make sure you have entered the correct parameters."
+            if e.code == 500:
+               g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
+            abort(400)
+            
+         g.error = "Failed to access url, make sure you have entered the correct parameters"
+         abort(400) # return 400 if we can't get an exact code
       except Exception, e:
          if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
             if e.code == 400:
@@ -183,6 +198,8 @@ def create_app(config='config.yaml'):
          output = openNetCDF(params, histogram)
       elif type == 'basic': # Outputs a set of standard statistics
          output = openNetCDF(params, basic)
+      elif tpye == 'scatter': # Outputs a scatter graph
+         output = openNetCDF(params, scatter)
       elif type == 'raw': # Outputs the raw values
          output = openNetCDF(params, raw)
       elif type == 'test': # Used to test new code
@@ -210,7 +227,7 @@ def create_app(config='config.yaml'):
       
       try:
          jsonData = jsonify(output = output, type = params['type'], coverage = params['coverage'], error = g.graphError)
-      except Exception, e:
+      except TypeError as e:
          g.error = "Request aborted, exception encountered: %s" % e
          abort(500) # If we fail to jsonify the data return 500
       
@@ -324,6 +341,16 @@ def create_app(config='config.yaml'):
          os.remove(temp.name)
          #temp.close()
          return output
+      except urllib2.URLError as e:
+         if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+            if e.code == 400:
+               g.error = "Failed to access url, make sure you have entered the correct parameters."
+            if e.code == 500:
+               g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
+            abort(400)
+            
+         g.error = "Failed to access url, make sure you have entered the correct parameters"
+         abort(400) # return 400 if we can't get an exact code
       except Exception, e:
          g.error = "Request aborted, exception encountered: %s" % e
          abort(400)   
@@ -335,7 +362,7 @@ def create_app(config='config.yaml'):
       arr = np.array(dataset.variables[params['coverage']])
       # Create a masked array ignoring nan's
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
-      time = getTimeDimension(dataset)
+      time = getCoordinateDimension(dataset, 'Time')
          
       if time == None:
          g.graphError = "could not find time dimension"
@@ -396,6 +423,13 @@ def create_app(config='config.yaml'):
    def histogram(dataset, params):
       var = np.array(dataset.variables[params['coverage']]) # Get the coverage as a numpy array
       return {'histogram': getHistogram(var)}
+   
+   """
+   Creates a scatter from the provided data.
+   """
+   def scatter(dataset, params):
+      var = np.array(dataset.variables[params['coverage']])
+      return {'scatter': getScatter(var)}
    
    """
    Returns the raw data.
@@ -471,16 +505,22 @@ def create_app(config='config.yaml'):
    Utility function to find the time dimension from a netcdf file. Needed as the
    time dimension will not always have the same name or the same attributes.
    """
-   def getTimeDimension(dataset):
+   def getCoordinateDimension(dataset, axis):
       for i, key in enumerate(dataset.variables):
          var = dataset.variables[key]
          app.logger.debug("========== key:" + key + " ===========") # DEBUG
          for name in var.ncattrs():
             app.logger.debug(name) # DEBUG
-            if name == "_CoordinateAxisType" and var._CoordinateAxisType == 'Time':
+            if name == "_CoordinateAxisType" and var._CoordinateAxisType == axis:
                return var
       
       return None
+   
+   def getXDimension(dataset):
+      pass
+   
+   def getYDimension(dataset):
+      pass
    
    def getUnits(coverage):
       for name in coverage.ncattrs():

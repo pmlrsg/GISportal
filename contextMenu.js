@@ -60,6 +60,7 @@ function createContextMenu()
                   },
                   showScalebar: showScalebar($trigger),
                   showMetadata: showMetadata($trigger),
+                  showGraphCreator: showGraphCreator(),
                }
             };                           
          }
@@ -79,8 +80,6 @@ function createContextMenu()
                // The items in the menu
                items: {
                   showMetadata: showMetadata($trigger),
-                  showGraphs: createGraphs(),
-                  showGraphCreator: showGraphCreator()
                }
             };                           
          }
@@ -125,7 +124,7 @@ function showMetadata($trigger) {
             $('#metadata-' + layer.name).dialog('close');
 
          $(document.body).append(
-            '<div id="metadata-' + layer.name + '" class="tt" title="' + layer.displayTitle + '">' +
+            '<div id="metadata-' + layer.name + '" class="tt" title="Metadata - ' + layer.displayTitle + '">' +
             '</div>'
          );
 
@@ -195,7 +194,7 @@ function showScalebar($trigger) {
 
          // Add the html to the document
          $(document.body).append(
-            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable tt" title="Scalebar Info">' +
+            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable tt" title="Scalebar - ' + layer.displayTitle + '">' +
                '<img src="' + scalebarDetails.url + '" alt="Scalebar"/>' +
                '<div id="' + layer.name + '-range-slider"></div>' +
                '<div>' +
@@ -223,7 +222,7 @@ function showScalebar($trigger) {
             '</div>'
          );
          
-         if(layer.minScaleVal != undefined && layer.maxScaleVal != undefined) {
+         if(typeof layer.minScaleVal !== 'undefined' && typeof layer.maxScaleVal !== 'undefined') {
             $('#' + layer.name + '-max').val(layer.maxScaleVal);
             $('#' + layer.name + '-min').val(layer.minScaleVal);
          }
@@ -465,13 +464,13 @@ function getScaleRange(min, max)
  */ 
 function validateScale(layer, newMin, newMax, reset)
 {  
-   if(newMin == null || typeof newMin === undefined)
+   if(newMin == null || typeof newMin === 'undefined')
       newMin = layer.minScaleVal;
       
-   if(newMax == null || typeof newMax === undefined)
+   if(newMax == null || typeof newMax === 'undefined')
       newMax = layer.maxScaleVal;
       
-   if(reset == null || typeof reset === undefined)
+   if(reset == null || typeof reset === 'undefined')
       reset = false;
    
    var min = parseFloat(newMin);
@@ -522,109 +521,6 @@ function validateScale(layer, newMin, newMax, reset)
       $('#' + layer.name + '-range-slider').slider("values", 1, max);
       updateScalebar(layer);
    }
-}
-
-/**
- * Temp - Used to create the demo graphs
- */
-function createGraphs()
-{
-   return {
-      name: 'Show Graphs',
-      callback: function() {
-         var graphData = {
-            id: 'testgraph',
-            title: 'Test Graph',
-            data: generateLineData(),
-            options: lineOptions(),
-            draggable: true
-         };
-         
-         createGraph(graphData);
-         
-         var graphData = {
-            id: 'candlegraph',
-            title: 'Candle Graph',
-            data: generateCandleData(),
-            options: candleOptions(),
-            draggable: false
-         };
-         
-         createGraph(graphData);
-         
-         var graphData = {
-            id: 'timegraph',
-            title: 'Basic Time Graph',
-            data: generateBasicTimeData(),
-            options: basicTimeOptions(),
-            selectable: true
-         };
-         
-         createGraph(graphData);
-         
-         $.ajax({
-            type: 'GET',
-            url: map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?&version=1.0.0&coverage=Pressure_reduced_to_MSL&type=histogram&bins=500,10500,20500,30500,40500,50500,60500,70500,80500,90500,100500,110500,120500,130500,140500,150500',
-            dataType: 'json',
-            asyc: true,
-            success: function(data) {
-               var num = data.output.histogram.Numbers
-               var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
-               
-               var graphData = {
-                  id: 'wcsgraphPressure_reduced_to_MSL',
-                  title: 'WCS Test Graph - Pressure_reduced_to_MSL',
-                  data: [num],
-                  options: barOptions(barwidth),
-                  selectable: true
-               };
-               
-               createGraph(graphData);
-            },
-            error: function(request, errorType, exception) {            
-               var data = {
-                  type: 'wcs data',
-                  request: request,
-                  errorType: errorType,
-                  exception: exception,
-                  url: this.url,
-               };          
-               gritterErrorHandler(data);
-            }
-         });
-         
-         $.ajax({
-            type: 'GET',
-            url: map.host + '/service/wcs2json/wcs?baseurl=http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?&version=1.0.0&coverage=v_wind_tropopause&type=histogram&bins=-100,-80,-60,-40,-20,0,20,40,60,80,100',
-            dataType: 'json',
-            asyc: true,
-            success: function(data) {
-               var num = data.output.histogram.Numbers
-               var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
-               
-               var graphData = {
-                  id: 'wcsgraphv_wind_tropopause',
-                  title: 'WCS Test Graph - v_wind_tropopause',
-                  data: [num],
-                  options: barOptions(barwidth),
-                  selectable: true
-               };
-               
-               createGraph(graphData);
-            },
-            error: function(request, errorType, exception) {    
-               var data = {
-                  type: 'wcs data',
-                  request: request,
-                  errorType: errorType,
-                  exception: exception,
-                  url: this.url,
-               };          
-               gritterErrorHandler(data);        
-            }
-         });
-      }
-   };
 }
 
 /**
@@ -756,8 +652,16 @@ function showGraphCreator()
             },
          });
          
-         // Set default value
-         //$('#graphcreator-baseurl').val('http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?')
+         // Get the currently selected layer
+         var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+         $('#graphcreator-baseurl').val(layer.wcsURL)
+         $('#graphcreator-coverage').val(layer.name);
+         
+         $('.lPanel').bind('selectedLayer', function(e) {
+            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+            $('#graphcreator-baseurl').val(layer.wcsURL)
+            $('#graphcreator-coverage').val(layer.name);
+         })
          
          graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
                            
@@ -782,13 +686,7 @@ function showGraphCreator()
                   var layerID = $(this).parent('li').attr('id');
                   $('#graphcreator-coverage').val(layerID);
                   var layer = map.getLayersByName(layerID)[0];
-                  if(layer.url.indexOf("ncWMS") == -1) {
-                     var path = layer.url.replace("wms", 'wcs')
-                     $('#graphcreator-baseurl').val(path);
-                  }
-                  else {
-                     $('#graphcreator-baseurl').val("");
-                  }          
+                  $('#graphcreator-baseurl').val(layer.wcsURL);   
                }
             });
    

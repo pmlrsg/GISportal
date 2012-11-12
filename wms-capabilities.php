@@ -175,7 +175,6 @@ function createCache($serverName, $serverURL, $xmlStr)
    
             if(!filterLayers($name))
             {
-               // Add to the layers array
                $layer = array(
                   //'SensorName'=>$sensorName,
                   'Name'=>$name,

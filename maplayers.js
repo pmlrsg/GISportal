@@ -12,13 +12,14 @@ var OPEC = OPEC || {};
  * @param {String} firstDate - The first date for which data is available for the layer
  * @param {String} lastDate - The last date for which data is available for the layer
  * @param {String} serverName - The server name which serves the layer
- * @param {String} url - The URL for the WMS service
+ * @param {String} wmsURL - The URL for the WMS service
+ * @param {String} wcsURL - The URL for the WCS service
  * @param {String} sensorName - The name of the sensor for this layer (unescaped)
  * @param {String} exBoundingBox - The geographic bounds for data in this layer
  * 
  * @return {Object} Returns the OPEC.MicroLayer object.
  */
-OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, url, sensorName, exBoundingBox){
+OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox){
    this.name = name.replace("/","-");
    this.urlName = name;
    this.displayTitle = title.replace(/_/g, " ");
@@ -27,7 +28,8 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
    this.firstDate = firstDate;
    this.lastDate = lastDate;
    this.serverName = serverName;
-   this.url = url;
+   this.wmsURL = wmsURL;
+   this.wcsURL = wcsURL;
    this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
    this.sensorName = sensorName;
    this.exBoundingBox = exBoundingBox;
@@ -39,7 +41,7 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
 OpenLayers.Map.prototype.host = "";
 
 // A list of layer names that will be selected by default
-OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind"];
+OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind", "CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -62,7 +64,7 @@ OpenLayers.Map.prototype.microLayers = [];
 OpenLayers.Map.prototype.layerStore = [];
 
 // The unique id of the last tutorial message
-OpenLayers.Map.prototype.tutUID = undefined;
+OpenLayers.Map.prototype.tutUID = null;
 
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
@@ -100,6 +102,9 @@ OpenLayers.Layer.prototype.controlID = 'opLayers';
 // Set this to true of the layer is a temporal layer with date-time based data
 OpenLayers.Layer.prototype.temporal = false;
 
+// Set this to true if the layer has an elevation component
+OpenLayers.Layer.prototype.elevation = false;
+
 // A list of styles available for the layer
 OpenLayers.Layer.prototype.styles = [];
 
@@ -111,6 +116,9 @@ OpenLayers.Layer.prototype.boundingBox = [];
 
 // Holds cached date-times as array of ISO8601 strings for each layer based on data availability
 OpenLayers.Layer.prototype.DTCache = [];
+
+// Holds cached elevation numbers as an array
+OpenLayers.Layer.prototype.elevationCache = [];
 
 // Holds an array of the current date-times for the current date and layer as an array of ISO8601 strings
 OpenLayers.Layer.prototype.currentDateTimes = [];
@@ -259,21 +267,19 @@ OpenLayers.Map.prototype.getMasterCache = function() {
  * Map function which gets data layers asynchronously and creates operational layers for each one
  * 
  * @param {String} fileName - The file name for the specific JSON layer cache
- * @param {String} sensorName - The sensor name
- * @param {String} url - The URL of the WMS service for the layer
- * 
+ * @param {String} microLayer - The microLayer for the layer to be downloaded
  */
-OpenLayers.Map.prototype.getLayerData = function(fileName, sensorName, url) {
+OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
       dataType: 'json',
       asyc: true,
       success: function(data) {
-         createOpLayer(data, sensorName, url);
+         createOpLayer(data, microLayer);
          // DEBUG
          //console.log("Adding layer...");
-         addOpLayer(data.Name.replace("/","-"));
+         addOpLayer(microLayer.name);
          // DEBUG
          //console.log("Added Layer");
       },
