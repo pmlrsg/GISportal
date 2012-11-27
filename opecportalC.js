@@ -52,7 +52,7 @@ function createBaseLayers()
       { layers: 'basic' },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }
    );
-   //map.addLayer(meta);
+   map.addLayer(meta);
 
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
@@ -61,7 +61,7 @@ function createBaseLayers()
       { layers: 'landsat' },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
    );
-   //map.addLayer(landsat);
+   map.addLayer(landsat);
    
    // Add BlueMarble layer
    var blueMarble = new OpenLayers.Layer.WMS(
@@ -70,7 +70,7 @@ function createBaseLayers()
       {layers: "BlueMarble" },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
    );
-   //map.addLayer(blueMarble);
+   map.addLayer(blueMarble);
    
    // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
