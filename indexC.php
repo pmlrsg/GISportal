@@ -70,7 +70,7 @@
 <script type="text/javascript" src="js-libs/Cesium/js/Cesium.js" "></script>
 
 <!-- O2C -->
-<script type="text/javascript" src="js-libs/O2C/js/O2C.new.js"></script>
+<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>
 
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="opecportalC.js"></script>

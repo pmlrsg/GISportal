@@ -198,8 +198,10 @@ def create_app(config='config.yaml'):
          output = openNetCDF(params, histogram)
       elif type == 'basic': # Outputs a set of standard statistics
          output = openNetCDF(params, basic)
-      elif tpye == 'scatter': # Outputs a scatter graph
+      elif type == 'scatter': # Outputs a scatter graph
          output = openNetCDF(params, scatter)
+      elif type == 'point':
+         output = getPointData(params, raw)
       elif type == 'raw': # Outputs the raw values
          output = openNetCDF(params, raw)
       elif type == 'test': # Used to test new code
@@ -239,8 +241,10 @@ def create_app(config='config.yaml'):
    def getParams():
       time = request.args.get('time', None)
       bbox = request.args.get('bbox', None)
+      vertical = request.args.get('vertical', None)
       return {'time': time,
-              'bbox': bbox}
+              'bbox': bbox,
+              'vertical': vertical }
    
    """
    Gets any required parameters.
@@ -250,7 +254,7 @@ def create_app(config='config.yaml'):
       service = 'WCS'
       requestType = 'GetCoverage'
       version = request.args.get('version', '1.0.0')
-      format = 'NetCDF3'
+      format = request.args.get('format', 'NetCDF3')
       coverage = request.args.get('coverage')
       crs = 'OGC:CRS84'
       type = request.args.get('type')
@@ -289,8 +293,10 @@ def create_app(config='config.yaml'):
    """
    def createURL(params):
       baseURL = params.pop('baseURL')
+      temBaseUrl = baseURL
       query = urllib.urlencode(params)
       url = baseURL + query
+      params['baseURL'] = temBaseUrl
       app.logger.debug('URL: ' + url) # DEBUG
       if "wcs2json/wcs" in baseURL:
          g.error = 'possible infinite recursion detected, cancelled request'
@@ -332,7 +338,7 @@ def create_app(config='config.yaml'):
          #file.close()
               
          app.logger.debug('before opening netcdf') # DEBUG
-         rootgrp = netCDF.Dataset(temp.name, 'r', format='NETCDF3')
+         rootgrp = netCDF.Dataset(temp.name, 'r', format=params['format'])
          #rootgrp = netCDF.Dataset((os.path.join(app.instance_path, "test.nc")), 'r', format='NETCDF3')
          app.logger.debug('netcdf file open') # DEBUG
          output = method(rootgrp, params)   
@@ -353,7 +359,94 @@ def create_app(config='config.yaml'):
          abort(400) # return 400 if we can't get an exact code
       except Exception, e:
          g.error = "Request aborted, exception encountered: %s" % e
-         abort(400)   
+         abort(400)
+         
+   def contactWCSServer(url):
+      app.logger.debug('Contacting WCS Server with request...')
+      resp = urllib2.urlopen(url)     
+      app.logger.debug('Request successful')
+      return resp
+         
+   def saveOutTempFile(resp):
+      app.logger.debug('Saving out temporary file...')
+      temp = tempfile.NamedTemporaryFile('w+b', delete=False)
+      temp.write(resp.read())
+      temp.close()
+      resp.close()
+      app.logger.debug('Temporary file saved successfully')
+      return temp.name
+       
+   def openNetCDFFile(fileName, params):
+      app.logger.debug('Opening netCDF file...')
+      rootgrp = netCDF.Dataset(fileName, 'r', format=params['format'])
+      app.logger.debug('NetCDF file opened')
+      return rootgrp
+   
+   def expandBbox(params):
+      # TODO: try except for malformed bbox
+      app.logger.debug('Expanding Bbox...')
+      increment = 0.1
+      values = params['bbox'].split(',')
+      for i,v in enumerate(values):
+         values[i] = float(values[i]) # Cast string to float
+         if i == 0:
+            values[i] -= increment
+         elif i == 3:
+            values[i] += increment
+         values[i] = str(values[i])
+      params['bbox'] = ','.join(values)
+      app.logger.debug(','.join(values))
+      app.logger.debug('New Bbox %s' % params['bbox'])
+      app.logger.debug('Bbox Expanded')
+      # Recreate the url
+      app.logger.debug('Recreating the url...')
+      params['url'] = createURL(params)
+      app.logger.debug('Url recreated')
+      return params
+   
+   """
+   Tries to get a single point of data to return
+   """      
+   def getPointData(params, method):
+      import os
+      app.logger.debug('Beginning try to get point data...')
+      for x in range(10) :
+         app.logger.debug('Attempt %s' % (x + 1))
+         #expand box
+         params = expandBbox(params)
+         try:
+            return getData(params, method)
+         except urllib2.URLError as e:
+            if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+               app.logger.debug(e.code)
+               if e.code != 400:
+                  g.graphError = "Failed to make a valid connection with the WCS server"
+                  return {}
+               else:
+                  app.logger.debug('Made a bad request to the WCS server')
+      
+      # If we get here, then no point found
+      g.graphError = "Could not retrieve a data point for that area"
+      return {}
+   
+   """
+   Generic method for getting data from a wcs server
+   """
+   def getData(params, method, checkdata=None):
+      import os
+      resp = contactWCSServer(params['url'])
+      app.logger.debug('Checking data...')
+      fileName = saveOutTempFile(resp)
+      rootgrp = openNetCDFFile(fileName, params)
+      # Check data
+      # Run passed in method
+      app.logger.debug('Data checked, beginning requested process...')
+      output = method(rootgrp, params)
+      rootgrp.close()
+      os.remove(fileName)
+      app.logger.debug('Process complete, returning data for transmission...')
+      return output
+      
    
    """
    Performs a basic set of statistical functions on the provided data.
@@ -362,7 +455,7 @@ def create_app(config='config.yaml'):
       arr = np.array(dataset.variables[params['coverage']])
       # Create a masked array ignoring nan's
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
-      time = getCoordinateDimension(dataset, 'Time')
+      time = getCoordinateVariable(dataset, 'Time')
          
       if time == None:
          g.graphError = "could not find time dimension"
@@ -397,6 +490,7 @@ def create_app(config='config.yaml'):
       output['data'] = {}
       
       for i, row in enumerate(maskedArray):
+         #app.logger.debug(row)
          date = netCDF.num2date(times[i], time.units, calendar='standard')
          mean = getMean(row)
          median = getMedian(row)
@@ -505,7 +599,7 @@ def create_app(config='config.yaml'):
    Utility function to find the time dimension from a netcdf file. Needed as the
    time dimension will not always have the same name or the same attributes.
    """
-   def getCoordinateDimension(dataset, axis):
+   def getCoordinateVariable(dataset, axis):
       for i, key in enumerate(dataset.variables):
          var = dataset.variables[key]
          app.logger.debug("========== key:" + key + " ===========") # DEBUG
@@ -513,6 +607,15 @@ def create_app(config='config.yaml'):
             app.logger.debug(name) # DEBUG
             if name == "_CoordinateAxisType" and var._CoordinateAxisType == axis:
                return var
+      
+      return None
+   
+   def getDimension(dataset, dimName):
+      for i, key in enumerate(dataset.dimensions):
+         app.logger.debug(key)
+         dimension = dataset.dimensions[key]
+         if key == dimName:
+            return len(dimension)
       
       return None
    

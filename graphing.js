@@ -232,8 +232,11 @@ function barOptions(barwidth)
       title: 'Example Graph',
       yaxis: {
          min: 0,
-         autoscaleMargin: 1
-      }
+         autoscaleMargin: 1,
+         labelsAngle: 45,
+         title: 'Number of Points'
+      },
+      HtmlText: false,
    };
 }
 
@@ -242,7 +245,7 @@ function candleOptions()
    return {
       candles: { show: true, candleWidth: 0.6 },
       xaxis: { noTicks: 10 },
-      title: 'Example Graph'
+      title: 'Example Graph',
    };
 }
 
@@ -251,7 +254,8 @@ function basicTimeOptions(yaxisTitle)
    return {
       xaxis: {
          mode: 'time',
-         labelsAngle: 45
+         labelsAngle: 45,
+         title: 'time',
       },
       yaxis: {
          title: yaxisTitle, 

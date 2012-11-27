@@ -43,25 +43,47 @@ function createContextMenu()
          selector: '.selectedLayer',
          // Dynamically creates the menu each time
          build: function($trigger, e) {
-
-            // Return the new menu
-            return {
-               // The items in the menu
-               items: {
+            
+            function buildMenu() {
+               var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+               //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';
+               
+               var fold1 = {                  
                   fold1: {
                      name: "Opacity",
                      items: {
                         opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
                      }
-                  }, 
-                  fold2: {
+                  }
+               };
+               
+               var fold2 = {
+                 fold3: {
                      name: "Layer Styles", 
                      items: getCurrentStyles($trigger),
-                  },
+                  }
+               };
+               
+               var fold3 = {
+                  fold2: {
+                     name: "Layer Elevation",
+                     items: getCurrentElevation($trigger),
+                  }
+               };
+               
+               var rest = {
                   showScalebar: showScalebar($trigger),
                   showMetadata: showMetadata($trigger),
                   showGraphCreator: showGraphCreator(),
-               }
+               };
+               
+               return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
+            }
+
+            // Return the new menu
+            return {
+               // The items in the menu
+               items: buildMenu(),
             };                           
          }
       })
@@ -355,24 +377,39 @@ function getCurrentStyles($trigger)
    });
 
    // Iter through each of the styles and create an array
-   $.each(styles, function(index, value) 
-   {
-      var styleIndex = 'style' + index;
-      menuOutput[index] = [];
-      menuOutput[index][styleIndex] = 
-      {
-         index: styleIndex,
+   $.each(styles, function(index, value) {
+      menuOutput['Layer Styles' + index] = {
          name: value.Name,
          className: value.Name == layer.params["STYLES"] ? "styleSelected" : "",
-         callbackName: value.Name,
+         callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
-         callback: function() 
-         {
+         callback: function() {
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
             layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});
+            console.log(value.Name);
             updateScalebar(layer);
          }
       }                       
+   });
+   
+   return menuOutput;
+}
+
+function getCurrentElevation($trigger) 
+{
+   var layer = map.getLayersByName($trigger.attr('id'))[0];
+   var menuOutput = [];
+   
+   $.each(layer.elevationCache, function(index, value) {
+      menuOutput['Layer Elevation ' + index] = {
+         name: parseFloat(value).toFixed(3) + " " + layer.elevationUnits,
+         className: value == layer.params['ELEVATION'] ? 'elevationSelected' : "",
+         callbackName: 'Layer Elevation ' + value,
+         callback: function() {
+            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+            layer.mergeNewParams({elevation: value});
+         }
+      }
    });
    
    return menuOutput;

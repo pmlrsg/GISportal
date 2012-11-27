@@ -8,7 +8,7 @@ import hashlib
 import json
 import string
 
-CACHELIFE = 1 #86400
+CACHELIFE = 1 #3600 # cache time in seconds, 1 hour cache
 LAYERCACHEPATH = "./cache/layers/"
 SERVERCACHEPATH = "./cache/"
 MASTERCACHEPATH = "./cache/mastercache"
@@ -21,6 +21,7 @@ XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 
 PRODUCTFILTER = "productFilter.csv"
 LAYERFILTER = "layerFilter.csv"
+dirtyCaches = [] # List of caches that may need recreating
 
 def updateCaches():
    servers = csvToList(SERVERLIST)
@@ -55,6 +56,12 @@ def updateCaches():
             # We don't have the oldXML so we need to skip the md5 check
             createCache(server, newXML) 
             change = True
+   
+   dirtyCachesCopy = dirtyCaches[:]
+   print "Checking for dirty caches..."        
+   for dirtyServer in dirtyCachesCopy:    
+      regenerateCache(dirtyServer)
+   print "Dirty caches regenerated"     
          
    if change:
       createMasterCache(servers)
@@ -62,11 +69,19 @@ def updateCaches():
 def createMasterCache(servers):
    masterCache = []
    for server in servers:
-      file = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON)
+      file = None
+      try:
+         file = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON)
+      except IOError as e:
+         print 'Failed to open json file at "' + SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON + '"'       
+         print e
+         
       if file != None:
          masterCache.append(json.loads(file))
-         
+   
+   print "Saving mastercache..."         
    saveFile(MASTERCACHEPATH + FILEEXTENSIONJSON, json.dumps(masterCache))
+   print "mastercache saved" 
          
 def checkMD5(oldXML, newXML):
    newMD5 = hashlib.md5(newXML)
@@ -79,6 +94,12 @@ def checkMD5(oldXML, newXML):
    return newMD5.hexdigest() != oldMD5.hexdigest()
    
 def createCache(server, xml):
+   
+   # Check that we have the xml file
+   if xml == None:
+      dirtyCaches.append(server)
+      return
+   
    # Save out the xml file for later
    saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
    
@@ -88,6 +109,10 @@ def createCache(server, xml):
    
    ET.register_namespace(NAMESPACE, NAMESPACE)
    root = ET.fromstring(xml)
+   
+   if root.find('./%sCapability/%sLayer/%sLayer' % (NAMESPACE,NAMESPACE,NAMESPACE)) == None:
+      dirtyCaches.append(server)
+      return
    
    for service in root.iterfind('./%sService' % (NAMESPACE)):
       serverTitle = service.find('./%sTitle' % (NAMESPACE)).text
@@ -292,6 +317,23 @@ def blackfilter(stringToTest, filterList):
             return False
       
    return True
+
+def regenerateCache(dirtyServer):
+   import time
+   for i in range(10):
+      dirtyCaches.remove(dirtyServer)
+      if i < 10:
+         try:
+            resp = urllib2.urlopen(server['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
+            newXML = resp.read()
+            createCache(server, newXML)
+            if dirtyServer not in dirtyCaches:
+               return
+            else:
+               time.sleep(30)
+         except urllib2.URLError as e:
+            print 'Failed to open url to ' + server['wmsURL']
+            print e
 
 layerBlackList = csvToList(LAYERFILTER)
 productBlackList = csvToList(PRODUCTFILTER)

@@ -6,3 +6,4 @@ vostok-modis-pre,http://earthserver.pml.ac.uk:8080/thredds/wms/PML-MODIS-q0-dail
 hawaii,http://oos.soest.hawaii.edu/thredds/wms/hioos/satellite/dhw?,http://oos.soest.hawaii.edu/thredds/wcs/hioos/satellite/dhw?
 met-no,http://thredds.met.no/thredds/wms/osisaf_test/met.no/ice/conc_nh_agg?,http://thredds.met.no/thredds/wcs/osisaf_test/met.no/ice/conc_nh_agg?
 mapserver,http://demo.mapserver.org/cgi-bin/mapserv?map=/osgeo/mapserver/msautotest/world/world.map&,
+ogs,http://earthserver.pml.ac.uk:8080/thredds/wms/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?,http://earthserver.pml.ac.uk:8080/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?

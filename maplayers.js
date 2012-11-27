@@ -20,6 +20,7 @@ var OPEC = OPEC || {};
  * @return {Object} Returns the OPEC.MicroLayer object.
  */
 OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox){
+   this.origName = name.replace("/","-");
    this.name = name.replace("/","-");
    this.urlName = name;
    this.displayTitle = title.replace(/_/g, " ");
@@ -105,6 +106,11 @@ OpenLayers.Layer.prototype.temporal = false;
 // Set this to true if the layer has an elevation component
 OpenLayers.Layer.prototype.elevation = false;
 
+// Elevation default
+OpenLayers.Layer.prototype.elevationDefault = null;
+
+OpenLayers.Layer.prototype.elevationUnits = null;
+
 // A list of styles available for the layer
 OpenLayers.Layer.prototype.styles = [];
 
@@ -128,6 +134,9 @@ OpenLayers.Layer.prototype.selectedDateTime = '';
 
 // Is the layer selected for display in the GUI or not
 OpenLayers.Layer.prototype.selected = false;
+
+// Used to store the cesium layer
+OpenLayers.Layer.prototype.globeLayer = null;
 
 // Function which looks for a date within a layer.
 // The date passed is in the format yyyy-mm-dd or is an empty string

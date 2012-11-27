@@ -516,6 +516,10 @@ div .sensor-accordion {
    font-weight: bold;
 }
 
+.elevationSelected span {
+   font-weight: bold;
+}
+
 /* ======= Graph Creator ======= */
 
 #graphcreator-baseurl {

@@ -29,3 +29,14 @@ function displayDateString(date)
    var day = date.substring(8, 10);
    return day + '-' + month + '-' + year;
 }
+
+function getObjectKey(obj, value)
+{
+   for(var key in obj) {
+      // TEST
+      if(obj[key] == value) {
+         return key;
+      }
+   }
+   return null;
+};

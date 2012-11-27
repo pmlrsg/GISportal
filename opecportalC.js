@@ -52,7 +52,7 @@ function createBaseLayers()
       { layers: 'basic' },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }
    );
-   map.addLayer(meta);
+   //map.addLayer(meta);
 
    // Add NASA Landsat layer
    var landsat = new OpenLayers.Layer.WMS(
@@ -61,7 +61,7 @@ function createBaseLayers()
       { layers: 'landsat' },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
    );
-   map.addLayer(landsat);
+   //map.addLayer(landsat);
    
    // Add BlueMarble layer
    var blueMarble = new OpenLayers.Layer.WMS(
@@ -70,7 +70,7 @@ function createBaseLayers()
       {layers: "BlueMarble" },
       { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
    );
-   map.addLayer(blueMarble);
+   //map.addLayer(blueMarble);
    
    // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
@@ -170,8 +170,7 @@ function createRefLayers()
  */
 function createOpLayers() 
 {
-   $.each(map.getCapabilities, function(i, item) 
-   {
+   $.each(map.getCapabilities, function(i, item) {
       var wmsURL = item.wmsURL;
       var wcsURL = item.wcsURL;
       var serverName = item.serverName;
@@ -181,14 +180,36 @@ function createOpLayers()
             // Go through each layer and load it
             $.each(item, function(i, item) {
                if(item.Name && item.Name != "") {
-                  var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);           
-                  map.microLayers[microLayer.name] = microLayer;               
+                  var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
+                  checkNameUnique(microLayer);               
                   $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
                }
             });
          }
       });
    });
+}
+
+function checkNameUnique(microLayer, count) 
+{
+   var name = null
+   
+   if(typeof count === "undefined" || count == 0) {
+      var name = microLayer.name;
+      count = 0;
+   }
+   else {
+      var name = microLayer.name + count;
+   }
+   
+   if(name in map.microLayers) {
+      checkNameUnique(microLayer, ++count);
+   }
+   else
+      if(count != 0) { 
+         microLayer.name = microLayer.name + count; 
+      }
+      map.microLayers[microLayer.name] = microLayer;
 }
 
 /**
@@ -216,6 +237,9 @@ function createOpLayer(layerData, microLayer)
       else if (value.Name.toLowerCase() == 'elevation') {
          layer.elevation = true;
          layer.elevationCache = dimension.Value.split(',');
+         layer.mergeNewParams({elevation: value.Default});
+         layer.elevationDefault = value.Default;
+         layer.elevationUnits = value.Units;
       }
    });
 
@@ -259,6 +283,7 @@ function addOpLayer(layerName)
    
    // Add the layer to the map
    map.addLayer(layer);
+   map.setLayerIndex(layer, map.numBaseLayers + map.numOpLayers);
    
    map.events.register("click", layer, getFeatureInfo);
 
@@ -751,6 +776,11 @@ function nonLayerDependent()
       }, 300);
       $(this).data('timeout', t);
    });
+   
+   // Stop link being activated
+   $('#mapOptionsBtn').click(function() {
+      return false;
+   });
 
    // Add permalink share panel click functionality
    $('#shareMapToggleBtn').click(function() {
@@ -1078,10 +1108,10 @@ $(document).ready(function()
       selected: function(e, ui) {
          // DEBUG
          //console.log("selected");
-         if(map.microLayers[ui.option.text]) {
+         if(ui.option.text in map.microLayers) {
             var microLayer = map.microLayers[ui.option.text];
 
-            if(map.layerStore[ui.option.text]) {
+            if(ui.option.text in map.layerStore) {
                // DEBUG
                //console.log("Adding layer...");
                addOpLayer(ui.option.text);
@@ -1089,7 +1119,7 @@ $(document).ready(function()
                //console.log("Added Layer");
             }
             else
-               map.getLayerData(microLayer.serverName + '_' + microLayer.name + '.json', microLayer);
+               map.getLayerData(microLayer.serverName + '_' + microLayer.origName + '.json', microLayer);
          }
          else {
             // DEBUG
@@ -1273,6 +1303,7 @@ function getFeatureInfo(event) {
                   '&version=1.1.1' + 
                   '&bbox=' + map.getExtent().toBBOX() + 
                   '&time=' + this.params.TIME + 
+                  '&elevation=' + this.params.ELEVATION + 
                   x + event.xy.x +
                   y + event.xy.y + 
                   '&SRS=EPSG:4326' + 

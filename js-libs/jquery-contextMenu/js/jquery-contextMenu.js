@@ -933,10 +933,17 @@ var // currently active contextMenu trigger
             root.accesskeys || (root.accesskeys = {});
             
             // create contextMenu items
-            $.each(opt.items, function(key, item) {
-                if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
-                   item = opt.items[key]['style' + key]
-                }
+            for(index in opt.items) {
+                var key = index;
+                if(Object.prototype.toString.call(opt.items) === '[object Array]' && key.indexOf("Layer") == -1) { break; }
+                var item = opt.items[index];
+                //if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
+                   //key = item;
+                   //item = opt.items[item];
+                //}
+                //else {
+                   //key = getObjectKey(opt, item);
+                //}
                
                 var $t = $('<li class="context-menu-item ' + (item.className || "") +'"></li>'),
                 $label = null,
@@ -945,7 +952,7 @@ var // currently active contextMenu trigger
                 item.$node = $t.data({
                     'contextMenu': opt,
                     'contextMenuRoot': root,
-                    'contextMenuKey': key
+                    'contextMenuKey': key,
                 });
                 
                 // register accesskey
@@ -1080,7 +1087,7 @@ var // currently active contextMenu trigger
                     // browsers supporting neither will not be preventing text-selection
                     $t.on('selectstart.disableTextSelect', handle.abortevent);
                 }
-            });
+            };
             // attach contextMenu to <body> (to bypass any possible overflow:hidden issues on parents of the trigger element)
             if (!opt.$node) {
                 opt.$menu.css('display', 'none').addClass('context-menu-root');
