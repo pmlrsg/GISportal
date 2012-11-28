@@ -43,29 +43,35 @@ def updateCaches():
             # Try to contact the server for the newXML
             resp = urllib2.urlopen(server['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
             newXML = resp.read()
-            oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
-            if oldXML == None:
-               oldXML = "old"
-               
-            if checkMD5(oldXML, newXML):
-               print 'md5 check failed...'
-               # Create the caches for this server
-               createCache(server, newXML)
-               change = True   
          except urllib2.URLError as e:
             print 'Failed to open url to ' + server['wmsURL']
             print e
             # If we can't contact the server, skip to the next server
+         except IOError as e:
+            print 'Failed to open url to ' + server['wmsURL']
+            print e
+         try:
+            oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
          except IOError as e:
             print 'Failed to open xml file at "' + SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML + '"'       
             print e
             # We don't have the oldXML so we need to skip the md5 check
             createCache(server, newXML) 
             change = True
+            
+         if oldXML == None:
+            oldXML = "old"
+            
+         if checkMD5(oldXML, newXML):
+            print 'md5 check failed...'
+            # Create the caches for this server
+            createCache(server, newXML)
+            change = True   
    
    dirtyCachesCopy = dirtyCaches[:]
    print "Checking for dirty caches..."        
-   for dirtyServer in dirtyCachesCopy:    
+   for dirtyServer in dirtyCachesCopy:  
+      print "server name: " + dirtyServer['name']  
       regenerateCache(dirtyServer)
    print "Dirty caches regenerated"     
          
@@ -327,19 +333,24 @@ def blackfilter(stringToTest, filterList):
 def regenerateCache(dirtyServer):
    import time
    for i in range(10):
-      dirtyCaches.remove(dirtyServer)
+      if dirtyServer in dirtyCaches:
+         dirtyCaches.remove(dirtyServer)
       if i < 10:
          try:
-            resp = urllib2.urlopen(server['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
+            resp = urllib2.urlopen(dirtyServer['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
             newXML = resp.read()
-            createCache(server, newXML)
+            createCache(dirtyServer, newXML)
             if dirtyServer not in dirtyCaches:
                return
             else:
                time.sleep(30)
          except urllib2.URLError as e:
-            print 'Failed to open url to ' + server['wmsURL']
+            print 'Failed to open url to ' + dirtyServer['wmsURL']
             print e
+         except IOError as e:
+            print 'Failed to open url to ' + dirtyServer['wmsURL']   
+            print e
+            # We don't have the oldXML so we need to skip the md5 check
 
 layerBlackList = csvToList(LAYERFILTER)
 productBlackList = csvToList(PRODUCTFILTER)
