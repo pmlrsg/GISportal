@@ -7,6 +7,12 @@ import xml.etree.ElementTree as ET
 import hashlib
 import json
 import string
+import os
+
+# Change the python working directory to be where this script is located
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 
 CACHELIFE = 1 #3600 # cache time in seconds, 1 hour cache
 LAYERCACHEPATH = "./cache/layers/"
