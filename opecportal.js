@@ -970,15 +970,27 @@ function setupDrawingControls()
       map.addControl(control);
    };
 
-   // Handle jQuery UI icon button click events - each button has a class of "iconBtn"
+   // TRAC Ticket #58: Fixes flaky non-selection of jQuery UI buttons (http://bugs.jqueryui.com/ticket/7665)
+   $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
+   function(e) {h.disabled && (e.preventDefault(), e.stopImmediatePropagation())}
+   ).bind('mousedown', function() {
+      $(this).addClass('opec_click')
+   }).bind('mouseup', function() {
+      if ($(this).hasClass('opec_click')) {
+         $(this).click()
+      }
+      $(this).removeClass('opec_click')
+   }); 
+
+   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
    $('#panZoom input:radio').click(function(e) {
       toggleControl(this);
    });
 
-   // Handle drawing control radio buttons click events - each button has a class of "iconBtn"
+   // Manually Handle drawing control radio buttons click event - each button has a class of "iconBtn"
    $('#ROIButtonSet input:radio').click(function(e) {
       toggleDrawingControl(this);
-   }); 
+   });
 
 }
 
