@@ -1,3 +1,10 @@
+/**
+ *@module O2C 
+ */
+
+/**
+ * 
+ */
 if (typeof OpenLayers !== 'undefined') {  
    OpenLayers.Map.prototype.globe = {
       is3D: true,

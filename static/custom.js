@@ -1,4 +1,8 @@
-// Custom JavaScript functionality
+/**
+ * Custom JavaScript functionality
+ * 
+ * @module custom
+ */
 
 // Extension to JavaScript Arrays to de-duplicate them
 Array.prototype.deDupe = function() {

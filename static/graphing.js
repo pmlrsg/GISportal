@@ -1,3 +1,11 @@
+/**
+ * @module graphing
+ */
+
+/**
+ * 
+ * @param {Object} graphOptions
+ */
 function createGraph(graphOptions) {
    
    // Append html code

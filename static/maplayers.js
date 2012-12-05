@@ -1,11 +1,26 @@
+/**
+ * Map and map layers library - maplayers.js
+ * @module maplayers
+ * 
+ */
+
+/**
+ *@external Openlayers.Map 
+ */
+
 /* Map and map layers library - maplayers.js */
 
-// Create OPEC namespace object
+/**
+ * Create OPEC namespace object
+ * 
+ * @namespace
+ */ 
 var OPEC = OPEC || {};
 
 /**
  * Creates an OPEC.MicroLayer Object (layers in the selector but not yet map layers)
  * 
+ * @constructor
  * @param {String} name - The layer name (unescaped)
  * @param {String} title - The title of the layer
  * @param {String} abstract - The abstract information for the layer
@@ -16,8 +31,6 @@ var OPEC = OPEC || {};
  * @param {String} wcsURL - The URL for the WCS service
  * @param {String} sensorName - The name of the sensor for this layer (unescaped)
  * @param {String} exBoundingBox - The geographic bounds for data in this layer
- * 
- * @return {Object} Returns the OPEC.MicroLayer object.
  */
 OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox){
    this.origName = name.replace("/","-");
@@ -138,9 +151,14 @@ OpenLayers.Layer.prototype.selected = false;
 // Used to store the cesium layer
 OpenLayers.Layer.prototype.globeLayer = null;
 
-// Function which looks for a date within a layer.
-// The date passed is in the format yyyy-mm-dd or is an empty string
-// Returns the array of date-times if there's a match or null if not.
+/**
+ * Function which looks for a date within a layer. The date 
+ * passed is in the format yyyy-mm-dd or is an empty string. 
+ * Returns the array of date-times if there's a match or null
+ * if not.
+ * 
+ * @memberOf external:OpenLayers.Map.matchDate
+ */
 OpenLayers.Layer.prototype.matchDate = function (thedate){
    var thelayer = this;
    var filtArray = $.grep(thelayer.DTCache, function(dt, i) {
@@ -207,6 +225,7 @@ OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
 
 /**
  * Map function to re-generate the global date cache for selected layers
+ * 
  */
 OpenLayers.Map.prototype.refreshDateCache = function(){
    var map = this;
@@ -228,7 +247,6 @@ OpenLayers.Map.prototype.refreshDateCache = function(){
  * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
  * 
  * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
- * 
  * @return {Boolean} Returns true or false depending on if there is layer data available for the given date
  */
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
@@ -344,6 +362,9 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
    });
 }
 
+/**
+ * @param {Object} name - name of layer to check
+ */
 OpenLayers.Map.prototype.isSelected = function(name) {
    return $.inArray(name, map.sampleLayers) > -1 ? true : false;
 }

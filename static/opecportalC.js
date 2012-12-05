@@ -1,7 +1,15 @@
+/**
+ * Will yuidoc or jsdoc3 work? Only one can be chosen
+ * 
+ * @module opecportal
+ */
+
 /*====================================================================================*/
 //Initialise javascript global variables and objects
 
-// The OpenLayers map object
+/**
+ * The OpenLayers map object
+ */
 var map;
 
 /*
@@ -171,25 +179,34 @@ function createRefLayers()
 function createOpLayers() 
 {
    $.each(map.getCapabilities, function(i, item) {
-      var wmsURL = item.wmsURL;
-      var wcsURL = item.wcsURL;
-      var serverName = item.serverName;
-      $.each(item.server, function(index, item) {
-         if(item.length) {
-            var sensorName = index;
-            // Go through each layer and load it
-            $.each(item, function(i, item) {
-               if(item.Name && item.Name != "") {
-                  var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
-                  checkNameUnique(microLayer);               
-                  $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
-               }
-            });
-         }
-      });
+      // Make sure important data is not missing...
+      if(typeof item.server !== "undefined" && typeof item.url !== "undefined" && typeof item.serverName !== "undefined") {
+         var wmsURL = item.wmsURL;
+         var wcsURL = item.wcsURL;
+         var serverName = item.serverName;
+         $.each(item.server, function(index, item) {
+            if(item.length) {
+               var sensorName = index;
+               // Go through each layer and load it
+               $.each(item, function(i, item) {
+                  if(item.Name && item.Name != "") {
+                     var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
+                     checkNameUnique(microLayer);               
+                     $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
+                  }
+               });
+            }
+         });
+      }
    });
 }
 
+/**
+ * Checks if a layer name is unique
+ * 
+ * @param {OPEC.MicroLayer} microLayer - The layer to check 
+ * @param {Number} count - Number of other layers with the same name (optional)
+ */
 function checkNameUnique(microLayer, count) 
 {
    var name = null
@@ -221,7 +238,7 @@ function createOpLayer(layerData, microLayer)
       microLayer.name,
       microLayer.wmsURL,
       { layers: microLayer.urlName, transparent: true}, 
-      { opacity: 1 }
+      { opacity: 1, wrapDateLine: true }
    );
 
    // Get the time dimension if this is a temporal layer

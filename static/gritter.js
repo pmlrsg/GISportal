@@ -1,3 +1,6 @@
+/**
+ * @module gritter
+ */
 
 /**
  * Setup the options for the gritter and create opening
@@ -126,12 +129,13 @@ function createHelpMessages()
          return 'Welcome to the Opec Portal';
       },
       text: function(layer) { 
-         return 'It\'s great to have you here! First thing you need to do is decide which layers you want to use. You can do that from the ' +
-         '<a id="wtHelp-layerSelectionPanel" href="#">layer selection panel</a>.' +
-         ' If you have any trouble, you can always just hit the ' + 
+         return '<p>It\'s great to have you here! First thing you need to do is decide which layers you want to use. You can do that from the ' +
+         '<a id="wtHelp-layerSelectionPanel" href="#">layer selection panel</a>.</p><br>' +
+         ' <p>If you have any trouble, you can always just hit the ' + 
          '<a id="wtHelp-questionMark" href="#">question mark</a>' + 
-         ' at the top of most windows. When you are ready for the next step just click ' +
-         '<a id="wtHelp-next" href="#">next</a>.';    
+         ' at the top of most windows.</p><br>' +
+         '<p>When you are ready for the next step just click ' +
+         '<a id="wtHelp-next" href="#">next</a>.</p>';    
       },
       afterOpen: function(layer) {
          

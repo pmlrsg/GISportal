@@ -1,4 +1,8 @@
 /**
+ * @module contextMenu
+ */
+
+/**
  * Creates the contextMenu and functions for the
  * creation of custom menu items.
  */
@@ -111,6 +115,8 @@ function createContextMenu()
 
 /**
  * Creates an Object to be used in an contextMenu.
+ * 
+ * @function
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
  * 
