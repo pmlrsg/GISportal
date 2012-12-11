@@ -171,12 +171,12 @@ function createHelpMessages()
          return 'Viewing Layers';
       },
       text: function() {
-         return 'To view the layers you just selected, you need to use the ' +
-         '<a id="ltHelp-layersPanel" href="#">layers panel</a>. ' +
-         'If you want to see a layer displayed on the map you need to select it\'s checkbox ' +
-         'and then select a date (We will cover dates next). When you are done with a layer just uncheck it. ' +
-         'You can also right click on layers for further options. When you are ready for the next step just click ' +
-         '<a id="wtHelp-next" href="#">next</a>.';
+         return '<p>To view the layers you just selected, you need to use the ' +
+         '<a id="ltHelp-layersPanel" href="#">layers panel</a>.<p><br>' +
+         '<p>If you want to see a layer displayed on the map you need to select it\'s checkbox ' +
+         'and then select a date (We will cover dates next).<p><br><p>When you are done with a layer just uncheck it. ' +
+         'You can also right click on layers for further options.<p><br><p>When you are ready for the next step just click ' +
+         '<a id="wtHelp-next" href="#">next</a>.<p>';
       },
       afterOpen: function() {
          $('#ltHelp-layersPanel').click(function() {
@@ -358,6 +358,35 @@ function createHelpMessages()
             '<li>Is the baseURL the correct one for that layer?</li>' + 
             '<li>View the query yourself in a browser, it may have more information as to what is wrong.</li>' + 
          '</ol>';
+      },
+      max: 1,
+   }
+   
+   map.helperMessages['3DTutorial'] = {
+      title: function() {
+         return 'Welcome to 3D mode!';
+      },
+      text: function() {
+         return '<p>Things are a little different here. Left click and drag will rotate the planet. ' +
+         'Right click and drag up or down will zoom in or out (You can use the mouse wheel too!). ' +
+         'Middle click and drag will rotate the camera.</p>' +
+         '<br> <p><a id="tDT-Not-Working" href="#">Not working?</a></p>';
+      },
+      afterOpen: function(data) {
+         $('#tDT-Not-Working').click(function() {
+            showMessage('3DNotWorking', null);
+            return false;
+         })
+      },
+      max: 1,
+   }
+   
+   map.helperMessages['3DNotWorking'] = {
+      title: function() {
+         return 'Try this...';
+      },
+      text: function() {
+         return 'Check that your browser and hardware support webGL <a id="tDNW-webglCheck" href="http://get.webgl.org/" target="_blank">here</a> .';
       },
       max: 1,
    }

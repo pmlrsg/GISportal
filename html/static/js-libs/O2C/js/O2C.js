@@ -7,7 +7,7 @@
  */
 if (typeof OpenLayers !== 'undefined') {  
    OpenLayers.Map.prototype.globe = {
-      is3D: true,
+      is3D: false,
       isColumbus: false,
       canvasID: null,
       $canvas: null,
@@ -28,12 +28,11 @@ if (typeof OpenLayers !== 'undefined') {
          this.canvasID = div + "_canvas";
          this.$mapdiv = $("#" + div);
          
-         var is2d = false;
          if(options.canvasID){
             this.canvasID = options.canvasID;
          }
-         if(options.is2d){
-            is2d = options.is2d;
+         if(options.is3D){
+            this.is3D = options.is3D;
          }
          if(options.proxy){
             this.proxyUrl = options.proxy;
@@ -43,51 +42,50 @@ if (typeof OpenLayers !== 'undefined') {
             "id": this.canvasID,
             "class": "fullsize",
          });
-         this.canvas = this.$canvas.get(0);
-         div1.append(this.$canvas);  
-         this.$mapdiv.append(div1);
          
-         this.ellipsoid = Cesium.Ellipsoid.WGS84;
-         this.scene = new Cesium.Scene(this.canvas);
-         this.primitives = this.scene.getPrimitives();
-         this.cb = new Cesium.CentralBody(this.ellipsoid);
-         
-         //var bing = new Cesium.BingMapsImageryProvider({
-            //server : "dev.virtualearth.net",
-            //mapStyle : Cesium.BingMapsStyle.AERIAL
-         //});
-         
-         //this.cb.getImageryLayers().addImageryProvider(bing);
-         this.cb.nightImageSource = "img/land_ocean_ice_lights_2048.jpg";
-         this.cb.specularMapSource = "img/earthspec1k.jpg";
-         if (this.scene.getContext().getMaximumTextureSize() > 2048) {
-             this.cb.cloudsMapSource = "img/earthcloudmaptrans.jpg";
-             this.cb.bumpMapSource = "img/earthbump1k.jpg";
-         }
-         this.cb.showSkyAtmosphere = false;
-         this.cb.showGroundAtmosphere = false;
-         this.primitives.setCentralBody(this.cb);
-         
-         this.scene.getCamera().getControllers().addCentralBody();
-         
-         this.transitioner = new Cesium.SceneTransitioner(this.scene, this.ellipsoid);
-         
-         if(is2d) {
-            map.show2D();
-         }
-         else {
-            map.show3D();
-         }
-         
-         var that = this;
-         this.scene.setAnimation(function() {           
-            var camera = that.scene.getCamera();
-            var cameraPosition = new Cesium.Cartesian4(camera.position.x, camera.position.y, camera.position.z, 1.0);
-            //var v = Cesium.Cartesian3.fromCartesian4(camera.transform.multiplyByVector(cameraPosition));
-            that.scene.setSunPosition(Cesium.computeSunPosition(new Cesium.JulianDate()));
+         try {
+            this.canvas = this.$canvas.get(0);
+            div1.append(this.$canvas);  
+            this.$mapdiv.append(div1);
             
-            // Add code here to update primitives based on changes to animation time, camera parameters, etc.
-         });
+            this.ellipsoid = Cesium.Ellipsoid.WGS84;
+            this.scene = new Cesium.Scene(this.canvas);
+            this.primitives = this.scene.getPrimitives();
+            this.cb = new Cesium.CentralBody(this.ellipsoid);
+      
+            this.cb.nightImageSource = "img/land_ocean_ice_lights_2048.jpg";
+            this.cb.specularMapSource = "img/earthspec1k.jpg";
+            if (this.scene.getContext().getMaximumTextureSize() > 2048) {
+                this.cb.cloudsMapSource = "img/earthcloudmaptrans.jpg";
+                this.cb.bumpMapSource = "img/earthbump1k.jpg";
+            }
+            this.cb.showSkyAtmosphere = false;
+            this.cb.showGroundAtmosphere = false;
+            this.primitives.setCentralBody(this.cb);
+            
+            this.scene.getCamera().getControllers().addCentralBody();
+            
+            this.transitioner = new Cesium.SceneTransitioner(this.scene, this.ellipsoid);
+            
+            var that = this;
+            this.scene.setAnimation(function() {           
+               var camera = that.scene.getCamera();
+               var cameraPosition = new Cesium.Cartesian4(camera.position.x, camera.position.y, camera.position.z, 1.0);
+               //var v = Cesium.Cartesian3.fromCartesian4(camera.transform.multiplyByVector(cameraPosition));
+               that.scene.setSunPosition(Cesium.computeSunPosition(new Cesium.JulianDate()));
+               
+               // Add code here to update primitives based on changes to animation time, camera parameters, etc.
+            });    
+         } catch(e) {
+            console.log(e.message);
+            var stack = e.stack;
+            if (stack) {
+               console.log(stack);
+            }
+            
+            map.cesiumLoaded = false;
+            return 
+         }
          
          (function tick() {
             try {
@@ -98,7 +96,7 @@ if (typeof OpenLayers !== 'undefined') {
                // to avoid losing the animation frame.
                console.log(e.message);
                var stack = e.stack;
-               if (stack){
+               if (stack) {
                   console.log(stack);
                }
             }         
@@ -127,14 +125,14 @@ if (typeof OpenLayers !== 'undefined') {
          
          this.maxExtent = this.getMaxExtent();
          this.scene.getCamera().map = this;
+         map.cesiumLoaded = true;
       },
       
-      addLayer: function(layer) {
+      addLayer: function(layer) {        
          if (layer instanceof OpenLayers.Layer.Vector) { 
             // TODO actually implement this correctly
             //this.baseLayer = layer; // gets rid of null pointers TODO don't do this
             //layer.renderer = new OpenLayers.Renderer.GlobeRenderer(this);
-            //OpenLayers.Map.prototype.addLayer.apply(this, arguments);
          } 
          else if (layer instanceof OpenLayers.Layer.WMS) {
             var url = layer.url;
@@ -261,24 +259,33 @@ if (typeof OpenLayers !== 'undefined') {
    };
     
    OpenLayers.Map.prototype.setupGlobe = function(map, div, options) {
+      
+      this.globe.initialise(map, div, options);
+      
+      if(!map.cesiumLoaded) {
+         this.globe.$canvas.parent("div").hide();
+         return this.globe = null;
+      }
+      
       this.destroy = function() {
          OpenLayers.Map.prototype.destroy.call(this);
          $(this.globe.canvas).remove();
+         
       };
       
-      this.addLayer = function(layer) {      
+      this.addLayer = function(layer) {              
          layer.setVisibility = function(visibility) {
             if(typeof this.globeLayer !== 'undefined') {
                this.globeLayer.show = visibility;
                //console.log(layer);
                //console.log(visibility);
-            }
+            }        
             OpenLayers.Layer.prototype.setVisibility.call(layer, visibility);
-         };    
-            
+         }; 
+             
          var globeLayer = this.globe.addLayer(layer);
          layer.globeLayer = globeLayer;
-         OpenLayers.Map.prototype.addLayer.call(this, layer);   
+         OpenLayers.Map.prototype.addLayer.call(this, layer); 
       };
       
       this.removeLayer = function(layer) {
@@ -388,10 +395,15 @@ if (typeof OpenLayers !== 'undefined') {
       this.setBaseLayer = function(layer) {
          this.globe.setBaseLayer(layer);
          OpenLayers.Map.prototype.setBaseLayer.call(this, layer);
-      }
+      }  
       
-      this.globe.initialise(map, div, options);
-            
+      if(!map.globe.is3D) {
+         map.show2D();
+      }
+      else {
+         map.show3D();
+      }  
+      
       return this.globe
    }    
 }

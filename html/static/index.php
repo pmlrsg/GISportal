@@ -66,6 +66,12 @@
 <!-- jQuery UI dialog extension -->
 <script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.0.1.js"></script>
 
+<!-- Cesium -->
+<script type="text/javascript" src="js-libs/Cesium/js/Cesium.js" "></script>
+
+<!-- O2C -->
+<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>
+
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="opecportal.js"></script>
 <script type="text/javascript" src="gritter.js"></script>
@@ -80,7 +86,7 @@
 //--------PHP-DEBUG-SETTINGS-------------
    // DEFINED in wms-capabilities.php
 //---------------------------------------
-   require('wms-capabilities.php');
+   //require('wms-capabilities.php');
 
    // Generate cache files
    //updateCache();
@@ -248,8 +254,22 @@
       </ul>
    </div>
    <div class="toolbar" id="mapOptions">
-   	<h2>Some header text</h2>
-      <p>Some stuff can go here in the future...</p>
+      <div id="viewtoggle">
+         <ul id="controlToggle">
+            <li>
+               <input type="radio" name="view" value="2D" id="2DToggle" onclick="toggleView(this);" />
+               <label for="noneToggle">2D View</label>
+            </li>
+            <li>
+               <input type="radio" name="view" value="columbus" id="columbusToggle" onclick="toggleView(this);" />
+               <label for="pointToggle">Columbus View</label>
+            </li>
+            <li>
+               <input type="radio" name="view" value="3D" id="3DToggle" checked="checked" onclick="toggleView(this);" />
+               <label for="lineToggle">3D View</label>
+            </li>
+            </ul>
+       </div>
    </div>
    <div class="toolbar" id="shareOptions">
    	<h3>Share</h3>

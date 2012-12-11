@@ -15,9 +15,9 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 CACHELIFE = 1 #3600 # cache time in seconds, 1 hour cache
-LAYERCACHEPATH = "./cache/layers/"
-SERVERCACHEPATH = "./cache/"
-MASTERCACHEPATH = "./cache/mastercache"
+LAYERCACHEPATH = "./html/static/cache/layers/"
+SERVERCACHEPATH = "./html/static/cache/"
+MASTERCACHEPATH = "./html/static/cache/mastercache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 GET_CAPABILITES_PARAMS = "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"

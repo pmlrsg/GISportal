@@ -54,6 +54,9 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
 // Flask host
 OpenLayers.Map.prototype.host = "";
 
+// Not all browsers have webGL
+OpenLayers.Map.prototype.cesiumLoaded = null;
+
 // A list of layer names that will be selected by default
 OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind", "CRW_SST" ];
 

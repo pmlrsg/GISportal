@@ -1,7 +1,15 @@
+/**
+ * Will yuidoc or jsdoc3 work? Only one can be chosen
+ * 
+ * @module opecportal
+ */
+
 /*====================================================================================*/
 //Initialise javascript global variables and objects
 
-// The OpenLayers map object
+/**
+ * The OpenLayers map object
+ */
 var map;
 
 /*
@@ -63,6 +71,7 @@ function createBaseLayers()
    );
    map.addLayer(landsat);
    
+   // Add BlueMarble layer
    var blueMarble = new OpenLayers.Layer.WMS(
       'Blue Marble',
       'http://demonstrator.vegaspace.com/wmspub', 
@@ -125,7 +134,7 @@ function createRefLayers()
          protocol: new OpenLayers.Protocol.HTTP({
             url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
             format: new OpenLayers.Format.GML()
-            }),
+         }),
          strategies: [new OpenLayers.Strategy.Fixed()],
          projection: lonlat,
          styleMap: AMT_style_map
@@ -169,25 +178,55 @@ function createRefLayers()
  */
 function createOpLayers() 
 {
-   $.each(map.getCapabilities, function(i, item) 
-   {
-      var wmsURL = item.wmsURL;
-      var wcsURL = item.wcsURL;
-      var serverName = item.serverName;
-      $.each(item.server, function(index, item) {
-         if(item.length) {
-            var sensorName = index;
-            // Go through each layer and load it
-            $.each(item, function(i, item) {
-               if(item.Name && item.Name != "") {
-                  var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);           
-                  map.microLayers[microLayer.name] = microLayer;               
-                  $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
-               }
-            });
-         }
-      });
+   $.each(map.getCapabilities, function(i, item) {
+      // Make sure important data is not missing...
+      if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL && typeof item.serverName !== "undefined") {
+         var wmsURL = item.wmsURL;
+         var wcsURL = item.wcsURL;
+         var serverName = item.serverName;
+         $.each(item.server, function(index, item) {
+            if(item.length) {
+               var sensorName = index;
+               // Go through each layer and load it
+               $.each(item, function(i, item) {
+                  if(item.Name && item.Name != "") {
+                     var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
+                     checkNameUnique(microLayer);               
+                     $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
+                  }
+               });
+            }
+         });
+      }
    });
+}
+
+/**
+ * Checks if a layer name is unique
+ * 
+ * @param {OPEC.MicroLayer} microLayer - The layer to check 
+ * @param {Number} count - Number of other layers with the same name (optional)
+ */
+function checkNameUnique(microLayer, count) 
+{
+   var name = null
+   
+   if(typeof count === "undefined" || count == 0) {
+      var name = microLayer.name;
+      count = 0;
+   }
+   else {
+      var name = microLayer.name + count;
+   }
+   
+   if(name in map.microLayers) {
+      checkNameUnique(microLayer, ++count);
+   }
+   else
+      if(count != 0) { 
+         microLayer.name = microLayer.name + count; 
+      }
+      map.microLayers[microLayer.name] = microLayer;
 }
 
 /**
@@ -199,7 +238,7 @@ function createOpLayer(layerData, microLayer)
       microLayer.name,
       microLayer.wmsURL,
       { layers: microLayer.urlName, transparent: true}, 
-      { opacity: 1 }
+      { opacity: 1, wrapDateLine: true }
    );
 
    // Get the time dimension if this is a temporal layer
@@ -207,17 +246,24 @@ function createOpLayer(layerData, microLayer)
       var dimension = value;
       if (value.Name.toLowerCase() == 'time') {
          layer.temporal = true;
-         datetimes = dimension.Value.split(',');
+         var datetimes = dimension.Value.split(',');
          layer.DTCache = datetimes;
          layer.firstDate = displayDateString(datetimes[0]);
          layer.lastDate = displayDateString(datetimes[datetimes.length - 1]);
+      }
+      else if (value.Name.toLowerCase() == 'elevation') {
+         layer.elevation = true;
+         layer.elevationCache = dimension.Value.split(',');
+         layer.mergeNewParams({elevation: value.Default});
+         layer.elevationDefault = value.Default;
+         layer.elevationUnits = value.Units;
       }
    });
 
    layer.urlName = microLayer.urlName;
    layer.displayTitle = microLayer.displayTitle;
-   layer.title = microLayer.Title;
-   layer.abstract = microLayer.Abstract;
+   layer.title = microLayer.title;
+   layer.abstract = microLayer.abstract;
    layer.displaySensorName = microLayer.sensorNameDisplay;
    layer.sensorName = microLayer.sensorName;
    layer.wcsURL = microLayer.wcsURL;
@@ -254,6 +300,9 @@ function addOpLayer(layerName)
    
    // Add the layer to the map
    map.addLayer(layer);
+   map.setLayerIndex(layer, map.numBaseLayers + map.numOpLayers);
+   
+   map.events.register("click", layer, getFeatureInfo);
 
    // Add the layer to the panel
    addLayerToPanel(layer);
@@ -277,6 +326,8 @@ function removeOpLayer(layer)
 
    // Remove the layer from the map
    map.removeLayer(layer);
+   
+   map.events.unregister("click", layer, getFeatureInfo);
 
    // Add the layer to the layerStore
    map.layerStore[layer.name] = layer;
@@ -490,6 +541,11 @@ function mapInit()
       displayProjection: lonlat,
       controls: []
    });
+   
+   map.setupGlobe(map, 'map', {
+      is3D: false,
+      proxy: '/service/proxy?url=',
+   });
 
    // Get the master cache file from the server. This file contains some of 
    // the data from a getCapabilities query.
@@ -598,7 +654,7 @@ function nonLayerDependent()
    $('#layerAccordion').css('max-height', $(document).height() - 120);
    $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
    $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
-
+   
    $(window).resize(function() {
       $('#layerAccordion').css('max-height', $(window).height() - 120);
       $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
@@ -736,6 +792,11 @@ function nonLayerDependent()
          $('#mapOptions').hide('fast');
       }, 300);
       $(this).data('timeout', t);
+   });
+   
+   // Stop link being activated
+   $('#mapOptionsBtn').click(function() {
+      return false;
    });
 
    // Add permalink share panel click functionality
@@ -1076,10 +1137,10 @@ $(document).ready(function()
       selected: function(e, ui) {
          // DEBUG
          //console.log("selected");
-         if(map.microLayers[ui.option.text]) {
+         if(ui.option.text in map.microLayers) {
             var microLayer = map.microLayers[ui.option.text];
 
-            if(map.layerStore[ui.option.text]) {
+            if(ui.option.text in map.layerStore) {
                // DEBUG
                //console.log("Adding layer...");
                addOpLayer(ui.option.text);
@@ -1087,7 +1148,7 @@ $(document).ready(function()
                //console.log("Added Layer");
             }
             else
-               map.getLayerData(microLayer.serverName + '_' + microLayer.name + '.json', microLayer);
+               map.getLayerData(microLayer.serverName + '_' + microLayer.origName + '.json', microLayer);
          }
          else {
             // DEBUG
@@ -1179,3 +1240,179 @@ $(document).ready(function()
    // Start setting up anything that is not layer dependent
    nonLayerDependent();
 });
+
+function toggleView(element) {
+   if (element.checked) {
+      if (element.value=="2D"){
+         map.show2D();
+      } else if (element.value=="3D"){
+         map.show3D();
+         showMessage('3DTutorial', null);
+      } else {
+         map.showColumbus();
+      }  
+   }
+}
+
+// Used to get the value of a point back. Needed until WCS version is implemented. 
+// --------------------------------------------------------------------------------------------------
+function getFeatureInfo(event) {
+   if(!this.visibility) return;
+   
+   var control = map.getControlsByClass("OpenLayers.Control.Navigation")[0];
+   if(!control.active) return;
+   
+   var p = new OpenLayers.Pixel(event.xy.x, event.xy.y);
+   var lonLat = map.getLonLatFromPixel(p);
+   
+   if(this.isBaseLayer) {
+      // Do nothing yet...
+   } else {
+      if(typeof this.options.clickable !== 'undefined' && !this.options.clickable) return null;
+      
+      var maxp = new OpenLayers.Pixel(p.x + 10, p.y + 10),
+         minp = new OpenLayers.Pixel(p.x - 10, p.y - 10),
+         bbox = this.options.bbox;
+         
+      if(bbox && bbox.length > 0) bbox = bbox[0];
+      
+      var bounds = new OpenLayers.Bounds();
+      if(!bbox) {
+         
+      } else if(bbox.lowercorner && bbox.uppercorner) {
+         var lower = bbox.lowercorner.split(' '),
+            upper = bbox.uppercorner.split(' ');
+         bounds.extend(new OpenLayers.LonLat(lower[0], lower[1]));
+         bounds.extend(new OpenLayers.LonLat(upper[0], upper[1]));
+      } else if(bbox.maxx && bbox.maxy && bbox.minx && bbox.miny) {
+         bounds.extend(new OpenLayers.LonLat(bbox.minx, bbox.miny));
+         bounds.extend(new OpenLayers.LonLat(bbox.maxx, bbox.maxy));
+      }
+      
+      var click_bounds = new OpenLayers.Bounds();
+      click_bounds.extend(map.getLonLatFromPixel(maxp));
+      click_bounds.extend(map.getLonLatFromPixel(minp));
+      
+      var minLL = map.getLonLatFromPixel(minp);
+      var maxLL = map.getLonLatFromPixel(maxp);
+      
+      if(click_bounds.intersectsBounds(bounds) || !bbox) {
+         
+         // Immediately load popup saying "loading"
+         var tempPopup = new OpenLayers.Popup (
+            "temp", // TODO: does this need to be unique?
+            lonLat,
+            new OpenLayers.Size(100, 50),
+            "Loading...",
+            true, // Means "add a close box"
+            null  // Do nothing when popup is closed.
+         );
+         tempPopup.autoSize = true;
+         map.addPopup(tempPopup);
+        
+         var bbox = maxLL.lat + ',' + minLL.lon + ',' + minLL.lat + ',' + maxLL.lon,
+            x = "",
+            y = "";
+         if(this.url.contains("1.0RC3")) {
+            x = '&X=';
+            y = '&Y=';
+         } else {
+            x = '&I=';
+            y = '&J=';
+         }  
+            
+         $.ajax({
+            type: 'GET',
+            url: OpenLayers.ProxyHost + 
+               this.url + 
+               encodeURIComponent(
+                  'request=GetFeatureInfo' + 
+                  '&service=wms' +
+                  '&layers=' + this.urlName + 
+                  '&QUERY_LAYERS=' + this.urlName + 
+                  '&version=1.1.1' + 
+                  '&bbox=' + map.getExtent().toBBOX() + 
+                  '&time=' + this.params.TIME + 
+                  '&elevation=' + this.params.ELEVATION + 
+                  x + event.xy.x +
+                  y + event.xy.y + 
+                  '&SRS=EPSG:4326' + 
+                  '&INFO_FORMAT=text/xml' +
+                  '&WIDTH=' + map.size.w +
+                  '&HEIGHT=' + map.size.h
+               ),
+            dataType: 'xml',
+            asyc: true,
+            success: function(data) {
+               console.log(data);
+               var xmldoc = data,
+                  lon = parseFloat(getElementValue(xmldoc, 'longitude')),
+                  lat = parseFloat(getElementValue(xmldoc, 'latitude')),
+                  val = parseFloat(getElementValue(xmldoc, 'value')),
+                  html = "";
+                  
+               if(lon && lat && val) {
+                  var truncVal = val.toPrecision(4);
+                  html = "<b>Lon:</b> " + lon.toFixed(6) + "<br /><b>Lat:</b> " +
+                     lat.toFixed(6) + "<br /><b>Value:</b> " + truncVal + "<br />";
+                     
+                  if(!isNaN(truncVal)) {
+                     html += '<a href="#" onclick=setColourScaleMin(' + val + ') ' +
+                        'title="Sets the minimum of the colour scale to ' + truncVal + '">' +
+                        'Set colour min</a><br />';
+                     html += '<a href="#" onclick=setColourScaleMax(' + val + ') ' +
+                        'title="Sets the maximum of the colour scale to ' + truncVal + '">' +
+                        'Set colour max</a><br />';
+                  }
+               }
+               
+               // Remove the "Loading..." popup
+               map.removePopup(tempPopup);
+               // Show the result in a popup
+               var popup = new OpenLayers.Popup (
+                  "id", // TODO: does this need to be unique?
+                  lonLat,
+                  new OpenLayers.Size(100, 50),
+                  html,
+                  true, // Means "add a close box"
+                  null  // Do nothing when popup is closed.
+               );
+               popup.autoSize = true;
+               map.addPopup(popup);
+            },
+            error: function(request, errorType, exception) {
+               var data = {
+                  type: 'master cache',
+                  request: request,
+                  errorType: errorType,
+                  exception: exception,
+                  url: this.url,
+               };          
+               gritterErrorHandler(data);
+            }
+         });
+      }
+   }
+}
+
+// Gets the value of the element with the given name from the given XML document,
+// or null if the given element doesn't exist
+function getElementValue(xml, elName)
+{
+    var el = xml.getElementsByTagName(elName);
+    if (!el || !el[0] || !el[0].firstChild) return null;
+    return el[0].firstChild.nodeValue;
+}
+
+// Sets the minimum value of the colour scale
+function setColourScaleMin(scaleMin)
+{
+   // Do nothing
+}
+
+// Sets the minimum value of the colour scale
+function setColourScaleMax(scaleMax)
+{
+   // Do nothing
+}
+// --------------------------------------------------------------------------------------------------
