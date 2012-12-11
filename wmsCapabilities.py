@@ -119,7 +119,7 @@ def createCache(server, xml):
    subMasterCache = {}
    subMasterCache['server'] = {}
    
-   ET.register_namespace(NAMESPACE, NAMESPACE)
+   #ET.register_namespace(NAMESPACE, NAMESPACE)
    root = ET.fromstring(xml)
    
    if root.find('./%sCapability/%sLayer/%sLayer' % (NAMESPACE,NAMESPACE,NAMESPACE)) == None:
