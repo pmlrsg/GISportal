@@ -636,10 +636,12 @@ function showGraphCreator()
                   '</h3>' +
                   '<div id="advanced-inputs">' +
                      '<div>' +
-                        '<label for="graphcreator-time-label">Time:</label>' +
+                        '<label for="graphcreator-time-label">Time:</label>' + 
                      '</div>' +
                      '<div>' +
-                        '<input id="graphcreator-time" title="You can use &quot/&quot for ranges" placeholder="yyyy-mm-dd" type="text" name="graphcreator-time"/>' +
+                        '<input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>' +
+                        '<label> to </label>' +
+                        '<input id="graphcreator-time2" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time2"/>' +
                      '</div>' +
                      '<div>' +
                         '<label for="graphcreator-bbox-label">Bbox:</label>' +
@@ -670,7 +672,7 @@ function showGraphCreator()
                '</div>' +
             '</div>'
          );
-         
+               
          var graphCreator = $('#graphCreator'),
              graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
          
@@ -694,6 +696,20 @@ function showGraphCreator()
                }
             },
          });
+
+         // Add the jQuery UI datepickers to the dialog
+         $('#graphcreator-time, #graphcreator-time2').datepicker({
+            showButtonPanel: true,
+            dateFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true
+         });
+         // Set the datepicker controls to the current view date if set
+         var viewDate = $('#viewDate').datepicker('getDate');
+         if (viewDate != ""){
+            $('#graphcreator-time').datepicker('setDate', viewDate);
+            $('#graphcreator-time2').datepicker('setDate', viewDate);
+         }
          
          // Get the currently selected layer
          var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
@@ -753,12 +769,16 @@ function showGraphCreator()
          
          // Create and display the graph
          graphCreatorGenerate.on('click', ':button', function(e) {
-            
+            // Extract the date-time value from the datepickers either as single date-time or date-time range
+            var dateRange = $('#graphcreator-time').val();         
+            if ($('#graphcreator-time2').val() != ""){
+               dateRange += ("/" + $('#graphcreator-time2').val());
+            }
             $.ajax({
                type: 'GET',
                url: map.host + '/service/wcs2json/wcs?' + 'baseurl=' + $('#graphcreator-baseurl').val() + 
                   '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
-                  '&time=' + $('#graphcreator-time').val() + '&bbox=' + $('#graphcreator-bbox').val(),
+                  '&time=' + dateRange + '&bbox=' + $('#graphcreator-bbox').val(),
                dataType: 'json',
                asyc: true,
                success: function(data) {
