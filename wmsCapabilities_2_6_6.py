@@ -30,6 +30,7 @@ LAYERFILTER = "layerFilter.csv"
 dirtyCaches = [] # List of caches that may need recreating
 
 def updateCaches():
+   print 'Starting cache generation'
    servers = csvToList(SERVERLIST)
    change = False
    
@@ -85,6 +86,8 @@ def updateCaches():
          
    if change:
       createMasterCache(servers)
+   
+   print 'Finished generating caches'
       
 def createMasterCache(servers):
    masterCache = []
@@ -101,7 +104,7 @@ def createMasterCache(servers):
    
    print "Saving mastercache..."         
    saveFile(MASTERCACHEPATH + FILEEXTENSIONJSON, json.dumps(masterCache))
-   print "mastercache saved" 
+   print "Mastercache saved" 
          
 def checkMD5(oldXML, newXML):
    newMD5 = hashlib.md5(newXML)
@@ -195,7 +198,7 @@ def createCache(server, xml):
    subMasterCache['wcsURL'] = server['wcsURL']
    subMasterCache['serverName'] = server['name']
    
-   print 'Finished creating caches...'
+   print 'Cache creation complete...'
       
    # Return and save out the cache for this server
    return saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))

@@ -14,7 +14,7 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-CACHELIFE = 1 #3600 # cache time in seconds, 1 hour cache
+CACHELIFE = 3600 #3600 # cache time in seconds, 1 hour cache
 LAYERCACHEPATH = "./html/static/cache/layers/"
 SERVERCACHEPATH = "./html/static/cache/"
 MASTERCACHEPATH = "./html/static/cache/mastercache"
@@ -30,6 +30,7 @@ LAYERFILTER = "layerFilter.csv"
 dirtyCaches = [] # List of caches that may need recreating
 
 def updateCaches():
+   print 'Starting cache generation'
    servers = csvToList(SERVERLIST)
    change = False
    
@@ -50,6 +51,7 @@ def updateCaches():
          except IOError as e:
             print 'Failed to open url to ' + server['wmsURL']
             print e
+         
          try:
             oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
          except IOError as e:
@@ -62,11 +64,18 @@ def updateCaches():
          if oldXML == None:
             oldXML = "old"
             
+         # Check that we have the xml file
+         if newXML == None:
+            dirtyCaches.append(server)
+            continue
+            
          if checkMD5(oldXML, newXML):
             print 'md5 check failed...'
             # Create the caches for this server
             createCache(server, newXML)
-            change = True   
+            change = True
+         else: 
+            print 'md5 check passed'
    
    dirtyCachesCopy = dirtyCaches[:]
    print "Checking for dirty caches..."        
@@ -77,6 +86,8 @@ def updateCaches():
          
    if change:
       createMasterCache(servers)
+      
+   print 'Finished generating caches'
       
 def createMasterCache(servers):
    masterCache = []
@@ -106,12 +117,6 @@ def checkMD5(oldXML, newXML):
    return newMD5.hexdigest() != oldMD5.hexdigest()
    
 def createCache(server, xml):
-   
-   # Check that we have the xml file
-   if xml == None:
-      dirtyCaches.append(server)
-      return
-   
    # Save out the xml file for later
    saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
    
@@ -193,7 +198,7 @@ def createCache(server, xml):
    subMasterCache['wcsURL'] = server['wcsURL']
    subMasterCache['serverName'] = server['name']
    
-   print 'Finished creating caches...'
+   print 'Cache creation complete...'
       
    # Return and save out the cache for this server
    return saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
@@ -306,7 +311,6 @@ def replace_all(text, dic):
     return text
  
 def genDateRange(startDate, endDate, interval):
-   import datetime
    import isodate # https://github.com/gweis/isodate
    
    dates = []
