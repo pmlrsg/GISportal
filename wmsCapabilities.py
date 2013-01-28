@@ -51,6 +51,11 @@ def updateCaches():
          except IOError as e:
             print 'Failed to open url to ' + server['wmsURL']
             print e
+            
+         # Check that we have the xml file
+         if newXML == None:
+            dirtyCaches.append(server)
+            continue
          
          try:
             oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
@@ -63,11 +68,6 @@ def updateCaches():
             
          if oldXML == None:
             oldXML = "old"
-            
-         # Check that we have the xml file
-         if newXML == None:
-            dirtyCaches.append(server)
-            continue
             
          if checkMD5(oldXML, newXML):
             print 'md5 check failed...'
@@ -104,7 +104,7 @@ def createMasterCache(servers):
    
    print "Saving mastercache..."         
    saveFile(MASTERCACHEPATH + FILEEXTENSIONJSON, json.dumps(masterCache))
-   print "mastercache saved" 
+   print "Mastercache saved" 
          
 def checkMD5(oldXML, newXML):
    newMD5 = hashlib.md5(newXML)

@@ -51,6 +51,11 @@ def updateCaches():
          except IOError as e:
             print 'Failed to open url to ' + server['wmsURL']
             print e
+            
+         # Check that we have the xml file
+         if newXML == None:
+            dirtyCaches.append(server)
+            continue
          
          try:
             oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
@@ -63,11 +68,6 @@ def updateCaches():
             
          if oldXML == None:
             oldXML = "old"
-            
-         # Check that we have the xml file
-         if newXML == None:
-            dirtyCaches.append(server)
-            continue
             
          if checkMD5(oldXML, newXML):
             print 'md5 check failed...'
@@ -86,7 +86,7 @@ def updateCaches():
          
    if change:
       createMasterCache(servers)
-   
+      
    print 'Finished generating caches'
       
 def createMasterCache(servers):
@@ -116,7 +116,7 @@ def checkMD5(oldXML, newXML):
    
    return newMD5.hexdigest() != oldMD5.hexdigest()
    
-def createCache(server, xml):  
+def createCache(server, xml):
    # Save out the xml file for later
    saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
    
