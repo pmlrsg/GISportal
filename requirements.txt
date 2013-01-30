@@ -1,1 +1,1 @@
-isodate
+isodate==0.4.9
