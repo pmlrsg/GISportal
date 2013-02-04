@@ -1,9 +1,5 @@
 /**
- *@module O2C 
- */
-
-/**
- * 
+ * O2C - Openlayers to Cesium
  */
 if (typeof OpenLayers !== 'undefined') {  
    OpenLayers.Map.prototype.globe = {
