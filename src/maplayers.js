@@ -1,51 +1,36 @@
 /**
  * Map and map layers library - maplayers.js
- * @module maplayers
- * 
  */
 
 /**
- *@external Openlayers.Map 
- */
-
-/* Map and map layers library - maplayers.js */
-
-/**
- * Create OPEC namespace object
- * 
- * @namespace
- */ 
-var OPEC = OPEC || {};
-
-/**
- * Creates an OPEC.MicroLayer Object (layers in the selector but not yet map layers)
+ * Creates an opec.MicroLayer Object (layers in the selector but not yet map layers)
  * 
  * @constructor
- * @param {String} name - The layer name (unescaped)
- * @param {String} title - The title of the layer
- * @param {String} abstract - The abstract information for the layer
- * @param {String} firstDate - The first date for which data is available for the layer
- * @param {String} lastDate - The last date for which data is available for the layer
- * @param {String} serverName - The server name which serves the layer
- * @param {String} wmsURL - The URL for the WMS service
- * @param {String} wcsURL - The URL for the WCS service
- * @param {String} sensorName - The name of the sensor for this layer (unescaped)
- * @param {String} exBoundingBox - The geographic bounds for data in this layer
+ * @param {string} name - The layer name (unescaped)
+ * @param {string} title - The title of the layer
+ * @param {string} abstract - The abstract information for the layer
+ * @param {string} firstDate - The first date for which data is available for the layer
+ * @param {string} lastDate - The last date for which data is available for the layer
+ * @param {string} serverName - The server name which serves the layer
+ * @param {string} wmsURL - The URL for the WMS service
+ * @param {string} wcsURL - The URL for the WCS service
+ * @param {string} sensorName - The name of the sensor for this layer (unescaped)
+ * @param {string} exBoundingBox - The geographic bounds for data in this layer
  */
-OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox){
+opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox) {
    this.origName = name.replace("/","-");
    this.name = name.replace("/","-");
    this.urlName = name;
    this.displayTitle = title.replace(/_/g, " ");
    this.title = title;
-   this.abstract = abstract;
+   this.productAbstract = productAbstract;
    this.firstDate = firstDate;
    this.lastDate = lastDate;
    this.serverName = serverName;
    this.wmsURL = wmsURL;
    this.wcsURL = wcsURL;
    this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
-   this.sensorName = sensorName;
+   this.sensorName = sensorName.replace(/[\.,]+/g, "");
    this.exBoundingBox = exBoundingBox;
 }
 
@@ -53,6 +38,8 @@ OPEC.MicroLayer = function(name, title, abstract, firstDate, lastDate, serverNam
 
 // Flask host
 OpenLayers.Map.prototype.host = "";
+
+OpenLayers.Map.prototype.pywpsLocation = '/service/wcs2json/wcs?';
 
 // Not all browsers have webGL
 OpenLayers.Map.prototype.cesiumLoaded = null;
@@ -94,7 +81,7 @@ OpenLayers.Layer.prototype.displayTitle = '';
 OpenLayers.Layer.prototype.title = '';
 
 // Layer abstract
-OpenLayers.Layer.prototype.abstract = '';
+OpenLayers.Layer.prototype.productAbstract = '';
 
 // Layer sensor
 OpenLayers.Layer.prototype.displaySensorName = '';
@@ -162,7 +149,7 @@ OpenLayers.Layer.prototype.globeLayer = null;
  * 
  * @memberOf external:OpenLayers.Map.matchDate
  */
-OpenLayers.Layer.prototype.matchDate = function (thedate){
+OpenLayers.Layer.prototype.matchDate = function (thedate) {
    var thelayer = this;
    var filtArray = $.grep(thelayer.DTCache, function(dt, i) {
       var datePart = dt.substring(0, 10);
@@ -183,7 +170,7 @@ OpenLayers.Layer.prototype.matchDate = function (thedate){
  * @param {Date} thedate - The currently selected view data as a JavaScript Date object
  *
  */
-OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
+OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate) {
    var layer = lyr;
    if(thedate){
       var uidate = ISODateString(thedate);
@@ -210,11 +197,11 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate){
  * Map function to filter layers with date-time dependencies to given date
  * Used as the onselect callback function for the jQuery UI current view date DatePicker control
  * 
- * @param {String} dateText - yyyy-mm-dd format date string to filter to
+ * @param {string} dateText - yyyy-mm-dd format date string to filter to
  * @param {Object} inst - The instance of the jQuery UI DatePicker view date control
  *
  */
-OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
+OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst) {
    var themap = this;
    var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
    $.each(themap.layers, function(index, value) {
@@ -230,7 +217,7 @@ OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst){
  * Map function to re-generate the global date cache for selected layers
  * 
  */
-OpenLayers.Map.prototype.refreshDateCache = function(){
+OpenLayers.Map.prototype.refreshDateCache = function() {
    var map = this;
    map.enabledDays = [];
    $.each(map.layers, function(index, value) {
@@ -250,7 +237,7 @@ OpenLayers.Map.prototype.refreshDateCache = function(){
  * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
  * 
  * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
- * @return {Boolean} Returns true or false depending on if there is layer data available for the given date
+ * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
  */
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
    var themap = this;
@@ -279,6 +266,7 @@ OpenLayers.Map.prototype.getMasterCache = function() {
       url: "./cache/mastercache.json", 
       dataType: 'json',
       asyc: true,
+      cache: false,
       success: layerDependent,
       error: function(request, errorType, exception) {
          var data = {
@@ -286,7 +274,7 @@ OpenLayers.Map.prototype.getMasterCache = function() {
             request: request,
             errorType: errorType,
             exception: exception,
-            url: this.url,
+            url: this.url
          };          
          gritterErrorHandler(data);
       }
@@ -296,8 +284,8 @@ OpenLayers.Map.prototype.getMasterCache = function() {
 /**
  * Map function which gets data layers asynchronously and creates operational layers for each one
  * 
- * @param {String} fileName - The file name for the specific JSON layer cache
- * @param {String} microLayer - The microLayer for the layer to be downloaded
+ * @param {string} fileName - The file name for the specific JSON layer cache
+ * @param {string} microLayer - The microLayer for the layer to be downloaded
  */
 OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
    $.ajax({
@@ -305,6 +293,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
       url: "./cache/layers/" + fileName,
       dataType: 'json',
       asyc: true,
+      cache: false,
       success: function(data) {
          createOpLayer(data, microLayer);
          // DEBUG
@@ -319,7 +308,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
             request: request,
             errorType: errorType,
             exception: exception,
-            url: this.url,
+            url: this.url
          };          
          gritterErrorHandler(data);
       }
@@ -358,7 +347,7 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
             request: request,
             errorType: errorType,
             exception: exception,
-            url: this.url,
+            url: this.url
          };          
          gritterErrorHandler(data);
       }

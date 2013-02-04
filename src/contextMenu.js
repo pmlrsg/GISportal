@@ -1,8 +1,4 @@
 /**
- * @module contextMenu
- */
-
-/**
  * Creates the contextMenu and functions for the
  * creation of custom menu items.
  */
@@ -50,8 +46,7 @@ function createContextMenu()
             
             function buildMenu() {
                var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-               //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';
-               
+               //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';             
                var fold1 = {                  
                   fold1: {
                      name: "Opacity",
@@ -59,35 +54,30 @@ function createContextMenu()
                         opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
                      }
                   }
-               };
-               
+               };    
                var fold2 = {
                  fold3: {
                      name: "Layer Styles", 
-                     items: getCurrentStyles($trigger),
+                     items: getCurrentStyles($trigger)
                   }
-               };
-               
+               }; 
                var fold3 = {
                   fold2: {
                      name: "Layer Elevation",
-                     items: getCurrentElevation($trigger),
+                     items: getCurrentElevation($trigger)
                   }
                };
-               
                var rest = {
                   showScalebar: showScalebar($trigger),
                   showMetadata: showMetadata($trigger),
-                  showGraphCreator: showGraphCreator(),
-               };
-               
+                  showGraphCreator: showGraphCreator()
+               };  
                return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
             }
-
             // Return the new menu
             return {
                // The items in the menu
-               items: buildMenu(),
+               items: buildMenu()
             };                           
          }
       })
@@ -105,7 +95,7 @@ function createContextMenu()
             return {
                // The items in the menu
                items: {
-                  showMetadata: showMetadata($trigger),
+                  showMetadata: showMetadata($trigger)
                }
             };                           
          }
@@ -142,19 +132,26 @@ function showMetadata($trigger) {
          
          if(layer == null)
             return;
-           
-         var dateRange = function() {
-            return layer.temporal ? '<div><label>Date Range: ' + layer.firstDate + ' to ' + layer.lastDate + '</label></div>' : '';
-         }
 
          // Check if already open
          if($('#metadata-' + layer.name).length)
             $('#metadata-' + layer.name).dialog('close');
-
-         $(document.body).append(
-            '<div id="metadata-' + layer.name + '" class="tt" title="Metadata - ' + layer.displayTitle + '">' +
-            '</div>'
-         );
+            
+         var data = {
+            name: layer.name,
+            displayTitle: layer.displayTitle,
+            northBoundLat: layer.exBoundingBox.NorthBoundLatitude,
+            eastBoundLon: layer.exBoundingBox.EastBoundLongitude,
+            southBoundLat: layer.exBoundingBox.SouthBoundLatitude,
+            westBoundLon: layer.exBoundingBox.WestBoundLongitude,
+            addDateRange: layer.temporal,
+            productAbstract: layer.productAbstract,
+            firstDate: layer.firstDate,
+            lastDate: layer.lastDate  
+         };
+           
+         // Add the html to the document using a template
+         $(document.body).append(opec.templates.metadataWindow(data));
 
          // Show metadata for a selected layer
          $('#metadata-' + layer.name).dialog({
@@ -169,27 +166,10 @@ function showMetadata($trigger) {
          }).dialogExtend({
             "help": false,
             "minimize": true,
-            "dblclick": "collapse",
-         });
-
-         //$('#metadata-' + layer.name).dialog();
-
-         // Add new data
-         $('<div><label>Source: ' + '</label></div>' +
-            '<div><label>Name: ' + layer.displayTitle + '</label></div>' +
-            '<div>' +
-               '<span>BoundingBox: ' +
-               '<label style="color: green">' + layer.exBoundingBox.NorthBoundLatitude + '</label>' + 'N, ' +
-               '<label style="color: blue">' + layer.exBoundingBox.EastBoundLongitude + '</label>' + 'E, ' +
-               '<label style="color: green">' + layer.exBoundingBox.SouthBoundLatitude + '</label>' + 'S, ' + 
-               '<label style="color: blue">' + layer.exBoundingBox.WestBoundLongitude + '</label>' + 'W ' + 
-               '</label></span>' +
-            '</div>' +
-            dateRange() +
-            '<div><label>Abstract: ' + layer.abstract + '</label></div>'
-         ).appendTo('#metadata-' + layer.name);
-
-         // Open dialog
+            "dblclick": "collapse"
+         });     
+         
+         //Open dialog
          $('#metadata-' + layer.name).dialog('open');
       }
    };
@@ -219,36 +199,15 @@ function showScalebar($trigger) {
          // If there is an open version, close it
          if($('#scalebar-' + layer.name).length)
             $('#scalebar-' + layer.name).dialog('close');
+            
+         var data = {
+            name: layer.name,
+            displayTitle: layer.displayTitle,
+            url: scalebarDetails.url
+         };
 
-         // Add the html to the document
-         $(document.body).append(
-            '<div id="scalebar-' + layer.name +'" class="scalebar unselectable tt" title="Scalebar - ' + layer.displayTitle + '">' +
-               '<img src="' + scalebarDetails.url + '" alt="Scalebar"/>' +
-               '<div id="' + layer.name + '-range-slider"></div>' +
-               '<div>' +
-                  '<label for="' + layer.name + '-max">Maximum Value: </label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="' + layer.name + '-max" title="The maximum value to be used" type="text" name="' + layer.name + '-max" />' +
-               '</div>' +
-               '<div id="' + layer.name + '-scale">' +
-                  '<input type="button" name="' + layer.name + '-scale-button" title="Add 25% to top and bottom of the slider" value="Recalculate Scale" />' +
-               '</div>' +
-               '<div id="' + layer.name + '-log">' +
-                  '<input type="checkbox" name="' + layer.name + '-log-checkbox" title="Use Logarithmic Scale"/>' +
-                  '<label for="' + layer.name + '-logarithmic">Logarithmic Scale </label>' +
-               '</div>' +
-               '<div id="' + layer.name + '-reset">' +
-                  '<input type="button" name="' + layer.name + '-reset-button" title="Reset the scale to the default values" value="Reset Scale" />' +
-               '</div>' +
-               '<div>' +
-                  '<label for="' + layer.name + '-min">Minimum Value: </label>' +
-               '</div>' +
-               '<div>' +
-                  '<input id="' + layer.name + '-min" title="The minimum value to be used" type="text" name="min"/>' +
-               '</div>' +
-            '</div>'
-         );
+         // Add the html to the document using a template
+         $(document.body).append($.mustache(opec.util.replace(['<![CDATA[',']]>'], '', $('#scalebarWindow').text()).trim(), data));
          
          if(typeof layer.minScaleVal !== 'undefined' && typeof layer.maxScaleVal !== 'undefined') {
             $('#' + layer.name + '-max').val(layer.maxScaleVal);
@@ -279,12 +238,12 @@ function showScalebar($trigger) {
                   $(this).trigger("resize");
                },
                "help" : function(e, dlg) {
-                  showMessage('scalebarTutorial', null);
-               },
-            },
-
+                  opec.gritter.showNotification('scalebarTutorial', null);
+               }
+            }
          });
          
+         // Event to change the scale to and from log if the checkbox is changed
          $('#' + layer.name + '-log').on('click', ':checkbox', function(e) {          
             // Check to see if the value was changed
             if(layer.log && $(this).is(':checked'))
@@ -295,10 +254,12 @@ function showScalebar($trigger) {
             validateScale(layer, null , null);
          });
          
+         // Event to reset the scale if the "Reset Scale" button is pressed
          $('#' + layer.name + '-reset').on('click', '[type="button"]', function(e) {                              
             validateScale(layer, layer.origMinScaleVal , layer.origMaxScaleVal, true);
          });
          
+         // Event to recalculate the scale if the "Recalculate Scale" button is pressed
          $('#' + layer.name + '-scale').on('click', '[type="button"]', function(e) {                              
             var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);
             $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
@@ -306,6 +267,7 @@ function showScalebar($trigger) {
             validateScale(layer, layer.minScaleVal , layer.maxScaleVal);
          });
          
+         // Event for unclicking the max box
          $('#' + layer.name + '-max').focusout(function(e) {          
             // Check to see if the value was changed
             var max = parseFloat($(this).val());
@@ -316,6 +278,7 @@ function showScalebar($trigger) {
             validateScale(layer, null , max);
          });
          
+         // Event for unclicking the min box
          $('#' + layer.name + '-min').focusout(function(e) {          
             // Check to see if the value was changed
             var min = parseFloat($(this).val());
@@ -326,6 +289,7 @@ function showScalebar($trigger) {
             validateScale(layer, min , null);
          });
          
+         // Get the range for the scalebar
          var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);
 
          // Setup the jQuery UI slider
@@ -346,13 +310,13 @@ function showScalebar($trigger) {
          // Some css to keep everything in the right place.
          $('#' + layer.name + '-range-slider').css({
             'height': 256,
-            'margin': '5px 0px 0px 10px', 
+            'margin': '5px 0px 0px 10px'
          });
-         $('#' + layer.name + '-max').parent('div').addClass('scalebar-max');
-         $('#' + layer.name + '-scale').addClass('scalebar-scale');
-         $('#' + layer.name + '-log').addClass('scalebar-log');
-         $('#' + layer.name + '-reset').addClass('scalebar-reset');
-         $('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
+         //$('#' + layer.name + '-max').parent('div').addClass('scalebar-max');
+         //$('#' + layer.name + '-scale').addClass('scalebar-scale');
+         //$('#' + layer.name + '-log').addClass('scalebar-log');
+         //$('#' + layer.name + '-reset').addClass('scalebar-reset');
+         //$('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
          
          // Open the dialog box
          $('#scalebar-' + layer.name).dialog('open');
@@ -435,7 +399,7 @@ function updateScalebar(layer)
       
       var params = {
          colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
-         logscale: layer.log,
+         logscale: layer.log
       }
       
       layer.mergeNewParams(params);
@@ -472,7 +436,7 @@ function getScalebarDetails(layer)
    return {
       url: url,
       width: width,
-      height: height,
+      height: height
    };
 }
 
@@ -486,24 +450,24 @@ function createGetLegendURL(layer, hasBase)
 
 /**
  * Calculates a scale range based on the provided values.
- * @param {Float} min - The lower end of the scale.
- * @param {Float} max - The higher end of the scale.
+ * @param {number} min - The lower end of the scale.
+ * @param {number} max - The higher end of the scale.
  * @return {Object} Returns two values min and max in an object.
  */
 function getScaleRange(min, max)
 {
    return {
       max: max + Math.abs((max / 100) * 25),
-      min: min - Math.abs((max / 100) * 25),
+      min: min - Math.abs((max / 100) * 25)
    };
 }
 
 /**
  * Validates the entries for the scale bar
  * @param {Object} layer - The layer who's scalebar you wish to validate
- * @param {Float} newMin - The new minimum value to be used for the scale
- * @param {Float} newMax - The new maximum value to be used for the scale
- * @param {Boolean} reset - Resets the scale if true
+ * @param {number} newMin - The new minimum value to be used for the scale
+ * @param {number} newMax - The new maximum value to be used for the scale
+ * @param {boolean} reset - Resets the scale if true
  */ 
 function validateScale(layer, newMin, newMax, reset)
 {  
@@ -579,102 +543,11 @@ function showGraphCreator()
          if(graphCreator.length)
             graphCreator.dialog('close');
          
-         // Add the html to the document
-         $(document.body).append(
-            '<div id="graphCreator" class="unselectable tt" title="Graph Creator">' +
-               '<div class="ui-control">' +
-                  '<h3 id="basic-inputs-header" class="ui-control-header ui-helper-reset">' +
-                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
-                     '<a href="#">Basic Inputs</a>' + 
-                  '</h3>' +
-                  '<div id="basic-inputs">' +
-                     '<div>' +
-                        '<label for="graphcreator-baseurl-label">Base URL:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path"/>' +
-                     '</div>' +
-                     '<div>' +
-                        '<label for="graphcreator-coverage-label">Coverage:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-coverage" title="Name of the Coverage" placeholder="Name of the Coverage" type="text" name="graphcreator-coverage"/>' +
-                        '<input id="graphcreator-coverage-button" title="Get the top selected layer" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />' +
-                     '</div>' +
-                     '<div>' +
-                        '<label for="graphcreator-type-label">Type:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<select id="graphcreator-type" title="Type of query you want to make" name="graphcreator-type">' +
-                           '<option value="basic" title="Returns a time series with mean, median, max, min and STD">basic</option>' +
-                           '<option value="histogram" title="Returns a histogram">histogram</option>' +
-                           '<option value="raw" title="Not for normal use (gets the raw data)">raw</option>' +
-                           '<option value="test" title="Not for normal use (test new queries)">test</option>' +
-                           '<option value="error" title="Generates errors, used testing error handling">error</option>' +
-                        '</select>' +
-                     '</div>' +
-                  '</div>' +
-               '</div>' +
-               '<div class="ui-control">' +
-                  '<h3 id="histogram-inputs-header" class="ui-control-header ui-helper-reset">' +
-                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
-                     '<a href="#">Histogram Inputs</a>' + 
-                  '</h3>' +
-                  '<div id="histogram-inputs">' +
-                     '<div>' +
-                        '<label for="graphcreator-bins-label">Bins:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-bins" title="Comma Separated Bins" placeholder="example: 0,2.5,5,7.5,10" type="text" name="graphcreator-bins"/>' +
-                     '</div>' +
-                  '</div>' +
-               '</div>' +
-               '<div class="ui-control">' +
-                  '<h3 id="advanced-inputs-header" class="ui-control-header ui-helper-reset">' +
-                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
-                     '<a href="#">Advanced Inputs</a>' + 
-                  '</h3>' +
-                  '<div id="advanced-inputs">' +
-                     '<div>' +
-                        '<label for="graphcreator-time-label">Time:</label>' + 
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>' +
-                        '<label> to </label>' +
-                        '<input id="graphcreator-time2" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time2"/>' +
-                     '</div>' +
-                     '<div>' +
-                        '<label for="graphcreator-bbox-label">Bbox:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-bbox" title="Bbox in lon,lat,lon,lat format" placeholder="lon,lat,lon,lat" type="text" name="graphcreator-bbox"/>' +
-                     '</div>' +
-                  '</div>' +
-               '</div>' +
-               '<div class="ui-control">' +
-                  '<h3 id="graph-format-header" class="ui-control-header ui-helper-reset">' +
-                     '<span class="ui-icon ui-icon-triangle-1-s"></span>' +
-                     '<a href="#">Graph Format</a>' + 
-                  '</h3>' +
-                  '<div id="graph-format">' +
-                     '<div>' +
-                        '<label for="graphcreator-barwidth-label">Barwidth:</label>' +
-                     '</div>' +
-                     '<div>' +
-                        '<input id="graphcreator-barwidth" title="This does nothing at present" placeholder="This does nothing at present" type="text" name="graphcreator-barwidth"/>' +
-                        '<input id="graphcreator-barwidth-button" title="This does nothing at present" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />' +                    
-                     '</div>' +
-                  '</div>' +
-               '</div>' +
-               '<div id="graphcreator-generate">' +
-                  '<input type="button" title="Generate a graph from a WCS request" name="graphcreator-generate-button" value="Generate Graph" />' +
-                  '<img src="img/ajax-loader.gif"/>' +  
-               '</div>' +
-            '</div>'
-         );
-               
-         var graphCreator = $('#graphCreator'),
-             graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
+         // Add the html to the document using a template
+         $(document.body).append(opec.util.replace(['<![CDATA[',']]>'], '', $('#graphcreatorWindow').text()).trim(), {});
+         
+         graphCreator = $('#graphCreator');           
+         var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
          
          // Turn it into a dialog box
          graphCreator.dialog({
@@ -692,9 +565,9 @@ function showGraphCreator()
             "dblclick": "collapse",
             "events": {
                "help" : function(e, dlg) {
-                  showMessage('graphCreatorTutorial', null);
+                  opec.gritter.showNotification ('graphCreatorTutorial', null);
                }
-            },
+            }
          });
 
          // Add the jQuery UI datepickers to the dialog
@@ -726,7 +599,7 @@ function showGraphCreator()
                            
          // When selecting the bounding box text field, request user to draw the box to populate values
          $('#graphcreator-bbox').click(function() {
-            showMessage('bbox', null);
+            opec.gritter.showNotification('bbox', null);
          });
          
          // Event to open and close the panels when clicked
@@ -776,17 +649,17 @@ function showGraphCreator()
             }
             $.ajax({
                type: 'GET',
-               url: map.host + '/service/wcs2json/wcs?' + 'baseurl=' + $('#graphcreator-baseurl').val() + 
+               url: map.host + map.pywpsLocation + 'baseurl=' + $('#graphcreator-baseurl').val() + 
                   '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
                   '&time=' + dateRange + '&bbox=' + $('#graphcreator-bbox').val(),
                dataType: 'json',
                asyc: true,
                success: function(data) {
                   if(data.error != "") {
-                     d = {
+                     var d = {
                         error: data.error
                      };
-                     showMessage('graphError', d);
+                     opec.gritter.showNotification('graphError', d);
                      return;
                   }
                                   
@@ -813,35 +686,35 @@ function showGraphCreator()
                            data: d1.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
-                           label: 'STD',
+                           label: 'STD'
                         },
                         {
                            data: d2.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
-                           label: 'max',
+                           label: 'max'
                         },
                         {
                            data: d3.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
-                           label: 'min',
+                           label: 'min'
                         },
                         {
                            data: d4.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
-                           label: 'median',
+                           label: 'median'
                         },
                         {
                            data: d5.sort(sortDates),
                            lines: { show: true },
                            points: { show: true },
-                           label: 'mean',
+                           label: 'mean'
                         }],
                         options: basicTimeOptions(data.output.units),
                         selectable: true,
-                        selectSeries: true,
+                        selectSeries: true
                      };
                      
                      createGraph(graphData);
@@ -855,7 +728,7 @@ function showGraphCreator()
                         title: 'WCS Test Graph',
                         data: [num],
                         options: barOptions(barwidth),
-                        selectable: false,
+                        selectable: false
                      };
                      
                      createGraph(graphData);
@@ -867,7 +740,7 @@ function showGraphCreator()
                      request: request,
                      errorType: errorType,
                      exception: exception,
-                     url: this.url,
+                     url: this.url
                   };          
                   gritterErrorHandler(data);
                }

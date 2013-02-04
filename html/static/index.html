@@ -1,0 +1,468 @@
+<!DOCTYPE HTML>
+<html>
+<!-- http://spyrestudios.com/demos/sliding-panel-left/ -->
+<head>
+<meta charset="utf-8">
+<title>OPEC Visualisation Portal Prototype</title>
+
+<!-- ============================ Now for the styling ============================ -->
+<!-- jQuery UI theming CSS -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.9.1.custom.min.css" />
+
+<!-- Default OpenLayers styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
+
+<!-- Context Menu styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-contextMenu/css/jquery-contextMenu.css" />
+
+<!-- Gritter styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-gritter/css/jquery.gritter.css" />
+
+<!-- Multiselect styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-multiselect/css/jquery.multiselect.css" />
+
+<!-- jQuery UI dialog extension styling -->
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/>
+
+<!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
+
+<!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
+<link rel="stylesheet" type="text/css" href="css/main.css" />
+
+<!-- ============================ JavaScript libraries ============================ -->
+<!-- Latest jQuery from jQuery.com -->
+<script type="text/javascript" src="js-libs/jquery/jquery-1.8.2.min.js"></script>
+
+<!-- The latest jQuery UI from jqueryui.com -->
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.9.1.custom.min.js"></script>
+
+<!-- OpenLayers Map Code-->
+<script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
+
+<!-- Flotr2 -->
+<script type="text/javascript" src="js-libs/Flotr2/js/flotr2.min.js"></script>
+
+<!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
+<!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
+
+<!-- http://code.google.com/p/jquery-multi-open-accordion -->
+<script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.3.js"></script>
+
+<!-- http://medialize.github.com/jQuery-contextMenu/ -->
+<script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
+
+<!-- https://github.com/jboesch/Gritter -->
+<script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.js"></script>
+
+<!-- https://github.com/michael/multiselect -->
+<script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
+
+<!-- jQuery UI dialog extension -->
+<script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.0.1.js"></script>
+
+<!-- Cesium -->
+<script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>
+
+<!-- O2C -->
+<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>
+
+<!-- D3 -->
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<!-- mustache -->
+<script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
+
+<!-- Custom JavaScript -->
+<script type="text/javascript" src="opecvis.js"></script>
+
+<!-- =================================== Templates =================================== -->
+<!-- Metadata Window -->
+<script type="text/html" id="metadataWindow">
+   <![CDATA[
+      {{! List of used variables for this template:
+         name - A unique id of the layer whos metadata is to be displayed.
+         displayTitle - What will be shown to the user to identifiy the window.
+         source - The source of the data that makes up the layer.
+         northBoundLat - North Bound Latitude.
+         eastBoundLon - East Bound Longitude.
+         southBoundLat - South Bound Latitude.
+         westBoundLon - West Bound Longitude.
+         addDateRange - Returns true if the layer has temporal data.
+         firstDate - The first avaliable date for the layer.
+         lastDate - The last avaliable date for the layer.
+         productAbstract - A description of the layer.
+      }}
+      <div id="metadata-{{name}}" class="tt" title="Metadata - {{displayTitle}}">          
+         <div>
+            <label>Source: {{source}}</label>
+         </div>
+         <div>
+            <label>Name: {{displayTitle}}</label>
+         </div>
+         <div>
+            <span>
+               BoundingBox:
+               <label style="color: green">{{northBoundLat}}</label>
+               N,
+               <label style="color: blue">{{eastBoundLon}}</label>
+               E,
+               <label style="color: green">{{southBoundLat}}</label>
+               S,
+               <label style="color: blue">{{westBoundLon}}</label>
+               W
+            </span>
+         </div>
+         {{#addDateRange}}
+         <div>
+            <label>Date Range: {{firstDate}} to {{lastDate}} </label>
+         </div>
+         {{/addDateRange}}
+         <div>
+            <label>Abstract: {{productAbstract}}</label>
+         </div>
+      </div>
+   ]]>
+</script>
+<!-- Scalebar Window -->
+<script type="text/html" id="scalebarWindow">
+   <![CDATA[
+      {{! List of used variables for this template:
+         name - A unique id of the layer whos metadata is to be displayed.
+         displayTitle - What will be shown to the user to identifiy the window.
+         url - The url of the scalebar picture.
+      }}
+      <div id="scalebar-{{name}}" class="scalebar unselectable tt" title="Scalebar - {{displayTitle}}">
+         <img src="{{url}}" alt="Scalebar" />
+         <div id="{{name}}-range-slider"></div>
+         <div>
+            <label for="{{name}}-max">Maximum Value: </label>
+         </div>
+         <div class="scalebar-max">
+            <input id="{{name}}-max" title="The maximum value to be used" type="text" name="{{name}}-max" />
+         </div>
+         <div id="{{name}}-scale" class="scalebar-scale">
+            <input type="button" name="{{name}}-scale-button" title="Add 25% to top and bottom of the slider" value="Recalculate Scale" />
+         </div>
+         <div id="{{name}}-log" class="scalebar-log">
+            <input type="checkbox" name="{{name}}-log-checkbox" title="Use Logarithmic Scale" />
+            <label for="{{name}}-logarithmic">Logarithmic Scale</label>
+         </div>
+         <div id="{{name}}-reset" class="scalebar-reset">
+            <input type="button" name="{{name}}-reset-button" title="Reset the scale to the default values" value="Reset Scale" />
+         </div>
+         <div>
+            <label for="{{name}}-min">Minimum Value: </label>
+         </div>
+         <div class="scalebar-min">
+            <input id="{{name}}-min" title="The minimum value to be used" type="text" name="min" />
+         </div>
+      </div>
+   ]]>
+</script>
+<!-- Graph Creator Window-->
+<script type="text/html" id="graphcreatorWindow">
+   <![CDATA[
+      <div id="graphCreator" class="unselectable tt" title="Graph Creator">
+         <div class="ui-control">
+            <h3 id="basic-inputs-header" class="ui-control-header ui-helper-reset">
+               <span class="ui-icon ui-icon-triangle-1-s"></span>
+               <a href="#">Basic Inputs</a> 
+            </h3>
+            <div id="basic-inputs">
+               <div>
+                  <label for="graphcreator-baseurl-label">Base URL:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path" />
+               </div>
+               <div>
+                  <label for="graphcreator-coverage-label">Coverage:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-coverage" title="Name of the Coverage" placeholder="Name of the Coverage" type="text" name="graphcreator-coverage" />
+                  <input id="graphcreator-coverage-button" title="Get the top selected layer" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />
+               </div>
+               <div>
+                  <label for="graphcreator-type-label">Type:</label>
+               </div>
+               <div>
+                  <select id="graphcreator-type" title="Type of query you want to make" name="graphcreator-type">
+                     <option value="basic" title="Returns a time series with mean, median, max, min and STD">basic</option>
+                     <option value="histogram" title="Returns a histogram">histogram</option>
+                     <option value="raw" title="Not for normal use (gets the raw data)">raw</option>
+                     <option value="test" title="Not for normal use (test new queries)">test</option>
+                     <option value="error" title="Generates errors, used testing error handling">error</option>
+                  </select>
+               </div>
+            </div>
+         </div>
+         <div class="ui-control">
+            <h3 id="histogram-inputs-header" class="ui-control-header ui-helper-reset">
+               <span class="ui-icon ui-icon-triangle-1-s"></span>
+               <a href="#">Histogram Inputs</a>
+            </h3>
+            <div id="histogram-inputs">
+               <div>
+                  <label for="graphcreator-bins-label">Bins:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-bins" title="Comma Separated Bins" placeholder="example: 0,2.5,5,7.5,10" type="text" name="graphcreator-bins"/>
+               </div>
+            </div>
+         </div>
+         <div class="ui-control">
+            <h3 id="advanced-inputs-header" class="ui-control-header ui-helper-reset">
+               <span class="ui-icon ui-icon-triangle-1-s"></span>
+               <a href="#">Advanced Inputs</a>
+            </h3>
+            <div id="advanced-inputs">
+               <div>
+                  <label for="graphcreator-time-label">Time:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>
+                  <label> to </label>
+                  <input id="graphcreator-time2" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time2"/>
+               </div>
+               <div>
+                  <label for="graphcreator-bbox-label">Bbox:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-bbox" title="Bbox in lon,lat,lon,lat format" placeholder="lon,lat,lon,lat" type="text" name="graphcreator-bbox"/>
+               </div>
+            </div>
+         </div>
+         <div class="ui-control">
+            <h3 id="graph-format-header" class="ui-control-header ui-helper-reset">
+               <span class="ui-icon ui-icon-triangle-1-s"></span>
+               <a href="#">Graph Format</a>
+            </h3>
+            <div id="graph-format">
+               <div>
+                  <label for="graphcreator-barwidth-label">Barwidth:</label>
+               </div>
+               <div>
+                  <input id="graphcreator-barwidth" title="This does nothing at present" placeholder="This does nothing at present" type="text" name="graphcreator-barwidth"/>
+                  <input id="graphcreator-barwidth-button" title="This does nothing at present" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />                    
+               </div>
+            </div>
+         </div>
+         <div id="graphcreator-generate">
+            <input type="button" title="Generate a graph from a WCS request" name="graphcreator-generate-button" value="Generate Graph" />
+            <img src="img/ajax-loader.gif"/> 
+         </div>
+      </div>
+   ]]>
+</script>
+<!-- ================================================================================= -->
+
+</head>
+<body>
+   <!-- CSS check and info for screen readers -->
+   <div id="nocss-info">
+      <h1>OPEC Portal</h1>
+      <!-- Info for screen readers and any bots. Should show up on search results -->
+      <span>
+         Welcome to the OPEC (Operational Ecology) Marine Ecosystem Forecasting Portal. The OPEC project will develop 
+         and evaluate ecosystem forecast tools to help assess and manage the risks posed by human activities on the 
+         marine environment, helping to improve the ability to predict the “health” of European marine ecosystems.
+      </span>
+      <div class="css-check">
+         This website requires css to work. Please enable it in your browser.
+      </div>
+   </div>
+   <!-- JavaScript check -->
+   <noscript>
+      <div id="noscript-warning">
+         This website requires JavaScript to work. Please enable it in your browser.
+      </div>
+   </noscript>
+
+   <!-- The Map -->
+   <div id="map"></div>
+   <!-- The Top Toolbar -->
+   <div id="topToolbar" class="toolbar unselectable tt">
+      <ul>
+         <li id="panZoom">
+            <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
+               <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
+            <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
+               <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
+            <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
+               <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
+         </li>
+         <li class="divider"></li>
+         <li>
+            <fieldset>
+               <legend>View Date</legend>
+               <input size="10" type="text" name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
+            </fieldset>
+         </li>
+         <li class="divider"></li>
+         <!-- Placeholder ROI radio buttons -->
+         <li id="ROIButtonSet">
+            <input type="radio" id="point" name="radio" value="point" />
+               <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
+            <input type="radio" id="box" name="radio" value="box"/>
+               <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
+            <input type="radio" id="circle" name="radio" value="circle" />
+               <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
+            <input type="radio" id="polygon" name="radio" value="polygon" />
+               <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
+         </li>
+         <li class="divider"></li>
+         <li>
+            <a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window" title="Map Information"/></a>        
+         </li>
+         <li>
+            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window" title="Share Links"/></a>
+         </li>
+         <li>
+            <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window" title="Select Layers"/></a>
+         </li>
+         <li class="divider"></li>
+         <li>
+            <a href="#" id="mapOptionsBtn"><img src="img/map-icon.png" alt="Click for Map Options"></a>
+         </li>
+         <li class="divider"></li>
+         <li>
+            <a href="#" id="infoToggleBtn"><img src="img/info32.png" alt="Toggle Information Window" title="Information"></a>
+         </li>   
+      </ul>
+   </div>
+   <!-- The Left Panels -->
+   <a class="trigger triggerL unselectable" href="#">Layers</a>
+   <div class="panel lPanel unselectable">
+      <h3 id="layerLbl">Data Layers</h3>
+      <div id="layerAccordion">
+         <h3><a href="#">Operational Layers</a></h3>
+         <div id="opLayers"></div>
+         <h3><a href="#">Reference Layers</a></h3>
+         <div id="refLayers"></div> 
+      </div>
+      <div style="clear: both;"> </div>
+   </div>
+   <!-- The Right Panels -->
+   <a class="trigger triggerR unselectable" href="#">Data</a>
+   <div class="panel rPanel unselectable">
+      <h3 id="dataLbl">Data Analysis</h3>
+      
+      <div id="dataAccordion">
+         <h3><a href="#">Current R.O.I.</a></h3>
+         <div id="dispROI"></div>
+         <h3><a href="#">Data Tools</a></h3>
+         <div id="dataTools">
+            <div id="dataTabs">
+               <ul>
+                  <li><a href="#tabs-1">Analyses</a></li>
+                  <li><a href="#tabs-2">Export<br></a></li>
+               </ul>
+               <div id="tabs-1">
+                  <div id="analyses">
+                     <h3><a href="#">Basic Statistics</a></h3>
+                        <table id="bStats">
+                           <tr>
+                              <td>Mean Value:</td>
+                              <td>Two</td>
+                           </tr>
+                           <tr>
+                              <td>Max Value:</td>
+                              <td>Two</td>
+                           </tr>
+                           <tr>
+                              <td>Min Value:</td>
+                              <td>Two</td>
+                           </tr>
+                           <tr>
+                              <td>Std.Dev.:</td>
+                              <td>Two</td>
+                           </tr>
+                        </table>
+                     <h3><a href="#">Spatial Analysis</a></h3>
+                     <div id="spatial">
+                        <h3><a href="#">Thresholding</a></h3>
+                        <div id="threshold"></div>
+                        <h3><a href="#">Data Correlation</a></h3>
+                        <div id="dCorr"></div> 
+                     </div> 
+                     <h3><a href="#">Temporal Analysis</a></h3>
+                     <div id="temporal">
+                        <h3><a href="#">Time Series</a></h3>
+                        <div id="tSeries"></div>
+                        <h3><a href="#">Interannual Variability</a></h3>
+                        <div id="IAVar"></div>
+                     </div> 
+                     <h3><a href="#">Risk Analysis</a></h3>
+                     <div id="risk"></div> 
+                  </div>
+               </div>
+               <div id="tabs-2">
+                  <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+               </div>
+            </div>      
+         </div>
+      </div>
+      <div style="clear: both;"> </div>
+   </div>
+   <div class="toolbar" id="mapOptions">
+      <div id="viewtoggle">
+         <ul id="controlToggle">
+            <li>
+               <input type="radio" name="view" value="2D" id="2DToggle" checked="checked" onclick="toggleView(this);" />
+               <label for="noneToggle">2D View</label>
+            </li>
+            <li>
+               <input type="radio" name="view" value="columbus" id="columbusToggle" onclick="toggleView(this);" />
+               <label for="pointToggle">Columbus View</label>
+            </li>
+            <li>
+               <input type="radio" name="view" value="3D" id="3DToggle" onclick="toggleView(this);" />
+               <label for="lineToggle">3D View</label>
+            </li>
+            <li>
+               <fieldset>
+                  <legend>Base Layer</legend>
+                  <select class="ui-corner-all" id="baseLayer" name="Base Layer">
+                  </select>
+               </fieldset>
+            </li>
+            <li class="divider"></li>
+            <li>
+               <fieldset>
+                  <legend>Quick Region</legend>
+                  <select class="ui-corner-all" id="quickRegion" name="Quick Region">
+                  </select>
+               </fieldset>
+            </li>
+         </ul>
+       </div>
+   </div>
+   <div class="toolbar" id="shareOptions">
+   	<h3>Share</h3>
+      <div>
+         <input type="text" name="shareLink" value="Permalink would go here!" id="shareLink" />
+         <label class="iconBtn" for="shareLink"></label>
+      </div> 
+   </div>
+   <div id="info" class="unselectable" title="Information">
+      <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
+      <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
+      <p>&copy;2012 PML Applications Ltd<br />
+      EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
+      <div style="clear: both;"> </div>
+   </div>
+   <div id="mapInfo" title="MapInfo">
+      <div>
+         <span id="latlng"></span>
+      </div>
+      <div>
+         <span id="mapInfo-Projection"></span>
+      </div>
+   </div>
+   <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
+      <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
+      <div id="layers"></div>
+   </div>
+   <div id="dThree" title="D3 Test"></div>
+</body>
+</html>

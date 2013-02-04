@@ -82,9 +82,9 @@ ul li {
    overflow: hidden;
    padding: 0 10px 0 10px;
    height: 50px;
-   width: 500px;
+   width: 624px;
    left: 50%;
-   margin-left: -250px;
+   margin-left: -312px;
    position: fixed;
    background: #222222;
    border:1px solid #666666;
@@ -207,16 +207,16 @@ ul li {
 /* Map Options Panel */
 #mapOptions {
    display:none;
-   bottom: 53px;
+   top: 53px;
    height:200px;
    width:400px;
    margin-left: -200px;
-   -moz-border-radius-topleft: 15px;
-   -moz-border-radius-topright: 15px;
-   -webkit-border-top-left-radius: 15px;
-   -webkit-border-top-right-radius: 15px;
-   border-top-left-radius: 15px;
-   border-top-right-radius: 15px;
+   -moz-border-radius-bottomleft: 15px;
+   -moz-border-radius-bottomright: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-bottom-right-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-bottom-right-radius: 15px;
 }
 
 /* Toolbar buttons (overriding jQuery UI styling) */
@@ -563,7 +563,7 @@ div .sensor-accordion {
 /* ======= Unselectable ======= */
 
 .unselectable {
-  -moz-user-select: none;
+  -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
@@ -603,4 +603,21 @@ div .sensor-accordion {
    color: black;
    border-color: black;
    opacity: .9;
+}
+/* ================================ */
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: url(#temperature-gradient);
+  stroke-width: 1.5px;
 }

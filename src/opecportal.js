@@ -1,11 +1,17 @@
 /**
+ * @file main file
  * Will yuidoc or jsdoc3 work? Only one can be chosen
- * 
- * @module opecportal
  */
 
 /*====================================================================================*/
 //Initialise javascript global variables and objects
+
+/**
+ * Create opec namespace object
+ * @namespace
+ * @global
+ */ 
+var opec = opec || {};
 
 /**
  * The OpenLayers map object
@@ -90,7 +96,7 @@ function createBaseLayers()
 function createRefLayers()
 {
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
-   for(i = 12; i <= 19; i++) {
+   for(var i = 12; i <= 19; i++) {
       // skip AMT18 as it isn't available
       if(i == 18) continue;
       // Style the AMT vector layers with different colours for each one
@@ -180,7 +186,7 @@ function createOpLayers()
 {
    $.each(map.getCapabilities, function(i, item) {
       // Make sure important data is not missing...
-      if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL && typeof item.serverName !== "undefined") {
+      if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL !== "undefined" && typeof item.serverName !== "undefined") {
          var wmsURL = item.wmsURL;
          var wcsURL = item.wcsURL;
          var serverName = item.serverName;
@@ -190,7 +196,7 @@ function createOpLayers()
                // Go through each layer and load it
                $.each(item, function(i, item) {
                   if(item.Name && item.Name != "") {
-                     var microLayer = new OPEC.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
+                     var microLayer = new opec.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
                      checkNameUnique(microLayer);               
                      $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
                   }
@@ -205,18 +211,18 @@ function createOpLayers()
  * Checks if a layer name is unique
  * 
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
- * @param {Number} count - Number of other layers with the same name (optional)
+ * @param {number} count - Number of other layers with the same name (optional)
  */
 function checkNameUnique(microLayer, count) 
 {
    var name = null
    
    if(typeof count === "undefined" || count == 0) {
-      var name = microLayer.name;
+      name = microLayer.name;
       count = 0;
    }
    else {
-      var name = microLayer.name + count;
+      name = microLayer.name + count;
    }
    
    if(name in map.microLayers) {
@@ -263,7 +269,7 @@ function createOpLayer(layerData, microLayer)
    layer.urlName = microLayer.urlName;
    layer.displayTitle = microLayer.displayTitle;
    layer.title = microLayer.title;
-   layer.abstract = microLayer.abstract;
+   layer.productAbstract = microLayer.productAbstract;
    layer.displaySensorName = microLayer.sensorNameDisplay;
    layer.sensorName = microLayer.sensorName;
    layer.wcsURL = microLayer.wcsURL;
@@ -351,7 +357,7 @@ function addAccordionToPanel(id, displayName)
 
    // Creates the accordion
    $('#' + id).parent('div').multiOpenAccordion({
-      active: 0,
+      active: 0
       //click: function(e) {
          //var parent = $(this).parent('div');
          //if(parent.hasClass('sort-start')) {
@@ -544,7 +550,7 @@ function mapInit()
    
    map.setupGlobe(map, 'map', {
       is3D: false,
-      proxy: '/service/proxy?url=',
+      proxy: '/service/proxy?url='
    });
 
    // Get the master cache file from the server. This file contains some of 
@@ -610,11 +616,11 @@ function nonLayerDependent()
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
    $("#layerAccordion, #dataAccordion").multiOpenAccordion({
-      active: [0, 1],
+      active: [0, 1]
    });
 
    $('#refLayers').multiOpenAccordion({
-      active: 0,
+      active: 0
    });
 
    // Makes each of the accordions sortable
@@ -624,7 +630,7 @@ function nonLayerDependent()
       handle: 'h3',
       update: function() {
          updateAccordionOrder();
-      },  
+      }
    })
    .disableSelection();
    //.bind('sortstart', function(e, ui) {
@@ -725,7 +731,7 @@ function nonLayerDependent()
    });
 
    // Populate Quick Regions from the quickRegions array
-   for(i = 0; i < quickRegion.length; i++) {
+   for(var i = 0; i < quickRegion.length; i++) {
        $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
    }
    
@@ -736,7 +742,7 @@ function nonLayerDependent()
       changeMonth: true,
       changeYear: true,
       beforeShowDay: function(date) { return map.allowedDays(date); },
-      onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); },
+      onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
    });
 
    // Pan and zoom control buttons
@@ -855,6 +861,7 @@ function addDialogClickHandler(idOne, idTwo)
 /**
  * Sets up the drawing controls to allow for the selection 
  * of ROI's. 
+ * 
  */
 function setupDrawingControls()
 {
@@ -867,6 +874,9 @@ function setupDrawingControls()
          fillOpacity : 0.3,
          pointRadius: 5
       },
+      /**
+       * @constructor 
+       */
       preFeatureInsert : function(feature) {
          this.removeAllFeatures();
       },
@@ -959,12 +969,12 @@ function setupDrawingControls()
             ctx.fillStyle = '#CCCCCC';
             var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
             ctx.beginPath();
-            x0= 5 + (vertices[0].x-bounds.left)*scale;
-            y0= 5 + (bounds.top-vertices[0].y)*scale;
+            var x0 = 5 + (vertices[0].x-bounds.left)*scale;
+            var y0 = 5 + (bounds.top-vertices[0].y)*scale;
             ctx.moveTo(x0,y0);
             for(var i=1,j=vertices.length; i<j; i++){
-               x= 5 + (vertices[i].x-bounds.left)*scale;
-               y= 5 + (bounds.top-vertices[i].y)*scale;
+               var x = 5 + (vertices[i].x-bounds.left) * scale;
+               var y = 5 + (bounds.top-vertices[i].y) * scale;
                ctx.lineTo(x, y);
             };
             ctx.lineTo(x0,y0);
@@ -1069,8 +1079,11 @@ $(document).ready(function()
    $(document).tooltip({
       track: true,
       position: { my: "left+5 center", at: "right center", collision: "flipfit" },
-      tooltipClass: 'ui-tooltip-info',
+      tooltipClass: 'ui-tooltip-info'
    });
+   
+   opec.templates = {};
+   opec.templates.metadataWindow = Mustache.compile(opec.util.replace(['<![CDATA[', ']]>'], '', $('#metadataWindow').text()).trim());
    
    $(document).click(function() {
       $(this).tooltip('close');
@@ -1094,7 +1107,7 @@ $(document).ready(function()
    }).dialogExtend({
       "help": false,
       "minimize": true,
-      "dblclick": "collapse",
+      "dblclick": "collapse"
    });
 
    // Show map info such as latlng
@@ -1107,7 +1120,7 @@ $(document).ready(function()
    }).dialogExtend({
       "help": false,
       "minimize": true,
-      "dblclick": "collapse",
+      "dblclick": "collapse"
    });
 
    $('#layerSelection').dialog({
@@ -1117,7 +1130,7 @@ $(document).ready(function()
       height: 400,
       minHeight: 400,
       resizable: true,
-      autoOpen: true,
+      autoOpen: true
    }).dialogExtend({
       "help": true,
       "minimize": true,
@@ -1128,9 +1141,9 @@ $(document).ready(function()
             $(this).trigger("resize");
          },
          "help" : function(e, dlg) {
-            showMessage('layerSelector', null);
+            opec.gritter.showNotification('layerSelector', null);
          }
-      },
+      }
    });
 
    $('#layers').multiselect({
@@ -1168,7 +1181,7 @@ $(document).ready(function()
             //console.log("Layer removed");
          }
          else if(map.layerStore[ui.option.text])
-            var layer = map.layerStore[ui.option.text];
+            layer = map.layerStore[ui.option.text];
          else
             // DEBUG
             console.log("no layer data to use");
@@ -1205,6 +1218,20 @@ $(document).ready(function()
       }
    });
    
+   $("#dThree").dialog({
+      position: ['center', 'center'],
+      width: 1000,
+      height: 600,
+      resizable: false,
+      autoOpen: true
+   }).dialogExtend({
+      "help": false,
+      "minimize": true,
+      "dblclick": "collapse"
+   });
+   
+   addDThreeGraph();
+   
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
    $('#this-Is-A-Prototype').dialog({
       position: ['center', 'center'],
@@ -1225,7 +1252,7 @@ $(document).ready(function()
    });
    
    // Setup the gritter so we can use it for error messages
-   setupGritter();
+   opec.gritter.setup();
 
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
@@ -1247,7 +1274,7 @@ function toggleView(element) {
          map.show2D();
       } else if (element.value=="3D"){
          map.show3D();
-         showMessage('3DTutorial', null);
+         opec.gritter.showNotification('3DTutorial', null);
       } else {
          map.showColumbus();
       }  
@@ -1256,6 +1283,10 @@ function toggleView(element) {
 
 // Used to get the value of a point back. Needed until WCS version is implemented. 
 // --------------------------------------------------------------------------------------------------
+/**
+ * @constructor
+ * @param {Object} event
+ */
 function getFeatureInfo(event) {
    if(!this.visibility) return;
    
@@ -1310,8 +1341,8 @@ function getFeatureInfo(event) {
          tempPopup.autoSize = true;
          map.addPopup(tempPopup);
         
-         var bbox = maxLL.lat + ',' + minLL.lon + ',' + minLL.lat + ',' + maxLL.lon,
-            x = "",
+         bbox = maxLL.lat + ',' + minLL.lon + ',' + minLL.lat + ',' + maxLL.lon;
+         var x = "",
             y = "";
          if(this.url.contains("1.0RC3")) {
             x = '&X=';
@@ -1386,7 +1417,7 @@ function getFeatureInfo(event) {
                   request: request,
                   errorType: errorType,
                   exception: exception,
-                  url: this.url,
+                  url: this.url
                };          
                gritterErrorHandler(data);
             }
@@ -1416,3 +1447,110 @@ function setColourScaleMax(scaleMax)
    // Do nothing
 }
 // --------------------------------------------------------------------------------------------------
+
+function addDThreeGraph() 
+{
+   var margin = {top: 20, right: 80, bottom: 30, left: 50},
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
+
+   var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
+   
+   var x = d3.time.scale()
+      .range([0, width]);
+   
+   var y = d3.scale.linear()
+      .range([height, 0]);
+   
+   var color = d3.scale.category10();
+   
+   var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+   
+   var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+   
+   var line = d3.svg.line()
+      .interpolate("basis")
+      .x(function(d) { return x(d.date); })
+      .y(function(d) { return y(d.temperature); });
+   
+   var svg = d3.select("#dThree").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+   d3.tsv("data.tsv", function(error, data) {
+      color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
+
+      data.forEach(function(d) {
+         d.date = parseDate(d.date);
+      });
+   
+      var cities = color.domain().map(function(name) {
+         return {
+            name: name,
+            values: data.map(function(d) {
+               return {date: d.date, temperature: +d[name]};
+            })
+         };
+      });
+   
+     x.domain(d3.extent(data, function(d) { return d.date; }));
+   
+     y.domain([
+       d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
+       d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
+     ]);
+     
+    svg.append("linearGradient")
+      .attr("id", "temperature-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", 0).attr("y1", y(10))
+      .attr("x2", 0).attr("y2", y(20))
+    .selectAll("stop")
+      .data([
+        {offset: "0%", color: "steelblue"},
+        {offset: "50%", color: "gray"},
+        {offset: "100%", color: "red"}
+      ])
+    .enter().append("stop")
+      .attr("offset", function(d) { return d.offset; })
+      .attr("stop-color", function(d) { return d.color; });
+   
+     svg.append("g")
+         .attr("class", "x axis")
+         .attr("transform", "translate(0," + height + ")")
+         .call(xAxis);
+   
+     svg.append("g")
+         .attr("class", "y axis")
+         .call(yAxis)
+       .append("text")
+         .attr("transform", "rotate(-90)")
+         .attr("y", 6)
+         .attr("dy", ".71em")
+         .style("text-anchor", "end")
+         .text("Temperature (ºC)");
+   
+     var city = svg.selectAll(".city")
+         .data(cities)
+       .enter().append("g")
+         .attr("class", "city");
+   
+     city.append("path")
+         .attr("class", "line")
+         .attr("d", function(d) { return line(d.values); })
+         .style("stroke", function(d) { return color(d.name); });
+   
+     city.append("text")
+         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
+         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
+         .attr("x", 3)
+         .attr("dy", ".35em")
+         .text(function(d) { return d.name; });
+   });
+}

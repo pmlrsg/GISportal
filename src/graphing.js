@@ -1,6 +1,125 @@
-/**
- * @module graphing
- */
+var graphs = {}
+
+graphs.timeSeriesChart = function() {
+   var margin = { top: 20, right: 20, bottom: 30, left: 50},
+   width = 960,
+   height = 500;
+   
+   var x = d3.time.scale()
+   .range([0, width]);
+   
+   var y = d3.scale.linear()
+   .range([height, 0]);
+   
+   var colour = d3.scale.category10();
+   
+   var xAxis = d3.svg.axis()
+   .scale(x)
+   .orient("bottom");
+   
+   var yAxis = d3.svg.axis()
+   .scale(y)
+   .orient("left");
+   
+   var line = d3.svg.line()
+   .iterpolate("basis")
+   .x(function(d) { return x(d.x); })
+   .y(function(d) { return y(d.y); });
+   
+   function chart(selection) {
+      selection.each(function(data) {
+         x.domain(d3.extent(data, function(d) { return d.date; }));
+         
+         y.domain([
+            d3.min(data, function(d) { return d3.min(d.values, function(v) { return v.temperature; }); }),
+            d3.max(data, function(d) { return d3.max(d.values, function(v) { return v.temperature; }); })
+         ]);
+         
+         var svg = d3.select(this).selectAll("svg").data([data]);
+         
+         var gEnter = svg.enter().append("svg").append("g");
+         gEnter.append("g").attr("class", "x axis")
+         
+         svg.attr("width", width)
+         .attr("height", height)
+         
+         var g = svg.select("g")
+         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      });  
+   }
+}
+
+graphs.histogramChart = function() {
+   var margin = { top: 0, right: 0, bottom: 20, left: 0 },
+      width = 700,
+      height = 450;
+      
+   var histogram = d3.layout.histogram(),
+   x = d3.scale.ordinal(),
+   y = d3.scale.linear(),
+   xAxis = d3.svg.axis().scale(x).orient("bottom").tickSize(6, 0),
+   yAxis = d3.svg.axis().scale(y).orient("left");
+   
+   function chart(selection) {
+      selection.each(function(data) {
+         data = histogram(data);
+         
+         x.domain(data.map(function(d) { return d.x; }))
+         .rangeRoundBands([0, width - margin.left - margin.right], .1);
+         
+         y.domain([0, d3.max(data, function(d) { return d.y; })])
+         .range([height - margin.top - margin.bottom, 0]);
+         
+         var svg = d3.select(this).selectAll("svg").data([data]);
+         
+         var gEnter = svg.enter().append("svg").append("g");
+         gEnter.append("g").attr("class", "bars");
+         gEnter.append("g").attr("class", "x axis");
+         gEnter.append("g").attr("class", "y axis");
+         
+         svg.attr("width", width)
+         .attr("height", height);
+         
+         var g = svg.select("g")
+         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+         
+         var bar = svg.select(".bars").selectAll(".bar").data(data);
+         bar.enter().append("rect");
+         bar.exit().remove();
+         bar.attr("width", x.rangeBand())
+         .attr("x", function(d) { return x(d.x) })
+         .attr("y", function(d) { return y(d.y) })
+         .attr("height", function(d) { return y.range()[0] - y(d.y) })
+         .order();
+         
+         g.select(".x.axis")
+         .attr("transform", "translate(0," + y.range()[0] + ")")
+      });
+   }
+   
+   chart.margin = function(_) {
+      if(!arguments.length) return margin;
+      margin = _;
+      return chart;
+   };
+   
+   chart.width = function(_) {
+      if(!arguments.length) return width;
+      width = _;
+      return chart;
+   };
+   
+   chart.height = function(_) {
+      if(!arguments.length) return height;
+      height = _;
+      return chart;
+   };
+   
+   d3.rebind(chart, histogram, "value", "range", "bins");
+   d3.rebind(chart, xAxis, "tickFormat");
+   
+   return chart;
+}
 
 /**
  * 
@@ -28,7 +147,7 @@ function createGraph(graphOptions) {
    }).dialogExtend({
       "help": false,
       "minimize": true,
-      "dblclick": "collapse",
+      "dblclick": "collapse"
    });
 
    // TODO: Tidy up css into a class
@@ -224,7 +343,7 @@ function lineOptions()
         sensibility     : 1,
         trackDecimals   : 2,
         trackFormatter  : function (o) { return 'x = ' + o.x +', y = ' + o.y; }
-      },
+      }
    };
 }
 
@@ -244,7 +363,7 @@ function barOptions(barwidth)
          labelsAngle: 45,
          title: 'Number of Points'
       },
-      HtmlText: false,
+      HtmlText: false
    };
 }
 
@@ -253,7 +372,7 @@ function candleOptions()
    return {
       candles: { show: true, candleWidth: 0.6 },
       xaxis: { noTicks: 10 },
-      title: 'Example Graph',
+      title: 'Example Graph'
    };
 }
 
@@ -263,17 +382,17 @@ function basicTimeOptions(yaxisTitle)
       xaxis: {
          mode: 'time',
          labelsAngle: 45,
-         title: 'time',
+         title: 'time'
       },
       yaxis: {
-         title: yaxisTitle, 
+         title: yaxisTitle
       },
       selection: {
          mode: 'x'
       },
       legend: {
          position: 'se', // Position the legend 'south-east'.
-         backgroundColor: '#D2E8FF', // A light blue background color.
+         backgroundColor: '#D2E8FF' // A light blue background color.
       },
       HtmlText: false,
       title: 'Time'
