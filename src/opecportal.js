@@ -293,7 +293,7 @@ function addOpLayer(layerName)
    map.events.register("click", layer, getFeatureInfo);
 
    // Add the layer to the panel
-   opec.leftPanel.addLayerToGroup(layer, layer.displaySensorName);
+   opec.leftPanel.addLayerToGroup(layer, layer.sensorName);
 
    // Increase the count of OpLayers
    map.numOpLayers++;
