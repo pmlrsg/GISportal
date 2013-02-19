@@ -1,12 +1,12 @@
 /**
  * Custom JavaScript functionality
+ * @namespace
  */
-
 opec.util = {};
 
 /**
 * An extremely handy PHP function ported to JS, works well for templating
-* @private
+* 
 * @param {(string|Array)} search A list of things to search for
 * @param {(string|Array)} replace A list of things to replace the searches with
 * @return {string} sa The output

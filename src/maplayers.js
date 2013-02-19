@@ -295,7 +295,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
       asyc: true,
       cache: false,
       success: function(data) {
-         createOpLayer(data, microLayer);
+         opec.createOpLayer(data, microLayer);
          // DEBUG
          //console.log("Adding layer...");
          addOpLayer(microLayer.name);

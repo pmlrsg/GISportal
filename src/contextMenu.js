@@ -207,7 +207,7 @@ function showScalebar($trigger) {
          };
 
          // Add the html to the document using a template
-         $(document.body).append($.mustache(opec.util.replace(['<![CDATA[',']]>'], '', $('#scalebarWindow').text()).trim(), data));
+         $(document.body).append(opec.templates.scalebarWindow(data));
          
          if(typeof layer.minScaleVal !== 'undefined' && typeof layer.maxScaleVal !== 'undefined') {
             $('#' + layer.name + '-max').val(layer.maxScaleVal);
@@ -542,9 +542,13 @@ function showGraphCreator()
          // If there is an open version, close it
          if(graphCreator.length)
             graphCreator.dialog('close');
+            
+         var data = {
+            advanced: true
+         };
          
          // Add the html to the document using a template
-         $(document.body).append(opec.util.replace(['<![CDATA[',']]>'], '', $('#graphcreatorWindow').text()).trim(), {});
+         $(document.body).append(opec.templates.graphCreatorWindow(data));
          
          graphCreator = $('#graphCreator');           
          var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();

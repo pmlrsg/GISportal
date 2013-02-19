@@ -17,7 +17,8 @@
       "externs/externs.js",
       "externs/jQuery-1.8.2.js",
       "externs/OpenLayers.js",
-      "externs/d3.js"
+      "externs/d3.js",
+      "externs/Cesium.js"
    ],
    
    "mode": "SIMPLE",
@@ -29,7 +30,5 @@
       "nonStandardJsDocs": "WARNING",
       "internetExplorerChecks": "WARNING",
       "invalidCasts": "ERROR"
-   },
-   
-   "output-file": "html/static/opecvis.js"
+   }
 }

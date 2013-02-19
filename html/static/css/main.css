@@ -82,7 +82,7 @@ ul li {
    overflow: hidden;
    padding: 0 10px 0 10px;
    height: 50px;
-   width: 624px;
+   width: 662px;
    left: 50%;
    margin-left: -312px;
    position: fixed;
@@ -234,24 +234,31 @@ ul li {
 .panel {
    z-index:9999;
    position:absolute;
-   top: 50px;
+   top: 5px;
    display: none;
    height: auto;
    background: #333333;
    border:2px solid #666666;
-   max-width:300px;
+   max-width:320px;
+}
+
+.panel ul li {
+   float: left;
+   height: 100%;
 }
 
 /* Layers icon for left panel */
 #layerLbl {
    background:url(../img/layers.png) no-repeat;
    padding-left: 30px;
+   margin-left: 100px;
 }
 
 /* Layers icon for right panel */
 #dataLbl {
    background:url(../img/data.png) no-repeat;
    padding-left: 30px;
+   margin-right: 100px;
 }
 
 .lPanel {
@@ -268,6 +275,10 @@ ul li {
 
 #layerAccordion {
    overflow: hidden;
+   width: auto;
+   font-size: 0.9em;
+   font-family: Tahoma, Geneva, sans-serif;
+   padding-top: 2px;
 }
 
 #opLayers {
@@ -297,13 +308,14 @@ ul li {
 }
 
 a.trigger {
-   z-index:10;
+   z-index:99999;
    position: absolute;
    text-decoration: none;
    top: 0px;
    color:#fff;
    border:2px solid #555555;
    display: block;
+   top: 5px;
 }
 
 a.triggerL {
@@ -346,7 +358,56 @@ a.active.triggerR {
    background:#222222 url(../img/Right_icn.png) 10% 50% no-repeat;
 }
 
-/* ======== Info Dialog Box ========
+.panel-button {
+   width: 32px;
+   height: 32px;
+}
+
+.panel-toolbar {
+   background: #333333;
+   border: #333333;
+   overflow: hidden;
+}
+
+.lPanel-buttonSet {
+}
+
+#lpanel-tabs {
+   padding-left: 3px;
+   padding-right: 5px;
+   padding-bottom: 3px;
+   margin-left: 10px;
+   margin-top:4px;
+   background: #FFFFFF;
+}
+
+.opec-tab-filler {
+   margin-top: 31px; 
+   margin-left: 62px; 
+   height: 6px; 
+   width: 231px; 
+   background: #FFFFFF;
+}
+
+#opec-lPanel-content {
+   background: #FFFFFF;
+   padding: 0.3em;
+   color: black;
+}
+
+.opec-tab select {
+   width: 250px;
+   padding: 2px;
+   border:#000000 1px solid;
+   background-color:#EEEEEE;
+}
+
+.opec-tab fieldset {
+   margin-top: 5px;
+   border: 0px;
+}
+
+/* ======== Info Dialog Box ======== */
 /* style the information dialogue */
 #info {
    filter: alpha(opacity=70);
@@ -578,7 +639,9 @@ div .sensor-accordion {
 /* Override some basic jQuery UI Styles */
 .ui-widget { font-family: Tahoma, Geneva, sans-serif; font-size: 0.8em; }
 .ui-widget .ui-widget { font-size: 0.9em; }
-.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-family: Tahoma, Geneva, sans-serif; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 0.9em; font-family: Tahoma, Geneva, sans-serif; }
+
+/* button.ui-button-icon-only { width: 32px; height: 32px; } */
 
 .ui-icon-drawpoint  { background-image: url(../img/selectionPoint.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }
 .ui-icon-drawbox  { background-image: url(../img/selectionBox.png) !important; height: 26px; width: 26px;margin: -12px -2px !important; }

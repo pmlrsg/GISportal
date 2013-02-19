@@ -48,43 +48,27 @@ OpenLayers.ProxyHost = '/service/proxy?url=';   // Flask (Python) service OpenLa
 /**
  * Create all the base layers for the map.
  */
-function createBaseLayers()
-{
-   // Add GEBCO base layer
-   var gebco = new OpenLayers.Layer.WMS(
-      "GEBCO",
-      "http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?",
-      { layers: 'gebco_08_grid' },
-      { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }
-   );
-   map.addLayer(gebco);
-
-   // Add Metacarta basic vmap0 base layer
-   var meta = new OpenLayers.Layer.WMS(
-      'Metacarta Basic',
-      'http://labs.metacarta.com/wms/vmap0',
-      { layers: 'basic' },
-      { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }
-   );
-   map.addLayer(meta);
-
-   // Add NASA Landsat layer
-   var landsat = new OpenLayers.Layer.WMS(
-      'Landsat',
-      'http://irs.gis-lab.info/?',
-      { layers: 'landsat' },
-      { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
-   );
-   map.addLayer(landsat);
+opec.createBaseLayers = function() {
+   opec.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
    
-   // Add BlueMarble layer
-   var blueMarble = new OpenLayers.Layer.WMS(
-      'Blue Marble',
-      'http://demonstrator.vegaspace.com/wmspub', 
-      {layers: "BlueMarble" },
-      { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize'}
-   );
-   map.addLayer(blueMarble);
+   function createBaseLayer(name, url, opts) {
+      var layer = new OpenLayers.Layer.WMS(
+         name,
+         url,
+         opts,
+         { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
+      );
+      layer.controlID = 'baseLayers';
+      layer.displayTitle = name;
+      layer.name = name;
+      map.addLayer(layer);
+      opec.leftPanel.addLayerToGroup(layer, 'baseLayerGroup');
+   }
+   
+   createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
+   createBaseLayer('Metacarta Basic', 'http://labs.metacarta.com/wms/vmap0', { layers: 'basic' });
+   createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
+   createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
    // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
@@ -93,8 +77,9 @@ function createBaseLayers()
 /**
  * Create all the reference layers for the map.
  */
-function createRefLayers()
-{
+opec.createRefLayers = function() {  
+   opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#refLayers'));
+   
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
    for(var i = 12; i <= 19; i++) {
       // skip AMT18 as it isn't available
@@ -151,7 +136,7 @@ function createRefLayers()
       cruiseTrack.setVisibility(false);
       cruiseTrack.displayTitle = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
-      addLayerToPanel(cruiseTrack);
+      opec.leftPanel.addLayerToGroup(cruiseTrack, 'refLayerGroup');
    }
 
    // Setup Black sea outline layer (Vector)
@@ -172,7 +157,7 @@ function createRefLayers()
    blackSea.selected = true;
    blackSea.displayTitle = "The Black Sea (KML)";
    map.addLayer(blackSea);
-   addLayerToPanel(blackSea);
+   opec.leftPanel.addLayerToGroup(blackSea, 'refLayerGroup');
 
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
@@ -182,8 +167,7 @@ function createRefLayers()
  * Create MicroLayers from the getCapabilities request to 
  * be used in the layer selector.
  */
-function createOpLayers() 
-{
+opec.createOpLayers = function() {
    $.each(map.getCapabilities, function(i, item) {
       // Make sure important data is not missing...
       if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL !== "undefined" && typeof item.serverName !== "undefined") {
@@ -197,7 +181,7 @@ function createOpLayers()
                $.each(item, function(i, item) {
                   if(item.Name && item.Name != "") {
                      var microLayer = new opec.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
-                     checkNameUnique(microLayer);               
+                     opec.checkNameUnique(microLayer);               
                      $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
                   }
                });
@@ -213,8 +197,7 @@ function createOpLayers()
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
  */
-function checkNameUnique(microLayer, count) 
-{
+opec.checkNameUnique = function(microLayer, count) {
    var name = null
    
    if(typeof count === "undefined" || count == 0) {
@@ -226,7 +209,7 @@ function checkNameUnique(microLayer, count)
    }
    
    if(name in map.microLayers) {
-      checkNameUnique(microLayer, ++count);
+      opec.checkNameUnique(microLayer, ++count);
    }
    else
       if(count != 0) { 
@@ -238,8 +221,7 @@ function checkNameUnique(microLayer, count)
 /**
  * Create a layer to be displayed on the map.
  */ 
-function createOpLayer(layerData, microLayer) 
-{
+opec.createOpLayer = function(layerData, microLayer) {
    var layer = new OpenLayers.Layer.WMS (
       microLayer.name,
       microLayer.wmsURL,
@@ -302,7 +284,7 @@ function addOpLayer(layerName)
 
    // Check if an accordion is there for us
    if(!$('#' + layer.displaySensorName).length)
-      addAccordionToPanel(layer.sensorName, layer.displaySensorName);
+      opec.leftPanel.addGroupToPanel(layer.sensorName, layer.displaySensorName, $('#opLayers'));
    
    // Add the layer to the map
    map.addLayer(layer);
@@ -311,7 +293,7 @@ function addOpLayer(layerName)
    map.events.register("click", layer, getFeatureInfo);
 
    // Add the layer to the panel
-   addLayerToPanel(layer);
+   opec.leftPanel.addLayerToGroup(layer, layer.displaySensorName);
 
    // Increase the count of OpLayers
    map.numOpLayers++;
@@ -324,11 +306,11 @@ function addOpLayer(layerName)
 function removeOpLayer(layer)
 {
    // Remove the layer from the panel
-   removeLayerFromPanel(layer);
+   opec.leftPanel.removeLayerFromGroup(layer);
    
    // Check if we were the last layer
    if($('#' + layer.displaySensorName).children('li').length == 0)
-      removeAccordionFromPanel(layer.displaySensorName);
+      opec.leftPanel.removeGroupFromPanel(layer.displaySensorName);
 
    // Remove the layer from the map
    map.removeLayer(layer);
@@ -343,118 +325,11 @@ function removeOpLayer(layer)
 }
 
 /**
- * Add an accordion to the layers panel.
- */
-function addAccordionToPanel(id, displayName)
-{ 
-   // Add the accordion
-   $('#opLayers').prepend(
-      '<div>' +
-         '<h3>' + displayName + '</h3>' +
-         '<div id="' + id + '" class="sensor-accordion"></div>' +
-      '</div>'
-   );
-
-   // Creates the accordion
-   $('#' + id).parent('div').multiOpenAccordion({
-      active: 0
-      //click: function(e) {
-         //var parent = $(this).parent('div');
-         //if(parent.hasClass('sort-start')) {
-            //parent.removeClass('sort-start');
-            //return false;
-         //}
-      //},
-   });
-
-   // Makes each of the operational layers sortable
-   $('#' + id).sortable({
-      connectWith: ".sensor-accordion",
-      appendTo:".sensor-accordion",
-      helper:"clone",
-      update: function() {
-         updateLayerOrder($(this));
-      }
-   }).disableSelection();
-}
-
-/**
- * Remove an accordion from the layers panel. 
- */
-function removeAccordionFromPanel(id)
-{
-   if($('#' + id).length) {        
-      // Remove the accordion we were asked to remove
-      $('#' + id).parent('div').remove();
-   }
-   
-   // Do a search for any others that need to be removed
-   $.each($('.sensor-accordion'), function(index, value) {
-      if($(this).children('li').length == 0)
-         $(this).parent('div').remove();
-   });
-}
-
-/**
- * Add a layer to the layers panel.
- */ 
-function addLayerToPanel(layer)
-{
-   // if not already on list and not a base layer, populate the layers panel (left slide panel)
-   if(!$('#' + layer.name).length && layer.displayInLayerSwitcher && !layer.isBaseLayer) {
-      // jQuery selector for the layer controlID
-      var selID = layer.controlID == 'opLayers' ? '#' + layer.displaySensorName : '#' + layer.controlID; 
-
-      $(selID).prepend(
-         '<li id="' + layer.name + '">' +
-            '<img src="img/ajax-loader.gif"/>' +
-            '<input type="checkbox"' + (layer.visibility ? ' checked="yes"' : '') + '" name="' + layer.name + '" value="' + layer.name + '" />' + 
-               layer.displayTitle +  
-            '<a id="layer-exclamation" href="#">' +
-               '<img src="img/exclamation_small.png"/>' +
-            '</a>' +           
-         '</li>'
-      );
-
-      var $layer = $('#' + layer.name);
-
-      // Show the img when we are loading data for the layer
-      layer.events.register("loadstart", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').show();
-      });
-      // Hide the img when we have finished loading data
-      layer.events.register("loadend", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
-      });
-      // Hide the ajax-loader and the exclamation mark initially
-      $layer.find('img[src="img/ajax-loader.gif"]').hide();
-      $layer.find('img[src="img/exclamation_small.png"]').hide();
-
-      // Check the layer state when its visibility is changed
-      layer.events.register("visibilitychanged", layer, function() {
-         checkLayerState(layer);
-      });
-      
-      // Remove the dummy layer
-      removeDummyHelpLayer()
-   }
-}
-
-/**
- * Remove a layer from the layers panel. 
- */
-function removeLayerFromPanel(layer)
-{
-   if($('#' + layer.name).length)
-      $('#' + layer.name).remove();
-}
-
-/**
  * Adds a dummy layer to help the user. 
  */
 function addDummyHelpLayer()
 {
-   addAccordionToPanel("Need-Help", "Need Help?");
+   opec.leftPanel.addGroupToPanel("Need-Help", "Need Help?", $('#opLayers'));
    
    $('#Need-Help').prepend(
    '<li id="Help" class="notSelectable">' +
@@ -476,7 +351,7 @@ function addDummyHelpLayer()
  */
 function removeDummyHelpLayer()
 {
-   removeAccordionFromPanel("Need-Help");
+   opec.leftPanel.removeGroupFromPanel("Need-Help");
 }
 
 /**
@@ -488,41 +363,6 @@ function customPermalinkArgs()
    var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
       this, arguments
    );
-}
-
-/**
- * Updates all the layer indexes in all the layer accordions.
- */ 
-function updateAccordionOrder()
-{
-   $.each($('.sensor-accordion'), function(index, value) {
-      if($(this).children('li').length == 0)
-         removeAccordionFromPanel($(this).attr('id'));
-      else    
-         updateLayerOrder($(this));
-   });
-}
-
-/**
- * Updates the position of layers based on their new 
- * position on the stack.
- */ 
-function updateLayerOrder(accordion)
-{
-   var layerOffset = 0;
-   $.each(accordion.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
-      layerOffset += $(this).children('li').length;
-   });
-
-   var order = accordion.sortable('toArray');   
-   if(order.length > 0) {         
-      $.each(order, function(index, value) {
-         var layer = map.getLayersByName(value)[0];
-         map.setLayerIndex(layer, map.numBaseLayers + layerOffset + order.length - index - 1);
-      });
-   }
-   else
-      removeAccordionFromPanel(accordion.attr('id'));
 }
 
 /**
@@ -558,9 +398,9 @@ function mapInit()
    map.getMasterCache();
 
    // Create the base layers and then add them to the map
-   createBaseLayers();
+   opec.createBaseLayers();
    // Create the reference layers and then add them to the map
-   createRefLayers();
+   opec.createRefLayers();
 
    // Add a couple of useful map controls
    //var mousePos = new OpenLayers.Control.MousePosition();
@@ -577,13 +417,13 @@ function mapInit()
 function layerDependent(data)
 {
    map.getCapabilities = data;
-   createOpLayers();
+   opec.createOpLayers();
 
    //var ows = new OpenLayers.Format.OWSContext();
    //var doc = ows.write(map);
 }
 
-/*====================================================================================*/
+/*===========================================================================*/
 
 /**
  * Loads anything that is not dependent on layer data. 
@@ -615,41 +455,17 @@ function nonLayerDependent()
 
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#layerAccordion, #dataAccordion").multiOpenAccordion({
+   $("#dataAccordion").multiOpenAccordion({
       active: [0, 1]
    });
-
-   $('#refLayers').multiOpenAccordion({
-      active: 0
-   });
-
-   // Makes each of the accordions sortable
-   $('#opLayers').sortable({
-      axis: 'y',
-      distance: 10,
-      handle: 'h3',
-      update: function() {
-         updateAccordionOrder();
-      }
-   })
-   .disableSelection();
-   //.bind('sortstart', function(e, ui) {
-   //   $(this).addClass('sort-start');
-   //});
-
-   // Makes each of the reference layers sortable
-   $("#refLayers").sortable({
-      axis: 'y',
-      distance: 10,
-      update: function() {
-         var order = $("#refLayers").sortable('toArray');                 
-         $.each(order, function(index, value) {
-            var layer = map.getLayersByName(value);
-            map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
-         });
-      }
-   });
    
+   // Setup the left panel
+   opec.leftPanel.setup();
+   
+   //--------------------------------------------------------------------------
+   
+   // If the window is resized move dialogs to the center to stop them going of
+   // the screen
    $(window).resize(function(event) {
       if(event.target == window) {
          $(".ui-dialog-content").dialog("option", "position", "center");
@@ -666,13 +482,15 @@ function nonLayerDependent()
       $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
       $('#refLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
    });
+   
+   //--------------------------------------------------------------------------
 
    // Handle selection of visible layers
-   $('.lPanel').on('mousedown', 'li', function(e) {
+   $('#opec-lPanel-content').on('mousedown', 'li', function(e) {
       var itm = $(this);
       if(!itm.hasClass('notSelectable')) {
          var child = itm.children('input').first();
-         $('.lPanel li').each(function(index) {
+         $('.opec-layer:visible').each(function(index) {
             $(this).removeClass('selectedLayer');
          });
          itm.addClass('selectedLayer');
@@ -772,6 +590,28 @@ function nonLayerDependent()
       return false;
    });
    
+   // Left slide panel buttons
+   $('#triggerL-buttonset').buttonset();
+   $('#triggerL-add-accordion').button({ icons: { primary: 'ui-icon-circle-plus'}, text: false });
+   $('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
+   
+   $('#triggerL-add-accordion').click(function(e) {
+      
+   })
+   
+   $('#triggerL-add-group').button();
+   
+   $('#lpanel-tabs').buttonset();
+   $('#tab-lpanel-operational').button();
+   $('#tab-lpanel-reference').button();
+   $('#tab-lpanel-base-layers').button();
+   
+   $('#lpanel-tabs :button').click(function(e) { 
+      var tabToShow = $(this).attr('href');
+      $('#opec-lPanel-content .opec-tab').filter(function(i) { return $(this).attr('id') != tabToShow.slice(1) }).hide('fast');
+      $(tabToShow).show('fast');
+   });
+     
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
       $(".rPanel").toggle("fast");
@@ -1072,6 +912,13 @@ function setupDrawingControls()
  */
 $(document).ready(function() 
 {
+   // Compile Templates
+   opec.templates = {};
+   opec.templates.layer = Mustache.compile($('#opec-template-layer').text().trim());
+   opec.templates.metadataWindow = Mustache.compile($('#opec-template-metadataWindow').text().trim());
+   opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
+   opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
+   
    // Need to put this early so that tooltips
    // work at the start to make the page feel
    // responsive. 
@@ -1081,9 +928,6 @@ $(document).ready(function()
       position: { my: "left+5 center", at: "right center", collision: "flipfit" },
       tooltipClass: 'ui-tooltip-info'
    });
-   
-   opec.templates = {};
-   opec.templates.metadataWindow = Mustache.compile(opec.util.replace(['<![CDATA[', ']]>'], '', $('#metadataWindow').text()).trim());
    
    $(document).click(function() {
       $(this).tooltip('close');
