@@ -62,9 +62,12 @@ def build_min_opec_js(t):
 @target('html/static/OPECPortal.js', SRC)
 def build_opec_js(t):
    t.info('building non-compiled version')
-   destination = open('html/static/OPECPortal.js', 'w')
+   destination = open('html/static/OPECPortal.js', 'wb')
    for filename in SRC:
-      shutil.copyfileobj(open(filename, 'r'), destination)
+      #shutil.copyfileobj(open(filename, 'r'), destination)
+      with open(filename, 'rb') as file:
+         destination.write(file.read())
+         destination.write('\n')
    destination.close()
    t.info('finished')
    
