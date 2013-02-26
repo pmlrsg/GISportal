@@ -1,4 +1,10 @@
 /**
+ * Context Menu
+ * @namespace 
+ */
+opec.contextMenu = {};
+
+/**
  * Creates the contextMenu and functions for the
  * creation of custom menu items.
  */
@@ -36,7 +42,7 @@ function createContextMenu()
       }
       
       /**
-       * Create the context menu the Oplayers in the data layers accordion.
+       * Create the context menu the oplayers in the data layers accordion.
        */
       $.contextMenu({
          // The class to activate on when right clicked
@@ -70,9 +76,19 @@ function createContextMenu()
                var rest = {
                   showScalebar: showScalebar($trigger),
                   showMetadata: showMetadata($trigger),
-                  showGraphCreator: showGraphCreator()
-               };  
-               return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
+                  showGraphCreator: showGraphCreator(),
+                  viewData: opec.contextMenu.viewData($trigger)
+               };
+               
+               if(layer.controlID == 'opLayers') {
+                  return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
+               }
+               else if (layer.controlID == 'refLayers') {
+                  return $.extend(true, fold1, rest);
+               }
+               else {
+                  return $.extend(true, fold1, rest);
+               } 
             }
             // Return the new menu
             return {
@@ -90,7 +106,7 @@ function createContextMenu()
          selector: '.preloaderContextMenu',
          // Dynamically creates the menu each time
          build: function($trigger, e) {
-
+            e.preventDefault();
             // Return the new menu
             return {
                // The items in the menu
@@ -100,7 +116,77 @@ function createContextMenu()
             };                           
          }
       })
+      
+      /**
+       * Create the context menu for the groups
+       */
+      $.contextMenu({
+         selector: '.ui-accordion-header-dropdown',
+         build: function($trigger, e) {
+            return {
+               items: {
+                  checkAll: opec.contextMenu.checkAll($trigger),
+                  saveToProfile: opec.contextMenu.saveToProfile()
+               }
+            }
+         }
+      })
    });
+}
+
+opec.contextMenu.checkAll = function($trigger) {
+   return {
+      name: "Check All",
+      callback: function() {
+         $trigger.parent().parent().next('div').find('[type="checkbox"]').each(function() {
+            $this = $(this);
+            if(!$this.is(':checked')) {
+               $this.trigger('click');
+               $this.attr('checked', 'checked');
+            }
+         });
+      }
+   };
+}
+
+opec.contextMenu.saveToProfile = function() {
+   return {
+      name: "Save To Profile",
+      callback: function() {
+         
+      }
+   };
+}
+
+opec.contextMenu.viewData = function($trigger) {
+   var layerName = "";
+   var layer = null;
+   
+   if($trigger.attr('id')) {
+      layerName = $trigger.attr('id');
+      layer = map.getLayersByName(layerName)[0];
+   }
+   else {
+      layerName = $trigger.text();
+      layer = map.microLayers[layerName];
+   }
+   
+   return {
+      name: "Zoom To Data",
+      callback: function() {
+         if(layer == null)
+            return;
+            
+          var bbox = new OpenLayers.Bounds(
+             layer.exBoundingBox.WestBoundLongitude,
+             layer.exBoundingBox.SouthBoundLatitude,
+             layer.exBoundingBox.EastBoundLongitude,
+             layer.exBoundingBox.NorthBoundLatitude
+          ).transform(map.displayProjection, map.projection);
+          
+         map.zoomToExtent(bbox);
+      }
+   };
 }
 
 /**
@@ -335,6 +421,9 @@ function showScalebar($trigger) {
 function getCurrentStyles($trigger)
 {
    var layer = map.getLayersByName($trigger.attr('id'))[0];
+   if(layer.controlID != 'opLayers')
+      return [];
+      
    var menuOutput = [];
    var styles = layer.styles.slice();
    // Add a new style that will remove styles from the layer

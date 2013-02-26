@@ -55,6 +55,8 @@ def create_app(config='config.yaml'):
             'thredds.met.no','thredds.met.no:8080', 'irs.gis-lab.info',
             'demonstrator.vegaspace.com']
    
+   graphs = {}
+   
    """
    Nothing yet. Maybe return info plus admin login page?
    """
@@ -65,7 +67,7 @@ def create_app(config='config.yaml'):
    
    
    
-   
+#############################################################################################################################  
    """
    Standard proxy
    """
@@ -135,7 +137,7 @@ def create_app(config='config.yaml'):
    
    
    
-   
+#######################################################################################################################  
    """
    Attempts to harvest links to datasets from a thredds catalog.
    """
@@ -171,7 +173,7 @@ def create_app(config='config.yaml'):
    
    
    
-   
+#########################################################################################################################
    """
    Gets wcs data from a specified server, then performs a requested function
    on the received data, before jsonifying the output and returning it.
@@ -181,31 +183,26 @@ def create_app(config='config.yaml'):
       import random
       
       g.graphError = "";
-      
-      params = getParams() # Gets any optional parameters
+
+      params = getParams() # Gets any parameters
       params = checkParams(params) # Checks what parameters where entered
-      requiredParams = getRequiredParams() # Gets any required parameters
-      checkRequiredParams(requiredParams) # Checks to make sure we have all the parameters we need to contact the wcs server
       
-      params = dict(params.items() + requiredParams.items())
-      #urlParams = params.copy()
-      #urlParams.pop('type')
       params['url'] = createURL(params)
-      app.logger.debug('before type') # DEBUG
+      app.logger.debug('Processing request...') # DEBUG
       
-      type = params['type']
+      type = params['type'].getValue()
       if type == 'histogram': # Outputs data needed to create a histogram
-         output = openNetCDF(params, histogram)
+         output = getBboxData(params, histogram)
       elif type == 'basic': # Outputs a set of standard statistics
-         output = openNetCDF(params, basic)
+         output = getBboxData(params, basic)
       elif type == 'scatter': # Outputs a scatter graph
-         output = openNetCDF(params, scatter)
+         output = getBboxData(params, scatter)
       elif type == 'point':
          output = getPointData(params, raw)
       elif type == 'raw': # Outputs the raw values
-         output = openNetCDF(params, raw)
+         output = getBboxData(params, raw)
       elif type == 'test': # Used to test new code
-         output = openNetCDF(params, test)
+         output = getBboxData(params, test)
       elif type == 'error': # Used to test error handling client-side
          choice = random.randrange(1,7)
          if choice == 1:
@@ -225,141 +222,91 @@ def create_app(config='config.yaml'):
          g.error = '"%s" is not a valid option' % type
          return abort(400)
       
-      app.logger.debug('before json') # DEBUG
+      app.logger.debug('Jsonifying response...') # DEBUG
       
       try:
-         jsonData = jsonify(output = output, type = params['type'], coverage = params['coverage'], error = g.graphError)
+         jsonData = jsonify(output = output, type = params['type'].getValue(), coverage = params['coverage'].getValue(), error = g.graphError)
       except TypeError as e:
          g.error = "Request aborted, exception encountered: %s" % e
          abort(500) # If we fail to jsonify the data return 500
+         
+      app.logger.debug('Request complete, Sending results') # DEBUG
       
       return jsonData
    
    """
-   Gets any optional parameters.
+   Gets any parameters.
    """
    def getParams():
-      time = request.args.get('time', None)
-      bbox = request.args.get('bbox', None)
-      vertical = request.args.get('vertical', None)
-      return {'time': time,
-              'bbox': bbox,
-              'vertical': vertical }
+      # Required for url
+      nameToParam = {}
+      nameToParam["baseURL"] = Param("baseURL", False, False, request.args.get('baseurl'))
+      nameToParam["service"] = Param("service", False, True, 'WCS')
+      nameToParam["request"] = Param("request", False, True, 'GetCoverage')
+      nameToParam["version"] = Param("version", False, True, request.args.get('version', '1.0.0'))
+      nameToParam["format"] = Param("format", False, True, request.args.get('format', 'NetCDF3'))
+      nameToParam["coverage"] = Param("coverage", False, True, request.args.get('coverage'))
+      nameToParam["crs"] = Param("crs", False, True, 'OGC:CRS84')
+      
+      # Optional extras
+      nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
+      
+      # One Required
+      nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
+      nameToParam["circle"] = Param("circle", True, True, request.args.get('circle', None))
+      nameToParam["polygon"] = Param("polygon", True, True, request.args.get('polygon', None))
+      nameToParam["point"] = Param("point", True, True, request.args.get('point', None))
+      
+      # Custom
+      nameToParam["type"] = Param("type", False, False, request.args.get('type'))
+      nameToParam["graphXAxis"] = Param("graphXAxis", True, False, request.args.get('graphXAxis'))
+      nameToParam["graphYAxis"] = Param("graphYAxis", True, False, request.args.get('graphYAxis'))
+      nameToParam["graphZAxis"] = Param("graphZAxis", True, False, request.args.get('graphZAxis'))
+      
+      nameToParam["graphXFunc"] = Param("graphXFunc", True, False, request.args.get('graphXFunc'))
+      nameToParam["graphYFunc"] = Param("graphYFunc", True, False, request.args.get('graphYFunc'))
+      nameToParam["graphZFunc"] = Param("graphZFunc", True, False, request.args.get('graphZFunc'))
+      
+      return nameToParam
    
    """
-   Gets any required parameters.
-   """
-   def getRequiredParams():
-      baseURL = request.args.get('baseurl')
-      service = 'WCS'
-      requestType = 'GetCoverage'
-      version = request.args.get('version', '1.0.0')
-      format = request.args.get('format', 'NetCDF3')
-      coverage = request.args.get('coverage')
-      crs = 'OGC:CRS84'
-      type = request.args.get('type')
-      return {'baseURL': baseURL, 
-              'service': service, 
-              'request': requestType, 
-              'version': version, 
-              'format': format, 
-              'coverage': coverage, 
-              'type': type,
-              'crs': crs}
-   
-   """
-   Check the optional parameters to see if they are valid.
+   Check the parameters to see if they are valid.
    """
    def checkParams(params):    
       checkedParams = {}
       
       for key in params.iterkeys():
-         if params[key] != None:
+         if params[key].getValue() == None or len(params[key].getValue()) == 0:
+            if not params[key].isOptional():            
+               g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
+               abort(400)
+         else:
             checkedParams[key] = params[key]
             
       return checkedParams
    
-   """
-   Check the required parameters to see if they are valid.
-   """        
-   def checkRequiredParams(params):
-      for key in params.iterkeys():
-         if params[key] == None or len(params[key]) == 0:
-            g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
-            abort(400)
+   def createMask(params):
+      if params["bbox"] != None:
+         pass
+      
+      
    
    """
    Create the url that will be used to contact the wcs server.
    """
    def createURL(params):
-      baseURL = params.pop('baseURL')
-      temBaseUrl = baseURL
-      query = urllib.urlencode(params)
-      url = baseURL + query
-      params['baseURL'] = temBaseUrl
+      urlParams = {}
+      for param in params.itervalues():
+         if param.neededInUrl():
+            urlParams[param.getName()] = param.getValue()
+      
+      query = urllib.urlencode(urlParams)
+      url = params['baseURL'].getValue() + query
       app.logger.debug('URL: ' + url) # DEBUG
-      if "wcs2json/wcs" in baseURL:
+      if "wcs2json/wcs" in params['baseURL'].getValue():
          g.error = 'possible infinite recursion detected, cancelled request'
          abort(400)
-      return url
-   
-   """
-   Attempt to open the url, write the response to file and then
-   open it as a netcdf dataset, before running the provided method on it.
-   """
-   def openNetCDF(params, method):   
-      import os
-      app.logger.debug('before try')
-      try:
-         resp = urllib2.urlopen(params['url'])
-         if resp.code != 200:
-            g.error = 'Received %s from %s' % resp.code, params['url']
-            abort(400)
-         
-         # DEBUG used to debug tempfile
-         #app.logger.debug('opening file...') # DEBUG
-         #file = open((os.path.join(app.instance_path, "pythonopen.nc")), "w")
-         #app.logger.debug('writing to file...') # DEBUG
-         #file.write(resp.read())
-         #app.logger.debug('closing file..') # DEBUG
-         #file.close()
-         
-         app.logger.debug('after code check') # DEBUG
-         temp = tempfile.NamedTemporaryFile('w+b', delete=False)
-         temp.write(resp.read())
-         temp.close()
-         resp.close()
-         
-         # DEBUG used to write out a copy of tempfile
-         #file = open(temp.name, 'r')
-         #copy = open((os.path.join(app.instance_path, "tempfilecopy.nc")), 'w')
-         #copy.write(file.read())
-         #copy.close()
-         #file.close()
-              
-         app.logger.debug('before opening netcdf') # DEBUG
-         rootgrp = netCDF.Dataset(temp.name, 'r', format=params['format'])
-         #rootgrp = netCDF.Dataset((os.path.join(app.instance_path, "test.nc")), 'r', format='NETCDF3')
-         app.logger.debug('netcdf file open') # DEBUG
-         output = method(rootgrp, params)   
-         app.logger.debug('method run') # DEBUG
-         rootgrp.close()
-         os.remove(temp.name)
-         #temp.close()
-         return output
-      except urllib2.URLError as e:
-         if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
-            if e.code == 400:
-               g.error = "Failed to access url, make sure you have entered the correct parameters."
-            if e.code == 500:
-               g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
-            abort(400)
-            
-         g.error = "Failed to access url, make sure you have entered the correct parameters"
-         abort(400) # return 400 if we can't get an exact code
-      except Exception, e:
-         g.error = "Request aborted, exception encountered: %s" % e
-         abort(400)
+      return Param("url", False, False, url)
          
    def contactWCSServer(url):
       app.logger.debug('Contacting WCS Server with request...')
@@ -378,7 +325,7 @@ def create_app(config='config.yaml'):
        
    def openNetCDFFile(fileName, params):
       app.logger.debug('Opening netCDF file...')
-      rootgrp = netCDF.Dataset(fileName, 'r', format=params['format'])
+      rootgrp = netCDF.Dataset(fileName, 'r', format=params['format'].getValue())
       app.logger.debug('NetCDF file opened')
       return rootgrp
    
@@ -386,23 +333,41 @@ def create_app(config='config.yaml'):
       # TODO: try except for malformed bbox
       app.logger.debug('Expanding Bbox...')
       increment = 0.1
-      values = params['bbox'].split(',')
+      values = params['bbox'].getValue().split(',')
       for i,v in enumerate(values):
          values[i] = float(values[i]) # Cast string to float
-         if i == 0:
+         if i == 0 or i == 1:
             values[i] -= increment
-         elif i == 3:
+         elif i == 2 or i == 3:
             values[i] += increment
          values[i] = str(values[i])
-      params['bbox'] = ','.join(values)
+      params['bbox'].setValue(','.join(values))
       app.logger.debug(','.join(values))
-      app.logger.debug('New Bbox %s' % params['bbox'])
+      app.logger.debug('New Bbox %s' % params['bbox'].getValue())
       app.logger.debug('Bbox Expanded')
       # Recreate the url
       app.logger.debug('Recreating the url...')
       params['url'] = createURL(params)
       app.logger.debug('Url recreated')
       return params
+   
+   """
+   Generic method for getting data from a wcs server
+   """
+   def getData(params, method, checkdata=None):
+      import os
+      resp = contactWCSServer(params['url'].getValue())
+      fileName = saveOutTempFile(resp)
+      rootgrp = openNetCDFFile(fileName, params)
+      app.logger.debug('Checking data...')
+      # Check data
+      # Run passed in method
+      app.logger.debug('Data checked, beginning requested process...')
+      output = method(rootgrp, params)
+      rootgrp.close()
+      os.remove(fileName)
+      app.logger.debug('Process complete, returning data for transmission...')
+      return output
    
    """
    Tries to get a single point of data to return
@@ -429,30 +394,30 @@ def create_app(config='config.yaml'):
       g.graphError = "Could not retrieve a data point for that area"
       return {}
    
-   """
-   Generic method for getting data from a wcs server
-   """
-   def getData(params, method, checkdata=None):
-      import os
-      resp = contactWCSServer(params['url'])
-      app.logger.debug('Checking data...')
-      fileName = saveOutTempFile(resp)
-      rootgrp = openNetCDFFile(fileName, params)
-      # Check data
-      # Run passed in method
-      app.logger.debug('Data checked, beginning requested process...')
-      output = method(rootgrp, params)
-      rootgrp.close()
-      os.remove(fileName)
-      app.logger.debug('Process complete, returning data for transmission...')
-      return output
-      
-   
+   def getBboxData(params, method):
+      import os, errno
+      try:
+         return getData(params, method)
+      except urllib2.URLError as e:
+         if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+            if e.code == 400:
+               g.error = "Failed to access url, make sure you have entered the correct parameters."
+            if e.code == 500:
+               g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
+            abort(400)
+            
+         g.error = "Failed to access url, make sure you have entered the correct parameters"
+         abort(400) # return 400 if we can't get an exact code
+      #except IOError as e:
+         #if e[0] == 2:
+            #g.error = "Unable to save file"
+            #abort(400)
+              
    """
    Performs a basic set of statistical functions on the provided data.
    """
    def basic(dataset, params):
-      arr = np.array(dataset.variables[params['coverage']])
+      arr = np.array(dataset.variables[params['coverage'].getValue()])
       # Create a masked array ignoring nan's
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
       time = getCoordinateVariable(dataset, 'Time')
@@ -464,7 +429,7 @@ def create_app(config='config.yaml'):
       times = np.array(time)
       output = {}
       
-      units = getUnits(dataset.variables[params['coverage']])
+      units = getUnits(dataset.variables[params['coverage'].getValue()])
       output['units'] = units
       
       app.logger.debug('starting basic calc') # DEBUG
@@ -515,21 +480,21 @@ def create_app(config='config.yaml'):
    Creates a histogram from the provided data. If no bins are created it creates its own.
    """
    def histogram(dataset, params):
-      var = np.array(dataset.variables[params['coverage']]) # Get the coverage as a numpy array
+      var = np.array(dataset.variables[params['coverage'].getValue()]) # Get the coverage as a numpy array
       return {'histogram': getHistogram(var)}
    
    """
    Creates a scatter from the provided data.
    """
    def scatter(dataset, params):
-      var = np.array(dataset.variables[params['coverage']])
+      var = np.array(dataset.variables[params['coverage'].getValue()])
       return {'scatter': getScatter(var)}
    
    """
    Returns the raw data.
    """
    def raw(dataset, params):
-      var = np.array(dataset.variables[params['coverage']]) # Get the coverage as a numpy array
+      var = np.array(dataset.variables[params['coverage'].getValue()]) # Get the coverage as a numpy array
       return {'rawdata': var.tolist()}
    
    """
@@ -568,14 +533,14 @@ def create_app(config='config.yaml'):
    """
    def getHistogram(arr):
       maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
-      bins = request.args.get('bins', None)
+      bins = request.args.get('bins', None) # TODO move to get params
       numbers = []
       app.logger.debug('before bins') # DEBUG
       
       if bins == None or not bins:
          max = getMax(maskedarr)
          min = getMin(maskedarr)
-         bins = np.linspace(min, max, 10) # Create ten evenly spaced bins 
+         bins = np.linspace(min, max, 11) # Create ten evenly spaced bins 
          app.logger.debug('bins generated') # DEBUG
          N,bins = np.histogram(maskedarr, bins) # Create the histogram
       else:
@@ -634,11 +599,216 @@ def create_app(config='config.yaml'):
    
    @app.errorhandler(400)
    def badRequest(error):
-      resp = make_response(g.error, 400)
-      resp.headers['MESSAGE'] = g.error
-      return resp
+      if hasattr(g, 'error'):
+         resp = make_response(g.error, 400)
+         resp.headers['MESSAGE'] = g.error
+         return resp
+      else:
+         resp = make_response("Bad request", 400)
+         resp.headers['MESSAGE'] = "Bad request"
+         return resp
    
    return app
+
+class Mask(object):
+   def __init__(self, bbox):
+      self._bbox = bbox
+      
+   def getBbox(self):
+      return self._bbox
+   
+#===============================================================================
+# class Ellipse(Mask):
+#   def __init__(self, centre, height, width):
+#      self._lat = centre.getLat()
+#      self._lon = centre.getLon()
+#      self._height = height
+#      self._width = width
+#      
+#   def getCentre(self):
+#      return Point(self._lat, self._lon)
+#      
+#   def createBbox(self, lat, lon, height, width):
+#      hRadius = height / 2
+#      wRadius = width / 2
+#      
+#      return Bbox(self._lon - wRadius, self._lat - hRadius, self._lon + wRadius, self._lat + hRadius)
+#   
+#   def pointInMask(self, point):
+#      x = (math.pow(point.getLon() - getCentre().getLon(), 2)) / self._width
+#      y = (math.pow(point.getLat() - getCentre().getLat(), 2)) / self._height
+#      
+#      return x + y <= 1
+#===============================================================================
+      
+class Polygon(Mask):
+   def __init__(self, points = None, commaSeparatedPoints = None):
+      if points != None:
+         self._poly = points
+      
+      if commaSeparatedPoints != None:
+         points = []
+         values = commaSeparatedPoints.getValue().split(',')
+         [points.append(Point(values[i], values[i+1])) for i in range(0, len(values), 2)]
+         self._poly = points
+      
+      if points == None and commaSeparatedPoints == None:
+         #TODO: Throw developer error
+         pass
+      
+      super(Polygon, self).__init__(createBbox(self._poly))
+   
+   def getPolygonAsTupleList(self):
+      listToReturn = []
+      for point in self._poly:
+         listToReturn.append((point.getLon(), point.getLat()))
+         
+      return listToReturn
+   
+   def createBbox(self, points):
+      minLon = None
+      maxLon = None
+      minLat = None
+      maxLat = None
+      
+      for point in point:
+         if minLon == None:
+            minLon = point.getLon()
+         elif point.getLon() < minLon:
+            minLon = point.getLon()
+            
+         if maxLon == None:
+            maxLon = point.getLon()
+         elif point.getLon() > maxLon:
+            maxLon = point.getLon()
+            
+         if minLat == None:
+            minLat = point.getLat()
+         elif point.getLat() < minLat:
+            minLat = point.getLat()
+            
+         if maxLat == None:
+            maxLat = point.getLat()
+         elif point.getLat() > maxLat:
+            maxLat = point.getLat()
+            
+      return Bbox(minLon, minLat, maxLon, maxLat)
+           
+   def pointInMask(self, point, poly=None):
+      if poly == None:
+         poly = self.getPolygonAsTupleList()
+      
+      x = point.getLon()
+      y = point.getLat()
+      
+      # check if point is a vertex
+      if (x,y) in poly: return True
+   
+      # check if point is on a boundary
+      for i in range(len(poly)):
+         p1 = None
+         p2 = None
+         if i == 0:
+            p1 = poly[0]
+            p2 = poly[1]
+         else:
+            p1 = poly[i - 1]
+            p2 = poly[i]
+         if p1[1] == p2[1] and p1[1] == y and x > min(p1[0], p2[0]) and x < max(p1[0], p2[0]):
+            return "True"
+         
+      n = len(poly)
+      inside = False
+   
+      p1x,p1y = poly[0]
+      for i in range(n+1):
+         p2x,p2y = poly[i % n]
+         if y > min(p1y,p2y):
+            if y <= max(p1y,p2y):
+               if x <= max(p1x,p2x):
+                  if p1y != p2y:
+                     xints = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
+                  if p1x == p2x or x <= xints:
+                     inside = not inside
+         p1x,p1y = p2x,p2y
+         
+      return inside
+
+class Point:
+   def __init__(self, lon, lat):
+      self._lat = lat
+      self._lon = lon
+      
+   def getLat(self):
+      return self._lat
+   
+   def getLon(self):
+      return self._lon
+   
+   def getTuple(self):
+      return (self.getLon(), self.getLat())
+   
+class Bbox:
+   def __init__(self, lon1, lat1, lon2, lat2):
+      self._bottomLeft = Point(lon1, lat1)
+      self._topRight = Point(lon2, lat2)
+      self._topLeft = Point(lon1, lat2)
+      self._bottomRight = Point(lon2, lat1)
+      
+   def getBottomLeft(self):
+      return self._bottomLeft
+   
+   def getTopLeft(self):
+      return self._topLeft
+   
+   def getBottomRight(self):
+      return self._bottomRight
+   
+   def getTopRight(self):
+      return self._topRight
+
+class Graph:
+   def __init__(self, name, numAxis, params, funcs):
+      self._name = name
+      self._numAxis = numAxis
+      self._params = params
+      self._funcs = funcs
+      
+   def hasX(self):
+      return self._numAxis >= 1
+   
+   def hasY(self):
+      return self._numAxis >= 2
+   
+   def hasZ(self):
+      return self._numAxis >= 3
+     
+   # what axis
+   # allowed/not allowed funcs
+   # custom params
+   # special funcs
+   
+class Param:
+   def __init__(self, name, optional, neededInUrl, value):
+      self._name = name
+      self._optional = optional
+      self._neededInUrl = neededInUrl
+      self._value = value
+      
+   def isOptional(self):
+      return self._optional
+   
+   def neededInUrl(self):
+      return self._neededInUrl
+   
+   def getName(self):
+      return self._name
+   
+   def getValue(self):
+      return self._value
+   
+   def setValue(self, value):
+      self._value = value
 
 if __name__ == '__main__':
    app = create_app(config="config.yaml")

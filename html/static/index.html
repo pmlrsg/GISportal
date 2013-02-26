@@ -6,8 +6,10 @@
 <title>OPEC Visualisation Portal Prototype</title>
 
 <!-- ============================ Now for the styling ============================ -->
+<!-- <link rel="stylesheet" type="text/css" href="css/reset.css" /> -->
+
 <!-- jQuery UI theming CSS -->
-<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.9.1.custom.min.css" />
+<link rel="stylesheet" type="text/css" href="js-libs/jquery-ui/css/black-tie/jquery-ui-1.10.1.custom.min.css" />
 
 <!-- Default OpenLayers styling -->
 <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/style.css" />
@@ -31,10 +33,11 @@
 
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="js-libs/jquery/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.9.1.custom.min.js"></script>
+<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.10.1.custom.min.js"></script>
 
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
@@ -58,7 +61,7 @@
 <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
 
 <!-- jQuery UI dialog extension -->
-<script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.0.1.js"></script>
+<script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script>
 
 <!-- Cesium -->
 <script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>
@@ -301,11 +304,11 @@
       <ul>
          <li id="panZoom">
             <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
-               <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
+            <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
             <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
-               <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
+            <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
             <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
-               <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
+            <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
          </li>
          <li class="divider"></li>
          <li>
@@ -323,8 +326,13 @@
             </fieldset>
          </li>
          <li class="divider"></li>
-         <li>
-            <a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window" title="Map Information"/></a>        
+         <li id="opec-toolbar-actions" class="opec-toolbar-buttonpane">
+            <button id="mapInfoToggleBtn"></button>
+            <input type="checkbox" id="shareMapToggleBtn" /><label class="opec-iconBigBtn" for="shareMapToggleBtn" title="Open Share Panel"></label>
+            <button id="layerPreloader"></button>
+            <input type="checkbox" id="opec-button-3d" /><label class="opec-iconBigBtn" for="opec-button-3d" title="Go To 3D Mode!"></label>
+            <button id="infoToggleBtn"></button>
+            <!--<a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window" title="Map Information"/></a>        
          </li>
          <li>
             <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window" title="Share Links"/></a>
@@ -332,14 +340,15 @@
          <li>
             <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window" title="Select Layers"/></a>
          </li>
-         <li class="divider"></li>
          <li>
+            <button id="opec-button-3d"></button>
+            <label  for="opec-button-3d" title="Go to 3D mode"></label>
             <a href="#" id="mapOptionsBtn"><img src="img/map-icon.png" alt="Click for Map Options"></a>
          </li>
          <li class="divider"></li>
          <li>
             <a href="#" id="infoToggleBtn"><img src="img/info32.png" alt="Toggle Information Window" title="Information"></a>
-         </li>   
+         </li> --> 
       </ul>
    </div>
    <!-- The Left Panels -->
@@ -357,24 +366,22 @@
                   <input id="triggerL-enter-group-name" title="Group Name" type="text" placeholder="enter group name here" />
                </li>
                <li id="triggerL-buttonset" class="lPanel-buttonSet">
-                  
                </li>
                <li id="lpanel-tabs" class="ui-corner-top lPanel-buttonSet">
-                  <button id="tab-lpanel-operational" href="#lpanel-operational">Operational</button>
-                  <button id="tab-lpanel-reference" href="#lpanel-reference">Reference</button>
-                  <button id="tab-lpanel-base-layers" href="#lpanel-base-layers">Options</button>
+                  <button id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">Operational</button>
+                  <button id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">Reference</button>
+                  <button id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">Options</button>
                </li>
-            </ul>
-            <!-- <div class="opec-tab-filler"></div> -->         
+            </ul>       
          </div>
          <div id="opec-lPanel-content" class="ui-corner-all">
-            <div id="lpanel-operational" class="ui-corner-top opec-tab opec-tab-active">
-               <div id="opLayers" style="overflow-x: hidden"></div>
-               </div>
-            <div id="lpanel-reference" class="ui-corner-top opec-tab" style="display: none;">
-               <div id="refLayers"></div> 
-               </div>
-            <div id="lpanel-base-layers" class="opec-tab" style="display: none;">
+            <div id="opec-lPanel-operational" class="ui-corner-top opec-tab-content opec-tab-active">
+               <!-- <div id="opLayers" style="overflow-x: hidden"></div> -->
+            </div>
+            <div id="opec-lPanel-reference" class="ui-corner-top opec-tab-content" style="display: none;">
+               <!-- <div id="refLayers"></div> -->
+            </div>
+            <div id="lpanel-base-layers" class="opec-tab-content" style="display: none;">
                <div id="baseLayers">
                   <fieldset>
                      <legend>Base Layer</legend>

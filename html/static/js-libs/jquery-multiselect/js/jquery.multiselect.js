@@ -484,7 +484,7 @@ $.widget("ui.multiselect", {
    // used by select and deselect, etc.
    _findItem: function(text, list) {
       var found = null;
-      list.children('li.ui-element:visible').each(function(i,el) {
+      list.children('li.ui-element').filter(function() { return !($(this).css('visibility') == 'hidden' || $(this).css('display') == 'block') }).each(function(i,el) {
          el = $(el);
          if (el.text().toLowerCase() === text.toLowerCase())
             found = el;

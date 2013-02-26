@@ -170,7 +170,7 @@ function gritterLayerHelper()
          // If the date is set...
          if(inst != null) { 
             var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
-            var uidate = ISODateString(thedate);
+            var uidate = opec.util.ISODateString(thedate);
             var mDate = layer.matchDate(uidate);
 
             // Can the layer display the selected date?

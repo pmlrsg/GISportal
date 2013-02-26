@@ -173,7 +173,7 @@ OpenLayers.Layer.prototype.matchDate = function (thedate) {
 OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate) {
    var layer = lyr;
    if(thedate){
-      var uidate = ISODateString(thedate);
+      var uidate = opec.util.ISODateString(thedate);
       var mDate = layer.matchDate(uidate);
       if(mDate){
          lyr.currentDateTimes = mDate;
@@ -190,7 +190,7 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate) {
          console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
       }
    }
-   checkLayerState(layer)
+   opec.checkLayerState(layer);
 };
 
 /**
@@ -241,7 +241,7 @@ OpenLayers.Map.prototype.refreshDateCache = function() {
  */
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
    var themap = this;
-   var uidate = ISODateString(thedate);
+   var uidate = opec.util.ISODateString(thedate);
    // Filter the datetime array to see if it matches the date using jQuery grep utility
    var filtArray = $.grep(themap.enabledDays, function(dt, i) {
       var datePart = dt.substring(0, 10);
@@ -298,7 +298,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
          opec.createOpLayer(data, microLayer);
          // DEBUG
          //console.log("Adding layer...");
-         addOpLayer(microLayer.name);
+         opec.addOpLayer(microLayer.name);
          // DEBUG
          //console.log("Added Layer");
       },

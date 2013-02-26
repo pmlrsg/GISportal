@@ -11,8 +11,7 @@ opec.util = {};
 * @param {(string|Array)} replace A list of things to replace the searches with
 * @return {string} sa The output
 */  
-opec.util.replace = function(search, replace, subject, count){
-
+opec.util.replace = function(search, replace, subject, count) {
    var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
       f = [].concat(search),
       r = [].concat(replace),
@@ -43,8 +42,7 @@ opec.util.replace = function(search, replace, subject, count){
       }
    }
    
-   return sa ? s : s[0];
-   
+   return sa ? s : s[0];  
 }
 
 // Extension to JavaScript Arrays to de-duplicate them
@@ -59,8 +57,10 @@ Array.prototype.deDupe = function() {
    return out;
 }
 
-// Turn JavaScript date, d into ISO8601 date part (no time)
-function ISODateString(d) {
+/**
+ * Turn JavaScript date, d into ISO8601 date part (no time)
+ */ 
+opec.util.ISODateString = function(d) {
    function pad(n){
       return n<10 ? '0'+n : n;
    }
@@ -69,9 +69,10 @@ function ISODateString(d) {
    return datestring;
 }
 
-// Format date string so it can be displayed
-function displayDateString(date) 
-{
+/**
+ * Format date string so it can be displayed
+ */ 
+opec.util.displayDateString = function(date) {
    var year = date.substring(0, 4);
    var month = date.substring(5, 7);
    var day = date.substring(8, 10);

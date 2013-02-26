@@ -1,9 +1,4 @@
-/**
- * @file main file
- * Will yuidoc or jsdoc3 work? Only one can be chosen
- */
-
-/*====================================================================================*/
+/*===========================================================================*/
 //Initialise javascript global variables and objects
 
 /**
@@ -43,13 +38,13 @@ var quickRegion = [
 
 // Define a proxy for the map to allow async javascript http protocol requests
 OpenLayers.ProxyHost = '/service/proxy?url=';   // Flask (Python) service OpenLayers proxy
-/*====================================================================================*/
+/*===========================================================================*/
 
 /**
  * Create all the base layers for the map.
  */
 opec.createBaseLayers = function() {
-   opec.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
+   //opec.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
    
    function createBaseLayer(name, url, opts) {
       var layer = new OpenLayers.Layer.WMS(
@@ -62,7 +57,7 @@ opec.createBaseLayers = function() {
       layer.displayTitle = name;
       layer.name = name;
       map.addLayer(layer);
-      opec.leftPanel.addLayerToGroup(layer, 'baseLayerGroup');
+      //opec.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
    }
    
    createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
@@ -78,7 +73,7 @@ opec.createBaseLayers = function() {
  * Create all the reference layers for the map.
  */
 opec.createRefLayers = function() {  
-   opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#refLayers'));
+   opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
    
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
    for(var i = 12; i <= 19; i++) {
@@ -136,7 +131,7 @@ opec.createRefLayers = function() {
       cruiseTrack.setVisibility(false);
       cruiseTrack.displayTitle = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
-      opec.leftPanel.addLayerToGroup(cruiseTrack, 'refLayerGroup');
+      opec.leftPanel.addLayerToGroup(cruiseTrack, $('#refLayerGroup'));
    }
 
    // Setup Black sea outline layer (Vector)
@@ -157,7 +152,7 @@ opec.createRefLayers = function() {
    blackSea.selected = true;
    blackSea.displayTitle = "The Black Sea (KML)";
    map.addLayer(blackSea);
-   opec.leftPanel.addLayerToGroup(blackSea, 'refLayerGroup');
+   opec.leftPanel.addLayerToGroup(blackSea, $('#refLayerGroup'));
 
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
@@ -226,7 +221,7 @@ opec.createOpLayer = function(layerData, microLayer) {
       microLayer.name,
       microLayer.wmsURL,
       { layers: microLayer.urlName, transparent: true}, 
-      { opacity: 1, wrapDateLine: true }
+      { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
    );
 
    // Get the time dimension if this is a temporal layer
@@ -236,8 +231,8 @@ opec.createOpLayer = function(layerData, microLayer) {
          layer.temporal = true;
          var datetimes = dimension.Value.split(',');
          layer.DTCache = datetimes;
-         layer.firstDate = displayDateString(datetimes[0]);
-         layer.lastDate = displayDateString(datetimes[datetimes.length - 1]);
+         layer.firstDate = opec.util.displayDateString(datetimes[0]);
+         layer.lastDate = opec.util.displayDateString(datetimes[datetimes.length - 1]);
       }
       else if (value.Name.toLowerCase() == 'elevation') {
          layer.elevation = true;
@@ -268,8 +263,7 @@ opec.createOpLayer = function(layerData, microLayer) {
 /**
  * Add a layer to the map from the layerStore. 
  */
-function addOpLayer(layerName)
-{
+opec.addOpLayer = function(layerName) {
    // Get layer from layerStore
    var layer = map.layerStore[layerName];
 
@@ -281,10 +275,10 @@ function addOpLayer(layerName)
 
    // Remove the layer from the layerStore
    delete map.layerStore[layerName];
-
+   
    // Check if an accordion is there for us
-   if(!$('#' + layer.displaySensorName).length)
-      opec.leftPanel.addGroupToPanel(layer.sensorName, layer.displaySensorName, $('#opLayers'));
+   //if(!$('#' + layer.displaySensorName).length)
+      //opec.leftPanel.addGroupToPanel(layer.sensorName, layer.displaySensorName, $('#opec-lPanel-operational'));
    
    // Add the layer to the map
    map.addLayer(layer);
@@ -293,7 +287,7 @@ function addOpLayer(layerName)
    map.events.register("click", layer, getFeatureInfo);
 
    // Add the layer to the panel
-   opec.leftPanel.addLayerToGroup(layer, layer.sensorName);
+   opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-operational')));
 
    // Increase the count of OpLayers
    map.numOpLayers++;
@@ -303,14 +297,13 @@ function addOpLayer(layerName)
  * Remove a layer from the map and into the 
  * layerStore. 
  */
-function removeOpLayer(layer)
-{
+opec.removeOpLayer = function(layer) {
    // Remove the layer from the panel
    opec.leftPanel.removeLayerFromGroup(layer);
    
    // Check if we were the last layer
-   if($('#' + layer.displaySensorName).children('li').length == 0)
-      opec.leftPanel.removeGroupFromPanel(layer.displaySensorName);
+   //if($('#' + layer.displaySensorName).children('li').length == 0)
+      //opec.leftPanel.removeGroupFromPanel(layer.displaySensorName);
 
    // Remove the layer from the map
    map.removeLayer(layer);
@@ -322,36 +315,6 @@ function removeOpLayer(layer)
 
    // Decrease the count of OpLayers
    map.numOpLayers--;
-}
-
-/**
- * Adds a dummy layer to help the user. 
- */
-function addDummyHelpLayer()
-{
-   opec.leftPanel.addGroupToPanel("Need-Help", "Need Help?", $('#opLayers'));
-   
-   $('#Need-Help').prepend(
-   '<li id="Help" class="notSelectable">' +
-      'You Need to add some layers! Use the ' +      
-      '<a id="dmhLayerSelection" href="#">Layer Selection</a>' +  
-      ' panel.' +
-   '</li>'
-   );
-   
-   // Open the layer panel on click
-   $('#dmhLayerSelection').click(function(e) {
-      $('#layerPreloader').trigger('click');
-         return false;
-   });
-}
-
-/**
- * Removes dummy layer 
- */
-function removeDummyHelpLayer()
-{
-   opec.leftPanel.removeGroupFromPanel("Need-Help");
 }
 
 /**
@@ -367,9 +330,8 @@ function customPermalinkArgs()
 
 /**
  * Checks to see if a layer is not visible and selected.
- */ 
-function checkLayerState(layer)
-{
+ */
+opec.checkLayerState = function(layer) {
    if(!layer.visibility && layer.selected)
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
    else
@@ -444,12 +406,38 @@ function nonLayerDependent()
          map.setLayerIndex(value, map.layers.length - 1);
       });
    });
+   
+   //----------------------------Quick Region----------------------------------
 
    // Handles re-set of the quick region selector after zooming in or out on the map or panning
    function quickRegionReset(e){
       $('#quickRegion').val('Choose a Region');
    }
    map.events.register('moveend', map, quickRegionReset);
+   
+   // Populate Quick Regions from the quickRegions array
+   for(var i = 0; i < quickRegion.length; i++) {
+       $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
+   }
+   
+   // Change of quick region event handler - happens even if the selection isn't changed
+   $('#quickRegion').change(function(e) {
+       var qr_id = $('#quickRegion').val();
+       var bbox = new OpenLayers.Bounds(
+                   quickRegion[qr_id][1],
+                   quickRegion[qr_id][2],
+                   quickRegion[qr_id][3],
+                   quickRegion[qr_id][4]
+                ).transform(map.displayProjection, map.projection);
+       // Prevent the quick region selection being reset after the zoomtToExtent event         
+       map.events.unregister('moveend', map, quickRegionReset);
+       // Do the zoom to the quick region bounds
+       map.zoomToExtent(bbox);
+       // Re-enable quick region reset on map pan/zoom
+       map.events.register('moveend', map, quickRegionReset);
+   });
+   
+   //--------------------------------------------------------------------------
   
    //Configure and generate the UI elements
 
@@ -473,14 +461,14 @@ function nonLayerDependent()
    });
 
    // set the max height of each of the accordions relative to the size of the window
-   $('#layerAccordion').css('max-height', $(document).height() - 120);
-   $('#opLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
-   $('#refLayers').css('max-height', ($(document).height() - 120) / 2 - 40);
+   $('#layerAccordion').css('max-height', $(document).height() - 300);
+   $('#opec-lPanel-operational').css('max-height', $(document).height() - 350);
+   $('#opec-lPanel-reference').css('max-height', $(document).height() - 350);
    
    $(window).resize(function() {
-      $('#layerAccordion').css('max-height', $(window).height() - 120);
-      $('#opLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
-      $('#refLayers').css('max-height', ($(window).height() - 120) / 2 - 40);
+      $('#layerAccordion').css('max-height', $(window).height() - 300);
+      $('#opec-lPanel-operational').css('max-height', $(window).height() - 350);
+      $('#opec-lPanel-reference').css('max-height', $(window).height() - 350);
    });
    
    //--------------------------------------------------------------------------
@@ -498,11 +486,8 @@ function nonLayerDependent()
       }
    });
    
-   // Add Dummy Layer
-   addDummyHelpLayer();
-
    // Toggle visibility of data layers
-   $('#opLayers, #refLayers').on('click', ':checkbox', function(e) {
+   $('#opec-lPanel-operational, #opec-lPanel-reference').on('click', ':checkbox', function(e) {
       var v = $(this).val();
       var layer = map.getLayersByName(v)[0];
       if($(this).is(':checked')) {
@@ -517,13 +502,13 @@ function nonLayerDependent()
          }
          else {
             layer.setVisibility(true);
-            checkLayerState(layer);
+            opec.checkLayerState(layer);
          }
       }
       else {
          layer.selected = false;
          layer.setVisibility(false);
-         checkLayerState(layer);
+         opec.checkLayerState(layer);
          // Update map date cache now a new temporal layer has been removed
          if(layer.temporal)
             map.refreshDateCache();
@@ -547,11 +532,6 @@ function nonLayerDependent()
            $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
        }
    });
-
-   // Populate Quick Regions from the quickRegions array
-   for(var i = 0; i < quickRegion.length; i++) {
-       $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
-   }
    
    // jQuery UI elements
    $('#viewDate').datepicker({
@@ -581,36 +561,8 @@ function nonLayerDependent()
    $("#analyses").accordion({ collapsible: true, heightStyle: 'content' });
    $("#spatial").accordion({ collapsible: true, heightStyle: 'content' });
    $("#temporal").accordion({ collapsible: true, heightStyle: 'content' }); 
-
-   //Hook up the other events for the general UI
-   // Left slide panel show-hide functionality      
-   $(".triggerL").click(function(e) {
-      $(".lPanel").toggle("fast");
-      $(this).toggleClass("active");
-      return false;
-   });
    
-   // Left slide panel buttons
-   $('#triggerL-buttonset').buttonset();
-   $('#triggerL-add-accordion').button({ icons: { primary: 'ui-icon-circle-plus'}, text: false });
-   $('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
-   
-   $('#triggerL-add-accordion').click(function(e) {
-      
-   })
-   
-   $('#triggerL-add-group').button();
-   
-   $('#lpanel-tabs').buttonset();
-   $('#tab-lpanel-operational').button();
-   $('#tab-lpanel-reference').button();
-   $('#tab-lpanel-base-layers').button();
-   
-   $('#lpanel-tabs :button').click(function(e) { 
-      var tabToShow = $(this).attr('href');
-      $('#opec-lPanel-content .opec-tab').filter(function(i) { return $(this).attr('id') != tabToShow.slice(1) }).hide('fast');
-      $(tabToShow).show('fast');
-   });
+   //--------------------------------------------------------------------------
      
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
@@ -618,64 +570,39 @@ function nonLayerDependent()
       $(this).toggleClass("active");
       return false;
    });
-
-   // Add map options panel rollover functionality
-   $('#mapOptionsBtn').hover(function() {
-      clearTimeout($(this).data('timeout'));
-      $('#mapOptions').show('fast');
-   }, function() {
-      var t = setTimeout(function() {
-         $('#mapOptions').hide('fast');
-      }, 500);
-      $(this).data('timeout', t);
-   });
-
-   $('#mapOptions').hover(function() {
-      clearTimeout($('#mapOptionsBtn').data('timeout'));
-      $('#mapOptions').show();
-   }, function() {
-      var t = setTimeout(function() {
-         $('#mapOptions').hide('fast');
-      }, 300);
-      $(this).data('timeout', t);
-   });
    
-   // Stop link being activated
-   $('#mapOptionsBtn').click(function() {
-      return false;
-   });
-
-   // Add permalink share panel click functionality
-   $('#shareMapToggleBtn').click(function() {
-      $('#shareOptions').toggle();
-      return false;
-   });
+   //--------------------------------------------------------------------------
+   
+   $('#opec-toolbar-actions')
+      .buttonset().children('button:first')
+      .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
+      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'} })
+      .click(function(e) {
+         if(map.globe.is3D) {
+            map.show2D();
+         } 
+         else {
+            map.show3D();
+            opec.gritter.showNotification('3DTutorial', null);
+         }
+      })
+      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
    
    // Add toggle functionality for dialogs
    addDialogClickHandler('#infoToggleBtn', '#info');
    addDialogClickHandler('#mapInfoToggleBtn', '#mapInfo');
    addDialogClickHandler('#layerPreloader', '#layerSelection');
 
+   // Add permalink share panel click functionality
+   $('#shareMapToggleBtn').click(function() {
+      $('#shareOptions').toggle();
+   });
+   
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
        map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
-   });
-   
-   // Change of quick region event handler - happens even if the selection isn't changed
-   $('#quickRegion').change(function(e) {
-       var qr_id = $('#quickRegion').val();
-       var bbox = new OpenLayers.Bounds(
-                   quickRegion[qr_id][1],
-                   quickRegion[qr_id][2],
-                   quickRegion[qr_id][3],
-                   quickRegion[qr_id][4]
-                ).transform(map.displayProjection, map.projection);
-       // Prevent the quick region selection being reset after the zoomtToExtent event         
-       map.events.unregister('moveend', map, quickRegionReset);
-       // Do the zoom to the quick region bounds
-       map.zoomToExtent(bbox);
-       // Re-enable quick region reset on map pan/zoom
-       map.events.register('moveend', map, quickRegionReset);
    });
 
    createContextMenu();
@@ -910,7 +837,7 @@ function setupDrawingControls()
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
-$(document).ready(function() 
+function main()
 {
    // Compile Templates
    opec.templates = {};
@@ -919,19 +846,18 @@ $(document).ready(function()
    opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
    opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
    
-   // Need to put this early so that tooltips
-   // work at the start to make the page feel
-   // responsive. 
+   // Need to put this early so that tooltips work at the start to make the
+   // page feel responsive.    
+   //$(document).tooltip({
+      //track: true,
+      //position: { my: "left+10 center", at: "right center", collision: "flipfit" },
+      //tooltipClass: 'ui-tooltip-info'
+   //});
    
-   $(document).tooltip({
-      track: true,
-      position: { my: "left+5 center", at: "right center", collision: "flipfit" },
-      tooltipClass: 'ui-tooltip-info'
-   });
+   //$(document).click(function() {
+      //$(this).tooltip('close');
+   //});
    
-   $(document).click(function() {
-      $(this).tooltip('close');
-   });
    /*
    $(document).on('mouseenter', '.tt', function() {
       $(this).tooltip({
@@ -1000,7 +926,7 @@ $(document).ready(function()
             if(ui.option.text in map.layerStore) {
                // DEBUG
                //console.log("Adding layer...");
-               addOpLayer(ui.option.text);
+               opec.addOpLayer(ui.option.text);
                // DEBUG
                //console.log("Added Layer");
             }
@@ -1020,7 +946,7 @@ $(document).ready(function()
          if(layer) {
             // DEBUG
             //console.log("Removing layer...");
-            removeOpLayer(layer);
+            opec.removeOpLayer(layer);
             // DEBUG
             //console.log("Layer removed");
          }
@@ -1062,7 +988,7 @@ $(document).ready(function()
       }
    });
    
-   $("#dThree").dialog({
+   /*$("#dThree").dialog({
       position: ['center', 'center'],
       width: 1000,
       height: 600,
@@ -1075,6 +1001,7 @@ $(document).ready(function()
    });
    
    addDThreeGraph();
+   */
    
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
    $('#this-Is-A-Prototype').dialog({
@@ -1110,19 +1037,6 @@ $(document).ready(function()
 
    // Start setting up anything that is not layer dependent
    nonLayerDependent();
-});
-
-function toggleView(element) {
-   if (element.checked) {
-      if (element.value=="2D"){
-         map.show2D();
-      } else if (element.value=="3D"){
-         map.show3D();
-         opec.gritter.showNotification('3DTutorial', null);
-      } else {
-         map.showColumbus();
-      }  
-   }
 }
 
 // Used to get the value of a point back. Needed until WCS version is implemented. 
