@@ -10,6 +10,7 @@
       "src/graphing.js",
       "src/custom.js",
       "src/contextMenu.js",
+      "src/timeline.js",
       "html/static/js-libs/jquery-gritter/js/jquery.gritter.js"
    ],
    

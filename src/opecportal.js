@@ -482,7 +482,7 @@ function nonLayerDependent()
             $(this).removeClass('selectedLayer');
          });
          itm.addClass('selectedLayer');
-         $(this).trigger('selectedLayer')
+         $(this).trigger('selectedLayer');
       }
    });
    
@@ -496,9 +496,13 @@ function nonLayerDependent()
          // that checks for valid data on the current date to decide if to show data
          if(layer.temporal) {
             map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
+            // Now display the layer on the timeline
+            var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
+            var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
+            t1.addTimeBar(layer.name, layer.title, startDate, endDate, layer.DTCache);            
             // Update map date cache now a new temporal layer has been added
             map.refreshDateCache();
-            $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate))
+            $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
          }
          else {
             layer.setVisibility(true);
@@ -509,9 +513,12 @@ function nonLayerDependent()
          layer.selected = false;
          layer.setVisibility(false);
          opec.checkLayerState(layer);
-         // Update map date cache now a new temporal layer has been removed
-         if(layer.temporal)
+         if(layer.temporal) {
+            // Remove the layer display on the timeline
+            t1.removeTimeBarByName(layer.name);  
+            // Update map date cache now a new temporal layer has been removed
             map.refreshDateCache();
+         }
       }
    });
 
@@ -540,7 +547,13 @@ function nonLayerDependent()
       changeMonth: true,
       changeYear: true,
       beforeShowDay: function(date) { return map.allowedDays(date); },
-      onSelect: function(dateText, inst) { return map.filterLayersByDate(dateText, inst); }
+      onSelect: function(dateText, inst) {
+         var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
+         // Synchronise date with the timeline
+         t1.setDate(thedate);
+         // Filter the layer data to the selected date
+         map.filterLayersByDate(thedate);
+      }
    });
 
    // Pan and zoom control buttons
@@ -608,6 +621,8 @@ function nonLayerDependent()
    createContextMenu();
    setupDrawingControls();
    gritterLayerHelper();
+   // Setup timeline
+   $.getJSON('timeline.json', function(data) { t1 = new OPEC.TimeLine('timeline', data); });
 }
 
 function addDialogClickHandler(idOne, idTwo)

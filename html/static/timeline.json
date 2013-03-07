@@ -1,0 +1,13 @@
+{
+   "__comment": "Sample timeline data",
+   "selectedDate": "2006-06-05T00:00:00Z",
+   "chartMargins": {
+      "top": 5,
+      "right": 0,
+      "bottom": 5,
+      "left": 0
+   },
+   "barHeight": 10,
+   "barMargin": 2,
+   "timebars": []
+}

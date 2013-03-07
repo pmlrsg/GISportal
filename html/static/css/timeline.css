@@ -1,0 +1,71 @@
+/* Fix for IE SVG overflow issues */
+svg {
+   overflow: hidden;
+   position: absolute;
+   shape-rendering: crispEdges;
+}
+
+.timelineDiv {
+   padding: 0 10px 0 10px;
+   width: 625px;
+   left: 50%;
+   margin-left: -312px;
+   position: fixed;
+   border:1px solid #666666;
+   filter: alpha(opacity=80);
+   opacity: .80;
+   background-color: #222222;
+   bottom: 0;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-topright: 15px;
+   -webkit-border-top-left-radius: 15px;
+   -webkit-border-top-right-radius: 15px;
+   border-top-left-radius: 15px;
+   border-top-right-radius: 15px;
+}
+
+.timeline {
+}
+
+.main {
+}
+
+.main text {
+   font: 10px sans-serif;
+   text-anchor: start;
+   fill: lightgray;
+   /*stroke:black;
+   stroke-width:0.5px;*/
+}
+
+.separatorLine {
+   stroke: gray;
+}
+
+.nowLine {
+   stroke: lightblue;
+   stroke-width: 1.5;
+   stroke-dasharray: 2,2;
+}
+
+.selectedDateLine {
+   fill: green;
+   fill-opacity: 0.5;
+   stroke: lightgreen;
+   stroke-opacity: 0.7;
+}
+
+.laneText {
+}
+
+.detailLine {
+   stroke-width: 1;
+}
+
+.timeRange {
+   fill: rgb(60,60,60);
+}
+
+.axis line, .axis path {
+   stroke:gray !important;
+}

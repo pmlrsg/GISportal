@@ -201,14 +201,13 @@ OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate) {
  * @param {Object} inst - The instance of the jQuery UI DatePicker view date control
  *
  */
-OpenLayers.Map.prototype.filterLayersByDate = function(dateText, inst) {
+OpenLayers.Map.prototype.filterLayersByDate = function(date) {
    var themap = this;
-   var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
    $.each(themap.layers, function(index, value) {
       var layer = value;
       // Only filter date-dependent layers
       if (layer.temporal){
-         themap.selectDateTimeLayer(value, thedate);
+         themap.selectDateTimeLayer(value, date);
       }
    });      
 };
