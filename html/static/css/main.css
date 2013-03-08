@@ -379,14 +379,21 @@ a.active.triggerR {
    overflow: hidden;
 }
 
-.lPanel-buttonSet {
+#triggerL-buttonset {
+   margin: 0px;
+   padding: 1px;
+   padding-right: 5px;
+   padding-bottom: 3px;
+   padding-left: 2px;
+   background: white;
 }
 
 #lpanel-tabs {
    padding-left: 3px;
    padding-right: 5px;
    padding-bottom: 3px;
-   margin-left: 10px;
+   margin-left: 5px;
+   margin-right:2px;
    margin-top:4px;
    background: #FFFFFF;
 }
@@ -396,6 +403,7 @@ a.active.triggerR {
    color: black;
    height: auto;
    overflow-y: auto; 
+   min-width: 290px;
 }
 
 .opec-tab {
@@ -683,6 +691,13 @@ div .sensor-accordion {
 .ui-accordion-header-buttonpane .ui-state-focus .ui-icon {
    background-image: url(../js-libs/jquery-ui/css/black-tie/images/ui-icons_ffffff_256x240.png) !important;
 }
+.ui-accordion .ui-accordion-icons {
+   padding-left: 2.2em;
+   padding-right: 4.0em;
+}
+.ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
+.ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9; }
+.ui-accordion { width: auto; }
 
 /* Add some jQuery UI Styles */
 .ui-accordion-header-buttonpane {
@@ -697,10 +712,10 @@ div .sensor-accordion {
 .ui-accordion .ui-accordion-header-dropdown { width: 21px; padding: 1px; height: 20px; }
 .ui-accordion .ui-accordion-header-close span,
 .ui-accordion .ui-accordion-header-dropdown span { display: block; margin: 2px; }
-/* Override some more accordion styles */
-.ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
-.ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9; }
-.ui-accordion { width: auto; }
+
+.ui-accordion .ui-accordion-header-title { word-wrap: break-word; }
+.ui-accordion .ui-accordion-header-rename-box { margin-top: 5px; }
+.ui-accordion .ui-accordion-header-rename-confirm { }
 
 /* Override tooltip style */
 .ui-tooltip-info {
@@ -717,27 +732,31 @@ div .sensor-accordion {
    opacity: .9;
 }
 
-.ui-accordion-header-close {
-   float: right;
-}
-
+.ui-dialog .ui-dialog-titlebar-buttonpane { position: absolute; top: 50%; right: 0.3em; margin-top: -10px; height: 18px; }
 .ui-dialog .ui-dialog-titlebar-buttonpane > a { float: right; }
-.ui-dialog .ui-dialog-titlebar-maximize, 
-.ui-dialog .ui-dialog-titlebar-minimize, 
+.ui-dialog .ui-dialog-titlebar-maximise, 
+.ui-dialog .ui-dialog-titlebar-minimise, 
 .ui-dialog .ui-dialog-titlebar-help, 
 .ui-dialog .ui-dialog-titlebar-close,
 .ui-dialog .ui-dialog-titlebar-help,
 .ui-dialog .ui-dialog-titlebar-restore {
-   width: 21px;
-   padding: 1px;
-   height: 20px;
+    position: relative;
+    right: auto;
+    top: auto;
+    padding: 1px;
+    margin: 1px;
+    width: 21px;
+    height: 20px;
+    
 }
 
-.ui-dialog .ui-dialog-titlebar-maximize span,
-.ui-dialog .ui-dialog-titlebar-minimize span,
+.ui-dialog .ui-dialog-titlebar-maximise span,
+.ui-dialog .ui-dialog-titlebar-minimise span,
 .ui-dialog .ui-dialog-titlebar-help span,
+.ui-dialog .ui-dialog-titlebar-close span,
 .ui-dialog .ui-dialog-titlebar-restore span {
    display: block;
+   margin: -8px;
 }
 
 /* ================================ */

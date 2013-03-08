@@ -3,13 +3,17 @@
    "paths": [
       "html/static/js-libs/"
    ],
-   "inputs" : [
+   "inputs": [
+      "src/opec.js",
+      "src/dialog.js",
       "src/opecportal.js",
-      "src/maplayers.js",
       "src/gritter.js",
       "src/graphing.js",
-      "src/custom.js",
+      "src/util.js",
+      "src/panel.js",
+      "src/window.js",
       "src/contextMenu.js",
+      "src/maplayers.js",     
       "src/timeline.js",
       "html/static/js-libs/jquery-gritter/js/jquery.gritter.js"
    ],

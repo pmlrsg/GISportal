@@ -51,7 +51,7 @@ function createContextMenu()
          build: function($trigger, e) {
             
             function buildMenu() {
-               var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+               var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
                //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';             
                var fold1 = {                  
                   fold1: {
@@ -125,8 +125,10 @@ function createContextMenu()
          build: function($trigger, e) {
             return {
                items: {
-                  checkAll: opec.contextMenu.checkAll($trigger),
-                  saveToProfile: opec.contextMenu.saveToProfile()
+                  selectAll: opec.contextMenu.selectAll($trigger),
+                  deselectAll: opec.contextMenu.deselectAll($trigger),
+                  saveToProfile: opec.contextMenu.saveToProfile(),
+                  renameGroup: opec.contextMenu.renameGroup($trigger)
                }
             }
          }
@@ -134,12 +136,12 @@ function createContextMenu()
    });
 }
 
-opec.contextMenu.checkAll = function($trigger) {
+opec.contextMenu.selectAll = function($trigger) {
    return {
-      name: "Check All",
+      name: "Select All",
       callback: function() {
          $trigger.parent().parent().next('div').find('[type="checkbox"]').each(function() {
-            $this = $(this);
+            var $this = $(this);
             if(!$this.is(':checked')) {
                $this.trigger('click');
                $this.attr('checked', 'checked');
@@ -149,6 +151,21 @@ opec.contextMenu.checkAll = function($trigger) {
    };
 }
 
+opec.contextMenu.deselectAll = function($trigger) {
+   return {
+      name: "Deselect All",
+      callback: function() {
+         $trigger.parent().parent().next('div').find('[type="checkbox"]').each(function() {
+            var $this = $(this);
+            if($this.is(':checked')) {
+               $this.trigger('click');
+               $this.removeAttr('checked');
+            }
+         });
+      }
+   };   
+}
+
 opec.contextMenu.saveToProfile = function() {
    return {
       name: "Save To Profile",
@@ -156,6 +173,15 @@ opec.contextMenu.saveToProfile = function() {
          
       }
    };
+}
+
+opec.contextMenu.renameGroup = function($trigger) {
+   return {
+      name: "Rename Group",
+      callback: function() {
+         $trigger.parent().parent().parent().multiOpenAccordion('renameGroup');
+      }
+   }
 }
 
 opec.contextMenu.viewData = function($trigger) {

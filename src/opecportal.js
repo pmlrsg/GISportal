@@ -1,12 +1,11 @@
-/*===========================================================================*/
-//Initialise javascript global variables and objects
-
 /**
  * Create opec namespace object
  * @namespace
- * @global
  */ 
 var opec = opec || {};
+
+/*===========================================================================*/
+//Initialise javascript global variables and objects
 
 /**
  * The OpenLayers map object
@@ -177,13 +176,21 @@ opec.createOpLayers = function() {
                   if(item.Name && item.Name != "") {
                      var microLayer = new opec.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
                      opec.checkNameUnique(microLayer);               
-                     $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: map.isSelected});                
+                     $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
                   }
                });
             }
          });
       }
    });
+}
+
+/**
+ * @param {Object} name - name of layer to check
+ */
+opec.isSelected = function(name) {
+   if(map)
+      return $.inArray(name, map.sampleLayers) > -1 ? true : false;
 }
 
 /**
@@ -613,6 +620,21 @@ function nonLayerDependent()
       $('#shareOptions').toggle();
    });
    
+   function addDialogClickHandler(idOne, idTwo)
+   {
+      $(idOne).click(function(e) {
+         if($(idTwo).dialog('isOpen')) {
+           $(idTwo).dialog('close');
+         }
+         else {
+           $(idTwo).dialog('open');
+         }
+         return false;
+      });
+   }
+   
+   //--------------------------------------------------------------------------
+   
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
        map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
@@ -623,19 +645,6 @@ function nonLayerDependent()
    gritterLayerHelper();
    // Setup timeline
    $.getJSON('timeline.json', function(data) { t1 = new OPEC.TimeLine('timeline', data); });
-}
-
-function addDialogClickHandler(idOne, idTwo)
-{
-   $(idOne).click(function(e) {
-      if($(idTwo).dialog('isOpen')) {
-        $(idTwo).dialog('close');
-      }
-      else {
-        $(idTwo).dialog('open');
-      }
-      return false;
-   });
 }
 
 /*====================================================================================*/
@@ -884,50 +893,45 @@ function main()
    });*/
    
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
-   $('#info').dialog({
-       position: ['left', 'bottom'],
-       width: 245,
-       height: 220,
-       resizable: false
-   }).dialogExtend({
-      "help": false,
-      "minimize": true,
-      "dblclick": "collapse"
+   $('#info').extendedDialog({
+      position: ['left', 'bottom'],
+      width: 245,
+      height: 220,
+      resizable: false,
+      showHelp: false,
+      showMinimise: true,
+      dblclick: "collapse"
    });
 
    // Show map info such as latlng
-   $('#mapInfo').dialog({
+   $('#mapInfo').extendedDialog({
       position: ['center', 'center'],
       width: 220,
       height: 200,
       resizable: true,
-      autoOpen: false
-   }).dialogExtend({
-      "help": false,
-      "minimize": true,
-      "dblclick": "collapse"
+      autoOpen: false,
+      showHelp: false,
+      showMinimise: true,
+      dblclick: "collapse"
    });
 
-   $('#layerSelection').dialog({
+   $('#layerSelection').extendedDialog({
       position: ['center', 'center'],
       width: 500,
       minWidth:500,
       height: 400,
       minHeight: 400,
       resizable: true,
-      autoOpen: true
-   }).dialogExtend({
-      "help": true,
-      "minimize": true,
-      "dblclick": "collapse",
-      "events": {
-         "restore": function(e, dlg) {
-            // Used to resize content on the dialog.
-            $(this).trigger("resize");
-         },
-         "help" : function(e, dlg) {
-            opec.gritter.showNotification('layerSelector', null);
-         }
+      autoOpen: true,
+      showHelp: true,
+      showMinimise: true,
+      dblclick: "collapse",
+      restore: function(e, dlg) {
+         // Used to resize content on the dialog.
+         $(this).trigger("resize");
+      },
+      help : function(e, dlg) {
+         opec.gritter.showNotification('layerSelector', null);
       }
    });
 

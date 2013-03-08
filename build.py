@@ -33,6 +33,8 @@ SRC = [path
 # Reorder to move opecportal.js to the front
 SRC.remove('src/opecportal.js')
 SRC.insert(0, 'src/opecportal.js')
+SRC.remove('src/opec.js')
+SRC.append('src/opec.js')
 
 JSDOC = 'lib/jsdoc/jsdoc'
 PLOVR_JAR = 'lib/plovr/plovr-eba786b34df9.jar'

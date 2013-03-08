@@ -85,7 +85,8 @@ if (typeof OpenLayers !== 'undefined') {
          
          (function tick() {
             try {
-               that.scene.render();
+               //if(map.globe.$canvas.filter(':visible').length)
+                  that.scene.render();
             } catch (e) {
                // Live editing can create invalid states, e.g., a conic sensor with inner half-angle
                // greater than outer half-angle, which cause exceptions.  We swallow the exceptions

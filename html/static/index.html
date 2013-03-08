@@ -36,11 +36,11 @@
 
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
-<script type="text/javascript" src="js-libs/jquery-ui/js/jquery-ui-1.10.1.custom.min.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
 
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
@@ -64,7 +64,7 @@
 <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
 
 <!-- jQuery UI dialog extension -->
-<script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script>
+<!-- <script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script> -->
 
 <!-- Cesium -->
 <script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>
@@ -77,6 +77,9 @@
 
 <!-- mustache -->
 <script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
+
+<!-- dialog -->
+<script type="text/javascript" src="js-libs/dialog.js"></script>
 
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="OPECPortal.js"></script>
@@ -361,19 +364,17 @@
       <div id="layerAccordion" class="ui-helper-reset">
          <div id="triggerL-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
-               <li id="triggerL-buttonset" class="lPanel-buttonSet">
-                  <button id="triggerL-add-accordion" class="panel-button"></button>
-                  <button id="triggerL-remove-accordion" class="panel-button"></button>
-               </li>
-               <li id="triggerL-group-creation" style="display: none; margin-top: 4px;">
-                  <input id="triggerL-enter-group-name" title="Group Name" type="text" placeholder="enter group name here" />
-               </li>
-               <li id="triggerL-buttonset" class="lPanel-buttonSet">
-               </li>
                <li id="lpanel-tabs" class="ui-corner-top lPanel-buttonSet">
                   <button id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">Operational</button>
                   <button id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">Reference</button>
                   <button id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">Options</button>
+               </li>
+               <li id="triggerL-buttonset" class="lPanel-buttonSet ui-corner-top">
+                  <button id="triggerL-add-accordion" class="panel-button"></button>
+                  <!-- <button id="triggerL-remove-accordion" class="panel-button"></button> -->
+               </li>
+               <li id="triggerL-group-creation" style="display: none; margin-top: 4px;">
+                  <input id="triggerL-enter-group-name" title="Group Name" type="text" placeholder="enter group name here" />
                </li>
             </ul>       
          </div>

@@ -352,10 +352,3 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
       }
    });
 }
-
-/**
- * @param {Object} name - name of layer to check
- */
-OpenLayers.Map.prototype.isSelected = function(name) {
-   return $.inArray(name, map.sampleLayers) > -1 ? true : false;
-}

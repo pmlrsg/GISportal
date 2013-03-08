@@ -14,7 +14,7 @@
 			hideAll: null,
 			classes: {
 				accordion: 'ui-accordion ui-widget ui-helper-reset',
-				h3: 'ui-accordion-header ui-helper-reset ui-state-default ui-corner-all ui-accordion-icons',
+				h3: 'ui-accordion-header ui-state-default ui-corner-all ui-accordion-icons',
 				div: 'ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom',
 				divActive: 'ui-accordion-content-active',
 				span: 'ui-accordion-header-icon ui-icon ui-icon-triangle-1-e',
@@ -71,11 +71,12 @@
             .end();
             
          var span = $('<span class="' + options.classes.span +'"></span>');
-         var inputText = $('<input type="text" />').hide();
+         var inputText = $('<input type="text" />').hide().addClass('ui-accordion-header-rename-box').click(function() { return false; });
+         var enterText = $('<button></button>').button({ label: 'ok', text: true }).hide().addClass('ui-accordion-header-rename-confirm');
 				
 			$h3.each(function(index) {
 				var $this = $(this);
-				$this.addClass(options.classes.h3).prepend(inputText).prepend(span).append(buttonPane);
+				$this.addClass(options.classes.h3).prepend(span, inputText, enterText).append(buttonPane);
 				if(self._isActive(index)) {
 					self._showTab($this)
 				}
@@ -213,6 +214,37 @@
 				}
 			});
 			return (tabs.length == 0 ? [-1] : tabs);
+		},
+		
+		renameGroup: function() {
+         var $this = this.element,
+         $h3 = $this.children('h3'),
+         $div = $this.children('div'),
+         span = $h3.find('.ui-accordion-header-title'),
+         input = $h3.find('.ui-accordion-header-rename-box'),
+         confirm = $h3.find('.ui-accordion-header-rename-confirm');
+         
+         span.hide();
+         input.val(span.text()).show();
+         confirm.show().click(rename);
+         
+         function rename() {
+            input.hide();
+            confirm.hide();
+            span.text('').text(input.val());
+            //$div.attr('id', input.val());
+            span.show();
+            confirm.unbind('click', rename);
+            return false;
+         }
+		},
+		
+      _showRename: function() {
+
+		},
+		
+		_hideRename: function() {
+		   
 		},
 		
 		// Setting array of active tabs

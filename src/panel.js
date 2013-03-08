@@ -56,12 +56,12 @@ opec.leftPanel.setup = function() {
    
    // Add group on click
    $('#triggerL-add-accordion')
-      .button({ icons: { primary: 'ui-icon-circle-plus'}, text: false })   
+      .button({ label: 'Add a new group', icons: { primary: 'ui-icon-circle-plus'}, text: false })   
       .click(function(e) { 
          var $panel = $('.opec-tab-content:visible');
          opec.leftPanel.addNextGroupToPanel($panel);
       });
-   $('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
+   //$('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
 
    $('#triggerL-add-group').button();
    
@@ -131,7 +131,8 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
 
       })
           
-      // Remove the accordion we were asked to remove      
+      // Remove the accordion we were asked to remove   
+      $id.parent('div').multiOpenAccordion('destroy');
       $id.parent('div').remove();
    }
    

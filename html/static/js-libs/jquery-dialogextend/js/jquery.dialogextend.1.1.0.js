@@ -179,7 +179,10 @@
 					"draggable" : false,
 					"height" : newHeight,
 					"width" : newWidth,
-					"position" : [1, 1]
+					"position" : {
+					   my: "left bottom",
+					   at: "left+1 bottom+1"
+					}
 				})
 				// disable draggable-handle (for <titlebar=none> only)
 				.dialog("widget")
@@ -208,13 +211,14 @@
 				var fixedContainer = $('<div id="dialog-extend-fixed-container"></div>').appendTo("body");
 			}
 			$(fixedContainer).css({
-				// ie6 does not support {position:fixed} ===> simply use {absolute}
-				"position" : ( $.browser.mise && parseInt($.browser.version) <= 6 ) ? "absolute" : "fixed",
+				// (ie6 does not support {position:fixed} ===> simply use {absolute}) ===> Changed, IE6 support not needed
+				"position" : "fixed",
 				"bottom" : 1,
 				"left" : 1,
 				"z-index" : 9999,
-				"width" : 1, // TODO add width here.
+				"width" : 1 // TODO add width here.
 			});
+
 			// start!
 			$(self)
 				// trigger custom event
@@ -228,9 +232,11 @@
 						"float" : "left",
 						"margin" : 1,
 						"position" : "static"
-					})
-					.appendTo(fixedContainer)
-				.find(".ui-dialog-content")
+					});
+			$(self).dialog("widget").appendTo(fixedContainer);
+			$(self)
+			   .dialog("widget")
+			   .find(".ui-dialog-content")
 				// modify dialog with new config
 				.dialog("option", {
 					"resizable" : false,
@@ -272,6 +278,13 @@
 				// trigger custom event
 				.dialogExtend("_trigger", "minimize");
 			// maintain chainability
+			
+			$(self).dialog('widget').css({
+            // float is essential for stacking dialog when there are many many minimized dialogs
+            "float" : "left",
+            "margin" : 1,
+            "position" : "static"
+			});
 			return self;
 		},
 
@@ -307,7 +320,7 @@
                .dialogExtend("_setState", "normal")
                // modify dialog buttons according to new state
                .dialogExtend("_toggleButtons");
-            // maintain chainability
+         // maintain chainability
          return self;
 		},
 		
@@ -405,9 +418,10 @@
                .css({ "position" : "relative", "top" : "auto", "right": "auto", "margin" : 0 })
                // change icon
                .find(".ui-icon").removeClass("ui-icon-closethick").addClass(settings.buttons.close.icon).end()
+               .button('option', 'label', null)
                // move to button-pane
                .appendTo(buttonPane) 
-               .button('option', 'label', null)
+               
             .end();
 			// other titlebar behaviors
 			$(titlebar)
@@ -465,6 +479,8 @@
 			// maintain chainability
 			return self;
 		},
+		
+		//-----------------------------------------------------------------------
 
 		"_initTitleBar" : function(){
 			var self = this;
@@ -514,6 +530,8 @@
 			// maintain chainability
 			return self;
 		},
+		
+		//-----------------------------------------------------------------------
 
 		"_loadSnapshot" : function(){
 			var self = this;
@@ -540,6 +558,8 @@
 				}
 			};
 		},
+		
+		//-----------------------------------------------------------------------
 
 		"_restoreFromCollapsed" : function(){
 			var self = this;
@@ -653,6 +673,8 @@
 			// maintain chainability
 			return self;
 		},
+		
+		//-----------------------------------------------------------------------
 
 		"_restoreWithoutTriggerEvent" : function(){
 			var self = this;
