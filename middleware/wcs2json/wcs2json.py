@@ -197,6 +197,8 @@ def create_app(config='config.yaml'):
          output = getBboxData(params, basic)
       elif type == 'scatter': # Outputs a scatter graph
          output = getBboxData(params, scatter)
+      elif type == 'hovmollerLon' or 'hovmollerLat': # outputs a hovmoller graph
+         output = getBboxData(params, hovmoller)
       elif type == 'point':
          output = getPointData(params, raw)
       elif type == 'raw': # Outputs the raw values
@@ -228,7 +230,7 @@ def create_app(config='config.yaml'):
          jsonData = jsonify(output = output, type = params['type'].getValue(), coverage = params['coverage'].getValue(), error = g.graphError)
       except TypeError as e:
          g.error = "Request aborted, exception encountered: %s" % e
-         abort(500) # If we fail to jsonify the data return 500
+         abort(400) # If we fail to jsonify the data return 500
          
       app.logger.debug('Request complete, Sending results') # DEBUG
       
@@ -475,6 +477,133 @@ def create_app(config='config.yaml'):
       app.logger.debug('Finished basic') # DEBUG
       
       return output
+   
+   def hovmoller(dataset, params):
+      xAxisVar = params['graphXAxis'].getValue()
+      yAxisVar = params['graphYAxis'].getValue()
+      zAxisVar = params['graphZAxis'].getValue()
+      
+      print xAxisVar, yAxisVar, zAxisVar
+          
+      xVar = getCoordinateVariable(dataset, xAxisVar)
+      xArr = np.array(xVar)
+      yVar = getCoordinateVariable(dataset, yAxisVar)
+      yArr = np.array(yVar)
+      zArr = np.array(dataset.variables[zAxisVar])
+      
+      if xVar == None:
+         g.graphError = "could not find %s dimension" % xAxisVar
+         return
+      if yVar == None:
+         g.graphError = "could not find %s dimension" % yAxisVar
+         return
+      
+      # Create a masked array ignoring nan's
+      zMaskedArray = np.ma.masked_array(zArr, [np.isnan(x) for x in zArr])
+      
+      time = None
+      lat = None
+      lon = None
+      
+      if xAxisVar == 'Time':
+         times = xArr
+         time = xVar
+         lat = yArr
+      else:        
+         lon = xArr
+         times = yArr
+         time = yVar
+         
+      #for debug
+      #if lat == None:
+         #var = getCoordinateVariable(dataset, 'Lat')
+         #lat = np.array(var)
+      #elif lon == None:
+         #var = getCoordinateVariable(dataset, 'Lon')
+         #lon = np.array(var)
+      
+
+      output = {}
+      
+      units = getUnits(dataset.variables[params['coverage'].getValue()])
+      output['units'] = units
+      
+      app.logger.debug('starting basic calc') # DEBUG
+      
+      #mean = getMean(maskedArray)
+      #median = getMedian(maskedArray)
+      #std = getStd(maskedArray)
+      #min = getMin(maskedArray)
+      #max = getMax(maskedArray)
+      
+      timeUnits = getUnits(time)
+      start = None
+      if timeUnits:
+         start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      else: 
+         start = ''.join(times[0])
+      
+      output['global'] = {'time': start}
+      app.logger.debug('starting iter of dates') # DEBUG
+      
+      output['data'] = []
+      
+      # Temp code dup
+      if lat != None:     
+         for i, timelatlon in enumerate(zMaskedArray):
+            
+            date = None    
+            if timeUnits:
+               date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            else:     
+               date = ''.join(times[i])
+            #output['data'][date.isoformat()] = []
+            
+            for j, latRow in enumerate(timelatlon):            
+               latitude = lat[j]
+               #output['data'][date.isoformat()].append([float(latitude), getMean(latRow)])              
+               mean = getMean(latRow)
+               
+               if np.isnan(mean):
+                  output['data'].append([date, float(latitude), 0])
+               else:               
+                  output['data'].append([date, float(latitude), mean])
+                  
+      elif lon != None:
+         zMaskedArray = zMaskedArray.swapaxes(1,2)
+         
+         for i, timelonlat in enumerate(zMaskedArray):    
+            date = None
+            if timeUnits:  
+               date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            else:    
+               date = ''.join(times[i])  
+            #output['data'][date.isoformat()] = []
+                           
+            for j, lonRow in enumerate(timelonlat):
+               longitude = lon[j]            
+               #lonArr = []                                  
+               #for k, latRow in enumerate(lonRow):
+                  #lonArr.append(lon[k])                 
+               #lonArr = np.array(lonArr)
+               #output['data'][date.isoformat()].append([float(longitude), getMean(lonRow)])
+               
+               mean = getMean(lonRow)
+               
+               if np.isnan(mean):
+                  pass
+               else:
+                  output['data'].append([date, float(longitude), mean])          
+            
+         #app.logger.debug(time)
+         
+      if len(output['data']) < 1:
+         g.graphError = "no valid data available to use"
+         return output
+         
+      app.logger.debug('Finished basic') # DEBUG
+      
+      return output
       
    """
    Creates a histogram from the provided data. If no bins are created it creates its own.
@@ -590,10 +719,10 @@ def create_app(config='config.yaml'):
    def getYDimension(dataset):
       pass
    
-   def getUnits(coverage):
-      for name in coverage.ncattrs():
+   def getUnits(variable):
+      for name in variable.ncattrs():
          if name == "units":
-            return coverage.units
+            return variable.units
          
       return ''
    

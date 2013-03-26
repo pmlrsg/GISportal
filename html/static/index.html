@@ -212,6 +212,8 @@
             <div>
                <select id="graphcreator-type" title="Type of query you want to make" name="graphcreator-type">
                   <option value="basic" title="Returns a time series with mean, median, max, min and STD">basic</option>
+                  <option value="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">Hovmöller Latitude</option>
+                  <option value="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">Hovmöller Longitude</option>
                   <option value="histogram" title="Returns a histogram">histogram</option>
                   <option value="raw" title="Not for normal use (gets the raw data)">raw</option>
                   <option value="test" title="Not for normal use (test new queries)">test</option>
@@ -242,7 +244,7 @@
          </h3>
          <div id="advanced-inputs">
             <div>
-               <label for="graphcreator-time-label">Time:</label>
+               <label for="graphcreator-time-label">Date:</label>
             </div>
             <div>
                <input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>
@@ -401,9 +403,8 @@
    <!-- The Right Panels -->
    <a class="trigger triggerR unselectable" href="#">Data</a>
    <div class="panel rPanel unselectable">
-      <h3 id="dataLbl">Data Analysis</h3>      
-      <div id="dataAccordion">
-         <div id="opec-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
+      <h3 id="dataLbl">Data Analysis</h3>  
+      <div id="opec-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
                <li class="rPanel-buttonSet">                  
                </li>
@@ -419,7 +420,8 @@
                      <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
                </li>
             </ul>
-         </div>
+      </div>    
+      <div id="dataAccordion">
          <h3><a href="#">Current R.O.I.</a></h3>
          <div id="dispROI"></div>
          <h3><a href="#">Data Tools</a></h3>
@@ -505,7 +507,7 @@
    <div id="info" class="unselectable" title="Information">
       <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
       <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
-      <p>&copy;2012 PML Applications Ltd<br />
+      <p>&copy;2013 PML Applications Ltd<br />
       EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
       <div style="clear: both;"> </div>
    </div>

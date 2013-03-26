@@ -36,7 +36,7 @@ if (typeof OpenLayers !== 'undefined') {
          var div1 = $('<div/>').attr("class", "fullsize");
          this.$canvas = $("<canvas/>").attr({
             "id": this.canvasID,
-            "class": "fullsize",
+            "class": "fullsize"
          });
          
          try {
@@ -80,7 +80,7 @@ if (typeof OpenLayers !== 'undefined') {
             }
             
             map.cesiumLoaded = false;
-            return 
+            return;
          }
          
          (function tick() {
@@ -238,7 +238,7 @@ if (typeof OpenLayers !== 'undefined') {
       
       setBaseLayer: function(layer) {
          var addedLayer = null, addedLayerIndex = null;
-         if(this.currentBaseLayer != null && this.currentBaseLayer.getImageryProvider().getUrl() != layer.url) {
+         if(this.currentBaseLayer !== null && this.currentBaseLayer.getImageryProvider().getUrl() != layer.url) {
             for(var i = 0, len = this.baseLayers.length; i < len; i++) {
                if(layer.url == this.baseLayers[i].getImageryProvider().getUrl()) {
                   var globeLayer = this.cb.getImageryLayers().add(this.baseLayers[i], 0);
@@ -252,7 +252,7 @@ if (typeof OpenLayers !== 'undefined') {
             this.baseLayers.push(this.currentBaseLayer);
             this.currentBaseLayer = addedLayer;
          }
-      },
+      }
    };
     
    OpenLayers.Map.prototype.setupGlobe = function(map, div, options) {
@@ -261,7 +261,8 @@ if (typeof OpenLayers !== 'undefined') {
       
       if(!map.cesiumLoaded) {
          this.globe.$canvas.parent("div").hide();
-         return this.globe = null;
+         this.globe = null;
+         return this.globe;
       }
       
       this.destroy = function() {
@@ -392,7 +393,7 @@ if (typeof OpenLayers !== 'undefined') {
       this.setBaseLayer = function(layer) {
          this.globe.setBaseLayer(layer);
          OpenLayers.Map.prototype.setBaseLayer.call(this, layer);
-      }  
+      };
       
       if(!map.globe.is3D) {
          map.show2D();
@@ -401,6 +402,6 @@ if (typeof OpenLayers !== 'undefined') {
          map.show3D();
       }  
       
-      return this.globe
-   }    
+      return this.globe;
+   };
 }

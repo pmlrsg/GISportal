@@ -12,6 +12,8 @@
 			active: 0,
 			showAll: null,
 			hideAll: null,
+			showClose: null,
+			$panel: null,
 			classes: {
 				accordion: 'ui-accordion ui-widget ui-helper-reset',
 				h3: 'ui-accordion-header ui-state-default ui-corner-all ui-accordion-icons',
@@ -57,8 +59,12 @@
                .blur(function(){ $(this).removeClass("ui-state-focus"); })
             .end()
             .find('.ui-accordion-header-close')
+               .each(function() {
+                  if(typeof options.showClose !== "undefined" && $.isFunction(options.showClose))
+                     options.showClose(options.$panel) ? $(this).show() : $(this).hide();
+               })
                .click(function() {
-                  options.events.close($div.attr('id'));
+                  if(options.events.close) { options.events.close($div.attr('id')); }
                   return false;
                })
             .end()
@@ -106,7 +112,7 @@
    			})
    		   .bind('dblclick', function(e) {
    		      e.preventDefault();
-   		      $(this).find('ui-accordion-header-title').hide();
+   		      //$(this).find('ui-accordion-header-title').hide();
    		      console.log("dblclick works")		      
    		   })
    			.bind('mouseover', function(){

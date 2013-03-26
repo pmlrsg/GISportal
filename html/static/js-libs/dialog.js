@@ -189,7 +189,7 @@
          var that = this;
 
          // calculate new dimension
-         var newHeight = this.widget.find(".ui-dialog-titlebar").height() + 15;
+         var newHeight = this.uiDialog.find(".ui-dialog-titlebar").height() + 15;
 
          // trigger custom event
          that._trigger("beforeCollapse");
@@ -198,16 +198,18 @@
          that._saveSnapshot();
 
          // modify dialog size (after hiding content)
-         that.element.dialog("option", {
+         that.element.css({
             "resizable" : false,
             "height" : newHeight,
             "maxHeight" : newHeight
          });
 
          // hide content
+         that.uiDialog.find(".ui-dialog-content").hide();
+         
          // hide button-pane
          // make title-bar no-wrap
-         that.hide().element.find(".ui-dialog-buttonpane:visible").hide().end().find(".ui-dialog-titlebar").css("white-space", "nowrap").end().find(".ui-dialog-content");
+         that.uiDialog.find(".ui-dialog-buttonpane:visible").hide().end().find(".ui-dialog-titlebar").css("white-space", "nowrap").end();
 
          // mark new state
          that._setState("collapsed");
@@ -336,10 +338,11 @@
          }).end();
          
          // hide content
-         // hide button-pane
-         // make title-bar no-wrap
          that.uiDialog.find(".ui-dialog-content").hide();
-         that.uiDialog.find(".ui-dialog-buttonpane:visible").hide().end().find(".ui-dialog-titlebar").css("white-space", "nowrap").end().find(".ui-dialog-content");
+         
+         // hide button-pane
+         // make title-bar no-wrap     
+         that.uiDialog.find(".ui-dialog-buttonpane:visible").hide().end().find(".ui-dialog-titlebar").css("white-space", "nowrap").end();
          // disable draggable-handle (for <titlebar=none> only)
          //that.uiDialog.draggable("destroy");
          that.uiDialog.draggable("option", "handle", null).find(".ui-dialog-draggable-handle").css("cursor", "text").end().find(".ui-dialog-content");
@@ -558,25 +561,37 @@
       _restoreFromCollapsed : function() {
          var that = this;
          var original = this._loadSnapshot();
+         
          // restore dialog
-         that
+         that.uiDialog.find(".ui-dialog-content").show();
+         
          // show content
          // show button-pane
          // fix title-bar wrap
-         .show().uiDialog.find(".ui-dialog-buttonpane:hidden").show().end().find(".ui-dialog-titlebar").css("white-space", original.titlebar.wrap).end().find(".ui-dialog-content")
-         // restore config & size
-         .dialog("option", {
-            "resizable" : original.config.resizable,
-            "height" : original.size.height,
-            "maxHeight" : original.size.maxHeight
-         });
+         that.uiDialog.find(".ui-dialog-buttonpane:hidden")
+            .show()
+         .end()
+         .find(".ui-dialog-titlebar")
+            .css("white-space", original.titlebar.wrap)
+         .end();
 
+         // Restore config & size or defaults
+         that.options.resizable = original.config.resizable;
+         that.options.height = original.size.height;
+         that.options.maxHeight = original.size.maxHeight;
+         that.options.minHeight = original.size.minHeight;
+         that.uiDialog.css("height", original.size.elementHeight);
+         that.uiDialog.css("width", original.size.elementWidth);
+            
+         this._size();
+         this._position();
       },
 
       _restoreFromNormal : function() {
          // do nothing actually...
       },
 
+      /*
       _restoreFromMaximized : function() {
          var that = this;
          var original = $(this).dialogExtend("_loadSnapshot");
@@ -599,7 +614,7 @@
          })
          // restore draggable-handle (for <titlebar=none> only)
          .dialog("widget").draggable("option", "handle", $(this).find(".ui-dialog-draggable-handle")).find(".ui-dialog-draggable-handle").css("cursor", "move");
-      },
+      }, */
 
       _restoreFromMinimised : function() {
          var that = this;
@@ -748,11 +763,17 @@
       },
 
       _createTitlebar : function() {
-         var uiDialogTitle;
+         var uiDialogTitle,
+            options = this.options;
 
-         this.uiDialogTitlebar = $("<div>").addClass("ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix").prependTo(this.uiDialog);
+         this.uiDialogTitlebar = $("<div>").addClass("ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix").prependTo(this.uiDialog)            
+            // avoid text-highlight when double-click
+            .select(function() {
+               return false;
+            });
+            
          this._on(this.uiDialogTitlebar, {
-            mousedown : function(event) {
+            mousedown : function( event ) {
                // Don't prevent click on close button (#8838)
                // Focusing a dialog that is partially scrolled out of view
                // causes the browser to scroll it into view, preventing the click event
@@ -760,30 +781,22 @@
                   // Dialog isn't getting focus when dragging (#8063)
                   this.uiDialog.focus();
                }
+            },
+            dblclick : function( event ) {
+               if ( options.dblclick && options.dblclick.length ) {
+                  if(!this.isNormal())
+                     this.restore();
+                  else if(options.dblclick == "collapse")
+                     this.collapse();
+                  else if(options.dblclick == "minimise")
+                     this.minimise();
+                  //else if(options.dblclick == "maximise")
+                     //this.maximise();
+               }
             }
          });
 
          this.uiDialogTitlebarButtonPane = $("<div>").addClass('ui-dialog-titlebar-buttonpane').appendTo(this.uiDialogTitlebar);
-
-         /*-----------------------------------------------------------------------
-          this.uiDialogTitlebarClose = $("<button></button>")
-          .button({
-            label: this.options.closeText,
-            icons: {
-               primary: "ui-icon-closethick"
-            },
-            text: false
-          })
-          .addClass("ui-dialog-titlebar-close")
-          .appendTo( this.uiDialogTitlebarButtonPane );
-          this._on( this.uiDialogTitlebarClose, {
-            click: function( event ) {
-               event.preventDefault();
-               this.close( event );
-            }
-          });
-          -----------------------------------------------------------------------*/
-
          this._createTitlebarButtons();
 
          uiDialogTitle = $("<span>").uniqueId().addClass("ui-dialog-title").prependTo(this.uiDialogTitlebar);

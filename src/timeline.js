@@ -54,13 +54,6 @@
 */
 
 /**
- * Create OPEC namespace object if not available
- *
- * @namespace
- */
-var OPEC = OPEC || {};
-
-/**
  * Helper function which returns the nearest value in an array to a given value
  *
  * @param {number|Array}   arr   The array of integers to search within
@@ -71,12 +64,13 @@ var OPEC = OPEC || {};
 getNearestInArray = function(arr, goal) {
    var closest = null;
    $.each(arr, function(i, e) {
-      if (closest == null || Math.abs(e - goal) < Math.abs(closest - goal)) {
+      if (closest === null || Math.abs(e - goal) < Math.abs(closest - goal)) {
          closest = e;
       }
    });
    return closest;
-}
+};
+
 /**
  * @constructor TimeLine
  * The TimeLine is a visualisation chart to visualise events in time.
@@ -84,7 +78,7 @@ getNearestInArray = function(arr, goal) {
  * @param {string}   id       The DOM element id in which the timeline will be created.
  * @param {Object}   options  Timeline options in JSON format
  */
-OPEC.TimeLine = function(id, options) {
+opec.TimeLine = function(id, options) {
 
    // Use "self" to refer to this instance of the OPEC.TimeLine object
    var self = this;
@@ -99,10 +93,10 @@ OPEC.TimeLine = function(id, options) {
    this.id = id;
    this.visible = true;
    this.timebars = (options.timebars instanceof Array) ? options.timebars : [];
-   this.barHeight = options.barHeight != null ? options.barHeight : 20;
-   this.barMargin = options.barMargin != null ? options.barMargin : 4;
+   this.barHeight = options.barHeight !== null ? options.barHeight : 20;
+   this.barMargin = options.barMargin !== null ? options.barMargin : 4;
    this.now = new Date();
-   this.selectedDate = options.selectedDate != null ? new Date(options.selectedDate) : new Date();
+   this.selectedDate = options.selectedDate !== null ? new Date(options.selectedDate) : new Date();
    this.margin = options.chartMargins || { top : 0, right : 0, bottom : 0, left : 0 };
    this.laneHeight = this.barHeight + this.barMargin*2 + 1;
    this.colours = d3.scale.category10(); // d3 colour categories scale with 10 cotrasting colours
@@ -115,12 +109,12 @@ OPEC.TimeLine = function(id, options) {
    var minDate = d3.min(this.timebars, function(d) { return new Date(d.startDate); });
    var maxDate = d3.max(this.timebars, function(d) { return new Date(d.endDate); });
    // Set some default max and min dates if no initial timebars (6 months either side of selected date)
-   if (typeof minDate === 'undefined' || minDate == null ){
+   if (typeof minDate === 'undefined' || minDate === null ){
       minDate = new Date(this.selectedDate.getTime() - 15778450000);
-   };
-   if (typeof maxDate === 'undefined' || maxDate == null ){
+   }
+   if (typeof maxDate === 'undefined' || maxDate === null ){
       maxDate = new Date(this.selectedDate.getTime() + 15778450000);
-   };
+   }
    // Set initial y scale
    this.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]);
@@ -156,7 +150,7 @@ OPEC.TimeLine = function(id, options) {
       // Now update the date based on the new value of x
       self.draggedDate = self.xScale.invert(x);
       // Move the graphical marker
-      self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); })
+      self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
    };
    this.dragDateEnd = function() {
       self.selectedDate = self.draggedDate;
@@ -193,7 +187,7 @@ OPEC.TimeLine = function(id, options) {
 };
 
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
-OPEC.TimeLine.prototype.redraw = function() {
+opec.TimeLine.prototype.redraw = function() {
    
    var self = this;  // Useful for when the scope/meaning of "this" changes
 
@@ -202,7 +196,7 @@ OPEC.TimeLine.prototype.redraw = function() {
    this.yScale.domain([0, this.timebars.length]).range([0, this.height]);
    
    // Scale the chart and main drawing areas
-   $('div#' + this.id).height(this.chartHeight);
+   $('#' + this.id).height(this.chartHeight);
    this.main.attr('width', this.width).attr('height', this.height);
    this.chart.attr('width', this.chartWidth).attr('height', this.chartHeight)
       // Set the SVG clipping area to prevent drawing outside the bounds of the widget chart area
@@ -253,7 +247,7 @@ OPEC.TimeLine.prototype.redraw = function() {
       .attr('stroke', function(d, i) { return self.colours(i); })
       .attr('class', 'timeRange');
    // Time bar removal
-   var ex = this.bars.exit();
+   ex = this.bars.exit();
    ex.remove();
    // Re-scale the x values and widths of ALL the time bars
    this.bars
@@ -272,7 +266,7 @@ OPEC.TimeLine.prototype.redraw = function() {
             .attr('class', 'detailLine');
    });
    // Date detail removal at time bar level
-   var ex = this.dateDetails.exit();
+   ex = this.dateDetails.exit();
    ex.remove();
    // Re-scale the x values for all the detail lines for each time bar
    this.main.selectAll('.detailLine')
@@ -299,80 +293,80 @@ OPEC.TimeLine.prototype.redraw = function() {
       .attr('dy', '0.7ex')
       .attr('text-anchor', 'end').attr('class', 'laneText');
    // Label removal
-   var ex = this.labels.exit();
+   ex = this.labels.exit();
    ex.remove();      
-}
+};
 
 // Re-calculate the dynamic widget height
-OPEC.TimeLine.prototype.reHeight = function() {
+opec.TimeLine.prototype.reHeight = function() {
    this.height = this.laneHeight*(this.timebars.length);
    // If no timebars, we'll need a default height, say 25 pixels
-   if (this.height == 0){ this.height = 25 };
+   if (this.height === 0){ this.height = 25; }
    this.chartHeight = this.height + this.margin.top + this.margin.bottom + 20; // +20 pixels to accomodate the x-axis labels
-}
+};
 
 // Re-calculate the dynamic widget width
-OPEC.TimeLine.prototype.reWidth = function() {
+opec.TimeLine.prototype.reWidth = function() {
    this.chartWidth = $('div#' + this.id).width();
    this.width = this.chartWidth - this.margin.right - this.margin.left;
-}
+};
 
 // Reset the timeline to its original data extents
-OPEC.TimeLine.prototype.reset = function() {
+opec.TimeLine.prototype.reset = function() {
    this.zoom.translate([0, 0]).scale(1);
    this.reHeight();
    this.reWidth();
    this.redraw();
-}
+};
 
 // Zoom function to a new date range
-OPEC.TimeLine.prototype.zoomDate = function(startDate, endDate){
+opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
    var minDate = new Date(startDate);
    var maxDate = new Date(endDate);
    this.minDate = ((minDate instanceof Date) ? minDate : this.minDate);
    this.maxDate = ((minDate instanceof Date) ? maxDate : this.maxDate);
    this.xScale.domain([this.minDate, this.maxDate]);
    this.redraw();
-}
+};
 
 // Show the timebar
-OPEC.TimeLine.prototype.hide = function() {
+opec.TimeLine.prototype.hide = function() {
    this.chart.transition().duration(800).attr('height', 0);
    this.main.transition().duration(800).attr('height', 0);
    $('div#' + this.id).slideUp(1000);
    this.visible = false;
-}
+};
 
 // Hide the timebar
-OPEC.TimeLine.prototype.show = function() {
+opec.TimeLine.prototype.show = function() {
    this.chart.transition().duration(1000).attr('height', this.chartHeight);
    this.main.transition().duration(1000).attr('height', this.height);
    $('div#' + this.id).slideDown(800);
    this.visible = true;
-}
+};
 
 // Add a new time bar to the chart in JSON timeBar notation
-OPEC.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
+opec.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
    this.timebars.push(timeBar);
    this.reHeight();
    this.redraw();
-}
+};
 
 // Add a new time bar using detailed parameters
-OPEC.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
+opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
-   newTimebar['name'] = name;
-   newTimebar['label'] = label;
-   newTimebar['startDate'] = startDate;
-   newTimebar['endDate'] = endDate;
-   newTimebar['dateTimes'] = dateTimes;     
+   newTimebar.name = name;
+   newTimebar.label = label;
+   newTimebar.startDate = startDate;
+   newTimebar.endDate = endDate;
+   newTimebar.dateTimes = dateTimes;     
    this.timebars.push(newTimebar);
    this.reHeight();
    this.redraw();
-}
+};
 
 // Remove a time bar by index
-OPEC.TimeLine.prototype.removeTimeBar = function(index) {
+opec.TimeLine.prototype.removeTimeBar = function(index) {
    this.timebars.splice(index, 1);
    var temp = this.timebars;
    // Kludge to clear out the display
@@ -383,10 +377,10 @@ OPEC.TimeLine.prototype.removeTimeBar = function(index) {
    this.timebars = temp;
    this.reHeight();
    this.redraw();
-}
+};
 
 // Remove a time bar by name (if found)
-OPEC.TimeLine.prototype.removeTimeBarByName = function(name) {
+opec.TimeLine.prototype.removeTimeBarByName = function(name) {
    var self = this;
    var match = false;
    for (var i = 0; i < self.timebars.length; i++){
@@ -394,8 +388,8 @@ OPEC.TimeLine.prototype.removeTimeBarByName = function(name) {
          self.timebars.splice(i, 1);
          i--;
          match = true;
-      };
-   };
+      }
+   }
    var temp = this.timebars;
    // Return and do nothing if no match
    if (!match){ return; }
@@ -409,19 +403,19 @@ OPEC.TimeLine.prototype.removeTimeBarByName = function(name) {
       self.reHeight();
       self.redraw();
    }
-}
+};
 
 // Set the currently selected date and animated the transition
-OPEC.TimeLine.prototype.setDate = function(date) {
+opec.TimeLine.prototype.setDate = function(date) {
    var self = this;  // Useful for when the scope/meaning of "this" changes
    var selectedDate = self.draggedDate = new Date(date);
    this.selectedDate = ((selectedDate instanceof Date) ? selectedDate : this.selectedDate);
    // Move the selected date-time line
    this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
-}
+};
 
 // Get the currently selected date
-OPEC.TimeLine.prototype.getDate = function() {
+opec.TimeLine.prototype.getDate = function() {
    var selectedDate = new Date(this.selectedDate);
    return ((selectedDate instanceof Date) ? selectedDate : null);
-}
+};

@@ -8,8 +8,7 @@ opec.contextMenu = {};
  * Creates the contextMenu and functions for the
  * creation of custom menu items.
  */
-function createContextMenu()
-{
+opec.contextMenu.setup = function() {
    // Setup the context menu and any custom controls
    $(function() {
 
@@ -39,7 +38,7 @@ function createContextMenu()
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
             $("#" + item.id).slider("value", layer.opacity);        
          });
-      }
+      };
       
       /**
        * Create the context menu the oplayers in the data layers accordion.
@@ -96,7 +95,7 @@ function createContextMenu()
                items: buildMenu()
             };                           
          }
-      })
+      });
       
       /**
        * Create the context menu for the layer selector elements
@@ -115,7 +114,7 @@ function createContextMenu()
                }
             };                           
          }
-      })
+      });
       
       /**
        * Create the context menu for the groups
@@ -130,11 +129,11 @@ function createContextMenu()
                   saveToProfile: opec.contextMenu.saveToProfile(),
                   renameGroup: opec.contextMenu.renameGroup($trigger)
                }
-            }
+            };
          }
-      })
+      });
    });
-}
+};
 
 opec.contextMenu.selectAll = function($trigger) {
    return {
@@ -149,7 +148,7 @@ opec.contextMenu.selectAll = function($trigger) {
          });
       }
    };
-}
+};
 
 opec.contextMenu.deselectAll = function($trigger) {
    return {
@@ -164,7 +163,7 @@ opec.contextMenu.deselectAll = function($trigger) {
          });
       }
    };   
-}
+};
 
 opec.contextMenu.saveToProfile = function() {
    return {
@@ -173,7 +172,7 @@ opec.contextMenu.saveToProfile = function() {
          
       }
    };
-}
+};
 
 opec.contextMenu.renameGroup = function($trigger) {
    return {
@@ -181,8 +180,8 @@ opec.contextMenu.renameGroup = function($trigger) {
       callback: function() {
          $trigger.parent().parent().parent().multiOpenAccordion('renameGroup');
       }
-   }
-}
+   };
+};
 
 opec.contextMenu.viewData = function($trigger) {
    var layerName = "";
@@ -200,7 +199,7 @@ opec.contextMenu.viewData = function($trigger) {
    return {
       name: "Zoom To Data",
       callback: function() {
-         if(layer == null)
+         if(layer === null)
             return;
             
           var bbox = new OpenLayers.Bounds(
@@ -213,7 +212,7 @@ opec.contextMenu.viewData = function($trigger) {
          map.zoomToExtent(bbox);
       }
    };
-}
+};
 
 /**
  * Creates an Object to be used in an contextMenu.
@@ -242,12 +241,12 @@ function showMetadata($trigger) {
       name: "Show Metadata",
       callback: function() {
          
-         if(layer == null)
+         if(layer === null)
             return;
 
          // Check if already open
          if($('#metadata-' + layer.name).length)
-            $('#metadata-' + layer.name).dialog('close');
+            $('#metadata-' + layer.name).extendedDialog('close');
             
          var data = {
             name: layer.name,
@@ -266,7 +265,7 @@ function showMetadata($trigger) {
          $(document.body).append(opec.templates.metadataWindow(data));
 
          // Show metadata for a selected layer
-         $('#metadata-' + layer.name).dialog({
+         $('#metadata-' + layer.name).extendedDialog({
             position: ['center', 'center'],
             width: 400,
             height: 250,
@@ -274,15 +273,14 @@ function showMetadata($trigger) {
             autoOpen: false,
             close: function() {
                $('#metadata-' + layer.name).remove();
-            }
-         }).dialogExtend({
-            "help": false,
-            "minimize": true,
-            "dblclick": "collapse"
-         });     
+            },
+            showHelp: false,
+            showMinimise: true,
+            dblclick: "collapse"
+         });   
          
          //Open dialog
-         $('#metadata-' + layer.name).dialog('open');
+         $('#metadata-' + layer.name).extendedDialog('open');
       }
    };
 }
@@ -310,7 +308,7 @@ function showScalebar($trigger) {
 
          // If there is an open version, close it
          if($('#scalebar-' + layer.name).length)
-            $('#scalebar-' + layer.name).dialog('close');
+            $('#scalebar-' + layer.name).extendedDialog('close');
             
          var data = {
             name: layer.name,
@@ -331,27 +329,24 @@ function showScalebar($trigger) {
          }
 
          // Show the scalebar for a selected layer
-         $('#scalebar-' + layer.name).dialog({
+         $('#scalebar-' + layer.name).extendedDialog({
             position: ['center', 'center'],
             width: 310,
             resizable: false,
             autoOpen: false,
+            showHelp: true,
+            showMinimise: true,
+            dblclick: "collapse",
             close: function() {
                // Remove on close
                $('#scalebar-' + layer.name).remove(); 
-            }
-         }).dialogExtend({
-            "help": true,
-            "minimize": true,
-            "dblclick": "collapse",
-            "events": {
-               "restore": function(e, dlg) {
-                  // Used to resize content on the dialog.
-                  $(this).trigger("resize");
-               },
-               "help" : function(e, dlg) {
-                  opec.gritter.showNotification('scalebarTutorial', null);
-               }
+            },
+            restore: function(e, dlg) {
+               // Used to resize content on the dialog.
+               $(this).trigger("resize");
+            },
+            help : function(e, dlg) {
+               opec.gritter.showNotification('scalebarTutorial', null);
             }
          });
          
@@ -360,7 +355,7 @@ function showScalebar($trigger) {
             // Check to see if the value was changed
             if(layer.log && $(this).is(':checked'))
                return;
-            else if(layer.log == false && !$(this).is(':checked'))
+            else if(layer.log === false && !$(this).is(':checked'))
                return;
                
             validateScale(layer, null , null);
@@ -431,7 +426,7 @@ function showScalebar($trigger) {
          //$('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
          
          // Open the dialog box
-         $('#scalebar-' + layer.name).dialog('open');
+         $('#scalebar-' + layer.name).extendedDialog('open');
       }
    };
 }
@@ -474,7 +469,7 @@ function getCurrentStyles($trigger)
             console.log(value.Name);
             updateScalebar(layer);
          }
-      }                       
+      };                      
    });
    
    return menuOutput;
@@ -494,7 +489,7 @@ function getCurrentElevation($trigger)
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
             layer.mergeNewParams({elevation: value});
          }
-      }
+      };
    });
    
    return menuOutput;
@@ -515,7 +510,7 @@ function updateScalebar(layer)
       var params = {
          colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
          logscale: layer.log
-      }
+      };
       
       layer.mergeNewParams(params);
       
@@ -535,17 +530,16 @@ function getScalebarDetails(layer)
    $.each(layer.styles, function(index, value)
    {
       // If the style names match grab its info
-      if(value.Name == layer.params["STYLES"] && url == null)
-      {
+      if(value.Name == layer.params["STYLES"] && url === null) {
          url = value.LegendURL + createGetLegendURL(layer, true);
-         width = parseInt(value.Width);
-         height = parseInt(value.Height);
+         width = parseInt(value.Width, 10);
+         height = parseInt(value.Height, 10);
          return false; // Break loop
       }
    });
    
    // If the url is still null then there were no matches, so use a generic url
-   if(url == null)
+   if(url === null)
       url = createGetLegendURL(layer, false);
       
    return {
@@ -586,13 +580,13 @@ function getScaleRange(min, max)
  */ 
 function validateScale(layer, newMin, newMax, reset)
 {  
-   if(newMin == null || typeof newMin === 'undefined')
+   if(newMin === null || typeof newMin === 'undefined')
       newMin = layer.minScaleVal;
       
-   if(newMax == null || typeof newMax === 'undefined')
+   if(newMax === null || typeof newMax === 'undefined')
       newMax = layer.maxScaleVal;
       
-   if(reset == null || typeof reset === 'undefined')
+   if(reset === null || typeof reset === 'undefined')
       reset = false;
    
    var min = parseFloat(newMin);
@@ -627,7 +621,7 @@ function validateScale(layer, newMin, newMax, reset)
       
       if(min < $('#' + layer.name + '-range-slider').slider('option', 'min') || 
          max > $('#' + layer.name + '-range-slider').slider('option', 'max') ||
-         reset == true)
+         reset === true)
       {
          var scaleRange = getScaleRange(min, max);
          $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
@@ -656,7 +650,7 @@ function showGraphCreator()
          var graphCreator = $('#graphCreator');
          // If there is an open version, close it
          if(graphCreator.length)
-            graphCreator.dialog('close');
+            graphCreator.extendedDialog('close');
             
          var data = {
             advanced: true
@@ -669,7 +663,7 @@ function showGraphCreator()
          var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
          
          // Turn it into a dialog box
-         graphCreator.dialog({
+         graphCreator.extendedDialog({
             position: ['center', 'center'],
             width:340,
             resizable: false,
@@ -677,15 +671,12 @@ function showGraphCreator()
             close: function() {
                // Remove on close
                $('#graphCreator').remove(); 
-            }
-         }).dialogExtend({
-            "help": true,
-            "minimize": true,
-            "dblclick": "collapse",
-            "events": {
-               "help" : function(e, dlg) {
-                  opec.gritter.showNotification ('graphCreatorTutorial', null);
-               }
+            },
+            showHelp: true,
+            showMinimise: true,
+            dblclick: "collapse",
+            help : function(e, dlg) {
+               opec.gritter.showNotification ('graphCreatorTutorial', null);
             }
          });
 
@@ -698,21 +689,21 @@ function showGraphCreator()
          });
          // Set the datepicker controls to the current view date if set
          var viewDate = $('#viewDate').datepicker('getDate');
-         if (viewDate != ""){
+         if (viewDate !== ""){
             $('#graphcreator-time').datepicker('setDate', viewDate);
             $('#graphcreator-time2').datepicker('setDate', viewDate);
          }
          
          // Get the currently selected layer
          var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-         $('#graphcreator-baseurl').val(layer.wcsURL)
-         $('#graphcreator-coverage').val(layer.name);
+         $('#graphcreator-baseurl').val(layer.wcsURL);
+         $('#graphcreator-coverage').val(layer.origName);
          
          $('.lPanel').bind('selectedLayer', function(e) {
             var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-            $('#graphcreator-baseurl').val(layer.wcsURL)
-            $('#graphcreator-coverage').val(layer.name);
-         })
+            $('#graphcreator-baseurl').val(layer.wcsURL);
+            $('#graphcreator-coverage').val(layer.origName);
+         });
          
          graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
                            
@@ -763,95 +754,43 @@ function showGraphCreator()
          graphCreatorGenerate.on('click', ':button', function(e) {
             // Extract the date-time value from the datepickers either as single date-time or date-time range
             var dateRange = $('#graphcreator-time').val();         
-            if ($('#graphcreator-time2').val() != ""){
+            if ($('#graphcreator-time2').val() !== "") {
                dateRange += ("/" + $('#graphcreator-time2').val());
             }
+            
+            var graphXAxis = null,
+            graphYAxis = null;
+            
+            if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
+               graphXAxis = 'Lon';
+               graphYAxis = 'Time';
+            }
+            else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
+               graphXAxis = 'Time';
+               graphYAxis = 'Lat';
+            }
+            
+            var params = {
+               baseurl: $('#graphcreator-baseurl').val(),
+               coverage: $('#graphcreator-coverage').val(),
+               type: $('#graphcreator-type').val(),
+               bins: $('#graphcreator-bins').val(),
+               time: dateRange,
+               bbox: $('#graphcreator-bbox').val(),
+               graphXAxis: graphXAxis,
+               graphYAxis: graphYAxis,
+               graphZAxis: $('#graphcreator-coverage').val()
+            };
+            
+            var request = $.param( params );
+            
             $.ajax({
                type: 'GET',
-               url: map.host + map.pywpsLocation + 'baseurl=' + $('#graphcreator-baseurl').val() + 
-                  '&coverage=' + $('#graphcreator-coverage').val() + '&type=' + $('#graphcreator-type').val() + '&bins=' + $('#graphcreator-bins').val() +
-                  '&time=' + dateRange + '&bbox=' + $('#graphcreator-bbox').val(),
+               url: map.host + map.pywpsLocation + request,
                dataType: 'json',
                asyc: true,
                success: function(data) {
-                  if(data.error != "") {
-                     var d = {
-                        error: data.error
-                     };
-                     opec.gritter.showNotification('graphError', d);
-                     return;
-                  }
-                                  
-                  if(data.type == 'basic') {                                    
-                     var start = new Date(data.output.global.time).getTime(),
-                        d1 = [],
-                        d2 = [], 
-                        d3 = [],
-                        d4 = [], 
-                        d5 = [];
-                     
-                     $.each(data.output.data, function(i, value) {
-                        d1.push([new Date(i).getTime(), value.std]);
-                        d2.push([new Date(i).getTime(), value.max]);
-                        d3.push([new Date(i).getTime(), value.min]);
-                        d4.push([new Date(i).getTime(), value.median]);
-                        d5.push([new Date(i).getTime(), value.mean]);
-                     });
-                     
-                     var graphData = {
-                        id: 'wcsgraph' + Date.now(),
-                        title: 'WCS Test Graph',
-                        data: [{
-                           data: d1.sort(sortDates),
-                           lines: { show: true },
-                           points: { show: true },
-                           label: 'STD'
-                        },
-                        {
-                           data: d2.sort(sortDates),
-                           lines: { show: true },
-                           points: { show: true },
-                           label: 'max'
-                        },
-                        {
-                           data: d3.sort(sortDates),
-                           lines: { show: true },
-                           points: { show: true },
-                           label: 'min'
-                        },
-                        {
-                           data: d4.sort(sortDates),
-                           lines: { show: true },
-                           points: { show: true },
-                           label: 'median'
-                        },
-                        {
-                           data: d5.sort(sortDates),
-                           lines: { show: true },
-                           points: { show: true },
-                           label: 'mean'
-                        }],
-                        options: basicTimeOptions(data.output.units),
-                        selectable: true,
-                        selectSeries: true
-                     };
-                     
-                     createGraph(graphData);
-                  }
-                  else if(data.type == 'histogram') {
-                     var num = data.output.histogram.Numbers
-                     var barwidth = (Math.abs(num[num.length-1][0] - num[0][0]))/num.length
-                  
-                     var graphData = {
-                        id: 'wcsgraph' + Date.now(),
-                        title: 'WCS Test Graph',
-                        data: [num],
-                        options: barOptions(barwidth),
-                        selectable: false
-                     };
-                     
-                     createGraph(graphData);
-                  }  
+                  opec.graphs.create(data);
                },
                error: function(request, errorType, exception) {
                   var data = {
@@ -867,7 +806,7 @@ function showGraphCreator()
          }); 
                   
          // Open the dialog box
-         graphCreator.dialog('open');
+         graphCreator.extendedDialog('open');
       }
    };
 }

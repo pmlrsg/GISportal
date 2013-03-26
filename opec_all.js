@@ -5,16 +5,17 @@
    ],
    "inputs": [
       "src/opec.js",
-      "src/dialog.js",
+      "html/static/js-libs/dialog.js",
       "src/opecportal.js",
       "src/gritter.js",
       "src/graphing.js",
-      "src/util.js",
+      "src/utils.js",
       "src/panel.js",
       "src/window.js",
       "src/contextMenu.js",
       "src/maplayers.js",     
       "src/timeline.js",
+      "src/O2C.js",
       "html/static/js-libs/jquery-gritter/js/jquery.gritter.js"
    ],
    

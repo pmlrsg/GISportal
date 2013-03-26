@@ -72,10 +72,12 @@ opec.leftPanel.setup = function() {
    
    $('#lpanel-tabs :button').click(function(e) { 
       var tabToShow = $(this).attr('href');
-      $('#opec-lPanel-content .opec-tab-content').filter(function(i) { return $(this).attr('id') != tabToShow.slice(1) }).hide('fast');
+      $('#opec-lPanel-content .opec-tab-content').filter(function(i) { 
+         return $(this).attr('id') != tabToShow.slice(1); 
+      }).hide('fast');
       $(tabToShow).show('fast');
    });
-}
+};
 
 /**
  * Add a group to the layers panel.
@@ -92,6 +94,13 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
    // Creates the accordion
    $('#' + id).parent('div').multiOpenAccordion({
       active: 0,
+      $panel: $panelName,
+      showClose: function($panelName) {
+         if($panelName.is("#opec-lPanel-reference") && $panelName.children().length <= 1)
+            return false;
+         else
+            return true;
+      },
       events: {
          close: function(id) {
             opec.leftPanel.removeGroupFromPanel(id);
@@ -113,7 +122,7 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
          }
       }).disableSelection();
    //}
-}
+};
 
 /**
  * Remove a group from the layers panel. 
@@ -129,7 +138,7 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
             $('#layers').multiselect('deselect', layer.name);
          }
 
-      })
+      });
           
       // Remove the accordion we were asked to remove   
       $id.parent('div').multiOpenAccordion('destroy');
@@ -141,7 +150,7 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
       //if($(this).children('li').length == 0)
          //$(this).parent('div').remove();
    //});
-}
+};
 
 opec.leftPanel.getFirstGroupFromPanel = function($panelName) {
    return $panelName.find('.sensor-accordion')
@@ -149,7 +158,7 @@ opec.leftPanel.getFirstGroupFromPanel = function($panelName) {
          return !$(this).hasClass('opec-help');
       })
       .first();
-}
+};
 
 opec.leftPanel.addNextGroupToPanel = function($panelName) {
    var number = ($panelName.find('.sensor-accordion')
@@ -158,12 +167,12 @@ opec.leftPanel.addNextGroupToPanel = function($panelName) {
       })
       .length + 1);
       
-   while($('#group' + number).length != 0) {
+   while($('#group' + number).length !== 0) {
       number++;
    }
       
    opec.leftPanel.addGroupToPanel('group' + number, 'Group ' + number, $panelName);
-}
+};
 
 /**
  * Add a layer to a group on the layers panel.
@@ -212,7 +221,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
       // Remove the dummy layer
       //removeDummyHelpLayer()
    }
-}
+};
 
 /**
  * Remove a layer from its group on the layers panel. 
@@ -220,7 +229,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
 opec.leftPanel.removeLayerFromGroup = function(layer) {
    if($('#' + layer.name).length)
       $('#' + layer.name).remove();
-}
+};
 
 /**
  * Updates all the layer indexes in all the layer accordions.
@@ -232,7 +241,7 @@ opec.leftPanel.updateGroupOrder = function($panel) {
       //else    
          opec.leftPanel.updateLayerOrder($(this));
    });
-}
+};
 
 /**
  * Updates the position of layers based on their new 
@@ -256,7 +265,7 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
    }
    else
       ;//opec.leftPanel.removeGroupFromPanel(accordion.attr('id'));
-}
+};
 
 /**
  * Adds a dummy layer to help the user. 
@@ -275,8 +284,8 @@ opec.leftPanel.addDummyHelpLayer = function() {
    
    // Open the layer panel on click
    $('#dmhLayerSelection').click(function(e) {
-      if($('#layerSelection').dialog('isOpen')) {
-         $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); })
+      if($('#layerSelection').extendedDialog('isOpen')) {
+         $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
       }
       else {
          $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
@@ -284,7 +293,7 @@ opec.leftPanel.addDummyHelpLayer = function() {
       
       return false;
    });
-}
+};
 
 ///**
 // * Removes dummy layer 
@@ -292,3 +301,246 @@ opec.leftPanel.addDummyHelpLayer = function() {
 //opec.leftPanel.removeDummyHelpLayer = function() {
    //opec.leftPanel.removeGroupFromPanel("Need-Help");
 //}
+
+/**
+ * Right Panel
+ * @namespace 
+ */
+opec.rightPanel = {};
+
+opec.rightPanel.setup = function() {
+   
+   // Right slide panel show-hide functionality
+   $(".triggerR").click(function(e) {
+      $(".rPanel").toggle("fast");
+      $(this).toggleClass("active");
+      return false;
+   });
+   
+   // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
+   // for data layers (in left panel) and data analysis (in right panel)
+   $("#dataAccordion").multiOpenAccordion({
+      active: [0, 1]
+   });
+   
+   // Regions of interest drawing control buttons - with custom styling
+   $('#ROIButtonSet').buttonset();
+   $('#point').button({ icons: { primary: 'ui-icon-drawpoint'} });
+   $('#box').button({ icons: { primary: 'ui-icon-drawbox'} });
+   $('#circle').button({ icons: { primary: 'ui-icon-drawcircle'} });
+   $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
+   
+   // Data Analysis panel tabs and accordions
+   $("#dataTabs").tabs();
+   $("#analyses").accordion({ collapsible: true, heightStyle: 'content' });
+   $("#spatial").accordion({ collapsible: true, heightStyle: 'content' });
+   $("#temporal").accordion({ collapsible: true, heightStyle: 'content' }); 
+   
+   opec.rightPanel.setupDrawingControls();
+};
+
+/**
+ * Sets up the drawing controls to allow for the selection 
+ * of ROI's. 
+ * 
+ */
+opec.rightPanel.setupDrawingControls = function() {
+   // Add the Vector drawing layer for POI drawing
+   var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
+      style : {
+         strokeColor : 'red',
+         fillColor : 'red',
+         strokeWidth : 2,
+         fillOpacity : 0.3,
+         pointRadius: 5
+      },
+      /**
+       * @constructor 
+       */
+      preFeatureInsert : function(feature) {
+         this.removeAllFeatures();
+      },
+      onFeatureInsert : function(feature) {
+         ROIAdded(feature);
+      },
+      rendererOptions: { zIndexing: true }
+   }); 
+
+   vectorLayer.controlID = "poiLayer";
+   vectorLayer.displayInLayerSwitcher=false;
+   map.addLayer(vectorLayer);
+
+   // Function called once a ROI has been drawn on the map
+   function ROIAdded(feature) {
+      // Get the geometry of the drawn feature
+      var geom = new OpenLayers.Geometry();
+      geom = feature.geometry;
+      
+      // Special HTML character for the degree symbol
+      var d = '&deg;';
+      
+      // Get bounds of the feature's geometry
+      var bounds = new OpenLayers.Bounds();
+      bounds = geom.getBounds();
+       
+      // Some metrics for the ROI
+      var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
+      
+      // Get some values for non-point ROIs
+      if(map.ROI_Type !== '' && map.ROI_Type != 'point') {
+         area_deg = geom.getArea();
+         area_km = (geom.getGeodesicArea()*1e-6);
+         height_deg = bounds.getHeight();
+         width_deg = bounds.getWidth();
+         // Note - to get values in true ellipsoidal distances, we need to use Vincenty functions for measuring ellipsoidal
+         // distances instead of planar distances (http://www.movable-type.co.uk/scripts/latlong-vincenty.html)
+         ctrLon = geom.getCentroid().x;
+         ctrLat = geom.getCentroid().y;
+         height_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(ctrLon,bounds.top),new OpenLayers.LonLat(ctrLon,bounds.bottom));
+         width_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(bounds.left,ctrLat),new OpenLayers.LonLat(bounds.right,ctrLat));
+         radius_deg = ((bounds.getWidth() + bounds.getHeight())/4);
+      }
+        
+      switch(map.ROI_Type) {
+         case 'point':
+            $('#dispROI').html('<h3>Point ROI</h4>');
+            $('#dispROI').append('<img src="./img/pointROI.png" title ="Point Region Of Interest" alt="Map Point" />');
+            $('#dispROI').append('<p>Lon, Lat: ' + geom.x.toPrecision(4) + d + ', ' + geom.y.toPrecision(4) + d + '</p>');
+            break;
+         case 'box':
+            var bbox = bounds;
+            // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
+            if ($('#graphcreator-bbox').size()){
+               $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
+            }
+            $('#dispROI').html('<h3>Rectangular ROI</h4>');
+            // Setup the JavaScript canvas object and draw our ROI on it
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            var c = document.getElementById('ROIC');
+            var ctx = c.getContext('2d');
+            ctx.lineWidth = 4;
+            ctx.fillStyle = '#CCCCCC';
+            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
+            ctx.fillRect(5,5,width_deg*scale,height_deg*scale);
+            ctx.strokeRect(5,5,width_deg*scale,height_deg*scale);
+            //
+            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');           
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
+            break;
+         case 'circle':
+            $('#dispROI').html('<h3>Circular ROI</h4>');
+            $('#dispROI').append('<img src="./img/circleROI.png" title ="Circular Region Of Interest" alt="Map Point" />');
+            $('#dispROI').append('<p>Radius: ' + radius_deg.toPrecision(4) + d + '</p>');
+            $('#dispROI').append('<p>Centre lat, lon: ' + ctrLat.toPrecision(4) + ', ' + ctrLon.toPrecision(4) + '</p>');
+            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
+            break;
+         case 'polygon':
+            // Get the polygon vertices
+            var vertices = geom.getVertices();
+            $('#dispROI').html('<h3>Custom Polygon ROI</h4>');     
+            // Setup the JavaScript canvas object and draw our ROI on it
+            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
+            var c = document.getElementById('ROIC');
+            var ctx = c.getContext('2d');
+            ctx.lineWidth = 4;
+            ctx.fillStyle = '#CCCCCC';
+            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
+            ctx.beginPath();
+            var x0 = 5 + (vertices[0].x-bounds.left)*scale;
+            var y0 = 5 + (bounds.top-vertices[0].y)*scale;
+            ctx.moveTo(x0,y0);
+            for(var i=1,j=vertices.length; i<j; i++){
+               var x = 5 + (vertices[i].x-bounds.left) * scale;
+               var y = 5 + (bounds.top-vertices[i].y) * scale;
+               ctx.lineTo(x, y);
+            }
+            ctx.lineTo(x0,y0);
+            ctx.stroke();
+            ctx.fill();
+            ctx.closePath();
+            //
+            $('#dispROI').append('<p>Centroid Lat, Lon:' + ctrLat.toPrecision(4) + d + ', ' + ctrLon.toPrecision(4) + d + '</p>');
+            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</p>');
+            break;
+      }
+   }
+
+   // Function which can toggle OpenLayers controls based on the clicked control
+   // The value of the value of the underlying radio button is used to match 
+   // against the key value in the mapControls array so the right control is toggled
+   function toggleControl(element) {
+      for(var key in mapControls) {
+         var control = mapControls[key];
+         if($(element).val() == key) {
+            $('#'+key).attr('checked', true);
+            control.activate();
+         }
+         else {
+            $('#'+key).attr('checked', false);
+            control.deactivate();
+         }
+      }
+      $('#panZoom input:radio').button('refresh');
+   }
+
+   // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
+   function toggleDrawingControl(element) {
+      toggleControl(element);
+      vectorLayer.removeAllFeatures();
+      map.ROI_Type = element.value;
+      // DEBUG
+      console.info(map.ROI_Type);
+   }
+
+   /* 
+   Set up event handling for the map including as well as mouse-based 
+   OpenLayers controls for jQuery UI buttons and drawing controls
+   */
+
+   // Create map controls identified by key values which can be activated and deactivated
+   var mapControls = {
+      zoomIn: new OpenLayers.Control.ZoomBox(
+         { out: false, alwaysZoom: true }
+      ),
+      zoomOut: new OpenLayers.Control.ZoomBox(
+         { out: true, alwaysZoom: true }
+      ),
+      pan: new OpenLayers.Control.Navigation(),
+      point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
+      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }}),
+      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false}),
+      polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
+   };
+
+   // Add all the controls to the map
+   for (var key in mapControls) {
+      var control = mapControls[key];
+      map.addControl(control);
+   }
+
+   // TRAC Ticket #58: Fixes flaky non-selection of jQuery UI buttons (http://bugs.jqueryui.com/ticket/7665)
+   $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
+      function(e) { h.disabled && ( e.preventDefault(), e.stopImmediatePropagation() ); }
+   ).bind('mousedown', function() {
+      $(this).addClass('opec_click');
+   }).bind('mouseup', function() {
+      if ($(this).hasClass('opec_click')) {
+         $(this).click();
+      }
+      $(this).removeClass('opec_click');
+   }); 
+
+   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
+   $('#panZoom input:radio').click(function(e) {
+      toggleControl(this);
+   });
+
+   // Manually Handle drawing control radio buttons click event - each button has a class of "iconBtn"
+   $('#ROIButtonSet input:radio').click(function(e) {
+      toggleDrawingControl(this);
+   });
+
+};

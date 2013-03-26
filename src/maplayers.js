@@ -2,38 +2,6 @@
  * Map and map layers library - maplayers.js
  */
 
-/**
- * Creates an opec.MicroLayer Object (layers in the selector but not yet map layers)
- * 
- * @constructor
- * @param {string} name - The layer name (unescaped)
- * @param {string} title - The title of the layer
- * @param {string} abstract - The abstract information for the layer
- * @param {string} firstDate - The first date for which data is available for the layer
- * @param {string} lastDate - The last date for which data is available for the layer
- * @param {string} serverName - The server name which serves the layer
- * @param {string} wmsURL - The URL for the WMS service
- * @param {string} wcsURL - The URL for the WCS service
- * @param {string} sensorName - The name of the sensor for this layer (unescaped)
- * @param {string} exBoundingBox - The geographic bounds for data in this layer
- */
-opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox) {
-   this.origName = name.replace("/","-");
-   this.name = name.replace("/","-");
-   this.urlName = name;
-   this.displayTitle = title.replace(/_/g, " ");
-   this.title = title;
-   this.productAbstract = productAbstract;
-   this.firstDate = firstDate;
-   this.lastDate = lastDate;
-   this.serverName = serverName;
-   this.wmsURL = wmsURL;
-   this.wcsURL = wcsURL;
-   this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
-   this.sensorName = sensorName.replace(/[\.,]+/g, "");
-   this.exBoundingBox = exBoundingBox;
-}
-
 /* Extend existing OpenLayers.Map and OpenLayers.Layer objects */
 
 // Flask host
@@ -67,9 +35,6 @@ OpenLayers.Map.prototype.helperMessages = [];
 OpenLayers.Map.prototype.microLayers = [];
 OpenLayers.Map.prototype.layerStore = [];
 
-// The unique id of the last tutorial message
-OpenLayers.Map.prototype.tutUID = null;
-
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
 
@@ -93,10 +58,10 @@ OpenLayers.Layer.prototype.firstDate = '';
 OpenLayers.Layer.prototype.lastDate = '';
 
 // The min and max scale range, used by the scalebar
-OpenLayers.Layer.prototype.maxScaleVal;
-OpenLayers.Layer.prototype.origMaxScaleVal;
-OpenLayers.Layer.prototype.minScaleVal;
-OpenLayers.Layer.prototype.origMinScaleVal;
+OpenLayers.Layer.prototype.maxScaleVal = null;
+OpenLayers.Layer.prototype.origMaxScaleVal = null;
+OpenLayers.Layer.prototype.minScaleVal = null;
+OpenLayers.Layer.prototype.origMinScaleVal = null;
 OpenLayers.Layer.prototype.log = false;
 
 // Add a new property to the OpenLayers layer object to tell the UI which <ul>
@@ -161,7 +126,7 @@ OpenLayers.Layer.prototype.matchDate = function (thedate) {
    else{
       return null;
    }
-}
+};
 
 /**
  * Select the given temporal layer on the Map based on JavaScript date input
@@ -219,17 +184,20 @@ OpenLayers.Map.prototype.filterLayersByDate = function(date) {
 OpenLayers.Map.prototype.refreshDateCache = function() {
    var map = this;
    map.enabledDays = [];
+   
    $.each(map.layers, function(index, value) {
       var layer = value;
       if(layer.selected && layer.temporal) {
          map.enabledDays = map.enabledDays.concat(layer.DTCache);
       }
    });
-   map.enabledDays = map.enabledDays.deDupe();
+   
+   map.enabledDays = opec.util.arrayDeDupe(map.enabledDays);
+   
    // Re-filter the layers by date now the date cache has changed
    // DEBUG
    console.info('Global date cache now has ' + map.enabledDays.length + ' members.');
-}
+};
 
 /**
  * Map function which returns availability (boolean) of data for the given JavaScript date for all layers.
@@ -253,7 +221,7 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
    else {
       return [false];
    }
-}
+};
 
 /**
  * Map function to get the master cache JSON file from the server and then start layer dependent code asynchronously
@@ -278,7 +246,7 @@ OpenLayers.Map.prototype.getMasterCache = function() {
          gritterErrorHandler(data);
       }
    });
-}
+};
 
 /**
  * Map function which gets data layers asynchronously and creates operational layers for each one
@@ -312,7 +280,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
          gritterErrorHandler(data);
       }
    });
-}
+};
 
 /**
  * Map function which gets layers metadata asynchronously and sets up the map scale min and max parameters
@@ -351,4 +319,4 @@ OpenLayers.Map.prototype.getMetadata = function(layer) {
          gritterErrorHandler(data);
       }
    });
-}
+};

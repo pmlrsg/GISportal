@@ -5,6 +5,9 @@
 opec.gritter = {};
 opec.gritter._notifications = [];
 
+// The unique id of the last tutorial message
+opec.gritter.tutUID = null;
+
 /**
  * Setup the options for the gritter and create opening
  * welcome message.
@@ -16,7 +19,15 @@ opec.gritter.setup = function() {
       fade_out_speed: 800,
       time: 6000
    });
-}
+   
+   // Create the help messages to be used by the gritter
+   createHelpMessages();
+   
+   // Set and display the welcome message
+   createWelcomeMessage();
+   
+   opec.gritter.gritterLayerHelper();
+};
 
 /**
  * Adds a type of notification
@@ -26,7 +37,7 @@ opec.gritter.setup = function() {
  */
 opec.gritter.addNotification = function(id, params) {
    opec.gritter._notifications[id] = params;
-}
+};
 
 /**
  * Shows a gritter message with the message details provided.
@@ -72,7 +83,7 @@ opec.gritter.showNotification = function(nN, data) {
    });
    
    return uid;  
-}
+};
 
 /**
  * Hides a notification based of the information provided. A uid
@@ -94,14 +105,14 @@ opec.gritter.hideNotification = function(params) {
    if(typeof params.type !== 'undefined') {
       // TODO: remove all notifications of a type.
    }
-}
+};
 
 /**
  * Create the opening message that the user will see.
  */
 function createWelcomeMessage()
 {
-   map.tutUID = opec.gritter.showNotification('welcomeTutorial', null);
+   opec.gritter.tutUID = opec.gritter.showNotification('welcomeTutorial', null);
 }
 
 /**
@@ -117,19 +128,19 @@ function gritterErrorHandler(data)
 {  
    if(data.request.status == 400) {
       opec.gritter.showNotification('error400', data);
-      return
+      return;
    }
    else if (data.request.status == 500) {
       opec.gritter.showNotification('error500', data);
-      return
+      return;
    }
    else if (data.request.status == 502) {
       opec.gritter.showNotification('error502');
-      return
+      return;
    }
    else if (data.errorType == 'parsererror') {
       opec.gritter.showNotification('errorParserError', data);
-      return
+      return;
    }
      
    if(data.layer) {
@@ -156,8 +167,7 @@ function gritterErrorHandler(data)
  * A logic function that tries to diagnose any problems 
  * with layers and show the correct help message.
  */ 
-function gritterLayerHelper()
-{      
+opec.gritter.gritterLayerHelper = function() {
    $(document).on('click', 'img[src="img/exclamation_small.png"]', function() {
       var layerID = $(this).parent().parent().attr('id');
       var layer = map.getLayersByName(layerID)[0];
@@ -168,18 +178,18 @@ function gritterLayerHelper()
          var inst = $('#viewDate').datepicker('getDate'); // Get the selected date
         
          // If the date is set...
-         if(inst != null) { 
+         if(inst !== null) { 
             var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
             var uidate = opec.util.ISODateString(thedate);
             var mDate = layer.matchDate(uidate);
 
             // Can the layer display the selected date?
-            if(mDate == null) {
+            if(mDate === null) {
                helpMessage = 'dateNotInRange';
             }
          }
          // If the date is not set...
-         else if(inst == null) {
+         else if(inst === null) {
             helpMessage = 'noDate';
          }
       }
@@ -189,7 +199,7 @@ function gritterLayerHelper()
 
       return false;
    });
-}
+};
 
 /**
  * Creates all the help messages to be used.
@@ -212,8 +222,8 @@ function createHelpMessages()
       },
       afterOpen: function(layer) {       
          $('#wtHelp-layerSelectionPanel').click(function(e) {
-            if($('#layerSelection').dialog('isOpen')) {
-               $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); })
+            if($('#layerSelection').extendedDialog('isOpen')) {
+               $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
             }
             else {
                $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
@@ -228,9 +238,9 @@ function createHelpMessages()
          });
 
          $('#wtHelp-next').click(function(e) {
-            var params = {uid: map.tutUID};
+            var params = {uid: opec.gritter.tutUID};
             opec.gritter.hideNotification(params);
-            map.tutUID = opec.gritter.showNotification('layerTutorial', null);
+            opec.gritter.tutUID = opec.gritter.showNotification('layerTutorial', null);
 
             return false;
          });
@@ -258,15 +268,15 @@ function createHelpMessages()
          });
          
          $('#wtHelp-next').click(function(e) {
-            var params = {uid: map.tutUID};
+            var params = {uid: opec.gritter.tutUID};
             opec.gritter.hideNotification(params);
-            map.tutUID = opec.gritter.showNotification('dateTutorial', null);
+            opec.gritter.tutUID = opec.gritter.showNotification('dateTutorial', null);
 
             return false;
          });
       },
       max: 1
-   }
+   };
    
    // Date Tutorial
    opec.gritter._notifications['dateTutorial'] = {
@@ -282,9 +292,9 @@ function createHelpMessages()
       },
       afterOpen: function() {
          $('#dtNext').click(function(e) {
-            var params = {uid: map.tutUID};
+            var params = {uid: opec.gritter.tutUID};
             opec.gritter.hideNotification(params);
-            map.tutUID = opec.gritter.showNotification('tbdTutorial', null);
+            opec.gritter.tutUID = opec.gritter.showNotification('tbdTutorial', null);
 
             return false;
          });
@@ -292,7 +302,7 @@ function createHelpMessages()
          $('#dtDatepickerBtn').click(function() {
             $('#viewDate').datepicker("show").datepicker("show").effect("highlight", {}, 3000);
             return false;
-         })
+         });
       },
       max: 1
    };
@@ -387,7 +397,7 @@ function createHelpMessages()
          'if you don\'t some will be created for you.';
       },
       max: 1
-   }
+   };
    
    // Scalebar Tutorial
    opec.gritter._notifications['scalebarTutorial'] = {
@@ -435,7 +445,7 @@ function createHelpMessages()
          '</ol>';
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['3DTutorial'] = {
       title: function() {
@@ -451,10 +461,10 @@ function createHelpMessages()
          $('#tDT-Not-Working').click(function() {
             opec.gritter.showNotification('3DNotWorking', null);
             return false;
-         })
+         });
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['3DNotWorking'] = {
       title: function() {
@@ -464,7 +474,7 @@ function createHelpMessages()
          return 'Check that your browser and hardware support webGL <a id="tDNW-webglCheck" href="http://get.webgl.org/" target="_blank">here</a> .';
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['error400'] = {
       title: function() {
@@ -486,7 +496,7 @@ function createHelpMessages()
          });
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['error500'] = {
       title: function() {
@@ -500,7 +510,7 @@ function createHelpMessages()
          'While we fix this maybe you would like to try a different query?';
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['error502'] = {
       title: function() {
@@ -514,7 +524,7 @@ function createHelpMessages()
          'just check that other sites work.'; 
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['errorParserError'] = {
       title: function() {
@@ -526,7 +536,7 @@ function createHelpMessages()
          '" address.';
       },
       max: 1
-   }
+   };
    
    opec.gritter._notifications['graphError'] = {
       title: function() {
@@ -536,5 +546,5 @@ function createHelpMessages()
          return 'The server informed us that it failed to make a graph for your selection with the message "' +
          data.error + '".';
       }
-   }
+   };
 }

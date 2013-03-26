@@ -2,7 +2,7 @@
  * Create opec namespace object
  * @namespace
  */ 
-var opec = opec || {};
+var opec = opec || (opec = {});
 
 /*===========================================================================*/
 //Initialise javascript global variables and objects
@@ -12,9 +12,37 @@ var opec = opec || {};
  */
 var map;
 
-/*
-Helper functions
-*/
+/**
+ * Creates an opec.MicroLayer Object (layers in the selector but not yet map layers)
+ * 
+ * @constructor
+ * @param {string} name - The layer name (unescaped)
+ * @param {string} title - The title of the layer
+ * @param {string} abstract - The abstract information for the layer
+ * @param {string} firstDate - The first date for which data is available for the layer
+ * @param {string} lastDate - The last date for which data is available for the layer
+ * @param {string} serverName - The server name which serves the layer
+ * @param {string} wmsURL - The URL for the WMS service
+ * @param {string} wcsURL - The URL for the WCS service
+ * @param {string} sensorName - The name of the sensor for this layer (unescaped)
+ * @param {string} exBoundingBox - The geographic bounds for data in this layer
+ */
+opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox) {
+   this.origName = name.replace("/","-");
+   this.name = name.replace("/","-");
+   this.urlName = name;
+   this.displayTitle = title.replace(/_/g, " ");
+   this.title = title;
+   this.productAbstract = productAbstract;
+   this.firstDate = firstDate;
+   this.lastDate = lastDate;
+   this.serverName = serverName;
+   this.wmsURL = wmsURL;
+   this.wcsURL = wcsURL;
+   this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
+   this.sensorName = sensorName.replace(/[\.,]+/g, "");
+   this.exBoundingBox = exBoundingBox;
+};
 
 // Predefined map coordinate systems
 var lonlat = new OpenLayers.Projection("EPSG:4326");
@@ -66,13 +94,28 @@ opec.createBaseLayers = function() {
    
    // Get and store the number of base layers
    map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
-}
+};
 
 /**
  * Create all the reference layers for the map.
  */
 opec.createRefLayers = function() {  
    opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
+   
+   var colourFunc = function(feature) {
+      var colourLookup = {
+         'AMT12 Cruise Track': 'blue',
+         'AMT13 Cruise Track': 'aqua',
+         'AMT14 Cruise Track': 'lime',
+         'AMT15 Cruise Track': 'magenta',
+         'AMT16 Cruise Track': 'red',
+         'AMT17 Cruise Track': 'orange',
+         'AMT19 Cruise Track': 'yellow'
+      };
+      
+      if ($.inArray(feature, colourLookup))
+         return colourLookup[feature];
+   };
    
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
    for(var i = 12; i <= 19; i++) {
@@ -84,31 +127,7 @@ opec.createRefLayers = function() {
       },
       {
          context: {
-            colour: function(feature) {
-               switch(feature.layer.displayTitle) {
-                  case 'AMT12 Cruise Track':
-                    return 'blue';
-                    break;
-                  case 'AMT13 Cruise Track':
-                    return 'aqua';
-                    break;
-                  case 'AMT14 Cruise Track':
-                    return 'lime';
-                    break;
-                  case 'AMT15 Cruise Track':
-                    return 'magenta';
-                    break;
-                  case 'AMT16 Cruise Track':
-                    return 'red';
-                    break;
-                  case 'AMT17 Cruise Track':
-                    return 'orange';
-                    break;
-                  case 'AMT19 Cruise Track':
-                    return 'yellow';
-                    break;
-               }
-            }
+            colour: colourFunc
          }
       });
 
@@ -155,7 +174,7 @@ opec.createRefLayers = function() {
 
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
-}
+};
 
 /** 
  * Create MicroLayers from the getCapabilities request to 
@@ -173,7 +192,7 @@ opec.createOpLayers = function() {
                var sensorName = index;
                // Go through each layer and load it
                $.each(item, function(i, item) {
-                  if(item.Name && item.Name != "") {
+                  if(item.Name && item.Name !== "") {
                      var microLayer = new opec.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
                      opec.checkNameUnique(microLayer);               
                      $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
@@ -183,7 +202,7 @@ opec.createOpLayers = function() {
          });
       }
    });
-}
+};
 
 /**
  * @param {Object} name - name of layer to check
@@ -191,7 +210,7 @@ opec.createOpLayers = function() {
 opec.isSelected = function(name) {
    if(map)
       return $.inArray(name, map.sampleLayers) > -1 ? true : false;
-}
+};
 
 /**
  * Checks if a layer name is unique
@@ -200,9 +219,9 @@ opec.isSelected = function(name) {
  * @param {number} count - Number of other layers with the same name (optional)
  */
 opec.checkNameUnique = function(microLayer, count) {
-   var name = null
+   var name = null;
    
-   if(typeof count === "undefined" || count == 0) {
+   if(typeof count === "undefined" || count === 0) {
       name = microLayer.name;
       count = 0;
    }
@@ -214,11 +233,11 @@ opec.checkNameUnique = function(microLayer, count) {
       opec.checkNameUnique(microLayer, ++count);
    }
    else
-      if(count != 0) { 
+      if(count !== 0) { 
          microLayer.name = microLayer.name + count; 
       }
       map.microLayers[microLayer.name] = microLayer;
-}
+};
 
 /**
  * Create a layer to be displayed on the map.
@@ -250,6 +269,7 @@ opec.createOpLayer = function(layerData, microLayer) {
       }
    });
 
+   layer.origName = microLayer.origName;
    layer.urlName = microLayer.urlName;
    layer.displayTitle = microLayer.displayTitle;
    layer.title = microLayer.title;
@@ -265,7 +285,7 @@ opec.createOpLayer = function(layerData, microLayer) {
    map.layerStore[layer.name] = layer;
    
    map.getMetadata(layer);
-}
+};
 
 /**
  * Add a layer to the map from the layerStore. 
@@ -298,7 +318,7 @@ opec.addOpLayer = function(layerName) {
 
    // Increase the count of OpLayers
    map.numOpLayers++;
-}
+};
 
 /**
  * Remove a layer from the map and into the 
@@ -322,18 +342,18 @@ opec.removeOpLayer = function(layer) {
 
    // Decrease the count of OpLayers
    map.numOpLayers--;
-}
+};
 
 /**
  * Creates a list of custom args that will be added to the
  * permalink url.
  */
-function customPermalinkArgs()
+opec.customPermalinkArgs = function()
 {
    var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
       this, arguments
    );
-}
+};
 
 /**
  * Checks to see if a layer is not visible and selected.
@@ -343,7 +363,7 @@ opec.checkLayerState = function(layer) {
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
    else
       $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
-}
+};
 
 /**
  * Start mapInit() - the main function for setting up the map
@@ -447,15 +467,12 @@ function nonLayerDependent()
    //--------------------------------------------------------------------------
   
    //Configure and generate the UI elements
-
-   // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
-   // for data layers (in left panel) and data analysis (in right panel)
-   $("#dataAccordion").multiOpenAccordion({
-      active: [0, 1]
-   });
    
    // Setup the left panel
    opec.leftPanel.setup();
+   
+   // Setup the right panel
+   opec.rightPanel.setup();
    
    //--------------------------------------------------------------------------
    
@@ -463,7 +480,7 @@ function nonLayerDependent()
    // the screen
    $(window).resize(function(event) {
       if(event.target == window) {
-         $(".ui-dialog-content").dialog("option", "position", "center");
+         $(".ui-dialog-content").extendedDialog("option", "position", "center");
       }
    });
 
@@ -569,28 +586,6 @@ function nonLayerDependent()
    $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
    $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
 
-   // Regions of interest drawing control buttons - with custom styling
-   $('#ROIButtonSet').buttonset();
-   $('#point').button({ icons: { primary: 'ui-icon-drawpoint'} });
-   $('#box').button({ icons: { primary: 'ui-icon-drawbox'} });
-   $('#circle').button({ icons: { primary: 'ui-icon-drawcircle'} });
-   $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
-
-   // Data Analysis panel tabs and accordions
-   $("#dataTabs").tabs();
-   $("#analyses").accordion({ collapsible: true, heightStyle: 'content' });
-   $("#spatial").accordion({ collapsible: true, heightStyle: 'content' });
-   $("#temporal").accordion({ collapsible: true, heightStyle: 'content' }); 
-   
-   //--------------------------------------------------------------------------
-     
-   // Right slide panel show-hide functionality
-   $(".triggerR").click(function(e) {
-      $(".rPanel").toggle("fast");
-      $(this).toggleClass("active");
-      return false;
-   });
-   
    //--------------------------------------------------------------------------
    
    $('#opec-toolbar-actions')
@@ -623,11 +618,11 @@ function nonLayerDependent()
    function addDialogClickHandler(idOne, idTwo)
    {
       $(idOne).click(function(e) {
-         if($(idTwo).dialog('isOpen')) {
-           $(idTwo).dialog('close');
+         if($(idTwo).extendedDialog('isOpen')) {
+           $(idTwo).extendedDialog('close');
          }
          else {
-           $(idTwo).dialog('open');
+           $(idTwo).extendedDialog('open');
          }
          return false;
       });
@@ -640,220 +635,11 @@ function nonLayerDependent()
        map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
    });
 
-   createContextMenu();
-   setupDrawingControls();
-   gritterLayerHelper();
+   // Setup the contextMenu
+   opec.contextMenu.setup();
+   
    // Setup timeline
-   $.getJSON('timeline.json', function(data) { t1 = new OPEC.TimeLine('timeline', data); });
-}
-
-/*====================================================================================*/
-
-/**
- * Sets up the drawing controls to allow for the selection 
- * of ROI's. 
- * 
- */
-function setupDrawingControls()
-{
-   // Add the Vector drawing layer for POI drawing
-   var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
-      style : {
-         strokeColor : 'red',
-         fillColor : 'red',
-         strokeWidth : 2,
-         fillOpacity : 0.3,
-         pointRadius: 5
-      },
-      /**
-       * @constructor 
-       */
-      preFeatureInsert : function(feature) {
-         this.removeAllFeatures();
-      },
-      onFeatureInsert : function(feature) {
-         ROIAdded(feature);
-      },
-      rendererOptions: { zIndexing: true }
-   }); 
-
-   vectorLayer.controlID = "poiLayer";
-   vectorLayer.displayInLayerSwitcher=false;
-   map.addLayer(vectorLayer);
-
-   // Function called once a ROI has been drawn on the map
-   function ROIAdded(feature) {
-      // Get the geometry of the drawn feature
-      var geom = new OpenLayers.Geometry();
-      geom = feature.geometry;
-      
-      // Special HTML character for the degree symbol
-      var d = '&deg;';
-      
-      // Get bounds of the feature's geometry
-      var bounds = new OpenLayers.Bounds();
-      bounds = geom.getBounds();
-       
-      // Some metrics for the ROI
-      var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
-      
-      // Get some values for non-point ROIs
-      if(map.ROI_Type != '' && map.ROI_Type != 'point') {
-         area_deg = geom.getArea();
-         area_km = (geom.getGeodesicArea()*1e-6);
-         height_deg = bounds.getHeight();
-         width_deg = bounds.getWidth();
-         // Note - to get values in true ellipsoidal distances, we need to use Vincenty functions for measuring ellipsoidal
-         // distances instead of planar distances (http://www.movable-type.co.uk/scripts/latlong-vincenty.html)
-         ctrLon = geom.getCentroid().x;
-         ctrLat = geom.getCentroid().y;
-         height_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(ctrLon,bounds.top),new OpenLayers.LonLat(ctrLon,bounds.bottom));
-         width_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(bounds.left,ctrLat),new OpenLayers.LonLat(bounds.right,ctrLat));
-         radius_deg = ((bounds.getWidth() + bounds.getHeight())/4);
-      };
-        
-      switch(map.ROI_Type) {
-         case 'point':
-            $('#dispROI').html('<h3>Point ROI</h4>');
-            $('#dispROI').append('<img src="./img/pointROI.png" title ="Point Region Of Interest" alt="Map Point" />');
-            $('#dispROI').append('<p>Lon, Lat: ' + geom.x.toPrecision(4) + d + ', ' + geom.y.toPrecision(4) + d + '</p>');
-            break;
-         case 'box':
-            var bbox = bounds;
-            // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
-            if ($('#graphcreator-bbox').size()){
-               $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
-            }
-            $('#dispROI').html('<h3>Rectangular ROI</h4>');
-            // Setup the JavaScript canvas object and draw our ROI on it
-            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
-            var c = document.getElementById('ROIC');
-            var ctx = c.getContext('2d');
-            ctx.lineWidth = 4;
-            ctx.fillStyle = '#CCCCCC';
-            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
-            ctx.fillRect(5,5,width_deg*scale,height_deg*scale);
-            ctx.strokeRect(5,5,width_deg*scale,height_deg*scale);
-            //
-            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
-            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');           
-            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
-            break;
-         case 'circle':
-            $('#dispROI').html('<h3>Circular ROI</h4>');
-            $('#dispROI').append('<img src="./img/circleROI.png" title ="Circular Region Of Interest" alt="Map Point" />');
-            $('#dispROI').append('<p>Radius: ' + radius_deg.toPrecision(4) + d + '</p>');
-            $('#dispROI').append('<p>Centre lat, lon: ' + ctrLat.toPrecision(4) + ', ' + ctrLon.toPrecision(4) + '</p>');
-            $('#dispROI').append('<p>Width: ' + width_deg.toPrecision(4) + d + ' (' + width_km.toPrecision(4) + ' km)</p>');
-            $('#dispROI').append('<p>Height: ' + height_deg.toPrecision(4) + d + ' (' + height_km.toPrecision(4) + ' km)</p>');
-            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</sup></p>');
-            break;
-         case 'polygon':
-            // Get the polygon vertices
-            var vertices = geom.getVertices();
-            $('#dispROI').html('<h3>Custom Polygon ROI</h4>');     
-            // Setup the JavaScript canvas object and draw our ROI on it
-            $('#dispROI').append('<canvas id="ROIC" width="100" height="100"></canvas>');
-            var c = document.getElementById('ROIC');
-            var ctx = c.getContext('2d');
-            ctx.lineWidth = 4;
-            ctx.fillStyle = '#CCCCCC';
-            var scale = (width_deg > height_deg) ? 90/width_deg : 90/height_deg;
-            ctx.beginPath();
-            var x0 = 5 + (vertices[0].x-bounds.left)*scale;
-            var y0 = 5 + (bounds.top-vertices[0].y)*scale;
-            ctx.moveTo(x0,y0);
-            for(var i=1,j=vertices.length; i<j; i++){
-               var x = 5 + (vertices[i].x-bounds.left) * scale;
-               var y = 5 + (bounds.top-vertices[i].y) * scale;
-               ctx.lineTo(x, y);
-            };
-            ctx.lineTo(x0,y0);
-            ctx.stroke();
-            ctx.fill();
-            ctx.closePath();
-            //
-            $('#dispROI').append('<p>Centroid Lat, Lon:' + ctrLat.toPrecision(4) + d + ', ' + ctrLon.toPrecision(4) + d + '</p>');
-            $('#dispROI').append('<p>Projected Area: ' + area_km.toPrecision(4) + ' km<sup>2</p>');
-            break;
-      };
-   };
-
-   // Function which can toggle OpenLayers controls based on the clicked control
-   // The value of the value of the underlying radio button is used to match 
-   // against the key value in the mapControls array so the right control is toggled
-   function toggleControl(element) {
-      for(key in mapControls) {
-         var control = mapControls[key];
-         if($(element).val() == key) {
-            $('#'+key).attr('checked', true);
-            control.activate();
-         }
-         else {
-            $('#'+key).attr('checked', false);
-            control.deactivate();
-         }
-      }
-      $('#panZoom input:radio').button('refresh');
-   };
-
-   // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
-   function toggleDrawingControl(element) {
-      toggleControl(element);
-      vectorLayer.removeAllFeatures();
-      map.ROI_Type = element.value;
-      // DEBUG
-      console.info(map.ROI_Type);
-   };
-
-   /* 
-   Set up event handling for the map including as well as mouse-based 
-   OpenLayers controls for jQuery UI buttons and drawing controls
-   */
-
-   // Create map controls identified by key values which can be activated and deactivated
-   var mapControls = {
-      zoomIn: new OpenLayers.Control.ZoomBox(
-         { out: false, alwaysZoom: true }
-      ),
-      zoomOut: new OpenLayers.Control.ZoomBox(
-         { out: true, alwaysZoom: true }
-      ),
-      pan: new OpenLayers.Control.Navigation(),
-      point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }}),
-      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false}),
-      polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
-   };
-
-   // Add all the controls to the map
-   for (var key in mapControls) {
-      var control = mapControls[key];
-      map.addControl(control);
-   };
-
-   // TRAC Ticket #58: Fixes flaky non-selection of jQuery UI buttons (http://bugs.jqueryui.com/ticket/7665)
-   $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
-   function(e) {h.disabled && (e.preventDefault(), e.stopImmediatePropagation())}
-   ).bind('mousedown', function() {
-      $(this).addClass('opec_click')
-   }).bind('mouseup', function() {
-      if ($(this).hasClass('opec_click')) {
-         $(this).click()
-      }
-      $(this).removeClass('opec_click')
-   }); 
-
-   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
-   $('#panZoom input:radio').click(function(e) {
-      toggleControl(this);
-   });
-
-   // Manually Handle drawing control radio buttons click event - each button has a class of "iconBtn"
-   $('#ROIButtonSet input:radio').click(function(e) {
-      toggleDrawingControl(this);
-   });
-
+   $.getJSON('timeline.json', function(data) { t1 = new opec.TimeLine('timeline', data); });
 }
 
 /*====================================================================================*/
@@ -979,7 +765,7 @@ function main()
          if(that.availableList.children('li.ui-element:visible').length > 50) {
             var warning = $('<div id="warning" title="You sure about this?"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Adding lots of layers may cause the browser to slow down. Are you sure you want to proceed?</p></div>');
             $(document.body).append(warning);          
-            $('#warning').dialog({
+            $('#warning').extendedDialog({
                position: ['center', 'center'],
                width: 300,
                height: 200,
@@ -988,11 +774,11 @@ function main()
                modal: true,
                buttons: {
                   "Add Layers": function() {
-                     $(this).dialog("close");
+                     $(this).extendedDialog("close");
                      func(that);
                   },
                   "Stop Adding Layers": function() {
-                     $(this).dialog("close");
+                     $(this).extendedDialog("close");
                   }
                },
                close: function() {
@@ -1007,32 +793,31 @@ function main()
       }
    });
    
-   /*$("#dThree").dialog({
+   $("#dThree").extendedDialog({
       position: ['center', 'center'],
       width: 1000,
       height: 600,
       resizable: false,
-      autoOpen: true
-   }).dialogExtend({
-      "help": false,
-      "minimize": true,
-      "dblclick": "collapse"
+      autoOpen: true,
+      showHelp: false,
+      showMinimise: true,
+      dblclick: "collapse"
    });
    
    addDThreeGraph();
-   */
    
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
-   $('#this-Is-A-Prototype').dialog({
+   $('#this-Is-A-Prototype').extendedDialog({
       position: ['center', 'center'],
       width: 300,
       height: 230,
       resizable: false,
       autoOpen: true,
       modal: true,
+      showHelp: false,
       buttons: {
          "Ok": function() {
-            $(this).dialog("close");
+            $(this).extendedDialog("close");
          }
       },
       close: function() {
@@ -1047,12 +832,6 @@ function main()
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
    mapInit();
-
-   // Create the help messages to be used by the gritter
-   createHelpMessages();
-
-   // Set and display the welcome message
-   createWelcomeMessage();
 
    // Start setting up anything that is not layer dependent
    nonLayerDependent();
@@ -1164,14 +943,14 @@ function getFeatureInfo(event) {
                   html = "<b>Lon:</b> " + lon.toFixed(6) + "<br /><b>Lat:</b> " +
                      lat.toFixed(6) + "<br /><b>Value:</b> " + truncVal + "<br />";
                      
-                  if(!isNaN(truncVal)) {
-                     html += '<a href="#" onclick=setColourScaleMin(' + val + ') ' +
-                        'title="Sets the minimum of the colour scale to ' + truncVal + '">' +
-                        'Set colour min</a><br />';
-                     html += '<a href="#" onclick=setColourScaleMax(' + val + ') ' +
-                        'title="Sets the maximum of the colour scale to ' + truncVal + '">' +
-                        'Set colour max</a><br />';
-                  }
+                  //if(!isNaN(truncVal)) {
+                     //html += '<a href="#" onclick=setColourScaleMin(' + val + ') ' +
+                        //'title="Sets the minimum of the colour scale to ' + truncVal + '">' +
+                        //'Set colour min</a><br />';
+                     //html += '<a href="#" onclick=setColourScaleMax(' + val + ') ' +
+                        //'title="Sets the maximum of the colour scale to ' + truncVal + '">' +
+                        //'Set colour max</a><br />';
+                  //}
                }
                
                // Remove the "Loading..." popup

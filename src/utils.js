@@ -43,19 +43,26 @@ opec.util.replace = function(search, replace, subject, count) {
    }
    
    return sa ? s : s[0];  
-}
+};
 
 // Extension to JavaScript Arrays to de-duplicate them
-Array.prototype.deDupe = function() {
-   var arr = this;
+opec.util.arrayDeDupe = function(array) {
    var i,
-   len=arr.length,
-   out=[],
-   obj={};
-   for (i=0;i<len;i++) { obj[arr[i]]=0; }
-   for (i in obj) { out.push(i); }
-   return out;
-}
+      len = array.length,
+      outArray = [],
+      obj = {};
+      
+   for (i = 0; i < len; i++) { obj[array[i]] = 0; }
+   for (i in obj) { outArray.push(i); }
+   return outArray;
+};
+
+// Array Remove - By John Resig (MIT Licensed)
+opec.util.arrayRemove = function(array, from, to) {
+   var rest = array.slice((to || from) + 1 || array.length);
+   array.length = from < 0 ? array.length + from : from;
+   return array.push.apply(array, rest);
+};
 
 /**
  * Turn JavaScript date, d into ISO8601 date part (no time)
@@ -67,7 +74,7 @@ opec.util.ISODateString = function(d) {
    // Add 1 to month as its zero based.
    var datestring = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
    return datestring;
-}
+};
 
 /**
  * Format date string so it can be displayed
@@ -77,7 +84,7 @@ opec.util.displayDateString = function(date) {
    var month = date.substring(5, 7);
    var day = date.substring(8, 10);
    return day + '-' + month + '-' + year;
-}
+};
 
 function getObjectKey(obj, value)
 {
@@ -88,4 +95,4 @@ function getObjectKey(obj, value)
       }
    }
    return null;
-};
+}
