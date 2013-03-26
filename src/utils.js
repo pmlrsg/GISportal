@@ -5,12 +5,13 @@
 opec.util = {};
 
 /**
-* An extremely handy PHP function ported to JS, works well for templating
-* 
-* @param {(string|Array)} search A list of things to search for
-* @param {(string|Array)} replace A list of things to replace the searches with
-* @return {string} sa The output
-*/  
+ * An extremely handy PHP function ported to JS, works well for templating
+ * 
+ * @param {(string|Array)} search - A list of things to search for
+ * @param {(string|Array)} replace - A list of things to replace the searches with
+ * @param {(string)} subject - The string to search
+ * @return {string} The resulting string
+ */  
 opec.util.replace = function(search, replace, subject, count) {
    var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
       f = [].concat(search),
@@ -45,7 +46,9 @@ opec.util.replace = function(search, replace, subject, count) {
    return sa ? s : s[0];  
 };
 
-// Extension to JavaScript Arrays to de-duplicate them
+/**
+ * Extension to JavaScript Arrays to de-duplicate them
+ */ 
 opec.util.arrayDeDupe = function(array) {
    var i,
       len = array.length,
@@ -57,7 +60,9 @@ opec.util.arrayDeDupe = function(array) {
    return outArray;
 };
 
-// Array Remove - By John Resig (MIT Licensed)
+/** 
+ * Array Remove - By John Resig (MIT Licensed)
+ */
 opec.util.arrayRemove = function(array, from, to) {
    var rest = array.slice((to || from) + 1 || array.length);
    array.length = from < 0 ? array.length + from : from;

@@ -573,7 +573,7 @@ function hovmoller(graphData) {
          .attr("x", 0 - (height/2))
          .attr("dy", ".71em")
          .style("text-anchor", "end")
-         .text("Latitude ()"); 
+         .text("Latitude"); 
          
       var rects = g.selectAll("rects")
          .data(trends.data)
