@@ -5,136 +5,192 @@
 opec.contextMenu = {};
 
 /**
- * Creates the contextMenu and functions for the
- * creation of custom menu items.
+ * Setup the context menu and any custom controls needed in menu items
  */
 opec.contextMenu.setup = function() {
-   // Setup the context menu and any custom controls
-   $(function() {
-
-      /**
-       * Create the custom control for the slider
-       */
-      $.contextMenu.types.slider = function(item, opt, root) {
-         $('<div id="' + item.id + '" class="context-menu slider"></div>').appendTo(this)
-         .on('click', '> li', function() {
-            console.log('Clicked on ' + $(this).text());
-            root.$menu.trigger('contextmenu:hide');
-         })
-         // Setup the slider
-         .slider({
-            max: 1,
-            min: 0,
-            value: 1,
-            step: 0.05,
-            change: function(e, ui) {
-               var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-               layer.setOpacity($("#" + item.id).slider("value"));
-               return true;
-            }
-         });
-
-         root.$menu.on('contextmenu:focus', function() {
-            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-            $("#" + item.id).slider("value", layer.opacity);        
-         });
-      };
-      
-      /**
-       * Create the context menu the oplayers in the data layers accordion.
-       */
-      $.contextMenu({
-         // The class to activate on when right clicked
-         selector: '.selectedLayer',
-         // Dynamically creates the menu each time
-         build: function($trigger, e) {
+   /**
+    * Create the custom control for the slider
+    */
+   $.contextMenu.types.slider = function(item, opt, root) {
+      $('<div id="' + item.id + '" class="context-menu slider"></div>').appendTo(this)
+      .on('click', '> li', function() {
+         console.log('Clicked on ' + $(this).text());
+         root.$menu.trigger('contextmenu:hide');
+      })
+      // Setup the slider
+      .slider({
+         max: 1,
+         min: 0,
+         value: 1,
+         step: 0.05,
+         change: function(e, ui) {
+            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            layer.setOpacity($("#" + item.id).slider("value"));
+            return true;
+         }
+      });
+   
+      /*
+       * When the 'contextmenu' gets focus grab the opacity value from the 
+       * selected layer and set the slider's position to be that value.
+       */ 
+      root.$menu.on('contextmenu:focus', function() {
+         var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+         if(typeof layer.opacity === 'undefined' || layer.opacity === null)
+            layer.setOpacity(1);
             
-            function buildMenu() {
-               var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
-               //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';             
-               var fold1 = {                  
-                  fold1: {
-                     name: "Opacity",
-                     items: {
-                        opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
-                     }
-                  }
-               };    
-               var fold2 = {
-                 fold3: {
-                     name: "Layer Styles", 
-                     items: getCurrentStyles($trigger)
-                  }
-               }; 
-               var fold3 = {
-                  fold2: {
-                     name: "Layer Elevation",
-                     items: getCurrentElevation($trigger)
-                  }
-               };
-               var rest = {
-                  showScalebar: showScalebar($trigger),
-                  showMetadata: showMetadata($trigger),
-                  showGraphCreator: showGraphCreator(),
-                  viewData: opec.contextMenu.viewData($trigger)
-               };
-               
-               if(layer.controlID == 'opLayers') {
-                  return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
-               }
-               else if (layer.controlID == 'refLayers') {
-                  return $.extend(true, fold1, rest);
-               }
-               else {
-                  return $.extend(true, fold1, rest);
-               } 
-            }
-            // Return the new menu
-            return {
-               // The items in the menu
-               items: buildMenu()
-            };                           
-         }
+         $("#" + item.id).slider("value", layer.opacity);        
       });
-      
-      /**
-       * Create the context menu for the layer selector elements
-       */
-      $.contextMenu({
-         // The class to activate on when right clicked
-         selector: '.preloaderContextMenu',
-         // Dynamically creates the menu each time
-         build: function($trigger, e) {
-            e.preventDefault();
-            // Return the new menu
-            return {
-               // The items in the menu
-               items: {
-                  showMetadata: showMetadata($trigger)
+   };
+   
+   /**
+    * Create the context menu for the oplayers in the data layers accordion.
+    */
+   $.contextMenu({
+      // The class to activate on when right clicked
+      selector: '.selectedLayer',
+      // Dynamically creates the menu each time
+      build: function($trigger, e) {    
+              
+         function buildMenu() {
+            /*
+             * Get the visible selected layer by id so as to avoid selecting one
+             * of the other selected layers on other tabs. 
+             */
+            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';  
+            
+            // Opacity           
+            var fold1 = {                  
+               fold1: {
+                  name: "Opacity",
+                  items: {
+                     opacitySlider: {type: "slider", customName: "Opacity Slider", id:"opacitySlider"}
+                  }
                }
-            };                           
-         }
-      });
-      
-      /**
-       * Create the context menu for the groups
-       */
-      $.contextMenu({
-         selector: '.ui-accordion-header-dropdown',
-         build: function($trigger, e) {
-            return {
-               items: {
-                  selectAll: opec.contextMenu.selectAll($trigger),
-                  deselectAll: opec.contextMenu.deselectAll($trigger),
-                  saveToProfile: opec.contextMenu.saveToProfile(),
-                  renameGroup: opec.contextMenu.renameGroup($trigger)
+            };  
+            // Styles  
+            var fold2 = {
+              fold3: {
+                  name: "Layer Styles", 
+                  items: opec.contextMenu.getCurrentStyles($trigger)
+               }
+            }; 
+            // Elevation
+            var fold3 = {
+               fold2: {
+                  name: "Layer Elevation",
+                  items: opec.contextMenu.getCurrentElevation($trigger)
                }
             };
+            var rest = {
+               showScalebar: opec.contextMenu.showScalebar($trigger),
+               showMetadata: opec.contextMenu.showMetadata($trigger),
+               showGraphCreator: opec.contextMenu.showGraphCreator(),
+               viewData: opec.contextMenu.viewData($trigger),
+               heatmap: opec.contextMenu.heatmapTest()
+            };
+            
+            if(layer.controlID == 'opLayers') {
+               return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
+            }
+            else if (layer.controlID == 'refLayers') {
+               return $.extend(true, fold1, rest);
+            }
+            else {
+               return $.extend(true, fold1, rest);
+            } 
          }
-      });
+         // Return the new menu
+         return {
+            // The items in the menu
+            items: buildMenu()
+         };                           
+      }
+   });
+   
+   /**
+    * Create the context menu for the layer selector elements
+    */
+   $.contextMenu({
+      // The class to activate on when right clicked
+      selector: '.preloaderContextMenu',
+      // Dynamically creates the menu each time
+      build: function($trigger, e) {
+         e.preventDefault();
+         return {
+            items: {
+               showMetadata: opec.contextMenu.showMetadata($trigger)
+            }
+         };                           
+      }
+   });
+   
+   /**
+    * Create the context menu for the groups
+    */
+   $.contextMenu({
+      // The class to activate on when right clicked
+      selector: '.ui-accordion-header-dropdown',
+      // Dynamically creates the menu each time
+      build: function($trigger, e) {
+         return {
+            items: {
+               selectAll: opec.contextMenu.selectAll($trigger),
+               deselectAll: opec.contextMenu.deselectAll($trigger),
+               saveToProfile: opec.contextMenu.saveToProfile(),
+               renameGroup: opec.contextMenu.renameGroup($trigger)
+            }
+         };
+      }
    });
 };
 
+opec.contextMenu.heatmapTest = function() {
+   return {
+      name: "Test Heatmap",
+      callback: function() {
+         var testData = {
+            max: 46,
+            data: [{lat: 33.5363, lng: -117.044, count: 1}, 
+               {lat: 33.5608, lng: -117.24, count: 1},
+               {lat: 38, lng: -97, count: 1}, 
+               {lat: 38.9358, lng: -77.1621, count: 1}]
+         };
+         
+         var transformedTestData = { max: testData.max, data: []},
+            data = testData.data,
+            datalen = data.length,
+            nudata = {};
+            nudata.data = [];
+            
+         while(datalen--) {
+            nudata.data.push({
+               lonlat: new OpenLayers.LonLat(data[datalen].lng, data[datalen].lat),
+               count: data[datalen].count
+            });
+         }
+         
+         transformedTestData = nudata;
+         
+         var layer = new OpenLayers.Layer.OSM();
+         var heatmap = new OpenLayers.Layer.Heatmap("Heatmap Layer", map, layer, 
+            {visible: true, radius: 10}, 
+            {isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")}
+         );
+            
+         map.addLayers([layer, heatmap]);
+         heatmap.setDataSet(transformedTestData);       
+      }
+   };
+};
+
+
+/**
+ * Select all layers in the group
+ * 
+ * @param {Object} $trigger - The object the menu was triggered on.
+ */
 opec.contextMenu.selectAll = function($trigger) {
    return {
       name: "Select All",
@@ -150,6 +206,11 @@ opec.contextMenu.selectAll = function($trigger) {
    };
 };
 
+/**
+ * Deselects all layers in the group
+ * 
+ * @param {Object} $trigger - The object the menu was triggered on.
+ */
 opec.contextMenu.deselectAll = function($trigger) {
    return {
       name: "Deselect All",
@@ -165,15 +226,22 @@ opec.contextMenu.deselectAll = function($trigger) {
    };   
 };
 
+/**
+ * Saves group in the current condition to the users profile (PlaceHolder)
+ */
 opec.contextMenu.saveToProfile = function() {
    return {
       name: "Save To Profile",
-      callback: function() {
-         
+      callback: function() {        
       }
    };
 };
 
+/**
+ * Allow the group to be renamed
+ * 
+ * @param {Object} $trigger - The object the menu was triggered on.
+ */
 opec.contextMenu.renameGroup = function($trigger) {
    return {
       name: "Rename Group",
@@ -183,6 +251,11 @@ opec.contextMenu.renameGroup = function($trigger) {
    };
 };
 
+/**
+ * Zooms the view extent to match the bbox of the layer
+ * 
+ * @param {Object} $trigger - The object the menu was triggered on.
+ */
 opec.contextMenu.viewData = function($trigger) {
    var layerName = "";
    var layer = null;
@@ -217,14 +290,12 @@ opec.contextMenu.viewData = function($trigger) {
 /**
  * Creates an Object to be used in an contextMenu.
  * 
- * @function
- * 
  * @param {Object} $trigger - The object the menu was triggered on.
  * 
  * @return {Object} Returns an object containing the display name to show on 
  * the menu and a callback to be executed when selected.
  */
-function showMetadata($trigger) {
+opec.contextMenu.showMetadata = function($trigger) {
    var layerName = "";
    var layer = null;
    
@@ -240,50 +311,11 @@ function showMetadata($trigger) {
    return { 
       name: "Show Metadata",
       callback: function() {
-         
-         if(layer === null)
-            return;
-
-         // Check if already open
-         if($('#metadata-' + layer.name).length)
-            $('#metadata-' + layer.name).extendedDialog('close');
-            
-         var data = {
-            name: layer.name,
-            displayTitle: layer.displayTitle,
-            northBoundLat: layer.exBoundingBox.NorthBoundLatitude,
-            eastBoundLon: layer.exBoundingBox.EastBoundLongitude,
-            southBoundLat: layer.exBoundingBox.SouthBoundLatitude,
-            westBoundLon: layer.exBoundingBox.WestBoundLongitude,
-            addDateRange: layer.temporal,
-            productAbstract: layer.productAbstract,
-            firstDate: layer.firstDate,
-            lastDate: layer.lastDate  
-         };
-           
-         // Add the html to the document using a template
-         $(document.body).append(opec.templates.metadataWindow(data));
-
-         // Show metadata for a selected layer
-         $('#metadata-' + layer.name).extendedDialog({
-            position: ['center', 'center'],
-            width: 400,
-            height: 250,
-            resizable: true,
-            autoOpen: false,
-            close: function() {
-               $('#metadata-' + layer.name).remove();
-            },
-            showHelp: false,
-            showMinimise: true,
-            dblclick: "collapse"
-         });   
-         
-         //Open dialog
-         $('#metadata-' + layer.name).extendedDialog('open');
+         // Opens Metadata Dialog
+         opec.window.createMetadata(layer);
       }
    };
-}
+};
 
 /**
  * Creates an Object to be used in an contextMenu.
@@ -293,143 +325,16 @@ function showMetadata($trigger) {
  * @return {Object} Returns an object containing the display name to show on 
  * the menu and a callback to be executed when selected.
  */
-function showScalebar($trigger) {
+opec.contextMenu.showScalebar = function($trigger) {
    return { 
       name: "Show Scalebar",
       
-      /**
-       * Opens a jQuery UI dialog which display a scalebar image fetched from the 
-       * server and adds a jQuery UI slider along with two input boxes.
-       */
       callback: function() { 
-         // Get the selected layer
-         var layer = map.getLayersByName($trigger.attr('id'))[0];       
-         var scalebarDetails = getScalebarDetails(layer);
-
-         // If there is an open version, close it
-         if($('#scalebar-' + layer.name).length)
-            $('#scalebar-' + layer.name).extendedDialog('close');
-            
-         var data = {
-            name: layer.name,
-            displayTitle: layer.displayTitle,
-            url: scalebarDetails.url
-         };
-
-         // Add the html to the document using a template
-         $(document.body).append(opec.templates.scalebarWindow(data));
-         
-         if(typeof layer.minScaleVal !== 'undefined' && typeof layer.maxScaleVal !== 'undefined') {
-            $('#' + layer.name + '-max').val(layer.maxScaleVal);
-            $('#' + layer.name + '-min').val(layer.minScaleVal);
-         }
-         else {
-            $('#' + layer.name + '-max').val = '';
-            $('#' + layer.name + '-min').val = '';  
-         }
-
-         // Show the scalebar for a selected layer
-         $('#scalebar-' + layer.name).extendedDialog({
-            position: ['center', 'center'],
-            width: 310,
-            resizable: false,
-            autoOpen: false,
-            showHelp: true,
-            showMinimise: true,
-            dblclick: "collapse",
-            close: function() {
-               // Remove on close
-               $('#scalebar-' + layer.name).remove(); 
-            },
-            restore: function(e, dlg) {
-               // Used to resize content on the dialog.
-               $(this).trigger("resize");
-            },
-            help : function(e, dlg) {
-               opec.gritter.showNotification('scalebarTutorial', null);
-            }
-         });
-         
-         // Event to change the scale to and from log if the checkbox is changed
-         $('#' + layer.name + '-log').on('click', ':checkbox', function(e) {          
-            // Check to see if the value was changed
-            if(layer.log && $(this).is(':checked'))
-               return;
-            else if(layer.log === false && !$(this).is(':checked'))
-               return;
-               
-            validateScale(layer, null , null);
-         });
-         
-         // Event to reset the scale if the "Reset Scale" button is pressed
-         $('#' + layer.name + '-reset').on('click', '[type="button"]', function(e) {                              
-            validateScale(layer, layer.origMinScaleVal , layer.origMaxScaleVal, true);
-         });
-         
-         // Event to recalculate the scale if the "Recalculate Scale" button is pressed
-         $('#' + layer.name + '-scale').on('click', '[type="button"]', function(e) {                              
-            var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);
-            $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
-            $('#' + layer.name + '-range-slider').slider('option', 'max', scaleRange.max);
-            validateScale(layer, layer.minScaleVal , layer.maxScaleVal);
-         });
-         
-         // Event for unclicking the max box
-         $('#' + layer.name + '-max').focusout(function(e) {          
-            // Check to see if the value was changed
-            var max = parseFloat($(this).val());
-            
-            if(max == layer.maxScaleVal)
-               return;
-               
-            validateScale(layer, null , max);
-         });
-         
-         // Event for unclicking the min box
-         $('#' + layer.name + '-min').focusout(function(e) {          
-            // Check to see if the value was changed
-            var min = parseFloat($(this).val());
-            
-            if(min == layer.minScaleVal)
-               return;
-               
-            validateScale(layer, min , null);
-         });
-         
-         // Get the range for the scalebar
-         var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);
-
-         // Setup the jQuery UI slider
-         $('#' + layer.name + '-range-slider').slider({
-            orientation: "vertical",
-            range: true,
-            values: [ layer.minScaleVal, layer.maxScaleVal ],
-            max: scaleRange.max,
-            min: scaleRange.min,
-            step: 0.00000001,
-            change: function(e, ui) {
-               if($(this).slider("values", 0) != layer.minScaleVal || $(this).slider("values", 1) != layer.maxScaleVal) {      
-                  validateScale(layer, $(this).slider("values", 0), $(this).slider("values", 1));
-               }
-            }
-         });
-
-         // Some css to keep everything in the right place.
-         $('#' + layer.name + '-range-slider').css({
-            'height': 256,
-            'margin': '5px 0px 0px 10px'
-         });
-         //$('#' + layer.name + '-max').parent('div').addClass('scalebar-max');
-         //$('#' + layer.name + '-scale').addClass('scalebar-scale');
-         //$('#' + layer.name + '-log').addClass('scalebar-log');
-         //$('#' + layer.name + '-reset').addClass('scalebar-reset');
-         //$('#' + layer.name + '-min').parent('div').addClass('scalebar-min');
-         
-         // Open the dialog box
-         $('#scalebar-' + layer.name).extendedDialog('open');
+         // Opens Scalebar Dialog
+         opec.window.createScalebar($trigger);
       }
    };
-}
+};
 
 /**
  * Creates and returns an array of available styles for a layer. The html id
@@ -439,7 +344,7 @@ function showScalebar($trigger) {
  * 
  * @return {Array} Returns an array of available styles for a layer.
  */
-function getCurrentStyles($trigger)
+opec.contextMenu.getCurrentStyles = function($trigger)
 {
    var layer = map.getLayersByName($trigger.attr('id'))[0];
    if(layer.controlID != 'opLayers')
@@ -464,7 +369,7 @@ function getCurrentStyles($trigger)
          callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
          callback: function() {
-            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
             layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});
             console.log(value.Name);
             updateScalebar(layer);
@@ -473,10 +378,9 @@ function getCurrentStyles($trigger)
    });
    
    return menuOutput;
-}
+};
 
-function getCurrentElevation($trigger) 
-{
+opec.contextMenu.getCurrentElevation = function($trigger) {
    var layer = map.getLayersByName($trigger.attr('id'))[0];
    var menuOutput = [];
    
@@ -486,331 +390,23 @@ function getCurrentElevation($trigger)
          className: value == layer.params['ELEVATION'] ? 'elevationSelected' : "",
          callbackName: 'Layer Elevation ' + value,
          callback: function() {
-            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
+            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
             layer.mergeNewParams({elevation: value});
          }
       };
    });
    
    return menuOutput;
-}
-
-/**
- * Update the scale bar after changes have occurred.
- * @param {Object} layer - The layer who's scalebar needs to be updated.
- */
-function updateScalebar(layer)
-{
-   // Check we have something to update
-   if($('#scalebar-' + layer.name).length)
-   {
-      var scalebarDetails = getScalebarDetails(layer);
-      $('#scalebar-' + layer.name + '> img').attr('src', scalebarDetails.url);
-      
-      var params = {
-         colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
-         logscale: layer.log
-      };
-      
-      layer.mergeNewParams(params);
-      
-      // DEBUG
-      console.info('url: ' + scalebarDetails.url);
-   }
-}
-
-function getScalebarDetails(layer)
-{
-   // Setup defaults
-   var url = null;
-   var width = 110;
-   var height = 256;
-   
-   // Iter over styles
-   $.each(layer.styles, function(index, value)
-   {
-      // If the style names match grab its info
-      if(value.Name == layer.params["STYLES"] && url === null) {
-         url = value.LegendURL + createGetLegendURL(layer, true);
-         width = parseInt(value.Width, 10);
-         height = parseInt(value.Height, 10);
-         return false; // Break loop
-      }
-   });
-   
-   // If the url is still null then there were no matches, so use a generic url
-   if(url === null)
-      url = createGetLegendURL(layer, false);
-      
-   return {
-      url: url,
-      width: width,
-      height: height
-   };
-}
-
-function createGetLegendURL(layer, hasBase)
-{
-   if(hasBase)
-      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
-   else
-      return layer.url + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
-}
-
-/**
- * Calculates a scale range based on the provided values.
- * @param {number} min - The lower end of the scale.
- * @param {number} max - The higher end of the scale.
- * @return {Object} Returns two values min and max in an object.
- */
-function getScaleRange(min, max)
-{
-   return {
-      max: max + Math.abs((max / 100) * 25),
-      min: min - Math.abs((max / 100) * 25)
-   };
-}
-
-/**
- * Validates the entries for the scale bar
- * @param {Object} layer - The layer who's scalebar you wish to validate
- * @param {number} newMin - The new minimum value to be used for the scale
- * @param {number} newMax - The new maximum value to be used for the scale
- * @param {boolean} reset - Resets the scale if true
- */ 
-function validateScale(layer, newMin, newMax, reset)
-{  
-   if(newMin === null || typeof newMin === 'undefined')
-      newMin = layer.minScaleVal;
-      
-   if(newMax === null || typeof newMax === 'undefined')
-      newMax = layer.maxScaleVal;
-      
-   if(reset === null || typeof reset === 'undefined')
-      reset = false;
-   
-   var min = parseFloat(newMin);
-   var max = parseFloat(newMax);
-   
-   if (isNaN(min)) {
-      alert('Scale limits must be set to valid numbers');
-      // Reset to the old value
-      $('#' + layer.name + '-min').val(layer.minScaleVal);
-      $('#' + layer.name + '-range-slider').slider("values", 0, layer.minScaleVal);
-   } 
-   else if (isNaN(max)) {
-      alert('Scale limits must be set to valid numbers');
-      // Reset to the old value
-      $('#' + layer.name + '-max').val(layer.maxScaleVal);
-      $('#' + layer.name + '-range-slider').slider("values", 1, layer.maxScaleVal);
-   } 
-   else if (min > max) {
-      alert('Minimum scale value must be less than the maximum');
-      // Reset to the old values
-      $('#' + layer.name + '-min').val(layer.minScaleVal);
-      $('#' + layer.name + '-max').val(layer.maxScaleVal);
-   } 
-   else if (min <= 0 && $('#' + layer.name + '-log').children('[type="checkbox"]').first().is(':checked')) {
-      alert('Cannot use a logarithmic scale with negative or zero values');
-      $('#' + layer.name + '-log').children('[type="checkbox"]').attr('checked', false);
-      $('#' + layer.name + '-range-slider').slider("values", 0, layer.minScaleVal);
-   } 
-   else { 
-      $('#' + layer.name + '-min').val(min);
-      $('#' + layer.name + '-max').val(max);
-      
-      if(min < $('#' + layer.name + '-range-slider').slider('option', 'min') || 
-         max > $('#' + layer.name + '-range-slider').slider('option', 'max') ||
-         reset === true)
-      {
-         var scaleRange = getScaleRange(min, max);
-         $('#' + layer.name + '-range-slider').slider('option', 'min', scaleRange.min);
-         $('#' + layer.name + '-range-slider').slider('option', 'max', scaleRange.max);
-         console.log("scale changed");
-      }
-      
-      layer.minScaleVal = min;
-      layer.maxScaleVal = max;     
-      layer.log = $('#' + layer.name + '-log').children('[type="checkbox"]').first().is(':checked') ? true : false;
-      
-      $('#' + layer.name + '-range-slider').slider("values", 0, min);
-      $('#' + layer.name + '-range-slider').slider("values", 1, max);
-      updateScalebar(layer);
-   }
-}
+};
 
 /**
  * Creates and shows the graph creator dialog box
  */
-function showGraphCreator()
-{
+opec.contextMenu.showGraphCreator = function() {
    return {
       name: 'Show Graph Creator',
       callback: function() {
-         var graphCreator = $('#graphCreator');
-         // If there is an open version, close it
-         if(graphCreator.length)
-            graphCreator.extendedDialog('close');
-            
-         var data = {
-            advanced: true
-         };
-         
-         // Add the html to the document using a template
-         $(document.body).append(opec.templates.graphCreatorWindow(data));
-         
-         graphCreator = $('#graphCreator');           
-         var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
-         
-         // Turn it into a dialog box
-         graphCreator.extendedDialog({
-            position: ['center', 'center'],
-            width:340,
-            resizable: false,
-            autoOpen: false,
-            close: function() {
-               // Remove on close
-               $('#graphCreator').remove(); 
-            },
-            showHelp: true,
-            showMinimise: true,
-            dblclick: "collapse",
-            help : function(e, dlg) {
-               opec.gritter.showNotification ('graphCreatorTutorial', null);
-            }
-         });
-
-         // Add the jQuery UI datepickers to the dialog
-         $('#graphcreator-time, #graphcreator-time2').datepicker({
-            showButtonPanel: true,
-            dateFormat: 'yy-mm-dd',
-            changeMonth: true,
-            changeYear: true
-         });
-         // Set the datepicker controls to the current view date if set
-         var viewDate = $('#viewDate').datepicker('getDate');
-         if (viewDate !== ""){
-            $('#graphcreator-time').datepicker('setDate', viewDate);
-            $('#graphcreator-time2').datepicker('setDate', viewDate);
-         }
-         
-         // Get the currently selected layer
-         var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-         $('#graphcreator-baseurl').val(layer.wcsURL);
-         $('#graphcreator-coverage').val(layer.origName);
-         
-         $('.lPanel').bind('selectedLayer', function(e) {
-            var layer = map.getLayersByName($('.selectedLayer').attr('id'))[0];
-            $('#graphcreator-baseurl').val(layer.wcsURL);
-            $('#graphcreator-coverage').val(layer.origName);
-         });
-         
-         graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
-                           
-         // When selecting the bounding box text field, request user to draw the box to populate values
-         $('#graphcreator-bbox').click(function() {
-            opec.gritter.showNotification('bbox', null);
-         });
-         
-         // Event to open and close the panels when clicked
-         $('.ui-control-header').click(function() {
-            $(this)
-               .toggleClass("ui-control-header-active")
-               .find("> .ui-icon").toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
-               .next().toggleClass("ui-control-content-active").slideToggle();
-            return false;
-         });
-         
-         // Gets the top layer that's checkbox is checked and puts it's ID into the coverage box
-         $('#graphcreator-coverage-button').click(function() {
-            $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
-               if($(this).is(':checked')) {
-                  var layerID = $(this).parent('li').attr('id');
-                  $('#graphcreator-coverage').val(layerID);
-                  var layer = map.getLayersByName(layerID)[0];
-                  $('#graphcreator-baseurl').val(layer.wcsURL);   
-               }
-            });
-   
-            return false;
-         });
-         
-         graphCreator.unbind('.loadGraph').bind('ajaxStart.loadGraph', function() {
-            $(this).find('img[src="img/ajax-loader.gif"]').show();
-         }).bind('ajaxStop.loadGraph', function() {
-            $(this).find('img[src="img/ajax-loader.gif"]').hide();
-         });
-         
-         $('#graphcreator-barwidth-button').click(function() {
-            return false;
-         });
-         
-         // Close histogram, advanced and format panels
-         $('#histogram-inputs-header').trigger('click');
-         $('#advanced-inputs-header').trigger('click');
-         $('#graph-format-header').trigger('click');
-         
-         // Create and display the graph
-         graphCreatorGenerate.on('click', ':button', function(e) {
-            // Extract the date-time value from the datepickers either as single date-time or date-time range
-            var dateRange = $('#graphcreator-time').val();         
-            if ($('#graphcreator-time2').val() !== "") {
-               dateRange += ("/" + $('#graphcreator-time2').val());
-            }
-            
-            var graphXAxis = null,
-            graphYAxis = null;
-            
-            if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
-               graphXAxis = 'Lon';
-               graphYAxis = 'Time';
-            }
-            else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
-               graphXAxis = 'Time';
-               graphYAxis = 'Lat';
-            }
-            
-            var params = {
-               baseurl: $('#graphcreator-baseurl').val(),
-               coverage: $('#graphcreator-coverage').val(),
-               type: $('#graphcreator-type').val(),
-               bins: $('#graphcreator-bins').val(),
-               time: dateRange,
-               bbox: $('#graphcreator-bbox').val(),
-               graphXAxis: graphXAxis,
-               graphYAxis: graphYAxis,
-               graphZAxis: $('#graphcreator-coverage').val()
-            };
-            
-            var request = $.param( params );
-            
-            $.ajax({
-               type: 'GET',
-               url: map.host + map.pywpsLocation + request,
-               dataType: 'json',
-               asyc: true,
-               success: function(data) {
-                  opec.graphs.create(data);
-               },
-               error: function(request, errorType, exception) {
-                  var data = {
-                     type: 'wcs data',
-                     request: request,
-                     errorType: errorType,
-                     exception: exception,
-                     url: this.url
-                  };          
-                  gritterErrorHandler(data);
-               }
-            });
-         }); 
-                  
-         // Open the dialog box
-         graphCreator.extendedDialog('open');
+         opec.window.createGraphCreator();
       }
    };
-}
-
-function sortDates(a, b) {
-   return a[0] - b[0];
-}
+};

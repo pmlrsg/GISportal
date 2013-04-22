@@ -275,7 +275,7 @@ $.widget("ui.multiselect", {
       return uiObject;
    },
    _messages: function(type, msg, params) {
-      console.info("message: " + msg + " " + params);
+      //console.info("message: " + msg + " " + params);
       //this._trigger('messages', null, this._ui('message', type, $.tmpl(msg, params)));
    },
    _refreshDividerLocation: function() {

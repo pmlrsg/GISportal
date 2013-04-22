@@ -3,6 +3,7 @@
 <!-- http://spyrestudios.com/demos/sliding-panel-left/ -->
 <head>
 <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>OPEC Visualisation Portal Prototype</title>
 
 <!-- ============================ Now for the styling ============================ -->
@@ -27,7 +28,7 @@
 <link rel="stylesheet" type="text/css" href="css/timeline.css" />
 
 <!-- jQuery UI dialog extension styling -->
-<link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/>
+<!--<link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/> -->
 
 <!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 
@@ -77,6 +78,10 @@
 
 <!-- mustache -->
 <script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
+
+<!-- heatmapjs -->
+<script type="text/javascript" src="js-libs/heatmapjs/heatmap.js"></script>
+<script type="text/javascript" src="js-libs/heatmapjs/heatmap-openlayers.js"></script>
 
 <!-- dialog -->
 <script type="text/javascript" src="js-libs/dialog.js"></script>
@@ -320,6 +325,7 @@
          </li>
          <li class="divider"></li>
          <li>
+            <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>View Date</legend>
                <input size="10" type="text" name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
@@ -327,6 +333,7 @@
          </li>
          <li class="divider"></li>
          <li>
+            <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>Quick Region</legend>
                <select class="ui-corner-all" id="quickRegion" name="Quick Region">
@@ -364,7 +371,7 @@
    <div class="panel lPanel unselectable">
       <h3 id="layerLbl">Data Layers</h3>
       <div id="layerAccordion" class="ui-helper-reset">
-         <div id="triggerL-toolbar" class="panel-toolbar ui-helper-reset">
+         <div id="opec-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
                <li id="lpanel-tabs" class="ui-corner-top lPanel-buttonSet">
                   <button id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">Operational</button>
@@ -403,81 +410,88 @@
    <!-- The Right Panels -->
    <a class="trigger triggerR unselectable" href="#">Data</a>
    <div class="panel rPanel unselectable">
-      <h3 id="dataLbl">Data Analysis</h3>  
-      <div id="opec-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
-            <ul>
-               <li class="rPanel-buttonSet">                  
-               </li>
-               <!-- Placeholder ROI radio buttons -->
-               <li id="ROIButtonSet">
-                  <input type="radio" id="point" name="radio" value="point" />
-                     <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
-                  <input type="radio" id="box" name="radio" value="box"/>
-                     <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
-                  <input type="radio" id="circle" name="radio" value="circle" />
-                     <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
-                  <input type="radio" id="polygon" name="radio" value="polygon" />
-                     <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
-               </li>
-            </ul>
-      </div>    
-      <div id="dataAccordion">
-         <h3><a href="#">Current R.O.I.</a></h3>
-         <div id="dispROI"></div>
-         <h3><a href="#">Data Tools</a></h3>
-         <div id="dataTools">
-            <div id="dataTabs">
+      <h3 id="dataLbl">Data Analysis</h3>     
+      <div id="dataAccordion" class="ui-helper-reset">
+         <div id="opec-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
+            <!-- Using fieldsets as no easy CSS alternative -->
+            <fieldset>
+               <legend>Data Selection Tools</legend>
                <ul>
-                  <li><a href="#tabs-1">Analyses</a></li>
-                  <li><a href="#tabs-2">Export<br></a></li>
+                  <!-- Placeholder ROI radio buttons -->
+                  <li id="ROIButtonSet">
+                     <input type="radio" id="point" name="radio" value="point" />
+                        <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
+                     <input type="radio" id="box" name="radio" value="box"/>
+                        <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
+                     <input type="radio" id="circle" name="radio" value="circle" />
+                        <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
+                     <input type="radio" id="polygon" name="radio" value="polygon" />
+                        <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
+                  </li>
                </ul>
-               <div id="tabs-1">
-                  <div id="analyses">
-                     <h3><a href="#">Basic Statistics</a></h3>
-                        <table id="bStats">
-                           <tr>
-                              <td>Mean Value:</td>
-                              <td>Two</td>
-                           </tr>
-                           <tr>
-                              <td>Max Value:</td>
-                              <td>Two</td>
-                           </tr>
-                           <tr>
-                              <td>Min Value:</td>
-                              <td>Two</td>
-                           </tr>
-                           <tr>
-                              <td>Std.Dev.:</td>
-                              <td>Two</td>
-                           </tr>
-                        </table>
-                     <h3><a href="#">Spatial Analysis</a></h3>
-                     <div id="spatial">
-                        <h3><a href="#">Thresholding</a></h3>
-                        <div id="threshold"></div>
-                        <h3><a href="#">Data Correlation</a></h3>
-                        <div id="dCorr"></div> 
-                     </div> 
-                     <h3><a href="#">Temporal Analysis</a></h3>
-                     <div id="temporal">
-                        <h3><a href="#">Time Series</a></h3>
-                        <div id="tSeries"></div>
-                        <h3><a href="#">Interannual Variability</a></h3>
-                        <div id="IAVar"></div>
-                     </div> 
-                     <h3><a href="#">Risk Analysis</a></h3>
-                     <div id="risk"></div> 
-                  </div>
+            </fieldset>
+         </div> 
+         <div id="opec-rPanel-content" class="ui-corner-all">
+            <div class="opec-tab-content">
+               <h3><a href="#">Current R.O.I.</a></h3>
+               <div id="dispROI"><span>No Selection</span></div>
+               <h3><a href="#">Data Tools</a></h3>
+               <div id="dataTools">
+                  <div id="dataTabs">
+                     <ul>
+                        <li><a href="#tabs-1">Analyses</a></li>
+                        <li><a href="#tabs-2">Export<br></a></li>
+                     </ul>
+                     <div id="tabs-1">
+                        <div id="analyses">
+                           <h3><a href="#">Basic Statistics</a></h3>
+                              <table id="bStats">
+                                 <tr>
+                                    <td>Mean Value:</td>
+                                    <td>Two</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Max Value:</td>
+                                    <td>Two</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Min Value:</td>
+                                    <td>Two</td>
+                                 </tr>
+                                 <tr>
+                                    <td>Std.Dev.:</td>
+                                    <td>Two</td>
+                                 </tr>
+                              </table>
+                           <h3><a href="#">Spatial Analysis</a></h3>
+                           <div id="spatial">
+                              <h3><a href="#">Thresholding</a></h3>
+                              <div id="threshold"></div>
+                              <h3><a href="#">Data Correlation</a></h3>
+                              <div id="dCorr"></div> 
+                           </div> 
+                           <h3><a href="#">Temporal Analysis</a></h3>
+                           <div id="temporal">
+                              <h3><a href="#">Time Series</a></h3>
+                              <div id="tSeries"></div>
+                              <h3><a href="#">Interannual Variability</a></h3>
+                              <div id="IAVar"></div>
+                           </div> 
+                           <h3><a href="#">Risk Analysis</a></h3>
+                           <div id="risk"></div> 
+                        </div>
+                     </div>
+                     <div id="tabs-2">
+                        <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+                     </div>
+                  </div>      
                </div>
-               <div id="tabs-2">
-                  <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-               </div>
-            </div>      
+            </div>
          </div>
       </div>
       <div style="clear: both;"> </div>
    </div>
+   <!-- 
    <div class="toolbar" id="mapOptions">
       <div id="viewtoggle">
          <ul id="controlToggle">
@@ -496,7 +510,8 @@
             <li class="divider"></li>
          </ul>
        </div>
-   </div>
+   </div> -->
+   <!-- Share Options Panel, appears after the share options button has been clicked  -->
    <div class="toolbar" id="shareOptions">
    	<h3>Share</h3>
       <div>
@@ -511,6 +526,7 @@
       EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
       <div style="clear: both;"> </div>
    </div>
+   <!-- Map Info Dialog -->
    <div id="mapInfo" title="MapInfo">
       <div>
          <span id="latlng"></span>
@@ -519,10 +535,12 @@
          <span id="mapInfo-Projection"></span>
       </div>
    </div>
+   <!-- Layer Selection Dialog -->
    <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
       <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
       <div id="layers"></div>
    </div>
+   <!-- D3 Timeline -->
    <div id="timeline" class="timelineDiv">
    </div>
    <div id="dThree" title="D3 Test"></div>

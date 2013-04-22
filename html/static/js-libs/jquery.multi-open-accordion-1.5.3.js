@@ -46,42 +46,43 @@
 			$div = $this.children('div');	
 				
 			$this.addClass(options.classes.accordion);	
-			
-			var buttonPane = $('<div class="' +options.classes.buttonPane+ '"></div>');
-			$(buttonPane)
-			   .append('<a class="' +options.classes.buttons.close+ '" href="#"><span class="ui-icon ' +options.icons.close+ '">close</span></a>')
-			   .append('<a class="' +options.classes.buttons.dropdown+ '" href="#"><span class="ui-icon ' +options.icons.dropdown+ '">dropdown</span></a>')
-			   .find('.ui-accordion-header-close,.ui-accordion-header-dropdown')
-               .attr("role", "button")
-               .mouseover(function(){ $(this).addClass("ui-state-hover"); })
-               .mouseout(function(){ $(this).removeClass("ui-state-hover"); })
-               .focus(function(){ $(this).addClass("ui-state-focus"); })
-               .blur(function(){ $(this).removeClass("ui-state-focus"); })
-            .end()
-            .find('.ui-accordion-header-close')
-               .each(function() {
-                  if(typeof options.showClose !== "undefined" && $.isFunction(options.showClose))
-                     options.showClose(options.$panel) ? $(this).show() : $(this).hide();
-               })
-               .click(function() {
-                  if(options.events.close) { options.events.close($div.attr('id')); }
-                  return false;
-               })
-            .end()
-            .find('.ui-accordion-header-dropdown')
-               .click(function(e) {
-                  e.preventDefault();
-                  if(options.events.dropdown) { options.events.dropdown($this); }
-                  return false;
-               })
-            .end();
-            
-         var span = $('<span class="' + options.classes.span +'"></span>');
-         var inputText = $('<input type="text" />').hide().addClass('ui-accordion-header-rename-box').click(function() { return false; });
-         var enterText = $('<button></button>').button({ label: 'ok', text: true }).hide().addClass('ui-accordion-header-rename-confirm');
 				
 			$h3.each(function(index) {
 				var $this = $(this);
+				
+           var buttonPane = $('<div class="' +options.classes.buttonPane+ '"></div>');
+            $(buttonPane)
+               .append('<a class="' +options.classes.buttons.close+ '" href="#"><span class="ui-icon ' +options.icons.close+ '">close</span></a>')
+               .append('<a class="' +options.classes.buttons.dropdown+ '" href="#"><span class="ui-icon ' +options.icons.dropdown+ '">dropdown</span></a>')
+               .find('.ui-accordion-header-close,.ui-accordion-header-dropdown')
+                  .attr("role", "button")
+                  .mouseover(function(){ $(this).addClass("ui-state-hover"); })
+                  .mouseout(function(){ $(this).removeClass("ui-state-hover"); })
+                  .focus(function(){ $(this).addClass("ui-state-focus"); })
+                  .blur(function(){ $(this).removeClass("ui-state-focus"); })
+               .end()
+               .find('.ui-accordion-header-close')
+                  .each(function() {
+                     if(typeof options.showClose !== "undefined" && $.isFunction(options.showClose))
+                        options.showClose(options.$panel) ? $(this).show() : $(this).hide();
+                  })
+                  .click(function() {
+                     if(options.events.close) { options.events.close($div.attr('id')); }
+                     return false;
+                  })
+               .end()
+               .find('.ui-accordion-header-dropdown')
+                  .click(function(e) {
+                     e.preventDefault();
+                     if(options.events.dropdown) { options.events.dropdown($this); }
+                     return false;
+                  })
+               .end();
+               
+            var span = $('<span class="' + options.classes.span +'"></span>');
+            var inputText = $('<input type="text" />').hide().addClass('ui-accordion-header-rename-box').click(function() { return false; });
+            var enterText = $('<button></button>').button({ label: 'ok', text: true }).hide().addClass('ui-accordion-header-rename-confirm');
+							
 				$this.addClass(options.classes.h3).prepend(span, inputText, enterText).append(buttonPane);
 				if(self._isActive(index)) {
 					self._showTab($this)

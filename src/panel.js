@@ -319,7 +319,7 @@ opec.rightPanel.setup = function() {
    
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#dataAccordion").multiOpenAccordion({
+   $("#opec-rPanel-content").children('div').multiOpenAccordion({
       active: [0, 1]
    });
    
@@ -354,9 +354,6 @@ opec.rightPanel.setupDrawingControls = function() {
          fillOpacity : 0.3,
          pointRadius: 5
       },
-      /**
-       * @constructor 
-       */
       preFeatureInsert : function(feature) {
          this.removeAllFeatures();
       },
@@ -467,60 +464,28 @@ opec.rightPanel.setupDrawingControls = function() {
             break;
       }
    }
-
-   // Function which can toggle OpenLayers controls based on the clicked control
-   // The value of the value of the underlying radio button is used to match 
-   // against the key value in the mapControls array so the right control is toggled
-   function toggleControl(element) {
-      for(var key in mapControls) {
-         var control = mapControls[key];
-         if($(element).val() == key) {
-            $('#'+key).attr('checked', true);
-            control.activate();
-         }
-         else {
-            $('#'+key).attr('checked', false);
-            control.deactivate();
-         }
-      }
-      $('#panZoom input:radio').button('refresh');
-   }
-
+   
+   opec.mapControls.point = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point);
+   opec.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
+   opec.mapControls.circle = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false});
+   opec.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon);
+   
+   map.addControls([opec.mapControls.point, opec.mapControls.box, opec.mapControls.circle, opec.mapControls.polygon]);
+   
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
-      toggleControl(element);
+      opec.toggleControl(element);
       vectorLayer.removeAllFeatures();
       map.ROI_Type = element.value;
       // DEBUG
-      console.info(map.ROI_Type);
+      //console.info(map.ROI_Type);
    }
-
-   /* 
-   Set up event handling for the map including as well as mouse-based 
-   OpenLayers controls for jQuery UI buttons and drawing controls
-   */
-
-   // Create map controls identified by key values which can be activated and deactivated
-   var mapControls = {
-      zoomIn: new OpenLayers.Control.ZoomBox(
-         { out: false, alwaysZoom: true }
-      ),
-      zoomOut: new OpenLayers.Control.ZoomBox(
-         { out: true, alwaysZoom: true }
-      ),
-      pan: new OpenLayers.Control.Navigation(),
-      point: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point),
-      box: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }}),
-      circle: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false}),
-      polygon: new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon)
-   };
-
-   // Add all the controls to the map
-   for (var key in mapControls) {
-      var control = mapControls[key];
-      map.addControl(control);
-   }
-
+   
+   // Manually Handle drawing control radio buttons click event - each button has a class of "iconBtn"
+   $('#ROIButtonSet input:radio').click(function(e) {
+      toggleDrawingControl(this);
+   });
+   
    // TRAC Ticket #58: Fixes flaky non-selection of jQuery UI buttons (http://bugs.jqueryui.com/ticket/7665)
    $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
       function(e) { h.disabled && ( e.preventDefault(), e.stopImmediatePropagation() ); }
@@ -532,15 +497,4 @@ opec.rightPanel.setupDrawingControls = function() {
       }
       $(this).removeClass('opec_click');
    }); 
-
-   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
-   $('#panZoom input:radio').click(function(e) {
-      toggleControl(this);
-   });
-
-   // Manually Handle drawing control radio buttons click event - each button has a class of "iconBtn"
-   $('#ROIButtonSet input:radio').click(function(e) {
-      toggleDrawingControl(this);
-   });
-
 };

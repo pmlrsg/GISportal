@@ -12,15 +12,101 @@ var opec = opec || (opec = {});
  */
 var map;
 
+// Stores the data provided by the master cache file on the server. This 
+// includes layer names, titles, abstracts, etc.
+opec.cache = {};
+opec.cache.wmsLayers = [];
+opec.cache.wfsLayers = [];
+
 /**
- * Creates an opec.MicroLayer Object (layers in the selector but not yet map layers)
+ * Map function to get the master cache JSON files from the server and then 
+ * start layer dependent code asynchronously
+ */
+opec.loadLayers = function() { 
+   
+   var errorHandling = function(request, errorType, exception) {
+      var data = {
+         type: 'master cache',
+         request: request,
+         errorType: errorType,
+         exception: exception,
+         url: this.url
+      };  
+      gritterErrorHandler(data); 
+   };
+    
+   // Get WMS and WFS caches
+   opec.genericAsyc('./cache/mastercache.json', opec.initWMSlayers, errorHandling, 'json', {}); 
+   opec.genericAsyc('./cache/wfsMasterCache.json', opec.initWFSLayers, errorHandling, 'json', {});
+};
+
+opec.getFeature = function(layer, time) {
+   
+   var errorHandling = function(request, errorType, exception) {
+      var data = {
+         type: 'getFeature',
+         request: request,
+         errorType: errorType,
+         exception: exception,
+         url: this.url
+      };  
+      gritterErrorHandler(data); 
+   };
+  
+   var featureID = layer.WFSDatesToIDs[time];   
+   var updateLayer = function(data, opts) {
+      var output = data.output;
+      var pos = output.position.split(' ');
+      var point = new OpenLayers.Geometry.Point(pos[1], pos[0]);
+      var feature = new OpenLayers.Feature.Vector(point, {
+         message: $('<div/>').html(output.content).html(),
+         location: 'Lon: ' + pos[1] + ' Lat: ' + pos[0] 
+      });
+      layer.addFeatures(feature);
+   };
+   
+   var params = {
+      baseurl: layer.url,
+      request: 'GetFeature',
+      version: '1.1.0',
+      featureID: featureID,
+      typeName: layer.urlName
+   };   
+   var request = $.param(params);   
+   
+   opec.genericAsyc(map.pywfsLocation + request, updateLayer, errorHandling, 'json', {layer: layer}); 
+};
+
+/**
+ * Generic Asyc Ajax to save having lots of different ones all over the place.
+ * 
+ * @param {string} url - The url to use as part of the ajax call
+ * @param {Function} success - Called if everything goes ok.
+ * @param {Function} error - Called if problems arise from the ajax call.
+ */
+opec.genericAsyc = function(url, success, error, dataType, opts) {
+   //var map = this;
+   $.ajax({
+      type: 'GET',
+      url: url, 
+      dataType: dataType,
+      asyc: true,
+      cache: false,
+      success: function(data) { success(data, opts); },
+      error: error
+   });
+};
+
+/**
+ * Creates an opec.MicroLayer Object (layers in the selector but not yet map 
+ * layers)
  * 
  * @constructor
  * @param {string} name - The layer name (unescaped)
  * @param {string} title - The title of the layer
  * @param {string} abstract - The abstract information for the layer
- * @param {string} firstDate - The first date for which data is available for the layer
- * @param {string} lastDate - The last date for which data is available for the layer
+ * @param {string} firstDate - The first date for which data is available
+ * @param {string} lastDate - The last date for which data is available
  * @param {string} serverName - The server name which serves the layer
  * @param {string} wmsURL - The URL for the WMS service
  * @param {string} wcsURL - The URL for the WCS service
@@ -102,19 +188,112 @@ opec.createBaseLayers = function() {
 opec.createRefLayers = function() {  
    opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
    
+   $.each(opec.cache.wfsLayers, function(i, item) {
+      if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
+         var url = item.url;
+         $.each(item.layers, function(i, item) {
+            if (item.times !== 'undefined' && typeof item.name !== 'undefined') {
+               createRefLayer(item, url);
+            }
+         });
+      } 
+   });
+   
+   function createRefLayer(layer, url) {
+      var wfsLayer = new OpenLayers.Layer.Vector(layer.name, { 
+            //protocol: new OpenLayers.Protocol.WFS({
+            //   version: '1.0.0',
+            //   url: url,
+            //   featureType: layer.name
+               //featureid: function() { return this.WFSDatesToIDs[$('#viewDate').datepicker('getDate')]; }
+            //}),
+            projection: lonlat,
+            styleMap: new OpenLayers.StyleMap({
+               'default':{
+                  strokeColor: "#00FF00",
+                  strokeOpacity: 1,
+                  strokeWidth: 3,
+                  fillColor: "#FF5500",
+                  fillOpacity: 0.5,
+                  pointRadius: 6,
+                  pointerEvents: "visiblePainted",             
+                  fontSize: "12px",
+                  fontFamily: "Courier New, monospace",
+                  fontWeight: "bold",
+                  labelOutlineColor: "white",
+                  labelOutlineWidth: 3
+               }
+            }),
+            eventListeners: {
+               'featureselected': function(event) {
+                  var feature = event.feature;
+                  var popup = new OpenLayers.Popup.FramedCloud("popup",
+                     OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
+                     null,
+                     feature.attributes.message + "<br>" + feature.attributes.location,
+                     null,
+                     true,
+                     null
+                  );
+                  popup.autoSize = true;
+                  popup.maxSize = new OpenLayers.Size(400, 500);
+                  popup.fixedRelativePosition = true;
+                  feature.popup = popup;
+                  map.addPopup(popup);
+               },
+               'featureunselected': function(event) {
+                  var feature = event.feature;
+                  map.removePopup(feature.popup);
+                  feature.popup.destroy();
+                  feature.popup = null;
+               }
+            }
+         }, {
+            typeName: layer.name, format: 'image/png', transparent: true, 
+            exceptions: 'XML', version: '1.0', layers: '1'
+         }
+      ); 
+      
+      opec.mapControls.selector.setLayer(wfsLayer);
+      
+      if (layer.times.length) {
+         wfsLayer.temporal = true;
+         var times = [];
+         var dateToIDLookup = {};
+         for(var i = 0; i < layer.times.length; i++) {
+            var time = layer.times[i];
+            times.push(time.startdate);
+            dateToIDLookup[time.startdate] = time.id;          
+         }
+         wfsLayer.DTCache = times;
+         wfsLayer.WFSDatesToIDs = dateToIDLookup;
+         //layer.firstDate = opec.utils.displayDateString(datetimes[0].startdate);
+         //layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1].startdate);
+      }
+   
+      wfsLayer.urlName = layer.name.replace('-', ':');
+      // Make this layer a reference layer
+      wfsLayer.controlID = "refLayers";
+      wfsLayer.setVisibility(false);
+      wfsLayer.displayTitle = layer.name;
+      wfsLayer.url = url;
+      map.addLayer(wfsLayer);
+      opec.leftPanel.addLayerToGroup(wfsLayer, $('#refLayerGroup'));
+   }
+   
    var colourFunc = function(feature) {
       var colourLookup = {
-         'AMT12 Cruise Track': 'blue',
-         'AMT13 Cruise Track': 'aqua',
-         'AMT14 Cruise Track': 'lime',
-         'AMT15 Cruise Track': 'magenta',
-         'AMT16 Cruise Track': 'red',
-         'AMT17 Cruise Track': 'orange',
-         'AMT19 Cruise Track': 'yellow'
+         'AMT 12 track': 'blue',
+         'AMT 13 track': 'aqua',
+         'AMT 14 track': 'lime',
+         'AMT 15 track': 'magenta',
+         'AMT 16 track': 'red',
+         'AMT 17 track': 'orange',
+         'AMT 19 track': 'yellow'
       };
       
       if ($.inArray(feature, colourLookup))
-         return colourLookup[feature];
+         return colourLookup[feature.attributes.Name];
    };
    
    // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
@@ -181,7 +360,7 @@ opec.createRefLayers = function() {
  * be used in the layer selector.
  */
 opec.createOpLayers = function() {
-   $.each(map.getCapabilities, function(i, item) {
+   $.each(opec.cache.wmsLayers, function(i, item) {
       // Make sure important data is not missing...
       if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL !== "undefined" && typeof item.serverName !== "undefined") {
          var wmsURL = item.wmsURL;
@@ -213,7 +392,7 @@ opec.isSelected = function(name) {
 };
 
 /**
- * Checks if a layer name is unique
+ * Checks if a layer name is unique recursively
  * 
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
@@ -251,14 +430,15 @@ opec.createOpLayer = function(layerData, microLayer) {
    );
 
    // Get the time dimension if this is a temporal layer
+   // or elevation dimension
    $.each(layerData.Dimensions, function(index, value) {
       var dimension = value;
       if (value.Name.toLowerCase() == 'time') {
          layer.temporal = true;
          var datetimes = dimension.Value.split(',');
          layer.DTCache = datetimes;
-         layer.firstDate = opec.util.displayDateString(datetimes[0]);
-         layer.lastDate = opec.util.displayDateString(datetimes[datetimes.length - 1]);
+         layer.firstDate = opec.utils.displayDateString(datetimes[0]);
+         layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1]);
       }
       else if (value.Name.toLowerCase() == 'elevation') {
          layer.elevation = true;
@@ -366,8 +546,7 @@ opec.checkLayerState = function(layer) {
 };
 
 /**
- * Start mapInit() - the main function for setting up the map
- * plus its controls, layers, styling and events.
+ * Sets up the map, plus its controls, layers, styling and events.
  */
 function mapInit() 
 {
@@ -384,17 +563,43 @@ function mapInit()
 
    // Get the master cache file from the server. This file contains some of 
    // the data from a getCapabilities query.
-   map.getMasterCache();
+   opec.loadLayers();
 
    // Create the base layers and then add them to the map
    opec.createBaseLayers();
    // Create the reference layers and then add them to the map
-   opec.createRefLayers();
+   //opec.createRefLayers();
 
    // Add a couple of useful map controls
    //var mousePos = new OpenLayers.Control.MousePosition();
    //var permalink =  new OpenLayers.Control.Permalink();
    //map.addControls([mousePos,permalink]);
+   
+   /* 
+    * Set up event handling for the map including as well as mouse-based 
+    * OpenLayers controls for jQuery UI buttons and drawing controls
+    */
+   
+   // Create map controls identified by key values which can be activated and deactivated
+   opec.mapControls = {
+      zoomIn: new OpenLayers.Control.ZoomBox(
+         { out: false, alwaysZoom: true }
+      ),
+      zoomOut: new OpenLayers.Control.ZoomBox(
+         { out: true, alwaysZoom: true }
+      ),
+      pan: new OpenLayers.Control.Navigation(),
+      selector: new OpenLayers.Control.SelectFeature([], {
+         hover: false,
+         autoActive: true
+      })
+   };
+
+   // Add all the controls to the map
+   for (var key in opec.mapControls) {
+      var control = opec.mapControls[key];
+      map.addControl(control);
+   }
 
    if(!map.getCenter())
       map.zoomTo(3);
@@ -403,14 +608,20 @@ function mapInit()
 /**
  * Anything that needs to be done after the layers are loaded goes here.
  */ 
-function layerDependent(data)
-{
-   map.getCapabilities = data;
+opec.initWMSlayers = function(data, opts) {
+   opec.cache.wmsLayers = data;
+   // Create WMS layers from the data
    opec.createOpLayers();
-
+   
    //var ows = new OpenLayers.Format.OWSContext();
    //var doc = ows.write(map);
-}
+};
+
+opec.initWFSLayers = function(data, opts) {
+   opec.cache.wfsLayers = data;
+   // Create WFS layers from the data
+   opec.createRefLayers();
+};
 
 /*===========================================================================*/
 
@@ -585,6 +796,42 @@ function nonLayerDependent()
    $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
    $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
    $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
+   
+   // Function which can toggle OpenLayers controls based on the clicked control
+   // The value of the value of the underlying radio button is used to match 
+   // against the key value in the mapControls array so the right control is toggled
+   opec.toggleControl = function(element) {
+      for(var key in opec.mapControls) {
+         var control = opec.mapControls[key];
+         if($(element).val() == key) {
+            $('#'+key).attr('checked', true);
+            control.activate();
+            
+            if(key == 'pan') {
+               opec.mapControls.selector.activate();
+            }
+         }
+         else {
+            if(key != 'selector') {
+               if(key == 'pan') {
+                  opec.mapControls.selector.deactivate();
+               }
+               
+               $('#'+key).attr('checked', false);
+               control.deactivate();
+            }
+         }
+      }
+      $('#panZoom input:radio').button('refresh');
+   };
+   
+   // Making sure the correct controls are active
+   opec.toggleControl($('#panZoom input:radio'));
+
+   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
+   $('#panZoom input:radio').click(function(e) {
+      opec.toggleControl(this);
+   });
 
    //--------------------------------------------------------------------------
    
@@ -793,6 +1040,7 @@ function main()
       }
    });
    
+   /*
    $("#dThree").extendedDialog({
       position: ['center', 'center'],
       width: 1000,
@@ -804,7 +1052,7 @@ function main()
       dblclick: "collapse"
    });
    
-   addDThreeGraph();
+   addDThreeGraph();*/
    
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
    $('#this-Is-A-Prototype').extendedDialog({
@@ -837,10 +1085,11 @@ function main()
    nonLayerDependent();
 }
 
-// Used to get the value of a point back. Needed until WCS version is implemented. 
 // --------------------------------------------------------------------------------------------------
 /**
- * @constructor
+ * Temporary used to get the value of a point back. Needed until WCS version is 
+ * implemented. 
+ * 
  * @param {Object} event
  */
 function getFeatureInfo(event) {

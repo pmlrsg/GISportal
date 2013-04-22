@@ -1,4 +1,6 @@
 /*!
+ * This is a modified version of jQueryUI's dialog.js
+ * 
  * jQuery UI Dialog 1.10.1
  * http://jqueryui.com
  *
@@ -11,11 +13,13 @@
  * Depends:
  * jquery.ui.core.js
  * jquery.ui.widget.js
- *  jquery.ui.button.js
+ * jquery.ui.button.js
  * jquery.ui.draggable.js
  * jquery.ui.mouse.js
  * jquery.ui.position.js
  * jquery.ui.resizable.js
+ * 
+ * 
  */
 ( function($, undefined) {
 
@@ -298,7 +302,8 @@
          // remember original state
          that._saveSnapshot();
          
-         console.log(this.options);
+         // DEBUG
+         //console.log(this.options);
 
          // move dialog from body to container (at lower-left-hand corner)
          that.uiDialog.css({
@@ -647,8 +652,9 @@
                .css("white-space", original.titlebar.wrap)
             .end()
             .find(".ui-dialog-content");
-            
-         console.log(original);
+          
+         // DEBUG  
+         //console.log(original);
             
          // restore config & size
          that.options.resizable = original.config.resizable;

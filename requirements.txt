@@ -1,1 +1,2 @@
 isodate==0.4.9
+BeautifulSoup==3.2.1

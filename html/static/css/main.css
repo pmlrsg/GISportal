@@ -269,6 +269,7 @@ ul li {
    background:url(../img/data.png) no-repeat;
    padding-left: 30px;
    margin-right: 100px;
+   margin-left: 10px;
 }
 
 .lPanel {
@@ -374,9 +375,16 @@ a.active.triggerR {
 }
 
 .panel-toolbar {
+   color: #CCCCCC;
    background: #333333;
    border: #333333;
    overflow: hidden;
+}
+
+.panel-toolbar fieldset {
+   margin-left: 2px;
+   margin-right: 2px;
+   margin-bottom: 5px;
 }
 
 #triggerL-buttonset {
@@ -399,6 +407,14 @@ a.active.triggerR {
 }
 
 #opec-lPanel-content {
+   background: #FFFFFF;
+   color: black;
+   height: auto;
+   overflow-y: auto; 
+   min-width: 290px;
+}
+
+#opec-rPanel-content {
    background: #FFFFFF;
    color: black;
    height: auto;
@@ -694,6 +710,7 @@ div .sensor-accordion {
 .ui-accordion .ui-accordion-icons {
    padding-left: 2.2em;
    padding-right: 4.0em;
+   margin: 0px;
 }
 .ui-accordion .ui-accordion-content { padding: 0.3em; position: static; overflow: hidden; }
 .ui-accordion .ui-state-active { background: none repeat scroll 0 0 #E9E9E9; }

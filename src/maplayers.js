@@ -7,13 +7,14 @@
 // Flask host
 OpenLayers.Map.prototype.host = "";
 
-OpenLayers.Map.prototype.pywpsLocation = '/service/wcs2json/wcs?';
+OpenLayers.Map.prototype.pywcsLocation = '/service/wcs2json/wcs?';
+OpenLayers.Map.prototype.pywfsLocation = '/service/wfs2json/wfs?';
 
 // Not all browsers have webGL
 OpenLayers.Map.prototype.cesiumLoaded = null;
 
 // A list of layer names that will be selected by default
-OpenLayers.Map.prototype.sampleLayers = ["MRCS_ECOVARS-no3", "MRCS_ECOVARS-chl", "v_wind", "CRW_SST" ];
+OpenLayers.Map.prototype.sampleLayers = ["no3", "chl", "v_wind", "CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -91,6 +92,8 @@ OpenLayers.Layer.prototype.boundingBox = [];
 // Holds cached date-times as array of ISO8601 strings for each layer based on data availability
 OpenLayers.Layer.prototype.DTCache = [];
 
+OpenLayers.Layer.prototype.WFSDatesToIDs = {};
+
 // Holds cached elevation numbers as an array
 OpenLayers.Layer.prototype.elevationCache = [];
 
@@ -131,26 +134,32 @@ OpenLayers.Layer.prototype.matchDate = function (thedate) {
 /**
  * Select the given temporal layer on the Map based on JavaScript date input
  * 
- * @param {Object} lyr - The OpenLayers.Layer object to select
+ * @param {Object} layer - The OpenLayers.Layer object to select
  * @param {Date} thedate - The currently selected view data as a JavaScript Date object
  *
  */
-OpenLayers.Map.prototype.selectDateTimeLayer = function(lyr, thedate) {
-   var layer = lyr;
-   if(thedate){
-      var uidate = opec.util.ISODateString(thedate);
+OpenLayers.Map.prototype.selectDateTimeLayer = function(layer, thedate) {
+   if(thedate) {
+      var uidate = opec.utils.ISODateString(thedate);
       var mDate = layer.matchDate(uidate);
-      if(mDate){
-         lyr.currentDateTimes = mDate;
+      if(mDate) {
+         layer.currentDateTimes = mDate;
          // Choose 1st date in the matched date-times for the moment - will expand functionality later
-         lyr.selectedDateTime = mDate[0];
-         layer.mergeNewParams({time: lyr.selectedDateTime});
+         layer.selectedDateTime = mDate[0];
+         
+         if(layer.controlID == 'opLayers')
+            layer.mergeNewParams({time: layer.selectedDateTime});
+         else {    
+            layer.removeAllFeatures();      
+            opec.getFeature(layer, layer.selectedDateTime);
+         }
+         
          layer.setVisibility(layer.selected);
-         console.info('Layer ' + layer.name + ' data available for date-time ' + lyr.selectedDateTime + '. Layer selection and display: ' + layer.selected);
+         console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
       }
       else{
-         lyr.currentDateTimes = [];
-         lyr.selectedDateTime = '';
+         layer.currentDateTimes = [];
+         layer.selectedDateTime = '';
          layer.setVisibility(false);
          console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
       }
@@ -192,7 +201,7 @@ OpenLayers.Map.prototype.refreshDateCache = function() {
       }
    });
    
-   map.enabledDays = opec.util.arrayDeDupe(map.enabledDays);
+   map.enabledDays = opec.utils.arrayDeDupe(map.enabledDays);
    
    // Re-filter the layers by date now the date cache has changed
    // DEBUG
@@ -208,7 +217,7 @@ OpenLayers.Map.prototype.refreshDateCache = function() {
  */
 OpenLayers.Map.prototype.allowedDays = function(thedate) {
    var themap = this;
-   var uidate = opec.util.ISODateString(thedate);
+   var uidate = opec.utils.ISODateString(thedate);
    // Filter the datetime array to see if it matches the date using jQuery grep utility
    var filtArray = $.grep(themap.enabledDays, function(dt, i) {
       var datePart = dt.substring(0, 10);
@@ -221,31 +230,6 @@ OpenLayers.Map.prototype.allowedDays = function(thedate) {
    else {
       return [false];
    }
-};
-
-/**
- * Map function to get the master cache JSON file from the server and then start layer dependent code asynchronously
- */
-OpenLayers.Map.prototype.getMasterCache = function() {
-   var map = this;
-   $.ajax({
-      type: 'GET',
-      url: "./cache/mastercache.json", 
-      dataType: 'json',
-      asyc: true,
-      cache: false,
-      success: layerDependent,
-      error: function(request, errorType, exception) {
-         var data = {
-            type: 'master cache',
-            request: request,
-            errorType: errorType,
-            exception: exception,
-            url: this.url
-         };          
-         gritterErrorHandler(data);
-      }
-   });
 };
 
 /**

@@ -1,5 +1,4 @@
 /**
- * @brief
  * OPEC.Timeline is an interactive visualisation widget to visualise date-time ranges
  * with a start and end date and detail dates in between as timelines on a chart based around
  * d3.js (http://d3js.org/), a JavaScript library for manipulating documents based on data.
@@ -45,38 +44,16 @@
  *
  */
 
-/*
-* TODO
-*
-*/
-
 /**
- * Helper function which returns the nearest value in an array to a given value
+ * The TimeLine is a visualisation chart to visualise events in time. 
  *
- * @param {number|Array}   arr   The array of integers to search within
- * @param {number}         goal  The value for which to find the nearest
- *
- * @return {number} Returns the value of the nearest number in the array
- */
-getNearestInArray = function(arr, goal) {
-   var closest = null;
-   $.each(arr, function(i, e) {
-      if (closest === null || Math.abs(e - goal) < Math.abs(closest - goal)) {
-         closest = e;
-      }
-   });
-   return closest;
-};
-
-/**
  * @constructor TimeLine
- * The TimeLine is a visualisation chart to visualise events in time.
  *
  * @param {string}   id       The DOM element id in which the timeline will be created.
  * @param {Object}   options  Timeline options in JSON format
  */
 opec.TimeLine = function(id, options) {
-
+ 
    // Use "self" to refer to this instance of the OPEC.TimeLine object
    var self = this;
 
@@ -106,22 +83,46 @@ opec.TimeLine = function(id, options) {
    var minDate = d3.min(this.timebars, function(d) { return new Date(d.startDate); });
    var maxDate = d3.max(this.timebars, function(d) { return new Date(d.endDate); });
    // Set some default max and min dates if no initial timebars (6 months either side of selected date)
-   if (typeof minDate === 'undefined' || minDate === null ){
+   if (typeof minDate === 'undefined' || minDate === null ) {
       minDate = new Date(this.selectedDate.getTime() - 15778450000);
    }
-   if (typeof maxDate === 'undefined' || maxDate === null ){
+   if (typeof maxDate === 'undefined' || maxDate === null ) {
       maxDate = new Date(this.selectedDate.getTime() + 15778450000);
    }
    // Set initial y scale
    this.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]);
+   
+   this.clickDate = function(d, i) {
+      var x = d3.event.layerX;      
+      // Prevent dragging the selector off-scale
+      x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.layerX);
+      // Now update the date based on the new value of x
+      self.draggedDate = self.xScale.invert(x);
+      // Move the graphical marker
+      self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
+      
+      self.selectedDate = self.draggedDate;
+      // **Update the OPEC map**
+      // Change the selected date in the datepicker control
+      $('#viewDate').datepicker('setDate', self.selectedDate);
+      // Filter the layer data to the selected date
+      map.filterLayersByDate(self.selectedDate);
+      // console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
+   };
 
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom().x(this.xScale).on('zoom', function() { self.redraw(); });
-   this.chart = d3.select('div#' + this.id).append('svg').attr('class', 'timeline').call(self.zoom);
-
+   this.chart = d3.select('div#' + this.id)
+      .append('svg')
+      .attr('class', 'timeline')
+      .on('click', self.clickDate )
+      .call(self.zoom);
+      
    // Create the graphical drawing area for the widget (main)
-   this.main = this.chart.append('svg:g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')').attr('class', 'main');
+   this.main = this.chart.append('svg:g')
+      .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')')
+      .attr('class', 'main');
 
    // Separator line drawing initialisation
    this.separatorArea = this.main.append('svg:g');
@@ -158,12 +159,13 @@ opec.TimeLine = function(id, options) {
       map.filterLayersByDate(self.selectedDate);
       // console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
    };
+
    // Initialise the selected date-time marker and handle dragging via a callback
    this.selectedDateLine = this.main.append('svg:rect').attr('cursor', 'e-resize').attr('class', 'selectedDateLine')
       .call(
          d3.behavior.drag().origin(Object)
          .on('drag', self.dragDate)
-         .on('dragend', self.dragDateEnd)
+         .on('dragend', self.dragDateEnd)    
    );
 
    // X-axis intialisation

@@ -2,17 +2,17 @@
  * Custom JavaScript functionality
  * @namespace
  */
-opec.util = {};
+opec.utils = {};
 
 /**
  * An extremely handy PHP function ported to JS, works well for templating
  * 
  * @param {(string|Array)} search - A list of things to search for
  * @param {(string|Array)} replace - A list of things to replace the searches with
- * @param {(string)} subject - The string to search
+ * @param {string} subject - The string to search
  * @return {string} The resulting string
  */  
-opec.util.replace = function(search, replace, subject, count) {
+opec.utils.replace = function(search, replace, subject, count) {
    var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
       f = [].concat(search),
       r = [].concat(replace),
@@ -20,26 +20,24 @@ opec.util.replace = function(search, replace, subject, count) {
       ra = r instanceof Array, sa = s instanceof Array;
    s = [].concat(s);
    
-   if(count){
+   if(count) {
       this.window[count] = 0;
    }
 
-   for(i = 0, sl = s.length; i < sl; i++){
-      
-      if(s[i] === ''){
+   for(i = 0, sl = s.length; i < sl; i++) {      
+      if(s[i] === '') {
          continue;
       }
       
-      for (j = 0, fl = f.length; j < fl; j++){
-         
+      for (j = 0, fl = f.length; j < fl; j++) {     
+             
          temp = s[i] + '';
          repl = ra ? (r[j] !== undefined ? r[j] : '') : r[0];
          s[i] = (temp).split(f[j]).join(repl);
          
-         if(count && s[i] !== temp){
+         if(count && s[i] !== temp) {
             this.window[count] += (temp.length-s[i].length) / f[j].length;
-         }
-         
+         }       
       }
    }
    
@@ -49,7 +47,7 @@ opec.util.replace = function(search, replace, subject, count) {
 /**
  * Extension to JavaScript Arrays to de-duplicate them
  */ 
-opec.util.arrayDeDupe = function(array) {
+opec.utils.arrayDeDupe = function(array) {
    var i,
       len = array.length,
       outArray = [],
@@ -63,16 +61,34 @@ opec.util.arrayDeDupe = function(array) {
 /** 
  * Array Remove - By John Resig (MIT Licensed)
  */
-opec.util.arrayRemove = function(array, from, to) {
+opec.utils.arrayRemove = function(array, from, to) {
    var rest = array.slice((to || from) + 1 || array.length);
    array.length = from < 0 ? array.length + from : from;
    return array.push.apply(array, rest);
 };
 
 /**
+ * Helper function which returns the nearest value in an array to a given value
+ *
+ * @param {number|Array}   arr   The array of integers to search within
+ * @param {number}         goal  The value for which to find the nearest
+ *
+ * @return {number} Returns the value of the nearest number in the array
+ */
+getNearestInArray = function(arr, goal) {
+   var closest = null;
+   $.each(arr, function(i, e) {
+      if (closest === null || Math.abs(e - goal) < Math.abs(closest - goal)) {
+         closest = e;
+      }
+   });
+   return closest;
+};
+
+/**
  * Turn JavaScript date, d into ISO8601 date part (no time)
  */ 
-opec.util.ISODateString = function(d) {
+opec.utils.ISODateString = function(d) {
    function pad(n){
       return n<10 ? '0'+n : n;
    }
@@ -84,15 +100,14 @@ opec.util.ISODateString = function(d) {
 /**
  * Format date string so it can be displayed
  */ 
-opec.util.displayDateString = function(date) {
+opec.utils.displayDateString = function(date) {
    var year = date.substring(0, 4);
    var month = date.substring(5, 7);
    var day = date.substring(8, 10);
    return day + '-' + month + '-' + year;
 };
 
-function getObjectKey(obj, value)
-{
+function getObjectKey(obj, value) {
    for(var key in obj) {
       // TEST
       if(obj[key] == value) {
@@ -101,3 +116,15 @@ function getObjectKey(obj, value)
    }
    return null;
 }
+
+opec.utils.sortDates = function(a, b) {
+   return a[0] - b[0];
+};
+
+opec.utils.ceil1places = function(num) {
+   return Math.ceil(num * 10) / 10;
+};
+
+opec.utils.ceil3places = function(num) {
+   return Math.ceil(num * 1000) / 1000;
+};

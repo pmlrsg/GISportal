@@ -53,7 +53,7 @@ def create_app(config='config.yaml'):
             'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
             'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu',
             'thredds.met.no','thredds.met.no:8080', 'irs.gis-lab.info',
-            'demonstrator.vegaspace.com']
+            'demonstrator.vegaspace.com', 'grid.bodc.nerc.ac.uk' ]
    
    graphs = {}
    
@@ -175,6 +175,136 @@ def create_app(config='config.yaml'):
    
 #########################################################################################################################
    """
+   WFS
+   """
+   @app.route('/wfs2json/wfs', methods = ['GET'])
+   def getWFSData():
+      from owslib.wfs import WebFeatureService   
+      import string
+      
+      params = getWFSParams() # Get parameters     
+      params = checkParams(params) # Check parameters
+      
+      wfs = WebFeatureService(params['baseURL'].value, version=params['version'].value)
+      response = wfs.getfeature(typename=str(params['typeName'].value), featureid=[params['featureID'].value]) # Contact server
+      
+      if string.find(params['baseURL'].value, 'bodc', 0): 
+         response = processBODCResponse(response.read(), params) # Get data from response
+      else:
+         pass
+      
+      app.logger.debug('Jsonifying response...') # DEBUG
+      
+      # Convert to json
+      try:
+         jsonData = jsonify(output = response)
+      except TypeError as e:
+         g.error = "Request aborted, exception encountered: %s" % e
+         abort(500) # If we fail to jsonify the data return 500
+         
+      app.logger.debug('Request complete, Sending results') # DEBUG
+      
+      return jsonData # return json
+      
+   """
+   Process data from a normalish wfs server
+   """
+   def processBODCResponse(response, params):
+      import parse
+      import string
+      import operator
+      
+      output = {}
+      
+      typename = string.split(str(params['typeName'].value).lower(), ':', 1)[1]
+      data = parse.process(response, tag=None)[0]     
+      feature = data['featuremembers'][typename]
+      sortedFeature = sorted(feature.iteritems(), key = operator.itemgetter(0))
+            
+      if 'shref' in feature:
+         output['shref'] = feature['shref']         
+      if 'datacat' in feature:
+         output['datacat'] = feature['datacat']        
+      if 'instrument' in feature:
+         output['instrument'] = feature['instrument']        
+      if 'country' in feature:
+         output['country'] = feature['country']
+      if 'org' in feature:
+         output['org'] = feature['org']
+      if 'startdate' in feature:
+         output['startdate'] = feature['startdate']
+      if 'projectnam' in feature:
+         output['projectnam'] = feature['projectnam']
+      if 'theme' in feature:
+         output['theme'] = feature['theme']
+      if 'paramgroup' in feature:
+         output['paramgroup'] = feature['paramgroup']
+      if 'paramdisp' in feature:
+         output['paramdisp'] = feature['paramdisp']
+      if 'metadata' in feature:
+         output['metadata'] = feature['metadata']
+      if 'dataqxf' in feature:
+         output['dataqxf'] = feature['dataqxf']
+      if 'dataodv' in feature:
+         output['dataodv'] = feature['dataodv']
+      if 'databodcreq' in feature:
+         output['databodcreq'] = feature['databodcreq']
+      if 'dataplot1' in feature:
+         output['dataplot1'] = feature['dataplot1']
+      if 'dataplot2' in feature:
+         output['dataplot2'] = feature['dataplot2']
+      if 'dataplot3' in feature:
+         output['dataplot3'] = feature['dataplot3']
+      if 'dataplot4' in feature:
+         output['dataplot4'] = feature['dataplot4']
+      if 'dataplot5' in feature:
+         output['dataplot5'] = feature['dataplot5']
+      if 'dataplot6' in feature:
+         output['dataplot6'] = feature['dataplot6']
+      if 'dataplot7' in feature:
+         output['dataplot7'] = feature['dataplot7']
+      if 'dataplot8' in feature:
+         output['dataplot8'] = feature['dataplot8']
+      if 'dataplot9' in feature:
+         output['dataplot9'] = feature['dataplot9']
+      if 'dataplot10' in feature:
+         output['dataplot10'] = feature['dataplot10']
+      if 'dataplot11' in feature:
+         output['dataplot11'] = feature['dataplot11']
+      
+      if 'shape' in feature:
+         shape = feature['shape']
+         if 'point' in shape:
+            point = shape['point']
+            if 'pos' in point:
+               output['position'] = point['pos']
+      
+      content = ""
+               
+      for item in sortedFeature:
+         if item[0] != 'shape':
+            content += '<div><br> %s: %s </div>' % (item[0], replaceAll(item[1], {'&lt;': '<', '&gt;': '>'}))
+         
+      output['content'] = content;
+                      
+      return output
+              
+   """
+   Gets any parameters.
+   """
+   def getWFSParams():
+      # Required for url
+      nameToParam = {}
+      nameToParam["baseURL"] = Param("baseURL", False, False, request.args.get('baseurl', None))
+      nameToParam["request"] = Param("request", False, False, request.args.get('request', None))
+      nameToParam["version"] = Param("request", False, False, request.args.get('version', '1.0.0'))
+      nameToParam["typeName"] = Param("typeName", False, False, request.args.get('typeName', None))
+      nameToParam["featureID"] = Param("featureID", False, False, request.args.get('featureID', None))
+      
+      return nameToParam
+
+#########################################################################################################################
+   """
    Gets wcs data from a specified server, then performs a requested function
    on the received data, before jsonifying the output and returning it.
    """
@@ -190,7 +320,7 @@ def create_app(config='config.yaml'):
       params['url'] = createURL(params)
       app.logger.debug('Processing request...') # DEBUG
       
-      type = params['type'].getValue()
+      type = params['type'].value
       if type == 'histogram': # Outputs data needed to create a histogram
          output = getBboxData(params, histogram)
       elif type == 'basic': # Outputs a set of standard statistics
@@ -227,7 +357,7 @@ def create_app(config='config.yaml'):
       app.logger.debug('Jsonifying response...') # DEBUG
       
       try:
-         jsonData = jsonify(output = output, type = params['type'].getValue(), coverage = params['coverage'].getValue(), error = g.graphError)
+         jsonData = jsonify(output = output, type = params['type'].value, coverage = params['coverage'].value, error = g.graphError)
       except TypeError as e:
          g.error = "Request aborted, exception encountered: %s" % e
          abort(400) # If we fail to jsonify the data return 500
@@ -278,7 +408,7 @@ def create_app(config='config.yaml'):
       checkedParams = {}
       
       for key in params.iterkeys():
-         if params[key].getValue() == None or len(params[key].getValue()) == 0:
+         if params[key].value == None or len(params[key].value) == 0:
             if not params[key].isOptional():            
                g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
                abort(400)
@@ -300,12 +430,12 @@ def create_app(config='config.yaml'):
       urlParams = {}
       for param in params.itervalues():
          if param.neededInUrl():
-            urlParams[param.getName()] = param.getValue()
+            urlParams[param.getName()] = param.value
       
       query = urllib.urlencode(urlParams)
-      url = params['baseURL'].getValue() + query
+      url = params['baseURL'].value + query
       app.logger.debug('URL: ' + url) # DEBUG
-      if "wcs2json/wcs" in params['baseURL'].getValue():
+      if "wcs2json/wcs" in params['baseURL'].value:
          g.error = 'possible infinite recursion detected, cancelled request'
          abort(400)
       return Param("url", False, False, url)
@@ -327,7 +457,7 @@ def create_app(config='config.yaml'):
        
    def openNetCDFFile(fileName, params):
       app.logger.debug('Opening netCDF file...')
-      rootgrp = netCDF.Dataset(fileName, 'r', format=params['format'].getValue())
+      rootgrp = netCDF.Dataset(fileName, 'r', format=params['format'].value)
       app.logger.debug('NetCDF file opened')
       return rootgrp
    
@@ -335,7 +465,7 @@ def create_app(config='config.yaml'):
       # TODO: try except for malformed bbox
       app.logger.debug('Expanding Bbox...')
       increment = 0.1
-      values = params['bbox'].getValue().split(',')
+      values = params['bbox'].value.split(',')
       for i,v in enumerate(values):
          values[i] = float(values[i]) # Cast string to float
          if i == 0 or i == 1:
@@ -343,9 +473,9 @@ def create_app(config='config.yaml'):
          elif i == 2 or i == 3:
             values[i] += increment
          values[i] = str(values[i])
-      params['bbox'].setValue(','.join(values))
+      params['bbox'].value = ','.join(values)
       app.logger.debug(','.join(values))
-      app.logger.debug('New Bbox %s' % params['bbox'].getValue())
+      app.logger.debug('New Bbox %s' % params['bbox'].value)
       app.logger.debug('Bbox Expanded')
       # Recreate the url
       app.logger.debug('Recreating the url...')
@@ -358,7 +488,7 @@ def create_app(config='config.yaml'):
    """
    def getData(params, method, checkdata=None):
       import os
-      resp = contactWCSServer(params['url'].getValue())
+      resp = contactWCSServer(params['url'].value)
       fileName = saveOutTempFile(resp)
       rootgrp = openNetCDFFile(fileName, params)
       app.logger.debug('Checking data...')
@@ -419,7 +549,7 @@ def create_app(config='config.yaml'):
    Performs a basic set of statistical functions on the provided data.
    """
    def basic(dataset, params):
-      arr = np.array(dataset.variables[params['coverage'].getValue()])
+      arr = np.array(dataset.variables[params['coverage'].value])
       # Create a masked array ignoring nan's
       maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
       time = getCoordinateVariable(dataset, 'Time')
@@ -431,7 +561,7 @@ def create_app(config='config.yaml'):
       times = np.array(time)
       output = {}
       
-      units = getUnits(dataset.variables[params['coverage'].getValue()])
+      units = getUnits(dataset.variables[params['coverage'].value])
       output['units'] = units
       
       app.logger.debug('starting basic calc') # DEBUG
@@ -441,7 +571,12 @@ def create_app(config='config.yaml'):
       #std = getStd(maskedArray)
       #min = getMin(maskedArray)
       #max = getMax(maskedArray)
-      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      timeUnits = getUnits(time)
+      start = None
+      if timeUnits:
+         start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      else: 
+         start = ''.join(times[0])
       
       #=========================================================================
       # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
@@ -458,7 +593,10 @@ def create_app(config='config.yaml'):
       
       for i, row in enumerate(maskedArray):
          #app.logger.debug(row)
-         date = netCDF.num2date(times[i], time.units, calendar='standard')
+         if timeUnits:
+            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+         else:     
+            date = ''.join(times[i])
          mean = getMean(row)
          median = getMedian(row)
          std = getStd(row)
@@ -468,7 +606,7 @@ def create_app(config='config.yaml'):
          if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
             pass
          else:
-            output['data'][date.isoformat()] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+            output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
       
       if len(output['data']) < 1:
          g.graphError = "no valid data available to use"
@@ -479,9 +617,9 @@ def create_app(config='config.yaml'):
       return output
    
    def hovmoller(dataset, params):
-      xAxisVar = params['graphXAxis'].getValue()
-      yAxisVar = params['graphYAxis'].getValue()
-      zAxisVar = params['graphZAxis'].getValue()
+      xAxisVar = params['graphXAxis'].value
+      yAxisVar = params['graphYAxis'].value
+      zAxisVar = params['graphZAxis'].value
       
       print xAxisVar, yAxisVar, zAxisVar
           
@@ -525,7 +663,7 @@ def create_app(config='config.yaml'):
 
       output = {}
       
-      units = getUnits(dataset.variables[params['coverage'].getValue()])
+      units = getUnits(dataset.variables[params['coverage'].value])
       output['units'] = units
       
       app.logger.debug('starting basic calc') # DEBUG
@@ -609,21 +747,21 @@ def create_app(config='config.yaml'):
    Creates a histogram from the provided data. If no bins are created it creates its own.
    """
    def histogram(dataset, params):
-      var = np.array(dataset.variables[params['coverage'].getValue()]) # Get the coverage as a numpy array
+      var = np.array(dataset.variables[params['coverage'].value]) # Get the coverage as a numpy array
       return {'histogram': getHistogram(var)}
    
    """
    Creates a scatter from the provided data.
    """
    def scatter(dataset, params):
-      var = np.array(dataset.variables[params['coverage'].getValue()])
+      var = np.array(dataset.variables[params['coverage'].value])
       return {'scatter': getScatter(var)}
    
    """
    Returns the raw data.
    """
    def raw(dataset, params):
-      var = np.array(dataset.variables[params['coverage'].getValue()]) # Get the coverage as a numpy array
+      var = np.array(dataset.variables[params['coverage'].value]) # Get the coverage as a numpy array
       return {'rawdata': var.tolist()}
    
    """
@@ -777,7 +915,7 @@ class Polygon(Mask):
       
       if commaSeparatedPoints != None:
          points = []
-         values = commaSeparatedPoints.getValue().split(',')
+         values = commaSeparatedPoints.value.split(',')
          [points.append(Point(values[i], values[i+1])) for i in range(0, len(values), 2)]
          self._poly = points
       
@@ -923,6 +1061,18 @@ class Param:
       self._optional = optional
       self._neededInUrl = neededInUrl
       self._value = value
+   
+   @property   
+   def value(self):
+      return self._value
+   
+   @value.getter
+   def value(self):
+      return self._value
+   
+   @value.setter
+   def value(self, value):
+      self._value = value
       
    def isOptional(self):
       return self._optional
@@ -933,11 +1083,10 @@ class Param:
    def getName(self):
       return self._name
    
-   def getValue(self):
-      return self._value
-   
-   def setValue(self, value):
-      self._value = value
+def replaceAll(text, dic):
+    for i, j in dic.iteritems():
+        text = text.replace(i, j)
+    return text
 
 if __name__ == '__main__':
    app = create_app(config="config.yaml")
