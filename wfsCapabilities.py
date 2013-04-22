@@ -23,24 +23,46 @@ XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 dirtyCaches = [] # List of caches that may need recreating if they don't get created the first time
 
 def createCache(server, xml):
-   from lxml import etree
    import json
-   from time import mktime, strptime
-   
-   # Save out the xml file for later
-   utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
+   import urllib
    
    print 'Creating caches...'
    subMasterCache = {}
    subMasterCache['layers'] = {}
-   
-   #root = etree.fromstring(xml)
+   subMasterCache['layers'][server['name']] = {}
    
    cleanServerName = server['name'].replace('/', '-')
    cleanLayerName = utils.replaceAll(server['params']['TypeName'], {':': '-', '\\': '-'})
    
-   tag='gml:featuremembers'
-   data = parse.process(xml,tag=tag)
+   subMasterCache['layers'][server['name']]['name'] = cleanLayerName;
+   
+   if 'passthrough' in server['options'] and server['options']['passthrough']:
+      subMasterCache['url'] = server['url'] + urllib.urlencode(server['params'])
+   elif xml != None:   
+      # Save out the xml file for later
+      utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
+      times = processTimes(server, xml)
+   
+      layer = {
+         'times': times
+      }
+      
+      # Save out layer cache
+      utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))     
+      subMasterCache['layers'][server['name']]['times'] = times;
+      subMasterCache['url'] = server['url']
+     
+   
+   subMasterCache['serverName'] = server['name']
+   
+   print 'Cache creation complete...'
+      
+   # Return and save out the cache for this server
+   return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
+
+def processTimes(server, xml):
+   from time import mktime, strptime
+   data = parse.process(xml,tag=server['options']['tag'])
 
    if (len(data) == 0):
       return None
@@ -50,22 +72,6 @@ def createCache(server, xml):
    data = data[0][data[0].keys()[0]]
    [int(mktime(strptime(x[sname.lower()].split('T')[0],"%Y-%m-%d"))) for x in data] 
    
-   layer = {
-      'times': data
-   }
-   
-   # Save out layer cache
-   utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))
-   
-   subMasterCache['layers'][server['name']] = {}
-   subMasterCache['layers'][server['name']]['name'] = cleanLayerName;
-   subMasterCache['layers'][server['name']]['times'] = data;
-   subMasterCache['url'] = server['url']
-   subMasterCache['serverName'] = server['name']
-   
-   print 'Cache creation complete...'
-      
-   # Return and save out the cache for this server
-   return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
+   return data
 
 utils.updateCaches(createCache, dirtyCaches,  wfsServers.servers, SERVERCACHEPATH, MASTERCACHEPATH, CACHELIFE)

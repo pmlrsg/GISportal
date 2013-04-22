@@ -12,8 +12,17 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
    
    # Go through each server
    for key, server in serverList.items():
-      # Check if the cache is valid
-      if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONXML, cacheLife):
+      
+      # Check if we are just passing a layer
+      if 'passthrough' in server['options'] and server['options']['passthrough']:
+         # Check if cache is valid
+         if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONJSON, cacheLife):        
+            createCache(server, None)
+            
+         continue
+      
+      # Check if cache is valid
+      if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONXML, cacheLife):        
          oldXML = None
          newXML = None       
          try:
