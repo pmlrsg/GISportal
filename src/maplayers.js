@@ -7,8 +7,8 @@
 // Flask host
 OpenLayers.Map.prototype.host = "";
 
-OpenLayers.Map.prototype.pywcsLocation = '/service/wcs2json/wcs?';
-OpenLayers.Map.prototype.pywfsLocation = '/service/wfs2json/wfs?';
+OpenLayers.Map.prototype.pywcsLocation = '/alphaservice/wcs2json/wcs?';
+OpenLayers.Map.prototype.pywfsLocation = '/alphaservice/wfs2json/wfs?';
 
 // Not all browsers have webGL
 OpenLayers.Map.prototype.cesiumLoaded = null;

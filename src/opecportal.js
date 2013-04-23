@@ -256,7 +256,7 @@ opec.createRefLayers = function() {
       
       opec.mapControls.selector.setLayer(wfsLayer);
       
-      if (layer.times.length) {
+      if (layer.times && layer.times.length) {
          wfsLayer.temporal = true;
          var times = [];
          var dateToIDLookup = {};
