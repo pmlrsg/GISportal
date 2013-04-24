@@ -289,7 +289,12 @@ def create_app(path):
                
       for item in sortedFeature:
          if item[0] != 'shape':
-            content += '<div><br> %s: %s </div>' % (item[0], replaceAll(item[1], {'&lt;': '<', '&gt;': '>'}))
+            # See if it contains a url
+            temp = '<div><br> %s: %s </div>' % (item[0], replaceAll(item[1], {'&lt;': '<', '&gt;': '>'}))
+            if '<a' in temp and "'>" in temp:
+               content += replaceAll(temp, {"'>": "' target='_blank'>"})
+            else:
+               content += temp
          
       output['content'] = content;
                       
