@@ -28,31 +28,39 @@ def createCache(server, xml):
    
    print 'Creating caches...'
    subMasterCache = {}
-   subMasterCache['layers'] = {}
-   subMasterCache['layers'][server['name']] = {}
+   subMasterCache['layers'] = []
    
    cleanServerName = server['name'].replace('/', '-')
    cleanLayerName = utils.replaceAll(server['params']['TypeName'], {':': '-', '\\': '-'})
    
-   subMasterCache['layers'][server['name']]['name'] = cleanLayerName;
+   # Layer iter
    
    if 'passthrough' in server['options'] and server['options']['passthrough']:
       subMasterCache['url'] = server['url'] + urllib.urlencode(server['params'])
+      
+      layer = {
+         'options': server['options'],
+         'name': cleanLayerName
+      }
+      
+      subMasterCache['layers'].append(layer)
+      
    elif xml != None:   
       # Save out the xml file for later
       utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
       times = processTimes(server, xml)
    
       layer = {
+         'name': cleanLayerName,
+         'options': server['options'],
          'times': times
       }
       
       # Save out layer cache
       utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))     
-      subMasterCache['layers'][server['name']]['times'] = times;
-      subMasterCache['url'] = server['url']
-     
-   
+      subMasterCache['layers'].append(layer)     
+      subMasterCache['url'] = server['url'] 
+      
    subMasterCache['serverName'] = server['name']
    
    print 'Cache creation complete...'

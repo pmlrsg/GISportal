@@ -8,38 +8,44 @@ import netCDF4 as netCDF
 
 from flask import Flask, abort, request, jsonify, make_response, g
 
-def create_app(config='config.yaml'):
-   import settings
-   app = Flask(__name__, instance_path=settings.PATH)
+def create_app(path):
+   import settings as settings
+   app = Flask(__name__, instance_path=path)
    
-   import yaml
+   #import yaml
    import os
    
-   with app.open_instance_resource(config) as f:
-    file = f.read()
+   #with app.open_instance_resource(config) as f:
+    #file = f.read()
    
-   config = yaml.load(file)
+   #config = yaml.load(file)
+   #app.config.from_object(settings)
+   
+   if settings.LOG_PATH != None:
+      if len(settings.LOG_PATH) == 0:
+         settings.LOG_PATH = path
+           
+      try:  
+         import logging
+         from logging.handlers import RotatingFileHandler
+      
+         if settings.LOG_PATH and len(settings.LOG_PATH) != 0 and os.path.exists(settings.LOG_PATH):
+            f_handler = RotatingFileHandler(os.path.join(settings.LOG_PATH, 'python-flask.log'))
+         else:
+            f_handler = RotatingFileHandler(os.path.join(app.instance_path, 'python-flask.log'))
+            
+         f_handler.setLevel(logging.DEBUG)
+         f_handler.setFormatter(logging.Formatter(
+             '[%(asctime)s] [%(levelname)s]: %(message)s '
+             '[in %(filename)s:%(lineno)d]'
+         ))
+         app.logger.addHandler(f_handler)
+         app.logger.setLevel(settings.LOG_LEVEL)
+      except:
+         print 'Failed to setup logging'
+   
    app.config.from_object(settings)
-   
-   try:  
-      import logging
-      from logging.handlers import RotatingFileHandler
-   
-      if 'LOG_PATH' in config and len(config['LOG_PATH']) != 0 and os.path.exists(config['LOG_PATH']):
-         f_handler = RotatingFileHandler(os.path.join(config['LOG_PATH'], 'python-flask.log'))
-      else:
-         f_handler = RotatingFileHandler(os.path.join(app.instance_path, 'python-flask.log'))
-         
-      f_handler.setLevel(logging.DEBUG)
-      f_handler.setFormatter(logging.Formatter(
-          '[%(asctime)s] [%(levelname)s]: %(message)s '
-          '[in %(filename)s:%(lineno)d]'
-      ))
-      app.logger.addHandler(f_handler)
-      app.logger.setLevel(config['LOG_LEVEL'])
-      app.logger.debug(app.debug)
-   except:
-      print 'Failed to setup logging'
+   app.logger.debug("In debug mode: %s" % app.debug)
    
    # Designed to prevent Open Proxy type stuff - white list of allowed hostnames
    allowedHosts = ['localhost','localhost:8080',
@@ -1089,7 +1095,7 @@ def replaceAll(text, dic):
     return text
 
 if __name__ == '__main__':
-   app = create_app(config="config.yaml")
+   app = create_app(path='/var/www/html/rbb/opecvis/middleware/wcs2json')
    
    if app.debug: use_debugger = True
    try:

@@ -173,7 +173,7 @@ opec.contextMenu.heatmapTest = function() {
          
          transformedTestData = nudata;
          
-         var layer = new OpenLayers.Layer.OSM();
+         var layer = new OpenLayers.Layer.Vector();
          var heatmap = new OpenLayers.Layer.Heatmap("Heatmap Layer", map, layer, 
             {visible: true, radius: 10}, 
             {isBaseLayer: false, opacity: 0.3, projection: new OpenLayers.Projection("EPSG:4326")}

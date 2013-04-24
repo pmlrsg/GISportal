@@ -138,7 +138,7 @@ opec.window.createGraphCreator = function() {
       
       $.ajax({
          type: 'GET',
-         url: map.host + map.pywcsLocation + request,
+         url: opec.wcsLocation + request,
          dataType: 'json',
          asyc: true,
          success: function(data) {
@@ -339,7 +339,7 @@ var graphCreator = {
          
          $.ajax({
             type: 'GET',
-            url: map.host + map.pywcsLocation + request,
+            url: opec.wcsLocation + request,
             dataType: 'json',
             asyc: true,
             success: function(data) {

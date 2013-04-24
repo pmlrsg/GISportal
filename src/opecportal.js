@@ -12,6 +12,13 @@ var opec = opec || (opec = {});
  */
 var map;
 
+// Path to the flask middleware
+opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
+
+// Flask url paths
+opec.wcsLocation = opec.middlewarePath + '/wcs2json/wcs?';
+opec.wfsLocation = opec.middlewarePath + '/wfs2json/wfs?';
+
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
 opec.cache = {};
@@ -74,7 +81,7 @@ opec.getFeature = function(layer, time) {
    };   
    var request = $.param(params);   
    
-   opec.genericAsyc(map.pywfsLocation + request, updateLayer, errorHandling, 'json', {layer: layer}); 
+   opec.genericAsyc(opec.wfsLocation + request, updateLayer, errorHandling, 'json', {layer: layer}); 
 };
 
 /**
@@ -150,7 +157,7 @@ var quickRegion = [
 ];
 
 // Define a proxy for the map to allow async javascript http protocol requests
-OpenLayers.ProxyHost = '/service/proxy?url=';   // Flask (Python) service OpenLayers proxy
+OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
 /*===========================================================================*/
 
 /**
@@ -192,8 +199,19 @@ opec.createRefLayers = function() {
       if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
          var url = item.url;
          $.each(item.layers, function(i, item) {
-            if (item.times !== 'undefined' && typeof item.name !== 'undefined') {
-               createRefLayer(item, url);
+            if (typeof item.name !== 'undefined' && typeof item.options !== 'undefined') {
+               if(typeof item.options.passthrough !== 'undefined' && item.options.passthrough) {
+                  item.style = new OpenLayers.StyleMap({
+                     strokeColor: "#00FF00",
+                     strokeOpacity: 1,
+                     strokeWidth: 3
+                  });
+                  item.displayTitle = item.name;
+                  createGMLLayer(item, url);
+               }
+               else {
+                  createRefLayer(item, url);
+               }
             }
          });
       } 
@@ -254,9 +272,16 @@ opec.createRefLayers = function() {
          }
       ); 
       
-      opec.mapControls.selector.setLayer(wfsLayer);
+      var selector = opec.mapControls.selector;
+      var layers = selector.layers;
       
-      if (layer.times && layer.times.length) {
+      if (typeof layers === 'undefined' || layers === null)
+         layers = [];
+      
+      layers.push(wfsLayer);     
+      opec.mapControls.selector.setLayer(layers);
+      
+      if (typeof layer.times !== 'undefined' && layer.times && layer.times.length) {
          wfsLayer.temporal = true;
          var times = [];
          var dateToIDLookup = {};
@@ -279,6 +304,25 @@ opec.createRefLayers = function() {
       wfsLayer.url = url;
       map.addLayer(wfsLayer);
       opec.leftPanel.addLayerToGroup(wfsLayer, $('#refLayerGroup'));
+   }
+   
+   function createGMLLayer(layer, url) {
+      var gmlLayer = new OpenLayers.Layer.Vector(layer.name, {
+         protocol: new OpenLayers.Protocol.HTTP({
+            url: url,
+            format: new OpenLayers.Format.GML()
+         }),
+         strategies: [new OpenLayers.Strategy.Fixed()],
+         projection: lonlat,
+         styleMap: layer.style
+      });
+
+      // Make this layer a reference layer         
+      gmlLayer.controlID = "refLayers";
+      gmlLayer.setVisibility(false);
+      gmlLayer.displayTitle = layer.displayTitle;
+      map.addLayer(gmlLayer);
+      opec.leftPanel.addLayerToGroup(gmlLayer, $('#refLayerGroup'));
    }
    
    var colourFunc = function(feature) {
@@ -309,10 +353,17 @@ opec.createRefLayers = function() {
             colour: colourFunc
          }
       });
-
-      // Create a style map object and set the 'default' and 'selected' intents
-      var AMT_style_map = new OpenLayers.StyleMap({ 'default': AMT_style });
-
+      
+      var layer = {
+         name: 'AMT' + i + '_Cruise_Track',
+         displayTitle: 'AMT' + i + ' Cruise Track',
+         // Create a style map object and set the 'default' and 'selected' intents
+         style: new OpenLayers.StyleMap({ 'default': AMT_style })
+      };
+      
+      createGMLLayer(layer, 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2');
+      
+      /*
       var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + '_Cruise_Track', {
          protocol: new OpenLayers.Protocol.HTTP({
             url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
@@ -328,7 +379,7 @@ opec.createRefLayers = function() {
       cruiseTrack.setVisibility(false);
       cruiseTrack.displayTitle = 'AMT' + i + ' Cruise Track';
       map.addLayer(cruiseTrack);
-      opec.leftPanel.addLayerToGroup(cruiseTrack, $('#refLayerGroup'));
+      opec.leftPanel.addLayerToGroup(cruiseTrack, $('#refLayerGroup')); */
    }
 
    // Setup Black sea outline layer (Vector)
