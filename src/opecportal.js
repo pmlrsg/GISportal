@@ -13,7 +13,7 @@ var opec = opec || (opec = {});
 var map;
 
 // Path to the flask middleware
-opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
+opec.middlewarePath = '/alphaservice'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths
 opec.wcsLocation = opec.middlewarePath + '/wcs2json/wcs?';
@@ -301,6 +301,7 @@ opec.createRefLayers = function() {
       wfsLayer.controlID = "refLayers";
       wfsLayer.setVisibility(false);
       wfsLayer.displayTitle = layer.name;
+      wfsLayer.title = layer.name;
       wfsLayer.url = url;
       map.addLayer(wfsLayer);
       opec.leftPanel.addLayerToGroup(wfsLayer, $('#refLayerGroup'));
@@ -321,6 +322,7 @@ opec.createRefLayers = function() {
       gmlLayer.controlID = "refLayers";
       gmlLayer.setVisibility(false);
       gmlLayer.displayTitle = layer.displayTitle;
+      gmlLayer.title = layer.displayTitle;
       map.addLayer(gmlLayer);
       opec.leftPanel.addLayerToGroup(gmlLayer, $('#refLayerGroup'));
    }
