@@ -284,6 +284,20 @@ ul li {
    min-width: 200px;
 }
 
+.rPanel {
+   padding: 10px 10px 10px 10px;
+   right: 0;
+   -moz-border-radius-topleft: 15px;
+   -moz-border-radius-bottomleft: 15px;
+   -webkit-border-bottom-left-radius: 15px;
+   -webkit-border-top-left-radius: 15px;
+   border-bottom-left-radius: 15px;
+   border-top-left-radius: 15px;
+   min-width: 200px;
+}
+
+/*---------------------------------------------------------------------------*/
+/* TODO: Change to class? */
 #layerAccordion {
    overflow: hidden;
    width: auto;
@@ -291,6 +305,15 @@ ul li {
    font-family: Tahoma, Geneva, sans-serif;
    padding-top: 2px;
 }
+
+#dataAccordion {
+   overflow: hidden;
+   width: auto;
+   font-size: 0.9em;
+   font-family: Tahoma, Geneva, sans-serif;
+   padding-top: 2px;
+}
+/*---------------------------------------------------------------------------*/
 
 #opLayers {
    height: auto;
@@ -306,17 +329,6 @@ ul li {
    background: #333333;
    color: #cccccc;
 } 
-
-.rPanel {
-   padding: 10px 10px 10px 10px;
-   right: 0;
-   -moz-border-radius-topleft: 15px;
-   -moz-border-radius-bottomleft: 15px;
-   -webkit-border-bottom-left-radius: 15px;
-   -webkit-border-top-left-radius: 15px;
-   border-bottom-left-radius: 15px;
-   border-top-left-radius: 15px;
-}
 
 a.trigger {
    z-index:99999;
@@ -396,16 +408,6 @@ a.active.triggerR {
    background: white;
 }
 
-#lpanel-tabs {
-   padding-left: 3px;
-   padding-right: 5px;
-   padding-bottom: 3px;
-   margin-left: 5px;
-   margin-right:2px;
-   margin-top:4px;
-   background: #FFFFFF;
-}
-
 #opec-lPanel-content {
    background: #FFFFFF;
    color: black;
@@ -430,6 +432,16 @@ a.active.triggerR {
 .opec-tab-content {
    overflow-y: auto;
    padding: 0.3em;
+}
+
+.opec-tab-group {
+   padding-left: 3px;
+   padding-right: 5px;
+   padding-bottom: 3px;
+   margin-left: 5px;
+   margin-right:2px;
+   margin-top:4px;
+   background: #FFFFFF;
 }
 
 .opec-tab-content select {
@@ -630,6 +642,10 @@ div .sensor-accordion {
 
 /* ======= Graph Creator ======= */
 
+#opec-graphing {
+   font-size: 1.1em;
+}
+
 #graphcreator-baseurl {
    width: 300px;
 }
@@ -647,6 +663,7 @@ div .sensor-accordion {
 
 .ui-control .ui-control-header {
    padding-bottom: 5px;
+   margin-left: 5px;
 }
 
 .ui-control .ui-control-header a {
@@ -657,9 +674,21 @@ div .sensor-accordion {
 
 .ui-control .ui-control-header .ui-icon {
    position: absolute;
-   left: .5em; 
+   left: .5em;
+   margin-left: 8px; 
    /*top: 50%; */
    /*margin-top: -8px; */
+}
+
+/* ===== Data Export ==== */
+
+#opec-tab-export select {
+   width: auto;
+   max-width: 100px;
+}
+
+.opec-list {
+   padding-bottom: 2px;
 }
 
 /* ===== Dummy Help Layer ===== */

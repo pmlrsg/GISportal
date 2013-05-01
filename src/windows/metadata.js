@@ -3,11 +3,11 @@ opec.window.createMetadata = function(layer) {
       return;
    
    // Check if already open
-   if($('#metadata-' + layer.name).length)
-      $('#metadata-' + layer.name).extendedDialog('close');
+   if($('#metadata-' + layer.id).length)
+      $('#metadata-' + layer.id).extendedDialog('close');
       
    var data = {
-      name: layer.name,
+      id: layer.id,
       displayTitle: layer.displayTitle,
       northBoundLat: layer.exBoundingBox.NorthBoundLatitude,
       eastBoundLon: layer.exBoundingBox.EastBoundLongitude,
@@ -23,14 +23,14 @@ opec.window.createMetadata = function(layer) {
    $(document.body).append(opec.templates.metadataWindow(data));
    
    // Show metadata for a selected layer
-   $('#metadata-' + layer.name).extendedDialog({
+   $('#metadata-' + layer.id).extendedDialog({
       position: ['center', 'center'],
       width: 400,
       height: 250,
       resizable: true,
       autoOpen: false,
       close: function() {
-         $('#metadata-' + layer.name).remove();
+         $('#metadata-' + layer.id).remove();
       },
       showHelp: false,
       showMinimise: true,
@@ -38,5 +38,5 @@ opec.window.createMetadata = function(layer) {
    });   
    
    //Open dialog
-   $('#metadata-' + layer.name).extendedDialog('open'); 
+   $('#metadata-' + layer.id).extendedDialog('open'); 
 };

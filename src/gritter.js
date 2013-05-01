@@ -171,7 +171,7 @@ function gritterErrorHandler(data)
 opec.gritter.gritterLayerHelper = function() {
    $(document).on('click', 'img[src="img/exclamation_small.png"]', function() {
       var layerID = $(this).parent().parent().attr('id');
-      var layer = map.getLayersByName(layerID)[0];
+      var layer = opec.getLayerByID(layerID);
       var helpMessage = 'none';
       
       // Is the layer temporal?

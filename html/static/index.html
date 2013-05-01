@@ -110,7 +110,7 @@
 <!-- Metadata Window -->
 <script type="text/html" id="opec-template-metadataWindow">
    {{! List of used variables for this template:
-      name - A unique id of the layer whos metadata is to be displayed.
+      id - A unique id of the layer whos metadata is to be displayed.
       displayTitle - What will be shown to the user to identifiy the window.
       source - The source of the data that makes up the layer.
       northBoundLat - North Bound Latitude.
@@ -122,7 +122,7 @@
       lastDate - The last avaliable date for the layer.
       productAbstract - A description of the layer.
    }}
-   <div id="metadata-{{name}}" class="tt" title="Metadata - {{displayTitle}}">          
+   <div id="metadata-{{id}}" class="tt" title="Metadata - {{displayTitle}}">          
       <div>
          <label>Source: {{source}}</label>
       </div>
@@ -373,7 +373,7 @@
       <div id="layerAccordion" class="ui-helper-reset">
          <div id="opec-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
-               <li id="lpanel-tabs" class="ui-corner-top lPanel-buttonSet">
+               <li class="opec-tab-group ui-corner-top lPanel-buttonSet">
                   <button id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">Operational</button>
                   <button id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">Reference</button>
                   <button id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">Options</button>
@@ -388,12 +388,8 @@
             </ul>       
          </div>
          <div id="opec-lPanel-content" class="ui-corner-all">
-            <div id="opec-lPanel-operational" class="ui-corner-top opec-tab-content opec-tab-active">
-               <!-- <div id="opLayers" style="overflow-x: hidden"></div> -->
-            </div>
-            <div id="opec-lPanel-reference" class="ui-corner-top opec-tab-content" style="display: none;">
-               <!-- <div id="refLayers"></div> -->
-            </div>
+            <div id="opec-lPanel-operational" class="ui-corner-top opec-tab-content opec-tab-active"></div>
+            <div id="opec-lPanel-reference" class="ui-corner-top opec-tab-content" style="display: none;"></div>
             <div id="lpanel-base-layers" class="opec-tab-content" style="display: none;">
                <div id="baseLayers">
                   <fieldset>
@@ -430,61 +426,75 @@
                   </li>
                </ul>
             </fieldset>
-         </div> 
+         </div>
+         <div id="opec-panel-toolbar" class="ui-corner-top panel-buttonSet">
+            <ul>
+               <li class="opec-tab-group ui-corner-top">
+                  <button id="opec-button-selection" class="opec-tab" href="#opec-tab-selection">Selection</button>
+                  <button id="opec-button-analyses" class="opec-tab" href="#opec-tab-analyses">Analyses</button>
+                  <button id="opec-button-export" class="opec-tab" href="#opec-tab-export">Data Export</button>
+               </li>
+            </ul>
+         </div>
          <div id="opec-rPanel-content" class="ui-corner-all">
-            <div class="opec-tab-content">
+            <div id="opec-tab-selection" class="opec-tab-content ui-corner-top opec-tab-active">
                <h3><a href="#">Current R.O.I.</a></h3>
                <div id="dispROI"><span>No Selection</span></div>
+            </div>
+            <div id="opec-tab-analyses" class="opec-tab-content ui-corner-top" style="display: none;">
+                  <h3>Graphing</h3>
+                  <div id="opec-graphing">  
+                  </div>
+                  <h3>Basic Statistics</h3>
+                  <div>
+                     <table id="bStats">
+                        <tr>
+                           <td>Mean Value:</td>
+                           <td>Two</td>
+                        </tr>
+                        <tr>
+                           <td>Max Value:</td>
+                           <td>Two</td>
+                        </tr>
+                        <tr>
+                           <td>Min Value:</td>
+                           <td>Two</td>
+                        </tr>
+                        <tr>
+                           <td>Std.Dev.:</td>
+                           <td>Two</td>
+                        </tr>
+                     </table>
+                  </div>
+                  <h3><a href="#">Spatial Analysis</a></h3>
+                  <div id="spatial">
+                     <h3><a href="#">Thresholding</a></h3>
+                     <div id="threshold"></div>
+                     <h3><a href="#">Data Correlation</a></h3>
+                     <div id="dCorr"></div> 
+                  </div> 
+                  <h3><a href="#">Temporal Analysis</a></h3>
+                  <div id="temporal">
+                     <h3><a href="#">Time Series</a></h3>
+                     <div id="tSeries"></div>
+                     <h3><a href="#">Interannual Variability</a></h3>
+                     <div id="IAVar"></div>
+                  </div> 
+                  <h3><a href="#">Risk Analysis</a></h3>
+                  <div id="risk"></div> 
+               </div>
+            <div id="opec-tab-export" class="opec-tab-content ui-corner-top" style="display: none;">
                <h3><a href="#">Data Tools</a></h3>
                <div id="dataTools">
-                  <div id="dataTabs">
-                     <ul>
-                        <li><a href="#tabs-1">Analyses</a></li>
-                        <li><a href="#tabs-2">Export<br></a></li>
-                     </ul>
-                     <div id="tabs-1">
-                        <div id="analyses">
-                           <h3><a href="#">Basic Statistics</a></h3>
-                              <table id="bStats">
-                                 <tr>
-                                    <td>Mean Value:</td>
-                                    <td>Two</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Max Value:</td>
-                                    <td>Two</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Min Value:</td>
-                                    <td>Two</td>
-                                 </tr>
-                                 <tr>
-                                    <td>Std.Dev.:</td>
-                                    <td>Two</td>
-                                 </tr>
-                              </table>
-                           <h3><a href="#">Spatial Analysis</a></h3>
-                           <div id="spatial">
-                              <h3><a href="#">Thresholding</a></h3>
-                              <div id="threshold"></div>
-                              <h3><a href="#">Data Correlation</a></h3>
-                              <div id="dCorr"></div> 
-                           </div> 
-                           <h3><a href="#">Temporal Analysis</a></h3>
-                           <div id="temporal">
-                              <h3><a href="#">Time Series</a></h3>
-                              <div id="tSeries"></div>
-                              <h3><a href="#">Interannual Variability</a></h3>
-                              <div id="IAVar"></div>
-                           </div> 
-                           <h3><a href="#">Risk Analysis</a></h3>
-                           <div id="risk"></div> 
-                        </div>
-                     </div>
-                     <div id="tabs-2">
-                        <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
-                     </div>
-                  </div>      
+                  <div class="opec-list"><b>Selected Layer: </b> None</div>
+                  <div class="opec-list"><b>Selected Bbox: </b> None</div>
+                  <div class="opec-list"><b>Selected Format: </b>
+                     <select id="opec-dataexport-format" title="Format you wish to the data to be returned in">
+                        <option value="NetCDF3" title="Returns a netcdf3 file">NetCDF3</option>
+                     </select>
+                  </div>
+                  <a href="#" target="_new">Download Data</a>
+                  <!-- <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p> -->  
                </div>
             </div>
          </div>

@@ -1,6 +1,9 @@
 /**
  * Represents a joint OpenLayers and Cesium layer allowing interaction with 
- * both layers through one API
+ * both layers through one API.
+ * 
+ * NOT IN USE AT PRESENT!
+ * 
  * @param {Object} name
  */
 opec.layer = function(name) {

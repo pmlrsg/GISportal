@@ -4,26 +4,61 @@
  */ 
 var opec = opec || (opec = {});
 
-/*===========================================================================*/
-//Initialise javascript global variables and objects
-
-/**
- * The OpenLayers map object
- */
-var map;
-
 // Path to the flask middleware
-opec.middlewarePath = '/alphaservice'; // <-- Change Path to match left hand side of WSGIScriptAlias
+opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths
 opec.wcsLocation = opec.middlewarePath + '/wcs2json/wcs?';
 opec.wfsLocation = opec.middlewarePath + '/wfs2json/wfs?';
+
+// Define a proxy for the map to allow async javascript http protocol requests
+OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
 opec.cache = {};
 opec.cache.wmsLayers = [];
 opec.cache.wfsLayers = [];
+
+// Temporary version of microLayer and layer storage.
+opec.layerStore = [];
+opec.microLayers = [];
+
+// Stores the current user selection. Any changes should trigger the correct event.
+// Could be changed to an array later to support multiple user selections
+opec.selection = {};
+opec.selection.layer = undefined;
+opec.selection.bbox = undefined;
+
+/*===========================================================================*/
+//Initialise javascript global variables and objects
+
+/**
+ * The OpenLayers map object
+ * Soon to be attached to opec namespace
+ */
+var map;
+
+// Predefined map coordinate systems - Needs to be moved at some point
+var lonlat = new OpenLayers.Projection("EPSG:4326");
+
+// Quick regions array in the format "Name",W,S,E,N - Needs to be moved at some point
+var quickRegion = [
+   ["Choose a Region",-150, -90, 150, 90],
+   ["World View", -150, -90, 150, 90],
+   ["European Seas", -23.44, 20.14, 39.88, 68.82],
+   ["Adriatic", 11.83, 39.00, 20.67, 45.80],
+   ["Baltic", 9.00, 51.08, 30.50, 67.62],
+   ["Biscay", -10, 43.00, 0, 49.00],
+   ["Black Sea", 27.30, 38.50, 42.00, 49.80],
+   ["English Channel", -5.00, 46.67, 4.30, 53.83],
+   ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
+   ["North Sea", -4.50, 50.20, 8.90, 60.50],
+   ["Western Med.", -6.00, 30.80, 16.50, 48.10],
+   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]  
+];
+
+/*===========================================================================*/
 
 /**
  * Map function to get the master cache JSON files from the server and then 
@@ -90,6 +125,8 @@ opec.getFeature = function(layer, time) {
  * @param {string} url - The url to use as part of the ajax call
  * @param {Function} success - Called if everything goes ok.
  * @param {Function} error - Called if problems arise from the ajax call.
+ * @param {string} dataType - What data type will be returned, xml, json, etc
+ * @param {object} 
  */
 opec.genericAsyc = function(url, success, error, dataType, opts) {
    //var map = this;
@@ -120,7 +157,10 @@ opec.genericAsyc = function(url, success, error, dataType, opts) {
  * @param {string} sensorName - The name of the sensor for this layer (unescaped)
  * @param {string} exBoundingBox - The geographic bounds for data in this layer
  */
-opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, serverName, wmsURL, wcsURL, sensorName, exBoundingBox) {
+opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, 
+   serverName, wmsURL, wcsURL, sensorName, exBoundingBox, providerTag) {
+   
+   this.id = name;      
    this.origName = name.replace("/","-");
    this.name = name.replace("/","-");
    this.urlName = name;
@@ -135,30 +175,8 @@ opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, se
    this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
    this.sensorName = sensorName.replace(/[\.,]+/g, "");
    this.exBoundingBox = exBoundingBox;
+   this.providerTag = providerTag;
 };
-
-// Predefined map coordinate systems
-var lonlat = new OpenLayers.Projection("EPSG:4326");
-
-// Quick regions array in the format "Name",W,S,E,N
-var quickRegion = [
-   ["Choose a Region",-150, -90, 150, 90],
-   ["World View", -150, -90, 150, 90],
-   ["European Seas", -23.44, 20.14, 39.88, 68.82],
-   ["Adriatic", 11.83, 39.00, 20.67, 45.80],
-   ["Baltic", 9.00, 51.08, 30.50, 67.62],
-   ["Biscay", -10, 43.00, 0, 49.00],
-   ["Black Sea", 27.30, 38.50, 42.00, 49.80],
-   ["English Channel", -5.00, 46.67, 4.30, 53.83],
-   ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
-   ["North Sea", -4.50, 50.20, 8.90, 60.50],
-   ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]  
-];
-
-// Define a proxy for the map to allow async javascript http protocol requests
-OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
-/*===========================================================================*/
 
 /**
  * Create all the base layers for the map.
@@ -297,6 +315,7 @@ opec.createRefLayers = function() {
       }
    
       wfsLayer.urlName = layer.name.replace('-', ':');
+      wfsLayer.id = layer.name;
       // Make this layer a reference layer
       wfsLayer.controlID = "refLayers";
       wfsLayer.setVisibility(false);
@@ -321,6 +340,7 @@ opec.createRefLayers = function() {
       // Make this layer a reference layer         
       gmlLayer.controlID = "refLayers";
       gmlLayer.setVisibility(false);
+      gmlLayer.id = layer.name;
       gmlLayer.displayTitle = layer.displayTitle;
       gmlLayer.title = layer.displayTitle;
       map.addLayer(gmlLayer);
@@ -400,6 +420,7 @@ opec.createRefLayers = function() {
    // Make this layer a reference layer
    blackSea.controlID = "refLayers";
    blackSea.selected = true;
+   blackSea.id = 'The_Black_Sea_KML';
    blackSea.displayTitle = "The Black Sea (KML)";
    map.addLayer(blackSea);
    opec.leftPanel.addLayerToGroup(blackSea, $('#refLayerGroup'));
@@ -415,7 +436,12 @@ opec.createRefLayers = function() {
 opec.createOpLayers = function() {
    $.each(opec.cache.wmsLayers, function(i, item) {
       // Make sure important data is not missing...
-      if(typeof item.server !== "undefined" && typeof item.wmsURL !== "undefined" && typeof item.wcsURL !== "undefined" && typeof item.serverName !== "undefined") {
+      if(typeof item.server !== "undefined" && 
+      typeof item.wmsURL !== "undefined" && 
+      typeof item.wcsURL !== "undefined" && 
+      typeof item.serverName !== "undefined" && 
+      typeof item.options !== "undefined") {
+         var providerTag = typeof item.options.providerShortTag !== "undefined" ? item.options.providerShortTag : '';       
          var wmsURL = item.wmsURL;
          var wcsURL = item.wcsURL;
          var serverName = item.serverName;
@@ -425,9 +451,11 @@ opec.createOpLayers = function() {
                // Go through each layer and load it
                $.each(item, function(i, item) {
                   if(item.Name && item.Name !== "") {
-                     var microLayer = new opec.MicroLayer(item.Name, item.Title, item.Abstract, item.FirstDate, item.LastDate, serverName, wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox);          
+                     var microLayer = new opec.MicroLayer(item.Name, item.Title, 
+                        item.Abstract, item.FirstDate, item.LastDate, serverName, 
+                        wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox, providerTag);          
                      opec.checkNameUnique(microLayer);               
-                     $('#layers').multiselect('addItem', {text: microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
+                     $('#layers').multiselect('addItem', {text: providerTag + ': ' + microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
                   }
                });
             }
@@ -461,14 +489,14 @@ opec.checkNameUnique = function(microLayer, count) {
       name = microLayer.name + count;
    }
    
-   if(name in map.microLayers) {
+   if(name in opec.microLayers) {
       opec.checkNameUnique(microLayer, ++count);
    }
    else
       if(count !== 0) { 
          microLayer.name = microLayer.name + count; 
       }
-      map.microLayers[microLayer.name] = microLayer;
+      opec.microLayers[microLayer.providerTag + ': ' + microLayer.name] = microLayer;
 };
 
 /**
@@ -476,7 +504,7 @@ opec.checkNameUnique = function(microLayer, count) {
  */ 
 opec.createOpLayer = function(layerData, microLayer) {
    var layer = new OpenLayers.Layer.WMS (
-      microLayer.name,
+      microLayer.providerTag + ': ' + microLayer.name,
       microLayer.wmsURL,
       { layers: microLayer.urlName, transparent: true}, 
       { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
@@ -502,6 +530,7 @@ opec.createOpLayer = function(layerData, microLayer) {
       }
    });
 
+   layer.id = microLayer.id;
    layer.origName = microLayer.origName;
    layer.urlName = microLayer.urlName;
    layer.displayTitle = microLayer.displayTitle;
@@ -515,7 +544,7 @@ opec.createOpLayer = function(layerData, microLayer) {
    layer.boundingBox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
-   map.layerStore[layer.name] = layer;
+   opec.layerStore[layer.name] = layer;
    
    map.getMetadata(layer);
 };
@@ -525,7 +554,7 @@ opec.createOpLayer = function(layerData, microLayer) {
  */
 opec.addOpLayer = function(layerName) {
    // Get layer from layerStore
-   var layer = map.layerStore[layerName];
+   var layer = opec.layerStore[layerName];
 
    if (typeof layer === 'undefined' || layer == 'null') {
       // Error: Could not get a layer object
@@ -534,7 +563,7 @@ opec.addOpLayer = function(layerName) {
    }
 
    // Remove the layer from the layerStore
-   delete map.layerStore[layerName];
+   delete opec.layerStore[layerName];
    
    // Check if an accordion is there for us
    //if(!$('#' + layer.displaySensorName).length)
@@ -571,10 +600,19 @@ opec.removeOpLayer = function(layer) {
    map.events.unregister("click", layer, getFeatureInfo);
 
    // Add the layer to the layerStore
-   map.layerStore[layer.name] = layer;
+   opec.layerStore[layer.name] = layer;
 
    // Decrease the count of OpLayers
    map.numOpLayers--;
+};
+
+/**
+ * Get a layer that has been added to the map by its id.
+ * In future this function will return a generic opec layer
+ * rather than a OpenLayers layer.
+ */
+opec.getLayerByID = function(id) {
+   return map.getLayersBy('id', id)[0];
 };
 
 /**
@@ -593,9 +631,9 @@ opec.customPermalinkArgs = function()
  */
 opec.checkLayerState = function(layer) {
    if(!layer.visibility && layer.selected)
-      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').show();
+      $('#' + layer.id).find('img[src="img/exclamation_small.png"]').show();
    else
-      $('#' + layer.name).find('img[src="img/exclamation_small.png"]').hide();
+      $('#' + layer.id).find('img[src="img/exclamation_small.png"]').hide();
 };
 
 /**
@@ -614,8 +652,8 @@ function mapInit()
       proxy: '/service/proxy?url='
    });
 
-   // Get the master cache file from the server. This file contains some of 
-   // the data from a getCapabilities query.
+   // Get both master cache files from the server. These files tells the server
+   // what layers to load for Operation (wms) and Reference (wcs) layers.
    opec.loadLayers();
 
    // Create the base layers and then add them to the map
@@ -777,7 +815,7 @@ function nonLayerDependent()
    // Toggle visibility of data layers
    $('#opec-lPanel-operational, #opec-lPanel-reference').on('click', ':checkbox', function(e) {
       var v = $(this).val();
-      var layer = map.getLayersByName(v)[0];
+      var layer = opec.getLayerByID(v);
       if($(this).is(':checked')) {
          layer.selected = true;
          // If the layer has date-time data, use special select routine
@@ -787,7 +825,7 @@ function nonLayerDependent()
             // Now display the layer on the timeline
             var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
             var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-            t1.addTimeBar(layer.name, layer.title, startDate, endDate, layer.DTCache);            
+            t1.addTimeBar(layer.id, layer.title, startDate, endDate, layer.DTCache);            
             // Update map date cache now a new temporal layer has been added
             map.refreshDateCache();
             $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
@@ -803,7 +841,7 @@ function nonLayerDependent()
          opec.checkLayerState(layer);
          if(layer.temporal) {
             // Remove the layer display on the timeline
-            t1.removeTimeBarByName(layer.name);  
+            t1.removeTimeBarByName(layer.id);  
             // Update map date cache now a new temporal layer has been removed
             map.refreshDateCache();
          }
@@ -932,7 +970,7 @@ function nonLayerDependent()
    
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
-       map.setBaseLayer(map.getLayersByName($('#baseLayer').val())[0]);
+       map.setBaseLayer(opec.getLayerByID($('#baseLayer').val()));
    });
 
    // Setup the contextMenu
@@ -1025,10 +1063,10 @@ function main()
       selected: function(e, ui) {
          // DEBUG
          //console.log("selected");
-         if(ui.option.text in map.microLayers) {
-            var microLayer = map.microLayers[ui.option.text];
+         if(ui.option.text in opec.microLayers) {
+            var microLayer = opec.microLayers[ui.option.text];
 
-            if(ui.option.text in map.layerStore) {
+            if(ui.option.text in opec.layerStore) {
                // DEBUG
                //console.log("Adding layer...");
                opec.addOpLayer(ui.option.text);
@@ -1046,7 +1084,7 @@ function main()
       deselected: function(e, ui) {
          // DEBUG
          //console.log("deselected");
-         var layer = map.getLayersByName(ui.option.text)[0];
+         var layer = opec.getLayerByID(ui.option.text);
 
          if(layer) {
             // DEBUG
@@ -1055,8 +1093,8 @@ function main()
             // DEBUG
             //console.log("Layer removed");
          }
-         else if(map.layerStore[ui.option.text])
-            layer = map.layerStore[ui.option.text];
+         else if(opec.layerStore[ui.option.text])
+            layer = opec.layerStore[ui.option.text];
          else
             // DEBUG
             console.log("no layer data to use");

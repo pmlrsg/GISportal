@@ -24,7 +24,7 @@ opec.contextMenu.setup = function() {
          value: 1,
          step: 0.05,
          change: function(e, ui) {
-            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.setOpacity($("#" + item.id).slider("value"));
             return true;
          }
@@ -35,7 +35,7 @@ opec.contextMenu.setup = function() {
        * selected layer and set the slider's position to be that value.
        */ 
       root.$menu.on('contextmenu:focus', function() {
-         var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+         var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
          if(typeof layer.opacity === 'undefined' || layer.opacity === null)
             layer.setOpacity(1);
             
@@ -57,7 +57,7 @@ opec.contextMenu.setup = function() {
              * Get the visible selected layer by id so as to avoid selecting one
              * of the other selected layers on other tabs. 
              */
-            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
             //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';  
             
             // Opacity           
@@ -262,11 +262,11 @@ opec.contextMenu.viewData = function($trigger) {
    
    if($trigger.attr('id')) {
       layerName = $trigger.attr('id');
-      layer = map.getLayersByName(layerName)[0];
+      layer = opec.getLayerByID(layerName);
    }
    else {
       layerName = $trigger.text();
-      layer = map.microLayers[layerName];
+      layer = opec.microLayers[layerName];
    }
    
    return {
@@ -296,16 +296,16 @@ opec.contextMenu.viewData = function($trigger) {
  * the menu and a callback to be executed when selected.
  */
 opec.contextMenu.showMetadata = function($trigger) {
-   var layerName = "";
+   var layerID = "";
    var layer = null;
    
    if($trigger.attr('id')) {
-      layerName = $trigger.attr('id');
-      layer = map.getLayersByName(layerName)[0];
+      layerID = $trigger.attr('id');
+      layer = opec.getLayerByID(layerID);
    }
    else {
-      layerName = $trigger.text();
-      layer = map.microLayers[layerName];
+      layerID = $trigger.text();
+      layer = opec.microLayers[layerID];
    }
       
    return { 
@@ -346,7 +346,7 @@ opec.contextMenu.showScalebar = function($trigger) {
  */
 opec.contextMenu.getCurrentStyles = function($trigger)
 {
-   var layer = map.getLayersByName($trigger.attr('id'))[0];
+   var layer = opec.getLayerByID($trigger.attr('id'));
    if(layer.controlID != 'opLayers')
       return [];
       
@@ -369,7 +369,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
          callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
          callback: function() {
-            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});
             console.log(value.Name);
             updateScalebar(layer);
@@ -381,7 +381,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
 };
 
 opec.contextMenu.getCurrentElevation = function($trigger) {
-   var layer = map.getLayersByName($trigger.attr('id'))[0];
+   var layer = opec.getLayerByID($trigger.attr('id'));
    var menuOutput = [];
    
    $.each(layer.elevationCache, function(index, value) {
@@ -390,7 +390,7 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
          className: value == layer.params['ELEVATION'] ? 'elevationSelected' : "",
          callbackName: 'Layer Elevation ' + value,
          callback: function() {
-            var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.mergeNewParams({elevation: value});
          }
       };
@@ -406,7 +406,7 @@ opec.contextMenu.showGraphCreator = function() {
    return {
       name: 'Show Graph Creator',
       callback: function() {
-         opec.window.createGraphCreator();
+         //opec.window.createGraphCreator();
       }
    };
 };

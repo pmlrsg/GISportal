@@ -104,7 +104,8 @@ def createCache(server, xml):
                utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))
                
          subMasterCache['server'][sensorName] = layers
-         
+   
+   subMasterCache['options'] = server['options']
    subMasterCache['wmsURL'] = server['url']
    subMasterCache['wcsURL'] = server['wcsurl']
    subMasterCache['serverName'] = server['name']

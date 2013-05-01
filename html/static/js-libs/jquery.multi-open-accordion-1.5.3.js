@@ -87,6 +87,9 @@
 				if(self._isActive(index)) {
 					self._showTab($this)
 				}
+				else {
+				   self._hideTab($this)
+				}
 			}); // End h3 each
 			
 			$this.children('div').each(function(index) {

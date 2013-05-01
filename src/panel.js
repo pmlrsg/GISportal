@@ -31,7 +31,7 @@ opec.leftPanel.setup = function() {
          opec.leftPanel.updateGroupOrder($(this));
          //var order = $("#opec-lPanel-reference").sortable('toArray');                 
          //$.each(order, function(index, value) {
-            //var layer = map.getLayersByName(value);
+            //var layer = opec.getLayerByID(value);
             //map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
          //});
       }
@@ -58,19 +58,19 @@ opec.leftPanel.setup = function() {
    $('#triggerL-add-accordion')
       .button({ label: 'Add a new group', icons: { primary: 'ui-icon-circle-plus'}, text: false })   
       .click(function(e) { 
-         var $panel = $('.opec-tab-content:visible');
+         var $panel = $('.lPanel .opec-tab-content:visible');
          opec.leftPanel.addNextGroupToPanel($panel);
       });
    //$('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
 
    $('#triggerL-add-group').button();
    
-   $('#lpanel-tabs').buttonset();
+   $('.lPanel .opec-tab-group').buttonset();
    $('#opec-lpanel-tab-operational').button();
    $('#opec-lpanel-tab-reference').button();
    $('#opec-lpanel-tab-options').button();
    
-   $('#lpanel-tabs :button').click(function(e) { 
+   $('.lPanel .opec-tab-group :button').click(function(e) { 
       var tabToShow = $(this).attr('href');
       $('#opec-lPanel-content .opec-tab-content').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
@@ -132,7 +132,7 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
    if($id.length) {    
       // Check if the accordion is empty
       $id.children('li').each(function() {
-         var layer = map.getLayersByName($(this).attr('id'))[0];
+         var layer = opec.getLayerByID($(this).attr('id'));
          if(typeof layer !== 'undefined') {
             opec.removeOpLayer(layer);
             $('#layers').multiselect('deselect', layer.name);
@@ -179,12 +179,12 @@ opec.leftPanel.addNextGroupToPanel = function($panelName) {
  */ 
 opec.leftPanel.addLayerToGroup = function(layer, $group) {
    // if not already on list and not a base layer, populate the layers panel (left slide panel)
-   if(!$('#' + layer.name).length && layer.displayInLayerSwitcher) {
+   if(!$('#' + layer.id).length && layer.displayInLayerSwitcher) {
       // jQuery selector for the layer controlID
       //var selID = layer.controlID == 'opLayers' ? '#' + layer.displaySensorName : '#' + layer.controlID; 
       
       var data = {
-         name: layer.name,
+         name: layer.id,
          visibility: layer.visibility,
          displayTitle: layer.displayTitle,
          type: layer.controlID
@@ -195,16 +195,16 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
          opec.templates.layer(data)
       );
 
-      var $layer = $('#' + layer.name);
+      var $layer = $('#' + layer.id);
 
       // Show the img when we are loading data for the layer
       layer.events.register("loadstart", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').show();
+         $('#' + this.id).find('img[src="img/ajax-loader.gif"]').show();
       });
       
       // Hide the img when we have finished loading data
       layer.events.register("loadend", layer, function(e) {
-         $('#' + this.name).find('img[src="img/ajax-loader.gif"]').hide();
+         $('#' + this.id).find('img[src="img/ajax-loader.gif"]').hide();
       });
       
       // Hide the ajax-loader and the exclamation mark initially
@@ -227,8 +227,8 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
  * Remove a layer from its group on the layers panel. 
  */
 opec.leftPanel.removeLayerFromGroup = function(layer) {
-   if($('#' + layer.name).length)
-      $('#' + layer.name).remove();
+   if($('#' + layer.id).length)
+      $('#' + layer.id).remove();
 };
 
 /**
@@ -256,7 +256,7 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
    var order = accordion.sortable('toArray');   
    if(order.length > 0) {         
       $.each(order, function(index, value) {
-         var layer = map.getLayersByName(value)[0];
+         var layer = opec.getLayerByID(value);
          if(typeof layer !== 'undefined') {
             var positionOffset = layer.controlID == 'opLayers' ? map.numBaseLayers : (map.numBaseLayers + map.numOpLayers);
             map.setLayerIndex(layer, positionOffset + layerOffset + order.length - index - 1);
@@ -331,12 +331,27 @@ opec.rightPanel.setup = function() {
    $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
    
    // Data Analysis panel tabs and accordions
-   $("#dataTabs").tabs();
-   $("#analyses").accordion({ collapsible: true, heightStyle: 'content' });
-   $("#spatial").accordion({ collapsible: true, heightStyle: 'content' });
-   $("#temporal").accordion({ collapsible: true, heightStyle: 'content' }); 
+   $("#opec-tab-analyses").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1, -1, -1] });
+   $("#spatial").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1] });
+   $("#temporal").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1] }); 
+   
+   $('.rPanel .opec-tab-group').buttonset();
+   $('#opec-button-selection').button();
+   $('#opec-button-analyses').button();
+   $('#opec-button-export').button();
+   
+   $('.rPanel .opec-tab-group :button').click(function(e) { 
+      var tabToShow = $(this).attr('href');
+      $('#opec-rPanel-content .opec-tab-content').filter(function(i) { 
+         return $(this).attr('id') != tabToShow.slice(1); 
+      }).hide('fast');
+      $(tabToShow).show('fast');
+   });
    
    opec.rightPanel.setupDrawingControls();
+   opec.rightPanel.setupGraphingTools();
+   opec.rightPanel.setupDataExport();
+   
 };
 
 /**
@@ -409,6 +424,8 @@ opec.rightPanel.setupDrawingControls = function() {
             // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
             if ($('#graphcreator-bbox').size()){
                $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
+               opec.selection.bbox = bbox.toBBOX(5, false);
+               $(opec.selection).trigger('selection_updated', {bbox: true});
             }
             $('#dispROI').html('<h3>Rectangular ROI</h4>');
             // Setup the JavaScript canvas object and draw our ROI on it
@@ -497,4 +514,254 @@ opec.rightPanel.setupDrawingControls = function() {
       }
       $(this).removeClass('opec_click');
    }); 
+};
+
+opec.rightPanel.setupGraphingTools = function() {
+   //var graphCreator = $('#graphCreator');
+   // If there is an open version, close it
+   //if(graphCreator.length)
+      //graphCreator.extendedDialog('close');
+      
+   var data = {
+      advanced: true
+   };
+   
+   // Add the html to the document using a template
+   $('#opec-graphing').append(opec.templates.graphCreatorWindow(data));
+   //$(document.body).append(opec.templates.graphCreatorWindow(data));
+   
+   var graphCreator = $('#graphCreator');           
+   var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
+   
+   /*
+   // Turn it into a dialog box
+   graphCreator.extendedDialog({
+      position: ['center', 'center'],
+      width:340,
+      resizable: false,
+      autoOpen: false,
+      close: function() {
+         // Remove on close
+         $('#graphCreator').remove(); 
+      },
+      showHelp: true,
+      showMinimise: true,
+      dblclick: "collapse",
+      help : function(e, dlg) {
+         opec.gritter.showNotification ('graphCreatorTutorial', null);
+      }
+   }); */
+
+   // Add the jQuery UI datepickers to the dialog
+   $('#graphcreator-time, #graphcreator-time2').datepicker({
+      showButtonPanel: true,
+      dateFormat: 'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true
+   });
+   // Set the datepicker controls to the current view date if set
+   var viewDate = $('#viewDate').datepicker('getDate');
+   if (viewDate !== ""){
+      $('#graphcreator-time').datepicker('setDate', viewDate);
+      $('#graphcreator-time2').datepicker('setDate', viewDate);
+   }
+   
+   
+   var layerID = $('.selectedLayer:visible').attr('id');
+   
+   // We need to check if a layer is selected
+   if(typeof layerID !== 'undefined') {
+      // Get the currently selected layer
+      var layer = opec.getLayerByID(layerID);
+      $('#graphcreator-baseurl').val(layer.wcsURL);
+      $('#graphcreator-coverage').val(layer.origName);
+   }
+   
+   // Check for changes to the selected layer
+   $('.lPanel').bind('selectedLayer', function(e) {
+      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      $('#graphcreator-baseurl').val(layer.wcsURL);
+      $('#graphcreator-coverage').val(layer.origName);
+   });
+   
+   graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
+                     
+   // When selecting the bounding box text field, request user to draw the box to populate values
+   $('#graphcreator-bbox').click(function() {
+      opec.gritter.showNotification('bbox', null);
+   });
+   
+   // Event to open and close the panels when clicked
+   $('.ui-control-header').click(function() {
+      $(this)
+         .toggleClass("ui-control-header-active")
+         .find("> .ui-icon").toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
+         .next().toggleClass("ui-control-content-active").slideToggle();
+      return false;
+   });
+   
+   // Gets the top layer that's checkbox is checked and puts it's ID into the coverage box
+   $('#graphcreator-coverage-button').click(function() {
+      $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
+         if($(this).is(':checked')) {
+            var layerID = $(this).parent('li').attr('id');
+            var layer = opec.getLayerByID(layerID);
+            $('#graphcreator-coverage').val(layer.origName);          
+            $('#graphcreator-baseurl').val(layer.wcsURL);   
+         }
+      });
+
+      return false;
+   });
+   
+   graphCreator.unbind('.loadGraph').bind('ajaxStart.loadGraph', function() {
+      $(this).find('img[src="img/ajax-loader.gif"]').show();
+   }).bind('ajaxStop.loadGraph', function() {
+      $(this).find('img[src="img/ajax-loader.gif"]').hide();
+   });
+   
+   $('#graphcreator-barwidth-button').click(function() {
+      return false;
+   });
+   
+   // Close histogram, advanced and format panels
+   $('#histogram-inputs-header').trigger('click');
+   $('#advanced-inputs-header').trigger('click');
+   $('#graph-format-header').trigger('click');
+   
+   // Create and display the graph
+   graphCreatorGenerate.on('click', ':button', function(e) {
+      // Extract the date-time value from the datepickers either as single date-time or date-time range
+      var dateRange = $('#graphcreator-time').val();         
+      if ($('#graphcreator-time2').val() !== "") {
+         dateRange += ("/" + $('#graphcreator-time2').val());
+      }
+      
+      var graphXAxis = null,
+      graphYAxis = null;
+      
+      if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
+         graphXAxis = 'Lon';
+         graphYAxis = 'Time';
+      }
+      else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
+         graphXAxis = 'Time';
+         graphYAxis = 'Lat';
+      }
+      
+      var params = {
+         baseurl: $('#graphcreator-baseurl').val(),
+         coverage: $('#graphcreator-coverage').val(),
+         type: $('#graphcreator-type').val(),
+         bins: $('#graphcreator-bins').val(),
+         time: dateRange,
+         bbox: $('#graphcreator-bbox').val(),
+         graphXAxis: graphXAxis,
+         graphYAxis: graphYAxis,
+         graphZAxis: $('#graphcreator-coverage').val()
+      };
+      
+      var request = $.param( params );
+      
+      $.ajax({
+         type: 'GET',
+         url: opec.wcsLocation + request,
+         dataType: 'json',
+         asyc: true,
+         success: function(data) {
+            opec.graphs.create(data);
+         },
+         error: function(request, errorType, exception) {
+            var data = {
+               type: 'wcs data',
+               request: request,
+               errorType: errorType,
+               exception: exception,
+               url: this.url
+            };          
+            gritterErrorHandler(data);
+         }
+      });
+   }); 
+            
+   // Open the dialog box
+   //graphCreator.extendedDialog('open');   
+};
+
+opec.rightPanel.setupDataExport = function() {
+   
+   var dataExport = $('#dataTools');
+   var selectedLayer = dataExport.children('div').first();
+   var selectedBbox = selectedLayer.next('div');
+   var dataDownloadURL = dataExport.children('a').first();
+   
+   var url = null;
+   var urlParams = {
+      service: 'WCS',
+      version: '1.0.0',
+      request: 'GetCoverage',
+      crs: 'OGC:CRS84',
+      format: 'NetCDF3'
+   };
+   
+   var layerID = $('.selectedLayer:visible').attr('id');
+   
+   // We need to check if a layer is selected
+   if(typeof layerID !== 'undefined') {
+      // Get the currently selected layer
+      var layer = opec.getLayerByID(layerID);
+      selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
+      
+      // Not using dot notation, so Closure doesn't change it.
+      urlParams['coverage'] = layer.urlName;
+      url = layer.wcsURL;  
+      updateURL();
+   }
+   
+   // Check for changes to the selected layer
+   $('.lPanel').bind('selectedLayer', function(e) {
+      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
+      
+      // Not using dot notation, so Closure doesn't change it.
+      urlParams['coverage'] = layer.urlName;
+      url = layer.wcsURL; 
+      updateURL();
+   });
+   
+   $(opec.selection).bind('selection_updated', function(event, params) {
+      if(typeof params.bbox !== 'undefinded' && params.bbox) {
+         var bbox = opec.selection.bbox.split(',');
+         selectedBbox.html('<b>Selected Bbox: </b>' + bbox[0] + ', ' + bbox[1] + ', ' + bbox[2] + ', ' + bbox[3]);
+         urlParams.bbox = opec.selection.bbox;
+         updateURL();
+      }
+   });
+   
+   function updateURL() {
+      var request = $.param( urlParams );
+      dataDownloadURL.attr('href', url + request);
+   }
+   
+   dataDownloadURL.click(function() {
+      // Check if there is data to download and catch spam clicks.
+      if($(this).attr('href') == '#' && $(this).text() != 'No Data To Download') {
+         dataDownloadURL.text('No Data To Download');
+         setTimeout(function() {
+            dataDownloadURL.text('Download Data');
+         }, 1000);
+         
+         return false;
+      }
+      // If the text is hasn't changed then download the data.
+      else if($(this).text() == 'Download Data') {
+         // TODO: We could use this to keep track of what data the user has
+         // downloaded. They might need to see what they have or have not
+         // downloaded.
+      }
+      // Top check will fail if the user spam clicks, but we still need to 'return false'.
+      else {
+         return false;
+      }
+   });
 };

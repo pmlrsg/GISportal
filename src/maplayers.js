@@ -8,7 +8,8 @@
 OpenLayers.Map.prototype.cesiumLoaded = null;
 
 // A list of layer names that will be selected by default
-OpenLayers.Map.prototype.sampleLayers = ["no3", "chl", "v_wind", "CRW_SST" ];
+// This should be moved to the middleware at some point...
+OpenLayers.Map.prototype.sampleLayers = ["metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -27,8 +28,8 @@ OpenLayers.Map.prototype.numOpLayers = 0;
 OpenLayers.Map.prototype.helperMessages = [];
 
 // Temporary version of microLayer and layer storage.
-OpenLayers.Map.prototype.microLayers = [];
-OpenLayers.Map.prototype.layerStore = [];
+//OpenLayers.Map.prototype.microLayers = [];
+//OpenLayers.Map.prototype.layerStore = [];
 
 // Store the type of the last drawn ROI within the map object ('', 'point', 'box', 'circle' or 'poly')
 OpenLayers.Map.prototype.ROI_Type = '';
@@ -243,7 +244,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
          opec.createOpLayer(data, microLayer);
          // DEBUG
          //console.log("Adding layer...");
-         opec.addOpLayer(microLayer.name);
+         opec.addOpLayer(microLayer.providerTag + ': ' + microLayer.name);
          // DEBUG
          //console.log("Added Layer");
       },

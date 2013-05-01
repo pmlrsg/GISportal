@@ -9,11 +9,13 @@ opec.window.createGraphCreator = function() {
    };
    
    // Add the html to the document using a template
-   $(document.body).append(opec.templates.graphCreatorWindow(data));
+   $('#opec-graphing').append(opec.templates.graphCreatorWindow(data));
+   //$(document.body).append(opec.templates.graphCreatorWindow(data));
    
    graphCreator = $('#graphCreator');           
    var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
    
+   /*
    // Turn it into a dialog box
    graphCreator.extendedDialog({
       position: ['center', 'center'],
@@ -30,7 +32,7 @@ opec.window.createGraphCreator = function() {
       help : function(e, dlg) {
          opec.gritter.showNotification ('graphCreatorTutorial', null);
       }
-   });
+   }); */
 
    // Add the jQuery UI datepickers to the dialog
    $('#graphcreator-time, #graphcreator-time2').datepicker({
@@ -47,12 +49,12 @@ opec.window.createGraphCreator = function() {
    }
    
    // Get the currently selected layer
-   var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+   var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
    $('#graphcreator-baseurl').val(layer.wcsURL);
    $('#graphcreator-coverage').val(layer.origName);
    
    $('.lPanel').bind('selectedLayer', function(e) {
-      var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage').val(layer.origName);
    });
@@ -78,7 +80,7 @@ opec.window.createGraphCreator = function() {
       $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
          if($(this).is(':checked')) {
             var layerID = $(this).parent('li').attr('id');
-            var layer = map.getLayersByName(layerID)[0];
+            var layer = opec.getLayerByID(layerID);
             $('#graphcreator-coverage').val(layer.origName);          
             $('#graphcreator-baseurl').val(layer.wcsURL);   
          }
@@ -158,7 +160,7 @@ opec.window.createGraphCreator = function() {
    }); 
             
    // Open the dialog box
-   graphCreator.extendedDialog('open');
+   //graphCreator.extendedDialog('open');
 };
 
 //-----------------------------------------------------------------------------
@@ -244,12 +246,12 @@ var graphCreator = {
       //-----------------------------------------------------------------------
       
       // Get the currently selected layer
-      var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage').val(layer.origName);
          
       $('.lPanel').bind('selectedLayer', function(event) {
-         var layer = map.getLayersByName($('.selectedLayer:visible').attr('id'))[0];
+         var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
          $('#graphcreator-baseurl').val(layer.wcsURL);
          $('#graphcreator-coverage').val(layer.origName);
       });
@@ -279,7 +281,7 @@ var graphCreator = {
             if($(this).is(':checked')) {
                var layerID = $(this).parent('li').attr('id');
                $('#graphcreator-coverage').val(layerID);
-               var layer = map.getLayersByName(layerID)[0];
+               var layer = opec.getLayerByID(layerID);
                $('#graphcreator-baseurl').val(layer.wcsURL);   
             }
          });

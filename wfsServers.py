@@ -12,6 +12,7 @@ servers = {
          'cql_filter': "PROJECTNAM='Oceans 2025 Theme 10 SO1 AMT' AND DATACAT='CTD or STD cast'",  
       },
       'options': {
+         'providerShortTag': 'bodc',
          'tag': 'gml:featuremembers'
       },
       'url': 'http://grid.bodc.nerc.ac.uk/web_services/wfs?' 
@@ -26,6 +27,7 @@ servers = {
          'outputFormat': 'GML2'        
       },
       'options': {
+         'providerShortTag': 'rsg',
          'passthrough': True,
          'format': 'GML2'
       },
@@ -41,6 +43,7 @@ servers = {
          'outputFormat': 'GML2'        
       },
       'options': {
+         'providerShortTag': 'rsg',
          'passthrough': True,
          'format': 'GML2'
       },
@@ -56,6 +59,7 @@ servers = {
          'outputFormat': 'GML2'        
       },
       'options': {
+         'providerShortTag': 'rsg',
          'passthrough': True,
          'format': 'GML2'
       },
@@ -71,6 +75,7 @@ servers = {
          'outputFormat': 'GML2'        
       },
       'options': {
+         'providerShortTag': 'rsg',
          'passthrough': True,
          'format': 'GML2'
       },

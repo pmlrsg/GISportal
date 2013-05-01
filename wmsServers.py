@@ -10,6 +10,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'Motherloade'
       },
       'wcsurl': 'http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?'
    },
@@ -22,6 +23,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'HiOOS'
       },
       'wcsurl': 'http://oos.soest.hawaii.edu/thredds/wcs/hioos/satellite/dhw?'
    },
@@ -34,6 +36,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'ogs'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?'
    },
@@ -46,6 +49,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'met-no'
       },
       'wcsurl': 'http://thredds.met.no/thredds/wcs/osisaf_test/met.no/ice/conc_nh_agg?'
    },
@@ -58,6 +62,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'ccitim'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/CCITIM?'
    },
@@ -70,6 +75,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'providerShortTag': 'metOffice'
       },
       'wcsurl': ''
    }
