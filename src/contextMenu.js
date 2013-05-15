@@ -144,6 +144,17 @@ opec.contextMenu.setup = function() {
          };
       }
    });
+   
+   //$.contextMenu({
+      //selector: '.opec-selector-contextMenu',
+      //build: function($trigger, e) {
+         //return {
+            //items: {
+               
+            //}
+         //}   
+      //}
+   //});
 };
 
 opec.contextMenu.heatmapTest = function() {
@@ -267,6 +278,7 @@ opec.contextMenu.viewData = function($trigger) {
    else {
       layerName = $trigger.text();
       layer = opec.microLayers[layerName];
+      console.log("To be be removed");
    }
    
    return {
@@ -365,6 +377,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
    $.each(styles, function(index, value) {
       menuOutput['Layer Styles' + index] = {
          name: value.Name,
+         // Ignore Lint warning
          className: value.Name == layer.params["STYLES"] ? "styleSelected" : "",
          callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
@@ -387,6 +400,7 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
    $.each(layer.elevationCache, function(index, value) {
       menuOutput['Layer Elevation ' + index] = {
          name: parseFloat(value).toFixed(3) + " " + layer.elevationUnits,
+         // Ignore Lint warning
          className: value == layer.params['ELEVATION'] ? 'elevationSelected' : "",
          callbackName: 'Layer Elevation ' + value,
          callback: function() {

@@ -101,6 +101,7 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
          else
             return true;
       },
+      showDropdown: true,
       events: {
          close: function(id) {
             opec.leftPanel.removeGroupFromPanel(id);
@@ -135,7 +136,8 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
          var layer = opec.getLayerByID($(this).attr('id'));
          if(typeof layer !== 'undefined') {
             opec.removeOpLayer(layer);
-            $('#layers').multiselect('deselect', layer.name);
+            // Deselect layer on layer selector
+            opec.layerSelector.toggleSelectionFromLayer(layer);
          }
 
       });

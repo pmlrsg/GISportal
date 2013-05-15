@@ -7,17 +7,9 @@
 // Not all browsers have webGL
 OpenLayers.Map.prototype.cesiumLoaded = null;
 
-// A list of layer names that will be selected by default
-// This should be moved to the middleware at some point...
-OpenLayers.Map.prototype.sampleLayers = ["metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
-
-// Array of ALL available date-times for all date-time layers where data's available
-// The array is populated once all the date-time layers have loaded
-OpenLayers.Map.prototype.enabledDays = [];
-
 // Stores the data provided by the master cache file on the server. This includes
 // layer names, titles, abstracts, etc.
-OpenLayers.Map.prototype.getCapabilities = [];
+//OpenLayers.Map.prototype.getCapabilities = [];
 
 // Used as offsets when sorting layers in groups
 OpenLayers.Map.prototype.numBaseLayers = 0;
@@ -244,7 +236,7 @@ OpenLayers.Map.prototype.getLayerData = function(fileName, microLayer) {
          opec.createOpLayer(data, microLayer);
          // DEBUG
          //console.log("Adding layer...");
-         opec.addOpLayer(microLayer.providerTag + ': ' + microLayer.name);
+         opec.addOpLayer(microLayer.id);
          // DEBUG
          //console.log("Added Layer");
       },

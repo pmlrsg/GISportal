@@ -21,8 +21,16 @@ opec.cache.wmsLayers = [];
 opec.cache.wfsLayers = [];
 
 // Temporary version of microLayer and layer storage.
-opec.layerStore = [];
-opec.microLayers = [];
+opec.layerStore = {};
+opec.microLayers = {};
+
+// A list of layer names that will be selected by default
+// This should be moved to the middleware at some point...
+opec.sampleLayers = ["metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
+
+// Array of ALL available date-times for all date-time layers where data's available
+// The array is populated once all the date-time layers have loaded
+opec.enabledDays = [];
 
 // Stores the current user selection. Any changes should trigger the correct event.
 // Could be changed to an array later to support multiple user selections
@@ -30,6 +38,7 @@ opec.selection = {};
 opec.selection.layer = undefined;
 opec.selection.bbox = undefined;
 
+opec.layerSelector = null;
 /*===========================================================================*/
 //Initialise javascript global variables and objects
 
@@ -454,14 +463,26 @@ opec.createOpLayers = function() {
                      var microLayer = new opec.MicroLayer(item.Name, item.Title, 
                         item.Abstract, item.FirstDate, item.LastDate, serverName, 
                         wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox, providerTag);          
-                     opec.checkNameUnique(microLayer);               
-                     $('#layers').multiselect('addItem', {text: providerTag + ': ' + microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
+                     microLayer = opec.checkNameUnique(microLayer);   
+                     opec.microLayers[microLayer.id] = microLayer;
+                     opec.layerSelector.addLayer(opec.templates.selectionItem({
+                        'id': microLayer.id,
+                        'name': microLayer.name, 
+                        'provider': providerTag, 
+                        'title': microLayer.displayTitle, 
+                        'abstract': microLayer.productAbstract
+                     }));            
+                     //$('#layers').multiselect('addItem', {text: providerTag + ': ' + microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
                   }
                });
             }
          });
       }
    });
+   
+   opec.layerSelector.refresh();
+   // Batch add here in future.
+   
 };
 
 /**
@@ -469,7 +490,7 @@ opec.createOpLayers = function() {
  */
 opec.isSelected = function(name) {
    if(map)
-      return $.inArray(name, map.sampleLayers) > -1 ? true : false;
+      return $.inArray(name, opec.sampleLayers) > -1 ? true : false;
 };
 
 /**
@@ -479,24 +500,24 @@ opec.isSelected = function(name) {
  * @param {number} count - Number of other layers with the same name (optional)
  */
 opec.checkNameUnique = function(microLayer, count) {
-   var name = null;
+   var id = null;
    
    if(typeof count === "undefined" || count === 0) {
-      name = microLayer.name;
+      id = microLayer.id;
       count = 0;
    }
    else {
-      name = microLayer.name + count;
+      id = microLayer.id + count;
    }
    
-   if(name in opec.microLayers) {
+   if(id in opec.microLayers) {
       opec.checkNameUnique(microLayer, ++count);
    }
    else
       if(count !== 0) { 
-         microLayer.name = microLayer.name + count; 
+         microLayer.id = microLayer.id + count; 
       }
-      opec.microLayers[microLayer.providerTag + ': ' + microLayer.name] = microLayer;
+      return microLayer;
 };
 
 /**
@@ -544,7 +565,7 @@ opec.createOpLayer = function(layerData, microLayer) {
    layer.boundingBox = layerData.BoundingBox;
    layer.setVisibility(false);     
    layer.selected = false;     
-   opec.layerStore[layer.name] = layer;
+   opec.layerStore[layer.id] = layer;
    
    map.getMetadata(layer);
 };
@@ -552,9 +573,9 @@ opec.createOpLayer = function(layerData, microLayer) {
 /**
  * Add a layer to the map from the layerStore. 
  */
-opec.addOpLayer = function(layerName) {
+opec.addOpLayer = function(layerID) {
    // Get layer from layerStore
-   var layer = opec.layerStore[layerName];
+   var layer = opec.layerStore[layerID];
 
    if (typeof layer === 'undefined' || layer == 'null') {
       // Error: Could not get a layer object
@@ -563,7 +584,7 @@ opec.addOpLayer = function(layerName) {
    }
 
    // Remove the layer from the layerStore
-   delete opec.layerStore[layerName];
+   delete opec.layerStore[layerID];
    
    // Check if an accordion is there for us
    //if(!$('#' + layer.displaySensorName).length)
@@ -600,7 +621,7 @@ opec.removeOpLayer = function(layer) {
    map.events.unregister("click", layer, getFeatureInfo);
 
    // Add the layer to the layerStore
-   opec.layerStore[layer.name] = layer;
+   opec.layerStore[layer.id] = layer;
 
    // Decrease the count of OpLayers
    map.numOpLayers--;
@@ -953,8 +974,7 @@ function nonLayerDependent()
       $('#shareOptions').toggle();
    });
    
-   function addDialogClickHandler(idOne, idTwo)
-   {
+   function addDialogClickHandler(idOne, idTwo) {
       $(idOne).click(function(e) {
          if($(idTwo).extendedDialog('isOpen')) {
            $(idTwo).extendedDialog('close');
@@ -985,14 +1005,14 @@ function nonLayerDependent()
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
-function main()
-{
+function main() {
    // Compile Templates
    opec.templates = {};
    opec.templates.layer = Mustache.compile($('#opec-template-layer').text().trim());
    opec.templates.metadataWindow = Mustache.compile($('#opec-template-metadataWindow').text().trim());
    opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
    opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
+   opec.templates.selectionItem = Mustache.compile($('#opec-template-selector-item').text().trim());
    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -1039,10 +1059,10 @@ function main()
       dblclick: "collapse"
    });
 
-   $('#layerSelection').extendedDialog({
+   $('#opec-layerSelection').extendedDialog({
       position: ['center', 'center'],
-      width: 500,
-      minWidth:500,
+      width: 550,
+      minWidth:550,
       height: 400,
       minHeight: 400,
       resizable: true,
@@ -1058,7 +1078,10 @@ function main()
          opec.gritter.showNotification('layerSelector', null);
       }
    });
+   
+   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
 
+/*
    $('#layers').multiselect({
       selected: function(e, ui) {
          // DEBUG
@@ -1129,7 +1152,7 @@ function main()
             func(that);
          
       }
-   });
+   });*/
    
    /*
    $("#dThree").extendedDialog({
@@ -1226,7 +1249,7 @@ function getFeatureInfo(event) {
       if(click_bounds.intersectsBounds(bounds) || !bbox) {
          
          // Immediately load popup saying "loading"
-         var tempPopup = new OpenLayers.Popup (
+         var tempPopup = new OpenLayers.Popup(
             "temp", // TODO: does this need to be unique?
             lonLat,
             new OpenLayers.Size(100, 50),

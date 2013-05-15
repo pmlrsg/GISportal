@@ -11,6 +11,7 @@
       "src/windows/scalebar.js",
       "src/windows/graphcreator.js",
       "src/windows/metadata.js",
+      "src/windows/layerselector.js",
       "src/gritter.js",
       "src/graphing.js",
       "src/utils.js",

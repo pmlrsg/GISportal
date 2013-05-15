@@ -83,6 +83,12 @@
 <script type="text/javascript" src="js-libs/heatmapjs/heatmap.js"></script>
 <script type="text/javascript" src="js-libs/heatmapjs/heatmap-openlayers.js"></script>
 
+<!-- filtrify -->
+<script type="text/javascript" src="js-libs/filtrify/js/filtrify.js"></script>
+
+<!-- quicksand -->
+<script type="text/javascript" src="js-libs/quicksand/js/quicksand.js"></script>
+
 <!-- dialog -->
 <script type="text/javascript" src="js-libs/dialog.js"></script>
 
@@ -105,6 +111,9 @@
       <a id="layer-exclamation" href="#">
          <img src="img/exclamation_small.png"/>
       </a>
+      <!--<a>
+         <span class="ui-icon ui-icon-circle-close">close</span>
+      </a>-->
    </li>
 </script>
 <!-- Metadata Window -->
@@ -285,6 +294,14 @@
          <img src="img/ajax-loader.gif"/> 
       </div>
    </div>
+</script>
+<!-- Item on the layer selection window -->
+<script type="text/html" id="opec-template-selector-item">
+    <li class="opec-unselected ui-state-default" data-provider="{{provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
+       <strong>{{name}}</strong>
+       <a href="#"><span class="ui-corner-all ui-icon ui-icon-plus"></span></a>
+       <span style="display:none;">Abstract: <i>{{abstract}}</i></span>
+    </li>
 </script>
 <!-- ================================================================================= -->
 
@@ -529,6 +546,8 @@
          <label class="iconBtn" for="shareLink"></label>
       </div> 
    </div>
+   
+   <!-- CLONE: change branding here -->
    <div id="info" class="unselectable" title="Information">
       <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
       <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
@@ -536,6 +555,8 @@
       EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
       <div style="clear: both;"> </div>
    </div>
+   <!------------------------------------------------------------------------->
+   
    <!-- Map Info Dialog -->
    <div id="mapInfo" title="MapInfo">
       <div>
@@ -546,10 +567,21 @@
       </div>
    </div>
    <!-- Layer Selection Dialog -->
-   <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
+   <!-- <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
       <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
       <div id="layers"></div>
+   </div> -->
+   
+   <div id="opec-layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
+      <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
+      <ul>
+         <li class="opec-tagMenu"></li>       
+         <li class="opec-selectable">
+            <ul></ul>
+         </li>       
+      </ul>
    </div>
+   
    <!-- D3 Timeline -->
    <div id="timeline" class="timelineDiv">
    </div>

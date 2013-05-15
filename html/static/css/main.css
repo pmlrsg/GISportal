@@ -613,15 +613,172 @@ div .sensor-accordion {
 
 /* ======== Layer Selector ======== */
 
-#layers {
+#opec-layerSelection {
+   overflow: hidden;
+}
+
+#opec-layerSelection > span {
+   margin-bottom: 5px;
+   display: block;
+}
+
+#opec-layerSelection > ul {
    width: 100%;
-   height: 80%;
-   margin-top: 10px;
-   /*position: absolute;
-   top: 20px;
-   left: 10px;
-   right: 10px;
-   bottom: 10px;*/
+   height: 90%;
+   margin: 0 auto;
+   padding: 0;
+   /*text-shadow: black 0 -1px;
+   text-shadow: rgba(0, 0, 0, 0.7) 0 -1px;*/
+   font-size: 1.2em;
+   border: 1px solid #333;
+}
+
+#opec-layerSelection .opec-selectable {
+   display: inline-block;
+   overflow-y: auto;
+   vertical-align: top;
+   width: 74%;
+   height: 100%;
+}
+
+#opec-layerSelection .opec-selectable > ul {
+   list-style: none; 
+   padding: 0;
+   width: 100%;
+   height: 100%;
+}
+
+#opec-layerSelection .opec-selectable > ul > li {
+   position: relative;
+   max-width: 200px;
+   word-wrap: break-word;
+   display: inline-block; 
+   *zoom: 1; 
+   vertical-align: top;
+   margin: 5px;
+   padding: 5px;
+   border-radius: 3px;
+   font-size: 85%;
+   opacity: .90;
+}
+
+#opec-layerSelection .opec-selectable > ul > li > a {
+   position: absolute;
+   top: 0px;
+   right: 0px;
+   margin-top: 3px;
+}
+
+#opec-layerSelection .opec-selectable > ul > li > strong {
+   margin-right: 15px;
+}
+
+#opec-layerSelection .opec-selectable > ul > li > span {
+   display: block;
+}
+
+#opec-layerSelection .opec-selectable > ul > li > span > i {
+   margin-left: 3px;
+}
+
+/* Class for when layers are selected or unselected on the layer selector */
+.opec-unselected {
+}
+
+.opec-selected {  
+}
+/*---------------------------------------------------------------------------*/
+
+#opec-layerSelection .opec-tagMenu {
+   color: black;
+   display:inline-block;
+   vertical-align: top;
+   width: 25%;
+   height: 100%;
+   /*background: rgba(17, 17, 17, 0.3);*/
+   opacity: .80;
+   margin: 0px;
+   overflow-y: auto;
+   overflow-x: hidden;
+   border-right: 1px black solid;
+}
+
+.ft-menu {
+   margin-left: 0px;
+   padding-left: 0px;
+   list-style: none;
+}
+
+.ft-field {
+   width: 100%;
+}
+
+.ft-label {
+   *zoom: 1; 
+   background: rgba(34, 34, 34, 0.5);
+   vertical-align: top;
+   margin: 2px;
+   margin-left: 5px;
+   padding: 2px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   border-radius: 3px;
+   font-size: 85%;
+   color: white;
+}
+
+.ft-label span {
+   margin-left: 5px;
+   position: absolute;
+   left: .5em;
+   margin-left: 15px;
+}
+
+.ft-label a {
+   margin-left: 15px;
+   text-decoration: none;
+}
+.ft-selected {
+   padding-left: 5px;
+}
+
+.ft-selected li {
+   list-style: none;
+   *zoom: 1; 
+   background: rgba(59, 88, 255, 0.7);
+   vertical-align: top;
+   margin: 2px;
+   /*margin-top: 5px;*/
+   margin-bottom: 1px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   border-radius: 3px;
+   font-size: 85%;
+   color: white;
+}
+.ft-selected li span {
+   margin-left: 10px;
+}
+
+.ft-tags {
+   list-style: none;
+   padding-left: 0px;
+}
+
+.ft-tags li {
+   *zoom: 1; 
+   background: rgba(17, 17, 17, 0.7);
+   vertical-align: top;
+   margin: 2px;
+   /*margin-top: 5px;*/
+   margin-bottom: 1px;
+   margin-left: 10px;
+   padding-left: 10px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+   border-radius: 3px;
+   font-size: 85%;
+   color: white;
 }
 
 /* ======== Context Menu ======== */
@@ -822,3 +979,5 @@ div .sensor-accordion {
   stroke: url(#temperature-gradient);
   stroke-width: 1.5px;
 }
+
+/* ========================================================================= */
