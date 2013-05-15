@@ -12,7 +12,8 @@
 			active: 0,
 			showAll: null,
 			hideAll: null,
-			showClose: null,
+			showClose: false,
+			showDropdown: false,
 			$panel: null,
 			classes: {
 				accordion: 'ui-accordion ui-widget ui-helper-reset',
@@ -63,8 +64,11 @@
                .end()
                .find('.ui-accordion-header-close')
                   .each(function() {
-                     if(typeof options.showClose !== "undefined" && $.isFunction(options.showClose))
-                        options.showClose(options.$panel) ? $(this).show() : $(this).hide();
+                     if(typeof options.showClose !== "undefined")
+                        if($.isFunction(options.showClose))
+                           options.showClose(options.$panel) ? $(this).show() : $(this).hide();
+                        else
+                           options.showClose ? $(this).show() : $(this).hide();
                   })
                   .click(function() {
                      if(options.events.close) { options.events.close($div.attr('id')); }
@@ -72,6 +76,13 @@
                   })
                .end()
                .find('.ui-accordion-header-dropdown')
+                  .each(function() {
+                     if(typeof options.showDropdown !== "undefined")
+                        if($.isFunction(options.showDropdown))
+                           options.showDropdown(options.$panel) ? $(this).show() : $(this).hide();
+                        else
+                           options.showDropdown ? $(this).show() : $(this).hide();
+                  })
                   .click(function(e) {
                      e.preventDefault();
                      if(options.events.dropdown) { options.events.dropdown($this); }
