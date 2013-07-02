@@ -301,7 +301,7 @@ opec.TimeLine.prototype.redraw = function() {
    //--------------------------------------------------------------------------
    
    // Position the date time detail lines (if available) for each time bar
-   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timeLayers);
+   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
    this.dateDetails.enter().insert('svg:g')
       .each(function(d1, i1) {
          d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
