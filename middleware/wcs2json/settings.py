@@ -1,5 +1,5 @@
-DEBUG = False
-DEBUG_WITH_APTANA = False
+DEBUG = True
+DEBUG_WITH_APTANA = True
 
 LOG_LEVEL = "DEBUG"
 # This path needs changing according to local server configuration

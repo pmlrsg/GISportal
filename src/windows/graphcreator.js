@@ -34,6 +34,7 @@ opec.window.createGraphCreator = function() {
       }
    }); */
 
+   // TODO: Add some logic to the way dates are selected.
    // Add the jQuery UI datepickers to the dialog
    $('#graphcreator-time, #graphcreator-time2').datepicker({
       showButtonPanel: true,

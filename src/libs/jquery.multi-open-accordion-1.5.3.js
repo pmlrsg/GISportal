@@ -25,17 +25,17 @@
 				stateHover: 'ui-state-hover',
 				buttonPane: 'ui-accordion-header-buttonpane',
 				buttons: {
-				   close: 'ui-accordion-header-close ui-corner-all',
-				   dropdown: 'ui-accordion-header-dropdown ui-corner-all'
+               close: 'ui-accordion-header-close ui-corner-all',
+               dropdown: 'ui-accordion-header-dropdown ui-corner-all'
 				}
 			},
 			icons: {
-			   close: 'ui-icon-circle-close',
-			   dropdown: 'ui-icon-circle-triangle-s'
+            close: 'ui-icon-circle-close',
+            dropdown: 'ui-icon-circle-triangle-s'
 			},
 			events: {
-			   close: null,
-			   dropdown: null
+            close: null,
+            dropdown: null
 			}
 		},
 
@@ -109,33 +109,33 @@
 			}); // End each
 			
 			$h3
-   			.bind('click', function(e) {
-   				// Preventing on click to navigate to the top of document
-   				e.preventDefault();
-   				var $this = $(this);
-   				var ui = {
-   					tab: $this,
-   					content: $this.next('div')
-   				};
-   				if(self._trigger('click', null, ui)) {
-   				   if ($this.hasClass(options.classes.stateDefault)) {
-   					   self._showTab($this);
-   				   } else {
-   					   self._hideTab($this);
-   				   }
+            .bind('click', function(e) {
+               // Preventing on click to navigate to the top of document
+               e.preventDefault();
+               var $this = $(this);
+               var ui = {
+                  tab: $this,
+                  content: $this.next('div')
+               };
+               if(self._trigger('click', null, ui)) {
+                  if ($this.hasClass(options.classes.stateDefault)) {
+                     self._showTab($this);
+                  } else {
+                     self._hideTab($this);
+                  }
                }
-   			})
-   		   .bind('dblclick', function(e) {
-   		      e.preventDefault();
-   		      //$(this).find('ui-accordion-header-title').hide();
-   		      console.log("dblclick works")		      
-   		   })
-   			.bind('mouseover', function(){
-   				$(this).addClass(options.classes.stateHover);
-   			})
-   			.bind('mouseout', function(){
-   				$(this).removeClass(options.classes.stateHover);
-   			});
+            })
+            .bind('dblclick', function(e) {
+               e.preventDefault();
+               //$(this).find('ui-accordion-header-title').hide();
+               console.log("dblclick works");
+            })
+            .bind('mouseover', function(){
+               $(this).addClass(options.classes.stateHover);
+            })
+            .bind('mouseout', function(){
+               $(this).removeClass(options.classes.stateHover);
+            });
 			
 			// Triggering initialized
 			self._trigger('init', null, $this);
@@ -168,8 +168,9 @@
 			var ui = {
 				tab: $this,
 				content: $this.next('div')
-			}
+			};
 			this._trigger('tabShown', null, ui);
+			console.log("Open Accordion");
 		},
 		
 		// Private helper method that used to show tabs 
@@ -185,8 +186,9 @@
 			var ui = {
 				tab: $this,
 				content: $this.next('div')
-			}
+			};
 			this._trigger('tabHidden', null, ui);
+			console.log("Close Accordion");
 		},
 		
 		// Helper method to determine wether passed parameter is an index of an
@@ -197,7 +199,7 @@
 			if(typeof options.active == "boolean" && !options.active) {
 				return false;
 			} else {
-				if(options.active.length != undefined) {
+				if(options.active.length !== undefined) {
 					for (var i = 0; i < options.active.length ; i++) {
 						if(options.active[i] == num)
 							return true;
@@ -223,7 +225,7 @@
 					});
 				}
 			});
-			return (ui.length == 0 ? undefined : ui);
+			return (ui.length === 0 ? undefined : ui);
 		},
 		
 		getActiveTabs: function() {
@@ -234,7 +236,7 @@
 					tabs.push(index);
 				}
 			});
-			return (tabs.length == 0 ? [-1] : tabs);
+			return (tabs.length === 0 ? [-1] : tabs);
 		},
 		
 		renameGroup: function() {
@@ -261,11 +263,9 @@
 		},
 		
       _showRename: function() {
-
 		},
 		
 		_hideRename: function() {
-		   
 		},
 		
 		// Setting array of active tabs
@@ -333,8 +333,8 @@
 							tabs.push(index);
 						}
 					});
-					return (tabs.length == 0 ? [-1] : tabs);
-					break;
+					return (tabs.length === 0 ? [-1] : tabs);
+					break; // ?? In original
 			}
 		}
 		
@@ -342,17 +342,16 @@
 	
 	// Helper array has object function thanks to @Vinko Vrsalovic
 	// http://stackoverflow.com/questions/143847/best-way-to-find-an-item-in-a-javascript-array
-	Array.prototype.hasObject = (!Array.indexOf ? function (o) {
-	    var l = this.length + 1;
-	    while (l -= 1) {
-	        if (this[l - 1] === o) {
-	            return true;
-	        }
-	    }
-	    return false;
-	  }: function (o) {
-	    return (this.indexOf(o) !== -1);
-	  }
-	);
+   Array.prototype.hasObject = (!Array.indexOf ? function (o) {
+      var l = this.length + 1;
+      while (l -= 1) {
+         if (this[l - 1] === o) {
+            return true;
+         }
+      }
+      return false;
+   }: function (o) {
+      return (this.indexOf(o) !== -1);
+   });
 	
 })(jQuery);

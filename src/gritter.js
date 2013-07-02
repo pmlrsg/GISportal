@@ -223,8 +223,8 @@ function createHelpMessages()
       },
       afterOpen: function(layer) {       
          $('#wtHelp-layerSelectionPanel').click(function(e) {
-            if($('#layerSelection').extendedDialog('isOpen')) {
-               $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            if($('#opec-layerSelection').extendedDialog('isOpen')) {
+               $('#opec-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
             }
             else {
                $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
@@ -363,22 +363,26 @@ function createHelpMessages()
       },
       text: function() {
          return 'The layer selector is made up of two parts. The ' +
-            '<a id="help-selectedLayers" href="#">selected layers</a>' +
-            ' panel and the ' +
             '<a id="help-availableLayers" href="#">available layers</a>' +
-            ' panel. To select a layer, you can click the plus sign at the ' +
-            'end of a layer or drag a layer from one side to the other. ' +
+            ' panel and the ' +
+            '<a id="help-tag-menu" href="#">tag menu</a>' +        
+            ' which can be used to limit or filter the avaliable layers. To select a layer, you can click the plus sign at the ' +
+            'end of a layer. ' +
             'To deselect a layer you can click the minus sign at the end of ' +
-            'the layer or again drag from one side to the other.';
+            'the layer.';
       },
       afterOpen: function(data) {
-         $('#help-selectedLayers').click(function() {
-            $('#layers .selected').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+         $('#help-availableLayers').click(function() {
+            $('#opec-layerSelection .opec-selectable').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
             return false;
          });
          
-         $('#help-availableLayers').click(function() {
-            $('#layers .available').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+         $('#help-tag-menu').click(function() {
+            $('#layerPreloader').fadeTo('slow', 0.3, function() { 
+               $(this).fadeTo('slow', 1).fadeTo('slow', 0.3, function() { 
+                  $(this).fadeTo('slow', 1); 
+               }); 
+            });
             return false;
          });
       },

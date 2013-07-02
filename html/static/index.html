@@ -22,15 +22,15 @@
 <link rel="stylesheet" type="text/css" href="js-libs/jquery-gritter/css/jquery.gritter.css" />
 
 <!-- Multiselect styling -->
-<link rel="stylesheet" type="text/css" href="js-libs/jquery-multiselect/css/jquery.multiselect.css" />
+<!-- <link rel="stylesheet" type="text/css" href="js-libs/jquery-multiselect/css/jquery.multiselect.css" /> -->
 
 <!-- Timeline styling -->
 <link rel="stylesheet" type="text/css" href="css/timeline.css" />
 
 <!-- jQuery UI dialog extension styling -->
-<!--<link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/> -->
+<!-- <link rel="stylesheet" type="text/css" href="js-libs/jquery-dialogextend/css/jquery.dialogextend.css"/> -->
 
-<!--<link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
+<!-- <link rel="stylesheet" type="text/css" href="js-libs/OpenLayers/theme/default/google.css">-->
 
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/main.css" />
@@ -53,16 +53,16 @@
 <!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
 
 <!-- http://code.google.com/p/jquery-multi-open-accordion -->
-<script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.3.js"></script>
+<!-- <script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.3.js"></script> -->
 
 <!-- http://medialize.github.com/jQuery-contextMenu/ -->
-<script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script>
+<!-- <script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script> -->
 
 <!-- https://github.com/jboesch/Gritter -->
-<script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.js"></script>
+<!-- <script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.js"></script> -->
 
 <!-- https://github.com/michael/multiselect -->
-<script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script>
+<!-- <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script> -->
 
 <!-- jQuery UI dialog extension -->
 <!-- <script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script> -->
@@ -84,16 +84,16 @@
 <script type="text/javascript" src="js-libs/heatmapjs/heatmap-openlayers.js"></script>
 
 <!-- filtrify -->
-<script type="text/javascript" src="js-libs/filtrify/js/filtrify.js"></script>
+<!-- <script type="text/javascript" src="js-libs/filtrify/js/filtrify.js"></script> -->
 
 <!-- quicksand -->
-<script type="text/javascript" src="js-libs/quicksand/js/quicksand.js"></script>
+<!-- <script type="text/javascript" src="js-libs/quicksand/js/quicksand.js"></script> -->
 
 <!-- dialog -->
-<script type="text/javascript" src="js-libs/dialog.js"></script>
+<!-- <script type="text/javascript" src="js-libs/dialog.js"></script> -->
 
 <!-- Custom JavaScript -->
-<script type="text/javascript" src="OPECPortal.min.js"></script>
+<script type="text/javascript" src="OPECPortal.js"></script>
 
 <!-- =================================== Templates =================================== -->
 <script type="text/html" id="opec-template-layer">
@@ -303,7 +303,7 @@
        <span style="display:none;">Abstract: <i>{{abstract}}</i></span>
     </li>
 </script>
-<!-- ================================================================================= -->
+<!-- ====================================================================== -->
 
 </head>
 <body>
@@ -364,24 +364,11 @@
             <button id="layerPreloader"></button>
             <input type="checkbox" id="opec-button-3d" /><label class="opec-iconBigBtn" for="opec-button-3d" title="Go To 3D Mode!"></label>
             <button id="infoToggleBtn"></button>
-            <!--<a href="#" id="mapInfoToggleBtn"><img src="img/mapInfo.png" alt="Toggle Map Information Window" title="Map Information"/></a>        
          </li>
-         <li>
-            <a href="#" id="shareMapToggleBtn"><img src="img/mapLink.png" alt="Toggle Share Map Window" title="Share Links"/></a>
-         </li>
-         <li>
-            <a href="#" id="layerPreloader"><img src="img/layers32.png" alt="Toggle Layer Preloader Window" title="Select Layers"/></a>
-         </li>
-         <li>
-            <button id="opec-button-3d"></button>
-            <label  for="opec-button-3d" title="Go to 3D mode"></label>
-            <a href="#" id="mapOptionsBtn"><img src="img/map-icon.png" alt="Click for Map Options"></a>
-         </li>
-         <li class="divider"></li>
-         <li>
-            <a href="#" id="infoToggleBtn"><img src="img/info32.png" alt="Toggle Information Window" title="Information"></a>
-         </li> --> 
       </ul>
+      <div style="position: fixed; left: 50%;">
+         <button></button>
+      </div>
    </div>
    <!-- The Left Panels -->
    <a class="trigger triggerL unselectable" href="#">Layers</a>
@@ -462,43 +449,6 @@
                   <h3>Graphing</h3>
                   <div id="opec-graphing">  
                   </div>
-                  <h3>Basic Statistics</h3>
-                  <div>
-                     <table id="bStats">
-                        <tr>
-                           <td>Mean Value:</td>
-                           <td>Two</td>
-                        </tr>
-                        <tr>
-                           <td>Max Value:</td>
-                           <td>Two</td>
-                        </tr>
-                        <tr>
-                           <td>Min Value:</td>
-                           <td>Two</td>
-                        </tr>
-                        <tr>
-                           <td>Std.Dev.:</td>
-                           <td>Two</td>
-                        </tr>
-                     </table>
-                  </div>
-                  <h3><a href="#">Spatial Analysis</a></h3>
-                  <div id="spatial">
-                     <h3><a href="#">Thresholding</a></h3>
-                     <div id="threshold"></div>
-                     <h3><a href="#">Data Correlation</a></h3>
-                     <div id="dCorr"></div> 
-                  </div> 
-                  <h3><a href="#">Temporal Analysis</a></h3>
-                  <div id="temporal">
-                     <h3><a href="#">Time Series</a></h3>
-                     <div id="tSeries"></div>
-                     <h3><a href="#">Interannual Variability</a></h3>
-                     <div id="IAVar"></div>
-                  </div> 
-                  <h3><a href="#">Risk Analysis</a></h3>
-                  <div id="risk"></div> 
                </div>
             <div id="opec-tab-export" class="opec-tab-content ui-corner-top" style="display: none;">
                <h3><a href="#">Data Tools</a></h3>
@@ -511,33 +461,12 @@
                      </select>
                   </div>
                   <a href="#" target="_new">Download Data</a>
-                  <!-- <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p> -->  
                </div>
             </div>
          </div>
       </div>
       <div style="clear: both;"> </div>
    </div>
-   <!-- 
-   <div class="toolbar" id="mapOptions">
-      <div id="viewtoggle">
-         <ul id="controlToggle">
-            <li>
-               <input type="radio" name="view" value="2D" id="2DToggle" checked="checked" onclick="toggleView(this);" />
-               <label for="noneToggle">2D View</label>
-            </li>
-            <li>
-               <input type="radio" name="view" value="columbus" id="columbusToggle" onclick="toggleView(this);" />
-               <label for="pointToggle">Columbus View</label>
-            </li>
-            <li>
-               <input type="radio" name="view" value="3D" id="3DToggle" onclick="toggleView(this);" />
-               <label for="lineToggle">3D View</label>
-            </li>
-            <li class="divider"></li>
-         </ul>
-       </div>
-   </div> -->
    <!-- Share Options Panel, appears after the share options button has been clicked  -->
    <div class="toolbar" id="shareOptions">
    	<h3>Share</h3>
@@ -551,11 +480,11 @@
    <div id="info" class="unselectable" title="Information">
       <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
       <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
-      <p>&copy;2013 PML Applications Ltd<br />
+      <p>&copy;2013 PML Applications Ltd<br/>
       EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
       <div style="clear: both;"> </div>
    </div>
-   <!------------------------------------------------------------------------->
+   <!-- ====================================================================== -->
    
    <!-- Map Info Dialog -->
    <div id="mapInfo" title="MapInfo">
@@ -584,6 +513,7 @@
    
    <!-- D3 Timeline -->
    <div id="timeline" class="timelineDiv">
+      <button style="display: none"></button>
    </div>
    <div id="dThree" title="D3 Test"></div>
 </body>

@@ -3,7 +3,7 @@
 servers = {
    'motherlodeAlaska': { 
       'name': 'motherlodeAlaska',
-      'url': 'http://motherlode.ucar.edu:8080/thredds/wms/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?',
+      'url': 'http://motherlode.ucar.edu:8080/thredds/wms/fmrc/NCEP/NAM/Alaska_11km/NCEP-NAM-Alaska_11km_best.ncd?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -12,7 +12,7 @@ servers = {
       'options': {
          'providerShortTag': 'Motherloade'
       },
-      'wcsurl': 'http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?'
+      'wcsurl': 'http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/NAM/Alaska_11km/NCEP-NAM-Alaska_11km_best.ncd?'
    },
    'hawaii': { 
       'name': 'hawaii',

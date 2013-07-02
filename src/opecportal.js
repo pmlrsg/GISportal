@@ -4,6 +4,9 @@
  */ 
 var opec = opec || (opec = {});
 
+/*===========================================================================*/
+//Initialise javascript variables and objects
+
 // Path to the flask middleware
 opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
@@ -21,8 +24,12 @@ opec.cache.wmsLayers = [];
 opec.cache.wfsLayers = [];
 
 // Temporary version of microLayer and layer storage.
-opec.layerStore = {};
+opec.layerStore = {}; // NOT IN USE!
+
 opec.microLayers = {};
+opec.layers = {};
+opec.selectedLayers = {};
+opec.nonSelectedLayers = {};
 
 // A list of layer names that will be selected by default
 // This should be moved to the middleware at some point...
@@ -32,6 +39,11 @@ opec.sampleLayers = ["metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS
 // The array is populated once all the date-time layers have loaded
 opec.enabledDays = [];
 
+// Used as offsets when sorting layers in groups
+opec.numBaseLayers = 0;
+opec.numRefLayers = 0;
+opec.numOpLayers = 0;
+
 // Stores the current user selection. Any changes should trigger the correct event.
 // Could be changed to an array later to support multiple user selections
 opec.selection = {};
@@ -39,8 +51,10 @@ opec.selection.layer = undefined;
 opec.selection.bbox = undefined;
 
 opec.layerSelector = null;
-/*===========================================================================*/
-//Initialise javascript global variables and objects
+opec.timeline = null;
+
+// Predefined map coordinate systems
+opec.lonlat = new OpenLayers.Projection("EPSG:4326");
 
 /**
  * The OpenLayers map object
@@ -48,10 +62,7 @@ opec.layerSelector = null;
  */
 var map;
 
-// Predefined map coordinate systems - Needs to be moved at some point
-var lonlat = new OpenLayers.Projection("EPSG:4326");
-
-// Quick regions array in the format "Name",W,S,E,N - Needs to be moved at some point
+// Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
 var quickRegion = [
    ["Choose a Region",-150, -90, 150, 90],
    ["World View", -150, -90, 150, 90],
@@ -91,7 +102,7 @@ opec.loadLayers = function() {
    opec.genericAsyc('./cache/wfsMasterCache.json', opec.initWFSLayers, errorHandling, 'json', {});
 };
 
-opec.getFeature = function(layer, time) {
+opec.getFeature = function(layer, olLayer, time) {
    
    var errorHandling = function(request, errorType, exception) {
       var data = {
@@ -113,11 +124,11 @@ opec.getFeature = function(layer, time) {
          message: $('<div/>').html(output.content).html(),
          location: 'Lon: ' + pos[1] + ' Lat: ' + pos[0] 
       });
-      layer.addFeatures(feature);
+      olLayer.addFeatures(feature);
    };
    
    var params = {
-      baseurl: layer.url,
+      baseurl: layer.wfsURL,
       request: 'GetFeature',
       version: '1.1.0',
       featureID: featureID,
@@ -151,43 +162,6 @@ opec.genericAsyc = function(url, success, error, dataType, opts) {
 };
 
 /**
- * Creates an opec.MicroLayer Object (layers in the selector but not yet map 
- * layers)
- * 
- * @constructor
- * @param {string} name - The layer name (unescaped)
- * @param {string} title - The title of the layer
- * @param {string} abstract - The abstract information for the layer
- * @param {string} firstDate - The first date for which data is available
- * @param {string} lastDate - The last date for which data is available
- * @param {string} serverName - The server name which serves the layer
- * @param {string} wmsURL - The URL for the WMS service
- * @param {string} wcsURL - The URL for the WCS service
- * @param {string} sensorName - The name of the sensor for this layer (unescaped)
- * @param {string} exBoundingBox - The geographic bounds for data in this layer
- */
-opec.MicroLayer = function(name, title, productAbstract, firstDate, lastDate, 
-   serverName, wmsURL, wcsURL, sensorName, exBoundingBox, providerTag) {
-   
-   this.id = name;      
-   this.origName = name.replace("/","-");
-   this.name = name.replace("/","-");
-   this.urlName = name;
-   this.displayTitle = title.replace(/_/g, " ");
-   this.title = title;
-   this.productAbstract = productAbstract;
-   this.firstDate = firstDate;
-   this.lastDate = lastDate;
-   this.serverName = serverName;
-   this.wmsURL = wmsURL;
-   this.wcsURL = wcsURL;
-   this.sensorNameDisplay = sensorName.replace(/\s+/g, "");
-   this.sensorName = sensorName.replace(/[\.,]+/g, "");
-   this.exBoundingBox = exBoundingBox;
-   this.providerTag = providerTag;
-};
-
-/**
  * Create all the base layers for the map.
  */
 opec.createBaseLayers = function() {
@@ -198,8 +172,10 @@ opec.createBaseLayers = function() {
          name,
          url,
          opts,
-         { projection: lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
+         { projection: opec.lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
       );
+      
+      layer.id = name;
       layer.controlID = 'baseLayers';
       layer.displayTitle = name;
       layer.name = name;
@@ -218,6 +194,7 @@ opec.createBaseLayers = function() {
 
 /**
  * Create all the reference layers for the map.
+ * WARNING: Horrible monster function. TODO: Refactor.
  */
 opec.createRefLayers = function() {  
    opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
@@ -225,136 +202,39 @@ opec.createRefLayers = function() {
    $.each(opec.cache.wfsLayers, function(i, item) {
       if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
          var url = item.url;
+         var serverName = item.serverName;
          $.each(item.layers, function(i, item) {
-            if (typeof item.name !== 'undefined' && typeof item.options !== 'undefined') {
-               if(typeof item.options.passthrough !== 'undefined' && item.options.passthrough) {
-                  item.style = new OpenLayers.StyleMap({
-                     strokeColor: "#00FF00",
-                     strokeOpacity: 1,
-                     strokeWidth: 3
-                  });
-                  item.displayTitle = item.name;
-                  createGMLLayer(item, url);
-               }
-               else {
-                  createRefLayer(item, url);
-               }
+            if(typeof item.name !== 'undefined' && typeof item.options !== 'undefined') {
+               item.productAbstract = "None Provided";
+               item.tags = {};
+               
+               var microLayer = new opec.MicroLayer(item.name, item.name, 
+                     item.productAbstract, "refLayers", {
+                        "serverName": serverName, 
+                        "wfsURL": url, 
+                        "providerTag": item.options.providerShortTag,
+                        "tags": item.tags,
+                        "options": item.options,
+                        "times" : item.times
+                     }
+               );
+                     
+               microLayer = opec.checkNameUnique(microLayer);   
+               opec.microLayers[microLayer.id] = microLayer;
+               opec.layerSelector.addLayer(opec.templates.selectionItem({
+                     'id': microLayer.id,
+                     'name': microLayer.name, 
+                     'provider': item.options.providerShortTag, 
+                     'title': microLayer.displayTitle, 
+                     'abstract': microLayer.productAbstract
+                  }), {'tags': microLayer.tags
+               }); 
             }
          });
       } 
    });
    
-   function createRefLayer(layer, url) {
-      var wfsLayer = new OpenLayers.Layer.Vector(layer.name, { 
-            //protocol: new OpenLayers.Protocol.WFS({
-            //   version: '1.0.0',
-            //   url: url,
-            //   featureType: layer.name
-               //featureid: function() { return this.WFSDatesToIDs[$('#viewDate').datepicker('getDate')]; }
-            //}),
-            projection: lonlat,
-            styleMap: new OpenLayers.StyleMap({
-               'default':{
-                  strokeColor: "#00FF00",
-                  strokeOpacity: 1,
-                  strokeWidth: 3,
-                  fillColor: "#FF5500",
-                  fillOpacity: 0.5,
-                  pointRadius: 6,
-                  pointerEvents: "visiblePainted",             
-                  fontSize: "12px",
-                  fontFamily: "Courier New, monospace",
-                  fontWeight: "bold",
-                  labelOutlineColor: "white",
-                  labelOutlineWidth: 3
-               }
-            }),
-            eventListeners: {
-               'featureselected': function(event) {
-                  var feature = event.feature;
-                  var popup = new OpenLayers.Popup.FramedCloud("popup",
-                     OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
-                     null,
-                     feature.attributes.message + "<br>" + feature.attributes.location,
-                     null,
-                     true,
-                     null
-                  );
-                  popup.autoSize = true;
-                  popup.maxSize = new OpenLayers.Size(400, 500);
-                  popup.fixedRelativePosition = true;
-                  feature.popup = popup;
-                  map.addPopup(popup);
-               },
-               'featureunselected': function(event) {
-                  var feature = event.feature;
-                  map.removePopup(feature.popup);
-                  feature.popup.destroy();
-                  feature.popup = null;
-               }
-            }
-         }, {
-            typeName: layer.name, format: 'image/png', transparent: true, 
-            exceptions: 'XML', version: '1.0', layers: '1'
-         }
-      ); 
-      
-      var selector = opec.mapControls.selector;
-      var layers = selector.layers;
-      
-      if (typeof layers === 'undefined' || layers === null)
-         layers = [];
-      
-      layers.push(wfsLayer);     
-      opec.mapControls.selector.setLayer(layers);
-      
-      if (typeof layer.times !== 'undefined' && layer.times && layer.times.length) {
-         wfsLayer.temporal = true;
-         var times = [];
-         var dateToIDLookup = {};
-         for(var i = 0; i < layer.times.length; i++) {
-            var time = layer.times[i];
-            times.push(time.startdate);
-            dateToIDLookup[time.startdate] = time.id;          
-         }
-         wfsLayer.DTCache = times;
-         wfsLayer.WFSDatesToIDs = dateToIDLookup;
-         //layer.firstDate = opec.utils.displayDateString(datetimes[0].startdate);
-         //layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1].startdate);
-      }
-   
-      wfsLayer.urlName = layer.name.replace('-', ':');
-      wfsLayer.id = layer.name;
-      // Make this layer a reference layer
-      wfsLayer.controlID = "refLayers";
-      wfsLayer.setVisibility(false);
-      wfsLayer.displayTitle = layer.name;
-      wfsLayer.title = layer.name;
-      wfsLayer.url = url;
-      map.addLayer(wfsLayer);
-      opec.leftPanel.addLayerToGroup(wfsLayer, $('#refLayerGroup'));
-   }
-   
-   function createGMLLayer(layer, url) {
-      var gmlLayer = new OpenLayers.Layer.Vector(layer.name, {
-         protocol: new OpenLayers.Protocol.HTTP({
-            url: url,
-            format: new OpenLayers.Format.GML()
-         }),
-         strategies: [new OpenLayers.Strategy.Fixed()],
-         projection: lonlat,
-         styleMap: layer.style
-      });
-
-      // Make this layer a reference layer         
-      gmlLayer.controlID = "refLayers";
-      gmlLayer.setVisibility(false);
-      gmlLayer.id = layer.name;
-      gmlLayer.displayTitle = layer.displayTitle;
-      gmlLayer.title = layer.displayTitle;
-      map.addLayer(gmlLayer);
-      opec.leftPanel.addLayerToGroup(gmlLayer, $('#refLayerGroup'));
-   }
+   opec.layerSelector.refresh();
    
    var colourFunc = function(feature) {
       var colourLookup = {
@@ -375,11 +255,11 @@ opec.createRefLayers = function() {
    for(var i = 12; i <= 19; i++) {
       // skip AMT18 as it isn't available
       if(i == 18) continue;
+      
       // Style the AMT vector layers with different colours for each one
       var AMT_style = new OpenLayers.Style({
          'strokeColor': '${colour}'
-      },
-      {
+      }, {
          context: {
             colour: colourFunc
          }
@@ -392,30 +272,12 @@ opec.createRefLayers = function() {
          style: new OpenLayers.StyleMap({ 'default': AMT_style })
       };
       
-      createGMLLayer(layer, 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2');
-      
-      /*
-      var cruiseTrack = new OpenLayers.Layer.Vector('AMT' + i + '_Cruise_Track', {
-         protocol: new OpenLayers.Protocol.HTTP({
-            url: 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2',
-            format: new OpenLayers.Format.GML()
-         }),
-         strategies: [new OpenLayers.Strategy.Fixed()],
-         projection: lonlat,
-         styleMap: AMT_style_map
-      });
-
-      // Make this layer a reference layer         
-      cruiseTrack.controlID = "refLayers";
-      cruiseTrack.setVisibility(false);
-      cruiseTrack.displayTitle = 'AMT' + i + ' Cruise Track';
-      map.addLayer(cruiseTrack);
-      opec.leftPanel.addLayerToGroup(cruiseTrack, $('#refLayerGroup')); */
+      opec.createGMLLayer(layer, 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2');
    }
 
    // Setup Black sea outline layer (Vector)
    var blackSea = new OpenLayers.Layer.Vector('The_Black_Sea_KML', {
-      projection: lonlat,
+      projection: opec.lonlat,
       strategies: [new OpenLayers.Strategy.Fixed()],
       protocol: new OpenLayers.Protocol.HTTP({
          url: 'black_sea.kml',
@@ -436,6 +298,27 @@ opec.createRefLayers = function() {
 
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+};
+
+opec.createGMLLayer = function(layer, url) {
+   var gmlLayer = new OpenLayers.Layer.Vector(layer.name, {
+      protocol: new OpenLayers.Protocol.HTTP({
+         url: url,
+         format: new OpenLayers.Format.GML()
+      }),
+      strategies: [new OpenLayers.Strategy.Fixed()],
+      projection: opec.lonlat,
+      styleMap: layer.style
+   });
+
+   // Make this layer a reference layer         
+   gmlLayer.controlID = "refLayers";
+   gmlLayer.setVisibility(false);
+   gmlLayer.id = layer.name;
+   gmlLayer.displayTitle = layer.displayTitle;
+   gmlLayer.title = layer.displayTitle;
+   map.addLayer(gmlLayer);
+   opec.leftPanel.addLayerToGroup(gmlLayer, $('#refLayerGroup'));
 };
 
 /** 
@@ -461,18 +344,30 @@ opec.createOpLayers = function() {
                $.each(item, function(i, item) {
                   if(item.Name && item.Name !== "") {
                      var microLayer = new opec.MicroLayer(item.Name, item.Title, 
-                        item.Abstract, item.FirstDate, item.LastDate, serverName, 
-                        wmsURL, wcsURL, sensorName, item.EX_GeographicBoundingBox, providerTag);          
+                        item.Abstract, "opLayers", { 
+                           "firstDate": item.FirstDate, 
+                           "lastDate": item.LastDate, 
+                           "serverName": serverName, 
+                           "wmsURL": wmsURL, 
+                           "wcsURL": wcsURL, 
+                           "sensor": sensorName, 
+                           "exBoundingBox": item.EX_GeographicBoundingBox, 
+                           "providerTag": providerTag, 
+                           "tags": item.tags
+                        }
+                     );
+                               
                      microLayer = opec.checkNameUnique(microLayer);   
                      opec.microLayers[microLayer.id] = microLayer;
                      opec.layerSelector.addLayer(opec.templates.selectionItem({
-                        'id': microLayer.id,
-                        'name': microLayer.name, 
-                        'provider': providerTag, 
-                        'title': microLayer.displayTitle, 
-                        'abstract': microLayer.productAbstract
-                     }));            
-                     //$('#layers').multiselect('addItem', {text: providerTag + ': ' + microLayer.name, title: microLayer.displayTitle, selected: opec.isSelected});                
+                           'id': microLayer.id,
+                           'name': microLayer.name, 
+                           'provider': providerTag, 
+                           'title': microLayer.displayTitle, 
+                           'abstract': microLayer.productAbstract
+                        }), 
+                        {'tags': microLayer.tags
+                     });                         
                   }
                });
             }
@@ -482,7 +377,16 @@ opec.createOpLayers = function() {
    
    opec.layerSelector.refresh();
    // Batch add here in future.
-   
+};
+
+/**
+ * Get a layer that has been added to the map by its id.
+ * In future this function will return a generic opec layer
+ * rather than a OpenLayers layer.
+ */
+opec.getLayerByID = function(id) {
+   //return map.getLayersBy('id', id)[0];
+   return opec.layers[id];
 };
 
 /**
@@ -505,135 +409,60 @@ opec.checkNameUnique = function(microLayer, count) {
    if(typeof count === "undefined" || count === 0) {
       id = microLayer.id;
       count = 0;
-   }
-   else {
+   } else {
       id = microLayer.id + count;
    }
    
    if(id in opec.microLayers) {
       opec.checkNameUnique(microLayer, ++count);
-   }
-   else
+   } else {
       if(count !== 0) { 
          microLayer.id = microLayer.id + count; 
       }
-      return microLayer;
+   }
+   
+   return microLayer;
 };
 
 /**
- * Create a layer to be displayed on the map.
- */ 
-opec.createOpLayer = function(layerData, microLayer) {
-   var layer = new OpenLayers.Layer.WMS (
-      microLayer.providerTag + ': ' + microLayer.name,
-      microLayer.wmsURL,
-      { layers: microLayer.urlName, transparent: true}, 
-      { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
-   );
+ * Returns availability (boolean) of data for the given JavaScript date for all layers.
+ * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
+ * 
+ * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
+ * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
+ */
+opec.allowedDays = function(thedate) {
+   var uidate = opec.utils.ISODateString(thedate);
+   // Filter the datetime array to see if it matches the date using jQuery grep utility
+   var filtArray = $.grep(opec.enabledDays, function(dt, i) {
+      var datePart = dt.substring(0, 10);
+      return (datePart == uidate);
+   });
+   // If the filtered array has members it has matched this day one or more times
+   if(filtArray.length > 0) {
+      return [true];
+   }
+   else {
+      return [false];
+   }
+};
 
-   // Get the time dimension if this is a temporal layer
-   // or elevation dimension
-   $.each(layerData.Dimensions, function(index, value) {
-      var dimension = value;
-      if (value.Name.toLowerCase() == 'time') {
-         layer.temporal = true;
-         var datetimes = dimension.Value.split(',');
-         layer.DTCache = datetimes;
-         layer.firstDate = opec.utils.displayDateString(datetimes[0]);
-         layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1]);
-      }
-      else if (value.Name.toLowerCase() == 'elevation') {
-         layer.elevation = true;
-         layer.elevationCache = dimension.Value.split(',');
-         layer.mergeNewParams({elevation: value.Default});
-         layer.elevationDefault = value.Default;
-         layer.elevationUnits = value.Units;
+/**
+ * Map function to re-generate the global date cache for selected layers.
+ */
+opec.refreshDateCache = function() {
+   var map = this;
+   opec.enabledDays = [];
+   
+   $.each(map.layers, function(index, value) {
+      var layer = value;
+      if(layer.selected && layer.temporal) {
+         opec.enabledDays = opec.enabledDays.concat(layer.DTCache);
       }
    });
-
-   layer.id = microLayer.id;
-   layer.origName = microLayer.origName;
-   layer.urlName = microLayer.urlName;
-   layer.displayTitle = microLayer.displayTitle;
-   layer.title = microLayer.title;
-   layer.productAbstract = microLayer.productAbstract;
-   layer.displaySensorName = microLayer.sensorNameDisplay;
-   layer.sensorName = microLayer.sensorName;
-   layer.wcsURL = microLayer.wcsURL;
-   layer.styles = layerData.Styles;
-   layer.exBoundingBox = microLayer.exBoundingBox;
-   layer.boundingBox = layerData.BoundingBox;
-   layer.setVisibility(false);     
-   layer.selected = false;     
-   opec.layerStore[layer.id] = layer;
    
-   map.getMetadata(layer);
-};
-
-/**
- * Add a layer to the map from the layerStore. 
- */
-opec.addOpLayer = function(layerID) {
-   // Get layer from layerStore
-   var layer = opec.layerStore[layerID];
-
-   if (typeof layer === 'undefined' || layer == 'null') {
-      // Error: Could not get a layer object
-      console.log("Error: Could not get a layer object");
-      return;
-   }
-
-   // Remove the layer from the layerStore
-   delete opec.layerStore[layerID];
-   
-   // Check if an accordion is there for us
-   //if(!$('#' + layer.displaySensorName).length)
-      //opec.leftPanel.addGroupToPanel(layer.sensorName, layer.displaySensorName, $('#opec-lPanel-operational'));
-   
-   // Add the layer to the map
-   map.addLayer(layer);
-   map.setLayerIndex(layer, map.numBaseLayers + map.numOpLayers);
-   
-   map.events.register("click", layer, getFeatureInfo);
-
-   // Add the layer to the panel
-   opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-operational')));
-
-   // Increase the count of OpLayers
-   map.numOpLayers++;
-};
-
-/**
- * Remove a layer from the map and into the 
- * layerStore. 
- */
-opec.removeOpLayer = function(layer) {
-   // Remove the layer from the panel
-   opec.leftPanel.removeLayerFromGroup(layer);
-   
-   // Check if we were the last layer
-   //if($('#' + layer.displaySensorName).children('li').length == 0)
-      //opec.leftPanel.removeGroupFromPanel(layer.displaySensorName);
-
-   // Remove the layer from the map
-   map.removeLayer(layer);
-   
-   map.events.unregister("click", layer, getFeatureInfo);
-
-   // Add the layer to the layerStore
-   opec.layerStore[layer.id] = layer;
-
-   // Decrease the count of OpLayers
-   map.numOpLayers--;
-};
-
-/**
- * Get a layer that has been added to the map by its id.
- * In future this function will return a generic opec layer
- * rather than a OpenLayers layer.
- */
-opec.getLayerByID = function(id) {
-   return map.getLayersBy('id', id)[0];
+   opec.enabledDays = opec.utils.arrayDeDupe(opec.enabledDays);  
+   console.info('Global date cache now has ' + opec.enabledDays.length + ' members.'); // DEBUG
 };
 
 /**
@@ -648,30 +477,19 @@ opec.customPermalinkArgs = function()
 };
 
 /**
- * Checks to see if a layer is not visible and selected.
- */
-opec.checkLayerState = function(layer) {
-   if(!layer.visibility && layer.selected)
-      $('#' + layer.id).find('img[src="img/exclamation_small.png"]').show();
-   else
-      $('#' + layer.id).find('img[src="img/exclamation_small.png"]').hide();
-};
-
-/**
  * Sets up the map, plus its controls, layers, styling and events.
  */
-function mapInit() 
-{
+opec.mapInit = function() {
    map = new OpenLayers.Map('map', {
-      projection: lonlat,
-      displayProjection: lonlat,
+      projection: opec.lonlat,
+      displayProjection: opec.lonlat,
       controls: []
    });
    
-   map.setupGlobe(map, 'map', {
-      is3D: false,
-      proxy: '/service/proxy?url='
-   });
+   //map.setupGlobe(map, 'map', {
+      //is3D: false,
+      //proxy: '/service/proxy?url='
+   //});
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
@@ -715,7 +533,7 @@ function mapInit()
 
    if(!map.getCenter())
       map.zoomTo(3);
-}
+};
 
 /**
  * Anything that needs to be done after the layers are loaded goes here.
@@ -740,7 +558,7 @@ opec.initWFSLayers = function(data, opts) {
 /**
  * Loads anything that is not dependent on layer data. 
  */
-function nonLayerDependent()
+opec.nonLayerDependent = function()
 {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
@@ -757,36 +575,6 @@ function nonLayerDependent()
       });
    });
    
-   //----------------------------Quick Region----------------------------------
-
-   // Handles re-set of the quick region selector after zooming in or out on the map or panning
-   function quickRegionReset(e){
-      $('#quickRegion').val('Choose a Region');
-   }
-   map.events.register('moveend', map, quickRegionReset);
-   
-   // Populate Quick Regions from the quickRegions array
-   for(var i = 0; i < quickRegion.length; i++) {
-       $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
-   }
-   
-   // Change of quick region event handler - happens even if the selection isn't changed
-   $('#quickRegion').change(function(e) {
-       var qr_id = $('#quickRegion').val();
-       var bbox = new OpenLayers.Bounds(
-                   quickRegion[qr_id][1],
-                   quickRegion[qr_id][2],
-                   quickRegion[qr_id][3],
-                   quickRegion[qr_id][4]
-                ).transform(map.displayProjection, map.projection);
-       // Prevent the quick region selection being reset after the zoomtToExtent event         
-       map.events.unregister('moveend', map, quickRegionReset);
-       // Do the zoom to the quick region bounds
-       map.zoomToExtent(bbox);
-       // Re-enable quick region reset on map pan/zoom
-       map.events.register('moveend', map, quickRegionReset);
-   });
-   
    //--------------------------------------------------------------------------
   
    //Configure and generate the UI elements
@@ -797,17 +585,20 @@ function nonLayerDependent()
    // Setup the right panel
    opec.rightPanel.setup();
    
+   // Setup the topbar
+   opec.topbar.setup();
+   
    //--------------------------------------------------------------------------
    
    // If the window is resized move dialogs to the center to stop them going of
    // the screen
    $(window).resize(function(event) {
       if(event.target == window) {
-         $(".ui-dialog-content").extendedDialog("option", "position", "center");
+         $(".ui-dialog-normal").extendedDialog("option", "position", "center");
       }
    });
 
-   // set the max height of each of the accordions relative to the size of the window
+   // Set the max height of each of the accordions relative to the size of the window
    $('#layerAccordion').css('max-height', $(document).height() - 300);
    $('#opec-lPanel-operational').css('max-height', $(document).height() - 350);
    $('#opec-lPanel-reference').css('max-height', $(document).height() - 350);
@@ -837,37 +628,16 @@ function nonLayerDependent()
    $('#opec-lPanel-operational, #opec-lPanel-reference').on('click', ':checkbox', function(e) {
       var v = $(this).val();
       var layer = opec.getLayerByID(v);
+      
       if($(this).is(':checked')) {
-         layer.selected = true;
-         // If the layer has date-time data, use special select routine
-         // that checks for valid data on the current date to decide if to show data
-         if(layer.temporal) {
-            map.selectDateTimeLayer(layer, $('#viewDate').datepicker('getDate'));
-            // Now display the layer on the timeline
-            var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
-            var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-            t1.addTimeBar(layer.id, layer.title, startDate, endDate, layer.DTCache);            
-            // Update map date cache now a new temporal layer has been added
-            map.refreshDateCache();
-            $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
-         }
-         else {
-            layer.setVisibility(true);
-            opec.checkLayerState(layer);
-         }
-      }
-      else {
-         layer.selected = false;
-         layer.setVisibility(false);
-         opec.checkLayerState(layer);
-         if(layer.temporal) {
-            // Remove the layer display on the timeline
-            t1.removeTimeBarByName(layer.id);  
-            // Update map date cache now a new temporal layer has been removed
-            map.refreshDateCache();
-         }
+         layer.select();
+         
+      } else {
+         layer.unselect();
       }
    });
+   
+   //--------------------------------------------------------------------------
 
    // Update our latlng on the mousemove event
    map.events.register("mousemove", map, function(e) { 
@@ -877,6 +647,8 @@ function nonLayerDependent()
    });
    
    $('#mapInfo-Projection').text('Map Projection: ' + map.projection);
+   
+   //--------------------------------------------------------------------------
 
    // Populate the base layers drop down menu
    $.each(map.layers, function(index, value) {
@@ -887,125 +659,38 @@ function nonLayerDependent()
        }
    });
    
-   // jQuery UI elements
-   $('#viewDate').datepicker({
-      showButtonPanel: true,
-      dateFormat: 'dd-mm-yy',
-      changeMonth: true,
-      changeYear: true,
-      beforeShowDay: function(date) { return map.allowedDays(date); },
-      onSelect: function(dateText, inst) {
-         var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
-         // Synchronise date with the timeline
-         t1.setDate(thedate);
-         // Filter the layer data to the selected date
-         map.filterLayersByDate(thedate);
-      }
-   });
-
-   // Pan and zoom control buttons
-   $('#panZoom').buttonset();
-   $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
-   $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
-   $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
-   
-   // Function which can toggle OpenLayers controls based on the clicked control
-   // The value of the value of the underlying radio button is used to match 
-   // against the key value in the mapControls array so the right control is toggled
-   opec.toggleControl = function(element) {
-      for(var key in opec.mapControls) {
-         var control = opec.mapControls[key];
-         if($(element).val() == key) {
-            $('#'+key).attr('checked', true);
-            control.activate();
-            
-            if(key == 'pan') {
-               opec.mapControls.selector.activate();
-            }
-         }
-         else {
-            if(key != 'selector') {
-               if(key == 'pan') {
-                  opec.mapControls.selector.deactivate();
-               }
-               
-               $('#'+key).attr('checked', false);
-               control.deactivate();
-            }
-         }
-      }
-      $('#panZoom input:radio').button('refresh');
-   };
-   
-   // Making sure the correct controls are active
-   opec.toggleControl($('#panZoom input:radio'));
-
-   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
-   $('#panZoom input:radio').click(function(e) {
-      opec.toggleControl(this);
-   });
-
-   //--------------------------------------------------------------------------
-   
-   $('#opec-toolbar-actions')
-      .buttonset().children('button:first')
-      .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
-      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'} })
-      .click(function(e) {
-         if(map.globe.is3D) {
-            map.show2D();
-         } 
-         else {
-            map.show3D();
-            opec.gritter.showNotification('3DTutorial', null);
-         }
-      })
-      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
-   
-   // Add toggle functionality for dialogs
-   addDialogClickHandler('#infoToggleBtn', '#info');
-   addDialogClickHandler('#mapInfoToggleBtn', '#mapInfo');
-   addDialogClickHandler('#layerPreloader', '#layerSelection');
-
-   // Add permalink share panel click functionality
-   $('#shareMapToggleBtn').click(function() {
-      $('#shareOptions').toggle();
-   });
-   
-   function addDialogClickHandler(idOne, idTwo) {
-      $(idOne).click(function(e) {
-         if($(idTwo).extendedDialog('isOpen')) {
-           $(idTwo).extendedDialog('close');
-         }
-         else {
-           $(idTwo).extendedDialog('open');
-         }
-         return false;
-      });
-   }
-   
-   //--------------------------------------------------------------------------
-   
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
        map.setBaseLayer(opec.getLayerByID($('#baseLayer').val()));
    });
+     
+   //--------------------------------------------------------------------------
 
    // Setup the contextMenu
    opec.contextMenu.setup();
    
    // Setup timeline
-   $.getJSON('timeline.json', function(data) { t1 = new opec.TimeLine('timeline', data); });
-}
+   opec.timeline = new opec.TimeLine('timeline', {
+      comment: "Sample timeline data",
+      selectedDate: new Date("2006-06-05T00:00:00Z"),
+      chartMargins: {
+         top: 7,
+         right: 0,
+         bottom: 5,
+         left: 0
+      },
+      barHeight: 20,
+      barMargin: 2,
+      timebars: [] 
+   });
+};
 
 /*====================================================================================*/
 
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
-function main() {
+opec.main = function() {
    // Compile Templates
    opec.templates = {};
    opec.templates.layer = Mustache.compile($('#opec-template-layer').text().trim());
@@ -1080,79 +765,6 @@ function main() {
    });
    
    opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
-
-/*
-   $('#layers').multiselect({
-      selected: function(e, ui) {
-         // DEBUG
-         //console.log("selected");
-         if(ui.option.text in opec.microLayers) {
-            var microLayer = opec.microLayers[ui.option.text];
-
-            if(ui.option.text in opec.layerStore) {
-               // DEBUG
-               //console.log("Adding layer...");
-               opec.addOpLayer(ui.option.text);
-               // DEBUG
-               //console.log("Added Layer");
-            }
-            else
-               map.getLayerData(microLayer.serverName + '_' + microLayer.origName + '.json', microLayer);
-         }
-         else {
-            // DEBUG
-            console.log("no layer data to use");
-         }
-      },
-      deselected: function(e, ui) {
-         // DEBUG
-         //console.log("deselected");
-         var layer = opec.getLayerByID(ui.option.text);
-
-         if(layer) {
-            // DEBUG
-            //console.log("Removing layer...");
-            opec.removeOpLayer(layer);
-            // DEBUG
-            //console.log("Layer removed");
-         }
-         else if(opec.layerStore[ui.option.text])
-            layer = opec.layerStore[ui.option.text];
-         else
-            // DEBUG
-            console.log("no layer data to use");
-      },
-      addall: function (that, func) {
-         if(that.availableList.children('li.ui-element:visible').length > 50) {
-            var warning = $('<div id="warning" title="You sure about this?"><p><span class="ui-icon ui-icon-alert" style="float: left; margin: 0 7px 50px 0;"></span>Adding lots of layers may cause the browser to slow down. Are you sure you want to proceed?</p></div>');
-            $(document.body).append(warning);          
-            $('#warning').extendedDialog({
-               position: ['center', 'center'],
-               width: 300,
-               height: 200,
-               resizable: false,
-               autoOpen: true,
-               modal: true,
-               buttons: {
-                  "Add Layers": function() {
-                     $(this).extendedDialog("close");
-                     func(that);
-                  },
-                  "Stop Adding Layers": function() {
-                     $(this).extendedDialog("close");
-                  }
-               },
-               close: function() {
-                  // Remove on close
-                  $('#warning').remove(); 
-               }
-            });
-         }
-         else
-            func(that);
-         
-      }
-   });*/
    
    /*
    $("#dThree").extendedDialog({
@@ -1193,11 +805,11 @@ function main() {
 
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
-   mapInit();
+   opec.mapInit();
 
    // Start setting up anything that is not layer dependent
-   nonLayerDependent();
-}
+   opec.nonLayerDependent();
+};
 
 // --------------------------------------------------------------------------------------------------
 /**

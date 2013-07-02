@@ -12,11 +12,12 @@
 
    var defaults = {
       noresults : "No results match",
-      hide      : true,
-      block     : [],
-      close     : false,
-      query     : undefined, // { category : [tags] } }
-      callback  : undefined // function ( query, match, mismatch ) {}
+      hide : true,
+      block : [],
+      blockFieldMenu: [],
+      close : false,
+      query : undefined, // { category : [tags] } }
+      callback : undefined // function ( query, match, mismatch ) {}
    }; 
 
    function Filtrify( containerID, placeholderID, options ) {
@@ -29,6 +30,7 @@
       this._matrix = [];
       this._fields = {};
       this._order = []; // helper to get the right field order
+      this._search = {};
       this._menu = {};
       this._query = {};
       this._match = [];
@@ -83,6 +85,16 @@
                };
             };
          };
+         
+         /*
+         $(element).on('opec-toggle-selected', 'a', function() {
+            $(this).find(".ui-icon")
+               .toggleClass("ui-icon-plus ui-icon-minus")
+            .end()
+            .toggleClass('opec-selected opec-unselected')
+            .toggleClass('ui-state-highlight');
+         });
+         */
 
          this._matrix.push( data );
 
@@ -91,22 +103,30 @@
 
    Filtrify.prototype.set = function () {
       var f = 0, field,
-         browser = $.browser;
+         browser = $.browser,
+         self = this;
 
-      this._menu.list = $("<ul class='ft-menu' />");
+      this._search.element = $('<ul class="opec-search"><input type="text" placeholder="Search" /></ul>');
+      this.createSearch();
+      this._menu.list = $('<ul class="ft-menu" />');
 
       for ( f; f < this._order.length; f++ ) {
          field = browser.webkit || browser.opera ? 
             this._order[f] : this._order[ this._order.length - f - 1 ];
+            
          this._menu[ field ] = {};
          this.build( field );
          this.cache( field );
          this.events( field );
          this.append( field );
          this.query( field );
+         
+         if($.inArray(field, this.options.blockFieldMenu) !== -1) {
+            this._menu[field].item.hide();
+         }
       };
 
-      this._holder.html( this._menu.list );
+      this._holder.html(self._menu.list).prepend(this._search.element);
    };
 
    Filtrify.prototype.build = function ( f ) {
@@ -114,7 +134,6 @@
          
       html = '<li class="ft-field">' + 
          '<h3 class="ft-label">' + 
-            //'<span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s"></span>' +
             '<a href="#">' + f + '</a>' + 
          "</h3>" + 
          '<div class="ft-panel ft-hidden">' +
@@ -161,6 +180,7 @@
    };
 
    Filtrify.prototype.events = function ( f ) {
+      var self = this;
 /*
       $( document ).on("click", this._bind(function(){
          this.closePanel( f );
@@ -169,7 +189,7 @@
       this._menu[f].panel.on("click", this._bind(function(event){
          event.stopPropagation();
       }, this) );
-*/
+
       this._menu[f].panel.on("mouseenter", this._bind(function(){
          this.bringToFront( f );
       }, this) );
@@ -179,8 +199,8 @@
          this.bringToFront( f );
          event.stopPropagation();
       }, this) );
-
-      this._menu[f].search.on( "keyup", "input", this._bind(function(event){
+      
+      this._menu[f].search.on( "keyup", "input", this._bind(function(event) {
 
          if ( event.which === 38 || event.which === 40 ) { 
             return false; 
@@ -195,7 +215,7 @@
 
       }, this) );
 
-      this._menu[f].search.on( "keydown", "input", this._bind(function(event){
+      this._menu[f].search.on( "keydown", "input", this._bind(function(event) {
 
          if( event.which === 40 ) {
             this.moveHighlight( f, "down" );
@@ -206,17 +226,19 @@
          };
 
       }, this) );
+      
+*/
 
-      this._menu[f].tags.on( "mouseenter", "li", this._bind(function(event){
-         this.highlight( f, $( event.target ) );
-      }, this) );
+      this._menu[f].tags.on( "mouseenter", "li", function(event) {
+         self.highlight( f, $(this) );
+      });
 
-      this._menu[f].tags.on( "mouseleave", "li", this._bind(function(){
-         this.clearHighlight( f );
-      }, this ) );
+      this._menu[f].tags.on( "mouseleave", "li", function() {
+         self.clearHighlight( f );
+      });
 
-      var self = this;
-      this._menu[f].tags.on( "click", "li", function(){
+      
+      this._menu[f].tags.on( "click", "li", function() {
          self.select( f );
          self.filter();
          // OPEC: using jQuery ui classes for style on selection
@@ -231,7 +253,53 @@
       });
 
    };
+   
+   Filtrify.prototype.createSearch = function() {
+      
+      this._search.results = [];
+      
+      var searchInput = this._search.element.children('input'),
+         field = 'name';
+    
+      this._search.element.on( "keyup", "input", this._bind(function(event) {
+         if ( event.which === 38 || event.which === 40 ) { 
+            return false; 
+         //} else if ( event.which === 13 ) {
+            //if ( this._menu['provider'].highlight.length ) {
+               //this.select('provider');
+               //this.filter();
+            //};
+         } else {
+            
+            //if(typeof this._search.term !== 'undefined' && this._search.term !== null)
+               //this.updateQueryTags( 'name', this._search.term);
+            
+            this.resetSearch(field);
+            this._search.term = $.trim( event.target.value.toLowerCase() );
+            this.search('name', this._search.term );
+            
+            //this._fields['name'] = {};
+            //this._fields['name'][event.target.value] = 1;
+            
+            this.filter();
+            
+         };
 
+      }, this) );
+
+      this._search.element.on( "keydown", "input", this._bind(function(event){
+
+         //if( event.which === 40 ) {
+            //this.moveHighlight( f, "down" );
+            //event.preventDefault();
+         //} else if ( event.which === 38 ) {
+            //this.moveHighlight( f, "up" );
+            //event.preventDefault();
+         //};
+
+      }, this) );
+   }
+/*
    Filtrify.prototype.bringToFront = function ( f ) {
       this._z = this._z + 1;
       this._menu[f].panel.css("z-index", this._z);
@@ -242,14 +310,16 @@
       this._menu[f].label.toggleClass("ft-opened");
       this._menu[f].panel.toggleClass("ft-hidden");
       this._menu[f].search.find("input").focus();
+      console.log("Panel Open")
    };
 
    Filtrify.prototype.closePanel = function ( f ) {
-      this.resetSearch( f );
+      //this.resetSearch( f );
       this._menu[f].panel.addClass("ft-hidden");
       this._menu[f].label.removeClass("ft-opened");
+      console.log("Panel Close")
    };
-
+*/
    Filtrify.prototype.preventOverflow = function ( f ) {
       var high_bottom, high_top, maxHeight, visible_bottom, visible_top;
 
@@ -314,19 +384,44 @@
       this._menu[f].mismatch.addClass("ft-hidden");
    };
 
-   Filtrify.prototype.search = function ( f, txt ) {
-      this.clearHighlight( f );
-      this.showResults( f, txt );
-      this.highlight( f, this._menu[f].tags.children(":visible:first") );
+   Filtrify.prototype.search = function ( field, term ) {
+      //this.clearHighlight( f );
+      //this.showResults( f, txt );
+      //this.highlight( f, this._menu[f].tags.children(":visible:first") );
+      
+      for (var tag in this._fields[field]) {
+         if(tag.toLowerCase().indexOf(term) >= 0 ) {
+            this._search.results.push(tag);
+         }
+      }
+      
+      // OPEC: If search results are empty we need to add a unique tag to
+      // clear the box.
+      if(this._search.results.length == 0) {
+         this._search.results.push('zzzzzzzzzz');
+      }
+      
+      for (var i = 0, len = this._search.results.length; i < len; i++) {
+         this.updateQueryTags( field, this._search.results[i]);
+      }
+      
+      // self._search.results[i]
    };
 
-   Filtrify.prototype.resetSearch = function ( f ) {
-      this._menu[f].search.find("input").val("");
-      this._menu[f].tags.children()
-         .not(this._menu[f].active)
-         .removeClass("ft-hidden");
+   Filtrify.prototype.resetSearch = function ( field ) {
+      //this._menu[f].search.find("input").val("");
+      //this._menu[f].tags.children()
+         //.not(this._menu[f].active)
+         //.removeClass("ft-hidden");
 
-      this.hideMismatch( f );
+      //this.hideMismatch( f );
+      
+      for (var i = 0, len = this._search.results.length; i < len; i++) {
+         this.updateQueryTags( field, this._search.results[i]);
+      }
+      
+      this._search.results = [];
+      
    };
 
    Filtrify.prototype.showResults = function ( f, txt ) {
@@ -359,13 +454,19 @@
       this.addToActive( f );
       this.hideHighlight( f );
       this.resetHighlight( f );
-      this.resetSearch( f );
+      //this.resetSearch( f );
 
-      if ( this.options.close ) {
-         this.closePanel( f );
-      };
+      //if ( this.options.close ) {
+         //this.closePanel( f );
+      //};
    };
-
+   
+   /**
+    * Adds tags to fields to be used to make up a search query.
+    * 
+    * @param {Object} f - The field to add the tag to.
+    * @param {Object} tag - The tag to add to the field.
+    */
    Filtrify.prototype.updateQueryTags = function ( f, tag ) {
       var index = $.inArray( tag, this._query[f] );
 
@@ -376,6 +477,11 @@
       };
    };
 
+   /**
+    * Adds 'ft-active' class onto fields.
+    * 
+    * @param {Object} f - The field to update.
+    */
    Filtrify.prototype.updateActiveClass = function ( f ) {
       if ( this._query[f].length ) {
          this._menu[f].label.addClass("ft-active");
@@ -384,24 +490,47 @@
       };
    };
 
+   /**
+    * Clones and then appends the selected tag onto the selected element of 
+    * that field.
+    * 
+    * @param {Object} f - The field of whose selected element to use.
+    */
    Filtrify.prototype.appendToSelected = function ( f ) {
       this._menu[f].selected.append( this._menu[f].highlight.clone().addClass('ui-state-highlight') );
       this._menu[f].highlight.hide();
       this.slideSelected( f );
    };
 
+   /**
+    * Adds the element to the active object.
+    * Slightly confusingly 'active' is a jQuery object not a javascript array.
+    * @param {Object} f - The field
+    */
    Filtrify.prototype.addToActive = function ( f ) {
       this._menu[f].active = this._menu[f].active.add( this._menu[f].highlight );
    };
-
+    
+   /**
+    * Unselects the tag from the field.
+    * 
+    * @param {Object} f - The field to unselect from.
+    * @param {Object} tag - The tag to unselect.
+    */
    Filtrify.prototype.unselect = function ( f, tag ) {
       this.updateQueryTags( f, tag );
       this.removeFromSelected( f, tag );
       this.removeFromActive( f, tag );
       this.updateActiveClass( f );
-      this.resetSearch( f );
+      //this.resetSearch( f );
    };
-
+   
+   /**
+    * Remove tag from the selected element and unhide the unselected version. 
+    * 
+    * @param {Object} f - The field to remove the tag from.
+    * @param {Object} tag - The tag to remove. 
+    */
    Filtrify.prototype.removeFromSelected = function ( f, tag ) {
       this._menu[f].selected
          .children()
@@ -420,6 +549,12 @@
       this.slideSelected( f );
    };
 
+   /**
+    * Remove from active list.
+    * 
+    * @param {Object} f - The field.
+    * @param {Object} tag - The tag.
+    */
    Filtrify.prototype.removeFromActive = function ( f, tag ) {
       this._menu[f].active = this._menu[f].active.filter(function() { 
          return ( this.textContent || this.innerText ) !== tag; 
@@ -440,31 +575,26 @@
       this.resetCachedMatch();
 
       for ( r = this._matrix.length - 1; r >= 0; r-- ) {
-
          m = true;
-
          for ( f in this._query ) {
-
-            c = 0;
-            
+            c = 0;          
             for ( t = this._query[f].length - 1; t >= 0; t-- ) {
                if ( $.inArray( this._query[f][t], this._matrix[r][f] ) !== -1 ) {
                   c = c + 1;
                };
             };
 
-            if ( !this._query[f].length  || c >= this._query[f].length ) {
+            if ( !this._query[f].length  || c > 0 ) {
                // match!
             } else { 
                m = false; 
             };
 
          };
-
+         
          this.updateFields( r, m );
          this.cacheMatch( r, m );
          this.showMatch( r, m );
-
       };
 
       this.rewriteFields();
@@ -478,7 +608,9 @@
       
       for ( field in this._fields ) {
          if ( row === this._matrix.length - 1 ) {
-            this._fields[field] = {};
+            if($.inArray(field, this.options.blockFieldMenu) === -1) {
+               this._fields[field] = {};
+            }
          };
 
          tags = this._matrix[row][field];
@@ -523,6 +655,16 @@
          this._mismatch.unshift( this._items[row] );
       };
    };
+   
+   Filtrify.prototype.refreshCache = function($selection) {
+      this._items.each(function(index, element) {
+         if($(element).attr('data-id') == $selection.attr('data-id')) {
+            element = $selection[0];
+            return false; // We could break
+         }
+      });
+      //this._items = this._container.children();
+   }
 
    Filtrify.prototype.showMatch = function ( row, match ) {
       if ( this.options.hide ) {
@@ -538,11 +680,11 @@
       };
    };
     
-    Filtrify.prototype.callback = function () {
-        if ( this.options.callback !== undefined && $.isFunction( this.options.callback ) ) {
-            this.options.callback( this._query, this._match, this._mismatch );
-        };
-    };
+   Filtrify.prototype.callback = function () {
+      if ( this.options.callback !== undefined && $.isFunction( this.options.callback ) ) {
+         this.options.callback( this._query, this._match, this._mismatch );
+      };
+   };
 
    Filtrify.prototype.trigger = function ( query ) {
       var f;
@@ -559,9 +701,9 @@
    };
 
    Filtrify.prototype.clearSearch = function ( f ) {
-      this.clearHighlight( f );
-      this.resetSearch( f );
-      this.clearSelected( f );
+      //this.clearHighlight( f );
+      //this.resetSearch( f );
+      //this.clearSelected( f );
    };
 
    Filtrify.prototype.clearSelected = function ( f ) {

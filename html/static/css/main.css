@@ -399,6 +399,11 @@ a.active.triggerR {
    margin-bottom: 5px;
 }
 
+/* FIX: IE9 is trying to be difficult */
+.panel-toolbar fieldset legend {
+   color: #CCCCCC;
+}
+
 #triggerL-buttonset {
    margin: 0px;
    padding: 1px;
@@ -675,6 +680,11 @@ div .sensor-accordion {
 
 #opec-layerSelection .opec-selectable > ul > li > span {
    display: block;
+   background-color: rgb(223, 223, 223);
+   color: black;
+   border: 1px solid black;
+   margin: 2px;
+   padding: 2px;
 }
 
 #opec-layerSelection .opec-selectable > ul > li > span > i {
@@ -701,6 +711,16 @@ div .sensor-accordion {
    overflow-y: auto;
    overflow-x: hidden;
    border-right: 1px black solid;
+}
+
+#opec-layerSelection .opec-tagMenu > .opec-search {
+   margin-top: 5px;
+   margin-bottom: 5px;
+}
+
+#opec-layerSelection .opec-tagMenu > .opec-search input {
+   width: 95%;
+   margin-left: 2px;
 }
 
 .ft-menu {
@@ -739,7 +759,6 @@ div .sensor-accordion {
    text-decoration: none;
 }
 .ft-selected {
-   padding-left: 5px;
 }
 
 .ft-selected li {
@@ -766,19 +785,37 @@ div .sensor-accordion {
 }
 
 .ft-tags li {
+   position: relative;
    *zoom: 1; 
    background: rgba(17, 17, 17, 0.7);
    vertical-align: top;
-   margin: 2px;
    /*margin-top: 5px;*/
    margin-bottom: 1px;
-   margin-left: 10px;
+   margin-left: 5px;
    padding-left: 10px;
    padding-top: 5px;
    padding-bottom: 5px;
    border-radius: 3px;
-   font-size: 85%;
+   font-size: 0.9em;
    color: white;
+}
+
+.ft-tags li:after {
+   content: attr(data-count);
+   font-size: 0.9em;
+   font-weight: normal;
+   display: inline-block;
+   position: absolute;
+   right: 3px;
+   top: 50%;
+   margin-top: -9px;
+   padding: 3px 6px;
+   background: rgba(60, 60, 60, 0.4);
+   
+   border-top-left-radius: 4px;
+   border-top-right-radius: 4px;
+   border-bottom-left-radius: 4px;
+   border-bottom-right-radius: 4px;
 }
 
 /* ======== Context Menu ======== */
@@ -937,6 +974,7 @@ div .sensor-accordion {
 
 .ui-dialog .ui-dialog-titlebar-buttonpane { position: absolute; top: 50%; right: 0.3em; margin-top: -10px; height: 18px; }
 .ui-dialog .ui-dialog-titlebar-buttonpane > a { float: right; }
+
 .ui-dialog .ui-dialog-titlebar-maximise, 
 .ui-dialog .ui-dialog-titlebar-minimise, 
 .ui-dialog .ui-dialog-titlebar-help, 

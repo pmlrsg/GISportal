@@ -1,3 +1,8 @@
+/**
+ * @constructor
+ * @param {Object} placeholderID
+ * @param {Object} containerID
+ */
 opec.window.layerSelector = function(placeholderID, containerID) {
    var self = this;
      
@@ -6,8 +11,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    this.$placeHolder = $('#' + placeholderID);
    this.$container = $('#' + containerID);
 
-   $.filtrify(containerID, placeholderID, {
+   this.filtrify = $.filtrify(containerID, placeholderID, {
       hide     : false,
+      block: ['data-id', 'data-title'],
+      blockFieldMenu: ['name'],
       callback : function ( query, match, mismatch ) {
          this.$container.quicksand($(match), {
             // all the parameters have sensible defaults
@@ -45,17 +52,24 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       
       if($(this).find(".ui-icon").hasClass('ui-icon-plus')) {      
          if(layerID in opec.microLayers) {
-            var microLayer = opec.microLayers[layerID];
-      
-            if(layerID in opec.layerStore) {
+            if(layerID in opec.layers) {
                // DEBUG
                console.log("Adding layer...");
-               opec.addOpLayer(layerID);
+               opec.addLayer(opec.getLayerByID(layerID));
                // DEBUG
                console.log("Added Layer");
+            } else {
+               var microlayer = opec.microLayers[layerID];
+               if(microlayer.type == 'opLayers') {
+                  opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer);
+               } else if (microlayer.type == 'refLayers') {
+                  // TODO: Deal with wfs layers.
+                  // Convert the microlayer. 
+                  // COMMENT: might change the way this works in future.
+                  var layer = new opec.layer(microlayer, {}); 
+                  opec.addLayer(layer);
+               }
             }
-            else
-               map.getLayerData(microLayer.serverName + '_' + microLayer.origName + '.json', microLayer);
                
             self.toggleLayerSelection($(this).parent());
          }
@@ -69,17 +83,15 @@ opec.window.layerSelector = function(placeholderID, containerID) {
          console.log("deselected");
          var layer = opec.getLayerByID(layerID);
 
-         if(layer) {
-            // DEBUG
-            console.log("Removing layer...");
+         if(layer) {            
+            console.log("Removing layer..."); // DEBUG         
+            opec.removeLayer(layer);           
+            console.log("Layer removed"); // DEBUG
             
-            opec.removeOpLayer(layer);
-            // DEBUG
-            console.log("Layer removed");
             self.toggleLayerSelection($(this).parent());
          }
          else if(opec.layerStore[layerID]) {
-            layer = opec.layerStore[layerID];
+            //layer = opec.layerStore[layerID];
             self.toggleLayerSelection($(this).parent());
          }
          else
@@ -90,59 +102,71 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       return false;
    });
    
-   $('#' + placeholderID + ' .ft-label').live("click", function() {
-      $(this).find("> .ui-icon")
-          .toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
-      .next().toggle();
-   });
+   //$('#' + placeholderID + ' .ft-label').live("click", function() {
+      //$(this).find("> .ui-icon")
+          //.toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
+      //.next().toggle();
+   //});
    
-};
-
-opec.window.layerSelector.prototype.addLayer = function(layer) {
-   this.$container.append(layer);
-};
-
-opec.window.layerSelector.prototype.batchAddLayers = function(layers) {
-
-};
-
-opec.window.layerSelector.prototype.toggleLayerSelection = function($selection) {
-   $selection.find(".ui-icon")
-      .toggleClass("ui-icon-plus ui-icon-minus")
-   .end()
-   .toggleClass('opec-selected opec-unselected')
-   .toggleClass('ui-state-highlight');
-};
-
-opec.window.layerSelector.prototype.toggleSelectionFromLayer = function(layer) {
-   var self = this;
-   this.$container.children('.opec-selected').each(function() {
-      if($(this).attr('data-id') == layer.id) {
-         self.toggleLayerSelection($(this));
+   this.addLayer = function(layer, extraInfo) {
+      var $layer = $(layer);
+      if (typeof extraInfo.tags !== 'undefined' && extraInfo.tags !== null) {
+         for(var tag in extraInfo.tags) {
+            if(extraInfo.tags[tag] !== null)  
+               $layer.attr('data-' + tag, extraInfo.tags[tag]);     
+         }
       }
-   });
-};
-
-opec.window.layerSelector.prototype.refresh = function() {
-   var self = this;
-   $.filtrify(this.container, this.placeholder, {
-      hide     : false,
-      callback : function ( query, match, mismatch ) {
-         self.$container.quicksand($(match), {
-            // all the parameters have sensible defaults
-            // and in most cases can be optional
-            adjustHeight: false,
-            adjustWidth: "auto",
-            duration: 500,
-            easing: "swing",
-            attribute: "data-id"
-         });
-         
-         setTimeout(function() {
-            self.$container.css('width', '100%');
-         }, 501);
-      }
-   });
+      
+      this.$container.append($layer);
+   };
+   
+   this.batchAddLayers = function(layers) {
+      
+   };
+   
+   this.toggleLayerSelection = function($selection) {
+      //$selection.trigger('opec-toggle-selected');
+      $selection.find(".ui-icon")
+         .toggleClass("ui-icon-plus ui-icon-minus")
+      .end()
+      .toggleClass('opec-selected opec-unselected')
+      .toggleClass('ui-state-highlight');
+      
+      this.filtrify.refreshCache($selection);
+   };
+   
+   this.toggleLayerSelectionFromLayer = function(layer) {
+      var self = this;
+      this.$container.children('.opec-selected').each(function() {
+         if($(this).attr('data-id') == layer.id) {
+            self.toggleLayerSelection($(this));
+         }
+      });  
+   };
+   
+   this.refresh = function() {
+      var self = this;
+      this.filtrify = $.filtrify(this.container, this.placeholder, {
+         hide     : false,
+         block: ['data-id', 'data-title'],
+         blockFieldMenu: ['name'],
+         callback : function ( query, match, mismatch ) {
+            self.$container.quicksand($(match), {
+               // all the parameters have sensible defaults
+               // and in most cases can be optional
+               adjustHeight: false,
+               adjustWidth: "auto",
+               duration: 500,
+               easing: "swing",
+               attribute: "data-id"
+            });
+            
+            setTimeout(function() {
+               self.$container.css('width', '100%');
+            }, 501);
+         }
+      });     
+   }; 
 };
 
 

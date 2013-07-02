@@ -1,7 +1,7 @@
 ExpiresActive On
-ExpiresDefault A0
+ExpiresDefault "access plus 0"
  
 # 1 HOUR default caching for JSON and XML files
 <filesMatch "\.(json|xml)$">
-ExpiresDefault A360
+ExpiresDefault "access plus 1 hour"
 </filesMatch>

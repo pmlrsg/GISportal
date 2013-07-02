@@ -1,6 +1,14 @@
-var Cesium = {};
+/**
+ * @externs
+ * @see http://cesium.agi.com/
+ */
+var Cesium = function(){};
 
 
+/**
+ * @param {Function=} callback
+ */
+Cesium.requestAnimationFrame = function(callback){};
 
 /**
  * @constructor
@@ -111,6 +119,13 @@ Cesium.Cartesian3.cross = function(left, right, result) {};
 Cesium.Cartesian3.dot = function(left, right) {};
 
 
+/**
+ * @param {Cesium.Cartesian3} cartesian The Cartesian to duplicate.
+ * @param {Cesium.Cartesian3} result The object onto which to store the result.
+ * @return {Cesium.Cartesian3}
+ */
+Cesium.Cartesian3.clone = function(cartesian, result) {};
+
 
 /**
  * @constructor
@@ -161,10 +176,15 @@ Cesium.CompositePrimitive = function() {};
 
 
 /**
+ * @return {Cesium.CentralBody}
+ */
+Cesium.CompositePrimitive.prototype.getCentralBody = function() {};
+
+
+/**
  * @param {Cesium.CentralBody} centralBody
  */
-Cesium.CompositePrimitive.prototype.setCentralBody =
-    function(centralBody) {};
+Cesium.CompositePrimitive.prototype.setCentralBody = function(centralBody) {};
 
 
 
@@ -186,6 +206,34 @@ Cesium.DefaultProxy = function(proxy) {};
 /**
  * @constructor
  */
+Cesium.Event = function() {};
+
+
+
+/**
+ * @constructor
+ * @extends {Cesium.TilingScheme}
+ */
+Cesium.GeographicTilingScheme = function() {};
+
+
+
+/**
+ * @constructor
+ * @param {Cesium.ImageryProvider} imageryProvider
+ */
+Cesium.ImageryLayer = function(imageryProvider) {};
+
+/**
+ * @return {Cesium.ImageryProvider} provider
+ */
+Cesium.ImageryLayer.prototype.getImageryProvider = function() {};
+
+
+
+/**
+ * @constructor
+ */
 Cesium.ImageryLayerCollection = function() {};
 
 
@@ -195,11 +243,102 @@ Cesium.ImageryLayerCollection = function() {};
 Cesium.ImageryLayerCollection.prototype.addImageryProvider = function(provider) {};
 
 
+/**
+ * @param {Cesium.ImageryLayer} layer
+ */
+Cesium.ImageryLayerCollection.prototype.add = function(layer) {};
+
+
+/**
+ * @param {Cesium.ImageryLayer} layer
+ * @param {boolean} destroy
+ */
+Cesium.ImageryLayerCollection.prototype.remove = function(layer, destroy) {};
+
+
 
 /**
  * @constructor
  */
 Cesium.ImageryProvider = function() {};
+
+
+/**
+ * @return {boolean}
+ */
+Cesium.ImageryProvider.prototype.isReady = function() {};
+
+
+/**
+ * @return {Cesium.Extent}
+ */
+Cesium.ImageryProvider.prototype.getExtent = function() {};
+
+
+/**
+ * @return {number}
+ */
+Cesium.ImageryProvider.prototype.getTileWidth = function() {};
+
+
+/**
+ * @return {number}
+ */
+Cesium.ImageryProvider.prototype.getTileHeight = function() {};
+
+
+/**
+ * @return {number}
+ */
+Cesium.ImageryProvider.prototype.getMaximumLevel = function() {};
+
+
+/**
+ *  @return {Cesium.TilingScheme}
+ */
+Cesium.ImageryProvider.prototype.getTilingScheme = function() {};
+
+
+/**
+ * //@returns {TileDiscardPolicy} The discard policy.
+ * // TODO
+ * @return {undefined}
+ */
+Cesium.ImageryProvider.prototype.getTileDiscardPolicy = function() {};
+
+
+/**
+ * @return {Cesium.Event} The event.
+ */
+Cesium.ImageryProvider.prototype.getErrorEvent = function() {};
+
+
+/**
+ * @return {HTMLImageElement|HTMLCanvasElement|undefined} A canvas or image containing the log to display, or undefined if there is no logo.
+ */
+Cesium.ImageryProvider.prototype.getLogo = function() {};
+
+
+/**
+ * @return {Cesium.Proxy|undefined}
+ */
+Cesium.ImageryProvider.prototype.getProxy = function() {};
+
+
+/**
+ * @param {number} x The tile X coordinate.
+ * @param {number} y The tile Y coordinate.
+ * @param {number} level The tile level.
+ * @return {Cesium.Promise|undefined}
+ */
+Cesium.ImageryProvider.prototype.requestImage = function(x, y, level) {};
+
+
+/**
+ * @param {string} url
+ * @return {Cesium.Promise}
+ */
+Cesium.ImageryProvider.loadImage = function(url) {};
 
 
 
@@ -235,8 +374,19 @@ Cesium.Ellipsoid.prototype.cartesianToCartographic = function(cartesian, result)
 
 /**
  * @constructor
+ * @param {number} west
+ * @param {number} south
+ * @param {number} east
+ * @param {number} north
  */
-Cesium.FeatureDetection = function() {}
+Cesium.Extent = function(west, south, east, north) {};
+
+
+
+/**
+ * @constructor
+ */
+Cesium.FeatureDetection = function() {};
 
 
 /**
@@ -346,6 +496,27 @@ Cesium.PerspectiveFrustrum.prototype.near;
 /**
  * @constructor
  */
+Cesium.Promise = function() {};
+
+
+
+/**
+ * @constructor
+ */
+Cesium.Proxy = function() {};
+
+
+/**
+ * @param {string} resource
+ * @return {string}
+ */
+Cesium.Proxy.prototype.getUrl = function(resource) {};
+
+
+
+/**
+ * @constructor
+ */
 Cesium.Quaternion = function() {};
 
 
@@ -399,9 +570,26 @@ Cesium.Scene.prototype.render = function() {};
 
 
 /**
+ */
+Cesium.Scene.prototype.destroy = function() {};
+
+
+/**
  * @type {Cesium.SceneMode}
  */
 Cesium.Scene.prototype.mode;
+
+
+/**
+ * @type {Object}
+ */
+Cesium.Scene.prototype.scene2D;
+
+
+/**
+ * @type {Cesium.SkyBox}
+ */
+Cesium.Scene.prototype.skyBox;
 
 
 
@@ -512,6 +700,18 @@ Cesium.SkyBoxOptions_.prototype.positiveZ;
 Cesium.SkyBoxOptions_.prototype.negativeZ;
 
 
+/**
+ * @constructor
+ */
+Cesium.TilingScheme = function() {};
+
+
+/**
+ * @return {Cesium.Extent}
+ */
+Cesium.TilingScheme.prototype.getExtent = function() {};
+
+
 
 /**
  * @constructor
@@ -532,3 +732,11 @@ Cesium.WebMercatorProjection.prototype.project = function(cartographic) {};
  * @return {Cesium.Cartographic}
  */
 Cesium.WebMercatorProjection.prototype.unproject = function(cartesian) {};
+
+
+
+/**
+ * @constructor
+ * @extends {Cesium.TilingScheme}
+ */
+Cesium.WebMercatorTilingScheme = function() {};

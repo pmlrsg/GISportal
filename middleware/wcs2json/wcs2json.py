@@ -393,6 +393,7 @@ def create_app(path):
       
       # Optional extras
       nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
+      nameToParam["depth"] = Param("depth", True, False, request.args.get('depth', None))
       
       # One Required
       nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
@@ -632,7 +633,8 @@ def create_app(path):
       yAxisVar = params['graphYAxis'].value
       zAxisVar = params['graphZAxis'].value
       
-      print xAxisVar, yAxisVar, zAxisVar
+      #np.set_printoptions(threshold=np.nan)
+      #print xAxisVar, yAxisVar, zAxisVar
           
       xVar = getCoordinateVariable(dataset, xAxisVar)
       xArr = np.array(xVar)
@@ -649,7 +651,7 @@ def create_app(path):
       
       # Create a masked array ignoring nan's
       zMaskedArray = np.ma.masked_array(zArr, [np.isnan(x) for x in zArr])
-      
+         
       time = None
       lat = None
       lon = None
@@ -673,6 +675,19 @@ def create_app(path):
       
 
       output = {}
+      
+      numDimensions = len(zMaskedArray.shape)
+      
+      # If 4 dimensions, assume depth and switch with time
+      if numDimensions == 4:
+         depth = np.array(getDepth(dataset))
+         zMaskedArray.swapaxes(1, 0)
+         if 'depth' in params:         
+            if params['depth'].value in depth:
+               pass
+         else:
+            zMaskedArray = zMaskedArray[0]
+            output['depth'] = float(depth[0])
       
       units = getUnits(dataset.variables[params['coverage'].value])
       output['units'] = units
@@ -708,7 +723,11 @@ def create_app(path):
                date = ''.join(times[i])
             #output['data'][date.isoformat()] = []
             
-            for j, latRow in enumerate(timelatlon):            
+            #print timelatlon
+            
+            for j, latRow in enumerate(timelatlon):   
+               #print '-------------------------------------'
+               #print latRow         
                latitude = lat[j]
                #output['data'][date.isoformat()].append([float(latitude), getMean(latRow)])              
                mean = getMean(latRow)
@@ -721,7 +740,8 @@ def create_app(path):
       elif lon != None:
          zMaskedArray = zMaskedArray.swapaxes(1,2)
          
-         for i, timelonlat in enumerate(zMaskedArray):    
+         for i, timelonlat in enumerate(zMaskedArray): 
+            #print timelonlat   
             date = None
             if timeUnits:  
                date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
@@ -730,6 +750,8 @@ def create_app(path):
             #output['data'][date.isoformat()] = []
                            
             for j, lonRow in enumerate(timelonlat):
+               #print '-------------------------------------'
+               #print lonRow  
                longitude = lon[j]            
                #lonArr = []                                  
                #for k, latRow in enumerate(lonRow):
@@ -851,6 +873,14 @@ def create_app(path):
             if name == "_CoordinateAxisType" and var._CoordinateAxisType == axis:
                return var
       
+      return None
+   
+   def getDepth(dataset):
+      for i, key in enumerate(dataset.variables):
+         var = dataset.variables[key]
+         if "_CoordinateAxisType" in var.ncattrs() and "_CoordinateZisPositive" in var.ncattrs():
+            if var._CoordinateAxisType == "Height" and var._CoordinateZisPositive == "down":
+               return var
       return None
    
    def getDimension(dataset, dimName):

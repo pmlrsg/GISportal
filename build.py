@@ -30,6 +30,10 @@ SRC = [path
        for path in ifind('src')
        if path.endswith('.js')]
 
+HTML = [path 
+        for path in ifind('src/html')
+        if path.endswith('.html')]
+
 # Reorder to move opecportal.js to the front
 SRC.remove('src/opecportal.js')
 SRC.insert(0, 'src/opecportal.js')
@@ -76,6 +80,20 @@ def build_opec_js(t):
 @target('html/static/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
 def uglify_opec(t):
    t.output(UGLIFYJS, SRC)
+   
+virtual('html', 'html/static/index.html')
+
+@target('html/static/index.html', HTML)
+def build_html(t):
+   t.info('Building HTML')
+   destination = open('html/static/index.html', 'w')
+   
+   if 'src/html/fragments/main.html' in HTML:
+      with open(HTML['src/html/fragments/main.html'], 'r') as file:       
+         destination.write(file.read())
+         destination.write('\n')
+         
+      
    
 virtual('doc', 'jsdoc')
 

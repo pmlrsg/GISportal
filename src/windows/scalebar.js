@@ -135,8 +135,7 @@ opec.window.createScalebar = function($trigger) {
  * 
  * @param {Object} layer - The layer who's scalebar needs to be updated.
  */
-function updateScalebar(layer)
-{
+function updateScalebar(layer) {
    // Check we have something to update
    if($('#scalebar-' + layer.id).length)
    {
@@ -155,8 +154,7 @@ function updateScalebar(layer)
    }
 }
 
-function getScalebarDetails(layer)
-{
+function getScalebarDetails(layer) {
    // Setup defaults
    var url = null;
    var width = 110;
@@ -166,7 +164,7 @@ function getScalebarDetails(layer)
    $.each(layer.styles, function(index, value)
    {
       // If the style names match grab its info
-      if(value.Name == layer.params["STYLES"] && url === null) {
+      if(value.Name == layer.style && url === null) {
          url = value.LegendURL + createGetLegendURL(layer, true);
          width = parseInt(value.Width, 10);
          height = parseInt(value.Height, 10);
@@ -191,8 +189,7 @@ function getScalebarDetails(layer)
  * @param {number} max - The higher end of the scale.
  * @return {Object} Returns two values min and max in an object.
  */
-function getScaleRange(min, max)
-{
+function getScaleRange(min, max) {
    return {
       max: max + Math.abs((max / 100) * 25),
       min: min - Math.abs((max / 100) * 25)
@@ -206,8 +203,7 @@ function getScaleRange(min, max)
  * @param {number} newMax - The new maximum value to be used for the scale
  * @param {boolean} reset - Resets the scale if true
  */ 
-function validateScale(layer, newMin, newMax, reset)
-{  
+function validateScale(layer, newMin, newMax, reset) {  
    if(newMin === null || typeof newMin === 'undefined')
       newMin = layer.minScaleVal;
       
@@ -267,10 +263,9 @@ function validateScale(layer, newMin, newMax, reset)
    }
 }
 
-function createGetLegendURL(layer, hasBase)
-{
+function createGetLegendURL(layer, hasBase) {
    if(hasBase)
       return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
    else
-      return layer.url + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log;
 }

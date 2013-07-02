@@ -9,7 +9,7 @@ opec.contextMenu = {};
  */
 opec.contextMenu.setup = function() {
    /**
-    * Create the custom control for the slider
+    * Create the custom control for the slider.
     */
    $.contextMenu.types.slider = function(item, opt, root) {
       $('<div id="' + item.id + '" class="context-menu slider"></div>').appendTo(this)
@@ -29,7 +29,7 @@ opec.contextMenu.setup = function() {
             return true;
          }
       });
-   
+      
       /*
        * When the 'contextmenu' gets focus grab the opacity value from the 
        * selected layer and set the slider's position to be that value.
@@ -41,6 +41,20 @@ opec.contextMenu.setup = function() {
             
          $("#" + item.id).slider("value", layer.opacity);        
       });
+   };
+   
+   /**
+    * Create custom checkbox control.
+    */
+   $.contextMenu.types.customCheckbox = function(item, opt, root) {
+      var value = item.selected ? 'checked="yes"' : '';
+      $('<label>' + 
+            '<input type="checkbox"' + value + 'name="context-menu-input-yesno">' +
+            '<span>' + item.customName + '</span>' +
+         '</label>').appendTo(this)
+         .on('click', ':checkbox', function() {
+            item.customCallback($(this).is(':checked'));
+         }); 
    };
    
    /**
@@ -71,31 +85,37 @@ opec.contextMenu.setup = function() {
             };  
             // Styles  
             var fold2 = {
-              fold3: {
+              fold2: {
                   name: "Layer Styles", 
                   items: opec.contextMenu.getCurrentStyles($trigger)
                }
             }; 
             // Elevation
             var fold3 = {
-               fold2: {
+               fold3: {
                   name: "Layer Elevation",
                   items: opec.contextMenu.getCurrentElevation($trigger)
                }
             };
+            var fold4 = {
+               sublayers: {
+                  name: "Sublayers", 
+                  items: opec.contextMenu.displaySublayers($trigger)
+               } 
+            };
             var rest = {
                showScalebar: opec.contextMenu.showScalebar($trigger),
                showMetadata: opec.contextMenu.showMetadata($trigger),
-               showGraphCreator: opec.contextMenu.showGraphCreator(),
                viewData: opec.contextMenu.viewData($trigger),
-               heatmap: opec.contextMenu.heatmapTest()
+               heatmap: opec.contextMenu.heatmapTest(),
+               testTimebar : opec.contextMenu.addTimebar()
             };
             
             if(layer.controlID == 'opLayers') {
-               return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
+               return layer.elevation ? $.extend(true, fold1, fold2, fold3, fold4, rest) : $.extend(true, fold1, fold2, fold4, rest);
             }
             else if (layer.controlID == 'refLayers') {
-               return $.extend(true, fold1, rest);
+               return $.extend(true, fold1, fold4, rest);
             }
             else {
                return $.extend(true, fold1, rest);
@@ -157,6 +177,15 @@ opec.contextMenu.setup = function() {
    //});
 };
 
+opec.contextMenu.addTimebar = function() {
+   return {
+      name: 'Test timebar',
+      callback: function() {
+         opec.timeline.addRangeBar();
+      }    
+   }; 
+};
+
 opec.contextMenu.heatmapTest = function() {
    return {
       name: "Test Heatmap",
@@ -195,7 +224,6 @@ opec.contextMenu.heatmapTest = function() {
       }
    };
 };
-
 
 /**
  * Select all layers in the group
@@ -274,8 +302,7 @@ opec.contextMenu.viewData = function($trigger) {
    if($trigger.attr('id')) {
       layerName = $trigger.attr('id');
       layer = opec.getLayerByID(layerName);
-   }
-   else {
+   } else {
       layerName = $trigger.text();
       layer = opec.microLayers[layerName];
       console.log("To be be removed");
@@ -362,7 +389,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
    if(layer.controlID != 'opLayers')
       return [];
       
-   var menuOutput = [];
+   var menuOutput = {};
    var styles = layer.styles.slice();
    // Add a new style that will remove styles from the layer
    styles.push({
@@ -378,12 +405,13 @@ opec.contextMenu.getCurrentStyles = function($trigger)
       menuOutput['Layer Styles' + index] = {
          name: value.Name,
          // Ignore Lint warning
-         className: value.Name == layer.params["STYLES"] ? "styleSelected" : "",
+         className: value.Name == layer.style ? "styleSelected" : "",
          callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
          callback: function() {
             var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
-            layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});
+            layer.style = value.Name;
+            layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});            
             console.log(value.Name);
             updateScalebar(layer);
          }
@@ -395,7 +423,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
 
 opec.contextMenu.getCurrentElevation = function($trigger) {
    var layer = opec.getLayerByID($trigger.attr('id'));
-   var menuOutput = [];
+   var menuOutput = {};
    
    $.each(layer.elevationCache, function(index, value) {
       menuOutput['Layer Elevation ' + index] = {
@@ -407,6 +435,66 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
             var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.mergeNewParams({elevation: value});
          }
+      };
+   });
+   
+   return menuOutput;
+};
+
+opec.contextMenu.displaySublayers = function($trigger) {
+   
+   var layerName = "",
+      layer = opec.getLayerByID($trigger.attr('id')),
+      sublayer = null,
+      menuOutput = {};
+   
+   /*
+   function displaySublayer(sublayerName, i) {
+      menuOutput['Sublayer' + i] = {
+         name: "sub" + i,
+         // Ignore Lint warning
+         className: 'sub' + i, // == layer.style ? "styleSelected" : "",
+         callbackName: 'Sublayers' + i,
+         // Create the callback for what happens when someone clicks on the menu button
+         callback: function() {
+            alert("hi");
+         }
+      }; 
+   }
+   
+   var keys = Object.keys(layer.openlayers);
+   for(var i = 0, len = keys.length; i < len; i++) {
+      sublayer = layer.openlayers[keys[i]];
+      displaySublayer(sublayer.name, i);
+   }*/
+  
+   $.each(layer.openlayers, function(index, value) {
+      sublayer = layer.openlayers[index];
+      if(sublayer.visibility) { isSelected = true; }
+      menuOutput['Sub Layer' + index] = {
+         name: "sub" + index,
+         type: 'customCheckbox',
+         customName: index,
+         customCallback: function(checked) {
+            var isSelected = false;          
+            sublayer.setVisibility(checked);
+            $.each(layer.openlayers, function(index, value) {
+               if(layer.openlayers[index].visibility) { isSelected = true; }
+            });
+            
+            var $checkbox = layer.$layer.find('[type="checkbox"]'); 
+            if(isSelected) {
+               $checkbox.attr('checked', 'yes');
+            } else {
+               $checkbox.removeAttr('checked');
+            }
+            
+            return false;
+         },
+         selected: sublayer.visibility,
+         // Ignore Lint warning
+         className: 'sub' + index      
+         //callbackName: 'Sublayers' + index
       };
    });
    

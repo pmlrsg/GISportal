@@ -11,9 +11,9 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 CACHELIFE = 3600 #3600 # cache time in seconds, 1 hour cache
-LAYERCACHEPATH = "./html/static/cache/layers/"
-SERVERCACHEPATH = "./html/static/cache/"
-MASTERCACHEPATH = "./html/static/cache/wfsMasterCache"
+LAYERCACHEPATH = "./../../html/static/cache/layers/"
+SERVERCACHEPATH = "./../../html/static/cache/"
+MASTERCACHEPATH = "./../../html/static/cache/wfsMasterCache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 GET_CAPABILITES_PARAMS = "SERVICE=WFS&REQUEST=GetCapabilities&VERSION=1.0.0"

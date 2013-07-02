@@ -80,7 +80,11 @@ opec.leftPanel.setup = function() {
 };
 
 /**
- * Add a group to the layers panel.
+ * Adds a group to the layers panel.
+ * 
+ * @param {number} id - The id to use for the panel.
+ * @param {string} displayName - The panel name to show.
+ * @param {Object} $panelName - jQuery object representing the panel.
  */
 opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
    // Add the accordion
@@ -127,6 +131,8 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
 
 /**
  * Remove a group from the layers panel. 
+ * 
+ * @param {string} id - The id of the panel to remove.
  */
 opec.leftPanel.removeGroupFromPanel = function(id) {
    var $id = $('#' + id);
@@ -135,7 +141,7 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
       $id.children('li').each(function() {
          var layer = opec.getLayerByID($(this).attr('id'));
          if(typeof layer !== 'undefined') {
-            opec.removeOpLayer(layer);
+            opec.removeLayer(layer);
             // Deselect layer on layer selector
             opec.layerSelector.toggleSelectionFromLayer(layer);
          }
@@ -154,14 +160,34 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
    //});
 };
 
+/**
+ * Returns the first group from the panel. If there is no first group, it 
+ * creates one.
+ * 
+ * @param {Object} $panelName - jQuery object representing the panel.
+ * 
+ * @return {Object} Returns the first group. 
+ */
 opec.leftPanel.getFirstGroupFromPanel = function($panelName) {
-   return $panelName.find('.sensor-accordion')
+   var $firstGroup = $panelName.find('.sensor-accordion')
       .filter(function(i) {
          return !$(this).hasClass('opec-help');
       })
       .first();
+      
+   if($firstGroup.length > 0) {
+      return $firstGroup;
+   } else {
+      opec.leftPanel.addNextGroupToPanel($panelName);
+      return opec.leftPanel.getFirstGroupFromPanel($panelName);
+   }
 };
 
+/**
+ * Adds an empty group to the panel.
+ * 
+ * @param {Object} $panelName - jQuery object representing the panel.
+ */
 opec.leftPanel.addNextGroupToPanel = function($panelName) {
    var number = ($panelName.find('.sensor-accordion')
       .filter(function(i) {
@@ -180,8 +206,8 @@ opec.leftPanel.addNextGroupToPanel = function($panelName) {
  * Add a layer to a group on the layers panel.
  */ 
 opec.leftPanel.addLayerToGroup = function(layer, $group) {
-   // if not already on list and not a base layer, populate the layers panel (left slide panel)
-   if(!$('#' + layer.id).length && layer.displayInLayerSwitcher) {
+   // if not already on list, populate the layers panel (left slide panel)
+   if(!$('#' + layer.id).length) {
       // jQuery selector for the layer controlID
       //var selID = layer.controlID == 'opLayers' ? '#' + layer.displaySensorName : '#' + layer.controlID; 
       
@@ -197,28 +223,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
          opec.templates.layer(data)
       );
 
-      var $layer = $('#' + layer.id);
-
-      // Show the img when we are loading data for the layer
-      layer.events.register("loadstart", layer, function(e) {
-         $('#' + this.id).find('img[src="img/ajax-loader.gif"]').show();
-      });
-      
-      // Hide the img when we have finished loading data
-      layer.events.register("loadend", layer, function(e) {
-         $('#' + this.id).find('img[src="img/ajax-loader.gif"]').hide();
-      });
-      
-      // Hide the ajax-loader and the exclamation mark initially
-      $layer.find('img[src="img/ajax-loader.gif"]').hide();
-      $layer.find('img[src="img/exclamation_small.png"]').hide();
-         
-      if(layer.controlID != 'baseLayers') {   
-         // Check the layer state when its visibility is changed
-         layer.events.register("visibilitychanged", layer, function() {
-            opec.checkLayerState(layer);
-         });
-      }
+      layer.$layer = $('#' + layer.id);
       
       // Remove the dummy layer
       //removeDummyHelpLayer()
@@ -250,18 +255,26 @@ opec.leftPanel.updateGroupOrder = function($panel) {
  * position on the stack.
  */ 
 opec.leftPanel.updateLayerOrder = function(accordion) {
-   var layerOffset = 0;
+   var layersBelowOffset = 0;
    $.each(accordion.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
-      layerOffset += $(this).children('li').length;
+      //layersBelowOffset += $(this).children('li').length;
+      $(this).children('li').each(function() {
+         if($(this).hasClass('opec-layer')) {
+            layersBelowOffset += opec.layers[$(this).attr('id')].order.length;
+         }
+      });
    });
 
-   var order = accordion.sortable('toArray');   
-   if(order.length > 0) {         
-      $.each(order, function(index, value) {
+   var layerGroupOrder = accordion.sortable('toArray');   
+   if(layerGroupOrder.length > 0) {         
+      $.each(layerGroupOrder, function(index, value) {
          var layer = opec.getLayerByID(value);
          if(typeof layer !== 'undefined') {
             var positionOffset = layer.controlID == 'opLayers' ? map.numBaseLayers : (map.numBaseLayers + map.numOpLayers);
-            map.setLayerIndex(layer, positionOffset + layerOffset + order.length - index - 1);
+            
+            for(var i = 0, len = layer.order.length; i < len; i++) {
+               map.setLayerIndex(layer.openlayers[layer.order[i]], positionOffset + layersBelowOffset + (layerGroupOrder.length - index - 1) + i);
+            }           
          }
       });
    }
@@ -286,11 +299,15 @@ opec.leftPanel.addDummyHelpLayer = function() {
    
    // Open the layer panel on click
    $('#dmhLayerSelection').click(function(e) {
-      if($('#layerSelection').extendedDialog('isOpen')) {
-         $('#layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+      if($('#opec-layerSelection').extendedDialog('isOpen')) {
+         $('#opec-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
       }
       else {
-         $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+         $('#layerPreloader').fadeTo('slow', 0.3, function() { 
+            $(this).fadeTo('slow', 1).fadeTo('slow', 0.3, function() { 
+               $(this).fadeTo('slow', 1); 
+            }); 
+         });
       }
       
       return false;
@@ -359,7 +376,6 @@ opec.rightPanel.setup = function() {
 /**
  * Sets up the drawing controls to allow for the selection 
  * of ROI's. 
- * 
  */
 opec.rightPanel.setupDrawingControls = function() {
    // Add the Vector drawing layer for POI drawing
@@ -518,6 +534,9 @@ opec.rightPanel.setupDrawingControls = function() {
    }); 
 };
 
+/**
+ * Sets up the graphing tools.
+ */
 opec.rightPanel.setupGraphingTools = function() {
    //var graphCreator = $('#graphCreator');
    // If there is an open version, close it
@@ -766,4 +785,152 @@ opec.rightPanel.setupDataExport = function() {
          return false;
       }
    });
+};
+
+/**
+ * Top bar
+ * @namespace 
+ */
+opec.topbar = {};
+
+opec.topbar.setup = function() {
+   
+   // Add jQuery UI datepicker
+   $('#viewDate').datepicker({
+      showButtonPanel: true,
+      dateFormat: 'dd-mm-yy',
+      changeMonth: true,
+      changeYear: true,
+      beforeShowDay: function(date) { return opec.allowedDays(date); },
+      onSelect: function(dateText, inst) {
+         var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
+         // Synchronise date with the timeline
+         opec.timeline.setDate(thedate);
+         // Filter the layer data to the selected date
+         opec.filterLayersByDate(thedate);
+      }
+   });
+   
+   //----------------------------Quick Region----------------------------------
+
+   // Handles re-set of the quick region selector after zooming in or out on the map or panning
+   function quickRegionReset(e){
+      $('#quickRegion').val('Choose a Region');
+   }
+   map.events.register('moveend', map, quickRegionReset);
+   
+   // Populate Quick Regions from the quickRegions array
+   for(var i = 0; i < quickRegion.length; i++) {
+       $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
+   }
+   
+   // Change of quick region event handler - happens even if the selection isn't changed
+   $('#quickRegion').change(function(e) {
+       var qr_id = $('#quickRegion').val();
+       var bbox = new OpenLayers.Bounds(
+                   quickRegion[qr_id][1],
+                   quickRegion[qr_id][2],
+                   quickRegion[qr_id][3],
+                   quickRegion[qr_id][4]
+                ).transform(map.displayProjection, map.projection);
+       // Prevent the quick region selection being reset after the zoomtToExtent event         
+       map.events.unregister('moveend', map, quickRegionReset);
+       // Do the zoom to the quick region bounds
+       map.zoomToExtent(bbox);
+       // Re-enable quick region reset on map pan/zoom
+       map.events.register('moveend', map, quickRegionReset);
+   });
+   
+   //--------------------------------------------------------------------------
+   
+   // Pan and zoom control buttons
+   $('#panZoom').buttonset();
+   $('#pan').button({ icons: { primary: 'ui-icon-arrow-4-diag'} });
+   $('#zoomIn').button({ icons: { primary: 'ui-icon-circle-plus'} });
+   $('#zoomOut').button({ icons: { primary: 'ui-icon-circle-minus'} });
+   
+   // Function which can toggle OpenLayers controls based on the clicked control
+   // The value of the value of the underlying radio button is used to match 
+   // against the key value in the mapControls array so the right control is toggled
+   opec.toggleControl = function(element) {
+      for(var key in opec.mapControls) {
+         var control = opec.mapControls[key];
+         if($(element).val() == key) {
+            $('#'+key).attr('checked', true);
+            control.activate();
+            
+            if(key == 'pan') {
+               opec.mapControls.selector.activate();
+            }
+         }
+         else {
+            if(key != 'selector') {
+               if(key == 'pan') {
+                  opec.mapControls.selector.deactivate();
+               }
+               
+               $('#'+key).attr('checked', false);
+               control.deactivate();
+            }
+         }
+      }
+      $('#panZoom input:radio').button('refresh');
+   };
+   
+   // Making sure the correct controls are active
+   opec.toggleControl($('#panZoom input:radio'));
+
+   // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
+   $('#panZoom input:radio').click(function(e) {
+      opec.toggleControl(this);
+   });
+   
+   //--------------------------------------------------------------------------
+   
+   // Create buttons
+   $('#opec-toolbar-actions')
+      .buttonset().children('button:first, input[type="button"]')
+      .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
+      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'} })
+      .click(function(e) {
+         if(map.globe.is3D) {
+            map.show2D();
+         } 
+         else {
+            map.show3D();
+            opec.gritter.showNotification('3DTutorial', null);
+         }
+      })
+      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
+   
+   // Add toggle functionality for dialogs
+   addDialogClickHandler('#infoToggleBtn', '#info');
+   addDialogClickHandler('#mapInfoToggleBtn', '#mapInfo');
+   addDialogClickHandler('#layerPreloader', '#opec-layerSelection');
+
+   // Add permalink share panel click functionality
+   $('#shareMapToggleBtn').click(function() {
+      $('#shareOptions').toggle();
+   });
+   
+   function addDialogClickHandler(idOne, idTwo) {
+      $(idOne).click(function(e) {
+         if($(idTwo).extendedDialog('isOpen')) {
+           $(idTwo).extendedDialog('close');
+         }
+         else {
+           $(idTwo).extendedDialog('open');
+         }
+         return false;
+      });
+   }
+   
+   $('#topToolbar').children('div').children('button').first()
+      .button({ label:'', icons: { primary: 'ui-icon-triangle-1-n'}})
+      .click(function() {
+         $('#topToolbar').slideUp(1000);
+         this.visible = false;
+      });
 };

@@ -933,10 +933,11 @@ var // currently active contextMenu trigger
             root.accesskeys || (root.accesskeys = {});
             
             // create contextMenu items
-            for(index in opt.items) {
+            for(var index in opt.items) {
                 var key = index;
+                // OPEC: Really horrible fix/hack to allow arrays.
                 if(Object.prototype.toString.call(opt.items) === '[object Array]' && key.indexOf("Layer") == -1) { break; }
-                var item = opt.items[index];
+                var item = opt.items[key];
                 //if(Object.prototype.toString.call(opt.items) === '[object Array]') {	 /*OpEc object>array fix*/
                    //key = item;
                    //item = opt.items[item];
@@ -959,7 +960,7 @@ var // currently active contextMenu trigger
                 // NOTE: the accesskey attribute should be applicable to any element, but Safari5 and Chrome13 still can't do that
                 if (item.accesskey) {
                     var aks = splitAccesskey(item.accesskey);
-                    for (var i=0, ak; ak = aks[i]; i++) {
+                    for (var i = 0, ak; ak = aks[i]; i++) {
                         if (!root.accesskeys[ak]) {
                             root.accesskeys[ak] = item;
                             item._name = item.name.replace(new RegExp('(' + ak + ')', 'i'), '<span class="context-menu-accesskey">$1</span>');

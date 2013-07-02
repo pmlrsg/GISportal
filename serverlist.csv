@@ -1,8 +1,0 @@
-name,wmsURL,wcsURL
-motherlodeAlaska,http://motherlode.ucar.edu:8080/thredds/wms/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?,http://motherlode.ucar.edu:8080/thredds/wcs/fmrc/NCEP/GFS/Alaska_191km/NCEP-GFS-Alaska_191km_best.ncd?
-hawaii,http://oos.soest.hawaii.edu/thredds/wms/hioos/satellite/dhw?,http://oos.soest.hawaii.edu/thredds/wcs/hioos/satellite/dhw?
-met-no,http://thredds.met.no/thredds/wms/osisaf_test/met.no/ice/conc_nh_agg?,http://thredds.met.no/thredds/wcs/osisaf_test/met.no/ice/conc_nh_agg?
-mapserver,http://demo.mapserver.org/cgi-bin/mapserv?map=/osgeo/mapserver/msautotest/world/world.map&,
-ogs,http://earthserver.pml.ac.uk:8080/thredds/wms/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?,http://earthserver.pml.ac.uk:8080/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?
-ccitim,http://earthserver.pml.ac.uk:8080/thredds/wms/CCITIM?,http://earthserver.pml.ac.uk:8080/thredds/wcs/CCITIM?
-metOffice,http://earthserver.pml.ac.uk:8080/thredds/wms/metoffice_mrcs_agg/Met_Office_MRCS_best.ncd?
