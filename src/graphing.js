@@ -9,7 +9,7 @@ opec.graphs.create = function(data) {
       return;
    }
                    
-   if(data.type == 'basic') {                                    
+   if(data.type == 'timeseries') {                                    
       var start = new Date(data.output.global.time).getTime(),
          d1 = [],
          d2 = [], 

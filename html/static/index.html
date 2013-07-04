@@ -202,11 +202,25 @@
    }}
    <div id="graphCreator" class="unselectable tt" title="Graph Creator">
       <div class="ui-control">
-         <h3 id="basic-inputs-header" class="ui-control-header ui-helper-reset">
+         <div>
+            <label for="graphcreator-gallery-label">Gallery:</label>
+         </div>
+         <div>
+            <select id="graphcreator-gallery" title="Type of query you want to make" name="graphcreator-gallery">
+               <option value="timeseries" title="Returns a time series with mean, median, max, min and STD">Timeseries</option>
+               <option value="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">Hovmöller Latitude</option>
+               <option value="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">Hovmöller Longitude</option>
+               <option value="histogram" title="Returns a histogram">Histogram</option>
+               <!--<option value="raw" title="Not for normal use (gets the raw data)">raw</option>
+               <option value="test" title="Not for normal use (test new queries)">test</option>
+               <option value="error" title="Generates errors, used testing error handling">error</option> -->
+            </select>
+         </div>
+         <h3 id="data-inputs-header" class="ui-control-header ui-helper-reset">
             <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Basic Inputs</a> 
+            <a href="#">Data</a> 
          </h3>
-         <div id="basic-inputs">
+         <div id="data-inputs">
             <div>
                <label for="graphcreator-baseurl-label">Base URL:</label>
             </div>
@@ -219,20 +233,6 @@
             <div>
                <input id="graphcreator-coverage" title="Name of the Coverage" placeholder="Name of the Coverage" type="text" name="graphcreator-coverage" />
                <input id="graphcreator-coverage-button" title="Get the top selected layer" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />
-            </div>
-            <div>
-               <label for="graphcreator-type-label">Type:</label>
-            </div>
-            <div>
-               <select id="graphcreator-type" title="Type of query you want to make" name="graphcreator-type">
-                  <option value="basic" title="Returns a time series with mean, median, max, min and STD">basic</option>
-                  <option value="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">Hovmöller Latitude</option>
-                  <option value="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">Hovmöller Longitude</option>
-                  <option value="histogram" title="Returns a histogram">histogram</option>
-                  <!--<option value="raw" title="Not for normal use (gets the raw data)">raw</option>
-                  <option value="test" title="Not for normal use (test new queries)">test</option>
-                  <option value="error" title="Generates errors, used testing error handling">error</option> -->
-               </select>
             </div>
          </div>
       </div>
@@ -254,7 +254,7 @@
       <div class="ui-control">
          <h3 id="advanced-inputs-header" class="ui-control-header ui-helper-reset">
             <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Advanced Inputs</a>
+            <a href="#">Area and Time of Interest</a>
          </h3>
          <div id="advanced-inputs">
             <div>
@@ -274,21 +274,6 @@
          </div>
       </div>
       {{/advanced}}
-      <div class="ui-control">
-         <h3 id="graph-format-header" class="ui-control-header ui-helper-reset">
-            <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Graph Format</a>
-         </h3>
-         <div id="graph-format">
-            <div>
-               <label for="graphcreator-barwidth-label">Barwidth:</label>
-            </div>
-            <div>
-               <input id="graphcreator-barwidth" title="This does nothing at present" placeholder="This does nothing at present" type="text" name="graphcreator-barwidth"/>
-               <input id="graphcreator-barwidth-button" title="This does nothing at present" type="button" name="graphcreator-barwidth-button" value="Get Bar Width" />                    
-            </div>
-         </div>
-      </div>
       <div id="graphcreator-generate">
          <input type="button" title="Generate a graph from a WCS request" name="graphcreator-generate-button" value="Generate Graph" />
          <img src="img/ajax-loader.gif"/> 

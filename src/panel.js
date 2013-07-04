@@ -399,6 +399,7 @@ opec.rightPanel.setupDrawingControls = function() {
    vectorLayer.controlID = "poiLayer";
    vectorLayer.displayInLayerSwitcher=false;
    map.addLayer(vectorLayer);
+   
 
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature) {
@@ -521,6 +522,22 @@ opec.rightPanel.setupDrawingControls = function() {
       toggleDrawingControl(this);
    });
    
+   // So that changing the input box changes the visual selection box on map
+   $('#opec-graphing').on('change', '#graphcreator-bbox', function() {
+      var values = $('#graphcreator-bbox').val().split(',');
+      values[0] = opec.utils.clamp(values[0], -180, 180); // Long
+      values[2] = opec.utils.clamp(values[2], -180, 180); // Long
+      values[1] = opec.utils.clamp(values[1], -90, 90); // Lat
+      values[3] = opec.utils.clamp(values[3], -90, 90); // Lat
+      $('#graphcreator-bbox').val(values[0] + ',' + values[1] + ',' + values[2] + ',' + values[3]);
+      var feature = new OpenLayers.Feature.Vector(new OpenLayers.Bounds(values[0], values[1], values[2], values[3]).toGeometry());
+      feature.layer = map.layers[map.layers.length -1];
+      var features = map.layers[map.layers.length -1].features;
+      if (features[0]) map.layers[map.layers.length -1].features[0].destroy();
+      map.layers[map.layers.length -1].features[0] = feature;
+      map.layers[map.layers.length -1].redraw();
+   });
+   
    // TRAC Ticket #58: Fixes flaky non-selection of jQuery UI buttons (http://bugs.jqueryui.com/ticket/7665)
    $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
       function(e) { h.disabled && ( e.preventDefault(), e.stopImmediatePropagation() ); }
@@ -532,6 +549,7 @@ opec.rightPanel.setupDrawingControls = function() {
       }
       $(this).removeClass('opec_click');
    }); 
+   
 };
 
 /**
@@ -574,11 +592,36 @@ opec.rightPanel.setupGraphingTools = function() {
    }); */
 
    // Add the jQuery UI datepickers to the dialog
-   $('#graphcreator-time, #graphcreator-time2').datepicker({
+   $('#graphcreator-time').datepicker({
       showButtonPanel: true,
       dateFormat: 'yy-mm-dd',
       changeMonth: true,
-      changeYear: true
+      changeYear: true,
+      beforeShowDay: function(date) { 
+         if($('#graphcreator-time2').datepicker('getDate')) {
+            var compareDate = $('#graphcreator-time2').datepicker('getDate');
+            if(opec.utils.compareDates(date, compareDate) != true)  {
+               return [false];
+            }
+         }
+         return opec.allowedDays(date); 
+      },
+   });
+   
+   $('#graphcreator-time2').datepicker({
+      showButtonPanel: true,
+      dateFormat: 'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      beforeShowDay: function(date) { 
+         if($('#graphcreator-time').datepicker('getDate')) {
+            var compareDate = $('#graphcreator-time').datepicker('getDate');
+            if(opec.utils.compareDates(compareDate, date) != true)  {
+               return [false]
+            }
+         }
+         return opec.allowedDays(date); 
+      },
    });
    // Set the datepicker controls to the current view date if set
    var viewDate = $('#viewDate').datepicker('getDate');
@@ -644,6 +687,16 @@ opec.rightPanel.setupGraphingTools = function() {
    $('#graphcreator-barwidth-button').click(function() {
       return false;
    });
+
+   $('#graphcreator-gallery').change(function() {
+      if(!$('#graphcreator-gallery option[value="histogram"]').prop("selected")) {
+         $('#histogram-inputs').parent().hide();
+      }
+      else  {
+         $('#histogram-inputs').parent().show();
+      }
+   });
+   $('#graphcreator-gallery').change(); // Initialise states
    
    // Close histogram, advanced and format panels
    $('#histogram-inputs-header').trigger('click');
@@ -661,11 +714,11 @@ opec.rightPanel.setupGraphingTools = function() {
       var graphXAxis = null,
       graphYAxis = null;
       
-      if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
+      if ( $('#graphcreator-gallery').val() == 'hovmollerLon' ) {
          graphXAxis = 'Lon';
          graphYAxis = 'Time';
       }
-      else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
+      else if ( $('#graphcreator-gallery').val() == 'hovmollerLat' ) {
          graphXAxis = 'Time';
          graphYAxis = 'Lat';
       }
@@ -673,7 +726,7 @@ opec.rightPanel.setupGraphingTools = function() {
       var params = {
          baseurl: $('#graphcreator-baseurl').val(),
          coverage: $('#graphcreator-coverage').val(),
-         type: $('#graphcreator-type').val(),
+         type: $('#graphcreator-gallery').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
@@ -691,6 +744,7 @@ opec.rightPanel.setupGraphingTools = function() {
          asyc: true,
          success: function(data) {
             opec.graphs.create(data);
+            console.log("success");
          },
          error: function(request, errorType, exception) {
             var data = {

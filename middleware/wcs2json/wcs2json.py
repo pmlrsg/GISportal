@@ -334,7 +334,7 @@ def create_app(path):
       type = params['type'].value
       if type == 'histogram': # Outputs data needed to create a histogram
          output = getBboxData(params, histogram)
-      elif type == 'basic': # Outputs a set of standard statistics
+      elif type == 'timeseries': # Outputs a set of standard statistics
          output = getBboxData(params, basic)
       elif type == 'scatter': # Outputs a scatter graph
          output = getBboxData(params, scatter)

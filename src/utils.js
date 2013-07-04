@@ -98,6 +98,17 @@ opec.utils.ISODateString = function(d) {
 };
 
 /**
+ * Returns true if first date is smaller than second
+ */ 
+opec.utils.compareDates = function(firstDate, secondDate) { 
+   var firstDate = opec.utils.ISODateString(firstDate);
+   var secondDate = opec.utils.ISODateString(secondDate);
+   if (firstDate < secondDate) return true;
+   return false;
+}
+   
+
+/**
  * Format date string so it can be displayed
  */ 
 opec.utils.displayDateString = function(date) {
@@ -127,4 +138,8 @@ opec.utils.ceil1places = function(num) {
 
 opec.utils.ceil3places = function(num) {
    return Math.ceil(num * 1000) / 1000;
+};
+
+opec.utils.clamp = function (num, min, max) {
+   return Math.min(Math.max(num, min), max);
 };

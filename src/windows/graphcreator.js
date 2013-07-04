@@ -1,4 +1,4 @@
-opec.window.createGraphCreator = function() {
+/* opec.window.createGraphCreator = function() {
    var graphCreator = $('#graphCreator');
    // If there is an open version, close it
    if(graphCreator.length)
@@ -15,24 +15,6 @@ opec.window.createGraphCreator = function() {
    graphCreator = $('#graphCreator');           
    var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
    
-   /*
-   // Turn it into a dialog box
-   graphCreator.extendedDialog({
-      position: ['center', 'center'],
-      width:340,
-      resizable: false,
-      autoOpen: false,
-      close: function() {
-         // Remove on close
-         $('#graphCreator').remove(); 
-      },
-      showHelp: true,
-      showMinimise: true,
-      dblclick: "collapse",
-      help : function(e, dlg) {
-         opec.gritter.showNotification ('graphCreatorTutorial', null);
-      }
-   }); */
 
    // TODO: Add some logic to the way dates are selected.
    // Add the jQuery UI datepickers to the dialog
@@ -40,8 +22,17 @@ opec.window.createGraphCreator = function() {
       showButtonPanel: true,
       dateFormat: 'yy-mm-dd',
       changeMonth: true,
-      changeYear: true
+      changeYear: true,
+      beforeShowDay: function(date) { return opec.allowedDays(date); },
+      // onSelect: function(dateText, inst) {
+         // var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
+         // // Synchronise date with the timeline
+         // opec.timeline.setDate(thedate);
+         // // Filter the layer data to the selected date
+         // opec.filterLayersByDate(thedate);
+      // }
    });
+   
    // Set the datepicker controls to the current view date if set
    var viewDate = $('#viewDate').datepicker('getDate');
    if (viewDate !== ""){
@@ -116,11 +107,11 @@ opec.window.createGraphCreator = function() {
       var graphXAxis = null,
       graphYAxis = null;
       
-      if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
+      if ( $('#graphcreator-gallery').val() == 'hovmollerLon' ) {
          graphXAxis = 'Lon';
          graphYAxis = 'Time';
       }
-      else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
+      else if ( $('#graphcreator-gallery').val() == 'hovmollerLat' ) {
          graphXAxis = 'Time';
          graphYAxis = 'Lat';
       }
@@ -128,7 +119,7 @@ opec.window.createGraphCreator = function() {
       var params = {
          baseurl: $('#graphcreator-baseurl').val(),
          coverage: $('#graphcreator-coverage').val(),
-         type: $('#graphcreator-type').val(),
+         type: $('#graphcreator-gallery').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
@@ -163,8 +154,9 @@ opec.window.createGraphCreator = function() {
    // Open the dialog box
    //graphCreator.extendedDialog('open');
 };
+*/
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 var graphCreator = {
    name: 'graphCreator',
    create: function(windowType, uid, data) {
@@ -317,11 +309,11 @@ var graphCreator = {
          var graphXAxis = null,
          graphYAxis = null;
          
-         if ( $('#graphcreator-type').val() == 'hovmollerLon' ) {
+         if ( $('#graphcreator-gallery').val() == 'hovmollerLon' ) {
             graphXAxis = 'Lon';
             graphYAxis = 'Time';
          }
-         else if ( $('#graphcreator-type').val() == 'hovmollerLat' ) {
+         else if ( $('#graphcreator-gallery').val() == 'hovmollerLat' ) {
             graphXAxis = 'Time';
             graphYAxis = 'Lat';
          }
@@ -329,7 +321,7 @@ var graphCreator = {
          var params = {
             baseurl: $('#graphcreator-baseurl').val(),
             coverage: $('#graphcreator-coverage').val(),
-            type: $('#graphcreator-type').val(),
+            type: $('#graphcreator-gallery').val(),
             bins: $('#graphcreator-bins').val(),
             time: dateRange,
             bbox: $('#graphcreator-bbox').val(),
