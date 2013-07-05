@@ -45,7 +45,7 @@
       
       this.init();
 
-   };
+   }
 
    Filtrify.prototype.init = function () {
       this.load();
@@ -53,7 +53,7 @@
 
       if ( this.options.query !== undefined ) { 
          this.trigger( this.options.query );
-      };
+      }
    };
 
    Filtrify.prototype.load = function () {
@@ -74,17 +74,17 @@
                if ( this._fields[field] === undefined ) {
                   this._order.push(field);
                   this._fields[field] = {};
-               };
+               }
 
                for ( t = 0; t < tags.length; t++ ) {
                   if ( tags[t].length ) {
                      tags[t] = tags[t].replace(/\\/g, "");
                      this._fields[field][tags[t]] = this._fields[field][tags[t]] === undefined ?
                         1 : this._fields[field][tags[t]] + 1;
-                  };
-               };
-            };
-         };
+                  }
+               }
+            }
+         }
          
          /*
          $(element).on('opec-toggle-selected', 'a', function() {
@@ -124,7 +124,7 @@
          if($.inArray(field, this.options.blockFieldMenu) !== -1) {
             this._menu[field].item.hide();
          }
-      };
+      }
 
       this._holder.html(self._menu.list).prepend(this._search.element);
    };
@@ -143,14 +143,14 @@
 
       for ( tag in this._fields[f] ) {
          tags.push( tag );
-      };
+      }
 
       tags.sort();
 
       for ( t = 0; t < tags.length; t++ ) {
          tag = tags[t];
          html += '<li class="ui-state-default" data-count="' + this._fields[f][tag] + '" ><span>' + tag + '</span></li>';
-      };
+      }
 
       html += "</ul><div class='ft-mismatch ft-hidden'></div></div></li>";
 
@@ -283,7 +283,7 @@
             
             this.filter();
             
-         };
+         }
 
       }, this) );
 
@@ -298,7 +298,7 @@
          //};
 
       }, this) );
-   }
+   };
 /*
    Filtrify.prototype.bringToFront = function ( f ) {
       this._z = this._z + 1;
@@ -343,11 +343,11 @@
             this.clearHighlight( f );
             this.highlight( f, next );
             this.preventOverflow( f );
-         };
+         }
       } else {
          this.highlight( f, this._menu[f].tags.children(":visible:first") );
          this.preventOverflow( f );
-      };
+      }
    };
 
    Filtrify.prototype.highlight = function ( f, elem ) {
@@ -397,7 +397,7 @@
       
       // OPEC: If search results are empty we need to add a unique tag to
       // clear the box.
-      if(this._search.results.length == 0) {
+      if(this._search.results.length === 0) {
          this._search.results.push('zzzzzzzzzz');
       }
       
@@ -438,12 +438,12 @@
                results = results + 1;
             } else {
                $(this).addClass("ft-hidden");
-            };
+            }
          });
 
       if ( !results ) {
          this.showMismatch( f, txt );
-      };
+      }
    };
 
    Filtrify.prototype.select = function ( f ) {
@@ -474,7 +474,7 @@
          this._query[f].push( tag );
       } else {
          this._query[f].splice( index, 1 );
-      };
+      }
    };
 
    /**
@@ -487,7 +487,7 @@
          this._menu[f].label.addClass("ft-active");
       } else {
          this._menu[f].label.removeClass("ft-active");
-      };
+      }
    };
 
    /**
@@ -566,7 +566,7 @@
          this._menu[f].selected.slideDown("fast");
       } else {
          this._menu[f].selected.slideUp("fast");
-      };
+      }
    };
 
    Filtrify.prototype.filter = function () {
@@ -581,21 +581,21 @@
             for ( t = this._query[f].length - 1; t >= 0; t-- ) {
                if ( $.inArray( this._query[f][t], this._matrix[r][f] ) !== -1 ) {
                   c = c + 1;
-               };
-            };
+               }
+            }
 
             if ( !this._query[f].length  || c > 0 ) {
                // match!
             } else { 
                m = false; 
-            };
+            }
 
-         };
+         }
          
          this.updateFields( r, m );
          this.cacheMatch( r, m );
          this.showMatch( r, m );
-      };
+      }
 
       this.rewriteFields();
 
@@ -611,7 +611,7 @@
             if($.inArray(field, this.options.blockFieldMenu) === -1) {
                this._fields[field] = {};
             }
-         };
+         }
 
          tags = this._matrix[row][field];
 
@@ -621,11 +621,11 @@
                if ( tags[t].length ) {
                   this._fields[field][tags[t]] = this._fields[field][tags[t]] === undefined ?
                      1 : this._fields[field][tags[t]] + 1;
-               };
-            };
+               }
+            }
 
-         };
-      };
+         }
+      }
 
    };
 
@@ -640,7 +640,7 @@
 
                element.setAttribute("data-count", count );
             }, this ) );
-      };
+      }
    };
 
    Filtrify.prototype.resetCachedMatch = function () {
@@ -653,7 +653,7 @@
          this._match.unshift( this._items[row] );
       } else {
          this._mismatch.unshift( this._items[row] );
-      };
+      }
    };
    
    Filtrify.prototype.refreshCache = function($selection) {
@@ -664,7 +664,7 @@
          }
       });
       //this._items = this._container.children();
-   }
+   };
 
    Filtrify.prototype.showMatch = function ( row, match ) {
       if ( this.options.hide ) {
@@ -675,15 +675,15 @@
             if ( hidden ) this._items[row].className = this._items[row].className.replace(/ft-hidden/g, "");
          } else {
             if ( !hidden ) this._items[row].className = this._items[row].className + " ft-hidden";
-         };
+         }
          
-      };
+      }
    };
     
    Filtrify.prototype.callback = function () {
       if ( this.options.callback !== undefined && $.isFunction( this.options.callback ) ) {
          this.options.callback( this._query, this._match, this._mismatch );
-      };
+      }
    };
 
    Filtrify.prototype.trigger = function ( query ) {
@@ -695,7 +695,7 @@
          this.updateActiveClass( f );
          this.updatePanel( f );
          this.toggleSelected( f );
-      }; 
+      }
 
       this.filter();
    };
@@ -728,7 +728,7 @@
          this._menu[f].selected.append( tag.clone() );
          this._menu[f].active = this._menu[f].active.add( tag );
          tag.addClass("ft-hidden");
-      };
+      }
    };
 
    Filtrify.prototype.toggleSelected = function ( f ) {
@@ -736,7 +736,7 @@
          this._menu[f].selected.show();
       } else {
          this._menu[f].selected.hide();
-      };
+      }
    };
 
    Filtrify.prototype.reset = function() {
