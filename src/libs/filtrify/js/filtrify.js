@@ -21,6 +21,8 @@
    }; 
 
    function Filtrify( containerID, placeholderID, options ) {
+      
+      opec.filt = this;
 
       this.options = $.extend({}, defaults, options) ;
 
@@ -181,53 +183,6 @@
 
    Filtrify.prototype.events = function ( f ) {
       var self = this;
-/*
-      $( document ).on("click", this._bind(function(){
-         this.closePanel( f );
-      }, this) );
-
-      this._menu[f].panel.on("click", this._bind(function(event){
-         event.stopPropagation();
-      }, this) );
-
-      this._menu[f].panel.on("mouseenter", this._bind(function(){
-         this.bringToFront( f );
-      }, this) );
-
-      this._menu[f].label.on("click", this._bind(function(event){
-         this.openPanel( f );
-         this.bringToFront( f );
-         event.stopPropagation();
-      }, this) );
-      
-      this._menu[f].search.on( "keyup", "input", this._bind(function(event) {
-
-         if ( event.which === 38 || event.which === 40 ) { 
-            return false; 
-         } else if ( event.which === 13 ) {
-            if ( this._menu[f].highlight.length ) {
-               this.select( f );
-               this.filter();
-            };
-         } else {
-            this.search( f, event.target.value );
-         };
-
-      }, this) );
-
-      this._menu[f].search.on( "keydown", "input", this._bind(function(event) {
-
-         if( event.which === 40 ) {
-            this.moveHighlight( f, "down" );
-            event.preventDefault();
-         } else if ( event.which === 38 ) {
-            this.moveHighlight( f, "up" );
-            event.preventDefault();
-         };
-
-      }, this) );
-      
-*/
 
       this._menu[f].tags.on( "mouseenter", "li", function(event) {
          self.highlight( f, $(this) );
@@ -299,56 +254,6 @@
 
       }, this) );
    };
-/*
-   Filtrify.prototype.bringToFront = function ( f ) {
-      this._z = this._z + 1;
-      this._menu[f].panel.css("z-index", this._z);
-      this._menu[f].search.find("input").focus();
-   };
-
-   Filtrify.prototype.openPanel = function ( f ) {
-      this._menu[f].label.toggleClass("ft-opened");
-      this._menu[f].panel.toggleClass("ft-hidden");
-      this._menu[f].search.find("input").focus();
-      console.log("Panel Open")
-   };
-
-   Filtrify.prototype.closePanel = function ( f ) {
-      //this.resetSearch( f );
-      this._menu[f].panel.addClass("ft-hidden");
-      this._menu[f].label.removeClass("ft-opened");
-      console.log("Panel Close")
-   };
-*/
-   Filtrify.prototype.preventOverflow = function ( f ) {
-      var high_bottom, high_top, maxHeight, visible_bottom, visible_top;
-
-      maxHeight = parseInt(this._menu[f].tags.css("maxHeight"), 10);
-      visible_top = this._menu[f].tags.scrollTop();
-      visible_bottom = maxHeight + visible_top;
-      high_top = this._menu[f].highlight.position().top + this._menu[f].tags.scrollTop();
-      high_bottom = high_top + this._menu[f].highlight.outerHeight();
-      if (high_bottom >= visible_bottom) {
-         return this._menu[f].tags.scrollTop((high_bottom - maxHeight) > 0 ? high_bottom - maxHeight : 0);
-      } else if (high_top < visible_top) {
-         return this._menu[f].tags.scrollTop(high_top);
-      }
-   };
-
-   Filtrify.prototype.moveHighlight = function ( f, direction ) {
-      if ( this._menu[f].highlight.length ) {
-         var method = direction === "down" ? "nextAll" : "prevAll",
-            next = this._menu[f].highlight[method](":visible:first");
-         if ( next.length ) {
-            this.clearHighlight( f );
-            this.highlight( f, next );
-            this.preventOverflow( f );
-         }
-      } else {
-         this.highlight( f, this._menu[f].tags.children(":visible:first") );
-         this.preventOverflow( f );
-      }
-   };
 
    Filtrify.prototype.highlight = function ( f, elem ) {
       this._menu[f].highlight = elem;
@@ -372,16 +277,6 @@
    Filtrify.prototype.clearHighlight = function ( f ) {
       this.removeHighlight( f );
       this.resetHighlight( f );
-   };
-
-   Filtrify.prototype.showMismatch = function ( f, txt ) {
-      this._menu[f].mismatch
-         .html( this.options.noresults + " \"<b>" + txt + "</b>\"")
-         .removeClass("ft-hidden");
-   };
-
-   Filtrify.prototype.hideMismatch = function ( f ) {
-      this._menu[f].mismatch.addClass("ft-hidden");
    };
 
    Filtrify.prototype.search = function ( field, term ) {
@@ -422,28 +317,6 @@
       
       this._search.results = [];
       
-   };
-
-   Filtrify.prototype.showResults = function ( f, txt ) {
-      var results = 0;
-
-      this.hideMismatch( f );
-
-      this._menu[f].tags
-         .children()
-         .not(this._menu[f].active)
-         .each(function() {
-            if ( ( this.textContent || this.innerText ).toUpperCase().indexOf( txt.toUpperCase() ) >= 0 ) {
-               $(this).removeClass("ft-hidden");
-               results = results + 1;
-            } else {
-               $(this).addClass("ft-hidden");
-            }
-         });
-
-      if ( !results ) {
-         this.showMismatch( f, txt );
-      }
    };
 
    Filtrify.prototype.select = function ( f ) {
@@ -685,64 +558,6 @@
          this.options.callback( this._query, this._match, this._mismatch );
       }
    };
-
-   Filtrify.prototype.trigger = function ( query ) {
-      var f;
-
-      for ( f in this._fields ) {
-         this.clearSearch( f );
-         this.updateQueryField( f, query );
-         this.updateActiveClass( f );
-         this.updatePanel( f );
-         this.toggleSelected( f );
-      }
-
-      this.filter();
-   };
-
-   Filtrify.prototype.clearSearch = function ( f ) {
-      //this.clearHighlight( f );
-      //this.resetSearch( f );
-      //this.clearSelected( f );
-   };
-
-   Filtrify.prototype.clearSelected = function ( f ) {
-      this._menu[f].selected.empty();
-      this._menu[f].active = $([]);
-   };
-
-   Filtrify.prototype.updateQueryField = function ( f, query ) {
-      this._query[f] = query[f] !== undefined ? query[f] : [];
-   };
-
-   Filtrify.prototype.updatePanel = function ( f ) {
-      var t = 0, tag,
-         tags = this._menu[f].tags.children().removeClass("ft-hidden");
-
-      for ( t; t < this._query[f].length; t++ ) {
-         
-         tag = tags.filter( this._bind( function( index ) {
-            return ( tags[index].textContent || tags[index].innerText ) === this._query[f][t]; 
-         }, this ));
-
-         this._menu[f].selected.append( tag.clone() );
-         this._menu[f].active = this._menu[f].active.add( tag );
-         tag.addClass("ft-hidden");
-      }
-   };
-
-   Filtrify.prototype.toggleSelected = function ( f ) {
-      if ( this._menu[f].selected.children().length ) {
-         this._menu[f].selected.show();
-      } else {
-         this._menu[f].selected.hide();
-      }
-   };
-
-   Filtrify.prototype.reset = function() {
-      this.trigger({});
-   };
-   
 
    $.filtrify = function( containerID, placeholderID, options ) {
       return new Filtrify( containerID, placeholderID, options );
