@@ -324,7 +324,7 @@ opec.TimeLine.prototype.redraw = function() {
    //--------------------------------------------------------------------------
 
    // Draw the time bars
-   this.bars = this.barArea.selectAll('rect').data(this.layerbars);
+   this.bars = this.barArea.selectAll('rect').data(this.timebars);
    this.bars
      .enter().insert('svg:rect')
       //.attr('fill', 'white')
@@ -340,13 +340,25 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Re-scale the x values and widths of ALL the time bars
    this.bars
-      .attr('x', function(d) { var x = d3.round(self.xScale(new Date(d.startDate)) + 0.5); return x; })
-      .attr('width', function(d) { return d3.round(self.xScale(new Date(d.endDate)) - self.xScale(new Date(d.startDate))); });
+      .attr('x', function(d) { 
+         if(d.startDate) { 
+            var x = d3.round(self.xScale(new Date(d.startDate)) + 0.5); 
+            return x; 
+         } else { 
+            return 0;
+         } 
+      }).attr('width', function(d) { 
+         if(d.endDate) { 
+            return d3.round(self.xScale(new Date(d.endDate)) - self.xScale(new Date(d.startDate))); 
+         } else { 
+            return 0; 
+         } 
+      });
       
    //--------------------------------------------------------------------------
    
    // Position the date time detail lines (if available) for each time bar
-   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.layerbars);
+   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
    this.dateDetails.enter().insert('svg:g')
       .each(function(d1, i1) {
          d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
@@ -481,6 +493,7 @@ opec.TimeLine.prototype.addRangeBar = function(name, callback) {
    newTimebar.name = name;
    newTimebar.callback = callback;
    newTimebar.type = 'range';
+   newTimebar.dateTimes = [];
    
    this.timebars.push(newTimebar);
    this.rangebars.push(newTimebar);

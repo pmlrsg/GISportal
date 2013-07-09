@@ -104,7 +104,7 @@ opec.leftPanel.setup = function() {
    });
      
    $('.lPanel .opec-quickRegion-save').button({ label: 'Save'}).click(function() {
-      var select = $('.lPanel .opec-quickRegion-select');
+      var select = $('.lPanel .opec-quickRegion-select'),
          id = select.val();
 
       opec.quickRegion[id][0] = $('.lPanel .opec-quickRegion-name').val();
@@ -120,15 +120,15 @@ opec.leftPanel.setup = function() {
    
    $('.lPanel .opec-quickRegion-add').button({ label: 'Add as new region' }).click(function() {
       opec.addQuickRegion($('.lPanel .opec-quickRegion-name').val(), {
-         left: left = $('.lPanel .opec-quickRegion-left').val(),
-         bottom: bottom = $('.lPanel .opec-quickRegion-bottom').val(),
-         right: right = $('.lPanel .opec-quickRegion-right').val(),
-         top: top = $('.lPanel .opec-quickRegion-top').val()
+         left: $('.lPanel .opec-quickRegion-left').val(),
+         bottom: $('.lPanel .opec-quickRegion-bottom').val(),
+         right: $('.lPanel .opec-quickRegion-right').val(),
+         top: $('.lPanel .opec-quickRegion-top').val()
       });
    });
    
    $('.lPanel .opec-quickRegion-remove').button({ label: 'Remove selected region' }).click(function() {
-      var select = $('.lPanel .opec-quickRegion-select');
+      var select = $('.lPanel .opec-quickRegion-select'),
          id = select.val();
          
       opec.removeQuickRegion(id);
