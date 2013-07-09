@@ -7,6 +7,7 @@ import os
 import re
 import shutil
 import sys
+import json
 
 from pake import Target, ifind, main, output, rule, target, variables, virtual
 
@@ -57,9 +58,9 @@ def report_sizes(t):
    
 virtual('build-all', 'build', 'doc')
    
-virtual('build', 'minjs', 'css')
+virtual('build', 'minjs', 'mincss', 'images')
 
-virtual('dev', 'js', 'css')
+virtual('dev', 'js', 'css', 'images')
 
 
 virtual('minjs', 'html/static/OPECPortal.min.js')
@@ -96,11 +97,50 @@ def build_html(t):
          destination.write(file.read())
          destination.write('\n')
          
-virtual('css', 'html/static/css/main.min.css')
-@target('html/static/css/main.min.css', YUICOMPRESSOR)
+virtual('mincss', 'html/static/css/OPECPortal.min.css')
+@target('html/static/css/OPECPortal.min.css', YUICOMPRESSOR)
 def build_min_opec_css(t):
-   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'main.css')
+   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')   
+         
+virtual('css', 'html/static/css/OPECPortal.css')
+@target('html/static/css/OPECPortal.css', YUICOMPRESSOR)
+def build_opec_css(t):
+   t.info('Building CSS')
+   opec_css = open('opec_css.json', 'r')
+   json_css = json.load(opec_css)
+   opec_css.close()
+   destination = open('html/static/css/OPECPortal.css', 'w')
+   for filename in json_css["files"]:
+      with open(filename, 'rb') as file:
+         t.info('-- Adding ' + filename)
+         destination.write(file.read())
+         destination.write('\n')
+   destination.close()
+   t.info('Finished building CSS.')
    
+virtual('images', 'build_images')
+@target('build_images', phony=True)
+def build_opec_images(t):
+   t.info('Moving Images')
+   opec_images = open('opec_images.json', 'r')
+   json_images = json.load(opec_images)
+   opec_images.close()
+   for foldername in json_images["folders"]:
+      t.info('-- Adding ' + foldername["to"])
+      root_src_dir = foldername["from"]
+      root_dst_dir = foldername["to"]
+      for src_dir, dirs, files in os.walk(root_src_dir):
+         dst_dir = src_dir.replace(root_src_dir, root_dst_dir)
+         if not os.path.exists(dst_dir):
+            os.mkdir(dst_dir)
+         for file_ in files:
+            src_file = os.path.join(src_dir, file_)
+            dst_file = os.path.join(dst_dir, file_)
+            if os.path.exists(dst_file):
+                os.remove(dst_file)
+            shutil.move(src_file, dst_dir)
+   t.info('Finished moving images.')
+    
 virtual('doc', 'jsdoc')
 @target('jsdoc', SRC, phony=True)
 def build_jsdoc(t):
