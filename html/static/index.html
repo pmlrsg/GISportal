@@ -207,16 +207,18 @@
          <div>
             <label for="graphcreator-gallery-label">Gallery:</label>
          </div>
-         <div>
-            <select id="graphcreator-gallery" title="Type of query you want to make" name="graphcreator-gallery">
-               <option value="timeseries" title="Returns a time series with mean, median, max, min and STD">Timeseries</option>
-               <option value="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">Hovmöller Latitude</option>
-               <option value="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">Hovmöller Longitude</option>
-               <option value="histogram" title="Returns a histogram">Histogram</option>
-               <!--<option value="raw" title="Not for normal use (gets the raw data)">raw</option>
-               <option value="test" title="Not for normal use (test new queries)">test</option>
-               <option value="error" title="Generates errors, used testing error handling">error</option> -->
-            </select>
+         <div id="graphcreator-gallery">
+            <input type="radio" name="gallery" value="timeseries" id="timeseries" title="Returns a time series with mean, median, max, min and STD" checked>
+            <label for="timeseries">Timeseries</label>
+            <input type="radio" name="gallery" value="hovmollerLat" id="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">
+            <label for="hovmollerLat">Hovmöller Latitude</label>
+            <input type="radio" name="gallery" value="hovmollerLon" id="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">
+            <label for="hovmollerLon">Hovmöller Longitude</label>
+            <input type="radio" name="gallery" value="histogram" id="histogram" title="Returns a histogram">
+            <label for="histogram">Histogram</label>
+            <!--<input type="radio" name="gallery" value="raw" title="Not for normal use (gets the raw data)"><label for="raw">raw</label>
+            <input type="radio" name="gallery" value="test" title="Not for normal use (test new queries)"><label for="test">test</label>
+            <input type="radio" name="gallery" value="error" title="Generates errors, used testing error handling"><label for="error">error</label> -->
          </div>
          <h3 id="data-inputs-header" class="ui-control-header ui-helper-reset">
             <span class="ui-icon ui-icon-triangle-1-s"></span>
@@ -353,7 +355,7 @@
             <button id="infoToggleBtn"></button>
          </li>
       </ul>
-      <div style="position: fixed; left: 50%;">
+      <div class="togglePanel">
          <button></button>
       </div>
    </div>
@@ -546,7 +548,9 @@
    
    <!-- D3 Timeline -->
    <div id="timeline" class="timelineDiv">
-      <button style="display: none"></button>
+      <div class="togglePanel">
+         <button></button>
+      </div>
    </div>
    <div id="dThree" title="D3 Test"></div>
 </body>

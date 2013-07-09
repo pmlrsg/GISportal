@@ -10,6 +10,7 @@ body {
    height:100%;
    font-family:Tahoma, Geneva, sans-serif;
    margin:0;
+   overflow: hidden;
    padding:0;
 }
 
@@ -296,6 +297,45 @@ ul li {
    min-width: 200px;
 }
 
+/* Icons for Graph Types in right panel */
+
+#graphcreator-gallery .ui-widget  {
+   background: none;
+   border: 0 none;
+   height: 75px;
+   width: 75px;
+}
+
+#graphcreator-gallery .ui-icon  {
+   background-position: 0 0;
+   border: 0 none;
+   height: 75px;
+   left: 0;
+   margin: 0;
+   top: 0;
+   width: 75px;
+}
+
+#graphcreator-gallery .ui-state-active  {
+   border: 1px solid #777;
+}
+
+.ui-icon.gallery_timeseries {
+   background-image: url("../img/gallery_timeseries.png");
+}
+
+.ui-icon.gallery_hov_lat {
+   background-image: url("../img/gallery_hov_lat.png");
+}
+
+.ui-icon.gallery_hov_long {
+   background-image: url("../img/gallery_hov_long.png");
+}
+
+.ui-icon.gallery_histogram {
+   background-image: url("../img/gallery_histogram.png");
+}
+
 /*---------------------------------------------------------------------------*/
 /* TODO: Change to class? */
 #layerAccordion {
@@ -469,6 +509,17 @@ a.active.triggerR {
    height: 40px;
    width: 40px;
    padding-bottom:5px;
+}
+
+.togglePanel  {
+   left: 49%;
+   position: fixed;
+   width: 50px;
+}
+
+#topToolbar .togglePanel  {
+   border-bottom-left-radius: 15px;
+   border-bottom-right-radius: 15px;
 }
 
 /* ======== Info Dialog Box ======== */

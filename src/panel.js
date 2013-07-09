@@ -437,8 +437,8 @@ opec.rightPanel.setupDrawingControls = function() {
    // Add the Vector drawing layer for POI drawing
    var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
       style : {
-         strokeColor : 'red',
-         fillColor : 'red',
+         strokeColor : 'white',
+         fillColor : 'green',
          strokeWidth : 2,
          fillOpacity : 0.3,
          pointRadius: 5
@@ -744,14 +744,21 @@ opec.rightPanel.setupGraphingTools = function() {
       return false;
    });
 
+   $('#graphcreator-gallery').buttonset();
+   $('#timeseries').button({ icons: { primary: 'gallery_timeseries'}, text: false });
+   $('#hovmollerLat').button({ icons: { primary: 'gallery_hov_lat'}, text: false });
+   $('#hovmollerLon').button({ icons: { primary: 'gallery_hov_long'}, text: false });
+   $('#histogram').button({ icons: { primary: 'gallery_histogram'}, text: false });
+   
    $('#graphcreator-gallery').change(function() {
-      if(!$('#graphcreator-gallery option[value="histogram"]').prop("selected")) {
+      if(!$('#graphcreator-gallery input[value="histogram"]').prop("checked")) {
          $('#histogram-inputs').parent().hide();
       }
       else  {
          $('#histogram-inputs').parent().show();
       }
    });
+   
    $('#graphcreator-gallery').change(); // Initialise states
    
    // Close histogram, advanced and format panels
@@ -770,11 +777,11 @@ opec.rightPanel.setupGraphingTools = function() {
       var graphXAxis = null,
       graphYAxis = null;
       
-      if ( $('#graphcreator-gallery').val() == 'hovmollerLon' ) {
+      if ( $('#graphcreator-gallery input[value="hovmollerLon"]').prop("checked") ) {
          graphXAxis = 'Lon';
          graphYAxis = 'Time';
       }
-      else if ( $('#graphcreator-gallery').val() == 'hovmollerLat' ) {
+      else if ( $('#graphcreator-gallery input[value="hovmollerLat"]').prop("checked") ) {
          graphXAxis = 'Time';
          graphYAxis = 'Lat';
       }
@@ -782,7 +789,7 @@ opec.rightPanel.setupGraphingTools = function() {
       var params = {
          baseurl: $('#graphcreator-baseurl').val(),
          coverage: $('#graphcreator-coverage').val(),
-         type: $('#graphcreator-gallery').val(),
+         type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
@@ -1006,11 +1013,18 @@ opec.topbar.setup = function() {
          return false;
       });
    }
-   
-   $('#topToolbar').children('div').children('button').first()
-      .button({ label:'', icons: { primary: 'ui-icon-triangle-1-n'}})
+
+   $('#topToolbar .togglePanel')
+      .button({ label:'Toggle Panel', icons: { primary: 'ui-icon-triangle-1-n'}, 'text': false})
       .click(function() {
-         $('#topToolbar').slideUp(1000);
-         this.visible = false;
+         if ($(this).parent().css('top') != "0px") {
+            $(this).parent().animate({top:'0px'});
+            console.log(this);
+            $(this).button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
+         }
+         else {
+            $(this).parent().animate({top:'-50px'});
+            $(this).button( "option", "icons", { primary: 'ui-icon-triangle-1-s'} );
+         }
       });
 };

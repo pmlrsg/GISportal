@@ -237,11 +237,23 @@ opec.TimeLine = function(id, options) {
 
    // Initialise the time bar label area to the left of the timeline
    this.labelArea = this.main.append('svg:g');
-   
-   $('#' + this.id + ' button').button({ icons: { primary: 'ui-icon-triangle-1-s'} })
+//    
+   // $('#' + this.id + ' button').button({ icons: { primary: 'ui-icon-triangle-1-s'} })
+      // .click(function() {
+         // self.hide(); 
+      // });
+
+   $('#' + this.id + ' .togglePanel')
+      .button({  label:'Toggle Panel', icons: { primary: 'ui-icon-triangle-1-s'}, 'text': false })
       .click(function() {
-         self.hide(); 
+         if ($(this).parent().css('bottom') != "0px") {
+            self.show();
+         }
+         else {
+            self.hide();
+         }
       });
+
 
    // Draw the graphical elements
    self.redraw();
@@ -417,18 +429,27 @@ opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
 
 // Show the timebar
 opec.TimeLine.prototype.hide = function() {
-   this.chart.transition().duration(800).attr('height', 0);
-   this.main.transition().duration(800).attr('height', 0);
-   $('div#' + this.id).slideUp(1000);
-   this.visible = false;
+   // this.chart.transition().duration(800).attr('height', 0);
+   // this.main.transition().duration(800).attr('height', 0);
+   // $('div#' + this.id).slideUp(1000);
+//    
+   // $('div#' + this.id + ' .togglePanel').animate({bottom:'0px' + $('div#' + this.id + ' .togglePanel').height()}, 1000);
+   // this.visible = false;
+   
+   
+   $('div#' + this.id).animate({bottom:'-53px'});
+   $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
 };
 
 // Hide the timebar
 opec.TimeLine.prototype.show = function() {
-   this.chart.transition().duration(1000).attr('height', this.chartHeight);
-   this.main.transition().duration(1000).attr('height', this.height);
-   $('div#' + this.id).slideDown(800);
-   this.visible = true;
+   // this.chart.transition().duration(1000).attr('height', this.chartHeight);
+   // this.main.transition().duration(1000).attr('height', this.height);
+   // $('div#' + this.id).slideDown(800);
+   // this.visible = true;
+   
+   $('div#' + this.id).animate({bottom: 0 });
+   $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-s'} );
 };
 
 // Add a new time bar to the chart in JSON timeBar notation
