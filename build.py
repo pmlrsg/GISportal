@@ -43,6 +43,8 @@ SRC.append('src/opec.js')
 JSDOC = 'lib/jsdoc/jsdoc'
 PLOVR_JAR = 'lib/plovr/plovr-eba786b34df9.jar'
 UGLIFYJS = '/local1/data/scratch/node-v0.8.18-linux-x64/node_modules/uglifyjs/bin/uglifyjs'
+YUICOMPRESSOR = 'lib/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar'
+CSS = 'html/static/css/'
 
 def report_sizes(t):
    t.info('uncompresses: %d bytes', os.stat(t.name).st_size)
@@ -57,7 +59,7 @@ virtual('build-all', 'build', 'doc')
    
 virtual('build', 'html/static/OPECPortal.min.js')
 
-virtual('dev', 'html/static/OPECPortal.js')
+virtual('dev', 'html/static/OPECPortal.js', 'html/static/css/main.min.css')
 
 virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
 
@@ -93,7 +95,10 @@ def build_html(t):
          destination.write(file.read())
          destination.write('\n')
          
-      
+
+@target('html/static/css/main.min.css', YUICOMPRESSOR)
+def build_min_opec_css(t):
+   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'main.css')
    
 virtual('doc', 'jsdoc')
 

@@ -168,5 +168,3 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       });     
    }; 
 };
-
-

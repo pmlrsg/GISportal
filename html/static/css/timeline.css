@@ -27,6 +27,13 @@ svg {
 .timeline {
 }
 
+/* TODO: Get rid of pixels. */
+.timelineDiv .togglePanel  {
+   border-top-right-radius: 15px;
+   border-top-left-radius: 15px;
+   margin-top: -27px;
+}
+
 .main {
 }
 
