@@ -59,10 +59,12 @@
    };
 
    Filtrify.prototype.load = function () {
+      console.log('loading');
       var attr, i, name, field, tags, data, t;
 
       this._items.each( this._bind( function( index, element ) {
 
+         console.log('items.each');
          attr = element.attributes;
          data = {};
 
@@ -104,6 +106,7 @@
    };
 
    Filtrify.prototype.set = function () {
+      console.log('set');
       var f = 0, field,
          browser = $.browser,
          self = this;
@@ -162,6 +165,7 @@
    };
 
    Filtrify.prototype.cache = function ( f ) {
+      console.log('cache');
       this._menu[f].label = this._menu[f].item.find("span.ft-label");
       this._menu[f].panel = this._menu[f].item.find("div.ft-panel");
       this._menu[f].selected = this._menu[f].item.find("ul.ft-selected");
@@ -320,6 +324,7 @@
    };
 
    Filtrify.prototype.select = function ( f ) {
+      console.log('select');
       this.updateQueryTags( f, this._menu[f].highlight.text() );
       this.updateActiveClass( f );
       this.removeHighlight( f );
@@ -391,6 +396,7 @@
     * @param {Object} tag - The tag to unselect.
     */
    Filtrify.prototype.unselect = function ( f, tag ) {
+      console.log('unselect');
       this.updateQueryTags( f, tag );
       this.removeFromSelected( f, tag );
       this.removeFromActive( f, tag );
@@ -443,6 +449,7 @@
    };
 
    Filtrify.prototype.filter = function () {
+      console.log('filtering');
       var f, r, t, c, m;
 
       this.resetCachedMatch();
@@ -465,9 +472,9 @@
 
          }
          
-         this.updateFields( r, m );
+         //this.updateFields( r, m );
          this.cacheMatch( r, m );
-         this.showMatch( r, m );
+         //this.showMatch( r, m );
       }
 
       this.rewriteFields();
@@ -477,6 +484,7 @@
    };
 
    Filtrify.prototype.updateFields = function ( row, match ) {
+      console.log('updating fields');
       var field, tags, t;
       
       for ( field in this._fields ) {
@@ -503,6 +511,7 @@
    };
 
    Filtrify.prototype.rewriteFields = function () {
+      console.log('fields being rewriten');
       var field;
       for ( field in this._fields ) {
          this._menu[field].tags
@@ -522,6 +531,7 @@
    };
 
    Filtrify.prototype.cacheMatch = function ( row, match ) {
+      console.log('cacheMatch');
       if ( match ) {
          this._match.unshift( this._items[row] );
       } else {
@@ -530,27 +540,17 @@
    };
    
    Filtrify.prototype.refreshCache = function($selection) {
+      console.log('refreshCache');
+      var self = this;
+      
       this._items.each(function(index, element) {
          if($(element).attr('data-id') == $selection.attr('data-id')) {
-            element = $selection[0];
-            return false; // We could break
+            //element = $selection[0];
+            self._items[index] = $selection[0];
+            //return false; // We could break
          }
       });
       //this._items = this._container.children();
-   };
-
-   Filtrify.prototype.showMatch = function ( row, match ) {
-      if ( this.options.hide ) {
-
-         var hidden = this._items[row].className.indexOf("ft-hidden") !== -1;
-
-         if ( match ) {
-            if ( hidden ) this._items[row].className = this._items[row].className.replace(/ft-hidden/g, "");
-         } else {
-            if ( !hidden ) this._items[row].className = this._items[row].className + " ft-hidden";
-         }
-         
-      }
    };
     
    Filtrify.prototype.callback = function () {
