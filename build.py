@@ -57,16 +57,17 @@ def report_sizes(t):
    
 virtual('build-all', 'build', 'doc')
    
-virtual('build', 'html/static/OPECPortal.min.js')
+virtual('build', 'minjs', 'css')
 
-virtual('dev', 'html/static/OPECPortal.js', 'html/static/css/main.min.css')
+virtual('dev', 'js', 'css')
 
-virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
 
+virtual('minjs', 'html/static/OPECPortal.min.js')
 @target('html/static/OPECPortal.min.js', PLOVR_JAR, 'opec_all.js')
 def build_min_opec_js(t):
    t.output('%(JAVA)s', '-jar', PLOVR_JAR, 'build', 'opec_all.js')
-   
+
+virtual('js', 'html/static/OPECPortal.js')
 @target('html/static/OPECPortal.js', SRC)
 def build_opec_js(t):
    t.info('building non-compiled version')
@@ -78,13 +79,13 @@ def build_opec_js(t):
          destination.write('\n')
    destination.close()
    t.info('finished')
-   
+
+virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
 @target('html/static/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
 def uglify_opec(t):
    t.output(UGLIFYJS, SRC)
    
 virtual('html', 'html/static/index.html')
-
 @target('html/static/index.html', HTML)
 def build_html(t):
    t.info('Building HTML')
@@ -95,26 +96,25 @@ def build_html(t):
          destination.write(file.read())
          destination.write('\n')
          
-
+virtual('css', 'html/static/css/main.min.css')
 @target('html/static/css/main.min.css', YUICOMPRESSOR)
 def build_min_opec_css(t):
    t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'main.css')
    
 virtual('doc', 'jsdoc')
-
 @target('jsdoc', SRC, phony=True)
 def build_jsdoc(t):
    t.info('building documentation')
    t.run(JSDOC, '-r', 'src', '-d', 'doc')
    t.info('built documentation')
    
-virtual('todo', 'fixme')
-   
+ 
 '''
 Taken from ol3 build.py 
 https://github.com/openlayers/ol3/blob/master/build.py
 under 2-clause BSD license
 '''
+virtual('todo', 'fixme') 
 @target('fixme', phony=True)
 def find_fixme(t):
    regex = re.compile(".(FIXME|TODO).")
