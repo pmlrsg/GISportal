@@ -21,8 +21,6 @@
    }; 
 
    function Filtrify( containerID, placeholderID, options ) {
-      
-      opec.filt = this;
 
       this.options = $.extend({}, defaults, options) ;
 
@@ -59,7 +57,7 @@
    };
 
    Filtrify.prototype.load = function () {
-      console.log('loading');
+      //console.log('loading');
       var attr, i, name, field, tags, data, t;
 
       this._items.each( this._bind( function( index, element ) {
@@ -106,7 +104,7 @@
    };
 
    Filtrify.prototype.set = function () {
-      console.log('set');
+      //console.log('set');
       var f = 0, field,
          browser = $.browser,
          self = this;
@@ -324,7 +322,7 @@
    };
 
    Filtrify.prototype.select = function ( f ) {
-      console.log('select');
+      //console.log('select');
       this.updateQueryTags( f, this._menu[f].highlight.text() );
       this.updateActiveClass( f );
       this.removeHighlight( f );
@@ -449,7 +447,7 @@
    };
 
    Filtrify.prototype.filter = function () {
-      console.log('filtering');
+      //console.log('filtering');
       var f, r, t, c, m;
 
       this.resetCachedMatch();
@@ -484,7 +482,7 @@
    };
 
    Filtrify.prototype.updateFields = function ( row, match ) {
-      console.log('updating fields');
+      //console.log('updating fields');
       var field, tags, t;
       
       for ( field in this._fields ) {
@@ -511,7 +509,7 @@
    };
 
    Filtrify.prototype.rewriteFields = function () {
-      console.log('fields being rewriten');
+      //console.log('fields being rewriten');
       var field;
       for ( field in this._fields ) {
          this._menu[field].tags
@@ -531,7 +529,7 @@
    };
 
    Filtrify.prototype.cacheMatch = function ( row, match ) {
-      console.log('cacheMatch');
+      //console.log('cacheMatch');
       if ( match ) {
          this._match.unshift( this._items[row] );
       } else {
@@ -540,7 +538,7 @@
    };
    
    Filtrify.prototype.refreshCache = function($selection) {
-      console.log('refreshCache');
+      //console.log('refreshCache');
       var self = this;
       
       this._items.each(function(index, element) {
