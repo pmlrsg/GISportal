@@ -77,6 +77,62 @@ opec.leftPanel.setup = function() {
       }).hide('fast');
       $(tabToShow).show('fast');
    });
+   
+   // Populate the base layers drop down menu
+   $.each(map.layers, function(index, value) {
+       var layer = value;
+       // Add map base layers to the baseLayer drop-down list from the map
+       if(layer.isBaseLayer) {
+           $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
+       }
+   });
+   
+   // Change of base layer event handler
+   $('#baseLayer').change(function(e) {
+       map.setBaseLayer(opec.baseLayers[$('#baseLayer').val()]);
+   });
+   
+   // Create quick region buttons
+   $('.lPanel .opec-quickRegion-reset').button({ label: 'Reset' }).click(function() {
+      var id = $('.lPanel .opec-quickRegion-select').val();
+      
+      $('.lPanel .opec-quickRegion-name').val(opec.quickRegion[id][0]);
+      $('.lPanel .opec-quickRegion-left').val(opec.quickRegion[id][1]);
+      $('.lPanel .opec-quickRegion-bottom').val(opec.quickRegion[id][2]);
+      $('.lPanel .opec-quickRegion-right').val(opec.quickRegion[id][3]);
+      $('.lPanel .opec-quickRegion-top').val(opec.quickRegion[id][4]);  
+   });
+     
+   $('.lPanel .opec-quickRegion-save').button({ label: 'Save'}).click(function() {
+      var select = $('.lPanel .opec-quickRegion-select');
+         id = select.val();
+
+      opec.quickRegion[id][0] = $('.lPanel .opec-quickRegion-name').val();
+      opec.quickRegion[id][1] = $('.lPanel .opec-quickRegion-left').val();
+      opec.quickRegion[id][2] = $('.lPanel .opec-quickRegion-bottom').val();
+      opec.quickRegion[id][3] = $('.lPanel .opec-quickRegion-right').val();
+      opec.quickRegion[id][4] = $('.lPanel .opec-quickRegion-top').val();
+      
+      $(".opec-quickRegion-select").each(function() {
+         $(this).find('option').eq(id).html(opec.quickRegion[id][0]);
+      });
+   });
+   
+   $('.lPanel .opec-quickRegion-add').button({ label: 'Add as new region' }).click(function() {
+      opec.addQuickRegion($('.lPanel .opec-quickRegion-name').val(), {
+         left: left = $('.lPanel .opec-quickRegion-left').val(),
+         bottom: bottom = $('.lPanel .opec-quickRegion-bottom').val(),
+         right: right = $('.lPanel .opec-quickRegion-right').val(),
+         top: top = $('.lPanel .opec-quickRegion-top').val()
+      });
+   });
+   
+   $('.lPanel .opec-quickRegion-remove').button({ label: 'Remove selected region' }).click(function() {
+      var select = $('.lPanel .opec-quickRegion-select');
+         id = select.val();
+         
+      opec.removeQuickRegion(id);
+   });
 };
 
 /**
@@ -864,37 +920,7 @@ opec.topbar.setup = function() {
          opec.filterLayersByDate(thedate);
       }
    });
-   
-   //----------------------------Quick Region----------------------------------
 
-   // Handles re-set of the quick region selector after zooming in or out on the map or panning
-   function quickRegionReset(e){
-      $('#quickRegion').val('Choose a Region');
-   }
-   map.events.register('moveend', map, quickRegionReset);
-   
-   // Populate Quick Regions from the quickRegions array
-   for(var i = 0; i < quickRegion.length; i++) {
-       $('#quickRegion').append('<option value="' + i + '">' + quickRegion[i][0] + '</option>');
-   }
-   
-   // Change of quick region event handler - happens even if the selection isn't changed
-   $('#quickRegion').change(function(e) {
-       var qr_id = $('#quickRegion').val();
-       var bbox = new OpenLayers.Bounds(
-                   quickRegion[qr_id][1],
-                   quickRegion[qr_id][2],
-                   quickRegion[qr_id][3],
-                   quickRegion[qr_id][4]
-                ).transform(map.displayProjection, map.projection);
-       // Prevent the quick region selection being reset after the zoomtToExtent event         
-       map.events.unregister('moveend', map, quickRegionReset);
-       // Do the zoom to the quick region bounds
-       map.zoomToExtent(bbox);
-       // Re-enable quick region reset on map pan/zoom
-       map.events.register('moveend', map, quickRegionReset);
-   });
-   
    //--------------------------------------------------------------------------
    
    // Pan and zoom control buttons
@@ -923,7 +949,7 @@ opec.topbar.setup = function() {
                   opec.mapControls.selector.deactivate();
                }
                
-               $('#'+key).attr('checked', false);
+               $('#' + key).attr('checked', false);
                control.deactivate();
             }
          }

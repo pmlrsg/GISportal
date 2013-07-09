@@ -30,10 +30,11 @@ opec.microLayers = {};
 opec.layers = {};
 opec.selectedLayers = {};
 opec.nonSelectedLayers = {};
+opec.baseLayers = {};
 
 // A list of layer names that will be selected by default
 // This should be moved to the middleware at some point...
-opec.sampleLayers = ["metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
+opec.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -56,14 +57,8 @@ opec.timeline = null;
 // Predefined map coordinate systems
 opec.lonlat = new OpenLayers.Projection("EPSG:4326");
 
-/**
- * The OpenLayers map object
- * Soon to be attached to opec namespace
- */
-var map;
-
 // Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
-var quickRegion = [
+opec.quickRegion = [
    ["Choose a Region",-150, -90, 150, 90],
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
@@ -75,8 +70,15 @@ var quickRegion = [
    ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
    ["North Sea", -4.50, 50.20, 8.90, 60.50],
    ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]  
+   ["Mediterranean", -6.00, 29.35, 36.00, 48.10],
+   ["+ Add Current View +", -150, -90, 150, 90]
 ];
+
+/**
+ * The OpenLayers map object
+ * Soon to be attached to opec namespace
+ */
+var map;
 
 /*===========================================================================*/
 
@@ -180,11 +182,12 @@ opec.createBaseLayers = function() {
       layer.displayTitle = name;
       layer.name = name;
       map.addLayer(layer);
+      opec.baseLayers[name] = layer;
       //opec.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
    }
    
    createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
-   createBaseLayer('Metacarta Basic', 'http://labs.metacarta.com/wms/vmap0', { layers: 'basic' });
+   createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
    createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
    createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
@@ -588,6 +591,9 @@ opec.nonLayerDependent = function()
    // Setup the topbar
    opec.topbar.setup();
    
+   // Setup quickRegions | On Both the left panel and the topbar.
+   opec.quickRegions.setup();
+   
    //--------------------------------------------------------------------------
    
    // If the window is resized move dialogs to the center to stop them going of
@@ -650,22 +656,6 @@ opec.nonLayerDependent = function()
    
    //--------------------------------------------------------------------------
 
-   // Populate the base layers drop down menu
-   $.each(map.layers, function(index, value) {
-       var layer = value;
-       // Add map base layers to the baseLayer drop-down list from the map
-       if(layer.isBaseLayer) {
-           $('#baseLayer').append('<option value="' + layer.name + '">' + layer.name + '</option>');
-       }
-   });
-   
-   // Change of base layer event handler
-   $('#baseLayer').change(function(e) {
-       map.setBaseLayer(opec.getLayerByID($('#baseLayer').val()));
-   });
-     
-   //--------------------------------------------------------------------------
-
    // Setup the contextMenu
    opec.contextMenu.setup();
    
@@ -685,7 +675,7 @@ opec.nonLayerDependent = function()
    });
 };
 
-/*====================================================================================*/
+/*===========================================================================*/
 
 /**
  * This code runs once the page has loaded - jQuery initialised.
@@ -744,12 +734,13 @@ opec.main = function() {
       dblclick: "collapse"
    });
 
+   // TODO: Should be moved to the layerSelector function
    $('#opec-layerSelection').extendedDialog({
       position: ['center', 'center'],
-      width: 550,
-      minWidth:550,
-      height: 400,
-      minHeight: 400,
+      width: 650,
+      minWidth:650,
+      height: 500,
+      minHeight: 500,
       resizable: true,
       autoOpen: true,
       showHelp: true,
@@ -811,7 +802,8 @@ opec.main = function() {
    opec.nonLayerDependent();
 };
 
-// --------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+
 /**
  * Temporary used to get the value of a point back. Needed until WCS version is 
  * implemented. 
@@ -977,7 +969,8 @@ function setColourScaleMax(scaleMax)
 {
    // Do nothing
 }
-// --------------------------------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------
 
 function addDThreeGraph() 
 {

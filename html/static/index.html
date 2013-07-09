@@ -74,6 +74,8 @@
 <!--<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>-->
 
 <!-- D3 -->
+<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.js"></script> -->
+<!-- <script src="js-libs/d3.js"></script> -->
 <script src="http://d3js.org/d3.v3.min.js"></script>
 
 <!-- mustache -->
@@ -338,7 +340,7 @@
             <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>Quick Region</legend>
-               <select class="ui-corner-all" id="quickRegion" name="Quick Region">
+               <select class="opec-quickRegion-select ui-corner-all" id="quickRegion" name="Quick Region">
                </select>
             </fieldset>
          </li>
@@ -385,7 +387,53 @@
                      <legend>Base Layer</legend>
                      <select class="ui-corner-all" id="baseLayer" name="Base Layer">
                      </select>
-                  </fieldset>        
+                  </fieldset>
+                  <!-- Quick Region -->
+                  <fieldset>
+                     <legend>Quick Regions</legend>
+                     <select class="opec-quickRegion-select ui-corner-all"></select>
+                     
+                     <div style="clear: both;"> </div>
+                     
+                     <button class="opec-quickRegion-remove">Remove selected region</button>
+                     
+                     <div style="clear: both;"> </div>
+                  </fieldset>
+                  
+                  <fieldset>
+
+                     <legend>Edit Regions:</legend>
+                     <div style="clear: both;"> </div>
+                     
+                     <!-- Quick Region Name -->
+                     <label for="opec-quickRegion-name">Region Name:</label>
+                     <input type="text" class="opec-quickRegion-name" name="opec-quickRegion-name"/>
+                     
+                     <div style="clear: both;"> </div>
+                     
+                     <!-- Quick Region Bounds -->
+                     <label for="opec-quickRegion-left">Left:</label>
+                     <input type="text" class="opec-quickRegion-left" name="opec-quickRegion-left"/>
+                     
+                     <div style="clear: both;"> </div>
+                     
+                     <label for="opec-quickRegion-bottom">Bottom:</label>
+                     <input type="text" class="opec-quickRegion-bottom" name="opec-quickRegion-bottom"/>
+                     
+                     <div style="clear: both;"> </div>
+                     
+                     <label for="opec-quickRegion-right">Right:</label>
+                     <input type="text" class="opec-quickRegion-right" name="opec-quickRegion-right"/>
+                     
+                     <div style="clear: both;"> </div>
+                     
+                     <label for="opec-quickRegion-top">Top:</label>
+                     <input type="text" class="opec-quickRegion-top" name="opec-quickRegion-top"/>
+                  </fieldset>  
+                  
+                  <button class="opec-quickRegion-reset">Reset</button>
+                  <button class="opec-quickRegion-save">Save</button> 
+                  <button class="opec-quickRegion-add">Add as new region</button>
                </div>
             </div>
          </div>

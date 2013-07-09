@@ -105,7 +105,7 @@ opec.utils.compareDates = function(firstDate, secondDate) {
    var secondDate = opec.utils.ISODateString(secondDate);
    if (firstDate < secondDate) return true;
    return false;
-}
+};
    
 
 /**

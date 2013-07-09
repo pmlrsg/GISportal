@@ -691,6 +691,12 @@ div .sensor-accordion {
    margin-left: 3px;
 }
 
+.opec-quickRegion-remove {
+   margin-top: 5px;
+}
+
+/*---------------------------------------------------------------------------*/
+
 /* Class for when layers are selected or unselected on the layer selector */
 .opec-unselected {
 }

@@ -77,7 +77,7 @@ opec.TimeLine = function(id, options) {
       },
       barHeight: 20,
       barMargin: 4,
-      timebars: [] 
+      timebars: []
    };
    
    this.options = $.extend({}, defaults, options) ;
@@ -89,6 +89,9 @@ opec.TimeLine = function(id, options) {
    
    // To lazy to go and rename everything "this.options.xxx"
    this.timebars = this.options.timebars;
+   this.layerbars = this.timebars.filter(function(element, index, array) { return element.type == 'layer'; });
+   this.rangebars = this.timebars.filter(function(element, index, array) { return element.type == 'range'; });
+   
    this.barHeight = this.options.barHeight;
    this.barMargin = this.options.barMargin;
 
@@ -123,33 +126,52 @@ opec.TimeLine = function(id, options) {
    
    //--------------------------------------------------------------------------
    
+   // Used to stop both events firing.
+   var isDragging = false;
+   
    this.clickDate = function(d, i) {
+      
+      // Stop the event firing if the drag event is fired.
+      if(isDragging) {
+         //isDragging = false;
+         return;
+      }
+      
       var x = d3.event.layerX;      
       // Prevent dragging the selector off-scale
       x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.layerX);
+      
       // Now update the date based on the new value of x
       self.draggedDate = self.xScale.invert(x);
+      
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
       
       self.selectedDate = self.draggedDate;
+      
       // **Update the OPEC map**
-      // Change the selected date in the datepicker control
+      // Change the selected date in the datepicker control      
       $('#viewDate').datepicker('setDate', self.selectedDate);
-      // Filter the layer data to the selected date
+      
+      // Filter the layer data to the selected date      
       opec.filterLayersByDate(self.selectedDate);
-      // console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
+      console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
    };
    
-   //--------------------------------------------------------------------------
-
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
-   this.zoom = d3.behavior.zoom().x(this.xScale).on('zoom', function() { self.redraw(); });
+   this.zoom = d3.behavior.zoom()
+                  .x(this.xScale)
+                  .on('zoom', function() { isDragging = true; self.redraw(); console.log("ZOOM!"); });
+
+   // Append the svg and add a class before attaching both events.
    this.chart = d3.select('div#' + this.id)
       .append('svg')
       .attr('class', 'timeline')
+      .call(self.zoom)
       .on('click', self.clickDate )
-      .call(self.zoom);
+      .on('mousedown', function() { isDragging = false; console.log('mousedown || ' + isDragging); });
+      
+   //--------------------------------------------------------------------------
       
    // Create the graphical drawing area for the widget (main)
    this.main = this.chart.append('svg:g')
@@ -178,21 +200,27 @@ opec.TimeLine = function(id, options) {
     */
    this.dragDate = function() {
       var x = self.xScale(self.draggedDate) + d3.event.dx;
+      
       // Prevent dragging the selector off-scale
       x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.dx);
+      
       // Now update the date based on the new value of x
       self.draggedDate = self.xScale.invert(x);
+      
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
+      console.log('--->New drag date/time = ' + self.draggedDate);  // Debugging
    };
    this.dragDateEnd = function() {
       self.selectedDate = self.draggedDate;
+      
       // **Update the OPEC map**
       // Change the selected date in the datepicker control
       $('#viewDate').datepicker('setDate', self.selectedDate);
+      
       // Filter the layer data to the selected date
       opec.filterLayersByDate(self.selectedDate);
-      // console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
+      console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
    };
 
    // Initialise the selected date-time marker and handle dragging via a callback
@@ -201,7 +229,7 @@ opec.TimeLine = function(id, options) {
          d3.behavior.drag().origin(Object)
          .on('drag', self.dragDate)
          .on('dragend', self.dragDateEnd)    
-   );
+      ).on("mousedown", function() { d3.event.stopPropagation(); });
 
    // X-axis intialisation
    this.xAxis = d3.svg.axis().scale(self.xScale).orient('bottom').tickSize(6, 0, 0);
@@ -228,8 +256,7 @@ opec.TimeLine = function(id, options) {
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
 opec.TimeLine.prototype.redraw = function() {
    
-   var self = this,  // Useful for when the scope/meaning of "this" changes
-      timeLayers = self.timebars.filter(function(element, index, array) { return element.type == 'layer'; });
+   var self = this;  // Useful for when the scope/meaning of "this" changes
 
    // Recalculate the x and y scales before redraw
    this.xScale.range([0, this.width]);
@@ -244,6 +271,7 @@ opec.TimeLine.prototype.redraw = function() {
 
    // Scale the x-axis and define the x-scale label format
    this.main.selectAll('.axis').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').call(this.xAxis);
+   
    // Generate a dynamic x-axis scale dependent on dimensions
    var scaling = (this.xScale.domain()[1] - this.xScale.domain()[0]) / (this.width * 4e7);
    if (scaling > 12) {
@@ -266,22 +294,25 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Draw the separator lines between time bars
    this.sepLines = this.separatorArea.selectAll('line').data(this.timebars);
+   
    // New separator lines arriving
    this.sepLines.enter().insert('svg:line')
       .attr('x1', 0)
       .attr('y1', function(d, i) { return d3.round(self.yScale(i) + 0.5); })
       .attr('y2', function(d, i) { return d3.round(self.yScale(i) + 0.5); })
       .attr('class', 'separatorLine');
+      
    // Separator line removal
    var ex = this.sepLines.exit();
    ex.remove();
+   
    // Re-scale the width of ALL the separator lines
    this.sepLines.attr('x2', this.width);
    
    //--------------------------------------------------------------------------
 
    // Draw the time bars
-   this.bars = this.barArea.selectAll('rect').data(this.timebars);
+   this.bars = this.barArea.selectAll('rect').data(this.layerbars);
    this.bars
      .enter().insert('svg:rect')
       //.attr('fill', 'white')
@@ -290,9 +321,11 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('height', d3.round(self.barHeight + 0.5))
       .attr('stroke', function(d, i) { return self.colours(i); })
       .attr('class', 'timeRange');
+      
    // Time bar removal
    ex = this.bars.exit();
    ex.remove();
+   
    // Re-scale the x values and widths of ALL the time bars
    this.bars
       .attr('x', function(d) { var x = d3.round(self.xScale(new Date(d.startDate)) + 0.5); return x; })
@@ -301,7 +334,7 @@ opec.TimeLine.prototype.redraw = function() {
    //--------------------------------------------------------------------------
    
    // Position the date time detail lines (if available) for each time bar
-   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
+   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.layerbars);
    this.dateDetails.enter().insert('svg:g')
       .each(function(d1, i1) {
          d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
@@ -335,6 +368,7 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Draw the time bar labels
    this.labels = this.labelArea.selectAll('text').data(this.timebars);
+   
    // New labels arriving
    this.labels.enter().insert('svg:text')
       .text(function(d) { return d.label; })
@@ -413,7 +447,10 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    newTimebar.endDate = endDate;
    newTimebar.dateTimes = dateTimes;
    newTimebar.type = 'layer';  
+   
    this.timebars.push(newTimebar);
+   this.layerbars.push(newTimebar);
+   
    this.reHeight();
    this.redraw();
 };
@@ -422,27 +459,36 @@ opec.TimeLine.prototype.addRangeBar = function(name, callback) {
    var newTimebar = {};
    newTimebar.name = name;
    newTimebar.callback = callback;
-   newTimebar.type = 'range';  
+   newTimebar.type = 'range';
+   
    this.timebars.push(newTimebar);
+   this.rangebars.push(newTimebar);
+   
    this.reHeight();
    this.redraw();  
 };
 
 // Remove a time bar by name (if found)
 opec.TimeLine.prototype.removeTimeBarByName = function(name) {
-   var self = this;
-   var match = false;
-   for (var i = 0; i < self.timebars.length; i++){
-      if (self.timebars[i].name == name) {
-         self.removeTimeBar(i);
-         break;
+   var self = this,
+   type = "";
+   
+   function removeByName(anArray) {
+      for (var j = 0; j < anArray.length; j++){
+         if (anArray[j].name == name) {
+            var bar = anArray[j];
+            anArray.splice(j, 1);
+            return bar;
+         }
       }
    }
-};
-
-// Remove a time bar by index
-opec.TimeLine.prototype.removeTimeBar = function(index) {
-   this.timebars.splice(index, 1);
+   
+   var bar = removeByName(self.timebars);
+   type = bar.type;
+   
+   if(type == 'layer') { removeByName(self.layerbars); }
+   else if (type == 'range') { removeByName(self.rangebars); }
+   
    var temp = this.timebars;
    // Kludge to clear out the display
    this.timebars = [];

@@ -108,7 +108,8 @@ opec.contextMenu.setup = function() {
                showMetadata: opec.contextMenu.showMetadata($trigger),
                viewData: opec.contextMenu.viewData($trigger),
                heatmap: opec.contextMenu.heatmapTest(),
-               testTimebar : opec.contextMenu.addTimebar()
+               addTimebar : opec.contextMenu.addTimebar(),
+               removeTimebar: opec.contextMenu.removeTimebar()
             };
             
             if(layer.controlID == 'opLayers') {
@@ -179,9 +180,18 @@ opec.contextMenu.setup = function() {
 
 opec.contextMenu.addTimebar = function() {
    return {
-      name: 'Test timebar',
+      name: 'Add Range Timebar',
       callback: function() {
-         opec.timeline.addRangeBar();
+         opec.timeline.addRangeBar("Test Range Bar", function(){});
+      }    
+   }; 
+};
+
+opec.contextMenu.removeTimebar = function() {
+   return {
+      name: 'Remove Range Timebar',
+      callback: function() {
+         opec.timeline.removeTimeBarByName("Test Range Bar");
       }    
    }; 
 };
@@ -469,8 +479,9 @@ opec.contextMenu.displaySublayers = function($trigger) {
    }*/
   
    $.each(layer.openlayers, function(index, value) {
+      var isSelected = false; 
       sublayer = layer.openlayers[index];
-      if(sublayer.visibility) { isSelected = true; }
+      //if(sublayer.visibility) { isSelected = true; }
       menuOutput['Sub Layer' + index] = {
          name: "sub" + index,
          type: 'customCheckbox',
