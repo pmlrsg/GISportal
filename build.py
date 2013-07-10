@@ -162,8 +162,6 @@ def replacePath(t):
       with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
          for line in read_file:
             for path in json_replacements["build-paths"]:
-               t.info("-- From " + path["from"])
-               t.info("-- To " + path["to"])
                destination.write(string.replace(line, path["from"], path["to"]))
    shutil.move('html/static/index.new.html', 'html/static/index.html')
    t.info('Finished replacing paths.')
