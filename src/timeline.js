@@ -449,7 +449,7 @@ opec.TimeLine.prototype.hide = function() {
    // this.visible = false;
    
    
-   $('div#' + this.id).animate({bottom:'-53px'});
+   $('div#' + this.id).animate({bottom: '-' + ($('div#timeline').height() - 2) + 'px'});
    $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
 };
 

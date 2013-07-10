@@ -127,6 +127,7 @@ def build_opec_images(t):
    opec_images = open('opec_images.json', 'r')
    json_images = json.load(opec_images)
    opec_images.close()
+   # http://stackoverflow.com/a/7420617/770233
    for foldername in json_images["folders"]:
       t.info('-- Adding ' + foldername["to"])
       root_src_dir = foldername["from"]
@@ -157,7 +158,7 @@ def replacePath(t):
    opec_replacements = open('opec_replacements.json', 'r')
    json_replacements = json.load(opec_replacements)
    opec_replacements.close()
-   with codecs.open('html/static/index.html', 'r+', 'utf-8') as read_file:
+   with codecs.open('html/static/index.html', 'r', 'utf-8') as read_file:
       with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
          for line in read_file:
             for path in json_replacements["build-paths"]:
