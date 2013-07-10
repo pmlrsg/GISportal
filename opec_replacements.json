@@ -1,0 +1,9 @@
+{
+   "id": "opec",
+   "build-paths": [
+      {
+         "from": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.css\" />",
+         "to": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.min.css\" />"
+      }
+    ]
+}

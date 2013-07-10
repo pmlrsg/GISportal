@@ -8,6 +8,8 @@ import re
 import shutil
 import sys
 import json
+import string
+import codecs
 
 from pake import Target, ifind, main, output, rule, target, variables, virtual
 
@@ -58,7 +60,7 @@ def report_sizes(t):
    
 virtual('build-all', 'build', 'doc')
    
-virtual('build', 'minjs', 'mincss', 'images')
+virtual('build', 'minjs', 'mincss', 'images', 'replace')
 
 virtual('dev', 'js', 'css', 'images')
 
@@ -148,6 +150,22 @@ def build_jsdoc(t):
    t.run(JSDOC, '-r', 'src', '-d', 'doc')
    t.info('built documentation')
    
+virtual('replace', 'replace-paths')
+@target('replace-paths', phony=True)
+def replacePath(t):
+   t.info('Replacing paths')
+   opec_replacements = open('opec_replacements.json', 'r')
+   json_replacements = json.load(opec_replacements)
+   opec_replacements.close()
+   with codecs.open('html/static/index.html', 'r+', 'utf-8') as read_file:
+      with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
+         for line in read_file:
+            for path in json_replacements["build-paths"]:
+               t.info("-- From " + path["from"])
+               t.info("-- To " + path["to"])
+               destination.write(string.replace(line, path["from"], path["to"]))
+   shutil.move('html/static/index.new.html', 'html/static/index.html')
+   t.info('Finished replacing paths.')
  
 '''
 Taken from ol3 build.py 
