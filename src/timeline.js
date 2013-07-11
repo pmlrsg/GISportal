@@ -211,6 +211,7 @@ opec.TimeLine = function(id, options) {
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
       console.log('--->New drag date/time = ' + self.draggedDate);  // Debugging
    };
+   
    this.dragDateEnd = function() {
       self.selectedDate = self.draggedDate;
       
@@ -359,16 +360,46 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Position the date time detail lines (if available) for each time bar
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
-   this.dateDetails.enter().insert('svg:g')
-      .each(function(d1, i1) {
-         d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
-           .enter().append('svg:line')
-            .attr('stroke', function() { return self.colours(i1); })
-            .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
-            .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
-            .attr('class', 'detailLine');
-   });
-   
+         this.dateDetails.enter().insert('svg:g')
+            .each(function(d1, i1) {
+               console.log(d1);
+               if(d1.startDate)  {
+                  // Time Bar
+                  d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
+                    .enter().append('svg:line')
+                     .attr('stroke', function() { return self.colours(i1); })
+                     .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
+                     .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
+                     .attr('class', 'detailLine');
+               }
+               else {
+                  // Range Bar
+                  this.dateDetails.enter().insert('svg:g')
+                     .each(function(d1, i1) {
+                        d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
+                          .enter().append('svg:line')
+                           .attr('stroke', function() { return self.colours(i1); })
+                           .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
+                           .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
+                           .attr('class', 'detailLine');
+                     });
+               }
+            });
+      //}
+      // else  {
+         // // Range Bar
+         // this.dateDetails.enter().insert('svg:g')
+            // .each(function(d1, i1) {
+               // d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
+                 // .enter().append('svg:line')
+                  // .attr('stroke', function() { return self.colours(i1); })
+                  // .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
+                  // .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
+                  // .attr('class', 'detailLine');
+            // });
+      // }
+   //}
+      
    //--------------------------------------------------------------------------
    
    // Date detail removal at time bar level
@@ -489,14 +520,16 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
 };
 
 opec.TimeLine.prototype.addRangeBar = function(name, callback) {
-   var newTimebar = {};
-   newTimebar.name = name;
-   newTimebar.callback = callback;
-   newTimebar.type = 'range';
-   newTimebar.dateTimes = [];
+   var newRangebar = {};
+   newRangebar.name = name;
+   newRangebar.callback = callback;
+   newRangebar.type = 'range';
+   newRangebar.dateTimes = [];
+   newRangebar.selectedStart = '';
+   newRangebar.selectedEnd = '';
    
-   this.timebars.push(newTimebar);
-   this.rangebars.push(newTimebar);
+   this.timebars.push(newRangebar);
+   this.rangebars.push(newRangebar);
    
    this.reHeight();
    this.redraw();  
