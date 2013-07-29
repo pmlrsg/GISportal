@@ -222,8 +222,6 @@ opec.layer = function(microlayer, layerData) {
             layer.elevationUnits = value.Units;
          }
       });
-      
-
    };
    
    //--------------------------------------------------------------------------
@@ -432,23 +430,26 @@ opec.layer = function(microlayer, layerData) {
       
       // Create WMS layer.
       if(this.controlID == 'opLayers') {    
+         
          layer = new OpenLayers.Layer.WMS (
             this.displayName(),
             this.wmsURL,
             { layers: this.urlName, transparent: true}, 
             { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
          );
-      } else if(this.controlID == 'refLayers') {  
-         if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {   
-            
-            // GML
+         
+      } else if(this.controlID == 'refLayers') {
+         
+         if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
+            // GML or KML
             layer = new OpenLayers.Layer.Vector(self.name, {
+               projection: opec.lonlat,
+               strategies: [new OpenLayers.Strategy.Fixed()],    
                protocol: new OpenLayers.Protocol.HTTP({
                   url: self.wfsURL,
-                  format: new OpenLayers.Format.GML()
-               }),
-               strategies: [new OpenLayers.Strategy.Fixed()],
-               projection: opec.lonlat,
+                  //format: new OpenLayers.Format.GML()
+                  format: this.options.format == 'GML2' ? new OpenLayers.Format.GML() : new OpenLayers.Format.KML({ extractStyles: true, extractAttributes: true}) 
+               }),                         
                styleMap: self.style
             });
                

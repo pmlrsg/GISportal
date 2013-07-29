@@ -11,8 +11,9 @@ var opec = opec || (opec = {});
 opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths
-opec.wcsLocation = opec.middlewarePath + '/wcs2json/wcs?';
-opec.wfsLocation = opec.middlewarePath + '/wfs2json/wfs?';
+opec.wcsLocation = opec.middlewarePath + '/wcs?';
+opec.wfsLocation = opec.middlewarePath + '/wfs?';
+opec.stateLocation = opec.middlewarePath + '/state';
 
 // Define a proxy for the map to allow async javascript http protocol requests
 OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
@@ -100,8 +101,8 @@ opec.loadLayers = function() {
    };
     
    // Get WMS and WFS caches
-   opec.genericAsyc('./cache/mastercache.json', opec.initWMSlayers, errorHandling, 'json', {}); 
-   opec.genericAsyc('./cache/wfsMasterCache.json', opec.initWFSLayers, errorHandling, 'json', {});
+   opec.genericAsync('GET', './cache/mastercache.json', null, opec.initWMSlayers, errorHandling, 'json', {}); 
+   opec.genericAsync('GET', './cache/wfsMasterCache.json', null, opec.initWFSLayers, errorHandling, 'json', {});
 };
 
 opec.getFeature = function(layer, olLayer, time) {
@@ -138,7 +139,7 @@ opec.getFeature = function(layer, olLayer, time) {
    };   
    var request = $.param(params);   
    
-   opec.genericAsyc(opec.wfsLocation + request, updateLayer, errorHandling, 'json', {layer: layer}); 
+   opec.genericAsync('GET', opec.wfsLocation, request, updateLayer, errorHandling, 'json', {layer: layer}); 
 };
 
 /**
@@ -150,11 +151,12 @@ opec.getFeature = function(layer, olLayer, time) {
  * @param {string} dataType - What data type will be returned, xml, json, etc
  * @param {object} 
  */
-opec.genericAsyc = function(url, success, error, dataType, opts) {
+opec.genericAsync = function(type, url, data, success, error, dataType, opts) {
    //var map = this;
    $.ajax({
-      type: 'GET',
+      type: type,
       url: url, 
+      data: data,
       dataType: dataType,
       asyc: true,
       cache: false,
@@ -197,7 +199,6 @@ opec.createBaseLayers = function() {
 
 /**
  * Create all the reference layers for the map.
- * WARNING: Horrible monster function. TODO: Refactor.
  */
 opec.createRefLayers = function() {  
    opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
@@ -209,16 +210,16 @@ opec.createRefLayers = function() {
          $.each(item.layers, function(i, item) {
             if(typeof item.name !== 'undefined' && typeof item.options !== 'undefined') {
                item.productAbstract = "None Provided";
-               item.tags = {};
+               //item.tags = {};
                
                var microLayer = new opec.MicroLayer(item.name, item.name, 
                      item.productAbstract, "refLayers", {
-                        "serverName": serverName, 
-                        "wfsURL": url, 
-                        "providerTag": item.options.providerShortTag,
-                        "tags": item.tags,
-                        "options": item.options,
-                        "times" : item.times
+                        'serverName': serverName, 
+                        'wfsURL': url, 
+                        'providerTag': item.options.providerShortTag,
+                        'tags': item.tags,
+                        'options': item.options,
+                        'times' : item.times
                      }
                );
                      
@@ -238,90 +239,9 @@ opec.createRefLayers = function() {
    });
    
    opec.layerSelector.refresh();
-   
-   var colourFunc = function(feature) {
-      var colourLookup = {
-         'AMT 12 track': 'blue',
-         'AMT 13 track': 'aqua',
-         'AMT 14 track': 'lime',
-         'AMT 15 track': 'magenta',
-         'AMT 16 track': 'red',
-         'AMT 17 track': 'orange',
-         'AMT 19 track': 'yellow'
-      };
-      
-      if ($.inArray(feature, colourLookup))
-         return colourLookup[feature.attributes.Name];
-   };
-   
-   // Add AMT cruise tracks 12-19 as GML Formatted Vector layer
-   for(var i = 12; i <= 19; i++) {
-      // skip AMT18 as it isn't available
-      if(i == 18) continue;
-      
-      // Style the AMT vector layers with different colours for each one
-      var AMT_style = new OpenLayers.Style({
-         'strokeColor': '${colour}'
-      }, {
-         context: {
-            colour: colourFunc
-         }
-      });
-      
-      var layer = {
-         name: 'AMT' + i + '_Cruise_Track',
-         displayTitle: 'AMT' + i + ' Cruise Track',
-         // Create a style map object and set the 'default' and 'selected' intents
-         style: new OpenLayers.StyleMap({ 'default': AMT_style })
-      };
-      
-      opec.createGMLLayer(layer, 'http://rsg.pml.ac.uk/geoserver/rsg/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=rsg:AMT' + i + '&outputFormat=GML2');
-   }
-
-   // Setup Black sea outline layer (Vector)
-   var blackSea = new OpenLayers.Layer.Vector('The_Black_Sea_KML', {
-      projection: opec.lonlat,
-      strategies: [new OpenLayers.Strategy.Fixed()],
-      protocol: new OpenLayers.Protocol.HTTP({
-         url: 'black_sea.kml',
-         format: new OpenLayers.Format.KML({
-            extractStyles: true,
-            extractAttributes: true
-         })
-      })
-   });
-
-   // Make this layer a reference layer
-   blackSea.controlID = "refLayers";
-   blackSea.selected = true;
-   blackSea.id = 'The_Black_Sea_KML';
-   blackSea.displayTitle = "The Black Sea (KML)";
-   map.addLayer(blackSea);
-   opec.leftPanel.addLayerToGroup(blackSea, $('#refLayerGroup'));
 
    // Get and store the number of reference layers
    map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
-};
-
-opec.createGMLLayer = function(layer, url) {
-   var gmlLayer = new OpenLayers.Layer.Vector(layer.name, {
-      protocol: new OpenLayers.Protocol.HTTP({
-         url: url,
-         format: new OpenLayers.Format.GML()
-      }),
-      strategies: [new OpenLayers.Strategy.Fixed()],
-      projection: opec.lonlat,
-      styleMap: layer.style
-   });
-
-   // Make this layer a reference layer         
-   gmlLayer.controlID = "refLayers";
-   gmlLayer.setVisibility(false);
-   gmlLayer.id = layer.name;
-   gmlLayer.displayTitle = layer.displayTitle;
-   gmlLayer.title = layer.displayTitle;
-   map.addLayer(gmlLayer);
-   opec.leftPanel.addLayerToGroup(gmlLayer, $('#refLayerGroup'));
 };
 
 /** 
@@ -677,6 +597,60 @@ opec.nonLayerDependent = function()
 
 /*===========================================================================*/
 
+opec.saveState = function(state) {
+   
+   // Save layers
+   state.map = {};
+   state.map.layers = [];  
+   
+   var keys = Object.keys(layer.openlayers);
+   for(var i = 0, len = keys.length; i < len; i++) {
+      var layer = layer.openlayers[keys[i]];
+      state.map.layer[layer.id] = {
+         'selected': layer.selected,
+         'opacity': layer.opacity,
+         'style': layer.style   
+      };
+      
+   }
+   
+   return state;
+};
+
+opec.loadState = function(state) {
+   state = state.opec;
+   opec.layers = state.layers;
+   
+};
+
+/*===========================================================================*/
+
+/**
+ * Gets the current state of the portal from any and all components who have 
+ * a state and wish to be stored. 
+ */
+opec.getState = function() {
+   var state = {};
+   
+   // TODO: Get states from component.
+   state = opec.leftPanel.saveState(state);
+   
+   // TODO: Merge state with default state.
+   
+   // TODO: Return state.
+   return state; 
+};
+
+opec.setState = function(state) {
+   
+   // TODO: Merge with default state.
+   
+   // TODO: Set states of components.
+   opec.leftPanel.loadState(state); 
+};
+
+/*===========================================================================*/
+
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
@@ -688,6 +662,24 @@ opec.main = function() {
    opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
    opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
    opec.templates.selectionItem = Mustache.compile($('#opec-template-selector-item').text().trim());
+   
+   // Grab the url of any state.
+   var stateID = opec.utils.getURLParameter('state');
+   
+   // Check if there is a state to load.
+   if(stateID !== null) {
+      console.log('Retrieving State...');
+      
+      // Async to get state object
+      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {
+         console.log('Success! State retrieved');
+         opec.setState($.parseJSON(data.output.state));
+      }, function(request, errorType, exception) {
+         console.log('Error: Failed to retrieved state. Ajax failed!');
+      }, 'json', {});
+   } else {
+      console.log('Loading Default State...');
+   }
    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -733,43 +725,8 @@ opec.main = function() {
       showMinimise: true,
       dblclick: "collapse"
    });
-
-   // TODO: Should be moved to the layerSelector function
-   $('#opec-layerSelection').extendedDialog({
-      position: ['center', 'center'],
-      width: 650,
-      minWidth:650,
-      height: 500,
-      minHeight: 500,
-      resizable: true,
-      autoOpen: true,
-      showHelp: true,
-      showMinimise: true,
-      dblclick: "collapse",
-      restore: function(e, dlg) {
-         // Used to resize content on the dialog.
-         $(this).trigger("resize");
-      },
-      help : function(e, dlg) {
-         opec.gritter.showNotification('layerSelector', null);
-      }
-   });
    
    opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
-   
-   /*
-   $("#dThree").extendedDialog({
-      position: ['center', 'center'],
-      width: 1000,
-      height: 600,
-      resizable: false,
-      autoOpen: true,
-      showHelp: false,
-      showMinimise: true,
-      dblclick: "collapse"
-   });
-   
-   addDThreeGraph();*/
    
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
    $('#this-Is-A-Prototype').extendedDialog({
@@ -968,113 +925,4 @@ function setColourScaleMin(scaleMin)
 function setColourScaleMax(scaleMax)
 {
    // Do nothing
-}
-
-// ----------------------------------------------------------------------------
-
-function addDThreeGraph() 
-{
-   var margin = {top: 20, right: 80, bottom: 30, left: 50},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom;
-
-   var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S").parse;
-   
-   var x = d3.time.scale()
-      .range([0, width]);
-   
-   var y = d3.scale.linear()
-      .range([height, 0]);
-   
-   var color = d3.scale.category10();
-   
-   var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-   
-   var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-   
-   var line = d3.svg.line()
-      .interpolate("basis")
-      .x(function(d) { return x(d.date); })
-      .y(function(d) { return y(d.temperature); });
-   
-   var svg = d3.select("#dThree").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-   d3.tsv("data.tsv", function(error, data) {
-      color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-
-      data.forEach(function(d) {
-         d.date = parseDate(d.date);
-      });
-   
-      var cities = color.domain().map(function(name) {
-         return {
-            name: name,
-            values: data.map(function(d) {
-               return {date: d.date, temperature: +d[name]};
-            })
-         };
-      });
-   
-     x.domain(d3.extent(data, function(d) { return d.date; }));
-   
-     y.domain([
-       d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.temperature; }); }),
-       d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.temperature; }); })
-     ]);
-     
-    svg.append("linearGradient")
-      .attr("id", "temperature-gradient")
-      .attr("gradientUnits", "userSpaceOnUse")
-      .attr("x1", 0).attr("y1", y(10))
-      .attr("x2", 0).attr("y2", y(20))
-    .selectAll("stop")
-      .data([
-        {offset: "0%", color: "steelblue"},
-        {offset: "50%", color: "gray"},
-        {offset: "100%", color: "red"}
-      ])
-    .enter().append("stop")
-      .attr("offset", function(d) { return d.offset; })
-      .attr("stop-color", function(d) { return d.color; });
-   
-     svg.append("g")
-         .attr("class", "x axis")
-         .attr("transform", "translate(0," + height + ")")
-         .call(xAxis);
-   
-     svg.append("g")
-         .attr("class", "y axis")
-         .call(yAxis)
-       .append("text")
-         .attr("transform", "rotate(-90)")
-         .attr("y", 6)
-         .attr("dy", ".71em")
-         .style("text-anchor", "end")
-         .text("Temperature (ºC)");
-   
-     var city = svg.selectAll(".city")
-         .data(cities)
-       .enter().append("g")
-         .attr("class", "city");
-   
-     city.append("path")
-         .attr("class", "line")
-         .attr("d", function(d) { return line(d.values); })
-         .style("stroke", function(d) { return color(d.name); });
-   
-     city.append("text")
-         .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-         .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.temperature) + ")"; })
-         .attr("x", 3)
-         .attr("dy", ".35em")
-         .text(function(d) { return d.name; });
-   });
 }

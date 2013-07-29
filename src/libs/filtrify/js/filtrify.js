@@ -62,7 +62,7 @@
 
       this._items.each( this._bind( function( index, element ) {
 
-         console.log('items.each');
+         //console.log('items.each');
          attr = element.attributes;
          data = {};
 

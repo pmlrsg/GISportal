@@ -6,7 +6,7 @@ import utils
 # server list
 import wmsServers
 # extra info for layers
-import wmslayertags
+import wmsLayerTags
 
 # Change the python working directory to be where this script is located
 abspath = os.path.abspath(__file__)
@@ -28,7 +28,7 @@ PRODUCTFILTER = "productFilter.csv"
 LAYERFILTER = "layerFilter.csv"
 
 dirtyCaches = [] # List of caches that may need recreating
-extraInfo = wmslayertags.layers
+extraInfo = wmsLayerTags.layers
    
 def createCache(server, xml):
    import xml.etree.ElementTree as ET
@@ -91,6 +91,7 @@ def createCache(server, xml):
                               #"FirstDate": dimensions['firstDate'],
                               #"LastDate": dimensions['lastDate'],
                               "EX_GeographicBoundingBox": exGeographicBoundingBox }
+                              
                if server['name'] in extraInfo:
                   if name in extraInfo[server['name']]:
                      masterLayer['tags'] = extraInfo[server['name']][name]

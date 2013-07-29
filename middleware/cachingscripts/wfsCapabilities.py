@@ -3,7 +3,12 @@
 import os
 import utils
 import parse
+
+# WFS Server list
 import wfsServers
+
+# Extra layer info
+import wfsLayerTags
 
 # Change the python working directory to be where this script is located
 abspath = os.path.abspath(__file__)
@@ -20,7 +25,9 @@ GET_CAPABILITES_PARAMS = "SERVICE=WFS&REQUEST=GetCapabilities&VERSION=1.0.0"
 SERVERLIST = "wfsServerList.csv"
 NAMESPACE = '{http://www.opengis.net/wfs}'
 XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
+
 dirtyCaches = [] # List of caches that may need recreating if they don't get created the first time
+extraInfo = wfsLayerTags.layers
 
 def createCache(server, xml):
    import json
@@ -29,19 +36,33 @@ def createCache(server, xml):
    print 'Creating caches...'
    subMasterCache = {}
    subMasterCache['layers'] = []
+   tags = None
    
    cleanServerName = server['name'].replace('/', '-')
-   cleanLayerName = utils.replaceAll(server['params']['TypeName'], {':': '-', '\\': '-'})
+   cleanLayerName =  server['name']
+   
+   if server['params'] and server['params']['TypeName']:
+      cleanLayerName = utils.replaceAll(server['params']['TypeName'], {':': '-', '\\': '-'})
+      
+   if server['name'] in extraInfo:
+      tags = extraInfo[server['name']]
    
    # Layer iter
    
    if 'passthrough' in server['options'] and server['options']['passthrough']:
-      subMasterCache['url'] = server['url'] + urllib.urlencode(server['params'])
+      if server['params']:
+         encodedParams = urllib.urlencode(server['params'])
+         subMasterCache['url'] = server['url'] + encodedParams
+      else:
+         subMasterCache['url'] = server['url']
       
       layer = {
-         'options': server['options'],
-         'name': cleanLayerName
+         'name': cleanLayerName,
+         'options': server['options'] 
       }
+      
+      if tags:
+         layer['tags'] = tags
       
       subMasterCache['layers'].append(layer)
       
@@ -55,6 +76,9 @@ def createCache(server, xml):
          'options': server['options'],
          'times': times
       }
+      
+      if tags:
+         layer['tags'] = tags
       
       # Save out layer cache
       utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))     

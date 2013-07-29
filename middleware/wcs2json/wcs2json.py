@@ -916,7 +916,9 @@ def create_app(path):
          resp.headers['MESSAGE'] = "Bad request"
          return resp
    
+   
    return app
+      
 
 class Mask(object):
    def __init__(self, bbox):

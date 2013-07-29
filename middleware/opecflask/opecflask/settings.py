@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 DEBUG_WITH_APTANA = False
 
 LOG_LEVEL = "DEBUG"

@@ -143,3 +143,7 @@ opec.utils.ceil3places = function(num) {
 opec.utils.clamp = function (num, min, max) {
    return Math.min(Math.max(num, min), max);
 };
+
+opec.utils.getURLParameter = function(name) {
+   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+};

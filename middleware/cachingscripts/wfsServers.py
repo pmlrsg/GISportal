@@ -75,27 +75,6 @@ servers = {
       },
       'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
    },
-   'AMT13': {
-      'name': 'AMT13',
-      'params': {
-         'service': 'wfs',
-         'request': 'GetFeature',
-         'version': '1.0.0',
-         'TypeName': 'rsg:AMT13',
-         'outputFormat': 'GML2'        
-      },
-      'options': {
-         'providerShortTag': 'rsg',
-         'passthrough': True,
-         'format': 'GML2',
-         'style': {
-            'strokeColor': "#00FF00",
-            'strokeOpacity': 1,
-            'strokeWidth': 3
-         }
-      },
-      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
-   },
    'coast_high': {
       'name': 'coast_high',
       'params': {
@@ -117,8 +96,8 @@ servers = {
       },
       'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
    },
-   'AMT-12': {
-      'name': 'AMT-12',
+   'AMT12': {
+      'name': 'AMT12',
       'params': {
          'service': 'wfs',
          'request': 'GetFeature',
@@ -131,19 +110,13 @@ servers = {
          'passthrough': True,
          'format': 'GML2',
          'style': {
-            'default': {
-               'style': {'strokeColor': '$(colour)'},
-               'extra': {'context': {
-                     'colour': 'blue'
-                  }
-               }
-            }
+            'strokeColor': 'blue'
          } 
       },
       'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
    },
-   'AMT-13': {
-      'name': 'AMT-13',
+   'AMT13': {
+      'name': 'AMT13',
       'params': {
          'service': 'wfs',
          'request': 'GetFeature',
@@ -156,16 +129,115 @@ servers = {
          'passthrough': True,
          'format': 'GML2',
          'style': {
-            'default': {
-               'style': {'strokeColor': '$(colour)'},
-               'extra': {'context': {
-                     'colour': 'blue'
-                  }
-               }
-            }
+            'strokeColor': 'aqua'
          } 
       },
       'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'AMT14': {
+      'name': 'AMT14',
+      'params': {
+         'service': 'wfs',
+         'request': 'GetFeature',
+         'version': '1.0.0',
+         'TypeName': 'rsg:AMT14',
+         'outputFormat': 'GML2'
+      },
+      'options': {
+         'providerShortTag': 'rsg',
+         'passthrough': True,
+         'format': 'GML2',
+         'style': {
+            'strokeColor': 'lime'
+         } 
+      },
+      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'AMT15': {
+      'name': 'AMT15',
+      'params': {
+         'service': 'wfs',
+         'request': 'GetFeature',
+         'version': '1.0.0',
+         'TypeName': 'rsg:AMT15',
+         'outputFormat': 'GML2'
+      },
+      'options': {
+         'providerShortTag': 'rsg',
+         'passthrough': True,
+         'format': 'GML2',
+         'style': {
+            'strokeColor': 'magenta'
+         } 
+      },
+      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'AMT16': {
+      'name': 'AMT16',
+      'params': {
+         'service': 'wfs',
+         'request': 'GetFeature',
+         'version': '1.0.0',
+         'TypeName': 'rsg:AMT16',
+         'outputFormat': 'GML2'
+      },
+      'options': {
+         'providerShortTag': 'rsg',
+         'passthrough': True,
+         'format': 'GML2',
+         'style': {
+            'strokeColor': 'red'
+         } 
+      },
+      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'AMT17': {
+      'name': 'AMT17',
+      'params': {
+         'service': 'wfs',
+         'request': 'GetFeature',
+         'version': '1.0.0',
+         'TypeName': 'rsg:AMT17',
+         'outputFormat': 'GML2'
+      },
+      'options': {
+         'providerShortTag': 'rsg',
+         'passthrough': True,
+         'format': 'GML2',
+         'style': {
+            'strokeColor': 'orange'
+         } 
+      },
+      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'AMT19': {
+      'name': 'AMT19',
+      'params': {
+         'service': 'wfs',
+         'request': 'GetFeature',
+         'version': '1.0.0',
+         'TypeName': 'rsg:AMT19',
+         'outputFormat': 'GML2'
+      },
+      'options': {
+         'providerShortTag': 'rsg',
+         'passthrough': True,
+         'format': 'GML2',
+         'style': {
+            'strokeColor': 'yellow'
+         } 
+      },
+      'url': 'http://rsg.pml.ac.uk/geoserver/rsg/ows?'
+   },
+   'The Black Sea': {
+      'name': 'The_Black_Sea',
+      'params': {},
+      'options': {
+         'providerShortTag': 'opec',
+         'passthrough': True,
+         'format': 'KML'
+      },
+      'url': 'black_sea.kml'
    }
    
 }

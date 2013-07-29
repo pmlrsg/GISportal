@@ -603,8 +603,8 @@ div .sensor-accordion {
 #shareOptions {
    display:none;
    top: 51px;
-   height:75px;
-   width:150px;
+   height:100px;
+   width:200px;
    margin-left: 90px;
    -moz-border-radius-bottomleft: 15px;
    -moz-border-radius-bottomright: 15px;

@@ -370,6 +370,39 @@ opec.leftPanel.addDummyHelpLayer = function() {
    });
 };
 
+/**
+ * Saves the state of the left panel
+ */
+opec.leftPanel.saveState = function(state) {  
+   state.leftPanel = {};
+   
+   // Panel Open?
+   if($('.triggerL').hasClass('active')) {
+      state.leftPanel.isOpen = true;
+   } else {
+      state.leftPanel.isOpen = false;
+   }
+   
+   // What tab is on display?
+   // Foreach tab:
+   //    What accordions exist and in what order?
+   //    What layers are in each accordions and in what order?
+   // What base layer is selected
+   
+   return state;
+};
+
+/**
+ * Loads the state given
+ */
+opec.leftPanel.loadState = function(state) {
+   state = state.leftPanel;
+   
+   if(state.isOpen) {
+      $(".triggerL").trigger('click');
+   }
+};
+
 ///**
 // * Removes dummy layer 
 // */
@@ -1001,6 +1034,24 @@ opec.topbar.setup = function() {
    $('#shareMapToggleBtn').click(function() {
       $('#shareOptions').toggle();
    });
+   
+   $('#shareOptions').find('button:first')
+      .button({ label: 'Save Current State'})
+      .click(function() {
+         // Get current state
+         // Add email to state
+         var contectEmail = $('#shareEmail').val();
+         var portalState = JSON.stringify(opec.getState());        
+               
+         // Async post the state
+         opec.genericAsync('POST', opec.stateLocation, { name: 'portal', email: contectEmail, state: portalState}, function(data, opts) {
+            console.log('POSTED state!');
+         }, function(request, errorType, exception) {
+            console.log('Failed to post state!');
+         }, 'json', {});
+         
+         // Change url to match returned url
+      });
    
    function addDialogClickHandler(idOne, idTwo) {
       $(idOne).click(function(e) {
