@@ -1,9 +1,9 @@
 from flask import Flask, abort, make_response, g
 from flask_sqlalchemy import SQLAlchemy
-from models.database import db_session
+from models.database import session
 import settings as settings
 
-db = None
+db = SQLAlchemy()
 
 def create_app(path):
    app = Flask(__name__, instance_path=path)
@@ -37,8 +37,8 @@ def create_app(path):
    app.logger.debug("In debug mode: %s" % app.debug)
    
    # setup database
-   app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-   db = SQLAlchemy(app)
+   app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + path + '/opecflask/states.db'
+   db.init_app(app)
    
    # register application views and blueprints  
    from opecflask.urls import routes, setup_routing, setupBlueprints
@@ -58,7 +58,7 @@ def create_app(path):
 
    @app.teardown_appcontext
    def shutdown_session(exception=None):
-       db_session.remove()
+       session.remove()
          
    #@app.teardown_appcontext
    #def close_connection(exception):
