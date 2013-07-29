@@ -60,9 +60,9 @@ def report_sizes(t):
    
 virtual('build-all', 'build', 'doc')
    
-virtual('build', 'minjs', 'mincss', 'images', 'replace')
+virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build')
 
-virtual('dev', 'js', 'css', 'images')
+virtual('dev', 'js', 'css', 'images', 'replace-dev')
 
 
 virtual('minjs', 'html/static/OPECPortal.min.js')
@@ -88,8 +88,8 @@ virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
 def uglify_opec(t):
    t.output(UGLIFYJS, SRC)
    
-virtual('html', 'html/static/index.html')
-@target('html/static/index.html', HTML)
+virtual('html', 'target-html')
+@target('target-html', HTML, phony=True)
 def build_html(t):
    t.info('Building HTML')
    destination = open('html/static/index.html', 'w')
@@ -99,13 +99,13 @@ def build_html(t):
          destination.write(file.read())
          destination.write('\n')
          
-virtual('mincss', 'html/static/css/OPECPortal.min.css')
-@target('html/static/css/OPECPortal.min.css', YUICOMPRESSOR)
+virtual('mincss', 'target-mincss')
+@target('target-mincss', YUICOMPRESSOR, phony=True)
 def build_min_opec_css(t):
    t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')   
          
-virtual('css', 'html/static/css/OPECPortal.css')
-@target('html/static/css/OPECPortal.css', YUICOMPRESSOR)
+virtual('css', 'target-css')
+@target('target-css', YUICOMPRESSOR, phony=True)
 def build_opec_css(t):
    t.info('Building CSS')
    opec_css = open('opec_css.json', 'r')
@@ -151,9 +151,17 @@ def build_jsdoc(t):
    t.run(JSDOC, '-r', 'src', '-d', 'doc')
    t.info('built documentation')
    
-virtual('replace', 'replace-paths')
-@target('replace-paths', phony=True)
-def replacePath(t):
+virtual('replace-build', 'replaceBuild')
+@target('replaceBuild', phony=True)
+def replaceBuild(t):
+   replacePath(t, 'build')
+   
+virtual('replace-dev', 'replaceDev')
+@target('replaceDev', phony=True)
+def replaceDev(t):
+   replacePath(t, 'dev')
+
+def replacePath(t, env):
    t.info('Replacing paths')
    opec_replacements = open('opec_replacements.json', 'r')
    json_replacements = json.load(opec_replacements)
@@ -162,7 +170,10 @@ def replacePath(t):
       with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
          for line in read_file:
             for path in json_replacements["build-paths"]:
-               destination.write(string.replace(line, path["from"], path["to"]))
+               if env == 'build':
+                  destination.write(string.replace(line, path["from"], path["to"]))
+               elif env == 'dev':
+                  destination.write(string.replace(line, path["to"], path["from"]))
    shutil.move('html/static/index.new.html', 'html/static/index.html')
    t.info('Finished replacing paths.')
  
