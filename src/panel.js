@@ -731,7 +731,14 @@ opec.rightPanel.setupGraphingTools = function() {
          $('#graphcreator-time').datepicker('setDate', null);
          $('#graphcreator-time2').datepicker('setDate', null);
       }
-   });   
+   });
+   
+   $(opec).on('rangeUpdate.opec', function(e, d) {
+      if ($('#graphcreator-range option:selected').val() == d.name)  {
+         $('#graphcreator-time').datepicker('setDate', d.selectedStart);
+         $('#graphcreator-time2').datepicker('setDate', d.selectedEnd);
+      }
+   });
    
    var layerID = $('.selectedLayer:visible').attr('id');
    

@@ -1056,23 +1056,3 @@ div .sensor-accordion {
    display: block;
    margin: -8px;
 }
-
-/* ================================ */
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  display: none;
-}
-
-.line {
-  fill: none;
-  stroke: url(#temperature-gradient);
-  stroke-width: 1.5px;
-}
-
-/* ========================================================================= */

@@ -122,6 +122,7 @@ opec.TimeLine = function(id, options) {
    
    // Set initial y scale
    this.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
+   console.log("xscale width:" + this.width);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
    //--------------------------------------------------------------------------
@@ -139,7 +140,11 @@ opec.TimeLine = function(id, options) {
          return;
       }
       
-      var x = d3.event.layerX;      
+      var x = d3.mouse(this)[0];    
+      console.log(x);  
+      console.log("d3.event.pagex: " + d3.event.pageX);
+      console.log("d3.event.screenx: " + d3.event.screenX);
+      console.log("d3.mouse:" + d3.mouse(this));
       // Prevent dragging the selector off-scale
       x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.layerX);
       
@@ -323,20 +328,20 @@ opec.TimeLine.prototype.redraw = function() {
    this.sepLines = this.separatorArea.selectAll('rect').data(this.timebars);
    
    // New separator lines arriving
-   this.sepLines.enter().insert('svg:line')
+   this.sepLines.enter().append('svg:line')
       .attr('x1', 0)
       .attr('x2', this.width)
       .attr('y1', function(d, i) { return d3.round(self.yScale(i) ); })
       .attr('y2', function(d, i) { return d3.round(self.yScale(i) ); })
       .attr('class', 'separatorLine');
       
-   this.sepLines.enter().insert('svg:rect')
+   this.sepLines.enter().append('svg:rect')
       .attr('x', 0)
       .attr('y', function(d, i) { d.y = d3.round(self.yScale(i) + 0.5) + "px"; return d3.round(self.yScale(i) + 0.5); })
       .attr('height', function(d, i) { return d3.round(self.barHeight + (self.barMargin*2)); })
       .attr('width', this.width)
       .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
-      .attr('fill', 'transparent')
+      .style('fill', 'transparent')
       .on('click', function(d) {
          if(d.type == 'range') {
             if (d.isDragging === false)  {
@@ -355,6 +360,7 @@ opec.TimeLine.prototype.redraw = function() {
                   d.selectedEnd = selectedEnd;
                }
                d.isDragging = false;
+               $(opec).trigger('rangeUpdate.opec', [d]);
                self.redraw();  
             }
          }  
@@ -378,7 +384,7 @@ opec.TimeLine.prototype.redraw = function() {
    // Draw the time bars
    this.bars = this.barArea.selectAll('rect').data(this.layerbars);
    this.bars
-     .enter().insert('svg:rect')
+     .enter().append('svg:rect')
       //.attr('fill', 'white')
       .attr('y', function(d, i) { return d3.round(self.yScale(i) + self.barMargin + 0.5); })
      .transition().duration(500)
@@ -410,7 +416,7 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Position the date time detail lines (if available) for each time bar
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
-   this.dateDetails.enter().insert('svg:g')
+   this.dateDetails.enter().append('svg:g')
       .each(function(d1, i1) {
          if(d1.type == 'layer')  {
             // Time Bar
@@ -427,7 +433,7 @@ opec.TimeLine.prototype.redraw = function() {
    this.rangeBarArea.selectAll('rect').remove(); // Dirty hack so that it forces functions 
    this.rangeBarRectangles = this.rangeBarArea.selectAll('rect').data(this.rangebars, function(d) { return d.y; });
    this.rangeBarRectangles.enter()
-        .insert("svg:rect")
+        .append("svg:rect")
           .attr("x", function(d, i) { 
              var x = 0;
              if (new Date(d.selectedStart) < new Date(d.selectedEnd))  {
@@ -507,7 +513,7 @@ opec.TimeLine.prototype.redraw = function() {
    this.labels = this.labelArea.selectAll('text').data(this.timebars);
    
    // New labels arriving
-   this.labels.enter().insert('svg:text')
+   this.labels.enter().append('svg:text')
       .text(function(d) { return d.label; })
       .attr('x', 1.5)
       .attr('y', function(d, i) { return d3.round(self.yScale(i + 0.5)); })
