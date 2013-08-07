@@ -220,7 +220,7 @@ var graphCreator = {
    },
    logic: function() {     
       var graphCreatorGenerate = window.$instance.find('#graphcreator-generate').first();
-      
+     
       // Add the jQuery UI datepickers to the dialog
       $('#graphcreator-time, #graphcreator-time2').datepicker({
          showButtonPanel: true,

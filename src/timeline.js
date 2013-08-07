@@ -94,11 +94,11 @@ opec.TimeLine = function(id, options) {
    
    this.barHeight = this.options.barHeight;
    this.barMargin = this.options.barMargin;
-
+   
    this.selectedDate = this.options.selectedDate;
    this.margin = this.options.chartMargins;
    this.laneHeight = this.barHeight + this.barMargin * 2 + 1;
-   this.colours = d3.scale.category10(); // d3 colour categories scale with 10 cotrasting colours
+   this.colours = d3.scale.category10(); // d3 colour categories scale with 10 contrasting colours
    
    //--------------------------------------------------------------------------
 
@@ -122,7 +122,7 @@ opec.TimeLine = function(id, options) {
    
    // Set initial y scale
    this.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
-   this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]);
+   this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
    //--------------------------------------------------------------------------
    
@@ -130,7 +130,9 @@ opec.TimeLine = function(id, options) {
    var isDragging = false;
    
    this.clickDate = function(d, i) {
-      
+      console.log(d);
+      console.log(i);
+      console.log(this);
       // Stop the event firing if the drag event is fired.
       if(isDragging) {
          //isDragging = false;
@@ -170,7 +172,8 @@ opec.TimeLine = function(id, options) {
       .call(self.zoom)
       .on('click', self.clickDate )
       .on('mousedown', function() { isDragging = false; console.log('mousedown || ' + isDragging); });
-      
+  
+   
    //--------------------------------------------------------------------------
       
    // Create the graphical drawing area for the widget (main)
@@ -185,8 +188,12 @@ opec.TimeLine = function(id, options) {
    this.barArea = this.main.append('svg:g');
 
    // Initialise the fine-grained date-time detail bar area
-   this.dateDetailArea = this.main.append('svg:g');
+   this.dateDetailArea = this.main.append('svg:g');   
+   
 
+   // Initialise the fine-grained date-time detail bar area
+   this.rangeBarArea = this.main.append('svg:g');   
+   
    // Initialise a vertical line through all timelines for today's date
    this.nowLine = this.main.append('svg:line').attr('class', 'nowLine');
 
@@ -268,6 +275,7 @@ opec.TimeLine = function(id, options) {
 
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
 opec.TimeLine.prototype.redraw = function() {
+   console.log("redraw");
    
    var self = this;  // Useful for when the scope/meaning of "this" changes
 
@@ -305,27 +313,70 @@ opec.TimeLine.prototype.redraw = function() {
 
    //--------------------------------------------------------------------------
    
+   // These are used to create the full width bars of the timeline
+   // It uses lines to depict the separate timelines and transparent rectangles
+   // so that each timeline can have its own event handlers.
+   // Previously it was using just lines but obviously you cannot add event handlers
+   // to empty space.
+   
    // Draw the separator lines between time bars
-   this.sepLines = this.separatorArea.selectAll('line').data(this.timebars);
+   this.sepLines = this.separatorArea.selectAll('rect').data(this.timebars);
    
    // New separator lines arriving
    this.sepLines.enter().insert('svg:line')
       .attr('x1', 0)
-      .attr('y1', function(d, i) { return d3.round(self.yScale(i) + 0.5); })
-      .attr('y2', function(d, i) { return d3.round(self.yScale(i) + 0.5); })
+      .attr('x2', this.width)
+      .attr('y1', function(d, i) { return d3.round(self.yScale(i) ); })
+      .attr('y2', function(d, i) { return d3.round(self.yScale(i) ); })
       .attr('class', 'separatorLine');
       
-   // Separator line removal
-   var ex = this.sepLines.exit();
-   ex.remove();
-   
-   // Re-scale the width of ALL the separator lines
-   this.sepLines.attr('x2', this.width);
+   this.sepLines.enter().insert('svg:rect')
+      .attr('x', 0)
+      .attr('y', function(d, i) { d.y = d3.round(self.yScale(i) + 0.5) + "px"; return d3.round(self.yScale(i) + 0.5); })
+      .attr('height', function(d, i) { return d3.round(self.barHeight + (self.barMargin*2)); })
+      .attr('width', this.width)
+      .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
+      .attr('fill', 'transparent')
+      .on('click', function(d) {
+         if(d.type == 'range') {
+            if (d.isDragging === false)  {
+               d3.event.stopPropagation();
+               d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
+               d.isDragging = true;
+            }
+            else if (d.isDragging === true)  {
+               d3.event.stopPropagation();
+               var selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
+               if (new Date(d.selectedStart) > new Date(selectedEnd))  {
+                  d.selectedEnd = d.selectedStart;
+                  d.selectedStart = selectedEnd;
+               }
+               else  {
+                  d.selectedEnd = selectedEnd;
+               }
+               d.isDragging = false;
+               self.redraw();  
+            }
+         }  
+      })
+      .on('mousemove', function(d) {
+         if(d.type == 'range') {
+            // Check if mousemove should drag the rectangle
+            if (d.isDragging === true)  {
+               d3.event.stopPropagation();
+               d.selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
+               self.redraw();  
+            }
+         }
+      });
+//       
+   // // Separator line removal
+   this.sepLines.exit().remove();
    
    //--------------------------------------------------------------------------
 
    // Draw the time bars
-   this.bars = this.barArea.selectAll('rect').data(this.timebars);
+   this.bars = this.barArea.selectAll('rect').data(this.layerbars);
    this.bars
      .enter().insert('svg:rect')
       //.attr('fill', 'white')
@@ -336,8 +387,7 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('class', 'timeRange');
       
    // Time bar removal
-   ex = this.bars.exit();
-   ex.remove();
+   this.bars.exit().remove();
    
    // Re-scale the x values and widths of ALL the time bars
    this.bars
@@ -360,57 +410,89 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Position the date time detail lines (if available) for each time bar
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
-         this.dateDetails.enter().insert('svg:g')
-            .each(function(d1, i1) {
-               console.log(d1);
-               if(d1.startDate)  {
-                  // Time Bar
-                  d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
-                    .enter().append('svg:line')
-                     .attr('stroke', function() { return self.colours(i1); })
-                     .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
-                     .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
-                     .attr('class', 'detailLine');
-               }
-               else {
-                  // Range Bar
-                  this.dateDetails.enter().insert('svg:g')
-                     .each(function(d1, i1) {
-                        d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
-                          .enter().append('svg:line')
-                           .attr('stroke', function() { return self.colours(i1); })
-                           .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
-                           .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
-                           .attr('class', 'detailLine');
-                     });
-               }
-            });
-      //}
-      // else  {
-         // // Range Bar
-         // this.dateDetails.enter().insert('svg:g')
-            // .each(function(d1, i1) {
-               // d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
-                 // .enter().append('svg:line')
-                  // .attr('stroke', function() { return self.colours(i1); })
-                  // .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
-                  // .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
-                  // .attr('class', 'detailLine');
-            // });
-      // }
-   //}
+   this.dateDetails.enter().insert('svg:g')
+      .each(function(d1, i1) {
+         if(d1.type == 'layer')  {
+            // Time Bar
+            d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
+              .enter().append('svg:line')
+               .attr('stroke', function() { return self.colours(i1); })
+               .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
+               .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
+               .attr('class', 'detailLine');
+         }
+      });
       
+   //--------------------------------------------------------------------------
+   this.rangeBarArea.selectAll('rect').remove(); // Dirty hack so that it forces functions 
+   this.rangeBarRectangles = this.rangeBarArea.selectAll('rect').data(this.rangebars, function(d) { return d.y; });
+   this.rangeBarRectangles.enter()
+        .insert("svg:rect")
+          .attr("x", function(d, i) { 
+             var x = 0;
+             if (new Date(d.selectedStart) < new Date(d.selectedEnd))  {
+                x = d3.round(self.xScale(new Date(d.selectedStart)) + 0.5); 
+             }
+             else {
+                x = d3.round(self.xScale(new Date(d.selectedEnd)) + 0.5); 
+             }
+             return x;
+          })
+          .attr("y", function(d) { console.log("d.y: " + d.y); return d.y; })
+          .attr("width", function(d, i) { 
+             var width = 0;
+             if (new Date(d.selectedStart) < new Date(d.selectedEnd))  {
+               width = d3.round(self.xScale(new Date(d.selectedEnd)) - self.xScale(new Date(d.selectedStart))); 
+             }
+             else {
+               width = d3.round(self.xScale(new Date(d.selectedStart)) - self.xScale(new Date(d.selectedEnd))); 
+             }
+             return width;
+          })
+          .attr("height", function(d, i) { return d3.round(self.laneHeight); })
+          .style("fill", function(d,i) { return self.colours(i); })
+          .attr('class', 'data-bar-type--range');
+
    //--------------------------------------------------------------------------
    
    // Date detail removal at time bar level
-   ex = this.dateDetails.exit();
-   ex.remove();
+   this.rangeBarRectangles.exit().remove();
+   
+   // Date detail removal at time bar level
+   this.dateDetails.exit().remove(); 
    
    // Re-scale the x values for all the detail lines for each time bar
    this.main.selectAll('.detailLine')
       .attr('x1', function(d) { return d3.round(self.xScale(new Date(d)) + 0.5); })
       .attr('x2', function(d) { return d3.round(self.xScale(new Date(d)) + 0.5); });
-
+      
+      
+   // Re-scale the x values for all rangebars
+   this.main.selectAll('.data-bar-type--range').data(this.rangebars).each(function(d) {
+      if(d.type == 'range' && d.selectedStart !== 0 && d.selectedEnd !== 0)  {
+         d3.select(this).attr('x', function(d, i) { 
+             var x = 0;
+             if (new Date(d.selectedStart) < new Date(d.selectedEnd))  {
+                x = d3.round(self.xScale(new Date(d.selectedStart)) + 0.5); 
+             }
+             else {
+                x = d3.round(self.xScale(new Date(d.selectedEnd)) + 0.5); 
+             }
+             return x;
+          })
+          .attr('width', function(d, i) { 
+             var width = 0;
+             if (new Date(d.selectedStart) < new Date(d.selectedEnd))  {
+               width = d3.round(self.xScale(new Date(d.selectedEnd)) - self.xScale(new Date(d.selectedStart))); 
+             }
+             else {
+               width = d3.round(self.xScale(new Date(d.selectedStart)) - self.xScale(new Date(d.selectedEnd))); 
+             }
+             return width;
+          });
+      }
+   });
+   
    // Draw the current date-time line
    this.nowLine
       .attr('x1', d3.round(self.xScale(self.now) + 0.5)).attr('y1', 0)
@@ -432,8 +514,7 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('dy', '0.7ex')
       .attr('text-anchor', 'end').attr('class', 'laneText');
    // Label removal
-   ex = this.labels.exit();
-   ex.remove();  
+   this.labels.exit().remove();  
       
    //-------------------------------------------------------------------------- 
 };
@@ -472,25 +553,12 @@ opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
 
 // Show the timebar
 opec.TimeLine.prototype.hide = function() {
-   // this.chart.transition().duration(800).attr('height', 0);
-   // this.main.transition().duration(800).attr('height', 0);
-   // $('div#' + this.id).slideUp(1000);
-//    
-   // $('div#' + this.id + ' .togglePanel').animate({bottom:'0px' + $('div#' + this.id + ' .togglePanel').height()}, 1000);
-   // this.visible = false;
-   
-   
    $('div#' + this.id).animate({bottom: '-' + ($('div#timeline').height() - 2) + 'px'});
    $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
 };
 
 // Hide the timebar
 opec.TimeLine.prototype.show = function() {
-   // this.chart.transition().duration(1000).attr('height', this.chartHeight);
-   // this.main.transition().duration(1000).attr('height', this.height);
-   // $('div#' + this.id).slideDown(800);
-   // this.visible = true;
-   
    $('div#' + this.id).animate({bottom: 0 });
    $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-s'} );
 };
@@ -521,13 +589,15 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
 
 opec.TimeLine.prototype.addRangeBar = function(name, callback) {
    var newRangebar = {};
-   newRangebar.name = name;
+   newRangebar.name = opec.utils.uniqueID();
+   newRangebar.label = prompt("Please give a label for this range bar.");
    newRangebar.callback = callback;
    newRangebar.type = 'range';
    newRangebar.dateTimes = [];
-   newRangebar.selectedStart = '';
-   newRangebar.selectedEnd = '';
-   
+   newRangebar.selectedStart = 0;
+   newRangebar.selectedEnd = 0;
+   newRangebar.y = ''; // So that the y can be specifically set to avoid bugs and complications with other types of timebars
+   newRangebar.isDragging = false; // Each bar needs to know if it is being modified so that it doesn't draw over over bars
    this.timebars.push(newRangebar);
    this.rangebars.push(newRangebar);
    

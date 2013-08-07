@@ -679,7 +679,7 @@ opec.rightPanel.setupGraphingTools = function() {
          opec.gritter.showNotification ('graphCreatorTutorial', null);
       }
    }); */
-
+   
    // Add the jQuery UI datepickers to the dialog
    $('#graphcreator-time').datepicker({
       showButtonPanel: true,
@@ -705,8 +705,8 @@ opec.rightPanel.setupGraphingTools = function() {
       beforeShowDay: function(date) { 
          if($('#graphcreator-time').datepicker('getDate')) {
             var compareDate = $('#graphcreator-time').datepicker('getDate');
-            if(opec.utils.compareDates(compareDate, date) != true)  {
-               return [false]
+            if(opec.utils.compareDates(compareDate, date) !== true)  {
+               return [false];
             }
          }
          return opec.allowedDays(date); 
@@ -719,6 +719,19 @@ opec.rightPanel.setupGraphingTools = function() {
       $('#graphcreator-time2').datepicker('setDate', viewDate);
    }
    
+   
+   $('#graphcreator-range').change(function() {
+      var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.name == $('#graphcreator-range option:selected').val(); });
+      if(d !== '' && d[0] !== undefined && d.selectedStart !== '' && d.selectedEnd !== '')  {
+         d = d[0]; // Take the first match
+         $('#graphcreator-time').datepicker('setDate', d.selectedStart);
+         $('#graphcreator-time2').datepicker('setDate', d.selectedEnd);
+      }
+      else  {
+         $('#graphcreator-time').datepicker('setDate', null);
+         $('#graphcreator-time2').datepicker('setDate', null);
+      }
+   });   
    
    var layerID = $('.selectedLayer:visible').attr('id');
    

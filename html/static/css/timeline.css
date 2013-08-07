@@ -73,6 +73,10 @@ svg {
    fill: rgb(60,60,60);
 }
 
+.data-bar-type--range  {
+   pointer-events: none;   
+}
+
 .axis line, .axis path {
    stroke:gray !important;
 }

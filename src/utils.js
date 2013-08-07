@@ -147,3 +147,8 @@ opec.utils.clamp = function (num, min, max) {
 opec.utils.getURLParameter = function(name) {
    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
+
+// A function for getting unique identifier, generic function so that it can easily be changed throughout the codebase
+opec.utils.uniqueID = function()  {
+   return new Date().getTime();
+}
