@@ -238,8 +238,12 @@
          <div id="advanced-inputs">
             <div>
                <label for="graphcreator-range">Range:</label>
-               <select name="graphcreator-range" id="graphcreator-range"><select>
+               <select name="graphcreator-range" id="graphcreator-range">
+                  <option selected>Select a Range</option>  
+               <select>
+               <button class="js-newRange">New Range</button>
             </div>
+            
             <div>
                <label for="graphcreator-time">Date:</label>
             </div>
@@ -247,6 +251,7 @@
                <input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>
                <label> to </label>
                <input id="graphcreator-time2" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time2"/>
+               <button class="js-updateRange">Update Range</button>
             </div>
             <div>
                <label for="graphcreator-bbox">Bbox:</label>

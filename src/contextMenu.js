@@ -178,37 +178,6 @@ opec.contextMenu.setup = function() {
    //});
 };
 
-function updateRanges()  {
-   // Populate range from rangebars
-   $('#graphcreator-range option').remove();
-   $('#graphcreator-range').append('<option>Select a Range</option>');
-   for(var i = 0; i < opec.timeline.rangebars.length; i++) {
-      $('#graphcreator-range').append('<option value="' + opec.timeline.rangebars[i].name + '">' + opec.timeline.rangebars[i].label + '</option>');
-   }
-}
-
-opec.contextMenu.addTimebar = function() {
-   return {
-      name: 'Add Range Timebar',
-      callback: function() {
-         opec.timeline.addRangeBar("Test Range Bar", function(){});
-         updateRanges();
-      }    
-   }; 
-};
-
-opec.contextMenu.removeTimebar = function() {
-   return {
-      name: 'Remove Range Timebar',
-      callback: function() {
-         if (opec.timeline.rangebars[0]!== undefined)  {
-            opec.timeline.removeTimeBarByName(opec.timeline.rangebars[0].name); // Needs to be more generic!
-         }
-         updateRanges();
-      }    
-   }; 
-};
-
 opec.contextMenu.heatmapTest = function() {
    return {
       name: "Test Heatmap",

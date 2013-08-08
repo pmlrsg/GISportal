@@ -719,7 +719,6 @@ opec.rightPanel.setupGraphingTools = function() {
       $('#graphcreator-time2').datepicker('setDate', viewDate);
    }
    
-   
    $('#graphcreator-range').change(function() {
       var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.name == $('#graphcreator-range option:selected').val(); });
       if(d !== '' && d[0] !== undefined && d.selectedStart !== '' && d.selectedEnd !== '')  {
@@ -739,6 +738,33 @@ opec.rightPanel.setupGraphingTools = function() {
          $('#graphcreator-time2').datepicker('setDate', d.selectedEnd);
       }
    });
+   
+   $('.js-newRange').on('click', function() {
+      var name = prompt("Please give a label for this range bar.");
+      opec.timeline.addRangeBar(name);
+      updateRanges(name);
+   });
+   
+   $('.js-updateRange').on('click', function() {
+      var selectedStart = $('#graphcreator-time').datepicker('getDate');
+      var selectedEnd = $('#graphcreator-time2').datepicker('getDate');
+      opec.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
+      opec.timeline.redraw();
+   });
+   
+   function updateRanges(label)  {
+      // Populate range from rangebars
+      $('#graphcreator-range option').remove();
+      $('#graphcreator-range').append('<option>Select a Range</option>');
+      for(var i = 0; i < opec.timeline.rangebars.length; i++) {
+         $('#graphcreator-range').append('<option value="' + opec.timeline.rangebars[i].name + '">' + opec.timeline.rangebars[i].label + '</option>');
+      }
+      if (label)  {
+         var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
+         $("#graphcreator-range option[value='" + d[0].name + "']").attr('selected', 'selected');
+      }
+   }
+
    
    var layerID = $('.selectedLayer:visible').attr('id');
    
