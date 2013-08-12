@@ -689,12 +689,12 @@ opec.rightPanel.setupGraphingTools = function() {
       beforeShowDay: function(date) { 
          if($('#graphcreator-time2').datepicker('getDate')) {
             var compareDate = $('#graphcreator-time2').datepicker('getDate');
-            if(opec.utils.compareDates(date, compareDate) != true)  {
+            if(opec.utils.compareDates(date, compareDate) !== true)  {
                return [false];
             }
          }
          return opec.allowedDays(date); 
-      },
+      }
    });
    
    $('#graphcreator-time2').datepicker({
@@ -710,7 +710,7 @@ opec.rightPanel.setupGraphingTools = function() {
             }
          }
          return opec.allowedDays(date); 
-      },
+      }
    });
    // Set the datepicker controls to the current view date if set
    var viewDate = $('#viewDate').datepicker('getDate');
@@ -1081,23 +1081,32 @@ opec.topbar.setup = function() {
       $('#shareOptions').toggle();
    });
    
-   $('#shareOptions').find('button:first')
-      .button({ label: 'Save Current State'})
-      .click(function() {
-         // Get current state
-         // Add email to state
-         var contectEmail = $('#shareEmail').val();
-         var portalState = JSON.stringify(opec.getState());        
-               
-         // Async post the state
-         opec.genericAsync('POST', opec.stateLocation, { name: 'portal', email: contectEmail, state: portalState}, function(data, opts) {
-            console.log('POSTED state!');
-         }, function(request, errorType, exception) {
-            console.log('Failed to post state!');
-         }, 'json', {});
-         
-         // Change url to match returned url
-      });
+   //$('#shareOptions').find('button:first')
+      //.button({ label: 'Login or Signup'})
+      //.click(function() {
+         //$('#opec-inline-login').append(opec.templates.loginBox({})).show();
+         //window.open('/service/login/google', "",
+          //"width=" + 400 + ",height=" + 400 +
+          //",status=1,location=1,resizable=yes" +
+          //",left=" + 0 +",top=" + 0);
+      //});
+   
+   // TODO: Move code to new home
+   function somethingtempcodehold() {
+      // Get current state
+      // Add email to state
+      var contectEmail = $('#shareEmail').val();
+      var portalState = JSON.stringify(opec.getState());        
+            
+      // Async post the state
+      opec.genericAsync('POST', opec.stateLocation, { name: 'portal', email: contectEmail, state: portalState}, function(data, opts) {
+         console.log('POSTED state!');
+      }, function(request, errorType, exception) {
+         console.log('Failed to post state!');
+      }, 'json', {});
+      
+      // Change url to match returned url
+   }
    
    function addDialogClickHandler(idOne, idTwo) {
       $(idOne).click(function(e) {

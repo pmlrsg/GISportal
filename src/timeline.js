@@ -140,11 +140,9 @@ opec.TimeLine = function(id, options) {
          return;
       }
       
-      var x = d3.mouse(this)[0];    
-      console.log(x);  
-      console.log("d3.event.pagex: " + d3.event.pageX);
-      console.log("d3.event.screenx: " + d3.event.screenX);
-      console.log("d3.mouse:" + d3.mouse(this));
+
+      var x = d3.mouse(this)[0];       
+      
       // Prevent dragging the selector off-scale
       x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.layerX);
       
@@ -416,6 +414,7 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Position the date time detail lines (if available) for each time bar
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
+
    this.dateDetails.enter().append('svg:g')
       .each(function(d1, i1) {
          if(d1.type == 'layer')  {
@@ -517,7 +516,7 @@ opec.TimeLine.prototype.redraw = function() {
       .text(function(d) { return d.label; })
       .attr('x', 1.5)
       .attr('y', function(d, i) { return d3.round(self.yScale(i + 0.5)); })
-      .attr('dy', '0.7ex')
+      .attr('dy', '0.5em')
       .attr('text-anchor', 'end').attr('class', 'laneText');
    // Label removal
    this.labels.exit().remove();  

@@ -51,8 +51,8 @@ svg {
 
 .nowLine {
    stroke: lightblue;
-   stroke-width: 1.5;
-   stroke-dasharray: 2,2;
+   stroke-width: 1.5px;
+   stroke-dasharray: 2px,2px;
 }
 
 .selectedDateLine {

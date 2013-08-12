@@ -12,11 +12,11 @@
 
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
 
 <!-- The latest jQuery UI from jqueryui.com -->
-<script type="text/javascript" src="http://code.jquery.com/ui/1.10.1/jquery-ui.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
@@ -49,8 +49,8 @@
 <!--<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>-->
 
 <!-- D3 -->
-<!-- <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.js"></script> -->
-<!-- <script src="js-libs/d3.js"></script> -->
+<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.js"></script> -->
+<!--<script src="js-libs/d3.v3.2.4.js"></script>-->
 <script src="http://d3js.org/d3.v3.js"></script>
 
 <!-- mustache -->
@@ -270,11 +270,31 @@
 </script>
 <!-- Item on the layer selection window -->
 <script type="text/html" id="opec-template-selector-item">
-    <li class="opec-unselected ui-state-default" data-provider="{{provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
-       <strong>{{name}}</strong>
-       <a href="#"><span class="ui-corner-all ui-icon ui-icon-plus"></span></a>
-       <span style="display:none;">Abstract: <i>{{abstract}}</i></span>
-    </li>
+   <li class="opec-unselected ui-state-default" data-provider="{{provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
+      <strong>{{name}}</strong>
+      <a href="#"><span class="ui-corner-all ui-icon ui-icon-plus"></span></a>
+      <span style="display:none;">Abstract: <i>{{abstract}}</i></span>
+   </li>
+</script>
+<!-- Login box -->
+<script type="text/html" id="opec-template-login-box">
+   <form action="/service/login" method="get" id="opec-openid-form">
+      <input type="hidden" name="action" value="verify">
+      <fieldset>
+         <legend>Sign-in or Create New Account</legend>
+         <div id="opec-openid-choice" style="display:block;">
+            <p>Please click your account provider:</p>
+            <div id="opec-openid-btns">
+               {{#providers}} {{#provider}} {{/provider}} {{/providers}}
+            </div>
+            <div id="opec-openid-input"></div>
+         </div>
+      </fieldset>
+   </form>
+</script>
+<!-- Provider Box -->
+<script type="text/html" id="opec-template-provider-box">
+   <a title="{{title}}" href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}"></a>
 </script>
 <!-- ====================================================================== -->
 
@@ -488,12 +508,7 @@
    </div>
    <!-- Share Options Panel, appears after the share options button has been clicked  -->
    <div class="toolbar" id="shareOptions">
-   	<h3>Share</h3>
-      <div>
-         <label class="iconBtn" for="shareEmail" title="Please enter your email"></label>
-         <input type="text" name="shareEmail" placeholder="example@example.com" id="shareEmail" />
-         <button>Save State</button>
-      </div> 
+   	<h3>Share Your Data! Track Your Progress!</h3>
    </div>
    
    <!-- CLONE: change branding here -->

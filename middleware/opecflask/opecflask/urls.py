@@ -1,3 +1,4 @@
+from views.user import portal_user
 from views.state import portal_state, getState, setState
 from views.proxy import portal_proxy, proxy
 from views.wfs import portal_wfs, getWFSData
@@ -43,6 +44,7 @@ def setup_routing(app, routes):
 
 # Alternative method to using 'setup_routing' above
 def setupBlueprints(app):
+   app.register_blueprint(portal_user)
    app.register_blueprint(portal_state)
    app.register_blueprint(portal_proxy)
    app.register_blueprint(portal_wfs)

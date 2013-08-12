@@ -3,20 +3,20 @@ from database import Base
 from opecflask import app
 import datetime
 
-class State(Base):
-   __tablename__ = 'state'
+class ROI(Base):
+   __tablename__ = 'roi'
    id = Column(Integer, index=True, primary_key=True)
    user_id = Column(Integer, ForeignKey('user.id'))
-   state = Column(String, unique=False)
+   roi = Column(String, unique=False)
    version = Column(Float, unique=False)
-   views = Column(Integer, unique=False)
+   uses = Column(Integer, unique=False)
    last_used = Column(DateTime, unique=False)
 
-   def __init__(self, user_id=None, state=None):  
+   def __init__(self, user_id=None, roi=None):  
       self.user_id = user_id   
-      self.state = state
+      self.roi = roi
       self.version = app.config['API_VERSION']
-      self.views = 0
+      self.uses = 0
       self.last_used = datetime.datetime.now()
 
    def __repr__(self):

@@ -1,0 +1,15 @@
+<!doctype html>
+<title>{% block title %}Welcome{% endblock %} | OPEC Portal OpenID</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<h1>OPEC Portal OpenID</h1>
+{% block body %}{% endblock %}
+<ul class=navigation>
+  {% if g.user %}
+  <li><a href="{{ url_for('portal_user.logout') }}">sign out [{{ g.user.name }}]</a>
+  {% else %}
+  <li><a href="{{ url_for('portal_user.login_with_google') }}">sign in</a>
+  {% endif %}
+</ul>
+{% for message in get_flashed_messages() %}
+  <p class=message>{{ message }}
+{% endfor %}

@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, request, jsonify, g, current_app
 from opecflask.models.database import db_session
 from opecflask.models.state import State
+from opecflask.models.graph import Graph
 from opecflask.models.user import User
 from opecflask.core import short_url
 import datetime
@@ -10,10 +11,7 @@ portal_state = Blueprint('portal_state', __name__)
 
 @portal_state.route('/state/<stateUrl>', methods = ['GET'])     
 def getState(stateUrl):
-   # TODO: need to check input
-   print stateUrl
-   
-   #stateUrl = request.args.get('state', None)
+   # Decode url into a number to match to a state
    stateID = short_url.decode_url(stateUrl)
    output = {}
         
@@ -41,13 +39,20 @@ def getState(stateUrl):
       
 @portal_state.route('/state', methods = ['GET'])     
 def getStates():
+   # Check if the user is logged in.
+   if g.user is None:
+      abort(401)
+      
    #TODO: Return available states filtered by email or other provided parameters.
-   email = request.values.get('email', None)
+   email = g.user.email
    
    if email is None:   
       return 'You need to enter an email'
       
    user = User.query.filter(User.email == email).first()
+   if user is None:
+      return 'No user with that email.'
+   
    states = user.states.all()
    
    output = {}
@@ -65,6 +70,10 @@ def getStates():
      
 @portal_state.route('/state', methods = ['POST'])      
 def setState():
+   # Check if the user is logged in.
+   if g.user is None:
+      abort(401)
+      
    email = request.values.get('email', None)
    state = request.values.get('state', None)
    

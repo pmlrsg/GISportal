@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>Overview</h2>
+  {% if g.user %}
+  <p>
+    You are currently signed in!
+  {% else %}
+    You need to login if you wish to save states or keep a history of your plots.
+  {% endif %}
+  <p>
+{% endblock %}

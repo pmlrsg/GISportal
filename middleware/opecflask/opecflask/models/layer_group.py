@@ -3,20 +3,18 @@ from database import Base
 from opecflask import app
 import datetime
 
-class State(Base):
-   __tablename__ = 'state'
+class LayerGroup(Base):
+   __tablename__ = 'layer_group'
    id = Column(Integer, index=True, primary_key=True)
    user_id = Column(Integer, ForeignKey('user.id'))
-   state = Column(String, unique=False)
+   layer_group = Column(String, unique=False)
    version = Column(Float, unique=False)
-   views = Column(Integer, unique=False)
    last_used = Column(DateTime, unique=False)
 
-   def __init__(self, user_id=None, state=None):  
+   def __init__(self, user_id=None, layer_group=None):  
       self.user_id = user_id   
-      self.state = state
+      self.layer_group = layer_group
       self.version = app.config['API_VERSION']
-      self.views = 0
       self.last_used = datetime.datetime.now()
 
    def __repr__(self):

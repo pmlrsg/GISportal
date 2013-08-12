@@ -25,7 +25,7 @@ opec.MicroLayer = function(name, title, productAbstract, type, opts) {
    this.productAbstract = productAbstract;
    this.type = type;
    
-   this.defaults = {};  
+   this.defaults = {};
    this.defaults.firstDate = null;
    this.defaults.lastDate = null;
    
@@ -229,7 +229,6 @@ opec.layer = function(microlayer, layerData) {
    this.mergeNewParams = function(object) {
       var self = this;
       
-      // Set the visibility of all layers
       var keys = Object.keys(this.openlayers);
       for(var i = 0, len = keys.length; i < len; i++) {
          self.openlayers[keys[i]].mergeNewParams(object);
@@ -695,7 +694,7 @@ opec.filterLayersByDate = function(date) {
  * @param {string} fileName - The file name for the specific JSON layer cache
  * @param {string} microLayer - The microLayer for the layer to be downloaded
  */
-opec.getLayerData = function(fileName, microlayer) {
+opec.getLayerData = function(fileName, microlayer) {   
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
@@ -710,6 +709,10 @@ opec.getLayerData = function(fileName, microlayer) {
          console.log("Adding layer..."); // DEBUG
          opec.addLayer(layer);           
          console.log("Added Layer"); // DEBUG
+         
+         // If the layer was loaded as part of a state load set some of the 
+         // values of the layer to the cached versions.
+         opec.checkIfLayerFromState(layer);
       },
       error: function(request, errorType, exception) {
          var data = {

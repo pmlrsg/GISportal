@@ -514,6 +514,8 @@ opec.nonLayerDependent = function()
    // Setup quickRegions | On Both the left panel and the topbar.
    opec.quickRegions.setup();
    
+   opec.openid.setup('shareOptions');
+   
    //--------------------------------------------------------------------------
    
    // If the window is resized move dialogs to the center to stop them going of
@@ -556,8 +558,7 @@ opec.nonLayerDependent = function()
       var layer = opec.getLayerByID(v);
       
       if($(this).is(':checked')) {
-         layer.select();
-         
+         layer.select();         
       } else {
          layer.unselect();
       }
@@ -601,26 +602,78 @@ opec.saveState = function(state) {
    
    // Save layers
    state.map = {};
-   state.map.layers = [];  
+   state.map.layers = {};  
    
-   var keys = Object.keys(layer.openlayers);
+   // Get the current layers and any settings/options for them.
+   var keys = Object.keys(opec.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
-      var layer = layer.openlayers[keys[i]];
-      state.map.layer[layer.id] = {
+      var layer = opec.layers[keys[i]];
+      state.map.layers[layer.id] = {
          'selected': layer.selected,
-         'opacity': layer.opacity,
-         'style': layer.style   
+         'opacity': layer.opacity !== null ? layer.opacity : 1,
+         'style': layer.style !== null ? layer.style : ''   
       };
       
    }
+   
+   // Get currently selected date.
+   state.map.date = $('#viewDate').datepicker('getDate').getTime();
+   
+   // Get selection from the map
+   var layer = map.getLayersBy('controlID', 'poiLayer')[0];
+   if(layer.features.length > 0) {
+      var feature = layer.features[0];
+      state.map.feature = opec.featureToGeoJSON(feature);
+   }
+
    
    return state;
 };
 
 opec.loadState = function(state) {
-   state = state.opec;
-   opec.layers = state.layers;
+   state = state.map;
    
+   // Load layers for state
+   var keys = Object.keys(state.layers);
+   for(var i = 0, len = keys.length; i < len; i++) {
+      var selection = opec.layerSelector.getLayerSelectionByID(keys[i]);
+      opec.layerSelector.selectLayer(keys[i], selection);
+   }
+   
+   // Set date
+   var date = new Date();
+   date.setTime(state.date);
+   $('#viewDate').datepicker('setDate', date);
+   
+   // Create the feature
+   if(typeof state.feature !== "undefined") {
+      var layer = map.getLayersBy('controlID', 'poiLayer')[0];
+      layer.addFeatures(opec.geoJSONToFeature(state.feature));
+   }
+};
+
+opec.featureToGeoJSON = function(feature) {
+   geoJSON = new OpenLayers.Format.GeoJSON();
+   return geoJSON.write(feature);
+};
+
+opec.geoJSONToFeature = function(geoJSONFeature) {
+   geoJSON = new OpenLayers.Format.GeoJSON();
+   return geoJSON.read(geoJSONFeature); 
+};
+
+opec.checkIfLayerFromState = function(layer) {
+   if(typeof opec.cache.state !== "undefined") {
+      var keys = Object.keys(opec.cache.state.map.layers);
+      var state = opec.cache.state.map;
+      for(var i = 0, len = keys.length; i < len; i++) {
+         if(keys[i] == layer.id) {
+            if(state.layers[keys[i]].selected === true) { $('#opec-lPanel-operational #' + layer.id + ' input:checkbox').trigger('click'); }
+            layer.setOpacity(state.layers[keys[i]].opacity);
+            //layer.setStyle(state.layers[keys[i]].style);
+         }
+      }
+   }
 };
 
 /*===========================================================================*/
@@ -633,6 +686,7 @@ opec.getState = function() {
    var state = {};
    
    // TODO: Get states from component.
+   state = opec.saveState(state);
    state = opec.leftPanel.saveState(state);
    
    // TODO: Merge state with default state.
@@ -643,9 +697,13 @@ opec.getState = function() {
 
 opec.setState = function(state) {
    
+   // Cache state for access by others
+   opec.cache.state = state;
+   
    // TODO: Merge with default state.
    
    // TODO: Set states of components.
+   opec.loadState(state);
    opec.leftPanel.loadState(state); 
 };
 
@@ -662,24 +720,8 @@ opec.main = function() {
    opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
    opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
    opec.templates.selectionItem = Mustache.compile($('#opec-template-selector-item').text().trim());
-   
-   // Grab the url of any state.
-   var stateID = opec.utils.getURLParameter('state');
-   
-   // Check if there is a state to load.
-   if(stateID !== null) {
-      console.log('Retrieving State...');
-      
-      // Async to get state object
-      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {
-         console.log('Success! State retrieved');
-         opec.setState($.parseJSON(data.output.state));
-      }, function(request, errorType, exception) {
-         console.log('Error: Failed to retrieved state. Ajax failed!');
-      }, 'json', {});
-   } else {
-      console.log('Loading Default State...');
-   }
+   opec.templates.loginBox = Mustache.compile($('#opec-template-login-box').text().trim());
+   opec.templates.providerBox = Mustache.compile($('#opec-template-provider-box').text().trim());
    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -757,6 +799,24 @@ opec.main = function() {
 
    // Start setting up anything that is not layer dependent
    opec.nonLayerDependent();
+   
+   // Grab the url of any state.
+   var stateID = opec.utils.getURLParameter('state');
+   
+   // Check if there is a state to load.
+   if(stateID !== null) {
+      console.log('Retrieving State...');
+      
+      // Async to get state object
+      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {
+         console.log('Success! State retrieved');
+         opec.setState($.parseJSON(data.output.state));
+      }, function(request, errorType, exception) {
+         console.log('Error: Failed to retrieved state. Ajax failed!');
+      }, 'json', {});
+   } else {
+      console.log('Loading Default State...');
+   }
 };
 
 // ----------------------------------------------------------------------------

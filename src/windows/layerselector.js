@@ -67,56 +67,11 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       var providerTag = $(this).parent().attr('data-provider');
       var id = providerTag + ': ' + layerName;
       
-      // DEBUG
-      console.log("selected");
-      
       if($(this).find(".ui-icon").hasClass('ui-icon-plus')) {      
-         if(layerID in opec.microLayers) {
-            if(layerID in opec.layers) {
-               // DEBUG
-               console.log("Adding layer...");
-               opec.addLayer(opec.getLayerByID(layerID));
-               // DEBUG
-               console.log("Added Layer");
-            } else {
-               var microlayer = opec.microLayers[layerID];
-               if(microlayer.type == 'opLayers') {
-                  opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer);
-               } else if (microlayer.type == 'refLayers') {
-                  // TODO: Deal with wfs layers.
-                  // Convert the microlayer. 
-                  // COMMENT: might change the way this works in future.
-                  var layer = new opec.layer(microlayer, {}); 
-                  opec.addLayer(layer);
-               }
-            }
-               
-            self.toggleLayerSelection($(this).parent());
-         }
-         else {
-            // DEBUG
-            console.log("no layer data to use");
-         }
+         self.selectLayer(layerID, $(this).parent());
       }
       else if($(this).find(".ui-icon").hasClass('ui-icon-minus')) {
-         // DEBUG
-         console.log("deselected");
-         var layer = opec.getLayerByID(layerID);
-
-         if(layer) {            
-            console.log("Removing layer..."); // DEBUG         
-            opec.removeLayer(layer);           
-            console.log("Layer removed"); // DEBUG
-            
-            self.toggleLayerSelection($(this).parent());
-         }
-         else if(opec.layerStore[layerID]) {
-            //layer = opec.layerStore[layerID];
-            self.toggleLayerSelection($(this).parent());
-         }
-         else
-            // DEBUG
-            console.log("no layer data to use");
+         self.deselectLayer(layerID, $(this).parent());
       }
       
       return false;
@@ -128,6 +83,16 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       //.next().toggle();
    //});
    
+   /**
+    * Used to grab the correct 'li' for the provided layer id.
+    */
+   this.getLayerSelectionByID = function(layerID) {
+      return $('#' + containerID).find('li[data-id="' + layerID + '"]');
+   };
+   
+   /**
+    * Add layer to the layerselector
+    */
    this.addLayer = function(layer, extraInfo) {
       var $layer = $(layer);
       if (typeof extraInfo.tags !== 'undefined' && extraInfo.tags !== null) {
@@ -138,6 +103,66 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       }
       
       this.$container.append($layer);
+   };
+   
+   /**
+    * Selects a layer
+    */
+   this.selectLayer = function(layerID, li) {
+      var self = this;
+      
+      if(layerID in opec.microLayers) {
+         if(layerID in opec.layers) {
+            // DEBUG
+            console.log("Adding layer...");
+            opec.addLayer(opec.getLayerByID(layerID));
+            // DEBUG
+            console.log("Added Layer");
+         } else {
+            var microlayer = opec.microLayers[layerID];
+            if(microlayer.type == 'opLayers') {
+               opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer);
+            } else if (microlayer.type == 'refLayers') {
+               // TODO: Deal with wfs layers.
+               // Convert the microlayer. 
+               // COMMENT: might change the way this works in future.
+               var layer = new opec.layer(microlayer, {}); 
+               opec.addLayer(layer);
+            }
+         }
+            
+         self.toggleLayerSelection(li);
+      }
+      else {
+         // DEBUG
+         console.log("no layer data to use");
+      }      
+   };
+   
+   /**
+    * Deselects a layer
+    */
+   this.deselectLayer = function(layerID, li) {
+      var self = this;
+      
+      // DEBUG
+      console.log("deselected");
+      var layer = opec.getLayerByID(layerID);
+   
+      if(layer) {            
+         console.log("Removing layer..."); // DEBUG         
+         opec.removeLayer(layer);           
+         console.log("Layer removed"); // DEBUG
+         
+         self.toggleLayerSelection(li);
+      }
+      else if(opec.layerStore[layerID]) {
+         //layer = opec.layerStore[layerID];
+         self.toggleLayerSelection(li);
+      }
+      else
+         // DEBUG
+         console.log("no layer data to use");
    };
    
    this.batchAddLayers = function(layers) {

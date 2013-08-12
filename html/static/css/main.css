@@ -87,10 +87,10 @@ ul li {
    left: 50%;
    margin-left: -312px;
    position: fixed;
-   background: #222222;
+   background: rgba(32, 32, 32, 0.8);
    border:1px solid #666666;
-   filter: alpha(opacity=80);
-   opacity: .80;
+   /*filter: alpha(opacity=80);
+   opacity: .80;*/
    color:#FFFFFF;
 }
 
@@ -603,19 +603,25 @@ div .sensor-accordion {
 #shareOptions {
    display:none;
    top: 51px;
-   height:100px;
-   width:200px;
-   margin-left: 90px;
+   height:180px;
+   width:300px;
+   margin-left: -150px;
    -moz-border-radius-bottomleft: 15px;
    -moz-border-radius-bottomright: 15px;
    -webkit-border-bottom-left-radius: 15px;
    -webkit-border-bottom-right-radius: 15px;
    border-bottom-left-radius: 15px;
    border-bottom-right-radius: 15px;
+   border: 2px solid #666666;
+   
 }
 
 #shareOptions h3 {
    margin-top: 5px; 
+}
+
+#shareOptions fieldset {
+   border: 2px groove threedface
 }
 
 #shareLink {

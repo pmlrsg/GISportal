@@ -57,7 +57,7 @@ opec.quickRegions.setup = function() {
  * map or panning.
  */ 
 opec.quickRegionReset = function(e) {
-   $('#quickRegion').val('Choose a Region');   
+   $('#quickRegion').val(0);   
 };
 
 opec.addQuickRegion = function(name, bounds) {

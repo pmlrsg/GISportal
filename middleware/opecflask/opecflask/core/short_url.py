@@ -48,7 +48,7 @@ Link: http://code.activestate.com/recipes/576918/
 '''
 
 DEFAULT_ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789'
-DEFAULT_BLOCK_SIZE = 24
+DEFAULT_BLOCK_SIZE = 64
 MIN_LENGTH = 13
 
 class UrlEncoder(object):
