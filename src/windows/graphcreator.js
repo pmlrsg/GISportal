@@ -1,3 +1,5 @@
+// File on list to be deleted if nothing breaks
+
 /* opec.window.createGraphCreator = function() {
    var graphCreator = $('#graphCreator');
    // If there is an open version, close it
@@ -157,7 +159,7 @@
 */
 
 //----------------------------------------------------------------------------
-var graphCreator = {
+/*var graphCreator = {
    name: 'graphCreator',
    create: function(windowType, uid, data) {
       
@@ -445,4 +447,4 @@ var graphCreator = {
    }
 };
 
-opec.window.addWindow(graphCreator);
+opec.window.addWindow(graphCreator);*/

@@ -14,6 +14,7 @@ opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of 
 opec.wcsLocation = opec.middlewarePath + '/wcs?';
 opec.wfsLocation = opec.middlewarePath + '/wfs?';
 opec.stateLocation = opec.middlewarePath + '/state';
+opec.graphLocation = opec.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
 OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
@@ -481,8 +482,7 @@ opec.initWFSLayers = function(data, opts) {
 /**
  * Loads anything that is not dependent on layer data. 
  */
-opec.nonLayerDependent = function()
-{
+opec.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
@@ -612,13 +612,14 @@ opec.saveState = function(state) {
          'selected': layer.selected,
          'opacity': layer.opacity !== null ? layer.opacity : 1,
          'style': layer.style !== null ? layer.style : ''   
-      };
-      
+      };    
    }
    
    // Get currently selected date.
-   state.map.date = $('#viewDate').datepicker('getDate').getTime();
-   
+   if(!opec.utils.isNullorUndefined($('#viewDate').datepicker('getDate'))) {
+      state.map.date = $('#viewDate').datepicker('getDate').getTime();
+   }
+     
    // Get selection from the map
    var layer = map.getLayersBy('controlID', 'poiLayer')[0];
    if(layer.features.length > 0) {
@@ -641,12 +642,14 @@ opec.loadState = function(state) {
    }
    
    // Set date
-   var date = new Date();
-   date.setTime(state.date);
-   $('#viewDate').datepicker('setDate', date);
+   if(!opec.utils.isNullorUndefined(state.date)) {
+      var date = new Date();
+      date.setTime(state.date);
+      $('#viewDate').datepicker('setDate', date);
+   }
    
-   // Create the feature
-   if(typeof state.feature !== "undefined") {
+   // Create the feature if there is one
+   if(!opec.utils.isNullorUndefined(state.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
       layer.addFeatures(opec.geoJSONToFeature(state.feature));
    }
@@ -808,9 +811,13 @@ opec.main = function() {
       console.log('Retrieving State...');
       
       // Async to get state object
-      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {
-         console.log('Success! State retrieved');
-         opec.setState($.parseJSON(data.output.state));
+      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {         
+         if(data.output.status == 200) {
+            opec.setState($.parseJSON(data.output.state));
+            console.log('Success! State retrieved');
+         } else {
+            console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
+         }
       }, function(request, errorType, exception) {
          console.log('Error: Failed to retrieved state. Ajax failed!');
       }, 'json', {});

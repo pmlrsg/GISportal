@@ -2,6 +2,9 @@ from flask import Blueprint, abort, request, jsonify, g, current_app, render_tem
 from opecflask.models.database import db_session
 from opecflask.models.state import State
 from opecflask.models.graph import Graph
+from opecflask.models.quickregions import QuickRegions
+from opecflask.models.roi import ROI
+from opecflask.models.layergroup import LayerGroup
 from opecflask.models.user import User
 from opecflask import oid
 import sqlite3 as sqlite

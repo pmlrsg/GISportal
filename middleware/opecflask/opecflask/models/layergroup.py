@@ -12,7 +12,7 @@ class LayerGroup(Base):
    last_used = Column(DateTime, unique=False)
 
    def __init__(self, user_id=None, layer_group=None):  
-      self.user_id = user_id   
+      self.user_id = user_id
       self.layer_group = layer_group
       self.version = app.config['API_VERSION']
       self.last_used = datetime.datetime.now()

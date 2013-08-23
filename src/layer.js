@@ -336,6 +336,12 @@ opec.layer = function(microlayer, layerData) {
       }
    };
    
+   this.closestDate = function(date) {
+      var layer = this;
+      
+      
+   };
+   
    /**
     * Select the given temporal layer on the Map based on JavaScript date input
     * 

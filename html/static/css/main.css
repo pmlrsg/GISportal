@@ -582,7 +582,7 @@ div .sensor-accordion {
    position: fixed;
    color: black;
    text-align: center;
-   top: 60px;
+   top: 70px;
    left: 0;
    width: 100%;
 }
@@ -626,6 +626,29 @@ div .sensor-accordion {
 
 #shareLink {
    width: 145px;
+}
+
+/* ======== Login Buttons ======== */
+
+.opec-login-with-google {
+   width: 145px;
+   height: 30px;
+   background: url(../img/Red-signin_Long_base_20dp.png);
+}
+
+.opec-login-with-google:hover {
+   background: url(../img/Red-signin_Long_hover_20dp.png);
+}
+
+.opec-login-with-google:active {
+   background: url(../img/Red-signin_Long_press_20dp.png);
+}
+
+
+.opec-login-with-yahoo {
+   width: 161px;
+   height: 22px;
+   background: url(../img/yahoo_signin_btn.png);
 }
 
 /* ======== Scalebar ======== */

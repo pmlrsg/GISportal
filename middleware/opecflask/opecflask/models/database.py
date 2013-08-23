@@ -16,5 +16,6 @@ def init_db():
     from graph import Graph
     from quickregions import QuickRegions
     from roi import ROI
+    from layergroup import LayerGroup
     from user import User
     Base.metadata.create_all(bind=engine)

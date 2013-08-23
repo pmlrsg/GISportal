@@ -5,7 +5,7 @@
 opec.window = {};
 
 opec.window._openWindows = {};
-opec.window._windowTypes = [];
+opec.window._windowTypes = {};
 
 /**
  * Add a type of window
@@ -22,7 +22,7 @@ opec.window.addWindow = function(window) {
  * @param {Object} data
  */
 opec.window.createWindow = function(windowType, uid, data) {  
-   if ($.inArray(windowType, opec.window._windowTypes) !== -1) {
+   if (!opec.utils.isNullorUndefined(opec.window._windowTypes[windowType])) {
       var window = opec.window._windowTypes[windowType].create(windowType, uid, data);
       opec.window._openWindows[uid] = window;
    }

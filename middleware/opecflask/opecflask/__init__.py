@@ -9,6 +9,8 @@ def create_app(path):
    app.config.update(SECRET_KEY = 'p7i0-22@0eheas^kzw3=1qfug_x+5)5)8u4v=2iyiwwx1eh)37', DEBUG = True)
    print path
    
+   setup_version(app)
+   
    #=== SETUP LOGGING ===#
    setup_logging(app, path)
    
@@ -69,7 +71,7 @@ def setup_logging(app, path):
             
          f_handler.setLevel(logging.DEBUG)
          f_handler.setFormatter(logging.Formatter(
-             '[%(asctime)s] [%(levelname)s]: %(message)s '
+             '[%(asctime)s] [%(levelname)s]: %(message)s'
              '[in %(filename)s:%(lineno)d]'
          ))
          app.logger.addHandler(f_handler)
@@ -86,12 +88,17 @@ def setup_config(app):
 def setup_blueprints(app):
    from views.user import portal_user
    from views.state import portal_state
+   from views.graph import portal_graph
+   #from views.quickregions import portal_quickRegions
+   #from views.roi import portal_roi
+   #from views.layergroup import portal_layerGroup
    from views.proxy import portal_proxy
    from views.wfs import portal_wfs
    from views.wcs import portal_wcs
 
    app.register_blueprint(portal_user)
    app.register_blueprint(portal_state)
+   app.register_blueprint(portal_graph)
    app.register_blueprint(portal_proxy)
    app.register_blueprint(portal_wfs)
    app.register_blueprint(portal_wcs)

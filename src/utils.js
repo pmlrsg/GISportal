@@ -151,4 +151,12 @@ opec.utils.getURLParameter = function(name) {
 // A function for getting unique identifier, generic function so that it can easily be changed throughout the codebase
 opec.utils.uniqueID = function()  {
    return new Date().getTime();
-}
+};
+
+opec.utils.isNullorUndefined = function(object) {
+   if(typeof object === null || typeof object === "undefined") {
+      return true;
+   }
+   
+   return false;
+};

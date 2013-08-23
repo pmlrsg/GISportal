@@ -278,7 +278,7 @@
 </script>
 <!-- Login box -->
 <script type="text/html" id="opec-template-login-box">
-   <form action="/service/login" method="get" id="opec-openid-form">
+   <form action="/service/login" method="get" id="{{id}}">
       <input type="hidden" name="action" value="verify">
       <fieldset>
          <legend>Sign-in or Create New Account</legend>
@@ -294,7 +294,7 @@
 </script>
 <!-- Provider Box -->
 <script type="text/html" id="opec-template-provider-box">
-   <a title="{{title}}" href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}"></a>
+   <a class="opec-login-with-{{name}}" title="{{title}} data-url="{{url}}"></a> <!--href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}" -->
 </script>
 <!-- ====================================================================== -->
 

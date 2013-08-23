@@ -9,14 +9,14 @@ class Graph(Base):
    user_id = Column(Integer, ForeignKey('user.id'))
    graph = Column(String, unique=False)
    version = Column(Float, unique=False)
-   runs = Column(Integer, unique=False)
+   retrievals = Column(Integer, unique=False)
    last_used = Column(DateTime, unique=False)
 
    def __init__(self, user_id=None, graph=None):  
       self.user_id = user_id   
       self.graph = graph
       self.version = app.config['API_VERSION']
-      self.runs = 0
+      self.retrievals = 0
       self.last_used = datetime.datetime.now()
 
    def __repr__(self):

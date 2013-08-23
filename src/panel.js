@@ -764,8 +764,7 @@ opec.rightPanel.setupGraphingTools = function() {
          $("#graphcreator-range option[value='" + d[0].name + "']").attr('selected', 'selected');
       }
    }
-
-   
+ 
    var layerID = $('.selectedLayer:visible').attr('id');
    
    // We need to check if a layer is selected
@@ -875,10 +874,19 @@ opec.rightPanel.setupGraphingTools = function() {
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
          graphZAxis: $('#graphcreator-coverage').val()
-      };
-      
+      };      
       var request = $.param( params );
       
+      var graphJSON = JSON.stringify(params);        
+            
+      // Async post the state
+      opec.genericAsync('POST', opec.graphLocation, { graph: graphJSON}, function(data, opts) {
+         console.log('POSTED graph!');
+      }, function(request, errorType, exception) {
+         console.log('Failed to post graph!');
+      }, 'json', {});
+      
+      // Get graph
       $.ajax({
          type: 'GET',
          url: opec.wcsLocation + request,

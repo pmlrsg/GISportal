@@ -2,6 +2,9 @@ from flask import Blueprint, abort, request, jsonify, g, current_app
 from opecflask.models.database import db_session
 from opecflask.models.state import State
 from opecflask.models.graph import Graph
+from opecflask.models.quickregions import QuickRegions
+from opecflask.models.roi import ROI
+from opecflask.models.layergroup import LayerGroup
 from opecflask.models.user import User
 from opecflask.core import short_url
 import datetime
@@ -16,18 +19,21 @@ def getState(stateUrl):
    output = {}
         
    if stateID is not None:      
-      state = State.query.filter(State.id == stateID).first()
+      state = State.query.filter(stateID == State.id).first()
       if state != None:
          state.views += 1
          state.last_used = datetime.datetime.now()
          db_session.commit()
          
          output = stateToJSON(state)
+         output['status'] = '200'
       else:
-         output['error'] = 'failed to get state'             
+         output['error'] = 'Failed to find a state matching that url'  
+         output['status'] = '404'           
       
    else:
-      output['error'] = 'failed to get state'
+      output['error'] = 'You must enter a valid state url'
+      output['status'] = '400'
       
    try:
       jsonData = jsonify(output = output)
@@ -57,7 +63,7 @@ def getStates():
    
    output = {}
    for state in states:
-      output[state.id] = stateToJSON(state)
+      output[short_url.encode_url(state.id)] = stateToJSON(state)
 
    try:
       jsonData = jsonify(output = output)
@@ -73,8 +79,9 @@ def setState():
    # Check if the user is logged in.
    if g.user is None:
       abort(401)
-      
-   email = request.values.get('email', None)
+   
+   print g.user
+   email = g.user.email
    state = request.values.get('state', None)
    
    output = {}
