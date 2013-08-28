@@ -44,7 +44,7 @@ SRC.remove('src/opec.js')
 SRC.append('src/opec.js')
 
 JSDOC = 'lib/jsdoc/jsdoc'
-PLOVR_JAR = 'lib/plovr/plovr-eba786b34df9.jar'
+PLOVR_JAR = 'lib/plovr/plovr-81ed862.jar'
 UGLIFYJS = '/local1/data/scratch/node-v0.8.18-linux-x64/node_modules/uglifyjs/bin/uglifyjs'
 YUICOMPRESSOR = 'lib/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar'
 CSS = 'html/static/css/'
