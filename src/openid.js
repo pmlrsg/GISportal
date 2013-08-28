@@ -31,7 +31,7 @@ opec.openid.setup = function(containerID) {
    };
    
    opec.openid.$loginBox.append(opec.templates.loginBox(data)); 
-      
+   /*   
    $('#' + opec.openid.loginForm + ' .opec-login-with-google').click(function() {
       var $this = $(this);
       var windowWidth = '500px';
@@ -52,7 +52,7 @@ opec.openid.setup = function(containerID) {
    $('#' + opec.openid.loginForm + ' .opec-login-with-yahoo').click(function() {
       
    });
-   
+   */
    
 };
 
@@ -80,7 +80,7 @@ opec.openid.hideLogin = function() {
 
 // Check to perform at each execution of the timed loop. It also triggers
 // the action that follows the closing of the popup
-opec.openid.waitForPopupClose = function() {
+/*opec.openid.waitForPopupClose = function() {
    if (isPopupClosed()) {
       popupWindow = null;
       var darkCover = window.document.getElementById(window.popupManager.constants['darkCover']);
@@ -95,12 +95,12 @@ opec.openid.waitForPopupClose = function() {
          interval = null;
       }
    }
-};
+}; */
 
 // Tests that the popup window has closed
-opec.openid.isPopupClosed = function() {
+/*opec.openid.isPopupClosed = function() {
    return (!popupWindow || popupWindow.closed);
-   };
+   };*/
 
 //======== ENDOF POPUP MANAGEMENT ========//
 
