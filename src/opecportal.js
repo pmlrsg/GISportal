@@ -150,7 +150,7 @@ opec.getFeature = function(layer, olLayer, time) {
  * @param {Function} success - Called if everything goes ok.
  * @param {Function} error - Called if problems arise from the ajax call.
  * @param {string} dataType - What data type will be returned, xml, json, etc
- * @param {object} 
+ * @param {object} opts - Object to pass to success function
  */
 opec.genericAsync = function(type, url, data, success, error, dataType, opts) {
    //var map = this;
@@ -656,12 +656,12 @@ opec.loadState = function(state) {
 };
 
 opec.featureToGeoJSON = function(feature) {
-   geoJSON = new OpenLayers.Format.GeoJSON();
+   var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.write(feature);
 };
 
 opec.geoJSONToFeature = function(geoJSONFeature) {
-   geoJSON = new OpenLayers.Format.GeoJSON();
+   var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.read(geoJSONFeature); 
 };
 
@@ -834,7 +834,7 @@ opec.main = function() {
  * 
  * @param {Object} event
  */
-function getFeatureInfo(event) {
+/*function getFeatureInfo(event) {
    if(!this.visibility) return;
    
    var control = map.getControlsByClass("OpenLayers.Control.Navigation")[0];
@@ -993,3 +993,4 @@ function setColourScaleMax(scaleMax)
 {
    // Do nothing
 }
+*/
