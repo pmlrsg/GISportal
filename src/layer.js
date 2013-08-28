@@ -1,3 +1,12 @@
+/* @param {string} firstDate - The first date for which data is available
+ * @param {string} lastDate - The last date for which data is available
+ * @param {string} serverName - The server name which serves the layer
+ * @param {string} wmsURL - The URL for the WMS service
+ * @param {string} wcsURL - The URL for the WCS service
+ * @param {string} sensorName - The name of the sensor for this layer (unescaped)
+ * @param {string} exBoundingBox - The geographic bounds for data in this layer
+ */
+
 /**
  * Creates an opec.MicroLayer Object (layers in the selector but not yet map 
  * layers)
@@ -5,14 +14,7 @@
  * @constructor
  * @param {string} name - The layer name (unescaped)
  * @param {string} title - The title of the layer
- * @param {string} abstract - The abstract information for the layer
- * @param {string} firstDate - The first date for which data is available
- * @param {string} lastDate - The last date for which data is available
- * @param {string} serverName - The server name which serves the layer
- * @param {string} wmsURL - The URL for the WMS service
- * @param {string} wcsURL - The URL for the WCS service
- * @param {string} sensorName - The name of the sensor for this layer (unescaped)
- * @param {string} exBoundingBox - The geographic bounds for data in this layer
+ * @param {string} productAbstract - The abstract information for the layer
  */
 opec.MicroLayer = function(name, title, productAbstract, type, opts) {
       
@@ -552,7 +554,7 @@ opec.layer = function(microlayer, layerData) {
       
       // TODO: be able to deal with all layer types.
       if(this.controlID == 'opLayers') {
-         map.events.register("click", layer, getFeatureInfo);
+         //map.events.register("click", layer, getFeatureInfo);
          // Increase the count of OpLayers
          opec.numOpLayers++;
       } else if (this.controlID == 'refLayers') {
@@ -574,7 +576,7 @@ opec.layer = function(microlayer, layerData) {
 
       // TODO: be able to deal with all layer types.
       if(this.controlID == 'opLayers') {
-         map.events.unregister("click", layer, getFeatureInfo);
+         //map.events.unregister("click", layer, getFeatureInfo);
          // Decrease the count of OpLayers
          opec.numOpLayers--;
       } else if(this.controlID == 'refLayers') {
