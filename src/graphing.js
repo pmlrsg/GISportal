@@ -27,7 +27,7 @@ opec.graphs.create = function(data) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: 'WCS Test Graph',
+         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          data: [{
             data: d1.sort(opec.utils.sortDates),
             lines: { show: true },
@@ -71,7 +71,7 @@ opec.graphs.create = function(data) {
    
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: 'WCS Test Graph',
+         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          data: [num],
          options: barOptions(barwidth),
          selectable: false
@@ -84,7 +84,7 @@ opec.graphs.create = function(data) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: 'WCS Hovmöller Test Graph',
+         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          type: data.type,
          colour: 'redToBlue',
          data: data.output
