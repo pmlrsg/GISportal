@@ -444,6 +444,7 @@ opec.layer = function(microlayer, layerData) {
             { layers: this.urlName, transparent: true}, 
             { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
          );
+         layer.controlID = 'opLayers';
          
       } else if(this.controlID == 'refLayers') {
          
@@ -459,6 +460,7 @@ opec.layer = function(microlayer, layerData) {
                }),                         
                styleMap: self.style
             });
+            layer.controlID = 'refLayers';
                
          } else {
 
@@ -494,6 +496,7 @@ opec.layer = function(microlayer, layerData) {
                typeName: self.name, format: 'image/png', transparent: true, 
                exceptions: 'XML', version: '1.0', layers: '1'
             });
+            layer.controlID = 'refLayers';
             
             var selector = opec.mapControls.selector;
             var layers = selector.layers;
@@ -550,7 +553,7 @@ opec.layer = function(microlayer, layerData) {
       
       // Add the layer to the map
       map.addLayer(layer);
-      //map.setLayerIndex(layer, map.numBaseLayers + map.numOpLayers);
+      //map.setLayerIndex(layer, opec.numBaseLayers + opec.numOpLayers);
       
       // TODO: be able to deal with all layer types.
       if(this.controlID == 'opLayers') {

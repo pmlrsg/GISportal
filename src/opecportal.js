@@ -195,7 +195,7 @@ opec.createBaseLayers = function() {
    createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
    // Get and store the number of base layers
-   map.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
+   opec.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 };
 
 /**
@@ -242,7 +242,7 @@ opec.createRefLayers = function() {
    opec.layerSelector.refresh();
 
    // Get and store the number of reference layers
-   map.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+   opec.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 };
 
 /** 
@@ -490,7 +490,7 @@ opec.nonLayerDependent = function() {
       var poiLayers = map.getLayersBy('controlID', 'poiLayer');
 
       $.each(refLayers, function(index, value) {
-         map.setLayerIndex(value, map.numBaseLayers + map.numOpLayers + index + 1);
+         map.setLayerIndex(value, map.layers.length - index - 1);
       });
 
       $.each(poiLayers, function(index, value) {

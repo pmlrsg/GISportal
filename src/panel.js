@@ -32,7 +32,7 @@ opec.leftPanel.setup = function() {
          //var order = $("#opec-lPanel-reference").sortable('toArray');                 
          //$.each(order, function(index, value) {
             //var layer = opec.getLayerByID(value);
-            //map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
+            //map.setLayerIndex(layer[0], opec.numBaseLayers + order.length - index - 1);
          //});
       }
    });
@@ -326,7 +326,7 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
       $.each(layerGroupOrder, function(index, value) {
          var layer = opec.getLayerByID(value);
          if(typeof layer !== 'undefined') {
-            var positionOffset = layer.controlID == 'opLayers' ? map.numBaseLayers : (map.numBaseLayers + map.numOpLayers);
+            var positionOffset = layer.controlID == 'opLayers' ? opec.numBaseLayers : (opec.numBaseLayers + opec.numOpLayers);
             
             for(var i = 0, len = layer.order.length; i < len; i++) {
                map.setLayerIndex(layer.openlayers[layer.order[i]], positionOffset + layersBelowOffset + (layerGroupOrder.length - index - 1) + i);
@@ -874,12 +874,13 @@ opec.rightPanel.setupGraphingTools = function() {
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
          graphZAxis: $('#graphcreator-coverage').val()
-      };      
+      };
+         
       var request = $.param( params );
       
       var graphJSON = JSON.stringify(params);        
             
-      // Async post the state
+      // Async post the graph
       opec.genericAsync('POST', opec.graphLocation, { graph: graphJSON}, function(data, opts) {
          console.log('POSTED graph!');
       }, function(request, errorType, exception) {
@@ -1065,9 +1066,9 @@ opec.topbar.setup = function() {
    $('#opec-toolbar-actions')
       .buttonset().children('button:first, input[type="button"]')
       .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
+      .next().button({ disabled: true, label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
       .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'} })
+      .next().button({ disabled: true, label: '', icons: { primary: 'ui-icon-opec-globe'} })
       .click(function(e) {
          if(map.globe.is3D) {
             map.show2D();
