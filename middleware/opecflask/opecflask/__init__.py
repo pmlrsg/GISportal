@@ -1,5 +1,9 @@
 from flask import Flask, abort, make_response, g, session
-from flask_openid import OpenID
+try:
+   from flask_openid import OpenID
+except:
+   from flaskext.openid import OpenID
+   
 from flask_sqlalchemy import SQLAlchemy
 import settings as settings
 import sys
