@@ -37,7 +37,7 @@ def getState(stateUrl):
       
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
@@ -67,7 +67,7 @@ def getStates():
 
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
@@ -108,7 +108,7 @@ def setState():
    
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
