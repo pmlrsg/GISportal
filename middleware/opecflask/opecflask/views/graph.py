@@ -10,7 +10,11 @@ from opecflask.models.user import User
 from opecflask.core import short_url
 import datetime
 import sqlite3 as sqlite
-from collections import OrderedDict
+
+try:
+   from collections import OrderedDict
+except:
+   from opecflask.core.ordered_dict import OrderedDict
 
 portal_graph = Blueprint('portal_graph', __name__)
 
@@ -40,7 +44,7 @@ def getGraph(graphUrl):
       
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
@@ -71,7 +75,7 @@ def getGraphs():
 
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
@@ -110,7 +114,7 @@ def setGraph():
    
    try:
       jsonData = jsonify(output = output)
-      #portal_state.logger.debug('Request complete, Sending results') # DEBUG
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
