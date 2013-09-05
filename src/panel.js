@@ -759,11 +759,13 @@ opec.rightPanel.setupGraphingTools = function() {
          console.log(option.data('hidden'));
          opec.timeline.showRange(option.val());
          option.data('hidden', false);
+         $('.js-hideRange').html("Hide Range");
       }
       else  {
          console.log(option.data('hidden'));
          opec.timeline.hideRange(option.val());
          option.data('hidden', true);
+         $('.js-hideRange').html("Show Range");
       }
    });
    
