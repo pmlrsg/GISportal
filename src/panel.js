@@ -756,13 +756,11 @@ opec.rightPanel.setupGraphingTools = function() {
    $('.js-hideRange').on('click', function() {
       var option = $('#graphcreator-range option:selected');
       if(option.data('hidden') == true)  {
-         console.log(option.data('hidden'));
          opec.timeline.showRange(option.val());
          option.data('hidden', false);
          $('.js-hideRange').html("Hide Range");
       }
       else  {
-         console.log(option.data('hidden'));
          opec.timeline.hideRange(option.val());
          option.data('hidden', true);
          $('.js-hideRange').html("Show Range");
