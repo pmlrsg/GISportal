@@ -70,7 +70,7 @@
 <!-- <script type="text/javascript" src="js-libs/dialog.js"></script> -->
 
 <!-- Custom JavaScript -->
-<script type="text/javascript" src="OPECPortal.min.js"></script>
+<script type="text/javascript" src="OPECPortal.js"></script>
 
 <!-- =================================== Templates =================================== -->
 <script type="text/html" id="opec-template-layer">
@@ -201,6 +201,12 @@
          </h3>
          <div id="data-inputs">
             <div>
+               <label for="graphcreator-title">Title:</label>
+            </div>
+            <div>
+               <input id="graphcreator-title" class="title-case" title="Title of the graph" type="text" name="graphcreator-title" />
+            </div>
+            <div>
                <label for="graphcreator-baseurl-label">Base URL:</label>
             </div>
             <div>
@@ -242,6 +248,8 @@
                   <option selected>Select a Range</option>  
                <select>
                <button class="js-newRange">New Range</button>
+               <button class="js-hideRange">Hide Range</button>
+               <button class="js-deleteRange">Delete Range</button>
             </div>
             
             <div>
@@ -295,6 +303,21 @@
 <!-- Provider Box -->
 <script type="text/html" id="opec-template-provider-box">
    <a class="opec-login-with-{{name}}" title="{{title}} data-url="{{url}}"></a> <!--href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}" -->
+</script>
+<!-- History Window List -->
+<script type="text/html" id="opec-template-history-list">
+   <li class="ui-state-default" data-id="{{ id }}">
+      {{ description }}
+   </li>
+</script>
+<!-- History Window Data -->
+<script type="text/html" id="opec-template-history-data">
+   <li class="hidden" data-id="{{ id }}" data-title="{{ title }}">
+      <p class="title-case">{{ title }}</p>
+      <div class="hidden">
+         <div class="json-data">{{ data }}</div>
+      </div>
+   </li>
 </script>
 <!-- ====================================================================== -->
 
@@ -544,6 +567,31 @@
             <ul></ul>
          </li>       
       </ul>
+   </div>
+   
+   <div id="opec-historyWindow" title="History">
+      <div id="opec-historyWindow-tabs" class="panel-toolbar ui-helper-reset opec-tab-group ui-corner-top">
+         <button id="opec-historyWindow-tab-States" class="opec-tab" href="#opec-historyWindow-states">States</button>
+         <button id="opec-historyWindow-tab-Graphs" class="opec-tab" href="#opec-historyWindow-graphs">Graphs</button>  
+      </div>
+      <div id="opec-historyWindow-content">
+         <div id="opec-historyWindow-states" class="opec-tab-content ui-corner-top">
+            <ul>
+               <li class="opec-historyWindow--scroll"></li>       
+               <li class="opec-historyWindow--data"></li>       
+            </ul>
+         </div>
+   
+         <div id="opec-historyWindow-graphs" class="opec-tab-content ui-corner-top" style="display: none;">
+            <ul>
+               <li class="opec-historyWindow--scroll"></li>       
+               <li class="opec-historyWindow--data">
+                  <button id="load-graph">Load Graph</button>
+                  <button id="remove-graph">Remove Graph</button>
+               </li>       
+            </ul>
+         </div>
+      </div>
    </div>
    
    <!-- D3 Timeline -->

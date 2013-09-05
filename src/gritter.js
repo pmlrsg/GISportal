@@ -388,6 +388,16 @@ function createHelpMessages()
       },
       max: 1
    };
+  
+   // History Tutorial
+   opec.gritter._notifications['history'] = {
+      title: function() {
+         return 'History Tutorial';
+      },
+      text: function() {
+         return 'The history window is a way of seeing your previous actions such as graphs and saved states.';
+      }
+   };
    
    // Graph Creator Tutorial
    opec.gritter._notifications['graphCreatorTutorial'] = {

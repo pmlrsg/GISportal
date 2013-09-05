@@ -82,6 +82,8 @@ opec.TimeLine = function(id, options) {
    
    this.options = $.extend({}, defaults, options) ;
 
+   this.hiddenRangebars = []; // Used to hide range bars
+
    // Initialise the fixed TimeLine widget properties from the JSON options file
    this.id = id;
    this.visible = true;
@@ -342,8 +344,15 @@ opec.TimeLine.prototype.redraw = function() {
       .style('fill', 'transparent')
       .on('click', function(d) {
          if(d.type == 'range') {
+            var currentlyDragging = self.rangebars.filter(function(d) { return d.isDragging; } )
+            
+            if (currentlyDragging.length == 1 && currentlyDragging != d)  {
+               d = currentlyDragging[0];
+            }
+            
             if (d.isDragging === false)  {
                d3.event.stopPropagation();
+               // There will be a maximum of 1 being dragged
                d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
                d.isDragging = true;
             }
@@ -380,15 +389,20 @@ opec.TimeLine.prototype.redraw = function() {
    //--------------------------------------------------------------------------
 
    // Draw the time bars
-   this.bars = this.barArea.selectAll('rect').data(this.layerbars);
+   // Note: Had to use closures to move variables from each into the .attr etc.
+   this.bars = this.barArea.selectAll('rect').data(this.timebars);
    this.bars
-     .enter().append('svg:rect')
-      //.attr('fill', 'white')
-      .attr('y', function(d, i) { return d3.round(self.yScale(i) + self.barMargin + 0.5); })
-     .transition().duration(500)
-      .attr('height', d3.round(self.barHeight + 0.5))
-      .attr('stroke', function(d, i) { return self.colours(i); })
-      .attr('class', 'timeRange');
+      .enter().append('svg:rect')
+      .each(function(d, i) {
+         d.colour = d.colour || self.colours(i);
+         if(d.type == 'layer')  {
+            d3.select(this).attr('y', (function(d, i) { return d3.round(self.yScale(i) + self.barMargin + 0.5); })(d,i))
+            .transition().duration(500)
+            .attr('height', d3.round(self.barHeight + 0.5))
+            .attr('stroke', (function(d, i) { return d.colour || self.colours(i); })(d,i))
+            .attr('class', 'timeRange');
+         }
+      });
       
    // Time bar removal
    this.bars.exit().remove();
@@ -421,7 +435,7 @@ opec.TimeLine.prototype.redraw = function() {
             // Time Bar
             d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
               .enter().append('svg:line')
-               .attr('stroke', function() { return self.colours(i1); })
+               .attr('stroke', function() { return d1.colour || self.colours(i1); })
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
@@ -455,7 +469,7 @@ opec.TimeLine.prototype.redraw = function() {
              return width;
           })
           .attr("height", function(d, i) { return d3.round(self.laneHeight); })
-          .style("fill", function(d,i) { return self.colours(i); })
+          .style("fill", function(d,i) { return d.colour || self.colours(i); })
           .attr('class', 'data-bar-type--range');
 
    //--------------------------------------------------------------------------
@@ -584,6 +598,8 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    newTimebar.endDate = endDate;
    newTimebar.dateTimes = dateTimes;
    newTimebar.type = 'layer';  
+   newTimebar.hidden = false;
+   newTimebar.colour = '';
    
    this.timebars.push(newTimebar);
    this.layerbars.push(newTimebar);
@@ -603,6 +619,7 @@ opec.TimeLine.prototype.addRangeBar = function(name, callback) {
    newRangebar.selectedEnd = 0;
    newRangebar.y = ''; // So that the y can be specifically set to avoid bugs and complications with other types of timebars
    newRangebar.isDragging = false; // Each bar needs to know if it is being modified so that it doesn't draw over over bars
+   newRangebar.colour = '';
    this.timebars.push(newRangebar);
    this.rangebars.push(newRangebar);
    
@@ -651,8 +668,36 @@ opec.TimeLine.prototype.setDate = function(date) {
    this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
 };
 
-// Get the currently selected date
+// Get the currently selected date 
 opec.TimeLine.prototype.getDate = function() {
    var selectedDate = new Date(this.selectedDate);
    return ((selectedDate instanceof Date) ? selectedDate : null);
 };
+
+opec.TimeLine.prototype.hideRange = function(name)  {
+   var self = this;
+   for (var i = 0; i < this.rangebars.length; i++)  {
+      var r = this.rangebars[i];
+      if (r.name == name)  {
+         self.hiddenRangebars.push(r);
+         self.removeTimeBarByName(name);
+      }
+   }
+}
+ 
+opec.TimeLine.prototype.showRange = function(name)  {
+   var self = this;
+   var tmp = [];
+   $.each(this.hiddenRangebars, function(i, r) { 
+      if(r.name == name)  {
+         self.timebars.push(r);
+         self.rangebars.push(r);
+      }  
+      else {
+         tmp.push(r);
+      }
+   });
+   this.hiddenRangebars = tmp;
+   this.reHeight();
+   this.redraw();  
+}

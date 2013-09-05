@@ -1,6 +1,32 @@
 opec.graphs = {};
 
-opec.graphs.create = function(data) {
+// Options currently requires a title
+opec.graphs.data = function(params, options)  {
+   var request = $.param( params );    
+   // Get graph
+   $.ajax({
+      type: 'GET',
+      url: opec.wcsLocation + request,
+      dataType: 'json',
+      asyc: true,
+      success: function(data) {
+         opec.graphs.create(data, options);
+         console.log("success");
+      },
+      error: function(request, errorType, exception) {
+         var data = {
+            type: 'wcs data',
+            request: request,
+            errorType: errorType,
+            exception: exception,
+            url: this.url
+         };          
+         gritterErrorHandler(data);
+      }
+   });
+}
+
+opec.graphs.create = function(data, options) {
    if(data.error !== "") {
       var d = {
          error: data.error
@@ -27,7 +53,7 @@ opec.graphs.create = function(data) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
+         title: options.title || data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          data: [{
             data: d1.sort(opec.utils.sortDates),
             lines: { show: true },
@@ -71,7 +97,7 @@ opec.graphs.create = function(data) {
    
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
+         title: options.title || data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          data: [num],
          options: barOptions(barwidth),
          selectable: false
@@ -84,7 +110,7 @@ opec.graphs.create = function(data) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
+         title: data.type + " of " + data.displayTitle,
          type: data.type,
          colour: 'redToBlue',
          data: data.output

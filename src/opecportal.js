@@ -147,6 +147,7 @@ opec.getFeature = function(layer, olLayer, time) {
  * Generic Asyc Ajax to save having lots of different ones all over the place.
  * 
  * @param {string} url - The url to use as part of the ajax call
+ * @param {Object} data - The data to be sent
  * @param {Function} success - Called if everything goes ok.
  * @param {Function} error - Called if problems arise from the ajax call.
  * @param {string} dataType - What data type will be returned, xml, json, etc
@@ -725,6 +726,8 @@ opec.main = function() {
    opec.templates.selectionItem = Mustache.compile($('#opec-template-selector-item').text().trim());
    opec.templates.loginBox = Mustache.compile($('#opec-template-login-box').text().trim());
    opec.templates.providerBox = Mustache.compile($('#opec-template-provider-box').text().trim());
+   opec.templates.historyList = Mustache.compile($('#opec-template-history-list').text().trim());
+   opec.templates.historyData = Mustache.compile($('#opec-template-history-data').text().trim());
    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -771,7 +774,8 @@ opec.main = function() {
       dblclick: "collapse"
    });
    
-   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
+   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul')
+   opec.historyWindow = new opec.window.history();
    
    $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
    $('#this-Is-A-Prototype').extendedDialog({

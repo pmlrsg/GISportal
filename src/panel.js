@@ -32,7 +32,7 @@ opec.leftPanel.setup = function() {
          //var order = $("#opec-lPanel-reference").sortable('toArray');                 
          //$.each(order, function(index, value) {
             //var layer = opec.getLayerByID(value);
-            //map.setLayerIndex(layer[0], opec.numBaseLayers + order.length - index - 1);
+            //map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
          //});
       }
    });
@@ -326,7 +326,7 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
       $.each(layerGroupOrder, function(index, value) {
          var layer = opec.getLayerByID(value);
          if(typeof layer !== 'undefined') {
-            var positionOffset = layer.controlID == 'opLayers' ? opec.numBaseLayers : (opec.numBaseLayers + opec.numOpLayers);
+            var positionOffset = layer.controlID == 'opLayers' ? map.numBaseLayers : (map.numBaseLayers + map.numOpLayers);
             
             for(var i = 0, len = layer.order.length; i < len; i++) {
                map.setLayerIndex(layer.openlayers[layer.order[i]], positionOffset + layersBelowOffset + (layerGroupOrder.length - index - 1) + i);
@@ -416,13 +416,21 @@ opec.leftPanel.loadState = function(state) {
  */
 opec.rightPanel = {};
 
+opec.rightPanel.open = function() {
+   $(".rPanel").show("fast");
+   $(".triggerR").addClass("active");
+}
+
+opec.rightPanel.toggle = function() {
+   $(".rPanel").toggle("fast");
+   $(".triggerR").toggleClass("active");
+}
+
 opec.rightPanel.setup = function() {
    
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
-      $(".rPanel").toggle("fast");
-      $(this).toggleClass("active");
-      return false;
+      opec.rightPanel.toggle();
    });
    
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
@@ -745,6 +753,26 @@ opec.rightPanel.setupGraphingTools = function() {
       updateRanges(name);
    });
    
+   $('.js-hideRange').on('click', function() {
+      var option = $('#graphcreator-range option:selected');
+      if(option.data('hidden') == true)  {
+         console.log(option.data('hidden'));
+         opec.timeline.showRange(option.val());
+         option.data('hidden', false);
+      }
+      else  {
+         console.log(option.data('hidden'));
+         opec.timeline.hideRange(option.val());
+         option.data('hidden', true);
+      }
+   });
+   
+   $('.js-deleteRange').on('click', function() {
+      opec.timeline.removeTimeBarByName($('#graphcreator-range option:selected').val());
+      $('#graphcreator-range option:selected').remove();
+   });
+   
+   
    $('.js-updateRange').on('click', function() {
       var selectedStart = $('#graphcreator-time').datepicker('getDate');
       var selectedEnd = $('#graphcreator-time2').datepicker('getDate');
@@ -864,7 +892,7 @@ opec.rightPanel.setupGraphingTools = function() {
          graphYAxis = 'Lat';
       }
       
-      var params = {
+      var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
          coverage: $('#graphcreator-coverage').val(),
          type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
@@ -874,44 +902,25 @@ opec.rightPanel.setupGraphingTools = function() {
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
          graphZAxis: $('#graphcreator-coverage').val()
-      };
-         
-      var request = $.param( params );
+      };      
       
-      var graphJSON = JSON.stringify(params);        
-            
-      // Async post the graph
-      opec.genericAsync('POST', opec.graphLocation, { graph: graphJSON}, function(data, opts) {
+      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[graphParams.coverage].displayTitle;
+      var graphObject = {};
+      graphObject.graphData = graphParams;      
+      graphObject.description = prompt("Please enter a description");
+      graphObject.title = title;
+      
+      // Async post the state
+      opec.genericAsync('POST', opec.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
          console.log('POSTED graph!');
       }, function(request, errorType, exception) {
          console.log('Failed to post graph!');
       }, 'json', {});
       
-      // Get graph
-      $.ajax({
-         type: 'GET',
-         url: opec.wcsLocation + request,
-         dataType: 'json',
-         asyc: true,
-         success: function(data) {
-            opec.graphs.create(data);
-            console.log("success");
-         },
-         error: function(request, errorType, exception) {
-            var data = {
-               type: 'wcs data',
-               request: request,
-               errorType: errorType,
-               exception: exception,
-               url: this.url
-            };          
-            gritterErrorHandler(data);
-         }
-      });
-   }); 
-            
-   // Open the dialog box
-   //graphCreator.extendedDialog('open');   
+      var options = {};
+      options.title = title;
+      opec.graphs.data(graphParams, options);
+   });
 };
 
 opec.rightPanel.setupDataExport = function() {
@@ -1066,9 +1075,9 @@ opec.topbar.setup = function() {
    $('#opec-toolbar-actions')
       .buttonset().children('button:first, input[type="button"]')
       .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
-      .next().button({ disabled: true, label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
       .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
-      .next().button({ disabled: true, label: '', icons: { primary: 'ui-icon-opec-globe'} })
+      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
       .click(function(e) {
          if(map.globe.is3D) {
             map.show2D();
