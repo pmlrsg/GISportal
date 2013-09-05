@@ -125,6 +125,8 @@ opec.layer = function(microlayer, layerData) {
    // Set this to true if the layer has an elevation component
    this.elevation = false;
    
+   this.selectedElevation = null;
+   
    // Elevation default
    this.elevationDefault = null;  
    
@@ -220,6 +222,7 @@ opec.layer = function(microlayer, layerData) {
             layer.elevation = true;
             layer.elevationCache = dimension.Value.split(',');
             layer.mergeNewParams({elevation: value.Default});
+            layer.selectedElevation = value.Default;
             layer.elevationDefault = value.Default;
             layer.elevationUnits = value.Units;
          }

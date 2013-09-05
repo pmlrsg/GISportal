@@ -419,10 +419,11 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
       menuOutput['Layer Elevation ' + index] = {
          name: parseFloat(value).toFixed(3) + " " + layer.elevationUnits,
          // Ignore Lint warning
-         className: value == layer.params['ELEVATION'] ? 'elevationSelected' : "",
+         className: value == layer.selectedElevation ? 'elevationSelected' : "",
          callbackName: 'Layer Elevation ' + value,
          callback: function() {
             var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+            layer.selectedElevation = value;
             layer.mergeNewParams({elevation: value});
          }
       };
