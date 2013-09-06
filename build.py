@@ -23,6 +23,8 @@ if sys.platform == 'win32':
    variables.PYTHON = 'C:/Python27/python.exe'
 else:
    variables.JAVA = 'java'
+   variables.JAR = 'jar'
+   variables.JSDOC = 'jsdoc'
    variables.PYTHON = 'python'
 
 SPEC = [path
@@ -40,15 +42,17 @@ HTML = [path
 # Reorder to move opecportal.js to the front
 SRC.remove('src/opecportal.js')
 SRC.insert(0, 'src/opecportal.js')
+# Reorder to move opec to the back
 SRC.remove('src/opec.js')
 SRC.append('src/opec.js')
 
-JSDOC = 'lib/jsdoc/jsdoc'
-PLOVR_JAR = 'lib/plovr/plovr-81ed862.jar'
-UGLIFYJS = '/local1/data/scratch/node-v0.8.18-linux-x64/node_modules/uglifyjs/bin/uglifyjs'
-YUICOMPRESSOR = 'lib/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar'
-CSS = 'html/static/css/'
+JSDOC = 'lib/jsdoc/jsdoc' # Used to build javadoc
+PLOVR_JAR = 'lib/plovr/plovr-81ed862.jar' # Used to build minjs
+UGLIFYJS = '/local1/data/scratch/node-v0.8.18-linux-x64/node_modules/uglifyjs/bin/uglifyjs' # Not used anymore, but can be
+YUICOMPRESSOR = 'lib/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar' # Used to build css
+CSS = 'html/static/css/' # css location 
 
+# -----------------------------------------------------------------------------
 def report_sizes(t):
    t.info('uncompresses: %d bytes', os.stat(t.name).st_size)
    stringio = StringIO()
@@ -57,18 +61,26 @@ def report_sizes(t):
       shutil.copyfileobj(f, gzipfile)
    gzipfile.close()
    t.info('   compressed: %d bytes', len(stringio.getvalue()))
-   
+
+# -----------------------------------------------------------------------------
+
+# normal build plus doc
 virtual('build-all', 'build', 'doc')
-   
+
+# normal build
 virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build')
 
+# dev build
 virtual('dev', 'js', 'css', 'images', 'replace-dev')
 
-
+# -----------------------------------------------------------------------------
 virtual('minjs', 'html/static/OPECPortal.min.js')
 @target('html/static/OPECPortal.min.js', PLOVR_JAR, 'opec_all.js')
 def build_min_opec_js(t):
+   t.info('Minifying JS')
    t.output('%(JAVA)s', '-jar', PLOVR_JAR, 'build', 'opec_all.js')
+   report_sizes(t)
+   t.info('Finished minifying JS')
 
 virtual('js', 'html/static/OPECPortal.js')
 @target('html/static/OPECPortal.js', SRC)
@@ -82,6 +94,7 @@ def build_opec_js(t):
          destination.write('\n')
    destination.close()
    t.info('finished')
+# -----------------------------------------------------------------------------
 
 virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
 @target('html/static/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
@@ -99,10 +112,13 @@ def build_html(t):
          destination.write(file.read())
          destination.write('\n')
          
-virtual('mincss', 'target-mincss')
-@target('target-mincss', YUICOMPRESSOR, phony=True)
+# -----------------------------------------------------------------------------       
+virtual('mincss', 'html/static/css/OPECPortal.min.css')
+@target('html/static/css/OPECPortal.min.css', YUICOMPRESSOR)
 def build_min_opec_css(t):
-   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')   
+   t.info('Minifying CSS')
+   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')
+   t.info('Finished minifying JS')
          
 virtual('css', 'target-css')
 @target('target-css', YUICOMPRESSOR, phony=True)
@@ -118,7 +134,8 @@ def build_opec_css(t):
          destination.write(file.read())
          destination.write('\n')
    destination.close()
-   t.info('Finished building CSS.')
+   t.info('Finished building CSS')
+# -----------------------------------------------------------------------------
    
 virtual('images', 'build_images')
 @target('build_images', phony=True)
@@ -142,7 +159,7 @@ def build_opec_images(t):
             if os.path.exists(dst_file):
                 os.remove(dst_file)
             shutil.copy(src_file, dst_dir)
-   t.info('Finished moving images.')
+   t.info('Finished moving images')
     
 virtual('doc', 'jsdoc')
 @target('jsdoc', SRC, phony=True)
@@ -175,8 +192,8 @@ def replacePath(t, env):
                elif env == 'dev':
                   destination.write(string.replace(line, path["to"], path["from"]))
    shutil.move('html/static/index.new.html', 'html/static/index.html')
-   t.info('Finished replacing paths.')
- 
+   t.info('Finished replacing paths')
+
 '''
 Taken from ol3 build.py 
 https://github.com/openlayers/ol3/blob/master/build.py
