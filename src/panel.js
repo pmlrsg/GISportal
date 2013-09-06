@@ -909,7 +909,8 @@ opec.rightPanel.setupGraphingTools = function() {
       var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage-real').val()].displayTitle;
       var graphObject = {};
       graphObject.graphData = graphParams;      
-      graphObject.description = prompt("Please enter a description");
+      //graphObject.description = prompt("Please enter a description");
+      graphObject.description = '';
       graphObject.title = title;
       
       // Async post the state
