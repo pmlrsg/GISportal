@@ -379,7 +379,7 @@ ul li {
 } 
 
 a.trigger {
-   z-index:99999;
+   z-index:9999;
    position: absolute;
    text-decoration: none;
    top: 0px;
@@ -1031,6 +1031,13 @@ div .sensor-accordion {
 /* ======= Unselectable ======= */
 
 .unselectable {
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+div.olMapViewport {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;

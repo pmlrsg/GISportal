@@ -160,3 +160,91 @@ opec.utils.isNullorUndefined = function(object) {
    
    return false;
 };
+
+/* Taken from:
+ *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
+ *    Apache 2.0 License
+ * 
+ * Computes the size of the window contents. Returns a pair of
+ * coordinates [width, height] which can be [0, 0] if it was not possible
+ * to compute the values.
+ */
+opec.utils.getWindowInnerSize = function() {
+  var width = 0;
+  var height = 0;
+  var elem = null;
+  if ('innerWidth' in window) {
+    // For non-IE
+    width = window.innerWidth;
+    height = window.innerHeight;
+  } else {
+    // For IE,
+    if (('BackCompat' === window.document.compatMode)
+        && ('body' in window.document)) {
+        elem = window.document.body;
+    } else if ('documentElement' in window.document) {
+      elem = window.document.documentElement;
+    }
+    if (elem !== null) {
+      width = elem.offsetWidth;
+      height = elem.offsetHeight;
+    }
+  }
+  return [width, height];
+};
+
+/* Taken from:
+ *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
+ *    Apache 2.0 License
+ * 
+ * Computes the coordinates of the parent window.
+ * Gets the coordinates of the parent frame.
+ */
+opec.utils.getParentCoords = function() {
+  var width = 0;
+  var height = 0;
+  if ('screenLeft' in window) {
+    // IE-compatible variants
+    width = window.screenLeft;
+    height = window.screenTop;
+  } else if ('screenX' in window) {
+    // Firefox-compatible
+    width = window.screenX;
+    height = window.screenY;
+  }
+  return [width, height];
+};
+
+/* Taken from:
+ *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
+ *    Apache 2.0 License
+ * 
+ * Computes the coordinates of the new window, so as to center it
+ * over the parent frame.
+ */
+opec.utils.getCenteredCoords = function(width, height) {
+   var parentSize = opec.utils.getWindowInnerSize();
+   var parentPos = opec.utils.getParentCoords();
+   var xPos = parentPos[0] +
+       Math.max(0, Math.floor((parentSize[0] - width) / 2));
+   var yPos = parentPos[1] +
+       Math.max(0, Math.floor((parentSize[1] - height) / 2));
+   return [xPos, yPos];
+};
+
+opec.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
+   if(onOpenHandler !== null) {
+      onOpenHandler();
+   }
+   
+   var coordinates = opec.utils.getCenteredCoords(width, height);
+   var popupWindow = window.open(url, "", 
+      "width=" + width + 
+      ", height=" + height + 
+      ", status = 1, location = 1, resizable = yes" + 
+      ", left=" + coordinates[0] + 
+      ", top=" + coordinates[1]
+   );
+   var interval = window.setInterval(checkforCloseHandler, 80);
+   return {'popupWindow':popupWindow, 'interval': interval};
+};

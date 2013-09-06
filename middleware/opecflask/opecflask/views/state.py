@@ -41,7 +41,55 @@ def getState(stateUrl):
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      abort(400) # If we fail to jsonify the data return 500
+      abort(500) # If we fail to jsonify the data return 500
+      
+@portal_state.route('/state/<stateUrl>', methods = ['DELETE'])
+def removeState(stateUrl):
+   # Check if the user is logged in.
+   if g.user is None:
+      abort(401)
+  
+   email = g.user.email
+   # Decode url into a number to match to a state
+   stateID = short_url.decode_url(stateUrl)
+   
+   output = {}
+   
+   if email is None or stateID is None:
+      output['status'] = 'Failed to remove state'
+      output['email'] = email
+      output['stateID'] = stateID
+   else:
+      # Might be able to use 'g.user' instead. Only reason I havn't is I'm not 
+      # sure on the reliability of it.
+      user = User.query.filter(User.email == email).first()
+      
+      if user is None: 
+         # Create new user
+         user = User(email)
+         db_session.add(user)
+         db_session.commit()
+      
+      state = user.states.filter(State.id == stateID).first()
+      
+      if state != None:
+         db_session.delete(state)
+         db_session.commit()
+         
+         output['message'] = 'Successfully removed state.'
+         output['status'] = '200'
+         
+      else:
+         output['message'] = 'Failed to remove state as no state with that ID could be found.'
+         output['status'] = '404'
+         
+   try:
+      jsonData = jsonify(output = output)
+      #current_app.logger.debug('Request complete, Sending results') # DEBUG
+      return jsonData
+   except TypeError as e:
+      g.error = "Request aborted, exception encountered: %s" % e
+      abort(500) # If we fail to jsonify the data return 500
       
 @portal_state.route('/state', methods = ['GET'])     
 def getStates():
@@ -52,18 +100,21 @@ def getStates():
    #TODO: Return available states filtered by email or other provided parameters.
    email = g.user.email
    
-   if email is None:   
-      return 'You need to enter an email'
-      
-   user = User.query.filter(User.email == email).first()
-   if user is None:
-      return 'No user with that email.'
-   
-   states = user.states.all()
-   
    output = {}
-   for state in states:
-      output[short_url.encode_url(state.id)] = stateToJSON(state)
+   
+   if email is None:  
+      output['message'] = 'You need to enter an email'
+      output['status'] = '400'
+   else: 
+      user = User.query.filter(User.email == email).first()
+      if user is None:
+         output['message'] = 'No user with that email.'
+         output['status'] = '400'
+      else:
+         states = user.states.all()
+    
+         for state in states:
+            output[short_url.encode_url(state.id)] = stateToJSON(state)
 
    try:
       jsonData = jsonify(output = output)
@@ -71,7 +122,7 @@ def getStates():
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      abort(400) # If we fail to jsonify the data return 500
+      abort(500) # If we fail to jsonify the data return 500
    
      
 @portal_state.route('/state', methods = ['POST'])      
@@ -80,18 +131,20 @@ def setState():
    if g.user is None:
       abort(401)
    
-   print g.user
    email = g.user.email
    state = request.values.get('state', None)
    
    output = {}
    
    if email is None or state is None:
-      output['status'] = 'failed to store state'
+      output['message'] = 'failed to store state'
       output['email'] = email
       output['state'] = state
+      output['status'] = '404'
    else:
-      user = User.query.filter(User.email == email).first()
+      # Might be able to use 'g.user' instead. Only reason I havn't is I'm not 
+      # sure on the reliability of it.
+      user = User.query.filter(User.email == email).first() 
       
       if user is None: 
          # Create new user
@@ -100,11 +153,17 @@ def setState():
          db_session.commit()
               
       s = State(user.id, state)
-      db_session.add(s)
-      db_session.commit()
-   
-      output['url'] = short_url.encode_url(s.id)
-      output['status'] = 'state stored'
+      checksumMatch = user.states.filter(State.checksum == s.checksum).first()
+      if checksumMatch == None:
+         db_session.add(s)
+         db_session.commit()
+          
+         output['url'] = short_url.encode_url(s.id)
+         output['message'] = 'state stored'
+         output['status'] = '200'
+      else:
+         output['message'] = 'Failed to add state as state already exists'
+         output['status'] = '400'
    
    try:
       jsonData = jsonify(output = output)
@@ -112,7 +171,11 @@ def setState():
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      abort(400) # If we fail to jsonify the data return 500
+      abort(500) # If we fail to jsonify the data return 500
+   
+def compareChecksum(hexdigest1, hexdigest2):
+   return hexdigest1 == hexdigest2
+   
       
 def stateToJSON(state):
    output = {}
