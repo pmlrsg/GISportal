@@ -59,16 +59,60 @@ To Be Completed
 
 ## First Steps | Linux ##
 
-1. First we need to check out the repository.  
+1. **Checkout Repository**  
+First we need to check out the repository.  
 ``svn checkout http://rsg.pml.ac.uk/intranet/svnroots/opec/WP6/OpEcVis foldername``
 
-2. Next we need to install all the required libraries. This can be done in a few ways, the easiest using **pip** and the ``requirements.txt``. There are two ``requirements.txt``, one for the libraries need to run the caching scripts
+2. **Install Required Libraries**
+Next we need to install all the required libraries. This can be done in a few ways, the easiest using **pip** and the ``requirements.txt``. There are two ``requirements.txt``, one for the libraries need to run the caching scripts
 **Note:** Make sure you are in the correct directory  
 ``pip install -r requirements.txt``
 
-3. Finally we need build the page and all the documentation.  
-``build.py build-all``  
-This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
+3. **Build JavaScript/CSS**  
+The JavaScript and CSS need to be minifed. This is done with a build script. This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
+``build.py build``  
+**Notes**  
+Java 7 is required for the build process.  
+Make sure you are in the same directory as ``build.py``.  
+
+4. **Set Correct Path For Database Creation**  
+Edit path in `manage.py` to point to the absolute location of itself. `manage.py` is located at `middleware/opecflask`.  
+**Example**  
+`path = '/var/www/html/opecvis/middleware/opecflask'`  
+**Notes**  
+`/opecflask/user_storage.db` will be appended automatically to the path for the database location.  
+
+5. **Create database**  
+Make sure you are in ``middleware/opecflask``  
+Run ``python manage.py syncdb`` as apache (or make accessible to apache) to create the database.
+
+6. **Check WSGI Path**  
+Check the path in the ``wvastportal.wsgi`` points to the absolute location of the **WSGI** file.
+
+7. **Tell Apache About The WSGI File**  
+In the Apache ``.conf`` file you need to add these lines and change any paths to match your system.  
+**Notes**  
+This step assumes you have already setup the **wsgi_module** for apache. If not see appendix DOES NOT EXIST YET.
+
+        
+        WSGIDaemonProcess opecflask threads=5
+        WSGIScriptAlias /service "/path/to/wsgi/file/example.wsgi"
+        WSGISocketPrefix run/wsgi
+        
+        <Directory /path/to/wsgi/directory>
+                WSGIProcessGroup opecflask
+                WSGIApplicationGroup %{GLOBAL}
+                Order deny,allow
+                Allow from all
+        </Directory>
+        
+
+8. **Reload Apache**  
+Apache runs an instance of the application and does not auto reload on any changes. The easiest way depending on your setup is to reload the Apache configs and then touch the ``.wsgi`` file for any changes made in future.  
+`sudo service httpd reload` - reload Apache configs  
+`touch wvastportal.wsgi` - touching the file will restart the daemon process  
+**Notes**  
+It is very likely that the commands for apache will be different for you depending on what platform you are using and your setup.
 
 ## Folder Structure ##
 **doc** - location where jsdoc3 will create the javadoc.  
