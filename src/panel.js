@@ -805,9 +805,11 @@ opec.rightPanel.setupGraphingTools = function() {
    
    // Check for changes to the selected layer
    $('.lPanel').bind('selectedLayer', function(e) {
-      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      var layerID = $('.selectedLayer:visible').attr('id');
+      var layer = opec.getLayerByID(layerID);
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage').val(layer.origName);
+      $('#graphcreator-coverage-real').val(layerID);      
    });
    
    graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
@@ -832,7 +834,7 @@ opec.rightPanel.setupGraphingTools = function() {
          if($(this).is(':checked')) {
             var layerID = $(this).parent('li').attr('id');
             var layer = opec.getLayerByID(layerID);
-            $('#graphcreator-coverage').val(layer.origName);          
+            $('#graphcreator-coverage').val(layer.origName);    
             $('#graphcreator-baseurl').val(layer.wcsURL);   
          }
       });
@@ -904,7 +906,7 @@ opec.rightPanel.setupGraphingTools = function() {
          graphZAxis: $('#graphcreator-coverage').val()
       };      
       
-      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[graphParams.coverage].displayTitle;
+      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage-real').val()].displayTitle;
       var graphObject = {};
       graphObject.graphData = graphParams;      
       graphObject.description = prompt("Please enter a description");
