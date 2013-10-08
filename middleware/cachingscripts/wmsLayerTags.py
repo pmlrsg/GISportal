@@ -8,6 +8,15 @@ layers = {
          'interval': '3 hours'
       }                
    },
+   'dmi': {
+      # Layer name 
+      'chl': {
+         'niceName': 'Chlorophyll',
+         'type': 'Chlorophyll',
+         'region': ('Baltic','North Sea'),
+         'interval': 'Monthly'
+      }                
+   },
                   
    'ccitim': {
       'chlor_a': {
