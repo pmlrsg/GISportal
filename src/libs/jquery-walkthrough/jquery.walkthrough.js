@@ -19,7 +19,7 @@
    var _current;
    var _dom;
    var _template;
-   var _linkPrev, _linkNext; // Used for click handlers
+   var _linkPrev, _linkNext, _linkClose; // Used for click handlers
    var _domLoaded = false;
    var _options;
    
