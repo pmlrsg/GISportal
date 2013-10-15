@@ -162,7 +162,7 @@
                currentDOM.offset({ left: (bindingPosition.left + binding.innerWidth()/2) - (currentDOM.innerWidth()/2), top: distanceTop + binding.innerHeight() });
                currentDOM.addClass("arrow up");
             }
-            else if (distanceLeft > distanceRight ) {
+            else if ( distanceLeft > distanceRight) {
                currentDOM.offset({ left: distanceLeft - 15, top: bindingPosition.top });
                currentDOM.addClass("arrow right");
             }
@@ -173,8 +173,8 @@
             
             if (currentDOM.position().left < 0)  currentDOM.offset({ left: 0});
             if (currentDOM.position().top < 0)  currentDOM.offset({ top: 0});
-            if (currentDOM.position().right > document.width)  currentDOM.offset({ top: document.height - currentDOM.innerHeight()});
-            if (currentDOM.position().bottom > document.height)  currentDOM.offset({ right: document.width - currentDOM.innerWidth()});
+            if (currentDOM.position().right > document.width)  currentDOM.offset({ right: document.width - currentDOM.innerWidth()});
+            if (currentDOM.position().bottom > document.height)  currentDOM.offset({ top: document.height - currentDOM.innerHeight()});
             
             
          }
