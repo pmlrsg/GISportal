@@ -97,8 +97,9 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       var $layer = $(layer);
       if (typeof extraInfo.tags !== 'undefined' && extraInfo.tags !== null) {
          for(var tag in extraInfo.tags) {
-            if(extraInfo.tags[tag] !== null)  
-               $layer.attr('data-' + tag, extraInfo.tags[tag]);     
+            if(extraInfo.tags[tag] !== null)  {
+            	$layer.attr('data-' + tag, extraInfo.tags[tag]);
+            }
          }
       }
       
@@ -116,6 +117,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
             // DEBUG
             console.log("Adding layer...");
             opec.addLayer(opec.getLayerByID(layerID));
+            
             // DEBUG
             console.log("Added Layer");
          } else {
@@ -130,7 +132,6 @@ opec.window.layerSelector = function(placeholderID, containerID) {
                opec.addLayer(layer);
             }
          }
-            
          self.toggleLayerSelection(li);
       }
       else {

@@ -164,6 +164,9 @@
       <div id="{{name}}-reset" class="scalebar-reset">
          <input type="button" name="{{name}}-reset-button" title="Reset the scale to the default values" value="Reset Scale" />
       </div>
+      <div id="{{name}}-auto" class="scalebar-auto">
+         <input type="button" name="{{name}}-auto-button" title="Set the scale automatically" value="Auto Scale" />
+      </div>
       <div>
          <label for="{{name}}-min">Minimum Value: </label>
       </div>
@@ -213,7 +216,7 @@
                <input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path" />
             </div>
             <div>
-               <label for="graphcreator-coverage-label">Coverage:</label>
+               <label for="graphcreator-coverage-label">Layer:</label>
             </div>
             <div> 
                <input id="graphcreator-coverage-real" class="hidden" title="Real Name of the Coverage" placeholder="Real Name of the Coverage" type="text" name="graphcreator-coverage-real" />
@@ -320,10 +323,25 @@
       </div>
    </li>
 </script>
+
+<!-- Walkthrough -->
+<script type="text/html" id="opec-walkthrough">
+   <li class="{{ classes }} ui-dialog" data-id="{{ id }}">
+   	<button class="js-walkthrough-close ui-dialog-titlebar-close">Close</button>
+      {{{ content }}}
+      <span class="ui-icon next right">Next</span>
+   </li>
+</script>
+
+<!-- Walkthrough Menu -->
+<script type="text/html" id="opec-walkthrough-menu">
+	<li><a href="#{{ id }}">{{ name }}</a></li>
+</script>
+
 <!-- ====================================================================== -->
 
 </head>
-<body>
+<body role="application">
    <!-- CSS check and info for screen readers -->
    <div id="nocss-info">
       <h1>OPEC Portal</h1>
@@ -376,11 +394,11 @@
          </li>
          <li class="divider"></li>
          <li id="opec-toolbar-actions" class="opec-toolbar-buttonpane">
-            <button id="mapInfoToggleBtn"></button>
-            <input type="checkbox" id="shareMapToggleBtn" /><label class="opec-iconBigBtn" for="shareMapToggleBtn" title="Open Share Panel"></label>
-            <button id="layerPreloader"></button>
-            <input type="checkbox" id="opec-button-3d" /><label class="opec-iconBigBtn" for="opec-button-3d" title="Go To 3D Mode!"></label>
-            <button id="infoToggleBtn"></button>
+            <input type="checkbox" id="mapInfoToggleBtn" /><label class="opec-iconBigBtn" for="mapInfoToggleBtn" title="Toggle Map Info"></label>
+            <input type="checkbox" id="shareMapToggleBtn" /><label class="opec-iconBigBtn" for="shareMapToggleBtn" title="Toggle Share Panel"></label>
+            <input type="checkbox" id="layerPreloader" /><label class="opec-iconBigBtn" for="layerPreloader" title="Toggle Layer Selection Panel"></label>
+            <input type="checkbox" id="opec-button-3d" /><label class="opec-iconBigBtn" for="opec-button-3d" title="Toggle 3D Mode"></label>
+            <input type="checkbox" id="infoToggleBtn" /><label class="opec-iconBigBtn" for="infoToggleBtn" title="Toggle OPEC Information Box"></label>
          </li>
       </ul>
       <div class="togglePanel">
@@ -535,13 +553,9 @@
    	<h3>Share Your Data! Track Your Progress!</h3>
    </div>
    
-   <!-- CLONE: change branding here -->
-   <div id="info" class="unselectable" title="Information">
-      <a href="http://www.marineopec.eu" target="_new" name="OpEc Main Web Site" rel="external"> <img src="img/OpEc_small.png" alt="OpEc (Operational Ecology) Logo" /></a>
-      <a href="http://cordis.europa.eu/fp7/home_en.html" target="_new" name="European Union Seventh Framework Programme" rel="external"> <img src="img/fp7_small.png" alt="European Union FP7 Logo" /></a>
-      <p>&copy;2013 PML Applications Ltd<br/>
-      EU Project supported within DG SPACE for the 7th Framework Programme for Cooperation.</p>
-      <div style="clear: both;"> </div>
+   <div id="walkthrough-menu" class="unselectable" title="Help">
+   	<p>Interactive guides:</p>
+		<ul></ul>   	
    </div>
    <!-- ====================================================================== -->
    
@@ -574,6 +588,7 @@
       <div id="opec-historyWindow-tabs" class="panel-toolbar ui-helper-reset opec-tab-group ui-corner-top">
          <button id="opec-historyWindow-tab-States" class="opec-tab" href="#opec-historyWindow-states">States</button>
          <button id="opec-historyWindow-tab-Graphs" class="opec-tab" href="#opec-historyWindow-graphs">Graphs</button>  
+         <button id="opec-historyWindow-tab-Refresh" class="right" href="#opec-historyWindow-refresh">Refresh</button>  
       </div>
       <div id="opec-historyWindow-content">
          <div id="opec-historyWindow-states" class="opec-tab-content ui-corner-top">
@@ -602,5 +617,10 @@
       </div>
    </div>
    <div id="dThree" title="D3 Test"></div>
+   
+   <ul id="walkthrough"></ul>
+   
+   <div id="js-walkthrough-confirm">Would you like this walkthrough to appear next time you visit?</div>
+   
 </body>
 </html>

@@ -1,0 +1,83 @@
+#walkthrough li.active  {
+   background: rgba(0,0,0,0.8);
+   border-radius: 4px;
+   cursor: pointer;
+   display: block;
+   position: absolute;
+   max-width: 45%;
+   left: 100px;
+   top: 100px;
+   padding: 25px;
+   z-index: 10002;
+}
+
+#walkthrough li.active:last-of-type  {
+	cursor: default;
+}
+
+#walkthrough li.active .js-walkthrough-buttons  {
+   margin-top: 20px; 	
+}
+
+#walkthrough li.active .js-walkthrough-next  {
+   float: right;
+}
+
+.js-walkthrough-close.ui-dialog-titlebar-close  {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+}
+
+#walkthrough .ui-icon.next  {
+	background-position: -49px -192px;
+	background-image: url(images/ui-icons_222222_256x240.png);
+}
+
+
+#walkthrough li.active:last-of-type .ui-icon.next  {
+	display: none;
+}
+
+/* TODO: Switch to class */
+[aria-describedby="js-walkthrough-confirm"] {
+	z-index: 10003;
+}
+
+.arrow::before  {
+   border: solid transparent;
+   border-color: rgba(0, 0, 0, 0);
+   border-width: 10px;
+   content: " ";
+   height: 0;
+   margin-top: -10px;
+   pointer-events: none;
+   position: absolute;
+   top: 50%;
+   width: 0;
+}
+
+.arrow.left::before  {
+   border-right-color: rgba(0,0,0,0.8);
+   right: 100%;
+}
+
+.arrow.right::before  {
+   border-left-color: rgba(0,0,0,0.8);
+   left: 100%;
+}
+
+
+.arrow.down::before  {
+   border-top-color: rgba(0,0,0,0.8);
+   top: 100%;
+   left: 50%;
+   margin-top: 0;
+}
+
+.arrow.up::before  {
+   border-bottom-color: rgba(0,0,0,0.8);
+   top: 0;
+   left: 50%;
+   margin-top: -20px;
+}

@@ -55,6 +55,7 @@ opec.selection.bbox = undefined;
 
 opec.layerSelector = null;
 opec.timeline = null;
+opec.walkthrough = null;
 
 // Predefined map coordinate systems
 opec.lonlat = new OpenLayers.Projection("EPSG:4326");
@@ -728,6 +729,10 @@ opec.main = function() {
    opec.templates.providerBox = Mustache.compile($('#opec-template-provider-box').text().trim());
    opec.templates.historyList = Mustache.compile($('#opec-template-history-list').text().trim());
    opec.templates.historyData = Mustache.compile($('#opec-template-history-data').text().trim());
+   opec.templates.walkthrough = Mustache.compile($('#opec-walkthrough').text().trim());
+   opec.templates.walkthroughMenu = Mustache.compile($('#opec-walkthrough-menu').text().trim());
+
+   opec.walkthrough = new opec.Walkthrough(); // uses templates.walkthrough so needs to run after
    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -752,7 +757,7 @@ opec.main = function() {
    });*/
    
    // Need to render the jQuery UI info dialog before the map due to z-index issues!
-   $('#info').extendedDialog({
+   $('#walkthrough-menu').extendedDialog({
       position: ['left', 'bottom'],
       width: 245,
       height: 220,
@@ -774,29 +779,9 @@ opec.main = function() {
       dblclick: "collapse"
    });
    
-   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul')
+   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
    opec.historyWindow = new opec.window.history();
-   
-   $(document.body).append('<div id="this-Is-A-Prototype" title="This is a prototype, be nice!"><p>This is a prototype version of the OPEC (Operational Ecology) Marine Ecosystem Forecasting portal and therefore may be unstable. If you find any bugs or wish to provide feedback you can find more info <a href="http://trac.marineopec.eu/wiki" target="_blank">here</a>.</p></div>');
-   $('#this-Is-A-Prototype').extendedDialog({
-      position: ['center', 'center'],
-      width: 300,
-      height: 230,
-      resizable: false,
-      autoOpen: true,
-      modal: true,
-      showHelp: false,
-      buttons: {
-         "Ok": function() {
-            $(this).extendedDialog("close");
-         }
-      },
-      close: function() {
-         // Remove on close
-         $('#this-Is-A-Prototype').remove(); 
-      }
-   });
-   
+
    // Setup the gritter so we can use it for error messages
    opec.gritter.setup();
 
@@ -830,6 +815,25 @@ opec.main = function() {
    }
 };
 
+
+opec.getTopLayer = function() {
+	var layer = null;
+	$.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
+      if($(this).is(':checked')) {
+         var layerID = $(this).parent('li').attr('id');
+         layer = opec.getLayerByID(layerID);
+      }
+   });
+   return layer;
+};
+
+opec.updateLayerData = function(layerID)  {
+   var layer = opec.getLayerByID(layerID);
+   $('#graphcreator-baseurl').val(layer.wcsURL);
+   $('#graphcreator-coverage').val(layer.origName);
+   $('#graphcreator-coverage-real').val(layerID);      
+};
+   
 // ----------------------------------------------------------------------------
 
 /**

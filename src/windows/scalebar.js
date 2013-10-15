@@ -67,6 +67,14 @@ opec.window.createScalebar = function($trigger) {
       validateScale(layer, layer.origMinScaleVal , layer.origMaxScaleVal, true);
    });
    
+   // Event to automatically set the scale if the "Auto Scale" button is pressed
+   $('#' + layer.id + '-auto').on('click', '[type="button"]', function(e) {     
+   	opec.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent('http://vostok.npm.ac.uk:8080/thredds/wms/PML-M-AGGSLOW?item=minmax&layers=' + opec.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=-1&time=2003-12-16T12%3A00%3A00.000Z&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
+   		validateScale(layer, d.min, d.max, true);
+   	}, null, 'json', {});                          
+      
+   });
+   
    // Event to recalculate the scale if the "Recalculate Scale" button is pressed
    $('#' + layer.id + '-scale').on('click', '[type="button"]', function(e) {                              
       var scaleRange = getScaleRange(layer.minScaleVal, layer.maxScaleVal);

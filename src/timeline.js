@@ -683,7 +683,7 @@ opec.TimeLine.prototype.hideRange = function(name)  {
          self.removeTimeBarByName(name);
       }
    }
-}
+};
  
 opec.TimeLine.prototype.showRange = function(name)  {
    var self = this;
@@ -700,4 +700,4 @@ opec.TimeLine.prototype.showRange = function(name)  {
    this.hiddenRangebars = tmp;
    this.reHeight();
    this.redraw();  
-}
+};

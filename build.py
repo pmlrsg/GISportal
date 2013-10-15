@@ -86,10 +86,13 @@ virtual('js', 'html/static/OPECPortal.js')
 @target('html/static/OPECPortal.js', SRC)
 def build_opec_js(t):
    t.info('building non-compiled version')
+   opec_js = open('opec_js.json', 'r')
+   json_js = json.load(opec_js)
+   opec_js.close()
    destination = open('html/static/OPECPortal.js', 'wb')
-   for filename in SRC:
-      #shutil.copyfileobj(open(filename, 'r'), destination)
+   for filename in json_js["files"]:
       with open(filename, 'rb') as file:
+         t.info("JS - adding " + filename)
          destination.write(file.read())
          destination.write('\n')
    destination.close()

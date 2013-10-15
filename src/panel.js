@@ -4,6 +4,16 @@
  */
 opec.leftPanel = {};
 
+opec.leftPanel.open = function() {
+   $(".lPanel").show("fast");
+   $(".triggerL").addClass("active");
+}
+
+opec.leftPanel.toggle = function() {
+   $(".lPanel").toggle("fast");
+   $(".triggerL").toggleClass("active");
+}
+
 opec.leftPanel.setup = function() {
    //$('#refLayers').multiOpenAccordion({
    //   active: 0
@@ -46,9 +56,7 @@ opec.leftPanel.setup = function() {
    //Hook up the other events for the general UI
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
-      $(".lPanel").toggle("fast");
-      $(this).toggleClass("active");
-      return false;
+		opec.leftPanel.toggle();
    });
    
    // Left slide panel buttons
@@ -280,7 +288,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
       );
 
       layer.$layer = $('#' + layer.id);
-      
+      opec.updateLayerData(layer.id);
       // Remove the dummy layer
       //removeDummyHelpLayer()
    }
@@ -463,6 +471,9 @@ opec.rightPanel.setup = function() {
       }).hide('fast');
       $(tabToShow).show('fast');
    });
+   
+   $('#opec-button-analyses').click(); // show analyses first
+   $('#opec-tab-analyses > h3').click(); // show graphing first
    
    opec.rightPanel.setupDrawingControls();
    opec.rightPanel.setupGraphingTools();
@@ -649,6 +660,20 @@ opec.rightPanel.setupDrawingControls = function() {
    
 };
 
+
+opec.rightPanel.updateRanges = function(label)  {
+   // Populate range from rangebars
+   $('#graphcreator-range option').remove();
+   $('#graphcreator-range').append('<option>Select a Range</option>');
+   for(var i = 0; i < opec.timeline.rangebars.length; i++) {
+      $('#graphcreator-range').append('<option value="' + opec.timeline.rangebars[i].name + '">' + opec.timeline.rangebars[i].label + '</option>');
+   }
+   if (label)  {
+      var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
+      $("#graphcreator-range option[value='" + d[0].name + "']").attr('selected', 'selected');
+   }
+};
+
 /**
  * Sets up the graphing tools.
  */
@@ -702,7 +727,8 @@ opec.rightPanel.setupGraphingTools = function() {
             }
          }
          return opec.allowedDays(date); 
-      }
+      },
+      yearRange: "1970:2020"
    });
    
    $('#graphcreator-time2').datepicker({
@@ -718,7 +744,8 @@ opec.rightPanel.setupGraphingTools = function() {
             }
          }
          return opec.allowedDays(date); 
-      }
+      },
+      yearRange: "1970:2020"
    });
    // Set the datepicker controls to the current view date if set
    var viewDate = $('#viewDate').datepicker('getDate');
@@ -750,7 +777,7 @@ opec.rightPanel.setupGraphingTools = function() {
    $('.js-newRange').on('click', function() {
       var name = prompt("Please give a label for this range bar.");
       opec.timeline.addRangeBar(name);
-      updateRanges(name);
+      self.updateRanges(name);
    });
    
    $('.js-hideRange').on('click', function() {
@@ -779,19 +806,6 @@ opec.rightPanel.setupGraphingTools = function() {
       opec.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
       opec.timeline.redraw();
    });
-   
-   function updateRanges(label)  {
-      // Populate range from rangebars
-      $('#graphcreator-range option').remove();
-      $('#graphcreator-range').append('<option>Select a Range</option>');
-      for(var i = 0; i < opec.timeline.rangebars.length; i++) {
-         $('#graphcreator-range').append('<option value="' + opec.timeline.rangebars[i].name + '">' + opec.timeline.rangebars[i].label + '</option>');
-      }
-      if (label)  {
-         var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
-         $("#graphcreator-range option[value='" + d[0].name + "']").attr('selected', 'selected');
-      }
-   }
  
    var layerID = $('.selectedLayer:visible').attr('id');
    
@@ -804,12 +818,9 @@ opec.rightPanel.setupGraphingTools = function() {
    }
    
    // Check for changes to the selected layer
-   $('.lPanel').bind('selectedLayer', function(e) {
+   $('.lPanel').on('change', '.selectedLayer', function(e) {
       var layerID = $('.selectedLayer:visible').attr('id');
-      var layer = opec.getLayerByID(layerID);
-      $('#graphcreator-baseurl').val(layer.wcsURL);
-      $('#graphcreator-coverage').val(layer.origName);
-      $('#graphcreator-coverage-real').val(layerID);      
+      opec.updateLayerData(layerID);
    });
    
    graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
@@ -830,15 +841,9 @@ opec.rightPanel.setupGraphingTools = function() {
    
    // Gets the top layer that's checkbox is checked and puts it's ID into the coverage box
    $('#graphcreator-coverage-button').click(function() {
-      $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
-         if($(this).is(':checked')) {
-            var layerID = $(this).parent('li').attr('id');
-            var layer = opec.getLayerByID(layerID);
-            $('#graphcreator-coverage').val(layer.origName);    
-            $('#graphcreator-baseurl').val(layer.wcsURL);   
-         }
-      });
-
+      var layer = opec.getTopLayer();
+      $('#graphcreator-coverage').val(layer.origName);    
+      $('#graphcreator-baseurl').val(layer.wcsURL);
       return false;
    });
    
@@ -909,8 +914,7 @@ opec.rightPanel.setupGraphingTools = function() {
       var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage-real').val()].displayTitle;
       var graphObject = {};
       graphObject.graphData = graphParams;      
-      //graphObject.description = prompt("Please enter a description");
-      graphObject.description = '';
+      graphObject.description = prompt("Please enter a description");
       graphObject.title = title;
       
       // Async post the state
@@ -1025,7 +1029,8 @@ opec.topbar.setup = function() {
          opec.timeline.setDate(thedate);
          // Filter the layer data to the selected date
          opec.filterLayersByDate(thedate);
-      }
+      },
+      yearRange: "1970:2020"
    });
 
    //--------------------------------------------------------------------------
@@ -1075,12 +1080,11 @@ opec.topbar.setup = function() {
    //--------------------------------------------------------------------------
    
    // Create buttons
-   $('#opec-toolbar-actions')
-      .buttonset().children('button:first, input[type="button"]')
-      .button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} })
-      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
-      .next().button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
+   $('#opec-toolbar-actions').buttonset();
+   $('#mapInfoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} });
+   $('#shareMapToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} });
+   $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
+   $('#opec-button-3d').button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
       .click(function(e) {
          if(map.globe.is3D) {
             map.show2D();
@@ -1089,18 +1093,16 @@ opec.topbar.setup = function() {
             map.show3D();
             opec.gritter.showNotification('3DTutorial', null);
          }
-      })
-      .next().next().button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
+      });
+   $('#infoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
    
    // Add toggle functionality for dialogs
-   addDialogClickHandler('#infoToggleBtn', '#info');
+   addDialogClickHandler('#shareMapToggleBtn', '#shareOptions');
    addDialogClickHandler('#mapInfoToggleBtn', '#mapInfo');
-   addDialogClickHandler('#layerPreloader', '#opec-layerSelection');
-
-   // Add permalink share panel click functionality
-   $('#shareMapToggleBtn').click(function() {
-      $('#shareOptions').toggle();
-   });
+   addDialogClickHandler('#layerPreloader', $('#opec-layerSelection').parent());
+   addDialogClickHandler('#infoToggleBtn', $('#walkthrough-menu').parent());
+   
+   
    
    //$('#shareOptions').find('button:first')
       //.button({ label: 'Login or Signup'})
@@ -1131,13 +1133,7 @@ opec.topbar.setup = function() {
    
    function addDialogClickHandler(idOne, idTwo) {
       $(idOne).click(function(e) {
-         if($(idTwo).extendedDialog('isOpen')) {
-           $(idTwo).extendedDialog('close');
-         }
-         else {
-           $(idTwo).extendedDialog('open');
-         }
-         return false;
+         $(idTwo).toggle();
       });
    }
 

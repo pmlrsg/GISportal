@@ -638,8 +638,7 @@ opec.layer = function(microlayer, layerData) {
    
 };
 
-opec.addLayer = function(layer) {  
-   
+opec.addLayer = function(layer) {   
    delete opec.nonSelectedLayers[layer.id];
    opec.selectedLayers[layer.id] = layer;
    
@@ -657,6 +656,12 @@ opec.addLayer = function(layer) {
    } else if (layer.controlID == 'refLayers') {
       opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-reference')));
    }
+   
+   
+   // TODO: Too tightly coupled
+   opec.leftPanel.open();
+   layer.select();
+   $('input[name="' + layer.id + '"]').prop('checked', true);
    
    // Hide the ajax-loader and the exclamation mark initially
    layer.$layer.find('img[src="img/ajax-loader.gif"]').hide();

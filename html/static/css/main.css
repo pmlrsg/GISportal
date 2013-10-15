@@ -35,6 +35,10 @@ h3 {
    text-transform: capitalize;
 }
 
+.right  {
+   float: right;
+}
+
 /* style the ROI canvas */
 canvas { 
 }
@@ -379,7 +383,7 @@ ul li {
 } 
 
 a.trigger {
-   z-index:9999;
+   z-index:10000;
    position: absolute;
    text-decoration: none;
    top: 0px;
@@ -513,7 +517,8 @@ a.active.triggerR {
    padding-top: 5px;
 }
 
-.opec-toolbar-buttonpane button {
+.opec-toolbar-buttonpane button,
+.opec-toolbar-buttonpane input[type='checkbox'] {
    height: 40px;
    width: 40px;
    padding-bottom:5px;
@@ -530,24 +535,20 @@ a.active.triggerR {
    border-bottom-right-radius: 15px;
 }
 
-/* ======== Info Dialog Box ======== */
-/* style the information dialogue */
-#info {
+/* ======== walkthrough-menu ======== */
+#walkthrough-menu {
    filter: alpha(opacity=70);
    opacity: 0.7;
    overflow: hidden;
 }
 
-#info p {
+#walkthrough-menu p {
    color:#000;
    text-align:center;
    line-height: 1.3em;
    font-size: 0.75em;
 }
 
-#info img {
-   border:0;
-}
 
 /* ======== Metadata ======== */
 
@@ -967,6 +968,10 @@ div .sensor-accordion {
    font-weight: bold;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 .elevationSelected span {
    font-weight: bold;
 }
@@ -1042,12 +1047,6 @@ div.olMapViewport {
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
-}
-
-/* ===== Prototype Modal ===== */
-
-#this-Is-A-Prototype {
-   overflow: hidden;
 }
 
 /* Override some basic jQuery UI Styles */

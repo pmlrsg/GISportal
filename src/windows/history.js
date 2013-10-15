@@ -26,9 +26,11 @@ opec.window.history = function() {
       }
    });
    
+   refreshGraphs();
+   
    $('#opec-historyWindow-tabs').buttonset();
    $('#opec-historyWindow-tab button').button();
-   $('#opec-historyWindow-tabs button').click(function(e) { 
+   $('#opec-historyWindow-tabs .opec-tab').click(function(e) { 
       var tabToShow = $(this).attr('href');
       $('#opec-historyWindow-content div').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
@@ -36,25 +38,56 @@ opec.window.history = function() {
       $(tabToShow).show();
    });
    
+   $("#opec-historyWindow-tab-Refresh").click(function() {
+      refreshGraphs();
+   });
+   
+   $("#remove-graph").click(function()  {
+      opec.genericAsync(
+         'POST',
+         '/service/graph',
+         {},
+         function(d) {
+            $('#opec-historyWindow-graphs .opec-historyWindow--scroll li').remove();
+                  $('#opec-historyWindow-graphs .opec-historyWindow--data li').remove();
+            $.each(d.output, function(k,v) { 
+                  var data = JSON.parse(v.graph);
+                  data.id = data.description + v.lastUsed;
+                  data.data = JSON.stringify(data.graphData);
+                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll').append(opec.templates.historyList(data));
+                  $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
+               } 
+            );
+         },
+         function() { console.log('Data was not available'); },
+         'json',
+         {}
+      );
+   });
+   
    /* Graphs */
-   opec.genericAsync(
-      'GET',
-      '/service/graph',
-      {},
-      function(d) {
-         $.each(d.output, function(k,v) { 
-               var data = JSON.parse(v.graph);
-               data.id = data.description + v.lastUsed;
-               data.data = JSON.stringify(data.graphData);
-               $('#opec-historyWindow-graphs .opec-historyWindow--scroll').append(opec.templates.historyList(data));
-               $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
-            } 
-         );
-      },
-      function() { console.log('Data was not available'); },
-      'json',
-      {}
-   );
+   function refreshGraphs() {
+      opec.genericAsync(
+         'GET',
+         '/service/graph',
+         {},
+         function(d) {
+            $('#opec-historyWindow-graphs .opec-historyWindow--scroll li').remove();
+                  $('#opec-historyWindow-graphs .opec-historyWindow--data li').remove();
+            $.each(d.output, function(k,v) { 
+                  var data = JSON.parse(v.graph);
+                  data.id = data.description + v.lastUsed;
+                  data.data = JSON.stringify(data.graphData);
+                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll').append(opec.templates.historyList(data));
+                  $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
+               } 
+            );
+         },
+         function() { console.log('Data was not available'); },
+         'json',
+         {}
+      );
+   }
    
    $('#opec-historyWindow-graphs .opec-historyWindow--scroll').on('click', 'li', function() {
       $('.opec-historyWindow--scroll li').removeClass('selected ui-state-highlight');

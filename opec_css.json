@@ -6,6 +6,7 @@
       "html/static/js-libs/jquery-contextMenu/css/jquery-contextMenu.css",
       "html/static/js-libs/jquery-gritter/css/jquery.gritter.css",
       "html/static/css/timeline.css",
-      "html/static/css/main.css"
+      "html/static/css/main.css",
+      "html/static/css/walkthrough.css"
    ]
 }
