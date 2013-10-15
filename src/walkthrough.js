@@ -62,7 +62,7 @@ opec.Walkthrough = function() {
 		         id : 6,
 		         prev : 5,
 		         content: '<p>Step 6. Use the timeline at the bottom to quickly see the dates for which there is data available.</p><p>See \'Overview of the timeline\' for help on how to use it. This guide is now complete, please click on the X at the top right of the box to finish.</p>',
-		         binding: '#timeline'
+		         //binding: '#timeline'
 		      }
    		]
    	},
