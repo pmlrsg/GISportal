@@ -1,0 +1,7 @@
+rm -f html/static/cache/*.xml
+rm -f html/static/cache/*.json
+rm -f html/static/cache/layers/*.json
+python middleware/cachingscripts/wmsCapabilities_2_6_6.py 
+python middleware/cachingscripts/wfsCapabilities.py
+touch html/static/cache/wfsMasterCache.json
+
