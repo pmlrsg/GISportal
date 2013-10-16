@@ -1,0 +1,2 @@
+Redirect /index.html /v3/static/index.html
+DirectoryIndex index.html
