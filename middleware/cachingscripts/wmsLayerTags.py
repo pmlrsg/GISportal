@@ -8,12 +8,21 @@ layers = {
          'interval': '3 hours'
       }                
    },
+   'pml_monthly': {
+      # Layer name 
+      'Chl4': {
+         'niceName': 'Chlorophyll-a Large Plankton',
+         'type': 'Chlorophyll',
+         'region': ('UK Shelf Seas'),
+         'interval': 'Monthly'
+      }                
+   },
    'dmi': {
       # Layer name 
       'chl': {
          'niceName': 'Chlorophyll',
          'type': 'Chlorophyll',
-         'region': ('Baltic','North Sea'),
+         'region': ('Baltic'),
          'interval': 'Monthly'
       }                
    },
