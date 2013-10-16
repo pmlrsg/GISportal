@@ -192,7 +192,7 @@ def replacePath(t, env):
             if env == 'build':
                replacedLine = string.replace(line, path["dev"], path["build"])
             elif env == 'dev':
-               replacedLine = destination.write(string.replace(line, path["build"], path["dev"]))
+               replacedLine = string.replace(line, path["build"], path["dev"])
             destination.write(replacedLine)
    shutil.move('html/static/index.new.html', 'html/static/index.html')
    t.info('Finished replacing paths')
