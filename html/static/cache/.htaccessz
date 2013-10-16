@@ -1,7 +1,0 @@
-ExpiresActive On
-ExpiresDefault "access plus 0"
- 
-# 1 HOUR default caching for JSON and XML files
-<filesMatch "\.(json|xml)$">
-ExpiresDefault "access plus 1 hour"
-</filesMatch>
