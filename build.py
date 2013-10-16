@@ -186,14 +186,14 @@ def replacePath(t, env):
    opec_replacements = open('opec_replacements.json', 'r')
    json_replacements = json.load(opec_replacements)
    opec_replacements.close()
-   with codecs.open('html/static/index.html', 'r', 'utf-8') as read_file:
-      with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
-         for line in read_file:
-            for path in json_replacements["build-paths"]:
-               if env == 'build':
-                  destination.write(string.replace(line, path["from"], path["to"]))
-               elif env == 'dev':
-                  destination.write(string.replace(line, path["to"], path["from"]))
+   with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
+      for line in codecs.open('html/static/index.html', 'r', 'utf-8'):
+         for path in json_replacements["build-paths"]:
+            if env == 'build':
+               replacedLine = string.replace(line, path["dev"], path["build"])
+            elif env == 'dev':
+               replacedLine = destination.write(string.replace(line, path["build"], path["dev"]))
+            destination.write(replacedLine)
    shutil.move('html/static/index.new.html', 'html/static/index.html')
    t.info('Finished replacing paths')
 

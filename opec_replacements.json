@@ -2,8 +2,12 @@
    "id": "opec",
    "build-paths": [
       {
-         "from": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.css\" />",
-         "to": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.min.css\" />"
+         "dev": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.css\" />",
+         "build": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.min.css\" />"
+      },
+      {
+         "dev": "<script type=\"text/javascript\" src=\"OPECPortal.js\"></script>",
+         "build": "<script type=\"text/javascript\" src=\"OPECPortal.min.js\"></script>"
       }
     ]
 }
