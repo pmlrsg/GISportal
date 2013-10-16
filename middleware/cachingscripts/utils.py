@@ -8,6 +8,7 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
    
    print 'Starting cache generation'
    #servers = csvToList(serverList)
+   
    change = False
    
    # Go through each server
@@ -96,7 +97,7 @@ def createMasterCache(servers, cachePath, masterCachePath):
    print "Saving mastercache..."         
    saveFile(masterCachePath + FILEEXTENSIONJSON, json.dumps(masterCache))
    print "Mastercache saved" 
-   
+           
 def regenerateCache(dirtyServer, dirtyCaches, createCache):
    import urllib, urllib2, time
    for i in range(10):

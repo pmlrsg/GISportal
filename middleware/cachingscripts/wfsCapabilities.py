@@ -29,6 +29,15 @@ XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 dirtyCaches = [] # List of caches that may need recreating if they don't get created the first time
 extraInfo = wfsLayerTags.layers
 
+
+def touch(fname, times=None):
+   import os
+   with file(fname, 'a'):
+      os.utime(fname, times)
+      
+# Touch master cache so that it doesn't 404 if no data
+touch(MASTERCACHEPATH + '.json')
+
 def createCache(server, xml):
    import json
    import urllib
@@ -92,6 +101,7 @@ def createCache(server, xml):
    # Return and save out the cache for this server
    return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
 
+      
 def processTimes(server, xml):
    from time import mktime, strptime
    data = parse.process(xml,tag=server['options']['tag'])
