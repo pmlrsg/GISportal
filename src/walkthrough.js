@@ -56,7 +56,7 @@ opec.Walkthrough = function() {
 		         prev : 4,
 		         next : 6,
 		         content: '<p>Step 5. If you would like to view the data over time, please move over to the data analysis panel (on the right) where you can select a date range and generate graphs of the dataset in which you are interested.</p>',
-		      	commands: [ "$('.rPanel').show(); "]
+		      	commands: [ "opec.rightPanel.show(); "]
 		      },
 		      {
 		         id : 6,
@@ -101,7 +101,8 @@ opec.Walkthrough = function() {
 		         content: '<p>Step 4. Data ranges can be created within the data analysis panel. Once created (by pressing "New Range") a new bar will appear in the timeline.</p>',
 		         //binding: '.rPanel',
 		         commands: [ 
-		         	"$('#advanced-inputs-header').click();", 
+		         	"opec.rightPanel.open();",
+						"$('#advanced-inputs-header').click();", 
 		         	"opec.timeline.addRangeBar('Range bar covering 2001');",
 		         	"opec.rightPanel.updateRanges('Range bar covering 2001');" ,
 		         	"opec.timeline.redraw();"
