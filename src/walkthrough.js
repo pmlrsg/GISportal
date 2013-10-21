@@ -74,21 +74,21 @@ opec.Walkthrough = function() {
 		         id : 0,
 		         next: 1,
 		         content: '<p>Step 1. At the bottom of the screen is the timeline, this is the main way of dealing with time on the portal.</p>',
-		         binding: '#timeline'
+		         //binding: '#timeline'
 		      },
 		      {
 		         id : 1,
 		         next: 2,
 		         prev: 0,
 		         content: '<p>Step 2. The timeline grows as you select layers, for temporal data it shows each item as a line.</p>',
-		         binding: '#timeline'
+		         //binding: '#timeline'
 		      },
 		      {
 		         id : 2,
 		         next: 3,
 		         prev: 1,
 		         content: '<p>Step 3. You can change the timescale by zooming in or out using a scrollwheel or similar.</p>',
-		         binding: '#timeline',
+		         //binding: '#timeline',
 		         commands: [
 		         	"opec.timeline.zoomDate(\"01/01/2000\", \"01/01/2003\");",
 		         	"opec.timeline.redraw();"
@@ -99,7 +99,7 @@ opec.Walkthrough = function() {
 		         next: 4,
 		         prev: 2,
 		         content: '<p>Step 4. Data ranges can be created within the data analysis panel. Once created (by pressing "New Range") a new bar will appear in the timeline.</p>',
-		         binding: '.rPanel',
+		         //binding: '.rPanel',
 		         commands: [ 
 		         	"$('#advanced-inputs-header').click();", 
 		         	"opec.timeline.addRangeBar('Range bar covering 2001');",
@@ -112,7 +112,7 @@ opec.Walkthrough = function() {
 		         prev: 3,		 
 		         next: 5,        
 		         content: '<p>Step 5. To select a range, you can click the bar <span class="bold">once</span> to choose the start of your range and then click a <span class="bold">second</span> time to choose the end date. To select more precise dates, you can use the row underneath where you created the range in the data analysis panel.</p>',
-		         binding: '#timeline',
+		         //binding: '#timeline',
 		         commands: [
 		         	"opec.timeline.rangebars[0].selectedStart = \"01/01/2001\";",
 		         	"opec.timeline.rangebars[0].selectedEnd = \"01/01/2002\";",
@@ -123,7 +123,7 @@ opec.Walkthrough = function() {
 		         id : 5,
 		         prev: 4,		         
 		         content: '<p>Step 6. To create a graph, you can open the data analysis panel and select an area of the map. Then, providing a layer is selected, you can click generate graph then name the graph (for future reference) and wait until the graph has been created. If a lot of data is being processed, this can take some time.</p>',
-		         binding: '.rPanel',
+		         //binding: '.rPanel',
 		         commands: [
 		         	"$('#graphcreator-bbox').val('-4.6896,46.91016,5.01133,55.44653');",
 		         	"$('#graphcreator-bbox').change();",
