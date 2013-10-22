@@ -295,20 +295,17 @@ opec.layer = function(microlayer, layerData) {
    };
    
    this.unselect = function() {
-      var layer = this;
-      
-      layer.selected = false;
-      layer.setVisibility(false);
-      layer.checkLayerState();
-      
-      if(layer.temporal) {
-         // Remove the layer display on the timeline
-         opec.timeline.removeTimeBarByName(layer.name); 
-         
-         // Update map date cache now a new temporal layer has been removed
-         opec.refreshDateCache();
-      }     
-   };
+		var layer = this;
+		layer.selected = false;
+		layer.setVisibility(false);
+		layer.checkLayerState();
+
+		if (layer.temporal) {
+			opec.timeline.removeTimeBarByName(layer.name);
+			opec.refreshDateCache();
+		}
+
+	};
    
    //this.setLayerIndex = function(id, index) {      
       //var layer = this.openlayers[id];
@@ -402,9 +399,10 @@ opec.layer = function(microlayer, layerData) {
     */
    this.getMetadata = function() {
       var layer = this;
+		console.log(layer);
       $.ajax({
          type: 'GET',
-         url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&request=GetMetadata'),
+         url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
          dataType: 'json',
          asyc: true,
          success: function(data) {

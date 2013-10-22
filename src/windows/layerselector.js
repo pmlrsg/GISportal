@@ -151,9 +151,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       var layer = opec.getLayerByID(layerID);
    
       if(layer) {            
-         console.log("Removing layer..."); // DEBUG         
+         console.log("Removing layer..."); // DEBUG
+			layer.unselect();			
          opec.removeLayer(layer);           
-         console.log("Layer removed"); // DEBUG
+			console.log("Layer removed"); // DEBUG
          
          self.toggleLayerSelection(li);
       }
