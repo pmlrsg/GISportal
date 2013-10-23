@@ -150,7 +150,7 @@ function createGraph(graphOptions) {
       var choiceContainer = dialog.children('.choices').css({"left": 620, "top": 20, "position": "absolute"});
       $.each(graphOptions.data, function(key, val) {
         choiceContainer.append('<br/>' +
-         '<input type="checkbox" name="' + key + '" checked="checked" id="id' + key + '">' +
+         '<input type="checkbox" name="' + key + '" ' + (val.label==="median"?'checked="checked"':'') +  'id="id' + key + '">' +
          '<label for="id' + key + '">' + val.label + '</label>');
       });
       
