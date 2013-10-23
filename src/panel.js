@@ -289,7 +289,8 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
 
       layer.$layer = $('#' + layer.id);
       opec.updateLayerData(layer.id);
-      // Remove the dummy layer
+      opec.rightPanel.updateCoverageList();
+		// Remove the dummy layer
       //removeDummyHelpLayer()
    }
 };
@@ -432,6 +433,18 @@ opec.rightPanel.open = function() {
 opec.rightPanel.toggle = function() {
    $(".rPanel").toggle("fast");
    $(".triggerR").toggleClass("active");
+}
+
+opec.rightPanel.updateCoverageList = function()  {
+	var selected = $('#graphcreator-coverage option:selected');
+	$('#graphcreator-coverage option').remove();
+	var keys = Object.keys(opec.selectedLayers);
+	var selected = '';
+	for (var i = 0; i < keys.length; i++)  {
+		// TODO Nicer way of select
+		if (opec.selectedLayers[keys[i]] === selected.value) selected = 'selected'; 
+		$('#graphcreator-coverage').append('<option ' + selected + ' value="' + keys[i] + '">' + opec.selectedLayers[keys[i]].displayTitle + '</option>');
+	}	
 }
 
 opec.rightPanel.setup = function() {
@@ -777,7 +790,7 @@ opec.rightPanel.setupGraphingTools = function() {
    $('.js-newRange').on('click', function() {
       var name = prompt("Please give a label for this range bar.");
       opec.timeline.addRangeBar(name);
-      self.updateRanges(name);
+      opec.rightPanel.updateRanges(name);
    });
    
    $('.js-hideRange').on('click', function() {
@@ -814,7 +827,7 @@ opec.rightPanel.setupGraphingTools = function() {
       // Get the currently selected layer
       var layer = opec.getLayerByID(layerID);
       $('#graphcreator-baseurl').val(layer.wcsURL);
-      $('#graphcreator-coverage').val(layer.origName);
+      $('#graphcreator-coverage option[val=' + layer.origName + ']').selected = true;
    }
    
    // Check for changes to the selected layer
@@ -836,14 +849,6 @@ opec.rightPanel.setupGraphingTools = function() {
          .toggleClass("ui-control-header-active")
          .find("> .ui-icon").toggleClass("ui-icon-triangle-1-e ui-icon-triangle-1-s").end()
          .next().toggleClass("ui-control-content-active").slideToggle();
-      return false;
-   });
-   
-   // Gets the top layer that's checkbox is checked and puts it's ID into the coverage box
-   $('#graphcreator-coverage-button').click(function() {
-      var layer = opec.getTopLayer();
-      $('#graphcreator-coverage').val(layer.origName);    
-      $('#graphcreator-baseurl').val(layer.wcsURL);
       return false;
    });
    
@@ -901,17 +906,17 @@ opec.rightPanel.setupGraphingTools = function() {
       
       var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
-         coverage: $('#graphcreator-coverage').val(),
+         coverage: $('#graphcreator-coverage option:selected').val(),
          type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
-         graphZAxis: $('#graphcreator-coverage').val()
+         graphZAxis: $('#graphcreator-coverage option:checked').val()
       };      
       
-      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage-real').val()].displayTitle;
+      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].displayTitle;
       var graphObject = {};
       graphObject.graphData = graphParams;      
       graphObject.description = prompt("Please enter a description");
@@ -973,9 +978,12 @@ opec.rightPanel.setupDataExport = function() {
    
    $(opec.selection).bind('selection_updated', function(event, params) {
       if(typeof params.bbox !== 'undefinded' && params.bbox) {
+         var layer = opec.getTopLayer();
          var bbox = opec.selection.bbox.split(',');
          selectedBbox.html('<b>Selected Bbox: </b>' + bbox[0] + ', ' + bbox[1] + ', ' + bbox[2] + ', ' + bbox[3]);
-         urlParams.bbox = opec.selection.bbox;
+         urlParams['bbox'] = opec.selection.bbox;
+         urlParams['coverage'] = layer.urlName;
+			url = layer.wcsURL;
          updateURL();
       }
    });
