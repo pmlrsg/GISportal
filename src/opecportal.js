@@ -465,18 +465,22 @@ opec.mapInit = function() {
  * Anything that needs to be done after the layers are loaded goes here.
  */ 
 opec.initWMSlayers = function(data, opts) {
-   opec.cache.wmsLayers = data;
-   // Create WMS layers from the data
-   opec.createOpLayers();
-   
-   //var ows = new OpenLayers.Format.OWSContext();
-   //var doc = ows.write(map);
+   if (data !== null)  {
+      opec.cache.wmsLayers = data;
+      // Create WMS layers from the data
+      opec.createOpLayers();
+      
+      //var ows = new OpenLayers.Format.OWSContext();
+      //var doc = ows.write(map);
+   }
 };
 
 opec.initWFSLayers = function(data, opts) {
-   opec.cache.wfsLayers = data;
-   // Create WFS layers from the data
-   opec.createRefLayers();
+   if (data !== null)  {
+      opec.cache.wfsLayers = data;
+      // Create WFS layers from the data
+      opec.createRefLayers();
+   }
 };
 
 /*===========================================================================*/
@@ -833,7 +837,7 @@ opec.updateLayerData = function(layerID)  {
    $('#graphcreator-coverage').val(layer.origName);
    $('#graphcreator-coverage-real').val(layerID);      
 };
-   
+
 // ----------------------------------------------------------------------------
 
 /**

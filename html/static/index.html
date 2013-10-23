@@ -53,6 +53,9 @@
 <!--<script src="js-libs/d3.v3.2.4.js"></script>-->
 <script src="http://d3js.org/d3.v3.js"></script>
 
+<!-- D3.chart -->
+<script src="js-libs/d3.chart/d3.chart.js"></script>
+
 <!-- mustache -->
 <script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
 
@@ -220,8 +223,9 @@
             </div>
             <div> 
                <input id="graphcreator-coverage-real" class="hidden" title="Real Name of the Coverage" placeholder="Real Name of the Coverage" type="text" name="graphcreator-coverage-real" />
-               <input id="graphcreator-coverage" title="Name of the Coverage" placeholder="Name of the Coverage" type="text" name="graphcreator-coverage" />
-               <input id="graphcreator-coverage-button" title="Get the top selected layer" type="button" name="graphcreator-coverage-button" value="Get Top Layer" />
+					<select id="graphcreator-coverage" name="graphcreator-coverage">
+						<option value="" disabled selected>Name of the Coverage</option>
+					</select>	
             </div>
          </div>
       </div>
@@ -620,7 +624,7 @@
    
    <ul id="walkthrough"></ul>
    
-   <div id="js-walkthrough-confirm">Would you like this walkthrough to appear next time you visit?</div>
+   <div id="js-walkthrough-confirm" class="hidden">Would you like this walkthrough to appear next time you visit?</div>
    
 </body>
 </html>
