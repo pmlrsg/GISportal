@@ -444,7 +444,7 @@ opec.rightPanel.updateCoverageList = function()  {
 		// TODO Nicer way of select
  		var layer = opec.selectedLayers[keys[i]];
 		if (opec.selectedLayers[keys[i]] === selected.value) selected = 'selected'; 
-		$('#graphcreator-coverage').append('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle || layer.id) + '</option>');
+		$('#graphcreator-coverage').append('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
 }
 
