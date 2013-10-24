@@ -56,7 +56,7 @@ opec.Walkthrough = function() {
 		         prev : 4,
 		         next : 6,
 		         content: '<p>Step 5. If you would like to view the data over time, please move over to the data analysis panel (on the right) where you can select a date range and generate graphs of the dataset in which you are interested.</p>',
-		      	commands: [ "opec.rightPanel.show(); "]
+		      	commands: [ "opec.rightPanel.open(); "]
 		      },
 		      {
 		         id : 6,
