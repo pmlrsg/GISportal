@@ -55,14 +55,13 @@
       _current = currentStep;
       var _currentDOM = ' li[data-id="' + _current + '"]';
       $('li', _dom).hide().removeClass('active');
-      $('li[data-id="' + _current + '"]', _dom).show().addClass('active');
-       
+      $('li[data-id="' + _current + '"]', _dom).show().addClass('active').draggable(); 
       if(_steps[currentStep].next >= 0) $(_linkNext, _currentDOM).show();
       else $(_linkNext, _currentDOM).hide();
       
       if(_linkPrev != null && _steps[currentStep].prev >= 0) $(_linkPrev, _currentDOM).show();
       else $(_linkPrev, _currentDOM).hide();
-      
+
       if (_domLoaded)  {
          _reposition();
       }
@@ -230,7 +229,7 @@
    	$(_linkClose).button({ label: 'Close', icons: { primary: 'ui-icon-closethick'}, text: false });
    };
    
-   $.fn.walkthroughCurrentStep = function () { return _current; };
+   $.fn.walkthroughCurrentStep = function () { return _current; }
    
    $.fn.walkthroughReposition = function()  {
       _domLoaded = true;
