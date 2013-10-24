@@ -342,9 +342,10 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('width', this.width)
       .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
       .style('fill', 'transparent')
-      .on('click', function(d) {
+      .on('mousedown', function(d) {
+			console.log('dragstart!',d);
          if(d.type == 'range') {
-            var currentlyDragging = self.rangebars.filter(function(d) { return d.isDragging; } )
+            var currentlyDragging = self.rangebars.filter(function(d) { return d.isDragging; } );
             
             if (currentlyDragging.length == 1 && currentlyDragging != d)  {
                d = currentlyDragging[0];
@@ -356,8 +357,22 @@ opec.TimeLine.prototype.redraw = function() {
                d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
                d.isDragging = true;
             }
-            else if (d.isDragging === true)  {
+      	}  
+      })
+      .on('mousemove', function(d) {
+         if(d.type == 'range') {
+            // Check if mousemove should drag the rectangle
+            if (d.isDragging === true)  {
                d3.event.stopPropagation();
+               d.selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
+               self.redraw();  
+            }
+         }
+      })
+		.on('mouseup', function(d) {
+			if (d.type == 'range')  {
+				if (d.isDragging === true)  {
+					d3.event.stopPropagation();
                var selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
                if (new Date(d.selectedStart) > new Date(selectedEnd))  {
                   d.selectedEnd = d.selectedStart;
@@ -369,19 +384,9 @@ opec.TimeLine.prototype.redraw = function() {
                d.isDragging = false;
                $(opec).trigger('rangeUpdate.opec', [d]);
                self.redraw();  
-            }
-         }  
-      })
-      .on('mousemove', function(d) {
-         if(d.type == 'range') {
-            // Check if mousemove should drag the rectangle
-            if (d.isDragging === true)  {
-               d3.event.stopPropagation();
-               d.selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
-               self.redraw();  
-            }
-         }
-      });
+				}
+			}		
+		});
 //       
    // // Separator line removal
    this.sepLines.exit().remove();

@@ -627,8 +627,8 @@ opec.rightPanel.setupDrawingControls = function() {
    opec.mapControls.circle = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false});
    opec.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon);
    
-   map.addControls([opec.mapControls.point, opec.mapControls.box, opec.mapControls.circle, opec.mapControls.polygon]);
-   
+   //map.addControls([opec.mapControls.point, opec.mapControls.box, opec.mapControls.circle, opec.mapControls.polygon]);
+   map.addControls([opec.mapControls.point, opec.mapControls.box]);
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
       opec.toggleControl(element);
@@ -919,8 +919,9 @@ opec.rightPanel.setupGraphingTools = function() {
       var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].displayTitle;
       var graphObject = {};
       graphObject.graphData = graphParams;      
-      graphObject.description = prompt("Please enter a description");
-      graphObject.title = title;
+      //graphObject.description = prompt("Please enter a description");
+      graphObject.description = title;
+		graphObject.title = title;
       
       // Async post the state
       opec.genericAsync('POST', opec.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
