@@ -428,6 +428,7 @@ opec.rightPanel = {};
 opec.rightPanel.open = function() {
    $(".rPanel").show("fast");
    $(".triggerR").addClass("active");
+	$('#advanced-inputs-header').click();
 }
 
 opec.rightPanel.toggle = function() {
