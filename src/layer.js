@@ -301,7 +301,7 @@ opec.layer = function(microlayer, layerData) {
 		layer.checkLayerState();
 
 		if (layer.temporal) {
-			if (opec.timeline.timebars.filter(function(l) { l.name === layer.name; }) > 0) {
+			if (opec.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
 				opec.timeline.removeTimeBarByName(layer.name);
 			}
 			
