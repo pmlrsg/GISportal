@@ -689,15 +689,23 @@ opec.rightPanel.updateRanges = function(label)  {
    }
 };
 
+opec.rightPanel.getDateRange = function()  {
+	var dateRange = $('#graphcreator-time').val();         
+	if ($('#graphcreator-time2').val() !== "") {
+		dateRange += ("/" + $('#graphcreator-time2').val());
+	}
+	return dateRange;
+}
+
 /**
- * Sets up the graphing tools.
- */
+* Sets up the graphing tools.
+*/
 opec.rightPanel.setupGraphingTools = function() {
-   //var graphCreator = $('#graphCreator');
-   // If there is an open version, close it
-   //if(graphCreator.length)
-      //graphCreator.extendedDialog('close');
-      
+//var graphCreator = $('#graphCreator');
+// If there is an open version, close it
+//if(graphCreator.length)
+	//graphCreator.extendedDialog('close');
+	
    var data = {
       advanced: true
    };
@@ -734,15 +742,6 @@ opec.rightPanel.setupGraphingTools = function() {
       dateFormat: 'yy-mm-dd',
       changeMonth: true,
       changeYear: true,
-      beforeShowDay: function(date) { 
-         if($('#graphcreator-time2').datepicker('getDate')) {
-            var compareDate = $('#graphcreator-time2').datepicker('getDate');
-            if(opec.utils.compareDates(date, compareDate) !== true)  {
-               return [false];
-            }
-         }
-         return opec.allowedDays(date); 
-      },
       yearRange: "1970:2020"
    });
    
@@ -751,15 +750,6 @@ opec.rightPanel.setupGraphingTools = function() {
       dateFormat: 'yy-mm-dd',
       changeMonth: true,
       changeYear: true,
-      beforeShowDay: function(date) { 
-         if($('#graphcreator-time').datepicker('getDate')) {
-            var compareDate = $('#graphcreator-time').datepicker('getDate');
-            if(opec.utils.compareDates(compareDate, date) !== true)  {
-               return [false];
-            }
-         }
-         return opec.allowedDays(date); 
-      },
       yearRange: "1970:2020"
    });
    // Set the datepicker controls to the current view date if set
@@ -814,13 +804,14 @@ opec.rightPanel.setupGraphingTools = function() {
       $('#graphcreator-range option:selected').remove();
    });
    
-   
-   $('.js-updateRange').on('click', function() {
-      var selectedStart = $('#graphcreator-time').datepicker('getDate');
-      var selectedEnd = $('#graphcreator-time2').datepicker('getDate');
-      opec.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
-      opec.timeline.redraw();
-   });
+	$('#opec-graphing').on('change', '.hasDatepicker', function()  { 
+      if ($('#graphcreator-range option:selected').val() !== 'Select a Range') {
+			var selectedStart = $('#graphcreator-time').datepicker('getDate');
+			var selectedEnd = $('#graphcreator-time2').datepicker('getDate');
+			opec.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
+			opec.timeline.redraw();
+		}
+	});
  
    var layerID = $('.selectedLayer:visible').attr('id');
    
@@ -889,10 +880,8 @@ opec.rightPanel.setupGraphingTools = function() {
    // Create and display the graph
    graphCreatorGenerate.on('click', ':button', function(e) {
       // Extract the date-time value from the datepickers either as single date-time or date-time range
-      var dateRange = $('#graphcreator-time').val();         
-      if ($('#graphcreator-time2').val() !== "") {
-         dateRange += ("/" + $('#graphcreator-time2').val());
-      }
+     
+		var dateRange = opec.rightPanel.getDateRange();
       
       var graphXAxis = null,
       graphYAxis = null;
@@ -967,7 +956,12 @@ opec.rightPanel.setupDataExport = function() {
       url = layer.wcsURL;  
       updateURL();
    }
-   
+
+	$('#opec-graphing').on('change', '.hasDatepicker', function()  {
+		urlParams['time'] = opec.rightPanel.getDateRange();
+		updateURL();
+	});
+
    // Check for changes to the selected layer
    $('.lPanel').bind('selectedLayer', function(e) {
       var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
