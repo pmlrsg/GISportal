@@ -812,7 +812,7 @@ opec.rightPanel.setupGraphingTools = function() {
 			opec.timeline.redraw();
 		}
 	});
- 
+
    var layerID = $('.selectedLayer:visible').attr('id');
    
    // We need to check if a layer is selected
@@ -822,7 +822,13 @@ opec.rightPanel.setupGraphingTools = function() {
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage option[val=' + layer.origName + ']').selected = true;
    }
-   
+  
+	$('#graphcreator-coverage').on('change', function()  {
+		var layerID = $('option:selected', this).val();	
+		var layer = opec.getLayerByID(layerID);
+		$('#graphcreator-baseurl').val(layer.wcsURL);
+	});
+
    // Check for changes to the selected layer
    $('.lPanel').on('change', '.selectedLayer', function(e) {
       var layerID = $('.selectedLayer:visible').attr('id');
@@ -957,12 +963,7 @@ opec.rightPanel.setupDataExport = function() {
       updateURL();
    }
 
-	$('#opec-graphing').on('change', '.hasDatepicker', function()  {
-		urlParams['time'] = opec.rightPanel.getDateRange();
-		updateURL();
-	});
-
-   // Check for changes to the selected layer
+ 	// Check for changes to the selected layer
    $('.lPanel').bind('selectedLayer', function(e) {
       var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
       selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
@@ -972,7 +973,8 @@ opec.rightPanel.setupDataExport = function() {
       url = layer.wcsURL; 
       updateURL();
    });
-   
+  
+	// TODO: IMPROVE
    $(opec.selection).bind('selection_updated', function(event, params) {
       if(typeof params.bbox !== 'undefinded' && params.bbox) {
          var layer = opec.getTopLayer();
@@ -983,7 +985,20 @@ opec.rightPanel.setupDataExport = function() {
 			url = layer.wcsURL;
          updateURL();
       }
-   });
+
+		$('#opec-graphing').on('change', '.hasDatepicker', updateUrlTime);
+		$(opec).on('rangeUpdate.opec', updateUrlTime);
+
+		function updateUrlTime() {
+			if (typeof layerID !== 'undefined')  {	
+				var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));	
+				urlParams['time'] = opec.rightPanel.getDateRange();
+				url = layer.wcsURL;
+				updateURL();
+			}
+		}
+
+	});
    
    function updateURL() {
       var request = $.param( urlParams );
