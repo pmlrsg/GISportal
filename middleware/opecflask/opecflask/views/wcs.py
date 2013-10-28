@@ -150,6 +150,7 @@ def createURL(params):
 def contactWCSServer(url):
    current_app.logger.debug('Contacting WCS Server with request...')
    resp = urllib2.urlopen(url)     
+   current_app.logger.debug(url)
    current_app.logger.debug('Request successful')
    return resp
       
