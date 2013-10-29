@@ -175,8 +175,8 @@ opec.TimeLine = function(id, options) {
       .append('svg')
       .attr('class', 'timeline')
       .call(self.zoom)
-      .on('click', self.clickDate )
-      .on('mousedown', function() { isDragging = false; console.log('mousedown || ' + isDragging); });
+      .on('click', self.clickDate)
+      .on('mousedown', function() {  isDragging = false; console.log('mousedown || ' + isDragging); });
   
    
    //--------------------------------------------------------------------------
@@ -334,7 +334,8 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('y1', function(d, i) { return d3.round(self.yScale(i) ); })
       .attr('y2', function(d, i) { return d3.round(self.yScale(i) ); })
       .attr('class', 'separatorLine');
-      
+   
+	var dragging = null;	
    this.sepLines.enter().append('svg:rect')
       .attr('x', 0)
       .attr('y', function(d, i) { d.y = d3.round(self.yScale(i) + 0.5) + "px"; return d3.round(self.yScale(i) + 0.5); })
@@ -342,50 +343,51 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('width', this.width)
       .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
       .style('fill', 'transparent')
+      .on('click', function(d)  {
+         if (d.type == 'range')  {
+            d3.event.stopPropagation();
+            d3.event.preventDefault();
+         }
+      })
       .on('mousedown', function(d) {
-			console.log('dragstart!',d);
          if(d.type == 'range') {
-            var currentlyDragging = self.rangebars.filter(function(d) { return d.isDragging; } );
-            
-            if (currentlyDragging.length == 1 && currentlyDragging != d)  {
-               d = currentlyDragging[0];
-            }
-            
-            if (d.isDragging === false)  {
-               d3.event.stopPropagation();
+            d3.event.stopPropagation();
+            if (dragging === null)  {
                // There will be a maximum of 1 being dragged
                d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
-               d.isDragging = true;
+               dragging = d.name;
             }
       	}  
       })
       .on('mousemove', function(d) {
-         if(d.type == 'range') {
+			if(d.type == 'range') {
+            d3.event.stopPropagation();
             // Check if mousemove should drag the rectangle
-            if (d.isDragging === true)  {
-               d3.event.stopPropagation();
-               d.selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
+            if (dragging !== null)  {
+               self.rangebars.filter(function(d) { return d.name === dragging; })[0].selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
                self.redraw();  
             }
          }
       })
 		.on('mouseup', function(d) {
-			if (d.type == 'range')  {
-				if (d.isDragging === true)  {
-					d3.event.stopPropagation();
+			if(d.type == 'range') {
+            d3.event.stopPropagation();
+            d3.event.preventDefault();
+            if (dragging !== null)  {
+               d = self.rangebars.filter(function(d) { return d.name === dragging; })[0];
                var selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
                if (new Date(d.selectedStart) > new Date(selectedEnd))  {
                   d.selectedEnd = d.selectedStart;
                   d.selectedStart = selectedEnd;
                }
                else  {
-                  d.selectedEnd = selectedEnd;
+                  selectedEnd = selectedEnd;
                }
-               d.isDragging = false;
                $(opec).trigger('rangeUpdate.opec', [d]);
+               dragging = null;
                self.redraw();  
-				}
-			}		
+            }
+         }
 		});
 //       
    // // Separator line removal

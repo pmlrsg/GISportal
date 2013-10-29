@@ -452,7 +452,7 @@ function createHelpMessages()
       text: function() {
          return 'Some things to try when dealing with bad requests:' + 
          '<ol>' +
-            '<li>Check the parameters are valid. BaseURL, Coverage, Type, etc..</li>' +
+            '<li>Check the parameters are valid. Layer, Type, etc..</li>' +
             '<li>Using a Bbox? Is it inside the area covered by the layer? Have you tried it in a different spot?</li>' + 
             '<li>Using a date? Is it correctly formated? Does the layer have data for that time?</li>' + 
             '<li>Is the baseURL the correct one for that layer?</li>' + 
@@ -496,10 +496,10 @@ function createHelpMessages()
          return 'Sorry what was that? Could you say that again?';         
       },
       text: function(data) {
-         return 'We had a little trouble understanding what you wanted as a bad request was made. ' + 
+         return 'We had a little trouble understanding what you wanted as not all of the data was provided. ' + 
          'You can view the request for yourself ' + 
          '<a id="url400" href="' + data.url + '" target="_blank">here</a>' + '. ' +
-         'Make sure you have entered all the required parameters (base URL, coverage and type) ' +
+         'Make sure you have entered all the required parameters (layer and type of graph) ' +
          'and that each of them is valid before trying again. If you still have trouble it may be ' + 
          'that there is no data available for your selection. Do you need some further help? ' +
          '<a id="error400-next" href="#">Yes</a>';

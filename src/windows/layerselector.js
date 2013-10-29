@@ -98,7 +98,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       if (typeof extraInfo.tags !== 'undefined' && extraInfo.tags !== null) {
          for(var tag in extraInfo.tags) {
             if(extraInfo.tags[tag] !== null)  {
-            	$layer.attr('data-' + tag, extraInfo.tags[tag]);
+               $layer.attr('data-' + tag, extraInfo.tags[tag]);
             }
          }
       }
@@ -152,9 +152,9 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    
       if(layer) {            
          console.log("Removing layer..."); // DEBUG
-			layer.unselect();			
+         layer.unselect();       
          opec.removeLayer(layer);           
-			console.log("Layer removed"); // DEBUG
+         console.log("Layer removed"); // DEBUG
          
          self.toggleLayerSelection(li);
       }

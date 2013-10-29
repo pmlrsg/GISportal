@@ -307,7 +307,6 @@ opec.layer = function(microlayer, layerData) {
 			
 			opec.refreshDateCache();
 		}
-
 	};
    
    //this.setLayerIndex = function(id, index) {      
@@ -678,6 +677,7 @@ opec.removeLayer = function(layer) {
    delete opec.selectedLayers[layer.id];
    opec.nonSelectedLayers[layer.id] = layer;
    
+   $('#graphcreator-coverage option[value=' + layer.name + ']').remove();
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);

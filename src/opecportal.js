@@ -834,8 +834,7 @@ opec.getTopLayer = function() {
 opec.updateLayerData = function(layerID)  {
    var layer = opec.getLayerByID(layerID);
    $('#graphcreator-baseurl').val(layer.wcsURL);
-   $('#graphcreator-coverage').val(layer.origName);
-   $('#graphcreator-coverage-real').val(layerID);      
+   $('#graphcreator-coverage option[value=' + layer.origName + ']').prop('selected', true);
 };
 
 // ----------------------------------------------------------------------------

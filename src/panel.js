@@ -432,7 +432,8 @@ opec.rightPanel.open = function() {
 }
 
 opec.rightPanel.toggle = function() {
-   $(".rPanel").toggle("fast");
+	$('#advanced-inputs-header').click();
+	$(".rPanel").toggle("fast");
    $(".triggerR").toggleClass("active");
 }
 
@@ -440,13 +441,13 @@ opec.rightPanel.updateCoverageList = function()  {
 	var selected = $('#graphcreator-coverage option:selected');
 	$('#graphcreator-coverage option').remove();
 	var keys = Object.keys(opec.selectedLayers);
-	var selected = '';
 	for (var i = 0; i < keys.length; i++)  {
 		// TODO Nicer way of select
  		var layer = opec.selectedLayers[keys[i]];
 		if (opec.selectedLayers[keys[i]] === selected.value) selected = 'selected'; 
-		$('#graphcreator-coverage').append('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
+		$('#graphcreator-coverage').prepend('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
+	$('#graphcreator-coverage').prepend('<option value="" disabled="" selected="">Name of the Layer</option>');
 }
 
 opec.rightPanel.setup = function() {
@@ -912,25 +913,31 @@ opec.rightPanel.setupGraphingTools = function() {
          graphYAxis: graphYAxis,
          graphZAxis: $('#graphcreator-coverage option:checked').val()
       };      
-      
-      var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].displayTitle;
-      var graphObject = {};
-      graphObject.graphData = graphParams;      
-      //graphObject.description = prompt("Please enter a description");
-      graphObject.description = title;
-		graphObject.title = title;
-      
-      // Async post the state
-      opec.genericAsync('POST', opec.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
-         console.log('POSTED graph!');
-      }, function(request, errorType, exception) {
-         console.log('Failed to post graph!');
-      }, 'json', {});
-      
-      var options = {};
-      options.title = title;
-      opec.graphs.data(graphParams, options);
-   });
+     	
+	  	if (graphParams.baseurl && graphParams.coverage)  {
+			var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].displayTitle;
+			var graphObject = {};
+			graphObject.graphData = graphParams;      
+			//graphObject.description = prompt("Please enter a description");
+			graphObject.description = title;
+			graphObject.title = title;
+			
+			// Async post the state
+			opec.genericAsync('POST', opec.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
+				console.log('POSTED graph!');
+			}, function(request, errorType, exception) {
+				console.log('Failed to post graph!');
+			}, 'json', {});
+			
+			var options = {};
+			options.title = title;
+			opec.graphs.data(graphParams, options);
+  		}
+		else {
+			// TODO: Add Gritter
+			console.log('No data provided');	
+		}
+	 });
 };
 
 opec.rightPanel.setupDataExport = function() {
