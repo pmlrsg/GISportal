@@ -290,6 +290,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
       layer.$layer = $('#' + layer.id);
       opec.updateLayerData(layer.id);
       opec.rightPanel.updateCoverageList();
+		
 		// Remove the dummy layer
       //removeDummyHelpLayer()
    }

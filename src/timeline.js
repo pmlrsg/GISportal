@@ -123,7 +123,7 @@ opec.TimeLine = function(id, options) {
    }
    
    // Set initial y scale
-   this.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
+   self.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
    console.log("xscale width:" + this.width);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
@@ -167,8 +167,8 @@ opec.TimeLine = function(id, options) {
    
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom()
-                  .x(this.xScale)
-                  .on('zoom', function() { isDragging = true; self.redraw(); console.log("ZOOM!"); });
+                 .x(self.xScale)
+                 .on('zoom', function() { isDragging = true; self.redraw(); console.log("ZOOM!"); });
 
    // Append the svg and add a class before attaching both events.
    this.chart = d3.select('div#' + this.id)
@@ -285,9 +285,9 @@ opec.TimeLine.prototype.redraw = function() {
    var self = this;  // Useful for when the scope/meaning of "this" changes
 
    // Recalculate the x and y scales before redraw
-   this.xScale.range([0, this.width]);
+   self.xScale.range([0, this.width]);
    this.yScale.domain([0, this.timebars.length]).range([0, this.height]);
-   
+ 
    // Scale the chart and main drawing areas
    $('#' + this.id).height(this.chartHeight);
    this.main.attr('width', this.width).attr('height', this.height);
@@ -296,10 +296,11 @@ opec.TimeLine.prototype.redraw = function() {
       .style('clip', 'rect( 0px, '+ (this.width + this.margin.left) +'px, ' + this.chartHeight + 'px, ' + this.margin.left + 'px)');
 
    // Scale the x-axis and define the x-scale label format
+   // This appears to be broken in that it moves to the selected date rather than selected zoom!
    this.main.selectAll('.axis').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').call(this.xAxis);
    
    // Generate a dynamic x-axis scale dependent on dimensions
-   var scaling = (this.xScale.domain()[1] - this.xScale.domain()[0]) / (this.width * 4e7);
+   var scaling = (self.xScale.domain()[1] - self.xScale.domain()[0]) / (this.width * 4e7);
    if (scaling > 12) {
       this.xAxis.ticks(d3.time.years, d3.round(scaling/12)).tickFormat(d3.time.format('%Y'));
    }
@@ -569,11 +570,12 @@ opec.TimeLine.prototype.reset = function() {
 
 // Zoom function to a new date range
 opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
+   var self = this;
    var minDate = new Date(startDate);
    var maxDate = new Date(endDate);
    this.minDate = ((minDate instanceof Date) ? minDate : this.minDate);
-   this.maxDate = ((minDate instanceof Date) ? maxDate : this.maxDate);
-   this.xScale.domain([this.minDate, this.maxDate]);
+   this.maxDate = ((maxDate instanceof Date) ? maxDate : this.maxDate);
+   self.xScale.domain([this.minDate, this.maxDate]);
    this.redraw();
 };
 
@@ -613,6 +615,14 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    
    this.reHeight();
    this.redraw();
+
+   // TODO: Move asap. tidy up
+   if (Object.keys(opec.layers).length === 1)  {
+      var data = opec.timeline.layerbars[0];
+      opec.timeline.zoomDate(data.startDate, data.endDate);
+      opec.timeline.setDate(data.endDate);
+      this.redraw();
+   }  
 };
 
 opec.TimeLine.prototype.addRangeBar = function(name, callback) {

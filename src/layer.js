@@ -284,7 +284,7 @@ opec.layer = function(microlayer, layerData) {
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
          opec.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
-                  
+        			
          // Update map date cache now a new temporal layer has been added
          opec.refreshDateCache();
          $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
