@@ -166,7 +166,6 @@ opec.TimeLine = function(id, options) {
       console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
    };
   
-   firstOne = this;
 
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom()
