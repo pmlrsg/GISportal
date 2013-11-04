@@ -439,13 +439,15 @@ opec.rightPanel.toggle = function() {
 }
 
 opec.rightPanel.updateCoverageList = function()  {
-	var selected = $('#graphcreator-coverage option:selected');
+	var selectedLayer = $('#graphcreator-coverage option:selected');
 	$('#graphcreator-coverage option').remove();
 	var keys = Object.keys(opec.selectedLayers);
 	for (var i = 0; i < keys.length; i++)  {
 		// TODO Nicer way of select
  		var layer = opec.selectedLayers[keys[i]];
-		if (opec.selectedLayers[keys[i]] === selected.value) selected = 'selected'; 
+		var selected = '';
+		if (opec.selectedLayers[keys[i]] === selectedLayer.value) selected = 'selected';
+	   console.log('Coverage', keys[i]);	
 		$('#graphcreator-coverage').prepend('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
 	$('#graphcreator-coverage').prepend('<option value="" disabled="" selected="">Name of the Layer</option>');

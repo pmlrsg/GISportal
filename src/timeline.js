@@ -6,6 +6,7 @@
  * OPEC.Timeline has been tested on Firefox 18.0, Safari 5.1.2, Chrome 24.0, Opera 11.64 & IE 9+.
  *
  * @author  Martyn J Atkins, <martat@pml.ac.uk>
+ *          Shane Hudson, <shh@pml.ac.uk>
  * @date    2013-02-28
  * @version 1.0
  *
@@ -111,19 +112,19 @@ opec.TimeLine = function(id, options) {
    //--------------------------------------------------------------------------
    
    // Set initial x scale
-   var minDate = d3.min(this.timebars, function(d) { return new Date(d.startDate); });
-   var maxDate = d3.max(this.timebars, function(d) { return new Date(d.endDate); });
+   this.minDate = d3.min(this.timebars, function(d) { return new Date(d.startDate); });
+   this.maxDate = d3.max(this.timebars, function(d) { return new Date(d.endDate); });
    
    // Set some default max and min dates if no initial timebars (6 months either side of selected date)
-   if (typeof minDate === 'undefined' || minDate === null ) {
-      minDate = new Date(this.selectedDate.getTime() - 15778450000);
+   if (typeof this.minDate === 'undefined' || this.minDate === null ) {
+      this.minDate = new Date(this.selectedDate.getTime() - 15778450000);
    }
-   if (typeof maxDate === 'undefined' || maxDate === null ) {
-      maxDate = new Date(this.selectedDate.getTime() + 15778450000);
+   if (typeof this.maxDate === 'undefined' || this.maxDate === null ) {
+      this.maxDate = new Date(this.selectedDate.getTime() + 15778450000);
    }
    
    // Set initial y scale
-   self.xScale = d3.time.scale().domain([minDate, maxDate]).range([0, this.width]);
+   this.xScale = d3.time.scale().domain([this.minDate, this.maxDate]).range([0, this.width]);
    console.log("xscale width:" + this.width);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
@@ -164,11 +165,14 @@ opec.TimeLine = function(id, options) {
       opec.filterLayersByDate(self.selectedDate);
       console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
    };
-   
+  
+   firstOne = this;
+
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom()
-                 .x(self.xScale)
-                 .on('zoom', function() { isDragging = true; self.redraw(); console.log("ZOOM!"); });
+                .x(this.xScale)
+              .on('zoom', function() { isDragging = true; console.log(self.xScale.domain()); self.redraw(); console.log("ZOOM-2!"); });
+                 
 
    // Append the svg and add a class before attaching both events.
    this.chart = d3.select('div#' + this.id)
@@ -177,8 +181,8 @@ opec.TimeLine = function(id, options) {
       .call(self.zoom)
       .on('click', self.clickDate)
       .on('mousedown', function() {  isDragging = false; console.log('mousedown || ' + isDragging); });
-  
-   
+
+
    //--------------------------------------------------------------------------
       
    // Create the graphical drawing area for the widget (main)
@@ -211,6 +215,7 @@ opec.TimeLine = function(id, options) {
     * Private method/function which handles the drag event of the selected date marker
     */
    this.dragDate = function() {
+      var self = opec.timeline;
       var x = self.xScale(self.draggedDate) + d3.event.dx;
       
       // Prevent dragging the selector off-scale
@@ -245,7 +250,7 @@ opec.TimeLine = function(id, options) {
       ).on("mousedown", function() { d3.event.stopPropagation(); });
 
    // X-axis intialisation
-   this.xAxis = d3.svg.axis().scale(self.xScale).orient('bottom').tickSize(6, 0, 0);
+   this.xAxis = d3.svg.axis().scale(this.xScale).orient('bottom').tickSize(6, 0, 0);
    this.main.append('svg:g').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').attr('class', 'axis');
 
    // Initialise the time bar label area to the left of the timeline
@@ -283,11 +288,11 @@ opec.TimeLine.prototype.redraw = function() {
    console.log("redraw");
    
    var self = this;  // Useful for when the scope/meaning of "this" changes
-
+   console.log('------ ' + this.xScale.domain());
    // Recalculate the x and y scales before redraw
-   self.xScale.range([0, this.width]);
+    this.xScale.range([0, this.width]);
+   //this.xScale.domain([self.minDate, self.maxDate]).range([0, this.width]);
    this.yScale.domain([0, this.timebars.length]).range([0, this.height]);
- 
    // Scale the chart and main drawing areas
    $('#' + this.id).height(this.chartHeight);
    this.main.attr('width', this.width).attr('height', this.height);
@@ -296,10 +301,9 @@ opec.TimeLine.prototype.redraw = function() {
       .style('clip', 'rect( 0px, '+ (this.width + this.margin.left) +'px, ' + this.chartHeight + 'px, ' + this.margin.left + 'px)');
 
    // Scale the x-axis and define the x-scale label format
-   // This appears to be broken in that it moves to the selected date rather than selected zoom!
    this.main.selectAll('.axis').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').call(this.xAxis);
-   
    // Generate a dynamic x-axis scale dependent on dimensions
+   
    var scaling = (self.xScale.domain()[1] - self.xScale.domain()[0]) / (this.width * 4e7);
    if (scaling > 12) {
       this.xAxis.ticks(d3.time.years, d3.round(scaling/12)).tickFormat(d3.time.format('%Y'));
@@ -522,8 +526,8 @@ opec.TimeLine.prototype.redraw = function() {
    
    // Draw the current date-time line
    this.nowLine
-      .attr('x1', d3.round(self.xScale(self.now) + 0.5)).attr('y1', 0)
-      .attr('x2', d3.round(self.xScale(self.now) + 0.5)).attr('y2', self.height);
+      .attr('x1', d3.round(this.xScale(self.now) + 0.5)).attr('y1', 0)
+      .attr('x2', d3.round(this.xScale(self.now) + 0.5)).attr('y2', self.height);
 
    // Draw the selected date-time line
    this.selectedDateLine
@@ -575,7 +579,10 @@ opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
    var maxDate = new Date(endDate);
    this.minDate = ((minDate instanceof Date) ? minDate : this.minDate);
    this.maxDate = ((maxDate instanceof Date) ? maxDate : this.maxDate);
-   self.xScale.domain([this.minDate, this.maxDate]);
+   console.log(minDate, maxDate);
+   console.log(this.xScale.domain());
+   this.xScale.domain([this.minDate, this.maxDate]).range([0, this.width]);
+   this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 };
 
@@ -611,18 +618,21 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    newTimebar.colour = '';
    
    this.timebars.push(newTimebar);
-   this.layerbars.push(newTimebar);
-   
-   this.reHeight();
-   this.redraw();
+   this.layerbars.push(newTimebar); 
 
    // TODO: Move asap. tidy up
    if (Object.keys(opec.layers).length === 1)  {
+      this.reHeight();
+      // redraw is done in zoom
       var data = opec.timeline.layerbars[0];
       opec.timeline.zoomDate(data.startDate, data.endDate);
-      opec.timeline.setDate(data.endDate);
-      this.redraw();
+      //opec.timeline.setDate(data.endDate);
+      // Already redraws within zoom - this.redraw();
    }  
+   
+      this.reHeight();
+      this.redraw();
+   
 };
 
 opec.TimeLine.prototype.addRangeBar = function(name, callback) {

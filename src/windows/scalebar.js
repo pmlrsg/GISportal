@@ -69,7 +69,7 @@ opec.window.createScalebar = function($trigger) {
    
    // Event to automatically set the scale if the "Auto Scale" button is pressed
    $('#' + layer.id + '-auto').on('click', '[type="button"]', function(e) {     
-   	opec.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent('http://vostok.npm.ac.uk:8080/thredds/wms/'+opec.getTopLayer().id + '?item=minmax&layers=' + opec.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=-1&time=2003-12-16T12%3A00%3A00.000Z&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
+   	opec.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(opec.getTopLayer().wmsURL + 'item=minmax&layers=' + opec.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=-1&time='+ new Date(opec.getTopLayer().selectedDateTime).toISOString() + '&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
    		validateScale(layer, d.min, d.max, true);
    	}, null, 'json', {});                          
       

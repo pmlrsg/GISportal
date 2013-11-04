@@ -58,8 +58,7 @@
       $('li[data-id="' + _current + '"]', _dom).show().addClass('active').draggable(); 
       if(_steps[currentStep].next >= 0) $(_linkNext, _currentDOM).show();
       else $(_linkNext, _currentDOM).hide();
-      
-      if(_linkPrev != null && _steps[currentStep].prev >= 0) $(_linkPrev, _currentDOM).show();
+           if(_linkPrev != null && _steps[currentStep].prev >= 0) $(_linkPrev, _currentDOM).show();
       else $(_linkPrev, _currentDOM).hide();
 
       if (_domLoaded)  {
@@ -91,27 +90,6 @@
       	}
       } 
       
-      $(_dom).one('click', 'li[data-id="' + _current + '"] ' + _linkClose, function() {
-      	$(_dom).hide();
-      	if(!_options.ignore_cookies)  {
-	      	$('#js-walkthrough-confirm').extendedDialog({
-			      resizable: false,
-			      height:140,
-			      modal: true,
-	      		showHelp: false,
-			      buttons: {
-	     			   "Yes": function() {
-			        		_setCookie('walkthrough-hide', false);
-							$( this ).extendedDialog( "close" );
-			        	},
-			        	"No": function() {
-			        		_setCookie('walkthrough-hide', true);
-	        				$( this ).extendedDialog( "close" );
-			        	}
-			      }
-			    });
-      	}
-      });
       
    }
    
@@ -206,7 +184,30 @@
 		$('body').append('<div class=\"overlay\" style=\"height: 100%; top: 0; left: 0; position: absolute; background: rgba(255,255,255,0.25); width: 100%; z-index: 10001\"></div>');
 		$('#walkthrough').on('click', '.js-walkthrough-close', function() { $('.overlay').remove(); });
 		
-		
+		$(_linkClose).button({ label: 'Close', icons: { primary: 'ui-icon-closethick'}, text: false });
+ 
+      $(_dom).on('click',  _linkClose, function() {
+      	$(_dom).hide();
+      	if(!_options.ignore_cookies)  {
+	      	$('#js-walkthrough-confirm').extendedDialog({
+			      resizable: false,
+			      height:140,
+			      modal: true,
+	      		showHelp: false,
+			      buttons: {
+	     			   "Yes": function() {
+			        		_setCookie('walkthrough-hide', false);
+							$( this ).extendedDialog( "close" );
+			        	},
+			        	"No": function() {
+			        		_setCookie('walkthrough-hide', true);
+	        				$( this ).extendedDialog( "close" );
+			        	}
+			      }
+			    });
+      	}
+      });
+
       if (_options.ignore_cookies == false)  {
 	      // Getting the cookie, checking progress
 	      var cookie = _getCookie('walkthrough-hide');
@@ -226,7 +227,8 @@
 	      $(_dom).show();
 	      _reposition();
       }
-   	$(_linkClose).button({ label: 'Close', icons: { primary: 'ui-icon-closethick'}, text: false });
+   	
+
    };
    
    $.fn.walkthroughCurrentStep = function () { return _current; }
