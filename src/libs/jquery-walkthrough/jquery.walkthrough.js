@@ -95,7 +95,7 @@
    
    function _showNext(currentStep)  {
       var next = _steps[currentStep].next;
-      if (next >= 0)  {
+      if (next >= 0 && _dom.is(':visible'))  {
       	console.log('Next: ', next);
          //_setCookie('walkthrough-progress', next, 30);  
          _showCurrent(next);
@@ -208,7 +208,7 @@
       	}
       });
 
-      if (_options.ignore_cookies == false)  {
+      if (_options.ignore_cookies == false )  {
 	      // Getting the cookie, checking progress
 	      var cookie = _getCookie('walkthrough-hide');
 	      // >= 0 to avoid any problems such as undefined etc
