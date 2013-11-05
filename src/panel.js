@@ -1110,8 +1110,8 @@ opec.topbar.setup = function() {
    
    // Create buttons
    $('#opec-toolbar-actions').buttonset();
-   $('#mapInfoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-info'} });
-   $('#shareMapToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} });
+   $('#mapInfoToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-info'} });
+   $('#shareMapToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-link'} });
    $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
    $('#opec-button-3d').button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
       .click(function(e) {
