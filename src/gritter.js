@@ -553,6 +553,16 @@ function createHelpMessages()
       max: 1
    };
    
+   opec.gritter._notifications['dataNotSelected'] = {
+      title: function() {
+         return 'No Data Selected';         
+      },
+      text: function(data) {
+         return 'Please make sure to select a layer from the dropdown list and then press the generate graph button again.';
+      },
+      max: 1
+   };
+   
    opec.gritter._notifications['graphError'] = {
       title: function() {
          return 'Sorry, we failed to create a graph';

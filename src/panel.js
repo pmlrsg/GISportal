@@ -937,8 +937,7 @@ opec.rightPanel.setupGraphingTools = function() {
 			opec.graphs.data(graphParams, options);
   		}
 		else {
-			// TODO: Add Gritter
-			console.log('No data provided');	
+			opec.gritter.showNotification ('dataNotSelected', null);
 		}
 	 });
 };
