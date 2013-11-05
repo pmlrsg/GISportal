@@ -1111,7 +1111,7 @@ opec.topbar.setup = function() {
    // Create buttons
    $('#opec-toolbar-actions').buttonset();
    $('#mapInfoToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-info'} });
-   $('#shareMapToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-link'} });
+   $('#shareMapToggleBtn').button({ label: '', disabled: 'true',  icons: { primary: 'ui-icon-opec-globe-link'} });
    $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
    $('#opec-button-3d').button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
       .click(function(e) {
@@ -1126,10 +1126,10 @@ opec.topbar.setup = function() {
    $('#infoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
    
    // Add toggle functionality for dialogs
-   addDialogClickHandler('#shareMapToggleBtn', '#shareOptions');
-   addDialogClickHandler('#mapInfoToggleBtn', '#mapInfo');
-   addDialogClickHandler('#layerPreloader', $('#opec-layerSelection').parent());
-   addDialogClickHandler('#infoToggleBtn', $('#walkthrough-menu').parent());
+   addDialogClickHandler('shareMapToggleBtn', '#shareOptions');
+   addDialogClickHandler('mapInfoToggleBtn', '#mapInfo');
+   addDialogClickHandler('layerPreloader', $('#opec-layerSelection'));
+   addDialogClickHandler('infoToggleBtn', $('#walkthrough-menu'));
    
    
    
@@ -1161,8 +1161,9 @@ opec.topbar.setup = function() {
    }
    
    function addDialogClickHandler(idOne, idTwo) {
-      $(idOne).click(function(e) {
-         $(idTwo).toggle();
+      $("label[for=" + idOne + "]").click(function(e) {
+         if ($(idTwo).extendedDialog("isOpen")) $(idTwo).extendedDialog("close");
+         else $(idTwo).extendedDialog("open");
       });
    }
 

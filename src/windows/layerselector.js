@@ -19,10 +19,18 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       dblclick: "collapse",
       restore: function(e, dlg) {
          // Used to resize content on the dialog.
-         $(this).trigger("resize");
+         $(this).trigger("resize"); 
       },
       help : function(e, dlg) {
          opec.gritter.showNotification('layerSelector', null);
+      },
+      close: function(event, ui)  {
+         console.log('layer selector closed');
+         $('label[for=layerPreloader]').removeClass('ui-state-active');
+      },
+      open: function(event, ui)  {
+         console.log('layer selector open');
+         $('label[for=layerPreloader]').addClass('ui-state-active');
       }
    });
      
