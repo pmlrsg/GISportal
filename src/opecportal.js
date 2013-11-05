@@ -388,6 +388,7 @@ opec.refreshDateCache = function() {
    });
    
    opec.enabledDays = opec.utils.arrayDeDupe(opec.enabledDays);  
+   opec.rightPanel.updateCoverageList();
    console.info('Global date cache now has ' + opec.enabledDays.length + ' members.'); // DEBUG
 };
 

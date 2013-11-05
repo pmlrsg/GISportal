@@ -443,14 +443,14 @@ opec.rightPanel.updateCoverageList = function()  {
 	$('#graphcreator-coverage option').remove();
 	var keys = Object.keys(opec.selectedLayers);
 	for (var i = 0; i < keys.length; i++)  {
-		// TODO Nicer way of select
+		// TODO Nicer way of select, make sure to clean up
  		var layer = opec.selectedLayers[keys[i]];
+		var tickedLayers = $('#opec-lPanel-operational input:checked');
 		var selected = '';
-		if (opec.selectedLayers[keys[i]] === selectedLayer.value) selected = 'selected';
-	   console.log('Coverage', keys[i]);	
+		if (layer === selectedLayer.value || (tickedLayers.length === 1 && layer === tickedLayers[0].value) || i === keys.length - 1) selected = 'selected';
 		$('#graphcreator-coverage').prepend('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
-	$('#graphcreator-coverage').prepend('<option value="" disabled="" selected="">Name of the Layer</option>');
+	$('#graphcreator-coverage').prepend('<option value="" disabled="">Name of the Layer</option>');
 }
 
 opec.rightPanel.setup = function() {
