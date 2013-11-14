@@ -451,6 +451,7 @@ opec.rightPanel.updateCoverageList = function()  {
 		$('#graphcreator-coverage').prepend('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
 	$('#graphcreator-coverage').prepend('<option value="" disabled="">Name of the Layer</option>');
+   $('#graphcreator-coverage').change();
 }
 
 opec.rightPanel.setup = function() {
@@ -830,7 +831,21 @@ opec.rightPanel.setupGraphingTools = function() {
 	$('#graphcreator-coverage').on('change', function()  {
 		var layerID = $('option:selected', this).val();	
 		var layer = opec.getLayerByID(layerID);
-		$('#graphcreator-baseurl').val(layer.wcsURL);
+      if (layer.wcsURL)  {
+         $('#graphcreator-baseurl').val(layer.wcsURL);
+
+         if (layer.controlID === 'refLayers') {
+            $('#advanced-inputs-header').parent().hide();
+            $('.js-reference').show();
+            
+            // TEMP CODE
+            $('#graphcreator-reference-variable option:selected').attr('value', 'TEMP-CPHLPS01').html('TEMP-CPHLPS01'); 
+         }
+         else  {
+            $('#advanced-inputs-header').parent().show();
+            $('.js-reference').hide();
+         }
+      }
 	});
 
    // Check for changes to the selected layer
@@ -907,7 +922,7 @@ opec.rightPanel.setupGraphingTools = function() {
       
       var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
-         coverage: $('#graphcreator-coverage option:selected').val(),
+         coverage: opec.selectedLayers[$('#graphcreator-coverage option:selected').val()].origName,
          type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
@@ -1057,7 +1072,7 @@ opec.topbar.setup = function() {
          // Synchronise date with the timeline
          opec.timeline.setDate(thedate);
          // Filter the layer data to the selected date
-         opec.filterLayersByDate(thedate);
+         //opec.filterLayersByDate(thedate);
       },
       yearRange: "1970:2020"
    });
