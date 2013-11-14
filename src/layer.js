@@ -327,23 +327,23 @@ opec.layer = function(microlayer, layerData) {
     */
    this.matchDate = function(date) {
       var layer = this;
-      
+      var nearestDate = null; 
       var filtArray = $.grep(layer.DTCache, function(dt, i) {
          var datePart = dt.substring(0, 10);
+         if (nearestDate === null || (datePart > nearestDate && datePart < date) || (datePart < nearestDate && datePart > date)) nearestDate = dt; 
          return (datePart == date);
       });
       
       if (filtArray.length > 0) {
          return filtArray;
-      } else {
+      } 
+      else  if (nearestDate != null) {
+         console.log("Using nearest date: " + nearestDate);
+         return [nearestDate];
+      }
+      else {
          return null;
       }
-   };
-   
-   this.closestDate = function(date) {
-      var layer = this;
-      
-      
    };
    
    /**
@@ -406,7 +406,7 @@ opec.layer = function(microlayer, layerData) {
          type: 'GET',
          url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
          dataType: 'json',
-         asyc: true,
+         async: true,
          success: function(data) {
             layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
             layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
@@ -719,7 +719,7 @@ opec.getLayerData = function(fileName, microlayer) {
       type: 'GET',
       url: "./cache/layers/" + fileName,
       dataType: 'json',
-      asyc: true,
+      async: true,
       cache: false,
       success: function(data) {
          // Convert the microlayer. 
