@@ -1,6 +1,6 @@
 from opecflask import create_app
 
-app, database = create_app(path='/var/www/html/rbb/opecvis/middleware/opecflask')
+app, database = create_app(path='/var/www/html/opec/middleware/opecflask/')
 
 if app.debug: use_debugger = True
 try:

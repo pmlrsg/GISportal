@@ -117,8 +117,7 @@ opec.TimeLine = function(id, options) {
    
    // Set some default max and min dates if no initial timebars (6 months either side of selected date)
    if (typeof this.minDate === 'undefined' || this.minDate === null ) {
-      this.minDate = new Date(this.selectedDate.getTime() - 15778450000);
-   }
+      this.minDate = new Date(this.selectedDate.getTime() - 15778450000);}
    if (typeof this.maxDate === 'undefined' || this.maxDate === null ) {
       this.maxDate = new Date(this.selectedDate.getTime() + 15778450000);
    }
@@ -625,12 +624,12 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
       // redraw is done in zoom
       var data = opec.timeline.layerbars[0];
       opec.timeline.zoomDate(data.startDate, data.endDate);
-      //opec.timeline.setDate(data.endDate);
+      opec.timeline.setDate(data.endDate);
       // Already redraws within zoom - this.redraw();
    }  
    
-      this.reHeight();
-      this.redraw();
+   this.reHeight();
+   this.redraw();
    
 };
 
@@ -650,8 +649,21 @@ opec.TimeLine.prototype.addRangeBar = function(name, callback) {
    this.rangebars.push(newRangebar);
    
    this.reHeight();
-   this.redraw();  
+   this.redraw(); 
+
 };
+
+// NOTE: There may be problems with duplicated unique IDs
+opec.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
+   if (rangebar.selectedEnd) rangebar.selectedEnd = new Date(rangebar.selectedEnd);
+   if (rangebar.selectedStart) rangebar.selectedStart = new Date(rangebar.selectedStart);
+
+   this.timebars.push(rangebar);
+   this.rangebars.push(rangebar);
+
+   this.reHeight();
+   this.redraw();
+}
 
 // Remove a time bar by name (if found)
 opec.TimeLine.prototype.removeTimeBarByName = function(name) {
@@ -692,6 +704,8 @@ opec.TimeLine.prototype.setDate = function(date) {
    this.selectedDate = ((selectedDate instanceof Date) ? selectedDate : this.selectedDate);
    // Move the selected date-time line
    this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
+   $('#viewDate').datepicker('setDate', self.selectedDate).blur();
+   opec.filterLayersByDate(date);
 };
 
 // Get the currently selected date 

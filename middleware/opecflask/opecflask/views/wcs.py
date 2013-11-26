@@ -156,7 +156,7 @@ def contactWCSServer(url):
       
 def saveOutTempFile(resp):
    current_app.logger.debug('Saving out temporary file...')
-   temp = tempfile.NamedTemporaryFile('w+b', delete=False)
+   temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
    temp.write(resp.read())
    temp.close()
    resp.close()
@@ -376,7 +376,11 @@ def hovmoller(dataset, params):
    
    # If 4 dimensions, assume depth and switch with time
    if numDimensions == 4:
-      depth = np.array(getDepth(dataset))
+      depth = np.array(getDepth(dataset)) 
+      depth = [0]
+      if depth is None:
+         depth = [0]
+         current_app.logger.debug('checking depth: ' + depth)
       zMaskedArray.swapaxes(1, 0)
       if 'depth' in params:         
          if params['depth'].value in depth:

@@ -4,11 +4,19 @@
 <h1>OPEC Portal OpenID</h1>
 {% block body %}{% endblock %}
 <ul class=navigation>
-  {% if g.user %}
-  <li><a href="{{ url_for('portal_user.logout') }}">sign out [{{ g.user.name }}]</a>
-  {% else %}
-  <li><a href="{{ url_for('portal_user.login_with_google') }}">sign in</a>
-  {% endif %}
+   {% if g.user %}
+      <script>
+         window.opener.opec.openid.loggedIn = true;
+         window.close();
+      </script>
+      <li><a href="{{ url_for('portal_user.logout') }}">sign out [{{ g.user.name }}]</a>
+      {% else %}
+      <script>
+         window.opener.opec.openid.loggedIn = false;
+         window.close();
+      </script>
+      <li><a href="{{ url_for('portal_user.login_with_google') }}">sign in</a>
+   {% endif %}
 </ul>
 {% for message in get_flashed_messages() %}
   <p class=message>{{ message }}

@@ -3,7 +3,7 @@
 servers = {
    'hcmr': { 
       'name': 'hcmr',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -12,7 +12,7 @@ servers = {
       'options': {
          'providerShortTag': 'HCMR'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?'
    },
    'pml_annual': { 
       'name': 'pml_annual',
@@ -55,7 +55,7 @@ servers = {
    },
    'pml_daily': { 
       'name': 'pml_daily',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-D-AGGSLOW?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/PML-D-AGGSLOW?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -64,7 +64,7 @@ servers = {
       'options': {
          'providerShortTag': 'PML'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-D-AGGSLOW?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/PML-D-AGGSLOW?'
    },
    'cefas': { 
       'name': 'cefas',
@@ -81,7 +81,7 @@ servers = {
    },
    'dmi': { 
       'name': 'dmi',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/DMI/chl.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI/chl.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -90,11 +90,11 @@ servers = {
       'options': {
          'providerShortTag': 'DMI'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/DMI/chl.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI/chl.nc?'
    },
    'ogs': { 
       'name': 'ogs',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -103,6 +103,22 @@ servers = {
       'options': {
          'providerShortTag': 'OGS'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?'
-   }
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?'
+   },
+	'hawaii': {
+			'name': 'hawaii',
+			'url': 'http://oos.soest.hawaii.edu/thredds/wms/hioos/satellite/dhw?',
+			'params': {
+				'SERVICE': 'WMS',
+				'request': 'GetCapabilities',
+				'version': '1.3.0'
+				},
+			'options': {
+				'providerShortTag': 'HiOOS'
+				},
+			'wcsurl':
+			'http://oos.soest.hawaii.edu/thredds/wcs/hioos/satellite/dhw?'
+			},
+
+
 }

@@ -162,6 +162,7 @@ def setState():
          output['message'] = 'state stored'
          output['status'] = '200'
       else:
+         output['url'] = short_url.encode_url(checksumMatch.id)
          output['message'] = 'Failed to add state as state already exists'
          output['status'] = '400'
    

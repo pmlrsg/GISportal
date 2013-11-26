@@ -23,7 +23,7 @@ def create_app(path):
    
    #=== SETUP DATABASE ===#
    app.config['DATABASE_URI'] = 'sqlite:///' + path + '/opecflask/user_storage.db'
-   
+
    #=== ROUTES ===#
    @app.before_request
    def before_request():
@@ -111,7 +111,7 @@ def setup_blueprints(app):
 # when run by apache things will create in the wrong place. 
 path = sys.path[0]
 app = create_app(path)
-oid = OpenID(app, path + '/tmp')
+oid = OpenID(app, '/home/rsgadmin/cache/opec/openID')
 print path
 
 # register application views and blueprints  

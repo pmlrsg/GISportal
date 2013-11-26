@@ -154,7 +154,7 @@ opec.utils.uniqueID = function()  {
 };
 
 opec.utils.isNullorUndefined = function(object) {
-   if(typeof object === null || typeof object === "undefined") {
+   if(object === null || typeof object === "undefined") {
       return true;
    }
    

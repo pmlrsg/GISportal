@@ -78,7 +78,7 @@ opec.window.history = function() {
                   var data = JSON.parse(v.graph);
                   data.id = data.description + v.lastUsed;
                   data.data = JSON.stringify(data.graphData);
-                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll').append(opec.templates.historyList(data));
+                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll ul').append(opec.templates.historyList(data));
                   $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
                } 
             );
@@ -90,7 +90,7 @@ opec.window.history = function() {
    }
    
    $('#opec-historyWindow-graphs .opec-historyWindow--scroll').on('click', 'li', function() {
-      $('.opec-historyWindow--scroll li').removeClass('selected ui-state-highlight');
+      $('.opec-historyWindow--scroll li').removeClass('selected ui-tate-highlight');
       $(this).addClass('selected ui-state-highlight');
       $('#opec-historyWindow-graphs .opec-historyWindow--data li').addClass('hidden');
       $('#opec-historyWindow-graphs .opec-historyWindow--data li').filter(function(d, e) {
@@ -122,25 +122,41 @@ opec.window.history = function() {
    });
    
    /* States */
-   opec.genericAsync(
-      'GET',
-      '/service/state',
-      {},
-      function(d) {
-         $.each(d.output, function(k,v) { 
-               var data = JSON.parse(v.state);
-               data.id = data.description + v.lastUsed;
-               data.data = JSON.stringify(data.state);
-               data.title = v.title;
-               $('#opec-historyWindow-states .opec-historyWindow--scroll').append(opec.templates.historyList(data));
-               $('#opec-historyWindow-states .opec-historyWindow--data').append(opec.templates.historyData(data));
-            } 
+   opec.window.history.loadStateHistory = function() {
+      if (opec.openid.loggedIn === true) {
+         opec.genericAsync(
+            'GET',
+            '/service/state',
+            {},
+            function(d) {
+               $.each(d.output, function(k,v) {
+                     console.log('-- ' + k, v); 
+                     var data = {};
+                     data.id = k;
+                     var d = new Date(v.lastUsed);
+                     data.description = d.toDateString() + ' ' + d.getUTCHours() + ':' + d.getUTCMinutes();
+                     data.title = data.description; // So that it works with same template as graphs
+                     data.data = v.state;
+                     console.log(data.data);
+                     $('#opec-historyWindow-states .opec-historyWindow--scroll ul').append(opec.templates.historyList(data));
+                     $('#opec-historyWindow-states .opec-historyWindow--data').append(opec.templates.historyData(data));
+                  } 
+               );
+            },
+            function() { console.log('Data was not available'); },
+            'json',
+            {}
          );
-      },
-      function() { console.log('Data was not available'); },
-      'json',
-      {}
-   );
+      }
+   }
+
+   $('#opec-historyWindow').on('click', '#opec-historyWindow-loadState', function() {
+      opec.ajaxState($('#opec-historyWindow-states .opec-historyWindow--scroll li.selected').data('id'));
+   });
+
+   $('#opec-historyWindow').on('click', '#opec-historyWindow-reloadState', function()  {
+      window.location = location.origin + location.pathname + '?state=' + $('#opec-historyWindow-states .opec-historyWindow--scroll li.selected').data('id');
+   });
    
    $('#opec-historyWindow-states .opec-historyWindow--scroll').on('click', 'li', function() {
       $('.opec-historyWindow--scroll li').removeClass('selected ui-state-highlight');

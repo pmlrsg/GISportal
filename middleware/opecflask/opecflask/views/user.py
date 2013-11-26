@@ -104,8 +104,8 @@ def create_user():
          #return redirect(url_for('portal_user.edit_profile'))
    #return render_template('edit_profile.html', form=form)
    
-@portal_user.route('/logout')
+@portal_user.route('/logout', methods=['GET','POST'])
 def logout():
    session.pop('openid', None)
-   flash(u'You have been signed out')
-   return redirect(oid.get_next_url())
+   #flash(u'You have been signed out')
+   return "200", 200

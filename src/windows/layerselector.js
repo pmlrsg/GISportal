@@ -116,16 +116,18 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    
    /**
     * Selects a layer
+    * selected should be true to add it to both panel and map
     */
    this.selectLayer = function(layerID, li) {
       var self = this;
-      
       if(layerID in opec.microLayers) {
          if(layerID in opec.layers) {
             // DEBUG
             console.log("Adding layer...");
-            opec.addLayer(opec.getLayerByID(layerID));
-            
+            var layer = opec.getLayerByID(layerID);
+            opec.addLayer(layer);
+            opec.checkIfLayerFromState(layer);
+
             // DEBUG
             console.log("Added Layer");
          } else {
@@ -138,8 +140,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
                // COMMENT: might change the way this works in future.
                var layer = new opec.layer(microlayer, {}); 
                opec.addLayer(layer);
+               opec.checkIfLayerFromState(layer);   
             }
          }
+
          self.toggleLayerSelection(li);
       }
       else {

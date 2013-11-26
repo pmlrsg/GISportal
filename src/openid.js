@@ -8,18 +8,33 @@ opec.openid.setup = function(containerID) {
    opec.openid.loginBox = containerID;
    opec.openid.$loginBox = $('#' + containerID);
    opec.openid.darkCoverID = 'darkCover';
-   
+  
+   opec.openid.logoutLocation = '/service/logout'; 
    opec.openid.popupWindow = null;
    
    opec.openid.loginForm = 'opec-openid-form'; // Set id for login form
    opec.openid.$loginForm = $('#' + opec.openid.loginForm);
-   
+
+   opec.openid.saveButton = 'opec-openid-getlink';
+   opec.openid.$saveButton = $('#' + opec.openid.saveButton);
+ 
+   opec.openid.logoutButton = 'opec-openid-logout';
+   opec.openid.$logoutButton = $('#' + opec.openid.logoutButton);
+
+   opec.openid.content = 'opec-openid-content';
+   opec.openid.$content = $('#' + opec.openid.content);
+
    opec.openid.onOpenHandler = function() {
       opec.openid.darkscreen(opec.openid.darkCoverID);
    };
    
    opec.openid.onCloseHandler = function() {
-      
+      if (opec.openid.loggedIn === true)  {
+         opec.openid.hideLogin();
+      }
+      else  {
+         console.log('User did not log in');
+      }
    };
    
    opec.openid.darkCoverStyle = [
@@ -68,17 +83,47 @@ opec.openid.setup = function(containerID) {
    $('#' + opec.openid.loginForm + ' .opec-login-with-yahoo').click(function() {
       var $this = $(this);     
       opec.openid.openPopup($this.attr('data-url'));
+   })
+   
+
+   opec.openid.$saveButton.click(function() {
+      opec.openid.getLink();
    });
-   
+
+   opec.openid.$logoutButton.click(function()  {
+      opec.openid.logout();
+   });
+
 };
 
-opec.openid.login = function(urlToOpen) {
-   
+// getLink to state
+opec.openid.getLink = function()  {
+   opec.genericAsync('POST', opec.stateLocation, { state: JSON.stringify(opec.getState())}, function(data, opts) { 
+      if (data['output']['url']) {
+         console.log(data['output']);
+         $('#opec-openid-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+      }
+   }, 
+   function(request, errorType, exception) {
+      console.log(request, errorType, exception);
+      if (exception === 'UNAUTHORIZED') opec.openid.showLogin();
+   }, 'json', {});
 };
 
-opec.openid.logout = function() {
-   
+opec.openid.logout = function() { opec.genericAsync('GET', opec.openid.logoutLocation, null, function(data, opts) {
+      console.log(data); 
+      if (data == '200')  {
+         opec.openid.loggedIn = false;
+         opec.openid.showLogin();
+      }
+   }, 
+   function(request, errorType, exception) {
+      console.log(request, errorType, exception);
+      if (exception === 'UNAUTHORIZED') opec.openid.showLogin();
+   }, 'json', {});
 };
+
+
 
 opec.openid.openPopup = function(urlToOpen) {
    var windowWidth = '870px';
@@ -86,17 +131,20 @@ opec.openid.openPopup = function(urlToOpen) {
       
    var dataObject = opec.utils.openPopup(windowWidth, windowHeight, urlToOpen, opec.openid.onOpenHandler, opec.openid.waitForPopupClose);  
     opec.openid.popupWindow = dataObject.popupWindow;
-    opec.openid.interval = dataObject.interval;
+   opec.openid.interval = dataObject.interval;
 };
 
 opec.openid.showLogin = function() {
-   opec.openid.$loginForm.show();
+   $('#' + opec.openid.loginForm).show();
+   opec.openid.$content.hide();
+   opec.logout();
 };
 
 opec.openid.hideLogin = function() {
-   opec.openid.$loginForm.hide();
+   $('#' + opec.openid.loginForm).hide();
+   opec.openid.$content.show();
+   opec.login();
 };
-
 
 //======== POPUP MANAGEMENT ========//
 /* Taken from:
@@ -132,6 +180,7 @@ opec.openid.waitForPopupClose = function() {
          window.clearInterval(opec.openid.interval);
          opec.openid.interval = null;
       }
+      
    }
 };
 

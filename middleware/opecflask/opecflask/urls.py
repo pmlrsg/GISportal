@@ -17,7 +17,7 @@ routes = [
    ),
    ((portal_wfs, '/wfs2json'),
       ('/wfs', getWFSData)
-   )
+   ),
 ]
 
 def setup_routing(app, routes):

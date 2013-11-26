@@ -713,6 +713,7 @@ opec.filterLayersByDate = function(date) {
  * 
  * @param {string} fileName - The file name for the specific JSON layer cache
  * @param {string} microLayer - The microLayer for the layer to be downloaded
+ * @param {boolean} selected - True if the layer should be put straight onto the map
  */
 opec.getLayerData = function(fileName, microlayer) {   
    $.ajax({
@@ -726,13 +727,19 @@ opec.getLayerData = function(fileName, microlayer) {
          // COMMENT: might change the way this works in future.
          var layer = new opec.layer(microlayer, data);        
          
-         console.log("Adding layer..."); // DEBUG
-         opec.addLayer(layer);           
-         console.log("Added Layer"); // DEBUG
+         if (layer.selected === true) { // Presume from state
          
-         // If the layer was loaded as part of a state load set some of the 
-         // values of the layer to the cached versions.
-         opec.checkIfLayerFromState(layer);
+            // If the layer was loaded as part of a state load set some of the 
+            // values of the layer to the cached versions.
+            opec.checkIfLayerFromState(layer);
+
+         } 
+         else {
+            console.log("Adding layer..."); // DEBUG
+            opec.addLayer(layer);    
+            console.log("Added Layer"); // DEBUG
+         }
+
       },
       error: function(request, errorType, exception) {
          var data = {

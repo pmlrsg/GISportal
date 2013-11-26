@@ -4,6 +4,7 @@
  */ 
 var opec = opec || (opec = {});
 
+
 /*===========================================================================*/
 //Initialise javascript variables and objects
 
@@ -161,7 +162,7 @@ opec.genericAsync = function(type, url, data, success, error, dataType, opts) {
       url: url, 
       data: data,
       dataType: dataType,
-      asyc: true,
+      async: true,
       cache: false,
       success: function(data) { success(data, opts); },
       error: error
@@ -460,6 +461,7 @@ opec.mapInit = function() {
 
    if(!map.getCenter())
       map.zoomTo(3);
+
 };
 
 /**
@@ -563,7 +565,6 @@ opec.nonLayerDependent = function() {
    $('#opec-lPanel-operational, #opec-lPanel-reference').on('click', ':checkbox', function(e) {
       var v = $(this).val();
       var layer = opec.getLayerByID(v);
-      
       if($(this).is(':checked')) {
          layer.select();         
       } else {
@@ -606,7 +607,7 @@ opec.nonLayerDependent = function() {
 /*===========================================================================*/
 
 opec.saveState = function(state) {
-   
+   var state = state || {}; 
    // Save layers
    state.map = {};
    state.map.layers = {};  
@@ -633,22 +634,41 @@ opec.saveState = function(state) {
       var feature = layer.features[0];
       state.map.feature = opec.featureToGeoJSON(feature);
    }
+   
+   state.rangebars = opec.timeline.rangebars;
+   // Get zoom level
+   state.map.zoom = map.zoom;
 
+   // Get position
+   state.map.extent = map.getExtent();
+
+   // Get quick regions
+   var regions = [];
+   for (var i = 0; i < opec.quickRegion.length; i++)  {
+      if (opec.quickRegion[i][0] !== '+ Add Current View +') regions.push(opec.quickRegion[i]);
+   }
+   console.log(regions);
+   state.map.regions = regions;
    
    return state;
 };
 
 opec.loadState = function(state) {
+   var state = state || {};
+   var rightPanel = state.rightPanel;
+   var rangebars = state.rangebars;
    state = state.map;
    
    // Load layers for state
    var keys = Object.keys(state.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
-      var selection = opec.layerSelector.getLayerSelectionByID(keys[i]);
-      opec.layerSelector.selectLayer(keys[i], selection);
+      if (!opec.layers[keys[i]]) {
+         var selection = opec.layerSelector.getLayerSelectionByID(keys[i]);
+         opec.layerSelector.selectLayer(keys[i], selection, true);
+      }
    }
    
-   // Set date
+   // Load date
    if(!opec.utils.isNullorUndefined(state.date)) {
       var date = new Date();
       date.setTime(state.date);
@@ -659,6 +679,29 @@ opec.loadState = function(state) {
    if(!opec.utils.isNullorUndefined(state.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
       layer.addFeatures(opec.geoJSONToFeature(state.feature));
+    }
+   
+   if (rangebars)  {
+      for (var i = 0; i < rangebars.length; i++)  {
+         opec.timeline.addRangeBarCopy(rangebars[i]);
+      }
+      if (rightPanel.selectedRange) opec.rightPanel.updateRanges(rightPanel.selectedRange);
+      else opec.rightPanel.updateRanges();
+   }
+
+   // Load position
+   if (state.extent)
+      map.zoomToExtent(new OpenLayers.Bounds([state.extent.left,state.extent.bottom, state.extent.right, state.extent.top]));
+
+   // Load Quick Regions
+   if (state.regions) {
+      var amount = opec.quickRegion.length;
+      for (var i = 0; i < amount; i++)  {
+         opec.removeQuickRegion(0);
+      }
+
+      opec.quickRegion = state.regions;
+      opec.quickRegions.setup();
    }
 };
 
@@ -677,14 +720,34 @@ opec.checkIfLayerFromState = function(layer) {
       var keys = Object.keys(opec.cache.state.map.layers);
       var state = opec.cache.state.map;
       for(var i = 0, len = keys.length; i < len; i++) {
-         if(keys[i] == layer.id) {
-            if(state.layers[keys[i]].selected === true) { $('#opec-lPanel-operational #' + layer.id + ' input:checkbox').trigger('click'); }
+         if(keys[i] == layer.id){
+            if(state.layers[keys[i]].selected === true) { $('#opec-lPanel-operational #' + layer.id + ' input:checkbox').prop("checked", true); layer.select();  }
             layer.setOpacity(state.layers[keys[i]].opacity);
             //layer.setStyle(state.layers[keys[i]].style);
          }
       }
    }
 };
+
+
+/*===========================================================================*/
+
+/**
+ * Any code that should be run when user logs in
+ */
+opec.login = function() {
+   $('#mapInfoToggleBtn').button("enable");
+   opec.window.history.loadStateHistory();
+};
+
+/**
+ * Any code that should be run when the user logs out
+ */
+opec.logout = function() {
+   $('#mapInfoToggleBtn').button("disable").prop("checked", false);
+   $('#opec-historyWindow').extendedDialog("close");
+}
+
 
 /*===========================================================================*/
 
@@ -698,7 +761,8 @@ opec.getState = function() {
    // TODO: Get states from component.
    state = opec.saveState(state);
    state = opec.leftPanel.saveState(state);
-   
+   state = opec.rightPanel.saveState(state);
+
    // TODO: Merge state with default state.
    
    // TODO: Return state.
@@ -706,15 +770,16 @@ opec.getState = function() {
 };
 
 opec.setState = function(state) {
-   
+   var state = state || {}; 
    // Cache state for access by others
    opec.cache.state = state;
-   
+   opec.rightPanel.coverageStateSelected = false; // reset due to new state
    // TODO: Merge with default state.
    
    // TODO: Set states of components.
    opec.loadState(state);
-   opec.leftPanel.loadState(state); 
+   opec.leftPanel.loadState(state);
+   opec.rightPanel.loadState(state); 
 };
 
 /*===========================================================================*/
@@ -803,9 +868,17 @@ opec.main = function() {
    // Check if there is a state to load.
    if(stateID !== null) {
       console.log('Retrieving State...');
-      
+      opec.ajaxState(stateID);
+   }
+   else {
+      console.log('Loading Default State...');
+   }
+ 
+};
+
+opec.ajaxState = function(id) { 
       // Async to get state object
-      opec.genericAsync('GET', opec.stateLocation + '/' + stateID, null, function(data, opts) {         
+      opec.genericAsync('GET', opec.stateLocation + '/' + id, null, function(data, opts) {         
          if(data.output.status == 200) {
             opec.setState($.parseJSON(data.output.state));
             console.log('Success! State retrieved');
@@ -815,11 +888,7 @@ opec.main = function() {
       }, function(request, errorType, exception) {
          console.log('Error: Failed to retrieved state. Ajax failed!');
       }, 'json', {});
-   } else {
-      console.log('Loading Default State...');
-   }
-};
-
+   } 
 
 opec.getTopLayer = function() {
 	var layer = null;

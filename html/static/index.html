@@ -43,7 +43,7 @@
 <!-- <script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script> -->
 
 <!-- Cesium -->
-<script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>
+<!-- <script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>-->
 
 <!-- O2C -->
 <!--<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>-->
@@ -191,12 +191,12 @@
          <div id="graphcreator-gallery">
             <input type="radio" name="gallery" value="timeseries" id="timeseries" title="Returns a time series with mean, median, max, min and STD" checked>
             <label for="timeseries">Timeseries</label>
+            <input type="radio" name="gallery" value="histogram" id="histogram" title="Returns a histogram">
+            <label for="histogram">Histogram</label>
             <input type="radio" name="gallery" value="hovmollerLat" id="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">
             <label for="hovmollerLat">Hovmöller Latitude</label>
             <input type="radio" name="gallery" value="hovmollerLon" id="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">
             <label for="hovmollerLon">Hovmöller Longitude</label>
-            <input type="radio" name="gallery" value="histogram" id="histogram" title="Returns a histogram">
-            <label for="histogram">Histogram</label>
             <!--<input type="radio" name="gallery" value="raw" title="Not for normal use (gets the raw data)"><label for="raw">raw</label>
             <input type="radio" name="gallery" value="test" title="Not for normal use (test new queries)"><label for="test">test</label>
             <input type="radio" name="gallery" value="error" title="Generates errors, used testing error handling"><label for="error">error</label> -->
@@ -213,19 +213,27 @@
                <input id="graphcreator-title" class="title-case" title="Title of the graph" type="text" name="graphcreator-title" />
             </div>
             <div class="hidden">
-               <label for="graphcreator-baseurl-label">Base URL:</label>
+               <label for="graphcreator-baseurl">Base URL:</label>
             </div>
             <div class="hidden">
                <input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path" />
             </div>
             <div>
-               <label for="graphcreator-coverage-label">Make sure to select the correct layer:</label>
+               <label for="graphcreator-coverage">Make sure to select the correct layer:</label>
             </div>
             <div> 
                <input id="graphcreator-coverage-real" class="hidden" title="Real Name of the Coverage" placeholder="Real Name of the Coverage" type="text" name="graphcreator-coverage-real" />
 					<select id="graphcreator-coverage" name="graphcreator-coverage">
 						<option value="" disabled selected>Name of the Layer</option>
 					</select>	
+            </div>
+            <div class="hidden js-reference">
+               <label for="graphcreator-reference-variable">Select a variable</label>
+            </div>
+            <div class="hidden js-reference">
+               <select id="graphcreator-reference-variable" name="graphcreator-reference-variable">
+                  <option value="" disabled selected>Name of the Variable</option>
+               </select>
             </div>
          </div>
       </div>
@@ -508,10 +516,8 @@
                         <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
                      <input type="radio" id="box" name="radio" value="box"/>
                      <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
-                     <!--  <input type="radio" id="track" name="radio" value="track"/>
-                     <label class="iconBtn" for="track" title="Track: Select a track from the analyses tab."></label>
                      
-                      <input type="radio" id="circle" name="radio" value="circle" />
+                     <!-- <input type="radio" id="circle" name="radio" value="circle" />
                         <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
                      <input type="radio" id="polygon" name="radio" value="polygon" />
                         <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
@@ -559,6 +565,13 @@
    <!-- Share Options Panel, appears after the share options button has been clicked  -->
    <div class="toolbar" id="shareOptions">
    	<h3>Share Your Data! Track Your Progress!</h3>
+      <div id="opec-openid-content" class="hidden">
+         <button id="opec-openid-getlink">Save Progress</button>
+         <label for="opec-openid-shareurl">Paste Link:</label>
+         <input type="text" disabled  id="opec-openid-shareurl">
+
+         <button id="opec-openid-logout">Log out</button>
+      </div>
    </div>
    
    <div id="walkthrough-menu" class="unselectable" title="Help">
@@ -601,14 +614,17 @@
       <div id="opec-historyWindow-content">
          <div id="opec-historyWindow-states" class="opec-tab-content ui-corner-top">
             <ul>
-               <li class="opec-historyWindow--scroll"></li>       
-               <li class="opec-historyWindow--data"></li>       
+               <li class="opec-historyWindow--scroll"><ul></ul></li>       
+               <li class="opec-historyWindow--data">
+               <button id="opec-historyWindow-loadState">Load State into current page</button>
+               <button id="opec-historyWindow-reloadState">Refresh page to state</button>
+               </li>       
             </ul>
          </div>
    
          <div id="opec-historyWindow-graphs" class="opec-tab-content ui-corner-top" style="display: none;">
             <ul>
-               <li class="opec-historyWindow--scroll"></li>       
+               <li class="opec-historyWindow--scroll"><ul><ul></li>       
                <li class="opec-historyWindow--data">
                   <button id="load-graph">Load Graph</button>
                   <button id="remove-graph">Remove Graph</button>
@@ -629,6 +645,5 @@
    <ul id="walkthrough"></ul>
    
    <div id="js-walkthrough-confirm" class="hidden">Would you like this walkthrough to appear next time you visit?</div>
-   
 </body>
 </html>

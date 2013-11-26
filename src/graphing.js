@@ -110,7 +110,7 @@ opec.graphs.create = function(data, options) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: data.type + " of " + data.displayTitle,
+         title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          type: data.type,
          colour: 'redToBlue',
          data: data.output

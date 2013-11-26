@@ -397,8 +397,11 @@ opec.leftPanel.saveState = function(state) {
    // Foreach tab:
    //    What accordions exist and in what order?
    //    What layers are in each accordions and in what order?
-   // What base layer is selected
    
+   // What base layer is selected
+   state.leftPanel.baseLayer = $('#baseLayer option:selected').val();
+
+
    return state;
 };
 
@@ -406,19 +409,18 @@ opec.leftPanel.saveState = function(state) {
  * Loads the state given
  */
 opec.leftPanel.loadState = function(state) {
-   state = state.leftPanel;
+   var map = state.map;
+   var state = state.leftPanel;
    
    if(state.isOpen) {
-      $(".triggerL").trigger('click');
+      opec.leftPanel.open();
+   }
+
+   if (state.baseLayer)  {
+      $('#baseLayer option[value="'+state.baseLayer+'"]').prop('selected', true);
+      $('#baseLayer').change();
    }
 };
-
-///**
-// * Removes dummy layer 
-// */
-//opec.leftPanel.removeDummyHelpLayer = function() {
-   //opec.leftPanel.removeGroupFromPanel("Need-Help");
-//}
 
 /**
  * Right Panel
@@ -438,19 +440,32 @@ opec.rightPanel.toggle = function() {
    $(".triggerR").toggleClass("active");
 }
 
+// coverageStateSelected is a boolean that is set when a state has
+// selected a coverage. This is so that the select box can be
+// modified without always returning to the same state.
+opec.rightPanel.coverageStateSelected = false;
+
 opec.rightPanel.updateCoverageList = function()  {
 	var selectedLayer = $('#graphcreator-coverage option:selected');
 	$('#graphcreator-coverage option').remove();
-	var keys = Object.keys(opec.selectedLayers);
+	var keys = Object.keys(opec.layers);
 	for (var i = 0; i < keys.length; i++)  {
 		// TODO Nicer way of select, make sure to clean up
- 		var layer = opec.selectedLayers[keys[i]];
+ 		var layer = opec.layers[keys[i]];
 		var tickedLayers = $('#opec-lPanel-operational input:checked');
 		var selected = '';
+      // Potentially change to using selectedLayers, I haven't done so since sometimes the array has more entries than it should
 		if (layer === selectedLayer.value || (tickedLayers.length === 1 && layer === tickedLayers[0].value) || i === keys.length - 1) selected = 'selected';
 		$('#graphcreator-coverage').prepend('<option ' + selected + ' value="' + keys[i] + '">' + (layer.displayTitle.length > 0 ? layer.displayTitle : keys[i]) + '</option>');
 	}	
 	$('#graphcreator-coverage').prepend('<option value="" disabled="">Name of the Layer</option>');
+
+   var state = opec.cache.state;
+   if (state && state.rightPanel.selectedCoverage)  {
+      $('#graphcreator-coverage option[value="' + state.rightPanel.selectedCoverage + '"]').prop("selected", true);
+      opec.rightPanel.coverageStateSelected = true;
+   }
+
    $('#graphcreator-coverage').change();
 }
 
@@ -690,7 +705,7 @@ opec.rightPanel.updateRanges = function(label)  {
    }
    if (label)  {
       var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
-      $("#graphcreator-range option[value='" + d[0].name + "']").attr('selected', 'selected');
+      if (d.length > 0) $("#graphcreator-range option[value='" + (d[0].name || d.name) + "']").attr('selected', 'selected');
    }
 };
 
@@ -929,7 +944,7 @@ opec.rightPanel.setupGraphingTools = function() {
          bbox: $('#graphcreator-bbox').val(),
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
-         graphZAxis: $('#graphcreator-coverage option:checked').val()
+         graphZAxis: opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].origName
       };      
      	
 	  	if (graphParams.baseurl && graphParams.coverage)  {
@@ -1053,6 +1068,59 @@ opec.rightPanel.setupDataExport = function() {
 };
 
 /**
+ * Saves the state of the right panel
+ */
+opec.rightPanel.saveState = function(state) {  
+   state.rightPanel = {};
+   
+   // Panel Open?
+   if($('.triggerR').hasClass('active')) {
+      state.rightPanel.isOpen = true;
+   } else {
+      state.rightPanel.isOpen = false;
+   }
+
+   state.rightPanel.selectedCoverage = $('#graphcreator-coverage option:selected').val();
+   state.rightPanel.selectedRange = $('#graphcreator-range option:selected').val();
+
+   state.rightPanel.gallery = $('#graphcreator-gallery input:checked').val();
+  
+   state.rightPanel.fromDate = $('#graphcreator-time').datepicker("getDate");
+   state.rightPanel.toDate = $('#graphcreator-time2').datepicker("getDate");
+
+   state.rightPanel.bbox = $('#graphcreator-bbox').val();
+
+   return state;
+};
+
+/**
+ * Loads the state given
+ */
+opec.rightPanel.loadState = function(state) {
+   var map = state.map;
+   var state = state.rightPanel;
+   
+   if(state.isOpen) {
+      opec.rightPanel.open();
+   }
+
+   if(state.gallery)  {
+      $('#graphcreator-gallery input[value="' + state.gallery + '"]').prop("checked", true);
+      $('#' + state.gallery).button("refresh");
+   }
+
+   if (state.fromDate)$('#graphcreator-time').datepicker("setDate",  new Date(state.fromDate));
+   
+   if (state.toDate) $('#graphcreator-time2').datepicker("setDate", new Date(state.toDate));
+
+   if (state.bbox) $('#graphcreator-bbox').val(state.bbox);
+
+   if (state.selectedRange) $('#graphcreator-range option[value="' + state.selectedRange + '"]').prop("selected", true);
+
+};
+
+
+/**
  * Top bar
  * @namespace 
  */
@@ -1126,7 +1194,7 @@ opec.topbar.setup = function() {
    // Create buttons
    $('#opec-toolbar-actions').buttonset();
    $('#mapInfoToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-info'} });
-   $('#shareMapToggleBtn').button({ label: '', disabled: 'true',  icons: { primary: 'ui-icon-opec-globe-link'} });
+   $('#shareMapToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} });
    $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
    $('#opec-button-3d').button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
       .click(function(e) {
@@ -1141,41 +1209,14 @@ opec.topbar.setup = function() {
    $('#infoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
    
    // Add toggle functionality for dialogs
-   addDialogClickHandler('shareMapToggleBtn', '#shareOptions');
-   addDialogClickHandler('mapInfoToggleBtn', '#mapInfo');
+   $('#shareMapToggleBtn').click(function() {
+      $('#shareOptions').toggle();
+   });
+   addDialogClickHandler('mapInfoToggleBtn', $('#opec-historyWindow'));
    addDialogClickHandler('layerPreloader', $('#opec-layerSelection'));
    addDialogClickHandler('infoToggleBtn', $('#walkthrough-menu'));
    
-   
-   
-   //$('#shareOptions').find('button:first')
-      //.button({ label: 'Login or Signup'})
-      //.click(function() {
-         //$('#opec-inline-login').append(opec.templates.loginBox({})).show();
-         //window.open('/service/login/google', "",
-          //"width=" + 400 + ",height=" + 400 +
-          //",status=1,location=1,resizable=yes" +
-          //",left=" + 0 +",top=" + 0);
-      //});
-   
-   // TODO: Move code to new home
-   function somethingtempcodehold() {
-      // Get current state
-      // Add email to state
-      var contectEmail = $('#shareEmail').val();
-      var portalState = JSON.stringify(opec.getState());        
-            
-      // Async post the state
-      opec.genericAsync('POST', opec.stateLocation, { name: 'portal', email: contectEmail, state: portalState}, function(data, opts) {
-         console.log('POSTED state!');
-      }, function(request, errorType, exception) {
-         console.log('Failed to post state!');
-      }, 'json', {});
-      
-      // Change url to match returned url
-   }
-   
-   function addDialogClickHandler(idOne, idTwo) {
+     function addDialogClickHandler(idOne, idTwo) {
       $("label[for=" + idOne + "]").click(function(e) {
          if ($(idTwo).extendedDialog("isOpen")) $(idTwo).extendedDialog("close");
          else $(idTwo).extendedDialog("open");
