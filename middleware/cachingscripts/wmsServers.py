@@ -14,9 +14,9 @@ servers = {
       },
       'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?'
    },
-   'pml_monthly': { 
-      'name': 'pml_monthly',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-M-AGGSLOW?',
+   'pml_annual': { 
+      'name': 'pml_annual',
+      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-Y-AGGSLOW?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -25,7 +25,33 @@ servers = {
       'options': {
          'providerShortTag': 'PML'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-M-AGGSLOW?'
+      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-Y-AGGSLOW?'
+   },
+   'pml_seasonal': { 
+      'name': 'pml_seasonal',
+      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-S-AGGSLOW?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'PML'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-S-AGGSLOW?'
+   },
+   'pml_monthly': { 
+      'name': 'pml_monthly',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/PML-M-AGGSLOW?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'PML'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/PML-M-AGGSLOW?'
    },
    'pml_daily': { 
       'name': 'pml_daily',
@@ -39,6 +65,19 @@ servers = {
          'providerShortTag': 'PML'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-D-AGGSLOW?'
+   },
+   'cefas': { 
+      'name': 'cefas',
+      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/CEFAS/resoutcut.nc?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'Cefas'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/CEFAS/resoutcut.nc?'
    },
    'dmi': { 
       'name': 'dmi',
