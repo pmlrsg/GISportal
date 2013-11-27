@@ -505,6 +505,9 @@ a.active.triggerR {
    margin-top: 5px;
 }
 
+.lPanel .ui-accordion-header { display: none; }
+.lPanel .ui-accordion-content { border: 0 none; }
+
 .opec-tab-content select {
    width: 250px;
    padding: 2px;
