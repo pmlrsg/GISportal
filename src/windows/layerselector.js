@@ -7,7 +7,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    var self = this;
    
    $('#opec-layerSelection').extendedDialog({
-      position: ['center', 'center'],
+      position: ['left', 'center'],
       width: 650,
       minWidth:650,
       height: 500,
