@@ -665,6 +665,14 @@ opec.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
    this.redraw();
 }
 
+// Rename timebar
+opec.TimeLine.prototype.rename = function(name, label)  {
+   this.rangebars.filter(function(d) { return d.name == name; })[0].label = label;   
+   this.timebars.filter(function(d) { return d.name == name; })[0].label = label;
+   this.reHeight();
+   this.redraw();
+}
+
 // Remove a time bar by name (if found)
 opec.TimeLine.prototype.removeTimeBarByName = function(name) {
    var self = this,

@@ -112,7 +112,7 @@ opec.gritter.hideNotification = function(params) {
  */
 function createWelcomeMessage()
 {
-   opec.gritter.tutUID = opec.gritter.showNotification('welcomeTutorial', null);
+   //opec.gritter.tutUID = opec.gritter.showNotification('welcomeTutorial', null);
 }
 
 /**

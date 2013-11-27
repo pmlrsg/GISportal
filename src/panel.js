@@ -48,7 +48,7 @@ opec.leftPanel.setup = function() {
    });
    
    // Add dummy help layer
-   opec.leftPanel.addDummyHelpLayer();
+   //opec.leftPanel.addDummyHelpLayer();
    
    // Add first Group
    opec.leftPanel.addNextGroupToPanel($('#opec-lPanel-operational'));
@@ -350,10 +350,11 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
 
 /**
  * Adds a dummy layer to help the user. 
- */
+ 
 opec.leftPanel.addDummyHelpLayer = function() {
    opec.leftPanel.addGroupToPanel("Need-Help", "Need Help?", $('#opec-lPanel-operational'));
-   
+*/ 
+/* 
    $('#Need-Help')
       .addClass('opec-help')
       .prepend(
@@ -362,7 +363,7 @@ opec.leftPanel.addDummyHelpLayer = function() {
          '<a id="dmhLayerSelection" href="#">Layer Selection</a>' +  
          ' panel.' +
       '</li>');
-   
+  
    // Open the layer panel on click
    $('#dmhLayerSelection').click(function(e) {
       if($('#opec-layerSelection').extendedDialog('isOpen')) {
@@ -379,7 +380,7 @@ opec.leftPanel.addDummyHelpLayer = function() {
       return false;
    });
 };
-
+*/
 /**
  * Saves the state of the left panel
  */
@@ -800,7 +801,10 @@ opec.rightPanel.setupGraphingTools = function() {
    });
    
    $('.js-newRange').on('click', function() {
-      var name = prompt("Please give a label for this range bar.");
+      //var name = prompt("Please give a label for this range bar.");
+      if (!opec.timeline.rangeCounter) opec.timeline.rangeCounter = 1;
+      var name = "Time Range " + opec.timeline.rangeCounter;
+      opec.timeline.rangeCounter++;
       opec.timeline.addRangeBar(name);
       opec.rightPanel.updateRanges(name);
    });
@@ -823,7 +827,13 @@ opec.rightPanel.setupGraphingTools = function() {
       opec.timeline.removeTimeBarByName($('#graphcreator-range option:selected').val());
       $('#graphcreator-range option:selected').remove();
    });
-   
+  
+   $('.js-renameRange').on('click', function() {
+      var name = prompt("Please give a label for this range bar.");
+      opec.timeline.rename($('#graphcreator-range option:selected').val(), name);
+      opec.rightPanel.updateRanges(name);
+   });
+
 	$('#opec-graphing').on('change', '.hasDatepicker', function()  { 
       if ($('#graphcreator-range option:selected').val() !== 'Select a Range') {
 			var selectedStart = $('#graphcreator-time').datepicker('getDate');

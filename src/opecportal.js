@@ -833,6 +833,7 @@ opec.main = function() {
       height: 220,
       resizable: false,
       showHelp: false,
+      autoOpen: false,
       showMinimise: true,
       dblclick: "collapse"
    });
