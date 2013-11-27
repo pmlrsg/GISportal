@@ -78,7 +78,7 @@ opec.leftPanel.setup = function() {
    $('#opec-lpanel-tab-reference').button();
    $('#opec-lpanel-tab-options').button();
    
-   $('.lPanel .opec-tab-group :button').click(function(e) { 
+   $('.lPanel .opec-tab-group input').click(function(e) { 
       var tabToShow = $(this).attr('href');
       $('#opec-lPanel-content .opec-tab-content').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
@@ -500,7 +500,7 @@ opec.rightPanel.setup = function() {
    $('#opec-button-analyses').button();
    $('#opec-button-export').button();
    
-   $('.rPanel .opec-tab-group :button').click(function(e) { 
+   $('.rPanel .opec-tab-group input').click(function(e) { 
       var tabToShow = $(this).attr('href');
       $('#opec-rPanel-content .opec-tab-content').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 

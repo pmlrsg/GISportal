@@ -426,9 +426,12 @@
          <div id="opec-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
                <li class="opec-tab-group ui-corner-top lPanel-buttonSet">
-                  <button id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">Operational</button>
-                  <button id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">Reference</button>
-                  <button id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">Options</button>
+                  <input type="radio" name="layer-tab" checked id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">
+                  <label for="opec-lpanel-tab-operational">Operational</label>
+                  <input type="radio" name="layer-tab" id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">
+                  <label for="opec-lpanel-tab-reference">Reference</label>
+                  <input type="radio" name="layer-tab" id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">
+                  <label for="opec-lpanel-tab-options">Options</label>
                </li>
                <li id="triggerL-buttonset" class="lPanel-buttonSet ui-corner-top">
                   <button id="triggerL-add-accordion" class="panel-button"></button>
@@ -530,9 +533,12 @@
          <div id="opec-panel-toolbar" class="ui-corner-top panel-buttonSet">
             <ul>
                <li class="opec-tab-group ui-corner-top">
-                  <button id="opec-button-selection" class="opec-tab" href="#opec-tab-selection">Selection</button>
-                  <button id="opec-button-analyses" class="opec-tab" href="#opec-tab-analyses">Analysis</button>
-                  <button id="opec-button-export" class="opec-tab" href="#opec-tab-export">Data Export</button>
+                  <input type="radio" name="data-analysis-tab" id="opec-button-selection" class="opec-tab" href="#opec-tab-selection">
+                  <label for="opec-button-selection">Selection</label>
+                  <input type="radio" name="data-analysis-tab" id="opec-button-analyses" class="opec-tab" href="#opec-tab-analyses">
+                  <label for="opec-button-analyses">Analysis</label>
+                  <input type="radio" name="data-analysis-tab" checked id="opec-button-export" class="opec-tab" href="#opec-tab-export">
+                  <label for="opec-button-export">Data Export</label>
                </li>
             </ul>
          </div>
