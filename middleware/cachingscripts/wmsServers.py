@@ -3,7 +3,7 @@
 servers = {
    'hcmr': { 
       'name': 'hcmr',
-      'url': 'http://earthserver.pml.ac.uk/thredds/wms/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/HCMR-M-AGGSLOW?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -12,11 +12,11 @@ servers = {
       'options': {
          'providerShortTag': 'HCMR'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/HCMR/POMERSEM_MED_19900101000000-19900131000000.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/HCMR-M-AGGSLOW?'
    },
    'pml_annual': { 
       'name': 'pml_annual',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-Y-AGGSLOW?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/PML-Y-AGGSLOW?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -25,11 +25,11 @@ servers = {
       'options': {
          'providerShortTag': 'PML'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-Y-AGGSLOW?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/PML-Y-AGGSLOW?'
    },
    'pml_seasonal': { 
       'name': 'pml_seasonal',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/PML-S-AGGSLOW?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/PML-S-AGGSLOW?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -38,7 +38,7 @@ servers = {
       'options': {
          'providerShortTag': 'PML'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/PML-S-AGGSLOW?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/PML-S-AGGSLOW?'
    },
    'pml_monthly': { 
       'name': 'pml_monthly',
@@ -68,7 +68,7 @@ servers = {
    },
    'cefas': { 
       'name': 'cefas',
-      'url': 'http://earthserver.pml.ac.uk:8080/thredds/wms/CEFAS/resoutcut.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/CEFAS/resoutcut.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -77,11 +77,11 @@ servers = {
       'options': {
          'providerShortTag': 'Cefas'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk:8080/thredds/wcs/CEFAS/resoutcut.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/CEFAS/resoutcut.nc?'
    },
    'dmi': { 
       'name': 'dmi',
-      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI/chl.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI/DMI_1990_2009.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -90,11 +90,11 @@ servers = {
       'options': {
          'providerShortTag': 'DMI'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI/chl.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI/DMI_1990_2009.nc?'
    },
    'ogs': { 
       'name': 'ogs',
-      'url': 'http://earthserver.pml.ac.uk/thredds/wms/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -103,22 +103,6 @@ servers = {
       'options': {
          'providerShortTag': 'OGS'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/myov02-med-ogs-bio-reanalysis_1342796868410.nc?'
-   },
-	'hawaii': {
-			'name': 'hawaii',
-			'url': 'http://oos.soest.hawaii.edu/thredds/wms/hioos/satellite/dhw?',
-			'params': {
-				'SERVICE': 'WMS',
-				'request': 'GetCapabilities',
-				'version': '1.3.0'
-				},
-			'options': {
-				'providerShortTag': 'HiOOS'
-				},
-			'wcsurl':
-			'http://oos.soest.hawaii.edu/thredds/wcs/hioos/satellite/dhw?'
-			},
-
-
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?'
+   }
 }
