@@ -64,25 +64,25 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       $(this).toggleClass('ui-state-hover');
    });
    
-   $('#' + containerID + ' li').live("click", function() {
-       $(this).children('span').toggle();
-       return false;
-   });
-   
-   $('#' + containerID + ' li a').live("click", function(event, data) {
-      var layerID = $(this).parent().attr('data-id');
-      var layerName = $(this).parent().attr('data-name');
-      var providerTag = $(this).parent().attr('data-provider');
+   $('#' + containerID + ' li').live("click", function(event, data) {
+      var layerID = $(this).attr('data-id');
+      var layerName = $(this).attr('data-name');
+      var providerTag = $(this).attr('data-provider');
       var id = providerTag + ': ' + layerName;
       
-      if($(this).find(".ui-icon").hasClass('ui-icon-plus')) {      
-         self.selectLayer(layerID, $(this).parent());
+      if(!$(this).hasClass('opec-selected')) {      
+         self.selectLayer(layerID, $(this));
       }
-      else if($(this).find(".ui-icon").hasClass('ui-icon-minus')) {
-         self.deselectLayer(layerID, $(this).parent());
+      else if($(this).hasClass('opec-selected')) {
+         self.deselectLayer(layerID, $(this));
       }
       
       return false;
+   });
+   
+   $('#' + containerID + ' li a').live("click", function() {
+       $(this).parent().children('span').toggle();
+       return false;
    });
    
    //$('#' + placeholderID + ' .ft-label').live("click", function() {
@@ -185,10 +185,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    
    this.toggleLayerSelection = function($selection) {
       //$selection.trigger('opec-toggle-selected');
-      $selection.find(".ui-icon")
-         .toggleClass("ui-icon-plus ui-icon-minus")
-      .end()
-      .toggleClass('opec-selected opec-unselected')
+      $selection.toggleClass('opec-selected opec-unselected')
       .toggleClass('ui-state-highlight');
       
       this.filtrify.refreshCache($selection);
