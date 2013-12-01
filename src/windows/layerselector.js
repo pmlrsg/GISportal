@@ -81,6 +81,8 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    });
    
    $('#' + containerID + ' li a').live("click", function() {
+       if($('span',this).hasClass('ui-icon-triangle-1-e')) $('span',this).addClass('ui-icon-triangle-1-s').removeClass('ui-icon-triangle-1-e'); 
+       else $('span',this).addClass('ui-icon-triangle-1-e').removeClass('ui-icon-triangle-1-s');
        $(this).parent().children('span').toggle();
        return false;
    });
