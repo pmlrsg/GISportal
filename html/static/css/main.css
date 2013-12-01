@@ -761,14 +761,9 @@ div .sensor-accordion {
    overflow: hidden;
 }
 
-#opec-layerSelection > span {
-   margin-bottom: 5px;
-   display: block;
-}
-
 #opec-layerSelection > ul {
    width: 100%;
-   height: 90%;
+   height: 85%;
    margin: 0 auto;
    padding: 0;
    /*text-shadow: black 0 -1px;
@@ -776,6 +771,23 @@ div .sensor-accordion {
    font-size: 1.2em;
    border: 1px solid #333;
 }
+
+#opec-layerSelection p {
+   font-size: 0.8em;
+   line-height: 1;
+   margin: 0;
+   padding: 0;
+   margin-left: 5px;
+   margin-bottom: 5px;
+}
+
+#opec-layerSelection > p {
+   font-size: 1em;
+   margin-left: 0;
+   margin-bottom: 5px;
+   display: block;
+}
+
 
 #opec-layerSelection .opec-selectable {
    display: inline-block;

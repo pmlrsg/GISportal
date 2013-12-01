@@ -610,7 +610,8 @@ opec.saveState = function(state) {
    var state = state || {}; 
    // Save layers
    state.map = {};
-   state.map.layers = {};  
+   state.map.layers = {}; 
+   state.timeline = {}; 
    
    // Get the current layers and any settings/options for them.
    var keys = Object.keys(opec.layers);
@@ -649,14 +650,21 @@ opec.saveState = function(state) {
    }
    console.log(regions);
    state.map.regions = regions;
-   
+  
+
+   // Get timeline zoom
+   state.timeline.minDate = opec.timeline.xScale.domain()[0];
+   state.timeline.maxDate = opec.timeline.xScale.domain()[1];
    return state;
 };
 
 opec.loadState = function(state) {
    var state = state || {};
+
+   // TODO: Refactor!
    var rightPanel = state.rightPanel;
    var rangebars = state.rangebars;
+   var timeline = state.timeline;
    state = state.map;
    
    // Load layers for state
@@ -702,6 +710,11 @@ opec.loadState = function(state) {
 
       opec.quickRegion = state.regions;
       opec.quickRegions.setup();
+   }
+
+   if (timeline)  {
+      opec.timeline.zoomDate(timeline.minDate, timeline.maxDate);
+      if (state.date) opec.timeline.setDate(new Date(state.date));
    }
 };
 

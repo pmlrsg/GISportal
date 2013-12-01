@@ -619,7 +619,7 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    this.layerbars.push(newTimebar); 
 
    // TODO: Move asap. tidy up
-   if (Object.keys(opec.layers).length === 1)  {
+   if (Object.keys(opec.layers).length === 1 && !opec.cache.state.timeline)  {
       this.reHeight();
       // redraw is done in zoom
       var data = opec.timeline.layerbars[0];
