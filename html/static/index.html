@@ -87,13 +87,12 @@
    <li id="{{name}}" class="opec-layer">
       <img src="img/ajax-loader.gif"/>
       <input type="checkbox" {{#visibility}}checked="yes"{{/visibility}} name="{{name}}" value="{{name}}" />
-      {{displayTitle}} 
+      <p>{{displayTitle}}</p>
       <a id="layer-exclamation" href="#">
          <img src="img/exclamation_small.png"/>
       </a>
-      <!--<a>
-         <span class="ui-icon ui-icon-circle-close">close</span>
-      </a>-->
+      <span class="opec-layer-dropdown ui-icon ui-icon-triangle-1-s">dropdown</span>
+      
    </li>
 </script>
 <!-- Metadata Window -->
