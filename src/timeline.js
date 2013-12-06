@@ -575,8 +575,9 @@ opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
    var self = this;
    var minDate = new Date(startDate);
    var maxDate = new Date(endDate);
-   this.minDate = ((minDate instanceof Date) ? minDate : this.minDate);
-   this.maxDate = ((maxDate instanceof Date) ? maxDate : this.maxDate);
+   var padding = (maxDate - minDate) * 0.05; 
+   this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime() - padding) : this.minDate);
+   this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime() + padding) : this.maxDate);
    console.log(minDate, maxDate);
    console.log(this.xScale.domain());
    this.xScale.domain([this.minDate, this.maxDate]).range([0, this.width]);
