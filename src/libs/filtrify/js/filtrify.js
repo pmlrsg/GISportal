@@ -109,7 +109,7 @@
          browser = $.browser,
          self = this;
 
-      this._search.element = $('<ul class="opec-search"><input type="text" placeholder="Search" /></ul>');
+      this._search.element = $('<ul class="opec-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p>');
       this.createSearch();
       this._menu.list = $('<ul class="ft-menu" />');
 
