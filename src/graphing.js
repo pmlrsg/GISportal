@@ -10,6 +10,7 @@ opec.graphs.data = function(params, options)  {
       dataType: 'json',
       asyc: true,
       success: function(data) {
+         console.log(data);
          opec.graphs.create(data, options);
          console.log("success");
       },
