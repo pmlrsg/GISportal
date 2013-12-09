@@ -66,6 +66,19 @@ servers = {
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/PML-D-AGGSLOW?'
    },
+   'imsmetu_annual': { 
+      'name': 'imsmetu_annual',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'IMS-METU'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?'
+   },
    'cefas': { 
       'name': 'cefas',
       'url': 'http://earthserver.pml.ac.uk/thredds/wms/CEFAS/resoutcut.nc?',
