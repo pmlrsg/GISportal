@@ -32,7 +32,7 @@ layers = {
          'niceName': 'SeaDAS Concentration of Chlorophyll-a',
          'niceTitle': 'Mass concentration of chlorophyll-a in sea water',
          'type': 'Chlorophyll-a',
-         'measurement': {'milligram m-3','test'}
+         'measurement': 'milligram m-3'
       },
               
       'chlor_a_bias_uncertainty': {
