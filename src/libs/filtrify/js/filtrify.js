@@ -45,6 +45,7 @@
       
       this.init();
 
+      $('.ft-menu li').multiOpenAccordion({ active: 'false'});
    }
 
    Filtrify.prototype.init = function () {
@@ -156,10 +157,7 @@
       }
 
       html += "</ul><div class='ft-mismatch ft-hidden'></div></div></li>";
-
-      this._menu[f].item = $(html).multiOpenAccordion({
-         active: 0
-      });
+      this._menu[f].item = $(html);
    };
 
    Filtrify.prototype.cache = function ( f ) {

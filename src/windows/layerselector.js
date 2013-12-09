@@ -57,9 +57,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
          setTimeout(function() {
             self.$container.css('width', '100%');
          }, 501);
-      }
-   });
-   
+       }
+   }
+  );
+         
    $('#' + containerID + ' li').live("hover", function() {
       $(this).toggleClass('ui-state-hover');
    });
@@ -201,7 +202,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
          }
       });  
    };
-   
+
    this.refresh = function() {
       var self = this;
       this.filtrify = $.filtrify(this.container, this.placeholder, {

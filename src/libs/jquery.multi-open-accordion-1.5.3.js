@@ -139,7 +139,8 @@
 			
 			// Triggering initialized
 			self._trigger('init', null, $this);
-			
+
+		
 		},
 		
 		// Destroying the whole multi open widget
