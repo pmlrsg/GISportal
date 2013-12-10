@@ -145,7 +145,7 @@ opec.layer = function(microlayer, layerData) {
     */
    this.init = function(microlayer, layerData) {
       var self = this;
-      
+      console.log(microlayer, layerData); 
       this.id = microlayer.id;
       this.providerTag = microlayer.providerTag;  
       this.name = microlayer.name;
