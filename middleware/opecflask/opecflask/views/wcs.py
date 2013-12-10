@@ -25,7 +25,7 @@ def getWcsData():
    
    params['url'] = createURL(params)
    current_app.logger.debug('Processing request...') # DEBUG
-   
+   current_app.logger.debug(params['url'].value)
    type = params['type'].value
    if type == 'histogram': # Outputs data needed to create a histogram
       output = getBboxData(params, histogram)
@@ -88,7 +88,7 @@ def getParams():
    
    # Optional extras
    nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
-   nameToParam["depth"] = Param("depth", True, False, request.args.get('depth', None))
+   nameToParam["Vertical"] = Param("Vertical", True, True, request.args.get('depth', None))
    
    # One Required
    nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
