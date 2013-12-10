@@ -952,6 +952,7 @@ opec.rightPanel.setupGraphingTools = function() {
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
+         depth: opec.selectedLayers[$('#graphcreator-coverage option:selected').val()].selectedElevation,
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
          graphZAxis: opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].origName

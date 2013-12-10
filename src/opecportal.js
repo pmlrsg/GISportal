@@ -545,6 +545,7 @@ opec.nonLayerDependent = function() {
       $('#opec-lPanel-operational').css('max-height', $(window).height() - 350);
       $('#opec-lPanel-reference').css('max-height', $(window).height() - 350);
    });
+
    
    //--------------------------------------------------------------------------
 
@@ -889,6 +890,7 @@ opec.main = function() {
    }
  
 };
+
 
 opec.ajaxState = function(id) { 
       // Async to get state object
