@@ -297,7 +297,11 @@
    <li class="opec-unselected ui-state-default" data-provider="{{provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
       <strong>{{name}}</strong>
       <a href="#"><span class="ui-corner-all ui-icon ui-icon-triangle-1-e"></span></a>
-      <span style="display:none;">Abstract: <i>{{abstract}}</i></span>
+      <div style="display:none;">
+         <p>Abstract: <i>{{abstract}}</i></p>
+         <p>Provider: <i>{{provider}}</i></p>
+         {{#tags}}<p>{{tag}} : <i>{{value}}</i></p>{{/tags}}
+      </div>
    </li>
 </script>
 <!-- Login box -->
@@ -515,8 +519,8 @@
                <ul>
                   <!-- Placeholder ROI radio buttons -->
                   <li id="ROIButtonSet">
-                     <input type="radio" id="point" name="radio" value="point" />
-                        <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>
+                     <!-- <input type="radio" id="point" name="radio" value="point" />
+                     <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>-->
                      <input type="radio" id="box" name="radio" value="box"/>
                      <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
                      

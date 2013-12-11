@@ -829,7 +829,7 @@ div .sensor-accordion {
    margin-right: 15px;
 }
 
-#opec-layerSelection .opec-selectable > ul > li > span {
+#opec-layerSelection .opec-selectable > ul > li > div {
    display: block;
    background-color: rgb(223, 223, 223);
    color: black;
@@ -838,7 +838,11 @@ div .sensor-accordion {
    padding: 2px;
 }
 
-#opec-layerSelection .opec-selectable > ul > li > span > i {
+#opec-layerSelection .opec-selectable > ul > li> div p {
+   font-size: 0.9em;
+}
+
+#opec-layerSelection .opec-selectable > ul > li > div i {
    margin-left: 3px;
 }
 

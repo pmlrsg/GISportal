@@ -485,7 +485,7 @@ opec.rightPanel.setup = function() {
    
    // Regions of interest drawing control buttons - with custom styling
    $('#ROIButtonSet').buttonset();
-   $('#point').button({ icons: { primary: 'ui-icon-drawpoint'} });
+   $('#point').button({ icons: { primary: 'ui-icon-drawpoint' }});
    $('#box').button({ icons: { primary: 'ui-icon-drawbox'} });
    $('#circle').button({ icons: { primary: 'ui-icon-drawcircle'} });
    $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });

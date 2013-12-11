@@ -288,13 +288,21 @@ opec.createOpLayers = function() {
                                
                      microLayer = opec.checkNameUnique(microLayer);   
                      opec.microLayers[microLayer.id] = microLayer;
+                     if (microLayer.tags)  {
+                        var tags = [];
+                        $.each(microLayer.tags, function(d, i) {
+                           if (microLayer.tags[d]) tags.push({ "tag" : d.toString(), "value" : microLayer.tags[d] }); 
+                        });
+                     }
+                     
                      opec.layerSelector.addLayer(opec.templates.selectionItem({
                            'id': microLayer.id,
                            'name': microLayer.name, 
                            'provider': providerTag,
                            'positive': positive, 
                            'title': microLayer.displayTitle, 
-                           'abstract': microLayer.productAbstract
+                           'abstract': microLayer.productAbstract,
+                           'tags': tags
                         }), 
                         {'tags': microLayer.tags
                      });                         
