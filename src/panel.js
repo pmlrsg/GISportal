@@ -944,7 +944,20 @@ opec.rightPanel.setupGraphingTools = function() {
          graphXAxis = 'Time';
          graphYAxis = 'Lat';
       }
-      
+     
+      // Some providers change direction of depth,
+      // so this makes it match direction
+      var depthDirection = function()  {
+         var layerID = $('#graphcreator-coverage option:selected').val();
+         var layer = opec.selectedLayers[layerID];
+         var elevation = layer.selectedElevation;
+         var direction = opec.microLayers[layerID].positive;
+
+         // Take direction === up as default
+         if (direction === "down") elevation = -elevation; 
+         return elevation;
+      }
+
       var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
          coverage: opec.selectedLayers[$('#graphcreator-coverage option:selected').val()].origName,
@@ -952,7 +965,7 @@ opec.rightPanel.setupGraphingTools = function() {
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
          bbox: $('#graphcreator-bbox').val(),
-         depth: opec.selectedLayers[$('#graphcreator-coverage option:selected').val()].selectedElevation,
+         depth: depthDirection(),
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
          graphZAxis: opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].origName

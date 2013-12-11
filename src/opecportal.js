@@ -260,7 +260,8 @@ opec.createOpLayers = function() {
       typeof item.wcsURL !== "undefined" && 
       typeof item.serverName !== "undefined" && 
       typeof item.options !== "undefined") {
-         var providerTag = typeof item.options.providerShortTag !== "undefined" ? item.options.providerShortTag : '';       
+         var providerTag = typeof item.options.providerShortTag !== "undefined" ? item.options.providerShortTag : '';
+         var positive = typeof item.options.positive !== "undefined" ? item.options.positive : 'up';       
          var wmsURL = item.wmsURL;
          var wcsURL = item.wcsURL;
          var serverName = item.serverName;
@@ -279,7 +280,8 @@ opec.createOpLayers = function() {
                            "wcsURL": wcsURL, 
                            "sensor": sensorName, 
                            "exBoundingBox": item.EX_GeographicBoundingBox, 
-                           "providerTag": providerTag, 
+                           "providerTag": providerTag,
+                           "positive" : positive, 
                            "tags": item.tags
                         }
                      );
@@ -289,7 +291,8 @@ opec.createOpLayers = function() {
                      opec.layerSelector.addLayer(opec.templates.selectionItem({
                            'id': microLayer.id,
                            'name': microLayer.name, 
-                           'provider': providerTag, 
+                           'provider': providerTag,
+                           'positive': positive, 
                            'title': microLayer.displayTitle, 
                            'abstract': microLayer.productAbstract
                         }), 
