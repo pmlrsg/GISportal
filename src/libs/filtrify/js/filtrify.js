@@ -113,6 +113,13 @@
       this._search.element = $('<ul class="opec-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p>');
       this.createSearch();
       this._menu.list = $('<ul class="ft-menu" />');
+    
+      // TODO: Make this configurable 
+      // Force provider to be last
+      if (this._order.indexOf("provider") > -1) {
+         this._order.splice(this._order.indexOf("provider"),1);
+         this._order.splice(this._order.length, 0, "provider");
+      }
 
       for ( f; f < this._order.length; f++ ) {
          field = browser.webkit || browser.opera ? 
@@ -136,7 +143,7 @@
    Filtrify.prototype.build = function ( f ) {
       var html, t, tag, tags = [];
          
-      html = '<li class="ft-field">' + 
+      html = '<li class="ft-field" data-name="' + f + '">' + 
          '<h3 class="ft-label">' + 
             '<a href="#">' + f + '</a>' + 
          "</h3>" + 
@@ -184,6 +191,7 @@
    Filtrify.prototype.events = function ( f ) {
       var self = this;
 
+      
       this._menu[f].tags.on( "mouseenter", "li", function(event) {
          self.highlight( f, $(this) );
       });
@@ -191,7 +199,6 @@
       this._menu[f].tags.on( "mouseleave", "li", function() {
          self.clearHighlight( f );
       });
-
       
       this._menu[f].tags.on( "click", "li", function() {
          self.select( f );
@@ -479,6 +486,40 @@
 
    };
 
+   Filtrify.prototype.trigger = function ( query ) {
+      var f;
+
+      // YUCK
+      var a = {};
+      for (var i = 0; i < query.length; i++) { a[query[i].category] = query[i].tags }
+      
+      for ( f in this._fields ) {
+         this.clearSearch( f );
+         this.updateQueryField( f, a );
+         this.updateActiveClass( f );
+         this.updatePanel( f );
+      };
+
+
+      // YUCK YUCK YUCK, as per #122 and #123
+      console.log("YUCK");
+      
+      $('.ft-tags li').show();
+      for (var i = 0; i < query.length; i++) {
+         var category = query[i].category;
+         console.log("category: ", category);
+         for(var j = 0; j < query[i].tags.length; j++)  {
+            $('.ft-field[data-name="' + category + '"] span:contains('+query[i].tags[j]+')').parent().hide();
+         }
+      }
+
+      $('.ft-selected').show();
+      $('.ft-selected li').show().addClass('ui-state-highlight')
+                          .parents('.ft-panel').siblings('h3').click();
+      
+      this.filter();
+   };
+
    Filtrify.prototype.updateFields = function ( row, match ) {
       //console.log('updating fields');
       var field, tags, t;
@@ -548,9 +589,48 @@
       });
       //this._items = this._container.children();
    };
-    
+
+   Filtrify.prototype.clearSearch = function ( f ) {
+      this.clearHighlight( f );
+      this.resetSearch( f );
+      this.clearSelected( f );
+   };
+
+   Filtrify.prototype.clearSelected = function ( f ) {
+      this._menu[f].selected.empty();
+      this._menu[f].active = $([]);
+   };
+
+   Filtrify.prototype.updateQueryField = function ( f, query ) {
+      this._query[f] = query[f] !== undefined ? query[f] : [];
+   };
+
+   Filtrify.prototype.updatePanel = function ( f ) {
+      var t = 0, tag,
+          tags = this._menu[f].tags.children().removeClass("ft-hidden");
+
+      for ( t; t < this._query[f].length; t++ ) {
+
+         tag = tags.filter( this._bind( function( index ) {
+            return ( tags[index].textContent || tags[index].innerText ) === this._query[f][t]; 
+         }, this ));
+
+         this._menu[f].selected.append( tag.clone() );
+         this._menu[f].active = this._menu[f].active.add( tag );
+         tag.addClass("ft-hidden");
+      };
+   };
+
+   Filtrify.prototype.toggleSelected = function ( f ) {
+      if ( this._menu[f].selected.children().length ) {
+         this._menu[f].selected.show();
+      } else {
+         this._menu[f].selected.hide();
+      };
+   };
+
    Filtrify.prototype.callback = function () {
-      if ( this.options.callback !== undefined && $.isFunction( this.options.callback ) ) {
+         if ( this.options.callback !== undefined && $.isFunction( this.options.callback ) ) {
          this.options.callback( this._query, this._match, this._mismatch );
       }
    };

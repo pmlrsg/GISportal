@@ -253,6 +253,7 @@ opec.createRefLayers = function() {
  * be used in the layer selector.
  */
 opec.createOpLayers = function() {
+   var layers = [];
    $.each(opec.cache.wmsLayers, function(i, item) {
       // Make sure important data is not missing...
       if(typeof item.server !== "undefined" && 
@@ -295,7 +296,8 @@ opec.createOpLayers = function() {
                         });
                      }
                      
-                     opec.layerSelector.addLayer(opec.templates.selectionItem({
+                     layers.push({
+                        "meta" : {
                            'id': microLayer.id,
                            'name': microLayer.name, 
                            'provider': providerTag,
@@ -303,8 +305,8 @@ opec.createOpLayers = function() {
                            'title': microLayer.displayTitle, 
                            'abstract': microLayer.productAbstract,
                            'tags': tags
-                        }), 
-                        {'tags': microLayer.tags
+                        },
+                        "tags": microLayer.tags
                      });                         
                   }
                });
@@ -312,7 +314,20 @@ opec.createOpLayers = function() {
          });
       }
    });
-   
+  
+   if (layers.length > 0)  {
+      layers.sort(function(a,b)  {
+         var a = a.meta.name.toLowerCase();
+         var b = b.meta.name.toLowerCase();
+         if (a > b) return 1;
+         if (a < b) return -1;
+         return 0;
+      });
+
+      $.each(layers, function(i, item) {
+         opec.layerSelector.addLayer(opec.templates.selectionItem(item.meta), { "tags" : item.tags} );
+      });
+   }
    opec.layerSelector.refresh();
    // Batch add here in future.
 };
@@ -624,7 +639,8 @@ opec.saveState = function(state) {
    state.map = {};
    state.map.layers = {}; 
    state.timeline = {}; 
-   
+   state.layerSelector = {};
+
    // Get the current layers and any settings/options for them.
    var keys = Object.keys(opec.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
@@ -667,6 +683,23 @@ opec.saveState = function(state) {
    // Get timeline zoom
    state.timeline.minDate = opec.timeline.xScale.domain()[0];
    state.timeline.maxDate = opec.timeline.xScale.domain()[1];
+
+   // Get filters on layer selector
+   // TODO: Refactor as per #123
+   state.layerSelector.filters = [];
+   $.each($('.ft-field[data-name]'), function(i, item) {
+      console.log('category:', item);
+      var tags = [];
+      $.each($('.ft-selected li span', item), function(i, e)  {
+         tags.push($(e).text()); 
+      });
+      console.log('tags', tags);
+      state.layerSelector.filters.push({ 
+         "category" : $(item).data('name'),
+         "tags" : tags
+      });
+   });
+
    return state;
 };
 
@@ -677,6 +710,7 @@ opec.loadState = function(state) {
    var rightPanel = state.rightPanel;
    var rangebars = state.rangebars;
    var timeline = state.timeline;
+   var layerSelector = state.layerSelector;
    state = state.map;
    
    // Load layers for state
@@ -727,6 +761,11 @@ opec.loadState = function(state) {
    if (timeline)  {
       opec.timeline.zoomDate(timeline.minDate, timeline.maxDate);
       if (state.date) opec.timeline.setDate(new Date(state.date));
+   }
+
+
+   if (layerSelector && layerSelector.filters)  {
+      opec.layerSelector.filtrify.trigger(layerSelector.filters);
    }
 };
 
