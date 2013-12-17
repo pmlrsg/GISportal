@@ -677,7 +677,7 @@ opec.removeLayer = function(layer) {
    delete opec.selectedLayers[layer.id];
    opec.nonSelectedLayers[layer.id] = layer;
    
-   $('#graphcreator-coverage option[value=' + layer.name + ']').remove();
+   $('#graphcreator-coverage option[value=' + layer.id + ']').remove();
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
