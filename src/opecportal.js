@@ -4,6 +4,8 @@
  */ 
 var opec = opec || (opec = {});
 
+opec.VERSION = 0.3.0;
+opec.SVN_VERSION = $svn_version$;
 
 /*===========================================================================*/
 //Initialise javascript variables and objects
