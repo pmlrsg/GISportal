@@ -109,7 +109,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       if (typeof extraInfo.tags !== 'undefined' && extraInfo.tags !== null) {
          for(var tag in extraInfo.tags) {
             if(extraInfo.tags[tag] !== null)  {
-               $layer.attr('data-' + tag, extraInfo.tags[tag]);
+               if (extraInfo.tags[tag].length > 1)
+                  $layer.attr('data-' + tag, JSON.stringify(extraInfo.tags[tag]));
+               else
+                  $layer.attr('data-' + tag, extraInfo.tags[tag]);
             }
          }
       }

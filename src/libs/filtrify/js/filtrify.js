@@ -71,7 +71,18 @@
             name = attr[i].name;
             if ( name.indexOf( "data-" ) === 0 && $.inArray( name, this.options.block ) === -1 ) {
                field = name.replace(/data-/gi, "").replace(/-/gi, " ");
-               tags = element.getAttribute( name ).split(", ");
+               try {
+                  tags = JSON.parse(element.getAttribute( name ));
+
+                  // All tags should be an array (so they can be looped
+                  // later) but occasionally they were not
+                  // so this forces anything that isn't already
+                  // an array to become one
+                  if (!([tags][0] instanceof Array)) tags = [tags];
+               }
+               catch(e) {
+                  tags = [element.getAttribute( name )];
+               }
                data[field] = tags;
 
                if ( this._fields[field] === undefined ) {
@@ -80,11 +91,11 @@
                }
 
                for ( t = 0; t < tags.length; t++ ) {
-                  if ( tags[t].length ) {
+                  //if ( tags[t].length ) {
                      tags[t] = tags[t].replace(/\\/g, "");
                      this._fields[field][tags[t]] = this._fields[field][tags[t]] === undefined ?
                         1 : this._fields[field][tags[t]] + 1;
-                  }
+                  //}
                }
             }
          }
