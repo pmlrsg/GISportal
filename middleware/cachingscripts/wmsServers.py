@@ -10,6 +10,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'HCMR'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/HCMR-M-AGGSLOW?'
@@ -92,9 +93,9 @@ servers = {
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/CEFAS/resoutcut.nc?'
    },
-   'dmi': { 
-      'name': 'dmi',
-      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI/DMI_1990_2009.nc?',
+   'dmi_monthy': { 
+      'name': 'dmi_monthly',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI_M/DMI_1990_2009_monthly_mean.nc?',
       'params': {
          'SERVICE': 'WMS',
          'request': 'GetCapabilities',
@@ -103,7 +104,33 @@ servers = {
       'options': {
          'providerShortTag': 'DMI'
       },
-      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI/DMI_1990_2009.nc?'
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI_M/DMI_1990_2009_monthly_mean.nc?'
+   },
+   'dmi_annual': { 
+      'name': 'dmi_annual',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI_Y/DMI_1990_2009_annual_mean.nc?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'DMI'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI_Y/DMI_1990_2009_annual_mean.nc?'
+   },
+   'dmi_seasonal': { 
+      'name': 'dmi_seasonal',
+      'url': 'http://earthserver.pml.ac.uk/thredds/wms/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'DMI'
+      },
+      'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?'
    },
    'ogs_ammonia': { 
       'name': 'ogs_ammonia',
