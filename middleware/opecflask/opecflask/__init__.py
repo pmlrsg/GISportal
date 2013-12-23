@@ -51,8 +51,9 @@ def create_app(path):
    
 def setup_version(app):
    app.config['MAJOR_VERSION'] = '0'
-   app.config['MINOR_VERSION'] = '13'
-   app.config['API_VERSION'] = '0.1'
+   app.config['MINOR_VERSION'] = '3'
+   app.config['API_VERSION'] = '0.0'
+   app.config['SVN_VERSION'] = filter(lambda, x: x.isdigit(), "$Rev$")
 
 """
 Setup logging for the application. If no path is provided, is empty, or does
