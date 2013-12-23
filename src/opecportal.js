@@ -5,7 +5,7 @@
 var opec = opec || (opec = {});
 
 opec.VERSION = "0.3.0";
-opec.SVN_VERSION = "$Rev$";
+opec.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
 
 /*==========================================================================*/
 //Initialise javascript variables and objects
