@@ -88,7 +88,7 @@ def getParams():
    
    # Optional extras
    nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
-   nameToParam["Vertical"] = Param("Vertical", True, True, request.args.get('depth', None))
+   nameToParam["vertical"] = Param("vertical", True, True, request.args.get('depth', None))
    
    # One Required
    nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))

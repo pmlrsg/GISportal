@@ -123,15 +123,17 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    /**
     * Selects a layer
     * selected should be true to add it to both panel and map
+    * options will be passed to the layer once created
     */
-   this.selectLayer = function(layerID, li) {
+   this.selectLayer = function(layerID, li, options) {
       var self = this;
+      var options = options || {};
       if(layerID in opec.microLayers) {
          if(layerID in opec.layers) {
             // DEBUG
             console.log("Adding layer...");
             var layer = opec.getLayerByID(layerID);
-            opec.addLayer(layer);
+            opec.addLayer(layer, options);
             opec.checkIfLayerFromState(layer);
 
             // DEBUG
@@ -139,13 +141,13 @@ opec.window.layerSelector = function(placeholderID, containerID) {
          } else {
             var microlayer = opec.microLayers[layerID];
             if(microlayer.type == 'opLayers') {
-               opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer);
+               opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
             } else if (microlayer.type == 'refLayers') {
                // TODO: Deal with wfs layers.
                // Convert the microlayer. 
                // COMMENT: might change the way this works in future.
                var layer = new opec.layer(microlayer, {}); 
-               opec.addLayer(layer);
+               opec.addLayer(layer, options);
                opec.checkIfLayerFromState(layer);   
             }
          }

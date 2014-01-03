@@ -408,10 +408,10 @@ opec.layer = function(microlayer, layerData) {
          dataType: 'json',
          async: true,
          success: function(data) {
-            layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
-            layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
-            layer.minScaleVal = layer.origMinScaleVal;
-            layer.maxScaleVal = layer.origMaxScaleVal;
+            if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
+            if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
+            if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
+            if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             
             layer.log = data.log == 'true' ? true : false;
          },
@@ -638,7 +638,8 @@ opec.layer = function(microlayer, layerData) {
    
 };
 
-opec.addLayer = function(layer) {   
+opec.addLayer = function(layer, options) {
+   var options = options || {};   
    delete opec.nonSelectedLayers[layer.id];
    opec.selectedLayers[layer.id] = layer;
    
@@ -656,7 +657,14 @@ opec.addLayer = function(layer) {
    } else if (layer.controlID == 'refLayers') {
       opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-reference')));
    }
-   
+  
+   if (options.minScaleVal || options.maxScaleVal)  {   
+      if (options.minScaleVal !== null) opec.layers[layer.id].minScaleVal = options.minScaleVal; 
+      if (options.maxScaleVal !== null) opec.layers[layer.id].maxScaleVal = options.maxScaleVal;
+      layer.minScaleVal = opec.layers[layer.id].minScaleVal;
+      layer.maxScaleVal = opec.layers[layer.id].maxScaleVal;
+      updateScalebar(layer);
+   }
    
    // TODO: Too tightly coupled
    opec.leftPanel.open();
@@ -713,9 +721,10 @@ opec.filterLayersByDate = function(date) {
  * 
  * @param {string} fileName - The file name for the specific JSON layer cache
  * @param {string} microLayer - The microLayer for the layer to be downloaded
- * @param {boolean} selected - True if the layer should be put straight onto the map
+ * @param {object} options - Any extra options for the layer
  */
-opec.getLayerData = function(fileName, microlayer) {   
+opec.getLayerData = function(fileName, microlayer, options) {  
+  var options = options || {}; 
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
@@ -736,7 +745,7 @@ opec.getLayerData = function(fileName, microlayer) {
          } 
          else {
             console.log("Adding layer..."); // DEBUG
-            opec.addLayer(layer);    
+            opec.addLayer(layer, options);    
             console.log("Added Layer"); // DEBUG
          }
 

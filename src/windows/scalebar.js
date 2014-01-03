@@ -149,17 +149,16 @@ function updateScalebar(layer) {
    {
       var scalebarDetails = getScalebarDetails(layer);
       $('#scalebar-' + layer.id + '> img').attr('src', scalebarDetails.url);
-      
-      var params = {
-         colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
-         logscale: layer.log
-      };
-      
-      layer.mergeNewParams(params);
-      
-      // DEBUG
+       // DEBUG
       console.info('url: ' + scalebarDetails.url);
-   }
+   }   
+   
+   var params = {
+      colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
+      logscale: layer.log
+   };
+   
+   layer.mergeNewParams(params);
 }
 
 function getScalebarDetails(layer) {
