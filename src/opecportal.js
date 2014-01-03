@@ -650,7 +650,9 @@ opec.saveState = function(state) {
       state.map.layers[layer.id] = {
          'selected': layer.selected,
          'opacity': layer.opacity !== null ? layer.opacity : 1,
-         'style': layer.style !== null ? layer.style : ''   
+         'style': layer.style !== null ? layer.style : '',
+         'minScaleVal': layer.minScaleVal,
+         'maxScaleVal': layer.maxScaleVal  
       };    
    }
    
@@ -686,6 +688,8 @@ opec.saveState = function(state) {
    state.timeline.minDate = opec.timeline.xScale.domain()[0];
    state.timeline.maxDate = opec.timeline.xScale.domain()[1];
 
+
+
    // Get filters on layer selector
    // TODO: Refactor as per #123
    state.layerSelector.filters = [];
@@ -720,7 +724,10 @@ opec.loadState = function(state) {
    for(var i = 0, len = keys.length; i < len; i++) {
       if (!opec.layers[keys[i]]) {
          var selection = opec.layerSelector.getLayerSelectionByID(keys[i]);
-         opec.layerSelector.selectLayer(keys[i], selection, true);
+         var options = {};
+         if (state.layers[keys[i]].minScaleVal !== null) options.minScaleVal = state.layers[keys[i]].minScaleVal;
+         if (state.layers[keys[i]].maxScaleVal !== null) options.maxScaleVal = state.layers[keys[i]].maxScaleVal;
+         opec.layerSelector.selectLayer(keys[i], selection, options);
       }
    }
    
