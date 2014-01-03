@@ -107,7 +107,7 @@ opec.contextMenu.setup = function() {
                showScalebar: opec.contextMenu.showScalebar($trigger),
                showMetadata: opec.contextMenu.showMetadata($trigger),
                viewData: opec.contextMenu.viewData($trigger),
-               heatmap: opec.contextMenu.heatmapTest()
+               //heatmap: opec.contextMenu.heatmapTest()
             };
             
             if(layer.controlID == 'opLayers') {
