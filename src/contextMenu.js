@@ -111,10 +111,10 @@ opec.contextMenu.setup = function() {
             };
             
             if(layer.controlID == 'opLayers') {
-               return layer.elevation ? $.extend(true, fold1, fold2, fold3, fold4, rest) : $.extend(true, fold1, fold2, fold4, rest);
+               return layer.elevation ? $.extend(true, fold1, fold2, fold3, rest) : $.extend(true, fold1, fold2, rest);
             }
             else if (layer.controlID == 'refLayers') {
-               return $.extend(true, fold1, fold4, rest);
+               return $.extend(true, fold1, rest);
             }
             else {
                return $.extend(true, fold1, rest);
