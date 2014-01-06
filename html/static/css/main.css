@@ -839,6 +839,10 @@ div .sensor-accordion {
 }
 
 #opec-layerSelection .opec-selectable > ul > li> div p {
+   -moz-user-select: text;
+   -khtml-user-select: initial;
+   -webkit-user-select: initial;
+   user-select: initial;
    font-size: 0.9em;
 }
 
