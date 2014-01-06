@@ -7,25 +7,23 @@ opec.quickRegions = {};
 opec.quickRegions.setup = function() {
    
    // Reset quick region selection if the screen is moved.
-   map.events.register('moveend', map, opec.quickRegionReset);
-   
+   // Check if event already exists, ie. if a state has been loaded over current
+   if (!map.events.listeners.moveend)
+      map.events.register('moveend', map, opec.quickRegionReset);
+  
+   $('.opec-quickRegion-select option').remove(); 
    // Populate Quick Regions from the quickRegions array 
    $('.opec-quickRegion-select').each(function( index ) {
       for(var i = 0; i < opec.quickRegion.length; i++) {
          $(this).append('<option value="' + i + '">' + opec.quickRegion[i][0] + '</option>');
       }
+      $(this).prepend('<option value="-1">Choose a Region</option>');
    });
    
    // Change of quick region event handler - happens even if the selection isn't changed
    $('#quickRegion').change(function(e) {
        var qr_id = $('#quickRegion').val();
-       
-       if(opec.quickRegion[qr_id][0] == '+ Add Current View +') {
-          var extent = map.getExtent().transform(map.projection, map.displayProjection);
-          opec.addQuickRegion("Custom Region", {left: extent.left, bottom: extent.bottom, right: extent.right, top: extent.top});
-          return;
-       }
-       
+             
        var bbox = new OpenLayers.Bounds(
                    opec.quickRegion[qr_id][1],
                    opec.quickRegion[qr_id][2],
@@ -57,39 +55,38 @@ opec.quickRegions.setup = function() {
  * map or panning.
  */ 
 opec.quickRegionReset = function(e) {
-   $('#quickRegion').val(0);   
+   $('#quickRegion').val(-1);   
 };
 
 opec.addQuickRegion = function(name, bounds) {
    var region = [name, bounds.left, bounds.bottom, bounds.right, bounds.top];         
-   opec.quickRegion.splice(opec.quickRegion.length - 1, 0, region);
-   var index = opec.quickRegion.length > 1 ? opec.quickRegion.length - 2 : 0;
+   opec.quickRegion[opec.quickRegion.length] = region;
+   var index = opec.quickRegion.length - 1;
    
    // Insert new quick region into any quick region list
    $(".opec-quickRegion-select").each(function() {
-      if(index > 0) {
-         $(this).find('option').eq(index).val(index + 1).before($("<option></option>").val(index).html(opec.quickRegion[index][0]));
-      } else {
-         $(this).append('<option value="' + index + '">' + opec.quickRegion[index][0] + '</option>');
-      }
-      
+      $(this).append('<option value="' + index + '">' + opec.quickRegion[index][0] + '</option>');
    });
    
    return;
 };
 
+opec.addCurrentView = function()  {
+    var extent = map.getExtent().transform(map.projection, map.displayProjection);
+    opec.addQuickRegion("Custom Region", {left: extent.left, bottom: extent.bottom, right: extent.right, top: extent.top});
+    return;
+}
+
+
 opec.removeQuickRegion = function(index) {
-   
-   // Don't allow special region to be removed.
-   if(opec.quickRegion[index][0] == '+ Add Current View +') { return; }
-   
+   if (index === "-1") return;
    opec.quickRegion.splice(index, 1);
    
    $(".opec-quickRegion-select").each(function() {
       // Remove region
-      $(this).find('option').eq(index).remove();
+      $(this).find('option[value="' + index + '"]').remove();
       // Fix indexes
-      $(this).find('option').slice(index).each(function() {
+      $(this).find('option').slice(parseInt(index) + 1).each(function() {
          $(this).val( $(this).val() - 1 );
       });
    });

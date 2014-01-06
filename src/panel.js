@@ -141,6 +141,8 @@ opec.leftPanel.setup = function() {
          
       opec.removeQuickRegion(id);
    });
+
+   $('.lPanel .opec-quickRegion-addCurrent').button({ label: 'Add current view' }).click(opec.addCurrentView);
 };
 
 /**

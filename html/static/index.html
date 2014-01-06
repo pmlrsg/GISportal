@@ -294,7 +294,7 @@
 </script>
 <!-- Item on the layer selection window -->
 <script type="text/html" id="opec-template-selector-item">
-   <li class="opec-unselected ui-state-default" data-provider="{{provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
+   <li class="opec-unselected ui-state-default" data-provider="{{ provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
       <strong>{{name}}</strong>
       <a href="#"><span class="ui-corner-all ui-icon ui-icon-triangle-1-e"></span></a>
       <div style="display:none;">
@@ -463,7 +463,7 @@
                      <div style="clear: both;"> </div>
                      
                      <button class="opec-quickRegion-remove">Remove selected region</button>
-                     
+                     <button class="opec-quickRegion-addCurrent">Add Current View</button> 
                      <div style="clear: both;"> </div>
                   </fieldset>
                   
@@ -657,5 +657,6 @@
    <ul id="walkthrough"></ul>
    
    <div id="js-walkthrough-confirm" class="hidden">Would you like this walkthrough to appear next time you visit?</div>
+
 </body>
 </html>

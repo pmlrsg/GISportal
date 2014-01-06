@@ -65,7 +65,6 @@ opec.lonlat = new OpenLayers.Projection("EPSG:4326");
 
 // Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
 opec.quickRegion = [
-   ["Choose a Region",-150, -90, 150, 90],
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
    ["Adriatic", 11.83, 39.00, 20.67, 45.80],
@@ -76,8 +75,7 @@ opec.quickRegion = [
    ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
    ["North Sea", -4.50, 50.20, 8.90, 60.50],
    ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-   ["Mediterranean", -6.00, 29.35, 36.00, 48.10],
-   ["+ Add Current View +", -150, -90, 150, 90]
+   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
 /**
@@ -676,13 +674,8 @@ opec.saveState = function(state) {
    state.map.extent = map.getExtent();
 
    // Get quick regions
-   var regions = [];
-   for (var i = 0; i < opec.quickRegion.length; i++)  {
-      if (opec.quickRegion[i][0] !== '+ Add Current View +') regions.push(opec.quickRegion[i]);
-   }
-   console.log(regions);
-   state.map.regions = regions;
-  
+   state.map.regions = opec.quickRegion;
+   state.map.selectedRegion = $('#quickRegion option:selected').val();
 
    // Get timeline zoom
    state.timeline.minDate = opec.timeline.xScale.domain()[0];
@@ -758,13 +751,12 @@ opec.loadState = function(state) {
 
    // Load Quick Regions
    if (state.regions) {
-      var amount = opec.quickRegion.length;
-      for (var i = 0; i < amount; i++)  {
-         opec.removeQuickRegion(0);
-      }
-
       opec.quickRegion = state.regions;
       opec.quickRegions.setup();
+   }
+
+   if (state.selectedRegion)  {
+      $('#quickRegion').val(state.selectedRegion);
    }
 
    if (timeline)  {
