@@ -277,7 +277,7 @@ opec.TimeLine = function(id, options) {
    // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
    $(window).resize(function() {
       // Change the widget width settings dynamically if the DIV is visible
-      if(self.visible){ self.reWidth(); self.redraw(); }
+      if(self.visible && event.target == window){ self.reWidth(); self.redraw(); }
    });
 };
 
