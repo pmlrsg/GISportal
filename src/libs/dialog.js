@@ -988,6 +988,8 @@
                $(this).addClass("ui-dialog-dragging");
                that._blockFrames();
                that._trigger("dragStart", event, filteredUi(ui));
+               this.mousemove = map.events.listeners.mousemove || [];
+               map.events.listeners.mousemove = [];
             },
             drag : function(event, ui) {
                that._trigger("drag", event, filteredUi(ui));
@@ -997,6 +999,7 @@
                $(this).removeClass("ui-dialog-dragging");
                that._unblockFrames();
                that._trigger("dragStop", event, filteredUi(ui));
+               map.events.listeners = this.mousemove;
             }
          });
       },
@@ -1006,7 +1009,6 @@
          // .ui-resizable has position: relative defined in the stylesheet
          // but dialogs have to use absolute or fixed positioning
          position = this.uiDialog.css("position"), resizeHandles = typeof handles === "string" ? handles : "n,e,s,w,se,sw,ne,nw";
-
          function filteredUi(ui) {
             return {
                originalPosition : ui.originalPosition,
@@ -1030,6 +1032,8 @@
                $(this).addClass("ui-dialog-resizing");
                that._blockFrames();
                that._trigger("resizeStart", event, filteredUi(ui));
+               this.mousemove = map.events.listeners.mousemove || [];
+               map.events.listeners.mousemove = [];
             },
             resize : function(event, ui) {
                that._trigger("resize", event, filteredUi(ui));
@@ -1040,6 +1044,7 @@
                $(this).removeClass("ui-dialog-resizing");
                that._unblockFrames();
                that._trigger("resizeStop", event, filteredUi(ui));
+               map.events.listeners.mousemove = this.mousemove;
             }
          }).css("position", position);
       },
