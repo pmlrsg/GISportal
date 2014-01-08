@@ -999,7 +999,7 @@
                $(this).removeClass("ui-dialog-dragging");
                that._unblockFrames();
                that._trigger("dragStop", event, filteredUi(ui));
-               map.events.listeners = this.mousemove;
+               map.events.listeners.mousemove = this.mousemove;
             }
          });
       },
