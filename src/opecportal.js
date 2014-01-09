@@ -304,7 +304,10 @@ opec.createOpLayers = function() {
                            'positive': positive, 
                            'title': microLayer.displayTitle, 
                            'abstract': microLayer.productAbstract,
-                           'tags': tags
+                           'tags': tags,
+                           'bounds': microLayer.exBoundingBox,
+                           'firstDate': microLayer.firstDate,
+                           'lastDate': microLayer.lastDate
                         },
                         "tags": microLayer.tags
                      });                         
