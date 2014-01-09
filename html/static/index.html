@@ -301,6 +301,15 @@
          <p>Abstract: <i>{{abstract}}</i></p>
          <p>Provider: <i>{{provider}}</i></p>
          {{#tags}}<p>{{tag}} : <i>{{value}}</i></p>{{/tags}}
+         {{#bounds}}<p>Bounding Box:  <label style="color: green">{{bounds.NorthBoundLatitude}}</label>
+            N,
+            <label style="color: blue">{{bounds.EastBoundLongitude}}</label>
+            E,
+            <label style="color: green">{{bounds.SouthBoundLatitude}}</label>
+            S,
+            <label style="color: blue">{{bounds.WestBoundLongitude}}</label>
+            W</p>{{/bounds}}
+         <p>Date Range: {{firstDate}} to {{lastDate}}</p>
       </div>
    </li>
 </script>

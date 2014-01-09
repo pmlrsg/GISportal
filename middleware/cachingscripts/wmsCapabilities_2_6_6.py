@@ -88,8 +88,8 @@ def createCache(server, xml):
                masterLayer = {"Name": name,
                               "Title": title,
                               "Abstract": abstract,
-                              #"FirstDate": dimensions['firstDate'],
-                              #"LastDate": dimensions['lastDate'],
+                              "FirstDate": dimensions['firstDate'],
+                              "LastDate": dimensions['lastDate'],
                               "EX_GeographicBoundingBox": exGeographicBoundingBox }
                               
                if server['name'] in extraInfo:
