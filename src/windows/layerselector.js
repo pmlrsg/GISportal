@@ -44,7 +44,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       block: ['data-id', 'data-title'],
       blockFieldMenu: ['name'],
       callback : function ( query, match, mismatch ) {
-         this.$container.quicksand($(match), {
+         self.$container.quicksand($(match), {
             // all the parameters have sensible defaults
             // and in most cases can be optional
             adjustHeight: false,

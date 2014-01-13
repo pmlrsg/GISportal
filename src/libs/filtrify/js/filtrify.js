@@ -36,6 +36,7 @@
       this._match = [];
       this._mismatch = [];
       this._z = 9999;
+      this._memory = []; // Used to store the results when selected is toggled
 
       this._bind = function ( fn, me ) { 
          return function () { 
@@ -46,6 +47,37 @@
       this.init();
 
       $('.ft-menu li').multiOpenAccordion({ active: 'false'});
+
+      var self = this;
+      // Toggle between filter and selected
+      // TODO: Refactor this code. Move it somewhere nice
+      // Improve binding, had to use main reference to make sure everything is updated correctly
+      $('.opec-tagMenu').on('click', '.js-selected-tags.toggle-off', function()  {
+         if ( opec.layerSelector.filtrify._memory.length === 0) {
+            opec.layerSelector.filtrify._memory = opec.layerSelector.filtrify._container.children();
+            opec.layerSelector.filtrify._container.empty();
+            opec.layerSelector.filtrify._container.append($(opec.layerSelector.filtrify._items).filter('.opec-selected'));
+            $('.ft-menu').hide();
+            $('.js-clear-tags').attr("disabled", true);
+            $('.opec-search input').attr("disabled", true);
+            $('.js-selected-tags').addClass('ui-state-highlight');
+            $(this).addClass('toggle-on').removeClass('toggle-off');
+         }
+      });
+      
+      $('.opec-tagMenu').on('click', '.js-selected-tags.toggle-on', function()  {
+         if (opec.layerSelector.filtrify._memory.length > 0) {
+            opec.layerSelector.filtrify._container.empty().append(opec.layerSelector.filtrify._memory);
+            $('.ft-menu').show();
+            $('.js-clear-tags').attr("disabled", false);
+            $('.opec-search input').attr("disabled", false);
+            $(this).addClass('toggle-off').removeClass('toggle-on');
+            $('.js-selected-tags').removeClass('ui-state-highlight');
+            opec.layerSelector.filtrify._memory = [];
+         }   
+      });
+   
+
    }
 
    Filtrify.prototype.init = function () {
@@ -121,10 +153,16 @@
          browser = $.browser,
          self = this;
 
-      this._search.element = $('<ul class="opec-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p>');
+      // Would be very nice to have this a bit cleaner!
+      this._search.element = $('<button class="js-clear-tags clear-tags">Clear Filter</button><ul class="opec-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p><button class="js-selected-tags selected-tags toggle-off">Show Selected</button>');
       this.createSearch();
       this._menu.list = $('<ul class="ft-menu" />');
-    
+     
+      $('.opec-tagMenu').on('click', '.js-clear-tags', function() {
+         self.trigger({});
+         $('.opec-search input').val('');
+      });
+
       for ( f; f < this._order.length; f++ ) {
          field = this._order[ this._order.length - f - 1 ];
             
@@ -141,6 +179,8 @@
       }
 
       this._holder.html(self._menu.list).prepend(this._search.element);
+      $('.js-selected-tags').button();
+      $('.js-clear-tags').button(); 
    };
 
    Filtrify.prototype.build = function ( f ) {
@@ -217,6 +257,7 @@
          //$(this).removeClass('ui-state-highlight')
       });
 
+
    };
    
    Filtrify.prototype.createSearch = function() {
@@ -263,6 +304,7 @@
          //};
 
       }, this) );
+
    };
 
    Filtrify.prototype.highlight = function ( f, elem ) {

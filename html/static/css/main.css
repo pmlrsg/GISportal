@@ -955,6 +955,23 @@ div .sensor-accordion {
    margin-left: 10px;
 }
 
+.ui-widget .ui-widget.selected-tags,
+.ui-widget .ui-widget.clear-tags {
+   font-size: 0.8em;
+   width: 100%;
+}
+
+.clear-tags[disabled]  {
+   cursor: auto;
+   opacity: 0.6;
+}
+
+.selected-tags:focus,
+.clear-tags:focus {
+   outline: 0;
+}
+
+
 .ft-tags {
    list-style: none;
    padding-left: 0px;
