@@ -324,14 +324,12 @@ def basic(dataset, params):
    
    return output
 
+
 def hovmoller(dataset, params):
    xAxisVar = params['graphXAxis'].value
    yAxisVar = params['graphYAxis'].value
    zAxisVar = params['graphZAxis'].value
-   
-   #np.set_printoptions(threshold=np.nan)
-   #print xAxisVar, yAxisVar, zAxisVar
-       
+
    xVar = getCoordinateVariable(dataset, xAxisVar)
    xArr = np.array(xVar)
    yVar = getCoordinateVariable(dataset, yAxisVar)
@@ -346,7 +344,7 @@ def hovmoller(dataset, params):
       return
    
    # Create a masked array ignoring nan's
-   zMaskedArray = np.ma.masked_array(zArr, [np.isnan(x) for x in zArr])
+   zMaskedArray = np.ma.masked_where(np.isnan(zArr), zArr)
       
    time = None
    lat = None
@@ -360,45 +358,8 @@ def hovmoller(dataset, params):
       lon = xArr
       times = yArr
       time = yVar
-      
-   #for debug
-   #if lat == None:
-      #var = getCoordinateVariable(dataset, 'Lat')
-      #lat = np.array(var)
-   #elif lon == None:
-      #var = getCoordinateVariable(dataset, 'Lon')
-      #lon = np.array(var)
-   
 
    output = {}
-   
-   numDimensions = len(zMaskedArray.shape)
-   
-   # If 4 dimensions, assume depth and switch with time
-   if numDimensions == 4:
-      depth = np.array(getDepth(dataset)) 
-      depth = [0]
-      if depth is None:
-         depth = [0]
-         current_app.logger.debug('checking depth: ' + depth)
-      zMaskedArray.swapaxes(1, 0)
-      if 'depth' in params:         
-         if params['depth'].value in depth:
-            pass
-      else:
-         zMaskedArray = zMaskedArray[0]
-         output['depth'] = float(depth[0])
-   
-   units = getUnits(dataset.variables[params['coverage'].value])
-   output['units'] = units
-   
-   current_app.logger.debug('starting basic calc') # DEBUG
-   
-   #mean = getMean(maskedArray)
-   #median = getMedian(maskedArray)
-   #std = getStd(maskedArray)
-   #min = getMin(maskedArray)
-   #max = getMax(maskedArray)
    
    timeUnits = getUnits(time)
    start = None
@@ -408,74 +369,63 @@ def hovmoller(dataset, params):
       start = ''.join(times[0])
    
    output['global'] = {'time': start}
-   current_app.logger.debug('starting iter of dates') # DEBUG
    
    output['data'] = []
-   
-   # Temp code dup
-   if lat != None:     
-      for i, timelatlon in enumerate(zMaskedArray):
-         
-         date = None    
-         if timeUnits:
-            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
-         else:     
-            date = ''.join(times[i])
-         #output['data'][date.isoformat()] = []
-         
-         #print timelatlon
-         
-         for j, latRow in enumerate(timelatlon):   
-            #print '-------------------------------------'
-            #print latRow         
-            latitude = lat[j]
-            #output['data'][date.isoformat()].append([float(latitude), getMean(latRow)])              
-            mean = getMean(latRow)
-            
-            if np.isnan(mean):
-               output['data'].append([date, float(latitude), 0])
-            else:               
-               output['data'].append([date, float(latitude), mean])
-               
+ 
+   direction = None 
+   if lat != None:
+      direction = 'lat'
    elif lon != None:
-      zMaskedArray = zMaskedArray.swapaxes(1,2)
-      
-      for i, timelonlat in enumerate(zMaskedArray): 
-         #print timelonlat   
-         date = None
-         if timeUnits:  
-            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
-         else:    
-            date = ''.join(times[i])  
-         #output['data'][date.isoformat()] = []
-                        
-         for j, lonRow in enumerate(timelonlat):
-            #print '-------------------------------------'
-            #print lonRow  
-            longitude = lon[j]            
-            #lonArr = []                                  
-            #for k, latRow in enumerate(lonRow):
-               #lonArr.append(lon[k])                 
-            #lonArr = np.array(lonArr)
-            #output['data'][date.isoformat()].append([float(longitude), getMean(lonRow)])
-            
-            mean = getMean(lonRow)
-            
-            if np.isnan(mean):
-               pass
-            else:
-               output['data'].append([date, float(longitude), mean])          
+      direction = 'lon'
+      zMaskedArray = zMaskedArray.swapaxes(1,2) # Make it use Lon instead of Lat
+   
+   numDimensions = len(zMaskedArray.shape)
+
+   # If 4 dimensions, assume depth and switch with time
+   if numDimensions == 4:
+      depth = np.array(getDepth(dataset))
+      if len(depth.shape) > 1:
+         current_app.logger.debug('WARNING: There are multiple depths.')
+      else:
+         # Presume 1 depth, set to contents of depth
+         # This way, it will enumerate over correct array
+         # whether depth or not
+         zMaskedArray = zMaskedArray.swapaxes(0,1)[0]
          
-      #current_app.logger.debug(time)
+         output['depth'] = float(depth[0])
+ 
+
+   for i, timelatlon in enumerate(zMaskedArray):
+      date = None    
+      if timeUnits:
+         date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+      else:     
+         date = ''.join(times[i])
       
+      for j, row in enumerate(timelatlon):
+         
+         if direction == "lat":
+            pos = lat[j]
+         elif direction == "lon":
+            pos = lon[j]
+         
+         mean = getMean(row)
+         
+         if np.isnan(mean):
+            mean = 0
+
+         output['data'].append([date, float(pos), mean])
+            
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
       return output
       
-   current_app.logger.debug('Finished basic') # DEBUG
    
    return output
-   
+
+
+
+  
 """
 Creates a histogram from the provided data. If no bins are created it creates its own.
 """
@@ -579,7 +529,8 @@ def getDepth(dataset):
    for i, key in enumerate(dataset.variables):
       var = dataset.variables[key]
       if "_CoordinateAxisType" in var.ncattrs() and "_CoordinateZisPositive" in var.ncattrs():
-         if var._CoordinateAxisType == "Height" and var._CoordinateZisPositive == "down":
+         #if var._CoordinateAxisType == "Height" and var._CoordinateZisPositive == "down":
+         if var._CoordinateAxisType == "Height":
             return var
    return None
 
