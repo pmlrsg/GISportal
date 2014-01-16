@@ -155,6 +155,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ammonia.nc?'
@@ -168,6 +169,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_CarnMesozoo.nc?'
@@ -181,6 +183,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cdia.nc?'
@@ -194,6 +197,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-dia.nc?'
@@ -207,6 +211,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-largephy.nc?'
@@ -220,6 +225,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-nflag.nc?'
@@ -233,6 +239,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?'
@@ -246,6 +253,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Clargephy.nc?'
@@ -259,6 +267,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cnflag.nc?'
@@ -272,6 +281,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cpicophy.nc?'
@@ -285,6 +295,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_HeteroFlag.nc?'
@@ -298,6 +309,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Microzoo.nc?'
@@ -311,6 +323,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_nitrate.nc?'
@@ -324,6 +337,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_OmniMesozoo.nc?'
@@ -337,6 +351,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_oxygen.nc?'
@@ -350,6 +365,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_pCO.nc?'
@@ -363,6 +379,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_phosphate.nc?'
@@ -376,6 +393,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ppn.nc?'
@@ -389,6 +407,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3NH4_PO4.nc?'
@@ -402,6 +421,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_PO4.nc?'
@@ -415,6 +435,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_SIO4.nc?'
@@ -428,6 +449,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal_Anomaly.nc?'
@@ -441,6 +463,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal.nc?'
@@ -454,6 +477,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_silicate.nc?'
@@ -467,6 +491,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_tem_Anomaly.nc?'
@@ -480,6 +505,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_temp.nc?'
@@ -493,6 +519,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalchlorophyll.nc?'
@@ -506,6 +533,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_TotalPhytoC.nc?'
@@ -519,6 +547,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalzooplankton.nc?'
@@ -532,6 +561,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_nitrate.nc?'
@@ -545,6 +575,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_phosphate.nc?'
@@ -558,6 +589,7 @@ servers = {
          'version': '1.3.0'
       },
       'options': {
+         'positive': 'down',
          'providerShortTag': 'OGS'
       },
       'wcsurl': 'http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_silicate.nc?'

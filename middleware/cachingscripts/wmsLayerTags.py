@@ -642,8 +642,8 @@ layers = {
             "region": "Med"
         }
     }, 
-    "ogs_oxygen": {
-        "oxygen": {
+    "ogs_Oxygen": {
+        "Oxygen": {
             "Ecosystem_Element": "Gases", 
             "MSFD": [
                 "Eutrophication"
