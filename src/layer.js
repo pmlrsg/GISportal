@@ -299,7 +299,7 @@ opec.layer = function(microlayer, layerData) {
 		layer.selected = false;
 		layer.setVisibility(false);
 		layer.checkLayerState();
-
+      delete opec.selectedLayers[layer.id];
 		if (layer.temporal) {
 			if (opec.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
 				opec.timeline.removeTimeBarByName(layer.name);
@@ -683,13 +683,13 @@ opec.removeLayer = function(layer) {
    opec.leftPanel.removeLayerFromGroup(layer);
    
    delete opec.selectedLayers[layer.id];
-   opec.nonSelectedLayers[layer.id] = layer;
-   
-   $('#graphcreator-coverage option[value=' + layer.id + ']').remove();
+   delete opec.layers[layer.id];
+    
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
+   opec.rightPanel.updateCoverageList();
 };
 
 opec.setLayerIndex = function(layer, index) {
