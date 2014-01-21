@@ -798,9 +798,9 @@ function hovmoller(graphData) {
          .orient("bottom")
          .ticks(8)
          .tickValues([d3.min(trends.data, function(d, i) {
-            return d[1];
+            return d[1].toFixed(2);
          }), d3.max(trends.data, function(d, i) {
-            return d[1];
+            return d[1].toFixed(2);
          })]);
       
       yAxis = d3.svg.axis()
@@ -821,9 +821,9 @@ function hovmoller(graphData) {
          .orient("left")
          .ticks(8)
          .tickValues([d3.min(trends.data, function(d, i) {
-            return d[1];
+            return d[1].toFixed(2);
          }), d3.max(trends.data, function(d, i) {
-            return d[1];
+            return d[1].toFixed(2);
          })]);
    }
       
