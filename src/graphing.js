@@ -437,7 +437,7 @@ opec.graphs.createDialog = function(uid, title) {
 
 function hovmoller(graphData) {  
    var trends = graphData.data;
-   
+   console.log(trends); 
    // Set some defaults for the basic chart
    var 
       width = 580,
@@ -476,7 +476,7 @@ function hovmoller(graphData) {
    
    if ( graphData.type == 'hovmollerLon' ) {
       // Create basic linear scale for the x, y and z axis.
-      zScale = d3.scale.log();
+      zScale = d3.scale.linear();
       xScale = d3.scale.ordinal();
       yScale = d3.time.scale().range([0, height]);
       
@@ -490,7 +490,7 @@ function hovmoller(graphData) {
       }));    
    } else {
       // Create basic linear scale for the x, y and z axis.
-      zScale = d3.scale.log();
+      zScale = d3.scale.linear();
       xScale = d3.time.scale().range([0, width]);
       yScale = d3.scale.ordinal();
       
@@ -761,9 +761,9 @@ function hovmoller(graphData) {
    "rgb(110,0,0)",
    "rgb(105,0,0)",
    "rgb(0,0,0)"];
-   
+  /* 
    function addscales(scale) {
-     var x = 0.003921569;
+     var x = 0.003921569;  // 1 / 255
      for(var i = 0; i < 256; i++) {
        var z = (i * x) < 1 ? i * x : 1;
        scale.push(z);
@@ -771,16 +771,22 @@ function hovmoller(graphData) {
    }
    
    addscales(scale);
-   
+   */
+
+
    // Add the domain to the zScale - we re map the scale to 
-   zScale.domain([d3.min(trends.data, function(trend) { 
-      return trend[2];
-   }), d3.max(trends.data, function(trend) {
-      return trend[2];
-   })])
-   .domain(scale
-      .map(zScale.invert))
-      .range(colours);
+   zScale.domain([
+      d3.min(trends.data, function(trend) {
+         return trend[2];
+      }), 
+      d3.max(trends.data, function(trend) {
+         return trend[2];
+      })
+   ]);
+
+   //scale = scale.map(zScale.invert);
+   //zScale.domain(scale);
+   zScale.range([0, colours.length]);
 
    var xAxis,
       yAxis;
@@ -852,7 +858,7 @@ function hovmoller(graphData) {
                 .attr("y", function(d, i) { return yScale( parseDate(d[0]) ); })
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d, i) { return 8; })
-                .style("fill", function(d, i) { return zScale(d[2] > 0 ? d[2] : 0.001 ); });  
+                .style("fill", function(d, i) { return colours[Math.round(zScale(d[2]))]; });  
    } else {
       g.append("g")
         .attr("class", "xaxis")
@@ -884,11 +890,30 @@ function hovmoller(graphData) {
                 .attr("y", function(d, i) { return yScale( d[1] ); })
                 .attr("width", function(d, i) { return 8; })
                 .attr("height", yScale.rangeBand())
-                .style("fill", function(d, i) { return zScale(d[2] > 0 ? d[2] : 0.001 ); });
+                .style("fill", function(d, i) { 
+                   return colours[Math.round(zScale(d[2]))]; 
+                });
    }
    
    g.selectAll(".xaxis text").attr("transform", "translate("+width/365/2+",0)");
-   
+  
+   // Percentage of the range
+   function stopAmount(percentage)  {
+      var x = (zScale.range()[1] - zScale.range()[0]) / 100;
+      return x * percentage;
+   }
+
+   // Percentage of the domain
+   function stopScale(percentage)  {
+      var x = (zScale.domain()[1] - zScale.domain()[0]) / 100;
+      return x * percentage;
+   }
+
+   // Colour from percentage of range
+   function stopColor(percentage) {
+      return colours[Math.round(stopAmount(percentage))];
+   }
+
    var gradient = svg.append("defs").append("linearGradient")
       .attr("id", "gradient")
       .attr("y1", "0%")
@@ -899,97 +924,97 @@ function hovmoller(graphData) {
    
    gradient.append("stop")
       .attr("offset", "0%")
-      .attr("stop-color",zScale(zScale.domain()[255]))
+      .attr("stop-color",stopColor(0))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "0.5%")
-      .attr("stop-color",zScale(zScale.domain()[254]))
+      .attr("stop-color",stopColor(0.5))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "6.25%")
-      .attr("stop-color",zScale(zScale.domain()[240]))
+      .attr("stop-color",stopColor(6.25))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "12.5%")
-      .attr("stop-color", zScale(zScale.domain()[224]))
+      .attr("stop-color", stopColor(12.5))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "18.75%")
-      .attr("stop-color", zScale(zScale.domain()[208]))
+      .attr("stop-color", stopColor(18.75))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "25%")
-      .attr("stop-color", zScale(zScale.domain()[192]))
+      .attr("stop-color", stopColor(25))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "31.25%")
-      .attr("stop-color", zScale(zScale.domain()[176]))
+      .attr("stop-color", stopColor(31.25))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "37.5%")
-      .attr("stop-color", zScale(zScale.domain()[160]))
+      .attr("stop-color", stopColor(37.5))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "43.75%")
-      .attr("stop-color", zScale(zScale.domain()[144]))
+      .attr("stop-color", stopColor(43.75))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "50%")
-      .attr("stop-color", zScale(zScale.domain()[128]))
+      .attr("stop-color", stopColor(50))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "56.25%")
-      .attr("stop-color", zScale(zScale.domain()[112]))
+      .attr("stop-color", stopColor(56.25))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "62.5%")
-      .attr("stop-color", zScale(zScale.domain()[96]))
+      .attr("stop-color", stopColor(62.5))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "68.75%")
-      .attr("stop-color", zScale(zScale.domain()[80]))
+      .attr("stop-color", stopColor(68.75))
       .attr("stop-opacity", 1);
    
    gradient.append("stop")
       .attr("offset", "75%")
-      .attr("stop-color", zScale(zScale.domain()[64]))
+      .attr("stop-color", stopColor(75))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "81.25%")
-      .attr("stop-color", zScale(zScale.domain()[48]))
+      .attr("stop-color", stopColor(81.25))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "87.5%")
-      .attr("stop-color", zScale(zScale.domain()[32]))
+      .attr("stop-color", stopColor(87.5))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "93.75%")
-      .attr("stop-color", zScale(zScale.domain()[16]))
+      .attr("stop-color", stopColor(93.75))
       .attr("stop-opacity", 1);
       
    gradient.append("stop")
       .attr("offset", "99.9%")
-      .attr("stop-color", zScale(zScale.domain()[1]))
+      .attr("stop-color", stopColor(99.9))
       .attr("stop-opacity", 1);
 
    gradient.append("stop")
       .attr("offset", "100%")
-      .attr("stop-color", zScale(zScale.domain()[0]))
+      .attr("stop-color", stopColor(100))
       .attr("stop-opacity", 1);
    
    svg.append("g").attr("class", "legend_group").append("rect").attr("class", "legend")
@@ -998,7 +1023,7 @@ function hovmoller(graphData) {
       .style("fill", "url(#gradient)")
       .attr("transform", "translate("+[width + margin.left + 10, height/10]+")");
    
-   var legend_data = [zScale.domain()[255], zScale.domain()[192], zScale.domain()[128], zScale.domain()[64], zScale.domain()[0]];
+   var legend_data = [stopScale(0), stopScale(25), stopScale(50), stopScale(75), stopScale(100)];
    
    svg.select("g.legend_group").selectAll(".labels")
       .data(legend_data).enter()

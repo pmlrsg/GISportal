@@ -344,7 +344,7 @@ def hovmoller(dataset, params):
       return
    
    # Create a masked array ignoring nan's
-   zMaskedArray = np.ma.masked_where(np.isnan(zArr), zArr)
+   zMaskedArray = np.ma.masked_invalid(zArr)
       
    time = None
    lat = None
@@ -372,14 +372,18 @@ def hovmoller(dataset, params):
    
    output['data'] = []
  
+   numDimensions = len(zMaskedArray.shape)
+   
    direction = None 
    if lat != None:
       direction = 'lat'
    elif lon != None:
       direction = 'lon'
-      zMaskedArray = zMaskedArray.swapaxes(1,2) # Make it use Lon instead of Lat
+      if numDimensions == 4:
+         zMaskedArray = zMaskedArray.swapaxes(2,3)
+      else:
+         zMaskedArray = zMaskedArray.swapaxes(1,2) # Make it use Lon instead of Lat
    
-   numDimensions = len(zMaskedArray.shape)
 
    # If 4 dimensions, assume depth and switch with time
    if numDimensions == 4:
