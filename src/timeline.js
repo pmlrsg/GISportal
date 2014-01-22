@@ -533,6 +533,7 @@ opec.TimeLine.prototype.redraw = function() {
       .attr('width', 4).attr('height', self.height - 2);
    
    // Draw the time bar labels
+   this.labelArea.selectAll('text').remove(); // Dirty hack to redraw labels for update
    this.labels = this.labelArea.selectAll('text').data(this.timebars);
    
    // New labels arriving
