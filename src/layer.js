@@ -290,7 +290,12 @@ opec.layer = function(microlayer, layerData) {
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
-      }    
+      }   
+
+      // Checks if scale data already loaded
+      // Used for when layer has been hidden
+      if (layer.origMinScaleVal !== null)
+         opec.window.createScalebar(layer.id);  
    };
    
    this.unselect = function() {
