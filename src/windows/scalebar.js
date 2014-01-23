@@ -4,7 +4,13 @@
  */
 opec.window.createScalebar = function($trigger) {
    // Get the selected layer
-   var layer = opec.getLayerByID($trigger.attr('id'));       
+   var layer;
+   if (typeof $trigger === 'object')  {
+      layer = opec.getLayerByID($trigger.attr('id'));
+   }
+   else  {
+      layer = opec.getLayerByID($trigger);
+   }   
    var scalebarDetails = getScalebarDetails(layer);
 
    // If there is an open version, close it

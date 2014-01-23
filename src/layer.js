@@ -274,7 +274,6 @@ opec.layer = function(microlayer, layerData) {
       var layer = this;
       
       layer.selected = true;
-      
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
@@ -295,7 +294,8 @@ opec.layer = function(microlayer, layerData) {
    };
    
    this.unselect = function() {
-		var layer = this;
+		var layer = this; 
+      $('#scalebar-' + layer.id).remove(); 
 		layer.selected = false;
 		layer.setVisibility(false);
 		layer.checkLayerState();
@@ -414,6 +414,7 @@ opec.layer = function(microlayer, layerData) {
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             
             layer.log = data.log == 'true' ? true : false;
+            opec.window.createScalebar(layer.id); 
          },
          error: function(request, errorType, exception) {
             layer.origMinScaleVal = 0;
