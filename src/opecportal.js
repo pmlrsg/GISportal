@@ -653,7 +653,8 @@ opec.saveState = function(state) {
          'opacity': layer.opacity !== null ? layer.opacity : 1,
          'style': layer.style !== null ? layer.style : '',
          'minScaleVal': layer.minScaleVal,
-         'maxScaleVal': layer.maxScaleVal  
+         'maxScaleVal': layer.maxScaleVal,
+         'scalebarOpen': $('#scalebar-' + layer.id).length > 0 ? 'true' : 'false'  
       };    
    }
    

@@ -964,8 +964,7 @@ opec.rightPanel.setupGraphingTools = function() {
 
       var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
-         coverage: opec.selectedLayers[$('#graphcreator-coverage option:selected').val()].origName
-                   || $('#graphcreator-coverage option:selected').val(),
+         coverage: opec.layers[$('#graphcreator-coverage option:selected').val()].origName || $('#graphcreator-coverage option:selected').val(),
          type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,

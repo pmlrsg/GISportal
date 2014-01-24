@@ -26,11 +26,11 @@ opec.MicroLayer = function(name, title, productAbstract, type, opts) {
    this.title = title;  
    this.productAbstract = productAbstract;
    this.type = type;
-   
+    
    this.defaults = {};
    this.defaults.firstDate = null;
    this.defaults.lastDate = null;
-   
+   this.defaults.scalebarOpen = null;
    this.defaults.serverName = null;
    this.defaults.wfsURL = null;
    this.defaults.wmsURL = null;
@@ -291,13 +291,34 @@ opec.layer = function(microlayer, layerData) {
          layer.setVisibility(true);
          layer.checkLayerState();
       }   
-
-      // Checks if scale data already loaded
-      // Used for when layer has been hidden
-      if (layer.origMinScaleVal !== null)
-         opec.window.createScalebar(layer.id);  
+      layer.createScalebar();
+      
    };
    
+   this.createScalebar = function()  {
+      var layer = this;
+      if (layer.origMinScaleVal !== null)  {
+
+         if (opec.cache.state && opec.cache.state.map && opec.cache.state.map.layers && opec.cache.state.map.layers[layer.id])   {
+            this.scalebarOpen = opec.cache.state.map.layers[layer.id].scalebarOpen;
+         }
+
+         // If false, do not open
+         if (this.scalebarOpen !== 'false')
+         { 
+            opec.window.createScalebar(layer.id);  
+         }
+         
+         if (this.scalebarOpen !== null) {
+            this.scalebarOpen = null;
+         }
+         
+         if (opec.cache.state && opec.cache.state.map && opec.cache.state.map.layers && opec.cache.state.map.layers[layer.id])   {
+            opec.cache.state.map.layers[layer.id].scalebarOpen = this.scalebarOpen;
+         }
+      }
+   }
+  
    this.unselect = function() {
 		var layer = this; 
       $('#scalebar-' + layer.id).remove(); 
@@ -419,7 +440,7 @@ opec.layer = function(microlayer, layerData) {
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             
             layer.log = data.log == 'true' ? true : false;
-            opec.window.createScalebar(layer.id); 
+            layer.createScalebar(); 
          },
          error: function(request, errorType, exception) {
             layer.origMinScaleVal = 0;
