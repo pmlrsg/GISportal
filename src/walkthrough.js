@@ -134,9 +134,21 @@ opec.Walkthrough = function() {
    		]
    	}
    ];
-    
+
+
+   this.disclaimer = {
+      'id' : 'disclaimer',
+     	'name' : 'Disclaimer and License',
+  		'steps' : [ 
+         {
+            id : 0,
+            content: '<p>IMPORTANT: PLEASE READ THE FOLLOWING CAREFULLY</p><p>This is a prototype.</p><p>Liability</p><p>Use by you of the data (which includes model outputs and simulations) provided by PML on this site is entirely at your own risk.  This data is provided “as is” without any warranty of any kind, either expressed or implied, including without limitation, any implied warranties as to its merchantability or its suitability for any use.  All implied conditions relating to the quality or suitability of the data and the medium on which it is provided, and all liabilities arising from the supply of the data (including any liability arising in negligence) are excluded to the fullest extent permitted by law.</p><p>Acknowledgement</p><p>In using the data you agree to acknowledge use of the data in the acknowledgement section of any resulting publication.</p><p>Copyright PML 2013 and 2014</p>',
+         }
+      ] 
+   };
+
    // Steps (content), DOM element, template
-   $('#walkthrough').walkthrough(this.chapters[0], 
+   $('#walkthrough').walkthrough(this.disclaimer, 
       { 
          'dom' : $('#walkthrough'), 
          'template' : opec.templates.walkthrough,
