@@ -1009,10 +1009,10 @@ opec.rightPanel.setupGraphingTools = function() {
 opec.rightPanel.setupDataExport = function() {
    
    var dataExport = $('#dataTools');
-   var selectedLayer = dataExport.children('div').first();
-   var selectedBbox = selectedLayer.next('div');
-   var selectedTime = selectedBbox.next('div');
-   var dataDownloadURL = dataExport.children('a').first();
+   var selectedLayer = $('.js-export-layer');
+   var selectedBbox = $('.js-export-bbox');
+   var selectedTime = $('.js-export-time');
+   var dataDownloadURL = $('.js-export-url');
    
    var url = null;
    var urlParams = {
@@ -1063,6 +1063,7 @@ opec.rightPanel.setupDataExport = function() {
       }
 
 		$('#opec-graphing').on('change', '.hasDatepicker', updateUrlTime);
+      $('#topToolbar').on('change', '#viewDate', updateUrlTime);
 		$(opec).on('rangeUpdate.opec', updateUrlTime);
 
 		function updateUrlTime() {

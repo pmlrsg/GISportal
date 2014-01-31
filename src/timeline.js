@@ -163,6 +163,7 @@ opec.TimeLine = function(id, options) {
       // Filter the layer data to the selected date      
       opec.filterLayersByDate(self.selectedDate);
       console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
+      $('#viewDate').change();
    };
   
 
@@ -716,6 +717,7 @@ opec.TimeLine.prototype.setDate = function(date) {
    this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
    $('#viewDate').datepicker('setDate', self.selectedDate).blur();
    opec.filterLayersByDate(date);
+   $('#viewDate').change();
 };
 
 // Get the currently selected date 
