@@ -78,6 +78,17 @@ opec.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
+// Provider logos
+opec.providers = {
+   "CCI" : { "logo": "img/cci.png" },
+   "Cefas" : { "logo": "img/cefas.png" },
+   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true" },
+   "HCMR" : { "logo" : "img/hcmr.png" },
+   "IMS-METU" : { "logo" : "img/metu.png" },
+   "OGS" : {"logo" : "img/ogs.png" },
+   "PML" : { "logo" : "img/pml.png" }  
+};
+
 /**
  * The OpenLayers map object
  * Soon to be attached to opec namespace

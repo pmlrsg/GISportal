@@ -873,6 +873,8 @@ opec.rightPanel.setupGraphingTools = function() {
                $('#advanced-inputs-header').parent().show();
                $('.js-reference').hide();
             }
+            if (opec.selection.bbox)
+               $(opec.selection).trigger('selection_updated', {bbox: true});
          }
       }
 	});
@@ -992,6 +994,7 @@ opec.rightPanel.setupGraphingTools = function() {
 			
 			var options = {};
 			options.title = title;
+         options.provider = opec.layers[$('#graphcreator-coverage option:selected').val()].providerTag;
 			opec.graphs.data(graphParams, options);
   		}
 		else {
@@ -1044,12 +1047,13 @@ opec.rightPanel.setupDataExport = function() {
 	// TODO: IMPROVE
    $(opec.selection).bind('selection_updated', function(event, params) {
       if(typeof params.bbox !== 'undefinded' && params.bbox) {
-         var layer = opec.getTopLayer();
+         var layer = opec.layers[$('#graphcreator-coverage').val()];
          var bbox = opec.selection.bbox.split(',');
+         selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
          selectedBbox.html('<b>Selected Bbox: </b>' + bbox[0] + ', ' + bbox[1] + ', ' + bbox[2] + ', ' + bbox[3]);
          urlParams['bbox'] = opec.selection.bbox;
          urlParams['coverage'] = layer.urlName;
-			url = layer.wcsURL;
+         url = layer.wcsURL;
          updateURL();
       }
 

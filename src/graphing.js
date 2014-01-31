@@ -86,6 +86,7 @@ opec.graphs.create = function(data, options) {
             label: 'mean'
          }],
          options: basicTimeOptions(data.output.units),
+         provider: options.provider,
          selectable: true,
          selectSeries: true
       };
@@ -154,7 +155,14 @@ function createGraph(graphOptions) {
          '<input type="checkbox" name="' + key + '" ' + (val.label==="median"?'checked="checked"':'') +  'id="id' + key + '">' +
          '<label for="id' + key + '">' + val.label + '</label>');
       });
-      
+      var logoStyles;
+      if (opec.providers[graphOptions.provider].vertical === 'true')  {
+         logoStyles = "float: right; width: 50px; margin-top: -140px;";
+      }
+      else {
+         logoStyles = "float: right; margin-top: -30px;";
+      }
+      dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">'); 
       // Update the graph when checkboxes are changed
       choiceContainer.find("input").click(function() {
          graph = drawGraph(container, plotAccordingToChoices());
