@@ -405,7 +405,7 @@
             <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>View Date</legend>
-               <input size="10" type="text" name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
+               <input size="10" type="text" disabled name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
             </fieldset>
          </li>
          <li class="divider"></li>
@@ -567,14 +567,15 @@
             <div id="opec-tab-export" class="opec-tab-content ui-corner-top" style="display: none;">
                <h3><a href="#">Data Tools</a></h3>
                <div id="dataTools">
-                  <div class="opec-list"><b>Selected Layer: </b> None</div>
-                  <div class="opec-list"><b>Selected Bbox: </b> None</div>
-                  <div class="opec-list"><b>Selected Format: </b>
+                  <div class="opec-list js-export-layer"><b>Selected Layer: </b> None</div>
+                  <div class="opec-list js-export-bbox"><b>Selected Bbox: </b> None</div>
+                  <div class="opec-list js-export-time"><b>Selected Time: </b> None</div>
+                  <div class="opec-list js-export-format"><b>Selected Format: </b>
                      <select id="opec-dataexport-format" title="Format you wish to the data to be returned in">
                         <option value="NetCDF3" title="Returns a netcdf3 file">NetCDF3</option>
                      </select>
                   </div>
-                  <a href="#" target="_new">Download Data</a>
+                  <a class="js-export-url" href="#" target="_new">Download Data</a>
                </div>
             </div>
          </div>
