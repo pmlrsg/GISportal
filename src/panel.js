@@ -713,11 +713,14 @@ opec.rightPanel.updateRanges = function(label)  {
 };
 
 opec.rightPanel.getDateRange = function()  {
-	var dateRange = $('#graphcreator-time').val();         
-	if ($('#graphcreator-time2').val() !== "") {
-		dateRange += ("/" + $('#graphcreator-time2').val());
-	}
-	return dateRange;
+	if ($('#graphcreator-time').val() !== "")  {
+      var dateRange = $('#graphcreator-time').val();         
+      if ($('#graphcreator-time2').val() !== "") {
+         dateRange += ("/" + $('#graphcreator-time2').val());
+      }
+      return dateRange;
+   } 
+   else return $('#viewDate').val();
 }
 
 /**
@@ -1008,6 +1011,7 @@ opec.rightPanel.setupDataExport = function() {
    var dataExport = $('#dataTools');
    var selectedLayer = dataExport.children('div').first();
    var selectedBbox = selectedLayer.next('div');
+   var selectedTime = selectedBbox.next('div');
    var dataDownloadURL = dataExport.children('a').first();
    
    var url = null;
@@ -1049,6 +1053,7 @@ opec.rightPanel.setupDataExport = function() {
       if(typeof params.bbox !== 'undefinded' && params.bbox) {
          var layer = opec.layers[$('#graphcreator-coverage').val()];
          var bbox = opec.selection.bbox.split(',');
+         updateUrlTime();
          selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
          selectedBbox.html('<b>Selected Bbox: </b>' + bbox[0] + ', ' + bbox[1] + ', ' + bbox[2] + ', ' + bbox[3]);
          urlParams['bbox'] = opec.selection.bbox;
@@ -1061,12 +1066,11 @@ opec.rightPanel.setupDataExport = function() {
 		$(opec).on('rangeUpdate.opec', updateUrlTime);
 
 		function updateUrlTime() {
-			if (typeof layerID !== 'undefined')  {	
-				var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));	
-				urlParams['time'] = opec.rightPanel.getDateRange();
-				url = layer.wcsURL;
-				updateURL();
-			}
+         var layer = opec.layers[$('#graphcreator-coverage').val()];
+         opec.selection.time = urlParams['time'] = opec.rightPanel.getDateRange();
+         selectedTime.html('<b>Selected Time: </b>' + opec.selection.time);
+         url = layer.wcsURL;
+         updateURL();
 		}
 
 	});

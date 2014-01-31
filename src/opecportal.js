@@ -55,6 +55,7 @@ opec.numOpLayers = 0;
 opec.selection = {};
 opec.selection.layer = undefined;
 opec.selection.bbox = undefined;
+opec.selection.time = undefined;
 
 opec.layerSelector = null;
 opec.timeline = null;
