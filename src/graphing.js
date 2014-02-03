@@ -168,7 +168,6 @@ function createGraph(graphOptions) {
          graph = drawGraph(container, plotAccordingToChoices());
       });
      
-      dialog.append('<a href="' + toCSV() + '" download="data.csv">csv</a>');
 
 
       // Draws the graph with only the datasets that have checks in their checkboxes
@@ -203,6 +202,7 @@ function createGraph(graphOptions) {
          return(csv);
       }
 
+      dialog.append('<a href="' + toCSV() + '" download="data.csv">csv</a>');
    }
    
    // Initial call
