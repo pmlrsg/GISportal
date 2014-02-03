@@ -713,14 +713,11 @@ opec.rightPanel.updateRanges = function(label)  {
 };
 
 opec.rightPanel.getDateRange = function()  {
-	if ($('#graphcreator-time').val() !== "")  {
-      var dateRange = $('#graphcreator-time').val();         
-      if ($('#graphcreator-time2').val() !== "") {
-         dateRange += ("/" + $('#graphcreator-time2').val());
-      }
-      return dateRange;
-   } 
-   else return $('#viewDate').val();
+   var dateRange = $('#graphcreator-time').val();         
+   if ($('#graphcreator-time2').val() !== "") {
+      dateRange += ("/" + $('#graphcreator-time2').val());
+   }
+   return dateRange;
 }
 
 /**
@@ -1063,15 +1060,19 @@ opec.rightPanel.setupDataExport = function() {
       }
 
 		$('#opec-graphing').on('change', '.hasDatepicker', updateUrlTime);
-      $('#topToolbar').on('change', '#viewDate', updateUrlTime);
 		$(opec).on('rangeUpdate.opec', updateUrlTime);
 
 		function updateUrlTime() {
          var layer = opec.layers[$('#graphcreator-coverage').val()];
          opec.selection.time = urlParams['time'] = opec.rightPanel.getDateRange();
-         selectedTime.html('<b>Selected Time: </b>' + opec.selection.time);
-         url = layer.wcsURL;
-         updateURL();
+         if (opec.selection.time !== '')  {
+            selectedTime.html('<b>Selected Time: </b>' + opec.selection.time);
+            url = layer.wcsURL;
+            updateURL();
+         }
+         else {
+            selectedTime.html('');
+         }
 		}
 
 	});
