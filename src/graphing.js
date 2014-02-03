@@ -167,7 +167,10 @@ function createGraph(graphOptions) {
       choiceContainer.find("input").click(function() {
          graph = drawGraph(container, plotAccordingToChoices());
       });
-      
+     
+      dialog.append('<a href="' + toCSV() + '" download="data.csv">csv</a>');
+
+
       // Draws the graph with only the datasets that have checks in their checkboxes
       function plotAccordingToChoices() {     
          var data = [];
@@ -180,6 +183,26 @@ function createGraph(graphOptions) {
          
          return data;
       }
+   
+      function toCSV()  {
+         var csv = '';
+         for (var i = 0; i < graphOptions.data.length; i++) {         
+            csv += graphOptions.data[i].label + "X,";
+            csv += graphOptions.data[i].label + "Y";
+            csv = i === graphOptions.data.length -1 ? csv += "\n" : csv += ',';
+         }   
+
+         for (var i = 0; i < graphOptions.data[0].data.length; i++) {
+            var line = '';
+            for (var j = 0; j < graphOptions.data.length; j++) {
+               line += j === graphOptions.data.length -1 ? graphOptions.data[j].data[i]: graphOptions.data[j].data[i] + ',';
+            }
+            csv += line + "\n";
+         }
+         csv = "data:application/octet-stream," + encodeURIComponent(csv);
+         return(csv);
+      }
+
    }
    
    // Initial call
