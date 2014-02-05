@@ -186,8 +186,7 @@ function createGraph(graphOptions) {
       function toCSV()  {
          var csv = '';
          for (var i = 0; i < graphOptions.data.length; i++) {         
-            csv += graphOptions.data[i].label + "X,";
-            csv += graphOptions.data[i].label + "Y";
+            csv += graphOptions.data[i].label;
             csv = i === graphOptions.data.length -1 ? csv += "\n" : csv += ',';
          }   
 
@@ -202,7 +201,7 @@ function createGraph(graphOptions) {
          return(csv);
       }
 
-      dialog.append('<a href="' + toCSV() + '" download="data.csv">csv</a>');
+      dialog.append('<a href="' + toCSV() + '" download="data.csv">Export Data</a>');
    }
    
    // Initial call
