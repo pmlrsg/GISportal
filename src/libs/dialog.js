@@ -624,7 +624,7 @@
       _restoreFromMinimised : function() {
          var that = this;
          var original = this._loadSnapshot();
-
+         console.log(that.uiDialog);
          // restore dialog
          // move dialog back from container to body
          that.uiDialog.appendTo("body").css({
@@ -671,11 +671,11 @@
          // restore position *AFTER* size restored
          that.element.css("position", [original.position.left, original.position.top]);
 
-         // restore draggable-handle (for <titlebar=none> only)
-         that.uiDialog.draggable("option", "handle", $(this).find(".ui-dialog-draggable-handle")).find(".ui-dialog-draggable-handle").css("cursor", "move");
-         
          this._size();
          this._position();
+         // restore draggable-handle (for <titlebar=none> only)
+         //that.uiDialog.draggable("option", "handle", $(this).find(".ui-dialog-draggable-handle")).find(".ui-dialog-draggable-handle").css("cursor", "move");
+        that.draggable();  // line above wasn't working 
       },
 
       //--------------------------------------------------------------------------
