@@ -156,7 +156,7 @@ function createGraph(graphOptions) {
          '<label for="id' + key + '">' + val.label + '</label>');
       });
       var logoStyles;
-      if (opec.providers[graphOptions.provider].vertical === 'true')  {
+      if (opec.providers[graphOptions.provider] && opec.providers[graphOptions.provider].vertical === 'true')  {
          logoStyles = "float: right; width: 50px; margin-top: -140px;";
       }
       else {
