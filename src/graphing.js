@@ -156,13 +156,17 @@ function createGraph(graphOptions) {
          '<label for="id' + key + '">' + val.label + '</label>');
       });
       var logoStyles;
-      if (opec.providers[graphOptions.provider] && opec.providers[graphOptions.provider].vertical === 'true')  {
-         logoStyles = "float: right; width: 50px; margin-top: -140px;";
+      if (opec.providers[graphOptions.provider])
+      {
+         if (opec.providers[graphOptions.provider].vertical === 'true')  {
+            logoStyles = "float: right; width: 50px; margin-top: -140px;";
+         }
+         else {
+            logoStyles = "float: right; margin-top: -30px;";
+         }
+         dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">'); 
       }
-      else {
-         logoStyles = "float: right; margin-top: -30px;";
-      }
-      dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">'); 
+         
       // Update the graph when checkboxes are changed
       choiceContainer.find("input").click(function() {
          graph = drawGraph(container, plotAccordingToChoices());
