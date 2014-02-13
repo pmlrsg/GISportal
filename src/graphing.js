@@ -115,7 +115,8 @@ opec.graphs.create = function(data, options) {
          title: data.type + " of " + opec.selectedLayers[data.coverage].displayTitle,
          type: data.type,
          colour: 'redToBlue',
-         data: data.output
+         data: data.output,
+         options: options
       };
       
       hovmoller(graphData);                                      
@@ -825,18 +826,24 @@ function hovmoller(graphData) {
    var xAxis,
       yAxis;
    
+   var myTicks = function(scale) {
+      var values = scale.domain();
+      var ticks = [];
+      for (var i=0; i < values.length; i += Math.round(values.length/graphData.options.labelCount))  {
+         ticks.push(values[i]);
+      }
+      return ticks;
+   };
+   
    if( graphData.type == 'hovmollerLon' ) {
       xAxis = d3.svg.axis()
          .scale(xScale) // set the range of the axis
-         .tickSize(1) // height of the ticks
+         .tickSize(10) // height of the ticks
          .orient("bottom")
-         .ticks(8)
-         .tickValues([d3.min(trends.data, function(d, i) {
-            return d[1].toFixed(2);
-         }), d3.max(trends.data, function(d, i) {
-            return d[1].toFixed(2);
-         })]);
-      
+         .ticks(1)
+         .tickValues(myTicks(xScale))
+         .tickFormat(function(d,i) { return d.toFixed(2); });
+
       yAxis = d3.svg.axis()
          .scale(yScale)
          .tickSize(1)
@@ -848,17 +855,15 @@ function hovmoller(graphData) {
          .tickSize(1)
          .ticks(6)
          .orient("bottom");
-         
+      
+
       yAxis = d3.svg.axis()
          .scale(yScale) // set the range of the axis
-         .tickSize(1) // height of the ticks
+         .tickSize(10) // height of the ticks
          .orient("left")
          .ticks(8)
-         .tickValues([d3.min(trends.data, function(d, i) {
-            return d[1].toFixed(2);
-         }), d3.max(trends.data, function(d, i) {
-            return d[1].toFixed(2);
-         })]);
+         .tickValues(myTicks(yScale))
+         .tickFormat(function(d,i) { return d.toFixed(2); });
    }
       
    if ( graphData.type == 'hovmollerLon' ) {

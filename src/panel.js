@@ -549,6 +549,9 @@ opec.rightPanel.setupDrawingControls = function() {
 
    // Function called once a ROI has been drawn on the map
    function ROIAdded(feature) {
+      // Switch back to pan
+      $('label[for="pan"], #pan').click();
+      
       // Get the geometry of the drawn feature
       var geom = new OpenLayers.Geometry();
       geom = feature.geometry;
@@ -924,6 +927,15 @@ opec.rightPanel.setupGraphingTools = function() {
       else  {
          $('#histogram-inputs').parent().show();
       }
+      
+      if(!$('#graphcreator-gallery input[value="hovmollerLat"]').prop("checked")
+         && !$('#graphcreator-gallery input[value="hovmollerLon"]').prop("checked")) {
+         $('#graph-settings').parent().hide();
+      }
+      else  {
+         $('#graph-settings').parent().show();
+      }
+
    });
    
    $('#graphcreator-gallery').change(); // Initialise states
@@ -995,6 +1007,7 @@ opec.rightPanel.setupGraphingTools = function() {
 			var options = {};
 			options.title = title;
          options.provider = opec.layers[$('#graphcreator-coverage option:selected').val()].providerTag;
+         options.labelCount = $('#graph-settings-labels').val();
 			opec.graphs.data(graphParams, options);
   		}
 		else {
