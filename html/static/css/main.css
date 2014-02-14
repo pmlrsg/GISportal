@@ -1071,6 +1071,15 @@ div .sensor-accordion {
    /*margin-top: -8px; */
 }
 
+.yaxis line, 
+.yaxis path,
+.xaxis line,
+.xaxis path {
+   fill: none;
+   stroke: #000;
+   shape-rendering: crispEdges;
+}
+
 /* ===== Data Export ==== */
 
 #opec-tab-export select {
