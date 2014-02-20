@@ -675,7 +675,7 @@
          this._position();
          // restore draggable-handle (for <titlebar=none> only)
          //that.uiDialog.draggable("option", "handle", $(this).find(".ui-dialog-draggable-handle")).find(".ui-dialog-draggable-handle").css("cursor", "move");
-        that.draggable();  // line above wasn't working 
+        that.uiDialog.draggable();  // line above wasn't working 
       },
 
       //--------------------------------------------------------------------------
