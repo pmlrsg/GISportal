@@ -279,6 +279,9 @@ opec.layer = function(microlayer, layerData) {
       if(layer.temporal) {
          layer.selectDateTimeLayer($('#viewDate').datepicker('getDate'));
          
+         delete opec.nonSelectedLayers[layer.id];
+         opec.selectedLayers[layer.id] = layer;
+         
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
@@ -667,8 +670,8 @@ opec.layer = function(microlayer, layerData) {
 
 opec.addLayer = function(layer, options) {
    var options = options || {};   
-   delete opec.nonSelectedLayers[layer.id];
-   opec.selectedLayers[layer.id] = layer;
+   //delete opec.nonSelectedLayers[layer.id];
+   //opec.selectedLayers[layer.id] = layer;
    
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
