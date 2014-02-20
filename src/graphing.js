@@ -11,7 +11,18 @@ opec.graphs.data = function(params, options)  {
       asyc: true,
       success: function(data) {
          console.log(data);
-         opec.graphs.create(data, options);
+         
+         // This length is arbitary
+         // From tests, this should work fine
+         // Numbers bigger may result in
+         // the data being too large to graph
+         if ((data.type !=='hovmollerLat' && data.type !== 'hovmollerLon') 
+             || data.output.data.length < 4653) {
+            opec.graphs.create(data, options);
+         }
+         else  {
+            opec.gritter.showNotification('graphData', null); 
+         }
          console.log("success");
       },
       error: function(request, errorType, exception) {

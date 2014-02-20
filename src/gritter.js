@@ -572,4 +572,13 @@ function createHelpMessages()
          data.error + '".';
       }
    };
+
+   opec.gritter._notifications['graphData'] = {
+      title: function() {
+         return 'Sorry, that is too much data';
+      },
+      text: function(data) {
+         return 'I\'m afraid we are not currently able to plot that amount of data on this type of graph.'
+      }
+   };
 }
