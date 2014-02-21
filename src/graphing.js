@@ -11,18 +11,7 @@ opec.graphs.data = function(params, options)  {
       asyc: true,
       success: function(data) {
          console.log(data);
-         
-         // This length is arbitary
-         // From tests, this should work fine
-         // Numbers bigger may result in
-         // the data being too large to graph
-         if ((data.type !=='hovmollerLat' && data.type !== 'hovmollerLon') 
-             || data.output.data.length < 4653) {
-            opec.graphs.create(data, options);
-         }
-         else  {
-            opec.gritter.showNotification('graphData', null); 
-         }
+         opec.graphs.create(data, options);
          console.log("success");
       },
       error: function(request, errorType, exception) {
@@ -906,6 +895,7 @@ function hovmoller(graphData) {
             .append("rect")
                 .attr("x", function(d, i) { return  xScale( d[1] ); })
                 .attr("y", function(d, i) { return yScale( parseDate(d[0]) ); })
+                .attr("class", "graph-rect")
                 .attr("width", xScale.rangeBand())
                 .attr("height", function(d, i) { return 8; })
                 .style("fill", function(d, i) { return colours[Math.round(zScale(d[2]))]; });  
@@ -938,6 +928,7 @@ function hovmoller(graphData) {
             .append("rect")
                 .attr("x", function(d, i) { return  xScale( parseDate(d[0]) ); })
                 .attr("y", function(d, i) { return yScale( d[1] ); })
+                .attr("class", "graph-rect")
                 .attr("width", function(d, i) { return 8; })
                 .attr("height", yScale.rangeBand())
                 .style("fill", function(d, i) { 
@@ -1086,6 +1077,17 @@ function hovmoller(graphData) {
          }).attr("class", "labels").attr("transform", function(d,i) {
             return "translate(" + [width + margin.left + 35, ((height/6) * (i-0.5)) + height/5 ] + ")";
          });
+     
+   var graph = $('#' + graphData.id + '-graph');
+   if (($('.graph-rect', graph).length === $('.graph-rect[width="0"]').length) 
+       || ($('.graph-rect', graph).length === $('.graph-rect[height="0"]').length))  {
+      
+      graph.remove();
+      opec.gritter.showNotification('graphData', null);
+
+   }
+
+
 }
 
 opec.graphs.timeSeriesChart = function() {
