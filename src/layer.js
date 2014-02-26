@@ -290,6 +290,8 @@ opec.layer = function(microlayer, layerData) {
          // Update map date cache now a new temporal layer has been added
          opec.refreshDateCache();
          $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
+
+         opec.zoomOverall();
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
@@ -335,7 +337,8 @@ opec.layer = function(microlayer, layerData) {
 			}
 			
 			opec.refreshDateCache();
-		}
+		   opec.zoomOverall();
+      }
 	};
    
    //this.setLayerIndex = function(id, index) {      

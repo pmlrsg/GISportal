@@ -82,12 +82,12 @@ opec.quickRegion = [
 // Provider logos
 opec.providers = {
    "CCI" : { "logo": "img/cci.png" },
-   "Cefas" : { "logo": "img/cefas.png" },
-   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true" },
-   "HCMR" : { "logo" : "img/hcmr.png" },
-   "IMS-METU" : { "logo" : "img/metu.png" },
-   "OGS" : {"logo" : "img/ogs.png" },
-   "PML" : { "logo" : "img/pml.png" }  
+   "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
+   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true", "url" : "http://www.dmi.dk/en/vejr/" },
+   "HCMR" : { "logo" : "img/hcmr.png", "url" : "http://innovator.ath.hcmr.gr/newhcmr1/" },
+   "IMS-METU" : { "logo" : "img/metu.png", "url" : "http://www.ims.metu.edu.tr/" },
+   "OGS" : {"logo" : "img/ogs.png", "url" :  "http://www.ogs.trieste.it/" },
+   "PML" : { "logo" : "img/pml.png", "url" : "http://www.pml.ac.uk/default.aspx" }  
 };
 
 /**
@@ -884,7 +884,9 @@ opec.main = function() {
    opec.templates.walkthroughMenu = Mustache.compile($('#opec-walkthrough-menu').text().trim());
 
    opec.walkthrough = new opec.Walkthrough(); // uses templates.walkthrough so needs to run after
-   
+  
+   $('#version').html('v' + opec.VERSION + ':' + opec.SVN_VERSION);
+    
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
    //$(document).tooltip({
@@ -988,6 +990,29 @@ opec.updateLayerData = function(layerID)  {
    var layer = opec.getLayerByID(layerID);
    $('#graphcreator-baseurl').val(layer.wcsURL);
    $('#graphcreator-coverage option[value=' + layer.origName + ']').prop('selected', true);
+};
+
+opec.zoomOverall = function()  {
+   if (Object.keys(opec.selectedLayers).length > 0)  {
+
+      // minX, minY, maxX, maxY
+      var largestBounds = [ 
+         Number.MAX_VALUE,
+         Number.MAX_VALUE,
+         Number.MIN_VALUE,
+         Number.MIN_VALUE
+      ];
+
+      for (var i = 0; i < Object.keys(opec.selectedLayers).length; i++)  {
+         var layer = opec.selectedLayers[Object.keys(opec.selectedLayers)[i]].boundingBox;
+         if (+layer.MinX < +largestBounds[0]) largestBounds[0] = layer.MinX; // left 
+         if (+layer.MinY < +largestBounds[1]) largestBounds[1] = layer.MinY; // bottom
+         if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = layer.MaxX; // right 
+         if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = layer.MaxY; // top
+      }
+
+      map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
+   }
 };
 
 // ----------------------------------------------------------------------------
