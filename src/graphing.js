@@ -165,7 +165,12 @@ function createGraph(graphOptions) {
          else {
             logoStyles = "float: right; margin-top: -30px;";
          }
-         dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">'); 
+
+         if (opec.providers[graphOptions.provider].url)  {
+            dialog.append('<a href="' + opec.providers[graphOptions.provider].url + '"><img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '"></a>');
+         } else  {
+            dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">');
+         }
       }
          
       // Update the graph when checkboxes are changed
