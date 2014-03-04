@@ -1,7 +1,7 @@
 {
    "id": "opec",
    "paths": [
-      "html/static/js-libs/"
+      "html/js-libs/"
    ],
    "inputs": [
       "src/libs/jquery-walkthrough/jquery.walkthrough.js",

@@ -1,7 +1,7 @@
 {
    "id": "opec",
    "folders": [
-      { "from" : "html/static/js-libs/jquery-ui/css/black-tie/images/", "to" : "html/static/css/images/"},
-      { "from" : "html/static/js-libs/jquery-gritter/images/", "to" : "html/static/images/"}
+      { "from" : "html/js-libs/jquery-ui/css/black-tie/images/", "to" : "html/css/images/"},
+      { "from" : "html/js-libs/jquery-gritter/images/", "to" : "html/images/"}
    ]
 }

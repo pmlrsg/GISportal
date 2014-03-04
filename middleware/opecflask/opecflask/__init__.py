@@ -9,7 +9,7 @@ import settings as settings
 import sys
 
 def create_app(path):
-   app = Flask(__name__, instance_path=path)
+   app = Flask(__name__)
    app.config.update(SECRET_KEY = 'p7i0-22@0eheas^kzw3=1qfug_x+5)5)8u4v=2iyiwwx1eh)37', DEBUG = True)
    print path
    
@@ -22,7 +22,7 @@ def create_app(path):
    setup_config(app)
    
    #=== SETUP DATABASE ===#
-   app.config['DATABASE_URI'] = 'sqlite:////home/rsgadmin/cache/opec/openID/user_storage.db'
+   app.config['DATABASE_URI'] = 'sqlite:////home/rsgadmin/cache/oc_cci/openID/user_storage.db'
 
    #=== ROUTES ===#
    @app.before_request
@@ -116,7 +116,7 @@ path = sys.path[0]
 #path = '/local1/data/scratch/Workspaces/Opec/Opec/middleware/opecflask'
 
 app = create_app(path)
-oid = OpenID(app, '/home/rsgadmin/cache/opec/openID')
+oid = OpenID(app, '/home/rsgadmin/cache/oc_cci/openID')
 print path
 
 # register application views and blueprints  

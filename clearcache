@@ -1,7 +1,7 @@
-rm -f /home/rsgadmin/cache/opec/*.xml
-rm -f /home/rsgadmin/cache/opec/*.json
-rm -f /home/rsgadmin/cache/opec/layers/*.json
-python middleware/cachingscripts/wmsCapabilities_2_6_6.py 
-python middleware/cachingscripts/wfsCapabilities.py
-touch html/static/cache/wfsMasterCache.json
+rm -f html/cache/*.xml
+rm -f html/cache/*.json
+rm -f html/cache/*.json
+python cachescripts/wmsCapabilities_2_6_6.py 
+python cachescripts/wfsCapabilities.py
+touch html/cache/wfsMasterCache.json
 

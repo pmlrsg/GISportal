@@ -50,7 +50,7 @@ JSDOC = 'lib/jsdoc/jsdoc' # Used to build javadoc
 PLOVR_JAR = 'lib/plovr/plovr-81ed862.jar' # Used to build minjs
 UGLIFYJS = '/local1/data/scratch/node-v0.8.18-linux-x64/node_modules/uglifyjs/bin/uglifyjs' # Not used anymore, but can be
 YUICOMPRESSOR = 'lib/yuicompressor-2.4.7/build/yuicompressor-2.4.7.jar' # Used to build css
-CSS = 'html/static/css/' # css location 
+CSS = 'html/css/' # css location 
 
 # -----------------------------------------------------------------------------
 def report_sizes(t):
@@ -74,22 +74,22 @@ virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build')
 virtual('dev', 'js', 'css', 'images', 'replace-dev')
 
 # -----------------------------------------------------------------------------
-virtual('minjs', 'html/static/OPECPortal.min.js')
-@target('html/static/OPECPortal.min.js', PLOVR_JAR, 'opec_all.js')
+virtual('minjs', 'html/OPECPortal.min.js')
+@target('html/OPECPortal.min.js', PLOVR_JAR, 'opec_all.js')
 def build_min_opec_js(t):
    t.info('Minifying JS')
    t.output('%(JAVA)s', '-jar', PLOVR_JAR, 'build', 'opec_all.js')
    report_sizes(t)
    t.info('Finished minifying JS')
 
-virtual('js', 'html/static/OPECPortal.js')
-@target('html/static/OPECPortal.js', SRC)
+virtual('js', 'html/OPECPortal.js')
+@target('html/OPECPortal.js', SRC)
 def build_opec_js(t):
    t.info('building non-compiled version')
    opec_js = open('opec_js.json', 'r')
    json_js = json.load(opec_js)
    opec_js.close()
-   destination = open('html/static/OPECPortal.js', 'wb')
+   destination = open('html/OPECPortal.js', 'wb')
    for filename in json_js["files"]:
       with open(filename, 'rb') as file:
          t.info("JS - adding " + filename)
@@ -99,8 +99,8 @@ def build_opec_js(t):
    t.info('finished')
 # -----------------------------------------------------------------------------
 
-virtual('uglify', 'html/static/OPECPortal.uglify.min.js')
-@target('html/static/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
+virtual('uglify', 'html/OPECPortal.uglify.min.js')
+@target('html/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
 def uglify_opec(t):
    t.output(UGLIFYJS, SRC)
    
@@ -108,7 +108,7 @@ virtual('html', 'target-html')
 @target('target-html', HTML, phony=True)
 def build_html(t):
    t.info('Building HTML')
-   destination = open('html/static/index.html', 'w')
+   destination = open('html/index.html', 'w')
    
    if 'src/html/fragments/main.html' in HTML:
       with open(HTML['src/html/fragments/main.html'], 'r') as file:       
@@ -116,8 +116,8 @@ def build_html(t):
          destination.write('\n')
          
 # -----------------------------------------------------------------------------       
-virtual('mincss', 'html/static/css/OPECPortal.min.css')
-@target('html/static/css/OPECPortal.min.css', YUICOMPRESSOR)
+virtual('mincss', 'html/css/OPECPortal.min.css')
+@target('html/css/OPECPortal.min.css', YUICOMPRESSOR)
 def build_min_opec_css(t):
    t.info('Minifying CSS')
    t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')
@@ -130,7 +130,7 @@ def build_opec_css(t):
    opec_css = open('opec_css.json', 'r')
    json_css = json.load(opec_css)
    opec_css.close()
-   destination = open('html/static/css/OPECPortal.css', 'w')
+   destination = open('html/css/OPECPortal.css', 'w')
    for filename in json_css["files"]:
       with open(filename, 'rb') as file:
          t.info('-- Adding ' + filename)
@@ -186,15 +186,15 @@ def replacePath(t, env):
    opec_replacements = open('opec_replacements.json', 'r')
    json_replacements = json.load(opec_replacements)
    opec_replacements.close()
-   with codecs.open('html/static/index.new.html', 'w', 'utf-8') as destination:
-      for line in codecs.open('html/static/index.html', 'r', 'utf-8'):
+   with codecs.open('html/index.new.html', 'w', 'utf-8') as destination:
+      for line in codecs.open('html/index.html', 'r', 'utf-8'):
          for path in json_replacements["build-paths"]:
             if env == 'build':
                replacedLine = string.replace(line, path["dev"], path["build"])
             elif env == 'dev':
                replacedLine = string.replace(line, path["build"], path["dev"])
          destination.write(replacedLine)
-   shutil.move('html/static/index.new.html', 'html/static/index.html')
+   shutil.move('html/index.new.html', 'html/index.html')
    t.info('Finished replacing paths')
 
 '''

@@ -3,7 +3,10 @@
 import os
 import utils
 import parse
+import sys
 
+sys.path.append(os.path.join(sys.path[0],'..','config'))
+print sys.path
 # WFS Server list
 import wfsServers
 
@@ -16,9 +19,9 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 CACHELIFE = 3600 #3600 # cache time in seconds, 1 hour cache
-LAYERCACHEPATH = "/home/rsgadmin/cache/opec/layers/"
-SERVERCACHEPATH = "/home/rsgadmin/cache/opec/"
-MASTERCACHEPATH = "/home/rsgadmin/cache/opec/wfsMasterCache"
+LAYERCACHEPATH = "../html/cache/layers/"
+SERVERCACHEPATH = "../html/cache/"
+MASTERCACHEPATH = "../html/cache/wfsMasterCache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 GET_CAPABILITES_PARAMS = "SERVICE=WFS&REQUEST=GetCapabilities&VERSION=1.0.0"
