@@ -467,7 +467,7 @@ def getMean(arr):
 Returns the std value from the provided array.
 """
 def getStd(arr):
-   return float(np.std(arr))
+   return float(np.std(arr.compressed()))
 
 """
 Returns the minimum value from the provided array. 
