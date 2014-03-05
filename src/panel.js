@@ -967,7 +967,7 @@ opec.rightPanel.setupGraphingTools = function() {
       // so this makes it match direction
       var depthDirection = function()  {
          var layerID = $('#graphcreator-coverage option:selected').val();
-         var layer = opec.selectedLayers[layerID];
+         var layer = opec.layers[layerID];
          var elevation = layer.selectedElevation;
          var direction = opec.microLayers[layerID].positive;
 
@@ -986,11 +986,11 @@ opec.rightPanel.setupGraphingTools = function() {
          depth: depthDirection(),
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
-         graphZAxis: opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].origName
+         graphZAxis: opec.layers[$('#graphcreator-coverage option:checked').val()].origName
       };      
      	
 	  	if (graphParams.baseurl && graphParams.coverage)  {
-			var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.selectedLayers[$('#graphcreator-coverage option:checked').val()].displayTitle;
+			var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.layers[$('#graphcreator-coverage option:checked').val()].displayTitle;
 			var graphObject = {};
 			graphObject.graphData = graphParams;      
 			//graphObject.description = prompt("Please enter a description");
