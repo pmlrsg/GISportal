@@ -82,7 +82,9 @@ def create_user():
          flash(u'Profile successfully created')
          db_session.add(User(email, session['openid']))
          db_session.commit()
-         return redirect(oid.get_next_url())
+         # The index has a script that closes popup when logged in
+         #return redirect(oid.get_next_url()) 
+         return redirect(url_for('portal_user.index'))
    print('returning')
    return redirect(url_for('portal_user.index'))
    
