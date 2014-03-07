@@ -194,7 +194,6 @@ function createGraph(graphOptions) {
       }
    
       function toCSV()  {
-         TEMP_GRAPH = graphOptions;
          var csv = 'time,'; // Time should be the first column
          for (var i = 0; i < graphOptions.data.length; i++) {         
             csv += graphOptions.data[i].label;
