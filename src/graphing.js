@@ -194,7 +194,8 @@ function createGraph(graphOptions) {
       }
    
       function toCSV()  {
-         var csv = '';
+         TEMP_GRAPH = graphOptions;
+         var csv = 'time,'; // Time should be the first column
          for (var i = 0; i < graphOptions.data.length; i++) {         
             csv += graphOptions.data[i].label;
             csv = i === graphOptions.data.length -1 ? csv += "\n" : csv += ',';
@@ -203,7 +204,8 @@ function createGraph(graphOptions) {
          for (var i = 0; i < graphOptions.data[0].data.length; i++) {
             var line = '';
             for (var j = 0; j < graphOptions.data.length; j++) {
-               line += j === graphOptions.data.length -1 ? graphOptions.data[j].data[i]: graphOptions.data[j].data[i] + ',';
+               if (j === 0) line += graphOptions.data[j].data[i][0] + ',';
+               line += j === graphOptions.data.length -1 ? graphOptions.data[j].data[i][1]: graphOptions.data[j].data[i][1] + ',';
             }
             csv += line + "\n";
          }
