@@ -46,6 +46,7 @@ def setup_routing(app, routes):
 def setupBlueprints(app):
    app.register_blueprint(portal_user)
    app.register_blueprint(portal_state)
+   app.register_blueprint(portal_errors)
    app.register_blueprint(portal_proxy)
    app.register_blueprint(portal_wfs)
    app.register_blueprint(portal_wcs)
