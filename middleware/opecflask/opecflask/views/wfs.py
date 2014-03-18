@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, request, jsonify, g, current_app
 from opecflask.core.param import Param
+from opecflask.core import error_handler
 
 portal_wfs = Blueprint('portal_wfs', __name__)
 
@@ -29,6 +30,7 @@ def getWFSData():
       jsonData = jsonify(output = response)
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
+      error_handler.setError('2-06', None, g.user.id, "views/wfs.py:getWFSData - Type error, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
       
    current_app.logger.debug('Request complete, Sending results') # DEBUG

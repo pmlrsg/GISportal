@@ -1,5 +1,6 @@
 from flask import Blueprint, abort, request, jsonify, g, current_app
 from opecflask.core.param import Param
+from opecflask.core import error_handler
 
 import urllib
 import urllib2
@@ -66,7 +67,8 @@ def getWcsData():
       jsonData = jsonify(output = output, type = params['type'].value, coverage = params['coverage'].value, error = g.graphError)
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      abort(400) # If we fail to jsonify the data return 500
+      error_handler.setError('2-06', None, g.user.id, "views/wcs.py:getWcsData - Type erro, returning 400 to user. Exception %s" % e, request)
+      abort(400) # If we fail to jsonify the data return 400
       
    current_app.logger.debug('Request complete, Sending results') # DEBUG
    
@@ -118,6 +120,7 @@ def checkParams(params):
       if params[key].value == None or len(params[key].value) == 0:
          if not params[key].isOptional():            
             g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
+            error_handler.setError('2-06', None, g.user.id, "views/wcs.py:checkParams - Parameter is missing or invalid, returning 400 to user. Parameter %s" % key, request)
             abort(400)
       else:
          checkedParams[key] = params[key]
@@ -144,6 +147,7 @@ def createURL(params):
    current_app.logger.debug('URL: ' + url) # DEBUG
    if "wcs2json/wcs" in params['baseURL'].value:
       g.error = 'possible infinite recursion detected, cancelled request'
+      error_handler.setError('2-06', None, g.user.id, "views/wcs.py:createURL - Possible recursion detected, returning 400 to user.", request)
       abort(400)
    return Param("url", False, False, url)
       
@@ -247,6 +251,7 @@ def getBboxData(params, method):
          abort(400)
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
+      error_handler.setError('2-06', None, g.user.id, "views/wcs.py:getBboxData - Failed to access url, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
    #except IOError as e:
       #if e[0] == 2:
@@ -422,6 +427,7 @@ def hovmoller(dataset, params):
             
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
+      error_handler.setError('2-07', None, g.user.id, "views/wcs.py:hovmoller - No valid data available to use.")
       return output
       
    

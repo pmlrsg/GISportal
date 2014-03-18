@@ -7,6 +7,7 @@ from opecflask.models.roi import ROI
 from opecflask.models.layergroup import LayerGroup
 from opecflask.models.user import User
 from opecflask.core import short_url
+from opecflask.core import error_handler
 import datetime
 import sqlite3 as sqlite
 
@@ -30,10 +31,14 @@ def getState(stateUrl):
       else:
          output['error'] = 'Failed to find a state matching that url'  
          output['status'] = '404'           
+         error_handler.setError('2-07', None, None, "views/state.py:getState - Failed to find state matching the url, returning 404 to user.", request)
+      
       
    else:
       output['error'] = 'You must enter a valid state url'
       output['status'] = '400'
+      error_handler.setError('2-04', None, None, "views/state.py:getStates - Failed to find state, no state url was provided, returning 400 to user.", request)
+      
       
    try:
       jsonData = jsonify(output = output)
@@ -41,12 +46,14 @@ def getState(stateUrl):
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
+      error_handler.setError('2-0', None, g.user.id, "views/state.py:removeStates - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
       
 @portal_state.route('/state/<stateUrl>', methods = ['DELETE'])
 def removeState(stateUrl):
    # Check if the user is logged in.
    if g.user is None:
+      error_handler.setError('2-04', None, None, "views/state.py:removeState - Failed to remove state data because the user is not logged in, returning 401 to user.", request)  
       abort(401)
   
    email = g.user.email
@@ -56,9 +63,11 @@ def removeState(stateUrl):
    output = {}
    
    if email is None or stateID is None:
-      output['status'] = 'Failed to remove state'
+      output['status'] = '404'
+      output['message'] = 'Failed to remove state'
       output['email'] = email
       output['stateID'] = stateID
+      error_handler.setError('2-04', None, g.user.id, "views/state.py:removeState - Failed to remove state data, not enough data provided, returning 404 to user.", request)  
    else:
       # Might be able to use 'g.user' instead. Only reason I havn't is I'm not 
       # sure on the reliability of it.
@@ -82,6 +91,8 @@ def removeState(stateUrl):
       else:
          output['message'] = 'Failed to remove state as no state with that ID could be found.'
          output['status'] = '404'
+         error_handler.setError('2-04', None, None, "views/state.py:removeStates - Failed to remove state because the state id could not be found, returning 404 to user.", request)
+      
          
    try:
       jsonData = jsonify(output = output)
@@ -89,12 +100,14 @@ def removeState(stateUrl):
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
+      error_handler.setError('2-05', None, g.user.id, "views/state.py:removeStates - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
       
 @portal_state.route('/state', methods = ['GET'])     
 def getStates():
    # Check if the user is logged in.
    if g.user is None:
+      error_handler.setError('2-04', None, None, "views/state.py:getStates - Failed to store state data because the user is not logged in, returning 401 to user.", request)
       abort(401)
       
    #TODO: Return available states filtered by email or other provided parameters.
@@ -105,11 +118,13 @@ def getStates():
    if email is None:  
       output['message'] = 'You need to enter an email'
       output['status'] = '400'
+      error_handler.setError('2-04', None, g.user.id, "views/state.py:getStates - Email address is missing, returning 400 to user.", request)
    else: 
       user = User.query.filter(User.email == email).first()
       if user is None:
          output['message'] = 'No user with that email.'
          output['status'] = '400'
+         error_handler.setError('2-06', None, g.user.id, "views/state.py:getStates - There is no user with the email address provided, returning 400 to user.", request)
       else:
          states = user.states.all()
     
@@ -122,6 +137,7 @@ def getStates():
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
+      error_handler.setError('2-05', None, g.user.id, "views/state.py:getStates - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
    
      
@@ -129,6 +145,7 @@ def getStates():
 def setState():
    # Check if the user is logged in.
    if g.user is None:
+      error_handler.setError('2-05', None, g.user.id, "views/state.py:setState - The user is not logged in, returning 401 to user.", request)
       abort(401)
    
    email = g.user.email
@@ -141,6 +158,8 @@ def setState():
       output['email'] = email
       output['state'] = state
       output['status'] = '404'
+
+      error_handler.setError('2-04', state, g.user.id, "views/state.py:setState - Failed to store state data, returning 404 to user.", request)
    else:
       # Might be able to use 'g.user' instead. Only reason I havn't is I'm not 
       # sure on the reliability of it.
@@ -165,6 +184,7 @@ def setState():
          output['url'] = short_url.encode_url(checksumMatch.id)
          output['message'] = 'Failed to add state as state already exists'
          output['status'] = '400'
+         error_handler.setError('2-05', state, g.user.id, "views/state.py:setState - The state already exists in the database, returning 400 to the user.", request)
    
    try:
       jsonData = jsonify(output = output)
@@ -172,6 +192,7 @@ def setState():
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
+      error_handler.setError('2-06', state, g.user.id, "views/state.py:setState - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
    
 def compareChecksum(hexdigest1, hexdigest2):

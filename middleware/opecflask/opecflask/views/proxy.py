@@ -1,4 +1,5 @@
 from flask import Blueprint, abort, request, make_response, g, current_app
+from opecflask.core import error_handler
 
 portal_proxy = Blueprint('portal_proxy', __name__)
 
@@ -32,6 +33,7 @@ def proxy():
       host = url.split("/")[2]
       current_app.logger.debug(host)
       if host and allowedHosts and not host in allowedHosts:
+         error_handler.setError('2-01', None, g.user.id, "views/proxy.py:proxy - Host is not in the whitelist, returning 502 to user.", request)
          abort(502)
          
       if url.startswith("http://") or url.startswith("https://"):      
@@ -64,6 +66,7 @@ def proxy():
          return resp
       else:
          g.error = 'Missing protocol. Add "http://" or "https://" to the front of your request url.'
+         error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - The protocol is missing, returning 400 to user.", request)
          abort(400)
    
    except urllib2.URLError as e:
@@ -75,6 +78,7 @@ def proxy():
          abort(400)
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
+      error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
    except Exception, e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
@@ -83,4 +87,5 @@ def proxy():
          abort(e.code)
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
+      error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code

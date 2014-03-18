@@ -6,6 +6,7 @@ from opecflask.models.quickregions import QuickRegions
 from opecflask.models.roi import ROI
 from opecflask.models.layergroup import LayerGroup
 from opecflask.models.user import User
+from opecflask.core import error_handler
 from opecflask import oid
 import sqlite3 as sqlite
 
