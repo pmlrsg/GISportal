@@ -18,4 +18,5 @@ def init_db():
     from roi import ROI
     from layergroup import LayerGroup
     from user import User
+    from errors import Errors
     Base.metadata.create_all(bind=engine)

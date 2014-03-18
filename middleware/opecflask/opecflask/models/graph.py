@@ -26,4 +26,4 @@ class Graph(Base):
       self.checksum = m.hexdigest()
 
    def __repr__(self):
-      return '<State ID %r>' % (self.id)
+      return '<Graph ID %r>' % (self.id)
