@@ -1,5 +1,5 @@
 {
-   "id": "opec",
+   "id": "gisportal",
    "build-paths": [
       {
          "dev": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.css\" />",

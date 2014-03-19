@@ -1,13 +1,13 @@
 {
-   "id": "opec",
+   "id": "gisportal",
    "paths": [
       "html/js-libs/"
    ],
    "inputs": [
       "src/libs/jquery-walkthrough/jquery.walkthrough.js",
-      "src/opec.js",
+      "src/gisportal.js",
       "src/libs/dialog.js",
-      "src/opecportal.js",
+      "src/gisportal.js",
       "src/window.js",
       "src/windows/scalebar.js",
       "src/windows/graphcreator.js",
