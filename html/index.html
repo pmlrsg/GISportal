@@ -76,7 +76,7 @@
 <script type="text/javascript" src="OPECPortal.min.js"></script>
 
 <!-- =================================== Templates =================================== -->
-<script type="text/html" id="opec-template-layer">
+<script type="text/html" id="gisportal-template-layer">
    {{! List of used variables for this template:
       name - The name of the layer
       loader - Show ajax loader (true/false)
@@ -84,19 +84,19 @@
       visibility - Is the layer visible
       displayTitle - The name to show     
    }}
-   <li id="{{name}}" class="opec-layer">
+   <li id="{{name}}" class="gisportal-layer">
       <img src="img/ajax-loader.gif"/>
       <input type="checkbox" {{#visibility}}checked="yes"{{/visibility}} name="{{name}}" value="{{name}}" />
       <p>{{displayTitle}}</p>
       <a id="layer-exclamation" href="#">
          <img src="img/exclamation_small.png"/>
       </a>
-      <span class="opec-layer-dropdown ui-icon ui-icon-triangle-1-s">dropdown</span>
+      <span class="gisportal-layer-dropdown ui-icon ui-icon-triangle-1-s">dropdown</span>
       
    </li>
 </script>
 <!-- Metadata Window -->
-<script type="text/html" id="opec-template-metadataWindow">
+<script type="text/html" id="gisportal-template-metadataWindow">
    {{! List of used variables for this template:
       id - A unique id of the layer whos metadata is to be displayed.
       displayTitle - What will be shown to the user to identifiy the window.
@@ -141,7 +141,7 @@
    </div>
 </script>
 <!-- Scalebar Window -->
-<script type="text/html" id="opec-template-scalebarWindow">
+<script type="text/html" id="gisportal-template-scalebarWindow">
    {{! List of used variables for this template:
       name - A unique id of the layer whos metadata is to be displayed.
       displayTitle - What will be shown to the user to identifiy the window.
@@ -178,7 +178,7 @@
    </div>
 </script>
 <!-- Graph Creator Window-->
-<script type="text/html" id="opec-template-graphCreatorWindow">
+<script type="text/html" id="gisportal-template-graphCreatorWindow">
    {{! List of used variables for this template:
       advanced - Show advanced options (true/false)
    }}
@@ -308,8 +308,8 @@
    </div>
 </script>
 <!-- Item on the layer selection window -->
-<script type="text/html" id="opec-template-selector-item">
-   <li class="opec-unselected ui-state-default" data-provider="{{ provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
+<script type="text/html" id="gisportal-template-selector-item">
+   <li class="gisportal-unselected ui-state-default" data-provider="{{ provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
       <strong>{{name}}</strong>
       <a href="#"><span class="ui-corner-all ui-icon ui-icon-triangle-1-e"></span></a>
       <div style="display:none;">
@@ -329,33 +329,33 @@
    </li>
 </script>
 <!-- Login box -->
-<script type="text/html" id="opec-template-login-box">
+<script type="text/html" id="gisportal-template-login-box">
    <form action="/service/login" method="get" id="{{id}}">
       <input type="hidden" name="action" value="verify">
       <fieldset>
          <legend>Sign-in or Create New Account</legend>
-         <div id="opec-openid-choice" style="display:block;">
+         <div id="gisportal-openid-choice" style="display:block;">
             <p>Please click your account provider:</p>
-            <div id="opec-openid-btns">
+            <div id="gisportal-openid-btns">
                {{#providers}} {{#provider}} {{/provider}} {{/providers}}
             </div>
-            <div id="opec-openid-input"></div>
+            <div id="gisportal-openid-input"></div>
          </div>
       </fieldset>
    </form>
 </script>
 <!-- Provider Box -->
-<script type="text/html" id="opec-template-provider-box">
-   <a class="opec-login-with-{{name}}" title="{{title}}" data-url="{{url}}"></a> <!--href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}" -->
+<script type="text/html" id="gisportal-template-provider-box">
+   <a class="gisportal-login-with-{{name}}" title="{{title}}" data-url="{{url}}"></a> <!--href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}" -->
 </script>
 <!-- History Window List -->
-<script type="text/html" id="opec-template-history-list">
+<script type="text/html" id="gisportal-template-history-list">
    <li class="ui-state-default" data-id="{{ id }}">
       {{ description }}
    </li>
 </script>
 <!-- History Window Data -->
-<script type="text/html" id="opec-template-history-data">
+<script type="text/html" id="gisportal-template-history-data">
    <li class="hidden" data-id="{{ id }}" data-title="{{ title }}">
       <p class="title-case">{{ title }}</p>
       <div class="hidden">
@@ -365,7 +365,7 @@
 </script>
 
 <!-- Walkthrough -->
-<script type="text/html" id="opec-walkthrough">
+<script type="text/html" id="gisportal-walkthrough">
    <li class="{{ classes }} ui-dialog" data-id="{{ id }}">
    	<button class="js-walkthrough-close ui-dialog-titlebar-close">Close</button>
       {{{ content }}}
@@ -374,7 +374,7 @@
 </script>
 
 <!-- Walkthrough Menu -->
-<script type="text/html" id="opec-walkthrough-menu">
+<script type="text/html" id="gisportal-walkthrough-menu">
 	<li><a href="#{{ id }}">{{ name }}</a></li>
 </script>
 
@@ -428,17 +428,17 @@
             <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>Quick Region</legend>
-               <select class="opec-quickRegion-select ui-corner-all" id="quickRegion" name="Quick Region">
+               <select class="gisportal-quickRegion-select ui-corner-all" id="quickRegion" name="Quick Region">
                </select>
             </fieldset>
          </li>
          <li class="divider"></li>
-         <li id="opec-toolbar-actions" class="opec-toolbar-buttonpane">
-            <!--<input type="checkbox" id="mapInfoToggleBtn" /><label class="opec-iconBigBtn" for="mapInfoToggleBtn" title="Toggle Map Info"></label>-->
-            <input type="checkbox" id="shareMapToggleBtn" /><label class="opec-iconBigBtn" for="shareMapToggleBtn" title="Toggle Share Panel"></label>
-            <input type="checkbox" id="layerPreloader" /><label class="opec-iconBigBtn" for="layerPreloader" title="Toggle Layer Selection Panel"></label>
-            <!--<input type="checkbox" id="opec-button-3d" /><label class="opec-iconBigBtn" for="opec-button-3d" title="Toggle 3D Mode"></label>-->
-            <input type="checkbox" id="infoToggleBtn" /><label class="opec-iconBigBtn" for="infoToggleBtn" title="Toggle OPEC Information Box"></label>
+         <li id="gisportal-toolbar-actions" class="gisportal-toolbar-buttonpane">
+            <!--<input type="checkbox" id="mapInfoToggleBtn" /><label class="gisportal-iconBigBtn" for="mapInfoToggleBtn" title="Toggle Map Info"></label>-->
+            <input type="checkbox" id="shareMapToggleBtn" /><label class="gisportal-iconBigBtn" for="shareMapToggleBtn" title="Toggle Share Panel"></label>
+            <input type="checkbox" id="layerPreloader" /><label class="gisportal-iconBigBtn" for="layerPreloader" title="Toggle Layer Selection Panel"></label>
+            <!--<input type="checkbox" id="gisportal-button-3d" /><label class="gisportal-iconBigBtn" for="gisportal-button-3d" title="Toggle 3D Mode"></label>-->
+            <input type="checkbox" id="infoToggleBtn" /><label class="gisportal-iconBigBtn" for="infoToggleBtn" title="Toggle OPEC Information Box"></label>
          </li>
       </ul>
       <div class="togglePanel">
@@ -450,15 +450,15 @@
    <div class="panel lPanel unselectable">
       <h3 id="layerLbl">Data Layers</h3>
       <div id="layerAccordion" class="ui-helper-reset">
-         <div id="opec-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
+         <div id="gisportal-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
             <ul>
-               <li class="opec-tab-group ui-corner-top lPanel-buttonSet">
-                  <input type="radio" name="layer-tab" checked id="opec-lpanel-tab-operational" class="opec-tab" href="#opec-lPanel-operational">
-                  <label for="opec-lpanel-tab-operational">Models</label>
-                  <input type="radio" name="layer-tab" id="opec-lpanel-tab-reference" class="opec-tab" href="#opec-lPanel-reference">
-                  <label for="opec-lpanel-tab-reference">Reference</label>
-                  <input type="radio" name="layer-tab" id="opec-lpanel-tab-options" class="opec-tab" href="#lpanel-base-layers">
-                  <label for="opec-lpanel-tab-options">Options</label>
+               <li class="gisportal-tab-group ui-corner-top lPanel-buttonSet">
+                  <input type="radio" name="layer-tab" checked id="gisportal-lpanel-tab-operational" class="gisportal-tab" href="#gisportal-lPanel-operational">
+                  <label for="gisportal-lpanel-tab-operational">Models</label>
+                  <input type="radio" name="layer-tab" id="gisportal-lpanel-tab-reference" class="gisportal-tab" href="#gisportal-lPanel-reference">
+                  <label for="gisportal-lpanel-tab-reference">Reference</label>
+                  <input type="radio" name="layer-tab" id="gisportal-lpanel-tab-options" class="gisportal-tab" href="#lpanel-base-layers">
+                  <label for="gisportal-lpanel-tab-options">Options</label>
                </li>
                <li id="triggerL-buttonset" class="hidden lPanel-buttonSet ui-corner-top">
                   <button id="triggerL-add-accordion" class="panel-button"></button>
@@ -469,10 +469,10 @@
                </li>
             </ul>       
          </div>
-         <div id="opec-lPanel-content" class="ui-corner-all">
-            <div id="opec-lPanel-operational" class="ui-corner-top opec-tab-content opec-tab-active"></div>
-            <div id="opec-lPanel-reference" class="ui-corner-top opec-tab-content" style="display: none;"></div>
-            <div id="lpanel-base-layers" class="opec-tab-content" style="display: none;">
+         <div id="gisportal-lPanel-content" class="ui-corner-all">
+            <div id="gisportal-lPanel-operational" class="ui-corner-top gisportal-tab-content gisportal-tab-active"></div>
+            <div id="gisportal-lPanel-reference" class="ui-corner-top gisportal-tab-content" style="display: none;"></div>
+            <div id="lpanel-base-layers" class="gisportal-tab-content" style="display: none;">
                <div id="baseLayers">
                   <fieldset>
                      <legend>Base Layer</legend>
@@ -482,12 +482,12 @@
                   <!-- Quick Region -->
                   <fieldset>
                      <legend>Quick Regions</legend>
-                     <select class="opec-quickRegion-select ui-corner-all"></select>
+                     <select class="gisportal-quickRegion-select ui-corner-all"></select>
                      
                      <div style="clear: both;"> </div>
                      
-                     <button class="opec-quickRegion-remove">Remove selected region</button>
-                     <button class="opec-quickRegion-addCurrent">Add Current View</button> 
+                     <button class="gisportal-quickRegion-remove">Remove selected region</button>
+                     <button class="gisportal-quickRegion-addCurrent">Add Current View</button> 
                      <div style="clear: both;"> </div>
                   </fieldset>
                   
@@ -497,34 +497,34 @@
                      <div style="clear: both;"> </div>
                      
                      <!-- Quick Region Name -->
-                     <label for="opec-quickRegion-name">Region Name:</label>
-                     <input type="text" class="opec-quickRegion-name" name="opec-quickRegion-name"/>
+                     <label for="gisportal-quickRegion-name">Region Name:</label>
+                     <input type="text" class="gisportal-quickRegion-name" name="gisportal-quickRegion-name"/>
                      
                      <div style="clear: both;"> </div>
                      
                      <!-- Quick Region Bounds -->
-                     <label for="opec-quickRegion-left">Left:</label>
-                     <input type="text" class="opec-quickRegion-left" name="opec-quickRegion-left"/>
+                     <label for="gisportal-quickRegion-left">Left:</label>
+                     <input type="text" class="gisportal-quickRegion-left" name="gisportal-quickRegion-left"/>
                      
                      <div style="clear: both;"> </div>
                      
-                     <label for="opec-quickRegion-bottom">Bottom:</label>
-                     <input type="text" class="opec-quickRegion-bottom" name="opec-quickRegion-bottom"/>
+                     <label for="gisportal-quickRegion-bottom">Bottom:</label>
+                     <input type="text" class="gisportal-quickRegion-bottom" name="gisportal-quickRegion-bottom"/>
                      
                      <div style="clear: both;"> </div>
                      
-                     <label for="opec-quickRegion-right">Right:</label>
-                     <input type="text" class="opec-quickRegion-right" name="opec-quickRegion-right"/>
+                     <label for="gisportal-quickRegion-right">Right:</label>
+                     <input type="text" class="gisportal-quickRegion-right" name="gisportal-quickRegion-right"/>
                      
                      <div style="clear: both;"> </div>
                      
-                     <label for="opec-quickRegion-top">Top:</label>
-                     <input type="text" class="opec-quickRegion-top" name="opec-quickRegion-top"/>
+                     <label for="gisportal-quickRegion-top">Top:</label>
+                     <input type="text" class="gisportal-quickRegion-top" name="gisportal-quickRegion-top"/>
                   </fieldset>  
                   
-                  <button class="opec-quickRegion-reset">Reset</button>
-                  <button class="opec-quickRegion-save">Save</button> 
-                  <button class="opec-quickRegion-add">Add as new region</button>
+                  <button class="gisportal-quickRegion-reset">Reset</button>
+                  <button class="gisportal-quickRegion-save">Save</button> 
+                  <button class="gisportal-quickRegion-add">Add as new region</button>
                </div>
             </div>
          </div>
@@ -536,7 +536,7 @@
    <div class="panel rPanel unselectable">
       <h3 id="dataLbl">Data Analysis</h3>     
       <div id="dataAccordion" class="ui-helper-reset">
-         <div id="opec-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
+         <div id="gisportal-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
             <!-- Using fieldsets as no easy CSS alternative -->
             <fieldset>
                <legend>Data Selection Tools</legend>
@@ -557,36 +557,36 @@
                </ul>
             </fieldset>
          </div>
-         <div id="opec-panel-toolbar" class="ui-corner-top panel-buttonSet">
+         <div id="gisportal-panel-toolbar" class="ui-corner-top panel-buttonSet">
             <ul>
-               <li class="opec-tab-group ui-corner-top">
-                  <input type="radio" name="data-analysis-tab" id="opec-button-selection" class="opec-tab" href="#opec-tab-selection">
-                  <label for="opec-button-selection">Selection</label>
-                  <input type="radio" name="data-analysis-tab" id="opec-button-analyses" class="opec-tab" href="#opec-tab-analyses">
-                  <label for="opec-button-analyses">Analysis</label>
-                  <input type="radio" name="data-analysis-tab" checked id="opec-button-export" class="opec-tab" href="#opec-tab-export">
-                  <label for="opec-button-export">Data Export</label>
+               <li class="gisportal-tab-group ui-corner-top">
+                  <input type="radio" name="data-analysis-tab" id="gisportal-button-selection" class="gisportal-tab" href="#gisportal-tab-selection">
+                  <label for="gisportal-button-selection">Selection</label>
+                  <input type="radio" name="data-analysis-tab" id="gisportal-button-analyses" class="gisportal-tab" href="#gisportal-tab-analyses">
+                  <label for="gisportal-button-analyses">Analysis</label>
+                  <input type="radio" name="data-analysis-tab" checked id="gisportal-button-export" class="gisportal-tab" href="#gisportal-tab-export">
+                  <label for="gisportal-button-export">Data Export</label>
                </li>
             </ul>
          </div>
-         <div id="opec-rPanel-content" class="ui-corner-all">
-            <div id="opec-tab-selection" class="opec-tab-content ui-corner-top opec-tab-active">
+         <div id="gisportal-rPanel-content" class="ui-corner-all">
+            <div id="gisportal-tab-selection" class="gisportal-tab-content ui-corner-top gisportal-tab-active">
                <h3><a href="#">Current R.O.I.</a></h3>
                <div id="dispROI"><span>No Selection</span></div>
             </div>
-            <div id="opec-tab-analyses" class="opec-tab-content ui-corner-top" style="display: none;">
+            <div id="gisportal-tab-analyses" class="gisportal-tab-content ui-corner-top" style="display: none;">
                <h3>Graphing</h3>
-               <div id="opec-graphing">  
+               <div id="gisportal-graphing">  
                </div>
             </div>
-            <div id="opec-tab-export" class="opec-tab-content ui-corner-top" style="display: none;">
+            <div id="gisportal-tab-export" class="gisportal-tab-content ui-corner-top" style="display: none;">
                <h3><a href="#">Data Tools</a></h3>
                <div id="dataTools">
-                  <div class="opec-list js-export-layer"><b>Selected Layer: </b> None</div>
-                  <div class="opec-list js-export-bbox"><b>Selected Bbox: </b> None</div>
-                  <div class="opec-list js-export-time"><b>Selected Time: </b> None</div>
-                  <div class="opec-list js-export-format"><b>Selected Format: </b>
-                     <select id="opec-dataexport-format" title="Format you wish to the data to be returned in">
+                  <div class="gisportal-list js-export-layer"><b>Selected Layer: </b> None</div>
+                  <div class="gisportal-list js-export-bbox"><b>Selected Bbox: </b> None</div>
+                  <div class="gisportal-list js-export-time"><b>Selected Time: </b> None</div>
+                  <div class="gisportal-list js-export-format"><b>Selected Format: </b>
+                     <select id="gisportal-dataexport-format" title="Format you wish to the data to be returned in">
                         <option value="NetCDF3" title="Returns a netcdf3 file">NetCDF3</option>
                      </select>
                   </div>
@@ -600,12 +600,12 @@
    <!-- Share Options Panel, appears after the share options button has been clicked  -->
    <div class="toolbar" id="shareOptions">
    	<h3>Share Your Data! Track Your Progress!</h3>
-      <div id="opec-openid-content" class="hidden">
-         <button id="opec-openid-getlink">Save Progress</button>
-         <label for="opec-openid-shareurl">Paste Link:</label>
-         <input type="text" readonly  id="opec-openid-shareurl">
+      <div id="gisportal-openid-content" class="hidden">
+         <button id="gisportal-openid-getlink">Save Progress</button>
+         <label for="gisportal-openid-shareurl">Paste Link:</label>
+         <input type="text" readonly  id="gisportal-openid-shareurl">
 
-         <button id="opec-openid-logout">Log out</button>
+         <button id="gisportal-openid-logout">Log out</button>
       </div>
    </div>
    
@@ -631,39 +631,39 @@
       <div id="layers"></div>
    </div> -->
    
-   <div id="opec-layerSelection" class="layer-selection unselectable tt" title="Variable Selection">
+   <div id="gisportal-layerSelection" class="layer-selection unselectable tt" title="Variable Selection">
       <p>Choose the variables you want displayed on the map from the contents of the box on the right.</p>
       <p>Use the filter box on the left to limit the contents either by matching on the variable name or limiting the selection to specific predefined tag associated with a variable such as its type being Chlorophyll.</p>
       <p>Click on the variable to add or remove it, click on the arrow to see more details about the variable.</p>
       <ul>
-         <li class="opec-tagMenu"></li>       
-         <li class="opec-selectable">
+         <li class="gisportal-tagMenu"></li>       
+         <li class="gisportal-selectable">
             <ul></ul>
          </li>       
       </ul>
    </div>
    
-   <div id="opec-historyWindow" title="History">
-      <div id="opec-historyWindow-tabs" class="panel-toolbar ui-helper-reset opec-tab-group ui-corner-top">
-         <button id="opec-historyWindow-tab-States" class="opec-tab" href="#opec-historyWindow-states">States</button>
-         <button id="opec-historyWindow-tab-Graphs" class="opec-tab" href="#opec-historyWindow-graphs">Graphs</button>  
-         <button id="opec-historyWindow-tab-Refresh" class="right" href="#opec-historyWindow-refresh">Refresh</button>  
+   <div id="gisportal-historyWindow" title="History">
+      <div id="gisportal-historyWindow-tabs" class="panel-toolbar ui-helper-reset gisportal-tab-group ui-corner-top">
+         <button id="gisportal-historyWindow-tab-States" class="gisportal-tab" href="#gisportal-historyWindow-states">States</button>
+         <button id="gisportal-historyWindow-tab-Graphs" class="gisportal-tab" href="#gisportal-historyWindow-graphs">Graphs</button>  
+         <button id="gisportal-historyWindow-tab-Refresh" class="right" href="#gisportal-historyWindow-refresh">Refresh</button>  
       </div>
-      <div id="opec-historyWindow-content">
-         <div id="opec-historyWindow-states" class="opec-tab-content ui-corner-top">
+      <div id="gisportal-historyWindow-content">
+         <div id="gisportal-historyWindow-states" class="gisportal-tab-content ui-corner-top">
             <ul>
-               <li class="opec-historyWindow--scroll"><ul></ul></li>       
-               <li class="opec-historyWindow--data">
-               <button id="opec-historyWindow-loadState">Load State into current page</button>
-               <button id="opec-historyWindow-reloadState">Refresh page to state</button>
+               <li class="gisportal-historyWindow--scroll"><ul></ul></li>       
+               <li class="gisportal-historyWindow--data">
+               <button id="gisportal-historyWindow-loadState">Load State into current page</button>
+               <button id="gisportal-historyWindow-reloadState">Refresh page to state</button>
                </li>       
             </ul>
          </div>
    
-         <div id="opec-historyWindow-graphs" class="opec-tab-content ui-corner-top" style="display: none;">
+         <div id="gisportal-historyWindow-graphs" class="gisportal-tab-content ui-corner-top" style="display: none;">
             <ul>
-               <li class="opec-historyWindow--scroll"><ul><ul></li>       
-               <li class="opec-historyWindow--data">
+               <li class="gisportal-historyWindow--scroll"><ul><ul></li>       
+               <li class="gisportal-historyWindow--data">
                   <button id="load-graph">Load Graph</button>
                   <button id="remove-graph">Remove Graph</button>
                </li>       
@@ -684,6 +684,6 @@
    
    <div id="js-walkthrough-confirm" class="hidden">Would you like this walkthrough to appear next time you visit?</div>
 
-   <a href="/" class="opec-logo"><img src="img/OpEc_small.png"></a>
+   <a href="/" class="gisportal-logo"><img src="img/OpEc_small.png"></a>
 </body>
 </html>

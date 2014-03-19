@@ -2,17 +2,17 @@
  * Window
  * @namespace
  */
-opec.window = {};
+gisportal.window = {};
 
-opec.window._openWindows = {};
-opec.window._windowTypes = {};
+gisportal.window._openWindows = {};
+gisportal.window._windowTypes = {};
 
 /**
  * Add a type of window
  * @param {Object} window
  */
-opec.window.addWindow = function(window) {
-   opec.window._windowTypes[window.name] = window;
+gisportal.window.addWindow = function(window) {
+   gisportal.window._windowTypes[window.name] = window;
 };
 
 /**
@@ -21,10 +21,10 @@ opec.window.addWindow = function(window) {
  * @param {number} uid
  * @param {Object} data
  */
-opec.window.createWindow = function(windowType, uid, data) {  
-   if (!opec.utils.isNullorUndefined(opec.window._windowTypes[windowType])) {
-      var window = opec.window._windowTypes[windowType].create(windowType, uid, data);
-      opec.window._openWindows[uid] = window;
+gisportal.window.createWindow = function(windowType, uid, data) {  
+   if (!gisportal.utils.isNullorUndefined(gisportal.window._windowTypes[windowType])) {
+      var window = gisportal.window._windowTypes[windowType].create(windowType, uid, data);
+      gisportal.window._openWindows[uid] = window;
    }
 };
 
@@ -33,25 +33,25 @@ opec.window.createWindow = function(windowType, uid, data) {
  * @param {number} uid
  * @param {Object} obj
  */
-opec.window.removeWindow = function(uid, obj) {  
-   //var inArray = $.inArray( uid, opec.window._openWindows );
+gisportal.window.removeWindow = function(uid, obj) {  
+   //var inArray = $.inArray( uid, gisportal.window._openWindows );
     
    //if ( inArray !== -1 ) {
-      //var window = opec.window._openWindows[uid].destroy();
-      //opec.utils.arrayRemove(opec.window._openWindows, inArray);     
+      //var window = gisportal.window._openWindows[uid].destroy();
+      //gisportal.utils.arrayRemove(gisportal.window._openWindows, inArray);     
    //}
    
-   if(typeof opec.window._openWindows !== 'undefined') {
-      var window = opec.window._openWindows[uid];
+   if(typeof gisportal.window._openWindows !== 'undefined') {
+      var window = gisportal.window._openWindows[uid];
       // Check we have a window
       if(typeof window === 'undefined')
          return;
          
       window.destroy();
-      delete opec.window._openWindows[uid];
+      delete gisportal.window._openWindows[uid];
    }
 };
 
-opec.window.getWindow = function(uid) {
+gisportal.window.getWindow = function(uid) {
    
 };

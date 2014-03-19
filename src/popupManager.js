@@ -32,11 +32,10 @@
 //  for popup size, or you can display a button 'Sign in with Google' and set the
 //..'onclick' handler of the button to googleOpener.popup()
 
-opec.popupManager = {}; // Changed to be under the opec namespace.
-
+gisportal.popupManager = {};
 // Library constants
 
-opec.popupManager.constants = {
+gisportal.popupManager.constants = {
   'darkCover' : 'popupManager_darkCover_div',
   'darkCoverStyle' : ['position:absolute;',
                       'top:0px;',
@@ -59,7 +58,7 @@ opec.popupManager.constants = {
 // Computes the size of the window contents. Returns a pair of
 // coordinates [width, height] which can be [0, 0] if it was not possible
 // to compute the values.
-opec.popupManager.getWindowInnerSize = function() {
+gisportal.popupManager.getWindowInnerSize = function() {
   var width = 0;
   var height = 0;
   var elem = null;
@@ -85,7 +84,7 @@ opec.popupManager.getWindowInnerSize = function() {
 
 // Computes the coordinates of the parent window.
 // Gets the coordinates of the parent frame
-opec.popupManager.getParentCoords = function() {
+gisportal.popupManager.getParentCoords = function() {
   var width = 0;
   var height = 0;
   if ('screenLeft' in window) {
@@ -102,7 +101,7 @@ opec.popupManager.getParentCoords = function() {
 
 // Computes the coordinates of the new window, so as to center it
 // over the parent frame
-opec.popupManager.getCenteredCoords = function(width, height) {
+gisportal.popupManager.getCenteredCoords = function(width, height) {
    var parentSize = this.getWindowInnerSize();
    var parentPos = this.getParentCoords();
    var xPos = parentPos[0] +
@@ -130,7 +129,7 @@ opec.popupManager.getCenteredCoords = function(width, height) {
 //  openidParams.onOpenHandler = myOnOpenHandler;
 //  ... other customizations
 //  var myOpener = popupManager.createOpener(openidParams);
-opec.popupManager.darkenScreen = function() {
+gisportal.popupManager.darkenScreen = function() {
   var darkCover = window.document.getElementById(window.popupManager.constants['darkCover']);
   if (!darkCover) {
     darkCover = window.document.createElement('div');
@@ -172,7 +171,7 @@ opec.popupManager.darkenScreen = function() {
 //    ... // other extension parameters
 //    'openid.ui.language' : 'fr_CH',
 //    ... };
-opec.popupManager.createPopupOpener = (function(openidParams) {
+gisportal.popupManager.createPopupOpener = (function(openidParams) {
   var interval_ = null;
   var popupWindow_ = null;
   var that = this;

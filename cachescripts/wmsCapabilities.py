@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
-import urllib
-import urllib2
-import csv
-import xml.etree.ElementTree as ET
-import hashlib
-import json
-import string
 import os
+import utils
+import sys
+
+sys.path.append(os.path.join(sys.path[0],'..','config'))
+# server list
+import wmsServers
+# extra info for layers
+import wmsLayerTags
 
 # Change the python working directory to be where this script is located
 abspath = os.path.abspath(__file__)
@@ -15,110 +16,28 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 CACHELIFE = 3600 #3600 # cache time in seconds, 1 hour cache
-LAYERCACHEPATH = "/home/rsgadmin/cache/opec/layers/"
-SERVERCACHEPATH = "/home/rsgadmin/cache/opec/"
-MASTERCACHEPATH = "/home/rsgadmin/cache/opec/mastercache"
+LAYERCACHEPATH = "../html/cache/layers/"
+SERVERCACHEPATH = "../html/cache/"
+MASTERCACHEPATH = "../html/cache/mastercache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 GET_CAPABILITES_PARAMS = "SERVICE=WMS&REQUEST=GetCapabilities&VERSION=1.3.0"
-SERVERLIST = "serverlist.csv"
+
 NAMESPACE = '{http://www.opengis.net/wms}'
 XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 
 PRODUCTFILTER = "productFilter.csv"
 LAYERFILTER = "layerFilter.csv"
-dirtyCaches = [] # List of caches that may need recreating
 
-def updateCaches():
-   print 'Starting cache generation'
-   servers = csvToList(SERVERLIST)
-   change = False
-   
-   # Go through each server
-   for server in servers:
-      # Check if the cache is valid
-      if not checkCacheValid(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, CACHELIFE):
-         oldXML = None
-         newXML = None       
-         try:
-            # Try to contact the server for the newXML
-            resp = urllib2.urlopen(server['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
-            newXML = resp.read()
-         except urllib2.URLError as e:
-            print 'Failed to open url to ' + server['wmsURL']
-            print e
-            # If we can't contact the server, skip to the next server
-         except IOError as e:
-            print 'Failed to open url to ' + server['wmsURL']
-            print e
-            
-         # Check that we have the xml file
-         if newXML == None:
-            dirtyCaches.append(server)
-            continue
-         
-         try:
-            oldXML = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML)
-         except IOError as e:
-            print 'Failed to open xml file at "' + SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML + '"'       
-            print e
-            # We don't have the oldXML so we need to skip the md5 check
-            createCache(server, newXML) 
-            change = True
-            
-         if oldXML == None:
-            oldXML = "old"
-            
-         if checkMD5(oldXML, newXML):
-            print 'md5 check failed...'
-            # Create the caches for this server
-            createCache(server, newXML)
-            change = True
-         else: 
-            print 'md5 check passed'
-   
-   dirtyCachesCopy = dirtyCaches[:]
-   print "Checking for dirty caches..."        
-   for dirtyServer in dirtyCachesCopy:  
-      print "server name: " + dirtyServer['name']  
-      regenerateCache(dirtyServer)
-   print "Dirty caches regenerated"     
-         
-   if change:
-      createMasterCache(servers)
-      
-   print 'Finished generating caches'
-      
-def createMasterCache(servers):
-   masterCache = []
-   for server in servers:
-      file = None
-      try:
-         file = getFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON)
-      except IOError as e:
-         print 'Failed to open json file at "' + SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON + '"'       
-         print e
-         
-      if file != None:
-         masterCache.append(json.loads(file))
-   
-   print "Saving mastercache..."         
-   saveFile(MASTERCACHEPATH + FILEEXTENSIONJSON, json.dumps(masterCache))
-   print "Mastercache saved" 
-         
-def checkMD5(oldXML, newXML):
-   newMD5 = hashlib.md5(newXML)
-   oldMD5 = hashlib.md5(oldXML) 
-   
-   print 'Checking md5...'
-   print newMD5.hexdigest()
-   print oldMD5.hexdigest()
-   
-   return newMD5.hexdigest() != oldMD5.hexdigest()
+dirtyCaches = [] # List of caches that may need recreating
+extraInfo = wmsLayerTags.layers
    
 def createCache(server, xml):
+   import xml.etree.ElementTree as ET
+   import json
+   
    # Save out the xml file for later
-   saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
+   utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONXML, xml)
    
    print 'Creating caches...'
    subMasterCache = {}
@@ -131,19 +50,19 @@ def createCache(server, xml):
       dirtyCaches.append(server)
       return
    
-   for service in root.iterfind('./%sService' % (NAMESPACE)):
+   for service in root.findall('./%sService' % (NAMESPACE)):
       serverTitle = service.find('./%sTitle' % (NAMESPACE)).text
       serverAbstract = service.find('./%sAbstract' % (NAMESPACE)).text if service.find('./%sAbstract' % (NAMESPACE)) is not None else None
    
-   for product in root.iterfind('./%sCapability/%sLayer/%sLayer' % (NAMESPACE,NAMESPACE,NAMESPACE)):
+   for product in root.findall('./%sCapability/%sLayer/%sLayer' % (NAMESPACE,NAMESPACE,NAMESPACE)):
       sensorName = product.find('./%sTitle' % (NAMESPACE)).text
       
-      if blackfilter(sensorName, productBlackList):
-         sensorName = replace_all(sensorName, {' ':'_', '(':'_', ')':'_', '/':'_'})
+      if utils.blackfilter(sensorName, productBlackList):
+         sensorName = utils.replaceAll(sensorName, {' ':'_', '(':'_', ')':'_', '/':'_'})
          print sensorName
          layers = []
          
-         for layer in product.iterfind('./%sLayer' % (NAMESPACE)):
+         for layer in product.findall('./%sLayer' % (NAMESPACE)):
             name = layer.find('./%sName' % (NAMESPACE)).text
             title = layer.find('./%sTitle' % (NAMESPACE)).text
             abstract = layer.find('./%sAbstract' % (NAMESPACE)).text
@@ -163,15 +82,24 @@ def createCache(server, xml):
             dimensions = createDimensionsArray(layer, server)
             temporal = dimensions['temporal']
             styles = createStylesArray(layer)
-            
-            if blackfilter(name, layerBlackList):
-               # Data to be sent in the mastercache
-               layers.append({"Name": name,
+
+
+
+            if utils.blackfilter(name, layerBlackList):
+               
+               masterLayer = {"Name": name,
                               "Title": title,
                               "Abstract": abstract,
-                              #"FirstDate": dimensions['firstDate'],
-                              #"LastDate": dimensions['lastDate'],
-                              "EX_GeographicBoundingBox": exGeographicBoundingBox})
+                              "FirstDate": dimensions['firstDate'],
+                              "LastDate": dimensions['lastDate'],
+                              "EX_GeographicBoundingBox": exGeographicBoundingBox }
+                              
+               if server['name'] in extraInfo:
+                  if name in extraInfo[server['name']]:
+                     masterLayer['tags'] = extraInfo[server['name']][name]
+               
+               # Data to be sent in the mastercache
+               layers.append(masterLayer)
                
                # Data to be saved out
                layer = {#"Name": name,
@@ -190,20 +118,22 @@ def createCache(server, xml):
                cleanLayerName = name.replace('/', '-')
                
                # Save out layer cache
-               saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))
+               utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))
                
          subMasterCache['server'][sensorName] = layers
-         
-   subMasterCache['wmsURL'] = server['wmsURL']
-   subMasterCache['wcsURL'] = server['wcsURL']
+   
+   subMasterCache['options'] = server['options']
+   subMasterCache['wmsURL'] = server['url']
+   subMasterCache['wcsURL'] = server['wcsurl']
    subMasterCache['serverName'] = server['name']
    
    print 'Cache creation complete...'
       
    # Return and save out the cache for this server
-   return saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
+   return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
                      
 def createDimensionsArray(layer, server):
+   import string
    dimensions = {}
    dimensions['dimensions'] = []
    dimensions['temporal'] = False
@@ -211,7 +141,7 @@ def createDimensionsArray(layer, server):
    dimensions['lastDate'] = None
    
    # Iterate over each dimension
-   for dimension in layer.iterfind('./%sDimension' % (NAMESPACE)):
+   for dimension in layer.findall('./%sDimension' % (NAMESPACE)):
       dimensionList = dimension.text.split(',')
       dimensionValue = dimension.text.strip()
       
@@ -252,63 +182,14 @@ def createDimensionsArray(layer, server):
 def createStylesArray(layer):
    styles = []
    
-   for style in layer.iterfind('./%sStyle' % (NAMESPACE)):      
+   for style in layer.findall('./%sStyle' % (NAMESPACE)):      
       styles.append({"Name": style.find('./%sName' % (NAMESPACE)).text,
                          "Abstract": style.find('./%sAbstract' % (NAMESPACE)).text,
                          "LegendURL": style.find('./%sLegendURL/%sOnlineResource' % (NAMESPACE,NAMESPACE)).get('%shref' % (XLINKNAMESPACE)),
                          "Width": style.find('./%sLegendURL' % (NAMESPACE)).get('width'),
                          "Height": style.find('./%sLegendURL' % (NAMESPACE)).get('height')})
       
-   return styles    
-          
-def csvToList(file):
-   data = []
-   try:
-      with open(file, 'rb') as csvfile:
-         reader = csv.reader(csvfile, delimiter=",")
-         titles = reader.next()
-         reader = csv.DictReader(csvfile, titles)
-         for row in reader:
-            data.append(row)
-   except IOError as e:
-      print 'Could not open csv file at "' + file + '"'
-      print e
-      return []
-         
-   return data
-
-def checkCacheValid(file, life):
-   import os.path, time
-   try:
-      cDate = os.path.getctime(file)
-      if time.time() - cDate < life:
-         print '%s valid' % file
-         return True
-      else:
-         print '%s expired' % file
-         return False
-   except OSError as e:
-      print 'Failed to open %s' % file
-      print e
-      return False
-   
-def getFile(filepath):
-   data = None
-   with open(filepath) as file:
-      data = file.read()
-
-   return data
-   
-def saveFile(path, data):
-   with open(path, 'wb') as file:
-      file.write(data)
-   
-   return data
-
-def replace_all(text, dic):
-    for i, j in dic.iteritems():
-        text = text.replace(i, j)
-    return text
+   return styles
  
 def genDateRange(startDate, endDate, interval):
    import isodate # https://github.com/gweis/isodate
@@ -326,36 +207,6 @@ def genDateRange(startDate, endDate, interval):
       
    return dates
 
-def blackfilter(stringToTest, filterList):
-   if len(filterList) != 0:
-      for v in filterList:
-         if stringToTest.find(v['name']) != -1:
-            return False
-      
-   return True
-
-def regenerateCache(dirtyServer):
-   import time
-   for i in range(10):
-      if dirtyServer in dirtyCaches:
-         dirtyCaches.remove(dirtyServer)
-      if i < 10:
-         try:
-            resp = urllib2.urlopen(dirtyServer['wmsURL'] + GET_CAPABILITES_PARAMS, timeout=30)
-            newXML = resp.read()
-            createCache(dirtyServer, newXML)
-            if dirtyServer not in dirtyCaches:
-               return
-            else:
-               time.sleep(30)
-         except urllib2.URLError as e:
-            print 'Failed to open url to ' + dirtyServer['wmsURL']
-            print e
-         except IOError as e:
-            print 'Failed to open url to ' + dirtyServer['wmsURL']   
-            print e
-            # We don't have the oldXML so we need to skip the md5 check
-
-layerBlackList = csvToList(LAYERFILTER)
-productBlackList = csvToList(PRODUCTFILTER)
-updateCaches()
+layerBlackList = utils.csvToList(LAYERFILTER)
+productBlackList = utils.csvToList(PRODUCTFILTER)
+utils.updateCaches(createCache, dirtyCaches,  wmsServers.servers, SERVERCACHEPATH, MASTERCACHEPATH, CACHELIFE)

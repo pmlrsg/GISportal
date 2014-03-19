@@ -3,10 +3,10 @@
  * @param {Object} placeholderID
  * @param {Object} containerID
  */
-opec.window.layerSelector = function(placeholderID, containerID) {
+gisportal.window.layerSelector = function(placeholderID, containerID) {
    var self = this;
    
-   $('#opec-layerSelection').extendedDialog({
+   $('#gisportal-layerSelection').extendedDialog({
       position: ['left', 'center'],
       width: 650,
       minWidth:650,
@@ -22,7 +22,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
          $(this).trigger("resize"); 
       },
       help : function(e, dlg) {
-         opec.gritter.showNotification('layerSelector', null);
+         gisportal.gritter.showNotification('layerSelector', null);
       },
       close: function(event, ui)  {
          console.log('layer selector closed');
@@ -71,10 +71,10 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       var providerTag = $(this).attr('data-provider');
       var id = providerTag + ': ' + layerName;
       
-      if(!$(this).hasClass('opec-selected')) {      
+      if(!$(this).hasClass('gisportal-selected')) {      
          self.selectLayer(layerID, $(this));
       }
-      else if($(this).hasClass('opec-selected')) {
+      else if($(this).hasClass('gisportal-selected')) {
          self.deselectLayer(layerID, $(this));
       }
       
@@ -128,27 +128,27 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    this.selectLayer = function(layerID, li, options) {
       var self = this;
       var options = options || {};
-      if(layerID in opec.microLayers) {
-         if(layerID in opec.layers) {
+      if(layerID in gisportal.microLayers) {
+         if(layerID in gisportal.layers) {
             // DEBUG
             console.log("Adding layer...");
-            var layer = opec.getLayerByID(layerID);
-            opec.addLayer(layer, options);
-            opec.checkIfLayerFromState(layer);
+            var layer = gisportal.getLayerByID(layerID);
+            gisportal.addLayer(layer, options);
+            gisportal.checkIfLayerFromState(layer);
 
             // DEBUG
             console.log("Added Layer");
          } else {
-            var microlayer = opec.microLayers[layerID];
+            var microlayer = gisportal.microLayers[layerID];
             if(microlayer.type == 'opLayers') {
-               opec.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
+               gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
             } else if (microlayer.type == 'refLayers') {
                // TODO: Deal with wfs layers.
                // Convert the microlayer. 
                // COMMENT: might change the way this works in future.
-               var layer = new opec.layer(microlayer, {}); 
-               opec.addLayer(layer, options);
-               opec.checkIfLayerFromState(layer);   
+               var layer = new gisportal.layer(microlayer, {}); 
+               gisportal.addLayer(layer, options);
+               gisportal.checkIfLayerFromState(layer);   
             }
          }
 
@@ -168,18 +168,18 @@ opec.window.layerSelector = function(placeholderID, containerID) {
       
       // DEBUG
       console.log("deselected");
-      var layer = opec.getLayerByID(layerID);
+      var layer = gisportal.getLayerByID(layerID);
    
       if(layer) {            
          console.log("Removing layer..."); // DEBUG
          layer.unselect();       
-         opec.removeLayer(layer);           
+         gisportal.removeLayer(layer);           
          console.log("Layer removed"); // DEBUG
          
          self.toggleLayerSelection(li);
       }
-      else if(opec.layerStore[layerID]) {
-         //layer = opec.layerStore[layerID];
+      else if(gisportal.layerStore[layerID]) {
+         //layer = gisportal.layerStore[layerID];
          self.toggleLayerSelection(li);
       }
       else
@@ -192,8 +192,8 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    };
    
    this.toggleLayerSelection = function($selection) {
-      //$selection.trigger('opec-toggle-selected');
-      $selection.toggleClass('opec-selected opec-unselected')
+      //$selection.trigger('gisportal-toggle-selected');
+      $selection.toggleClass('gisportal-selected gisportal-unselected')
       .toggleClass('ui-state-highlight');
       
       this.filtrify.refreshCache($selection);
@@ -201,7 +201,7 @@ opec.window.layerSelector = function(placeholderID, containerID) {
    
    this.toggleLayerSelectionFromLayer = function(layer) {
       var self = this;
-      this.$container.children('.opec-selected').each(function() {
+      this.$container.children('.gisportal-selected').each(function() {
          if($(this).attr('data-id') == layer.id) {
             self.toggleLayerSelection($(this));
          }

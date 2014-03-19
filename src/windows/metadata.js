@@ -1,4 +1,4 @@
-opec.window.createMetadata = function(layer) {
+gisportal.window.createMetadata = function(layer) {
    if(layer === null)
       return;
    
@@ -20,7 +20,7 @@ opec.window.createMetadata = function(layer) {
    };
      
    // Add the html to the document using a template
-   $(document.body).append(opec.templates.metadataWindow(data));
+   $(document.body).append(gisportal.templates.metadataWindow(data));
    
    // Show metadata for a selected layer
    $('#metadata-' + layer.id).extendedDialog({

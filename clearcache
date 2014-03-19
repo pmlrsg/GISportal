@@ -1,7 +1,7 @@
 rm -f html/cache/*.xml
 rm -f html/cache/*.json
 rm -f html/cache/*.json
-python cachescripts/wmsCapabilities_2_6_6.py 
+python cachescripts/wmsCapabilities.py 
 python cachescripts/wfsCapabilities.py
 touch html/cache/wfsMasterCache.json
 

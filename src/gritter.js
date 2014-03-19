@@ -2,17 +2,17 @@
  * Gritter
  * @namespace
  */
-opec.gritter = {};
-opec.gritter._notifications = [];
+gisportal.gritter = {};
+gisportal.gritter._notifications = [];
 
 // The unique id of the last tutorial message
-opec.gritter.tutUID = null;
+gisportal.gritter.tutUID = null;
 
 /**
  * Setup the options for the gritter and create opening
  * welcome message.
  */
-opec.gritter.setup = function() {
+gisportal.gritter.setup = function() {
    $.extend($.gritter.options, { 
       position: 'bottom-right',
       fade_in_speed: 'medium',
@@ -26,7 +26,7 @@ opec.gritter.setup = function() {
    // Set and display the welcome message
    createWelcomeMessage();
    
-   opec.gritter.gritterLayerHelper();
+   gisportal.gritter.gritterLayerHelper();
 };
 
 /**
@@ -35,8 +35,8 @@ opec.gritter.setup = function() {
  * @param {string} id - The identifier of the message
  * @param {Object} params - The makeup of the message
  */
-opec.gritter.addNotification = function(id, params) {
-   opec.gritter._notifications[id] = params;
+gisportal.gritter.addNotification = function(id, params) {
+   gisportal.gritter._notifications[id] = params;
 };
 
 /**
@@ -47,10 +47,10 @@ opec.gritter.addNotification = function(id, params) {
  * 
  * @return {number} Returns the unique ID of the message created. 
  */
-opec.gritter.showNotification = function(nN, data) {
+gisportal.gritter.showNotification = function(nN, data) {
    var uid;
    
-   var message = opec.gritter._notifications[nN];
+   var message = gisportal.gritter._notifications[nN];
    // Check for a title
    if(typeof message.title === 'undefined')
       message.title = function() {
@@ -94,7 +94,7 @@ opec.gritter.showNotification = function(nN, data) {
  * @param {string} [params.uid] - unique identifier of the notification to hide.
  * @param {string} [params.type] - The type of the notification to hide.
  */
-opec.gritter.hideNotification = function(params) {  
+gisportal.gritter.hideNotification = function(params) {  
    if(typeof params.uid !== 'undefined') {
       $.gritter.remove(params.uid, {
          fade: false,
@@ -112,7 +112,7 @@ opec.gritter.hideNotification = function(params) {
  */
 function createWelcomeMessage()
 {
-   //opec.gritter.tutUID = opec.gritter.showNotification('welcomeTutorial', null);
+   //gisportal.gritter.tutUID = gisportal.gritter.showNotification('welcomeTutorial', null);
 }
 
 /**
@@ -128,19 +128,19 @@ function createWelcomeMessage()
 function gritterErrorHandler(data)
 {  
    if(data.request.status == 400) {
-      opec.gritter.showNotification('error400', data);
+      gisportal.gritter.showNotification('error400', data);
       return;
    }
    else if (data.request.status == 500) {
-      opec.gritter.showNotification('error500', data);
+      gisportal.gritter.showNotification('error500', data);
       return;
    }
    else if (data.request.status == 502) {
-      opec.gritter.showNotification('error502');
+      gisportal.gritter.showNotification('error502');
       return;
    }
    else if (data.errorType == 'parsererror') {
-      opec.gritter.showNotification('errorParserError', data);
+      gisportal.gritter.showNotification('errorParserError', data);
       return;
    }
      
@@ -168,10 +168,10 @@ function gritterErrorHandler(data)
  * A logic function that tries to diagnose any problems 
  * with layers and show the correct help message.
  */ 
-opec.gritter.gritterLayerHelper = function() {
+gisportal.gritter.gritterLayerHelper = function() {
    $(document).on('click', 'img[src="img/exclamation_small.png"]', function() {
       var layerID = $(this).parent().parent().attr('id');
-      var layer = opec.getLayerByID(layerID);
+      var layer = gisportal.getLayerByID(layerID);
       var helpMessage = 'none';
       
       // Is the layer temporal?
@@ -181,7 +181,7 @@ opec.gritter.gritterLayerHelper = function() {
          // If the date is set...
          if(inst !== null) { 
             var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
-            var uidate = opec.utils.ISODateString(thedate);
+            var uidate = gisportal.utils.ISODateString(thedate);
             var mDate = layer.matchDate(uidate);
 
             // Can the layer display the selected date?
@@ -196,7 +196,7 @@ opec.gritter.gritterLayerHelper = function() {
       }
 
       var data = { layer: layer };
-      opec.gritter.showNotification(helpMessage, data);
+      gisportal.gritter.showNotification(helpMessage, data);
 
       return false;
    });
@@ -208,7 +208,7 @@ opec.gritter.gritterLayerHelper = function() {
 function createHelpMessages()
 {
    // Opening welcome message
-   opec.gritter._notifications['welcomeTutorial'] = {
+   gisportal.gritter._notifications['welcomeTutorial'] = {
       title: function() {
          return 'Welcome to the Opec Portal';
       },
@@ -223,8 +223,8 @@ function createHelpMessages()
       },
       afterOpen: function(layer) {       
          $('#wtHelp-layerSelectionPanel').click(function(e) {
-            if($('#opec-layerSelection').extendedDialog('isOpen')) {
-               $('#opec-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            if($('#gisportal-layerSelection').extendedDialog('isOpen')) {
+               $('#gisportal-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
             }
             else {
                $('#layerPreloader').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
@@ -239,9 +239,9 @@ function createHelpMessages()
          });
 
          $('#wtHelp-next').click(function(e) {
-            var params = {uid: opec.gritter.tutUID};
-            opec.gritter.hideNotification(params);
-            opec.gritter.tutUID = opec.gritter.showNotification('layerTutorial', null);
+            var params = {uid: gisportal.gritter.tutUID};
+            gisportal.gritter.hideNotification(params);
+            gisportal.gritter.tutUID = gisportal.gritter.showNotification('layerTutorial', null);
 
             return false;
          });
@@ -250,7 +250,7 @@ function createHelpMessages()
    };
    
    // Layer panels
-   opec.gritter._notifications['layerTutorial'] = {
+   gisportal.gritter._notifications['layerTutorial'] = {
       title: function() {
          return 'Viewing Layers';
       },
@@ -269,9 +269,9 @@ function createHelpMessages()
          });
          
          $('#wtHelp-next').click(function(e) {
-            var params = {uid: opec.gritter.tutUID};
-            opec.gritter.hideNotification(params);
-            opec.gritter.tutUID = opec.gritter.showNotification('dateTutorial', null);
+            var params = {uid: gisportal.gritter.tutUID};
+            gisportal.gritter.hideNotification(params);
+            gisportal.gritter.tutUID = gisportal.gritter.showNotification('dateTutorial', null);
 
             return false;
          });
@@ -280,7 +280,7 @@ function createHelpMessages()
    };
    
    // Date Tutorial
-   opec.gritter._notifications['dateTutorial'] = {
+   gisportal.gritter._notifications['dateTutorial'] = {
       title: function() {
          return 'Selecting Dates';
       },
@@ -293,9 +293,9 @@ function createHelpMessages()
       },
       afterOpen: function() {
          $('#dtNext').click(function(e) {
-            var params = {uid: opec.gritter.tutUID};
-            opec.gritter.hideNotification(params);
-            opec.gritter.tutUID = opec.gritter.showNotification('tbdTutorial', null);
+            var params = {uid: gisportal.gritter.tutUID};
+            gisportal.gritter.hideNotification(params);
+            gisportal.gritter.tutUID = gisportal.gritter.showNotification('tbdTutorial', null);
 
             return false;
          });
@@ -309,20 +309,20 @@ function createHelpMessages()
    };
 
    // To be Continued
-   opec.gritter._notifications['tbdTutorial'] = {
+   gisportal.gritter._notifications['tbdTutorial'] = {
       title: function() {
          return 'To Be Continued';
       },
       text: function() {
          return 'Be sure to provide any feedback about these tutorials ' +
-         '<a id="give-some-feedback" href="http://trac.marineopec.eu/wiki" target="_blank">here</a>. ' +
+         '<a id="give-some-feedback" href="http://trac.marinegisportal.eu/wiki" target="_blank">here</a>. ' +
          'Are they useful? Easy to follow? Too long? Too short?';
       },
       max: 1
    };
 
    // No date selected on date picker
-   opec.gritter._notifications['noDate'] = {
+   gisportal.gritter._notifications['noDate'] = {
       title: function() {
          return 'You need to select a date';
       },
@@ -343,7 +343,7 @@ function createHelpMessages()
    };
 
    // The selected date is not supported by this layer
-   opec.gritter._notifications['dateNotInRange'] = {
+   gisportal.gritter._notifications['dateNotInRange'] = {
       title: function() {
          return 'Select another date';
       },
@@ -357,7 +357,7 @@ function createHelpMessages()
    };
    
    // Layer Selector Tutorial
-   opec.gritter._notifications['layerSelector'] = {
+   gisportal.gritter._notifications['layerSelector'] = {
       title: function() {
          return 'Layer Selection Tutorial';
       },
@@ -373,7 +373,7 @@ function createHelpMessages()
       },
       afterOpen: function(data) {
          $('#help-availableLayers').click(function() {
-            $('#opec-layerSelection .opec-selectable').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+            $('#gisportal-layerSelection .gisportal-selectable').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
             return false;
          });
          
@@ -390,7 +390,7 @@ function createHelpMessages()
    };
   
    // History Tutorial
-   opec.gritter._notifications['history'] = {
+   gisportal.gritter._notifications['history'] = {
       title: function() {
          return 'History Tutorial';
       },
@@ -400,7 +400,7 @@ function createHelpMessages()
    };
    
    // Graph Creator Tutorial
-   opec.gritter._notifications['graphCreatorTutorial'] = {
+   gisportal.gritter._notifications['graphCreatorTutorial'] = {
       title: function() {
          return 'Lets Create A Graph!';
       },
@@ -415,7 +415,7 @@ function createHelpMessages()
    };
    
    // Scalebar Tutorial
-   opec.gritter._notifications['scalebarTutorial'] = {
+   gisportal.gritter._notifications['scalebarTutorial'] = {
       title: function() {
          return 'Scalebar Tutorial';
       },
@@ -428,7 +428,7 @@ function createHelpMessages()
    };
    
    // Bounding box selection for graphs
-   opec.gritter._notifications['bbox'] = {
+   gisportal.gritter._notifications['bbox'] = {
       title: function(){
          return 'Select a bounding box';         
       },
@@ -445,7 +445,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['badRequestHelp'] = {
+   gisportal.gritter._notifications['badRequestHelp'] = {
       title: function() {
          return 'Dealing With Bad Requests';
       },
@@ -462,7 +462,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['3DTutorial'] = {
+   gisportal.gritter._notifications['3DTutorial'] = {
       title: function() {
          return 'Welcome to 3D mode!';
       },
@@ -474,14 +474,14 @@ function createHelpMessages()
       },
       afterOpen: function(data) {
          $('#tDT-Not-Working').click(function() {
-            opec.gritter.showNotification('3DNotWorking', null);
+            gisportal.gritter.showNotification('3DNotWorking', null);
             return false;
          });
       },
       max: 1
    };
    
-   opec.gritter._notifications['3DNotWorking'] = {
+   gisportal.gritter._notifications['3DNotWorking'] = {
       title: function() {
          return 'Try this...';
       },
@@ -491,7 +491,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['error400'] = {
+   gisportal.gritter._notifications['error400'] = {
       title: function() {
          return 'Sorry what was that? Could you say that again?';         
       },
@@ -506,14 +506,14 @@ function createHelpMessages()
       },
       afterOpen: function(data) {
          $('#error400-next').click(function(e) {
-            opec.gritter.showNotification('badRequestHelp', null);
+            gisportal.gritter.showNotification('badRequestHelp', null);
             return false;
          });
       },
       max: 1
    };
    
-   opec.gritter._notifications['error500'] = {
+   gisportal.gritter._notifications['error500'] = {
       title: function() {
          return 'We\'re Sorry...Something Went Wrong';         
       },
@@ -527,7 +527,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['error502'] = {
+   gisportal.gritter._notifications['error502'] = {
       title: function() {
          return 'Well That Wasn\'t Supposed To Happen';
       },
@@ -541,7 +541,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['errorParserError'] = {
+   gisportal.gritter._notifications['errorParserError'] = {
       title: function() {
          return 'Parse Error: Unexpected character';         
       },
@@ -553,7 +553,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['dataNotSelected'] = {
+   gisportal.gritter._notifications['dataNotSelected'] = {
       title: function() {
          return 'No Data Selected';         
       },
@@ -563,7 +563,7 @@ function createHelpMessages()
       max: 1
    };
    
-   opec.gritter._notifications['graphError'] = {
+   gisportal.gritter._notifications['graphError'] = {
       title: function() {
          return 'Sorry, we failed to create a graph';
       },
@@ -573,7 +573,7 @@ function createHelpMessages()
       }
    };
 
-   opec.gritter._notifications['graphData'] = {
+   gisportal.gritter._notifications['graphData'] = {
       title: function() {
          return 'Sorry, that is too much data';
       },

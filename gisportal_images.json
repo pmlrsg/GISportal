@@ -1,0 +1,7 @@
+{
+   "id": "gisportal",
+   "folders": [
+      { "from" : "html/js-libs/jquery-ui/css/black-tie/images/", "to" : "html/css/images/"},
+      { "from" : "html/js-libs/jquery-gritter/images/", "to" : "html/images/"}
+   ]
+}

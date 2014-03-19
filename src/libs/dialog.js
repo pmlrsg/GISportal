@@ -39,7 +39,7 @@
       minWidth : true
    };
 
-   $.widget("opec.extendedDialog", {
+   $.widget("gisportal.extendedDialog", {
       version : "1.10.1",
       options : {
          appendTo : "body",
@@ -1275,7 +1275,7 @@
    if ($.uiBackCompat !== false) {
       // position option with array notation
       // just override with old implementation
-      $.widget("opec.extendedDialog", $.opec.extendedDialog, {
+      $.widget("gisportal.extendedDialog", $.gisportal.extendedDialog, {
          _position : function() {
             var position = this.options.position, myAt = [], offset = [0, 0], isVisible;
 

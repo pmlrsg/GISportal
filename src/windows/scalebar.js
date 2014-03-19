@@ -2,14 +2,14 @@
  * Opens a jQuery UI dialog which display a scalebar image fetched from the 
  * server and adds a jQuery UI slider along with two input boxes.
  */
-opec.window.createScalebar = function($trigger) {
+gisportal.window.createScalebar = function($trigger) {
    // Get the selected layer
    var layer;
    if (typeof $trigger === 'object')  {
-      layer = opec.getLayerByID($trigger.attr('id'));
+      layer = gisportal.getLayerByID($trigger.attr('id'));
    }
    else  {
-      layer = opec.getLayerByID($trigger);
+      layer = gisportal.getLayerByID($trigger);
    }   
    var scalebarDetails = getScalebarDetails(layer);
 
@@ -24,7 +24,7 @@ opec.window.createScalebar = function($trigger) {
    };
 
    // Add the html to the document using a template
-   $(document.body).append(opec.templates.scalebarWindow(data));
+   $(document.body).append(gisportal.templates.scalebarWindow(data));
    
    if(typeof layer.minScaleVal !== 'undefined' && typeof layer.maxScaleVal !== 'undefined') {
       $('#' + layer.id + '-max').val(layer.maxScaleVal);
@@ -53,7 +53,7 @@ opec.window.createScalebar = function($trigger) {
          $(this).trigger("resize");
       },
       help : function(e, dlg) {
-         opec.gritter.showNotification('scalebarTutorial', null);
+         gisportal.gritter.showNotification('scalebarTutorial', null);
       }
    });
    
@@ -75,7 +75,7 @@ opec.window.createScalebar = function($trigger) {
    
    // Event to automatically set the scale if the "Auto Scale" button is pressed
    $('#' + layer.id + '-auto').on('click', '[type="button"]', function(e) {     
-   	opec.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(opec.getTopLayer().wmsURL + 'item=minmax&layers=' + opec.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=' + (opec.getTopLayer().selectedElevation || -1) + '&time='+ new Date(opec.getTopLayer().selectedDateTime).toISOString() + '&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
+   	gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(gisportal.getTopLayer().wmsURL + 'item=minmax&layers=' + gisportal.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=' + (gisportal.getTopLayer().selectedElevation || -1) + '&time='+ new Date(gisportal.getTopLayer().selectedDateTime).toISOString() + '&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
    		validateScale(layer, d.min, d.max, true);
    	}, null, 'json', {});                          
       

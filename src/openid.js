@@ -2,42 +2,42 @@
  * Openid
  * @namespace 
  */
-opec.openid = {};
+gisportal.openid = {};
 
-opec.openid.setup = function(containerID) {
-   opec.openid.loginBox = containerID;
-   opec.openid.$loginBox = $('#' + containerID);
-   opec.openid.darkCoverID = 'darkCover';
+gisportal.openid.setup = function(containerID) {
+   gisportal.openid.loginBox = containerID;
+   gisportal.openid.$loginBox = $('#' + containerID);
+   gisportal.openid.darkCoverID = 'darkCover';
   
-   opec.openid.logoutLocation = '/service/logout'; 
-   opec.openid.popupWindow = null;
+   gisportal.openid.logoutLocation = '/service/logout'; 
+   gisportal.openid.popupWindow = null;
    
-   opec.openid.loginForm = 'opec-openid-form'; // Set id for login form
-   opec.openid.$loginForm = $('#' + opec.openid.loginForm);
+   gisportal.openid.loginForm = 'gisportal-openid-form'; // Set id for login form
+   gisportal.openid.$loginForm = $('#' + gisportal.openid.loginForm);
 
-   opec.openid.saveButton = 'opec-openid-getlink';
-   opec.openid.$saveButton = $('#' + opec.openid.saveButton);
+   gisportal.openid.saveButton = 'gisportal-openid-getlink';
+   gisportal.openid.$saveButton = $('#' + gisportal.openid.saveButton);
  
-   opec.openid.logoutButton = 'opec-openid-logout';
-   opec.openid.$logoutButton = $('#' + opec.openid.logoutButton);
+   gisportal.openid.logoutButton = 'gisportal-openid-logout';
+   gisportal.openid.$logoutButton = $('#' + gisportal.openid.logoutButton);
 
-   opec.openid.content = 'opec-openid-content';
-   opec.openid.$content = $('#' + opec.openid.content);
+   gisportal.openid.content = 'gisportal-openid-content';
+   gisportal.openid.$content = $('#' + gisportal.openid.content);
 
-   opec.openid.onOpenHandler = function() {
-      opec.openid.darkscreen(opec.openid.darkCoverID);
+   gisportal.openid.onOpenHandler = function() {
+      gisportal.openid.darkscreen(gisportal.openid.darkCoverID);
    };
    
-   opec.openid.onCloseHandler = function() {
-      if (opec.openid.loggedIn === true)  {
-         opec.openid.hideLogin();
+   gisportal.openid.onCloseHandler = function() {
+      if (gisportal.openid.loggedIn === true)  {
+         gisportal.openid.hideLogin();
       }
       else  {
          console.log('User did not log in');
       }
    };
    
-   opec.openid.darkCoverStyle = [
+   gisportal.openid.darkCoverStyle = [
       'position: absolute;',
       'top: 0px;',
       'left: 0px;',
@@ -51,15 +51,15 @@ opec.openid.setup = function(containerID) {
       'width: 100%;',
       'height: 100%;'
    ].join(' ');
-   opec.openid.interval = null;
+   gisportal.openid.interval = null;
    
    
    var data = {
-      id: opec.openid.loginForm,
-      providers: opec.openid.providers,
+      id: gisportal.openid.loginForm,
+      providers: gisportal.openid.providers,
       provider: function() {
          return function(text, render) {
-            return render(opec.templates.providerBox({
+            return render(gisportal.templates.providerBox({
                name: this.name, 
                title: this.title, 
                url: this.url, 
@@ -73,77 +73,77 @@ opec.openid.setup = function(containerID) {
       }
    };
    
-   opec.openid.$loginBox.append(opec.templates.loginBox(data)); 
+   gisportal.openid.$loginBox.append(gisportal.templates.loginBox(data)); 
  
-   $('#' + opec.openid.loginForm + ' .opec-login-with-google').click(function() {
+   $('#' + gisportal.openid.loginForm + ' .gisportal-login-with-google').click(function() {
       var $this = $(this);     
-      opec.openid.openPopup($this.attr('data-url'));  
+      gisportal.openid.openPopup($this.attr('data-url'));  
    });
    
-   $('#' + opec.openid.loginForm + ' .opec-login-with-yahoo').click(function() {
+   $('#' + gisportal.openid.loginForm + ' .gisportal-login-with-yahoo').click(function() {
       var $this = $(this);     
-      opec.openid.openPopup($this.attr('data-url'));
+      gisportal.openid.openPopup($this.attr('data-url'));
    })
    
 
-   opec.openid.$saveButton.click(function() {
-      opec.openid.getLink();
+   gisportal.openid.$saveButton.click(function() {
+      gisportal.openid.getLink();
    });
 
-   opec.openid.$logoutButton.click(function()  {
-      opec.openid.logout();
+   gisportal.openid.$logoutButton.click(function()  {
+      gisportal.openid.logout();
    });
 
 };
 
 // getLink to state
-opec.openid.getLink = function()  {
-   opec.genericAsync('POST', opec.stateLocation, { state: JSON.stringify(opec.getState())}, function(data, opts) { 
+gisportal.openid.getLink = function()  {
+   gisportal.genericAsync('POST', gisportal.stateLocation, { state: JSON.stringify(gisportal.getState())}, function(data, opts) { 
       if (data['output']['url']) {
          console.log(data['output']);
-         $('#opec-openid-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+         $('#gisportal-openid-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
       }
    }, 
    function(request, errorType, exception) {
       console.log(request, errorType, exception);
-      if (exception === 'UNAUTHORIZED') opec.openid.showLogin();
+      if (exception === 'UNAUTHORIZED') gisportal.openid.showLogin();
    }, 'json', {});
 };
 
-opec.openid.logout = function() { opec.genericAsync('GET', opec.openid.logoutLocation, null, function(data, opts) {
+gisportal.openid.logout = function() { gisportal.genericAsync('GET', gisportal.openid.logoutLocation, null, function(data, opts) {
       console.log(data); 
       if (data == '200')  {
-         opec.openid.loggedIn = false;
-         opec.openid.showLogin();
+         gisportal.openid.loggedIn = false;
+         gisportal.openid.showLogin();
       }
    }, 
    function(request, errorType, exception) {
       console.log(request, errorType, exception);
-      if (exception === 'UNAUTHORIZED') opec.openid.showLogin();
+      if (exception === 'UNAUTHORIZED') gisportal.openid.showLogin();
    }, 'json', {});
 };
 
 
 
-opec.openid.openPopup = function(urlToOpen) {
+gisportal.openid.openPopup = function(urlToOpen) {
    var windowWidth = '870px';
    var windowHeight = '600px';
       
-   var dataObject = opec.utils.openPopup(windowWidth, windowHeight, urlToOpen, opec.openid.onOpenHandler, opec.openid.waitForPopupClose);  
-    opec.openid.popupWindow = dataObject.popupWindow;
-   opec.openid.interval = dataObject.interval;
+   var dataObject = gisportal.utils.openPopup(windowWidth, windowHeight, urlToOpen, gisportal.openid.onOpenHandler, gisportal.openid.waitForPopupClose);  
+    gisportal.openid.popupWindow = dataObject.popupWindow;
+   gisportal.openid.interval = dataObject.interval;
 };
 
-opec.openid.showLogin = function() {
-   $('#' + opec.openid.loginForm).show();
-   opec.openid.$content.hide();
-   opec.logout();
+gisportal.openid.showLogin = function() {
+   $('#' + gisportal.openid.loginForm).show();
+   gisportal.openid.$content.hide();
+   gisportal.logout();
 };
 
-opec.openid.hideLogin = function() {
-   $('#' + opec.openid.loginForm).hide();
-   opec.openid.$content.show();
-   opec.login();
+gisportal.openid.hideLogin = function() {
+   $('#' + gisportal.openid.loginForm).hide();
+   gisportal.openid.$content.show();
+   gisportal.login();
 };
 
 //======== POPUP MANAGEMENT ========//
@@ -152,11 +152,11 @@ opec.openid.hideLogin = function() {
  *    Apache 2.0 License
  */
 
-opec.openid.darkscreen = function(darkCover) {
+gisportal.openid.darkscreen = function(darkCover) {
    var darkCoverDiv = $('#' + darkCover);
    if(darkCoverDiv.length === 0) {
       darkCoverDiv = $('<div></div>')
-         .attr('style', opec.openid.darkCoverStyle)
+         .attr('style', gisportal.openid.darkCoverStyle)
          .attr('id', darkCover);
       $(document.body).append(darkCoverDiv);
       
@@ -166,32 +166,32 @@ opec.openid.darkscreen = function(darkCover) {
 
 // Check to perform at each execution of the timed loop. It also triggers
 // the action that follows the closing of the popup
-opec.openid.waitForPopupClose = function() {
-   if (opec.openid.isPopupClosed()) {
-      opec.openid.popupWindow = null;
-      var darkCover = $('#' + opec.openid.darkCoverID);
+gisportal.openid.waitForPopupClose = function() {
+   if (gisportal.openid.isPopupClosed()) {
+      gisportal.openid.popupWindow = null;
+      var darkCover = $('#' + gisportal.openid.darkCoverID);
       if (darkCover.length !== 0) {
          darkCover.hide();
       }
-      if (opec.openid.onCloseHandler !== null) {
-         opec.openid.onCloseHandler();
+      if (gisportal.openid.onCloseHandler !== null) {
+         gisportal.openid.onCloseHandler();
       }
-      if (opec.openid.interval !== null) {
-         window.clearInterval(opec.openid.interval);
-         opec.openid.interval = null;
+      if (gisportal.openid.interval !== null) {
+         window.clearInterval(gisportal.openid.interval);
+         gisportal.openid.interval = null;
       }
       
    }
 };
 
 // Tests that the popup window has closed
-opec.openid.isPopupClosed = function() {
-   return (!opec.openid.popupWindow || opec.openid.popupWindow.closed);
+gisportal.openid.isPopupClosed = function() {
+   return (!gisportal.openid.popupWindow || gisportal.openid.popupWindow.closed);
 };
 
 //======== ENDOF POPUP MANAGEMENT ========//
 
-opec.openid.providers = [
+gisportal.openid.providers = [
    {name: 'google', title:'login with Google', url:'/service/login/google', imagePath:'img/Red-signin_Long_base_20dp.png', x:'0', y:'0', width:'147px', height:'30px'},
    {name: 'yahoo', title:'login with Yahoo', url:'/service/login/yahoo', imagePath:'img/yahoo_signin_btn.png', x:'0', y:'0', width:'161px', height:'22px'}
    //{name: 'myOpenID', title:'login with myOpenID', url:'/service/login/myopenid', imagePath:'0', x:'0', y:'0'},

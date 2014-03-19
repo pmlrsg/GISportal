@@ -8,7 +8,7 @@
  */
 
 /**
- * Creates an opec.MicroLayer Object (layers in the selector but not yet map 
+ * Creates an gisportal.MicroLayer Object (layers in the selector but not yet map 
  * layers)
  * 
  * @constructor
@@ -16,7 +16,7 @@
  * @param {string} title - The title of the layer
  * @param {string} productAbstract - The abstract information for the layer
  */
-opec.MicroLayer = function(name, title, productAbstract, type, opts) {
+gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
       
    this.id = name;      
    this.origName = name.replace("/","-");
@@ -74,7 +74,7 @@ opec.MicroLayer = function(name, title, productAbstract, type, opts) {
  * 
  * @param {Object} microlayer - The microlayer to use as a basis for the layer.
  */
-opec.layer = function(microlayer, layerData) {
+gisportal.layer = function(microlayer, layerData) {
    
    // Check the microlayer we got is valid.
    if (typeof microlayer === 'undefined' || microlayer == 'null') {
@@ -214,8 +214,8 @@ opec.layer = function(microlayer, layerData) {
             layer.temporal = true;
             var datetimes = dimension.Value.split(',');           
             layer.DTCache = datetimes;
-            layer.firstDate = opec.utils.displayDateString(datetimes[0]);
-            layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1]);
+            layer.firstDate = gisportal.utils.displayDateString(datetimes[0]);
+            layer.lastDate = gisportal.utils.displayDateString(datetimes[datetimes.length - 1]);
          
          // Elevation dimension   
          } else if (value.Name.toLowerCase() == 'elevation') {
@@ -279,19 +279,19 @@ opec.layer = function(microlayer, layerData) {
       if(layer.temporal) {
          layer.selectDateTimeLayer($('#viewDate').datepicker('getDate'));
          
-         delete opec.nonSelectedLayers[layer.id];
-         opec.selectedLayers[layer.id] = layer;
+         delete gisportal.nonSelectedLayers[layer.id];
+         gisportal.selectedLayers[layer.id] = layer;
          
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-         opec.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
+         gisportal.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
         			
          // Update map date cache now a new temporal layer has been added
-         opec.refreshDateCache();
+         gisportal.refreshDateCache();
          $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
 
-         opec.zoomOverall();
+         gisportal.zoomOverall();
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
@@ -304,22 +304,22 @@ opec.layer = function(microlayer, layerData) {
       var layer = this;
       if (layer.origMinScaleVal !== null)  {
 
-         if (opec.cache.state && opec.cache.state.map && opec.cache.state.map.layers && opec.cache.state.map.layers[layer.id])   {
-            this.scalebarOpen = opec.cache.state.map.layers[layer.id].scalebarOpen;
+         if (gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[layer.id])   {
+            this.scalebarOpen = gisportal.cache.state.map.layers[layer.id].scalebarOpen;
          }
 
          // If false, do not open
          if (this.scalebarOpen !== 'false')
          { 
-            opec.window.createScalebar(layer.id);  
+            gisportal.window.createScalebar(layer.id);  
          }
          
          if (this.scalebarOpen !== null) {
             this.scalebarOpen = null;
          }
          
-         if (opec.cache.state && opec.cache.state.map && opec.cache.state.map.layers && opec.cache.state.map.layers[layer.id])   {
-            opec.cache.state.map.layers[layer.id].scalebarOpen = this.scalebarOpen;
+         if (gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[layer.id])   {
+            gisportal.cache.state.map.layers[layer.id].scalebarOpen = this.scalebarOpen;
          }
       }
    }
@@ -330,14 +330,14 @@ opec.layer = function(microlayer, layerData) {
 		layer.selected = false;
 		layer.setVisibility(false);
 		layer.checkLayerState();
-      delete opec.selectedLayers[layer.id];
+      delete gisportal.selectedLayers[layer.id];
 		if (layer.temporal) {
-			if (opec.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
-				opec.timeline.removeTimeBarByName(layer.name);
+			if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
+				gisportal.timeline.removeTimeBarByName(layer.name);
 			}
 			
-			opec.refreshDateCache();
-		   opec.zoomOverall();
+			gisportal.refreshDateCache();
+		   gisportal.zoomOverall();
       }
 	};
    
@@ -389,7 +389,7 @@ opec.layer = function(microlayer, layerData) {
       var layer = this;
       
       if(date) {
-         var uidate = opec.utils.ISODateString(date);
+         var uidate = gisportal.utils.ISODateString(date);
          var matchedDate = layer.matchDate(uidate);
          if(matchedDate) {
             layer.currentDateTimes = matchedDate;
@@ -404,7 +404,7 @@ opec.layer = function(microlayer, layerData) {
                } else {
                   if($.isFunction(layer.openlayers[keys[i]].removeAllFeatures)) {
                      layer.openlayers[keys[i]].removeAllFeatures();
-                     opec.getFeature(layer, layer.openlayers[keys[i]], layer.selectedDateTime);   
+                     gisportal.getFeature(layer, layer.openlayers[keys[i]], layer.selectedDateTime);   
                   }
                }
             } 
@@ -487,7 +487,7 @@ opec.layer = function(microlayer, layerData) {
          if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
             // GML or KML
             layer = new OpenLayers.Layer.Vector(self.name, {
-               projection: opec.lonlat,
+               projection: gisportal.lonlat,
                strategies: [new OpenLayers.Strategy.Fixed()],    
                protocol: new OpenLayers.Protocol.HTTP({
                   url: self.wfsURL,
@@ -502,7 +502,7 @@ opec.layer = function(microlayer, layerData) {
 
             // Vector      
             layer = new OpenLayers.Layer.Vector(this.name, {
-               projection: opec.lonlat,
+               projection: gisportal.lonlat,
                styleMap: self.style,
                eventListeners: {
                   'featureselected': function(event) {
@@ -534,14 +534,14 @@ opec.layer = function(microlayer, layerData) {
             });
             layer.controlID = 'refLayers';
             
-            var selector = opec.mapControls.selector;
+            var selector = gisportal.mapControls.selector;
             var layers = selector.layers;
    
             if (typeof layers === 'undefined' || layers === null)
                layers = [];
    
             layers.push(layer);     
-            opec.mapControls.selector.setLayer(layers);
+            gisportal.mapControls.selector.setLayer(layers);
             
             if (typeof self.times !== 'undefined' && self.times && self.times.length) {
                self.temporal = true;
@@ -554,8 +554,8 @@ opec.layer = function(microlayer, layerData) {
                }
                self.DTCache = times;
                self.WFSDatesToIDs = dateToIDLookup;
-               //layer.firstDate = opec.utils.displayDateString(datetimes[0].startdate);
-               //layer.lastDate = opec.utils.displayDateString(datetimes[datetimes.length - 1].startdate);
+               //layer.firstDate = gisportal.utils.displayDateString(datetimes[0].startdate);
+               //layer.lastDate = gisportal.utils.displayDateString(datetimes[datetimes.length - 1].startdate);
             }
          }
       }
@@ -589,15 +589,15 @@ opec.layer = function(microlayer, layerData) {
       
       // Add the layer to the map
       map.addLayer(layer);
-      //map.setLayerIndex(layer, opec.numBaseLayers + opec.numOpLayers);
+      //map.setLayerIndex(layer, gisportal.numBaseLayers + gisportal.numOpLayers);
       
       // TODO: be able to deal with all layer types.
       if(this.controlID == 'opLayers') {
          //map.events.register("click", layer, getFeatureInfo);
          // Increase the count of OpLayers
-         opec.numOpLayers++;
+         gisportal.numOpLayers++;
       } else if (this.controlID == 'refLayers') {
-         opec.numRefLayers++;
+         gisportal.numRefLayers++;
       }
 
    };
@@ -609,7 +609,7 @@ opec.layer = function(microlayer, layerData) {
       // Remove layer from the order array.
       for(var i = 0, len = this.order.length; i < len; i++) {
          if(id === this.order[i]) {
-            opec.utils.arrayRemove(this.order, i, i);
+            gisportal.utils.arrayRemove(this.order, i, i);
          }
       }
 
@@ -617,9 +617,9 @@ opec.layer = function(microlayer, layerData) {
       if(this.controlID == 'opLayers') {
          //map.events.unregister("click", layer, getFeatureInfo);
          // Decrease the count of OpLayers
-         opec.numOpLayers--;
+         gisportal.numOpLayers--;
       } else if(this.controlID == 'refLayers') {
-         opec.numRefLayers--;
+         gisportal.numRefLayers--;
       }
 
    };
@@ -666,15 +666,15 @@ opec.layer = function(microlayer, layerData) {
    //--------------------------------------------------------------------------
    
    // Store new layer.
-   opec.layers[this.id] = this;
-   opec.nonSelectedLayers[this.id] = this;
+   gisportal.layers[this.id] = this;
+   gisportal.nonSelectedLayers[this.id] = this;
    
 };
 
-opec.addLayer = function(layer, options) {
+gisportal.addLayer = function(layer, options) {
    var options = options || {};   
-   //delete opec.nonSelectedLayers[layer.id];
-   //opec.selectedLayers[layer.id] = layer;
+   //delete gisportal.nonSelectedLayers[layer.id];
+   //gisportal.selectedLayers[layer.id] = layer;
    
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
@@ -686,21 +686,21 @@ opec.addLayer = function(layer, options) {
   
    if(layer.controlID == 'opLayers') {
       // Add the layer to the panel
-      opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-operational')));
+      gisportal.leftPanel.addLayerToGroup(layer, gisportal.leftPanel.getFirstGroupFromPanel($('#gisportal-lPanel-operational')));
    } else if (layer.controlID == 'refLayers') {
-      opec.leftPanel.addLayerToGroup(layer, opec.leftPanel.getFirstGroupFromPanel($('#opec-lPanel-reference')));
+      gisportal.leftPanel.addLayerToGroup(layer, gisportal.leftPanel.getFirstGroupFromPanel($('#gisportal-lPanel-reference')));
    }
   
    if (options.minScaleVal || options.maxScaleVal)  {   
-      if (options.minScaleVal !== null) opec.layers[layer.id].minScaleVal = options.minScaleVal; 
-      if (options.maxScaleVal !== null) opec.layers[layer.id].maxScaleVal = options.maxScaleVal;
-      layer.minScaleVal = opec.layers[layer.id].minScaleVal;
-      layer.maxScaleVal = opec.layers[layer.id].maxScaleVal;
+      if (options.minScaleVal !== null) gisportal.layers[layer.id].minScaleVal = options.minScaleVal; 
+      if (options.maxScaleVal !== null) gisportal.layers[layer.id].maxScaleVal = options.maxScaleVal;
+      layer.minScaleVal = gisportal.layers[layer.id].minScaleVal;
+      layer.maxScaleVal = gisportal.layers[layer.id].maxScaleVal;
       updateScalebar(layer);
    }
    
    // TODO: Too tightly coupled
-   opec.leftPanel.open();
+   gisportal.leftPanel.open();
    layer.select();
    $('input[name="' + layer.id + '"]').prop('checked', true);
    
@@ -709,23 +709,23 @@ opec.addLayer = function(layer, options) {
    layer.$layer.find('img[src="img/exclamation_small.png"]').hide();  
 };
 
-opec.removeLayer = function(layer) {
-   //var layer = opec.getLayerByID(id);
+gisportal.removeLayer = function(layer) {
+   //var layer = gisportal.getLayerByID(id);
    
    // Remove the layer from the panel
-   opec.leftPanel.removeLayerFromGroup(layer);
+   gisportal.leftPanel.removeLayerFromGroup(layer);
    
-   delete opec.selectedLayers[layer.id];
-   delete opec.layers[layer.id];
+   delete gisportal.selectedLayers[layer.id];
+   delete gisportal.layers[layer.id];
     
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
-   opec.rightPanel.updateCoverageList();
+   gisportal.rightPanel.updateCoverageList();
 };
 
-opec.setLayerIndex = function(layer, index) {
+gisportal.setLayerIndex = function(layer, index) {
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       map.setLayerIndex(layer.openlayers[keys[i]], index);
@@ -740,8 +740,8 @@ opec.setLayerIndex = function(layer, index) {
  * @param {Object} inst - The instance of the jQuery UI DatePicker view date control
  *
  */
-opec.filterLayersByDate = function(date) {
-   $.each(opec.selectedLayers, function(index, layer) {
+gisportal.filterLayersByDate = function(date) {
+   $.each(gisportal.selectedLayers, function(index, layer) {
       // Only filter date-dependent layers
       if (layer.temporal) {
          layer.selectDateTimeLayer(date);
@@ -756,7 +756,7 @@ opec.filterLayersByDate = function(date) {
  * @param {string} microLayer - The microLayer for the layer to be downloaded
  * @param {object} options - Any extra options for the layer
  */
-opec.getLayerData = function(fileName, microlayer, options) {  
+gisportal.getLayerData = function(fileName, microlayer, options) {  
   var options = options || {}; 
    $.ajax({
       type: 'GET',
@@ -767,18 +767,18 @@ opec.getLayerData = function(fileName, microlayer, options) {
       success: function(data) {
          // Convert the microlayer. 
          // COMMENT: might change the way this works in future.
-         var layer = new opec.layer(microlayer, data);        
+         var layer = new gisportal.layer(microlayer, data);        
          
          if (layer.selected === true) { // Presume from state
          
             // If the layer was loaded as part of a state load set some of the 
             // values of the layer to the cached versions.
-            opec.checkIfLayerFromState(layer);
+            gisportal.checkIfLayerFromState(layer);
 
          } 
          else {
             console.log("Adding layer..."); // DEBUG
-            opec.addLayer(layer, options);    
+            gisportal.addLayer(layer, options);    
             console.log("Added Layer"); // DEBUG
          }
 

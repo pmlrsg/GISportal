@@ -53,7 +53,7 @@
  * @param {string}   id       The DOM element id in which the timeline will be created.
  * @param {Object}   options  Timeline options in JSON format
  */
-opec.TimeLine = function(id, options) {
+gisportal.TimeLine = function(id, options) {
    
    // Use "self" to refer to this instance of the OPEC.TimeLine object
    var self = this;
@@ -161,7 +161,7 @@ opec.TimeLine = function(id, options) {
       $('#viewDate').datepicker('setDate', self.selectedDate);
       
       // Filter the layer data to the selected date      
-      opec.filterLayersByDate(self.selectedDate);
+      gisportal.filterLayersByDate(self.selectedDate);
       console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
       $('#viewDate').change();
    };
@@ -214,7 +214,7 @@ opec.TimeLine = function(id, options) {
     * Private method/function which handles the drag event of the selected date marker
     */
    this.dragDate = function() {
-      var self = opec.timeline;
+      var self = gisportal.timeline;
       var x = self.xScale(self.draggedDate) + d3.event.dx;
       
       // Prevent dragging the selector off-scale
@@ -236,7 +236,7 @@ opec.TimeLine = function(id, options) {
       $('#viewDate').datepicker('setDate', self.selectedDate);
       
       // Filter the layer data to the selected date
-      opec.filterLayersByDate(self.selectedDate);
+      gisportal.filterLayersByDate(self.selectedDate);
       console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
    };
 
@@ -283,7 +283,7 @@ opec.TimeLine = function(id, options) {
 };
 
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
-opec.TimeLine.prototype.redraw = function() {
+gisportal.TimeLine.prototype.redraw = function() {
    console.log("redraw");
    
    var self = this;  // Useful for when the scope/meaning of "this" changes
@@ -387,7 +387,7 @@ opec.TimeLine.prototype.redraw = function() {
                else  {
                   selectedEnd = selectedEnd;
                }
-               $(opec).trigger('rangeUpdate.opec', [d]);
+               $(gisportal).trigger('rangeUpdate.gisportal', [d]);
                dragging = null;
                self.redraw();  
             }
@@ -551,7 +551,7 @@ opec.TimeLine.prototype.redraw = function() {
 };
 
 // Re-calculate the dynamic widget height
-opec.TimeLine.prototype.reHeight = function() {
+gisportal.TimeLine.prototype.reHeight = function() {
    this.height = this.laneHeight*(this.timebars.length);
    // If no timebars, we'll need a default height, say 25 pixels
    if (this.height === 0){ this.height = 25; }
@@ -559,13 +559,13 @@ opec.TimeLine.prototype.reHeight = function() {
 };
 
 // Re-calculate the dynamic widget width
-opec.TimeLine.prototype.reWidth = function() {
+gisportal.TimeLine.prototype.reWidth = function() {
    this.chartWidth = $('div#' + this.id).width();
    this.width = this.chartWidth - this.margin.right - this.margin.left;
 };
 
 // Reset the timeline to its original data extents
-opec.TimeLine.prototype.reset = function() {
+gisportal.TimeLine.prototype.reset = function() {
    this.zoom.translate([0, 0]).scale(1);
    this.reHeight();
    this.reWidth();
@@ -573,7 +573,7 @@ opec.TimeLine.prototype.reset = function() {
 };
 
 // Zoom function to a new date range
-opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
+gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    var self = this;
    var minDate = new Date(startDate);
    var maxDate = new Date(endDate);
@@ -588,26 +588,26 @@ opec.TimeLine.prototype.zoomDate = function(startDate, endDate){
 };
 
 // Show the timebar
-opec.TimeLine.prototype.hide = function() {
+gisportal.TimeLine.prototype.hide = function() {
    $('div#' + this.id).animate({bottom: '-' + ($('div#timeline').height() - 2) + 'px'});
    $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
 };
 
 // Hide the timebar
-opec.TimeLine.prototype.show = function() {
+gisportal.TimeLine.prototype.show = function() {
    $('div#' + this.id).animate({bottom: 0 });
    $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-s'} );
 };
 
 // Add a new time bar to the chart in JSON timeBar notation
-opec.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
+gisportal.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
    this.timebars.push(timeBar);
    this.reHeight();
    this.redraw();
 };
 
 // Add a new time bar using detailed parameters
-opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
+gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
    newTimebar.name = name;
    newTimebar.label = label;
@@ -622,12 +622,12 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    this.layerbars.push(newTimebar); 
 
    // TODO: Move asap. tidy up
-   if (Object.keys(opec.layers).length === 1 && (!opec.cache.state || !opec.cache.state.timeline))  {
+   if (Object.keys(gisportal.layers).length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
       this.reHeight();
       // redraw is done in zoom
-      var data = opec.timeline.layerbars[0];
-      opec.timeline.zoomDate(data.startDate, data.endDate);
-      opec.timeline.setDate(data.endDate);
+      var data = gisportal.timeline.layerbars[0];
+      gisportal.timeline.zoomDate(data.startDate, data.endDate);
+      gisportal.timeline.setDate(data.endDate);
       // Already redraws within zoom - this.redraw();
    }  
    
@@ -636,9 +636,9 @@ opec.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, d
    
 };
 
-opec.TimeLine.prototype.addRangeBar = function(name, callback) {
+gisportal.TimeLine.prototype.addRangeBar = function(name, callback) {
    var newRangebar = {};
-   newRangebar.name = opec.utils.uniqueID();
+   newRangebar.name = gisportal.utils.uniqueID();
    newRangebar.label = name;
    newRangebar.callback = callback;
    newRangebar.type = 'range';
@@ -657,7 +657,7 @@ opec.TimeLine.prototype.addRangeBar = function(name, callback) {
 };
 
 // NOTE: There may be problems with duplicated unique IDs
-opec.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
+gisportal.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
    if (rangebar.selectedEnd) rangebar.selectedEnd = new Date(rangebar.selectedEnd);
    if (rangebar.selectedStart) rangebar.selectedStart = new Date(rangebar.selectedStart);
 
@@ -669,7 +669,7 @@ opec.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
 }
 
 // Rename timebar
-opec.TimeLine.prototype.rename = function(name, label)  {
+gisportal.TimeLine.prototype.rename = function(name, label)  {
    this.rangebars.filter(function(d) { return d.name == name; })[0].label = label;   
    this.timebars.filter(function(d) { return d.name == name; })[0].label = label;
    this.reHeight();
@@ -677,7 +677,7 @@ opec.TimeLine.prototype.rename = function(name, label)  {
 }
 
 // Remove a time bar by name (if found)
-opec.TimeLine.prototype.removeTimeBarByName = function(name) {
+gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    var self = this,
    type = "";
    
@@ -709,24 +709,24 @@ opec.TimeLine.prototype.removeTimeBarByName = function(name) {
 };
 
 // Set the currently selected date and animated the transition
-opec.TimeLine.prototype.setDate = function(date) {
+gisportal.TimeLine.prototype.setDate = function(date) {
    var self = this;  // Useful for when the scope/meaning of "this" changes
    var selectedDate = self.draggedDate = new Date(date);
    this.selectedDate = ((selectedDate instanceof Date) ? selectedDate : this.selectedDate);
    // Move the selected date-time line
    this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
    $('#viewDate').datepicker('setDate', self.selectedDate).blur();
-   opec.filterLayersByDate(date);
+   gisportal.filterLayersByDate(date);
    $('#viewDate').change();
 };
 
 // Get the currently selected date 
-opec.TimeLine.prototype.getDate = function() {
+gisportal.TimeLine.prototype.getDate = function() {
    var selectedDate = new Date(this.selectedDate);
    return ((selectedDate instanceof Date) ? selectedDate : null);
 };
 
-opec.TimeLine.prototype.hideRange = function(name)  {
+gisportal.TimeLine.prototype.hideRange = function(name)  {
    var self = this;
    for (var i = 0; i < this.rangebars.length; i++)  {
       var r = this.rangebars[i];
@@ -737,7 +737,7 @@ opec.TimeLine.prototype.hideRange = function(name)  {
    }
 };
  
-opec.TimeLine.prototype.showRange = function(name)  {
+gisportal.TimeLine.prototype.showRange = function(name)  {
    var self = this;
    var tmp = [];
    $.each(this.hiddenRangebars, function(i, r) { 

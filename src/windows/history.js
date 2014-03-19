@@ -3,10 +3,10 @@
  * @param {Object} placeholderID
  * @param {Object} containerID
  */
-opec.window.history = function() {
+gisportal.window.history = function() {
    var self = this;
    
-   $('#opec-historyWindow').extendedDialog({
+   $('#gisportal-historyWindow').extendedDialog({
       position: ['left', 'center'],
       width: 500,
       minWidth:500,
@@ -22,40 +22,40 @@ opec.window.history = function() {
          $(this).trigger("resize");
       },
       help : function(e, dlg) {
-         opec.gritter.showNotification('history', null);
+         gisportal.gritter.showNotification('history', null);
       }
    });
    
    refreshGraphs();
    
-   $('#opec-historyWindow-tabs').buttonset();
-   $('#opec-historyWindow-tab button').button();
-   $('#opec-historyWindow-tabs .opec-tab').click(function(e) { 
+   $('#gisportal-historyWindow-tabs').buttonset();
+   $('#gisportal-historyWindow-tab button').button();
+   $('#gisportal-historyWindow-tabs .gisportal-tab').click(function(e) { 
       var tabToShow = $(this).attr('href');
-      $('#opec-historyWindow-content div').filter(function(i) { 
+      $('#gisportal-historyWindow-content div').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
       }).hide();
       $(tabToShow).show();
    });
    
-   $("#opec-historyWindow-tab-Refresh").click(function() {
+   $("#gisportal-historyWindow-tab-Refresh").click(function() {
       refreshGraphs();
    });
    
    $("#remove-graph").click(function()  {
-      opec.genericAsync(
+      gisportal.genericAsync(
          'POST',
          '/service/graph',
          {},
          function(d) {
-            $('#opec-historyWindow-graphs .opec-historyWindow--scroll li').remove();
-                  $('#opec-historyWindow-graphs .opec-historyWindow--data li').remove();
+            $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll li').remove();
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li').remove();
             $.each(d.output, function(k,v) { 
                   var data = JSON.parse(v.graph);
                   data.id = data.description + v.lastUsed;
                   data.data = JSON.stringify(data.graphData);
-                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll').append(opec.templates.historyList(data));
-                  $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll').append(gisportal.templates.historyList(data));
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data').append(gisportal.templates.historyData(data));
                } 
             );
          },
@@ -67,19 +67,19 @@ opec.window.history = function() {
    
    /* Graphs */
    function refreshGraphs() {
-      opec.genericAsync(
+      gisportal.genericAsync(
          'GET',
          '/service/graph',
          {},
          function(d) {
-            $('#opec-historyWindow-graphs .opec-historyWindow--scroll li').remove();
-                  $('#opec-historyWindow-graphs .opec-historyWindow--data li').remove();
+            $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll li').remove();
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li').remove();
             $.each(d.output, function(k,v) { 
                   var data = JSON.parse(v.graph);
                   data.id = data.description + v.lastUsed;
                   data.data = JSON.stringify(data.graphData);
-                  $('#opec-historyWindow-graphs .opec-historyWindow--scroll ul').append(opec.templates.historyList(data));
-                  $('#opec-historyWindow-graphs .opec-historyWindow--data').append(opec.templates.historyData(data));
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll ul').append(gisportal.templates.historyList(data));
+                  $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data').append(gisportal.templates.historyData(data));
                } 
             );
          },
@@ -89,24 +89,24 @@ opec.window.history = function() {
       );
    }
    
-   $('#opec-historyWindow-graphs .opec-historyWindow--scroll').on('click', 'li', function() {
-      $('.opec-historyWindow--scroll li').removeClass('selected ui-tate-highlight');
+   $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll').on('click', 'li', function() {
+      $('.gisportal-historyWindow--scroll li').removeClass('selected ui-tate-highlight');
       $(this).addClass('selected ui-state-highlight');
-      $('#opec-historyWindow-graphs .opec-historyWindow--data li').addClass('hidden');
-      $('#opec-historyWindow-graphs .opec-historyWindow--data li').filter(function(d, e) {
-         return $(e).data('id') == $('#opec-historyWindow-graphs .opec-historyWindow--scroll li.selected').data('id');
+      $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li').addClass('hidden');
+      $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li').filter(function(d, e) {
+         return $(e).data('id') == $('#gisportal-historyWindow-graphs .gisportal-historyWindow--scroll li.selected').data('id');
       }).removeClass('hidden');
    });
    
-   $('#opec-historyWindow-graphs').on('click', '#load-graph', function() {
+   $('#gisportal-historyWindow-graphs').on('click', '#load-graph', function() {
       /* Open the Analyses Graphing panel */
-      opec.rightPanel.open();
-      $('#opec-button-analyses').click();
-      $('#opec-graphing').show('fast');
+      gisportal.rightPanel.open();
+      $('#gisportal-button-analyses').click();
+      $('#gisportal-graphing').show('fast');
       
       /* Store data from JSON into Graphing panel */
-      var el = $('#opec-historyWindow-graphs .opec-historyWindow--data li:not(".hidden") .json-data');
-      var title = $('#opec-historyWindow-graphs .opec-historyWindow--data li:not(".hidden") p');
+      var el = $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li:not(".hidden") .json-data');
+      var title = $('#gisportal-historyWindow-graphs .gisportal-historyWindow--data li:not(".hidden") p');
       var data = JSON.parse(el.html());
       $('#graphcreator-title').val(title.html());
       $('#graphcreator-baseurl').val(data.baseurl);
@@ -122,9 +122,9 @@ opec.window.history = function() {
    });
    
    /* States */
-   opec.window.history.loadStateHistory = function() {
-      if (opec.openid.loggedIn === true) {
-         opec.genericAsync(
+   gisportal.window.history.loadStateHistory = function() {
+      if (gisportal.openid.loggedIn === true) {
+         gisportal.genericAsync(
             'GET',
             '/service/state',
             {},
@@ -138,8 +138,8 @@ opec.window.history = function() {
                      data.title = data.description; // So that it works with same template as graphs
                      data.data = v.state;
                      console.log(data.data);
-                     $('#opec-historyWindow-states .opec-historyWindow--scroll ul').append(opec.templates.historyList(data));
-                     $('#opec-historyWindow-states .opec-historyWindow--data').append(opec.templates.historyData(data));
+                     $('#gisportal-historyWindow-states .gisportal-historyWindow--scroll ul').append(gisportal.templates.historyList(data));
+                     $('#gisportal-historyWindow-states .gisportal-historyWindow--data').append(gisportal.templates.historyData(data));
                   } 
                );
             },
@@ -150,20 +150,20 @@ opec.window.history = function() {
       }
    }
 
-   $('#opec-historyWindow').on('click', '#opec-historyWindow-loadState', function() {
-      opec.ajaxState($('#opec-historyWindow-states .opec-historyWindow--scroll li.selected').data('id'));
+   $('#gisportal-historyWindow').on('click', '#gisportal-historyWindow-loadState', function() {
+      gisportal.ajaxState($('#gisportal-historyWindow-states .gisportal-historyWindow--scroll li.selected').data('id'));
    });
 
-   $('#opec-historyWindow').on('click', '#opec-historyWindow-reloadState', function()  {
-      window.location = location.origin + location.pathname + '?state=' + $('#opec-historyWindow-states .opec-historyWindow--scroll li.selected').data('id');
+   $('#gisportal-historyWindow').on('click', '#gisportal-historyWindow-reloadState', function()  {
+      window.location = location.origin + location.pathname + '?state=' + $('#gisportal-historyWindow-states .gisportal-historyWindow--scroll li.selected').data('id');
    });
    
-   $('#opec-historyWindow-states .opec-historyWindow--scroll').on('click', 'li', function() {
-      $('.opec-historyWindow--scroll li').removeClass('selected ui-state-highlight');
+   $('#gisportal-historyWindow-states .gisportal-historyWindow--scroll').on('click', 'li', function() {
+      $('.gisportal-historyWindow--scroll li').removeClass('selected ui-state-highlight');
       $(this).addClass('selected ui-state-highlight');
-      $('.opec-historyWindow--data li').addClass('hidden');
-      $('.opec-historyWindow--data li').filter(function(d, e) {
-         return $(e).data('id') == $('.opec-historyWindow--scroll li.selected').data('id');
+      $('.gisportal-historyWindow--data li').addClass('hidden');
+      $('.gisportal-historyWindow--data li').filter(function(d, e) {
+         return $(e).data('id') == $('.gisportal-historyWindow--scroll li.selected').data('id');
       }).removeClass('hidden');
    });
 };

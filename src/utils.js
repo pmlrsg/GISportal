@@ -2,7 +2,7 @@
  * Custom JavaScript functionality
  * @namespace
  */
-opec.utils = {};
+gisportal.utils = {};
 
 /**
  * An extremely handy PHP function ported to JS, works well for templating
@@ -12,7 +12,7 @@ opec.utils = {};
  * @param {string} subject - The string to search
  * @return {string} The resulting string
  */  
-opec.utils.replace = function(search, replace, subject, count) {
+gisportal.utils.replace = function(search, replace, subject, count) {
    var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
       f = [].concat(search),
       r = [].concat(replace),
@@ -47,7 +47,7 @@ opec.utils.replace = function(search, replace, subject, count) {
 /**
  * Extension to JavaScript Arrays to de-duplicate them
  */ 
-opec.utils.arrayDeDupe = function(array) {
+gisportal.utils.arrayDeDupe = function(array) {
    var i,
       len = array.length,
       outArray = [],
@@ -61,7 +61,7 @@ opec.utils.arrayDeDupe = function(array) {
 /** 
  * Array Remove - By John Resig (MIT Licensed)
  */
-opec.utils.arrayRemove = function(array, from, to) {
+gisportal.utils.arrayRemove = function(array, from, to) {
    var rest = array.slice((to || from) + 1 || array.length);
    array.length = from < 0 ? array.length + from : from;
    return array.push.apply(array, rest);
@@ -88,7 +88,7 @@ getNearestInArray = function(arr, goal) {
 /**
  * Turn JavaScript date, d into ISO8601 date part (no time)
  */ 
-opec.utils.ISODateString = function(d) {
+gisportal.utils.ISODateString = function(d) {
    function pad(n){
       return n<10 ? '0'+n : n;
    }
@@ -100,9 +100,9 @@ opec.utils.ISODateString = function(d) {
 /**
  * Returns true if first date is smaller than second
  */ 
-opec.utils.compareDates = function(firstDate, secondDate) { 
-   var firstDate = opec.utils.ISODateString(firstDate);
-   var secondDate = opec.utils.ISODateString(secondDate);
+gisportal.utils.compareDates = function(firstDate, secondDate) { 
+   var firstDate = gisportal.utils.ISODateString(firstDate);
+   var secondDate = gisportal.utils.ISODateString(secondDate);
    if (firstDate < secondDate) return true;
    return false;
 };
@@ -111,7 +111,7 @@ opec.utils.compareDates = function(firstDate, secondDate) {
 /**
  * Format date string so it can be displayed
  */ 
-opec.utils.displayDateString = function(date) {
+gisportal.utils.displayDateString = function(date) {
    var year = date.substring(0, 4);
    var month = date.substring(5, 7);
    var day = date.substring(8, 10);
@@ -128,32 +128,32 @@ function getObjectKey(obj, value) {
    return null;
 }
 
-opec.utils.sortDates = function(a, b) {
+gisportal.utils.sortDates = function(a, b) {
    return a[0] - b[0];
 };
 
-opec.utils.ceil1places = function(num) {
+gisportal.utils.ceil1places = function(num) {
    return Math.ceil(num * 10) / 10;
 };
 
-opec.utils.ceil3places = function(num) {
+gisportal.utils.ceil3places = function(num) {
    return Math.ceil(num * 1000) / 1000;
 };
 
-opec.utils.clamp = function (num, min, max) {
+gisportal.utils.clamp = function (num, min, max) {
    return Math.min(Math.max(num, min), max);
 };
 
-opec.utils.getURLParameter = function(name) {
+gisportal.utils.getURLParameter = function(name) {
    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
 // A function for getting unique identifier, generic function so that it can easily be changed throughout the codebase
-opec.utils.uniqueID = function()  {
+gisportal.utils.uniqueID = function()  {
    return new Date().getTime();
 };
 
-opec.utils.isNullorUndefined = function(object) {
+gisportal.utils.isNullorUndefined = function(object) {
    if(object === null || typeof object === "undefined") {
       return true;
    }
@@ -169,7 +169,7 @@ opec.utils.isNullorUndefined = function(object) {
  * coordinates [width, height] which can be [0, 0] if it was not possible
  * to compute the values.
  */
-opec.utils.getWindowInnerSize = function() {
+gisportal.utils.getWindowInnerSize = function() {
   var width = 0;
   var height = 0;
   var elem = null;
@@ -200,7 +200,7 @@ opec.utils.getWindowInnerSize = function() {
  * Computes the coordinates of the parent window.
  * Gets the coordinates of the parent frame.
  */
-opec.utils.getParentCoords = function() {
+gisportal.utils.getParentCoords = function() {
   var width = 0;
   var height = 0;
   if ('screenLeft' in window) {
@@ -222,9 +222,9 @@ opec.utils.getParentCoords = function() {
  * Computes the coordinates of the new window, so as to center it
  * over the parent frame.
  */
-opec.utils.getCenteredCoords = function(width, height) {
-   var parentSize = opec.utils.getWindowInnerSize();
-   var parentPos = opec.utils.getParentCoords();
+gisportal.utils.getCenteredCoords = function(width, height) {
+   var parentSize = gisportal.utils.getWindowInnerSize();
+   var parentPos = gisportal.utils.getParentCoords();
    var xPos = parentPos[0] +
        Math.max(0, Math.floor((parentSize[0] - width) / 2));
    var yPos = parentPos[1] +
@@ -232,12 +232,12 @@ opec.utils.getCenteredCoords = function(width, height) {
    return [xPos, yPos];
 };
 
-opec.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
+gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
    if(onOpenHandler !== null) {
       onOpenHandler();
    }
    
-   var coordinates = opec.utils.getCenteredCoords(width, height);
+   var coordinates = gisportal.utils.getCenteredCoords(width, height);
    var popupWindow = window.open(url, "", 
       "width=" + width + 
       ", height=" + height + 

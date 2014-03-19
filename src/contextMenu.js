@@ -2,12 +2,12 @@
  * Context Menu
  * @namespace 
  */
-opec.contextMenu = {};
+gisportal.contextMenu = {};
 
 /**
  * Setup the context menu and any custom controls needed in menu items
  */
-opec.contextMenu.setup = function() {
+gisportal.contextMenu.setup = function() {
    /**
     * Create the custom control for the slider.
     */
@@ -24,7 +24,7 @@ opec.contextMenu.setup = function() {
          value: 1,
          step: 0.05,
          change: function(e, ui) {
-            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+            var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.setOpacity($("#" + item.id).slider("value"));
             return true;
          }
@@ -35,7 +35,7 @@ opec.contextMenu.setup = function() {
        * selected layer and set the slider's position to be that value.
        */ 
       root.$menu.on('contextmenu:focus', function() {
-         var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+         var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
          if(typeof layer.opacity === 'undefined' || layer.opacity === null)
             layer.setOpacity(1);
             
@@ -71,7 +71,7 @@ opec.contextMenu.setup = function() {
              * Get the visible selected layer by id so as to avoid selecting one
              * of the other selected layers on other tabs. 
              */
-            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+            var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
             //return layer.elevation ? 'fold3: { name: "Layer Elevation", items: getCurrentElevation($trigger), },' : '';  
             
             // Opacity           
@@ -87,27 +87,27 @@ opec.contextMenu.setup = function() {
             var fold2 = {
               fold2: {
                   name: "Layer Styles", 
-                  items: opec.contextMenu.getCurrentStyles($trigger)
+                  items: gisportal.contextMenu.getCurrentStyles($trigger)
                }
             }; 
             // Elevation
             var fold3 = {
                fold3: {
                   name: "Layer Elevation",
-                  items: opec.contextMenu.getCurrentElevation($trigger)
+                  items: gisportal.contextMenu.getCurrentElevation($trigger)
                }
             };
             var fold4 = {
                sublayers: {
                   name: "Sublayers", 
-                  items: opec.contextMenu.displaySublayers($trigger)
+                  items: gisportal.contextMenu.displaySublayers($trigger)
                } 
             };
             var rest = {
-               showScalebar: opec.contextMenu.showScalebar($trigger),
-               showMetadata: opec.contextMenu.showMetadata($trigger),
-               viewData: opec.contextMenu.viewData($trigger),
-               //heatmap: opec.contextMenu.heatmapTest()
+               showScalebar: gisportal.contextMenu.showScalebar($trigger),
+               showMetadata: gisportal.contextMenu.showMetadata($trigger),
+               viewData: gisportal.contextMenu.viewData($trigger),
+               //heatmap: gisportal.contextMenu.heatmapTest()
             };
             
             if(layer.controlID == 'opLayers') {
@@ -139,7 +139,7 @@ opec.contextMenu.setup = function() {
          e.preventDefault();
          return {
             items: {
-               showMetadata: opec.contextMenu.showMetadata($trigger)
+               showMetadata: gisportal.contextMenu.showMetadata($trigger)
             }
          };                           
       }
@@ -155,17 +155,17 @@ opec.contextMenu.setup = function() {
       build: function($trigger, e) {
          return {
             items: {
-               selectAll: opec.contextMenu.selectAll($trigger),
-               deselectAll: opec.contextMenu.deselectAll($trigger),
-               saveToProfile: opec.contextMenu.saveToProfile(),
-               renameGroup: opec.contextMenu.renameGroup($trigger)
+               selectAll: gisportal.contextMenu.selectAll($trigger),
+               deselectAll: gisportal.contextMenu.deselectAll($trigger),
+               saveToProfile: gisportal.contextMenu.saveToProfile(),
+               renameGroup: gisportal.contextMenu.renameGroup($trigger)
             }
          };
       }
    });
    
    //$.contextMenu({
-      //selector: '.opec-selector-contextMenu',
+      //selector: '.gisportal-selector-contextMenu',
       //build: function($trigger, e) {
          //return {
             //items: {
@@ -176,7 +176,7 @@ opec.contextMenu.setup = function() {
    //});
 };
 
-opec.contextMenu.heatmapTest = function() {
+gisportal.contextMenu.heatmapTest = function() {
    return {
       name: "Test Heatmap",
       callback: function() {
@@ -220,7 +220,7 @@ opec.contextMenu.heatmapTest = function() {
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
  */
-opec.contextMenu.selectAll = function($trigger) {
+gisportal.contextMenu.selectAll = function($trigger) {
    return {
       name: "Select All",
       callback: function() {
@@ -240,7 +240,7 @@ opec.contextMenu.selectAll = function($trigger) {
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
  */
-opec.contextMenu.deselectAll = function($trigger) {
+gisportal.contextMenu.deselectAll = function($trigger) {
    return {
       name: "Deselect All",
       callback: function() {
@@ -258,7 +258,7 @@ opec.contextMenu.deselectAll = function($trigger) {
 /**
  * Saves group in the current condition to the users profile (PlaceHolder)
  */
-opec.contextMenu.saveToProfile = function() {
+gisportal.contextMenu.saveToProfile = function() {
    return {
       name: "Save To Profile",
       callback: function() {        
@@ -271,7 +271,7 @@ opec.contextMenu.saveToProfile = function() {
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
  */
-opec.contextMenu.renameGroup = function($trigger) {
+gisportal.contextMenu.renameGroup = function($trigger) {
    return {
       name: "Rename Group",
       callback: function() {
@@ -285,16 +285,16 @@ opec.contextMenu.renameGroup = function($trigger) {
  * 
  * @param {Object} $trigger - The object the menu was triggered on.
  */
-opec.contextMenu.viewData = function($trigger) {
+gisportal.contextMenu.viewData = function($trigger) {
    var layerName = "";
    var layer = null;
    
    if($trigger.attr('id')) {
       layerName = $trigger.attr('id');
-      layer = opec.getLayerByID(layerName);
+      layer = gisportal.getLayerByID(layerName);
    } else {
       layerName = $trigger.text();
-      layer = opec.microLayers[layerName];
+      layer = gisportal.microLayers[layerName];
       console.log("To be be removed");
    }
    
@@ -324,24 +324,24 @@ opec.contextMenu.viewData = function($trigger) {
  * @return {Object} Returns an object containing the display name to show on 
  * the menu and a callback to be executed when selected.
  */
-opec.contextMenu.showMetadata = function($trigger) {
+gisportal.contextMenu.showMetadata = function($trigger) {
    var layerID = "";
    var layer = null;
    
    if($trigger.attr('id')) {
       layerID = $trigger.attr('id');
-      layer = opec.getLayerByID(layerID);
+      layer = gisportal.getLayerByID(layerID);
    }
    else {
       layerID = $trigger.text();
-      layer = opec.microLayers[layerID];
+      layer = gisportal.microLayers[layerID];
    }
       
    return { 
       name: "Show Metadata",
       callback: function() {
          // Opens Metadata Dialog
-         opec.window.createMetadata(layer);
+         gisportal.window.createMetadata(layer);
       }
    };
 };
@@ -354,13 +354,13 @@ opec.contextMenu.showMetadata = function($trigger) {
  * @return {Object} Returns an object containing the display name to show on 
  * the menu and a callback to be executed when selected.
  */
-opec.contextMenu.showScalebar = function($trigger) {
+gisportal.contextMenu.showScalebar = function($trigger) {
    return { 
       name: "Show Scalebar",
       
       callback: function() { 
          // Opens Scalebar Dialog
-         opec.window.createScalebar($trigger);
+         gisportal.window.createScalebar($trigger);
       }
    };
 };
@@ -373,9 +373,9 @@ opec.contextMenu.showScalebar = function($trigger) {
  * 
  * @return {Array} Returns an array of available styles for a layer.
  */
-opec.contextMenu.getCurrentStyles = function($trigger)
+gisportal.contextMenu.getCurrentStyles = function($trigger)
 {
-   var layer = opec.getLayerByID($trigger.attr('id'));
+   var layer = gisportal.getLayerByID($trigger.attr('id'));
    if(layer.controlID != 'opLayers')
       return [];
       
@@ -399,7 +399,7 @@ opec.contextMenu.getCurrentStyles = function($trigger)
          callbackName: 'Layer Styles ' + value.Name,
          // Create the callback for what happens when someone clicks on the menu button
          callback: function() {
-            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+            var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.style = value.Name;
             layer.mergeNewParams({styles: value.Name == 'Remove Style' ? '' : value.Name});            
             console.log(value.Name);
@@ -411,8 +411,8 @@ opec.contextMenu.getCurrentStyles = function($trigger)
    return menuOutput;
 };
 
-opec.contextMenu.getCurrentElevation = function($trigger) {
-   var layer = opec.getLayerByID($trigger.attr('id'));
+gisportal.contextMenu.getCurrentElevation = function($trigger) {
+   var layer = gisportal.getLayerByID($trigger.attr('id'));
    var menuOutput = {};
    
    $.each(layer.elevationCache, function(index, value) {
@@ -422,7 +422,7 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
          className: value == layer.selectedElevation ? 'elevationSelected' : "",
          callbackName: 'Layer Elevation ' + value,
          callback: function() {
-            var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+            var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
             layer.selectedElevation = value;
             layer.mergeNewParams({elevation: value});
          }
@@ -432,10 +432,10 @@ opec.contextMenu.getCurrentElevation = function($trigger) {
    return menuOutput;
 };
 
-opec.contextMenu.displaySublayers = function($trigger) {
+gisportal.contextMenu.displaySublayers = function($trigger) {
    
    var layerName = "",
-      layer = opec.getLayerByID($trigger.attr('id')),
+      layer = gisportal.getLayerByID($trigger.attr('id')),
       sublayer = null,
       menuOutput = {};
    
@@ -496,11 +496,11 @@ opec.contextMenu.displaySublayers = function($trigger) {
 /**
  * Creates and shows the graph creator dialog box
  */
-opec.contextMenu.showGraphCreator = function() {
+gisportal.contextMenu.showGraphCreator = function() {
    return {
       name: 'Show Graph Creator',
       callback: function() {
-         //opec.window.createGraphCreator();
+         //gisportal.window.createGraphCreator();
       }
    };
 };

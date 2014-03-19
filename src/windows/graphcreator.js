@@ -1,6 +1,6 @@
 // File on list to be deleted if nothing breaks
 
-/* opec.window.createGraphCreator = function() {
+/* gisportal.window.createGraphCreator = function() {
    var graphCreator = $('#graphCreator');
    // If there is an open version, close it
    if(graphCreator.length)
@@ -11,8 +11,8 @@
    };
    
    // Add the html to the document using a template
-   $('#opec-graphing').append(opec.templates.graphCreatorWindow(data));
-   //$(document.body).append(opec.templates.graphCreatorWindow(data));
+   $('#gisportal-graphing').append(gisportal.templates.graphCreatorWindow(data));
+   //$(document.body).append(gisportal.templates.graphCreatorWindow(data));
    
    graphCreator = $('#graphCreator');           
    var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
@@ -25,13 +25,13 @@
       dateFormat: 'yy-mm-dd',
       changeMonth: true,
       changeYear: true,
-      beforeShowDay: function(date) { return opec.allowedDays(date); },
+      beforeShowDay: function(date) { return gisportal.allowedDays(date); },
       // onSelect: function(dateText, inst) {
          // var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
          // // Synchronise date with the timeline
-         // opec.timeline.setDate(thedate);
+         // gisportal.timeline.setDate(thedate);
          // // Filter the layer data to the selected date
-         // opec.filterLayersByDate(thedate);
+         // gisportal.filterLayersByDate(thedate);
       // }
    });
    
@@ -43,12 +43,12 @@
    }
    
    // Get the currently selected layer
-   var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+   var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
    $('#graphcreator-baseurl').val(layer.wcsURL);
    $('#graphcreator-coverage').val(layer.origName);
    
    $('.lPanel').bind('selectedLayer', function(e) {
-      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage').val(layer.origName);
    });
@@ -57,7 +57,7 @@
                      
    // When selecting the bounding box text field, request user to draw the box to populate values
    $('#graphcreator-bbox').click(function() {
-      opec.gritter.showNotification('bbox', null);
+      gisportal.gritter.showNotification('bbox', null);
    });
    
    // Event to open and close the panels when clicked
@@ -74,7 +74,7 @@
       $.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
          if($(this).is(':checked')) {
             var layerID = $(this).parent('li').attr('id');
-            var layer = opec.getLayerByID(layerID);
+            var layer = gisportal.getLayerByID(layerID);
             $('#graphcreator-coverage').val(layer.origName);          
             $('#graphcreator-baseurl').val(layer.wcsURL);   
          }
@@ -134,11 +134,11 @@
       
       $.ajax({
          type: 'GET',
-         url: opec.wcsLocation + request,
+         url: gisportal.wcsLocation + request,
          dataType: 'json',
          asyc: true,
          success: function(data) {
-            opec.graphs.create(data);
+            gisportal.graphs.create(data);
          },
          error: function(request, errorType, exception) {
             var data = {
@@ -209,7 +209,7 @@
          showMinimise: true,
          dblclick: "collapse",
          help : function(e, dlg) {
-            opec.gritter.showNotification ('graphCreatorTutorial', null);
+            gisportal.gritter.showNotification ('graphCreatorTutorial', null);
          }
       });
       
@@ -241,12 +241,12 @@
       //-----------------------------------------------------------------------
       
       // Get the currently selected layer
-      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage').val(layer.origName);
          
       $('.lPanel').bind('selectedLayer', function(event) {
-         var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+         var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
          $('#graphcreator-baseurl').val(layer.wcsURL);
          $('#graphcreator-coverage').val(layer.origName);
       });
@@ -258,7 +258,7 @@
                         
       // When selecting the bounding box text field, request user to draw the box to populate values
       $('#graphcreator-bbox').click(function() {
-         opec.gritter.showNotification('bbox', null);
+         gisportal.gritter.showNotification('bbox', null);
       });
       
       // Event to open and close the panels when clicked
@@ -276,7 +276,7 @@
             if($(this).is(':checked')) {
                var layerID = $(this).parent('li').attr('id');
                $('#graphcreator-coverage').val(layerID);
-               var layer = opec.getLayerByID(layerID);
+               var layer = gisportal.getLayerByID(layerID);
                $('#graphcreator-baseurl').val(layer.wcsURL);   
             }
          });
@@ -336,7 +336,7 @@
          
          $.ajax({
             type: 'GET',
-            url: opec.wcsLocation + request,
+            url: gisportal.wcsLocation + request,
             dataType: 'json',
             asyc: true,
             success: function(data) {
@@ -344,7 +344,7 @@
                   var d = {
                      error: data.error
                   };
-                  opec.gritter.showNotification('graphError', d);
+                  gisportal.gritter.showNotification('graphError', d);
                   return;
                }
                                
@@ -368,31 +368,31 @@
                      id: 'wcsgraph' + Date.now(),
                      title: 'WCS Test Graph',
                      data: [{
-                        data: d1.sort(opec.utils.sortDates),
+                        data: d1.sort(gisportal.utils.sortDates),
                         lines: { show: true },
                         points: { show: true },
                         label: 'STD'
                      },
                      {
-                        data: d2.sort(opec.utils.sortDates),
+                        data: d2.sort(gisportal.utils.sortDates),
                         lines: { show: true },
                         points: { show: true },
                         label: 'max'
                      },
                      {
-                        data: d3.sort(opec.utils.sortDates),
+                        data: d3.sort(gisportal.utils.sortDates),
                         lines: { show: true },
                         points: { show: true },
                         label: 'min'
                      },
                      {
-                        data: d4.sort(opec.utils.sortDates),
+                        data: d4.sort(gisportal.utils.sortDates),
                         lines: { show: true },
                         points: { show: true },
                         label: 'median'
                      },
                      {
-                        data: d5.sort(opec.utils.sortDates),
+                        data: d5.sort(gisportal.utils.sortDates),
                         lines: { show: true },
                         points: { show: true },
                         label: 'mean'
@@ -447,4 +447,4 @@
    }
 };
 
-opec.window.addWindow(graphCreator);*/
+gisportal.window.addWindow(graphCreator);*/

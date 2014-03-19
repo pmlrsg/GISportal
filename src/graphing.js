@@ -1,17 +1,17 @@
-opec.graphs = {};
+gisportal.graphs = {};
 
 // Options currently requires a title
-opec.graphs.data = function(params, options)  {
+gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
    // Get graph
    $.ajax({
       type: 'GET',
-      url: opec.wcsLocation + request,
+      url: gisportal.wcsLocation + request,
       dataType: 'json',
       asyc: true,
       success: function(data) {
          console.log(data);
-         opec.graphs.create(data, options);
+         gisportal.graphs.create(data, options);
          console.log("success");
       },
       error: function(request, errorType, exception) {
@@ -27,12 +27,12 @@ opec.graphs.data = function(params, options)  {
    });
 }
 
-opec.graphs.create = function(data, options) {
+gisportal.graphs.create = function(data, options) {
    if(data.error !== "") {
       var d = {
          error: data.error
       };
-      opec.gritter.showNotification('graphError', d);
+      gisportal.gritter.showNotification('graphError', d);
       return;
    }
                    
@@ -54,33 +54,33 @@ opec.graphs.create = function(data, options) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: options.title || data.type + " of " + opec.layers[data.coverage].displayTitle,
+         title: options.title || data.type + " of " + gisportal.layers[data.coverage].displayTitle,
          data: [{
-            data: d1.sort(opec.utils.sortDates),
+            data: d1.sort(gisportal.utils.sortDates),
             lines: { show: true },
             points: { show: true },
             label: 'STD'
          },
          {
-            data: d2.sort(opec.utils.sortDates),
+            data: d2.sort(gisportal.utils.sortDates),
             lines: { show: true },
             points: { show: true },
             label: 'max'
          },
          {
-            data: d3.sort(opec.utils.sortDates),
+            data: d3.sort(gisportal.utils.sortDates),
             lines: { show: true },
             points: { show: true },
             label: 'min'
          },
          {
-            data: d4.sort(opec.utils.sortDates),
+            data: d4.sort(gisportal.utils.sortDates),
             lines: { show: true },
             points: { show: true },
             label: 'median'
          },
          {
-            data: d5.sort(opec.utils.sortDates),
+            data: d5.sort(gisportal.utils.sortDates),
             lines: { show: true },
             points: { show: true },
             label: 'mean'
@@ -99,7 +99,7 @@ opec.graphs.create = function(data, options) {
    
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: options.title || data.type + " of " + opec.layers[data.coverage].displayTitle,
+         title: options.title || data.type + " of " + gisportal.layers[data.coverage].displayTitle,
          data: [num],
          options: barOptions(barwidth),
          selectable: false
@@ -112,7 +112,7 @@ opec.graphs.create = function(data, options) {
       
       var graphData = {
          id: 'wcsgraph' + Date.now(),
-         title: data.type + " of " + opec.layers[data.coverage].displayTitle,
+         title: data.type + " of " + gisportal.layers[data.coverage].displayTitle,
          type: data.type,
          colour: 'redToBlue',
          data: data.output,
@@ -130,7 +130,7 @@ opec.graphs.create = function(data, options) {
 function createGraph(graphOptions) {
    
    // Create the dialog and cache the selector
-   var dialog = opec.graphs.createDialogAlt(graphOptions.id, graphOptions.title);
+   var dialog = gisportal.graphs.createDialogAlt(graphOptions.id, graphOptions.title);
 
    // TODO: Tidy up css into a class
    dialog.children('.graph').width(600).height(384);
@@ -157,19 +157,19 @@ function createGraph(graphOptions) {
          '<label for="id' + key + '">' + val.label + '</label>');
       });
       var logoStyles;
-      if (opec.providers[graphOptions.provider])
+      if (gisportal.providers[graphOptions.provider])
       {
-         if (opec.providers[graphOptions.provider].vertical === 'true')  {
+         if (gisportal.providers[graphOptions.provider].vertical === 'true')  {
             logoStyles = "float: right; width: 50px; margin-top: -140px;";
          }
          else {
             logoStyles = "float: right; margin-top: -30px;";
          }
 
-         if (opec.providers[graphOptions.provider].url)  {
-            dialog.append('<a href="' + opec.providers[graphOptions.provider].url + '"><img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '"></a>');
+         if (gisportal.providers[graphOptions.provider].url)  {
+            dialog.append('<a href="' + gisportal.providers[graphOptions.provider].url + '"><img style="' + logoStyles + '" src="' + gisportal.providers[graphOptions.provider].logo  + '"></a>');
          } else  {
-            dialog.append('<img style="' + logoStyles + '" src="' + opec.providers[graphOptions.provider].logo  + '">');
+            dialog.append('<img style="' + logoStyles + '" src="' + gisportal.providers[graphOptions.provider].logo  + '">');
          }
       }
          
@@ -419,7 +419,7 @@ function basicTimeOptions(yaxisTitle)
    };
 }
 
-opec.graphs.createDialogAlt = function(uid, title) {
+gisportal.graphs.createDialogAlt = function(uid, title) {
    // Append html code
    $(document.body).append(
       '<div id="' + uid + '-graph" class="unselectable" title="' + title + '">' +
@@ -448,7 +448,7 @@ opec.graphs.createDialogAlt = function(uid, title) {
    return dialog;
 };
 
-opec.graphs.createDialog = function(uid, title) {
+gisportal.graphs.createDialog = function(uid, title) {
    // Append html code
    $(document.body).append(
       '<div id="' + uid + '-graph" class="unselectable" title="' + title + '">' +
@@ -493,7 +493,7 @@ function hovmoller(graphData) {
       h : height + margin.top + margin.bottom
    };
    
-   var dialog = opec.graphs.createDialog(graphData.id, graphData.title);
+   var dialog = gisportal.graphs.createDialog(graphData.id, graphData.title);
 
    // TODO: Tidy up css into a class
    dialog.children('.graph').width(overall_dims.w).height(overall_dims.h);
@@ -1079,7 +1079,7 @@ function hovmoller(graphData) {
             //console.log(d)
             //console.log("adding text element");
             //if (i===0) { return null; }
-            return opec.utils.ceil3places(d);
+            return gisportal.utils.ceil3places(d);
          }).attr("class", "labels").attr("transform", function(d,i) {
             return "translate(" + [width + margin.left + 35, ((height/6) * (i-0.5)) + height/5 ] + ")";
          });
@@ -1089,14 +1089,14 @@ function hovmoller(graphData) {
        || ($('.graph-rect', graph).length === $('.graph-rect[height="0"]').length))  {
       
       graph.remove();
-      opec.gritter.showNotification('graphData', null);
+      gisportal.gritter.showNotification('graphData', null);
 
    }
 
 
 }
 
-opec.graphs.timeSeriesChart = function() {
+gisportal.graphs.timeSeriesChart = function() {
    var margin = { top: 20, right: 20, bottom: 30, left: 50},
    width = 960,
    height = 500;
@@ -1145,7 +1145,7 @@ opec.graphs.timeSeriesChart = function() {
    }
 };
 
-opec.graphs.histogramChart = function() {
+gisportal.graphs.histogramChart = function() {
    var margin = { top: 0, right: 0, bottom: 20, left: 0 },
       width = 700,
       height = 450;

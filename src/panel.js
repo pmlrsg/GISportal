@@ -2,30 +2,30 @@
  * Left Panel
  * @namespace 
  */
-opec.leftPanel = {};
+gisportal.leftPanel = {};
 
-opec.leftPanel.open = function() {
+gisportal.leftPanel.open = function() {
    $(".lPanel").show("fast");
    $(".triggerL").addClass("active");
 }
 
-opec.leftPanel.toggle = function() {
+gisportal.leftPanel.toggle = function() {
    $(".lPanel").toggle("fast");
    $(".triggerL").toggleClass("active");
 }
 
-opec.leftPanel.setup = function() {
+gisportal.leftPanel.setup = function() {
    //$('#refLayers').multiOpenAccordion({
    //   active: 0
    //});
    
    // Makes each of the accordions sortable
-   $('#opec-lPanel-operational').sortable({
+   $('#gisportal-lPanel-operational').sortable({
       axis: 'y',
       distance: 10,
       handle: 'h3',
       update: function() {
-         opec.leftPanel.updateGroupOrder($(this));
+         gisportal.leftPanel.updateGroupOrder($(this));
       }
    })
    .disableSelection();
@@ -34,29 +34,29 @@ opec.leftPanel.setup = function() {
    //});
    
    // Makes each of the reference layers sortable
-   $("#opec-lPanel-reference").sortable({
+   $("#gisportal-lPanel-reference").sortable({
       axis: 'y',
       distance: 10,
       update: function() {
-         opec.leftPanel.updateGroupOrder($(this));
-         //var order = $("#opec-lPanel-reference").sortable('toArray');                 
+         gisportal.leftPanel.updateGroupOrder($(this));
+         //var order = $("#gisportal-lPanel-reference").sortable('toArray');                 
          //$.each(order, function(index, value) {
-            //var layer = opec.getLayerByID(value);
+            //var layer = gisportal.getLayerByID(value);
             //map.setLayerIndex(layer[0], map.numBaseLayers + order.length - index - 1);
          //});
       }
    });
    
    // Add dummy help layer
-   //opec.leftPanel.addDummyHelpLayer();
+   //gisportal.leftPanel.addDummyHelpLayer();
    
    // Add first Group
-   opec.leftPanel.addNextGroupToPanel($('#opec-lPanel-operational'));
+   gisportal.leftPanel.addNextGroupToPanel($('#gisportal-lPanel-operational'));
    
    //Hook up the other events for the general UI
    // Left slide panel show-hide functionality      
    $(".triggerL").click(function(e) {
-		opec.leftPanel.toggle();
+		gisportal.leftPanel.toggle();
    });
    
    // Left slide panel buttons
@@ -66,21 +66,21 @@ opec.leftPanel.setup = function() {
    $('#triggerL-add-accordion')
       .button({ label: 'Add a new group', icons: { primary: 'ui-icon-circle-plus'}, text: false })   
       .click(function(e) { 
-         var $panel = $('.lPanel .opec-tab-content:visible');
-         opec.leftPanel.addNextGroupToPanel($panel);
+         var $panel = $('.lPanel .gisportal-tab-content:visible');
+         gisportal.leftPanel.addNextGroupToPanel($panel);
       });
    //$('#triggerL-remove-accordion').button({ icons: { primary: 'ui-icon-circle-minus'}, text: false });
 
    $('#triggerL-add-group').button();
    
-   $('.lPanel .opec-tab-group').buttonset();
-   $('#opec-lpanel-tab-operational').button();
-   $('#opec-lpanel-tab-reference').button();
-   $('#opec-lpanel-tab-options').button();
+   $('.lPanel .gisportal-tab-group').buttonset();
+   $('#gisportal-lpanel-tab-operational').button();
+   $('#gisportal-lpanel-tab-reference').button();
+   $('#gisportal-lpanel-tab-options').button();
    
-   $('.lPanel .opec-tab-group input').click(function(e) { 
+   $('.lPanel .gisportal-tab-group input').click(function(e) { 
       var tabToShow = $(this).attr('href');
-      $('#opec-lPanel-content .opec-tab-content').filter(function(i) { 
+      $('#gisportal-lPanel-content .gisportal-tab-content').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
       }).hide('fast');
       $(tabToShow).show('fast');
@@ -97,52 +97,52 @@ opec.leftPanel.setup = function() {
    
    // Change of base layer event handler
    $('#baseLayer').change(function(e) {
-       map.setBaseLayer(opec.baseLayers[$('#baseLayer').val()]);
+       map.setBaseLayer(gisportal.baseLayers[$('#baseLayer').val()]);
    });
    
    // Create quick region buttons
-   $('.lPanel .opec-quickRegion-reset').button({ label: 'Reset' }).click(function() {
-      var id = $('.lPanel .opec-quickRegion-select').val();
+   $('.lPanel .gisportal-quickRegion-reset').button({ label: 'Reset' }).click(function() {
+      var id = $('.lPanel .gisportal-quickRegion-select').val();
       
-      $('.lPanel .opec-quickRegion-name').val(opec.quickRegion[id][0]);
-      $('.lPanel .opec-quickRegion-left').val(opec.quickRegion[id][1]);
-      $('.lPanel .opec-quickRegion-bottom').val(opec.quickRegion[id][2]);
-      $('.lPanel .opec-quickRegion-right').val(opec.quickRegion[id][3]);
-      $('.lPanel .opec-quickRegion-top').val(opec.quickRegion[id][4]);  
+      $('.lPanel .gisportal-quickRegion-name').val(gisportal.quickRegion[id][0]);
+      $('.lPanel .gisportal-quickRegion-left').val(gisportal.quickRegion[id][1]);
+      $('.lPanel .gisportal-quickRegion-bottom').val(gisportal.quickRegion[id][2]);
+      $('.lPanel .gisportal-quickRegion-right').val(gisportal.quickRegion[id][3]);
+      $('.lPanel .gisportal-quickRegion-top').val(gisportal.quickRegion[id][4]);  
    });
      
-   $('.lPanel .opec-quickRegion-save').button({ label: 'Save'}).click(function() {
-      var select = $('.lPanel .opec-quickRegion-select'),
+   $('.lPanel .gisportal-quickRegion-save').button({ label: 'Save'}).click(function() {
+      var select = $('.lPanel .gisportal-quickRegion-select'),
          id = select.val();
 
-      opec.quickRegion[id][0] = $('.lPanel .opec-quickRegion-name').val();
-      opec.quickRegion[id][1] = $('.lPanel .opec-quickRegion-left').val();
-      opec.quickRegion[id][2] = $('.lPanel .opec-quickRegion-bottom').val();
-      opec.quickRegion[id][3] = $('.lPanel .opec-quickRegion-right').val();
-      opec.quickRegion[id][4] = $('.lPanel .opec-quickRegion-top').val();
+      gisportal.quickRegion[id][0] = $('.lPanel .gisportal-quickRegion-name').val();
+      gisportal.quickRegion[id][1] = $('.lPanel .gisportal-quickRegion-left').val();
+      gisportal.quickRegion[id][2] = $('.lPanel .gisportal-quickRegion-bottom').val();
+      gisportal.quickRegion[id][3] = $('.lPanel .gisportal-quickRegion-right').val();
+      gisportal.quickRegion[id][4] = $('.lPanel .gisportal-quickRegion-top').val();
       
-      $(".opec-quickRegion-select").each(function() {
-         $(this).find('option').eq(id).html(opec.quickRegion[id][0]);
+      $(".gisportal-quickRegion-select").each(function() {
+         $(this).find('option').eq(id).html(gisportal.quickRegion[id][0]);
       });
    });
    
-   $('.lPanel .opec-quickRegion-add').button({ label: 'Add as new region' }).click(function() {
-      opec.addQuickRegion($('.lPanel .opec-quickRegion-name').val(), {
-         left: $('.lPanel .opec-quickRegion-left').val(),
-         bottom: $('.lPanel .opec-quickRegion-bottom').val(),
-         right: $('.lPanel .opec-quickRegion-right').val(),
-         top: $('.lPanel .opec-quickRegion-top').val()
+   $('.lPanel .gisportal-quickRegion-add').button({ label: 'Add as new region' }).click(function() {
+      gisportal.addQuickRegion($('.lPanel .gisportal-quickRegion-name').val(), {
+         left: $('.lPanel .gisportal-quickRegion-left').val(),
+         bottom: $('.lPanel .gisportal-quickRegion-bottom').val(),
+         right: $('.lPanel .gisportal-quickRegion-right').val(),
+         top: $('.lPanel .gisportal-quickRegion-top').val()
       });
    });
    
-   $('.lPanel .opec-quickRegion-remove').button({ label: 'Remove selected region' }).click(function() {
-      var select = $('.lPanel .opec-quickRegion-select'),
+   $('.lPanel .gisportal-quickRegion-remove').button({ label: 'Remove selected region' }).click(function() {
+      var select = $('.lPanel .gisportal-quickRegion-select'),
          id = select.val();
          
-      opec.removeQuickRegion(id);
+      gisportal.removeQuickRegion(id);
    });
 
-   $('.lPanel .opec-quickRegion-addCurrent').button({ label: 'Add current view' }).click(opec.addCurrentView);
+   $('.lPanel .gisportal-quickRegion-addCurrent').button({ label: 'Add current view' }).click(gisportal.addCurrentView);
 };
 
 /**
@@ -152,7 +152,7 @@ opec.leftPanel.setup = function() {
  * @param {string} displayName - The panel name to show.
  * @param {Object} $panelName - jQuery object representing the panel.
  */
-opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
+gisportal.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
    // Add the accordion
    $panelName.prepend(
       '<div>' +
@@ -166,7 +166,7 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
       active: 0,
       $panel: $panelName,
       showClose: function($panelName) {
-         if($panelName.is("#opec-lPanel-reference") && $panelName.children().length <= 1)
+         if($panelName.is("#gisportal-lPanel-reference") && $panelName.children().length <= 1)
             return false;
          else
             return true;
@@ -174,7 +174,7 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
       showDropdown: true,
       events: {
          close: function(id) {
-            opec.leftPanel.removeGroupFromPanel(id);
+            gisportal.leftPanel.removeGroupFromPanel(id);
          },
          dropdown: function($group) {
             $group.find('.ui-accordion-header-dropdown').first().contextMenu();
@@ -182,14 +182,14 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
       }
    });
    
-   //if ($panelName.attr('id') == 'opec-lPanel-operational') {
+   //if ($panelName.attr('id') == 'gisportal-lPanel-operational') {
       // Makes each of the operational layers sortable
       $('#' + id).sortable({
          connectWith: ".sensor-accordion",
          appendTo:".sensor-accordion",
          helper:"clone",
          update: function() {
-            opec.leftPanel.updateLayerOrder($(this));
+            gisportal.leftPanel.updateLayerOrder($(this));
          }
       }).disableSelection();
    //}
@@ -200,16 +200,16 @@ opec.leftPanel.addGroupToPanel = function(id, displayName, $panelName) {
  * 
  * @param {string} id - The id of the panel to remove.
  */
-opec.leftPanel.removeGroupFromPanel = function(id) {
+gisportal.leftPanel.removeGroupFromPanel = function(id) {
    var $id = $('#' + id);
    if($id.length) {    
       // Check if the accordion is empty
       $id.children('li').each(function() {
-         var layer = opec.getLayerByID($(this).attr('id'));
+         var layer = gisportal.getLayerByID($(this).attr('id'));
          if(typeof layer !== 'undefined') {
-            opec.removeLayer(layer);
+            gisportal.removeLayer(layer);
             // Deselect layer on layer selector
-            opec.layerSelector.toggleSelectionFromLayer(layer);
+            gisportal.layerSelector.toggleSelectionFromLayer(layer);
          }
 
       });
@@ -234,18 +234,18 @@ opec.leftPanel.removeGroupFromPanel = function(id) {
  * 
  * @return {Object} Returns the first group. 
  */
-opec.leftPanel.getFirstGroupFromPanel = function($panelName) {
+gisportal.leftPanel.getFirstGroupFromPanel = function($panelName) {
    var $firstGroup = $panelName.find('.sensor-accordion')
       .filter(function(i) {
-         return !$(this).hasClass('opec-help');
+         return !$(this).hasClass('gisportal-help');
       })
       .first();
       
    if($firstGroup.length > 0) {
       return $firstGroup;
    } else {
-      opec.leftPanel.addNextGroupToPanel($panelName);
-      return opec.leftPanel.getFirstGroupFromPanel($panelName);
+      gisportal.leftPanel.addNextGroupToPanel($panelName);
+      return gisportal.leftPanel.getFirstGroupFromPanel($panelName);
    }
 };
 
@@ -254,10 +254,10 @@ opec.leftPanel.getFirstGroupFromPanel = function($panelName) {
  * 
  * @param {Object} $panelName - jQuery object representing the panel.
  */
-opec.leftPanel.addNextGroupToPanel = function($panelName) {
+gisportal.leftPanel.addNextGroupToPanel = function($panelName) {
    var number = ($panelName.find('.sensor-accordion')
       .filter(function(i) {
-         return !$(this).hasClass('opec-help');
+         return !$(this).hasClass('gisportal-help');
       })
       .length + 1);
       
@@ -265,13 +265,13 @@ opec.leftPanel.addNextGroupToPanel = function($panelName) {
       number++;
    }
       
-   opec.leftPanel.addGroupToPanel('group' + number, 'Group ' + number, $panelName);
+   gisportal.leftPanel.addGroupToPanel('group' + number, 'Group ' + number, $panelName);
 };
 
 /**
  * Add a layer to a group on the layers panel.
  */ 
-opec.leftPanel.addLayerToGroup = function(layer, $group) {
+gisportal.leftPanel.addLayerToGroup = function(layer, $group) {
    // if not already on list, populate the layers panel (left slide panel)
    if(!$('#' + layer.id).length) {
       // jQuery selector for the layer controlID
@@ -286,13 +286,13 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
       
       // Add the html to the document using a template
       $group.prepend(
-         opec.templates.layer(data)
+         gisportal.templates.layer(data)
       );
 
       layer.$layer = $('#' + layer.id);
-      opec.updateLayerData(layer.id);
-      opec.rightPanel.updateCoverageList();
-		$('#' + data.name + ' .opec-layer-dropdown').click(function(e)  { $(this).contextMenu({ x: e.clientX, y: e.clientY});  });
+      gisportal.updateLayerData(layer.id);
+      gisportal.rightPanel.updateCoverageList();
+		$('#' + data.name + ' .gisportal-layer-dropdown').click(function(e)  { $(this).contextMenu({ x: e.clientX, y: e.clientY});  });
 		// Remove the dummy layer
       //removeDummyHelpLayer()
    }
@@ -301,7 +301,7 @@ opec.leftPanel.addLayerToGroup = function(layer, $group) {
 /**
  * Remove a layer from its group on the layers panel. 
  */
-opec.leftPanel.removeLayerFromGroup = function(layer) {
+gisportal.leftPanel.removeLayerFromGroup = function(layer) {
    if($('#' + layer.id).length)
       $('#' + layer.id).remove();
 };
@@ -309,12 +309,12 @@ opec.leftPanel.removeLayerFromGroup = function(layer) {
 /**
  * Updates all the layer indexes in all the layer accordions.
  */ 
-opec.leftPanel.updateGroupOrder = function($panel) {
+gisportal.leftPanel.updateGroupOrder = function($panel) {
    $.each($panel.find('.sensor-accordion'), function(index, value) {
       //if($(this).children('li').length == 0)
-         //opec.leftPanel.removeGroupFromPanel($(this).attr('id'));
+         //gisportal.leftPanel.removeGroupFromPanel($(this).attr('id'));
       //else    
-         opec.leftPanel.updateLayerOrder($(this));
+         gisportal.leftPanel.updateLayerOrder($(this));
    });
 };
 
@@ -322,13 +322,13 @@ opec.leftPanel.updateGroupOrder = function($panel) {
  * Updates the position of layers based on their new 
  * position on the stack.
  */ 
-opec.leftPanel.updateLayerOrder = function(accordion) {
+gisportal.leftPanel.updateLayerOrder = function(accordion) {
    var layersBelowOffset = 0;
    $.each(accordion.parent('div').nextAll('div').children('.sensor-accordion'), function(index, value) {
       //layersBelowOffset += $(this).children('li').length;
       $(this).children('li').each(function() {
-         if($(this).hasClass('opec-layer')) {
-            layersBelowOffset += opec.layers[$(this).attr('id')].order.length;
+         if($(this).hasClass('gisportal-layer')) {
+            layersBelowOffset += gisportal.layers[$(this).attr('id')].order.length;
          }
       });
    });
@@ -336,7 +336,7 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
    var layerGroupOrder = accordion.sortable('toArray');   
    if(layerGroupOrder.length > 0) {         
       $.each(layerGroupOrder, function(index, value) {
-         var layer = opec.getLayerByID(value);
+         var layer = gisportal.getLayerByID(value);
          if(typeof layer !== 'undefined') {
             var positionOffset = layer.controlID == 'opLayers' ? map.numBaseLayers : (map.numBaseLayers + map.numOpLayers);
             
@@ -347,18 +347,18 @@ opec.leftPanel.updateLayerOrder = function(accordion) {
       });
    }
    else
-      ;//opec.leftPanel.removeGroupFromPanel(accordion.attr('id'));
+      ;//gisportal.leftPanel.removeGroupFromPanel(accordion.attr('id'));
 };
 
 /**
  * Adds a dummy layer to help the user. 
  
-opec.leftPanel.addDummyHelpLayer = function() {
-   opec.leftPanel.addGroupToPanel("Need-Help", "Need Help?", $('#opec-lPanel-operational'));
+gisportal.leftPanel.addDummyHelpLayer = function() {
+   gisportal.leftPanel.addGroupToPanel("Need-Help", "Need Help?", $('#gisportal-lPanel-operational'));
 */ 
 /* 
    $('#Need-Help')
-      .addClass('opec-help')
+      .addClass('gisportal-help')
       .prepend(
       '<li id="Help" class="notSelectable">' +
          'You Need to add some layers! Use the ' +      
@@ -368,8 +368,8 @@ opec.leftPanel.addDummyHelpLayer = function() {
   
    // Open the layer panel on click
    $('#dmhLayerSelection').click(function(e) {
-      if($('#opec-layerSelection').extendedDialog('isOpen')) {
-         $('#opec-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
+      if($('#gisportal-layerSelection').extendedDialog('isOpen')) {
+         $('#gisportal-layerSelection').parent('div').fadeTo('slow', 0.3, function() { $(this).fadeTo('slow', 1); });
       }
       else {
          $('#layerPreloader').fadeTo('slow', 0.3, function() { 
@@ -386,7 +386,7 @@ opec.leftPanel.addDummyHelpLayer = function() {
 /**
  * Saves the state of the left panel
  */
-opec.leftPanel.saveState = function(state) {  
+gisportal.leftPanel.saveState = function(state) {  
    state.leftPanel = {};
    
    // Panel Open?
@@ -411,12 +411,12 @@ opec.leftPanel.saveState = function(state) {
 /**
  * Loads the state given
  */
-opec.leftPanel.loadState = function(state) {
+gisportal.leftPanel.loadState = function(state) {
    var map = state.map;
    var state = state.leftPanel;
    
    if(state.isOpen) {
-      opec.leftPanel.open();
+      gisportal.leftPanel.open();
    }
 
    if (state.baseLayer)  {
@@ -429,15 +429,15 @@ opec.leftPanel.loadState = function(state) {
  * Right Panel
  * @namespace 
  */
-opec.rightPanel = {};
+gisportal.rightPanel = {};
 
-opec.rightPanel.open = function() {
+gisportal.rightPanel.open = function() {
    $(".rPanel").show("fast");
    $(".triggerR").addClass("active");
 	$('#advanced-inputs-header').click();
 }
 
-opec.rightPanel.toggle = function() {
+gisportal.rightPanel.toggle = function() {
 	$('#advanced-inputs-header').click();
 	$(".rPanel").toggle("fast");
    $(".triggerR").toggleClass("active");
@@ -446,16 +446,16 @@ opec.rightPanel.toggle = function() {
 // coverageStateSelected is a boolean that is set when a state has
 // selected a coverage. This is so that the select box can be
 // modified without always returning to the same state.
-opec.rightPanel.coverageStateSelected = false;
+gisportal.rightPanel.coverageStateSelected = false;
 
-opec.rightPanel.updateCoverageList = function()  {
+gisportal.rightPanel.updateCoverageList = function()  {
 	var selectedLayer = $('#graphcreator-coverage option:selected');
 	$('#graphcreator-coverage option').remove();
-	var keys = Object.keys(opec.layers);
+	var keys = Object.keys(gisportal.layers);
 	for (var i = 0; i < keys.length; i++)  {
 		// TODO Nicer way of select, make sure to clean up
- 		var layer = opec.layers[keys[i]];
-		var tickedLayers = $('#opec-lPanel-operational input:checked');
+ 		var layer = gisportal.layers[keys[i]];
+		var tickedLayers = $('#gisportal-lPanel-operational input:checked');
 		var selected = '';
       // Potentially change to using selectedLayers, I haven't done so since sometimes the array has more entries than it should
 		if (layer === selectedLayer.value || (tickedLayers.length === 1 && layer === tickedLayers[0].value) || i === keys.length - 1) selected = 'selected';
@@ -463,25 +463,25 @@ opec.rightPanel.updateCoverageList = function()  {
 	}	
 	$('#graphcreator-coverage').prepend('<option value="" disabled="">Name of the Layer</option>');
 
-   var state = opec.cache.state;
+   var state = gisportal.cache.state;
    if (state && state.rightPanel.selectedCoverage)  {
       $('#graphcreator-coverage option[value="' + state.rightPanel.selectedCoverage + '"]').prop("selected", true);
-      opec.rightPanel.coverageStateSelected = true;
+      gisportal.rightPanel.coverageStateSelected = true;
    }
 
    $('#graphcreator-coverage').change();
 }
 
-opec.rightPanel.setup = function() {
+gisportal.rightPanel.setup = function() {
    
    // Right slide panel show-hide functionality
    $(".triggerR").click(function(e) {
-      opec.rightPanel.toggle();
+      gisportal.rightPanel.toggle();
    });
    
    // Custom-made jQuery interface elements: multi-accordion sections (<h3>)
    // for data layers (in left panel) and data analysis (in right panel)
-   $("#opec-rPanel-content").children('div').multiOpenAccordion({
+   $("#gisportal-rPanel-content").children('div').multiOpenAccordion({
       active: [0, 1]
    });
    
@@ -493,29 +493,29 @@ opec.rightPanel.setup = function() {
    $('#polygon').button({ icons: { primary: 'ui-icon-drawpoly'} });
    
    // Data Analysis panel tabs and accordions
-   $("#opec-tab-analyses").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1, -1, -1] });
+   $("#gisportal-tab-analyses").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1, -1, -1] });
    $("#spatial").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1] });
    $("#temporal").multiOpenAccordion({ collapsible: true, heightStyle: 'content', active: [-1, -1] }); 
    
-   $('.rPanel .opec-tab-group').buttonset();
-   $('#opec-button-selection').button();
-   $('#opec-button-analyses').button();
-   $('#opec-button-export').button();
+   $('.rPanel .gisportal-tab-group').buttonset();
+   $('#gisportal-button-selection').button();
+   $('#gisportal-button-analyses').button();
+   $('#gisportal-button-export').button();
    
-   $('.rPanel .opec-tab-group input').click(function(e) { 
+   $('.rPanel .gisportal-tab-group input').click(function(e) { 
       var tabToShow = $(this).attr('href');
-      $('#opec-rPanel-content .opec-tab-content').filter(function(i) { 
+      $('#gisportal-rPanel-content .gisportal-tab-content').filter(function(i) { 
          return $(this).attr('id') != tabToShow.slice(1); 
       }).hide('fast');
       $(tabToShow).show('fast');
    });
    
-   $('#opec-button-analyses').click(); // show analyses first
-   $('#opec-tab-analyses > h3').click(); // show graphing first
+   $('#gisportal-button-analyses').click(); // show analyses first
+   $('#gisportal-tab-analyses > h3').click(); // show graphing first
    
-   opec.rightPanel.setupDrawingControls();
-   opec.rightPanel.setupGraphingTools();
-   opec.rightPanel.setupDataExport();
+   gisportal.rightPanel.setupDrawingControls();
+   gisportal.rightPanel.setupGraphingTools();
+   gisportal.rightPanel.setupDataExport();
    
 };
 
@@ -523,7 +523,7 @@ opec.rightPanel.setup = function() {
  * Sets up the drawing controls to allow for the selection 
  * of ROI's. 
  */
-opec.rightPanel.setupDrawingControls = function() {
+gisportal.rightPanel.setupDrawingControls = function() {
    // Add the Vector drawing layer for POI drawing
    var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
       style : {
@@ -592,8 +592,8 @@ opec.rightPanel.setupDrawingControls = function() {
             // If the graphing dialog is active, place the BBOX co-ordinates in it's BBOX text field
             if ($('#graphcreator-bbox').size()){
                $('#graphcreator-bbox').val(bbox.toBBOX(5, false));
-               opec.selection.bbox = bbox.toBBOX(5, false);
-               $(opec.selection).trigger('selection_updated', {bbox: true});
+               gisportal.selection.bbox = bbox.toBBOX(5, false);
+               $(gisportal.selection).trigger('selection_updated', {bbox: true});
             }
             $('#dispROI').html('<h3>Rectangular ROI</h4>');
             // Setup the JavaScript canvas object and draw our ROI on it
@@ -650,16 +650,16 @@ opec.rightPanel.setupDrawingControls = function() {
       }
    }
    
-   opec.mapControls.point = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point);
-   opec.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
-   opec.mapControls.circle = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false});
-   opec.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon);
+   gisportal.mapControls.point = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Point);
+   gisportal.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
+   gisportal.mapControls.circle = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 50}, persist: false});
+   gisportal.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon);
    
-   //map.addControls([opec.mapControls.point, opec.mapControls.box, opec.mapControls.circle, opec.mapControls.polygon]);
-   map.addControls([opec.mapControls.point, opec.mapControls.box]);
+   //map.addControls([gisportal.mapControls.point, gisportal.mapControls.box, gisportal.mapControls.circle, gisportal.mapControls.polygon]);
+   map.addControls([gisportal.mapControls.point, gisportal.mapControls.box]);
    // Function which can toggle OpenLayers drawing controls based on the value of the clicked control
    function toggleDrawingControl(element) {
-      opec.toggleControl(element);
+      gisportal.toggleControl(element);
       vectorLayer.removeAllFeatures();
       map.ROI_Type = element.value;
       // DEBUG
@@ -672,12 +672,12 @@ opec.rightPanel.setupDrawingControls = function() {
    });
    
    // So that changing the input box changes the visual selection box on map
-   $('#opec-graphing').on('change', '#graphcreator-bbox', function() {
+   $('#gisportal-graphing').on('change', '#graphcreator-bbox', function() {
       var values = $('#graphcreator-bbox').val().split(',');
-      values[0] = opec.utils.clamp(values[0], -180, 180); // Long
-      values[2] = opec.utils.clamp(values[2], -180, 180); // Long
-      values[1] = opec.utils.clamp(values[1], -90, 90); // Lat
-      values[3] = opec.utils.clamp(values[3], -90, 90); // Lat
+      values[0] = gisportal.utils.clamp(values[0], -180, 180); // Long
+      values[2] = gisportal.utils.clamp(values[2], -180, 180); // Long
+      values[1] = gisportal.utils.clamp(values[1], -90, 90); // Lat
+      values[3] = gisportal.utils.clamp(values[3], -90, 90); // Lat
       $('#graphcreator-bbox').val(values[0] + ',' + values[1] + ',' + values[2] + ',' + values[3]);
       var feature = new OpenLayers.Feature.Vector(new OpenLayers.Bounds(values[0], values[1], values[2], values[3]).toGeometry());
       feature.layer = map.layers[map.layers.length -1];
@@ -691,31 +691,31 @@ opec.rightPanel.setupDrawingControls = function() {
    $('#panZoom label.ui-button, #ROIButtonSet label.ui-button').unbind('mousedown').unbind('mouseup').unbind('mouseover').unbind('mouseout').unbind('click', 
       function(e) { h.disabled && ( e.preventDefault(), e.stopImmediatePropagation() ); }
    ).bind('mousedown', function() {
-      $(this).addClass('opec_click');
+      $(this).addClass('gisportal_click');
    }).bind('mouseup', function() {
-      if ($(this).hasClass('opec_click')) {
+      if ($(this).hasClass('gisportal_click')) {
          $(this).click();
       }
-      $(this).removeClass('opec_click');
+      $(this).removeClass('gisportal_click');
    }); 
    
 };
 
 
-opec.rightPanel.updateRanges = function(label)  {
+gisportal.rightPanel.updateRanges = function(label)  {
    // Populate range from rangebars
    $('#graphcreator-range option').remove();
    $('#graphcreator-range').append('<option>Select a Range</option>');
-   for(var i = 0; i < opec.timeline.rangebars.length; i++) {
-      $('#graphcreator-range').append('<option value="' + opec.timeline.rangebars[i].name + '">' + opec.timeline.rangebars[i].label + '</option>');
+   for(var i = 0; i < gisportal.timeline.rangebars.length; i++) {
+      $('#graphcreator-range').append('<option value="' + gisportal.timeline.rangebars[i].name + '">' + gisportal.timeline.rangebars[i].label + '</option>');
    }
    if (label)  {
-      var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
+      var d = gisportal.timeline.rangebars.filter(function(element, index, array) { return element.label == label; });
       if (d.length > 0) $("#graphcreator-range option[value='" + (d[0].name || d.name) + "']").attr('selected', 'selected');
    }
 };
 
-opec.rightPanel.getDateRange = function()  {
+gisportal.rightPanel.getDateRange = function()  {
    var dateRange = $('#graphcreator-time').val();         
    if ($('#graphcreator-time2').val() !== "") {
       dateRange += ("/" + $('#graphcreator-time2').val());
@@ -726,7 +726,7 @@ opec.rightPanel.getDateRange = function()  {
 /**
 * Sets up the graphing tools.
 */
-opec.rightPanel.setupGraphingTools = function() {
+gisportal.rightPanel.setupGraphingTools = function() {
 //var graphCreator = $('#graphCreator');
 // If there is an open version, close it
 //if(graphCreator.length)
@@ -737,8 +737,8 @@ opec.rightPanel.setupGraphingTools = function() {
    };
    
    // Add the html to the document using a template
-   $('#opec-graphing').append(opec.templates.graphCreatorWindow(data));
-   //$(document.body).append(opec.templates.graphCreatorWindow(data));
+   $('#gisportal-graphing').append(gisportal.templates.graphCreatorWindow(data));
+   //$(document.body).append(gisportal.templates.graphCreatorWindow(data));
    
    var graphCreator = $('#graphCreator');           
    var graphCreatorGenerate = graphCreator.find('#graphcreator-generate').first();
@@ -758,7 +758,7 @@ opec.rightPanel.setupGraphingTools = function() {
       showMinimise: true,
       dblclick: "collapse",
       help : function(e, dlg) {
-         opec.gritter.showNotification ('graphCreatorTutorial', null);
+         gisportal.gritter.showNotification ('graphCreatorTutorial', null);
       }
    }); */
    
@@ -786,7 +786,7 @@ opec.rightPanel.setupGraphingTools = function() {
    }
    
    $('#graphcreator-range').change(function() {
-      var d = opec.timeline.rangebars.filter(function(element, index, array) { return element.name == $('#graphcreator-range option:selected').val(); });
+      var d = gisportal.timeline.rangebars.filter(function(element, index, array) { return element.name == $('#graphcreator-range option:selected').val(); });
       if(d !== '' && d[0] !== undefined && d.selectedStart !== '' && d.selectedEnd !== '')  {
          d = d[0]; // Take the first match
          $('#graphcreator-time').datepicker('setDate', d.selectedStart);
@@ -798,7 +798,7 @@ opec.rightPanel.setupGraphingTools = function() {
       }
    });
    
-   $(opec).on('rangeUpdate.opec', function(e, d) {
+   $(gisportal).on('rangeUpdate.gisportal', function(e, d) {
       if ($('#graphcreator-range option:selected').val() == d.name)  {
          $('#graphcreator-time').datepicker('setDate', d.selectedStart);
          $('#graphcreator-time2').datepicker('setDate', d.selectedEnd);
@@ -807,44 +807,44 @@ opec.rightPanel.setupGraphingTools = function() {
    
    $('.js-newRange').on('click', function() {
       //var name = prompt("Please give a label for this range bar.");
-      if (!opec.timeline.rangeCounter) opec.timeline.rangeCounter = 1;
-      var name = "Time Range " + opec.timeline.rangeCounter;
-      opec.timeline.rangeCounter++;
-      opec.timeline.addRangeBar(name);
-      opec.rightPanel.updateRanges(name);
+      if (!gisportal.timeline.rangeCounter) gisportal.timeline.rangeCounter = 1;
+      var name = "Time Range " + gisportal.timeline.rangeCounter;
+      gisportal.timeline.rangeCounter++;
+      gisportal.timeline.addRangeBar(name);
+      gisportal.rightPanel.updateRanges(name);
    });
    
    $('.js-hideRange').on('click', function() {
       var option = $('#graphcreator-range option:selected');
       if(option.data('hidden') == true)  {
-         opec.timeline.showRange(option.val());
+         gisportal.timeline.showRange(option.val());
          option.data('hidden', false);
          $('.js-hideRange').html("Hide Range");
       }
       else  {
-         opec.timeline.hideRange(option.val());
+         gisportal.timeline.hideRange(option.val());
          option.data('hidden', true);
          $('.js-hideRange').html("Show Range");
       }
    });
    
    $('.js-deleteRange').on('click', function() {
-      opec.timeline.removeTimeBarByName($('#graphcreator-range option:selected').val());
+      gisportal.timeline.removeTimeBarByName($('#graphcreator-range option:selected').val());
       $('#graphcreator-range option:selected').remove();
    });
   
    $('.js-renameRange').on('click', function() {
       var name = prompt("Please give a label for this range bar.");
-      opec.timeline.rename($('#graphcreator-range option:selected').val(), name);
-      opec.rightPanel.updateRanges(name);
+      gisportal.timeline.rename($('#graphcreator-range option:selected').val(), name);
+      gisportal.rightPanel.updateRanges(name);
    });
 
-	$('#opec-graphing').on('change', '.hasDatepicker', function()  { 
+	$('#gisportal-graphing').on('change', '.hasDatepicker', function()  { 
       if ($('#graphcreator-range option:selected').val() !== 'Select a Range') {
 			var selectedStart = $('#graphcreator-time').datepicker('getDate');
 			var selectedEnd = $('#graphcreator-time2').datepicker('getDate');
-			opec.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
-			opec.timeline.redraw();
+			gisportal.timeline.rangebars.filter(function(element, index, array) { if(element.name == $('#graphcreator-range option:selected').val()) { element.selectedStart = selectedStart; element.selectedEnd = selectedEnd; }  });
+			gisportal.timeline.redraw();
 		}
 	});
 
@@ -853,14 +853,14 @@ opec.rightPanel.setupGraphingTools = function() {
    // We need to check if a layer is selected
    if(typeof layerID !== 'undefined') {
       // Get the currently selected layer
-      var layer = opec.getLayerByID(layerID);
+      var layer = gisportal.getLayerByID(layerID);
       $('#graphcreator-baseurl').val(layer.wcsURL);
       $('#graphcreator-coverage option[val=' + layer.origName + ']').selected = true;
    }
   
 	$('#graphcreator-coverage').on('change', function()  {
 		var layerID = $('option:selected', this).val();	
-		var layer = opec.getLayerByID(layerID);
+		var layer = gisportal.getLayerByID(layerID);
       if (layer) {
          if (layer.wcsURL)  {
             $('#graphcreator-baseurl').val(layer.wcsURL);
@@ -876,8 +876,8 @@ opec.rightPanel.setupGraphingTools = function() {
                $('#advanced-inputs-header').parent().show();
                $('.js-reference').hide();
             }
-            if (opec.selection.bbox)
-               $(opec.selection).trigger('selection_updated', {bbox: true});
+            if (gisportal.selection.bbox)
+               $(gisportal.selection).trigger('selection_updated', {bbox: true});
          }
       }
 	});
@@ -885,14 +885,14 @@ opec.rightPanel.setupGraphingTools = function() {
    // Check for changes to the selected layer
    $('.lPanel').on('change', '.selectedLayer', function(e) {
       var layerID = $('.selectedLayer:visible').attr('id');
-      opec.updateLayerData(layerID);
+      gisportal.updateLayerData(layerID);
    });
    
    graphCreatorGenerate.find('img[src="img/ajax-loader.gif"]').hide();
                      
    // When selecting the bounding box text field, request user to draw the box to populate values
    $('#graphcreator-bbox').click(function() {
-      opec.gritter.showNotification('bbox', null);
+      gisportal.gritter.showNotification('bbox', null);
    });
    
    // Event to open and close the panels when clicked
@@ -949,7 +949,7 @@ opec.rightPanel.setupGraphingTools = function() {
    graphCreatorGenerate.on('click', ':button', function(e) {
       // Extract the date-time value from the datepickers either as single date-time or date-time range
      
-		var dateRange = opec.rightPanel.getDateRange();
+		var dateRange = gisportal.rightPanel.getDateRange();
       
       var graphXAxis = null,
       graphYAxis = null;
@@ -967,9 +967,9 @@ opec.rightPanel.setupGraphingTools = function() {
       // so this makes it match direction
       var depthDirection = function()  {
          var layerID = $('#graphcreator-coverage option:selected').val();
-         var layer = opec.layers[layerID];
+         var layer = gisportal.layers[layerID];
          var elevation = layer.selectedElevation;
-         var direction = opec.microLayers[layerID].positive;
+         var direction = gisportal.microLayers[layerID].positive;
 
          // Take direction === up as default
          if (direction === "down") elevation = -elevation; 
@@ -978,7 +978,7 @@ opec.rightPanel.setupGraphingTools = function() {
 
       var graphParams = {
          baseurl: $('#graphcreator-baseurl').val(),
-         coverage: opec.layers[$('#graphcreator-coverage option:selected').val()].origName || $('#graphcreator-coverage option:selected').val(),
+         coverage: gisportal.layers[$('#graphcreator-coverage option:selected').val()].origName || $('#graphcreator-coverage option:selected').val(),
          type: $('#graphcreator-gallery input[name="gallery"]:checked').val(),
          bins: $('#graphcreator-bins').val(),
          time: dateRange,
@@ -986,11 +986,11 @@ opec.rightPanel.setupGraphingTools = function() {
          depth: depthDirection(),
          graphXAxis: graphXAxis,
          graphYAxis: graphYAxis,
-         graphZAxis: opec.layers[$('#graphcreator-coverage option:checked').val()].origName
+         graphZAxis: gisportal.layers[$('#graphcreator-coverage option:checked').val()].origName
       };      
      	
 	  	if (graphParams.baseurl && graphParams.coverage)  {
-			var title = $('#graphcreator-title').html() || graphParams.type + " of " + opec.layers[$('#graphcreator-coverage option:checked').val()].displayTitle;
+			var title = $('#graphcreator-title').html() || graphParams.type + " of " + gisportal.layers[$('#graphcreator-coverage option:checked').val()].displayTitle;
 			var graphObject = {};
 			graphObject.graphData = graphParams;      
 			//graphObject.description = prompt("Please enter a description");
@@ -998,7 +998,7 @@ opec.rightPanel.setupGraphingTools = function() {
 			graphObject.title = title;
 			
 			// Async post the state
-			opec.genericAsync('POST', opec.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
+			gisportal.genericAsync('POST', gisportal.graphLocation, { graph: JSON.stringify(graphObject)}, function(data, opts) {
 				console.log('POSTED graph!');
 			}, function(request, errorType, exception) {
 				console.log('Failed to post graph!');
@@ -1006,17 +1006,17 @@ opec.rightPanel.setupGraphingTools = function() {
 			
 			var options = {};
 			options.title = title;
-         options.provider = opec.layers[$('#graphcreator-coverage option:selected').val()].providerTag;
+         options.provider = gisportal.layers[$('#graphcreator-coverage option:selected').val()].providerTag;
          options.labelCount = $('#graph-settings-labels').val();
-			opec.graphs.data(graphParams, options);
+			gisportal.graphs.data(graphParams, options);
   		}
 		else {
-			opec.gritter.showNotification ('dataNotSelected', null);
+			gisportal.gritter.showNotification ('dataNotSelected', null);
 		}
 	 });
 };
 
-opec.rightPanel.setupDataExport = function() {
+gisportal.rightPanel.setupDataExport = function() {
    
    var dataExport = $('#dataTools');
    var selectedLayer = $('.js-export-layer');
@@ -1038,7 +1038,7 @@ opec.rightPanel.setupDataExport = function() {
    // We need to check if a layer is selected
    if(typeof layerID !== 'undefined') {
       // Get the currently selected layer
-      var layer = opec.getLayerByID(layerID);
+      var layer = gisportal.getLayerByID(layerID);
       selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
       
       // Not using dot notation, so Closure doesn't change it.
@@ -1049,7 +1049,7 @@ opec.rightPanel.setupDataExport = function() {
 
  	// Check for changes to the selected layer
    $('.lPanel').bind('selectedLayer', function(e) {
-      var layer = opec.getLayerByID($('.selectedLayer:visible').attr('id'));
+      var layer = gisportal.getLayerByID($('.selectedLayer:visible').attr('id'));
       selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
       
       // Not using dot notation, so Closure doesn't change it.
@@ -1059,27 +1059,27 @@ opec.rightPanel.setupDataExport = function() {
    });
   
 	// TODO: IMPROVE
-   $(opec.selection).bind('selection_updated', function(event, params) {
+   $(gisportal.selection).bind('selection_updated', function(event, params) {
       if(typeof params.bbox !== 'undefinded' && params.bbox) {
-         var layer = opec.layers[$('#graphcreator-coverage').val()];
-         var bbox = opec.selection.bbox.split(',');
+         var layer = gisportal.layers[$('#graphcreator-coverage').val()];
+         var bbox = gisportal.selection.bbox.split(',');
          updateUrlTime();
          selectedLayer.html('<b>Selected Layer: </b>' + layer.displayTitle);
          selectedBbox.html('<b>Selected Bbox: </b>' + bbox[0] + ', ' + bbox[1] + ', ' + bbox[2] + ', ' + bbox[3]);
-         urlParams['bbox'] = opec.selection.bbox;
+         urlParams['bbox'] = gisportal.selection.bbox;
          urlParams['coverage'] = layer.urlName;
          url = layer.wcsURL;
          updateURL();
       }
 
-		$('#opec-graphing').on('change', '.hasDatepicker', updateUrlTime);
-		$(opec).on('rangeUpdate.opec', updateUrlTime);
+		$('#gisportal-graphing').on('change', '.hasDatepicker', updateUrlTime);
+		$(gisportal).on('rangeUpdate.gisportal', updateUrlTime);
 
 		function updateUrlTime() {
-         var layer = opec.layers[$('#graphcreator-coverage').val()];
-         opec.selection.time = urlParams['time'] = opec.rightPanel.getDateRange();
-         if (opec.selection.time !== '')  {
-            selectedTime.html('<b>Selected Time: </b>' + opec.selection.time);
+         var layer = gisportal.layers[$('#graphcreator-coverage').val()];
+         gisportal.selection.time = urlParams['time'] = gisportal.rightPanel.getDateRange();
+         if (gisportal.selection.time !== '')  {
+            selectedTime.html('<b>Selected Time: </b>' + gisportal.selection.time);
             url = layer.wcsURL;
             updateURL();
          }
@@ -1121,7 +1121,7 @@ opec.rightPanel.setupDataExport = function() {
 /**
  * Saves the state of the right panel
  */
-opec.rightPanel.saveState = function(state) {  
+gisportal.rightPanel.saveState = function(state) {  
    state.rightPanel = {};
    
    // Panel Open?
@@ -1147,12 +1147,12 @@ opec.rightPanel.saveState = function(state) {
 /**
  * Loads the state given
  */
-opec.rightPanel.loadState = function(state) {
+gisportal.rightPanel.loadState = function(state) {
    var map = state.map;
    var state = state.rightPanel;
    
    if(state.isOpen) {
-      opec.rightPanel.open();
+      gisportal.rightPanel.open();
    }
 
    if(state.gallery)  {
@@ -1175,9 +1175,9 @@ opec.rightPanel.loadState = function(state) {
  * Top bar
  * @namespace 
  */
-opec.topbar = {};
+gisportal.topbar = {};
 
-opec.topbar.setup = function() {
+gisportal.topbar.setup = function() {
    
    // Add jQuery UI datepicker
    $('#viewDate').datepicker({
@@ -1185,13 +1185,13 @@ opec.topbar.setup = function() {
       dateFormat: 'dd-mm-yy',
       changeMonth: true,
       changeYear: true,
-      beforeShowDay: function(date) { return opec.allowedDays(date); },
+      beforeShowDay: function(date) { return gisportal.allowedDays(date); },
       onSelect: function(dateText, inst) {
          var thedate = new Date(inst.selectedYear, inst.selectedMonth, inst.selectedDay);
          // Synchronise date with the timeline
-         opec.timeline.setDate(thedate);
+         gisportal.timeline.setDate(thedate);
          // Filter the layer data to the selected date
-         //opec.filterLayersByDate(thedate);
+         //gisportal.filterLayersByDate(thedate);
       },
       yearRange: "1970:2020"
    });
@@ -1207,21 +1207,21 @@ opec.topbar.setup = function() {
    // Function which can toggle OpenLayers controls based on the clicked control
    // The value of the value of the underlying radio button is used to match 
    // against the key value in the mapControls array so the right control is toggled
-   opec.toggleControl = function(element) {
-      for(var key in opec.mapControls) {
-         var control = opec.mapControls[key];
+   gisportal.toggleControl = function(element) {
+      for(var key in gisportal.mapControls) {
+         var control = gisportal.mapControls[key];
          if($(element).val() == key) {
             $('#'+key).attr('checked', true);
             control.activate();
             
             if(key == 'pan') {
-               opec.mapControls.selector.activate();
+               gisportal.mapControls.selector.activate();
             }
          }
          else {
             if(key != 'selector') {
                if(key == 'pan') {
-                  opec.mapControls.selector.deactivate();
+                  gisportal.mapControls.selector.deactivate();
                }
                
                $('#' + key).attr('checked', false);
@@ -1233,38 +1233,38 @@ opec.topbar.setup = function() {
    };
    
    // Making sure the correct controls are active
-   opec.toggleControl($('#panZoom input:radio'));
+   gisportal.toggleControl($('#panZoom input:radio'));
 
    // Manually Handle jQuery UI icon button click event - each button has a class of "iconBtn"
    $('#panZoom input:radio').click(function(e) {
-      opec.toggleControl(this);
+      gisportal.toggleControl(this);
    });
    
    //--------------------------------------------------------------------------
    
    // Create buttons
-   $('#opec-toolbar-actions').buttonset();
-   $('#mapInfoToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-opec-globe-info'} });
-   $('#shareMapToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-globe-link'} });
-   $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-opec-layers'} })
-   $('#opec-button-3d').button({ label: '', icons: { primary: 'ui-icon-opec-globe'}, disabled: 'true' })
+   $('#gisportal-toolbar-actions').buttonset();
+   $('#mapInfoToggleBtn').button({ label: '', disabled: 'true', icons: { primary: 'ui-icon-gisportal-globe-info'} });
+   $('#shareMapToggleBtn').button({ label: '', icons: { primary: 'ui-icon-gisportal-globe-link'} });
+   $('#layerPreloader').button({ label: '', icons: { primary: 'ui-icon-gisportal-layers'} })
+   $('#gisportal-button-3d').button({ label: '', icons: { primary: 'ui-icon-gisportal-globe'}, disabled: 'true' })
       .click(function(e) {
          if(map.globe.is3D) {
             map.show2D();
          } 
          else {
             map.show3D();
-            opec.gritter.showNotification('3DTutorial', null);
+            gisportal.gritter.showNotification('3DTutorial', null);
          }
       });
-   $('#infoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-opec-info'} });
+   $('#infoToggleBtn').button({ label: '', icons: { primary: 'ui-icon-gisportal-info'} });
    
    // Add toggle functionality for dialogs
    $('#shareMapToggleBtn').click(function() {
       $('#shareOptions').toggle();
    });
-   addDialogClickHandler('mapInfoToggleBtn', $('#opec-historyWindow'));
-   addDialogClickHandler('layerPreloader', $('#opec-layerSelection'));
+   addDialogClickHandler('mapInfoToggleBtn', $('#gisportal-historyWindow'));
+   addDialogClickHandler('layerPreloader', $('#gisportal-layerSelection'));
    addDialogClickHandler('infoToggleBtn', $('#walkthrough-menu'));
    
      function addDialogClickHandler(idOne, idTwo) {

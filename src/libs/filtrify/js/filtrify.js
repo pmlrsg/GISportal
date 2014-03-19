@@ -52,28 +52,28 @@
       // Toggle between filter and selected
       // TODO: Refactor this code. Move it somewhere nice
       // Improve binding, had to use main reference to make sure everything is updated correctly
-      $('.opec-tagMenu').on('click', '.js-selected-tags.toggle-off', function()  {
-         if ( opec.layerSelector.filtrify._memory.length === 0) {
-            opec.layerSelector.filtrify._memory = opec.layerSelector.filtrify._container.children();
-            opec.layerSelector.filtrify._container.empty();
-            opec.layerSelector.filtrify._container.append($(opec.layerSelector.filtrify._items).filter('.opec-selected'));
+      $('.gisportal-tagMenu').on('click', '.js-selected-tags.toggle-off', function()  {
+         if ( gisportal.layerSelector.filtrify._memory.length === 0) {
+            gisportal.layerSelector.filtrify._memory = gisportal.layerSelector.filtrify._container.children();
+            gisportal.layerSelector.filtrify._container.empty();
+            gisportal.layerSelector.filtrify._container.append($(gisportal.layerSelector.filtrify._items).filter('.gisportal-selected'));
             $('.ft-menu').hide();
             $('.js-clear-tags').attr("disabled", true);
-            $('.opec-search input').attr("disabled", true);
+            $('.gisportal-search input').attr("disabled", true);
             $('.js-selected-tags').addClass('ui-state-highlight');
             $(this).addClass('toggle-on').removeClass('toggle-off');
          }
       });
       
-      $('.opec-tagMenu').on('click', '.js-selected-tags.toggle-on', function()  {
-         if (opec.layerSelector.filtrify._memory.length > 0) {
-            opec.layerSelector.filtrify._container.empty().append(opec.layerSelector.filtrify._memory);
+      $('.gisportal-tagMenu').on('click', '.js-selected-tags.toggle-on', function()  {
+         if (gisportal.layerSelector.filtrify._memory.length > 0) {
+            gisportal.layerSelector.filtrify._container.empty().append(gisportal.layerSelector.filtrify._memory);
             $('.ft-menu').show();
             $('.js-clear-tags').attr("disabled", false);
-            $('.opec-search input').attr("disabled", false);
+            $('.gisportal-search input').attr("disabled", false);
             $(this).addClass('toggle-off').removeClass('toggle-on');
             $('.js-selected-tags').removeClass('ui-state-highlight');
-            opec.layerSelector.filtrify._memory = [];
+            gisportal.layerSelector.filtrify._memory = [];
          }   
       });
    
@@ -133,11 +133,11 @@
          }
          
          /*
-         $(element).on('opec-toggle-selected', 'a', function() {
+         $(element).on('gisportal-toggle-selected', 'a', function() {
             $(this).find(".ui-icon")
                .toggleClass("ui-icon-plus ui-icon-minus")
             .end()
-            .toggleClass('opec-selected opec-unselected')
+            .toggleClass('gisportal-selected gisportal-unselected')
             .toggleClass('ui-state-highlight');
          });
          */
@@ -154,13 +154,13 @@
          self = this;
 
       // Would be very nice to have this a bit cleaner!
-      this._search.element = $('<button class="js-clear-tags clear-tags">Clear Filter</button><ul class="opec-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p><button class="js-selected-tags selected-tags toggle-off">Show Selected</button>');
+      this._search.element = $('<button class="js-clear-tags clear-tags">Clear Filter</button><ul class="gisportal-search"><p>Filter by variable name</p><input type="text" placeholder="Filter" /></ul><p>Filter by tag</p><button class="js-selected-tags selected-tags toggle-off">Show Selected</button>');
       this.createSearch();
       this._menu.list = $('<ul class="ft-menu" />');
      
-      $('.opec-tagMenu').on('click', '.js-clear-tags', function() {
+      $('.gisportal-tagMenu').on('click', '.js-clear-tags', function() {
          self.trigger({});
-         $('.opec-search input').val('');
+         $('.gisportal-search input').val('');
       });
 
       for ( f; f < this._order.length; f++ ) {
