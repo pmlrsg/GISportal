@@ -1,13 +1,13 @@
 {
-   "id": "gisportal",
+   "id": "opec",
    "build-paths": [
       {
-         "dev": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/GISPortal.css\" />",
-         "build": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/GISPortal.min.css\" />"
+         "dev": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.css\" />",
+         "build": "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/OPECPortal.min.css\" />"
       },
       {
-         "dev": "<script type=\"text/javascript\" src=\"GISPortal.js\"></script>",
-         "build": "<script type=\"text/javascript\" src=\"GISPortal.min.js\"></script>"
+         "dev": "<script type=\"text/javascript\" src=\"OPECPortal.js\"></script>",
+         "build": "<script type=\"text/javascript\" src=\"OPECPortal.min.js\"></script>"
       }
     ]
 }

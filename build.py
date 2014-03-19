@@ -74,22 +74,22 @@ virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build')
 virtual('dev', 'js', 'css', 'images', 'replace-dev')
 
 # -----------------------------------------------------------------------------
-virtual('minjs', 'html/GISPortal.min.js')
-@target('html/GISPortal.min.js', PLOVR_JAR, 'gisportal_all.js')
+virtual('minjs', 'html/OPECPortal.min.js')
+@target('html/OPECPortal.min.js', PLOVR_JAR, 'gisportal_all.js')
 def build_min_portal_js(t):
    t.info('Minifying JS')
    t.output('%(JAVA)s', '-jar', PLOVR_JAR, 'build', 'gisportal_all.js')
    report_sizes(t)
    t.info('Finished minifying JS')
 
-virtual('js', 'html/GISPortal.js')
-@target('html/GISPortal.js', SRC)
+virtual('js', 'html/OPECPortal.js')
+@target('html/OPECPortal.js', SRC)
 def build_portal_js(t):
    t.info('building non-compiled version')
    portal_js = open('gisportal_js.json', 'r')
    json_js = json.load(portal_js)
    portal_js.close()
-   destination = open('html/GISPortal.js', 'wb')
+   destination = open('html/OPECPortal.js', 'wb')
    for filename in json_js["files"]:
       with open(filename, 'rb') as file:
          t.info("JS - adding " + filename)
@@ -99,8 +99,8 @@ def build_portal_js(t):
    t.info('finished')
 # -----------------------------------------------------------------------------
 
-virtual('uglify', 'html/GISPortal.uglify.min.js')
-@target('html/GISPortal.uglify.min.js', UGLIFYJS, SRC)
+virtual('uglify', 'html/OPECPortal.uglify.min.js')
+@target('html/OPECPortal.uglify.min.js', UGLIFYJS, SRC)
 def uglify_portal(t):
    t.output(UGLIFYJS, SRC)
    
@@ -116,11 +116,11 @@ def build_html(t):
          destination.write('\n')
          
 # -----------------------------------------------------------------------------       
-virtual('mincss', 'html/css/GISPortal.min.css')
-@target('html/css/GISPortal.min.css', YUICOMPRESSOR)
+virtual('mincss', 'html/css/OPECPortal.min.css')
+@target('html/css/OPECPortal.min.css', YUICOMPRESSOR)
 def build_min_portal_css(t):
    t.info('Minifying CSS')
-   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'GISPortal.css')
+   t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'OPECPortal.css')
    t.info('Finished minifying JS')
          
 virtual('css', 'target-css')
@@ -130,7 +130,7 @@ def build_portal_css(t):
    portal_css = open('gisportal_css.json', 'r')
    json_css = json.load(portal_css)
    portal_css.close()
-   destination = open('html/css/GISPortal.css', 'w')
+   destination = open('html/css/OPECPortal.css', 'w')
    for filename in json_css["files"]:
       with open(filename, 'rb') as file:
          t.info('-- Adding ' + filename)
