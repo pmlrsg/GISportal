@@ -1,3 +1,0 @@
-LOG_LEVEL: "DEBUG"
-# This path needs changing according to local server configuration
-LOG_PATH: /var/www/html/rbb/opecvis/middleware/wcs2json/

@@ -1,5 +1,0 @@
-Flask==0.9
-numpy==1.6.2
-netCDF4==0.9.9
-lxml==2.3.5
-PyYAML==3.10
