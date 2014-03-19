@@ -7,7 +7,7 @@
       "src/libs/jquery-walkthrough/jquery.walkthrough.js",
       "src/gisportal.js",
       "src/libs/dialog.js",
-      "src/gisportal.js",
+      "src/portal.js",
       "src/window.js",
       "src/windows/scalebar.js",
       "src/windows/graphcreator.js",
