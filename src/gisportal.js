@@ -1,71 +1,71 @@
 /**
- * Create opec namespace object
+ * Create namespace object
  * @namespace
  */ 
-var opec = opec || (opec = {});
+var gisportal = gisportal || (gisportal = {});
 
-opec.VERSION = "0.3.0";
-opec.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
+gisportal.VERSION = "0.4.0";
+gisportal.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
 
 /*==========================================================================*/
 //Initialise javascript variables and objects
 
 // Path to the flask middleware
-opec.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths
-opec.wcsLocation = opec.middlewarePath + '/wcs?';
-opec.wfsLocation = opec.middlewarePath + '/wfs?';
-opec.stateLocation = opec.middlewarePath + '/state';
-opec.graphLocation = opec.middlewarePath + '/graph';
+gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
+gisportal.wfsLocation = gisportal.middlewarePath + '/wfs?';
+gisportal.stateLocation = gisportal.middlewarePath + '/state';
+gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-OpenLayers.ProxyHost = opec.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
+OpenLayers.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
-opec.cache = {};
-opec.cache.wmsLayers = [];
-opec.cache.wfsLayers = [];
+gisportal.cache = {};
+gisportal.cache.wmsLayers = [];
+gisportal.cache.wfsLayers = [];
 
 // Temporary version of microLayer and layer storage.
-opec.layerStore = {}; // NOT IN USE!
+gisportal.layerStore = {}; // NOT IN USE!
 
-opec.microLayers = {};
-opec.layers = {};
-opec.selectedLayers = {};
-opec.nonSelectedLayers = {};
-opec.baseLayers = {};
+gisportal.microLayers = {};
+gisportal.layers = {};
+gisportal.selectedLayers = {};
+gisportal.nonSelectedLayers = {};
+gisportal.baseLayers = {};
 
 // A list of layer names that will be selected by default
 // This should be moved to the middleware at some point...
-opec.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
+gisportal.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
-opec.enabledDays = [];
+gisportal.enabledDays = [];
 
 // Used as offsets when sorting layers in groups
-opec.numBaseLayers = 0;
-opec.numRefLayers = 0;
-opec.numOpLayers = 0;
+gisportal.numBaseLayers = 0;
+gisportal.numRefLayers = 0;
+gisportal.numOpLayers = 0;
 
 // Stores the current user selection. Any changes should trigger the correct event.
 // Could be changed to an array later to support multiple user selections
-opec.selection = {};
-opec.selection.layer = undefined;
-opec.selection.bbox = undefined;
-opec.selection.time = undefined;
+gisportal.selection = {};
+gisportal.selection.layer = undefined;
+gisportal.selection.bbox = undefined;
+gisportal.selection.time = undefined;
 
-opec.layerSelector = null;
-opec.timeline = null;
-opec.walkthrough = null;
+gisportal.layerSelector = null;
+gisportal.timeline = null;
+gisportal.walkthrough = null;
 
 // Predefined map coordinate systems
-opec.lonlat = new OpenLayers.Projection("EPSG:4326");
+gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
 
 // Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
-opec.quickRegion = [
+gisportal.quickRegion = [
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
    ["Adriatic", 11.83, 39.00, 20.67, 45.80],
@@ -80,7 +80,7 @@ opec.quickRegion = [
 ];
 
 // Provider logos
-opec.providers = {
+gisportal.providers = {
    "CCI" : { "logo": "img/cci.png" },
    "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
    "DMI" : { "logo" : "img/dmi.png", "vertical" : "true", "url" : "http://www.dmi.dk/en/vejr/" },
@@ -92,7 +92,7 @@ opec.providers = {
 
 /**
  * The OpenLayers map object
- * Soon to be attached to opec namespace
+ * Soon to be attached to namespace
  */
 var map;
 
@@ -102,7 +102,7 @@ var map;
  * Map function to get the master cache JSON files from the server and then 
  * start layer dependent code asynchronously
  */
-opec.loadLayers = function() { 
+gisportal.loadLayers = function() { 
    
    var errorHandling = function(request, errorType, exception) {
       var data = {
@@ -116,11 +116,11 @@ opec.loadLayers = function() {
    };
     
    // Get WMS and WFS caches
-   opec.genericAsync('GET', './cache/mastercache.json', null, opec.initWMSlayers, errorHandling, 'json', {}); 
-   opec.genericAsync('GET', './cache/wfsMasterCache.json', null, opec.initWFSLayers, errorHandling, 'json', {});
+   gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
+   gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
-opec.getFeature = function(layer, olLayer, time) {
+gisportal.getFeature = function(layer, olLayer, time) {
    
    var errorHandling = function(request, errorType, exception) {
       var data = {
@@ -154,7 +154,7 @@ opec.getFeature = function(layer, olLayer, time) {
    };   
    var request = $.param(params);   
    
-   opec.genericAsync('GET', opec.wfsLocation, request, updateLayer, errorHandling, 'json', {layer: layer}); 
+   gisportal.genericAsync('GET', gisportal.wfsLocation, request, updateLayer, errorHandling, 'json', {layer: layer}); 
 };
 
 /**
@@ -167,7 +167,7 @@ opec.getFeature = function(layer, olLayer, time) {
  * @param {string} dataType - What data type will be returned, xml, json, etc
  * @param {object} opts - Object to pass to success function
  */
-opec.genericAsync = function(type, url, data, success, error, dataType, opts) {
+gisportal.genericAsync = function(type, url, data, success, error, dataType, opts) {
    //var map = this;
    $.ajax({
       type: type,
@@ -184,15 +184,15 @@ opec.genericAsync = function(type, url, data, success, error, dataType, opts) {
 /**
  * Create all the base layers for the map.
  */
-opec.createBaseLayers = function() {
-   //opec.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
+gisportal.createBaseLayers = function() {
+   //gisportal.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
    
    function createBaseLayer(name, url, opts) {
       var layer = new OpenLayers.Layer.WMS(
          name,
          url,
          opts,
-         { projection: opec.lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
+         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
       );
       
       layer.id = name;
@@ -200,8 +200,8 @@ opec.createBaseLayers = function() {
       layer.displayTitle = name;
       layer.name = name;
       map.addLayer(layer);
-      opec.baseLayers[name] = layer;
-      //opec.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
+      gisportal.baseLayers[name] = layer;
+      //gisportal.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
    }
    
    createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
@@ -210,16 +210,16 @@ opec.createBaseLayers = function() {
    createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
    // Get and store the number of base layers
-   opec.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
+   gisportal.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 };
 
 /**
  * Create all the reference layers for the map.
  */
-opec.createRefLayers = function() {  
-   opec.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#opec-lPanel-reference'));
+gisportal.createRefLayers = function() {  
+   gisportal.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#gisportal-lPanel-reference'));
    
-   $.each(opec.cache.wfsLayers, function(i, item) {
+   $.each(gisportal.cache.wfsLayers, function(i, item) {
       if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
          var url = item.url;
          var serverName = item.serverName;
@@ -228,7 +228,7 @@ opec.createRefLayers = function() {
                item.productAbstract = "None Provided";
                //item.tags = {};
                
-               var microLayer = new opec.MicroLayer(item.name, item.name, 
+               var microLayer = new gisportal.MicroLayer(item.name, item.name, 
                      item.productAbstract, "refLayers", {
                         'serverName': serverName, 
                         'wfsURL': url, 
@@ -239,9 +239,9 @@ opec.createRefLayers = function() {
                      }
                );
                      
-               microLayer = opec.checkNameUnique(microLayer);   
-               opec.microLayers[microLayer.id] = microLayer;
-               opec.layerSelector.addLayer(opec.templates.selectionItem({
+               microLayer = gisportal.checkNameUnique(microLayer);   
+               gisportal.microLayers[microLayer.id] = microLayer;
+               gisportal.layerSelector.addLayer(gisportal.templates.selectionItem({
                      'id': microLayer.id,
                      'name': microLayer.name, 
                      'provider': item.options.providerShortTag, 
@@ -254,19 +254,19 @@ opec.createRefLayers = function() {
       } 
    });
    
-   opec.layerSelector.refresh();
+   gisportal.layerSelector.refresh();
 
    // Get and store the number of reference layers
-   opec.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+   gisportal.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 };
 
 /** 
  * Create MicroLayers from the getCapabilities request to 
  * be used in the layer selector.
  */
-opec.createOpLayers = function() {
+gisportal.createOpLayers = function() {
    var layers = [];
-   $.each(opec.cache.wmsLayers, function(i, item) {
+   $.each(gisportal.cache.wmsLayers, function(i, item) {
       // Make sure important data is not missing...
       if(typeof item.server !== "undefined" && 
       typeof item.wmsURL !== "undefined" && 
@@ -284,7 +284,7 @@ opec.createOpLayers = function() {
                // Go through each layer and load it
                $.each(item, function(i, item) {
                   if(item.Name && item.Name !== "") {
-                     var microLayer = new opec.MicroLayer(item.Name, item.Title, 
+                     var microLayer = new gisportal.MicroLayer(item.Name, item.Title, 
                         item.Abstract, "opLayers", { 
                            "firstDate": item.FirstDate, 
                            "lastDate": item.LastDate, 
@@ -299,8 +299,8 @@ opec.createOpLayers = function() {
                         }
                      );
                                
-                     microLayer = opec.checkNameUnique(microLayer);   
-                     opec.microLayers[microLayer.id] = microLayer;
+                     microLayer = gisportal.checkNameUnique(microLayer);   
+                     gisportal.microLayers[microLayer.id] = microLayer;
                      if (microLayer.tags)  {
                         var tags = [];
                         $.each(microLayer.tags, function(d, i) {
@@ -340,29 +340,29 @@ opec.createOpLayers = function() {
       });
 
       $.each(layers, function(i, item) {
-         opec.layerSelector.addLayer(opec.templates.selectionItem(item.meta), { "tags" : item.tags} );
+         gisportal.layerSelector.addLayer(gisportal.templates.selectionItem(item.meta), { "tags" : item.tags} );
       });
    }
-   opec.layerSelector.refresh();
+   gisportal.layerSelector.refresh();
    // Batch add here in future.
 };
 
 /**
  * Get a layer that has been added to the map by its id.
- * In future this function will return a generic opec layer
+ * In future this function will return a generic layer
  * rather than a OpenLayers layer.
  */
-opec.getLayerByID = function(id) {
+gisportal.getLayerByID = function(id) {
    //return map.getLayersBy('id', id)[0];
-   return opec.layers[id];
+   return gisportal.layers[id];
 };
 
 /**
  * @param {Object} name - name of layer to check
  */
-opec.isSelected = function(name) {
+gisportal.isSelected = function(name) {
    if(map)
-      return $.inArray(name, opec.sampleLayers) > -1 ? true : false;
+      return $.inArray(name, gisportal.sampleLayers) > -1 ? true : false;
 };
 
 /**
@@ -371,7 +371,7 @@ opec.isSelected = function(name) {
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
  */
-opec.checkNameUnique = function(microLayer, count) {
+gisportal.checkNameUnique = function(microLayer, count) {
    var id = null;
    
    if(typeof count === "undefined" || count === 0) {
@@ -381,8 +381,8 @@ opec.checkNameUnique = function(microLayer, count) {
       id = microLayer.id + count;
    }
    
-   if(id in opec.microLayers) {
-      opec.checkNameUnique(microLayer, ++count);
+   if(id in gisportal.microLayers) {
+      gisportal.checkNameUnique(microLayer, ++count);
    } else {
       if(count !== 0) { 
          microLayer.id = microLayer.id + count; 
@@ -399,10 +399,10 @@ opec.checkNameUnique = function(microLayer, count) {
  * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
  * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
  */
-opec.allowedDays = function(thedate) {
-   var uidate = opec.utils.ISODateString(thedate);
+gisportal.allowedDays = function(thedate) {
+   var uidate = gisportal.utils.ISODateString(thedate);
    // Filter the datetime array to see if it matches the date using jQuery grep utility
-   var filtArray = $.grep(opec.enabledDays, function(dt, i) {
+   var filtArray = $.grep(gisportal.enabledDays, function(dt, i) {
       var datePart = dt.substring(0, 10);
       return (datePart == uidate);
    });
@@ -418,27 +418,27 @@ opec.allowedDays = function(thedate) {
 /**
  * Map function to re-generate the global date cache for selected layers.
  */
-opec.refreshDateCache = function() {
+gisportal.refreshDateCache = function() {
    var map = this;
-   opec.enabledDays = [];
+   gisportal.enabledDays = [];
    
    $.each(map.layers, function(index, value) {
       var layer = value;
       if(layer.selected && layer.temporal) {
-         opec.enabledDays = opec.enabledDays.concat(layer.DTCache);
+         gisportal.enabledDays = gisportal.enabledDays.concat(layer.DTCache);
       }
    });
    
-   opec.enabledDays = opec.utils.arrayDeDupe(opec.enabledDays);  
-   opec.rightPanel.updateCoverageList();
-   console.info('Global date cache now has ' + opec.enabledDays.length + ' members.'); // DEBUG
+   gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);  
+   gisportal.rightPanel.updateCoverageList();
+   console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
 };
 
 /**
  * Creates a list of custom args that will be added to the
  * permalink url.
  */
-opec.customPermalinkArgs = function()
+gisportal.customPermalinkArgs = function()
 {
    var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
       this, arguments
@@ -448,10 +448,10 @@ opec.customPermalinkArgs = function()
 /**
  * Sets up the map, plus its controls, layers, styling and events.
  */
-opec.mapInit = function() {
+gisportal.mapInit = function() {
    map = new OpenLayers.Map('map', {
-      projection: opec.lonlat,
-      displayProjection: opec.lonlat,
+      projection: gisportal.lonlat,
+      displayProjection: gisportal.lonlat,
       controls: []
    });
    
@@ -462,12 +462,12 @@ opec.mapInit = function() {
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
-   opec.loadLayers();
+   gisportal.loadLayers();
 
    // Create the base layers and then add them to the map
-   opec.createBaseLayers();
+   gisportal.createBaseLayers();
    // Create the reference layers and then add them to the map
-   //opec.createRefLayers();
+   //gisportal.createRefLayers();
 
    // Add a couple of useful map controls
    //var mousePos = new OpenLayers.Control.MousePosition();
@@ -480,7 +480,7 @@ opec.mapInit = function() {
     */
    
    // Create map controls identified by key values which can be activated and deactivated
-   opec.mapControls = {
+   gisportal.mapControls = {
       zoomIn: new OpenLayers.Control.ZoomBox(
          { out: false, alwaysZoom: true }
       ),
@@ -495,8 +495,8 @@ opec.mapInit = function() {
    };
 
    // Add all the controls to the map
-   for (var key in opec.mapControls) {
-      var control = opec.mapControls[key];
+   for (var key in gisportal.mapControls) {
+      var control = gisportal.mapControls[key];
       map.addControl(control);
    }
 
@@ -508,22 +508,22 @@ opec.mapInit = function() {
 /**
  * Anything that needs to be done after the layers are loaded goes here.
  */ 
-opec.initWMSlayers = function(data, opts) {
+gisportal.initWMSlayers = function(data, opts) {
    if (data !== null)  {
-      opec.cache.wmsLayers = data;
+      gisportal.cache.wmsLayers = data;
       // Create WMS layers from the data
-      opec.createOpLayers();
+      gisportal.createOpLayers();
       
       //var ows = new OpenLayers.Format.OWSContext();
       //var doc = ows.write(map);
    }
 };
 
-opec.initWFSLayers = function(data, opts) {
+gisportal.initWFSLayers = function(data, opts) {
    if (data !== null)  {
-      opec.cache.wfsLayers = data;
+      gisportal.cache.wfsLayers = data;
       // Create WFS layers from the data
-      opec.createRefLayers();
+      gisportal.createRefLayers();
    }
 };
 
@@ -532,7 +532,7 @@ opec.initWFSLayers = function(data, opts) {
 /**
  * Loads anything that is not dependent on layer data. 
  */
-opec.nonLayerDependent = function() {
+gisportal.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
@@ -553,18 +553,18 @@ opec.nonLayerDependent = function() {
    //Configure and generate the UI elements
    
    // Setup the left panel
-   opec.leftPanel.setup();
+   gisportal.leftPanel.setup();
    
    // Setup the right panel
-   opec.rightPanel.setup();
+   gisportal.rightPanel.setup();
    
    // Setup the topbar
-   opec.topbar.setup();
+   gisportal.topbar.setup();
    
    // Setup quickRegions | On Both the left panel and the topbar.
-   opec.quickRegions.setup();
+   gisportal.quickRegions.setup();
    
-   opec.openid.setup('shareOptions');
+   gisportal.openid.setup('shareOptions');
    
    //--------------------------------------------------------------------------
    
@@ -578,24 +578,24 @@ opec.nonLayerDependent = function() {
 
    // Set the max height of each of the accordions relative to the size of the window
    $('#layerAccordion').css('max-height', $(document).height() - 300);
-   $('#opec-lPanel-operational').css('max-height', $(document).height() - 350);
-   $('#opec-lPanel-reference').css('max-height', $(document).height() - 350);
+   $('#gisportal-lPanel-operational').css('max-height', $(document).height() - 350);
+   $('#gisportal-lPanel-reference').css('max-height', $(document).height() - 350);
    
    $(window).resize(function() {
       $('#layerAccordion').css('max-height', $(window).height() - 300);
-      $('#opec-lPanel-operational').css('max-height', $(window).height() - 350);
-      $('#opec-lPanel-reference').css('max-height', $(window).height() - 350);
+      $('#gisportal-lPanel-operational').css('max-height', $(window).height() - 350);
+      $('#gisportal-lPanel-reference').css('max-height', $(window).height() - 350);
    });
 
    
    //--------------------------------------------------------------------------
 
    // Handle selection of visible layers
-   $('#opec-lPanel-content').on('mousedown', 'li', function(e) {
+   $('#gisportal-lPanel-content').on('mousedown', 'li', function(e) {
       var itm = $(this);
       if(!itm.hasClass('notSelectable')) {
          var child = itm.children('input').first();
-         $('.opec-layer:visible').each(function(index) {
+         $('.gisportal-layer:visible').each(function(index) {
             $(this).removeClass('selectedLayer');
          });
          itm.addClass('selectedLayer');
@@ -604,9 +604,9 @@ opec.nonLayerDependent = function() {
    });
    
    // Toggle visibility of data layers
-   $('#opec-lPanel-operational, #opec-lPanel-reference').on('click', ':checkbox', function(e) {
+   $('#gisportal-lPanel-operational, #gisportal-lPanel-reference').on('click', ':checkbox', function(e) {
       var v = $(this).val();
-      var layer = opec.getLayerByID(v);
+      var layer = gisportal.getLayerByID(v);
       if($(this).is(':checked')) {
          layer.select();         
       } else {
@@ -628,10 +628,10 @@ opec.nonLayerDependent = function() {
    //--------------------------------------------------------------------------
 
    // Setup the contextMenu
-   opec.contextMenu.setup();
+   gisportal.contextMenu.setup();
    
    // Setup timeline
-   opec.timeline = new opec.TimeLine('timeline', {
+   gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
       selectedDate: new Date("2006-06-05T00:00:00Z"),
       chartMargins: {
@@ -648,7 +648,7 @@ opec.nonLayerDependent = function() {
 
 /*===========================================================================*/
 
-opec.saveState = function(state) {
+gisportal.saveState = function(state) {
    var state = state || {}; 
    // Save layers
    state.map = {};
@@ -657,9 +657,9 @@ opec.saveState = function(state) {
    state.layerSelector = {};
 
    // Get the current layers and any settings/options for them.
-   var keys = Object.keys(opec.layers);
+   var keys = Object.keys(gisportal.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
-      var layer = opec.layers[keys[i]];
+      var layer = gisportal.layers[keys[i]];
       state.map.layers[layer.id] = {
          'selected': layer.selected,
          'opacity': layer.opacity !== null ? layer.opacity : 1,
@@ -671,7 +671,7 @@ opec.saveState = function(state) {
    }
    
    // Get currently selected date.
-   if(!opec.utils.isNullorUndefined($('#viewDate').datepicker('getDate'))) {
+   if(!gisportal.utils.isNullorUndefined($('#viewDate').datepicker('getDate'))) {
       state.map.date = $('#viewDate').datepicker('getDate').getTime();
    }
      
@@ -679,10 +679,10 @@ opec.saveState = function(state) {
    var layer = map.getLayersBy('controlID', 'poiLayer')[0];
    if(layer.features.length > 0) {
       var feature = layer.features[0];
-      state.map.feature = opec.featureToGeoJSON(feature);
+      state.map.feature = gisportal.featureToGeoJSON(feature);
    }
    
-   state.rangebars = opec.timeline.rangebars;
+   state.rangebars = gisportal.timeline.rangebars;
    // Get zoom level
    state.map.zoom = map.zoom;
 
@@ -690,12 +690,12 @@ opec.saveState = function(state) {
    state.map.extent = map.getExtent();
 
    // Get quick regions
-   state.map.regions = opec.quickRegion;
+   state.map.regions = gisportal.quickRegion;
    state.map.selectedRegion = $('#quickRegion option:selected').val();
 
    // Get timeline zoom
-   state.timeline.minDate = opec.timeline.xScale.domain()[0];
-   state.timeline.maxDate = opec.timeline.xScale.domain()[1];
+   state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
+   state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
 
 
@@ -718,7 +718,7 @@ opec.saveState = function(state) {
    return state;
 };
 
-opec.loadState = function(state) {
+gisportal.loadState = function(state) {
    var state = state || {};
 
    // TODO: Refactor!
@@ -731,34 +731,34 @@ opec.loadState = function(state) {
    // Load layers for state
    var keys = Object.keys(state.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
-      if (!opec.layers[keys[i]]) {
-         var selection = opec.layerSelector.getLayerSelectionByID(keys[i]);
+      if (!gisportal.layers[keys[i]]) {
+         var selection = gisportal.layerSelector.getLayerSelectionByID(keys[i]);
          var options = {};
          if (state.layers[keys[i]].minScaleVal !== null) options.minScaleVal = state.layers[keys[i]].minScaleVal;
          if (state.layers[keys[i]].maxScaleVal !== null) options.maxScaleVal = state.layers[keys[i]].maxScaleVal;
-         opec.layerSelector.selectLayer(keys[i], selection, options);
+         gisportal.layerSelector.selectLayer(keys[i], selection, options);
       }
    }
    
    // Load date
-   if(!opec.utils.isNullorUndefined(state.date)) {
+   if(!gisportal.utils.isNullorUndefined(state.date)) {
       var date = new Date();
       date.setTime(state.date);
       $('#viewDate').datepicker('setDate', date);
    }
    
    // Create the feature if there is one
-   if(!opec.utils.isNullorUndefined(state.feature)) {
+   if(!gisportal.utils.isNullorUndefined(state.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-      layer.addFeatures(opec.geoJSONToFeature(state.feature));
+      layer.addFeatures(gisportal.geoJSONToFeature(state.feature));
     }
    
    if (rangebars)  {
       for (var i = 0; i < rangebars.length; i++)  {
-         opec.timeline.addRangeBarCopy(rangebars[i]);
+         gisportal.timeline.addRangeBarCopy(rangebars[i]);
       }
-      if (rightPanel.selectedRange) opec.rightPanel.updateRanges(rightPanel.selectedRange);
-      else opec.rightPanel.updateRanges();
+      if (rightPanel.selectedRange) gisportal.rightPanel.updateRanges(rightPanel.selectedRange);
+      else gisportal.rightPanel.updateRanges();
    }
 
    // Load position
@@ -767,8 +767,8 @@ opec.loadState = function(state) {
 
    // Load Quick Regions
    if (state.regions) {
-      opec.quickRegion = state.regions;
-      opec.quickRegions.setup();
+      gisportal.quickRegion = state.regions;
+      gisportal.quickRegions.setup();
    }
 
    if (state.selectedRegion)  {
@@ -776,33 +776,33 @@ opec.loadState = function(state) {
    }
 
    if (timeline)  {
-      opec.timeline.zoomDate(timeline.minDate, timeline.maxDate);
-      if (state.date) opec.timeline.setDate(new Date(state.date));
+      gisportal.timeline.zoomDate(timeline.minDate, timeline.maxDate);
+      if (state.date) gisportal.timeline.setDate(new Date(state.date));
    }
 
 
    if (layerSelector && layerSelector.filters)  {
-      opec.layerSelector.filtrify.trigger(layerSelector.filters);
+      gisportal.layerSelector.filtrify.trigger(layerSelector.filters);
    }
 };
 
-opec.featureToGeoJSON = function(feature) {
+gisportal.featureToGeoJSON = function(feature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.write(feature);
 };
 
-opec.geoJSONToFeature = function(geoJSONFeature) {
+gisportal.geoJSONToFeature = function(geoJSONFeature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.read(geoJSONFeature); 
 };
 
-opec.checkIfLayerFromState = function(layer) {
-   if(typeof opec.cache.state !== "undefined") {
-      var keys = Object.keys(opec.cache.state.map.layers);
-      var state = opec.cache.state.map;
+gisportal.checkIfLayerFromState = function(layer) {
+   if(typeof gisportal.cache.state !== "undefined") {
+      var keys = Object.keys(gisportal.cache.state.map.layers);
+      var state = gisportal.cache.state.map;
       for(var i = 0, len = keys.length; i < len; i++) {
          if(keys[i] == layer.id){
-            if(state.layers[keys[i]].selected === true) { $('#opec-lPanel-operational #' + layer.id + ' input:checkbox').prop("checked", true); layer.select();  }
+            if(state.layers[keys[i]].selected === true) { $('#gisportal-lPanel-operational #' + layer.id + ' input:checkbox').prop("checked", true); layer.select();  }
             layer.setOpacity(state.layers[keys[i]].opacity);
             //layer.setStyle(state.layers[keys[i]].style);
          }
@@ -816,17 +816,17 @@ opec.checkIfLayerFromState = function(layer) {
 /**
  * Any code that should be run when user logs in
  */
-opec.login = function() {
+gisportal.login = function() {
    $('#mapInfoToggleBtn').button("enable");
-   opec.window.history.loadStateHistory();
+   gisportal.window.history.loadStateHistory();
 };
 
 /**
  * Any code that should be run when the user logs out
  */
-opec.logout = function() {
+gisportal.logout = function() {
    $('#mapInfoToggleBtn').button("disable").prop("checked", false);
-   $('#opec-historyWindow').extendedDialog("close");
+   $('#gisportal-historyWindow').extendedDialog("close");
 }
 
 
@@ -836,13 +836,13 @@ opec.logout = function() {
  * Gets the current state of the portal from any and all components who have 
  * a state and wish to be stored. 
  */
-opec.getState = function() {
+gisportal.getState = function() {
    var state = {};
    
    // TODO: Get states from component.
-   state = opec.saveState(state);
-   state = opec.leftPanel.saveState(state);
-   state = opec.rightPanel.saveState(state);
+   state = gisportal.saveState(state);
+   state = gisportal.leftPanel.saveState(state);
+   state = gisportal.rightPanel.saveState(state);
 
    // TODO: Merge state with default state.
    
@@ -850,17 +850,17 @@ opec.getState = function() {
    return state; 
 };
 
-opec.setState = function(state) {
+gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
-   opec.cache.state = state;
-   opec.rightPanel.coverageStateSelected = false; // reset due to new state
+   gisportal.cache.state = state;
+   gisportal.rightPanel.coverageStateSelected = false; // reset due to new state
    // TODO: Merge with default state.
    
    // TODO: Set states of components.
-   opec.loadState(state);
-   opec.leftPanel.loadState(state);
-   opec.rightPanel.loadState(state); 
+   gisportal.loadState(state);
+   gisportal.leftPanel.loadState(state);
+   gisportal.rightPanel.loadState(state); 
 };
 
 /*===========================================================================*/
@@ -868,24 +868,24 @@ opec.setState = function(state) {
 /**
  * This code runs once the page has loaded - jQuery initialised.
  */
-opec.main = function() {
+gisportal.main = function() {
    // Compile Templates
-   opec.templates = {};
-   opec.templates.layer = Mustache.compile($('#opec-template-layer').text().trim());
-   opec.templates.metadataWindow = Mustache.compile($('#opec-template-metadataWindow').text().trim());
-   opec.templates.scalebarWindow = Mustache.compile($('#opec-template-scalebarWindow').text().trim());
-   opec.templates.graphCreatorWindow = Mustache.compile($('#opec-template-graphCreatorWindow').text().trim());
-   opec.templates.selectionItem = Mustache.compile($('#opec-template-selector-item').text().trim());
-   opec.templates.loginBox = Mustache.compile($('#opec-template-login-box').text().trim());
-   opec.templates.providerBox = Mustache.compile($('#opec-template-provider-box').text().trim());
-   opec.templates.historyList = Mustache.compile($('#opec-template-history-list').text().trim());
-   opec.templates.historyData = Mustache.compile($('#opec-template-history-data').text().trim());
-   opec.templates.walkthrough = Mustache.compile($('#opec-walkthrough').text().trim());
-   opec.templates.walkthroughMenu = Mustache.compile($('#opec-walkthrough-menu').text().trim());
+   gisportal.templates = {};
+   gisportal.templates.layer = Mustache.compile($('#gisportal-template-layer').text().trim());
+   gisportal.templates.metadataWindow = Mustache.compile($('#gisportal-template-metadataWindow').text().trim());
+   gisportal.templates.scalebarWindow = Mustache.compile($('#gisportal-template-scalebarWindow').text().trim());
+   gisportal.templates.graphCreatorWindow = Mustache.compile($('#gisportal-template-graphCreatorWindow').text().trim());
+   gisportal.templates.selectionItem = Mustache.compile($('#gisportal-template-selector-item').text().trim());
+   gisportal.templates.loginBox = Mustache.compile($('#gisportal-template-login-box').text().trim());
+   gisportal.templates.providerBox = Mustache.compile($('#gisportal-template-provider-box').text().trim());
+   gisportal.templates.historyList = Mustache.compile($('#gisportal-template-history-list').text().trim());
+   gisportal.templates.historyData = Mustache.compile($('#gisportal-template-history-data').text().trim());
+   gisportal.templates.walkthrough = Mustache.compile($('#gisportal-walkthrough').text().trim());
+   gisportal.templates.walkthroughMenu = Mustache.compile($('#gisportal-walkthrough-menu').text().trim());
 
-   opec.walkthrough = new opec.Walkthrough(); // uses templates.walkthrough so needs to run after
+   gisportal.walkthrough = new gisportal.Walkthrough(); // uses templates.walkthrough so needs to run after
   
-   $('#version').html('v' + opec.VERSION + ':' + opec.SVN_VERSION);
+   $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
     
    // Need to put this early so that tooltips work at the start to make the
    // page feel responsive.    
@@ -933,26 +933,26 @@ opec.main = function() {
       dblclick: "collapse"
    });
    
-   opec.layerSelector = new opec.window.layerSelector('opec-layerSelection .opec-tagMenu', 'opec-layerSelection .opec-selectable ul');
-   opec.historyWindow = new opec.window.history();
+   gisportal.layerSelector = new gisportal.window.layerSelector('gisportal-layerSelection .gisportal-tagMenu', 'gisportal-layerSelection .gisportal-selectable ul');
+   gisportal.historyWindow = new gisportal.window.history();
 
    // Setup the gritter so we can use it for error messages
-   opec.gritter.setup();
+   gisportal.gritter.setup();
 
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
-   opec.mapInit();
+   gisportal.mapInit();
 
    // Start setting up anything that is not layer dependent
-   opec.nonLayerDependent();
+   gisportal.nonLayerDependent();
    
    // Grab the url of any state.
-   var stateID = opec.utils.getURLParameter('state');
+   var stateID = gisportal.utils.getURLParameter('state');
    
    // Check if there is a state to load.
    if(stateID !== null) {
       console.log('Retrieving State...');
-      opec.ajaxState(stateID);
+      gisportal.ajaxState(stateID);
    }
    else {
       console.log('Loading Default State...');
@@ -961,11 +961,11 @@ opec.main = function() {
 };
 
 
-opec.ajaxState = function(id) { 
+gisportal.ajaxState = function(id) { 
       // Async to get state object
-      opec.genericAsync('GET', opec.stateLocation + '/' + id, null, function(data, opts) {         
+      gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
          if(data.output.status == 200) {
-            opec.setState($.parseJSON(data.output.state));
+            gisportal.setState($.parseJSON(data.output.state));
             console.log('Success! State retrieved');
          } else {
             console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
@@ -975,25 +975,25 @@ opec.ajaxState = function(id) {
       }, 'json', {});
    } 
 
-opec.getTopLayer = function() {
+gisportal.getTopLayer = function() {
 	var layer = null;
 	$.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
       if($(this).is(':checked')) {
          var layerID = $(this).parent('li').attr('id');
-         layer = opec.getLayerByID(layerID);
+         layer = gisportal.getLayerByID(layerID);
       }
    });
    return layer;
 };
 
-opec.updateLayerData = function(layerID)  {
-   var layer = opec.getLayerByID(layerID);
+gisportal.updateLayerData = function(layerID)  {
+   var layer = gisportal.getLayerByID(layerID);
    $('#graphcreator-baseurl').val(layer.wcsURL);
    $('#graphcreator-coverage option[value=' + layer.origName + ']').prop('selected', true);
 };
 
-opec.zoomOverall = function()  {
-   if (Object.keys(opec.selectedLayers).length > 0)  {
+gisportal.zoomOverall = function()  {
+   if (Object.keys(gisportal.selectedLayers).length > 0)  {
 
       // minX, minY, maxX, maxY
       var largestBounds = [ 
@@ -1003,8 +1003,8 @@ opec.zoomOverall = function()  {
          Number.MIN_VALUE
       ];
 
-      for (var i = 0; i < Object.keys(opec.selectedLayers).length; i++)  {
-         var layer = opec.selectedLayers[Object.keys(opec.selectedLayers)[i]].boundingBox;
+      for (var i = 0; i < Object.keys(gisportal.selectedLayers).length; i++)  {
+         var layer = gisportal.selectedLayers[Object.keys(gisportal.selectedLayers)[i]].boundingBox;
          if (+layer.MinX < +largestBounds[0]) largestBounds[0] = layer.MinX; // left 
          if (+layer.MinY < +largestBounds[1]) largestBounds[1] = layer.MinY; // bottom
          if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = layer.MaxX; // right 
