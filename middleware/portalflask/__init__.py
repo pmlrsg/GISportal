@@ -108,9 +108,8 @@ def setup_blueprints(app):
    app.register_blueprint(portal_wfs)
    app.register_blueprint(portal_wcs)
 
-# Using 'sys.path' to get the absolute location of the application, otherwise
-# when run by apache things will create in the wrong place. 
 path = sys.path[0]
+app = create_app(path)
 
 oid = OpenID(app, settings.OPENID_FOLDER)
 print path

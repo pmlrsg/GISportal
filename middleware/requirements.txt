@@ -1,9 +1,9 @@
-Flask >= 0.9
+Flask
 Flask-OpenID
-SQLAlchemy >= 0.7.10
-numpy >= 1.6.2
-netCDF4 >= 0.9.9
-lxml >= 2.3.5
-PyYAML >= 3.10
+SQLAlchemy
+flask-sqlalchemy
+netCDF4
+lxml
+PyYAML
 flask_script
-
+BeautifulSoup
