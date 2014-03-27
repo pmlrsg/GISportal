@@ -74,8 +74,9 @@ gisportal.window.createScalebar = function($trigger) {
    });
    
    // Event to automatically set the scale if the "Auto Scale" button is pressed
-   $('#' + layer.id + '-auto').on('click', '[type="button"]', function(e) {     
-   	gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(gisportal.getTopLayer().wmsURL + 'item=minmax&layers=' + gisportal.getTopLayer().id + '&bbox=-180,-90,180,90&elevation=' + (gisportal.getTopLayer().selectedElevation || -1) + '&time='+ new Date(gisportal.getTopLayer().selectedDateTime).toISOString() + '&crs=EPSG%3A4326&width=50&height=50&request=GetMetadata') , null, function(d) {
+   $('#' + layer.id + '-auto').on('click', '[type="button"]', function(e) {
+      var l = gisportal.layers[layer.id];     
+   	gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.id + '&bbox=-180,-90,180,90&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
    		validateScale(layer, d.min, d.max, true);
    	}, null, 'json', {});                          
       
