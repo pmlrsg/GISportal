@@ -23,7 +23,7 @@ gisportal.graphs.timeseries = function(data, options)  {
    nv.addGraph({
       generate: function() {
 
-         
+        /* 
           var chart = nv.models.lineChart()
             .useVoronoi(false) // Work around for a bug in nvd3 https://github.com/novus/nvd3/issues/330
             .margin({left: 50, right: 50})
@@ -32,9 +32,10 @@ gisportal.graphs.timeseries = function(data, options)  {
             .useInteractiveGuideline(true);
        
          /* Chart with zooming
+         */
          var chart = nv.models.lineWithFocusChart()
-            .margin({left: 25}); */
-            // .useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
+            .margin({left: 25}) 
+            .useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
         
          if (chart.xAxis)  { 
