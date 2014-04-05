@@ -33,6 +33,8 @@ gisportal.graphs.create = function(data, options)  {
          graph = gisportal.graphs.timeseries(data, options);
          break;
       case 'histogram':
+         debugger;
+         graph = gisportal.graphs.histogram(data, options);
          break;
       case 'hovmollerLat':
          break;
@@ -42,7 +44,8 @@ gisportal.graphs.create = function(data, options)  {
 
    if (graph)  {
       var uid = 'wcsgraph' + Date.now();
-      gisportal.graphs.createDialog(uid, "GRAPH").append(graph);
+      var title = options.title || "Graph";
+      gisportal.graphs.createDialog(uid, title).append(graph);
    } 
 }
 
