@@ -47,7 +47,7 @@ First we need to clone the repository.
 
 2. **Install Dependencies**
 The following dependencies will need to be installed by your package manager (for example, yum). Some of the names may be different depending on your system, we use Fedora. Some may already be installed.
-``httpd mod_wsgi python-devel numpy netcdf-devel libyaml libxml libxslt-devel``
+``httpd mod_wsgi python-devel numpy netcdf-devel libyaml libxml libxslt-devel openssl-devel gcc``
 We also need to install all the required libraries. This can be done in a few ways, the easiest using **pip** and the ``requirements.txt``. This may need sudo permissions.
 ``pip install -r middleware/requirements.txt``
 
@@ -65,7 +65,7 @@ Java 7 is required for the build process.
 Make sure you are in the same directory as ``build.py``.  
 
 4. **Create database**  
-Make sure you are in ``middleware/opecflask``  
+Make sure you are in ``middleware/portalflask``  
 Run ``python manage.py syncdb`` as apache (or make accessible to apache) to create the database.
 
 5. **Tell Apache About The WSGI File**  
@@ -83,6 +83,8 @@ This step assumes you have already setup the **wsgi_module** for apache. If not 
         
             Require all granted
         </Directory>
+**Using SSL**
+If you intend to make the portal accessible using SSL the WSGIProcessGroup mut be unique for the whole server; e.g. change ``portalflask`` to ``portalflask_ssl``
 
 6. **Reload Apache**  
 Apache runs an instance of the application and does not auto reload on any changes. The easiest way depending on your setup is to reload the Apache configs and then touch the ``.wsgi`` file for any changes made in future.  
@@ -98,7 +100,7 @@ It is very likely that the commands for apache will be different for you dependi
 **lib** - libraries used for compiling, testing and documentation.  
 **middleware**  
 &ensp;**cachingscripts** - contains all the Python files todo with the cachingscripts.  
-&ensp;**opecflask** - contains the Python code for the data processing and data storage.
+&ensp;**portallask** - contains the Python code for the data processing and data storage.
 **src** - javascript source along with some libraries that will be compiled with plovr/closure.  
 &ensp;**libs**  
 &ensp;**windows**
@@ -111,11 +113,12 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
     sudo service httpd enable
     sudo service httpd start
     
-    sudo yum install python-devel numpy netcdf-devel libyaml libxml libxslt-devel
+    sudo yum install python-devel numpy netcdf-devel libyaml libxml libxslt-devel openssl-devel gcc
     sudo pip install -r middleware/requirements.txt
     
     mkdir config
     cp config_examples/* config/
+    mkdir html/cache
     mkdir html/cache/layers
     mkdir html/cache/openID
     mkdir html/cache/openID/associations
@@ -143,7 +146,7 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
     python middleware/manage.py syncdb
     
     SELinux must be permissive
-    seenforce 0
+    setenforce 0
     
     ./clearcache
     
