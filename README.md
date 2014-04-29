@@ -100,7 +100,7 @@ It is very likely that the commands for apache will be different for you dependi
 **lib** - libraries used for compiling, testing and documentation.  
 **middleware**  
 &ensp;**cachingscripts** - contains all the Python files todo with the cachingscripts.  
-&ensp;**portallask** - contains the Python code for the data processing and data storage.
+&ensp;**portalflask** - contains the Python code for the data processing and data storage.
 **src** - javascript source along with some libraries that will be compiled with plovr/closure.  
 &ensp;**libs**  
 &ensp;**windows**
