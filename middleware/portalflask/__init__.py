@@ -110,7 +110,6 @@ def setup_blueprints(app):
 
 path = sys.path[0]
 app = create_app(path)
-
 oid = OpenID(app, settings.OPENID_FOLDER)
 print path
 

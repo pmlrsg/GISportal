@@ -1,9 +1,10 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<meta name="viewport" content="width=device-width" />
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<title>OPEC Visualisation Portal Prototype</title>
+<title>GIS Portal Prototype</title>
 
 <!-- ============================ Now for the styling ============================ -->
 
@@ -13,388 +14,39 @@
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-<script type="text/javascript" src="http://code.jquery.com/jquery-migrate-1.1.1.min.js"></script>
 
-<!-- The latest jQuery UI from jqueryui.com -->
-<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<!-- jQuery UI -->
+<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 
-<!-- Flotr2 -->
-<script type="text/javascript" src="js-libs/Flotr2/js/flotr2.min.js"></script>
-
-<!-- http://forum.jquery.com/topic/expand-all-zones-for-an-accordion#14737000002919405 -->
-<!-- <script type="text/javascript" src="js-libs/multiAccordion.js"></script> -->
-
-<!-- http://code.google.com/p/jquery-multi-open-accordion -->
-<!-- <script type="text/javascript" src="js-libs/jquery.multi-open-accordion-1.5.3.js"></script> -->
-
-<!-- http://medialize.github.com/jQuery-contextMenu/ -->
-<!-- <script type="text/javascript" src="js-libs/jquery-contextMenu/js/jquery-contextMenu.js"></script> -->
-
-<!-- https://github.com/jboesch/Gritter -->
-<!-- <script type="text/javascript" src="js-libs/jquery-gritter/js/jquery.gritter.js"></script> -->
-
-<!-- https://github.com/michael/multiselect -->
-<!-- <script type="text/javascript" src="js-libs/jquery-multiselect/js/jquery.multiselect.js"></script> -->
-
-<!-- jQuery UI dialog extension -->
-<!-- <script type="text/javascript" src="js-libs/jquery-dialogextend/js/jquery.dialogextend.1.1.0.js"></script> -->
-
-<!-- Cesium -->
-<!-- <script type="text/javascript" src="js-libs/Cesium/js/Cesium.js"></script>-->
-
-<!-- O2C -->
-<!--<script type="text/javascript" src="js-libs/O2C/js/O2C.js"></script>-->
-
 <!-- D3 -->
-<!--<script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.js"></script> -->
-<!--<script src="js-libs/d3.v3.2.4.js"></script>-->
 <script src="http://d3js.org/d3.v3.js"></script>
-
-<!-- D3.chart -->
-<script src="js-libs/d3.chart/d3.chart.js"></script>
 
 <!-- mustache -->
 <script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
 
-<!-- heatmapjs -->
-<script type="text/javascript" src="js-libs/heatmapjs/heatmap.js"></script>
-<script type="text/javascript" src="js-libs/heatmapjs/heatmap-openlayers.js"></script>
 
-<!-- filtrify -->
-<!-- <script type="text/javascript" src="js-libs/filtrify/js/filtrify.js"></script> -->
-
-<!-- quicksand -->
-<!-- <script type="text/javascript" src="js-libs/quicksand/js/quicksand.js"></script> -->
-
-<!-- dialog -->
-<!-- <script type="text/javascript" src="js-libs/dialog.js"></script> -->
+<!-- Fuse -->
+<script type="text/javascript" src="js-libs/fuse/fuse.js"></script>
 
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
-<!-- =================================== Templates =================================== -->
-<script type="text/html" id="gisportal-template-layer">
-   {{! List of used variables for this template:
-      name - The name of the layer
-      loader - Show ajax loader (true/false)
-      checkbox - Show checkbox (true/false)
-      visibility - Is the layer visible
-      displayTitle - The name to show     
-   }}
-   <li id="{{name}}" class="gisportal-layer">
-      <img src="img/ajax-loader.gif"/>
-      <input type="checkbox" {{#visibility}}checked="yes"{{/visibility}} name="{{name}}" value="{{name}}" />
-      <p>{{displayTitle}}</p>
-      <a id="layer-exclamation" href="#">
-         <img src="img/exclamation_small.png"/>
-      </a>
-      <span class="gisportal-layer-dropdown ui-icon ui-icon-triangle-1-s">dropdown</span>
-      
-   </li>
-</script>
-<!-- Metadata Window -->
-<script type="text/html" id="gisportal-template-metadataWindow">
-   {{! List of used variables for this template:
-      id - A unique id of the layer whos metadata is to be displayed.
-      displayTitle - What will be shown to the user to identifiy the window.
-      source - The source of the data that makes up the layer.
-      northBoundLat - North Bound Latitude.
-      eastBoundLon - East Bound Longitude.
-      southBoundLat - South Bound Latitude.
-      westBoundLon - West Bound Longitude.
-      addDateRange - Returns true if the layer has temporal data.
-      firstDate - The first avaliable date for the layer.
-      lastDate - The last avaliable date for the layer.
-      productAbstract - A description of the layer.
-   }}
-   <div id="metadata-{{id}}" class="tt" title="Metadata - {{displayTitle}}">          
-      <div>
-         <label>Source: {{source}}</label>
-      </div>
-      <div>
-         <label>Name: {{displayTitle}}</label>
-      </div>
-      <div>
-         <span>
-            BoundingBox:
-            <label style="color: green">{{northBoundLat}}</label>
-            N,
-            <label style="color: blue">{{eastBoundLon}}</label>
-            E,
-            <label style="color: green">{{southBoundLat}}</label>
-            S,
-            <label style="color: blue">{{westBoundLon}}</label>
-            W
-         </span>
-      </div>
-      {{#addDateRange}}
-      <div>
-         <label>Date Range: {{firstDate}} to {{lastDate}} </label>
-      </div>
-      {{/addDateRange}}
-      <div>
-         <label>Abstract: {{productAbstract}}</label>
-      </div>
-   </div>
-</script>
-<!-- Scalebar Window -->
-<script type="text/html" id="gisportal-template-scalebarWindow">
-   {{! List of used variables for this template:
-      name - A unique id of the layer whos metadata is to be displayed.
-      displayTitle - What will be shown to the user to identifiy the window.
-      url - The url of the scalebar picture.
-   }}
-   <div id="scalebar-{{name}}" class="scalebar unselectable tt" title="Scalebar - {{displayTitle}}">
-      <img src="{{url}}" alt="Scalebar" />
-      <div id="{{name}}-range-slider"></div>
-      <div>
-         <label for="{{name}}-max">Maximum Value: </label>
-      </div>
-      <div class="scalebar-max">
-         <input id="{{name}}-max" title="The maximum value to be used" type="text" name="{{name}}-max" />
-      </div>
-      <div id="{{name}}-scale" class="scalebar-scale">
-         <input type="button" name="{{name}}-scale-button" title="Add 25% to top and bottom of the slider" value="Recalculate Scale" />
-      </div>
-      <div id="{{name}}-log" class="scalebar-log">
-         <input type="checkbox" name="{{name}}-log-checkbox" title="Use Logarithmic Scale" />
-         <label for="{{name}}-logarithmic">Logarithmic Scale</label>
-      </div>
-      <div id="{{name}}-reset" class="scalebar-reset">
-         <input type="button" name="{{name}}-reset-button" title="Reset the scale to the default values" value="Reset Scale" />
-      </div>
-      <div id="{{name}}-auto" class="scalebar-auto">
-         <input type="button" name="{{name}}-auto-button" title="Set the scale automatically" value="Auto Scale" />
-      </div>
-      <div>
-         <label for="{{name}}-min">Minimum Value: </label>
-      </div>
-      <div class="scalebar-min">
-         <input id="{{name}}-min" title="The minimum value to be used" type="text" name="min" />
-      </div>
-   </div>
-</script>
-<!-- Graph Creator Window-->
-<script type="text/html" id="gisportal-template-graphCreatorWindow">
-   {{! List of used variables for this template:
-      advanced - Show advanced options (true/false)
-   }}
-   <div id="graphCreator" class="unselectable tt" title="Graph Creator">
-      <div class="ui-control">
-         <div>
-            <label for="graphcreator-gallery-label">Gallery:</label>
-         </div>
-         <div id="graphcreator-gallery">
-            <input type="radio" name="gallery" value="timeseries" id="timeseries" title="Returns a time series with mean, median, max, min and STD" checked>
-            <label for="timeseries">Timeseries</label>
-            <input type="radio" name="gallery" value="histogram" id="histogram" title="Returns a histogram">
-            <label for="histogram">Histogram</label>
-            <input type="radio" name="gallery" value="hovmollerLat" id="hovmollerLat" title="Returns a hovmöller graph with Latitude on the Y Axis">
-            <label for="hovmollerLat">Hovmöller Latitude</label>
-            <input type="radio" name="gallery" value="hovmollerLon" id="hovmollerLon" title="Returns a hovmöller graph with longitude on the X Axis">
-            <label for="hovmollerLon">Hovmöller Longitude</label>
-            <!--<input type="radio" name="gallery" value="raw" title="Not for normal use (gets the raw data)"><label for="raw">raw</label>
-            <input type="radio" name="gallery" value="test" title="Not for normal use (test new queries)"><label for="test">test</label>
-            <input type="radio" name="gallery" value="error" title="Generates errors, used testing error handling"><label for="error">error</label> -->
-         </div>
-         <h3 id="data-inputs-header" class="ui-control-header ui-helper-reset">
-            <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Data</a> 
-         </h3>
-         <div id="data-inputs">
-            <div class="hidden">
-               <label for="graphcreator-title">Title:</label>
-            </div>
-            <div class="hidden">
-               <input id="graphcreator-title" class="title-case" title="Title of the graph" type="text" name="graphcreator-title" />
-            </div>
-            <div class="hidden">
-               <label for="graphcreator-baseurl">Base URL:</label>
-            </div>
-            <div class="hidden">
-               <input id="graphcreator-baseurl" title="Base URL of the WCS server" placeholder="WCS URL" type="text" name="graphcreator-path" />
-            </div>
-            <div>
-               <label for="graphcreator-coverage">Make sure to select the correct layer:</label>
-            </div>
-            <div> 
-               <input id="graphcreator-coverage-real" class="hidden" title="Real Name of the Coverage" placeholder="Real Name of the Coverage" type="text" name="graphcreator-coverage-real" />
-					<select id="graphcreator-coverage" name="graphcreator-coverage">
-						<option value="" disabled selected>Name of the Layer</option>
-					</select>	
-            </div>
-            <div class="hidden js-reference">
-               <label for="graphcreator-reference-variable">Select a variable</label>
-            </div>
-            <div class="hidden js-reference">
-               <select id="graphcreator-reference-variable" name="graphcreator-reference-variable">
-                  <option value="" disabled selected>Name of the Variable</option>
-               </select>
-            </div>
-         </div>
-      </div>
-      <div class="ui-control">
-         <h3 id="histogram-inputs-header" class="ui-control-header ui-helper-reset">
-            <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Histogram Inputs</a>
-         </h3>
-         <div id="histogram-inputs">
-            <div>
-               <label for="graphcreator-bins-label">Bins:</label>
-            </div>
-            <div>
-               <input id="graphcreator-bins" title="Comma Separated Bins" placeholder="example: 0,2.5,5,7.5,10" type="text" name="graphcreator-bins"/>
-            </div>
-         </div>
-      </div>
-      <div class="ui-control">
-         <h3 id="graph-settings-header" class="ui-control-header ui-helper-reset">
-            <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Graph Settings</a>
-         </h3>
-         <div id="graph-settings">
-            <div>
-               <label for="graph-settings-labels">Amount of Value Labels:</label>
-            </div>
-            <div>
-               <input id="graph-settings-labels" title="Amount of Value Labels" value="5" type="text" name="graph-settings-labels"/>
-            </div>
-         </div>
-      </div>
-
-      {{#advanced}}
-      <div class="ui-control">
-         <h3 id="advanced-inputs-header" class="ui-control-header ui-helper-reset">
-            <span class="ui-icon ui-icon-triangle-1-s"></span>
-            <a href="#">Area and Time of Interest</a>
-         </h3>
-         <div id="advanced-inputs">
-            <div>
-               <label for="graphcreator-range">Time Range:</label>
-               <select name="graphcreator-range" id="graphcreator-range">
-                  <option selected>Select a Range</option>  
-               <select>
-               <button class="js-newRange">New Range</button>
-               <button class="js-hideRange">Hide Range</button>
-               <button class="js-renameRange">Rename Range</button>
-               <button class="js-deleteRange">Delete Range</button>
-            </div>
-            
-            <div>
-               <label for="graphcreator-time">Date:</label>
-            </div>
-            <div>
-               <input id="graphcreator-time" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time"/>
-               <label> to </label>
-               <input id="graphcreator-time2" title="You can use also choose time&#47;date ranges" type="text" placeholder="yyyy-mm-dd" size="10" name="graphcreator-time2"/>
-               <button class="js-updateRange hidden">Update Range</button>
-            </div>
-            <div>
-               <label for="graphcreator-bbox">Bbox:</label>
-            </div>
-            <div>
-               <input id="graphcreator-bbox" title="Bbox in lon,lat,lon,lat format" placeholder="lon,lat,lon,lat" type="text" name="graphcreator-bbox"/>
-            </div>
-         </div>
-      </div>
-      {{/advanced}}
-      <div id="graphcreator-generate">
-         <input type="button" title="Generate a graph from a WCS request" name="graphcreator-generate-button" value="Generate Graph" />
-         <img src="img/ajax-loader.gif"/> 
-      </div>
-   </div>
-</script>
-<!-- Item on the layer selection window -->
-<script type="text/html" id="gisportal-template-selector-item">
-   <li class="gisportal-unselected ui-state-default" data-provider="{{ provider}}" data-title="{{title}}" data-id="{{id}}" data-name="{{name}}">
-      <strong>{{name}}</strong>
-      <a href="#"><span class="ui-corner-all ui-icon ui-icon-triangle-1-e"></span></a>
-      <div style="display:none;">
-         <p>Abstract: <i>{{abstract}}</i></p>
-         <p>Provider: <i>{{provider}}</i></p>
-         {{#tags}}<p>{{tag}} : <i>{{value}}</i></p>{{/tags}}
-         {{#bounds}}<p>Bounding Box:  <label style="color: green">{{bounds.NorthBoundLatitude}}</label>
-            N,
-            <label style="color: blue">{{bounds.EastBoundLongitude}}</label>
-            E,
-            <label style="color: green">{{bounds.SouthBoundLatitude}}</label>
-            S,
-            <label style="color: blue">{{bounds.WestBoundLongitude}}</label>
-            W</p>{{/bounds}}
-         <p>Date Range: {{firstDate}} to {{lastDate}}</p>
-      </div>
-   </li>
-</script>
-<!-- Login box -->
-<script type="text/html" id="gisportal-template-login-box">
-   <form action="/service/login" method="get" id="{{id}}">
-      <input type="hidden" name="action" value="verify">
-      <fieldset>
-         <legend>Sign-in or Create New Account</legend>
-         <div id="gisportal-openid-choice" style="display:block;">
-            <p>Please click your account provider:</p>
-            <div id="gisportal-openid-btns">
-               {{#providers}} {{#provider}} {{/provider}} {{/providers}}
-            </div>
-            <div id="gisportal-openid-input"></div>
-         </div>
-      </fieldset>
-   </form>
-</script>
-<!-- Provider Box -->
-<script type="text/html" id="gisportal-template-provider-box">
-   <a class="gisportal-login-with-{{name}}" title="{{title}}" data-url="{{url}}"></a> <!--href="{{url}}" target="_blank" style="background: rgba(0,0,0,0) url({{imagePath}}); background-position: {{x}}px {{y}}px; width: {{width}}; height: {{height}}" -->
-</script>
-<!-- History Window List -->
-<script type="text/html" id="gisportal-template-history-list">
-   <li class="ui-state-default" data-id="{{ id }}">
-      {{ description }}
-   </li>
-</script>
-<!-- History Window Data -->
-<script type="text/html" id="gisportal-template-history-data">
-   <li class="hidden" data-id="{{ id }}" data-title="{{ title }}">
-      <p class="title-case">{{ title }}</p>
-      <div class="hidden">
-         <div class="json-data">{{ data }}</div>
-      </div>
-   </li>
-</script>
-
-<!-- Walkthrough -->
-<script type="text/html" id="gisportal-walkthrough">
-   <li class="{{ classes }} ui-dialog" data-id="{{ id }}">
-   	<button class="js-walkthrough-close ui-dialog-titlebar-close">Close</button>
-      {{{ content }}}
-      <span class="ui-icon next right">Next</span>
-   </li>
-</script>
-
-<!-- Walkthrough Menu -->
-<script type="text/html" id="gisportal-walkthrough-menu">
-	<li><a href="#{{ id }}">{{ name }}</a></li>
-</script>
-
-<!-- ====================================================================== -->
-
 </head>
 <body role="application">
    <!-- CSS check and info for screen readers -->
-   <div id="nocss-info">
-      <h1>OPEC Portal</h1>
+   <div id="nocss-info" class="hidden">
+      <h1>GIS Portal</h1>
       <!-- Info for screen readers and any bots. Should show up on search results -->
       <span>
          Welcome to the OPEC (Operational Ecology) Marine Ecosystem Forecasting Portal. The OPEC project will develop 
          and evaluate ecosystem forecast tools to help assess and manage the risks posed by human activities on the 
          marine environment, helping to improve the ability to predict the “health” of European marine ecosystems.
       </span>
-      <div class="css-check">
-         This website requires css to work. Please enable it in your browser.
-      </div>
    </div>
+
    <!-- JavaScript check -->
    <noscript>
       <div id="noscript-warning">
@@ -404,286 +56,70 @@
 
    <!-- The Map -->
    <div id="map"></div>
-   <!-- The Top Toolbar -->
-   <div id="topToolbar" class="toolbar unselectable tt">
-      <ul>
-         <li id="panZoom">
-            <input type="radio" id="pan" name="radio" value="pan" checked="checked" />
-            <label class="iconBtn" for="pan" title="Pan the Map: Keep the mouse button pressed and drag the map around."></label>
-            <input type="radio" id="zoomIn" name="radio" value="zoomIn"/>
-            <label class="iconBtn" for="zoomIn" title="Zoom In: Click in the map to zoom in or drag a rectangle to zoom into that selection."></label>
-            <input type="radio" id="zoomOut" name="radio" value="zoomOut" />
-            <label class="iconBtn" for="zoomOut" title="Zoom Out: Click in the map to zoom out or drag a rectangle to zoom the map out into that selection."></label>
-         </li>
-         <li class="divider"></li>
-         <li>
-            <!-- Using fieldsets as no easy CSS alternative -->
-            <fieldset>
-               <legend>View Date</legend>
-               <input size="10" type="text" disabled name="viewDate" id="viewDate" placeholder="dd-mm-yyyy" />
-            </fieldset>
-         </li>
-         <li class="divider"></li>
-         <li>
-            <!-- Using fieldsets as no easy CSS alternative -->
-            <fieldset>
-               <legend>Quick Region</legend>
-               <select class="gisportal-quickRegion-select ui-corner-all" id="quickRegion" name="Quick Region">
-               </select>
-            </fieldset>
-         </li>
-         <li class="divider"></li>
-         <li id="gisportal-toolbar-actions" class="gisportal-toolbar-buttonpane">
-            <!--<input type="checkbox" id="mapInfoToggleBtn" /><label class="gisportal-iconBigBtn" for="mapInfoToggleBtn" title="Toggle Map Info"></label>-->
-            <input type="checkbox" id="shareMapToggleBtn" /><label class="gisportal-iconBigBtn" for="shareMapToggleBtn" title="Toggle Share Panel"></label>
-            <input type="checkbox" id="layerPreloader" /><label class="gisportal-iconBigBtn" for="layerPreloader" title="Toggle Layer Selection Panel"></label>
-            <!--<input type="checkbox" id="gisportal-button-3d" /><label class="gisportal-iconBigBtn" for="gisportal-button-3d" title="Toggle 3D Mode"></label>-->
-            <input type="checkbox" id="infoToggleBtn" /><label class="gisportal-iconBigBtn" for="infoToggleBtn" title="Toggle OPEC Information Box"></label>
-         </li>
-      </ul>
-      <div class="togglePanel">
-         <button></button>
-      </div>
-   </div>
-   <!-- The Left Panels -->
-   <a class="trigger triggerL unselectable" href="#">Layers</a>
-   <div class="panel lPanel unselectable">
-      <h3 id="layerLbl">Data Layers</h3>
-      <div id="layerAccordion" class="ui-helper-reset">
-         <div id="gisportal-triggerL-toolbar" class="panel-toolbar ui-helper-reset">
-            <ul>
-               <li class="gisportal-tab-group ui-corner-top lPanel-buttonSet">
-                  <input type="radio" name="layer-tab" checked id="gisportal-lpanel-tab-operational" class="gisportal-tab" href="#gisportal-lPanel-operational">
-                  <label for="gisportal-lpanel-tab-operational">Models</label>
-                  <input type="radio" name="layer-tab" id="gisportal-lpanel-tab-reference" class="gisportal-tab" href="#gisportal-lPanel-reference">
-                  <label for="gisportal-lpanel-tab-reference">Reference</label>
-                  <input type="radio" name="layer-tab" id="gisportal-lpanel-tab-options" class="gisportal-tab" href="#lpanel-base-layers">
-                  <label for="gisportal-lpanel-tab-options">Options</label>
-               </li>
-               <li id="triggerL-buttonset" class="hidden lPanel-buttonSet ui-corner-top">
-                  <button id="triggerL-add-accordion" class="panel-button"></button>
-                  <!-- <button id="triggerL-remove-accordion" class="panel-button"></button> -->
-               </li>
-               <li id="triggerL-group-creation" style="display: none; margin-top: 4px;">
-                  <input id="triggerL-enter-group-name" title="Group Name" type="text" placeholder="enter group name here" />
-               </li>
-            </ul>       
-         </div>
-         <div id="gisportal-lPanel-content" class="ui-corner-all">
-            <div id="gisportal-lPanel-operational" class="ui-corner-top gisportal-tab-content gisportal-tab-active"></div>
-            <div id="gisportal-lPanel-reference" class="ui-corner-top gisportal-tab-content" style="display: none;"></div>
-            <div id="lpanel-base-layers" class="gisportal-tab-content" style="display: none;">
-               <div id="baseLayers">
-                  <fieldset>
-                     <legend>Base Layer</legend>
-                     <select class="ui-corner-all" id="baseLayer" name="Base Layer">
-                     </select>
-                  </fieldset>
-                  <!-- Quick Region -->
-                  <fieldset>
-                     <legend>Quick Regions</legend>
-                     <select class="gisportal-quickRegion-select ui-corner-all"></select>
-                     
-                     <div style="clear: both;"> </div>
-                     
-                     <button class="gisportal-quickRegion-remove">Remove selected region</button>
-                     <button class="gisportal-quickRegion-addCurrent">Add Current View</button> 
-                     <div style="clear: both;"> </div>
-                  </fieldset>
-                  
-                  <fieldset>
 
-                     <legend>Edit Regions:</legend>
-                     <div style="clear: both;"> </div>
-                     
-                     <!-- Quick Region Name -->
-                     <label for="gisportal-quickRegion-name">Region Name:</label>
-                     <input type="text" class="gisportal-quickRegion-name" name="gisportal-quickRegion-name"/>
-                     
-                     <div style="clear: both;"> </div>
-                     
-                     <!-- Quick Region Bounds -->
-                     <label for="gisportal-quickRegion-left">Left:</label>
-                     <input type="text" class="gisportal-quickRegion-left" name="gisportal-quickRegion-left"/>
-                     
-                     <div style="clear: both;"> </div>
-                     
-                     <label for="gisportal-quickRegion-bottom">Bottom:</label>
-                     <input type="text" class="gisportal-quickRegion-bottom" name="gisportal-quickRegion-bottom"/>
-                     
-                     <div style="clear: both;"> </div>
-                     
-                     <label for="gisportal-quickRegion-right">Right:</label>
-                     <input type="text" class="gisportal-quickRegion-right" name="gisportal-quickRegion-right"/>
-                     
-                     <div style="clear: both;"> </div>
-                     
-                     <label for="gisportal-quickRegion-top">Top:</label>
-                     <input type="text" class="gisportal-quickRegion-top" name="gisportal-quickRegion-top"/>
-                  </fieldset>  
-                  
-                  <button class="gisportal-quickRegion-reset">Reset</button>
-                  <button class="gisportal-quickRegion-save">Save</button> 
-                  <button class="gisportal-quickRegion-add">Add as new region</button>
-               </div>
-            </div>
-         </div>
-      </div>
-      <div style="clear: both;"> </div>
-   </div>
-   <!-- The Right Panels -->
-   <a class="trigger triggerR unselectable" href="#">Analysis</a>
-   <div class="panel rPanel unselectable">
-      <h3 id="dataLbl">Data Analysis</h3>     
-      <div id="dataAccordion" class="ui-helper-reset">
-         <div id="gisportal-triggerR-toolbar" class="panel-toolbar ui-helper-reset">
-            <!-- Using fieldsets as no easy CSS alternative -->
-            <fieldset>
-               <legend>Data Selection Tools</legend>
-               <ul>
-                  <!-- Placeholder ROI radio buttons -->
-                  <li id="ROIButtonSet">
-                     <!-- <input type="radio" id="point" name="radio" value="point" />
-                     <label class="iconBtn" for="point" title="Draw Point: Click in the map to draw a point as a region of interest centred on the click point."></label>-->
-                     <input type="radio" id="box" name="radio" value="box"/>
-                     <label class="iconBtn" for="box" title="Draw Box: Click and drag on the map to draw a rectangle as a region of interest with the click point at its top-left."></label>
-                     
-                     <!-- <input type="radio" id="circle" name="radio" value="circle" />
-                        <label class="iconBtn" for="circle" title="Draw Circle: Click and drag on the map to draw a circle as a region of interest with the click point at its centre."></label>
-                     <input type="radio" id="polygon" name="radio" value="polygon" />
-                        <label class="iconBtn" for="polygon" title="Draw Polygon: Click repeatedly on the map to draw a polygon as a region of interest. Double-click to finish drawing the polygon"></label>
-							-->		
-						</li>
-               </ul>
-            </fieldset>
-         </div>
-         <div id="gisportal-panel-toolbar" class="ui-corner-top panel-buttonSet">
-            <ul>
-               <li class="gisportal-tab-group ui-corner-top">
-                  <input type="radio" name="data-analysis-tab" id="gisportal-button-selection" class="gisportal-tab" href="#gisportal-tab-selection">
-                  <label for="gisportal-button-selection">Selection</label>
-                  <input type="radio" name="data-analysis-tab" id="gisportal-button-analyses" class="gisportal-tab" href="#gisportal-tab-analyses">
-                  <label for="gisportal-button-analyses">Analysis</label>
-                  <input type="radio" name="data-analysis-tab" checked id="gisportal-button-export" class="gisportal-tab" href="#gisportal-tab-export">
-                  <label for="gisportal-button-export">Data Export</label>
-               </li>
-            </ul>
-         </div>
-         <div id="gisportal-rPanel-content" class="ui-corner-all">
-            <div id="gisportal-tab-selection" class="gisportal-tab-content ui-corner-top gisportal-tab-active">
-               <h3><a href="#">Current R.O.I.</a></h3>
-               <div id="dispROI"><span>No Selection</span></div>
-            </div>
-            <div id="gisportal-tab-analyses" class="gisportal-tab-content ui-corner-top" style="display: none;">
-               <h3>Graphing</h3>
-               <div id="gisportal-graphing">  
-               </div>
-            </div>
-            <div id="gisportal-tab-export" class="gisportal-tab-content ui-corner-top" style="display: none;">
-               <h3><a href="#">Data Tools</a></h3>
-               <div id="dataTools">
-                  <div class="gisportal-list js-export-layer"><b>Selected Layer: </b> None</div>
-                  <div class="gisportal-list js-export-bbox"><b>Selected Bbox: </b> None</div>
-                  <div class="gisportal-list js-export-time"><b>Selected Time: </b> None</div>
-                  <div class="gisportal-list js-export-format"><b>Selected Format: </b>
-                     <select id="gisportal-dataexport-format" title="Format you wish to the data to be returned in">
-                        <option value="NetCDF3" title="Returns a netcdf3 file">NetCDF3</option>
-                     </select>
-                  </div>
-                  <a class="js-export-url" href="#" target="_new">Download Data</a>
-               </div>
-            </div>
-         </div>
-      </div>
-      <div style="clear: both;"> </div>
-   </div>
-   <!-- Share Options Panel, appears after the share options button has been clicked  -->
-   <div class="toolbar" id="shareOptions">
-   	<h3>Share Your Data! Track Your Progress!</h3>
-      <div id="gisportal-openid-content" class="hidden">
-         <button id="gisportal-openid-getlink">Save Progress</button>
-         <label for="gisportal-openid-shareurl">Paste Link:</label>
-         <input type="text" readonly  id="gisportal-openid-shareurl">
+   <!-- The Timeline -->
+   <div id="timeline"></div>
+   <div id="viewDate" class="hidden"></div>
 
-         <button id="gisportal-openid-logout">Log out</button>
-      </div>
-   </div>
-   
-   <div id="walkthrough-menu" class="unselectable" title="Help">
-      <p id="version"></p>
-      <p>Interactive guides:</p>
-		<ul></ul>   	
-   </div>
-   <!-- ====================================================================== -->
-   
-   <!-- Map Info Dialog -->
-   <div id="mapInfo" title="MapInfo">
-      <div>
-         <span id="latlng"></span>
-      </div>
-      <div>
-         <span id="mapInfo-Projection"></span>
-      </div>
-   </div>
-   <!-- Layer Selection Dialog -->
-   <!-- <div id="layerSelection" class="layer-selection unselectable tt" title="Layer Selection">
-      <span>Please select which layers you would like to use with the map. You can change these layers at any time.</span>
-      <div id="layers"></div>
-   </div> -->
-   
-   <div id="gisportal-layerSelection" class="layer-selection unselectable tt" title="Variable Selection">
-      <p>Choose the variables you want displayed on the map from the contents of the box on the right.</p>
-      <p>Use the filter box on the left to limit the contents either by matching on the variable name or limiting the selection to specific predefined tag associated with a variable such as its type being Chlorophyll.</p>
-      <p>Click on the variable to add or remove it, click on the arrow to see more details about the variable.</p>
-      <ul>
-         <li class="gisportal-tagMenu"></li>       
-         <li class="gisportal-selectable">
-            <ul></ul>
-         </li>       
-      </ul>
-   </div>
-   
-   <div id="gisportal-historyWindow" title="History">
-      <div id="gisportal-historyWindow-tabs" class="panel-toolbar ui-helper-reset gisportal-tab-group ui-corner-top">
-         <button id="gisportal-historyWindow-tab-States" class="gisportal-tab" href="#gisportal-historyWindow-states">States</button>
-         <button id="gisportal-historyWindow-tab-Graphs" class="gisportal-tab" href="#gisportal-historyWindow-graphs">Graphs</button>  
-         <button id="gisportal-historyWindow-tab-Refresh" class="right" href="#gisportal-historyWindow-refresh">Refresh</button>  
-      </div>
-      <div id="gisportal-historyWindow-content">
-         <div id="gisportal-historyWindow-states" class="gisportal-tab-content ui-corner-top">
-            <ul>
-               <li class="gisportal-historyWindow--scroll"><ul></ul></li>       
-               <li class="gisportal-historyWindow--data">
-               <button id="gisportal-historyWindow-loadState">Load State into current page</button>
-               <button id="gisportal-historyWindow-reloadState">Refresh page to state</button>
-               </li>       
-            </ul>
+   <!-- Configure Your Map panel  -->
+   <div id="configurePanel" class="panel">
+      <button>Show tools</button>
+      <h2 class="panel-header">Configure your map</h2>
+      <div class="panel-container">
+         <div class="build-map">
+            <ul class="js-configure-indicators"></ul>
+            <div class="build-map-footer">
+               <button class="link js-remove-all">Clear all</button>
+               <button class="brand js-build">Build a map</button>
+            </div>
          </div>
-   
-         <div id="gisportal-historyWindow-graphs" class="gisportal-tab-content ui-corner-top" style="display: none;">
-            <ul>
-               <li class="gisportal-historyWindow--scroll"><ul><ul></li>       
-               <li class="gisportal-historyWindow--data">
-                  <button id="load-graph">Load Graph</button>
-                  <button id="remove-graph">Remove Graph</button>
-               </li>       
-            </ul>
-         </div>
+         
+         <!-- These are on the same line to avoid white-space bug with inline-block -->
+        <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
+        <ul class="panel-tabs">
+          <li>
+            <input type="radio" checked id="tab-browse" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
+            <div class="panel-tab">
+               <div class="panel-tab-content">
+                  <h3>Popular indicators</h3>
+                  <ul class="js-popular panel-list grid-list"></ul>
+               </div>
+              <!-- These are on the same line to avoid white-space bug with inline-block -->
+              <label class="panel-tab-name active dark" for="tab-ecosystem">Ecosystem</label><label class="panel-tab-name dark" for="tab-msfd">MSFD</label>
+              <ul class="panel-tabs dark">
+                <li>
+                  <input type="radio" checked id="tab-ecosystem" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                  <div class="panel-tab panel-tab-content indicator-select"></div>
+                </li>
+                <li>
+                  <input type="radio" id="tab-msfd" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                  <div class="panel-tab panel-tab-content indicator-select"></div>
+                </li>
+              </ul>
+            </div>
+          </li>
+          <li>
+            <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
+            <div class="panel-tab full-height">
+              <input type="search" id="indicatorSearch">
+              <ul class="js-search-results panel-tab-content panel-list grid-list"></ul>
+            </div>
+          </li>
+        </ul>
       </div>
-   </div>
-   
-   <!-- D3 Timeline -->
-   <div id="timeline" class="timelineDiv">
-      <div class="togglePanel">
-         <button></button>
-      </div>
-   </div>
-   <div id="dThree" title="D3 Test"></div>
-   
-   <ul id="walkthrough"></ul>
-   
-   <div id="js-walkthrough-confirm" class="hidden">Would you like this walkthrough to appear next time you visit?</div>
 
-   <a href="/" class="gisportal-logo"><img src="img/OpEc_small.png"></a>
+      <div class="panel-footer">
+      </div>
+    </div>
+
+    <div id="indicatorsPanel" class="panel hidden">
+      <button>Show tools</button>
+      <h2 class="panel-header">Start again</h2>
+      <div class="panel-container">
+        <ul class="js-indicators indicator-list grid-list">
+        </ul>
+      </div>
+    </div>   
+    
 </body>
 </html>

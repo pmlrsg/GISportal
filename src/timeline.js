@@ -254,23 +254,6 @@ gisportal.TimeLine = function(id, options) {
 
    // Initialise the time bar label area to the left of the timeline
    this.labelArea = this.main.append('svg:g');
-//    
-   // $('#' + this.id + ' button').button({ icons: { primary: 'ui-icon-triangle-1-s'} })
-      // .click(function() {
-         // self.hide(); 
-      // });
-
-   $('#' + this.id + ' .togglePanel')
-      .button({  label:'Toggle Panel', icons: { primary: 'ui-icon-triangle-1-s'}, 'text': false })
-      .click(function() {
-         if ($(this).parent().css('bottom') != "0px") {
-            self.show();
-         }
-         else {
-            self.hide();
-         }
-      });
-
 
    // Draw the graphical elements
    self.redraw();
