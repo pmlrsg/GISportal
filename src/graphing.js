@@ -3,6 +3,7 @@ gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
    function success(data) {
+      console.log('Data for graph creation received successfully');
       gisportal.graphs.create(data, options);
    }
       
@@ -45,31 +46,6 @@ gisportal.graphs.create = function(data, options)  {
    if (graph)  {
       var uid = 'wcsgraph' + Date.now();
       var title = options.title || "Graph";
-      gisportal.graphs.createDialog(uid, title).append(graph);
+      $('li[data-id="'+data.coverage+'"]').append(graph);
    } 
 }
-
-gisportal.graphs.createDialog = function(uid, title)  {
-   $(document.body).append('<div id="' + uid + '-graph" title="' + title + '"></div>');
-   var dialog = $('#' + uid + '-graph');
-
-   dialog.extendedDialog({
-      position: ['center', 'center'],
-      width: 700,
-      height: 450,
-      resizable: true,
-      autoOpen: true,
-      close: function() {
-         $('#' + uid + '-graph').remove();
-      },
-      showHelp: false,
-      showMinimise: true,
-      dblclick: 'collapse',
-      resizeStop: function()  {
-         $('svg', this).resize();
-      }
-   });
-
-   return dialog;
-}
-
