@@ -1,0 +1,79 @@
+<li data-id="{{id}}">
+   <div class="indicator-header" data-id="{{id}}">
+      <p class="grid-cell fill">{{name}}</p>
+      <button class="icon_show light js-toggleVisibility grid-cell icon-column reorder-before"></button>
+      <label class="icon_settings light grid-cell icon-column js-closable" for="tab-{{id}}-settings">Settings</label>
+      <label class="icon_scalebar light grid-cell icon-column js-closable" for="tab-{{id}}-scalebar">Scalebar</label>
+      <label class="icon_details light grid-cell icon-column js-closable" for="tab-{{id}}-details">Details</label>
+      <label class="icon_analyse light grid-cell icon-column js-closable" for="tab-{{id}}-analysis">Analysis</label>
+   </div>
+
+   <ul>
+      <li class="js-tab-settings" data-id="{{id}}">
+         <input type="radio" id="tab-{{id}}-settings" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+         <div class="panel-tab panel-tab-dark">
+            <label class="panel-tab-name active" for="tab-{{id}}-data-options">Data options</label><label class="panel-tab-name" for="tab-{{id}}-display-options">Display options</label>
+            <ul class="panel-tabs">
+               <li>
+                  <input type="radio" checked="" id="tab-{{id}}-data-options" name="tabs-{{id}}-options" class="js-tab-trigger panel-tab-trigger">
+                  <div class="panel-tab indicator-select">
+                     <!-- These should be multi-select boxes so that
+                                          indicators can be chosen within each option -->
+                     <label for="tab-{{id}}-region">Region</label>
+                     <select>
+                        <option>Europe (default)</option>
+                     </select>
+                     <label for="tab-{{id}}-interval">Interval</label>
+                     <select>
+                        <option>Monthly (default)</option>
+                     </select>
+                     <label for="tab-{{id}}-reliability">Reliability</label>
+                     <select>
+                        <option>High (default)</option>
+                     </select>
+                  </div>
+               </li>
+               <li>
+                  <input type="radio" id="tab-{{id}}-display-options" name="tabs-{{id}}-options" class="js-tab-trigger panel-tab-trigger">
+                  <div class="panel-tab indicator-select">
+                     <label for="tab-{{id}}-elevation">Elevation</label>
+                     <select id="tab-{{id}}-elevation">
+                        <option>-1000m (default)</option>
+                     </select>
+
+                     <label for="tab-{{id}}-layer-style">Layer style</label>
+                     <select id="tab-{{id}}-layer-style">
+                        <option>GEBCO</option>
+                     </select>
+                  </div>
+               </li>
+            </ul>
+         </div>
+      </li>
+
+      <li class="js-tab-scalebar" data-id="{{id}}">
+         <input type="radio" id="tab-{{id}}-scalebar" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+         <div class="panel-tab">
+            <div class="scale-options">
+               <h3>Scale</h3>
+               <div class="grid">
+                  <input class="js-min min grid-cell" type="text">
+                  <div class="range-slider grid-cell fill noUi-target noUi-ltr noUi-horizontal noUi-background"><div class="noUi-base"><div class="noUi-origin noUi-connect noUi-dragable" style="left: 5.2631579%;"><div class="noUi-handle noUi-handle-lower"></div></div><div class="noUi-origin noUi-background" style="left: 68.4210526%;"><div class="noUi-handle noUi-handle-upper"></div></div></div></div>
+                  <input class="js-max max grid-cell" type="text">
+               </div>
+               <input type="checkbox" id="tab-{{id}}-log">
+               <label for="tab-{{id}}-log">Logarithmic</label>
+               <button>Auto</button>
+               <button>Reset</button>
+               <button>Recalculate</button>
+            </div>
+
+            <div class="scalebar"></div>
+         </div>
+      </li>
+
+      <li class="js-tab-details" data-id="{{id}}"></li>
+   
+      <li class="js-tab-analysis" data-id="{{id}}"></li>
+   </ul>
+</li>

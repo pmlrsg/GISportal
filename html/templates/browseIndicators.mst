@@ -1,0 +1,13 @@
+{{! List of used variables for this template:
+   id - The indicator id
+   name - The name to be shown for the indicator
+}}
+
+{{#indicators}}
+   <li data-id="{{id}}">
+      <div class="icon_loading grid-cell icon-column">loading</div>
+      <p class="grid-cell fill">{{name}}</p>
+      <label for="{{location}}-toggleVisibility-{{id}}">Show/Hide</label>
+      <input type="checkbox" id="{{location}}-toggleVisibility-{{id}}" data-id="{{id}}" class="icon_hide js-toggleVisibility grid-cell icon-column">
+   </li>
+{{/indicators}}
