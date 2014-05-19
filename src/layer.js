@@ -674,6 +674,8 @@ gisportal.addLayer = function(layer, options) {
    
    layer.select();
 
+   gisportal.setCountryBordersToTopLayer();
+   
    /* loading icon here */
 };
 
@@ -686,6 +688,8 @@ gisportal.removeLayer = function(layer) {
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
+
+   gisportal.setCountryBordersToTopLayer();
 };
 
 gisportal.setLayerIndex = function(layer, index) {
