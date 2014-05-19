@@ -6,8 +6,9 @@
 \*------------------------------------*/
 
 $(document).ready(function()  {
-   $('.js-tab-trigger').change(changeTab);
-   $('.js-closable').mousedown(closeTab);
+   $('.panel').on('change', '.js-tab-trigger', changeTab);
+   $('.panel').on('change', '.js-icon-trigger', activeIcon);
+   $('.panel').on('mousedown', '.js-closable', closeTab);
 });
 
 
@@ -18,6 +19,7 @@ $(document).ready(function()  {
 
 function changeTab()  {
     var e = $(this)[0];
+
     $.each($('[name="' + e.name + '"]'), function(i,e)  {
       $('[for="' + e.id + '"]').removeClass('active');
     });
@@ -46,3 +48,16 @@ function closeTab(){
     e.one('mouseout', unbind);
   }
 }
+
+
+function activeIcon()  {
+   var e = $(this)[0];
+   if (e.checked)  {
+      $('[for="' + e.id + '"]').addClass('active');
+   }
+   else  {
+      $('[for="' + e.id + '"]').removeClass('active');
+   }
+}
+
+

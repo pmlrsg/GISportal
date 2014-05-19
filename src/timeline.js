@@ -429,7 +429,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             // Time Bar
             d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
               .enter().append('svg:line')
-               .attr('stroke', function() { return d1.colour || self.colours(i1); })
+               .attr('stroke', '#fff')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
@@ -514,7 +514,8 @@ gisportal.TimeLine.prototype.redraw = function() {
    // Draw the selected date-time line
    this.selectedDateLine
       .attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); }).attr('y', 2)
-      .attr('width', 4).attr('height', self.height - 2);
+      .attr('width', 10).attr('height', self.height - 2)
+      .attr('rx', 6).attr('ry', 6);
    
    // Draw the time bar labels
    this.labelArea.selectAll('text').remove(); // Dirty hack to redraw labels for update

@@ -8,7 +8,7 @@
 gisportal.configurePanel = {};
 
 gisportal.configurePanel.refreshData = function()  {
-   var groupedTags = this.groupTags();
+   var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
   this.renderPopular();
@@ -23,11 +23,11 @@ gisportal.configurePanel.initDOM = function()  {
       var id = $(this).parent().data('id');
       if ($(this).is(':checked'))  {
          gisportal.configurePanel.selectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', true);
+         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', true).change();
       }
       else  {
          gisportal.configurePanel.deselectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false);
+         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false).change();
       }
    }
 
@@ -41,7 +41,6 @@ gisportal.configurePanel.initDOM = function()  {
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
    
    $('.indicator-select').on('click', '.indicator-dropdown', function()  {
-      console.log(this);
       if ($(this).siblings('select').height() > 50)  {
         $(this).siblings('ul').toggleClass('hidden'); 
       }
@@ -68,17 +67,15 @@ gisportal.configurePanel.refreshIndicators = function()  {
          tmp.name = gisportal.layers[tmp.id].name;
          indicators.push(tmp);
       }
-
       var rendered = Mustache.render(template, {
          indicators : indicators 
       });
-      console.log(indicators, indicatorIds, gisportal.layers);
       $('.js-configure-indicators').html(rendered);
    });
 
 };
 
-gisportal.configurePanel.groupTags = function()  {
+gisportal.groupTags = function()  {
    var layers = gisportal.microLayers;
    var grouped = {};
    
@@ -117,6 +114,41 @@ gisportal.configurePanel.groupTags = function()  {
    return grouped;
 };
 
+gisportal.groupNames = function()  {
+   var group = {};
+
+   for (var i = 0; i < Object.keys(gisportal.microLayers).length; i++)  {
+      var indicator = gisportal.microLayers[Object.keys(gisportal.microLayers)[i]];
+      var name = indicator.name.toLowerCase();
+      var id = indicator.id;
+      var tags = indicator.tags;
+      
+      if (!group[name]) group[name] = {};
+      
+      if (tags)  { 
+         for (var j = 0; j < Object.keys(tags).length; j++)  {
+            var cat = Object.keys(tags)[j];
+            var tagName = tags[cat];
+            if (typeof tagName === 'string')  {
+               if (!group[name][cat]) group[name][cat] = [];
+               if (!group[name][cat][tagName]) group[name][cat][tagName] = [];
+               group[name][cat][tagName].push(id);
+            }
+            else if (typeof tagName === 'object' && tagName !== null)  {
+               for (var k = 0; k < tagName.length; k++)  {
+                  var innerTagName = tagName[k];
+                  if (!group[name][cat]) group[name][cat] = []; 
+                  if (!group[name][cat][innerTagName]) group[name][cat][innerTagName] = [];
+                  group[name][cat][innerTagName].push(id);              
+               }
+            }
+         }   
+      }
+   }
+
+   return group;
+};
+
 gisportal.configurePanel.renderTags = function(cat, grouped)  {
    var tagVals = grouped[cat];
    var tagNames = Object.keys(grouped[cat]);
@@ -132,6 +164,10 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
                tmp.name = gisportal.microLayers[tmp.id].name;
                indicators.push(tmp);
             }
+
+            indicators = _.uniq(indicators, function(val) {
+               return val.name;
+            }); 
 
 
             return function(template) { 
@@ -193,6 +229,10 @@ gisportal.configurePanel.search = function(val)  {
    var results = this.fuse.search(val);
 
    $.get('templates/browseIndicators.mst', function(template) {
+      results = _.uniq(results, function(val) {
+         return val.name.toLowerCase();
+      }); 
+
       var rendered = Mustache.render(template, {
          location: 'search',
          indicators : results
@@ -224,7 +264,6 @@ gisportal.configurePanel.selectLayer = function(id)  {
 };
 
 gisportal.configurePanel.deselectLayer = function(id)  {
-   console.log('deselect');
    if (gisportal.layers[id])  {
       gisportal.layers[id].unselect();
       /* For now, unselect() just hides */

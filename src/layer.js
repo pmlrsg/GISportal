@@ -686,7 +686,6 @@ gisportal.removeLayer = function(layer) {
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
-   gisportal.rightPanel.updateCoverageList();
 };
 
 gisportal.setLayerIndex = function(layer, index) {

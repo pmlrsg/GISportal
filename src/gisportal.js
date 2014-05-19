@@ -58,6 +58,8 @@ gisportal.selection.layer = undefined;
 gisportal.selection.bbox = undefined;
 gisportal.selection.time = undefined;
 
+gisportal.selectionTools = null;
+
 gisportal.layerSelector = null;
 gisportal.timeline = null;
 
@@ -117,7 +119,7 @@ gisportal.loadLayers = function() {
     
    // Get WMS and WFS caches
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
-   gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
+   //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
 gisportal.getFeature = function(layer, olLayer, time) {
@@ -473,14 +475,8 @@ gisportal.mapInit = function() {
    // Create the reference layers and then add them to the map
    //gisportal.createRefLayers();
 
-   // Add a couple of useful map controls
-   //var mousePos = new OpenLayers.Control.MousePosition();
-   //var permalink =  new OpenLayers.Control.Permalink();
-   //map.addControls([mousePos,permalink]);
-   
    /* 
-    * Set up event handling for the map including as well as mouse-based 
-    * OpenLayers controls for jQuery UI buttons and drawing controls
+    * Set up event handling for the map 
     */
    
    // Create map controls identified by key values which can be activated and deactivated
@@ -503,6 +499,8 @@ gisportal.mapInit = function() {
       var control = gisportal.mapControls[key];
       map.addControl(control);
    }
+
+   gisportal.selectionTools.init();
 
    if(!map.getCenter())
       map.zoomTo(3);
@@ -832,7 +830,10 @@ gisportal.main = function() {
       $(this).tooltip('destroy');
    });*/
    
-   
+   $('.js-start').click(function()  {
+      $('.start-background').toggleClass('hidden', true);
+   });
+ 
    // Setup the gritter so we can use it for error messages
    gisportal.gritter.setup();
 

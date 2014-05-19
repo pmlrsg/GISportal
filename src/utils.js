@@ -128,6 +128,21 @@ function getObjectKey(obj, value) {
    return null;
 }
 
+gisportal.utils.mustacheFormat = function(o)  {
+   var data = [];
+   for (var prop in o) {
+      if (o.hasOwnProperty(prop)) {
+         if (o[prop].length > 0)  {
+            data.push({
+               'key' : prop,
+               'value' : o[prop]
+            });
+         }
+      }
+   }
+   return data;
+}
+
 gisportal.utils.sortDates = function(a, b) {
    return a[0] - b[0];
 };

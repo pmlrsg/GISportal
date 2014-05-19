@@ -3,7 +3,6 @@ gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
    function success(data) {
-      console.log('Data for graph creation received successfully');
       gisportal.graphs.create(data, options);
    }
       
@@ -46,6 +45,7 @@ gisportal.graphs.create = function(data, options)  {
    if (graph)  {
       var uid = 'wcsgraph' + Date.now();
       var title = options.title || "Graph";
-      $('li[data-id="'+data.coverage+'"]').append(graph);
+      $('body').html(graph);
    } 
 }
+

@@ -1,0 +1,16 @@
+/*------------------------------------*\
+    Indicators
+\*------------------------------------*/
+
+.indicator-header  {
+  background-color: #59476d;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px;
+  min-height: 45px;
+  text-transform: capitalize;
+}
+
+.indicator-header .panel-tab-name  {
+  border-bottom: 0 none;
+}

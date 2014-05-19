@@ -18,6 +18,13 @@
 <!-- jQuery UI -->
 <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 
+
+<!-- jQuery no UI slider -->
+<script src="js-libs/jquery-nouislider/jquery.nouislider.min.js"></script>
+
+<!-- Lodash (_) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
 <!-- OpenLayers Map Code-->
 <script type="text/javascript" src="js-libs/OpenLayers/OpenLayers.js"></script>
 
@@ -36,16 +43,30 @@
 
 </head>
 <body role="application">
-   <!-- CSS check and info for screen readers -->
-   <div id="nocss-info" class="hidden">
-      <h1>GIS Portal</h1>
-      <!-- Info for screen readers and any bots. Should show up on search results -->
-      <span>
-         Welcome to the OPEC (Operational Ecology) Marine Ecosystem Forecasting Portal. The OPEC project will develop 
-         and evaluate ecosystem forecast tools to help assess and manage the risks posed by human activities on the 
-         marine environment, helping to improve the ability to predict the “health” of European marine ecosystems.
-      </span>
-   </div>
+   
+   <!-- The start page,
+         this should load before anything else. -->
+    <div class="start-background">
+      <div class="start-container">
+
+        <ul class="start-slider">
+          <li class="active">Marine OPEC takes data that you select and plots it on a map to help you analyse, export and share it.</li>
+          <li>Browse or search indicators from several reliable sources.</li>
+          <li>Analyse the data you've selected and create charts and graphs to better understand it.</li>
+          <li>Export any raw or processed data for use in third-party applications</li>
+        </ul>
+
+        <nav class="start-nav">
+          <button class="dropdown-trigger">Example maps</button>
+          <ul class="dropdown">
+            <li><a href="?state=">Cod in the North Atlantic</a></li>
+            <li><a href="?state=">Mediterranean saline levels</a></li>
+            <li><a href="?state=">Artic nitrates</a></li>
+          </ul>
+          <button class="brand js-start">Start building a map</button>
+        </nav>
+      </div>
+    </div>
 
    <!-- JavaScript check -->
    <noscript>
@@ -55,7 +76,7 @@
    </noscript>
 
    <!-- The Map -->
-   <div id="map"></div>
+   <div id="map" class=""></div>
 
    <!-- The Timeline -->
    <div id="timeline"></div>
@@ -102,7 +123,7 @@
             <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
             <div class="panel-tab full-height">
               <input type="search" id="indicatorSearch">
-              <ul class="js-search-results panel-tab-content panel-list grid-list"></ul>
+              <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
             </div>
           </li>
         </ul>
@@ -118,6 +139,8 @@
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
         </ul>
+        <label for="share-map">Share this map with colleagues</label>
+        <button id="share-map" class="js-share">Share</button>
       </div>
     </div>   
     
