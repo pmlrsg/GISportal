@@ -1,0 +1,55 @@
+/*------------------------------------*\
+    Start Page
+\*------------------------------------*/
+
+.start-background  {
+  background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+
+.start-container  {
+  background: #32273d;
+  color: #f7f6f8;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+.start-slider  {
+  background: #32273d;
+  height: 300px;
+}
+
+.start-slider li  {
+  display: none;
+
+  font-size: 18px;
+  line-height: 1.5; 
+  padding: 25px 80px;
+}
+
+.start-slider .active  {
+  display: block;
+}
+
+.start-nav  {
+  background: #251d2d;
+  padding: 27px 0;
+}
+
+.start-nav .dropdown-trigger  {
+  background: none;
+  border-style: none;
+  color: #d8d7b6;
+}
+
+

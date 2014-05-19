@@ -1,12 +1,21 @@
 {
    "id": "gisportal",
    "files": [
-      "html/js-libs/jquery-ui/css/black-tie/jquery-ui-1.10.1.custom.min.css",
+      "html/css/reset.css",
+      "html/css/fonts.css",
+      "html/css/start.css",
+      "html/css/animation.css",
       "html/js-libs/OpenLayers/theme/default/style.css",
-      "html/js-libs/jquery-contextMenu/css/jquery-contextMenu.css",
+      "html/css/jquery.nouislider.css",
       "html/js-libs/jquery-gritter/css/jquery.gritter.css",
       "html/css/timeline.css",
       "html/css/main.css",
-      "html/css/walkthrough.css"
+      "html/css/panel.css",
+      "html/css/grid.css",
+      "html/css/icons.css",
+      "html/css/scalebar.css",
+      "html/css/indicators.css",
+      "html/css/tables.css",
+      "html/css/nv.d3.css"
    ]
 }

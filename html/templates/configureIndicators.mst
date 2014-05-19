@@ -1,0 +1,3 @@
+{{#indicators}}
+   <li data-id="{{id}}"><button class="js-remove" data-id="{{id}}">Remove</button>{{name}}</li>
+{{/indicators}}

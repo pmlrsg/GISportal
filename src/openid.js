@@ -5,7 +5,7 @@
 gisportal.openid = {};
 
 gisportal.openid.setup = function(containerID) {
-   gisportal.openid.loginBox = containerID;
+/*   gisportal.openid.loginBox = containerID;
    gisportal.openid.$loginBox = $('#' + containerID);
    gisportal.openid.darkCoverID = 'darkCover';
   
@@ -93,7 +93,7 @@ gisportal.openid.setup = function(containerID) {
    gisportal.openid.$logoutButton.click(function()  {
       gisportal.openid.logout();
    });
-
+*/
 };
 
 // getLink to state

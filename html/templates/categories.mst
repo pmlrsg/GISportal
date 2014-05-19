@@ -1,0 +1,26 @@
+{{! List of used variables for this template:
+   category - The category
+   name - The name to be shown for the category
+}}
+
+<div>
+   <label for="select-{{tag}}" class="indicator-dropdown">{{tag}}</label>
+
+   <select multiple id="select-{{tag}}" class="hide-select" data-id="{{tag}}">
+      {{#indicators}}
+         <option value="{{id}}">{{name}}</option>
+      {{/indicators}}
+   </select>
+
+   <ul data-id="{{tag}}" class="hidden fake-select panel-list grid-list">
+      {{#indicators}}
+         <li data-id="{{id}}">
+            <div class="icon_loading grid-cell icon-column">loading</div>
+            <p class="grid-cell fill">{{name}}</p>
+            <label for="cat-toggleVisibility-{{id}}" class="icon_show icon-column grid-cell">Show/Hide</label>
+            <input type="checkbox" id="cat-toggleVisibility-{{id}}" data-id="{{id}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
+         </li>
+      {{/indicators}}
+   </ul>
+</div>
+

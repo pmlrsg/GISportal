@@ -1,0 +1,18 @@
+<input type="radio" id="tab-{{id}}-scalebar" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab">
+   <div class="scale-options">
+      <h3>Scale</h3>
+      <div class="grid">
+         <input class="js-min min grid-cell" type="text">
+         <div class="range-slider grid-cell fill"></div>
+         <input class="js-max max grid-cell" type="text">
+      </div>
+      <input type="checkbox" id="tab-{{id}}-log">
+      <label for="tab-{{id}}-log">Logarithmic</label>
+      <button>Auto</button>
+      <button>Reset</button>
+      <button>Recalculate</button>
+   </div>
+   <div class="scalebar"></div>
+</div>
+

@@ -159,7 +159,9 @@ gisportal.layer = function(microlayer, layerData) {
       
       // Layer abstract
       this.productAbstract = microlayer.productAbstract;
-      
+     
+      this.tags = microlayer.tags;
+
       // Add a new property to the OpenLayers layer object to tell the UI which <ul>
       // control ID in the layers panel to assign it to
       this.controlID = microlayer.type;
@@ -302,26 +304,7 @@ gisportal.layer = function(microlayer, layerData) {
    
    this.createScalebar = function()  {
       var layer = this;
-      if (layer.origMinScaleVal !== null)  {
-
-         if (gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[layer.id])   {
-            this.scalebarOpen = gisportal.cache.state.map.layers[layer.id].scalebarOpen;
-         }
-
-         // If false, do not open
-         if (this.scalebarOpen !== 'false')
-         { 
-            gisportal.window.createScalebar(layer.id);  
-         }
-         
-         if (this.scalebarOpen !== null) {
-            this.scalebarOpen = null;
-         }
-         
-         if (gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[layer.id])   {
-            gisportal.cache.state.map.layers[layer.id].scalebarOpen = this.scalebarOpen;
-         }
-      }
+      /* Make a scalebar */
    }
   
    this.unselect = function() {
@@ -644,10 +627,10 @@ gisportal.layer = function(microlayer, layerData) {
     * @method
     */
    this.checkLayerState = function() {
-      if(!this.isVisible && this.selected)
+      /*if(!this.isVisible && this.selected)
          this.$layer.find('img[src="img/exclamation_small.png"]').show();
       else
-         this.$layer.find('img[src="img/exclamation_small.png"]').hide();
+         this.$layer.find('img[src="img/exclamation_small.png"]').hide();*/
    };
    
    //--------------------------------------------------------------------------
@@ -673,24 +656,14 @@ gisportal.layer = function(microlayer, layerData) {
 
 gisportal.addLayer = function(layer, options) {
    var options = options || {};   
-   //delete gisportal.nonSelectedLayers[layer.id];
-   //gisportal.selectedLayers[layer.id] = layer;
    
-   var keys = Object.keys(layer.openlayers);
-   for(var i = 0, len = keys.length; i < len; i++) {
-      layer.addOLLayer(layer.openlayers[keys[i]], keys[i]);
+   if (layer.openlayers)  {
+      var keys = Object.keys(layer.openlayers);
+      for(var i = 0, len = keys.length; i < len; i++) {
+         layer.addOLLayer(layer.openlayers[keys[i]], keys[i]);
+      }
    }
    
-   // Layer visibility may have been set to true.
-   layer.setVisibility(false);
-  
-   if(layer.controlID == 'opLayers') {
-      // Add the layer to the panel
-      gisportal.leftPanel.addLayerToGroup(layer, gisportal.leftPanel.getFirstGroupFromPanel($('#gisportal-lPanel-operational')));
-   } else if (layer.controlID == 'refLayers') {
-      gisportal.leftPanel.addLayerToGroup(layer, gisportal.leftPanel.getFirstGroupFromPanel($('#gisportal-lPanel-reference')));
-   }
-  
    if (options.minScaleVal || options.maxScaleVal)  {   
       if (options.minScaleVal !== null) gisportal.layers[layer.id].minScaleVal = options.minScaleVal; 
       if (options.maxScaleVal !== null) gisportal.layers[layer.id].maxScaleVal = options.maxScaleVal;
@@ -699,21 +672,12 @@ gisportal.addLayer = function(layer, options) {
       updateScalebar(layer);
    }
    
-   // TODO: Too tightly coupled
-   gisportal.leftPanel.open();
    layer.select();
-   $('input[name="' + layer.id + '"]').prop('checked', true);
-   
-   // Hide the ajax-loader and the exclamation mark initially
-   layer.$layer.find('img[src="img/ajax-loader.gif"]').hide();
-   layer.$layer.find('img[src="img/exclamation_small.png"]').hide();  
+
+   /* loading icon here */
 };
 
 gisportal.removeLayer = function(layer) {
-   //var layer = gisportal.getLayerByID(id);
-   
-   // Remove the layer from the panel
-   gisportal.leftPanel.removeLayerFromGroup(layer);
    
    delete gisportal.selectedLayers[layer.id];
    delete gisportal.layers[layer.id];
@@ -722,7 +686,6 @@ gisportal.removeLayer = function(layer) {
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
-   gisportal.rightPanel.updateCoverageList();
 };
 
 gisportal.setLayerIndex = function(layer, index) {

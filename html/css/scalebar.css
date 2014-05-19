@@ -1,0 +1,36 @@
+/*------------------------------------*\
+    Scalebar
+\*------------------------------------*/
+
+.noUi-connect  {
+  background-color: #d8d3dd;
+  box-shadow: none;
+}
+
+.noUi-handle  {
+  background-color: #b1a7bc;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.noUi-target  {
+  border-radius: 25px;
+}
+
+input.min,
+input.max  {
+  width: 65px;
+}
+
+.scale-options  {
+  background-color: #fbfafb;
+  border-bottom: 1px solid #e0dce4;
+}
+
+.scalebar  {
+  background: url('../images/scalebar.jpg') repeat-y;
+  background-size: contain;
+  height: 20px;
+  width: 100;
+}
+
