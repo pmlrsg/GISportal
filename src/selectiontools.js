@@ -67,6 +67,9 @@ gisportal.selectionTools.toggleTool = function(tool)  {
    }
 
    map.ROI_Type = tool;
+
+   // keep the country_border layer on top if it's visible
+   gisportal.setCountryBordersToTopLayer();
 };
 
 gisportal.selectionTools.updateROI = function()  {
