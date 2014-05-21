@@ -32,9 +32,11 @@ gisportal.configurePanel.initDOM = function()  {
    }
 
    $('.js-build').click(function() {
-      gisportal.indicatorsPanel.refreshData();
-      $('#configurePanel').toggleClass('hidden', true);
-      $('#indicatorsPanel').toggleClass('hidden', false);
+      if (Object.keys(gisportal.layers).length > 0)  {
+         gisportal.indicatorsPanel.refreshData();
+         $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+         $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+      }
    });
 
    /* Temp */

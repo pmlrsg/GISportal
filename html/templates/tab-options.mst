@@ -48,6 +48,7 @@
                      <option value="{{Name}}">{{Name}}</option>
                   {{/styles}}
                </select>
+               <button class="js-zoom-data" data-id="{{id}}">Zoom to data</button>
             </div>
          </li>
       </ul>
