@@ -240,6 +240,7 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id)  {
+<<<<<<< HEAD
    var indicator = gisportal.layers[id];
    if (indicator)  {
       var firstDate = indicator.firstDate;
@@ -274,6 +275,41 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
             format: {
                decimals: 0
             }
+=======
+   var firstDate = gisportal.layers[id].firstDate;
+   var lastDate = gisportal.layers[id].lastDate;
+   var min = new Date(firstDate.split('-').reverse().join('-')).getTime();
+   var max = new Date(lastDate.split('-').reverse().join('-')).getTime();
+
+   var from = $('.js-min[data-id="' + id + '"]');
+   var to   = $('.js-max[data-id="' + id + '"]');
+
+   var Link = $.noUiSlider.Link;
+   var slider = $('.range-slider[data-id="' + id + '"]');
+   slider.noUiSlider({
+      start: [min, max],
+      connect: true,
+      behaviour: 'tap-drag',
+      range: {
+         'min': min,
+         'max': max
+      },
+      serialization: {
+         lower: [
+            $.Link({
+               target: from,
+               method: setDate 
+            })
+         ],
+         upper: [
+            $.Link({
+               target: to,
+               method: setDate
+            })
+         ],
+         format: {
+            decimals: 0
+>>>>>>> 77d83e7... fixes the inital date display error on the analysis tab
          }
       });
 
@@ -301,6 +337,10 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
       });
    }
 };
+
+function setDate(value){
+   $(this).val(new Date(+value).toISOString().substring(0,10));   
+}
 
 gisportal.indicatorsPanel.createGraph = function(id)  {
    var dateRange = $('.js-min[data-id="' + id + '"]').val(); // Find date range
