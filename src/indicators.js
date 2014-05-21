@@ -56,6 +56,21 @@ gisportal.indicatorsPanel.initDOM = function()  {
       $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
       $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
    });
+
+   $('.js-indicators').on('click', '.js-zoom-data', function()  {
+   var indicator = gisportal.microLayers[$(this).data('id')];
+   if(indicator === null)
+      return;
+            
+       var bbox = new OpenLayers.Bounds(
+          indicator.exBoundingBox.WestBoundLongitude,
+          indicator.exBoundingBox.SouthBoundLatitude,
+          indicator.exBoundingBox.EastBoundLongitude,
+          indicator.exBoundingBox.NorthBoundLatitude
+       ).transform(map.displayProjection, map.projection);
+       
+      map.zoomToExtent(bbox);
+   });
 };
 
 gisportal.indicatorsPanel.refreshData = function()  {
@@ -175,7 +190,7 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
 gisportal.indicatorsPanel.scalebarTab = function(id)  {
    $.get('templates/tab-scalebar.mst', function(template)  {
       var indicator = gisportal.microLayers[id];
-      indicator.legend = gisportal.scalebars.getScalebarDetails(id);
+      indicator.legend = gisportal.scalebars.getScalebarDetails(id).url;
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-scalebar').html(rendered);
    });

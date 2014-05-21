@@ -9,30 +9,26 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       var height = 256;
      
       // Iter over styles
-      $.each(layer.styles, function(index, value)
+      $.each(indicator.styles, function(index, value)
       {
          // If the style names match grab its info
-         if(value.Name == layer.style && url === null) {
-            url = value.LegendURL + createGetLegendURL(layer, true);
+         if(value.Name == indicator.style && url === null) {
+            url = value.LegendURL + gisportal.scalebars.createGetLegendURL(indicator, true);
             width = parseInt(value.Width, 10);
             height = parseInt(value.Height, 10);
             return false; // Break loop
          }
-      }
-   });
+      });
    
-   // If the url is still null then there were no matches, so use a generic url
-   if(url === null)
-      url = createGetLegendURL(layer, false);
-      
-   return {
-      url: url,
-      width: width,
-      height: height
-   }; 
-
-      gisportal.scalebars.createGetLegendURL(indicator, false);
-      
+      // If the url is still null then there were no matches, so use a generic url
+      if(url === null)
+         url = gisportal.scalebars.createGetLegendURL(indicator, false);
+         
+      return {
+         url: url,
+         width: width,
+         height: height
+      }; 
    }
 };
 
