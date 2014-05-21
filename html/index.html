@@ -79,13 +79,21 @@
    <div id="map" class=""></div>
 
    <!-- The Timeline -->
-   <div id="timeline"></div>
+   <div class="timeline-container">
+      <div class="timeline-inner grid">
+         <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
+         <div id="timeline" class="grid-cell fill"></div>
+         <a href="/" class="grid-cell">About</a>
+      </div>
+   </div>
    <div id="viewDate" class="hidden"></div>
 
+   <button class="js-show-tools show-tools hidden">Show tools</button>
+   
    <!-- Configure Your Map panel  -->
-   <div id="configurePanel" class="panel">
-      <button>Show tools</button>
+   <div id="configurePanel" class="panel active">
       <h2 class="panel-header">Configure your map</h2>
+      <button class="js-hide-panel">Hide</button>
       <div class="panel-container">
          <div class="build-map">
             <ul class="js-configure-indicators"></ul>
@@ -134,8 +142,10 @@
     </div>
 
     <div id="indicatorsPanel" class="panel hidden">
-      <button>Show tools</button>
-      <h2 class="panel-header">Start again</h2>
+      <div class="panel-header">
+         <button class="js-start-again">Start again</button>
+         <button class="js-hide-panel">Hide</button>
+      </div>
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
         </ul>

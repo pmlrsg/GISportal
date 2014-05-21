@@ -605,7 +605,7 @@ gisportal.nonLayerDependent = function() {
          bottom: 5,
          left: 0
       },
-      barHeight: 20,
+      barHeight: 10,
       barMargin: 2,
       timebars: [] 
    });
@@ -834,41 +834,8 @@ gisportal.main = function() {
    // Compile Templates
    gisportal.templates = {};
 
-   /*
-   gisportal.templates.layer = Mustache.compile($('#gisportal-template-layer').text().trim());
-   gisportal.templates.metadataWindow = Mustache.compile($('#gisportal-template-metadataWindow').text().trim());
-   gisportal.templates.scalebarWindow = Mustache.compile($('#gisportal-template-scalebarWindow').text().trim());
-   gisportal.templates.graphCreatorWindow = Mustache.compile($('#gisportal-template-graphCreatorWindow').text().trim());
-   gisportal.templates.selectionItem = Mustache.compile($('#gisportal-template-selector-item').text().trim());
-   gisportal.templates.loginBox = Mustache.compile($('#gisportal-template-login-box').text().trim());
-   gisportal.templates.providerBox = Mustache.compile($('#gisportal-template-provider-box').text().trim());
-   gisportal.templates.historyList = Mustache.compile($('#gisportal-template-history-list').text().trim());
-   gisportal.templates.historyData = Mustache.compile($('#gisportal-template-history-data').text().trim());
-  */
    $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-    
-   // Need to put this early so that tooltips work at the start to make the
-   // page feel responsive.    
-   //$(document).tooltip({
-      //track: true,
-      //position: { my: "left+10 center", at: "right center", collision: "flipfit" },
-      //tooltipClass: 'ui-tooltip-info'
-   //});
-   
-   //$(document).click(function() {
-      //$(this).tooltip('close');
-   //});
-   
-   /*
-   $(document).on('mouseenter', '.tt', function() {
-      $(this).tooltip({
-         track: true,
-         position: { my: "left+5 center", at: "right center", collision: "flipfit" }
-      });
-   }).on('mouseleave', '.tt', function() {
-      $(this).tooltip('destroy');
-   });*/
-   
+  
    $('.js-start').click(function()  {
       $('.start-background').toggleClass('hidden', true);
    });
@@ -882,6 +849,20 @@ gisportal.main = function() {
 
    gisportal.configurePanel.initDOM();
    gisportal.indicatorsPanel.initDOM();
+
+   $('.js-show-tools').on('click', showPanel);
+
+   function showPanel()  {
+      $(this).toggleClass('hidden', true);
+      $('.panel.active').toggleClass('hidden', false);
+   }
+
+   $('.js-hide-panel').on('click', hidePanel);
+
+   function hidePanel()  {
+      $(this).parents('.panel').toggleClass('hidden', true);
+      $('.js-show-tools').toggleClass('hidden', false);
+   }
 
    // Start setting up anything that is not layer dependent
    gisportal.nonLayerDependent();

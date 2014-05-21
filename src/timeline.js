@@ -76,7 +76,7 @@ gisportal.TimeLine = function(id, options) {
          bottom: 0,
          left: 0
       },
-      barHeight: 20,
+      barHeight: 5,
       barMargin: 4,
       timebars: []
    };
@@ -108,7 +108,6 @@ gisportal.TimeLine = function(id, options) {
    // Set up initial dynamic dimensions
    this.reHeight();
    this.reWidth();
-   
    //--------------------------------------------------------------------------
    
    // Set initial x scale
@@ -304,84 +303,6 @@ gisportal.TimeLine.prototype.redraw = function() {
    }
 
    //--------------------------------------------------------------------------
-   
-   // These are used to create the full width bars of the timeline
-   // It uses lines to depict the separate timelines and transparent rectangles
-   // so that each timeline can have its own event handlers.
-   // Previously it was using just lines but obviously you cannot add event handlers
-   // to empty space.
-   
-   // Draw the separator lines between time bars
-   this.sepLines = this.separatorArea.selectAll('rect').data(this.timebars);
-   
-   // New separator lines arriving
-   this.sepLines.enter().append('svg:line')
-      .attr('x1', 0)
-      .attr('x2', this.width)
-      .attr('y1', function(d, i) { return d3.round(self.yScale(i) ); })
-      .attr('y2', function(d, i) { return d3.round(self.yScale(i) ); })
-      .attr('class', 'separatorLine');
-   
-	var dragging = null;	
-   this.sepLines.enter().append('svg:rect')
-      .attr('x', 0)
-      .attr('y', function(d, i) { d.y = d3.round(self.yScale(i) + 0.5) + "px"; return d3.round(self.yScale(i) + 0.5); })
-      .attr('height', function(d, i) { return d3.round(self.barHeight + (self.barMargin*2)); })
-      .attr('width', this.width)
-      .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
-      .style('fill', 'transparent')
-      .on('click', function(d)  {
-         if (d.type == 'range')  {
-            d3.event.stopPropagation();
-            d3.event.preventDefault();
-         }
-      })
-      .on('mousedown', function(d) {
-         if(d.type == 'range') {
-            d3.event.stopPropagation();
-            if (dragging === null)  {
-               // There will be a maximum of 1 being dragged
-               d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
-               dragging = d.name;
-            }
-      	}  
-      })
-      .on('mousemove', function(d) {
-			if(d.type == 'range') {
-            d3.event.stopPropagation();
-            // Check if mousemove should drag the rectangle
-            if (dragging !== null)  {
-               self.rangebars.filter(function(d) { return d.name === dragging; })[0].selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
-               self.redraw();  
-            }
-         }
-      })
-		.on('mouseup', function(d) {
-			if(d.type == 'range') {
-            d3.event.stopPropagation();
-            d3.event.preventDefault();
-            if (dragging !== null)  {
-               d = self.rangebars.filter(function(d) { return d.name === dragging; })[0];
-               var selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
-               if (new Date(d.selectedStart) > new Date(selectedEnd))  {
-                  d.selectedEnd = d.selectedStart;
-                  d.selectedStart = selectedEnd;
-               }
-               else  {
-                  selectedEnd = selectedEnd;
-               }
-               $(gisportal).trigger('rangeUpdate.gisportal', [d]);
-               dragging = null;
-               self.redraw();  
-            }
-         }
-		});
-//       
-   // // Separator line removal
-   this.sepLines.exit().remove();
-   
-   //--------------------------------------------------------------------------
-
    // Draw the time bars
    // Note: Had to use closures to move variables from each into the .attr etc.
    this.bars = this.barArea.selectAll('rect').data(this.timebars);
@@ -517,19 +438,7 @@ gisportal.TimeLine.prototype.redraw = function() {
       .attr('width', 10).attr('height', self.height - 2)
       .attr('rx', 6).attr('ry', 6);
    
-   // Draw the time bar labels
-   this.labelArea.selectAll('text').remove(); // Dirty hack to redraw labels for update
-   this.labels = this.labelArea.selectAll('text').data(this.timebars);
-   
-   // New labels arriving
-   this.labels.enter().append('svg:text')
-      .text(function(d) { return d.label; })
-      .attr('x', 1.5)
-      .attr('y', function(d, i) { return d3.round(self.yScale(i + 0.5)); })
-      .attr('dy', '0.5em')
-      .attr('text-anchor', 'end').attr('class', 'laneText');
-   // Label removal
-   this.labels.exit().remove();  
+   this.drawLabels();
       
    //-------------------------------------------------------------------------- 
 };
@@ -554,6 +463,20 @@ gisportal.TimeLine.prototype.reset = function() {
    this.reHeight();
    this.reWidth();
    this.redraw();
+};
+
+gisportal.TimeLine.prototype.drawLabels = function()  {
+   // Draw the time bar labels
+
+   $('.js-timeline-labels').html('');
+   for (var i = 0; i < this.timebars.length; i++)  {
+      // Update label
+      //var positionTop = $('.timeline > g').position().top;
+      //positionTop += this.barHeight * i;
+      //positionTop += this.barMargin * i;
+      positionTop = $(this.bars[0][i]).position().top;
+      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + '</li>');
+   }
 };
 
 // Zoom function to a new date range
@@ -616,8 +539,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDa
    }  
    
    this.reHeight();
-   this.redraw();
-   
+   this.redraw(); 
 };
 
 gisportal.TimeLine.prototype.addRangeBar = function(name, callback) {

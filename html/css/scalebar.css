@@ -28,9 +28,8 @@ input.max  {
 }
 
 .scalebar  {
-  background: url('../images/scalebar.jpg') repeat-y;
-  background-size: contain;
-  height: 20px;
+  background-repeat: repeat-x;
+  height: 25px;
   width: 100;
 }
 

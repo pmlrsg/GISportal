@@ -5,19 +5,22 @@ svg {
    shape-rendering: crispEdges;
 }
 
-/* #timeline is the container, for now */
-#timeline  {
+.timeline-container  {
+   left: 0;
    bottom: 25px;
    position: absolute;
-   left: 0;
    width: 100%;
 }
 
-
-.timeline {
+.timeline-inner  {
    background-color: #fff;
    margin: 0 auto;
+   position: relative;
    width: 90%;
+}
+
+.timeline  {
+   width: 100%;
 }
 
 .main text {
@@ -25,6 +28,11 @@ svg {
    fill: #dadada;
    /*stroke:black;
    stroke-width:0.5px;*/
+}
+
+.main text:hover,
+.main text:focus  {
+   fill: #b1a7bc;
 }
 
 .separatorLine {
@@ -60,5 +68,20 @@ svg {
 }
 
 .axis line, .axis path {
-   stroke:gray !important;
+   stroke: 0 !important;
+}
+
+.timeline-labels  {
+   font-size: 10px;
+   min-width: 150px;
+}
+
+.timeline-labels li  {
+   position: absolute;
+   left: 15px;
+   top: 0;
+}
+
+#timeline.grid-cell  {
+   flex-basis: initial;
 }

@@ -13,6 +13,7 @@
       <button>Reset</button>
       <button>Recalculate</button>
    </div>
-   <div class="scalebar"></div>
+   <div class="scalebar" style="background-image: url({{legend}});"></div>
+
 </div>
 
