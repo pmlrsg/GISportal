@@ -212,7 +212,7 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
    var Link = $.noUiSlider.Link;
    var slider = $('.range-slider[data-id="' + id + '"]');
    slider.noUiSlider({
-      start: [2, 14],
+      start: [min, max],
       connect: true,
       behaviour: 'tap-drag',
       range: {
@@ -221,13 +221,15 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
       },
       serialization: {
          lower: [
-            new Link({
-               target: from 
+            $.Link({
+               target: from,
+               method: setDate 
             })
          ],
          upper: [
-            new Link({
-               target: to     
+            $.Link({
+               target: to,
+               method: setDate
             })
          ],
          format: {
@@ -259,6 +261,10 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
       to.val(new Date(+val[1]).toISOString().substring(0,10));
    });
 };
+
+function setDate(value){
+   $(this).val(new Date(+value).toISOString().substring(0,10));   
+}
 
 gisportal.indicatorsPanel.createGraph = function(id)  {
    var dateRange = $('.js-min[data-id="' + id + '"]').val(); // Find date range
