@@ -45,7 +45,11 @@ gisportal.graphs.create = function(data, options)  {
    if (graph)  {
       var uid = 'wcsgraph' + Date.now();
       var title = options.title || "Graph";
-      $('body').html(graph);
+      //$('body').html(graph);
+      $('#tab-'+ data.coverage +'-graph').html(graph);
+      $('#tab-'+ data.coverage +'-graph').css( 'width', '570');
+      $('#tab-'+ data.coverage +'-graph').css( 'height', '400');
+      $('#tab-'+ data.coverage +'-graph-settings').hide();
    } 
 }
 

@@ -2,41 +2,41 @@
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <li>
-      <p class="number grid-cell">1</p>
-      <div class="grid-cell fill">
-         <p>Draw a selection box on the map to refine the data before analysis</p>
-         <button class="js-draw-box" data-id="{{id}}">Draw Box</button>
-         <label for="tab-{{id}}-coordinates">Or enter coordinates</label>
-         <input id="tab-{{id}}-coordinates" class="js-coordinates" type="text">
-      </div>
+         <p class="number grid-cell">1</p>
+         <div class="grid-cell fill">
+            <p>Draw a selection box on the map to refine the data before analysis</p>
+            <button class="js-draw-box" data-id="{{id}}">Draw Box</button>
+            <label for="tab-{{id}}-coordinates">Or enter coordinates</label>
+            <input id="tab-{{id}}-coordinates" class="js-coordinates" type="text">
+         </div>
       </li>
       <li>
-      <p class="number grid-cell">2</p>
-      <div class="grid-cell fill">
-         <p>Set a date range using the timeline below</p>
-         <input data-id="{{id}}" class="js-min min grid-cell" type="text">
-         <input data-id="{{id}}" class="js-max max grid-cell" type="text">
-         <div data-id="{{id}}" class="range-slider grid-cell fill"></div>
-      </div>
+         <p class="number grid-cell">2</p>
+         <div class="grid-cell fill">
+            <p>Set a date range using the timeline below</p>
+            <input data-id="{{id}}" class="js-min min grid-cell" type="text">
+            <input data-id="{{id}}" class="js-max max grid-cell" type="text">
+            <div data-id="{{id}}" class="range-slider grid-cell fill"></div>
+         </div>
       </li>
       <li>
-      <p class="number grid-cell">3</p>
-      <div class="grid-cell fill">
-         <label for="tab-{{id}}-graph-type">Choose a graph type</label>
-         <select id="tab-{{id}}-graph-type">
-            <option selected value="timeseries">Timeseries (default)</option>
-            <option value="histogram">Histogram</option>
-            <option value="hovmollerLat">Hovmoller Latitude</option>
-            <option value="hovmollerLon">Hovmoller Longitude</option>
-         </select>
-         <button data-id="{{id}}" class="brand js-create-graph">Create graph</button>
-      </div>
+         <p class="number grid-cell">3</p>
+         <div class="grid-cell fill">
+            <label for="tab-{{id}}-graph-type">Choose a graph type</label>
+            <select id="tab-{{id}}-graph-type">
+               <option selected value="timeseries">Timeseries (default)</option>
+               <option value="histogram">Histogram</option>
+               <option value="hovmollerLat">Hovmoller Latitude</option>
+               <option value="hovmollerLon">Hovmoller Longitude</option>
+            </select>
+            <button data-id="{{id}}" class="brand js-create-graph">Create graph</button>
+         </div>
       </li>
       <li>
-      <input id="tab-{{id}}-export-processed" type="checkbox"><label for="tab-{{id}}-export-processed">Processed data</label>
-      <input id="tab-{{id}}-export-raw" type="checkbox"><label for="tab-{{id}}-export-raw">Raw data</label>
-      <input id="tab-{{id}}-export-sources" type="checkbox"><label for="tab-{{id}}-export-sources">Data sources</label>
-      <button class="brand">Export selected</button>
+         <input id="tab-{{id}}-export-processed" type="checkbox"><label for="tab-{{id}}-export-processed">Processed data</label>
+         <input id="tab-{{id}}-export-raw" type="checkbox"><label for="tab-{{id}}-export-raw">Raw data</label>
+         <input id="tab-{{id}}-export-sources" type="checkbox"><label for="tab-{{id}}-export-sources">Data sources</label>
+         <button class="brand">Export selected</button>
       </li>
    </ol>
 </div>
