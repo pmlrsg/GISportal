@@ -8,6 +8,11 @@
             <button class="js-draw-box" data-id="{{id}}">Draw Box</button>
             <label for="tab-{{id}}-coordinates">Or enter coordinates</label>
             <input id="tab-{{id}}-coordinates" class="js-coordinates" type="text">
+            <div class="bbox-info">
+               <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>
+               <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>
+               <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
+            </div>
          </div>
       </li>
       <li>

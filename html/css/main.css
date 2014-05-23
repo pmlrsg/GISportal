@@ -70,3 +70,4 @@ input[type="text"]  {
   width: 100%;
 }
 
+sup { vertical-align: super; font-size: 65%;}

@@ -849,6 +849,7 @@ gisportal.main = function() {
 
    gisportal.configurePanel.initDOM();
    gisportal.indicatorsPanel.initDOM();
+   gisportal.graphs.initDOM();
 
    $('.js-show-tools').on('click', showPanel);
 

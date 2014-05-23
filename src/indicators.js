@@ -21,6 +21,10 @@ gisportal.indicatorsPanel.initDOM = function()  {
    });
 
    $('.js-indicators').on('click', '.js-create-graph', function()  {
+      // show the loading message
+      $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
+      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
+
       var id = $(this).data('id');
       gisportal.indicatorsPanel.createGraph(id);
    });
@@ -298,8 +302,8 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
          from.val(new Date(+val[0]).toISOString().substring(0,10));
          to.val(new Date(+val[1]).toISOString().substring(0,10));
       });
-   }
-};
+   });
+}
 
 function setDate(value){
    $(this).val(new Date(+value).toISOString().substring(0,10));   
@@ -342,7 +346,7 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
       type: $('#tab-' + id + '-graph-type option:selected').val(),
       bins: '',
       time: dateRange,
-      bbox: $('#graphcreator-bbox').val(),
+      bbox: $('#tab-' + id + '-coordinates').val(),
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,

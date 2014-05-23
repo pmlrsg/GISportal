@@ -92,13 +92,75 @@ gisportal.selectionTools.updateROI = function()  {
 };
 
 gisportal.selectionTools.ROIAdded = function(feature)  {
+   var feature_type = map.ROI_Type;
    this.toggleTool('pan'); // So that people don't misclick
 
    var bounds = feature.geometry.bounds;
    var coords = "";
-   coords += bounds.bottom + ",";
    coords += bounds.left + ",";
+   coords += bounds.bottom + ",";
    coords += bounds.right + ",";
    coords += bounds.top;
    $('.js-coordinates').val(coords);
+
+   
+   // Get the geometry of the drawn feature
+   var geom = new OpenLayers.Geometry();
+   geom = feature.geometry;
+
+   var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
+
+   if(feature_type !== '' && feature_type != 'point') {
+      area_deg = geom.getArea();
+      area_km = (geom.getGeodesicArea()*1e-6);
+      height_deg = bounds.getHeight();
+      width_deg = bounds.getWidth();
+      // Note - to get values in true ellipsoidal distances, we need to use Vincenty functions for measuring ellipsoidal
+      // distances instead of planar distances (http://www.movable-type.co.uk/scripts/latlong-vincenty.html)
+      ctrLon = geom.getCentroid().x;
+      ctrLat = geom.getCentroid().y;
+      height_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(ctrLon,bounds.top),new OpenLayers.LonLat(ctrLon,bounds.bottom));
+      width_km = OpenLayers.Util.distVincenty(new OpenLayers.LonLat(bounds.left,ctrLat),new OpenLayers.LonLat(bounds.right,ctrLat));
+      radius_deg = ((bounds.getWidth() + bounds.getHeight())/4);
+
+      var pretty_height_km, pretty_width_km, pretty_area_km
+      // because not all browsers support Intl.NumberFormat ...
+      try {
+         pretty_height_km = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2}).format(height_km);
+      } catch(e) {
+         pretty_height_km = height_km.toPrecision(4);
+      }
+      try {
+         pretty_width_km = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 2}).format(width_km);
+      } catch(e) {
+         pretty_width_km = width_km.toPrecision(4);
+      }
+      try {
+         pretty_area_km = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0}).format(area_km);
+      } catch(e) {
+         pretty_area_km = area_km.toPrecision(4);
+      }
+      
+   }
+  
+   switch(feature_type) {
+      case 'box': 
+         $('.js-bbox-width').html(pretty_width_km+' km');
+         $('.js-bbox-height').html(pretty_height_km +' km');
+         $('.js-bbox-area').html(pretty_area_km +' km<sup>2</sup>');
+         break;
+      case 'point':
+         // set the .bbox-info div to show lat/long
+         break;
+      case 'circle':
+         // set the .bbox-info div to show lat/long of the centre, the radius, width, height and area
+         break;
+      case 'polgon':
+         // set the .bbox-info div to show the centroid lat/long and area
+         break;
+   }
+
+
+
+   
 };
