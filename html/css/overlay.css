@@ -1,0 +1,22 @@
+/*------------------------------------*\
+    Overlay
+\*------------------------------------*/
+
+.overlay  {
+   position: absolute;
+   top: 0;
+   left: 0;
+
+   height: 100%;
+   width: 100%;
+
+   display: flex;
+   align-items: center;
+   z-index: 1000;
+}
+
+.overlay-container  {
+   max-width: 650px;
+   margin: 0 auto;
+   width: 100%;
+}

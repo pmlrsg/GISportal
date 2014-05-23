@@ -71,7 +71,21 @@ gisportal.indicatorsPanel.initDOM = function()  {
        
       map.zoomToExtent(bbox);
    });
-};
+
+   $('.js-indicators').on('click', '.js-auto', function()  {
+      var id = $(this).data('id');
+      gisportal.scalebars.autoScale(id);
+   });
+
+   $('.js-indicators').on('click', '.js-reset', function()  {
+      var id = $(this).data('id');
+      gisportal.scalebars.resetScale(id);
+   });
+
+   $('.js-share').on('click', function()  {
+      gisportal.openid.showShare();
+   });
+}
 
 gisportal.indicatorsPanel.refreshData = function()  {
    $('.js-indicators').html('');

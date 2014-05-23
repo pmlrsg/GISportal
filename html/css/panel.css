@@ -72,6 +72,10 @@
   display: block;
 }
 
+.panel-tab-trigger:checked + table.panel-tab  {
+   display: table;
+}
+
 .panel-tab-name  {
   color: #8a7b9b;
   border-bottom: 1px solid #e0dce4;

@@ -23,11 +23,9 @@ gisportal.configurePanel.initDOM = function()  {
       var id = $(this).parent().data('id');
       if ($(this).is(':checked'))  {
          gisportal.configurePanel.selectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', true).change();
       }
       else  {
          gisportal.configurePanel.deselectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false).change();
       }
    }
 
@@ -257,12 +255,10 @@ gisportal.configurePanel.search = function(val)  {
 
 };
 
-gisportal.configurePanel.selectLayer = function(id)  {
-   var microlayer = gisportal.microLayers[id];
-   var options = {};
-   if (microlayer)  {
-      gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
-   }
+gisportal.configurePanel.selectLayer = function(id, options)  {
+   var options = options || {};
+   $('.js-toggleVisibility[data-id="' + id + '"]').toggleClass('active', true).prop('checked', true).change();
+   gisportal.addNewLayer(id, options); 
 };
 
 gisportal.configurePanel.deselectLayer = function(id)  {
@@ -270,7 +266,7 @@ gisportal.configurePanel.deselectLayer = function(id)  {
       gisportal.layers[id].unselect();
       /* For now, unselect() just hides */
       delete gisportal.layers[id];  
-      $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false); 
+      $('.js-toggleVisibility[data-id="' + id + '"]').removeClass('active').prop('checked', false).change(); 
    }
    gisportal.configurePanel.refreshIndicators(); 
 

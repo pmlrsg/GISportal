@@ -279,7 +279,8 @@ gisportal.layer = function(microlayer, layerData) {
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
-         layer.selectDateTimeLayer($('#viewDate').datepicker('getDate'));
+         var currentDate = gisportal.timeline.getDate();
+         layer.selectDateTimeLayer(currentDate);
          
          delete gisportal.nonSelectedLayers[layer.id];
          gisportal.selectedLayers[layer.id] = layer;
@@ -654,22 +655,30 @@ gisportal.layer = function(microlayer, layerData) {
    
 };
 
+gisportal.addNewLayer = function(id, options)  {
+   var microlayer = gisportal.microLayers[id];
+   var options = options || {};
+   if (microlayer)  {
+      gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
+   }
+};
+
 gisportal.addLayer = function(layer, options) {
    var options = options || {};   
-   
+  
    if (layer.openlayers)  {
       var keys = Object.keys(layer.openlayers);
       for(var i = 0, len = keys.length; i < len; i++) {
          layer.addOLLayer(layer.openlayers[keys[i]], keys[i]);
       }
    }
-   
+ 
    if (options.minScaleVal || options.maxScaleVal)  {   
       if (options.minScaleVal !== null) gisportal.layers[layer.id].minScaleVal = options.minScaleVal; 
       if (options.maxScaleVal !== null) gisportal.layers[layer.id].maxScaleVal = options.maxScaleVal;
       layer.minScaleVal = gisportal.layers[layer.id].minScaleVal;
       layer.maxScaleVal = gisportal.layers[layer.id].maxScaleVal;
-      updateScalebar(layer);
+      gisportal.scalebars.updateScalebar(layer.id);
    }
    
    layer.select();

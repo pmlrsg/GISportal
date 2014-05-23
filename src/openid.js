@@ -5,14 +5,14 @@
 gisportal.openid = {};
 
 gisportal.openid.setup = function(containerID) {
-/*   gisportal.openid.loginBox = containerID;
+   gisportal.openid.loginBox = containerID;
    gisportal.openid.$loginBox = $('#' + containerID);
    gisportal.openid.darkCoverID = 'darkCover';
   
    gisportal.openid.logoutLocation = '/service/logout'; 
    gisportal.openid.popupWindow = null;
    
-   gisportal.openid.loginForm = 'gisportal-openid-form'; // Set id for login form
+   gisportal.openid.loginForm = 'gisportal-openid-lin'; // Set id for login form
    gisportal.openid.$loginForm = $('#' + gisportal.openid.loginForm);
 
    gisportal.openid.saveButton = 'gisportal-openid-getlink';
@@ -54,36 +54,26 @@ gisportal.openid.setup = function(containerID) {
    gisportal.openid.interval = null;
    
    
-   var data = {
-      id: gisportal.openid.loginForm,
-      providers: gisportal.openid.providers,
-      provider: function() {
-         return function(text, render) {
-            return render(gisportal.templates.providerBox({
-               name: this.name, 
-               title: this.title, 
-               url: this.url, 
-               imagePath: this.imagePath, 
-               x: this.x, 
-               y: this.y,
-               width: this.width,
-               height: this.height
-            }));
-         };
-      }
-   };
    
-   gisportal.openid.$loginBox.append(gisportal.templates.loginBox(data)); 
+   //gisportal.openid.$loginBox.append(gisportal.templates.loginBox(data)); 
  
-   $('#' + gisportal.openid.loginForm + ' .gisportal-login-with-google').click(function() {
-      var $this = $(this);     
-      gisportal.openid.openPopup($this.attr('data-url'));  
+   $.get('templates/share-logged-out.mst', function(template)  {
+      var data = {
+         id: gisportal.openid.loginForm,
+         providers: gisportal.openid.providers
+      };
+      var rendered = Mustache.render(template, data);
+      $('.js-logged-out').html(rendered);
    });
-   
-   $('#' + gisportal.openid.loginForm + ' .gisportal-login-with-yahoo').click(function() {
-      var $this = $(this);     
-      gisportal.openid.openPopup($this.attr('data-url'));
-   })
+
+   $('.js-close-share').on('click', function()  {
+      $('.share').toggleClass('hidden', true);
+   });
+
+
+   $('.js-logged-out').on('click', '.js-login-button', function() {
+      gisportal.openid.openPopup($(this).attr('data-url'));  
+   });
    
 
    gisportal.openid.$saveButton.click(function() {
@@ -93,7 +83,6 @@ gisportal.openid.setup = function(containerID) {
    gisportal.openid.$logoutButton.click(function()  {
       gisportal.openid.logout();
    });
-*/
 };
 
 // getLink to state
@@ -101,13 +90,20 @@ gisportal.openid.getLink = function()  {
    gisportal.genericAsync('POST', gisportal.stateLocation, { state: JSON.stringify(gisportal.getState())}, function(data, opts) { 
       if (data['output']['url']) {
          console.log(data['output']);
-         $('#gisportal-openid-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+         $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
       }
    }, 
    function(request, errorType, exception) {
       console.log(request, errorType, exception);
       if (exception === 'UNAUTHORIZED') gisportal.openid.showLogin();
    }, 'json', {});
+};
+
+gisportal.openid.showShare = function()  {
+   $('.share').removeClass('hidden');
+   if (this.loggedIn)  {
+      this.getLink();
+   }
 };
 
 gisportal.openid.logout = function() { gisportal.genericAsync('GET', gisportal.openid.logoutLocation, null, function(data, opts) {
@@ -123,7 +119,9 @@ gisportal.openid.logout = function() { gisportal.genericAsync('GET', gisportal.o
    }, 'json', {});
 };
 
-
+gisportal.openid.login = function()  {
+   this.getLink();
+};
 
 gisportal.openid.openPopup = function(urlToOpen) {
    var windowWidth = '870px';
@@ -194,6 +192,4 @@ gisportal.openid.isPopupClosed = function() {
 gisportal.openid.providers = [
    {name: 'google', title:'login with Google', url:'/service/login/google', imagePath:'img/Red-signin_Long_base_20dp.png', x:'0', y:'0', width:'147px', height:'30px'},
    {name: 'yahoo', title:'login with Yahoo', url:'/service/login/yahoo', imagePath:'img/yahoo_signin_btn.png', x:'0', y:'0', width:'161px', height:'22px'}
-   //{name: 'myOpenID', title:'login with myOpenID', url:'/service/login/myopenid', imagePath:'0', x:'0', y:'0'},
-   //{name: 'OpenID', title:'login with OpenID', url:'/service/login', imagePath:'', x:'0', y:'0'}
 ];

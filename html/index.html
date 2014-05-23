@@ -46,8 +46,8 @@
    
    <!-- The start page,
          this should load before anything else. -->
-    <div class="start-background">
-      <div class="start-container">
+    <div class="start overlay">
+      <div class="start-container overlay-container">
 
         <ul class="start-slider">
           <li class="active">Marine OPEC takes data that you select and plots it on a map to help you analyse, export and share it.</li>
@@ -83,10 +83,10 @@
       <div class="timeline-inner grid">
          <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
          <div id="timeline" class="grid-cell fill"></div>
+         <div class="js-current-date"></div>
          <a href="/" class="grid-cell">About</a>
       </div>
    </div>
-   <div id="viewDate" class="hidden"></div>
 
    <button class="js-show-tools show-tools hidden">Show tools</button>
    
@@ -153,6 +153,20 @@
         <button id="share-map" class="js-share">Share</button>
       </div>
     </div>   
-    
+  
+   <!-- The share box. -->
+    <div class="share overlay hidden">
+      <div class="share-container overlay-container">
+         <button class="js-close-share">Close</button>
+         <div class="js-logged-in hidden">
+            <h2>Share this map</h2>
+            <p>Here's a link to this map. Just copy and paste anywhere</p>
+            <input class="js-shareurl">
+         </div>
+         <div class="js-logged-out"></div>
+      </div>
+    </div>
+
+   
 </body>
 </html>

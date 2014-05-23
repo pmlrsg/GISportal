@@ -132,16 +132,12 @@ gisportal.TimeLine = function(id, options) {
    var isDragging = false;
    
    this.clickDate = function(d, i) {
-      console.log(d);
-      console.log(i);
-      console.log(this);
       // Stop the event firing if the drag event is fired.
       if(isDragging) {
          //isDragging = false;
          return;
       }
       
-
       var x = d3.mouse(this)[0];       
       
       // Prevent dragging the selector off-scale
@@ -151,18 +147,8 @@ gisportal.TimeLine = function(id, options) {
       self.draggedDate = self.xScale.invert(x);
       
       // Move the graphical marker
-      self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
       
-      self.selectedDate = self.draggedDate;
-      
-      // **Update the OPEC map**
-      // Change the selected date in the datepicker control      
-      $('#viewDate').datepicker('setDate', self.selectedDate);
-      
-      // Filter the layer data to the selected date      
-      gisportal.filterLayersByDate(self.selectedDate);
-      console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
-      $('#viewDate').change();
+      self.setDate(self.draggedDate);
    };
   
 
@@ -224,19 +210,11 @@ gisportal.TimeLine = function(id, options) {
       
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
-      console.log('--->New drag date/time = ' + self.draggedDate);  // Debugging
+      self.showDate(self.draggedDate);   
    };
    
    this.dragDateEnd = function() {
-      self.selectedDate = self.draggedDate;
-      
-      // **Update the OPEC map**
-      // Change the selected date in the datepicker control
-      $('#viewDate').datepicker('setDate', self.selectedDate);
-      
-      // Filter the layer data to the selected date
-      gisportal.filterLayersByDate(self.selectedDate);
-      console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
+      self.setDate(self.draggedDate);
    };
 
    // Initialise the selected date-time marker and handle dragging via a callback
@@ -617,14 +595,21 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
    var self = this;  // Useful for when the scope/meaning of "this" changes
-   var selectedDate = self.draggedDate = new Date(date);
-   this.selectedDate = ((selectedDate instanceof Date) ? selectedDate : this.selectedDate);
+   this.selectedDate = self.draggedDate = new Date(date);
    // Move the selected date-time line
-   this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
-   $('#viewDate').datepicker('setDate', self.selectedDate).blur();
+   // ADD_CONFIG: Animation may not be wanted
+   this.selectedDateLine.transition().duration(500).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
+   
+   
+   //self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
+
    gisportal.filterLayersByDate(date);
-   $('#viewDate').change();
+   self.showDate(date);
 };
+
+gisportal.TimeLine.prototype.showDate = function(date) {
+   $('.js-current-date').html(date);
+}
 
 // Get the currently selected date 
 gisportal.TimeLine.prototype.getDate = function() {

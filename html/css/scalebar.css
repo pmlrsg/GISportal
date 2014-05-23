@@ -28,8 +28,7 @@ input.max  {
 }
 
 .scalebar  {
-  background-repeat: repeat-x;
-  height: 25px;
-  width: 100;
+   /*transform: rotate(-90deg);
+   transform-origin: 0 0; */
 }
 

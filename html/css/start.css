@@ -2,26 +2,14 @@
     Start Page
 \*------------------------------------*/
 
-.start-background  {
+.start  {
   background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  z-index: 1000;
+-index: 1000;
 }
 
 .start-container  {
   background: #32273d;
   color: #f7f6f8;
-  max-width: 650px;
-  margin: 0 auto;
 }
 
 .start-slider  {
