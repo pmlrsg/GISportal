@@ -1,0 +1,22 @@
+#graphPanel .panel-container { 
+	width: 150%;
+	max-width: 150%;
+	z-index: 20;
+}
+
+#graphPanel.panel {
+	overflow: visible;
+}
+.graph-holder {
+	background: #fff;
+	text-align: center;
+	padding: 10px;
+
+}
+
+.bbox-info div { width: 30%; display: inline-block;margin-top: 8px;}
+
+.bbox-info dd { display: inline-block; margin-right: 10px; font-weight: 800;}
+.bbox-info dt { display: inline-block; }
+
+.panel-tab .grid-list li { padding: 10px 20px;}
