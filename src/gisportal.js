@@ -628,7 +628,7 @@ gisportal.loadState = function(state) {
          gisportal.configurePanel.selectLayer(keys[i], options);
       }
    }
-     
+ 
    // Create the feature if there is one
    if(!gisportal.utils.isNullorUndefined(state.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];

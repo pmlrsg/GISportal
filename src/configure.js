@@ -29,13 +29,7 @@ gisportal.configurePanel.initDOM = function()  {
       }
    }
 
-   $('.js-build').click(function() {
-      if (Object.keys(gisportal.layers).length > 0)  {
-         gisportal.indicatorsPanel.refreshData();
-         $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-         $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-      }
-   });
+   $('.js-build').click(this.buildMap);
 
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
@@ -52,6 +46,15 @@ gisportal.configurePanel.initDOM = function()  {
 
    $('.build-map-footer').on('click', '.js-remove-all', gisportal.configurePanel.removeAll);
 }
+
+gisportal.configurePanel.buildMap = function()  {
+   if (Object.keys(gisportal.layers).length > 0)  {
+      gisportal.indicatorsPanel.refreshData();
+      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+   }
+
+};
 
 gisportal.configurePanel.refreshIndicators = function()  {
 

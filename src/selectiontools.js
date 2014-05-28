@@ -92,10 +92,12 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    this.toggleTool('pan'); // So that people don't misclick
 
    var bounds = feature.geometry.bounds;
-   var coords = "";
-   coords += bounds.bottom + ",";
-   coords += bounds.left + ",";
-   coords += bounds.right + ",";
-   coords += bounds.top;
-   $('.js-coordinates').val(coords);
+   if (bounds)  {
+      var coords = "";
+      coords += bounds.bottom + ",";
+      coords += bounds.left + ",";
+      coords += bounds.right + ",";
+      coords += bounds.top;
+      $('.js-coordinates').val(coords);
+   }
 };

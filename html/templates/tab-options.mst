@@ -9,21 +9,27 @@
               indicators can be chosen within each option -->
             <label for="tab-{{id}}-options-region">Region</label>
                <select id="tab-{{id}}-options-region">
-                  <option class="js-placeholder">Choose Region</option>
+                  {{^refined}}
+                     <option class="js-placeholder">Choose Region</option>
+                  {{/refined}}
                   {{#groupedNames.region}}
                      <option value="{{value}}">{{key}}</option>
                   {{/groupedNames.region}}
                </select>
                <label for="tab-{{id}}-options-interval">Interval</label>
                <select id="tab-{{id}}-options-interval">
-                  <option class="js-placeholder">Choose Interval</option>
+                  {{^refined}}
+                     <option class="js-placeholder">Choose Interval</option>
+                  {{/refined}}
                   {{#groupedNames.interval}}
                      <option value="{{value}}">{{key}}</option>
                   {{/groupedNames.interval}}
                </select>
                <label for="tab-{{id}}-options-reliability">Reliability</label>
                <select id="tab-{{id}}-options-reliability">
-                  <option class="js-placeholder">Choose Reliability</option>
+                  {{^refined}}
+                     <option class="js-placeholder">Choose Reliability</option>
+                  {{/refined}}
                   {{#groupedNames.Confidence}}
                      <option value="{{value}}">{{key}}</option>
                   {{/groupedNames.Confidence}}

@@ -12,7 +12,10 @@
       <button class="js-auto" data-id="{{id}}">Auto</button>
       <button class="js-reset" data-id="{{id}}">Reset</button>
    </div>
-   <img class="scalebar" src="{{legend}}">
-
+   <div class="scalebar-outer">
+      <div class="scalebar-inner">
+         <img class="scalebar" src="{{legend}}">
+      </div>
+   </div>
 </div>
 

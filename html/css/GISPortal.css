@@ -1182,6 +1182,12 @@ button.brand  {
   display: none !important;
 }
 
+.hide-text  {
+   text-indent: 100%;
+   white-space: nowrap;
+   overflow: hidden;
+}
+
 .dropdown {
   display: none;
   position: absolute;
@@ -1261,6 +1267,7 @@ input[type="text"]  {
     -webkit-flex: 1;
     -ms-flex: 1;
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
  }
 
@@ -1619,11 +1626,34 @@ input.max  {
   border-bottom: 1px solid #e0dce4;
 }
 
+
+/* Rotated scalebar with help from Ana Tudor
+   https://twitter.com/thebabydino/status/471630268726788096 */
+
 .scalebar  {
-   /*transform: rotate(-90deg);
-   transform-origin: 0 0; */
+   -webkit-transform: scaleX(.01 /* 1/scale factor from parent to undo that transform */) rotate(-90deg) translate(-50% /* position it correctly taking into account padding */);
+   -ms-transform: scaleX(.01 /* 1/scale factor from parent to undo that transform */) rotate(-90deg) translate(-50% /* position it correctly taking into account padding */);
+   transform: scaleX(.01 /* 1/scale factor from parent to undo that transform */) rotate(-90deg) translate(-50% /* position it correctly taking into account padding */);
+   -webkit-transform-origin: 0 0;
+   -ms-transform-origin: 0 0;
+   transform-origin: 0 0;
 }
 
+.scalebar-outer  {
+   display: inline-block; /* so that its width = the width of the image */
+}
+
+.scalebar-inner  {
+   height: 0;
+   padding: 50% 0; /* both padding-top & padding bottom = 50% the width of parent = 50% width of image => space taken vertically with height: 0 is the width of image */
+   overflow-y: hidden;
+   -webkit-transform: scaleX(100 /* a large scale factor */);
+   -ms-transform: scaleX(100 /* a large scale factor */);
+   transform: scaleX(100 /* a large scale factor */);
+   -webkit-transform-origin: 0 0;
+   -ms-transform-origin: 0 0;
+   transform-origin: 0 0;
+}
 
 /*------------------------------------*\
     Indicators

@@ -39,6 +39,12 @@ button.brand  {
   display: none !important;
 }
 
+.hide-text  {
+   text-indent: 100%;
+   white-space: nowrap;
+   overflow: hidden;
+}
+
 .dropdown {
   display: none;
   position: absolute;

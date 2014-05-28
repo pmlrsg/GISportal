@@ -27,8 +27,23 @@ input.max  {
   border-bottom: 1px solid #e0dce4;
 }
 
+
+/* Rotated scalebar with help from Ana Tudor
+   https://twitter.com/thebabydino/status/471630268726788096 */
+
 .scalebar  {
-   /*transform: rotate(-90deg);
-   transform-origin: 0 0; */
+   transform: scaleX(.01 /* 1/scale factor from parent to undo that transform */) rotate(-90deg) translate(-50% /* position it correctly taking into account padding */);
+   transform-origin: 0 0;
 }
 
+.scalebar-outer  {
+   display: inline-block; /* so that its width = the width of the image */
+}
+
+.scalebar-inner  {
+   height: 0;
+   padding: 50% 0; /* both padding-top & padding bottom = 50% the width of parent = 50% width of image => space taken vertically with height: 0 is the width of image */
+   overflow-y: hidden;
+   transform: scaleX(100 /* a large scale factor */);
+   transform-origin: 0 0;
+}

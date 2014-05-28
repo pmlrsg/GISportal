@@ -159,6 +159,14 @@ gisportal.indicatorsPanel.renderOptionsTab = function(indicator, id, group, refi
       for (var cat in group)  {
          indicator.groupedNames[cat] = gisportal.utils.mustacheFormat(group[cat]);
       }
+
+      if (refined)  {
+         indicator.refined = true;
+      }
+      else  {
+         indicator.refined = false;
+      }
+
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-options').html(rendered);
 
@@ -275,7 +283,8 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
          format: {
             decimals: 0
          }
-      });
+      }
+   });
 
 
       slider.on('slide', function(event, val)  {
