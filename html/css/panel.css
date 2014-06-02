@@ -6,12 +6,14 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 0;
+  top: 25px;
+  bottom: 125px;
   left: 25px;
-  height: 95%;
+  //height: 95%;
   overflow: hidden;
   min-width: 290px;
   width: 33.3%;
+  user-select: none;
 }
 
 .panel.large  {
@@ -28,11 +30,25 @@
   height: 45px;
 }
 
+.panel-header h2  {
+   line-height: 45px;
+   padding-left: 15px;
+}
+
+.panel-header button  {
+   position: absolute;
+   right: 3px;
+   top: 10px;
+}
+
 .panel-footer  {
   padding-top: 19px;
   padding-bottom: 18px;
   padding-right: 9px;
+  padding-left: 9px;
+}
 
+#configurePanel .panel-footer  {
   text-align: right;
 }
 
@@ -53,6 +69,7 @@
   background-color: #ffffff;
   width: 100%;
   display: none;
+  padding-top: 20px;
 }
 
 .panel-tab-content  {
@@ -82,7 +99,7 @@
   border-bottom: 1px solid #e0dce4;
   border-top: 1px solid transparent;
   display: inline-block;
-  height: 40px;
+  min-height: 40px;
   line-height: 40px;
   text-align: center;
   width: 50%;
@@ -136,8 +153,9 @@
 }
 
 .panel-tab.indicator-select  {
-  padding: 9px;
-  padding-top: 0;
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
 }
 
 .panel-tab.indicator-select select,
@@ -183,3 +201,26 @@
    margin-top: -35px !important; 
 }
 
+.search  {
+   border: 1px solid #d8d3dd;
+   display: block;
+   height: 45px;
+   padding: 5px;
+   padding-left: 10px;
+   margin: 0 auto; 
+   width: 95%;
+}
+
+.show-tools  {
+
+   background-color: #fafafb;
+   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
+   border: 1px solid #b1a7bc;
+   line-height: 40px;
+   padding-right: 20px;
+   left: 25px;
+   top: 25px;
+   position: absolute;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+}

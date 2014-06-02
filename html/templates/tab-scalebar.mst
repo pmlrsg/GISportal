@@ -1,5 +1,5 @@
 <input type="radio" id="tab-{{id}}-scalebar" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
-<div class="panel-tab">
+<div class="panel-tab scalebar-tab">
    <div class="scale-options">
       <h3>Scale</h3>
       <div class="grid">

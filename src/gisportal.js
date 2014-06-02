@@ -784,7 +784,8 @@ gisportal.main = function() {
    else {
       console.log('Loading Default State...');
    }
- 
+
+   gisportal.replaceAllIcons(); 
 };
 
 
@@ -840,4 +841,26 @@ gisportal.zoomOverall = function()  {
 
       map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
    }
+};
+
+// Automatically goes through all icons
+gisportal.replaceAllIcons = function()  {
+   gisportal.replaceSubtreeIcons('body');
+};
+
+// Goes through all icons in a subtree
+gisportal.replaceSubtreeIcons = function(el)  {
+   $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
+      var e = $(e); 
+      e.addClass('bg-being-removed');
+      var url = e.css('background-image').replace('url(','').replace(')','');
+      $.get(url,
+         function(svg){
+            var ele = document.importNode(svg.documentElement,true);
+            e.prepend(ele);
+            e.addClass('bg-removed');
+            e.removeClass('bg-being-removed');
+         },
+         "xml");
+   });
 };

@@ -5,9 +5,9 @@
 
 {{#indicators}}
    <li data-id="{{id}}">
-      <div class="icon_loading grid-cell icon-column">loading</div>
+      <div class="icon_loading icon-svg grid-cell icon-column">loading</div>
       <p class="grid-cell fill">{{name}}</p>
-      <label for="{{location}}-toggleVisibility-{{id}}" class="icon_show grid-cell icon-column">Show/Hide</label>
+      <label for="{{location}}-toggleVisibility-{{id}}" class="icon_show icon-svg grid-cell icon-column">Show/Hide</label>
       <input type="checkbox" id="{{location}}-toggleVisibility-{{id}}" data-id="{{id}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
    </li>
 {{/indicators}}

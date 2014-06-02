@@ -740,20 +740,21 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
          // Convert the microlayer. 
          // COMMENT: might change the way this works in future.
          var layer = new gisportal.layer(microlayer, data);        
-         
-         if (layer.selected === true) { // Presume from state
-         
-            // If the layer was loaded as part of a state load set some of the 
-            // values of the layer to the cached versions.
-            gisportal.checkIfLayerFromState(layer);
+         if (options.show !== false)  { 
+            if (layer.selected === true) { // Presume from state
+            
+               // If the layer was loaded as part of a state load set some of the 
+               // values of the layer to the cached versions.
+               gisportal.checkIfLayerFromState(layer);
 
-         } 
-         else {
-            console.log("Adding layer..."); // DEBUG
-            gisportal.addLayer(layer, options);    
-            console.log("Added Layer"); // DEBUG
+            } 
+            else {
+               console.log("Adding layer..."); // DEBUG
+               gisportal.addLayer(layer, options);    
+               console.log("Added Layer"); // DEBUG
+            }
          }
-
+         gisportal.configurePanel.refreshIndicators();
       },
       error: function(request, errorType, exception) {
          var data = {

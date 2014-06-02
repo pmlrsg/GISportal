@@ -12,6 +12,10 @@ body  {
    color: #111111;
 }
 
+p  {
+   user-select: initial;
+}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;
@@ -33,6 +37,20 @@ button.brand  {
   color: #fff;
 
   height: 40px;
+}
+
+button.secondary  {
+   background-color: #b1a7bc;
+   border: none;
+}
+
+.text-button  {
+   border: 0;
+   cursor: pointer;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   background: transparent;
+   text-decoration: underline;
 }
 
 .hidden  {

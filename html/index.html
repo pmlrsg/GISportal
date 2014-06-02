@@ -88,19 +88,17 @@
       </div>
    </div>
 
-   <button class="js-show-tools show-tools hidden">Show tools</button>
+   <button class="js-show-tools show-tools hidden"><span class="icon_show"></span>Show tools</button>
    
    <!-- Configure Your Map panel  -->
    <div id="configurePanel" class="panel active">
-      <h2 class="panel-header">Configure your map</h2>
-      <button class="js-hide-panel">Hide</button>
+      <div class="panel-header">
+         <h2>Choose your indicators</h2>
+         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+      </div>
       <div class="panel-container">
          <div class="build-map">
             <ul class="js-configure-indicators"></ul>
-            <div class="build-map-footer">
-               <button class="link js-remove-all">Clear all</button>
-               <button class="brand js-build">Build a map</button>
-            </div>
          </div>
          
          <!-- These are on the same line to avoid white-space bug with inline-block -->
@@ -114,7 +112,7 @@
                   <ul class="js-popular panel-list grid-list"></ul>
                </div>
               <!-- These are on the same line to avoid white-space bug with inline-block -->
-              <label class="panel-tab-name active dark" for="tab-ecosystem">Ecosystem</label><label class="panel-tab-name dark" for="tab-msfd">MSFD</label>
+              <label class="panel-tab-name active dark" for="tab-ecosystem">Ecosystem Indicators</label><label class="panel-tab-name dark" for="tab-msfd">MSFD Descriptors</label>
               <ul class="panel-tabs dark">
                 <li>
                   <input type="radio" checked id="tab-ecosystem" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
@@ -130,7 +128,7 @@
           <li>
             <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
             <div class="panel-tab full-height">
-              <input type="search" id="indicatorSearch">
+              <input type="search" placeholder="Search for an indicator" class="js-search search">
               <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
             </div>
           </li>
@@ -138,19 +136,23 @@
       </div>
 
       <div class="panel-footer">
+         <button class="brand js-build hidden">Next</button>
       </div>
     </div>
 
     <div id="indicatorsPanel" class="panel hidden">
       <div class="panel-header">
-         <button class="js-start-again">Start again</button>
-         <button class="js-hide-panel">Hide</button>
+         <h2>Map Tools</h2>
+         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
       </div>
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
         </ul>
-        <label for="share-map">Share this map with colleagues</label>
-        <button id="share-map" class="js-share">Share</button>
+        <label class="hidden" for="share-map">Share this map with colleagues</label>
+        <button id="share-map" class="js-share hidden secondary"><span class="icon_share light"></span>Share</button>
+      </div>
+      <div class="panel-footer">
+         <button class="brand js-start-again">Add Indicators</button>
       </div>
     </div>   
   

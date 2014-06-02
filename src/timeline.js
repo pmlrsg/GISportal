@@ -608,7 +608,8 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 };
 
 gisportal.TimeLine.prototype.showDate = function(date) {
-   $('.js-current-date').html(date);
+   var d = date.toDateString().substring(4);
+   $('.js-current-date').html(d);
 }
 
 // Get the currently selected date 

@@ -1,11 +1,11 @@
 <li data-id="{{id}}">
    <div class="indicator-header" data-id="{{id}}">
       <p class="grid-cell fill">{{name}}</p>
-      <button class="icon_show light js-toggleVisibility grid-cell icon-column reorder-before"></button>
-      <label class="icon_options light grid-cell icon-column js-closable" for="tab-{{id}}-options">Options</label>
-      <label class="icon_scalebar light grid-cell icon-column js-closable" for="tab-{{id}}-scalebar">Scalebar</label>
-      <label class="icon_details light grid-cell icon-column js-closable" for="tab-{{id}}-details">Details</label>
-      <label class="icon_analyse light grid-cell icon-column js-closable" for="tab-{{id}}-analysis">Analysis</label>
+      <button class="icon_show icon-svg light js-toggleVisibility grid-cell icon-column reorder-before"></button>
+      <label class="icon_options icon-svg light grid-cell icon-column js-closable" for="tab-{{id}}-options">Options</label>
+      <label class="icon_scalebar icon-svg light grid-cell icon-column js-closable" for="tab-{{id}}-scalebar">Scalebar</label>
+      <label class="icon_details icon-svg light grid-cell icon-column js-closable" for="tab-{{id}}-details">Details</label>
+      <label class="icon_analyse icon-svg light grid-cell icon-column js-closable" for="tab-{{id}}-analysis">Analysis</label>
    </div>
 
    <ul>
