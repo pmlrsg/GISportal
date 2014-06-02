@@ -853,14 +853,15 @@ gisportal.replaceSubtreeIcons = function(el)  {
    $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
       var e = $(e); 
       e.addClass('bg-being-removed');
-      var url = e.css('background-image').replace('url(','').replace(')','');
-      $.get(url,
-         function(svg){
-            var ele = document.importNode(svg.documentElement,true);
-            e.prepend(ele);
-            e.addClass('bg-removed');
-            e.removeClass('bg-being-removed');
-         },
-         "xml");
+      var url = e.css('background-image').replace('url(','').replace(')','').replace(/\"/g, "");
+      $.ajax({
+         url: url,
+         dataType: "xml"
+      }).done(function(svg){
+         var ele = document.importNode(svg.documentElement,true);
+         e.prepend(ele);
+         e.addClass('bg-removed');
+         e.removeClass('bg-being-removed');
+      });
    });
 };

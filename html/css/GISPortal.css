@@ -1241,6 +1241,20 @@ input[type="text"]  {
 }
 
 
+/* TEMP GRAPH stuff */
+
+#graph-container  {
+   background: #fff;
+   position: absolute;
+   top: 0;
+   left: 0;
+   height: 100%;
+   width: 100%;
+   z-index: 100;
+}
+
+
+
 /*------------------------------------*\
     Panels
 \*------------------------------------*/

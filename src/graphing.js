@@ -45,7 +45,12 @@ gisportal.graphs.create = function(data, options)  {
    if (graph)  {
       var uid = 'wcsgraph' + Date.now();
       var title = options.title || "Graph";
-      $('body').html(graph);
+      $('#graph-container > div').html(graph);
+      $('#graph-container').removeClass('hidden');
+   
+      $('#graph-container').on('click', 'button', function()  {
+         $('#graph-container').toggleClass('hidden', true);
+      });
+
    } 
 }
-
