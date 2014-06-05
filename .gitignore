@@ -1,0 +1,5 @@
+*.pyc
+html/cache/*
+html/GISPortal.js
+middleware/portalflask/settings.py
+config/*
