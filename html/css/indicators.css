@@ -11,6 +11,14 @@
   text-transform: capitalize;
 }
 
+.indicator-header > p  {
+   margin-bottom: 5px;
+}
+
 .indicator-header .panel-tab-name  {
   border-bottom: 0 none;
+}
+
+.indicator-header .icon_remove {
+   float: right;
 }

@@ -33,12 +33,18 @@
    opacity: 1;
 }
 
+.icon_arrow  {
+   background-image: url('../img/icons/arrow.svg');
+   background-size: 16px 16px;
+   opacity: 1;
+}
+
 .icon_show  {
    background-image: url('../img/icons/show.svg');
 }
 
 .icon_remove  {
-   background-image: url('../img/icons/remove.svg');
+   background-image: url('../img/icons/dustbin.svg');
 }
 
 .icon_options  {
@@ -51,6 +57,10 @@
 
 .icon_details  {
    background-image: url('../img/icons/details.svg');
+}
+
+.icon_map  {
+   background-image: url('../img/icons/map.svg');
 }
 
 .icon_analyse  {
@@ -84,18 +94,40 @@
    background-image: url('../img/icons/hide.svg');
 }
 
+.icon_checkbox  {
+   background-image: url('../img/icons/checkbox.svg');
+}
+
+.icon_checkbox svg  {
+   width: 24px;
+   height: 24px;
+}
+
+.icon_checkbox #tick  {
+   visibility: hidden;
+}
+
+.icon_checkbox.active #tick {
+   visibility: visible;
+}
+
 .icon-svg svg {
    stroke: #000;
    fill: #000;
-   width: 26px;
-   height: 26px;
+   width: 24px;
+   height: 24px;
    margin: 0 auto;
    shape-rendering: auto;
 }
 
-.icon-svg.light svg  {
-   stroke: #fff;
+.icon-svg.light svg,
+.icon-svg.light path  {
+   stroke: none;
    fill: #fff;
+}
+
+.icon-svg.no-stroke svg  {
+   stroke-opacity: 0;
 }
 
 .bg-removed  {

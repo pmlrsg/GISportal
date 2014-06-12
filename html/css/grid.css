@@ -3,7 +3,6 @@
 \*------------------------------------*/
 
 .grid-list.panel-list li,
-.grid-list .indicator-header,
 .grid
   {
   display: flex;
@@ -44,7 +43,6 @@
 
 @media only screen and (min-width : 1270px)  {
   .grid-list.panel-list li,
-  .grid-list .indicator-header,
   .grid  {
     flex-flow: initial;
   }

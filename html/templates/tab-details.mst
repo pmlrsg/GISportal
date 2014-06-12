@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-details" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{modified}}-details" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
 <table class="panel-tab">
    <tbody>
       <tr><td>Abstract</td><td>{{productAbstract}}</td></tr>

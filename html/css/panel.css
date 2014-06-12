@@ -62,7 +62,7 @@
 .panel-container,
 .panel-footer  {
   padding-top: 10px;
-  max-width: calc(100% - 45px);
+  /*max-width: calc(100% - 45px); */
 }
 
 .panel-tab  {
@@ -77,6 +77,10 @@
   overflow-y: hidden;
   position: relative;
   width: 100%;
+}
+
+.panel-tab-content h3  {
+   margin-left: 13px;
 }
 
 .panel-tab-trigger  {
@@ -95,13 +99,10 @@
 }
 
 .panel-tab-name  {
-  color: #8a7b9b;
   border-bottom: 1px solid #e0dce4;
   border-top: 1px solid transparent;
   display: inline-block;
   min-height: 40px;
-  line-height: 40px;
-  text-align: center;
   width: 50%;
 }
 
@@ -139,6 +140,10 @@
   background-color: #efedf1;
 }
 
+.panel-tab.indicator-select  {
+   padding-top: 0;
+}
+
 .panel-list  {
   margin-bottom: 20px;
   overflow-x: hidden;
@@ -148,14 +153,43 @@
   background-color: #ffffff;
 }
 
+.panel-list p {
+  text-transform: capitalize;
+}
+
+/* over specified */
+.panel-list p.grid-cell.fill  {
+   margin:0;
+   line-height: 40px;
+}
+
 .panel-list li:nth-child(even)  {
   background-color: #fbfafb;
 }
 
-.panel-tab.indicator-select  {
+.build-map li  {
+   padding-bottom: 5px;
+   text-transform: capitalize;
+}
+
+.build-map p  {
+   display: inline-block;
+}
+
+#configurePanel .panel-tab.indicator-select  { 
    padding-left: 9px;
    padding-right: 9px;
    padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.js-indicators .panel-tab.indicator-select li {
+   border-bottom: 1px solid #e0dce4;
+
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
 }
 
 .panel-tab.indicator-select select,
@@ -176,6 +210,12 @@
   text-transform: capitalize;
   margin-top: 9px;
   width: 100%;
+}
+
+.indicator-select .icon_arrow  {
+   float: right;
+   margin-top: 4px;
+   margin-right: 5px;
 }
 
 .panel-list.fake-select {

@@ -1,11 +1,11 @@
-<input type="radio" id="tab-{{id}}-analysis" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{modified}}-analysis" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <li>
       <p class="number grid-cell">1</p>
       <div class="grid-cell fill">
          <p>Draw a selection box on the map to refine the data before analysis</p>
-         <button class="js-draw-box" data-id="{{id}}">Draw Box</button>
+         <button class="js-draw-box" data-id="{{id}}" title="Draw Box">Draw Box</button>
          <label for="tab-{{id}}-coordinates">Or enter coordinates</label>
          <input id="tab-{{id}}-coordinates" class="js-coordinates" type="text">
       </div>

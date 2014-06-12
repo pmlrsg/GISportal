@@ -19,7 +19,7 @@ time, mark, audio, video {
    margin: 0;
    padding: 0;
    border: 0;
-   font-size: 100%;
+   font-size: inherit;
    font: inherit;
    vertical-align: baseline;
 }
@@ -48,20 +48,87 @@ table {
 }
 
 /*------------------------------------*\
-    Fonts
+   Fonts
+   This is where font faces are defined.
+   You may be looking for type.css 
 \*------------------------------------*/
 
 @font-face  {
   font-family: 'Open Sans';
   src: url("../fonts/OpenSans-Regular-webfont.eot");
   src: url("../fonts/OpenSans-Regular-webfont?#iefix") format("embedded-opentype"), url("../fonts/OpenSans-Regular-webfont.woff") format("woff"), url("../fonts/OpenSans-Regular-webfont.ttf") format("truetype"), url("../fonts/OpenSans-Regular-webfont.svg#OpenSans") format("svg");
-  font-weight: normal;
+  font-weight: 400;
   font-style: normal;
 }
 
-body  {
+@font-face  {
   font-family: 'Open Sans';
-  font-size: 14px;
+  src: url("../fonts/OpenSans-Light-webfont.eot");
+  src: url("../fonts/OpenSans-Light-webfont?#iefix") format("embedded-opentype"), url("../fonts/OpenSans-Light-webfont.woff") format("woff"), url("../fonts/OpenSans-Light-webfont.ttf") format("truetype"), url("../fonts/OpenSans-Light-webfont.svg#OpenSans") format("svg");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face  {
+  font-family: 'Open Sans';
+  src: url("../fonts/opensans-semibold-webfont.eot");
+  src: url("../fonts/opensans-semibold-webfont?#iefix") format("embedded-opentype"), url("../fonts/opensans-semibold-webfont.woff") format("woff"), url("../fonts/opensans-semibold-webfont.ttf") format("truetype"), url("../fonts/opensans-semibold-webfont.svg#pensans") format("svg");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/*------------------------------------*\
+   Type
+   This is where the type styles are
+   defined. You may be looking for
+   fonts.css
+\*------------------------------------*/
+
+body  {
+   font-family: 'Open Sans', sans-serif;
+   font-size: 13px;
+   font-size: 0.8125rem; /* 13/16 = 0.8125 */
+   line-height: 1.5;
+}
+
+h3  {
+   font-size: 15px;
+   font-size: 0.9375rem; /* 15/16=0.9275 */
+   font-weight: 600;
+}
+
+/* Start Screen */
+
+.intro-text  {
+   color: #f7f6f8;
+   font-size: 20px;
+   font-size: 1.25rem; /* 24/16 = 1.5 */
+   font-weight: 300;
+}
+
+.examples a   {
+   color: #f7f6f8;
+}
+
+/* Buttons */
+
+button.brand  {
+   /* Font was falling back to Arial, not sure why
+      so for now explicitly making Open Sans */
+   font-family: 'Open Sans', sans-serif;
+   font-size: 14px;
+   font-size: 0.875rem; /* 18/16 = 1.125 */
+}
+
+/* Panel */
+
+.panel-tab-name {
+   color: #8a7b9b;
+   font-size: 13px;
+   font-size: 0.8125rem; /* 13/16=0.8125 */
+   font-weight: 600;
+   line-height: 40px;
+   text-align: center;
 }
 
 /*------------------------------------*\
@@ -98,44 +165,56 @@ body  {
 \*------------------------------------*/
 
 .start  {
-  background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
--index: 1000;
+   background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
+   z-index: 1000;
 }
 
 .start-container  {
-  background: #32273d;
-  color: #f7f6f8;
+   background: #32273d;
+   color: #f7f6f8;
 }
 
-.start-slider  {
-  background: #32273d;
-  height: 300px;
+.intro-text  {
+   padding: 25px;
+   padding-bottom: 10px;
 }
 
-.start-slider li  {
-  display: none;
-
-  font-size: 18px;
-  line-height: 1.5; 
-  padding: 25px 80px;
-}
-
-.start-slider .active  {
-  display: block;
+.intro-text p  {
+   padding-bottom: 10px;
 }
 
 .start-nav  {
-  background: #251d2d;
-  padding: 27px 0;
+   background: #251d2d;
+   padding: 20px 15px;
+   text-align: right;
 }
 
-.start-nav .dropdown-trigger  {
-  background: none;
-  border-style: none;
-  color: #d8d7b6;
+.examples a   {
+   line-height: 45px;
+   display: block;
+   padding-left: 17px;
 }
 
+.examples .icon-svg  {
+   opacity: 1;
+   margin-right: 10px;
+}
 
+.example-1  {
+   background: #643d72;
+}
+
+.example-2  {
+   background: #683766;
+}
+
+.example-3  {
+   background: #47355b;
+}
+
+.example-4  {
+   background: #473d72;
+}
 
 /*------------------------------------*\
     Share
@@ -1078,14 +1157,14 @@ svg {
 
 .main text {
    text-anchor: start;
-   fill: #dadada;
+   fill: #b1a7bc;
    /*stroke:black;
    stroke-width:0.5px;*/
 }
 
 .main text:hover,
 .main text:focus  {
-   fill: #b1a7bc;
+   fill: #32253f;
 }
 
 .separatorLine {
@@ -1121,7 +1200,7 @@ svg {
 }
 
 .axis line, .axis path {
-   stroke: 0 !important;
+   stroke: #d8d3dd;
 }
 
 .timeline-labels  {
@@ -1153,6 +1232,7 @@ svg {
 
 body  {
    color: #111111;
+   overflow-y: hidden;
 }
 
 p  {
@@ -1328,7 +1408,7 @@ input[type="text"]  {
 .panel-container,
 .panel-footer  {
   padding-top: 10px;
-  max-width: calc(100% - 45px);
+  /*max-width: calc(100% - 45px); */
 }
 
 .panel-tab  {
@@ -1343,6 +1423,10 @@ input[type="text"]  {
   overflow-y: hidden;
   position: relative;
   width: 100%;
+}
+
+.panel-tab-content h3  {
+   margin-left: 13px;
 }
 
 .panel-tab-trigger  {
@@ -1361,13 +1445,10 @@ input[type="text"]  {
 }
 
 .panel-tab-name  {
-  color: #8a7b9b;
   border-bottom: 1px solid #e0dce4;
   border-top: 1px solid transparent;
   display: inline-block;
   min-height: 40px;
-  line-height: 40px;
-  text-align: center;
   width: 50%;
 }
 
@@ -1405,6 +1486,10 @@ input[type="text"]  {
   background-color: #efedf1;
 }
 
+.panel-tab.indicator-select  {
+   padding-top: 0;
+}
+
 .panel-list  {
   margin-bottom: 20px;
   overflow-x: hidden;
@@ -1414,14 +1499,43 @@ input[type="text"]  {
   background-color: #ffffff;
 }
 
+.panel-list p {
+  text-transform: capitalize;
+}
+
+/* over specified */
+.panel-list p.grid-cell.fill  {
+   margin:0;
+   line-height: 40px;
+}
+
 .panel-list li:nth-child(even)  {
   background-color: #fbfafb;
 }
 
-.panel-tab.indicator-select  {
+.build-map li  {
+   padding-bottom: 5px;
+   text-transform: capitalize;
+}
+
+.build-map p  {
+   display: inline-block;
+}
+
+#configurePanel .panel-tab.indicator-select  { 
    padding-left: 9px;
    padding-right: 9px;
    padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.js-indicators .panel-tab.indicator-select li {
+   border-bottom: 1px solid #e0dce4;
+
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
 }
 
 .panel-tab.indicator-select select,
@@ -1442,6 +1556,12 @@ input[type="text"]  {
   text-transform: capitalize;
   margin-top: 9px;
   width: 100%;
+}
+
+.indicator-select .icon_arrow  {
+   float: right;
+   margin-top: 4px;
+   margin-right: 5px;
 }
 
 .panel-list.fake-select {
@@ -1497,7 +1617,6 @@ input[type="text"]  {
 \*------------------------------------*/
 
 .grid-list.panel-list li,
-.grid-list .indicator-header,
 .grid
   {
   display: -webkit-flex;
@@ -1552,7 +1671,6 @@ input[type="text"]  {
 
 @media only screen and (min-width : 1270px)  {
   .grid-list.panel-list li,
-  .grid-list .indicator-header,
   .grid  {
     -webkit-flex-flow: initial;
     -ms-flex-flow: initial;
@@ -1611,12 +1729,19 @@ input[type="text"]  {
    opacity: 1;
 }
 
+.icon_arrow  {
+   background-image: url('../img/icons/arrow.svg');
+   -webkit-background-size: 16px 16px;
+   background-size: 16px 16px;
+   opacity: 1;
+}
+
 .icon_show  {
    background-image: url('../img/icons/show.svg');
 }
 
 .icon_remove  {
-   background-image: url('../img/icons/remove.svg');
+   background-image: url('../img/icons/dustbin.svg');
 }
 
 .icon_options  {
@@ -1629,6 +1754,10 @@ input[type="text"]  {
 
 .icon_details  {
    background-image: url('../img/icons/details.svg');
+}
+
+.icon_map  {
+   background-image: url('../img/icons/map.svg');
 }
 
 .icon_analyse  {
@@ -1663,18 +1792,40 @@ input[type="text"]  {
    background-image: url('../img/icons/hide.svg');
 }
 
+.icon_checkbox  {
+   background-image: url('../img/icons/checkbox.svg');
+}
+
+.icon_checkbox svg  {
+   width: 24px;
+   height: 24px;
+}
+
+.icon_checkbox #tick  {
+   visibility: hidden;
+}
+
+.icon_checkbox.active #tick {
+   visibility: visible;
+}
+
 .icon-svg svg {
    stroke: #000;
    fill: #000;
-   width: 26px;
-   height: 26px;
+   width: 24px;
+   height: 24px;
    margin: 0 auto;
    shape-rendering: auto;
 }
 
-.icon-svg.light svg  {
-   stroke: #fff;
+.icon-svg.light svg,
+.icon-svg.light path  {
+   stroke: none;
    fill: #fff;
+}
+
+.icon-svg.no-stroke svg  {
+   stroke-opacity: 0;
 }
 
 .bg-removed  {
@@ -1758,8 +1909,16 @@ input.max  {
   text-transform: capitalize;
 }
 
+.indicator-header > p  {
+   margin-bottom: 5px;
+}
+
 .indicator-header .panel-tab-name  {
   border-bottom: 0 none;
+}
+
+.indicator-header .icon_remove {
+   float: right;
 }
 
 /*------------------------------------*\
@@ -2538,7 +2697,7 @@ fill-opacity: 0 !important;
    shape-rendering: crispEdges;
 }
 
-.nvd3 .axis line, .axis path {
+.nvd3 .axis line, .nvd3 .axis path {
    fill: none;
    stroke: #000;
    shape-rendering: crispEdges;

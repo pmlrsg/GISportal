@@ -415,8 +415,8 @@ gisportal.TimeLine.prototype.redraw = function() {
       .attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); }).attr('y', 2)
       .attr('width', 10).attr('height', self.height - 2)
       .attr('rx', 6).attr('ry', 6);
-   
-   this.drawLabels();
+  
+   this.drawLabels(); 
       
    //-------------------------------------------------------------------------- 
 };
@@ -445,14 +445,15 @@ gisportal.TimeLine.prototype.reset = function() {
 
 gisportal.TimeLine.prototype.drawLabels = function()  {
    // Draw the time bar labels
-
    $('.js-timeline-labels').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
       // Update label
       //var positionTop = $('.timeline > g').position().top;
       //positionTop += this.barHeight * i;
       //positionTop += this.barMargin * i;
-      positionTop = $(this.bars[0][i]).position().top;
+      positionTop = (i+1) * (this.barHeight + this.barMargin) - 2; 
+      var barTop = $(this.bars[0][i]).position().top;
+      if (positionTop < barTop) positionTop = barTop;
       $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + '</li>');
    }
 };
@@ -560,6 +561,27 @@ gisportal.TimeLine.prototype.rename = function(name, label)  {
    this.redraw();
 }
 
+gisportal.TimeLine.prototype.has = function(name)  {
+   var has = _.where(gisportal.timeline.timebars, function(d)  {
+      return d.name.toLowerCase() === name.toLowerCase();
+   });
+
+   if (has.length > 0) return true;
+   return false;
+};
+
+gisportal.TimeLine.prototype.removeTimeBarById = function(id)  {
+   if (this.has(id))  {
+      this.removeTimeBarByName(id);
+   }
+   else if (gisportal.microLayers[id]) {
+      var name = gisportal.microLayers[id].name;
+      if (this.has(name))  {
+         this.removeTimeBarByName(name); 
+      }
+   }
+};
+
 // Remove a time bar by name (if found)
 gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    var self = this,
@@ -567,7 +589,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    
    function removeByName(anArray) {
       for (var j = 0; j < anArray.length; j++){
-         if (anArray[j].name == name) {
+         if (anArray[j].name.toLowerCase() == name.toLowerCase()) {
             var bar = anArray[j];
             anArray.splice(j, 1);
             return bar;

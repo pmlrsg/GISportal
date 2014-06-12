@@ -3,6 +3,7 @@
    "files": [
       "html/css/reset.css",
       "html/css/fonts.css",
+      "html/css/type.css",
       "html/css/overlay.css",      
       "html/css/start.css",
       "html/css/share.css",
