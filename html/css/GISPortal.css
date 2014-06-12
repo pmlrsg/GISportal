@@ -1215,8 +1215,8 @@ svg {
 }
 
 #timeline.grid-cell  {
-   -webkit-flex-basis: initial;
    -ms-flex-preferred-size: initial;
+   -webkit-flex-basis: initial;
    flex-basis: initial;
 }
 
@@ -1663,8 +1663,8 @@ input[type="text"]  {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  -webkit-flex-basis: 100%;
   -ms-flex-preferred-size: 100%;
+  -webkit-flex-basis: 100%;
   flex-basis: 100%;
   margin-bottom: 10px;
 }
@@ -1685,8 +1685,8 @@ input[type="text"]  {
   }
 
   .fill  {
-    -webkit-flex-basis: initial;
     -ms-flex-preferred-size: initial;
+    -webkit-flex-basis: initial;
     flex-basis: initial;
     marign: 0;
   }
