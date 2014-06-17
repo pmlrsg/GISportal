@@ -23,6 +23,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
    $('.js-indicators').on('click', '.js-create-graph', function()  {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.createGraph(id);
+      $(this).toggleClass("loading", true);
    });
 
    $('.js-indicators').on('click', '.js-draw-box', function()  {
@@ -292,7 +293,7 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
       $('[data-name="' + indicator.name + '"] #tab--options').prop('checked', true).change();
 
       if (refined || group.region.length === 1)  {
-         $('button[data-id="' + id + '"]').removeClass('hidden');
+         $('button[data-name="' + name + '"]').removeClass('hidden');
       }
 
    });
@@ -479,14 +480,17 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
    var graphXAxis = null,
        graphYAxis = null;
    
-   if ( $('#tab-' + id + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
+   var modified = id.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
+
+
+/*   if ( $('#tab-' + modified + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
       graphXAxis = 'Lon';
       graphYAxis = 'Time';
    }
-   else if ( $('#tab-' + id + '-graph-type option[value="hovmollerLat"]').prop("selected") ) {
+   else if ( $('#tab-' + modified + '-graph-type option[value="hovmollerLat"]').prop("selected") ) {
       graphXAxis = 'Time';
       graphYAxis = 'Lat';
-   }
+   }*/
   
    // Some providers change direction of depth,
    // so this makes it match direction

@@ -51,5 +51,6 @@ gisportal.graphs.create = function(data, options)  {
          $('#graph-container').toggleClass('hidden', true);
       });
 
+      $('button[data-id="' + data.coverage + '"]').toggleClass('loading', false);
    } 
 }
