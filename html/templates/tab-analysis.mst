@@ -36,10 +36,13 @@
             <!--<option value="hovmollerLat">Hovmoller Latitude</option>
             <option value="hovmollerLon">Hovmoller Longitude</option>-->
          </select>
-         <button data-id="{{id}}" class="brand js-create-graph">Create graph</button>
+         <button data-id="{{id}}" class="brand create-graph js-create-graph">Create graph</button>
       </div>
       </li>
-      <li>
+      <li class="hidden">
+         <button class="brand secondary">Sign in</button>
+      </li>
+      <li class="hidden">
       <input id="tab-{{id}}-export-processed" type="checkbox"><label for="tab-{{id}}-export-processed">Processed data</label>
       <input id="tab-{{id}}-export-raw" type="checkbox"><label for="tab-{{id}}-export-raw">Raw data</label>
       <button class="brand">Export selected</button>

@@ -60,10 +60,8 @@
     overflow-y: auto;
  }
 
-.panel-container,
 .panel-footer  {
   padding-top: 10px;
-  /*max-width: calc(100% - 45px); */
 }
 
 .panel-tab  {
@@ -168,8 +166,13 @@
   background-color: #fbfafb;
 }
 
-.build-map li  {
+.build-map  {
    padding-bottom: 5px;
+   padding-top: 10px;
+}
+
+.build-map li  {
+   padding-bottom: 10px;
    text-transform: capitalize;
 }
 
@@ -193,6 +196,10 @@
    padding-top: 10px;
 }
 
+.indicator-select label  {
+   text-transform: capitalize;
+}
+
 select,
 .indicator-dropdown {
   background: white;
@@ -213,6 +220,13 @@ select,
   width: 100%;
 }
 
+/* Firefox has a weird padding problem */
+@-moz-document url-prefix() {
+   #indicatorsPanel select  {
+      line-height: 28px;
+      padding-top: 7px;  
+   }
+}
 
 /* I'm using a hack for multiple select
  * so overriding the height breaks

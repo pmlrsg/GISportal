@@ -33,7 +33,6 @@ gisportal.graphs.create = function(data, options)  {
          graph = gisportal.graphs.timeseries(data, options);
          break;
       case 'histogram':
-         debugger;
          graph = gisportal.graphs.histogram(data, options);
          break;
       case 'hovmollerLat':

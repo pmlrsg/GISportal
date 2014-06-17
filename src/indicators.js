@@ -394,7 +394,10 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id)  {
-   if (gisportal.layers[id])  {
+   if (!gisportal.layers[id])  {
+      debugger;
+   }
+   else  {
       var firstDate = gisportal.layers[id].firstDate;
       var lastDate = gisportal.layers[id].lastDate;
       var min = new Date(firstDate.split('-').reverse().join('-')).getTime();
@@ -473,11 +476,11 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
    var graphXAxis = null,
        graphYAxis = null;
    
-   if ( $('#tab- ' + id + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
+   if ( $('#tab-' + id + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
       graphXAxis = 'Lon';
       graphYAxis = 'Time';
    }
-   else if ( $('#tab- ' + id + '-graph-type option[value="hovmollerLat"]').prop("selected") ) {
+   else if ( $('#tab-' + id + '-graph-type option[value="hovmollerLat"]').prop("selected") ) {
       graphXAxis = 'Time';
       graphYAxis = 'Lat';
    }

@@ -38,11 +38,16 @@ p  {
 button.brand  {
   background-color: #a19d63;
   border-style: none;
-  border-top: 8px solid #bab67c;
-  border-radius: 3px;
+  border-radius: 5px;
   color: #fff;
 
-  height: 40px;
+  padding: 0 35px 0 30px;
+  height: 35px;
+}
+
+button.brand.with-border  {
+  border-top: 6px solid #bab67c;
+  height: 41px;
 }
 
 button.secondary  {

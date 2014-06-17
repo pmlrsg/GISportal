@@ -118,6 +118,8 @@ button.brand  {
    font-family: 'Open Sans', sans-serif;
    font-size: 14px;
    font-size: 0.875rem; /* 18/16 = 1.125 */
+   font-weight: 600;
+   line-height: 35px;
 }
 
 /* Panel */
@@ -1274,11 +1276,16 @@ p  {
 button.brand  {
   background-color: #a19d63;
   border-style: none;
-  border-top: 8px solid #bab67c;
-  border-radius: 3px;
+  border-radius: 5px;
   color: #fff;
 
-  height: 40px;
+  padding: 0 35px 0 30px;
+  height: 35px;
+}
+
+button.brand.with-border  {
+  border-top: 6px solid #bab67c;
+  height: 41px;
 }
 
 button.secondary  {
@@ -1422,10 +1429,8 @@ input[type="text"]  {
     overflow-y: auto;
  }
 
-.panel-container,
 .panel-footer  {
   padding-top: 10px;
-  /*max-width: calc(100% - 45px); */
 }
 
 .panel-tab  {
@@ -1530,8 +1535,13 @@ input[type="text"]  {
   background-color: #fbfafb;
 }
 
-.build-map li  {
+.build-map  {
    padding-bottom: 5px;
+   padding-top: 10px;
+}
+
+.build-map li  {
+   padding-bottom: 10px;
    text-transform: capitalize;
 }
 
@@ -1555,6 +1565,10 @@ input[type="text"]  {
    padding-top: 10px;
 }
 
+.indicator-select label  {
+   text-transform: capitalize;
+}
+
 select,
 .indicator-dropdown {
   background: white;
@@ -1575,6 +1589,13 @@ select,
   width: 100%;
 }
 
+/* Firefox has a weird padding problem */
+@-moz-document url-prefix() {
+   #indicatorsPanel select  {
+      line-height: 28px;
+      padding-top: 7px;  
+   }
+}
 
 /* I'm using a hack for multiple select
  * so overriding the height breaks
@@ -1991,6 +2012,7 @@ input.max  {
 }
 
 .number  {
+   color: #b1a7bc;
    width: 85px;
 }
 
@@ -2009,6 +2031,11 @@ input.max  {
 
 .bbox-info dt  {
    margin: 0 10px 0 5px;
+}
+
+.create-graph  {
+   float: right;
+   margin-top: 20px;
 }
 
 /*------------------------------------*\
