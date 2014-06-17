@@ -196,6 +196,7 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
 
 gisportal.configurePanel.renderPopular = function()  {
    var indicators = [];
+   var groupedNames = gisportal.groupNames();
    var popular = gisportal.config.popularIndicators;
    popular = _.unique(popular, function(d)  {
       return d.toLowerCase();
@@ -203,9 +204,11 @@ gisportal.configurePanel.renderPopular = function()  {
    _.forEach(popular, function(d)  {
       var tmp = {};
       var d = d.toLowerCase();
-      tmp.name = d;
-      tmp.modified = d.replace(/ /g, '__');
-      indicators.push(tmp);
+      if (groupedNames[d])  {
+         tmp.name = d;
+         tmp.modified = d.replace(/ /g, '__');
+         indicators.push(tmp);
+      }
    });
 
    $.get('templates/browseIndicators.mst', function(template) {
