@@ -13,7 +13,7 @@
    min-width: 40px;
    font-size: 0;
 
-   opacity: 0.3;
+   opacity: 0.5;
    color: transparent;
 
    -webkit-appearance: none;
@@ -61,6 +61,10 @@
 
 .icon_map  {
    background-image: url('../img/icons/map.svg');
+}
+
+.icon_rect  {
+   background-image: url('../img/icons/select-rect.svg');
 }
 
 .icon_analyse  {

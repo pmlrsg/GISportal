@@ -17,13 +17,23 @@
   border-radius: 25px;
 }
 
+.noUi-origin  {
+   border-radius: 25px;
+}
+
 input.min,
 input.max  {
-  width: 65px;
+  margin: 10px 0;
+  width: 90px;
+}
+
+input.max  {
+   float: right;
 }
 
 .panel-tab.scalebar-tab  {
   background-color: #fbfafb;
+  padding: 9px;
 }
 
 .scale-options  {

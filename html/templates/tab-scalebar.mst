@@ -2,7 +2,7 @@
 <div class="panel-tab scalebar-tab">
    <div class="scalebar-outer">
       <div class="scalebar-inner">
-         <img class="scalebar" src="{{legend}}">
+         <img class="scalebar" src="{{legend}}" />
       </div>
    </div>
    <div class="scale-options">

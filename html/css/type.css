@@ -51,3 +51,13 @@ button.brand  {
    line-height: 40px;
    text-align: center;
 }
+
+.number  {
+   font-size: 24px;
+   font-size: 1.5rem;
+   text-align: center;
+}
+
+.bbox-info dt  {
+   color: #545454;
+}

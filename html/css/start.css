@@ -5,6 +5,7 @@
 .start  {
    background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
    z-index: 1000;
+   overflow-y: auto;
 }
 
 .start-container  {

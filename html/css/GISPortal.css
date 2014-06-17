@@ -131,6 +131,16 @@ button.brand  {
    text-align: center;
 }
 
+.number  {
+   font-size: 24px;
+   font-size: 1.5rem;
+   text-align: center;
+}
+
+.bbox-info dt  {
+   color: #545454;
+}
+
 /*------------------------------------*\
     Overlay
 \*------------------------------------*/
@@ -167,6 +177,7 @@ button.brand  {
 .start  {
    background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
    z-index: 1000;
+   overflow-y: auto;
 }
 
 .start-container  {
@@ -1215,8 +1226,8 @@ svg {
 }
 
 #timeline.grid-cell  {
-   -ms-flex-preferred-size: initial;
    -webkit-flex-basis: initial;
+   -ms-flex-preferred-size: initial;
    flex-basis: initial;
 }
 
@@ -1228,6 +1239,11 @@ svg {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+html  {
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+
 }
 
 body  {
@@ -1354,6 +1370,7 @@ input[type="text"]  {
   overflow: hidden;
   min-width: 290px;
   width: 33.3%;
+  max-width: 500px;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -1538,7 +1555,7 @@ input[type="text"]  {
    padding-top: 10px;
 }
 
-.panel-tab.indicator-select select,
+select,
 .indicator-dropdown {
   background: white;
   border-style: none;
@@ -1546,8 +1563,8 @@ input[type="text"]  {
   border-radius: 0;
   color: #8a7b9b;
   display: block;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  /*-webkit-appearance: none;
+  -moz-appearance: none;*/
   text-align: left;
   text-indent: 1px;
   text-overflow: '';
@@ -1556,6 +1573,14 @@ input[type="text"]  {
   text-transform: capitalize;
   margin-top: 9px;
   width: 100%;
+}
+
+
+/* I'm using a hack for multiple select
+ * so overriding the height breaks
+ * the hack. */
+#indicatorsPanel select  {
+  height: 35px;
 }
 
 .indicator-select .icon_arrow  {
@@ -1567,6 +1592,11 @@ input[type="text"]  {
 .panel-list.fake-select {
   border: 1px solid #d8d3dd;
   border-top: 0 none;
+}
+
+.panel-list .text-button {
+  line-height: 30px;
+  padding-left: 8px; 
 }
 
 .full-height  {
@@ -1631,6 +1661,13 @@ input[type="text"]  {
   min-height: 40px;
 }
 
+.js-tab-analysis .grid-list.panel-list li  {
+   -webkit-align-items: flex-start;
+   -ms-flex-align: start;
+   align-items: flex-start;
+   border-bottom: 1px solid #e0dce4;
+}
+
 .grid-list.panel-list li {
    -webkit-flex-flow: row;
    -ms-flex-flow: row;
@@ -1663,8 +1700,8 @@ input[type="text"]  {
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
-  -ms-flex-preferred-size: 100%;
   -webkit-flex-basis: 100%;
+  -ms-flex-preferred-size: 100%;
   flex-basis: 100%;
   margin-bottom: 10px;
 }
@@ -1685,8 +1722,8 @@ input[type="text"]  {
   }
 
   .fill  {
-    -ms-flex-preferred-size: initial;
     -webkit-flex-basis: initial;
+    -ms-flex-preferred-size: initial;
     flex-basis: initial;
     marign: 0;
   }
@@ -1709,7 +1746,7 @@ input[type="text"]  {
    min-width: 40px;
    font-size: 0;
 
-   opacity: 0.3;
+   opacity: 0.5;
    color: transparent;
 
    -webkit-appearance: none;
@@ -1758,6 +1795,10 @@ input[type="text"]  {
 
 .icon_map  {
    background-image: url('../img/icons/map.svg');
+}
+
+.icon_rect  {
+   background-image: url('../img/icons/select-rect.svg');
 }
 
 .icon_analyse  {
@@ -1853,13 +1894,23 @@ input[type="text"]  {
   border-radius: 25px;
 }
 
+.noUi-origin  {
+   border-radius: 25px;
+}
+
 input.min,
 input.max  {
-  width: 65px;
+  margin: 10px 0;
+  width: 90px;
+}
+
+input.max  {
+   float: right;
 }
 
 .panel-tab.scalebar-tab  {
   background-color: #fbfafb;
+  padding: 9px;
 }
 
 .scale-options  {
@@ -1917,8 +1968,47 @@ input.max  {
   border-bottom: 0 none;
 }
 
-.indicator-header .icon_remove {
+@media only screen and (min-width : 1270px)  {
+   .indicator-header .icon_remove {
+      float: right;
+   }
+}
+
+.js-tab-analysis .panel-tab  {
+   padding: 0;
+}
+
+.steps li  {
+   padding: 20px 20px 20px 0;
+}
+
+.icon_rect  {
    float: right;
+}
+
+.coordinates  {
+   margin-top: 15px;
+}
+
+.number  {
+   width: 85px;
+}
+
+.bbox-info  {
+   margin-top: 20px;
+}
+
+.bbox-info div {
+   display: inline-block;
+}
+
+.bbox-info dd,
+.bbox-info dt  {
+   display: inline;
+}
+
+.bbox-info dt  {
+   margin: 0 10px 0 5px;
 }
 
 /*------------------------------------*\

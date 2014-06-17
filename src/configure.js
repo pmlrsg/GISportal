@@ -35,6 +35,10 @@ gisportal.configurePanel.initDOM = function()  {
 
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
+
+   $('.js-indicators').on('change', '.hide-select', function()  {
+     // togggle! important 
+   });
    
    $('.indicator-select').on('click', '.indicator-dropdown', function()  {
       if ($(this).siblings('select').height() > 50)  {

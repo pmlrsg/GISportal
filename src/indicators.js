@@ -338,7 +338,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
       
 
       indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
-      indicator.legend = gisportal.scalebars.getScalebarDetails(id).url;
+      var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
+      if (scalebarDetails) indicator.legend = scalebarDetails.url;
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-scalebar').html(rendered);      
       $('[data-id="' + id + '"] .icon_scalebar').toggleClass('hidden', false);
@@ -393,43 +394,43 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id)  {
+   if (gisportal.layers[id])  {
+      var firstDate = gisportal.layers[id].firstDate;
+      var lastDate = gisportal.layers[id].lastDate;
+      var min = new Date(firstDate.split('-').reverse().join('-')).getTime();
+      var max = new Date(lastDate.split('-').reverse().join('-')).getTime();
 
-   var firstDate = gisportal.layers[id].firstDate;
-   var lastDate = gisportal.layers[id].lastDate;
-   var min = new Date(firstDate.split('-').reverse().join('-')).getTime();
-   var max = new Date(lastDate.split('-').reverse().join('-')).getTime();
+      var from = $('.js-min[data-id="' + id + '"]');
+      var to   = $('.js-max[data-id="' + id + '"]');
 
-   var from = $('.js-min[data-id="' + id + '"]');
-   var to   = $('.js-max[data-id="' + id + '"]');
-
-   var Link = $.noUiSlider.Link;
-   var slider = $('.range-slider[data-id="' + id + '"]');
-   slider.noUiSlider({
-      start: [min, max],
-      connect: true,
-      behaviour: 'tap-drag',
-      range: {
-         'min': min,
-         'max': max
-      },
-      serialization: {
-         lower: [
-            $.Link({
-               target: from,
-               method: setDate 
-            })
-         ],
-         upper: [
-            $.Link({
-               target: to,
-               method: setDate
-            })
-         ],
-         format: {
-            decimals: 0
+      var Link = $.noUiSlider.Link;
+      var slider = $('.range-slider[data-id="' + id + '"]');
+      slider.noUiSlider({
+         start: [min, max],
+         connect: true,
+         behaviour: 'tap-drag',
+         range: {
+            'min': min,
+            'max': max
+         },
+         serialization: {
+            lower: [
+               $.Link({
+                  target: from,
+                  method: setDate 
+               })
+            ],
+            upper: [
+               $.Link({
+                  target: to,
+                  method: setDate
+               })
+            ],
+            format: {
+               decimals: 0
+            }
          }
-      }
-   });
+      });
 
 
       slider.on('slide', function(event, val)  {
@@ -453,6 +454,7 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
          from.val(new Date(+val[0]).toISOString().substring(0,10));
          to.val(new Date(+val[1]).toISOString().substring(0,10));
       });
+   }
 };
 
 function setDate(value){

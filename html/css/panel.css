@@ -13,6 +13,7 @@
   overflow: hidden;
   min-width: 290px;
   width: 33.3%;
+  max-width: 500px;
   user-select: none;
 }
 
@@ -192,7 +193,7 @@
    padding-top: 10px;
 }
 
-.panel-tab.indicator-select select,
+select,
 .indicator-dropdown {
   background: white;
   border-style: none;
@@ -200,8 +201,8 @@
   border-radius: 0;
   color: #8a7b9b;
   display: block;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  /*-webkit-appearance: none;
+  -moz-appearance: none;*/
   text-align: left;
   text-indent: 1px;
   text-overflow: '';
@@ -210,6 +211,14 @@
   text-transform: capitalize;
   margin-top: 9px;
   width: 100%;
+}
+
+
+/* I'm using a hack for multiple select
+ * so overriding the height breaks
+ * the hack. */
+#indicatorsPanel select  {
+  height: 35px;
 }
 
 .indicator-select .icon_arrow  {
@@ -221,6 +230,11 @@
 .panel-list.fake-select {
   border: 1px solid #d8d3dd;
   border-top: 0 none;
+}
+
+.panel-list .text-button {
+  line-height: 30px;
+  padding-left: 8px; 
 }
 
 .full-height  {

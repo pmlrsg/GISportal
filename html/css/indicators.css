@@ -19,6 +19,45 @@
   border-bottom: 0 none;
 }
 
-.indicator-header .icon_remove {
+@media only screen and (min-width : 1270px)  {
+   .indicator-header .icon_remove {
+      float: right;
+   }
+}
+
+.js-tab-analysis .panel-tab  {
+   padding: 0;
+}
+
+.steps li  {
+   padding: 20px 20px 20px 0;
+}
+
+.icon_rect  {
    float: right;
+}
+
+.coordinates  {
+   margin-top: 15px;
+}
+
+.number  {
+   width: 85px;
+}
+
+.bbox-info  {
+   margin-top: 20px;
+}
+
+.bbox-info div {
+   display: inline-block;
+}
+
+.bbox-info dd,
+.bbox-info dt  {
+   display: inline;
+}
+
+.bbox-info dt  {
+   margin: 0 10px 0 5px;
 }
