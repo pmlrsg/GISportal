@@ -102,7 +102,8 @@ gisportal.indicatorsPanel.refreshData = function(indicators)  {
 };
 
 gisportal.indicatorsPanel.changeIndicator = function(current, id)  {
-   if (!gisportal.layers[current] && Object.keys(_.where(gisportal.configurePanel.selectedIndicators, { "name" : current })).length === 0)  {
+   var indicatorAmount  = Object.keys(_.where(gisportal.configurePanel.selectedIndicators, { "name" : current })).length;
+   if (!gisportal.layers[current] && indicatorAmount === 0)  {
       var tmp;
       for (var indicator in gisportal.layers)  {
          if (indicator.name.toLowerCase() === gisportal.microLayers[current].name.toLowerCase())  {
@@ -262,12 +263,14 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
          if (found === true)  {
             var newId = group.region[0].value[0];
             var newName;
-            if (id === "none") {
+            if (id === "none" || !id) {
                newName = data.name || gisportal.microLayers[newId].name.toLowerCase();
             } 
-            if (id && newId) {
-               // If id was none, then now use name so the name can be removed from indicators
-               if (newName) id = newName;
+            
+            // If id was none, then now use name so the name can be removed from indicators
+            if (newName) id = newName;
+            
+            if (id && newId && id !== newId) {
                gisportal.indicatorsPanel.changeIndicator(id, newId); 
             }
          }
@@ -395,7 +398,7 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id)  {
    if (!gisportal.layers[id])  {
-      debugger;
+      //debugger;
    }
    else  {
       var firstDate = gisportal.layers[id].firstDate;
