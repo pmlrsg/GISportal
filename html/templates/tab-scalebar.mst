@@ -7,9 +7,9 @@
    </div>
    <div class="scale-options">
       <div class="grid">
-         <input class="js-scale-min min grid-cell" data-id="{{id}}">
+         <input class="js-scale-min min grid-cell" value="{{minScaleVal}}" data-id="{{id}}">
          <div class="range-slider grid-cell fill"></div>
-         <input class="js-scale-max max grid-cell" data-id="{{id}}">
+         <input class="js-scale-max max grid-cell" value="{{maxScaleVal}}" data-id="{{id}}">
       </div>
       <input type="checkbox" id="tab-{{modified}}-log">
       <label for="tab-{{modified}}-log">Logarithmic</label>

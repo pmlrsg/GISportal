@@ -3,6 +3,7 @@ gisportal.scalebars = {};
 gisportal.scalebars.getScalebarDetails = function(id)  {
    var indicator = gisportal.layers[id];
    if (indicator)  {
+      indicator.getMetadata();
       // Setup defaults
       var url = null;
       var width = 110;
@@ -23,11 +24,15 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       // If the url is still null then there were no matches, so use a generic url
       if(url === null)
          url = gisportal.scalebars.createGetLegendURL(indicator, false);
-         
+     
+      $('.js-scale-min[data-id="' + id + '"]').val(indicator.minScaleVal);
+
       return {
          url: url,
          width: width,
-         height: height
+         height: height,
+         minScaleVal : indicator.minScaleVal,
+         maxScaleVal : indicator.maxScaleVal
       }; 
    }
 };

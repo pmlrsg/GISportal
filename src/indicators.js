@@ -22,6 +22,8 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-indicators').on('click', '.js-create-graph', function()  {
       var id = $(this).data('id');
+      $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
+      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
       gisportal.indicatorsPanel.createGraph(id);
       $(this).toggleClass("loading", true);
    });
@@ -45,6 +47,13 @@ gisportal.indicatorsPanel.initDOM = function()  {
       gisportal.configurePanel.deselectLayer($(this).data('name'));
       $(this).parents('li').remove();
 
+   });
+
+   $('.js-indicators').on('change','.js-scale-max, .js-scale-min', function()  {
+      var id = $(this).data('id');
+      var min = $('.js-scale-min[data-id="' + id + '"]').val();
+      var max = $('.js-scale-max[data-id="' + id + '"]').val();
+      if (id && min && max) gisportal.scalebars.validateScale(id, min, max); 
    });
 
    $('.js-indicators').on('click', '.js-reset-options', function()  {
@@ -324,6 +333,7 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
 gisportal.indicatorsPanel.scalebarTab = function(id)  {
    $.get('templates/tab-scalebar.mst', function(template)  {
       var indicator = gisportal.microLayers[id];
+      var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
       var layer = gisportal.layers[id];
       if (layer)  { 
          indicator.elevationCache = layer.elevationCache;  
@@ -342,11 +352,15 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
       
 
       indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
-      var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
-      if (scalebarDetails) indicator.legend = scalebarDetails.url;
+      if (scalebarDetails) {
+         indicator.legend = scalebarDetails.url;
+         indicator.maxScaleVal = scalebarDetails.maxScaleVal;
+         indicator.minScaleVal = scalebarDetails.minScaleVal;
+      }
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-scalebar').html(rendered);      
       $('[data-id="' + id + '"] .icon_scalebar').toggleClass('hidden', false);
+
 
       $('#tab-' + indicator.modified + '-elevation').on('change', function()  {
          var value = $(this).val();

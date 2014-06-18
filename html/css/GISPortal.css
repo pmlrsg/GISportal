@@ -1260,6 +1260,8 @@ p  {
    user-select: initial;
 }
 
+sup { vertical-align: super; font-size: 65%;}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;
@@ -2050,6 +2052,26 @@ input.max  {
 .create-graph  {
    float: right;
    margin-top: 20px;
+}
+
+/*------------------------------------*\
+    Graph Panel
+\*------------------------------------*/
+
+#graphPanel .panel-container { 
+   width: 150%;
+   max-width: 150%;
+   z-index: 20;
+}
+
+#graphPanel.panel {
+   overflow: visible;
+}
+
+.graph-holder {
+   background: #fff;
+   text-align: center;
+   padding: 10px;
 }
 
 /*------------------------------------*\
