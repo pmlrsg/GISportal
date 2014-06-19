@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{modified}}-scalebar" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{modified}}-scalebar" name="tabs-{{modified}}" {{#showScalebar}}checked{{/showScalebar}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab scalebar-tab">
    {{#units}}<p>Scale - {{units}}</p>{{/units}}
    <div class="scalebar-outer">

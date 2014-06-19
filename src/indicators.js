@@ -323,7 +323,8 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
    });
 };
 
-gisportal.indicatorsPanel.scalebarTab = function(id)  {
+gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
+   var toggleOn = toggleOn || false;
    $.get('templates/tab-scalebar.mst', function(template)  {
       var indicator = gisportal.microLayers[id];
       var layer = gisportal.layers[id];
@@ -341,11 +342,12 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
 
          indicator.style = layer.style;
       }
-      indicator.units = layer.units; 
+      
 
       indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
       var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
       if (scalebarDetails) indicator.legend = scalebarDetails.url;
+      if (toggleOn) indicator.showScalebar = true;
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-scalebar').html(rendered);      
       $('[data-id="' + id + '"] .icon_scalebar').toggleClass('hidden', false);
@@ -360,7 +362,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
          var value = $(this).val();
          layer.style = value;
          layer.mergeNewParams({ styles: value });
-         gisportal.indicatorsPanel.scalebarTab(id);
+         gisportal.indicatorsPanel.scalebarTab(id, true);
       });
    });
 };
