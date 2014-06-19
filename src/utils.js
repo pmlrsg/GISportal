@@ -274,5 +274,6 @@ gisportal.utils.nameToId = function(name)  {
    name = name.replace(/\./g, '_');
    name = name.replace(/\:/g, '_');
    name = name.replace(/\;/g, '_');
+   name = name.replace(/\//g, '_');
    return name.toLowerCase();
 }
