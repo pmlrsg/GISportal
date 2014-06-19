@@ -25,7 +25,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
       $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
       $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
       gisportal.indicatorsPanel.createGraph(id);
-      $(this).toggleClass("loading", true);
+      //$(this).toggleClass("loading", true);
    });
 
    $('.js-indicators').on('click', '.js-draw-box', function()  {
