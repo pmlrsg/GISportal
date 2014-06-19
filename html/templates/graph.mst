@@ -1,0 +1,5 @@
+<div data-id="{{id}}" class="graph">
+   <h2>{{title}}</h2>
+   <div class="graph"><svg></svg></div>
+   <div class="graph-data-provider-logo">{{providerLogo}}</div>
+</div>
