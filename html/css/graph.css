@@ -12,7 +12,8 @@
    overflow: visible;
 }
 
-.graph-holder {
+.graph-holder,
+.graph-wait-message {
    background: #fff;
    text-align: center;
    padding: 10px;
