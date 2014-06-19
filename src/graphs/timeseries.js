@@ -63,11 +63,11 @@ gisportal.graphs.timeseries = function(data, options)  {
          }
          
 
-         d3.select(svg)
+         d3.select('[data-id="' + data.coverage + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
               .datum(lines())  
-              .attr("width", window.innerWidth).attr("height", window.innerHeight )
+              .attr("width", "500px").attr("height", "500px" )
               .attr("style", "width: 100%; height: 100%;")
               .call(chart);
          //chart.xScale(d3.time.scale());
@@ -75,9 +75,8 @@ gisportal.graphs.timeseries = function(data, options)  {
 
          //svg.onresize = function() { chart.update() };
          nv.utils.windowResize(chart.update);
-         gisportal.graphs.addGraph(data, options, svg);
          return chart;
-      }
+      }, 
    });
 
    function lines() {
@@ -109,6 +108,5 @@ gisportal.graphs.timeseries = function(data, options)  {
       }];
    }
 
- 
    return svg;
 };

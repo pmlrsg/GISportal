@@ -12,7 +12,7 @@ gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
    function success(data) {
-      gisportal.graphs.create(data, options);
+      gisportal.graphs.addGraph(data, options);
    }
       
    function error(request, errorType, exception) {
@@ -51,19 +51,18 @@ gisportal.graphs.create = function(data, options)  {
    }
 }
 
-gisportal.graphs.addGraph = function(data, options, graph)  {
+gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
      
-   var graph = new XMLSerializer().serializeToString(graph);
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
          id : data.coverage,
          title : title,
-         svg : graph
       });
-      $('.graph-holder').html(rendered); 
+      $('.graph-holder').html(rendered);       
+      gisportal.graphs.create(data, options);
    });
 
 }
