@@ -76,7 +76,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          //svg.onresize = function() { chart.update() };
          nv.utils.windowResize(chart.update);
          gisportal.graphs.addGraph(data, options, svg);
-         return svg;
+         return chart;
       }
    });
 

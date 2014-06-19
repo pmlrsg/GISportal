@@ -1953,6 +1953,15 @@ input.max  {
 .scale-options  {
   background-color: #fbfafb;
   border-bottom: 1px solid #e0dce4;
+  padding-bottom: 10px;
+}
+
+.indicator-options  {
+  padding-top: 10px;
+}
+
+.indicator-option  {
+  margin-bottom: 10px;
 }
 
 

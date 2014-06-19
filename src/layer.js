@@ -428,7 +428,7 @@ gisportal.layer = function(microlayer, layerData) {
             if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
             if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-            
+            layer.units = data.units; 
             layer.log = data.log == 'true' ? true : false;
             layer.createScalebar(); 
          },
