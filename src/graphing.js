@@ -1,3 +1,12 @@
+gisportal.graphs.initDOM = function() {
+   $('.js-return-analysis').on('click', function() {
+      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+      $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);
+   });
+
+}
+
+
 // Options currently requires a title
 gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
@@ -40,17 +49,21 @@ gisportal.graphs.create = function(data, options)  {
       case 'hovmollerLon':
          break;
    }
+}
 
-   if (graph)  {
-      var uid = 'wcsgraph' + Date.now();
-      var title = options.title || "Graph";
-      $('#graph-container > div').html(graph);
-      $('#graph-container').removeClass('hidden');
-   
-      $('#graph-container').on('click', 'button', function()  {
-         $('#graph-container').toggleClass('hidden', true);
+gisportal.graphs.addGraph = function(data, options, graph)  {
+   var uid = 'wcsgraph' + Date.now();
+   var title = options.title || "Graph";
+     
+   var graph = new XMLSerializer().serializeToString(graph);
+
+   $.get('templates/graph.mst', function(template) {
+      var rendered = Mustache.render(template, {
+         id : data.coverage,
+         title : title,
+         svg : graph
       });
+      $('.graph-holder').html(rendered); 
+   });
 
-      $('button[data-id="' + data.coverage + '"]').toggleClass('loading', false);
-   } 
 }

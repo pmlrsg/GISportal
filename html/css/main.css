@@ -22,6 +22,8 @@ p  {
    user-select: initial;
 }
 
+sup { vertical-align: super; font-size: 65%;}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;

@@ -22,6 +22,8 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-indicators').on('click', '.js-create-graph', function()  {
       var id = $(this).data('id');
+      $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
+      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
       gisportal.indicatorsPanel.createGraph(id);
       $(this).toggleClass("loading", true);
    });
@@ -339,7 +341,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
 
          indicator.style = layer.style;
       }
-      
+      indicator.units = layer.units; 
 
       indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
       var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
