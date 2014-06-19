@@ -150,7 +150,7 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
       }
  
       var group = gisportal.groupNames()[name];
-      var modified = name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
+      var modified = gisportal.utils.nameToId(name);
       var rendered = Mustache.render(template, {
          id : id,
          name : name,
@@ -286,7 +286,7 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
       if (!id) indicator.id = name.toLowerCase();
       else indicator.id = id;
       indicator.name = name;
-      indicator.modified = name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
+      indicator.modified = gisportal.utils.nameToId(name);
       indicator.groupedNames = group;
       var rendered = Mustache.render(template, indicator);
       $('[data-name="' + name.toLowerCase() + '"].js-tab-options').html(rendered);
@@ -305,7 +305,7 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
 gisportal.indicatorsPanel.detailsTab = function(id)  {
    $.get('templates/tab-details.mst', function(template)  {
       var indicator = gisportal.microLayers[id];
-      indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase(); 
+      indicator.modified = gisportal.utils.nameToId(indicator.name); 
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-details').html(rendered);
       $('[data-id="' + id + '"] .icon_details').toggleClass('hidden', false);
@@ -315,7 +315,7 @@ gisportal.indicatorsPanel.detailsTab = function(id)  {
 gisportal.indicatorsPanel.analysisTab = function(id)  {
    $.get('templates/tab-analysis.mst', function(template)  {
       var indicator = gisportal.microLayers[id];      
-      indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase(); 
+      indicator.modified = gisportal.utils.nameToId(indicator.name); 
       var rendered = Mustache.render(template, indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       gisportal.indicatorsPanel.initialiseSliders(id);      
@@ -344,7 +344,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
       }
       
 
-      indicator.modified = indicator.name.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
+      indicator.modified = gisportal.utils.nameToId(indicator.name);
       var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
       if (scalebarDetails) indicator.legend = scalebarDetails.url;
       if (toggleOn) indicator.showScalebar = true;
@@ -484,7 +484,7 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
    var graphXAxis = null,
        graphYAxis = null;
    
-   var modified = id.replace(/ /g, '__').replace(/\./g, '').toLowerCase();
+   var modified = gisportal.utils.nameToId(id);
 
 
 /*   if ( $('#tab-' + modified + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
