@@ -269,5 +269,5 @@ gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkfor
  * Use as a HASH. Compare don't decipher. */
 gisportal.utils.nameToId = function(name)  {
    if (!name) return null;
-   return encodeURIComponent(name.replace(/\./g, '&#46;')).toLowerCase();
+   return encodeURIComponent(name.replace(/\./g, '&#46;').replace(/\,/g, '&#44;').toLowerCase();
 }
