@@ -270,9 +270,9 @@ gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkfor
 gisportal.utils.nameToId = function(name)  {
    if (!name) return null;
    name = name.replace(/\ /g, '__');
-   name = name.replace(/,/g, '');
-   name = name.replace(/./g, '');
-   name = name.replace(/:/g, '');
-   name = name.replace(/;/g, '');
+   name = name.replace(/\,/g, '_');
+   name = name.replace(/\./g, '_');
+   name = name.replace(/\:/g, '_');
+   name = name.replace(/\;/g, '_');
    return name.toLowerCase();
 }
