@@ -1,56 +1,40 @@
-<input type="radio" id="tab-{{id}}-options" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
-<div class="panel-tab panel-tab-dark">
-   <label class="panel-tab-name active" for="tab-{{id}}-data-options">Data options</label><label class="panel-tab-name" for="tab-{{id}}-display-options">Display options</label>
-   <ul class="panel-tabs">
-      <li>
-         <input type="radio" checked="" id="tab-{{id}}-data-options" name="tabs-{{id}}-options" class="js-tab-trigger panel-tab-trigger">
-         <div class="panel-tab indicator-select">
-            <!-- These should be multi-select boxes so that
-              indicators can be chosen within each option -->
-            <label for="tab-{{id}}-options-region">Region</label>
-               <select id="tab-{{id}}-options-region">
-                  <option class="js-placeholder">Choose Region</option>
-                  {{#groupedNames.region}}
-                     <option value="{{value}}">{{key}}</option>
-                  {{/groupedNames.region}}
-               </select>
-               <label for="tab-{{id}}-options-interval">Interval</label>
-               <select id="tab-{{id}}-options-interval">
-                  <option class="js-placeholder">Choose Interval</option>
-                  {{#groupedNames.interval}}
-                     <option value="{{value}}">{{key}}</option>
-                  {{/groupedNames.interval}}
-               </select>
-               <label for="tab-{{id}}-options-reliability">Reliability</label>
-               <select id="tab-{{id}}-options-reliability">
-                  <option class="js-placeholder">Choose Reliability</option>
-                  {{#groupedNames.Confidence}}
-                     <option value="{{value}}">{{key}}</option>
-                  {{/groupedNames.Confidence}}
-               </select>
-               <button class="js-reset-options hidden" data-id="{{id}}">Reset</button>
-               <button class="js-save-changes hidden" data-id="{{id}}">Save Changes</button>
-            </div>
-         </li>
-         <li>
-            <input type="radio" id="tab-{{id}}-display-options" name="tabs-{{id}}-options" class="js-tab-trigger panel-tab-trigger">
-            <div class="panel-tab indicator-select">
-               <label for="tab-{{id}}-elevation">Elevation</label>
-               <select id="tab-{{id}}-elevation">
-                  {{#elevationCache}}
-                     <option value="{{.}}">{{.}}{{elevationUnits}}</option>
-                  {{/elevationCache}}
-               </select>
+<input type="radio" id="tab-{{modified}}-options" checked name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
+<ul class="panel-list panel-tab indicator-select">
+   <!-- These should be multi-select boxes so that
+     indicators can be chosen within each option -->
+   <li>
+      <label for="tab-{{modified}}-options-region">Region{{#tags.region}} - {{tags.region}}{{/tags.region}}</label>
+      <select id="tab-{{modified}}-options-region">
+         {{^refined}}
+            <option class="js-placeholder">Choose Region</option>
+         {{/refined}}
+         {{#groupedNames.region}}
+            <option value="{{value}}">{{key}}</option>
+         {{/groupedNames.region}}
+      </select>
+   </li>
+   {{#hasInterval}}
+   <li>
+      <label for="tab-{{modified}}-options-interval">Interval{{#tags.interval}} - {{tags.interval}}{{/tags.interval}}</label>
+      <select id="tab-{{modified}}-options-interval">
+            <option class="js-placeholder">Choose Interval</option>
+         {{#groupedNames.interval}}
+            <option value="{{value}}">{{key}}</option>
+         {{/groupedNames.interval}}
+      </select>
+   </li>
+   {{/hasInterval}}
 
-               <label for="tab-{{id}}-layer-style">Layer style</label>
-               <select id="tab-{{id}}-layer-style">
-                  {{#styles}}                  
-                     <option value="{{Name}}">{{Name}}</option>
-                  {{/styles}}
-               </select>
-               <button class="js-zoom-data" data-id="{{id}}">Zoom to data</button>
-            </div>
-         </li>
-      </ul>
-   </div>
+   {{#hasConfidence}}
+   <li>
+      <label for="tab-{{modified}}-options-reliability">Reliability{{#tags.reliability}} - {{tags.reliability}}{{/tags.reliability}}</label>
+      <select id="tab-{{modified}}-options-reliability">
+                            {{#groupedNames.Confidence}}
+            <option value="{{value}}">{{key}}</option>
+         {{/groupedNames.Confidence}}
+      </select>
+   </li>
+   {{/hasConfidence}}
+   <button class="js-reset-options hidden text-button" data-id="{{id}}" data-name="{{name}}" title="Reset">Reset</button>
+</ul>
 

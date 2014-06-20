@@ -6,12 +6,15 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 0;
+  top: 25px;
+  bottom: 125px;
   left: 25px;
-  height: 95%;
+  //height: 95%;
   overflow: hidden;
   min-width: 290px;
   width: 33.3%;
+  max-width: 500px;
+  user-select: none;
 }
 
 .panel.large  {
@@ -28,30 +31,44 @@
   height: 45px;
 }
 
+.panel-header h2  {
+   line-height: 45px;
+   padding-left: 15px;
+}
+
+.panel-header button  {
+   position: absolute;
+   right: 3px;
+   top: 10px;
+}
+
 .panel-footer  {
   padding-top: 19px;
   padding-bottom: 18px;
   padding-right: 9px;
+  padding-left: 9px;
+}
 
+#configurePanel .panel-footer  {
   text-align: right;
 }
 
 .panel-container  {
     background-color: #efedf1;
     flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
  }
 
-.panel-container,
 .panel-footer  {
   padding-top: 10px;
-  max-width: calc(100% - 45px);
 }
 
 .panel-tab  {
   background-color: #ffffff;
   width: 100%;
   display: none;
+  padding-top: 20px;
 }
 
 .panel-tab-content  {
@@ -59,6 +76,10 @@
   overflow-y: hidden;
   position: relative;
   width: 100%;
+}
+
+.panel-tab-content h3  {
+   margin-left: 13px;
 }
 
 .panel-tab-trigger  {
@@ -72,14 +93,15 @@
   display: block;
 }
 
+.panel-tab-trigger:checked + table.panel-tab  {
+   display: table;
+}
+
 .panel-tab-name  {
-  color: #8a7b9b;
   border-bottom: 1px solid #e0dce4;
   border-top: 1px solid transparent;
   display: inline-block;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
+  min-height: 40px;
   width: 50%;
 }
 
@@ -117,6 +139,10 @@
   background-color: #efedf1;
 }
 
+.panel-tab.indicator-select  {
+   padding-top: 0;
+}
+
 .panel-list  {
   margin-bottom: 20px;
   overflow-x: hidden;
@@ -126,16 +152,55 @@
   background-color: #ffffff;
 }
 
+.panel-list p {
+  text-transform: capitalize;
+}
+
+/* over specified */
+.panel-list p.grid-cell.fill  {
+   margin:0;
+   line-height: 40px;
+}
+
 .panel-list li:nth-child(even)  {
   background-color: #fbfafb;
 }
 
-.panel-tab.indicator-select  {
-  padding: 9px;
-  padding-top: 0;
+.build-map  {
+   padding-bottom: 5px;
+   padding-top: 10px;
 }
 
-.panel-tab.indicator-select select,
+.build-map li  {
+   padding-bottom: 10px;
+   text-transform: capitalize;
+}
+
+.build-map p  {
+   display: inline-block;
+}
+
+#configurePanel .panel-tab.indicator-select  { 
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.js-indicators .panel-tab.indicator-select li {
+   border-bottom: 1px solid #e0dce4;
+
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.indicator-select label  {
+   text-transform: capitalize;
+}
+
+select,
 .indicator-dropdown {
   background: white;
   border-style: none;
@@ -143,8 +208,8 @@
   border-radius: 0;
   color: #8a7b9b;
   display: block;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+  /*-webkit-appearance: none;
+  -moz-appearance: none;*/
   text-align: left;
   text-indent: 1px;
   text-overflow: '';
@@ -155,9 +220,35 @@
   width: 100%;
 }
 
+/* Firefox has a weird padding problem */
+@-moz-document url-prefix() {
+   #indicatorsPanel select  {
+      line-height: 28px;
+      padding-top: 7px;  
+   }
+}
+
+/* I'm using a hack for multiple select
+ * so overriding the height breaks
+ * the hack. */
+#indicatorsPanel select  {
+  height: 35px;
+}
+
+.indicator-select .icon_arrow  {
+   float: right;
+   margin-top: 4px;
+   margin-right: 5px;
+}
+
 .panel-list.fake-select {
   border: 1px solid #d8d3dd;
   border-top: 0 none;
+}
+
+.panel-list .text-button {
+  line-height: 30px;
+  padding-left: 8px; 
 }
 
 .full-height  {
@@ -178,3 +269,26 @@
    margin-top: -35px !important; 
 }
 
+.search  {
+   border: 1px solid #d8d3dd;
+   display: block;
+   height: 45px;
+   padding: 5px;
+   padding-left: 10px;
+   margin: 0 auto; 
+   width: 95%;
+}
+
+.show-tools  {
+
+   background-color: #fafafb;
+   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
+   border: 1px solid #b1a7bc;
+   line-height: 40px;
+   padding-right: 20px;
+   left: 25px;
+   top: 25px;
+   position: absolute;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+}

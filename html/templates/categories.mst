@@ -4,21 +4,21 @@
 }}
 
 <div>
-   <label for="select-{{tag}}" class="indicator-dropdown">{{tag}}</label>
+   <label for="select-{{tag}}" class="indicator-dropdown">{{tag}}<span class="icon_arrow"></span></label>
 
    <select multiple id="select-{{tag}}" class="hide-select" data-id="{{tag}}">
       {{#indicators}}
-         <option value="{{id}}">{{name}}</option>
+         <option value="{{name}}">{{name}}</option>
       {{/indicators}}
    </select>
 
    <ul data-id="{{tag}}" class="hidden fake-select panel-list grid-list">
       {{#indicators}}
-         <li data-id="{{id}}">
-            <div class="icon_loading grid-cell icon-column">loading</div>
+         <li data-name="{{name}}">
+            <div class="icon_loading icon-svg grid-cell icon-column">loading</div>
             <p class="grid-cell fill">{{name}}</p>
-            <label for="cat-toggleVisibility-{{id}}" class="icon_show icon-column grid-cell">Show/Hide</label>
-            <input type="checkbox" id="cat-toggleVisibility-{{id}}" data-id="{{id}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
+            <label for="cat-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke icon-column grid-cell" title="Show/Hide {{name}}">Show/Hide</label>
+            <input type="checkbox" id="cat-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
          </li>
       {{/indicators}}
    </ul>

@@ -749,7 +749,7 @@ fill-opacity: 0 !important;
    shape-rendering: crispEdges;
 }
 
-.nvd3 .axis line, .axis path {
+.nvd3 .axis line, .nvd3 .axis path {
    fill: none;
    stroke: #000;
    shape-rendering: crispEdges;

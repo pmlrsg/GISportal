@@ -35,7 +35,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          */
          var chart = nv.models.lineWithFocusChart()
             .margin({left: 25});
-            //.useInteractiveGuideline(false); // There is a pull request for this waiting to be merged
+            //.useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
         
          if (chart.xAxis)  { 
@@ -64,15 +64,19 @@ gisportal.graphs.timeseries = function(data, options)  {
          
 
          d3.select(svg)
-              //.attr('viewBox', '0 0 ' + 600 + ' ' + 400)
-              //.attr('preserveAspectRatio', 'xMinYMin meet')
-              .datum(lines())      
+              //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
+              //.attr('preserveAspectRatio', "xMinYMin meet")
+              .datum(lines())  
+              .attr("width", window.innerWidth).attr("height", window.innerHeight )
+              .attr("style", "width: 100%; height: 100%;")
               .call(chart);
          //chart.xScale(d3.time.scale());
          //chart.yScale(d3.scale.linear());
 
-         svg.onresize = function() { chart.update() };
-         return chart;
+         //svg.onresize = function() { chart.update() };
+         nv.utils.windowResize(chart.update);
+         gisportal.graphs.addGraph(data, options, svg);
+         return svg;
       }
    });
 
@@ -105,5 +109,6 @@ gisportal.graphs.timeseries = function(data, options)  {
       }];
    }
 
+ 
    return svg;
 };

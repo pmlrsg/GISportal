@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-details" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{modified}}-details" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
 <table class="panel-tab">
    <tbody>
       <tr><td>Abstract</td><td>{{productAbstract}}</td></tr>
@@ -8,10 +8,10 @@
       <tr><td>Source</td><td>{{tags.Ecosystem_Element}}</td></tr>
       <tr><td>Indicator Type</td><td>{{#tags.MSFD}}{{.}} {{/tags.MSFD}}</td></tr>
       <tr><td>Bounding box</td><td>
-         <label style="color: green">{{boundingBox.MaxY}}</label> N, 
-         <label style="color: blue">{{boundingBox.MaxY}}</label>   E, 
-         <label style="color: green">{{boundingBox.MinY}}</label> S,
-         <label style="color: blue">{{boundingBox.MinX}}</label>   W 
+         <label style="color: green">{{exBoundingBox.NorthBoundLatitude}}</label> N, 
+         <label style="color: blue">{{exBoundingBox.EastBoundLongitude}}</label>   E, 
+         <label style="color: green">{{exBoundingBox.SouthBoundLatitude}}</label> S,
+         <label style="color: blue">{{exBoundingBox.WestBoundLongitude}}</label>   W 
       </td></tr>
       <tr><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
    </tbody>

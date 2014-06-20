@@ -60,7 +60,6 @@ gisportal.selection.time = undefined;
 
 gisportal.selectionTools = null;
 
-gisportal.layerSelector = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
@@ -187,7 +186,6 @@ gisportal.genericAsync = function(type, url, data, success, error, dataType, opt
  * Create all the base layers for the map.
  */
 gisportal.createBaseLayers = function() {
-   //gisportal.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
    
    function createBaseLayer(name, url, opts) {
       var layer = new OpenLayers.Layer.WMS(
@@ -203,7 +201,6 @@ gisportal.createBaseLayers = function() {
       layer.name = name;
       map.addLayer(layer);
       gisportal.baseLayers[name] = layer;
-      //gisportal.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
    }
    
    createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
@@ -219,7 +216,6 @@ gisportal.createBaseLayers = function() {
  * Create all the reference layers for the map.
  */
 gisportal.createRefLayers = function() {  
-   gisportal.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#gisportal-lPanel-reference'));
    
    $.each(gisportal.cache.wfsLayers, function(i, item) {
       if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
@@ -243,20 +239,11 @@ gisportal.createRefLayers = function() {
                      
                microLayer = gisportal.checkNameUnique(microLayer);   
                gisportal.microLayers[microLayer.id] = microLayer;
-               /*gisportal.layerSelector.addLayer(gisportal.templates.selectionItem({
-                     'id': microLayer.id,
-                     'name': microLayer.name, 
-                     'provider': item.options.providerShortTag, 
-                     'title': microLayer.displayTitle, 
-                     'abstract': microLayer.productAbstract
-                  }), {'tags': microLayer.tags
-               }); */
             }
          });
       } 
    });
    
-   //gisportal.layerSelector.refresh();
    gisportal.configurePanel.refreshData();
    // Get and store the number of reference layers
    gisportal.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
@@ -342,7 +329,6 @@ gisportal.createOpLayers = function() {
       });
 
       $.each(layers, function(i, item) {
-         //gisportal.layerSelector.addLayer(gisportal.templates.selectionItem(item.meta), { "tags" : item.tags} );
       });
    }
 
@@ -619,7 +605,6 @@ gisportal.saveState = function(state) {
    state.map = {};
    state.map.layers = {}; 
    state.timeline = {}; 
-   state.layerSelector = {};
 
    // Get the current layers and any settings/options for them.
    var keys = Object.keys(gisportal.layers);
@@ -636,8 +621,8 @@ gisportal.saveState = function(state) {
    }
    
    // Get currently selected date.
-   if(!gisportal.utils.isNullorUndefined($('#viewDate').datepicker('getDate'))) {
-      state.map.date = $('#viewDate').datepicker('getDate').getTime();
+   if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
+      state.map.date = gisportal.timeline.getDate();
    }
      
    // Get selection from the map
@@ -647,7 +632,6 @@ gisportal.saveState = function(state) {
       state.map.feature = gisportal.featureToGeoJSON(feature);
    }
    
-   state.rangebars = gisportal.timeline.rangebars;
    // Get zoom level
    state.map.zoom = map.zoom;
 
@@ -663,69 +647,33 @@ gisportal.saveState = function(state) {
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
 
-
-   // Get filters on layer selector
-   // TODO: Refactor as per #123
-   state.layerSelector.filters = [];
-   $.each($('.ft-field[data-name]'), function(i, item) {
-      console.log('category:', item);
-      var tags = [];
-      $.each($('.ft-selected li span', item), function(i, e)  {
-         tags.push($(e).text()); 
-      });
-      console.log('tags', tags);
-      state.layerSelector.filters.push({ 
-         "category" : $(item).data('name'),
-         "tags" : tags
-      });
-   });
-
    return state;
 };
 
 gisportal.loadState = function(state) {
+   $('.start').toggleClass('hidden', true);
    var state = state || {};
 
-   // TODO: Refactor!
-   var rightPanel = state.rightPanel;
-   var rangebars = state.rangebars;
    var timeline = state.timeline;
-   var layerSelector = state.layerSelector;
    state = state.map;
    
    // Load layers for state
    var keys = Object.keys(state.layers);
    for(var i = 0, len = keys.length; i < len; i++) {
       if (!gisportal.layers[keys[i]]) {
-         var selection = gisportal.layerSelector.getLayerSelectionByID(keys[i]);
          var options = {};
          if (state.layers[keys[i]].minScaleVal !== null) options.minScaleVal = state.layers[keys[i]].minScaleVal;
          if (state.layers[keys[i]].maxScaleVal !== null) options.maxScaleVal = state.layers[keys[i]].maxScaleVal;
-         gisportal.layerSelector.selectLayer(keys[i], selection, options);
+         gisportal.configurePanel.selectLayer(keys[i], options);
       }
    }
-   
-   // Load date
-   if(!gisportal.utils.isNullorUndefined(state.date)) {
-      var date = new Date();
-      date.setTime(state.date);
-      $('#viewDate').datepicker('setDate', date);
-   }
-   
+ 
    // Create the feature if there is one
    if(!gisportal.utils.isNullorUndefined(state.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
       layer.addFeatures(gisportal.geoJSONToFeature(state.feature));
     }
    
-   if (rangebars)  {
-      for (var i = 0; i < rangebars.length; i++)  {
-         gisportal.timeline.addRangeBarCopy(rangebars[i]);
-      }
-      if (rightPanel.selectedRange) gisportal.rightPanel.updateRanges(rightPanel.selectedRange);
-      else gisportal.rightPanel.updateRanges();
-   }
-
    // Load position
    if (state.extent)
       map.zoomToExtent(new OpenLayers.Bounds([state.extent.left,state.extent.bottom, state.extent.right, state.extent.top]));
@@ -746,9 +694,6 @@ gisportal.loadState = function(state) {
    }
 
 
-   if (layerSelector && layerSelector.filters)  {
-      gisportal.layerSelector.filtrify.trigger(layerSelector.filters);
-   }
 };
 
 gisportal.featureToGeoJSON = function(feature) {
@@ -767,7 +712,6 @@ gisportal.checkIfLayerFromState = function(layer) {
       var state = gisportal.cache.state.map;
       for(var i = 0, len = keys.length; i < len; i++) {
          if(keys[i] == layer.id){
-            if(state.layers[keys[i]].selected === true) { $('#gisportal-lPanel-operational #' + layer.id + ' input:checkbox').prop("checked", true); layer.select();  }
             layer.setOpacity(state.layers[keys[i]].opacity);
             //layer.setStyle(state.layers[keys[i]].style);
          }
@@ -782,15 +726,18 @@ gisportal.checkIfLayerFromState = function(layer) {
  * Any code that should be run when user logs in
  */
 gisportal.login = function() {
-   $('#mapInfoToggleBtn').button("enable");
-   gisportal.window.history.loadStateHistory();
+   $('.js-logged-out').toggleClass('hidden', true);
+   $('.js-logged-in').toggleClass('hidden', false);
+   gisportal.openid.login();
+   // Load history
 };
 
 /**
  * Any code that should be run when the user logs out
  */
 gisportal.logout = function() {
-   $('#mapInfoToggleBtn').button("disable").prop("checked", false);
+   $('.js-logged-out').toggleClass('hidden', false);
+   $('.js-logged-in').toggleClass('hidden', true);
 }
 
 
@@ -805,8 +752,6 @@ gisportal.getState = function() {
    
    // TODO: Get states from component.
    state = gisportal.saveState(state);
-   state = gisportal.leftPanel.saveState(state);
-   state = gisportal.rightPanel.saveState(state);
 
    // TODO: Merge state with default state.
    
@@ -818,7 +763,6 @@ gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
    gisportal.cache.state = state;
-   gisportal.rightPanel.coverageStateSelected = false; // reset due to new state
    // TODO: Merge with default state.
    
    // TODO: Set states of components.
@@ -837,7 +781,7 @@ gisportal.main = function() {
    $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
   
    $('.js-start').click(function()  {
-      $('.start-background').toggleClass('hidden', true);
+      $('.start').toggleClass('hidden', true);
    });
  
    // Setup the gritter so we can use it for error messages
@@ -880,7 +824,8 @@ gisportal.main = function() {
    else {
       console.log('Loading Default State...');
    }
- 
+
+   gisportal.replaceAllIcons(); 
 };
 
 
@@ -936,4 +881,27 @@ gisportal.zoomOverall = function()  {
 
       map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
    }
+};
+
+// Automatically goes through all icons
+gisportal.replaceAllIcons = function()  {
+   gisportal.replaceSubtreeIcons('body');
+};
+
+// Goes through all icons in a subtree
+gisportal.replaceSubtreeIcons = function(el)  {
+   $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
+      var e = $(e); 
+      e.addClass('bg-being-removed');
+      var url = e.css('background-image').replace('url(','').replace(')','').replace(/\"/g, "");
+      $.ajax({
+         url: url,
+         dataType: "xml"
+      }).done(function(svg){
+         var ele = document.importNode(svg.documentElement,true);
+         e.prepend(ele);
+         e.addClass('bg-removed');
+         e.removeClass('bg-being-removed');
+      });
+   });
 };

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<meta name="viewport" content="width=device-width" />
+<meta name="viewport" content="width=device-width, inital-scale=1.0, maximum-scale=1.0" />
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <title>eartH2Observe Visualisation Portal</title>
@@ -57,13 +57,7 @@
         </ul>
 
         <nav class="start-nav">
-          <button class="dropdown-trigger">Example maps</button>
-          <ul class="dropdown">
-            <li><a href="?state=">Cod in the North Atlantic</a></li>
-            <li><a href="?state=">Mediterranean saline levels</a></li>
-            <li><a href="?state=">Artic nitrates</a></li>
-          </ul>
-          <button class="brand js-start">Start building a map</button>
+           <button class="brand with-border js-start">Start building a map</button>
         </nav>
       </div>
     </div>
@@ -83,24 +77,22 @@
       <div class="timeline-inner grid">
          <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
          <div id="timeline" class="grid-cell fill"></div>
-         <a href="/" class="grid-cell">About</a>
+         <div class="js-current-date"></div>
+         <a href="http://marine-opec.eu/portal.html" class="grid-cell">About</a>
       </div>
    </div>
-   <div id="viewDate" class="hidden"></div>
 
-   <button class="js-show-tools show-tools hidden">Show tools</button>
+   <button class="js-show-tools show-tools hidden"><span class="icon_show"></span>Show tools</button>
    
    <!-- Configure Your Map panel  -->
    <div id="configurePanel" class="panel active">
-      <h2 class="panel-header">Configure your map</h2>
-      <button class="js-hide-panel">Hide</button>
+      <div class="panel-header">
+         <h2>Choose your indicators</h2>
+         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+      </div>
       <div class="panel-container">
          <div class="build-map">
             <ul class="js-configure-indicators"></ul>
-            <div class="build-map-footer">
-               <button class="link js-remove-all">Clear all</button>
-               <button class="brand js-build">Build a map</button>
-            </div>
          </div>
          
          <!-- These are on the same line to avoid white-space bug with inline-block -->
@@ -114,7 +106,7 @@
                   <ul class="js-popular panel-list grid-list"></ul>
                </div>
               <!-- These are on the same line to avoid white-space bug with inline-block -->
-              <label class="panel-tab-name active dark" for="tab-ecosystem">Indicator Type</label><label class="panel-tab-name dark" for="tab-msfd">Source</label>
+              <label class="panel-tab-name active dark" for="tab-ecosystem">Ecosystem Indicators</label><label class="panel-tab-name dark" for="tab-msfd">MSFD Descriptors</label>
               <ul class="panel-tabs dark">
                 <li>
                   <input type="radio" checked id="tab-ecosystem" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
@@ -130,7 +122,7 @@
           <li>
             <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
             <div class="panel-tab full-height">
-              <input type="search" id="indicatorSearch">
+              <input type="search" placeholder="Search for an indicator" class="js-search search">
               <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
             </div>
           </li>
@@ -138,21 +130,38 @@
       </div>
 
       <div class="panel-footer">
+         <button class="brand with-border js-build hidden">Next</button>
       </div>
     </div>
 
     <div id="indicatorsPanel" class="panel hidden">
       <div class="panel-header">
-         <button class="js-start-again">Start again</button>
-         <button class="js-hide-panel">Hide</button>
+         <h2>Map Tools</h2>
+         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
       </div>
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
         </ul>
-        <label for="share-map">Share this map with colleagues</label>
-        <button id="share-map" class="js-share">Share</button>
+        <label class="hidden" for="share-map">Share this map with colleagues</label>
+        <button id="share-map" class="js-share hidden secondary"><span class="icon_share light"></span>Share</button>
+      </div>
+      <div class="panel-footer">
+         <button class="brand with-border js-start-again">Add Indicators</button>
       </div>
     </div>   
+  
+   <!-- The share box. -->
+    <div class="share overlay hidden">
+      <div class="share-container overlay-container">
+         <button class="js-close-share">Close</button>
+         <div class="js-logged-in hidden">
+            <h2>Share this map</h2>
+            <p>Here's a link to this map. Just copy and paste anywhere</p>
+            <input class="js-shareurl">
+         </div>
+         <div class="js-logged-out"></div>
+      </div>
+    </div>
 
     <div id="graphPanel" class="panel hidden">
       <div class="panel-header">
@@ -170,7 +179,7 @@
         <label for="share-map">Share this graph with colleagues</label>
         <button id="share-map" class="js-share">Share</button>
       </div>
-    </div>
-    
+    </div> 
+
 </body>
 </html>

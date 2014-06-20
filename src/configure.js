@@ -7,6 +7,8 @@
 
 gisportal.configurePanel = {};
 
+gisportal.configurePanel.selectedIndicators = [];
+
 gisportal.configurePanel.refreshData = function()  {
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
@@ -20,27 +22,23 @@ gisportal.configurePanel.refreshData = function()  {
 
 gisportal.configurePanel.initDOM = function()  {
    function toggleIndicator()  {
-      var id = $(this).parent().data('id');
+      var name = $(this).parent().data('name').toLowerCase();
       if ($(this).is(':checked'))  {
-         gisportal.configurePanel.selectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', true).change();
+         gisportal.configurePanel.selectLayer(name);
       }
       else  {
-         gisportal.configurePanel.deselectLayer(id);
-         $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false).change();
+         gisportal.configurePanel.deselectLayer(name);
       }
    }
 
-   $('.js-build').click(function() {
-      if (Object.keys(gisportal.layers).length > 0)  {
-         gisportal.indicatorsPanel.refreshData();
-         $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-         $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-      }
-   });
+   $('.js-build').click(this.buildMap);
 
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
+
+   $('.js-indicators').on('change', '.hide-select', function()  {
+     // togggle! important 
+   });
    
    $('.indicator-select').on('click', '.indicator-dropdown', function()  {
       if ($(this).siblings('select').height() > 50)  {
@@ -49,11 +47,20 @@ gisportal.configurePanel.initDOM = function()  {
    });
 
    $('.js-configure-indicators').on('click', '.js-remove', function()  {
-      gisportal.configurePanel.deselectLayer($(this).data('id'));
+      gisportal.configurePanel.deselectLayer($(this).data('name'));
    });
 
-   $('.build-map-footer').on('click', '.js-remove-all', gisportal.configurePanel.removeAll);
 }
+
+gisportal.configurePanel.buildMap = function()  {
+   var indicators = gisportal.configurePanel.selectedIndicators;
+   if (indicators.length > 0)  {
+      gisportal.indicatorsPanel.refreshData(indicators);
+      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+   }
+
+};
 
 gisportal.configurePanel.refreshIndicators = function()  {
 
@@ -61,20 +68,22 @@ gisportal.configurePanel.refreshIndicators = function()  {
     * that leave indicators when all are
     * removed */
    $.get('templates/configureIndicators.mst', function(template) {
-      var indicatorIds = Object.keys(gisportal.layers);
       var indicators = [];
-      for (var i = 0; i < indicatorIds.length; i++)  {
-         var tmp = {};
-         tmp.id = indicatorIds[i];
-         tmp.name = gisportal.layers[tmp.id].name;
-         indicators.push(tmp);
-      }
+      for (var i in gisportal.configurePanel.selectedIndicators)  {
+         if (typeof gisportal.configurePanel.selectedIndicators[i] !== "string") indicators[i] = gisportal.configurePanel.selectedIndicators[i].name;
+         else indicators[i] = gisportal.configurePanel.selectedIndicators[i];
+      } 
       var rendered = Mustache.render(template, {
          indicators : indicators 
       });
       $('.js-configure-indicators').html(rendered);
    });
-
+   if (gisportal.configurePanel.selectedIndicators.length > 0)  {
+      $('.js-build').toggleClass('hidden', false);
+   }  
+   else  {
+      $('.js-build').toggleClass('hidden', true);
+   }
 };
 
 gisportal.groupTags = function()  {
@@ -98,7 +107,7 @@ gisportal.groupTags = function()  {
             
             if (typeof tagVal === "string")  {
                // tagVal is a single tag
-               grouped[tag][tagVal].push(layer.id);
+               grouped[tag][tagVal].push(layer.name);
             } 
             else if (typeof tagVal === "object" && tagVal !== null)  {
                // tagVal is a category (array of tags)
@@ -107,7 +116,7 @@ gisportal.groupTags = function()  {
                   if (!grouped[tag][t])  {
                      grouped[tag][t] = [];
                   }
-                  grouped[tag][t].push(layer.id);
+                  grouped[tag][t].push(layer.name);
                }
             }
          }
@@ -160,24 +169,24 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
       if (vals.length > 0)  {
          $.get('templates/categories.mst', (function(index) {
             var indicators = [];
-            for (var i = 0; i < vals.length; i++)  {
-               var tmp = [];
-               tmp.id = vals[i];
-               tmp.name = gisportal.microLayers[tmp.id].name;
+            vals = _.unique(vals, function(d)  {
+               return d.toLowerCase();
+            });
+            _.forEach(vals, function(d)  {
+               var tmp = {};
+               var d = d.toLowerCase();
+               tmp.name = d;
+               tmp.modified = d.replace(/ /g, '__');
                indicators.push(tmp);
-            }
-
-            indicators = _.uniq(indicators, function(val) {
-               return val.name;
-            }); 
-
-
+            });
+               
             return function(template) { 
                var rendered = Mustache.render(template, {
                   tag : tagNames[index],
                   indicators : indicators 
                });
                $('#tab-'+catName.toLowerCase()+' + .indicator-select').append(rendered);
+               gisportal.replaceAllIcons();
             }
          })(i));
       }
@@ -186,23 +195,30 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
 
 
 gisportal.configurePanel.renderPopular = function()  {
+   var indicators = [];
+   var groupedNames = gisportal.groupNames();
    var popular = gisportal.config.popularIndicators;
-   
-   var popularIndicators = [];
-   for (var i = 0; i < popular.length; i++)  {
-      var tmp = [];
-      tmp.id = popular[i];
-      tmp.name = gisportal.microLayers[tmp.id].name;
-      popularIndicators.push(tmp);
-   }
+   popular = _.unique(popular, function(d)  {
+      return d.toLowerCase();
+   });
+   _.forEach(popular, function(d)  {
+      var tmp = {};
+      var d = d.toLowerCase();
+      if (groupedNames[d])  {
+         tmp.name = d;
+         tmp.modified = d.replace(/ /g, '__');
+         indicators.push(tmp);
+      }
+   });
 
    $.get('templates/browseIndicators.mst', function(template) {
       var rendered = Mustache.render(template, {
          location : 'popular',
-         indicators : popularIndicators
+         indicators : indicators
       });
       
       $('.js-popular').html(rendered);
+      gisportal.replaceAllIcons();
    });
 };
 
@@ -222,7 +238,7 @@ gisportal.configurePanel.searchInit = function()  {
    };
    this.fuse = new Fuse(all, options);
 
-   $('#indicatorSearch').on('keypress', function()  {
+   $('.js-search').on('keypress', function()  {
       gisportal.configurePanel.search($(this).val());
    });
 };
@@ -231,54 +247,89 @@ gisportal.configurePanel.search = function(val)  {
    var results = this.fuse.search(val);
 
    $.get('templates/browseIndicators.mst', function(template) {
+      
+      var indicators = [];
+      
       results = _.uniq(results, function(val) {
          return val.name.toLowerCase();
       }); 
 
+      _.forEach(results, function(d)  {
+         var tmp = {};
+         tmp.name = d.name.toLowerCase();
+         tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
+         indicators.push(tmp);
+      });
       var rendered = Mustache.render(template, {
          location: 'search',
-         indicators : results
+         indicators : indicators
       });
       
       $('.js-search-results').html(rendered);
      
       var selected = [];
-      $('.js-toggleVisibility[data-id]:checked').each(function(i,d) { 
-          var id = $(d).data('id');
-          if ($.inArray(id, selected) === -1)  {
-              selected.push(id);
+      $('.js-toggleVisibility[data-name]:checked').each(function(i,d) { 
+          var name = $(d).data('name').toLowerCase();
+          if ($.inArray(name, selected) === -1)  {
+              selected.push(name);
           } 
       })
       
       for (var i = 0; i < selected.length; i++)  {
-         $('.js-toggleVisibility[data-id="' + selected[i] + '"]').prop("checked", true);
+         $('.js-toggleVisibility[data-name="' + selected[i] + '"]').prop("checked", true).toggleClass('active', true).change();
       }
+      gisportal.replaceAllIcons();
    });
 
 };
 
-gisportal.configurePanel.selectLayer = function(id)  {
-   var microlayer = gisportal.microLayers[id];
-   var options = {};
-   if (microlayer)  {
-      gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
-   }
+gisportal.configurePanel.selectLayer = function(name, options)  {
+   var options = options || {};
+   var name = name.toLowerCase();
+   var id = this.hasIndicator(name);  
+   
+   name = name.replace(/__/g, ' ');
+
+   $('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true).change();
+
+   var tmp = {};
+   tmp.name = name;
+   if (id) tmp.id = id;
+   gisportal.configurePanel.selectedIndicators.push(tmp);
+
+   gisportal.configurePanel.refreshIndicators();
 };
 
-gisportal.configurePanel.deselectLayer = function(id)  {
-   if (gisportal.layers[id])  {
-      gisportal.layers[id].unselect();
-      /* For now, unselect() just hides */
-      delete gisportal.layers[id];  
-      $('.js-toggleVisibility[data-id="' + id + '"]').prop('checked', false); 
+gisportal.configurePanel.deselectLayer = function(name)  {
+   var name = name.toLowerCase();
+   var id = this.hasIndicator(name);
+   gisportal.configurePanel.unselectIndicator(name);
+   $('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
+   // If there is an index then it is a 'real' layer, otherwise just a placeholder 
+   if (id)  {
+      gisportal.indicatorsPanel.removeIndicators(id);
    }
    gisportal.configurePanel.refreshIndicators(); 
 
 };
 
 gisportal.configurePanel.removeAll = function()  {
-   for (var id in gisportal.layers)  {
-      gisportal.configurePanel.deselectLayer(id);
+   for (var name in gisportal.selectedIndicators)  {
+      gisportal.configurePanel.deselectLayer(name);
    }
 };
 
+gisportal.configurePanel.hasIndicator = function(name)  {
+   var index = -1;
+   var id;
+   for (var i in gisportal.layers)  {
+      if (gisportal.layers[i].name.toLowerCase() === name.toLowerCase()) return gisportal.layers[i].id;
+   }
+   return false;
+};
+
+gisportal.configurePanel.unselectIndicator = function(name)  {
+   for (var i in gisportal.configurePanel.selectedIndicators)  {
+      if (gisportal.configurePanel.selectedIndicators[i].name.toLowerCase() === name.toLowerCase()) gisportal.configurePanel.selectedIndicators.pop(i);
+   }
+};

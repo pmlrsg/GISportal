@@ -2,54 +2,55 @@
     Start Page
 \*------------------------------------*/
 
-.start-background  {
-  background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
-
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  z-index: 1000;
+.start  {
+   background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
+   z-index: 1000;
+   overflow-y: auto;
 }
 
 .start-container  {
-  background: #32273d;
-  color: #f7f6f8;
-  max-width: 650px;
-  margin: 0 auto;
+   background: #32273d;
+   color: #f7f6f8;
 }
 
-.start-slider  {
-  background: #32273d;
-  height: 300px;
+.intro-text  {
+   padding: 25px;
+   padding-bottom: 10px;
 }
 
-.start-slider li  {
-  display: none;
-
-  font-size: 18px;
-  line-height: 1.5; 
-  padding: 25px 80px;
-}
-
-.start-slider .active  {
-  display: block;
+.intro-text p  {
+   padding-bottom: 10px;
 }
 
 .start-nav  {
-  background: #251d2d;
-  padding: 27px 0;
+   background: #251d2d;
+   padding: 20px 15px;
+   text-align: right;
 }
 
-.start-nav .dropdown-trigger  {
-  background: none;
-  border-style: none;
-  color: #d8d7b6;
+.examples a   {
+   line-height: 45px;
+   display: block;
+   padding-left: 17px;
 }
 
+.examples .icon-svg  {
+   opacity: 1;
+   margin-right: 10px;
+}
 
+.example-1  {
+   background: #643d72;
+}
+
+.example-2  {
+   background: #683766;
+}
+
+.example-3  {
+   background: #47355b;
+}
+
+.example-4  {
+   background: #473d72;
+}

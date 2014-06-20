@@ -102,6 +102,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    coords += bounds.right + ",";
    coords += bounds.top;
    $('.js-coordinates').val(coords);
+   $('.bbox-info').toggleClass('hidden', false);
 
    
    // Get the geometry of the drawn feature

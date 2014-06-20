@@ -8,9 +8,21 @@
   box-sizing: border-box;
 }
 
+html  {
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+
+}
+
 body  {
    color: #111111;
+   overflow-y: hidden;
 }
+
+p  {
+   user-select: initial;
+}
+
+sup { vertical-align: super; font-size: 65%;}
 
 #map  {
    background: #1a1a1a;
@@ -28,15 +40,53 @@ body  {
 button.brand  {
   background-color: #a19d63;
   border-style: none;
-  border-top: 8px solid #bab67c;
-  border-radius: 3px;
+  border-radius: 5px;
   color: #fff;
 
-  height: 40px;
+  padding: 0 35px 0 30px;
+  height: 35px;
+}
+
+button.brand.with-border  {
+  border-top: 6px solid #bab67c;
+  height: 41px;
+}
+
+button.secondary  {
+   background-color: #b1a7bc;
+   border: none;
+}
+
+.text-button  {
+   border: 0;
+   cursor: pointer;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   background: transparent;
+   text-decoration: underline;
+}
+
+button.brand:active,
+button.brand.loading {
+   background-color: #bab67c;
+}
+
+button.brand.loading  {
+   background-image: url('../img/ajax-loader-green.gif');
+   background-repeat: no-repeat;
+   background-size: 20px;
+   background-position: 10px 8px;
+   padding-left: 40px;
 }
 
 .hidden  {
   display: none !important;
+}
+
+.hide-text  {
+   text-indent: 100%;
+   white-space: nowrap;
+   overflow: hidden;
 }
 
 .dropdown {
@@ -70,4 +120,17 @@ input[type="text"]  {
   width: 100%;
 }
 
-sup { vertical-align: super; font-size: 65%;}
+
+/* TEMP GRAPH stuff */
+
+#graph-container  {
+   background: #fff;
+   position: absolute;
+   top: 0;
+   left: 0;
+   height: 100%;
+   width: 100%;
+   z-index: 100;
+}
+
+

@@ -1,39 +1,21 @@
-<li data-id="{{id}}">
-   <div class="indicator-header" data-id="{{id}}">
-      <p class="grid-cell fill">{{name}}</p>
-      <button class="icon_show light js-toggleVisibility grid-cell icon-column reorder-before"></button>
-      <label class="icon_options light grid-cell icon-column js-closable" for="tab-{{id}}-options">Options</label>
-      <label class="icon_scalebar light grid-cell icon-column js-closable" for="tab-{{id}}-scalebar">Scalebar</label>
-      <label class="icon_details light grid-cell icon-column js-closable" for="tab-{{id}}-details">Details</label>
-      <label class="icon_analyse light grid-cell icon-column js-closable" for="tab-{{id}}-analysis">Analysis</label>
+<li data-id="{{id}}" data-name="{{name}}">
+   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
+      <p>{{name}}</p>
+      <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column" title="Show/Hide">Show/Hide</button>
+      <label class="icon_options active icon-svg light icon-column js-closable" for="tab-{{modified}}-options" title="Refine Data">Options</label>
+      <label class="icon_scalebar hidden icon-svg light  icon-column js-closable" for="tab-{{modified}}-scalebar" title="Scalebar">Scalebar</label>
+      <label class="icon_details hidden icon-svg light icon-column js-closable" for="tab-{{modified}}-details" title="Details">Details</label>
+      <label class="icon_analyse hidden icon-svg light icon-column js-closable" for="tab-{{modified}}-analysis" title="Analysis">Analysis</label>      
+      <button class="icon_remove js-remove icon-svg light icon-column" data-name="{{name}}" title="Remove">Remove</button>
    </div>
 
    <ul>
-      <li class="js-tab-options" data-id="{{id}}"></li>
+      <li class="js-tab-options" data-name="{{name}}" data-id="{{id}}"></li>
 
-      <li class="js-tab-scalebar" data-id="{{id}}">
-         <input type="radio" id="tab-{{id}}-scalebar" name="tabs-{{id}}" class="js-tab-trigger panel-tab-trigger">
-         <div class="panel-tab">
-            <div class="scale-options">
-               <h3>Scale</h3>
-               <div class="grid">
-                  <input class="js-min min grid-cell" type="text">
-                  <div class="range-slider grid-cell fill noUi-target noUi-ltr noUi-horizontal noUi-background"><div class="noUi-base"><div class="noUi-origin noUi-connect noUi-dragable" style="left: 5.2631579%;"><div class="noUi-handle noUi-handle-lower"></div></div><div class="noUi-origin noUi-background" style="left: 68.4210526%;"><div class="noUi-handle noUi-handle-upper"></div></div></div></div>
-                  <input class="js-max max grid-cell" type="text">
-               </div>
-               <input type="checkbox" id="tab-{{id}}-log">
-               <label for="tab-{{id}}-log">Logarithmic</label>
-               <button>Auto</button>
-               <button>Reset</button>
-               <button>Recalculate</button>
-            </div>
+      <li class="js-tab-scalebar" data-name="{{name}}" data-id="{{id}}"></li>
 
-            <div class="scalebar"></div>
-         </div>
-      </li>
-
-      <li class="js-tab-details" data-id="{{id}}"></li>
+      <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
    
-      <li class="js-tab-analysis" data-id="{{id}}"></li>
+      <li class="js-tab-analysis" data-name="{{name}}" data-id="{{id}}"></li>
    </ul>
 </li>

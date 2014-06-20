@@ -25,14 +25,14 @@ svg {
 
 .main text {
    text-anchor: start;
-   fill: #dadada;
+   fill: #b1a7bc;
    /*stroke:black;
    stroke-width:0.5px;*/
 }
 
 .main text:hover,
 .main text:focus  {
-   fill: #b1a7bc;
+   fill: #32253f;
 }
 
 .separatorLine {
@@ -68,7 +68,7 @@ svg {
 }
 
 .axis line, .axis path {
-   stroke: 0 !important;
+   stroke: #d8d3dd;
 }
 
 .timeline-labels  {

@@ -23,5 +23,6 @@ td  {
   line-height: 1.5;
   padding-left: 15px;
   vertical-align: middle;
+  user-select: initial;
 }
 
