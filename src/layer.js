@@ -26,6 +26,8 @@ gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
    this.title = title;  
    this.productAbstract = productAbstract;
    this.type = type;
+   this.metadataComplete = false;
+   this.metadataQueue = [];
     
    this.defaults = {};
    this.defaults.firstDate = null;
@@ -82,7 +84,8 @@ gisportal.layer = function(microlayer, layerData) {
       console.log("Error: Could not get a layer object");
       return null;
    }
-   
+   this.metadataComplete = false;
+   this.metadataQueue = []; 
    this.times = []; // The times for each of the layers stored
    this.openlayers = {}; // OpenLayers layers
    this.cesiumLayers = {}; // Cesium layers
@@ -152,7 +155,6 @@ gisportal.layer = function(microlayer, layerData) {
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       this.origName = microlayer.origName; // Required for communication with the server.
       this.urlName = microlayer.urlName; // Layer Name with '/'
-      
       // Layer title
       this.displayTitle = microlayer.displayTitle;
       this.title = microlayer.title;
@@ -186,7 +188,10 @@ gisportal.layer = function(microlayer, layerData) {
       // The BoundingBox for the layer
       this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
       
+
       if(this.controlID == "opLayers") {
+         this.getMetadata();
+         this.getDimensions(layerData); // Get dimensions.
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
          
@@ -195,6 +200,7 @@ gisportal.layer = function(microlayer, layerData) {
          this.style = new OpenLayers.StyleMap(microlayer.options.style);
          this.times = microlayer.times;
       }
+
    };
    
    /**
@@ -299,15 +305,9 @@ gisportal.layer = function(microlayer, layerData) {
          layer.setVisibility(true);
          layer.checkLayerState();
       }   
-      layer.createScalebar();
       
    };
-   
-   this.createScalebar = function()  {
-      var layer = this;
-      /* Make a scalebar */
-   }
-  
+    
    this.unselect = function() {
 		var layer = this; 
       $('#scalebar-' + layer.id).remove(); 
@@ -430,7 +430,10 @@ gisportal.layer = function(microlayer, layerData) {
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             layer.units = data.units; 
             layer.log = data.log == 'true' ? true : false;
-            layer.createScalebar(); 
+
+            gisportal.microLayers[layer.id].metadataComplete = true; 
+            layer.metadataComplete = true;
+            _.each(gisportal.microLayers[layer.id].metadataQueue, function(d) { d(); delete d; });
          },
          error: function(request, errorType, exception) {
             layer.origMinScaleVal = 0;
@@ -636,12 +639,8 @@ gisportal.layer = function(microlayer, layerData) {
    
    //--------------------------------------------------------------------------
    
-   this.init(microlayer, layerData);
-   if(this.controlID == 'opLayers') {
-      this.getDimensions(layerData); // Get dimensions.
-      this.getMetadata();
-   }
    
+   this.init(microlayer, layerData);
    //---------------------------------- Temp ----------------------------------
    var olLayer = this.createOLLayer(); // Create OL layer.
    this.openlayers['anID'] = olLayer;
@@ -737,24 +736,27 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
       async: true,
       cache: false,
       success: function(data) {
+         var callback = function(layer)  { 
+            if (options.show !== false)  { 
+               if (layer.selected === true) { // Presume from state
+               
+                  // If the layer was loaded as part of a state load set some of the 
+                  // values of the layer to the cached versions.
+                  gisportal.checkIfLayerFromState(layer);
+
+               } 
+               else {
+                  console.log("Adding layer..."); // DEBUG
+                  gisportal.addLayer(layer, options);    
+                  console.log("Added Layer"); // DEBUG
+               }
+            }
+            if (options.callback) options.callback();
+            gisportal.configurePanel.refreshIndicators();
+         }
          // Convert the microlayer. 
          // COMMENT: might change the way this works in future.
-         var layer = new gisportal.layer(microlayer, data);        
-         if (options.show !== false)  { 
-            if (layer.selected === true) { // Presume from state
-            
-               // If the layer was loaded as part of a state load set some of the 
-               // values of the layer to the cached versions.
-               gisportal.checkIfLayerFromState(layer);
-
-            } 
-            else {
-               console.log("Adding layer..."); // DEBUG
-               gisportal.addLayer(layer, options);    
-               console.log("Added Layer"); // DEBUG
-            }
-         }
-         gisportal.configurePanel.refreshIndicators();
+         var layer = new gisportal.layer(microlayer, data, callback);     
       },
       error: function(request, errorType, exception) {
          var data = {
