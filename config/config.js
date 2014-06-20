@@ -27,9 +27,9 @@ gisportal.config = {
       "MSFD" : "Ecosystem"
    },
    popularIndicators : [
-      "PSurf", 
-      "Rainf", 
-      "LWdown",
+      "Rainfall Rate",
+      "PSurf",
+      "Rainf",
       "Qair",
    ]
 };

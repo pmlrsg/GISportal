@@ -16,7 +16,6 @@
       <button class="js-auto" data-id="{{id}}">Auto</button>
       <button class="js-reset" data-id="{{id}}">Reset</button>
    </div>
-   <div class="scalebar" style="background-image: url({{legend}});"></div>
 
    
 
@@ -39,4 +38,3 @@
    {{/hasStyles}}
    <button class="js-zoom-data text-button" data-id="{{id}}">Zoom to data</button>
 </div>
-

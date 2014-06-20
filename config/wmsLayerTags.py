@@ -1,62 +1,62 @@
 
 layers = { 
-    "forcing_psurf_201204": {
+    "ecmwf_psurf_monthly": {
         "PSurf": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "monthly",
             "niceName": "Surface atmospheric pressure",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
                 "Pressure", 
-                "Daily"
+                "Monthly"
             ],
             "region": "Global",
         }
     },
-    "forcing_rainf_201204": {
+    "ecmwf_rainf_monthly": {
         "Rainf": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "monthly",
             "niceName": "Rainfall Rate",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
                 "Precipitation", 
-                "Daily"
+                "Monthly"
             ],
             "region": "Global",
         }
     },
-    "forcing_qair_201204": {
+    "ecmwf_qair_monthly": {
         "Qair": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "monthly",
             "niceName": "Near surface specific humidity",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
                 "Precipitation", 
-                "Daily"
+                "Monthly"
             ],
             "region": "Global",
         }
     },
-    "forcing_lwdown_201204": {
+    "ecmwf_lwdown_monthly": {
         "LWdown": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "Monthly",
             "niceName": "Surface incident longwave radiation",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
                 "Radiation", 
-                "Daily"
+                "Monthly"
             ],
             "region": "Global",
         }
     }
     ,
-    "forcing_swdown_201204": {
+    "ecmwf_swdown_monthly": {
         "SWdown": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "Monthly",
             "niceName": "Surface incident shortwave radiation",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
@@ -66,10 +66,10 @@ layers = {
             "region": "Global",
         }
     },
-    "forcing_snowf_201204": {
+    "ecmwf_snowf_monthly": {
         "Snowf": {
             "Confidence": "Unknown",
-            "interval": "daily",
+            "interval": "Monthly",
             "niceName": "Snowfall rate",
             "Ecosystem_Element": "ECMWF Model Data",
             "MSFD": [
