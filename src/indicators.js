@@ -66,6 +66,15 @@ gisportal.indicatorsPanel.initDOM = function()  {
       $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
       $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
    });
+   
+
+   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max', function()  {
+      var id = $(this).data('id');
+      var min = $('.js-scale-min[data-id="' + id + '"]').val();
+      var max = $('.js-scale-max[data-id="' + id + '"]').val();
+      gisportal.scalebars.validateScale(id, min, max);
+   });
+
 
    $('.js-indicators').on('click', '.js-zoom-data', function()  {
    var indicator = gisportal.microLayers[$(this).data('id')];
@@ -397,13 +406,18 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 };
 
 // Needs a refactor
-gisportal.indicatorsPanel.initialiseSliders = function(id)  {
-   if (!gisportal.layers[id])  {
-      //debugger;
+gisportal.indicatorsPanel.initialiseSliders = function(id,firstDate, lastDate)  {
+     
+   if (gisportal.layers[id])  {
+      var firstDate = gisportal.layers[id].firstDate || firstDate || '';
+      var lastDate = gisportal.layers[id].lastDate || lastDate || '';
    }
    else  {
-      var firstDate = gisportal.layers[id].firstDate;
-      var lastDate = gisportal.layers[id].lastDate;
+      var firstDate = firstDate || '';
+      var lastDate = lastDate || '';
+   } 
+   
+   if (firstDate !== '' && lastDate !== '')  { 
       var min = new Date(firstDate.split('-').reverse().join('-')).getTime();
       var max = new Date(lastDate.split('-').reverse().join('-')).getTime();
 
