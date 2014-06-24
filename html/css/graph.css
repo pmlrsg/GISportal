@@ -1,0 +1,20 @@
+/*------------------------------------*\
+    Graph Panel
+\*------------------------------------*/
+
+#graphPanel .panel-container { 
+   width: 150%;
+   max-width: 150%;
+   z-index: 20;
+}
+
+#graphPanel.panel {
+   overflow: visible;
+}
+
+.graph-holder,
+.graph-wait-message {
+   background: #fff;
+   text-align: center;
+   padding: 10px;
+}
