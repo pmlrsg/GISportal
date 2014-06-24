@@ -510,12 +510,13 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
    // so this makes it match direction
    var depthDirection = function(id)  {
       var layerID = $('#graphcreator-coverage option:selected').val();
-      var layer = gisportal.microLayers[id];
-      var elevation = layer.selectedElevation;
+      //var layer = gisportal.microLayers[id];
+      var layer = gisportal.layers[id];
+      var elevation = layer.selectedElevation; // $('#tab-'+gisportal.utils.nameToId(layer.name)+'-elevation option:selected').val();    
       var direction = gisportal.microLayers[id].positive;
 
       // Take direction === up as default
-      if (direction === "down") elevation = -elevation; 
+      //if (direction === "down") elevation = -elevation; 
       return elevation;
    }
   
@@ -528,13 +529,14 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
       type: $('#tab-' + id + '-graph-type option:selected').val(),
       bins: '',
       time: dateRange,
-      bbox: $('#graphcreator-bbox').val(),
+      //bbox: $('#graphcreator-bbox').val(),
+      bbox: $('#tab-' + id + '-coordinates').val(),
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,
       graphZAxis: indicator.id
-   }; 
-   
+   };
+
    if (graphParams.baseurl && graphParams.coverage)  {
       var title = graphParams.type + " of " + indicator.name;
       
