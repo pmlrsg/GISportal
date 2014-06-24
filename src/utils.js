@@ -263,3 +263,17 @@ gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkfor
    var interval = window.setInterval(checkforCloseHandler, 80);
    return {'popupWindow':popupWindow, 'interval': interval};
 };
+
+/* Changes a name so that it can
+ * be used as an HTML id.
+ * Use as a HASH. Compare don't decipher. */
+gisportal.utils.nameToId = function(name)  {
+   if (!name) return null;
+   name = name.replace(/\ /g, '__');
+   name = name.replace(/\,/g, '_');
+   name = name.replace(/\./g, '_');
+   name = name.replace(/\:/g, '_');
+   name = name.replace(/\;/g, '_');
+   name = name.replace(/\//g, '_');
+   return name.toLowerCase();
+}

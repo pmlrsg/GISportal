@@ -8,7 +8,7 @@
          <p>Draw a selection box on the map to refine the data before analysis</p>
          <div class="coordinates">
             <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
-            <input id="tab-{{id}}-coordinates" class="js-coordinates" type="text">
+            <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
          </div>
          <div class="bbox-info hidden">
             <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>

@@ -3,7 +3,9 @@
 gisportal.graphs.initDOM = function() {
    $('.js-return-analysis').on('click', function() {
       $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);
+      $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);      
+      $('.graph-wait-message').toggleClass("hidden", false);
+      $('.graph-holder').html('');   
    });
 
 }
@@ -14,7 +16,7 @@ gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
    function success(data) {
-      gisportal.graphs.create(data, options);
+      gisportal.graphs.addGraph(data, options);
    }
       
    function error(request, errorType, exception) {
@@ -53,19 +55,20 @@ gisportal.graphs.create = function(data, options)  {
    }
 }
 
-gisportal.graphs.addGraph = function(data, options, graph)  {
+gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
-     
-   var graph = new XMLSerializer().serializeToString(graph);
+   var units = gisportal.layers[data.coverage].units;
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
          id : data.coverage,
          title : title,
-         svg : graph
+         units: units
       });
-      $('.graph-holder').html(rendered); 
+      $('.graph-holder').html(rendered);    
+      $('.graph-wait-message').toggleClass("hidden", true);   
+      gisportal.graphs.create(data, options);
    });
 
 }
