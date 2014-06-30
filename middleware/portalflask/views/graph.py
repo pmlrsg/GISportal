@@ -8,6 +8,8 @@ from portalflask.models.roi import ROI
 from portalflask.models.layergroup import LayerGroup
 from portalflask.models.user import User
 from portalflask.core import short_url
+from portalflask.core import error_handler
+
 import datetime
 import sqlite3 as sqlite
 
@@ -90,7 +92,7 @@ def getGraphs():
 def setGraph():
    # Check if the user is logged in.
    if g.user is None:
-      error_handler.setError('2-01', state, g.user.id, "views/graphs.py:setGraph - The user is no t logged in, returning 401 to user.", request)
+      error_handler.setError('2-01', state, g.user.id, "views/graphs.py:setGraph - The user is not logged in, returning 401 to user.", request)
       abort(401)
    
    email = g.user.email
