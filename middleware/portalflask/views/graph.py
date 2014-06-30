@@ -95,7 +95,7 @@ def setGraph():
    state = request.values.get('state', None)
    # Check if the user is logged in.
    if g.user is None:
-      error_handler.setError('2-01', state, g.user.id, "views/graphs.py:setGraph - The user is not logged in, returning 401 to user.", request)
+      error_handler.setError('2-01', state, None, "views/graphs.py:setGraph - The user is not logged in, returning 401 to user.", request)
       abort(401)
    
    email = g.user.email
