@@ -245,6 +245,20 @@ def getBboxData(params, method):
    except urllib2.URLError as e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
          if e.code == 400:
+            ## THIS IS BAD BAD CODE PLEASE DO NOT KILL ME. HOWEVER, DO DELETE ASAP 
+            ## On the first attempt, it may return a 400 due to vertical attribute in data
+            ## The second try removes the negative to attempt to fix.
+            try:
+               params["vertical"] = params["vertical"][1:]
+               return getData(params, method)
+            except urllib2.URLError as e:
+               if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+                  if e.code == 400:
+                     g.error = "Failed to access url, make sure you have entered the correct parameters."
+                  if e.code == 500:
+                     g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
+                  abort(400)
+            ## / BAD CODE
             g.error = "Failed to access url, make sure you have entered the correct parameters."
          if e.code == 500:
             g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
