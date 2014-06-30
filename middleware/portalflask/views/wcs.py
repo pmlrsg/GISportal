@@ -152,7 +152,7 @@ def createURL(params):
    return Param("url", False, False, url)
       
 def contactWCSServer(url):
-   current_app.logger.debug('Contacting WCS Server with request...')
+   current_app.logger.debug('Contacting WCS Server with request...' + url)
    resp = urllib2.urlopen(url)     
    current_app.logger.debug(url)
    current_app.logger.debug('Request successful')
@@ -249,8 +249,13 @@ def getBboxData(params, method):
             ## On the first attempt, it may return a 400 due to vertical attribute in data
             ## The second try removes the negative to attempt to fix.
             try:
-               params["vertical"] = params["vertical"][1:]
-               return getData(params, method)
+               current_app.logger.debug(params["vertical"].value)
+               params["vertical"]._value = params["vertical"].value[1:]
+               params['url'] = createURL(params)
+               datavar = getData(params, method)
+               current_app.logger.debug(datavar)
+               return datavar
+
             except urllib2.URLError as e:
                if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
                   if e.code == 400:
@@ -266,7 +271,6 @@ def getBboxData(params, method):
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, g.user.id, "views/wcs.py:getBboxData - Failed to access url, returning 400 to user. Exception %s" % e, request)
-      abort(400) # return 400 if we can't get an exact code
    #except IOError as e:
       #if e[0] == 2:
          #g.error = "Unable to save file"
