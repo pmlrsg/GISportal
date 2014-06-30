@@ -1,7 +1,6 @@
 from flask import Blueprint, abort, request, jsonify, g, current_app
 from sqlalchemy import desc
 from portalflask.models.database import db_session
-from portalflask.models.state import State
 from portalflask.models.graph import Graph
 from portalflask.models.quickregions import QuickRegions
 from portalflask.models.roi import ROI
