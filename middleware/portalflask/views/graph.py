@@ -21,7 +21,8 @@ except:
 portal_graph = Blueprint('portal_graph', __name__)
 
 @portal_graph.route('/graph/<graphUrl>', methods = ['GET'])
-def getGraph(graphUrl):
+def getGraph(graphUrl): 
+   state = request.values.get('state', None)
    # Decode url into a number to match to a state
    graphID = short_url.decode_url(graphUrl)
    print graphID
@@ -57,9 +58,10 @@ def getGraph(graphUrl):
    
 @portal_graph.route('/graph', methods = ['GET'])
 def getGraphs():
+   state = request.values.get('state', None)
    # Check if the user is logged in.
    if g.user is None:
-      error_handler.setError('2-01', state, g.user.id, "views/graphs.py:getGraphs - The user is no t logged in, returning 401 to user.", request)
+      error_handler.setError('2-01', state, g.user.id, "views/graphs.py:getGraphs - The user is not logged in, returning 401 to user.", request)
       abort(401)
       
    #TODO: Return available states filtered by email or other provided parameters.
@@ -89,7 +91,8 @@ def getGraphs():
       abort(400) # If we fail to jsonify the data return 400
    
 @portal_graph.route('/graph', methods = ['POST'])
-def setGraph():
+def setGraph(): 
+   state = request.values.get('state', None)
    # Check if the user is logged in.
    if g.user is None:
       error_handler.setError('2-01', state, g.user.id, "views/graphs.py:setGraph - The user is not logged in, returning 401 to user.", request)
