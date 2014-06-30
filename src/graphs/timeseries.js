@@ -38,30 +38,11 @@ gisportal.graphs.timeseries = function(data, options)  {
             //.useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
         
-         if (chart.xAxis)  { 
-            chart.xAxis.tickFormat(function(d) {
-               return d3.time.format('%x')(new Date(d))
-            });
-         }
+         chart.xTickFormat(function(d) {
+            return d3.time.format('%x')(new Date(d));
+         });
 
-         if (chart.yAxis)  {
-            chart.yAxis.tickFormat(function(d)  {
-               return d.toPrecision(1);
-            });
-         }
- 
-         if (chart.x2Axis)  {
-            chart.x2Axis.tickFormat(function(d) {
-               return d3.time.format('%x')(new Date(d))
-            });
-         }
-
-         if (chart.y2Axis)  { 
-            chart.y2Axis.tickFormat(function(d)  {
-               return d.toPrecision(1);
-            });
-         }
-         
+         chart.yTickFormat(d3.format("g"));
 
          d3.select('[data-id="' + data.coverage + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
