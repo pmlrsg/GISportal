@@ -20,6 +20,7 @@
       "html/css/indicators.css",
       "html/css/graph.css",
       "html/css/tables.css",
-      "html/css/nv.d3.css"
+      "html/css/nv.d3.css",
+      "html/css/mapcontrols.css"
    ]
 }

@@ -73,7 +73,12 @@
 
 .icon_share  {
   background-image: url('../img/icons/share.svg');
-}  
+} 
+
+.icon_region { background-image: url('../img/icons/map.svg'); }
+.icon_pan { background-image: url('../img/icons/options.svg'); }
+.icon_zoomin { background-image: url('../img/icons/zoom-in.svg'); }
+.icon_zoomout { background-image: url('../img/icons/zoom-out.svg'); }
 
 .icon_loading,
 .icon_loading:focus,
@@ -137,3 +142,4 @@
 .bg-removed  {
    background-image: none !important;
 } 
+.separator { border-right: 1px solid #e0dce4; }

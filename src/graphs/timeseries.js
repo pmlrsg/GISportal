@@ -34,7 +34,8 @@ gisportal.graphs.timeseries = function(data, options)  {
          /* Chart with zooming
          */
          var chart = nv.models.lineWithFocusChart()
-            .margin({left: 25});
+            .margin({left: 25})
+            .tooltipContent(function(key, x, y, e, graph) { return '<h3>' + key + '</h3>' +'<p>' + parseFloat(y).toFixed(2) + ' - ' + x + '</p>'; });
             //.useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
         

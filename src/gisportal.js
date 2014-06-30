@@ -444,7 +444,12 @@ gisportal.mapInit = function() {
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
-      controls: []
+      controls: [
+         new OpenLayers.Control.Zoom({
+            zoomInId: "mapZoomIn",
+            zoomOutId: "mapZoomOut"
+        })
+      ]
    });
    
    //map.setupGlobe(map, 'map', {
@@ -486,10 +491,12 @@ gisportal.mapInit = function() {
       map.addControl(control);
    }
 
+   gisportal.quickRegions.setup();
    gisportal.selectionTools.init();
 
    if(!map.getCenter())
       map.zoomTo(3);
+
 
 };
 

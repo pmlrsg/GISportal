@@ -184,5 +184,31 @@
       </div>
     </div> 
 
+    <!-- Map controls -->
+    <div class="map_controls">
+      <!--<button class="icon_region icon-svg dark separator js-quick-region">Select Region</button>
+      <button class="icon_pan icon-svg dark separator js-pan-map">Pan</button>-->
+      <button class="icon_zoomin icon-svg dark separator js-zoomin" id="mapZoomIn">Zoom In</button>
+      <button class="icon_zoomout icon-svg dark js-zoomout" id="mapZoomOut">Zoom Out</button>
+    </div>
+    <div class="map_quick_regions hidden">
+      <ul class="panel-list grid-list">
+        <li>
+          <p class="grid-cell fill"><label for="map-view-world_view">World View</label>
+          <input type="radio" name="quick_region" id="map-view-world_view" data-name="World View" class="js-quick-region" /></p>
+        </li>
+        <li class="">
+          <p class="grid-cell fill"><label for="map-view-north_sea">North Sea</label>
+          <input type="radio" name="quick_region" id="map-view-north_sea" data-name="North Sea" class="js-quick-region" /></p>
+        </li>
+        <li>
+          <p class="grid-cell fill"><label for="map-view-english_channel">English Channel</label>
+          <input type="radio" name="quick_region" id="map-view-english_channel" data-name="English Channel" class="js-quick-region" /></p>
+        </li>
+
+      </ul>
+    </div>
+
+
 </body>
 </html>
