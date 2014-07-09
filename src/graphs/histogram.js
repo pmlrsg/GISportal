@@ -13,11 +13,14 @@ gisportal.graphs.histogram = function(data, options)  {
              .margin({left:25});
              //.useInteractiveGuideline(true);
 
-         d3.select(svg)
-           .datum(bars())
+         var panel = $('#graphPanel .panel-container');
+         d3.select('[data-id="' + data.coverage + '"] .graph svg')
+           .datum(bars())              
+           .attr("width", $(panel).innerWidth() - 40).attr("height", $(panel).innerHeight() - 40 )
            .call(chart);
       
-         svg.onresize = function() { chart.update(); };
+         nv.utils.windowResize(chart.update);
+         return chart;
       }
    });
 
