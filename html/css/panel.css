@@ -9,8 +9,8 @@
   top: 25px;
   bottom: 125px;
   left: 25px;
-  //height: 95%;
-  overflow: hidden;
+  /*height: 95%;*/
+  /*overflow: hidden;*/
   min-width: 290px;
   width: 33.3%;
   max-width: 500px;
@@ -56,6 +56,7 @@
 .panel-container  {
     background-color: #efedf1;
     flex: 1;
+    height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
  }

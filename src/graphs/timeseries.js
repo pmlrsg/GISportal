@@ -34,7 +34,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          /* Chart with zooming
          */
          var chart = nv.models.lineWithFocusChart()
-            .margin({left: 25})
+            .margin({left: 35})
             .tooltipContent(function(key, x, y, e, graph) { return '<h3>' + key + '</h3>' +'<p>' + parseFloat(y).toFixed(2) + ' - ' + x + '</p>'; });
             //.useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
@@ -45,12 +45,13 @@ gisportal.graphs.timeseries = function(data, options)  {
 
          chart.yTickFormat(d3.format("g"));
 
+         var panel = $('#graphPanel .panel-container');
          d3.select('[data-id="' + data.coverage + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
               .datum(lines())  
-              .attr("width", "500px").attr("height", "500px" )
-              .attr("style", "width: 100%; height: 100%;")
+              .attr("width", $(panel).innerWidth() - 40).attr("height", $(panel).innerHeight() - 40 )
+              //.attr("style", "width: 100%; height: 100%;")
               .call(chart);
          //chart.xScale(d3.time.scale());
          //chart.yScale(d3.scale.linear());

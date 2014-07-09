@@ -43,6 +43,7 @@
 .grid-cell.fill  {
   flex: 1;
   flex-basis: 100%;
+  -ms-flex-preferred-size: 0px;
   margin-bottom: 10px;
 }
 

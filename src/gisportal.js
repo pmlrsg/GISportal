@@ -571,22 +571,29 @@ gisportal.saveState = function(state) {
    var state = state || {}; 
    // Save layers
    state.map = {};
+   state.selectedIndicators = [];
    state.map.layers = {}; 
    state.timeline = {}; 
 
    // Get the current layers and any settings/options for them.
-   var keys = Object.keys(gisportal.layers);
+   var keys = gisportal.configurePanel.selectedIndicators;
    for(var i = 0, len = keys.length; i < len; i++) {
-      var layer = gisportal.layers[keys[i]];
-      state.map.layers[layer.id] = {
-         'selected': layer.selected,
-         'opacity': layer.opacity !== null ? layer.opacity : 1,
-         'style': layer.style !== null ? layer.style : '',
-         'minScaleVal': layer.minScaleVal,
-         'maxScaleVal': layer.maxScaleVal,
-         'scalebarOpen': $('#scalebar-' + layer.id).length > 0 ? 'true' : 'false'  
-      };    
+      var selectedIndicator = gisportal.configurePanel.selectedIndicators[i];
+
+      if (selectedIndicator && selectedIndicator.id)  {
+         var indicator = gisportal.layers[selectedIndicator.id];
+         state.map.layers[indicator.id] = {
+            'selected': indicator.selected,
+            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+            'style': indicator.style !== null ? indicator.style : '',
+            'minScaleVal': indicator.minScaleVal,
+            'maxScaleVal': indicator.maxScaleVal,
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] .active').attr('for')
+         };    
+      }
    }
+   // outside of loop so it can be easily ordered 
+   state.selectedIndicators = gisportal.configurePanel.selectedIndicators;
    
    // Get currently selected date.
    if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
@@ -622,43 +629,50 @@ gisportal.loadState = function(state) {
    $('.start').toggleClass('hidden', true);
    var state = state || {};
 
-   var timeline = state.timeline;
-   state = state.map;
+   var stateTimeline = state.timeline;
+   var stateMap = state.map;
    
    // Load layers for state
-   var keys = Object.keys(state.layers);
-   for(var i = 0, len = keys.length; i < len; i++) {
-      if (!gisportal.layers[keys[i]]) {
+   var keys = state.selectedIndicators;
+   if (keys.length > 0)  {
+      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+   }
+   for (var i = 0, len = keys.length; i < len; i++) {
+      var indicator = gisportal.layers[state.selectedIndicators[i]];
+      if (!indicator) {
+         gisportal.configurePanel.buildMap();
          var options = {};
-         if (state.layers[keys[i]].minScaleVal !== null) options.minScaleVal = state.layers[keys[i]].minScaleVal;
-         if (state.layers[keys[i]].maxScaleVal !== null) options.maxScaleVal = state.layers[keys[i]].maxScaleVal;
-         gisportal.configurePanel.selectLayer(keys[i], options);
+         options.id = state.selectedIndicators[i].id;
+         gisportal.configurePanel.selectLayer(state.selectedIndicators[i].name, options);
+        
       }
    }
  
    // Create the feature if there is one
-   if(!gisportal.utils.isNullorUndefined(state.feature)) {
+         indicator = {};
+   if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-      layer.addFeatures(gisportal.geoJSONToFeature(state.feature));
+      layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
     }
    
    // Load position
-   if (state.extent)
-      map.zoomToExtent(new OpenLayers.Bounds([state.extent.left,state.extent.bottom, state.extent.right, state.extent.top]));
+   if (stateMap.extent)
+      map.zoomToExtent(new OpenLayers.Bounds([stateMap.extent.left,stateMap.extent.bottom, stateMap.extent.right, stateMap.extent.top]));
 
    // Load Quick Regions
-   if (state.regions) {
-      gisportal.quickRegion = state.regions;
+   if (stateMap.regions) {
+      gisportal.quickRegion = stateMap.regions;
       gisportal.quickRegions.setup();
    }
 
-   if (state.selectedRegion)  {
-      $('#quickRegion').val(state.selectedRegion);
+   if (stateMap.selectedRegion)  {
+      $('#quickRegion').val(stateMap.selectedRegion);
    }
 
-   if (timeline)  {
-      gisportal.timeline.zoomDate(timeline.minDate, timeline.maxDate);
-      if (state.date) gisportal.timeline.setDate(new Date(state.date));
+   if (stateTimeline)  {
+      gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
+      if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
    }
 
 
@@ -681,7 +695,10 @@ gisportal.checkIfLayerFromState = function(layer) {
       for(var i = 0, len = keys.length; i < len; i++) {
          if(keys[i] == layer.id){
             layer.setOpacity(state.layers[keys[i]].opacity);
-            //layer.setStyle(state.layers[keys[i]].style);
+            layer.setStyle(state.layers[keys[i]].style);
+            layer.minScaleVal = state.layers[keys[i]].minScaleVal;
+            layer.maxScaleVal = state.layers[keys[i]].maxScaleVal;
+            gisportal.scalebars.updateScalebar(layer.id);
          }
       }
    }

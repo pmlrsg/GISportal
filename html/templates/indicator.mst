@@ -1,4 +1,4 @@
-<li data-id="{{id}}" data-name="{{name}}">
+<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}">
    <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
       <p>{{name}}</p>
       <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column" title="Show/Hide">Show/Hide</button>

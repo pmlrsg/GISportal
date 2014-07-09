@@ -288,6 +288,12 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);  
    
+   if (options.id) {
+      gisportal.indicatorsPanel.changeIndicator(name, options.id);
+      id = options.id;
+   }
+
+   
    name = name.replace(/__/g, ' ');
 
    $('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true).change();
@@ -332,4 +338,14 @@ gisportal.configurePanel.unselectIndicator = function(name)  {
    for (var i in gisportal.configurePanel.selectedIndicators)  {
       if (gisportal.configurePanel.selectedIndicators[i].name.toLowerCase() === name.toLowerCase()) gisportal.configurePanel.selectedIndicators.pop(i);
    }
+};
+
+
+gisportal.configurePanel.reorderIndicators = function(index, name)  {
+   var arr = gisportal.configurePanel.selectedIndicators;
+   var current = _.findIndex(arr, function(d) { return d.name.toLowerCase() === name.toLowerCase();  });
+   var obj = arr[current];
+   arr.splice(current, 1);
+   arr.splice(index, 0, obj);
+   return arr;
 };

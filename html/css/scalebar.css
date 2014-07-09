@@ -67,6 +67,6 @@ input.max  {
    height: 0;
    padding: 50% 0; /* both padding-top & padding bottom = 50% the width of parent = 50% width of image => space taken vertically with height: 0 is the width of image */
    overflow-y: hidden;
-   transform: scaleX(100 /* a large scale factor */);
+   transform: scaleX(96 /* a large scale factor */);
    transform-origin: 0 0;
 }

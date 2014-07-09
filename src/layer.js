@@ -277,6 +277,13 @@ gisportal.layer = function(microlayer, layerData) {
       
       this.opacity = opacityValue;
    };
+
+   this.setStyle = function(style)  {
+      var indicator = this;
+      indicator.style = style;
+      indicator.mergeNewParams({ styles: style });
+      gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
+   }; 
    
    this.select = function() {
       var layer = this;
@@ -434,6 +441,7 @@ gisportal.layer = function(microlayer, layerData) {
             gisportal.microLayers[layer.id].metadataComplete = true; 
             layer.metadataComplete = true;
             _.each(gisportal.microLayers[layer.id].metadataQueue, function(d) { d(); delete d; });
+
          },
          error: function(request, errorType, exception) {
             layer.origMinScaleVal = 0;
@@ -687,8 +695,8 @@ gisportal.addLayer = function(layer, options) {
 
 gisportal.removeLayer = function(layer) {
    
-   delete gisportal.selectedLayers[layer.id];
-   delete gisportal.layers[layer.id];
+   if (gisportal.selectedLayers[layer.id]) delete gisportal.selectedLayers[layer.id];
+   if (gisportal.layers[layer.id])  delete gisportal.layers[layer.id];
     
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
@@ -740,18 +748,10 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
          // COMMENT: might change the way this works in future.
          var layer = new gisportal.layer(microlayer, data);     
          if (options.show !== false)  { 
-            if (layer.selected === true) { // Presume from state
-            
-               // If the layer was loaded as part of a state load set some of the 
-               // values of the layer to the cached versions.
-               gisportal.checkIfLayerFromState(layer);
-
-            } 
-            else {
-               console.log("Adding layer..."); // DEBUG
-               gisportal.addLayer(layer, options);    
-               console.log("Added Layer"); // DEBUG
-            }
+            gisportal.checkIfLayerFromState(layer);
+            console.log("Adding layer..."); // DEBUG
+            gisportal.addLayer(layer, options);    
+            console.log("Added Layer"); // DEBUG
          }
          gisportal.configurePanel.refreshIndicators();
       },

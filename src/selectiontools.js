@@ -95,13 +95,14 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
 
    var bounds = feature.geometry.bounds;
    var coords = "";
-   coords += bounds.left + ",";
-   coords += bounds.bottom + ",";
-   coords += bounds.right + ",";
-   coords += bounds.top;
-   $('.js-coordinates').val(coords);
-   $('.bbox-info').toggleClass('hidden', false);
-
+   if (bounds)  {
+      coords += bounds.left + ",";
+      coords += bounds.bottom + ",";
+      coords += bounds.right + ",";
+      coords += bounds.top;
+      $('.js-coordinates').val(coords);
+      $('.bbox-info').toggleClass('hidden', false);
+   }
    
    // Get the geometry of the drawn feature
    var geom = new OpenLayers.Geometry();
@@ -109,7 +110,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
 
    var area_deg, area_km, height_deg, width_deg, height_km, width_km, radius_deg, ctrLat, ctrLon = 0;
 
-   if(feature_type !== '' && feature_type != 'point') {
+   if(feature_type !== '' && feature_type != 'point' && bounds) {
       area_deg = geom.getArea();
       area_km = (geom.getGeodesicArea()*1e-6);
       height_deg = bounds.getHeight();

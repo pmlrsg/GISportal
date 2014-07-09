@@ -56,7 +56,7 @@ gisportal.graphs.create = function(data, options)  {
 gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
-   var units = gisportal.layers[data.coverage].units;
+   var units = gisportal.layers[options.id].units;
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
