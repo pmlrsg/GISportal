@@ -27,72 +27,75 @@ gisportal.config = {
          layerChange: {
             /**
             *  Layout:
-            *     {{ cd_index : ( function(){} | predefined_function )
+            *     (cd|cm){{index}} : ( function(){} | predefined_function_name | string )
             *  Example:
-            *     2 : 'indicator_name' //Call the indicator_name default function and apply to definition 2
-            *     3 : function( indicator ){ return indicator.name + "-" + indicator.id  } // Sets definition 3 to the indicator name + id
+            *     cd2 : 'indicator_name' //Call the indicator_name default function and apply to definition 2
+            *     cd3 : function( indicator ){ return indicator.name + "-" + indicator.id  } // Sets definition 3 to the indicator name + id,
+            *     cm1 : 1 //Sets metric 1 to the value of one
             */
-            8: 'indicator_name',
-            9: 'indicator_id',
-            2: 'indicator_region',
-            3: 'indicator_interval',
-            7: 'indicator_confidence',
-            4: 'indicator_elevation',
-            5: 'indicator_layer_style',
-            10:'indicator_year'
+            "cd8": 'indicator_name',
+            "cd9": 'indicator_id',
+            "cd2": 'indicator_region',
+            "cd3": 'indicator_interval',
+            "cd7": 'indicator_confidence',
+            "cd4": 'indicator_elevation',
+            "cd5": 'indicator_layer_style',
+            "cd10":'indicator_year',
+            'cm2': 1 // Used in layer
          },
          
          selectionBoxDrawn: {
-            8: 'indicator_name',
-            9: 'indicator_id',
-            2: 'indicator_region',
-            3: 'indicator_interval'
+            "cd8": 'indicator_name',
+            "cd9": 'indicator_id',
+            "cd2": 'indicator_region',
+            "cd3": 'indicator_interval'
          },
          
          selectionBoxTyped: {
-            8: 'indicator_name',
-            9: 'indicator_id',
-            2: 'indicator_region',
-            3: 'indicator_interval'
+            "cd8": 'indicator_name',
+            "cd9": 'indicator_id',
+            "cd2": 'indicator_region',
+            "cd3": 'indicator_interval'
          },
          
          dateRangeUsed: {
-            8: 'indicator_name',
-            9: 'indicator_id',
-            2: 'indicator_region',
-            3: 'indicator_interval'
+            "cd8": 'indicator_name',
+            "cd9": 'indicator_id',
+            "cd2": 'indicator_region',
+            "cd3": 'indicator_interval'
          },
          
          createGraph: {
-            8: 'indicator_name',
-            9: 'indicator_id',
-            2: 'indicator_region',
-            3: 'indicator_interval',
-            6: 'graph_type'
+            "cd8": 'indicator_name',
+            "cd9": 'indicator_id',
+            "cd2": 'indicator_region',
+            "cd3": 'indicator_interval',
+            "cd6": 'graph_type',
+            'cm1': 1  // Used in graph
          },
          
          
          //Does not a get a true gisportal.layer. Only: { 'name': 'Oxygen' }.
          selectLayer: {
-            8: 'indicator_name'
+            "cd8": 'indicator_name'
          },
          
          //Does not a get a true gisportal.layer. Only: { 'name': 'Oxygen' }.
          deselectLayer: {
-            8: 'indicator_name'
+            "cd8": 'indicator_name'
          },
          
          
          showLayer: {
-            8: 'indicator_name'
+            "cd8": 'indicator_name'
          },
          
          hideLayer: {
-            8: 'indicator_name'
+            "cd8": 'indicator_name'
          },
          
          timelineUpdate: {
-            10: 'timeline_year'
+            "cd10": 'timeline_year'
          }
          
       }
