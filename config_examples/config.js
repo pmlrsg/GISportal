@@ -20,7 +20,7 @@ gisportal.config = {
       "NPP", "Oxygen"
    ],
    analytics: {
-      active: false,
+      active: true,
       UATrackingId: 'UA-52647976-1',
       
       customDefinitions: {
