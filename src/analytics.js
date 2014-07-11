@@ -176,11 +176,11 @@ gisportal.analytics.initDomEvents = function(){
 }
 
 //Settigns for the custom dimesion ids and what the values shoudl be
-gisportal.analytics.customDimensions  = gisportal.config.analytics.customDimensions;
+gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
 
 
 //A list of common functions used when tracking anayltics
-gisportal.analytics.customDimensionFunctions= {
+gisportal.analytics.customDefinitionFunctions= {
 	//Indicator nice name
 	'indicator_name': function( indicator ){ return indicator.name.toLowerCase(); },
 	
@@ -238,33 +238,38 @@ gisportal.analytics.customDimensionFunctions= {
  * @param {gisportal.layer} indicator - The layer object
  * @param {string} nameSet - The set of customDimesion indexes to read from the settings.
  */
-gisportal.analytics.getCustomDimenstionValues = function( nameSet, indicator ){
+gisportal.analytics.getCustomDefinitionsValues = function( nameSet, indicator ){
 	var indicator = indicator || {};
 	var toSend = {};
 	
 	// Add our custom dimesions 
-	var dimensionIndexKeys = Object.keys( gisportal.analytics.customDimensions[ nameSet ] );
-	for( i in dimensionIndexKeys){
-		var  dimensionIndex = dimensionIndexKeys[ i ];
+	var definitionIndexKeys = Object.keys( gisportal.analytics.customDefinitions[ nameSet ] );
+	for( i in definitionIndexKeys){
+		var  definitionIndex = definitionIndexKeys[ i ];
 	
 		try{
 			
-			var mapped_name = gisportal.analytics.customDimensions[ nameSet ][ dimensionIndex ];
+			var mapped_name = gisportal.analytics.customDefinitions[ nameSet ][ definitionIndex ];
 			
 			if( typeof mapped_name == "function" )
 				mapped_function = mapped_name;
 			else if ( typeof mapped_name == "string" )
-				var mapped_function  = gisportal.analytics.customDimensionFunctions[ mapped_name ]
+				var mapped_function  = gisportal.analytics.customDefinitionFunctions[ mapped_name ]
 			else
 				throw "Not a valid key";
 			
 			var value = mapped_function( indicator );
 			
-			if( value != null && value.toString().length > 0 )
-				toSend[ "dimension" + dimensionIndex ] = value.toString();
-			
+			if( value != null && value.toString().length > 0 ){
+				if( definitionIndex.match( /cd[0-9]{1,2}/ ) )
+					definitionIndex = 'dimension' + definitionIndex.substr(2);
+				else if( definitionIndex.match( /cm[0-9]{1,2}/ ) )
+					definitionIndex = 'metric' + definitionIndex.substr(2);
+					
+				toSend[ definitionIndex ] = value.toString();
+			}
 		}catch(e){
-			console.log( "Error processing dimension " + dimensionIndex + ": " + e.toString() );
+			console.log( "Error processing definition " + definitionIndex + ": " + e.toString() );
 		};
 		
 	}
@@ -302,7 +307,7 @@ gisportal.analytics.events.selectLayer = function( indicator ){
 		'eventAction': 'Add'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectLayer', indicator  );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'selectLayer', indicator  );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -316,7 +321,7 @@ gisportal.analytics.events.deselectLayer = function( indicator ){
 		'eventAction': 'Remove'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'deselectLayer', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'deselectLayer', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -330,7 +335,7 @@ gisportal.analytics.events.hideLayer = function( indicator ){
 		'eventAction': 'Hide'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'hideLayer', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'hideLayer', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -344,7 +349,7 @@ gisportal.analytics.events.showLayer = function( indicator ){
 		'eventAction': 'Show'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'showLayer', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'showLayer', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -358,7 +363,7 @@ gisportal.analytics.events.timelineUpdate = function(  ){
 		'eventAction': 'Date change'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'timelineUpdate' );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'timelineUpdate' );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -444,7 +449,7 @@ gisportal.analytics.events.layerChange = function( indicator ){
 		'eventAction': 'Configure layer'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'layerChange', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'layerChange', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -471,7 +476,7 @@ gisportal.analytics.events.selectionBoxDrawn = function( indicator ){
 		'eventLabel': 'Selection box drawn'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectionBoxDrawn', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'selectionBoxDrawn', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -495,7 +500,7 @@ gisportal.analytics.events.selectionBoxTyped = function( indicator ){
 		'eventLabel': 'Selection box typed'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectionBoxTyped', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'selectionBoxTyped', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -517,7 +522,7 @@ gisportal.analytics.events.dateRangeUsed = function( indicator ){
 		'eventAction': 'Tool used'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'dateRangeUsed', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'dateRangeUsed', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -534,7 +539,7 @@ gisportal.analytics.events.createGraph = function( indicator ){
 		'eventAction': 'Created'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'createGraph', indicator );
+	var CDs = gisportal.analytics.getCustomDefinitionsValues( 'createGraph', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );

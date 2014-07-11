@@ -23,14 +23,14 @@ gisportal.config = {
       active: true,
       UATrackingId: 'UA-52647976-1',
       
-      customDimensions: {
+      customDefinitions: {
          layerChange: {
             /**
             *  Layout:
             *     {{ cd_index : ( function(){} | predefined_function )
             *  Example:
-            *     2 : 'indicator_name' //Call the indicator_name default function and apply to dimension 2
-            *     3 : function( indicator ){ return indicator.name + "-" + indicator.id  } // Sets dimension 3 to the indicator name + id
+            *     2 : 'indicator_name' //Call the indicator_name default function and apply to definition 2
+            *     3 : function( indicator ){ return indicator.name + "-" + indicator.id  } // Sets definition 3 to the indicator name + id
             */
             8: 'indicator_name',
             9: 'indicator_id',
