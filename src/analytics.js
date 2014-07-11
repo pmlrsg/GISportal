@@ -3,6 +3,8 @@ gisportal.analytics = {}
 
 
 gisportal.analytics.initGA = function(){
+	if( gisportal.config.analytics.active == false ) return;
+	
 	
 	//Load UA
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -10,25 +12,69 @@ gisportal.analytics.initGA = function(){
 	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-	ga('create', gisportal.config.UATrackingId , 'auto');
+	ga('create', gisportal.config.analytics.UATrackingId , 'auto');
 	ga('send', 'pageview');
 	
 	gisportal.analytics.initDomEvents();
+}
+
+gisportal.analytics.getGetParam = function(val) {
+    var result = "Not found",
+        tmp = [];
+    location.search
+    //.replace ( "?", "" ) 
+    // this is better, there might be a question mark inside
+    .substr(1)
+        .split("&")
+        .forEach(function (item) {
+        tmp = item.split("=");
+        if (tmp[0] === val) result = decodeURIComponent(tmp[1]);
+    });
+    return result;
 }
 
 /**
 * Adds events to the DOM. (requires the <body> to exist)
 */
 gisportal.analytics.initDomEvents = function(){
+	var state = gisportal.analytics.getGetParam('state');
+	if(  typeof state == 'string' && state != "" ){
+		ga('send', {
+			'hitType': 'event',
+			'eventCategory': 'Generic',
+			'eventAction': 'State loaded',
+			'eventLabel': state
+		});
+	}
 	
-	$( 'body' ).on( 'click' ,'.js-start, .panel-footer button', function(){
+	$( 'body' ).on( 'click' ,'.panel-footer button, .js-hide-panel, .js-show-tools', function(){
+		var eventLabel =  $(this).text().trim();
+		
+		if( $(this).hasClass('js-hide-panel') )
+			 eventLabel = "Hide tools";
+		else if( $(this).hasClass('js-show-tools') )
+			 eventLabel = "Show tools";
+		
+		
 		ga('send', {
 			'hitType': 'event',
 			'eventCategory': 'Generic',
 			'eventAction': 'Click',
-			'eventLabel': $(this).text()
+			'eventLabel': eventLabel
 		});
 	});
+	
+	
+	$( 'body' ).on( 'click' ,'.examples a, .js-start', function(){
+		ga('send', {
+			'hitType': 'event',
+			'eventCategory': 'Generic',
+			'eventAction': 'Click',
+			'eventLabel': 'Splash screen: ' + $(this).text().trim()
+		});
+	});
+	
+	
 	
 	
 	
@@ -50,51 +96,53 @@ gisportal.analytics.initDomEvents = function(){
 	$('body').on( 'mouseup', '.range-slider[data-id]', function(){
 		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
 		if( layer != null )
-			gisportal.analytics.events.dataRangeUsed( layer )
+			gisportal.analytics.events.dateRangeUsed( layer )
 	})
 	
 	
-	// Changes to indicators
-	$('body').on( 'change', '.indicator-option select, .indicator-select select', function(){
-		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-		if( layer != null )
-			gisportal.analytics.events.layerChange( layer )
-	})
-	
-	
-	// Someone drew a bounding box
-	$('body').on( 'click', '.js-draw-box', function(){
-		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-		if( layer != null )
-			gisportal.analytics.events.selectionBoxDrawn( layer )
-	})
 	
 	// User hides and openLayer
-	$('body').on( 'mousedown', '.indicator-header .js-toggleVisibility.active', function(){
+	$('body').on( 'mousedown', '.indicator-header .js-toggleVisibility:not(.active)', function(){
 		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
 		if( layer != null )
-			gisportal.analytics.events.showLayer( gisportal.layers[id] );
+			gisportal.analytics.events.showLayer( layer );
 	})
 	
 	
 	// User shows an openLayer
-	$('body').on( 'mousedown', '.indicator-header .js-toggleVisibility:not(.active)', function(){
+	$('body').on( 'mousedown', '.indicator-header .js-toggleVisibility.active', function(){
 		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
 		if( layer != null )
-			gisportal.analytics.events.hideLayer( gisportal.layers[id] );
+			gisportal.analytics.events.hideLayer( layer );
 	})
 	
     
 	
 	// Adding an indicator panel
-	$('body').on( 'click', '.js-toggleVisibility.active', function(){
+	$('body').on( 'click', '#configurePanel .js-toggleVisibility.active', function(){
 		var microLayer = gisportal.microLayers[ $(this).data('id') ];
 		gisportal.analytics.events.selectLayer( { name: $(this).data('name') } );
 	})
 	
 	// Removing an indicator panel
-	$('body').on( 'click', '.js-toggleVisibility:not(.active), .js-remove', function(){
-		gisportal.analytics.events.deselectLayer( { name: $(this).data('name') } );
+	$('body').on( 'click', '#configurePanel .js-toggleVisibility:not(.active), .js-remove', function(){
+		var name = $(this).data('name')
+		if( typeof name != "string" )
+			var name = $(this).closest('[data-name]').data('name')
+		
+		var tags = gisportal.groupNames()[ name ]
+		
+		for( i in tags ){
+			if( ! tags.hasOwnProperty( i ) ) continue;
+			
+			var tagOptions = tags[ i ];
+			
+			if( tagOptions.length > 0 ){
+				gisportal.microLayers[ tagOptions[0] ];
+			}
+		}
+		
+		gisportal.analytics.events.deselectLayer( { name: prettyName } );
 	})
 	
 	
@@ -102,90 +150,39 @@ gisportal.analytics.initDomEvents = function(){
 	$('#timeline').on( 'mouseup', function(){
 		gisportal.analytics.events.timelineUpdate();
 		
-		gisportal.layers.forEach(function( layer ){
-			gisportal.analytics.events.layerChange( layer )
-		})
+		for( i in gisportal.layers ){
+			if( gisportal.layers.hasOwnProperty( i ) ){
+				gisportal.analytics.events.layerChange( gisportal.layers[ i ] )
+			}
+		}
 	})
 	
 	
 	// Created a graph button
 	$('body').on( 'click', '.js-create-graph', function(){
-		gisportal.analytics.createGraph( gisportal.layers[ $(this).data('id') ] )
+		gisportal.analytics.events.createGraph( gisportal.layers[ $(this).data('id') ] )
+	})
+	
+	
+	
+	
+	
+	// Changes to an indicators seetings
+	$('body').on( 'change', '.indicator-option select', function(){
+		var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
+		if( layer != null )
+			gisportal.analytics.events.layerChange( layer )
 	})
 }
 
 //Settigns for the custom dimesion ids and what the values shoudl be
-gisportal.analytics.customDimensions  = {
-	layerChange: {
-		/**
-		*  Layout:
-		*     {{ cd_index : ( function(){} | predefined_function )
-		*  Example:
-		*     2 : 'indicator_name' //Call the indicator_name default function and apply to dimension 2
-		*     3 : function( indicator ){ return indicator.name + "-" + indicator.id  } // Sets dimension 3 to the indicator name + id
-		*/
-		8: 'indicator_name',
-		9: 'indicator_id',
-		2: 'indicator_region',
-		3: 'indicator_interval',
-		7: 'indicator_confidence',
-		4: 'indicator_elevation',
-		5: 'indicator_layer_style',
-		10:'indicator_year'
-	},
-	
-	selectionBoxDrawn: {
-		8: 'indicator_name',
-		9: 'indicator_id',
-		2: 'indicator_region',
-		3: 'indicator_interval'
-	},
-	
-	dateRangeUsed: {
-		8: 'indicator_name',
-		9: 'indicator_id',
-		2: 'indicator_region',
-		3: 'indicator_interval'
-	},
-	
-	createGraph: {
-		8: 'indicator_name',
-		9: 'indicator_id',
-		2: 'indicator_region',
-		3: 'indicator_interval',
-		6: 'graph_type'
-	},
-	
-	
-	//Does not a get a true gisportal.layer. Only: { 'name': 'Oxygen' }.
-	selectLayer: {
-		8: 'indicator_name'
-	},
-	
-	//Does not a get a true gisportal.layer. Only: { 'name': 'Oxygen' }.
-	deselectLayer: {
-		8: 'indicator_name'
-	},
-	
-	
-	showLayer: {
-		8: 'indicator_name'
-	},
-	
-	hideLayer: {
-		8: 'indicator_name'
-	},
-	
-	timelineUpdate: {
-		10: 'timeline_year'
-	}
-	
-}
+gisportal.analytics.customDimensions  = gisportal.config.analytics.customDimensions;
+
 
 //A list of common functions used when tracking anayltics
 gisportal.analytics.customDimensionFunctions= {
 	//Indicator nice name
-	'indicator_name': function( indicator ){ return indicator.name },
+	'indicator_name': function( indicator ){ return indicator.name.toLowerCase(); },
 	
 	//Indicator ID
 	'indicator_id': function( indicator ){ return indicator.id },
@@ -201,11 +198,12 @@ gisportal.analytics.customDimensionFunctions= {
 	
 	//Indicator elevation
 	'indicator_elevation': function( indicator ){
-		var elevation = gisportal.layers.Oxy1.openlayers.anID.params.ELEVATION;
-		if( typeof elevation == "string" && elevation != "" )
-			return elevation;
-		else
-			return indicator.elevationDefault;
+		try{
+			var elevation = indicator.openlayers.anID.params.ELEVATION;
+			if( typeof elevation == "string" && elevation != "" )
+				return elevation;
+		}catch(e){};	
+		return indicator.elevationDefault;
 	},
 	
 	//Current year of the data thats showing
@@ -215,11 +213,12 @@ gisportal.analytics.customDimensionFunctions= {
 	
 	//Indicator Layer Style
 	'indicator_layer_style': function( indicator ){
-		var style = gisportal.layers.Oxy1.openlayers.anID.params.STYLES;
-		if( typeof style == "string" && style != ""  )
-			return style;
-		else
-			return indicator.styles[0].Name;
+		try{
+			var style = indicator.openlayers.anID.params.STYLES;
+			if( typeof style == "string" && style != ""  )
+				return style;
+		}catch(e){};	
+		return indicator.styles[0].Name;
 	},
 	
 	//Current year of the time line
@@ -228,7 +227,7 @@ gisportal.analytics.customDimensionFunctions= {
 	},
 	
 	'graph_type': function( indicator ){
-		return $('#tab-' + gisportal.utils.nameToId( indicator.name ) + '-graph-type').val()
+		return $('#tab-' + indicator.id + '-graph-type').val()
 	},
 };
 
@@ -291,7 +290,7 @@ gisportal.analytics.send = function( toSend ){
 }
 
 gisportal.analytics.events = {};
-gisportal.analytics.events.pendingChanges = {};
+gisportal.analytics.pendingChanges = [];
 
 //Events relating to choosing / changing indactor layers
 
@@ -328,10 +327,10 @@ gisportal.analytics.events.hideLayer = function( indicator ){
 	var toSend = {
 		'hitType': 'event',
 		'eventCategory': 'Indicators',
-		'eventAction': 'Remove'
+		'eventAction': 'Hide'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectLayer', indicator );
+	var CDs = gisportal.analytics.getCustomDimenstionValues( 'hideLayer', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -342,10 +341,10 @@ gisportal.analytics.events.showLayer = function( indicator ){
 	var toSend = {
 		'hitType': 'event',
 		'eventCategory': 'Indicators',
-		'eventAction': 'Remove'
+		'eventAction': 'Show'
 	};
 	
-	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectLayer', indicator );
+	var CDs = gisportal.analytics.getCustomDimenstionValues( 'showLayer', indicator );
 	
 	toSend = $.extend( toSend, CDs );
 	gisportal.analytics.send( toSend );
@@ -365,37 +364,90 @@ gisportal.analytics.events.timelineUpdate = function(  ){
 	gisportal.analytics.send( toSend );
 }
 
+
+/*
+* Can be used to make sure events only fire at the end of a "perod"
+* This will stop lots of events being fired for what you would consider a single action.
+* 
+* @param {string} key A key to use for unqiueness
+* @param {Function} func A function to call back, also used for unqiueness
+* @param {int} int A long to wait before a "period" ends
+* @return {boolean} Tells the calling function if it is allowed to run
+*/
+gisportal.analytics.avoidRepeat = function(key,  func, length ){
+	
+	var pendingChanges = gisportal.analytics.pendingChanges;
+	
+	// Look at the current list of pending changes
+	for( i in pendingChanges ){
+		
+		//Find the current list
+		if( pendingChanges[i].key == key ){
+			
+			// Has it been allowed to run ?
+			if( pendingChanges[i].allow == true ){
+				
+				//Remove it from the list
+				pendingChanges.splice( i, 1 );
+				
+				// Tells the calling function to run
+				return true;
+			}
+			
+			// Rest the time out
+			clearTimeout( pendingChanges[i].timeout );
+			
+			pendingChanges[i].timeout = setTimeout( function(){
+				pendingChanges[i].allow = true;
+				pendingChanges[i].func();
+			}, length );
+			
+			// Tells the calling function not to run
+			return false;
+		}
+	}
+	
+	// If its not already in the pendingChanges que add it
+	gisportal.analytics.pendingChanges.push( {
+		func: func,
+		key: key,
+		timeout: -1,
+		allow: false
+	} );
+	
+	// Triggers the timeout
+	gisportal.analytics.avoidRepeat(key,  func, length );
+	
+	// Tells the calling function not to run
+	return false;
+}
+
 /**
  * Logs a change in the gisportal.layer parameters. Includes timesline changes, region, internval, elevation, etc....
  * 
  * @param {gisportal.layer} indicator - The layer object
  * @param {boolean} avoidSetTimeout - Whether or not to avoid the setTimeout. Used internally for self recall.
  */
-gisportal.analytics.events.layerChange = function( indicator, avoidSetTimeout ){
+gisportal.analytics.events.layerChange = function( indicator ){
 	
-	var avoidSetTimeout = avoidSetTimeout || false;
+	var callSelf = function(){
+		gisportal.analytics.events.layerChange( indicator );
+	};
 	
-	if( avoidSetTimeout == false ){
-		//By using time outs it avoids logging states which users are just using as a steping stones to other states
-		
-		if( gisportal.analytics.events.pendingChanges[ 'layerChange-' + indicator.name ] != null )
-			clearTimeout( gisportal.analytics.events.pendingChanges[ 'layerChange-' + indicator.name ] );
-		
-		gisportal.analytics.events.pendingChanges[ 'layerChange-' + indicator.name ] = setTimeout(function(){
-			gisportal.analytics.events.layerChange( indicator, true );
-		}, 10000);
-	}
+	var canRun = gisportal.analytics.avoidRepeat( 'layerChange-' + indicator.name.toLowerCase(),  callSelf , 3000 );
+	
+	if( canRun == false ) return;
 	
 	var toSend = {
 		'hitType': 'event',
-		'eventCategory': 'Graph',
-		'eventAction': 'Updated'
+		'eventCategory': 'Indicators',
+		'eventAction': 'Configure layer'
 	};
 	
 	var CDs = gisportal.analytics.getCustomDimenstionValues( 'layerChange', indicator );
 	
 	toSend = $.extend( toSend, CDs );
-	gisportal.analytics.send('send', toSend );
+	gisportal.analytics.send( toSend );
 }
 
 
@@ -403,11 +455,20 @@ gisportal.analytics.events.layerChange = function( indicator, avoidSetTimeout ){
 
 // Called when a used uses the the draw a bounding box tool
 gisportal.analytics.events.selectionBoxDrawn = function( indicator ){
+	
+	var callSelf = function(){
+		gisportal.analytics.events.selectionBoxDrawn( indicator );
+	};
+	var canRun = gisportal.analytics.avoidRepeat( 'selectionBoxDrawn' + indicator.name, callSelf,  1000 );
+	
+	if( canRun == false ) return;
+	
+	
 	var toSend = {
 		'hitType': 'event',
 		'eventCategory': 'Graph',
 		'eventAction': 'Tool used',
-		'eventLabel': 'Selection box'
+		'eventLabel': 'Selection box drawn'
 	};
 	
 	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectionBoxDrawn', indicator );
@@ -418,11 +479,20 @@ gisportal.analytics.events.selectionBoxDrawn = function( indicator ){
 
 // Called when a user manually inserts a bounding box
 gisportal.analytics.events.selectionBoxTyped = function( indicator ){
+	
+	
+	var callSelf = function(){
+		gisportal.analytics.events.selectionBoxTyped( indicator );
+	};
+	var canRun = gisportal.analytics.avoidRepeat( 'selectionBoxTyped' + indicator.name, callSelf,  1000 );
+	
+	if( canRun == false ) return;
+	
 	var toSend = {
 		'hitType': 'event',
 		'eventCategory': 'Graph',
 		'eventAction': 'Tool used',
-		'eventLabel': 'Selection box'
+		'eventLabel': 'Selection box typed'
 	};
 	
 	var CDs = gisportal.analytics.getCustomDimenstionValues( 'selectionBoxTyped', indicator );
@@ -433,6 +503,14 @@ gisportal.analytics.events.selectionBoxTyped = function( indicator ){
 
 // Called with the date range tool is used
 gisportal.analytics.events.dateRangeUsed = function( indicator ){
+	
+	var callSelf = function(){
+		gisportal.analytics.events.dateRangeUsed( indicator );
+	};
+	var canRun = gisportal.analytics.avoidRepeat( 'dateRangeUsed' + indicator.name, callSelf,  1000 );
+	
+	if( canRun == false ) return;
+	
 	var toSend = {
 		'hitType': 'event',
 		'eventCategory': 'Graph',

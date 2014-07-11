@@ -746,7 +746,9 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
       success: function(data) {
          // Convert the microlayer. 
          // COMMENT: might change the way this works in future.
-         var layer = new gisportal.layer(microlayer, data);     
+         var layer = new gisportal.layer(microlayer, data);
+         
+         
          if (options.show !== false)  { 
             gisportal.checkIfLayerFromState(layer);
             console.log("Adding layer..."); // DEBUG
@@ -754,6 +756,10 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
             console.log("Added Layer"); // DEBUG
          }
          gisportal.configurePanel.refreshIndicators();
+         
+         
+         // Track the indicator change
+         gisportal.analytics.events.layerChange( layer )
       },
       error: function(request, errorType, exception) {
          var data = {

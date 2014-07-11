@@ -139,6 +139,7 @@ gisportal.indicatorsPanel.changeIndicator = function(current, id)  {
          name : name
       });
    }
+   
 };
 
 gisportal.indicatorsPanel.addToPanel = function(data)  {
