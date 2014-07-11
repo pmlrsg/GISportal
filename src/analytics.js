@@ -251,13 +251,19 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet, indicator ){
 			
 			var mapped_name = gisportal.analytics.customDefinitions[ nameSet ][ definitionIndex ];
 			
+			
 			if( typeof mapped_name == "function" ){
+				//If its a function just run it
 				mapped_function = mapped_name;
 			}else if ( mapped_name != void( 0 ) && mapped_name.toString().length > 0 ){
+				//Do we have a default function with the name ?
 				mapped_name = mapped_name.toString();
+				
 				if( gisportal.analytics.customDefinitionFunctions[ mapped_name ] != void( 0 ) ){
+					//Yes then store that
 					var mapped_function  = gisportal.analytics.customDefinitionFunctions[ mapped_name ]
 				}else{
+					// No so jsut make a wrapper and return mapped_name;
 					mapped_function = function(){ return mapped_name; };
 				}
 			}else{
