@@ -251,13 +251,18 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet, indicator ){
 			
 			var mapped_name = gisportal.analytics.customDefinitions[ nameSet ][ definitionIndex ];
 			
-			if( typeof mapped_name == "function" )
+			if( typeof mapped_name == "function" ){
 				mapped_function = mapped_name;
-			else if ( typeof mapped_name == "string" )
-				var mapped_function  = gisportal.analytics.customDefinitionFunctions[ mapped_name ]
-			else
+			}else if ( mapped_name != void( 0 ) && mapped_name.toString().length > 0 ){
+				mapped_name = mapped_name.toString();
+				if( gisportal.analytics.customDefinitionFunctions[ mapped_name ] != void( 0 ) ){
+					var mapped_function  = gisportal.analytics.customDefinitionFunctions[ mapped_name ]
+				}else{
+					mapped_function = function(){ return mapped_name; };
+				}
+			}else{
 				throw "Not a valid key";
-			
+			}
 			var value = mapped_function( indicator );
 			
 			if( value != null && value.toString().length > 0 ){
