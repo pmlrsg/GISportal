@@ -175,7 +175,17 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
             return $(a).data('order') > $(b).data('order');
       }).appendTo('.js-indicators');
 
-
+      if (data.refine)  {
+         var refine = data.refine;
+         var cat = refine.cat;
+         var tag = refine.tag;
+         if (cat && tag)  {
+            var ids = group[cat][tag];
+            group = gisportal.indicatorsPanel.refineData(ids, "none");
+         }
+      }
+      
+      
       if (!refined)  {
          gisportal.indicatorsPanel.renderOptionsTab(data, group);
       }
@@ -266,7 +276,7 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
       for (var cat in group)  {
          group[cat] = gisportal.utils.mustacheFormat(group[cat]);
       }
-
+      
       group.region = group.region || []; 
       indicator.hasInterval = false;
       indicator.hasConfidence = false;

@@ -43,7 +43,7 @@ gisportal.graphs.timeseries = function(data, options)  {
             return d3.time.format('%x')(new Date(d));
          });
 
-         chart.yTickFormat(d3.format("g"));
+         chart.yTickFormat(d3.format(',.1f'));
 
          var panel = $('#graphPanel .panel-container');
          d3.select('[data-id="' + data.coverage + '"] .graph svg')

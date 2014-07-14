@@ -17,8 +17,8 @@
          <li data-name="{{name}}">
             <div class="icon_loading icon-svg grid-cell icon-column">loading</div>
             <p class="grid-cell fill">{{name}}</p>
-            <label for="cat-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke icon-column grid-cell" title="Show/Hide {{name}}">Show/Hide</label>
-            <input type="checkbox" id="cat-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
+            <label for="cat-{{tagModified}}-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke icon-column grid-cell" title="Show/Hide {{name}}">Show/Hide</label>
+            <input type="checkbox" id="cat-{{tagModified}}-toggleVisibility-{{modified}}" data-tag="{{tag}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
          </li>
       {{/indicators}}
    </ul>

@@ -53,10 +53,10 @@
          <p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>
         </div>
          <ul class="examples">
-          <li><a href="?state=" class="example-1"><div class="icon_map icon-svg light">Map</div>Cod in the North East Atlantic</a></li>
-          <li><a href="?state="class="example-2"><div class="icon_analyse icon-svg light">Graph</div>Seasonal changes in Chlorophyll levels in the Med</a></li>
-          <li><a href="?state=" class="example-3"><div class="icon_analyse icon-svg light">Graph</div>Interannual Nitrogen in the Baltic</a></li>
-          <li><a href="?state=" class="example-4"><div class="icon_map icon-svg light">Map</div>Summer zooplankton growth in the Black Sea</a></li>
+            <li><a href="?state=" class="example-1"><div class="icon_map icon-svg light">Map</div><span>Cod in the North East Atlantic</span></a></li>
+            <li><a href="?state="class="example-2"><div class="icon_analyse icon-svg light">Graph</div><span>Seasonal changes in Chlorophyll levels in the Med</span></a></li>
+            <li><a href="?state=" class="example-3"><div class="icon_analyse icon-svg light">Graph</div><span>Interannual Nitrogen in the Baltic</span></a></li>
+            <li><a href="?state=" class="example-4"><div class="icon_map icon-svg light">Map</div><span>Summer zooplankton growth in the Black Sea</span></a></li>
         </ul>
 
         <nav class="start-nav">
@@ -109,14 +109,18 @@
                   <ul class="js-popular panel-list grid-list"></ul>
                </div>
               <!-- These are on the same line to avoid white-space bug with inline-block -->
-              <label class="panel-tab-name active dark" for="tab-ecosystem">Ecosystem Indicators</label><label class="panel-tab-name dark" for="tab-msfd">MSFD Descriptors</label>
+              <label class="panel-tab-name browse-tabs active dark" for="tab-browse-1">1</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-2">2</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-3">3</label>
               <ul class="panel-tabs dark">
                 <li>
-                  <input type="radio" checked id="tab-ecosystem" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                  <input type="radio" checked id="tab-browse-1" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
                   <div class="panel-tab panel-tab-content indicator-select"></div>
                 </li>
                 <li>
-                  <input type="radio" id="tab-msfd" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                  <input type="radio" id="tab-browse-2" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                  <div class="panel-tab panel-tab-content indicator-select"></div>
+                </li>
+                <li>
+                  <input type="radio" id="tab-browse-3" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
                   <div class="panel-tab panel-tab-content indicator-select"></div>
                 </li>
               </ul>

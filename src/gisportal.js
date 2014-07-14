@@ -760,6 +760,8 @@ gisportal.setState = function(state) {
  * This code runs once the page has loaded - jQuery initialised.
  */
 gisportal.main = function() {
+   gisportal.initStart();
+
    // Compile Templates
    gisportal.templates = {};
 
@@ -889,4 +891,18 @@ gisportal.replaceSubtreeIcons = function(el)  {
          e.removeClass('bg-being-removed');
       });
    });
+};
+
+// Should probably be using Mustache for this
+gisportal.initStart = function()  {
+   var list = $('.start .examples li');
+   for (var i = 0; i < list.length; i++)  {
+      var current = gisportal.config.defaultStates[i];
+      var currentLi = $(list[i]);
+      if (!current) $(currentLi).remove();
+      else  {
+         $('a', currentLi).attr("href", current.url);
+         $('span', currentLi).text(current.name);
+      }
+   }
 };

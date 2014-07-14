@@ -74,7 +74,7 @@
 
 .panel-tab-content  {
   /*overflow-y: auto;*/
-  overflow-y: hidden;
+  /*overflow-y: hidden;*/
   position: relative;
   width: 100%;
 }
@@ -104,6 +104,10 @@
   display: inline-block;
   min-height: 40px;
   width: 50%;
+}
+
+.panel-tab-name.browse-tabs  {
+   width: 33.33%;
 }
 
 .panel-tab-name.focus,
