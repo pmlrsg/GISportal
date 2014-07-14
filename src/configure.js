@@ -332,6 +332,7 @@ gisportal.configurePanel.deselectLayer = function(name)  {
    var id = this.hasIndicator(name);
    gisportal.configurePanel.unselectIndicator(name);
    $('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
+   $('.js-configure-indicators [data-name="' + name + '"]').remove();
    // If there is an index then it is a 'real' layer, otherwise just a placeholder 
    if (id)  {
       gisportal.indicatorsPanel.removeIndicators(id);
@@ -356,9 +357,9 @@ gisportal.configurePanel.hasIndicator = function(name)  {
 };
 
 gisportal.configurePanel.unselectIndicator = function(name)  {
-   for (var i in gisportal.configurePanel.selectedIndicators)  {
-      if (gisportal.configurePanel.selectedIndicators[i].name.toLowerCase() === name.toLowerCase()) gisportal.configurePanel.selectedIndicators.pop(i);
-   }
+   _.remove(gisportal.configurePanel.selectedIndicators, function(d)  {
+      return d.name.toLowerCase() === name.toLowerCase();
+   });
 };
 
 
