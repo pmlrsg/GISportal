@@ -300,18 +300,16 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
          if (found === true)  {
             var newId = group.region[0].value[0];
             var newName;
-            if (id === "none" || !id) {
-               newName = data.name || gisportal.microLayers[newId].name.toLowerCase();
-            } 
-            
-            // If id was none, then now use name so the name can be removed from indicators
-            if (newName) id = newName;
-            
-            if (id && newId && id !== newId) {
+
+            if (id !== "none" && id)  {
                gisportal.indicatorsPanel.changeIndicator(id, newId); 
             }
-         }
-          
+            else {
+               newName = data.name || gisportal.microLayers[newId].name.toLowerCase();
+               if (newName) id = newName;
+               gisportal.indicatorsPanel.changeIndicator(id, newId); 
+            } 
+         }                  
       }
       else  {
          indicator.refined = false;
