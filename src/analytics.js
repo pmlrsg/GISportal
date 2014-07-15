@@ -142,7 +142,7 @@ gisportal.analytics.initDomEvents = function(){
          }
       }
       
-      gisportal.analytics.events.deselectLayer( { name: prettyName } );
+      gisportal.analytics.events.deselectLayer( { name: name } );
    })
    
    
