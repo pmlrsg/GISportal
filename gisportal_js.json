@@ -22,6 +22,7 @@
       "src/graphing.js",
       "src/graphs/timeseries.js",
       "src/graphs/histogram.js",
-      "src/utils.js" 
+      "src/utils.js",
+      "src/analytics.js" 
    ]
 }
