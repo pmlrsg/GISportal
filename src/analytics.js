@@ -18,6 +18,8 @@ gisportal.analytics.initGA = function(){
    gisportal.analytics.initDomEvents();
 }
 
+gisportal.analytics.initGA = function() {};
+
 gisportal.analytics.getGetParam = function(val) {
     var result = "Not found",
         tmp = [];
