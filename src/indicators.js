@@ -325,8 +325,8 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
       // TEMP
       $('[data-name="' + indicator.name + '"] #tab--options').prop('checked', true).change();
 
-      if (refined || group.region.length === 1)  {
-         $('button[data-name="' + name.toLowerCase() + '"]').removeClass('hidden');
+      if (refined)  {
+         $('.js-reset-options[data-name="' + name.toLowerCase() + '"]').removeClass('hidden');
       }
       gisportal.indicatorsPanel.checkTabFromState(id);
    });
