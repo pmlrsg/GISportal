@@ -183,6 +183,7 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
          if (cat && tag)  {
             var ids = group[cat][tag];
             group = gisportal.indicatorsPanel.refineData(ids, "none");
+            refined = true;
          }
       }
       
