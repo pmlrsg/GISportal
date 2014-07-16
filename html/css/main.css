@@ -55,6 +55,7 @@ button.brand.with-border  {
 button.secondary  {
    background-color: #b1a7bc;
    border: none;
+   color: #fff;
 }
 
 .text-button  {

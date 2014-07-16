@@ -47,6 +47,10 @@
    background-image: url('../img/icons/dustbin.svg');
 }
 
+.icon_close  {
+   background-image: url('../img/icons/close.svg');
+}
+
 .icon_options  {
    background-image: url('../img/icons/options.svg');
 }

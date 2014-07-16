@@ -103,6 +103,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-share').on('click', function()  {
       gisportal.openid.showShare();
+      gisportal.openid.getLink();
    });
 }
 

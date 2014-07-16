@@ -9,4 +9,16 @@
 .share-container  {
    background-color: #32273d;
    color: #f7f6f8;
+   padding: 25px;
+}
+
+.share-container .js-close-share  {
+   color: #f7f6f8;
+   float: right;
+}
+
+.js-shareurl  {
+   padding: 5px;
+   margin-top: 5px;
+   width: 100%;
 }
