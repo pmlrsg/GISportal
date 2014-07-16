@@ -301,14 +301,16 @@ gisportal.indicatorsPanel.renderOptionsTab = function(data, group) {
             var newId = group.region[0].value[0];
             var newName;
 
-            if (id !== "none" && id)  {
-               gisportal.indicatorsPanel.changeIndicator(id, newId); 
+            if (id !== newId)  {
+               if (id !== "none" && id)  {
+                  gisportal.indicatorsPanel.changeIndicator(id, newId); 
+               }
+               else {
+                  newName = data.name || gisportal.microLayers[newId].name.toLowerCase();
+                  if (newName) id = newName;
+                  gisportal.indicatorsPanel.changeIndicator(id, newId); 
+               } 
             }
-            else {
-               newName = data.name || gisportal.microLayers[newId].name.toLowerCase();
-               if (newName) id = newName;
-               gisportal.indicatorsPanel.changeIndicator(id, newId); 
-            } 
          }                  
       }
       else  {
