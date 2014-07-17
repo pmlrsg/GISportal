@@ -109,7 +109,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
 gisportal.indicatorsPanel.refreshData = function(indicators)  {
    $('.js-indicators').html('');
-   for (var i in indicators) {
+   for (var i = 0; i < indicators.length; i++) {
       this.addToPanel(indicators[i]);
    }
 };

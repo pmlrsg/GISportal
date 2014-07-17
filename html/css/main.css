@@ -56,6 +56,12 @@ button.secondary  {
    background-color: #b1a7bc;
    border: none;
    color: #fff;
+   padding: 5px 10px;
+   border-radius: 5px;
+}
+
+button.secondary svg  {
+   margin: inherit;
 }
 
 .text-button  {
