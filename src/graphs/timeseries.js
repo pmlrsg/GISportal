@@ -49,7 +49,7 @@ gisportal.graphs.timeseries = function(data, options)  {
             return d3.time.format('%x')(new Date(d));
          });
 
-         chart.yTickFormat(d3.format(',.0f'));
+         chart.yTickFormat(d3.format('.0f'));
 
          var panel = $('#graphPanel .panel-container');
          d3.select('[data-id="' + data.coverage + '"] .graph svg')
