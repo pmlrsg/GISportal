@@ -301,7 +301,7 @@ gisportal.layer = function(microlayer, layerData) {
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-         gisportal.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
+         gisportal.timeline.addTimeBar(layer.name, layer.name, startDate, endDate, layer.DTCache);   
         			
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
