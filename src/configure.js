@@ -322,7 +322,7 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    tmp.name = name;
    if (id) tmp.id = id;
    if (options.refine) tmp.refine = options.refine;
-   gisportal.configurePanel.selectedIndicators.push(tmp);
+   gisportal.configurePanel.selectedIndicators.unshift(tmp);
 
    gisportal.configurePanel.refreshIndicators();
 };
