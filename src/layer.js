@@ -311,7 +311,18 @@ gisportal.layer = function(microlayer, layerData) {
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
-      }   
+      } 
+      
+      
+      var index = _.findIndex(gisportal.configurePanel.selectedIndicators, function(d) { return d.name.toLowerCase() === layer.name.toLowerCase();  });
+      /* var mapIndex = _.findIndex(map.layers, function(d) { return d.url === gisportal.layers.Oxygen.wmsURL; });
+      var layer = map.layers[mapIndex];
+
+      var firstLayerIndex = _.findIndex(map.layers, function(d) { return d.controlID === 'opLayers' });
+
+      map.setLayerIndex(layer, firstLayerIndex + index );
+      */
+      gisportal.setLayerIndex(layer, gisportal.configurePanel.selectedIndicators.length - index);
       
    };
     

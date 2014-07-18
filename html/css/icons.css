@@ -97,12 +97,10 @@
    opacity: 0.3;
 }
 
-.icon_hide.active,
 .icon_show  {
    background-image: url('../img/icons/show.svg');
 }
 
-.icon_show.active,
 .icon_hide  {
    background-image: url('../img/icons/hide.svg');
 }

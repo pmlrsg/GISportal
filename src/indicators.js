@@ -220,7 +220,7 @@ gisportal.indicatorsPanel.selectLayer = function(id)  {
    var microlayer = gisportal.microLayers[id];
    var options = {};
    if (microlayer)  {
-      $('[data-id="' + id + '"] button').toggleClass('active', true);
+      //$('[data-id="' + id + '"] .icon_show').toggleClass('active', true);
       var name = microlayer.name.toLowerCase();
       var index = _.indexOf(gisportal.configurePanel.selectedIndicators, name);
       if (typeof gisportal.configurePanel.selectedIndicators[index] === "string") {
@@ -239,14 +239,14 @@ gisportal.indicatorsPanel.selectLayer = function(id)  {
 gisportal.indicatorsPanel.hideLayer = function(id)  {
    if (gisportal.layers[id])  {
       gisportal.layers[id].setVisibility(false);
-      $('[data-id="' + id + '"] button').toggleClass('active', false);   
+      $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', false);   
    }
 };
 
 gisportal.indicatorsPanel.showLayer = function(id)  {
     if (gisportal.layers[id])  {
       gisportal.layers[id].setVisibility(true);
-      $('[data-id="' + id + '"] button').toggleClass('active', true);   
+      $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', true);   
    }  
 };
 
