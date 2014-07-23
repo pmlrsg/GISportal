@@ -24,9 +24,9 @@ gisportal.config.analytics = {
         "cd8": 'indicator_confidence',
         "cd9": 'indicator_year',
         "cd10" : 'click_location',
-        'cm1' : "used_in_layer"
+        'cm1' : "used_in_layer",
         'cm2': "used_in_graph" // Used in layer
-  }
+  },
   
   customDefinitionsUsedInEvents: {
      layerChange: [
