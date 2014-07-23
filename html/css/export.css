@@ -1,0 +1,32 @@
+/*------------------------------------*\
+    Export
+\*------------------------------------*/
+
+/* Ugh, way too over specified */
+.js-tab-analysis .grid-list.panel-list li.export-button  {
+   align-items: center;
+   padding: 9px;
+}
+
+.export  {
+   background-color: rgba(0,0,0,0.8);
+}
+
+.export-container  {
+   background-color: #32273d;
+   color: #f7f6f8;
+   padding: 25px;
+}
+
+.export li  {
+   padding-bottom: 5px;
+}
+
+.export a  {
+   color: #fff;
+}
+
+.export .text-button  {
+   color: #fff;
+   float: right;
+}
