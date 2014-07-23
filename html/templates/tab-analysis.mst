@@ -39,8 +39,9 @@
          <button data-id="{{id}}" class="brand create-graph js-create-graph">Create graph</button>
       </div>
       </li>
-      <li>
-         <button class="brand secondary js-export-button" data-id="{{id}}">Export selected</button>
+      <li class="export-button">
+         <label for="export-{{modified}}">Export/download selected data</label>
+         <button id="export-{{modified}}" class="brand secondary js-export-button" data-id="{{id}}">Export</button>
       </li>
    </ol>
 </div>

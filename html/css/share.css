@@ -2,7 +2,7 @@
     Share
 \*------------------------------------*/
 
-.share-map-button  {
+.share-map-button {
    background: #fff;
    border-top: 1px solid #e0dce4;
    padding: 9px;
@@ -11,7 +11,8 @@
    align-items: center;
 }
 
-.share-map-button label  {
+.share-map-button label,
+.export-button label  {
    flex: 1;
 }
 

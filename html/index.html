@@ -46,9 +46,9 @@
    
    <!-- The start page,
          this should load before anything else. -->
-    <div class="start overlay"  data-page_location="Intro Panel" >
+    <div class="start overlay">
       <div class="start-container overlay-container">
-        <div class="intro-text" >
+        <div class="intro-text">
          <p>The Marine OPEC portal provides model simulated data for European Regional Seas.</p>
          <p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>
         </div>
@@ -76,7 +76,7 @@
    <div id="map" class=""></div>
 
    <!-- The Timeline -->
-   <div class="timeline-container" data-page_location="Timeline" >
+   <div class="timeline-container">
       <div class="timeline-inner grid">
          <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
          <div id="timeline" class="grid-cell fill"></div>
@@ -88,7 +88,7 @@
    <button class="js-show-tools show-tools hidden"><span class="icon_show"></span>Show tools</button>
    
    <!-- Configure Your Map panel  -->
-   <div id="configurePanel" class="panel active" data-page_location="Choose Indicators" >
+   <div id="configurePanel" class="panel active">
       <div class="panel-header">
          <h2>Choose your indicators</h2>
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
@@ -100,33 +100,33 @@
          
          <!-- These are on the same line to avoid white-space bug with inline-block -->
         <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
-        <ul class="panel-tabs" data-page_location="Browse" >
+        <ul class="panel-tabs">
           <li>
             <input type="radio" checked id="tab-browse" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
             <div class="panel-tab">
                <div class="panel-tab-content">
                   <h3>Popular indicators</h3>
-                  <ul class="js-popular panel-list grid-list" data-page_location="Popular" ></ul>
+                  <ul class="js-popular panel-list grid-list"></ul>
                </div>
               <!-- These are on the same line to avoid white-space bug with inline-block -->
               <label class="panel-tab-name browse-tabs active dark" for="tab-browse-1">1</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-2">2</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-3">3</label>
               <ul class="panel-tabs dark">
-                <li data-page_location="Ecosystem" >
+                <li>
                   <input type="radio" checked id="tab-browse-1" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
                   <div class="panel-tab panel-tab-content indicator-select"></div>
                 </li>
-                <li data-page_location="MSFD" >
+                <li>
                   <input type="radio" id="tab-browse-2" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
                   <div class="panel-tab panel-tab-content indicator-select"></div>
                 </li>
-                <li data-page_location="Region" >
+                <li>
                   <input type="radio" id="tab-browse-3" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
                   <div class="panel-tab panel-tab-content indicator-select"></div>
                 </li>
               </ul>
             </div>
           </li>
-          <li data-page_location="Search" >
+          <li>
             <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
             <div class="panel-tab full-height">
               <input type="search" placeholder="Search for an indicator" class="js-search search">
@@ -141,7 +141,7 @@
       </div>
     </div>
 
-    <div id="indicatorsPanel" class="panel hidden" data-page_location="Indicators Panel" >
+    <div id="indicatorsPanel" class="panel hidden">
       <div class="panel-header">
          <h2>Map Tools</h2>
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
@@ -151,7 +151,7 @@
         </ul>
         <div class="share-map-button">
            <label for="share-map">Share this map with colleagues</label>
-           <button id="share-map" class="js-share secondary"><span class="icon_share icon-svg light"></span>Share</button>
+           <button id="share-map" class="js-share brand secondary"><span class="icon_share icon-svg light"></span>Share</button>
         </div>
       </div>
       <div class="panel-footer">
