@@ -70,3 +70,4 @@ gisportal.graphs.addGraph = function(data, options)  {
    });
 
 }
+
