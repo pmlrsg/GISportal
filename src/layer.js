@@ -770,7 +770,7 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
          
          
          // Track the indicator change
-         //gisportal.analytics.events.layerChange( layer )
+         gisportal.analytics.events.layerChange( layer )
       },
       error: function(request, errorType, exception) {
          var data = {

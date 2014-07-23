@@ -45,6 +45,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
       }
 
       gisportal.configurePanel.deselectLayer($(this).data('name'));
+      
       $(this).parents('li').remove();
 
    });

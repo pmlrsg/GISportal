@@ -18,10 +18,9 @@ gisportal.analytics.initGA = function(){
    gisportal.analytics.initDomEvents();
 }
 
-gisportal.analytics.initGA = function() {};
 
 gisportal.analytics.getGetParam = function(val) {
-    var result = "Not found",
+    var result = "",
         tmp = [];
     location.search
     //.replace ( "?", "" ) 
@@ -125,27 +124,7 @@ gisportal.analytics.initDomEvents = function(){
       var microLayer = gisportal.microLayers[ $(this).data('id') ];
       gisportal.analytics.events.selectLayer( { name: $(this).data('name') } );
    })
-   
-   // Removing an indicator panel
-   $('body').on( 'click', '#configurePanel .js-toggleVisibility:not(.active), .js-remove', function(){
-      var name = $(this).data('name')
-      if( typeof name != "string" )
-         var name = $(this).closest('[data-name]').data('name')
-      
-      var tags = gisportal.groupNames()[ name ]
-      
-      for( i in tags ){
-         if( ! tags.hasOwnProperty( i ) ) continue;
-         
-         var tagOptions = tags[ i ];
-         
-         if( tagOptions.length > 0 ){
-            gisportal.microLayers[ tagOptions[0] ];
-         }
-      }
-      
-      gisportal.analytics.events.deselectLayer( { name: name } );
-   })
+
    
    
    // Timeline events
@@ -179,6 +158,7 @@ gisportal.analytics.initDomEvents = function(){
 
 //Settigns for the custom dimesion ids and what the values shoudl be
 gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
+gisportal.analytics.customDefinitionsUsedInEvents  = gisportal.config.analytics.customDefinitionsUsedInEvents;
 
 
 //A list of common functions used when tracking anayltics
@@ -231,6 +211,34 @@ gisportal.analytics.customDefinitionFunctions= {
    'graph_type': function( indicator ){
       return $('#tab-' + indicator.id + '-graph-type').val()
    },
+   'used_in_layer': function( indicator ){
+      return 1;
+   },
+   'used_in_graph': function( indicator ){
+      return 1;
+   },
+   
+   'click_location': function(  ){
+      if( ! ( window.event instanceof MouseEvent) ) return;
+      var click = window.event;
+      var target = window.event.target
+      
+      function getPath( element, chain ){
+          element = $(element);
+          if( element.is( window.document )) return;
+          
+           var location = element.data( 'page_location' );
+         if( location != null && location != "" )
+            chain.unshift( location );
+            
+         getPath( element.parent(), chain );
+      }
+      
+      var chain = [];
+      getPath( target, chain );
+      console.log( 'Click location:' + chain.join(' >> ') );
+      return chain.join(' >> ');
+   },
 };
 
 
@@ -244,54 +252,40 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet, indicator ){
    var indicator = indicator || {};
    var toSend = {};
    
-   // Add our custom dimesions 
-   var definitionIndexKeys = Object.keys( gisportal.analytics.customDefinitions[ nameSet ] );
-   for( i in definitionIndexKeys){
-      var  definitionIndex = definitionIndexKeys[ i ];
    
+   gisportal.analytics.customDefinitionsUsedInEvents[ nameSet ].forEach(function( customDefinitionKey ){
       try{
+         var valueFunction = gisportal.analytics.customDefinitionFunctions[ customDefinitionKey ];
+         var value = valueFunction( indicator );
          
-         var mapped_name = gisportal.analytics.customDefinitions[ nameSet ][ definitionIndex ];
-         
-         
-         if( typeof mapped_name == "function" ){
-            //If its a function just run it
-            mapped_function = mapped_name;
-         }else if ( mapped_name != void( 0 ) && mapped_name.toString().length > 0 ){
-            //Do we have a default function with the name ?
-            mapped_name = mapped_name.toString();
-            
-            if( gisportal.analytics.customDefinitionFunctions[ mapped_name ] != void( 0 ) ){
-               //Yes then store that
-               var mapped_function  = gisportal.analytics.customDefinitionFunctions[ mapped_name ]
-            }else{
-               // No so jsut make a wrapper and return mapped_name;
-               mapped_function = function(){ return mapped_name; };
-            }
-         }else{
-            throw "Not a valid key";
+         var definitionIndex = null;
+         for( var i in gisportal.analytics.customDefinitions ){
+            if( gisportal.analytics.customDefinitions.hasOwnProperty( i ) )
+               if( gisportal.analytics.customDefinitions[i] == customDefinitionKey )
+                  var definitionIndex = i;
          }
-         var value = mapped_function( indicator );
+         if( definitionIndex == null ) throw "No custom definition defined.";
          
          if( value != null && value.toString().length > 0 ){
             if( definitionIndex.match( /cd[0-9]{1,2}/ ) )
                definitionIndex = 'dimension' + definitionIndex.substr(2);
             else if( definitionIndex.match( /cm[0-9]{1,2}/ ) )
                definitionIndex = 'metric' + definitionIndex.substr(2);
-               
+                  
             toSend[ definitionIndex ] = value.toString();
          }
       }catch(e){
-         console.log( "Error processing definition " + definitionIndex + ": " + e.toString() );
-      };
-      
-   }
+          console.log( "Error processing definition " + customDefinitionKey + ": " + e.toString() );
+      }
+   })
    
    return toSend;
    
 }
 
 gisportal.analytics.send = function( toSend ){
+   if( gisportal.config.analytics.active == false ) return;
+   
    if( toSend['eventLabel'] == void( 0 ) ){
       var buffer = [];
       
@@ -398,12 +392,13 @@ gisportal.analytics.avoidRepeat = function(key,  func, length ){
    
    // Look at the current list of pending changes
    for( i in pendingChanges ){
+      var change = pendingChanges[i];
       
       //Find the current list
-      if( pendingChanges[i].key == key ){
+      if( change.key == key ){
          
          // Has it been allowed to run ?
-         if( pendingChanges[i].allow == true ){
+         if( change.allow == true ){
             
             //Remove it from the list
             pendingChanges.splice( i, 1 );
@@ -413,11 +408,11 @@ gisportal.analytics.avoidRepeat = function(key,  func, length ){
          }
          
          // Rest the time out
-         clearTimeout( pendingChanges[i].timeout );
+         clearTimeout( change.timeout );
          
-         pendingChanges[i].timeout = setTimeout( function(){
-            pendingChanges[i].allow = true;
-            pendingChanges[i].func();
+         change.timeout = setTimeout( function(){
+            change.allow = true;
+            change.func();
          }, length );
          
          // Tells the calling function not to run
@@ -447,6 +442,7 @@ gisportal.analytics.avoidRepeat = function(key,  func, length ){
  * @param {boolean} avoidSetTimeout - Whether or not to avoid the setTimeout. Used internally for self recall.
  */
 gisportal.analytics.events.layerChange = function( indicator ){
+   if( gisportal.config.analytics.active == false ) return;
    
    var callSelf = function(){
       gisportal.analytics.events.layerChange( indicator );
