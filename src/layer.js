@@ -412,7 +412,7 @@ gisportal.layer = function(microlayer, layerData) {
             } 
             //-----------------------------------------------------------------       
             
-            layer.setVisibility(layer.selected);
+            layer.setVisibility(layer.isVisible);
             console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
          }
          else {
@@ -698,7 +698,8 @@ gisportal.addLayer = function(layer, options) {
       layer.maxScaleVal = gisportal.layers[layer.id].maxScaleVal;
       gisportal.scalebars.updateScalebar(layer.id);
    }
-   
+  
+   layer.isVisible = options.visible; 
    layer.select();
 
    /* loading icon here */
