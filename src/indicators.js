@@ -243,6 +243,7 @@ gisportal.indicatorsPanel.selectLayer = function(id)  {
          });
          gisportal.configurePanel.selectedIndicators[index] = { name : name, id : id };
       }
+      options.visible = true;
       gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer, options);
    }
 };
