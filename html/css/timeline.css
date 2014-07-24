@@ -26,6 +26,10 @@ svg {
    width: 100%;
 }
 
+.main {
+   pointer-events: bounding-box;
+}
+
 .main text {
    text-anchor: start;
    fill: #b1a7bc;
