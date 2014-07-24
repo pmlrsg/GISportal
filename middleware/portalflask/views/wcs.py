@@ -258,7 +258,7 @@ def getPointData(params, method):
 def toCSV(data):
    import csv
    import json
-
+   import collections
 
    temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
 
@@ -269,10 +269,12 @@ def toCSV(data):
 
    csv_data.writerow(['date','std','max','min','median','mean'])
 
-   for row in data.iterkeys():
+   ordered = collections.OrderedDict(sorted(data.items())) 
+
+   for row in ordered.iterkeys():
       row_data = [row] # First column should be date (the row key)
-      for col in data[row].iterkeys():
-         row_data.append(data[row][col])
+      for col in ordered[row].iterkeys():
+         row_data.append(ordered[row][col])
       csv_data.writerow(row_data)
    
    current_app.logger.debug(csv_data)
