@@ -174,6 +174,7 @@ Procede to make this list **IN THIS ORDER**:
 - Graph type
 - Confidence
 - Year
+- Click Location
 
 **Custom Metrics**
 In the left hand panel select Custom Metrics and again make the following in the same order:
@@ -198,7 +199,8 @@ Go over each custom definition key in the config file and change it the one in y
  #cd6 - Layer Style  
  #cd7 - Graph type  
  #cd8 - Confidence  
- #cd9 - Year  
+ #cd9 - Year   
+ #cd10 - Click Location  
 
 ***Metrics:***  
  #cm1 - Used in graph  

@@ -301,7 +301,7 @@ gisportal.layer = function(microlayer, layerData) {
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-         gisportal.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
+         gisportal.timeline.addTimeBar(layer.name, layer.name, startDate, endDate, layer.DTCache);   
         			
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
@@ -311,7 +311,18 @@ gisportal.layer = function(microlayer, layerData) {
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
-      }   
+      } 
+      
+      
+      var index = _.findIndex(gisportal.configurePanel.selectedIndicators, function(d) { return d.name.toLowerCase() === layer.name.toLowerCase();  });
+      /* var mapIndex = _.findIndex(map.layers, function(d) { return d.url === gisportal.layers.Oxygen.wmsURL; });
+      var layer = map.layers[mapIndex];
+
+      var firstLayerIndex = _.findIndex(map.layers, function(d) { return d.controlID === 'opLayers' });
+
+      map.setLayerIndex(layer, firstLayerIndex + index );
+      */
+      gisportal.setLayerIndex(layer, gisportal.configurePanel.selectedIndicators.length - index);
       
    };
     
@@ -401,7 +412,7 @@ gisportal.layer = function(microlayer, layerData) {
             } 
             //-----------------------------------------------------------------       
             
-            layer.setVisibility(layer.selected);
+            layer.setVisibility(layer.isVisible);
             console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
          }
          else {
@@ -687,7 +698,8 @@ gisportal.addLayer = function(layer, options) {
       layer.maxScaleVal = gisportal.layers[layer.id].maxScaleVal;
       gisportal.scalebars.updateScalebar(layer.id);
    }
-   
+  
+   layer.isVisible = options.visible; 
    layer.select();
 
    /* loading icon here */
@@ -759,7 +771,7 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
          
          
          // Track the indicator change
-         //gisportal.analytics.events.layerChange( layer )
+         gisportal.analytics.events.layerChange( layer )
       },
       error: function(request, errorType, exception) {
          var data = {

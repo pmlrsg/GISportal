@@ -1,5 +1,6 @@
 <div data-id="{{id}}" class="graph">
    <h2>{{title}} ({{units}})</h2>
    <div class="graph"><svg></svg></div>
+   <button class="brand secondary js-export-button" data-id="{{id}}"><span class="icon_download icon-svg light"></span>Export</button>
    <div class="graph-data-provider-logo">{{providerLogo}}</div>
 </div>

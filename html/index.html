@@ -94,10 +94,6 @@
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
       </div>
       <div class="panel-container">
-         <div class="build-map">
-            <ul class="js-configure-indicators"></ul>
-         </div>
-         
          <!-- These are on the same line to avoid white-space bug with inline-block -->
         <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
         <ul class="panel-tabs">
@@ -149,8 +145,10 @@
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
         </ul>
-        <label class="hidden" for="share-map">Share this map with colleagues</label>
-        <button id="share-map" class="js-share hidden secondary"><span class="icon_share light"></span>Share</button>
+        <div class="share-map-button">
+           <label for="share-map">Share this map with colleagues</label>
+           <button id="share-map" class="js-share brand secondary"><span class="icon_share icon-svg light"></span>Share</button>
+        </div>
       </div>
       <div class="panel-footer">
          <button class="brand with-border js-start-again">Add Indicators</button>
@@ -160,13 +158,14 @@
    <!-- The share box. -->
     <div class="share overlay hidden">
       <div class="share-container overlay-container">
-         <button class="js-close-share">Close</button>
-         <div class="js-logged-in hidden">
+         <button class="js-close-share text-button">Close</button>
+         <div class="js-logged-in hidden"></div>
+         <div>
             <h2>Share this map</h2>
             <p>Here's a link to this map. Just copy and paste anywhere</p>
-            <input class="js-shareurl">
+            <input class="js-shareurl" placeholder="Loading...">
          </div>
-         <div class="js-logged-out"></div>
+         <div class="js-logged-out hidden"></div>
       </div>
     </div>
 
@@ -186,7 +185,20 @@
         <!--<label for="share-map">Share this graph with colleagues</label>
         <button id="share-map" class="js-share">Share</button> -->
       </div>
-    </div> 
+    </div>
+
+   <div class="export overlay hidden">
+      <div class="export-container overlay-container">
+         <button class="js-close-export text-button">Close</button>
+         <div>
+            <h2>Export the data</h2>
+            <ul>
+               <li><a id="export-csv" href="" download="processed.csv">Processed data - A CSV of the data used in the graph</a></li>
+               <li><a id="export-netcdf" href="" download="raw.nc">Raw data - The NetCDF for the selected area</a></li>
+            </ul>
+         </div>
+      </div>
+   </div> 
 
     <!-- Map controls -->
     <div class="map_controls">

@@ -43,8 +43,16 @@
    background-image: url('../img/icons/show.svg');
 }
 
+.icon_download  {
+   background-image: url('../img/icons/download.svg');
+}
+
 .icon_remove  {
    background-image: url('../img/icons/dustbin.svg');
+}
+
+.icon_close  {
+   background-image: url('../img/icons/close.svg');
 }
 
 .icon_options  {
@@ -93,12 +101,10 @@
    opacity: 0.3;
 }
 
-.icon_hide.active,
 .icon_show  {
    background-image: url('../img/icons/show.svg');
 }
 
-.icon_show.active,
 .icon_hide  {
    background-image: url('../img/icons/hide.svg');
 }

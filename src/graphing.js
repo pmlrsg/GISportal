@@ -67,6 +67,8 @@ gisportal.graphs.addGraph = function(data, options)  {
       $('.graph-holder').html(rendered);    
       $('.graph-wait-message').toggleClass("hidden", true);   
       gisportal.graphs.create(data, options);
+      gisportal.replaceAllIcons();
    });
 
 }
+

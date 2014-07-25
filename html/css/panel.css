@@ -61,6 +61,10 @@
     overflow-y: auto;
  }
 
+#configurePanel .panel-container  {
+   padding-top: 10px;
+}
+
 .panel-footer  {
   padding-top: 10px;
 }

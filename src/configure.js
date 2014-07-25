@@ -303,6 +303,8 @@ gisportal.configurePanel.search = function(val)  {
 };
 
 gisportal.configurePanel.selectLayer = function(name, options)  {
+   gisportal.analytics.events.selectLayer( { name: name } );
+   
    var options = options || {};
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);  
@@ -322,12 +324,16 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    tmp.name = name;
    if (id) tmp.id = id;
    if (options.refine) tmp.refine = options.refine;
-   gisportal.configurePanel.selectedIndicators.push(tmp);
+   gisportal.configurePanel.selectedIndicators.unshift(tmp);
 
    gisportal.configurePanel.refreshIndicators();
+
+   this.buildMap();
 };
 
 gisportal.configurePanel.deselectLayer = function(name)  {
+   gisportal.analytics.events.deselectLayer( { name: name } );
+   
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);
    gisportal.configurePanel.unselectIndicator(name);
@@ -337,7 +343,8 @@ gisportal.configurePanel.deselectLayer = function(name)  {
    if (id)  {
       gisportal.indicatorsPanel.removeIndicators(id);
    }
-   gisportal.configurePanel.refreshIndicators(); 
+   gisportal.configurePanel.refreshIndicators();
+   
 
 };
 
