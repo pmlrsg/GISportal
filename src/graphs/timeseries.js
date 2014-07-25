@@ -60,7 +60,7 @@ gisportal.graphs.timeseries = function(data, options)  {
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
               .datum(lines())  
-              .attr("width", $(panel).innerWidth() - 50).attr("height", $(panel).innerHeight() - 40 )
+              .attr("width", $(panel).innerWidth() - 50).attr("height", $(panel).innerHeight() - 90 )
               //.attr("style", "width: 100%; height: 100%;")
               .call(chart);
          //chart.xScale(d3.time.scale());

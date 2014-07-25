@@ -69,7 +69,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
    });
    
 
-   $('.js-indicators').on('click', '.js-export-button', function()  {
+   $('.js-indicators, #graphPanel').on('click', '.js-export-button', function()  {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.exportData(id);
       $('.export.overlay').toggleClass('hidden', false);
@@ -369,6 +369,8 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
       $('[data-id="' + id + '"] .icon_analyse').toggleClass('hidden', false);
       
       gisportal.indicatorsPanel.checkTabFromState(id);
+
+      gisportal.replaceAllIcons();
    });
 };
 

@@ -43,6 +43,10 @@
    background-image: url('../img/icons/show.svg');
 }
 
+.icon_download  {
+   background-image: url('../img/icons/download.svg');
+}
+
 .icon_remove  {
    background-image: url('../img/icons/dustbin.svg');
 }
