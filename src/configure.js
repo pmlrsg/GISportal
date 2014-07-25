@@ -327,6 +327,8 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    gisportal.configurePanel.selectedIndicators.unshift(tmp);
 
    gisportal.configurePanel.refreshIndicators();
+
+   this.buildMap();
 };
 
 gisportal.configurePanel.deselectLayer = function(name)  {
