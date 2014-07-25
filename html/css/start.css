@@ -1,0 +1,56 @@
+/*------------------------------------*\
+    Start Page
+\*------------------------------------*/
+
+.start  {
+   background: #635078 url('/img/PML-MAP-2@2x.png') no-repeat top left / cover;
+   z-index: 1000;
+   overflow-y: auto;
+}
+
+.start-container  {
+   background: #32273d;
+   color: #f7f6f8;
+}
+
+.intro-text  {
+   padding: 25px;
+   padding-bottom: 10px;
+}
+
+.intro-text p  {
+   padding-bottom: 10px;
+}
+
+.start-nav  {
+   background: #251d2d;
+   padding: 20px 15px;
+   text-align: right;
+}
+
+.examples a   {
+   line-height: 45px;
+   display: block;
+   padding-left: 17px;
+}
+
+.examples .icon-svg  {
+   opacity: 1;
+   margin-right: 10px;
+}
+
+.example-1  {
+   background: #643d72;
+}
+
+.example-2  {
+   background: #683766;
+}
+
+.example-3  {
+   background: #47355b;
+}
+
+.example-4  {
+   background: #473d72;
+}

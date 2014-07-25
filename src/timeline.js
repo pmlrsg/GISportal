@@ -76,7 +76,7 @@ gisportal.TimeLine = function(id, options) {
          bottom: 0,
          left: 0
       },
-      barHeight: 20,
+      barHeight: 5,
       barMargin: 4,
       timebars: []
    };
@@ -108,7 +108,6 @@ gisportal.TimeLine = function(id, options) {
    // Set up initial dynamic dimensions
    this.reHeight();
    this.reWidth();
-   
    //--------------------------------------------------------------------------
    
    // Set initial x scale
@@ -133,16 +132,12 @@ gisportal.TimeLine = function(id, options) {
    var isDragging = false;
    
    this.clickDate = function(d, i) {
-      console.log(d);
-      console.log(i);
-      console.log(this);
       // Stop the event firing if the drag event is fired.
       if(isDragging) {
          //isDragging = false;
          return;
       }
       
-
       var x = d3.mouse(this)[0];       
       
       // Prevent dragging the selector off-scale
@@ -152,18 +147,8 @@ gisportal.TimeLine = function(id, options) {
       self.draggedDate = self.xScale.invert(x);
       
       // Move the graphical marker
-      self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
       
-      self.selectedDate = self.draggedDate;
-      
-      // **Update the OPEC map**
-      // Change the selected date in the datepicker control      
-      $('#viewDate').datepicker('setDate', self.selectedDate);
-      
-      // Filter the layer data to the selected date      
-      gisportal.filterLayersByDate(self.selectedDate);
-      console.log('--->New clicked date/time = ' + self.selectedDate);  // Debugging
-      $('#viewDate').change();
+      self.setDate(self.draggedDate);
    };
   
 
@@ -225,19 +210,11 @@ gisportal.TimeLine = function(id, options) {
       
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
-      console.log('--->New drag date/time = ' + self.draggedDate);  // Debugging
+      self.showDate(self.draggedDate);   
    };
    
    this.dragDateEnd = function() {
-      self.selectedDate = self.draggedDate;
-      
-      // **Update the OPEC map**
-      // Change the selected date in the datepicker control
-      $('#viewDate').datepicker('setDate', self.selectedDate);
-      
-      // Filter the layer data to the selected date
-      gisportal.filterLayersByDate(self.selectedDate);
-      console.log('--->New selected date/time = ' + self.selectedDate);  // Debugging
+      self.setDate(self.draggedDate);
    };
 
    // Initialise the selected date-time marker and handle dragging via a callback
@@ -254,23 +231,6 @@ gisportal.TimeLine = function(id, options) {
 
    // Initialise the time bar label area to the left of the timeline
    this.labelArea = this.main.append('svg:g');
-//    
-   // $('#' + this.id + ' button').button({ icons: { primary: 'ui-icon-triangle-1-s'} })
-      // .click(function() {
-         // self.hide(); 
-      // });
-
-   $('#' + this.id + ' .togglePanel')
-      .button({  label:'Toggle Panel', icons: { primary: 'ui-icon-triangle-1-s'}, 'text': false })
-      .click(function() {
-         if ($(this).parent().css('bottom') != "0px") {
-            self.show();
-         }
-         else {
-            self.hide();
-         }
-      });
-
 
    // Draw the graphical elements
    self.redraw();
@@ -321,84 +281,6 @@ gisportal.TimeLine.prototype.redraw = function() {
    }
 
    //--------------------------------------------------------------------------
-   
-   // These are used to create the full width bars of the timeline
-   // It uses lines to depict the separate timelines and transparent rectangles
-   // so that each timeline can have its own event handlers.
-   // Previously it was using just lines but obviously you cannot add event handlers
-   // to empty space.
-   
-   // Draw the separator lines between time bars
-   this.sepLines = this.separatorArea.selectAll('rect').data(this.timebars);
-   
-   // New separator lines arriving
-   this.sepLines.enter().append('svg:line')
-      .attr('x1', 0)
-      .attr('x2', this.width)
-      .attr('y1', function(d, i) { return d3.round(self.yScale(i) ); })
-      .attr('y2', function(d, i) { return d3.round(self.yScale(i) ); })
-      .attr('class', 'separatorLine');
-   
-	var dragging = null;	
-   this.sepLines.enter().append('svg:rect')
-      .attr('x', 0)
-      .attr('y', function(d, i) { d.y = d3.round(self.yScale(i) + 0.5) + "px"; return d3.round(self.yScale(i) + 0.5); })
-      .attr('height', function(d, i) { return d3.round(self.barHeight + (self.barMargin*2)); })
-      .attr('width', this.width)
-      .attr('class', function(d,i) { return 'timeline-bar' + ' bar-type--' + d.type; })
-      .style('fill', 'transparent')
-      .on('click', function(d)  {
-         if (d.type == 'range')  {
-            d3.event.stopPropagation();
-            d3.event.preventDefault();
-         }
-      })
-      .on('mousedown', function(d) {
-         if(d.type == 'range') {
-            d3.event.stopPropagation();
-            if (dragging === null)  {
-               // There will be a maximum of 1 being dragged
-               d.selectedStart = self.xScale.invert(d3.mouse(this)[0]);
-               dragging = d.name;
-            }
-      	}  
-      })
-      .on('mousemove', function(d) {
-			if(d.type == 'range') {
-            d3.event.stopPropagation();
-            // Check if mousemove should drag the rectangle
-            if (dragging !== null)  {
-               self.rangebars.filter(function(d) { return d.name === dragging; })[0].selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
-               self.redraw();  
-            }
-         }
-      })
-		.on('mouseup', function(d) {
-			if(d.type == 'range') {
-            d3.event.stopPropagation();
-            d3.event.preventDefault();
-            if (dragging !== null)  {
-               d = self.rangebars.filter(function(d) { return d.name === dragging; })[0];
-               var selectedEnd = self.xScale.invert(d3.mouse(this)[0]);
-               if (new Date(d.selectedStart) > new Date(selectedEnd))  {
-                  d.selectedEnd = d.selectedStart;
-                  d.selectedStart = selectedEnd;
-               }
-               else  {
-                  selectedEnd = selectedEnd;
-               }
-               $(gisportal).trigger('rangeUpdate.gisportal', [d]);
-               dragging = null;
-               self.redraw();  
-            }
-         }
-		});
-//       
-   // // Separator line removal
-   this.sepLines.exit().remove();
-   
-   //--------------------------------------------------------------------------
-
    // Draw the time bars
    // Note: Had to use closures to move variables from each into the .attr etc.
    this.bars = this.barArea.selectAll('rect').data(this.timebars);
@@ -446,7 +328,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             // Time Bar
             d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
               .enter().append('svg:line')
-               .attr('stroke', function() { return d1.colour || self.colours(i1); })
+               .attr('stroke', '#fff')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
@@ -531,21 +413,10 @@ gisportal.TimeLine.prototype.redraw = function() {
    // Draw the selected date-time line
    this.selectedDateLine
       .attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); }).attr('y', 2)
-      .attr('width', 4).attr('height', self.height - 2);
-   
-   // Draw the time bar labels
-   this.labelArea.selectAll('text').remove(); // Dirty hack to redraw labels for update
-   this.labels = this.labelArea.selectAll('text').data(this.timebars);
-   
-   // New labels arriving
-   this.labels.enter().append('svg:text')
-      .text(function(d) { return d.label; })
-      .attr('x', 1.5)
-      .attr('y', function(d, i) { return d3.round(self.yScale(i + 0.5)); })
-      .attr('dy', '0.5em')
-      .attr('text-anchor', 'end').attr('class', 'laneText');
-   // Label removal
-   this.labels.exit().remove();  
+      .attr('width', 10).attr('height', self.height - 2)
+      .attr('rx', 6).attr('ry', 6);
+  
+   this.drawLabels(); 
       
    //-------------------------------------------------------------------------- 
 };
@@ -570,6 +441,23 @@ gisportal.TimeLine.prototype.reset = function() {
    this.reHeight();
    this.reWidth();
    this.redraw();
+};
+
+gisportal.TimeLine.prototype.drawLabels = function()  {
+   // Draw the time bar labels
+   $('.js-timeline-labels').html('');
+   for (var i = 0; i < this.timebars.length; i++)  {
+      // Update label
+      //var positionTop = $('.timeline > g').position().top;
+      //positionTop += this.barHeight * i;
+      //positionTop += this.barMargin * i;
+      var positionTop = (i+1) * (this.barHeight + this.barMargin) - 2; 
+      var barTop = $(this.bars[0][i]).position().top;
+      // The 300 below is ARBITARY. In Firefox it can get massive
+      // whereas in Chrome it is required occasionally. TO DO: fix.
+      if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
+      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + '</li>');
+   }
 };
 
 // Zoom function to a new date range
@@ -632,8 +520,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDa
    }  
    
    this.reHeight();
-   this.redraw();
-   
+   this.redraw(); 
 };
 
 gisportal.TimeLine.prototype.addRangeBar = function(name, callback) {
@@ -676,6 +563,27 @@ gisportal.TimeLine.prototype.rename = function(name, label)  {
    this.redraw();
 }
 
+gisportal.TimeLine.prototype.has = function(name)  {
+   var has = _.where(gisportal.timeline.timebars, function(d)  {
+      return d.name.toLowerCase() === name.toLowerCase();
+   });
+
+   if (has.length > 0) return true;
+   return false;
+};
+
+gisportal.TimeLine.prototype.removeTimeBarById = function(id)  {
+   if (this.has(id))  {
+      this.removeTimeBarByName(id);
+   }
+   else if (gisportal.microLayers[id]) {
+      var name = gisportal.microLayers[id].name;
+      if (this.has(name))  {
+         this.removeTimeBarByName(name); 
+      }
+   }
+};
+
 // Remove a time bar by name (if found)
 gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    var self = this,
@@ -683,7 +591,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    
    function removeByName(anArray) {
       for (var j = 0; j < anArray.length; j++){
-         if (anArray[j].name == name) {
+         if (anArray[j].name.toLowerCase() == name.toLowerCase()) {
             var bar = anArray[j];
             anArray.splice(j, 1);
             return bar;
@@ -711,14 +619,22 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
    var self = this;  // Useful for when the scope/meaning of "this" changes
-   var selectedDate = self.draggedDate = new Date(date);
-   this.selectedDate = ((selectedDate instanceof Date) ? selectedDate : this.selectedDate);
+   this.selectedDate = self.draggedDate = new Date(date);
    // Move the selected date-time line
-   this.selectedDateLine.transition().duration(1000).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
-   $('#viewDate').datepicker('setDate', self.selectedDate).blur();
+   // ADD_CONFIG: Animation may not be wanted
+   this.selectedDateLine.transition().duration(500).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
+   
+   
+   //self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
+
    gisportal.filterLayersByDate(date);
-   $('#viewDate').change();
+   self.showDate(date);
 };
+
+gisportal.TimeLine.prototype.showDate = function(date) {
+   var d = date.toDateString().substring(4);
+   $('.js-current-date').html(d);
+}
 
 // Get the currently selected date 
 gisportal.TimeLine.prototype.getDate = function() {

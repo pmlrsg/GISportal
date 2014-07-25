@@ -37,6 +37,7 @@ gisportal.selectedLayers = {};
 gisportal.nonSelectedLayers = {};
 gisportal.baseLayers = {};
 
+gisportal.graphs = {};
 // A list of layer names that will be selected by default
 // This should be moved to the middleware at some point...
 gisportal.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
@@ -57,9 +58,9 @@ gisportal.selection.layer = undefined;
 gisportal.selection.bbox = undefined;
 gisportal.selection.time = undefined;
 
-gisportal.layerSelector = null;
+gisportal.selectionTools = null;
+
 gisportal.timeline = null;
-gisportal.walkthrough = null;
 
 // Predefined map coordinate systems
 gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
@@ -117,7 +118,7 @@ gisportal.loadLayers = function() {
     
    // Get WMS and WFS caches
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
-   gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
+   //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
 gisportal.getFeature = function(layer, olLayer, time) {
@@ -185,7 +186,6 @@ gisportal.genericAsync = function(type, url, data, success, error, dataType, opt
  * Create all the base layers for the map.
  */
 gisportal.createBaseLayers = function() {
-   //gisportal.leftPanel.addGroupToPanel('baseLayerGroup', 'Base Layers', $('#baseLayers'));
    
    function createBaseLayer(name, url, opts) {
       var layer = new OpenLayers.Layer.WMS(
@@ -201,7 +201,6 @@ gisportal.createBaseLayers = function() {
       layer.name = name;
       map.addLayer(layer);
       gisportal.baseLayers[name] = layer;
-      //gisportal.leftPanel.addLayerToGroup(layer, $('#baseLayerGroup'));
    }
    
    createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
@@ -217,7 +216,6 @@ gisportal.createBaseLayers = function() {
  * Create all the reference layers for the map.
  */
 gisportal.createRefLayers = function() {  
-   gisportal.leftPanel.addGroupToPanel('refLayerGroup', 'Reference Layers', $('#gisportal-lPanel-reference'));
    
    $.each(gisportal.cache.wfsLayers, function(i, item) {
       if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
@@ -241,21 +239,12 @@ gisportal.createRefLayers = function() {
                      
                microLayer = gisportal.checkNameUnique(microLayer);   
                gisportal.microLayers[microLayer.id] = microLayer;
-               gisportal.layerSelector.addLayer(gisportal.templates.selectionItem({
-                     'id': microLayer.id,
-                     'name': microLayer.name, 
-                     'provider': item.options.providerShortTag, 
-                     'title': microLayer.displayTitle, 
-                     'abstract': microLayer.productAbstract
-                  }), {'tags': microLayer.tags
-               }); 
             }
          });
       } 
    });
    
-   gisportal.layerSelector.refresh();
-
+   gisportal.configurePanel.refreshData();
    // Get and store the number of reference layers
    gisportal.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
 };
@@ -340,10 +329,10 @@ gisportal.createOpLayers = function() {
       });
 
       $.each(layers, function(i, item) {
-         gisportal.layerSelector.addLayer(gisportal.templates.selectionItem(item.meta), { "tags" : item.tags} );
       });
    }
-   gisportal.layerSelector.refresh();
+
+   gisportal.configurePanel.refreshData();
    // Batch add here in future.
 };
 
@@ -430,7 +419,10 @@ gisportal.refreshDateCache = function() {
    });
    
    gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);  
-   gisportal.rightPanel.updateCoverageList();
+   
+   // Not too keen on this being here
+   gisportal.configurePanel.refreshIndicators(); 
+   
    console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
 };
 
@@ -452,7 +444,12 @@ gisportal.mapInit = function() {
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
-      controls: []
+      controls: [
+         new OpenLayers.Control.Zoom({
+            zoomInId: "mapZoomIn",
+            zoomOutId: "mapZoomOut"
+        })
+      ]
    });
    
    //map.setupGlobe(map, 'map', {
@@ -469,14 +466,8 @@ gisportal.mapInit = function() {
    // Create the reference layers and then add them to the map
    //gisportal.createRefLayers();
 
-   // Add a couple of useful map controls
-   //var mousePos = new OpenLayers.Control.MousePosition();
-   //var permalink =  new OpenLayers.Control.Permalink();
-   //map.addControls([mousePos,permalink]);
-   
    /* 
-    * Set up event handling for the map including as well as mouse-based 
-    * OpenLayers controls for jQuery UI buttons and drawing controls
+    * Set up event handling for the map 
     */
    
    // Create map controls identified by key values which can be activated and deactivated
@@ -500,8 +491,12 @@ gisportal.mapInit = function() {
       map.addControl(control);
    }
 
+   gisportal.quickRegions.setup();
+   gisportal.selectionTools.init();
+
    if(!map.getCenter())
       map.zoomTo(3);
+
 
 };
 
@@ -552,84 +547,8 @@ gisportal.nonLayerDependent = function() {
   
    //Configure and generate the UI elements
    
-   // Setup the left panel
-   gisportal.leftPanel.setup();
-   
-   // Setup the right panel
-   gisportal.rightPanel.setup();
-   
-   // Setup the topbar
-   gisportal.topbar.setup();
-   
-   // Setup quickRegions | On Both the left panel and the topbar.
-   gisportal.quickRegions.setup();
-   
    gisportal.openid.setup('shareOptions');
-   
-   //--------------------------------------------------------------------------
-   
-   // If the window is resized move dialogs to the center to stop them going of
-   // the screen
-   $(window).resize(function(event) {
-      if(event.target == window) {
-         $(".ui-dialog-normal").extendedDialog("option", "position", "center");
-      }
-   });
 
-   // Set the max height of each of the accordions relative to the size of the window
-   $('#layerAccordion').css('max-height', $(document).height() - 300);
-   $('#gisportal-lPanel-operational').css('max-height', $(document).height() - 350);
-   $('#gisportal-lPanel-reference').css('max-height', $(document).height() - 350);
-   
-   $(window).resize(function() {
-      $('#layerAccordion').css('max-height', $(window).height() - 300);
-      $('#gisportal-lPanel-operational').css('max-height', $(window).height() - 350);
-      $('#gisportal-lPanel-reference').css('max-height', $(window).height() - 350);
-   });
-
-   
-   //--------------------------------------------------------------------------
-
-   // Handle selection of visible layers
-   $('#gisportal-lPanel-content').on('mousedown', 'li', function(e) {
-      var itm = $(this);
-      if(!itm.hasClass('notSelectable')) {
-         var child = itm.children('input').first();
-         $('.gisportal-layer:visible').each(function(index) {
-            $(this).removeClass('selectedLayer');
-         });
-         itm.addClass('selectedLayer');
-         $(this).trigger('selectedLayer');
-      }
-   });
-   
-   // Toggle visibility of data layers
-   $('#gisportal-lPanel-operational, #gisportal-lPanel-reference').on('click', ':checkbox', function(e) {
-      var v = $(this).val();
-      var layer = gisportal.getLayerByID(v);
-      if($(this).is(':checked')) {
-         layer.select();         
-      } else {
-         layer.unselect();
-      }
-   });
-   
-   //--------------------------------------------------------------------------
-
-   // Update our latlng on the mousemove event
-   map.events.register("mousemove", map, function(e) { 
-      var position =  map.getLonLatFromPixel(e.xy);
-      if(position)
-         $('#latlng').text('Mouse Position: ' + position.lon.toPrecision(4) + ', ' + position.lat.toPrecision(4));
-   });
-   
-   $('#mapInfo-Projection').text('Map Projection: ' + map.projection);
-   
-   //--------------------------------------------------------------------------
-
-   // Setup the contextMenu
-   gisportal.contextMenu.setup();
-   
    // Setup timeline
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
@@ -640,7 +559,7 @@ gisportal.nonLayerDependent = function() {
          bottom: 5,
          left: 0
       },
-      barHeight: 20,
+      barHeight: 10,
       barMargin: 2,
       timebars: [] 
    });
@@ -652,27 +571,33 @@ gisportal.saveState = function(state) {
    var state = state || {}; 
    // Save layers
    state.map = {};
+   state.selectedIndicators = [];
    state.map.layers = {}; 
    state.timeline = {}; 
-   state.layerSelector = {};
 
    // Get the current layers and any settings/options for them.
-   var keys = Object.keys(gisportal.layers);
+   var keys = gisportal.configurePanel.selectedIndicators;
    for(var i = 0, len = keys.length; i < len; i++) {
-      var layer = gisportal.layers[keys[i]];
-      state.map.layers[layer.id] = {
-         'selected': layer.selected,
-         'opacity': layer.opacity !== null ? layer.opacity : 1,
-         'style': layer.style !== null ? layer.style : '',
-         'minScaleVal': layer.minScaleVal,
-         'maxScaleVal': layer.maxScaleVal,
-         'scalebarOpen': $('#scalebar-' + layer.id).length > 0 ? 'true' : 'false'  
-      };    
+      var selectedIndicator = gisportal.configurePanel.selectedIndicators[i];
+
+      if (selectedIndicator && selectedIndicator.id)  {
+         var indicator = gisportal.layers[selectedIndicator.id];
+         state.map.layers[indicator.id] = {
+            'selected': indicator.selected,
+            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+            'style': indicator.style !== null ? indicator.style : '',
+            'minScaleVal': indicator.minScaleVal,
+            'maxScaleVal': indicator.maxScaleVal,
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] .active').attr('for')
+         };    
+      }
    }
+   // outside of loop so it can be easily ordered 
+   state.selectedIndicators = gisportal.configurePanel.selectedIndicators;
    
    // Get currently selected date.
-   if(!gisportal.utils.isNullorUndefined($('#viewDate').datepicker('getDate'))) {
-      state.map.date = $('#viewDate').datepicker('getDate').getTime();
+   if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
+      state.map.date = gisportal.timeline.getDate();
    }
      
    // Get selection from the map
@@ -682,7 +607,6 @@ gisportal.saveState = function(state) {
       state.map.feature = gisportal.featureToGeoJSON(feature);
    }
    
-   state.rangebars = gisportal.timeline.rangebars;
    // Get zoom level
    state.map.zoom = map.zoom;
 
@@ -698,92 +622,60 @@ gisportal.saveState = function(state) {
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
 
-
-   // Get filters on layer selector
-   // TODO: Refactor as per #123
-   state.layerSelector.filters = [];
-   $.each($('.ft-field[data-name]'), function(i, item) {
-      console.log('category:', item);
-      var tags = [];
-      $.each($('.ft-selected li span', item), function(i, e)  {
-         tags.push($(e).text()); 
-      });
-      console.log('tags', tags);
-      state.layerSelector.filters.push({ 
-         "category" : $(item).data('name'),
-         "tags" : tags
-      });
-   });
-
    return state;
 };
 
 gisportal.loadState = function(state) {
+   $('.start').toggleClass('hidden', true);
    var state = state || {};
 
-   // TODO: Refactor!
-   var rightPanel = state.rightPanel;
-   var rangebars = state.rangebars;
-   var timeline = state.timeline;
-   var layerSelector = state.layerSelector;
-   state = state.map;
+   var stateTimeline = state.timeline;
+   var stateMap = state.map;
    
    // Load layers for state
-   var keys = Object.keys(state.layers);
-   for(var i = 0, len = keys.length; i < len; i++) {
-      if (!gisportal.layers[keys[i]]) {
-         var selection = gisportal.layerSelector.getLayerSelectionByID(keys[i]);
+   var keys = state.selectedIndicators;
+   if (keys.length > 0)  {
+      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+   }
+   for (var i = 0, len = keys.length; i < len; i++) {
+      var indicator = gisportal.layers[state.selectedIndicators[i]];
+      if (!indicator) {
+         gisportal.configurePanel.buildMap();
          var options = {};
-         if (state.layers[keys[i]].minScaleVal !== null) options.minScaleVal = state.layers[keys[i]].minScaleVal;
-         if (state.layers[keys[i]].maxScaleVal !== null) options.maxScaleVal = state.layers[keys[i]].maxScaleVal;
-         gisportal.layerSelector.selectLayer(keys[i], selection, options);
+         options.id = state.selectedIndicators[i].id;
+         gisportal.configurePanel.selectLayer(state.selectedIndicators[i].name, options);
+        
       }
    }
-   
-   // Load date
-   if(!gisportal.utils.isNullorUndefined(state.date)) {
-      var date = new Date();
-      date.setTime(state.date);
-      $('#viewDate').datepicker('setDate', date);
-   }
-   
+ 
    // Create the feature if there is one
-   if(!gisportal.utils.isNullorUndefined(state.feature)) {
+         indicator = {};
+   if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
       var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-      layer.addFeatures(gisportal.geoJSONToFeature(state.feature));
+      layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
     }
    
-   if (rangebars)  {
-      for (var i = 0; i < rangebars.length; i++)  {
-         gisportal.timeline.addRangeBarCopy(rangebars[i]);
-      }
-      if (rightPanel.selectedRange) gisportal.rightPanel.updateRanges(rightPanel.selectedRange);
-      else gisportal.rightPanel.updateRanges();
-   }
-
    // Load position
-   if (state.extent)
-      map.zoomToExtent(new OpenLayers.Bounds([state.extent.left,state.extent.bottom, state.extent.right, state.extent.top]));
+   if (stateMap.extent)
+      map.zoomToExtent(new OpenLayers.Bounds([stateMap.extent.left,stateMap.extent.bottom, stateMap.extent.right, stateMap.extent.top]));
 
    // Load Quick Regions
-   if (state.regions) {
-      gisportal.quickRegion = state.regions;
+   if (stateMap.regions) {
+      gisportal.quickRegion = stateMap.regions;
       gisportal.quickRegions.setup();
    }
 
-   if (state.selectedRegion)  {
-      $('#quickRegion').val(state.selectedRegion);
+   if (stateMap.selectedRegion)  {
+      $('#quickRegion').val(stateMap.selectedRegion);
    }
 
-   if (timeline)  {
-      gisportal.timeline.zoomDate(timeline.minDate, timeline.maxDate);
-      if (state.date) gisportal.timeline.setDate(new Date(state.date));
+   if (stateTimeline)  {
+      gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
+      if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
    }
 
 
-   if (layerSelector && layerSelector.filters)  {
-      gisportal.layerSelector.filtrify.trigger(layerSelector.filters);
-   }
 };
 
 gisportal.featureToGeoJSON = function(feature) {
@@ -802,9 +694,11 @@ gisportal.checkIfLayerFromState = function(layer) {
       var state = gisportal.cache.state.map;
       for(var i = 0, len = keys.length; i < len; i++) {
          if(keys[i] == layer.id){
-            if(state.layers[keys[i]].selected === true) { $('#gisportal-lPanel-operational #' + layer.id + ' input:checkbox').prop("checked", true); layer.select();  }
             layer.setOpacity(state.layers[keys[i]].opacity);
-            //layer.setStyle(state.layers[keys[i]].style);
+            layer.setStyle(state.layers[keys[i]].style);
+            layer.minScaleVal = state.layers[keys[i]].minScaleVal;
+            layer.maxScaleVal = state.layers[keys[i]].maxScaleVal;
+            gisportal.scalebars.updateScalebar(layer.id);
          }
       }
    }
@@ -817,16 +711,18 @@ gisportal.checkIfLayerFromState = function(layer) {
  * Any code that should be run when user logs in
  */
 gisportal.login = function() {
-   $('#mapInfoToggleBtn').button("enable");
-   gisportal.window.history.loadStateHistory();
+   $('.js-logged-out').toggleClass('hidden', true);
+   $('.js-logged-in').toggleClass('hidden', false);
+   gisportal.openid.login();
+   // Load history
 };
 
 /**
  * Any code that should be run when the user logs out
  */
 gisportal.logout = function() {
-   $('#mapInfoToggleBtn').button("disable").prop("checked", false);
-   $('#gisportal-historyWindow').extendedDialog("close");
+   $('.js-logged-out').toggleClass('hidden', false);
+   $('.js-logged-in').toggleClass('hidden', true);
 }
 
 
@@ -841,8 +737,6 @@ gisportal.getState = function() {
    
    // TODO: Get states from component.
    state = gisportal.saveState(state);
-   state = gisportal.leftPanel.saveState(state);
-   state = gisportal.rightPanel.saveState(state);
 
    // TODO: Merge state with default state.
    
@@ -854,13 +748,10 @@ gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
    gisportal.cache.state = state;
-   gisportal.rightPanel.coverageStateSelected = false; // reset due to new state
    // TODO: Merge with default state.
    
    // TODO: Set states of components.
    gisportal.loadState(state);
-   gisportal.leftPanel.loadState(state);
-   gisportal.rightPanel.loadState(state); 
 };
 
 /*===========================================================================*/
@@ -869,73 +760,17 @@ gisportal.setState = function(state) {
  * This code runs once the page has loaded - jQuery initialised.
  */
 gisportal.main = function() {
+   gisportal.initStart();
+
    // Compile Templates
    gisportal.templates = {};
-   gisportal.templates.layer = Mustache.compile($('#gisportal-template-layer').text().trim());
-   gisportal.templates.metadataWindow = Mustache.compile($('#gisportal-template-metadataWindow').text().trim());
-   gisportal.templates.scalebarWindow = Mustache.compile($('#gisportal-template-scalebarWindow').text().trim());
-   gisportal.templates.graphCreatorWindow = Mustache.compile($('#gisportal-template-graphCreatorWindow').text().trim());
-   gisportal.templates.selectionItem = Mustache.compile($('#gisportal-template-selector-item').text().trim());
-   gisportal.templates.loginBox = Mustache.compile($('#gisportal-template-login-box').text().trim());
-   gisportal.templates.providerBox = Mustache.compile($('#gisportal-template-provider-box').text().trim());
-   gisportal.templates.historyList = Mustache.compile($('#gisportal-template-history-list').text().trim());
-   gisportal.templates.historyData = Mustache.compile($('#gisportal-template-history-data').text().trim());
-   gisportal.templates.walkthrough = Mustache.compile($('#gisportal-walkthrough').text().trim());
-   gisportal.templates.walkthroughMenu = Mustache.compile($('#gisportal-walkthrough-menu').text().trim());
 
-   gisportal.walkthrough = new gisportal.Walkthrough(); // uses templates.walkthrough so needs to run after
-  
    $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-    
-   // Need to put this early so that tooltips work at the start to make the
-   // page feel responsive.    
-   //$(document).tooltip({
-      //track: true,
-      //position: { my: "left+10 center", at: "right center", collision: "flipfit" },
-      //tooltipClass: 'ui-tooltip-info'
-   //});
-   
-   //$(document).click(function() {
-      //$(this).tooltip('close');
-   //});
-   
-   /*
-   $(document).on('mouseenter', '.tt', function() {
-      $(this).tooltip({
-         track: true,
-         position: { my: "left+5 center", at: "right center", collision: "flipfit" }
-      });
-   }).on('mouseleave', '.tt', function() {
-      $(this).tooltip('destroy');
-   });*/
-   
-   // Need to render the jQuery UI info dialog before the map due to z-index issues!
-   $('#walkthrough-menu').extendedDialog({
-      position: ['left', 'bottom'],
-      width: 245,
-      height: 220,
-      resizable: false,
-      showHelp: false,
-      autoOpen: false,
-      showMinimise: true,
-      dblclick: "collapse"
+  
+   $('.js-start').click(function()  {
+      $('.start').toggleClass('hidden', true);
    });
-
-   // Show map info such as latlng
-   $('#mapInfo').extendedDialog({
-      position: ['center', 'center'],
-      width: 220,
-      height: 200,
-      resizable: true,
-      autoOpen: false,
-      showHelp: false,
-      showMinimise: true,
-      dblclick: "collapse"
-   });
-   
-   gisportal.layerSelector = new gisportal.window.layerSelector('gisportal-layerSelection .gisportal-tagMenu', 'gisportal-layerSelection .gisportal-selectable ul');
-   gisportal.historyWindow = new gisportal.window.history();
-
+ 
    // Setup the gritter so we can use it for error messages
    gisportal.gritter.setup();
 
@@ -943,9 +778,29 @@ gisportal.main = function() {
    // any layer dependent code is called in a callback in mapInit
    gisportal.mapInit();
 
+   gisportal.configurePanel.initDOM();
+   gisportal.indicatorsPanel.initDOM();
+   gisportal.graphs.initDOM();
+   gisportal.analytics.initGA();
+
+   $('.js-show-tools').on('click', showPanel);
+
+   function showPanel()  {
+      $(this).toggleClass('hidden', true);
+      $('.panel.active').toggleClass('hidden', false);
+   }
+
+   $('.js-hide-panel').on('click', hidePanel);
+
+   function hidePanel()  {
+      $(this).parents('.panel').toggleClass('hidden', true);
+      $('.js-show-tools').toggleClass('hidden', false);
+   }
+
    // Start setting up anything that is not layer dependent
    gisportal.nonLayerDependent();
-   
+  
+
    // Grab the url of any state.
    var stateID = gisportal.utils.getURLParameter('state');
    
@@ -957,7 +812,8 @@ gisportal.main = function() {
    else {
       console.log('Loading Default State...');
    }
- 
+
+   gisportal.replaceAllIcons(); 
 };
 
 
@@ -1012,5 +868,42 @@ gisportal.zoomOverall = function()  {
       }
 
       map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
+   }
+};
+
+// Automatically goes through all icons
+gisportal.replaceAllIcons = function()  {
+   gisportal.replaceSubtreeIcons('body');
+};
+
+// Goes through all icons in a subtree
+gisportal.replaceSubtreeIcons = function(el)  {
+   $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
+      var e = $(e); 
+      e.addClass('bg-being-removed');
+      var url = e.css('background-image').replace('url(','').replace(')','').replace(/\"/g, "");
+      $.ajax({
+         url: url,
+         dataType: "xml"
+      }).done(function(svg){
+         var ele = document.importNode(svg.documentElement,true);
+         e.prepend(ele);
+         e.addClass('bg-removed');
+         e.removeClass('bg-being-removed');
+      });
+   });
+};
+
+// Should probably be using Mustache for this
+gisportal.initStart = function()  {
+   var list = $('.start .examples li');
+   for (var i = 0; i < list.length; i++)  {
+      var current = gisportal.config.defaultStates[i];
+      var currentLi = $(list[i]);
+      if (!current) $(currentLi).remove();
+      else  {
+         $('a', currentLi).attr("href", current.url);
+         $('span', currentLi).text(current.name);
+      }
    }
 };

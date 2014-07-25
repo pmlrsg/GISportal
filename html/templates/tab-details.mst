@@ -1,0 +1,18 @@
+<input type="radio" id="tab-{{modified}}-details" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
+<table class="panel-tab">
+   <tbody>
+      <tr><td>Description</td><td>{{productAbstract}}</td></tr>
+      <tr><td>Provider</td><td>{{providerTag}}</td></tr>
+      <tr><td>Region</td><td>{{tags.region}}</td></tr>
+      <tr><td>Interval</td><td>{{tags.interval}}</td></tr>
+      <tr><td>Ecosystem element</td><td>{{tags.Ecosystem_Element}}</td></tr>
+      <tr><td>MSFD</td><td>{{#tags.MSFD}}{{.}} {{/tags.MSFD}}</td></tr>
+      <tr><td>Bounding box</td><td>
+         <label style="color: green">{{exBoundingBox.NorthBoundLatitude}}</label> N, 
+         <label style="color: blue">{{exBoundingBox.EastBoundLongitude}}</label>   E, 
+         <label style="color: green">{{exBoundingBox.SouthBoundLatitude}}</label> S,
+         <label style="color: blue">{{exBoundingBox.WestBoundLongitude}}</label>   W 
+      </td></tr>
+      <tr><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
+   </tbody>
+</table>

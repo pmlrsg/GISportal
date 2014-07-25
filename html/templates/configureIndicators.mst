@@ -1,0 +1,6 @@
+{{#indicators}}
+   <li data-name="{{.}}">
+      <button class="icon_remove icon-svg js-remove" data-name="{{.}}">Remove</button>
+      <p>{{.}}</p>
+   </li>
+{{/indicators}}

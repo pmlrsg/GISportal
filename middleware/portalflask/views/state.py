@@ -21,7 +21,7 @@ def getState(stateUrl):
         
    if stateID is not None:      
       state = State.query.filter(stateID == State.id).first()
-      if state != None:
+      if state is not None:
          state.views += 1
          state.last_used = datetime.datetime.now()
          db_session.commit()
@@ -46,7 +46,7 @@ def getState(stateUrl):
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      error_handler.setError('2-0', None, g.user.id, "views/state.py:removeStates - Type Error exception, returning 500 to user. Exception %s" % e, request)
+      error_handler.setError('2-0', None, g.user.id, "views/state.py:getState - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
       
 @portal_state.route('/state/<stateUrl>', methods = ['DELETE'])
@@ -144,16 +144,14 @@ def getStates():
 @portal_state.route('/state', methods = ['POST'])      
 def setState():
    # Check if the user is logged in.
-   if g.user is None:
-      error_handler.setError('2-05', None, g.user.id, "views/state.py:setState - The user is not logged in, returning 401 to user.", request)
-      abort(401)
-   
-   email = g.user.email
+   email = None
+   if g.user is not None:
+      email = g.user.email
    state = request.values.get('state', None)
    
    output = {}
    
-   if email is None or state is None:
+   if state is None:
       output['message'] = 'failed to store state'
       output['email'] = email
       output['state'] = state
@@ -165,14 +163,19 @@ def setState():
       # sure on the reliability of it.
       user = User.query.filter(User.email == email).first() 
       
-      if user is None: 
+      if user is None and email is not None: 
          # Create new user
          user = User(email)
          db_session.add(user)
          db_session.commit()
-              
-      s = State(user.id, state)
-      checksumMatch = user.states.filter(State.checksum == s.checksum).first()
+      
+      if user is None:
+         user_id = -1
+      else:
+         user_id = user.id
+         
+      s = State(user_id, state)
+      checksumMatch = State.query.filter(State.checksum == s.checksum).first()
       if checksumMatch == None:
          db_session.add(s)
          db_session.commit()
@@ -184,7 +187,7 @@ def setState():
          output['url'] = short_url.encode_url(checksumMatch.id)
          output['message'] = 'Failed to add state as state already exists'
          output['status'] = '400'
-         error_handler.setError('2-05', state, g.user.id, "views/state.py:setState - The state already exists in the database, returning 400 to the user.", request)
+         error_handler.setError('2-05', state, user_id, "views/state.py:setState - The state already exists in the database, returning 400 to the user.", request)
    
    try:
       jsonData = jsonify(output = output)
@@ -192,7 +195,7 @@ def setState():
       return jsonData
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      error_handler.setError('2-06', state, g.user.id, "views/state.py:setState - Type Error exception, returning 500 to user. Exception %s" % e, request)
+      error_handler.setError('2-06', state, user_id, "views/state.py:setState - Type Error exception, returning 500 to user. Exception %s" % e, request)
       abort(500) # If we fail to jsonify the data return 500
    
 def compareChecksum(hexdigest1, hexdigest2):

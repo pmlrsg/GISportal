@@ -1,0 +1,48 @@
+<input type="radio" id="tab-{{modified}}-analysis" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab">
+   <ol class="steps grid-list panel-list">
+      <li>
+      <p class="number grid-cell">1</p>
+      <div class="grid-cell fill">
+         <button class="icon_rect js-draw-box" data-id="{{id}}" title="Draw Box">Draw Box</button>
+         <p>Draw a selection box on the map to refine the data before analysis</p>
+         <div class="coordinates">
+            <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+            <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
+         </div>
+         <div class="bbox-info hidden">
+            <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>
+            <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>
+            <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
+         </div>
+      </div>
+      </li>
+      <li>
+      <p class="number grid-cell">2</p>
+      <div class="grid-cell fill">
+         <p>Set a date range using the timeline below</p>
+         <input data-id="{{id}}" placeholder="Start" class="js-min min grid-cell" type="text">
+         <input data-id="{{id}}" placeholder="End" class="js-max max grid-cell" type="text">
+         <div data-id="{{id}}" class="range-slider grid-cell fill"></div>
+      </div>
+      </li>
+      <li>
+      <p class="number grid-cell">3</p>
+      <div class="grid-cell fill">
+         <label for="tab-{{id}}-graph-type">Choose a graph type</label>
+         <select id="tab-{{id}}-graph-type">
+            <option selected value="timeseries">Timeseries (default)</option>
+            <option value="histogram">Histogram</option>
+            <!--<option value="hovmollerLat">Hovmoller Latitude</option>
+            <option value="hovmollerLon">Hovmoller Longitude</option>-->
+         </select>
+         <button data-id="{{id}}" class="brand create-graph js-create-graph">Create graph</button>
+      </div>
+      </li>
+      <li class="export-button">
+         <label for="export-{{modified}}">Export/download selected data</label>
+         <button id="export-{{modified}}" class="brand secondary js-export-button" data-id="{{id}}"><span class="icon_download icon-svg light"></span>Export</button>
+      </li>
+   </ol>
+</div>
+

@@ -1,0 +1,151 @@
+/*------------------------------------*\
+    Icons
+\*------------------------------------*/
+
+*[class^="icon"]  {
+   border: 0;
+   background-color: transparent;
+   background-repeat: no-repeat;
+   background-position: 50% 50%;
+   background-size: 24px 24px;
+   display: inline-block;
+   height: 25px;
+   min-width: 40px;
+   font-size: 0;
+
+   opacity: 0.5;
+   color: transparent;
+
+   -webkit-appearance: none;
+   -moz-appearance: none;
+
+   vertical-align: middle;
+}
+
+*[class^="icon_"]:focus,
+*[class^="icon_"]:hover  {
+   cursor: pointer;
+   opacity: 0.8;
+}
+
+*[class^="icon_"].active  {
+   cursor: pointer;
+   opacity: 1;
+}
+
+.icon_arrow  {
+   background-image: url('../img/icons/arrow.svg');
+   background-size: 16px 16px;
+   opacity: 1;
+}
+
+.icon_show  {
+   background-image: url('../img/icons/show.svg');
+}
+
+.icon_download  {
+   background-image: url('../img/icons/download.svg');
+}
+
+.icon_remove  {
+   background-image: url('../img/icons/dustbin.svg');
+}
+
+.icon_close  {
+   background-image: url('../img/icons/close.svg');
+}
+
+.icon_options  {
+   background-image: url('../img/icons/options.svg');
+}
+
+.icon_scalebar  {
+   background-image: url('../img/icons/scalebar.svg');
+}
+
+.icon_details  {
+   background-image: url('../img/icons/details.svg');
+}
+
+.icon_map  {
+   background-image: url('../img/icons/map.svg');
+}
+
+.icon_rect  {
+   background-image: url('../img/icons/select-rect.svg');
+}
+
+.icon_analyse  {
+   background-image: url('../img/icons/graph.svg');
+}
+
+.icon_share  {
+  background-image: url('../img/icons/share.svg');
+} 
+
+.icon_region { background-image: url('../img/icons/map.svg'); }
+.icon_pan { background-image: url('../img/icons/options.svg'); }
+.icon_zoomin { background-image: url('../img/icons/zoom-in.svg'); }
+.icon_zoomout { background-image: url('../img/icons/zoom-out.svg'); }
+
+.icon_loading,
+.icon_loading:focus,
+.icon_loading:hover  {
+   background-image: url('../img/icons/loading.png');
+   cursor: auto;
+   opacity: 0;
+}
+
+.icon_loading.active  {
+   animation: rotation: 2s infinite linear;
+   opacity: 0.3;
+}
+
+.icon_show  {
+   background-image: url('../img/icons/show.svg');
+}
+
+.icon_hide  {
+   background-image: url('../img/icons/hide.svg');
+}
+
+.icon_checkbox  {
+   background-image: url('../img/icons/checkbox.svg');
+}
+
+.icon_checkbox svg  {
+   width: 24px;
+   height: 24px;
+}
+
+.icon_checkbox #tick  {
+   visibility: hidden;
+}
+
+.icon_checkbox.active #tick {
+   visibility: visible;
+}
+
+.icon-svg svg {
+   stroke: #000;
+   fill: #000;
+   width: 24px;
+   height: 24px;
+   margin: 0 auto;
+   shape-rendering: auto;
+}
+
+.icon-svg.light svg,
+.icon-svg.light path  {
+   stroke: none;
+   fill: #fff;
+}
+
+.icon-svg.no-stroke svg  {
+   stroke-opacity: 0;
+}
+
+.bg-removed  {
+   background-image: none !important;
+} 
+.separator { border-right: 1px solid #e0dce4; }
