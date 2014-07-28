@@ -29,22 +29,22 @@ gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
    this.metadataComplete = false;
    this.metadataQueue = [];
     
-   this.defaults = {};
-   this.defaults.firstDate = null;
-   this.defaults.lastDate = null;
-   this.defaults.scalebarOpen = null;
-   this.defaults.serverName = null;
-   this.defaults.wfsURL = null;
-   this.defaults.wmsURL = null;
-   this.defaults.wcsURL = null;
-   this.defaults.sensorNameDisplay = null;   
-   this.defaults.sensorName = null;  
-   this.defaults.exBoundingBox = null; 
-   
-   this.defaults.providerTag = null;
-   this.defaults.tags = null;
-   this.defaults.options = null;
-   this.defaults.times = [];
+   this.defaults = {
+      firstDate : null,
+      lastDate : null,
+      scalebarOpen : null,
+      serverName : null,
+      wfsURL : null,
+      wmsURL : null,
+      wcsURL : null,
+      sensorNameDisplay : null,
+      sensorName : null,
+      exBoundingBox : null,
+      
+      providerTag : null,
+      tags : null,
+      options : null
+   };
    
    $.extend(true, this, this.defaults, opts);
 
@@ -141,7 +141,7 @@ gisportal.layer = function(microlayer, layerData) {
    
    this.WFSDatesToIDs = {};
    
-   this.spinnerValue = 0;
+   this.spinner = false;
    
    /**
     * Constructor for the layer.
@@ -295,7 +295,6 @@ gisportal.layer = function(microlayer, layerData) {
          var currentDate = gisportal.timeline.getDate();
          layer.selectDateTimeLayer(currentDate);
          
-         delete gisportal.nonSelectedLayers[layer.id];
          gisportal.selectedLayers[layer.id] = layer;
          
          // Now display the layer on the timeline
@@ -310,18 +309,10 @@ gisportal.layer = function(microlayer, layerData) {
          gisportal.zoomOverall();
       } else {
          layer.setVisibility(true);
-         layer.checkLayerState();
       } 
       
       
       var index = _.findIndex(gisportal.configurePanel.selectedIndicators, function(d) { return d.name.toLowerCase() === layer.name.toLowerCase();  });
-      /* var mapIndex = _.findIndex(map.layers, function(d) { return d.url === gisportal.layers.Oxygen.wmsURL; });
-      var layer = map.layers[mapIndex];
-
-      var firstLayerIndex = _.findIndex(map.layers, function(d) { return d.controlID === 'opLayers' });
-
-      map.setLayerIndex(layer, firstLayerIndex + index );
-      */
       gisportal.setLayerIndex(layer, gisportal.configurePanel.selectedIndicators.length - index);
       
    };
@@ -331,7 +322,6 @@ gisportal.layer = function(microlayer, layerData) {
       $('#scalebar-' + layer.id).remove(); 
 		layer.selected = false;
 		layer.setVisibility(false);
-		layer.checkLayerState();
       delete gisportal.selectedLayers[layer.id];
 		if (layer.temporal) {
 			if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
@@ -343,10 +333,6 @@ gisportal.layer = function(microlayer, layerData) {
       }
 	};
    
-   //this.setLayerIndex = function(id, index) {      
-      //var layer = this.openlayers[id];
-      //layer.setLayerIndex(index);
-   //};
    //--------------------------------------------------------------------------
    
    /**
@@ -422,7 +408,6 @@ gisportal.layer = function(microlayer, layerData) {
             console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
          }
       }
-      layer.checkLayerState();
    };
    
    /**
@@ -570,20 +555,19 @@ gisportal.layer = function(microlayer, layerData) {
       
       // Show the img when we are loading data for the layer
       layer.events.register("loadstart", layer, function(e) {
-         self.spinnerValue += 1;
+         self.spinner = true;
          self.updateSpinner();
       });
       
       // Hide the img when we have finished loading data
       layer.events.register("loadend", layer, function(e) {
-         self.spinnerValue -= 1;
+         self.spinner = false;
          self.updateSpinner();
       });
       
       if(self.controlID != 'baseLayers') {   
          // Check the layer state when its visibility is changed
          layer.events.register("visibilitychanged", layer, function() {
-            self.checkLayerState();
          });
       }
       
@@ -595,7 +579,6 @@ gisportal.layer = function(microlayer, layerData) {
       
       // Add the layer to the map
       map.addLayer(layer);
-      //map.setLayerIndex(layer, gisportal.numBaseLayers + gisportal.numOpLayers);
       
       // TODO: be able to deal with all layer types.
       if(this.controlID == 'opLayers') {
@@ -637,40 +620,23 @@ gisportal.layer = function(microlayer, layerData) {
          return;
          
       var $element = this.$layer.find('img[src="img/ajax-loader.gif"]');
-      if(this.spinnerValue === 0 && $element.is(':visible')) {
+      if(this.spinner === false && $element.is(':visible')) {
          $element.hide();
-      } else if(this.spinnerValue !== 0 && $element.is(':hidden')) {
+      } else if(this.spinner !== false && $element.is(':hidden')) {
          $element.show();
       }
    };
-   
-   /**
-    * Checks to see if a layer is not visible and selected.
-    * 
-    * @method
-    */
-   this.checkLayerState = function() {
-      /*if(!this.isVisible && this.selected)
-         this.$layer.find('img[src="img/exclamation_small.png"]').show();
-      else
-         this.$layer.find('img[src="img/exclamation_small.png"]').hide();*/
-   };
-   
+     
    //--------------------------------------------------------------------------
    
    
    this.init(microlayer, layerData);
-   //---------------------------------- Temp ----------------------------------
+   
    var olLayer = this.createOLLayer(); // Create OL layer.
    this.openlayers['anID'] = olLayer;
-   //this.addOLLayer(olLayer);
-   // Create Cesium layer.
-   //--------------------------------------------------------------------------
    
    // Store new layer.
    gisportal.layers[this.id] = this;
-   gisportal.nonSelectedLayers[this.id] = this;
-   
 };
 
 gisportal.addNewLayer = function(id, options)  {
