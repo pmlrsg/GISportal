@@ -1,5 +1,6 @@
 from views.user import portal_user
 from views.state import portal_state, getState, setState
+from views.errors import portal_errors, getError, setError
 from views.proxy import portal_proxy, proxy
 from views.wfs import portal_wfs, getWFSData
 from views.wcs import portal_wcs, getWcsData
@@ -11,6 +12,10 @@ routes = [
    ((portal_state, '/state'),
       ('/getstate', getState),
       ('/setstate', setState)
+   ),
+   ((portal_errors, '/error'),
+      ('/geterror' getError),
+      ('/seterror' setError)
    ),
    ((portal_wcs, '/wcs2json'),
       ('/wcs', getWcsData)

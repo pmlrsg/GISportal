@@ -43,6 +43,7 @@ button.brand  {
   border-radius: 5px;
   color: #fff;
 
+  line-height: 35px;
   padding: 0 35px 0 30px;
   height: 35px;
 }
@@ -55,6 +56,17 @@ button.brand.with-border  {
 button.secondary  {
    background-color: #b1a7bc;
    border: none;
+   color: #fff;
+   padding: 2px 10px;
+   border-radius: 5px;
+}
+
+button.brand.secondary:active  {
+   background-color: #59476d;
+}
+
+button.secondary svg  {
+   margin: inherit;
 }
 
 .text-button  {

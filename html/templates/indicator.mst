@@ -1,7 +1,7 @@
-<li data-id="{{id}}" data-name="{{name}}">
+<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}">
    <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
       <p>{{name}}</p>
-      <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column" title="Show/Hide">Show/Hide</button>
+      <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column active" title="Show/Hide">Show/Hide</button>
       <label class="icon_options active icon-svg light icon-column js-closable" for="tab-{{modified}}-options" title="Refine Data">Options</label>
       <label class="icon_scalebar hidden icon-svg light  icon-column js-closable" for="tab-{{modified}}-scalebar" title="Scalebar">Scalebar</label>
       <label class="icon_details hidden icon-svg light icon-column js-closable" for="tab-{{modified}}-details" title="Details">Details</label>

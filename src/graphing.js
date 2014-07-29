@@ -58,7 +58,7 @@ gisportal.graphs.create = function(data, options)  {
 gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
-   var units = gisportal.layers[data.coverage].units;
+   var units = gisportal.layers[options.id].units;
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
@@ -69,6 +69,8 @@ gisportal.graphs.addGraph = function(data, options)  {
       $('.graph-holder').html(rendered);    
       $('.graph-wait-message').toggleClass("hidden", true);   
       gisportal.graphs.create(data, options);
+      gisportal.replaceAllIcons();
    });
 
 }
+

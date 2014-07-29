@@ -6,6 +6,7 @@
       "html/css/type.css",
       "html/css/overlay.css",      
       "html/css/start.css",
+      "html/css/export.css",
       "html/css/share.css",
       "html/css/animation.css",
       "html/js-libs/OpenLayers/theme/default/style.css",
@@ -20,6 +21,7 @@
       "html/css/indicators.css",
       "html/css/graph.css",
       "html/css/tables.css",
-      "html/css/nv.d3.css"
+      "html/css/nv.d3.css",
+      "html/css/mapcontrols.css"
    ]
 }

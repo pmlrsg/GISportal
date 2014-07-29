@@ -43,8 +43,16 @@
    background-image: url('../img/icons/show.svg');
 }
 
+.icon_download  {
+   background-image: url('../img/icons/download.svg');
+}
+
 .icon_remove  {
    background-image: url('../img/icons/dustbin.svg');
+}
+
+.icon_close  {
+   background-image: url('../img/icons/close.svg');
 }
 
 .icon_options  {
@@ -73,7 +81,12 @@
 
 .icon_share  {
   background-image: url('../img/icons/share.svg');
-}  
+} 
+
+.icon_region { background-image: url('../img/icons/map.svg'); }
+.icon_pan { background-image: url('../img/icons/options.svg'); }
+.icon_zoomin { background-image: url('../img/icons/zoom-in.svg'); }
+.icon_zoomout { background-image: url('../img/icons/zoom-out.svg'); }
 
 .icon_loading,
 .icon_loading:focus,
@@ -88,12 +101,10 @@
    opacity: 0.3;
 }
 
-.icon_hide.active,
 .icon_show  {
    background-image: url('../img/icons/show.svg');
 }
 
-.icon_show.active,
 .icon_hide  {
    background-image: url('../img/icons/hide.svg');
 }
@@ -137,3 +148,4 @@
 .bg-removed  {
    background-image: none !important;
 } 
+.separator { border-right: 1px solid #e0dce4; }

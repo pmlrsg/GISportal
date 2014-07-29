@@ -1,4 +1,5 @@
 *.pyc
+*.orig
 html/cache
 html/cache/*
 html/GISPortal.js

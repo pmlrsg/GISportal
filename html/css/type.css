@@ -20,7 +20,9 @@ h3  {
 
 /* Start Screen */
 
-.intro-text  {
+.intro-text,
+.share-container h2,
+.export-container h2  {
    color: #f7f6f8;
    font-size: 20px;
    font-size: 1.25rem; /* 24/16 = 1.5 */

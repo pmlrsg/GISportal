@@ -34,45 +34,38 @@ gisportal.graphs.timeseries = function(data, options)  {
          /* Chart with zooming
          */
          var chart = nv.models.lineWithFocusChart()
-            .margin({left: 25});
+            .margin({left: 50})
+            .tooltipContent(function(key, x, y, e, graph) {
+               // y is already formatted so use e 
+               var num = parseFloat(e.point.y);
+               // If num%1 does not return 0 then it is a decimal
+               num = num % 1 ? num.toFixed(2) : num;
+               return '<h3>' + key + '</h3>' +'<p>' + num + ' - ' + x + '</p>'; 
+            });
             //.useInteractiveGuideline(true); // There is a pull request for this waiting to be merged
                                                // https://github.com/novus/nvd3/pull/336
         
-         if (chart.xAxis)  { 
-            chart.xAxis.tickFormat(function(d) {
-               return d3.time.format('%x')(new Date(d))
-            });
-         }
+         chart.xTickFormat(function(d) {
+            return d3.time.format('%x')(new Date(d));
+         });
 
-         if (chart.yAxis)  {
-            chart.yAxis.tickFormat(function(d)  {
-               return d.toPrecision(1);
-            });
-         }
- 
-         if (chart.x2Axis)  {
-            chart.x2Axis.tickFormat(function(d) {
-               return d3.time.format('%x')(new Date(d))
-            });
-         }
+         chart.yTickFormat(function(d)  {
+            var num = parseFloat(d);
+            num = num % 1 ? num.toFixed(2) : num;
+            return num;
+         });
 
-         if (chart.y2Axis)  { 
-            chart.y2Axis.tickFormat(function(d)  {
-               return d.toPrecision(1);
-            });
-         }
-         
-
+         var panel = $('#graphPanel .panel-container');
          d3.select('[data-id="' + data.coverage + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
               .datum(lines())  
-              .attr("width", "500px").attr("height", "500px" )
-              .attr("style", "width: 100%; height: 100%;")
+              .attr("width", $(panel).innerWidth() - 50).attr("height", $(panel).innerHeight() - 90 )
+              //.attr("style", "width: 100%; height: 100%;")
               .call(chart);
          //chart.xScale(d3.time.scale());
          //chart.yScale(d3.scale.linear());
-
+         
          //svg.onresize = function() { chart.update() };
          nv.utils.windowResize(chart.update);
          return chart;

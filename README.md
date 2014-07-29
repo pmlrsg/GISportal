@@ -151,3 +151,57 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
     ./clearcache
     
     sudo service httpd restart
+
+## Analytics ##
+
+**Enabling basic GA**
+
+Go to `config/config.js` and set `gisportal.config.analytics.active` to `true` and `gisportal.config.analytics.UATrackingId` to the tracking code of the project. Basic tracking is now enabled.
+
+**Setting up Custom Definations**
+
+For a deeper level of tracking custom definations needs to be setup. For this you need to go into the google analytics admin and select Custom Definitions under the property column.
+
+**Custom Dimensions**
+Start by clicking Custom Dimensions and creating a new custom dimesion labeled Indicator Name.   
+Procede to make this list **IN THIS ORDER**:  
+- Indicator Name
+- Indicator ID
+- Region
+- Interval
+- Elevation
+- Layer Style
+- Graph type
+- Confidence
+- Year
+- Click Location
+
+**Custom Metrics**
+In the left hand panel select Custom Metrics and again make the following in the same order:
+- Used in graph
+- Used in layer
+
+
+If you had no previous metrics or dimensions installed and you added them in the listed order analytics is now setup.
+
+**Follow this section only if you already had custom metrics made or didnt make them in that order:**  
+Each custom definiation has a unique index.`cm[0-9][0-9]` for `Custom Metrics` and `cd[0-9][0-9]` for `Custom Dimensions`.
+Indexes can not be changed. The current config file was expecting the definition names to be next to certain indexes.
+Go over each custom definition key in the config file and change it the one in your analytics account.
+
+**Currently mapped names:**  
+***Dimenstions:***  
+ #cd1 - Indicator Name  
+ #cd2 - Indicator ID  
+ #cd3 - Region  
+ #cd4 - Interval  
+ #cd5 - Elevation  
+ #cd6 - Layer Style  
+ #cd7 - Graph type  
+ #cd8 - Confidence  
+ #cd9 - Year   
+ #cd10 - Click Location  
+
+***Metrics:***  
+ #cm1 - Used in graph  
+ #cm2 - Used in layer 

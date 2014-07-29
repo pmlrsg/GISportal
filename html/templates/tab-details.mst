@@ -1,7 +1,7 @@
 <input type="radio" id="tab-{{modified}}-details" name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
 <table class="panel-tab">
    <tbody>
-      <tr><td>Abstract</td><td>{{productAbstract}}</td></tr>
+      <tr><td>Description</td><td>{{productAbstract}}</td></tr>
       <tr><td>Provider</td><td>{{providerTag}}</td></tr>
       <tr><td>Region</td><td>{{tags.region}}</td></tr>
       <tr><td>Interval</td><td>{{tags.interval}}</td></tr>

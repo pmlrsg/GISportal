@@ -277,6 +277,13 @@ gisportal.layer = function(microlayer, layerData) {
       
       this.opacity = opacityValue;
    };
+
+   this.setStyle = function(style)  {
+      var indicator = this;
+      indicator.style = style;
+      indicator.mergeNewParams({ styles: style });
+      gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
+   }; 
    
    this.select = function() {
       var layer = this;
@@ -294,7 +301,7 @@ gisportal.layer = function(microlayer, layerData) {
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-         gisportal.timeline.addTimeBar(layer.name, layer.displayTitle, startDate, endDate, layer.DTCache);   
+         gisportal.timeline.addTimeBar(layer.name, layer.name, startDate, endDate, layer.DTCache);   
         			
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
@@ -304,7 +311,18 @@ gisportal.layer = function(microlayer, layerData) {
       } else {
          layer.setVisibility(true);
          layer.checkLayerState();
-      }   
+      } 
+      
+      
+      var index = _.findIndex(gisportal.configurePanel.selectedIndicators, function(d) { return d.name.toLowerCase() === layer.name.toLowerCase();  });
+      /* var mapIndex = _.findIndex(map.layers, function(d) { return d.url === gisportal.layers.Oxygen.wmsURL; });
+      var layer = map.layers[mapIndex];
+
+      var firstLayerIndex = _.findIndex(map.layers, function(d) { return d.controlID === 'opLayers' });
+
+      map.setLayerIndex(layer, firstLayerIndex + index );
+      */
+      gisportal.setLayerIndex(layer, gisportal.configurePanel.selectedIndicators.length - index);
       
    };
     
@@ -394,7 +412,7 @@ gisportal.layer = function(microlayer, layerData) {
             } 
             //-----------------------------------------------------------------       
             
-            layer.setVisibility(layer.selected);
+            layer.setVisibility(layer.isVisible);
             console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
          }
          else {
@@ -434,6 +452,7 @@ gisportal.layer = function(microlayer, layerData) {
             gisportal.microLayers[layer.id].metadataComplete = true; 
             layer.metadataComplete = true;
             _.each(gisportal.microLayers[layer.id].metadataQueue, function(d) { d(); delete d; });
+
          },
          error: function(request, errorType, exception) {
             layer.origMinScaleVal = 0;
@@ -679,7 +698,8 @@ gisportal.addLayer = function(layer, options) {
       layer.maxScaleVal = gisportal.layers[layer.id].maxScaleVal;
       gisportal.scalebars.updateScalebar(layer.id);
    }
-   
+  
+   layer.isVisible = options.visible; 
    layer.select();
 
    gisportal.setCountryBordersToTopLayer();
@@ -689,8 +709,8 @@ gisportal.addLayer = function(layer, options) {
 
 gisportal.removeLayer = function(layer) {
    
-   delete gisportal.selectedLayers[layer.id];
-   delete gisportal.layers[layer.id];
+   if (gisportal.selectedLayers[layer.id]) delete gisportal.selectedLayers[layer.id];
+   if (gisportal.layers[layer.id])  delete gisportal.layers[layer.id];
     
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
@@ -742,22 +762,20 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
       success: function(data) {
          // Convert the microlayer. 
          // COMMENT: might change the way this works in future.
-         var layer = new gisportal.layer(microlayer, data);     
+         var layer = new gisportal.layer(microlayer, data);
+         
+         
          if (options.show !== false)  { 
-            if (layer.selected === true) { // Presume from state
-            
-               // If the layer was loaded as part of a state load set some of the 
-               // values of the layer to the cached versions.
-               gisportal.checkIfLayerFromState(layer);
-
-            } 
-            else {
-               console.log("Adding layer..."); // DEBUG
-               gisportal.addLayer(layer, options);    
-               console.log("Added Layer"); // DEBUG
-            }
+            gisportal.checkIfLayerFromState(layer);
+            console.log("Adding layer..."); // DEBUG
+            gisportal.addLayer(layer, options);    
+            console.log("Added Layer"); // DEBUG
          }
          gisportal.configurePanel.refreshIndicators();
+         
+         
+         // Track the indicator change
+         gisportal.analytics.events.layerChange( layer )
       },
       error: function(request, errorType, exception) {
          var data = {

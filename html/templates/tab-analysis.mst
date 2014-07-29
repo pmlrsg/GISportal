@@ -38,13 +38,9 @@
          <button data-id="{{id}}" class="brand create-graph js-create-graph">Create graph</button>
       </div>
       </li>
-      <li class="hidden">
-         <button class="brand secondary">Sign in</button>
-      </li>
-      <li class="hidden">
-      <input id="tab-{{id}}-export-processed" type="checkbox"><label for="tab-{{id}}-export-processed">Processed data</label>
-      <input id="tab-{{id}}-export-raw" type="checkbox"><label for="tab-{{id}}-export-raw">Raw data</label>
-      <button class="brand">Export selected</button>
+      <li class="export-button">
+         <label for="export-{{modified}}">Export/download selected data</label>
+         <button id="export-{{modified}}" class="brand secondary js-export-button" data-id="{{id}}"><span class="icon_download icon-svg light"></span>Export</button>
       </li>
    </ol>
 </div>

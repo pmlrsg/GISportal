@@ -1,8 +1,11 @@
 /* Fix for IE SVG overflow issues */
 svg {
    overflow: hidden;
-   //position: absolute;
    shape-rendering: crispEdges;
+}
+
+.graph svg  {
+   shape-rendering: auto;
 }
 
 .timeline-container  {
@@ -21,6 +24,10 @@ svg {
 
 .timeline  {
    width: 100%;
+}
+
+.main {
+   pointer-events: bounding-box;
 }
 
 .main text {

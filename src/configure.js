@@ -23,8 +23,18 @@ gisportal.configurePanel.refreshData = function()  {
 gisportal.configurePanel.initDOM = function()  {
    function toggleIndicator()  {
       var name = $(this).parent().data('name').toLowerCase();
+      var options = {};
+      
+      var cat = $(this).parents('[data-cat]');
+      if (cat)  {
+         var refine = {};
+         refine.cat = cat.data('cat');
+         refine.tag = $(this).data('tag');
+         options.refine = refine;
+      }
+
       if ($(this).is(':checked'))  {
-         gisportal.configurePanel.selectLayer(name);
+         gisportal.configurePanel.selectLayer(name, options);
       }
       else  {
          gisportal.configurePanel.deselectLayer(name);
@@ -35,7 +45,8 @@ gisportal.configurePanel.initDOM = function()  {
 
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
-
+   
+   
    $('.js-indicators').on('change', '.hide-select', function()  {
      // togggle! important 
    });
@@ -164,10 +175,15 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
    var tagVals = grouped[cat];
    var tagNames = Object.keys(grouped[cat]);
    var catName = gisportal.config.browseCategories[cat];
+   var tabNumber = _.indexOf(Object.keys(gisportal.config.browseCategories), cat) + 1;
+
+   $('#tab-browse-2 + .panel-tab').attr('data-cat', Object.keys(gisportal.config.browseCategories)[1]);
+
+
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
-         $.get('templates/categories.mst', (function(index) {
+         $.get('templates/categories.mst', (function(index, cat) {
             var indicators = [];
             vals = _.unique(vals, function(d)  {
                return d.toLowerCase();
@@ -176,16 +192,19 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
                var tmp = {};
                var d = d.toLowerCase();
                tmp.name = d;
-               tmp.modified = d.replace(/ /g, '__');
+               tmp.modified = gisportal.utils.nameToId(d);
                indicators.push(tmp);
             });
                
             return function(template) { 
                var rendered = Mustache.render(template, {
                   tag : tagNames[index],
+                  tagModified : gisportal.utils.nameToId(tagNames[index]),
                   indicators : indicators 
                });
-               $('#tab-'+catName.toLowerCase()+' + .indicator-select').append(rendered);
+               $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
+               $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
+               
                gisportal.replaceAllIcons();
             }
          })(i));
@@ -284,32 +303,48 @@ gisportal.configurePanel.search = function(val)  {
 };
 
 gisportal.configurePanel.selectLayer = function(name, options)  {
+   gisportal.analytics.events.selectLayer( { name: name } );
+   
    var options = options || {};
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);  
    
+   if (options.id) {
+      gisportal.indicatorsPanel.changeIndicator(name, options.id);
+      id = options.id;
+   }
+
+   
    name = name.replace(/__/g, ' ');
 
-   $('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true).change();
+   $('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true);   
+   $('.js-toggleVisibility[data-name="' + name + '"]').prev('label').toggleClass('active', true).prop('checked', true);
 
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
-   gisportal.configurePanel.selectedIndicators.push(tmp);
+   if (options.refine) tmp.refine = options.refine;
+   gisportal.configurePanel.selectedIndicators.unshift(tmp);
 
    gisportal.configurePanel.refreshIndicators();
+
+   this.buildMap();
 };
 
 gisportal.configurePanel.deselectLayer = function(name)  {
+   gisportal.analytics.events.deselectLayer( { name: name } );
+   
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);
    gisportal.configurePanel.unselectIndicator(name);
    $('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
+   $('.js-configure-indicators [data-name="' + name + '"]').remove();
    // If there is an index then it is a 'real' layer, otherwise just a placeholder 
    if (id)  {
       gisportal.indicatorsPanel.removeIndicators(id);
    }
-   gisportal.configurePanel.refreshIndicators(); 
+   gisportal.configurePanel.refreshIndicators();
+   
 
 };
 
@@ -329,7 +364,17 @@ gisportal.configurePanel.hasIndicator = function(name)  {
 };
 
 gisportal.configurePanel.unselectIndicator = function(name)  {
-   for (var i in gisportal.configurePanel.selectedIndicators)  {
-      if (gisportal.configurePanel.selectedIndicators[i].name.toLowerCase() === name.toLowerCase()) gisportal.configurePanel.selectedIndicators.pop(i);
-   }
+   _.remove(gisportal.configurePanel.selectedIndicators, function(d)  {
+      return d.name.toLowerCase() === name.toLowerCase();
+   });
+};
+
+
+gisportal.configurePanel.reorderIndicators = function(index, name)  {
+   var arr = gisportal.configurePanel.selectedIndicators;
+   var current = _.findIndex(arr, function(d) { return d.name.toLowerCase() === name.toLowerCase();  });
+   var obj = arr[current];
+   arr.splice(current, 1);
+   arr.splice(index, 0, obj);
+   return arr;
 };

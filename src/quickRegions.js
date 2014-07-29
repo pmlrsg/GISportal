@@ -8,46 +8,64 @@ gisportal.quickRegions.setup = function() {
    
    // Reset quick region selection if the screen is moved.
    // Check if event already exists, ie. if a state has been loaded over current
-   if (!map.events.listeners.moveend)
-      map.events.register('moveend', map, gisportal.quickRegionReset);
+   // if (!map.events.listeners.moveend)
+   //    map.events.register('moveend', map, gisportal.quickRegionReset);
   
-   $('.gisportal-quickRegion-select option').remove(); 
-   // Populate Quick Regions from the quickRegions array 
-   $('.gisportal-quickRegion-select').each(function( index ) {
-      for(var i = 0; i < gisportal.quickRegion.length; i++) {
-         $(this).append('<option value="' + i + '">' + gisportal.quickRegion[i][0] + '</option>');
-      }
-      $(this).prepend('<option value="-1">Choose a Region</option>');
-   });
+   // $('.gisportal-quickRegion-select option').remove(); 
+   // // Populate Quick Regions from the quickRegions array 
+   // $('.gisportal-quickRegion-select').each(function( index ) {
+   //    for(var i = 0; i < gisportal.quickRegion.length; i++) {
+   //       $(this).append('<option value="' + i + '">' + gisportal.quickRegion[i][0] + '</option>');
+   //    }
+   //    $(this).prepend('<option value="-1">Choose a Region</option>');
+   // });
    
-   // Change of quick region event handler - happens even if the selection isn't changed
-   $('#quickRegion').change(function(e) {
-       var qr_id = $('#quickRegion').val();
+   // // Change of quick region event handler - happens even if the selection isn't changed
+   // $('#quickRegion').change(function(e) {
+   //     var qr_id = $('#quickRegion').val();
              
-       var bbox = new OpenLayers.Bounds(
+   //     var bbox = new OpenLayers.Bounds(
+   //                 gisportal.quickRegion[qr_id][1],
+   //                 gisportal.quickRegion[qr_id][2],
+   //                 gisportal.quickRegion[qr_id][3],
+   //                 gisportal.quickRegion[qr_id][4]
+   //              ).transform(map.displayProjection, map.projection);
+                
+   //     // Prevent the quick region selection being reset after the zoomtToExtent event         
+   //     map.events.unregister('moveend', map, gisportal.quickRegionReset);
+   //     // Do the zoom to the quick region bounds
+   //     map.zoomToExtent(bbox);
+   //     // Re-enable quick region reset on map pan/zoom
+   //     map.events.register('moveend', map, gisportal.quickRegionReset);
+   // });
+   
+   // $('.lPanel .gisportal-quickRegion-select').change(function(e) {
+   //    var id = $(this).val();
+      
+   //    $('.lPanel .gisportal-quickRegion-name').val(gisportal.quickRegion[id][0]);
+   //    $('.lPanel .gisportal-quickRegion-left').val(gisportal.quickRegion[id][1]);
+   //    $('.lPanel .gisportal-quickRegion-bottom').val(gisportal.quickRegion[id][2]);
+   //    $('.lPanel .gisportal-quickRegion-right').val(gisportal.quickRegion[id][3]);
+   //    $('.lPanel .gisportal-quickRegion-top').val(gisportal.quickRegion[id][4]);         
+   // });
+
+
+  // new quick regions controls
+  console.log('quickRegion setup');
+  $('.js-quick-region').click(function(e) {
+     var region_name = $(this).attr('data-name');
+     console.log(region_name);
+     var qr_id = gisportal.quickRegion.indexOf(region_name);
+     console.log(qr_id);
+     var bbox = new OpenLayers.Bounds(
                    gisportal.quickRegion[qr_id][1],
                    gisportal.quickRegion[qr_id][2],
                    gisportal.quickRegion[qr_id][3],
                    gisportal.quickRegion[qr_id][4]
                 ).transform(map.displayProjection, map.projection);
-                
-       // Prevent the quick region selection being reset after the zoomtToExtent event         
-       map.events.unregister('moveend', map, gisportal.quickRegionReset);
-       // Do the zoom to the quick region bounds
-       map.zoomToExtent(bbox);
-       // Re-enable quick region reset on map pan/zoom
-       map.events.register('moveend', map, gisportal.quickRegionReset);
-   });
-   
-   $('.lPanel .gisportal-quickRegion-select').change(function(e) {
-      var id = $(this).val();
-      
-      $('.lPanel .gisportal-quickRegion-name').val(gisportal.quickRegion[id][0]);
-      $('.lPanel .gisportal-quickRegion-left').val(gisportal.quickRegion[id][1]);
-      $('.lPanel .gisportal-quickRegion-bottom').val(gisportal.quickRegion[id][2]);
-      $('.lPanel .gisportal-quickRegion-right').val(gisportal.quickRegion[id][3]);
-      $('.lPanel .gisportal-quickRegion-top').val(gisportal.quickRegion[id][4]);         
-   });
+
+     map.zoomToExtent(bbox);
+  });
 };
 
 /**
