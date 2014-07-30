@@ -23,13 +23,14 @@
 
 gisportal.config = {
    browseCategories : {
-      "Ecosystem_Element" : "MSFD",
-      "MSFD" : "Ecosystem"
+      "indicator_type" : "Indicator Type",
+      "data_provider" : "Data Provider",
+      "region" : "Region"
    },
    popularIndicators : [
       "Rainfall Rate",
-      "PSurf",
-      "Rainf",
-      "Qair",
+      "Near surface specific humidity",
+      "Surface incident longwave radiation",
+      "Surface incident shortwave radiation"
    ]
 };

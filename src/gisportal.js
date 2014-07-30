@@ -203,10 +203,11 @@ gisportal.createBaseLayers = function() {
       gisportal.baseLayers[name] = layer;
    }
    
-   createBaseLayer('GEBCO', 'http://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
-   createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
-   createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
-   createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
+   createBaseLayer('GEBCO', 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
+   // These options are commented out as they do not offer an SSL connection; they can safely be enabled but the layers will not if the portal is being used over SSL
+   //createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
+   //createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
+   //createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
    // Get and store the number of base layers
    gisportal.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
