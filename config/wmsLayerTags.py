@@ -1,5 +1,18 @@
 
 layers = { 
+    "ecmwf_forcing_lwdown": {
+        "LWdown": {
+            "Confidence": "Unknown",
+            "interval": "3-hourly",
+            "niceName": "Surface incident longwave radiation",
+            "data_provider": "ECMWF Model Data",
+            "indicator_type": [
+                "Radiation"
+                
+            ],
+            "region": "Global",
+        }
+    },
     "ecmwf_forcing_psurf": {
         "PSurf": {
             "Confidence": "Unknown",
@@ -8,19 +21,6 @@ layers = {
             "data_provider": "ECMWF Model Data",
             "indicator_type": [
                 "Pressure"
-                
-            ],
-            "region": "Global",
-        }
-    },
-    "ecmwf_forcing_rainf": {
-        "Rainf": {
-            "Confidence": "Unknown",
-            "interval": "3-hourly",
-            "niceName": "Rainfall Rate",
-            "data_provider": "ECMWF Model Data",
-            "indicator_type": [
-                "Precipitation" 
                 
             ],
             "region": "Global",
@@ -39,29 +39,15 @@ layers = {
             "region": "Global",
         }
     },
-    "ecmwf_forcing_lwdown": {
-        "LWdown": {
+    "ecmwf_forcing_rainf": {
+        "Rainf": {
             "Confidence": "Unknown",
             "interval": "3-hourly",
-            "niceName": "Surface incident longwave radiation",
+            "niceName": "Rainfall Rate",
             "data_provider": "ECMWF Model Data",
             "indicator_type": [
-                "Radiation"
+                "Precipitation" 
                 
-            ],
-            "region": "Global",
-        }
-    }
-    ,
-    "ecmwf_forcing_swdown": {
-        "SWdown": {
-            "Confidence": "Unknown",
-            "interval": "3-hourly",
-            "niceName": "Surface incident shortwave radiation",
-            "data_provider": "ECMWF Model Data",
-            "indicator_type": [
-                "Radiation"
-
             ],
             "region": "Global",
         }
@@ -78,6 +64,46 @@ layers = {
             ],
             "region": "Global",
         }
-    }
+    },
+    "ecmwf_forcing_swdown": {
+        "SWdown": {
+            "Confidence": "Unknown",
+            "interval": "3-hourly",
+            "niceName": "Surface incident shortwave radiation",
+            "data_provider": "ECMWF Model Data",
+            "indicator_type": [
+                "Radiation"
+
+            ],
+            "region": "Global",
+        }
+    },
+    "ecmwf_forcing_tair": {
+        "Tair": {
+            "Confidence": "Unknown",
+            "interval": "3-hourly",
+            "niceName": "Air Temperature",
+            "data_provider": "ECMWF Model Data",
+            "indicator_type": [
+                "Meteorology"
+
+            ],
+            "region": "Global",
+        }
+    },
+    "ecmwf_forcing_wind": {
+        "Wind": {
+            "Confidence": "Unknown",
+            "interval": "3-hourly",
+            "niceName": "Wind Speed",
+            "data_provider": "ECMWF Model Data",
+            "indicator_type": [
+                "Meteorology"
+
+            ],
+            "region": "Global",
+        }
+    },
+    
 
 }
