@@ -257,8 +257,8 @@ gisportal.configurePanel.searchInit = function()  {
    };
    this.fuse = new Fuse(all, options);
 
-   $('.js-search').on('keypress', function()  {
-      gisportal.configurePanel.search($(this).val());
+   $('.js-search').on('keyup', function()  {
+     gisportal.configurePanel.search($(this).val());
    });
 };
 
