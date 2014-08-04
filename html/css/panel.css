@@ -1,0 +1,303 @@
+/*------------------------------------*\
+    Panels
+\*------------------------------------*/
+
+.panel  {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 25px;
+  bottom: 125px;
+  left: 25px;
+  /*height: 95%;*/
+  /*overflow: hidden;*/
+  min-width: 290px;
+  width: 33.3%;
+  max-width: 500px;
+  user-select: none;
+}
+
+.panel.large  {
+  /*min-width: 500px;*/
+}
+
+.panel-header,
+.panel-footer  {
+  background-color: #32253f;
+}
+
+.panel-header  {
+  color: #fff;
+  height: 45px;
+}
+
+.panel-header h2  {
+   line-height: 45px;
+   padding-left: 15px;
+}
+
+.panel-header button  {
+   position: absolute;
+   right: 3px;
+   top: 10px;
+}
+
+.panel-footer  {
+  padding-top: 19px;
+  padding-bottom: 18px;
+  padding-right: 9px;
+  padding-left: 9px;
+}
+
+#configurePanel .panel-footer  {
+  text-align: right;
+}
+
+.panel-container  {
+    background-color: #efedf1;
+    flex: 1;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+ }
+
+#configurePanel .panel-container  {
+   padding-top: 10px;
+}
+
+.panel-footer  {
+  padding-top: 10px;
+}
+
+.panel-tab  {
+  background-color: #ffffff;
+  width: 100%;
+  display: none;
+  padding-top: 20px;
+}
+
+.panel-tab-content  {
+  /*overflow-y: auto;*/
+  /*overflow-y: hidden;*/
+  position: relative;
+  width: 100%;
+}
+
+.panel-tab-content h3  {
+   margin-left: 13px;
+}
+
+.panel-tab-trigger  {
+  position: fixed;
+  opacity: 0;
+  top: 0;
+  left: 0;
+}
+
+.panel-tab-trigger:checked + .panel-tab  {
+  display: block;
+}
+
+.panel-tab-trigger:checked + table.panel-tab  {
+   display: table;
+}
+
+.panel-tab-name  {
+  border-bottom: 1px solid #e0dce4;
+  border-top: 1px solid transparent;
+  display: inline-block;
+  min-height: 40px;
+  width: 50%;
+}
+
+.panel-tab-name.browse-tabs  {
+   width: 33.33%;
+}
+
+.panel-tab-name.focus,
+.panel-tab-name:hover,
+.panel-tab-name.active  {
+  color: #111111;
+}
+
+.panel-tab-name.active  {
+  background-color: #fff;
+  border-bottom: 1px solid #fff;
+  border-top: 1px solid #e0dce4;
+  border-right: 1px solid #e0dce4;
+}
+
+.panel-tab-name.active:last-of-type  {
+  border-left: 1px solid #e0dce4;
+  border-right: 0 none;
+}
+
+.panel-tab-name.dark.active  {
+  background-color: #efedf1;
+  border-bottom: 1px solid #efedf1;
+}
+
+.panel-tab-name.dark.active:last-of-type  {
+  border-left: 1px solid #e0dce4;
+  border-right: 0 none;
+}
+
+
+.dark .panel-tab,
+.panel-tab-dark  {
+  background-color: #efedf1;
+}
+
+.panel-tab.indicator-select  {
+   padding-top: 0;
+}
+
+.panel-list  {
+  margin-bottom: 20px;
+  overflow-x: hidden;
+}
+
+.panel-list li  {
+  background-color: #ffffff;
+}
+
+.panel-list p {
+  text-transform: capitalize;
+}
+
+/* over specified */
+.panel-list p.grid-cell.fill  {
+   margin:0;
+   line-height: 40px;
+}
+
+.panel-list li:nth-child(even)  {
+  background-color: #fbfafb;
+}
+
+.build-map  {
+   padding-bottom: 5px;
+   padding-top: 10px;
+}
+
+.build-map li  {
+   padding-bottom: 10px;
+   text-transform: capitalize;
+}
+
+.build-map p  {
+   display: inline-block;
+}
+
+#configurePanel .panel-tab.indicator-select  { 
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.js-indicators .panel-tab.indicator-select li {
+   border-bottom: 1px solid #e0dce4;
+
+   padding-left: 9px;
+   padding-right: 9px;
+   padding-bottom: 9px;
+   padding-top: 10px;
+}
+
+.indicator-select label  {
+   text-transform: capitalize;
+}
+
+select,
+.indicator-dropdown {
+  background: white;
+  border-style: none;
+  border: 1px solid #d8d3dd;
+  border-radius: 0;
+  color: #8a7b9b;
+  display: block;
+  /*-webkit-appearance: none;
+  -moz-appearance: none;*/
+  text-align: left;
+  text-indent: 1px;
+  text-overflow: '';
+  line-height: 33px;
+  padding-left: 10px;
+  text-transform: capitalize;
+  margin-top: 9px;
+  width: 100%;
+}
+
+/* Firefox has a weird padding problem */
+@-moz-document url-prefix() {
+   #indicatorsPanel select  {
+      line-height: 28px;
+      padding-top: 7px;  
+   }
+}
+
+/* I'm using a hack for multiple select
+ * so overriding the height breaks
+ * the hack. */
+#indicatorsPanel select  {
+  height: 35px;
+}
+
+.indicator-select .icon_arrow  {
+   float: right;
+   margin-top: 4px;
+   margin-right: 5px;
+}
+
+.panel-list.fake-select {
+  border: 1px solid #d8d3dd;
+  border-top: 0 none;
+}
+
+.panel-list .text-button {
+  line-height: 30px;
+  padding-left: 8px; 
+}
+
+.full-height  {
+   height: 100%;
+}
+
+.search-results p  {
+   text-transform: capitalize; 
+}
+
+/* Hide select so that mobile gets mobile version
+ * and desktop gets custom */
+.hide-select  {
+   opacity: 0; 
+   position: absolute; 
+   z-index: -1;  
+   width: 0px !important;
+   margin-top: -35px !important; 
+}
+
+.search  {
+   border: 1px solid #d8d3dd;
+   display: block;
+   height: 45px;
+   padding: 5px;
+   padding-left: 10px;
+   margin: 0 auto; 
+   width: 95%;
+}
+
+.show-tools  {
+
+   background-color: #fafafb;
+   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
+   border: 1px solid #b1a7bc;
+   line-height: 40px;
+   padding-right: 20px;
+   left: 25px;
+   top: 25px;
+   position: absolute;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+}

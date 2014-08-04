@@ -13,9 +13,7 @@ import sqlite3 as sqlite
 portal_user = Blueprint('portal_user', __name__)
 
 COMMON_PROVIDERS = {'google': 'https://www.google.com/accounts/o8/id',
-                    'yahoo': 'https://yahoo.com/',
-                    'aol': 'http://aol.com/',
-                    'steam': 'https://steamcommunity.com/openid/'
+                    'yahoo': 'https://yahoo.com/'
 }
 
 @portal_user.route('/')

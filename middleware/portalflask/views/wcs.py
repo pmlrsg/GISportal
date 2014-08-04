@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request, jsonify, g, current_app
+from flask import Blueprint, abort, request, Response, jsonify, g, current_app
 from portalflask.core.param import Param
 from portalflask.core import error_handler
 
@@ -23,15 +23,21 @@ def getWcsData():
 
    params = getParams() # Gets any parameters
    params = checkParams(params) # Checks what parameters where entered
-   
+   import pprint
+   current_app.logger.debug(pprint.pprint(params))
    params['url'] = createURL(params)
    current_app.logger.debug('Processing request...') # DEBUG
    current_app.logger.debug(params['url'].value)
    type = params['type'].value
    if type == 'histogram': # Outputs data needed to create a histogram
       output = getBboxData(params, histogram)
-   elif type == 'timeseries': # Outputs a set of standard statistics
-      output = getBboxData(params, basic)
+   elif type == 'timeseries': # Outputs a set of standard statistics  
+      if params.get('output_format') is not None:
+         if params['output_format']._value == 'csv':
+            data = getBboxData(params, basic)
+            output = toCSV(data)
+      else:
+         output = getBboxData(params, basic)
    elif type == 'scatter': # Outputs a scatter graph
       output = getBboxData(params, scatter)
    elif type == 'hovmollerLon' or 'hovmollerLat': # outputs a hovmoller graph
@@ -52,7 +58,7 @@ def getWcsData():
       elif choice == 3:
          abort(404)
       elif choice == 4:
-         return jsonify(outpu = "edfwefwrfewf")
+         return jsonify(output = "edfwefwrfewf")
       elif choice == 5:
          abort(502)
       elif choice == 6:
@@ -64,15 +70,22 @@ def getWcsData():
    current_app.logger.debug('Jsonifying response...') # DEBUG
    
    try:
-      jsonData = jsonify(output = output, type = params['type'].value, coverage = params['coverage'].value, error = g.graphError)
+      if params.get('output_format') is not None:
+         if params['output_format']._value == 'csv':
+            outputData = Response(output, mimetype='text/csv')
+      else:
+         outputData = jsonify(output = output, type = params['type'].value, coverage = params['coverage'].value, error = g.graphError)
    except TypeError as e:
       g.error = "Request aborted, exception encountered: %s" % e
-      error_handler.setError('2-06', None, g.user.id, "views/wcs.py:getWcsData - Type erro, returning 400 to user. Exception %s" % e, request)
+      user = None
+      if g.user:
+         user = g.user.id
+      error_handler.setError('2-06', None, user, "views/wcs.py:getWcsData - Type error, returning 400 to user. Exception %s" % e, request)
       abort(400) # If we fail to jsonify the data return 400
       
    current_app.logger.debug('Request complete, Sending results') # DEBUG
    
-   return jsonData
+   return outputData
 
 """
 Gets any parameters.
@@ -85,6 +98,7 @@ def getParams():
    nameToParam["request"] = Param("request", False, True, 'GetCoverage')
    nameToParam["version"] = Param("version", False, True, request.args.get('version', '1.0.0'))
    nameToParam["format"] = Param("format", False, True, request.args.get('format', 'NetCDF3'))
+   nameToParam["output_format"] = Param("output_format", True, True, request.args.get('output_format', None))
    nameToParam["coverage"] = Param("coverage", False, True, request.args.get('coverage'))
    nameToParam["crs"] = Param("crs", False, True, 'OGC:CRS84')
    
@@ -120,7 +134,10 @@ def checkParams(params):
       if params[key].value == None or len(params[key].value) == 0:
          if not params[key].isOptional():            
             g.error = 'required parameter "%s" is missing or is set to an invalid value' % key
-            error_handler.setError('2-06', None, g.user.id, "views/wcs.py:checkParams - Parameter is missing or invalid, returning 400 to user. Parameter %s" % key, request)
+            user = None
+            if g.user:
+               user = g.user.id  
+            error_handler.setError('2-06', None, user, "views/wcs.py:checkParams - Parameter is missing or invalid, returning 400 to user. Parameter %s" % key, request)
             abort(400)
       else:
          checkedParams[key] = params[key]
@@ -152,7 +169,7 @@ def createURL(params):
    return Param("url", False, False, url)
       
 def contactWCSServer(url):
-   current_app.logger.debug('Contacting WCS Server with request...')
+   current_app.logger.debug('Contacting WCS Server with request...' + url)
    resp = urllib2.urlopen(url)     
    current_app.logger.debug(url)
    current_app.logger.debug('Request successful')
@@ -238,6 +255,31 @@ def getPointData(params, method):
    g.graphError = "Could not retrieve a data point for that area"
    return {}
 
+def toCSV(data):
+   import csv
+   import json
+   import collections
+
+   temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
+
+   data = data['data'] # To get the actual data, with the dates
+
+   csv_data = csv.writer(open(temp.name, "wb+"))
+   
+
+   csv_data.writerow(['date','std','max','min','median','mean'])
+
+   ordered = collections.OrderedDict(sorted(data.items())) 
+
+   for row in ordered.iterkeys():
+      row_data = [row] # First column should be date (the row key)
+      for col in ordered[row].iterkeys():
+         row_data.append(ordered[row][col])
+      csv_data.writerow(row_data)
+   
+   current_app.logger.debug(csv_data)
+   return temp
+
 def getBboxData(params, method):
    import os, errno
    try:
@@ -245,6 +287,25 @@ def getBboxData(params, method):
    except urllib2.URLError as e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
          if e.code == 400:
+            ## THIS IS BAD BAD CODE PLEASE DO NOT KILL ME. HOWEVER, DO DELETE ASAP 
+            ## On the first attempt, it may return a 400 due to vertical attribute in data
+            ## The second try removes the negative to attempt to fix.
+            try:
+               current_app.logger.debug(params["vertical"].value)
+               params["vertical"]._value = params["vertical"].value[1:]
+               params['url'] = createURL(params)
+               datavar = getData(params, method)
+               current_app.logger.debug(datavar)
+               return datavar
+
+            except urllib2.URLError as e:
+               if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
+                  if e.code == 400:
+                     g.error = "Failed to access url, make sure you have entered the correct parameters."
+                  if e.code == 500:
+                     g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
+                  abort(400)
+            ## / BAD CODE
             g.error = "Failed to access url, make sure you have entered the correct parameters."
          if e.code == 500:
             g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
@@ -252,7 +313,6 @@ def getBboxData(params, method):
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, g.user.id, "views/wcs.py:getBboxData - Failed to access url, returning 400 to user. Exception %s" % e, request)
-      abort(400) # return 400 if we can't get an exact code
    #except IOError as e:
       #if e[0] == 2:
          #g.error = "Unable to save file"

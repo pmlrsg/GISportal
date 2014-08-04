@@ -93,6 +93,7 @@ def setup_config(app):
 def setup_blueprints(app):
    from views.user import portal_user
    from views.state import portal_state
+   from views.errors import portal_errors
    from views.graph import portal_graph
    #from views.quickregions import portal_quickRegions
    #from views.roi import portal_roi
@@ -103,6 +104,7 @@ def setup_blueprints(app):
 
    app.register_blueprint(portal_user)
    app.register_blueprint(portal_state)
+   app.register_blueprint(portal_errors)
    app.register_blueprint(portal_graph)
    app.register_blueprint(portal_proxy)
    app.register_blueprint(portal_wfs)
@@ -110,7 +112,6 @@ def setup_blueprints(app):
 
 path = sys.path[0]
 app = create_app(path)
-
 oid = OpenID(app, settings.OPENID_FOLDER)
 print path
 

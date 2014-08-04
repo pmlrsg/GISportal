@@ -1,0 +1,73 @@
+/*------------------------------------*\
+    Scalebar
+\*------------------------------------*/
+
+.noUi-connect  {
+  background-color: #d8d3dd;
+  box-shadow: none;
+}
+
+.noUi-handle  {
+  background-color: #b1a7bc;
+  border-radius: 50%;
+  box-shadow: none;
+}
+
+.noUi-target  {
+  border-radius: 25px;
+}
+
+.noUi-origin  {
+   border-radius: 25px;
+}
+
+input.min,
+input.max  {
+  margin: 10px 0;
+  width: 90px;
+}
+
+input.max  {
+   float: right;
+}
+
+.panel-tab.scalebar-tab  {
+  background-color: #fbfafb;
+  padding: 9px;
+}
+
+.scale-options  {
+  background-color: #fbfafb;
+  border-bottom: 1px solid #e0dce4;
+  padding-bottom: 10px;
+}
+
+.indicator-options  {
+  padding-top: 10px;
+}
+
+.indicator-option  {
+  margin-bottom: 10px;
+}
+
+
+/* Rotated scalebar with help from Ana Tudor
+   https://twitter.com/thebabydino/status/471630268726788096 */
+
+.scalebar  {
+   transform: rotate(-90deg) translateY(-100%) translateX(-50%);
+   transform-origin: 0 0;
+   display: block;
+   width: 97%;
+}
+
+.scalebar-outer  {
+   display: inline-block; /* so that its width = the width of the image */
+}
+
+.scalebar-inner  {
+   height: 0;
+   padding: 50% 0; /* both padding-top & padding bottom = 50% the width of parent = 50% width of image => space taken vertically with height: 0 is the width of image */
+   transform: scaleX(-1);
+   transform-origin: 0 0;
+}
