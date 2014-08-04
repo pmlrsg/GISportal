@@ -20,7 +20,7 @@ layers = {
             "niceName": "Surface atmospheric pressure",
             "data_provider": "ECMWF Model Data",
             "indicator_type": [
-                "Pressure"
+                "Meteorology"
                 
             ],
             "region": "Global",
