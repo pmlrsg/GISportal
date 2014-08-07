@@ -49,7 +49,9 @@ First we need to clone the repository.
 The following dependencies will need to be installed by your package manager (for example, yum). Some of the names may be different depending on your system, we use Fedora. Some may already be installed.
 ``httpd mod_wsgi python-devel numpy netcdf-devel libyaml libxml libxslt-devel openssl-devel gcc``
 We also need to install all the required libraries. This can be done in a few ways, the easiest using **pip** and the ``requirements.txt``. This may need sudo permissions.
-``pip install -r middleware/requirements.txt``
+``pip install -r middleware/requirements.txt``. We then need to enable the git submodule for nvd3, this is done by executing the following commands in the base directory.
+``git submodule init``
+``git submodule update``
 
 3. **Build JavaScript/CSS**  
 For production, JavaScript and CSS need to be minifed. This is done with a build script. This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
@@ -115,6 +117,9 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
     
     sudo yum install python-devel numpy netcdf-devel libyaml libxml libxslt-devel openssl-devel gcc
     sudo pip install -r middleware/requirements.txt
+
+    git submodule init
+    git submodule update
     
     mkdir config
     cp config_examples/* config/
