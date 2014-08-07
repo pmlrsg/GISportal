@@ -18,5 +18,6 @@ gisportal.config = {
    popularIndicators : [
       "Z6c", "max_Chl_surf", "MicroZoo1",
       "NPP", "Oxygen"
-   ]
+   ],
+   defaultStates: []
 };

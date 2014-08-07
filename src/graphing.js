@@ -57,10 +57,12 @@ gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
    var units = gisportal.layers[options.id].units;
-
+   console.log("mystery function 2");
+   console.log(data);
+   console.log(options);
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
-         id : data.coverage,
+         id : options.id,
          title : title,
          units: units
       });

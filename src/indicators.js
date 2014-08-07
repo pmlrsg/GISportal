@@ -143,6 +143,8 @@ gisportal.indicatorsPanel.changeIndicator = function(current, id)  {
   }
    
    if (gisportal.microLayers[id]) {
+      console.log('inside mystery function');
+      console.log(id);
       gisportal.indicatorsPanel.selectLayer(id);
       var name = gisportal.microLayers[id].name.toLowerCase();
       gisportal.indicatorsPanel.addToPanel({
@@ -380,7 +382,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
       var onMetadata = function()  {
          $.get('templates/tab-scalebar.mst', function(template)  {
       var indicator = gisportal.layers[id];
-         if (indicator.elevationCache.length > 0)  {         
+               if (indicator.elevationCache.length > 0)  {         
             indicator.hasElevation = true;
          }
          
@@ -408,7 +410,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
             var value = $(this).val();
             indicator.style = value;
             indicator.mergeNewParams({ styles: value });
-            gisportal.indicatorsPanel.scalebarTab(id, true);
+            gisportal.indicatorsPanel.scalebarTab(microlayer.name, true);
          });
 
          gisportal.indicatorsPanel.checkTabFromState(id);
@@ -575,7 +577,7 @@ gisportal.indicatorsPanel.getParams = function(id)  {
       // Take direction === up as default
       //if (direction === "down") elevation = -elevation; 
       return elevation;
-   }
+   };
   
    var indicator = gisportal.microLayers[id];
 
@@ -594,6 +596,15 @@ gisportal.indicatorsPanel.getParams = function(id)  {
       graphYAxis: graphYAxis,
       graphZAxis: indicator.id
    };
+   var bbox = $('#tab-' + id + '-coordinates').val();
+   if (bbox.indexOf('POLYGON') !== -1){
+      graphParams.isPolygon = 'true';
+      
+   }
+   if (bbox.indexOf('LINESTRING') !== -1){
+      graphParams.isLine = 'true';
+      
+   }
    return graphParams;
 };
 gisportal.indicatorsPanel.createGraph = function(id)  {
@@ -603,7 +614,7 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
       var title = graphParams.type + " of " + indicator.name;
       
       var graphObject = {};
-      graphObject.graphData = graphParams;      
+      graphObject.graphData = graphParams;
       graphObject.description = title;
       graphObject.title = title;
 
@@ -642,10 +653,13 @@ gisportal.indicatorsPanel.exportData = function(id)  {
 };
 
 gisportal.indicatorsPanel.exportRaw = function(id)  {
+   // adding in logic to check to see if irregular polygon/line
+   // have ben used, if so we will not just replace link with wcs URL
+   // we will instead give url to middleware
    var link = $('#export-netcdf');
    
-   var indicator = gisportal.microLayers[id];    
-
+   var indicator = gisportal.microLayers[id];
+   var graphParams = $.param(this.getParams(id));
    var url = null;
    var urlParams = {
       service: 'WCS',
@@ -660,8 +674,12 @@ gisportal.indicatorsPanel.exportRaw = function(id)  {
    urlParams['time'] = $('.js-min[data-id="' + indicator.id + '"]').val() + "/" + $('.js-max[data-id="' + indicator.id + '"]').val(); 
    
    var request = $.param(urlParams);
+   if(urlParams['bbox'].indexOf("POLYGON") !== -1 || urlParams['bbox'].indexOf("LINESTRING") !== -1){
+      url = "/service/download?"+graphParams;
+   }
+   else {
    url = indicator.wcsURL + request;
-
+}
    $(link).attr('href', url); 
 
 };

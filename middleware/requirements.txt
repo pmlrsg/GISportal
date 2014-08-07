@@ -7,3 +7,5 @@ lxml
 PyYAML
 flask_script
 BeautifulSoup
+shapely
+PIL
