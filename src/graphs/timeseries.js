@@ -56,7 +56,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          });
 
          var panel = $('#graphPanel .panel-container');
-         d3.select('[data-id="' + data.coverage + '"] .graph svg')
+         d3.select('[data-id="' + options.id + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
               .datum(lines())  

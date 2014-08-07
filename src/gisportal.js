@@ -373,8 +373,8 @@ gisportal.checkNameUnique = function(microLayer, count) {
    if(id in gisportal.microLayers) {
       gisportal.checkNameUnique(microLayer, ++count);
    } else {
-      if(count !== 0) { 
-         microLayer.id = microLayer.id + count; 
+      if(count !== 0) {
+         microLayer.id = microLayer.id + count;
       }
    }
    
