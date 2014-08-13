@@ -41,6 +41,8 @@
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
+
+
 </head>
 <body role="application">
    
@@ -89,6 +91,8 @@
       <div class="panel-header">
          <h2>Choose your indicators</h2>
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+         <button class="icon_session_share icon-svg light js-session-sharing-toggle">Session Sharing</button>
+         <button class="icon_map_tools icon-svg light js-map-tools">Map Tools</button>
       </div>
       <div class="panel-container">
          <div class="build-map">
@@ -142,6 +146,8 @@
       <div class="panel-header">
          <h2>Map Tools</h2>
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+         <button class="icon_session_share icon-svg light js-session-sharing-toggle">Session Sharing</button>
+         <button class="icon_map_tools icon-svg light js-map-tools">Map Tools</button>
       </div>
       <div class="panel-container">
         <ul class="js-indicators indicator-list grid-list">
@@ -184,6 +190,62 @@
         <button id="share-map" class="js-share">Share</button> -->
       </div>
     </div> 
+
+    <div id="sessionSharingPanel" class="panel hidden">
+      <div class="panel-header">
+        <h2>Session Sharing</h2>
+        <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+        <button class="icon_session_share icon-svg light js-session-sharing-toggle active">Session Sharing</button>
+        <button class="icon_map_tools icon-svg light js-map-tools">Map Tools</button>
+      </div>
+      <div class="panel-container">
+        <textarea id="socketCmd" rows="4" cols="55"></textarea><button id="socketSend">Send</button> 
+        <button id="btn-presenter">Presenter</button>
+        <div id="socketReturn" style="width:100%; height: 500px; overflow:scroll;"></div>
+      </div>
+    </div>
+
+    <div id="mapToolsPanel" class="panel hidden">
+      <div class="panel-header">
+        <h2>Map Tools</h2>
+        <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+        <button class="icon_session_share icon-svg light js-session-sharing-toggle">Session Sharing</button>
+        <button class="icon_map_tools icon-svg light js-map-tools active">Map Tools</button>
+      </div>
+      <div class="panel-container">
+        <div class="map-displayoptions">
+          <button class="icon_close icon-svg dark js-hide-map-tools">Close Map Tools</button>
+          <h3>Display Options</h3>
+          <ul class="js-map-options"></ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Map controls -->
+    <div class="map_controls">
+      <!--<button class="icon_region icon-svg dark separator js-quick-region">Select Region</button>
+      <button class="icon_pan icon-svg dark separator js-pan-map">Pan</button>-->
+      <button class="icon_zoomin icon-svg dark separator js-zoomin" id="mapZoomIn">Zoom In</button>
+      <button class="icon_zoomout icon-svg dark js-zoomout" id="mapZoomOut">Zoom Out</button>
+    </div>
+    <div class="map_quick_regions hidden">
+      <ul class="panel-list grid-list">
+        <li>
+          <p class="grid-cell fill"><label for="map-view-world_view">World View</label>
+          <input type="radio" name="quick_region" id="map-view-world_view" data-name="World View" class="js-quick-region" /></p>
+        </li>
+        <li class="">
+          <p class="grid-cell fill"><label for="map-view-north_sea">North Sea</label>
+          <input type="radio" name="quick_region" id="map-view-north_sea" data-name="North Sea" class="js-quick-region" /></p>
+        </li>
+        <li>
+          <p class="grid-cell fill"><label for="map-view-english_channel">English Channel</label>
+          <input type="radio" name="quick_region" id="map-view-english_channel" data-name="English Channel" class="js-quick-region" /></p>
+        </li>
+
+      </ul>
+    </div>
 
 </body>
 </html>

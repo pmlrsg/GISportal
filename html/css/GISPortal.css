@@ -1460,6 +1460,13 @@ input[type="text"]  {
    top: 10px;
 }
 
+.panel-header button.icon_session_share  {
+   right: 43px;
+}
+
+.panel-header button.icon_map_tools  {
+   right: 82px;
+}
 .panel-footer  {
   padding-top: 19px;
   padding-bottom: 18px;
@@ -1860,6 +1867,9 @@ select,
    background-image: url('../img/icons/map.svg');
 }
 
+.icon_map_tools  {
+   background-image: url('../img/icons/map-tools.svg');
+}
 .icon_rect  {
    background-image: url('../img/icons/select-rect.svg');
 }
@@ -1867,6 +1877,18 @@ select,
 .icon_analyse  {
    background-image: url('../img/icons/graph.svg');
 }
+
+.icon_session_share  {
+  background-image: url('../img/icons/session-share.svg');
+} 
+
+.icon_session_share_member  {
+  background-image: url('../img/icons/session-share-member.svg');
+} 
+
+.icon_session_share_presenter  {
+  background-image: url('../img/icons/session-share-presenter.svg');
+} 
 
 .icon_share  {
   background-image: url('../img/icons/share.svg');
@@ -2940,3 +2962,9 @@ fill-opacity: 0 !important;
 
 .map_controls .icon-svg  { height: 44px; }
 
+.map-displayoptions { background: #fff; padding: 10px; position: relative;}
+
+.map-displayoptions .icon_close { position: absolute; top: 10px; right:4px; }
+
+.map-displayoptions select {height: 35px; }
+.map-displayoptions li {margin-top:10px;}

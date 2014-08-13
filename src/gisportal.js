@@ -91,6 +91,13 @@ gisportal.providers = {
    "PML" : { "logo" : "img/pml.png", "url" : "http://www.pml.ac.uk/default.aspx" }  
 };
 
+gisportal.countryBorderLayers = {
+   "none" : { "id" : "0", "name" : "No Borders", "url": ""},
+   "countries_all_white" : { "id" : "countries_all_white", "name" : "White border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+   "countries_all_black": { "id" : "countries_all_black", "name" : "Black border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+   "countries_all_default": { "id" : "countries_all_default", "name" : "Blue border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+};
+
 /**
  * The OpenLayers map object
  * Soon to be attached to namespace
@@ -205,14 +212,50 @@ gisportal.createBaseLayers = function() {
    
    createBaseLayer('GEBCO', 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
    // These options are commented out as they do not offer an SSL connection; they can safely be enabled but the layers will not if the portal is being used over SSL
-   //createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
-   //createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
-   //createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
+   createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
+   createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
+   createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
    
    // Get and store the number of base layers
    gisportal.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 };
 
+/** Create  the country borders overlay
+ *
+ */
+gisportal.createCountryBorderLayer = function(layerName) {
+   // first remove the old country border layer if it exists
+   var old_layer = map.getLayersByName('country_borders');
+   if (old_layer.length > 0) {
+      old_layer[0].destroy();
+   }
+
+   if (layerName != '0') {
+      // then add the selected one
+      var layer = new OpenLayers.Layer.WMS(
+         'country_borders',
+         //'https://rsg.pml.ac.uk/geoserver/wms?',
+         gisportal.countryBorderLayers[layerName].url,
+         { layers: gisportal.countryBorderLayers[layerName].id, transparent: true },
+         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
+      );
+
+      layer.id = 'country_borders';
+      layer.controlID = 'country_borders';
+      layer.displayTitle = 'Country Borders';
+      layer.name = 'country_borders';
+      
+      map.addLayer(layer);   
+   }
+ }
+
+gisportal.setCountryBordersToTopLayer = function() {
+   // if the country border layer is on the map move it to the top
+   var border_layer = map.getLayersByName('country_borders');
+   if (border_layer.length > 0) {
+      border_layer[0].setZIndex(2000);   
+   }
+}
 /**
  * Create all the reference layers for the map.
  */
@@ -337,42 +380,6 @@ gisportal.createOpLayers = function() {
    // Batch add here in future.
 };
 
-/** Create  the country borders overlay
- *
- */
-gisportal.createCountryBorderLayer = function(layerName) {
-   // first remove the old country border layer if it exists
-   var old_layer = map.getLayersByName('country_borders');
-   if (old_layer.length > 0) {
-      old_layer[0].destroy();
-   }
-
-   if (layerName != '0') {
-      // then add the selected one
-      var layer = new OpenLayers.Layer.WMS(
-         'country_borders',
-         'https://rsg.pml.ac.uk/geoserver/wms?',
-         { layers: layerName, transparent: true },
-         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
-      );
-
-      layer.id = 'country_borders';
-      layer.controlID = 'country_borders';
-      layer.displayTitle = 'Country Borders';
-      layer.name = 'country_borders';
-      
-      map.addLayer(layer);   
-   }
- }
-
-gisportal.setCountryBordersToTopLayer = function() {
-   // if the country border layer is on the map move it to the top
-   var border_layer = map.getLayersByName('country_borders');
-   if (border_layer.length > 0) {
-      border_layer[0].setZIndex(2000);   
-   }
-}
-
 /**
  * Get a layer that has been added to the map by its id.
  * In future this function will return a generic layer
@@ -478,6 +485,19 @@ gisportal.customPermalinkArgs = function()
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
+   /* 
+    * Set up event handling for the map 
+    */
+   function mapEvent(event) {
+      sessionSharingShareEvent(event.type);
+   }
+   function mapBaseLayerChanged(event) {
+      sessionSharingShareEvent(event.type + " " + event.layer.name);
+   }
+   function mapLayerChanged(event) {
+      sessionSharingShareEvent(event.type + " " + event.layer.name + " " + event.property);
+   }
+
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
@@ -486,7 +506,13 @@ gisportal.mapInit = function() {
             zoomInId: "mapZoomIn",
             zoomOutId: "mapZoomOut"
         })
-      ]
+      ],
+      eventListeners: {
+         "moveend" : mapEvent,
+         "zoomend" : mapEvent,
+         "changeLayer" : mapLayerChanged,
+         "changebaselayer" : mapBaseLayerChanged
+      }
    });
    
    //map.setupGlobe(map, 'map', {
@@ -503,13 +529,6 @@ gisportal.mapInit = function() {
    // Create the reference layers and then add them to the map
    //gisportal.createRefLayers();
 
-   // show the country borders layer
-   gisportal.createCountryBorderLayer('countries_all_white');
-
-   /* 
-    * Set up event handling for the map 
-    */
-   
    // Create map controls identified by key values which can be activated and deactivated
    gisportal.mapControls = {
       zoomIn: new OpenLayers.Control.ZoomBox(
@@ -813,7 +832,7 @@ gisportal.main = function() {
  
    // Setup the gritter so we can use it for error messages
    gisportal.gritter.setup();
-
+      
    // Set up the map
    // any layer dependent code is called in a callback in mapInit
    gisportal.mapInit();
@@ -822,6 +841,8 @@ gisportal.main = function() {
    gisportal.indicatorsPanel.initDOM();
    gisportal.graphs.initDOM();
    gisportal.analytics.initGA();
+   
+   
 
    $('.js-show-tools').on('click', showPanel);
 
@@ -839,7 +860,9 @@ gisportal.main = function() {
 
    // Start setting up anything that is not layer dependent
    gisportal.nonLayerDependent();
-  
+
+   gisportal.maptools.init();
+   gisportal.sessionsharing.initDOM();
 
    // Grab the url of any state.
    var stateID = gisportal.utils.getURLParameter('state');
@@ -854,6 +877,11 @@ gisportal.main = function() {
    }
 
    gisportal.replaceAllIcons(); 
+
+   // make sure the user doesn't use the back button or refresh without knowing the consequences; commented out during development as it gets a bit annoying
+   // $(window).bind('beforeunload', function(){
+   //    return "This will reset your map and any selected indicators will be lost";
+   // });
 };
 
 

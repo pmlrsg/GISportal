@@ -71,6 +71,9 @@
    background-image: url('../img/icons/map.svg');
 }
 
+.icon_map_tools  {
+   background-image: url('../img/icons/map-tools.svg');
+}
 .icon_rect  {
    background-image: url('../img/icons/select-rect.svg');
 }
@@ -78,6 +81,18 @@
 .icon_analyse  {
    background-image: url('../img/icons/graph.svg');
 }
+
+.icon_session_share  {
+  background-image: url('../img/icons/session-share.svg');
+} 
+
+.icon_session_share_member  {
+  background-image: url('../img/icons/session-share-member.svg');
+} 
+
+.icon_session_share_presenter  {
+  background-image: url('../img/icons/session-share-presenter.svg');
+} 
 
 .icon_share  {
   background-image: url('../img/icons/share.svg');

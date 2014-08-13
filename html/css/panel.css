@@ -42,6 +42,13 @@
    top: 10px;
 }
 
+.panel-header button.icon_session_share  {
+   right: 43px;
+}
+
+.panel-header button.icon_map_tools  {
+   right: 82px;
+}
 .panel-footer  {
   padding-top: 19px;
   padding-bottom: 18px;

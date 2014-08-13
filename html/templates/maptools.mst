@@ -1,0 +1,16 @@
+<li>
+	<label for="select-basemap">Base May Layer</label>
+	<select id="select-basemap">
+		{{#baseLayers}}
+			<option value="{{id}}">{{name}}</option>
+		{{/baseLayers}}
+	</select>
+</li>
+<li>
+	<label for="select-country-borders">Country Borders</label>
+	<select id="select-country-borders">
+		{{#countryBorders}}
+			<option value="{{id}}">{{name}}</option>
+		{{/countryBorders}}
+	</select>
+</li>

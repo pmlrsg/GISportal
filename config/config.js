@@ -32,5 +32,9 @@ gisportal.config = {
       "Near surface specific humidity",
       "Surface incident longwave radiation",
       "Surface incident shortwave radiation"
-   ]
+   ],
+   countryBorder : {
+    'defaultLayer' : 'countries_all_white',
+    'alwaysVisible' : true
+  }
 };
