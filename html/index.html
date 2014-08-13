@@ -199,9 +199,18 @@
         <button class="icon_map_tools icon-svg light js-map-tools">Map Tools</button>
       </div>
       <div class="panel-container">
-        <textarea id="socketCmd" rows="4" cols="55"></textarea><button id="socketSend">Send</button> 
-        <button id="btn-presenter">Presenter</button>
-        <div id="socketReturn" style="width:100%; height: 500px; overflow:scroll;"></div>
+        <div class="panel-content-session-sharing">
+          <button class="icon_close icon-svg dark js-hide-session-sharing">Close Session Sharing</button>
+          <h3>Session Sharing</h3>
+          <p>To find out more about sharing a session please have a look at the <a href="sharing" class="">session sharing help page</a></p>
+          <div class="js-session-sharing-holder">
+            <button class="brand start-session-sharing js-start-session-sharing" />Start Session Sharing</button>
+            <div class="js-session-sharing-console hidden">
+              <div class="js-session-sharing-status-msg">Connecting to sharing server...</div>
+
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -213,7 +222,7 @@
         <button class="icon_map_tools icon-svg light js-map-tools active">Map Tools</button>
       </div>
       <div class="panel-container">
-        <div class="map-displayoptions">
+        <div class="panel-content-map-tools">
           <button class="icon_close icon-svg dark js-hide-map-tools">Close Map Tools</button>
           <h3>Display Options</h3>
           <ul class="js-map-options"></ul>

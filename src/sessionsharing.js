@@ -13,23 +13,50 @@ gisportal.sessionsharing.initDOM = function() {
       $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);      
       
    });
+
+   $('.js-start-session-sharing').click(function() {
+   	gisportal.sessionsharing.initSession();
+
+   });
 }	
 
 gisportal.sessionsharing.initSession = function() {
+	// hide the start button and show the options
+	$('.js-start-session-sharing').toggleClass('hidden', true);
+	$('.js-session-sharing-console').toggleClass('hidden', false);
 
-	$.getScript("http://pmpc1465.npm.ac.uk:6789/socket.io/socket.io.js")
+	var protocol = 'http', 
+	    host = 'pmpc1465.npm.ac.uk', 
+	    port = '6789';
+
+	var socket_url = protocol+'://'+host+':'+port;
+
+	$.getScript(socket_url+"/socket.io/socket.io.js")
 		.done(function( script, textStatus ) {
     		var socket = io.connect("http://pmpc1465.npm.ac.uk:6789/", {
 		   	"connect timeout": 1000
 		  	});
 
 		  	socket.on('error', function (reason){
-		   	console.error('Unable to connect Socket.IO', reason);
+		   	//console.error('Unable to connect Socket.IO', reason);
+		   	$('.js-session-sharing-status-msg').html('The connection failed; '+reason);
 		  	});
 
 		  	socket.on('connect', function (){
-		   	console.info('successfully established a working connection');
-		   	
+		   	$('.js-session-sharing-status-msg').html('Succuessfully connected.');
+		  	});
+
+		  	socket.on('connect_error', function (reason){
+		   	$('.js-session-sharing-status-msg').html('Could not connect to server; '+ reason);
+		  	});
+
+		  	socket.on('disconnect', function (reason){
+		   	$('.js-session-sharing-status-msg').html('Unexpectedly disconnected, trying to reconnect...');
+		  	});
+
+		  	// doesn't appear to work as the reconnect timeout is incrementally increased with each attempt; might have to monitor it outside of socket.io
+		  	socket.on('reconnect_error', function (reason){
+		   	$('.js-session-sharing-status-msg').html('Could not re-establish a connection, sorry');
 		  	});
 
 		  	socket.on('new msg', function(data) {
@@ -39,31 +66,31 @@ gisportal.sessionsharing.initSession = function() {
 		   	}
 		  	});
 
-			$('#btn-presenter').click(function() {
-				role = 'presenter';
-			});
+			// $('#btn-presenter').click(function() {
+			// 	role = 'presenter';
+			// });
 
-		  	$("#socketSend").click(function(e) {
-		    var inputText = $("#socketCmd").val().trim();
-		    if(inputText) {
-		      var chunks = inputText.match(/.{1,1024}/g)
-		        , len = chunks.length;
+		 //  	$("#socketSend").click(function(e) {
+		 //    var inputText = $("#socketCmd").val().trim();
+		 //    if(inputText) {
+		 //      var chunks = inputText.match(/.{1,1024}/g)
+		 //        , len = chunks.length;
 
-		      for(var i = 0; i<len; i++) {
-		        socket.emit('my msg', {
-		          msg: chunks[i]
-		        });
-		      }
+		 //      for(var i = 0; i<len; i++) {
+		 //        socket.emit('my msg', {
+		 //          msg: chunks[i]
+		 //        });
+		 //      }
 
-		      $("#socketCmd").val('');
+		 //      $("#socketCmd").val('');
 
-		      return false;
-		   	}
-		  	});
+		 //      return false;
+		 //   	}
+		 //  	});
 
   		})
   		.fail(function( jqxhr, settings, exception ) {
-    		console.log("Failed to get script: "+exception);
+    		$('.js-session-sharing-status-msg').html('Could not connect to server; the response was \''+ exception+'\' - <a href="javascript:gisportal.sessionsharing.initSession();">try again</a>');
    });
 
 	gisportal.sessionsharing.shareEvent = function(command) {

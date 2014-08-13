@@ -2962,9 +2962,17 @@ fill-opacity: 0 !important;
 
 .map_controls .icon-svg  { height: 44px; }
 
-.map-displayoptions { background: #fff; padding: 10px; position: relative;}
+.panel-content-map-tools { background: #fff; padding: 10px; position: relative;}
 
-.map-displayoptions .icon_close { position: absolute; top: 10px; right:4px; }
+.panel-content-map-tools .icon_close { position: absolute; top: 10px; right:4px; }
 
-.map-displayoptions select {height: 35px; }
-.map-displayoptions li {margin-top:10px;}
+.panel-content-map-tools select {height: 35px; }
+.panel-content-map-tools li {margin-top:10px;}
+.panel-content-session-sharing {background: #fff; padding: 10px; position: relative;}
+
+.panel-content-session-sharing .icon_close { position: absolute; top: 10px; right:4px; }
+.panel-content-session-sharing p {padding: 8px 0px; }
+
+.js-session-sharing-console { margin-top: 10px; }
+.js-session-sharing-status-msg { padding: 10px; background: #444; color: #fff; margin-top: 10px; }
+.js-session-sharing-status-msg a {color: #fff; font-weight: bold; }
