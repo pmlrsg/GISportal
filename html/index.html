@@ -18,7 +18,6 @@
 <!-- jQuery UI -->
 <script src="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script> 
 
-
 <!-- jQuery no UI slider -->
 <script src="js-libs/jquery-nouislider/jquery.nouislider.min.js"></script>
 
@@ -206,8 +205,10 @@
           <div class="js-session-sharing-holder">
             <button class="brand start-session-sharing js-start-session-sharing" />Start Session Sharing</button>
             <div class="js-session-sharing-console hidden">
+              <button id="btn-presenter">Presenter</button>
+              <button id="btn-member">Member</button>
               <div class="js-session-sharing-status-msg">Connecting to sharing server...</div>
-
+              <div class="js-session-sharing-history"></div>
             </div>
           </div>
         </div>

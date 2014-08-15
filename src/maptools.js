@@ -43,11 +43,13 @@ gisportal.maptools.init = function() {
       // set an action for the base map select changing
       $('#select-basemap').change(function() {
       	map.setBaseLayer(gisportal.baseLayers[$('#select-basemap').val()]);
+      	EventManager.publish("display-basemap-changed");
       });
 
       // set an action for the country borders select changing
 	   $('#select-country-borders').change(function() {
 			gisportal.createCountryBorderLayer($('#select-country-borders').val());
+			EventManager.publish("display-countryborders-changed");
 		});
 
 	   // set the default value if one exists in config.js

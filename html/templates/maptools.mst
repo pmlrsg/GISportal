@@ -1,5 +1,5 @@
 <li>
-	<label for="select-basemap">Base May Layer</label>
+	<label for="select-basemap">Base Map Layer</label>
 	<select id="select-basemap">
 		{{#baseLayers}}
 			<option value="{{id}}">{{name}}</option>

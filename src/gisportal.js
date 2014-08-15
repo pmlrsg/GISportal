@@ -491,12 +491,6 @@ gisportal.mapInit = function() {
    function mapEvent(event) {
       sessionSharingShareEvent(event.type);
    }
-   function mapBaseLayerChanged(event) {
-      sessionSharingShareEvent(event.type + " " + event.layer.name);
-   }
-   function mapLayerChanged(event) {
-      sessionSharingShareEvent(event.type + " " + event.layer.name + " " + event.property);
-   }
 
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
@@ -508,10 +502,8 @@ gisportal.mapInit = function() {
         })
       ],
       eventListeners: {
-         "moveend" : mapEvent,
-         "zoomend" : mapEvent,
-         "changeLayer" : mapLayerChanged,
-         "changebaselayer" : mapBaseLayerChanged
+         "moveend" : EventManager.publish("map-moveend"),
+         "zoomend" : EventManager.publish("map-zoomend"),
       }
    });
    
@@ -555,7 +547,6 @@ gisportal.mapInit = function() {
 
    if(!map.getCenter())
       map.zoomTo(3);
-
 
 };
 
@@ -602,6 +593,9 @@ gisportal.nonLayerDependent = function() {
       });
    });
    
+   // map.events.register("moveend", map, EventManager.publish("map-moveend"));
+   // map.events.register("zoomend", map, collaboration.mapZoom);
+
    //--------------------------------------------------------------------------
   
    //Configure and generate the UI elements
@@ -862,7 +856,9 @@ gisportal.main = function() {
    gisportal.nonLayerDependent();
 
    gisportal.maptools.init();
-   gisportal.sessionsharing.initDOM();
+   
+   // add in the collaboration features
+   collaboration.initDOM();
 
    // Grab the url of any state.
    var stateID = gisportal.utils.getURLParameter('state');

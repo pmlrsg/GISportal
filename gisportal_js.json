@@ -25,7 +25,8 @@
       "src/graphs/histogram.js",
       "src/utils.js",
       "src/analytics.js", 
-      "src/sessionsharing.js",
-      "src/maptools.js"
+      "src/collaboration.js",
+      "src/maptools.js",
+      "src/eventmanager.js"
    ]
 }
