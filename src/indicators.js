@@ -375,7 +375,7 @@ gisportal.indicatorsPanel.removeIndicators = function(id)  {
 
 gisportal.indicatorsPanel.checkTabFromState = function(id)  {
    // Couldn't find a better place to put it 
-   if (gisportal.cache && gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers)  {
+   if (gisportal.cache && gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[id])  {
       var openTab = gisportal.cache.state.map.layers[id].openTab;
       if (openTab)  {
          $('[data-id="' + id + '"] label').toggleClass('active', false);

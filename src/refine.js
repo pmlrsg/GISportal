@@ -26,7 +26,7 @@ gisportal.refinePanel.close = function()  {
 
 gisportal.refinePanel.foundIndicator = function(data)  {
    var id = data.id || data;
-   if (_.indexOf(gisportal.selectedLayers, id) > -1 || this.found) return false;
+   if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found)) return false;
    this.found = true;
    gisportal.indicatorsPanel.selectLayer(id);
    var tmp = {

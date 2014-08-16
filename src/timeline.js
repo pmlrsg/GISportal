@@ -456,7 +456,12 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
       // The 300 below is ARBITARY. In Firefox it can get massive
       // whereas in Chrome it is required occasionally. TO DO: fix.
       if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
-      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + ' - ' + gisportal.layers[this.timebars[i].id].tags.region + '</li>');
+      var id = this.timebars[i].id;
+
+      var label = $('.indicator-header[data-id="' + id +'"] > p').html();
+      if (!label || label === "") label =  this.timebars[i].label + ' - ' + gisportal.layers[id].tags.region; 
+      
+      $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
    }
 };
 

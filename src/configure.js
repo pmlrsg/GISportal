@@ -176,7 +176,8 @@ gisportal.groupNames = function()  {
 
 gisportal.configurePanel.renderTags = function(cat, grouped)  {
    var tagVals = grouped[cat];
-   var tagNames = Object.keys(grouped[cat]);
+   var tagNames = [];
+   if (grouped[cat]) tagNames = Object.keys(grouped[cat]);
    var catName = gisportal.config.browseCategories[cat];
    var tabNumber = _.indexOf(Object.keys(gisportal.config.browseCategories), cat) + 1;
 

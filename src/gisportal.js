@@ -364,7 +364,7 @@ gisportal.isSelected = function(name) {
  * Checks if a layer name is unique recursively
  * 
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
- * @param {number} count - Number of other layers with the same name (optional)
+ * @param {number} count - Number of other )ayers with the same name (optional)
  */
 gisportal.checkNameUnique = function(layer, count) {
    /*
@@ -596,7 +596,7 @@ gisportal.saveState = function(state) {
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
             'maxScaleVal': indicator.maxScaleVal,
-            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] .active').attr('for')
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
          };    
       }
    }
@@ -766,7 +766,12 @@ gisportal.setState = function(state) {
  * This code runs once the page has loaded - jQuery initialised.
  */
 gisportal.main = function() {
-   gisportal.initStart();
+ 
+   // Set up the map
+   // any layer dependent code is called in a callback in mapInit
+   gisportal.mapInit();
+
+  gisportal.initStart();
 
    // Compile Templates
    gisportal.templates = {};
@@ -779,11 +784,6 @@ gisportal.main = function() {
  
    // Setup the gritter so we can use it for error messages
    gisportal.gritter.setup();
-
-   // Set up the map
-   // any layer dependent code is called in a callback in mapInit
-   gisportal.mapInit();
-
    gisportal.configurePanel.initDOM();
    gisportal.indicatorsPanel.initDOM();
    gisportal.graphs.initDOM();
