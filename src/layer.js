@@ -8,15 +8,15 @@
  */
 
 /**
- * Creates an gisportal.MicroLayer Object (layers in the selector but not yet map 
- * layers)
+ * Represents a joint OpenLayers and Cesium layer allowing interaction with 
+ * both layers through one API.
  * 
  * @constructor
- * @param {string} name - The layer name (unescaped)
- * @param {string} title - The title of the layer
- * @param {string} productAbstract - The abstract information for the layer
+ * 
+ * @param {Object} microlayer - The microlayer to use as a basis for the layer.
  */
-gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
+gisportal.layer = function(name, title, productAbstract, type, opts) {
+   var layer = this;
       
    this.id = name;      
    this.origName = name.replace("/","-");
@@ -26,9 +26,10 @@ gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
    this.title = title;  
    this.productAbstract = productAbstract;
    this.type = type;
+   // These queues feel like a hack, refactor?
    this.metadataComplete = false;
    this.metadataQueue = [];
-    
+
    this.defaults = {
       firstDate : null,
       lastDate : null,
@@ -64,26 +65,19 @@ gisportal.MicroLayer = function(name, title, productAbstract, type, opts) {
             this.displayTitle = this.tags.niceTitle;
             this.tags.niceTitle = null;  
          }
+         else  {
+            if (this.tags[tag] instanceof Object)  {
+               this.tags[tag] = _.map(this.tags[tag], function(d) { return d.toLowerCase(); });
+            } 
+            else  {
+               this.tags[tag] = this.tags[tag].toLowerCase();
+            }
+         }
       }
    }
-};
 
-/**
- * Represents a joint OpenLayers and Cesium layer allowing interaction with 
- * both layers through one API.
- * 
- * @constructor
- * 
- * @param {Object} microlayer - The microlayer to use as a basis for the layer.
- */
-gisportal.layer = function(microlayer, layerData) {
-   
-   // Check the microlayer we got is valid.
-   if (typeof microlayer === 'undefined' || microlayer == 'null') {
-      // Error: Could not get a layer object
-      console.log("Error: Could not get a layer object");
-      return null;
-   }
+
+ 
    this.metadataComplete = false;
    this.metadataQueue = []; 
    this.times = []; // The times for each of the layers stored
@@ -93,8 +87,6 @@ gisportal.layer = function(microlayer, layerData) {
    // Maintains the order of layers 
    this.order = [];
    
-   // Element in the left hand panel.
-   this.$layer = null;
    
    // Is the layer selected for display in the GUI or not
    this.selected = false;
@@ -146,60 +138,38 @@ gisportal.layer = function(microlayer, layerData) {
    /**
     * Constructor for the layer.
     */
-   this.init = function(microlayer, layerData) {
+   this.init = function(layerData, options) {
       var self = this;
-      console.log(microlayer, layerData); 
-      this.id = microlayer.id;
-      this.providerTag = microlayer.providerTag;  
-      this.name = microlayer.name;
+      console.log(layerData); 
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
-      this.origName = microlayer.origName; // Required for communication with the server.
-      this.urlName = microlayer.urlName; // Layer Name with '/'
-      // Layer title
-      this.displayTitle = microlayer.displayTitle;
-      this.title = microlayer.title;
-      
-      // Layer abstract
-      this.productAbstract = microlayer.productAbstract;
-     
-      this.tags = microlayer.tags;
-
-      // Add a new property to the OpenLayers layer object to tell the UI which <ul>
-      // control ID in the layers panel to assign it to
-      this.controlID = microlayer.type;
-      
-      // Layer sensor
-      this.displaySensorName = microlayer.sensorNameDisplay; // Can be 'Null'.
-      this.sensorName = microlayer.sensorName; // Can be 'Null'.
-      
-      // URLs
-      //this.url = microlayer.url;
-      this.wfsURL = microlayer.wfsURL; // Can be 'Null'.
-      this.wmsURL = microlayer.wmsURL; // Can be 'Null'.
-      this.wcsURL = microlayer.wcsURL; // Can be 'Null'.
       
       // A list of styles available for the layer
       this.styles = null; // Can be 'Null'.
       this.style = null;
       
-      // The EX_GeographicBoundingBox for the layer
-      this.exBoundingBox = microlayer.exBoundingBox; // Can be 'Null'.
-      
       // The BoundingBox for the layer
       this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
       
 
-      if(this.controlID == "opLayers") {
+      if(this.type == "opLayers") {
          this.getMetadata();
          this.getDimensions(layerData); // Get dimensions.
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
          
-      } else if(this.controlID == "refLayers") {
-         this.options = microlayer.options;
-         this.style = new OpenLayers.StyleMap(microlayer.options.style);
-         this.times = microlayer.times;
+      } else if(this.type == "refLayers") {
+         this.style = new OpenLayers.StyleMap(this.options.style);
       }
+      
+      var olLayer = this.createOLLayer(); // Create OL layer.
+      this.openlayers['anID'] = olLayer;
+
+      if (options.show !== false)  { 
+         gisportal.checkIfLayerFromState(layer);
+         gisportal.addLayer(layer, options);    
+      }
+
+      this.select();
 
    };
    
@@ -235,31 +205,20 @@ gisportal.layer = function(microlayer, layerData) {
             layer.elevationUnits = value.Units;
          }
       });
+      
    };
    
    //--------------------------------------------------------------------------
    
    this.mergeNewParams = function(object) {
-      var self = this;
-      
-      var keys = Object.keys(this.openlayers);
-      for(var i = 0, len = keys.length; i < len; i++) {
-         self.openlayers[keys[i]].mergeNewParams(object);
-      }  
+      $.extend(this, object);   
    };
    
    // Is the layer visible? Even if selected, it might not be 
    // visible without a selected date.
-   this.isVisible = false;  
+   this.isVisible = true;  
    this.setVisibility = function(visibility) {
-      var self = this;
-      
-      // Set the visibility of all layers
-      var keys = Object.keys(this.openlayers);
-      for(var i = 0, len = keys.length; i < len; i++) {
-         self.openlayers[keys[i]].setVisibility(visibility);
-      }
-      
+      if (this.openlayers['anID']) this.openlayers['anID'].setVisibility(visibility);
       this.isVisible = visibility;
    };
    
@@ -281,26 +240,27 @@ gisportal.layer = function(microlayer, layerData) {
    this.setStyle = function(style)  {
       var indicator = this;
       indicator.style = style;
-      indicator.mergeNewParams({ styles: style });
       gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
    }; 
    
    this.select = function() {
+      // Just in case it tries to add a duplicate
+      if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
       var layer = this;
       
       layer.selected = true;
+      gisportal.selectedLayers.unshift(layer.id);
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
          var currentDate = gisportal.timeline.getDate();
          layer.selectDateTimeLayer(currentDate);
          
-         gisportal.selectedLayers[layer.id] = layer;
          
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
-         gisportal.timeline.addTimeBar(layer.name, layer.name, startDate, endDate, layer.DTCache);   
+         gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
         			
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
@@ -312,8 +272,8 @@ gisportal.layer = function(microlayer, layerData) {
       } 
       
       
-      var index = _.findIndex(gisportal.configurePanel.selectedIndicators, function(d) { return d.name.toLowerCase() === layer.name.toLowerCase();  });
-      gisportal.setLayerIndex(layer, gisportal.configurePanel.selectedIndicators.length - index);
+      var index = _.findIndex(gisportal.selectedLayers, function(d) { return d === layer.id;  });
+      gisportal.setLayerIndex(layer, gisportal.selectedLayers.length - index);
       
    };
     
@@ -322,7 +282,7 @@ gisportal.layer = function(microlayer, layerData) {
       $('#scalebar-' + layer.id).remove(); 
 		layer.selected = false;
 		layer.setVisibility(false);
-      delete gisportal.selectedLayers[layer.id];
+      gisportal.selectedLayers = _.pull(gisportal.selectedLayers, layer.id);
 		if (layer.temporal) {
 			if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
 				gisportal.timeline.removeTimeBarByName(layer.name);
@@ -387,7 +347,7 @@ gisportal.layer = function(microlayer, layerData) {
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
-               if(layer.controlID == 'opLayers') {
+               if(layer.type == 'opLayers') {
                   layer.openlayers[keys[i]].mergeNewParams({time: layer.selectedDateTime});
                } else {
                   if($.isFunction(layer.openlayers[keys[i]].removeAllFeatures)) {
@@ -434,9 +394,9 @@ gisportal.layer = function(microlayer, layerData) {
             layer.units = data.units; 
             layer.log = data.log == 'true' ? true : false;
 
-            gisportal.microLayers[layer.id].metadataComplete = true; 
+            gisportal.layers[layer.id].metadataComplete = true; 
             layer.metadataComplete = true;
-            _.each(gisportal.microLayers[layer.id].metadataQueue, function(d) { d(); delete d; });
+            _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
 
          },
          error: function(request, errorType, exception) {
@@ -463,7 +423,7 @@ gisportal.layer = function(microlayer, layerData) {
          layer = null;
       
       // Create WMS layer.
-      if(this.controlID == 'opLayers') {    
+      if(this.type == 'opLayers') {    
          
          layer = new OpenLayers.Layer.WMS (
             this.displayName(),
@@ -471,9 +431,9 @@ gisportal.layer = function(microlayer, layerData) {
             { layers: this.urlName, transparent: true}, 
             { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
          );
-         layer.controlID = 'opLayers';
+         layer.type = 'opLayers';
          
-      } else if(this.controlID == 'refLayers') {
+      } else if(this.type == 'refLayers') {
          
          if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
             // GML or KML
@@ -487,7 +447,7 @@ gisportal.layer = function(microlayer, layerData) {
                }),                         
                styleMap: self.style
             });
-            layer.controlID = 'refLayers';
+            layer.type = 'refLayers';
                
          } else {
 
@@ -523,7 +483,7 @@ gisportal.layer = function(microlayer, layerData) {
                typeName: self.name, format: 'image/png', transparent: true, 
                exceptions: 'XML', version: '1.0', layers: '1'
             });
-            layer.controlID = 'refLayers';
+            layer.type = 'refLayers';
             
             var selector = gisportal.mapControls.selector;
             var layers = selector.layers;
@@ -551,41 +511,42 @@ gisportal.layer = function(microlayer, layerData) {
          }
       }
       
-      layer.setVisibility(false);
       
-      // Show the img when we are loading data for the layer
-      layer.events.register("loadstart", layer, function(e) {
-         self.spinner = true;
-         self.updateSpinner();
-      });
-      
-      // Hide the img when we have finished loading data
-      layer.events.register("loadend", layer, function(e) {
-         self.spinner = false;
-         self.updateSpinner();
-      });
-      
-      if(self.controlID != 'baseLayers') {   
-         // Check the layer state when its visibility is changed
-         layer.events.register("visibilitychanged", layer, function() {
+      if (layer.events)  { 
+         // Show the img when we are loading data for the layer
+         layer.events.register("loadstart", layer, function(e) {
+            self.spinner = true;
+            self.updateSpinner();
          });
+         
+         // Hide the img when we have finished loading data
+         layer.events.register("loadend", layer, function(e) {
+            self.spinner = false;
+            self.updateSpinner();
+         });
+         
+         if(layer.type != 'baseLayers') {   
+            // Check the layer state when its visibility is changed
+            layer.events.register("visibilitychanged", layer, function() {
+            });
+         }
+
       }
       
       return layer;
    };
    
    this.addOLLayer = function(layer, id) {      
-      this.order.push(id);
       
       // Add the layer to the map
       map.addLayer(layer);
-      
+ 
       // TODO: be able to deal with all layer types.
-      if(this.controlID == 'opLayers') {
+      if(this.type == 'opLayers') {
          //map.events.register("click", layer, getFeatureInfo);
          // Increase the count of OpLayers
          gisportal.numOpLayers++;
-      } else if (this.controlID == 'refLayers') {
+      } else if (this.type == 'refLayers') {
          gisportal.numRefLayers++;
       }
 
@@ -593,7 +554,7 @@ gisportal.layer = function(microlayer, layerData) {
    
    this.removeOLLayer = function(layer, id) {
       // Remove the layer from the map.
-      map.removeLayer(layer);
+      map.removeLayer(map.getLayer(layer.id));
       
       // Remove layer from the order array.
       for(var i = 0, len = this.order.length; i < len; i++) {
@@ -603,11 +564,11 @@ gisportal.layer = function(microlayer, layerData) {
       }
 
       // TODO: be able to deal with all layer types.
-      if(this.controlID == 'opLayers') {
+      if(this.type == 'opLayers') {
          //map.events.unregister("click", layer, getFeatureInfo);
          // Decrease the count of OpLayers
          gisportal.numOpLayers--;
-      } else if(this.controlID == 'refLayers') {
+      } else if(this.type == 'refLayers') {
          gisportal.numRefLayers--;
       }
 
@@ -616,45 +577,33 @@ gisportal.layer = function(microlayer, layerData) {
    //--------------------------------------------------------------------------
    
    this.updateSpinner = function() {
-      if(this.$layer === null)
-         return;
-         
-      var $element = this.$layer.find('img[src="img/ajax-loader.gif"]');
-      if(this.spinner === false && $element.is(':visible')) {
+      /*if(this.spinner === false && $element.is(':visible')) {
          $element.hide();
       } else if(this.spinner !== false && $element.is(':hidden')) {
          $element.show();
-      }
+      }*/
    };
      
    //--------------------------------------------------------------------------
    
-   
-   this.init(microlayer, layerData);
-   
-   var olLayer = this.createOLLayer(); // Create OL layer.
-   this.openlayers['anID'] = olLayer;
    
    // Store new layer.
    gisportal.layers[this.id] = this;
 };
 
 gisportal.addNewLayer = function(id, options)  {
-   var microlayer = gisportal.microLayers[id];
+   var layer = gisportal.layers[id];
    var options = options || {};
-   if (microlayer)  {
-      gisportal.getLayerData(microlayer.serverName + '_' + microlayer.origName + '.json', microlayer,options);
+   if (layer)  {
+      gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer,options);
    }
 };
 
 gisportal.addLayer = function(layer, options) {
    var options = options || {};   
   
-   if (layer.openlayers)  {
-      var keys = Object.keys(layer.openlayers);
-      for(var i = 0, len = keys.length; i < len; i++) {
-         layer.addOLLayer(layer.openlayers[keys[i]], keys[i]);
-      }
+   if (layer)  {
+      layer.addOLLayer(layer.openlayers['anID'], layer.id);
    }
  
    if (options.minScaleVal || options.maxScaleVal)  {   
@@ -665,17 +614,14 @@ gisportal.addLayer = function(layer, options) {
       gisportal.scalebars.updateScalebar(layer.id);
    }
   
-   layer.isVisible = options.visible; 
-   layer.select();
+   layer.setVisibility(options.visible); 
 
    /* loading icon here */
 };
 
 gisportal.removeLayer = function(layer) {
-   
-   if (gisportal.selectedLayers[layer.id]) delete gisportal.selectedLayers[layer.id];
-   if (gisportal.layers[layer.id])  delete gisportal.layers[layer.id];
-    
+  var index = _.indexOf(gisportal.selectedLayers, layer.id); 
+   if (index > -1) gisportal.selectedLayers.splice(index,1);
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
@@ -683,10 +629,14 @@ gisportal.removeLayer = function(layer) {
 };
 
 gisportal.setLayerIndex = function(layer, index) {
-   var keys = Object.keys(layer.openlayers);
-   for(var i = 0, len = keys.length; i < len; i++) {
-      map.setLayerIndex(layer.openlayers[keys[i]], index);
-   }
+   var noLayers = gisportal.selectedLayers.length;
+   // Assume that we want them before the last layer, which is vector
+   var startIndex = map.layers.length - noLayers;
+   var name = layer.openlayers['anID'].name;
+   map.setLayerIndex(layer.openlayers['anID'], index);
+
+   var vector = map.getLayersByName('POI Layer')[0];
+   map.setLayerIndex(vector, map.layers.length - 1);
 };
 
 /**
@@ -713,8 +663,9 @@ gisportal.filterLayersByDate = function(date) {
  * @param {string} microLayer - The microLayer for the layer to be downloaded
  * @param {object} options - Any extra options for the layer
  */
-gisportal.getLayerData = function(fileName, microlayer, options) {  
-  var options = options || {}; 
+gisportal.getLayerData = function(fileName, layer, options) {  
+  var options = options || {};
+  var id = layer.id; 
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
@@ -722,17 +673,7 @@ gisportal.getLayerData = function(fileName, microlayer, options) {
       async: true,
       cache: false,
       success: function(data) {
-         // Convert the microlayer. 
-         // COMMENT: might change the way this works in future.
-         var layer = new gisportal.layer(microlayer, data);
-         
-         
-         if (options.show !== false)  { 
-            gisportal.checkIfLayerFromState(layer);
-            console.log("Adding layer..."); // DEBUG
-            gisportal.addLayer(layer, options);    
-            console.log("Added Layer"); // DEBUG
-         }
+         gisportal.layers[id].init(data, options);
          gisportal.configurePanel.refreshIndicators();
          
          

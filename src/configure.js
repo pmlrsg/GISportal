@@ -7,17 +7,25 @@
 
 gisportal.configurePanel = {};
 
-gisportal.configurePanel.selectedIndicators = [];
-
 gisportal.configurePanel.refreshData = function()  {
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
-  this.renderPopular();
+   this.renderPopular();
+   $("[id^='tab-browse']+.indicator-select").html('');
    for (var cat in gisportal.config.browseCategories)  {
       this.renderTags(cat, groupedTags);
    }
    this.searchInit();
+};
+
+gisportal.configurePanel.open = function()  {
+   $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
+};
+
+gisportal.configurePanel.close = function()  {
+   $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+   gisportal.configurePanel.refreshData();
 };
 
 gisportal.configurePanel.initDOM = function()  {
@@ -31,6 +39,7 @@ gisportal.configurePanel.initDOM = function()  {
          refine.cat = cat.data('cat');
          refine.tag = $(this).data('tag');
          options.refine = refine;
+         //options.refined = true;
       }
 
       if ($(this).is(':checked'))  {
@@ -41,7 +50,9 @@ gisportal.configurePanel.initDOM = function()  {
       }
    }
 
-   $('.js-build').click(this.buildMap);
+   $('.js-build').click(function()  {
+      gisportal.configurePanel.buildMap();
+   });
 
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
@@ -63,14 +74,10 @@ gisportal.configurePanel.initDOM = function()  {
 
 }
 
-gisportal.configurePanel.buildMap = function()  {
-   var indicators = gisportal.configurePanel.selectedIndicators;
-   if (indicators.length > 0)  {
-      gisportal.indicatorsPanel.refreshData(indicators);
-      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-   }
-
+gisportal.configurePanel.buildMap = function(indicator)  {
+   gisportal.configurePanel.close();
+   if (indicator) gisportal.refinePanel.open(indicator);
+   else gisportal.indicatorsPanel.open();
 };
 
 gisportal.configurePanel.refreshIndicators = function()  {
@@ -79,17 +86,13 @@ gisportal.configurePanel.refreshIndicators = function()  {
     * that leave indicators when all are
     * removed */
    $.get('templates/configureIndicators.mst', function(template) {
-      var indicators = [];
-      for (var i in gisportal.configurePanel.selectedIndicators)  {
-         if (typeof gisportal.configurePanel.selectedIndicators[i] !== "string") indicators[i] = gisportal.configurePanel.selectedIndicators[i].name;
-         else indicators[i] = gisportal.configurePanel.selectedIndicators[i];
-      } 
+      var indicators = gisportal.selectedLayers;
       var rendered = Mustache.render(template, {
          indicators : indicators 
       });
       $('.js-configure-indicators').html(rendered);
    });
-   if (gisportal.configurePanel.selectedIndicators.length > 0)  {
+   if (gisportal.selectedLayers.length > 0)  {
       $('.js-build').toggleClass('hidden', false);
    }  
    else  {
@@ -98,7 +101,7 @@ gisportal.configurePanel.refreshIndicators = function()  {
 };
 
 gisportal.groupTags = function()  {
-   var layers = gisportal.microLayers;
+   var layers = gisportal.layers;
    var grouped = {};
    
    for (var i = 0; i < Object.keys(layers).length; i++)  {
@@ -112,18 +115,17 @@ gisportal.groupTags = function()  {
                grouped[tag] = {};
             } 
             
-            if (grouped[tag] && !grouped[tag][tagVal] && tagVal !== null)  {
-               grouped[tag][tagVal] = [];
-            }
-            
             if (typeof tagVal === "string")  {
                // tagVal is a single tag
-               grouped[tag][tagVal].push(layer.name);
+               if (!grouped[tag][tagVal.toLowerCase()]) grouped[tag][tagVal.toLowerCase()] = [];
+               grouped[tag][tagVal.toLowerCase()].push(layer.name);
             } 
             else if (typeof tagVal === "object" && tagVal !== null)  {
+               tagVal = _.map(tagVal, function(d) { return d.toLowerCase(); });
+               if (!grouped[tag][tagVal]) grouped[tag][tagVal] = [];
                // tagVal is a category (array of tags)
                for (var k = 0; k < tagVal.length; k++)  {
-                  var t = tagVal[k];
+                  var t = tagVal[k].toLowerCase();
                   if (!grouped[tag][t])  {
                      grouped[tag][t] = [];
                   }
@@ -139,8 +141,8 @@ gisportal.groupTags = function()  {
 gisportal.groupNames = function()  {
    var group = {};
 
-   for (var i = 0; i < Object.keys(gisportal.microLayers).length; i++)  {
-      var indicator = gisportal.microLayers[Object.keys(gisportal.microLayers)[i]];
+   for (var i = 0; i < Object.keys(gisportal.layers).length; i++)  {
+      var indicator = gisportal.layers[Object.keys(gisportal.layers)[i]];
       var name = indicator.name.toLowerCase();
       var id = indicator.id;
       var tags = indicator.tags;
@@ -152,13 +154,14 @@ gisportal.groupNames = function()  {
             var cat = Object.keys(tags)[j];
             var tagName = tags[cat];
             if (typeof tagName === 'string')  {
+               tagName = tagName.toLowerCase();
                if (!group[name][cat]) group[name][cat] = [];
                if (!group[name][cat][tagName]) group[name][cat][tagName] = [];
                group[name][cat][tagName].push(id);
             }
             else if (typeof tagName === 'object' && tagName !== null)  {
                for (var k = 0; k < tagName.length; k++)  {
-                  var innerTagName = tagName[k];
+                  var innerTagName = tagName[k].toLowerCase();
                   if (!group[name][cat]) group[name][cat] = []; 
                   if (!group[name][cat][innerTagName]) group[name][cat][innerTagName] = [];
                   group[name][cat][innerTagName].push(id);              
@@ -242,12 +245,12 @@ gisportal.configurePanel.renderPopular = function()  {
 };
 
 gisportal.configurePanel.searchInit = function()  {
-
+   $('.js-search-results').html('');
    var all = [];
-   for (var i = 0; i < Object.keys(gisportal.microLayers).length; i++)  {
+   for (var i = 0; i < Object.keys(gisportal.layers).length; i++)  {
      var tmp = {};
-     tmp.id = Object.keys(gisportal.microLayers)[i];
-     tmp.name = gisportal.microLayers[Object.keys(gisportal.microLayers)[i]].name;
+     tmp.id = Object.keys(gisportal.layers)[i];
+     tmp.name = gisportal.layers[Object.keys(gisportal.layers)[i]].name;
      all.push(tmp)
    }
 
@@ -257,7 +260,7 @@ gisportal.configurePanel.searchInit = function()  {
    };
    this.fuse = new Fuse(all, options);
 
-   $('.js-search').on('keypress', function()  {
+   $('.js-search').on('keyup', function()  {
       gisportal.configurePanel.search($(this).val());
    });
 };
@@ -310,7 +313,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    var id = this.hasIndicator(name);  
    
    if (options.id) {
-      gisportal.indicatorsPanel.changeIndicator(name, options.id);
       id = options.id;
    }
 
@@ -324,11 +326,10 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    tmp.name = name;
    if (id) tmp.id = id;
    if (options.refine) tmp.refine = options.refine;
-   gisportal.configurePanel.selectedIndicators.unshift(tmp);
-
+   if (options.refined !== undefined) tmp.refined = options.refined;
    gisportal.configurePanel.refreshIndicators();
 
-   this.buildMap();
+   this.buildMap(tmp);
 };
 
 gisportal.configurePanel.deselectLayer = function(name)  {
@@ -363,15 +364,8 @@ gisportal.configurePanel.hasIndicator = function(name)  {
    return false;
 };
 
-gisportal.configurePanel.unselectIndicator = function(name)  {
-   _.remove(gisportal.configurePanel.selectedIndicators, function(d)  {
-      return d.name.toLowerCase() === name.toLowerCase();
-   });
-};
-
-
 gisportal.configurePanel.reorderIndicators = function(index, name)  {
-   var arr = gisportal.configurePanel.selectedIndicators;
+   var arr = gisportal.selectedLayers;
    var current = _.findIndex(arr, function(d) { return d.name.toLowerCase() === name.toLowerCase();  });
    var obj = arr[current];
    arr.splice(current, 1);

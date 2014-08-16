@@ -87,6 +87,7 @@ svg {
    position: absolute;
    left: 15px;
    top: 0;
+   text-transform: capitalize;
 }
 
 #timeline.grid-cell  {

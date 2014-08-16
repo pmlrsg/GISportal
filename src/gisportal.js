@@ -28,19 +28,11 @@ gisportal.cache = {};
 gisportal.cache.wmsLayers = [];
 gisportal.cache.wfsLayers = [];
 
-// Temporary version of microLayer and layer storage.
-gisportal.layerStore = {}; // NOT IN USE!
-
-gisportal.microLayers = {};
 gisportal.layers = {};
-gisportal.selectedLayers = {};
-gisportal.nonSelectedLayers = {};
+gisportal.selectedLayers = [];
 gisportal.baseLayers = {};
 
 gisportal.graphs = {};
-// A list of layer names that will be selected by default
-// This should be moved to the middleware at some point...
-gisportal.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -196,7 +188,7 @@ gisportal.createBaseLayers = function() {
       );
       
       layer.id = name;
-      layer.controlID = 'baseLayers';
+      layer.type = 'baseLayers';
       layer.displayTitle = name;
       layer.name = name;
       map.addLayer(layer);
@@ -226,7 +218,7 @@ gisportal.createRefLayers = function() {
                item.productAbstract = "None Provided";
                //item.tags = {};
                
-               var microLayer = new gisportal.MicroLayer(item.name, item.name, 
+               var layer = new gisportal.layer(item.name, item.name, 
                      item.productAbstract, "refLayers", {
                         'serverName': serverName, 
                         'wfsURL': url, 
@@ -237,8 +229,8 @@ gisportal.createRefLayers = function() {
                      }
                );
                      
-               microLayer = gisportal.checkNameUnique(microLayer);   
-               gisportal.microLayers[microLayer.id] = microLayer;
+               layer = gisportal.checkNameUnique(layer);   
+               gisportal.layers[layer.id] = layer;
             }
          });
       } 
@@ -246,7 +238,7 @@ gisportal.createRefLayers = function() {
    
    gisportal.configurePanel.refreshData();
    // Get and store the number of reference layers
-   gisportal.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+   gisportal.numRefLayers = map.getLayersBy('type', 'refLayers').length;
 };
 
 /** 
@@ -273,7 +265,7 @@ gisportal.createOpLayers = function() {
                // Go through each layer and load it
                $.each(item, function(i, item) {
                   if(item.Name && item.Name !== "") {
-                     var microLayer = new gisportal.MicroLayer(item.Name, item.Title, 
+                     var layer = new gisportal.layer(item.Name, item.Title, 
                         item.Abstract, "opLayers", { 
                            "firstDate": item.FirstDate, 
                            "lastDate": item.LastDate, 
@@ -288,29 +280,41 @@ gisportal.createOpLayers = function() {
                         }
                      );
                                
-                     microLayer = gisportal.checkNameUnique(microLayer);   
-                     gisportal.microLayers[microLayer.id] = microLayer;
-                     if (microLayer.tags)  {
+                     layer = gisportal.checkNameUnique(layer);   
+                     gisportal.layers[layer.id] = layer;
+                     if (layer.tags)  {
                         var tags = [];
-                        $.each(microLayer.tags, function(d, i) {
-                           if (microLayer.tags[d]) tags.push({ "tag" : d.toString(), "value" : microLayer.tags[d] }); 
+                        $.each(layer.tags, function(d, i) {
+                           if (layer.tags[d])  {
+                              var value = layer.tags[d];
+                              if (value instanceof Object) {
+                                 value = _.map(layer.tags[d], function(d) { return d.toLowerCase(); });
+                              }
+                              else  {
+                                 value = value.toLowerCase();
+                              }
+                              tags.push({
+                                 "tag" : d.toString(), 
+                                 "value" : value
+                              }); 
+                           }
                         });
                      }
                      
                      layers.push({
                         "meta" : {
-                           'id': microLayer.id,
-                           'name': microLayer.name, 
+                           'id': layer.id,
+                           'name': layer.name, 
                            'provider': providerTag,
                            'positive': positive, 
-                           'title': microLayer.displayTitle, 
-                           'abstract': microLayer.productAbstract,
+                           'title': layer.displayTitle, 
+                           'abstract': layer.productAbstract,
                            'tags': tags,
-                           'bounds': microLayer.exBoundingBox,
-                           'firstDate': microLayer.firstDate,
-                           'lastDate': microLayer.lastDate
+                           'bounds': layer.exBoundingBox,
+                           'firstDate': layer.firstDate,
+                           'lastDate': layer.lastDate
                         },
-                        "tags": microLayer.tags
+                        "tags": layer.tags
                      });                         
                   }
                });
@@ -321,10 +325,12 @@ gisportal.createOpLayers = function() {
   
    if (layers.length > 0)  {
       layers.sort(function(a,b)  {
-         var a = a.meta.name.toLowerCase();
-         var b = b.meta.name.toLowerCase();
-         if (a > b) return 1;
-         if (a < b) return -1;
+         if (a.meta.name && b.meta.name)  {
+            var a = a.meta.name.toLowerCase();
+            var b = b.meta.name.toLowerCase();
+            if (a > b) return 1;
+            if (a < b) return -1;
+         }
          return 0;
       });
 
@@ -360,25 +366,27 @@ gisportal.isSelected = function(name) {
  * @param {OPEC.MicroLayer} microLayer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
  */
-gisportal.checkNameUnique = function(microLayer, count) {
-   var id = null;
+gisportal.checkNameUnique = function(layer, count) {
+   /*
+   REIMPLEMENT
+var id = null;
    
    if(typeof count === "undefined" || count === 0) {
-      id = microLayer.id;
+      id = layer.id;
       count = 0;
    } else {
-      id = microLayer.id + count;
+      id = layer.id + count;
    }
    
-   if(id in gisportal.microLayers) {
-      gisportal.checkNameUnique(microLayer, ++count);
+   if(id in gisportal.layers) {
+      gisportal.checkNameUnique(layer, ++count);
    } else {
       if(count !== 0) { 
-         microLayer.id = microLayer.id + count; 
+         layer.id = layer.id + count; 
       }
    }
-   
-   return microLayer;
+  */ 
+   return layer;
 };
 
 /**
@@ -531,8 +539,8 @@ gisportal.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
-      var refLayers = map.getLayersBy('controlID', 'refLayers');
-      var poiLayers = map.getLayersBy('controlID', 'poiLayer');
+      var refLayers = map.getLayersBy('type', 'refLayers');
+      var poiLayers = map.getLayersBy('type', 'poiLayer');
 
       $.each(refLayers, function(index, value) {
          map.setLayerIndex(value, map.layers.length - index - 1);
@@ -576,12 +584,12 @@ gisportal.saveState = function(state) {
    state.timeline = {}; 
 
    // Get the current layers and any settings/options for them.
-   var keys = gisportal.configurePanel.selectedIndicators;
+   var keys = gisportal.selectedLayers;
    for(var i = 0, len = keys.length; i < len; i++) {
-      var selectedIndicator = gisportal.configurePanel.selectedIndicators[i];
+      var selectedIndicator = gisportal.selectedLayers[i];
 
-      if (selectedIndicator && selectedIndicator.id)  {
-         var indicator = gisportal.layers[selectedIndicator.id];
+      if (selectedIndicator)  {
+         var indicator = gisportal.layers[selectedIndicator];
          state.map.layers[indicator.id] = {
             'selected': indicator.selected,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
@@ -593,7 +601,7 @@ gisportal.saveState = function(state) {
       }
    }
    // outside of loop so it can be easily ordered 
-   state.selectedIndicators = gisportal.configurePanel.selectedIndicators;
+   state.selectedIndicators = gisportal.selectedLayers;
    
    // Get currently selected date.
    if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
@@ -635,24 +643,22 @@ gisportal.loadState = function(state) {
    // Load layers for state
    var keys = state.selectedIndicators;
    if (keys.length > 0)  {
-      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+      gisportal.configurePanel.close();
+      gisportal.indicatorsPanel.open();
    }
    for (var i = 0, len = keys.length; i < len; i++) {
-      var indicator = gisportal.layers[state.selectedIndicators[i]];
-      if (!indicator) {
-         gisportal.configurePanel.buildMap();
-         var options = {};
-         options.id = state.selectedIndicators[i].id;
-         gisportal.configurePanel.selectLayer(state.selectedIndicators[i].name, options);
+      var indicator = gisportal.layers[keys[i]];
+      if (indicator && !gisportal.selectedLayers[keys[i]]) {
+         gisportal.configurePanel.close();
+         gisportal.refinePanel.foundIndicator(state.selectedIndicators[i]);
         
       }
    }
- 
+   
    // Create the feature if there is one
          indicator = {};
    if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
-      var layer = map.getLayersBy('controlID', 'poiLayer')[0];
+      var layer = map.getLayersBy('type', 'poiLayer')[0];
       layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
     }
    
@@ -859,8 +865,8 @@ gisportal.zoomOverall = function()  {
          Number.MIN_VALUE
       ];
 
-      for (var i = 0; i < Object.keys(gisportal.selectedLayers).length; i++)  {
-         var layer = gisportal.selectedLayers[Object.keys(gisportal.selectedLayers)[i]].boundingBox;
+      for (var i = 0; i < gisportal.selectedLayers.length; i++)  {
+         var layer = gisportal.layers[gisportal.selectedLayers[i]].boundingBox;
          if (+layer.MinX < +largestBounds[0]) largestBounds[0] = layer.MinX; // left 
          if (+layer.MinY < +largestBounds[1]) largestBounds[1] = layer.MinY; // bottom
          if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = layer.MaxX; // right 

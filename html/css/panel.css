@@ -36,7 +36,13 @@
    padding-left: 15px;
 }
 
-.panel-header button  {
+.panel-header .back-button  {
+   color: #fff;
+   line-height: 40px;
+   padding-left: 15px;
+}
+
+.panel-header .icon_hide  {
    position: absolute;
    right: 3px;
    top: 10px;
@@ -148,7 +154,7 @@
   background-color: #efedf1;
 }
 
-.panel-tab.indicator-select  {
+#refinePanel .indicator-select  {
    padding-top: 0;
 }
 
@@ -196,13 +202,21 @@
    padding-top: 10px;
 }
 
-.js-indicators .panel-tab.indicator-select li {
+#refinePanel .panel-header h2  {
+   text-transform: capitalize;
+}
+
+#refinePanel .indicator-select li {
    border-bottom: 1px solid #e0dce4;
 
-   padding-left: 9px;
-   padding-right: 9px;
+   padding-left: 15px;
+   padding-right: 15px;
    padding-bottom: 9px;
    padding-top: 10px;
+}
+
+#refinePanel .panel-list .text-button  {
+   padding-left: 15px;
 }
 
 .indicator-select label  {

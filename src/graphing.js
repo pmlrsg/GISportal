@@ -60,7 +60,7 @@ gisportal.graphs.addGraph = function(data, options)  {
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
-         id : data.coverage,
+         id : options.id,
          title : title,
          units: units
       });

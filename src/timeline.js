@@ -456,7 +456,7 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
       // The 300 below is ARBITARY. In Firefox it can get massive
       // whereas in Chrome it is required occasionally. TO DO: fix.
       if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
-      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + '</li>');
+      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + ' - ' + gisportal.layers[this.timebars[i].id].tags.region + '</li>');
    }
 };
 
@@ -495,9 +495,10 @@ gisportal.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
 };
 
 // Add a new time bar using detailed parameters
-gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
+gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
    newTimebar.name = name;
+   newTimebar.id = id;
    newTimebar.label = label;
    newTimebar.startDate = startDate;
    newTimebar.endDate = endDate;
@@ -576,8 +577,8 @@ gisportal.TimeLine.prototype.removeTimeBarById = function(id)  {
    if (this.has(id))  {
       this.removeTimeBarByName(id);
    }
-   else if (gisportal.microLayers[id]) {
-      var name = gisportal.microLayers[id].name;
+   else if (gisportal.layers[id]) {
+      var name = gisportal.layers[id].name;
       if (this.has(name))  {
          this.removeTimeBarByName(name); 
       }
