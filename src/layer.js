@@ -211,7 +211,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    //--------------------------------------------------------------------------
    
    this.mergeNewParams = function(object) {
-      $.extend(this, object);   
+      //this.openlayers['anID'] = $.extend(this.openlayers['anID'], object);   
+      if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
    };
    
    // Is the layer visible? Even if selected, it might not be 

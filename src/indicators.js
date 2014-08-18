@@ -265,13 +265,13 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
             $('[data-id="' + indicator.id + '"] .js-tab-scalebar').html(rendered);      
             $('[data-id="' + indicator.id + '"] .icon_scalebar').toggleClass('hidden', false);
 
-            $('#tab-' + indicator.modified + '-elevation').on('change', function()  {
+            $('#tab-' + indicator.id + '-elevation').on('change', function()  {
                var value = $(this).val();
                indicator.selectedElevation = value; 
                indicator.mergeNewParams({elevation: value});
             });
 
-            $('#tab-' + indicator.modified + '-layer-style').on('change', function()  {
+            $('#tab-' + indicator.id + '-layer-style').on('change', function()  {
                var value = $(this).val();
                indicator.style = value;
                indicator.mergeNewParams({ styles: value });
