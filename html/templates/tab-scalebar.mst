@@ -12,7 +12,7 @@
          <div class="range-slider grid-cell fill"></div>
          <input class="js-scale-max max grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}">
       </div>
-      <input type="checkbox" id="tab-{{id}}-log">
+      <input type="checkbox" id="tab-{{id}}-log" data-id="{{id}}">
       <label for="tab-{{id}}-log">Logarithmic</label>
       <button class="js-auto text-button" data-id="{{id}}">Auto</button>
       <button class="js-reset text-button" data-id="{{id}}">Reset</button>

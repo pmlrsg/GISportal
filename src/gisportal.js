@@ -1,16 +1,17 @@
 /**
  * Create namespace object
- * @namespace
+ * @namespace gisportal
  */ 
 var gisportal = gisportal || (gisportal = {});
 
 gisportal.VERSION = "0.4.0";
-gisportal.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
+// This used to get the specific revision number from SVN. Need to change for Git
+//gisportal.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
 
 /*==========================================================================*/
 //Initialise javascript variables and objects
 
-// Path to the flask middleware
+// Path to the python flask middleware
 gisportal.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths
@@ -28,11 +29,15 @@ gisportal.cache = {};
 gisportal.cache.wmsLayers = [];
 gisportal.cache.wfsLayers = [];
 
+// gisportal.layers has all of the actual layer details
 gisportal.layers = {};
-gisportal.selectedLayers = [];
-gisportal.baseLayers = {};
 
-gisportal.graphs = {};
+// gisportal.selectedLayers is an array of the ids of your selected layers
+// to get the layer use gisportal.layers[gisportal.selectedLayers[i]]
+gisportal.selectedLayers = [];
+
+// Base layers are the map layers that show under the data
+gisportal.baseLayers = {};
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -50,14 +55,19 @@ gisportal.selection.layer = undefined;
 gisportal.selection.bbox = undefined;
 gisportal.selection.time = undefined;
 
+// gisportal.graphs is used as the object for graphing.js
+gisportal.graphs = {};
+
+// gisportal.selectionTools is used as the object for selection.js
 gisportal.selectionTools = null;
 
+// gisportal.timeline is used as the object for timeline.js
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
 gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
 
-// Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
+// Quick regions array in the format "Name",W,S,E,N
 gisportal.quickRegion = [
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
@@ -72,7 +82,7 @@ gisportal.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
-// Provider logos
+// Provider logos, each use an object with logo for image and url for link
 gisportal.providers = {
    "CCI" : { "logo": "img/cci.png" },
    "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
@@ -85,7 +95,7 @@ gisportal.providers = {
 
 /**
  * The OpenLayers map object
- * Soon to be attached to namespace
+ * Soon to be attached to gisportal namespace
  */
 var map;
 
@@ -108,11 +118,18 @@ gisportal.loadLayers = function() {
       gritterErrorHandler(data); 
    };
     
-   // Get WMS and WFS caches
+   // Get WMS cache
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
+   // Get WFS cache
    //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
+/**
+ * Used to show points and popup information about WFS features
+ * @param {object} layer - The gisportal.layers layer
+ * @param {object} olLayer - The Open Layers map layer
+ * @time {string} time - The date of the feature
+ */
 gisportal.getFeature = function(layer, olLayer, time) {
    
    var errorHandling = function(request, errorType, exception) {
@@ -161,7 +178,6 @@ gisportal.getFeature = function(layer, olLayer, time) {
  * @param {object} opts - Object to pass to success function
  */
 gisportal.genericAsync = function(type, url, data, success, error, dataType, opts) {
-   //var map = this;
    $.ajax({
       type: type,
       url: url, 
@@ -206,6 +222,8 @@ gisportal.createBaseLayers = function() {
 
 /**
  * Create all the reference layers for the map.
+ * Iterates over the gisportal.cache.wfslayers and adds all the correct
+ * layers to gisportal.layers
  */
 gisportal.createRefLayers = function() {  
    
@@ -242,8 +260,8 @@ gisportal.createRefLayers = function() {
 };
 
 /** 
- * Create MicroLayers from the getCapabilities request to 
- * be used in the layer selector.
+ * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
+ * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
    var layers = [];
@@ -282,6 +300,7 @@ gisportal.createOpLayers = function() {
                                
                      layer = gisportal.checkNameUnique(layer);   
                      gisportal.layers[layer.id] = layer;
+                     // Each layer tag needs to be lowercase so that they can compare
                      if (layer.tags)  {
                         var tags = [];
                         $.each(layer.tags, function(d, i) {
@@ -333,9 +352,6 @@ gisportal.createOpLayers = function() {
          }
          return 0;
       });
-
-      $.each(layers, function(i, item) {
-      });
    }
 
    gisportal.configurePanel.refreshData();
@@ -344,27 +360,29 @@ gisportal.createOpLayers = function() {
 
 /**
  * Get a layer that has been added to the map by its id.
- * In future this function will return a generic layer
- * rather than a OpenLayers layer.
+ * This is the same as gisportal.layers[id], it is rarely used.
+ * @param {string} id - The id of the layer
  */
 gisportal.getLayerByID = function(id) {
-   //return map.getLayersBy('id', id)[0];
    return gisportal.layers[id];
 };
 
 /**
- * @param {Object} name - name of layer to check
+ * Checks if a layer is selected
+ * @param {string} id - id of layer to check
  */
-gisportal.isSelected = function(name) {
-   if(map)
-      return $.inArray(name, gisportal.sampleLayers) > -1 ? true : false;
+gisportal.isSelected = function(id) {
+   if (gisportal.selectedLayers[id]) return true;
 };
 
 /**
  * Checks if a layer name is unique recursively
+ * This doesn't appear to be useful and would need
+ * reimplementing so for now is deprecated.
+ * It just returns the layer.
  * 
- * @param {OPEC.MicroLayer} microLayer - The layer to check 
- * @param {number} count - Number of other )ayers with the same name (optional)
+ * @param {gisportal.layer} layer - The layer to check 
+ * @param {number} count - Number of other layers with the same name (optional)
  */
 gisportal.checkNameUnique = function(layer, count) {
    /*
@@ -435,17 +453,6 @@ gisportal.refreshDateCache = function() {
 };
 
 /**
- * Creates a list of custom args that will be added to the
- * permalink url.
- */
-gisportal.customPermalinkArgs = function()
-{
-   var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
-      this, arguments
-   );
-};
-
-/**
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
@@ -459,7 +466,9 @@ gisportal.mapInit = function() {
         })
       ]
    });
-   
+
+   // This feature is currently deprecated but it allows
+   // Cesium to be used for 3D globes.   
    //map.setupGlobe(map, 'map', {
       //is3D: false,
       //proxy: '/service/proxy?url='
@@ -471,6 +480,7 @@ gisportal.mapInit = function() {
 
    // Create the base layers and then add them to the map
    gisportal.createBaseLayers();
+   
    // Create the reference layers and then add them to the map
    //gisportal.createRefLayers();
 
@@ -509,7 +519,9 @@ gisportal.mapInit = function() {
 };
 
 /**
- * Anything that needs to be done after the layers are loaded goes here.
+ * The initiation of WMS layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
    if (data !== null)  {
@@ -522,6 +534,11 @@ gisportal.initWMSlayers = function(data, opts) {
    }
 };
 
+/**
+ * The initiation of WMS layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
+ */ 
 gisportal.initWFSLayers = function(data, opts) {
    if (data !== null)  {
       gisportal.cache.wfsLayers = data;
