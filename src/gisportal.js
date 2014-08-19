@@ -376,18 +376,13 @@ gisportal.isSelected = function(id) {
 };
 
 /**
- * Checks if a layer name is unique recursively
- * This doesn't appear to be useful and would need
- * reimplementing so for now is deprecated.
- * It just returns the layer.
+ * Checks if a layer ID is unique recursively
  * 
  * @param {gisportal.layer} layer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
  */
 gisportal.checkNameUnique = function(layer, count) {
-   /*
-   REIMPLEMENT
-var id = null;
+   var id = null;
    
    if(typeof count === "undefined" || count === 0) {
       id = layer.id;
@@ -396,14 +391,13 @@ var id = null;
       id = layer.id + count;
    }
    
-   if(id in gisportal.layers) {
+   if (id in gisportal.layers) {
       gisportal.checkNameUnique(layer, ++count);
    } else {
       if(count !== 0) { 
          layer.id = layer.id + count; 
       }
    }
-  */ 
    return layer;
 };
 
@@ -550,7 +544,8 @@ gisportal.initWFSLayers = function(data, opts) {
 /*===========================================================================*/
 
 /**
- * Loads anything that is not dependent on layer data. 
+ * Loads anything that is not dependent on layer data.
+ * This is used to set the layer index to be the correct order 
  */
 gisportal.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
@@ -568,13 +563,7 @@ gisportal.nonLayerDependent = function() {
       });
    });
    
-   //--------------------------------------------------------------------------
-  
-   //Configure and generate the UI elements
-   
-   gisportal.openid.setup('shareOptions');
-
-   // Setup timeline
+   // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
       selectedDate: new Date("2006-06-05T00:00:00Z"),
@@ -592,6 +581,10 @@ gisportal.nonLayerDependent = function() {
 
 /*===========================================================================*/
 
+/**
+ * Creates an object that contains the current state
+ * @param {object} state - Optional, allows a previous state to be extended 
+ */
 gisportal.saveState = function(state) {
    var state = state || {}; 
    // Save layers
@@ -650,6 +643,10 @@ gisportal.saveState = function(state) {
    return state;
 };
 
+/**
+ * To load the state, provide a state object (created with saveState)
+ * @param {object} state - The saved state object
+ */
 gisportal.loadState = function(state) {
    $('.start').toggleClass('hidden', true);
    var state = state || {};
@@ -673,7 +670,7 @@ gisportal.loadState = function(state) {
    }
    
    // Create the feature if there is one
-         indicator = {};
+   indicator = {};
    if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
       var layer = map.getLayersBy('type', 'poiLayer')[0];
       layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
