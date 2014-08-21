@@ -1,4 +1,12 @@
 /**
+ * gisportal.js
+ * This file is the main portion of the codebase,
+ * it is the namespace. It is called by portal.js
+ * and is responsible for all of the other files.
+ */
+
+
+/**
  * Create namespace object
  * @namespace gisportal
  */ 
@@ -698,16 +706,29 @@ gisportal.loadState = function(state) {
 
 };
 
+/**
+ * This converts from Feature to GeoJSON
+ * @param {object} feature - The feature
+ */
 gisportal.featureToGeoJSON = function(feature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.write(feature);
 };
 
+/**
+ * This converts from GeoJSON to Feature
+ * @param {string} geoJSONFeature - The GeoJSON
+ */
 gisportal.geoJSONToFeature = function(geoJSONFeature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.read(geoJSONFeature); 
 };
 
+/**
+ * This applies the changes from the state
+ * to the layer once it is selected.
+ * @param {object} layer - The gisportal.layer[i] 
+ */
 gisportal.checkIfLayerFromState = function(layer) {
    if(typeof gisportal.cache.state !== "undefined") {
       var keys = Object.keys(gisportal.cache.state.map.layers);
@@ -728,7 +749,7 @@ gisportal.checkIfLayerFromState = function(layer) {
 /*===========================================================================*/
 
 /**
- * Any code that should be run when user logs in
+ * This will run when a user logs in using openID
  */
 gisportal.login = function() {
    $('.js-logged-out').toggleClass('hidden', true);
@@ -738,7 +759,7 @@ gisportal.login = function() {
 };
 
 /**
- * Any code that should be run when the user logs out
+ * This will run when a user logs out
  */
 gisportal.logout = function() {
    $('.js-logged-out').toggleClass('hidden', false);
@@ -755,7 +776,7 @@ gisportal.logout = function() {
 gisportal.getState = function() {
    var state = {};
    
-   // TODO: Get states from component.
+   // TODO: Split state into components
    state = gisportal.saveState(state);
 
    // TODO: Merge state with default state.
@@ -764,6 +785,10 @@ gisportal.getState = function() {
    return state; 
 };
 
+/**
+ * Loads the state and adds into cache
+ * @param {object} state - The state object
+ */
 gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
@@ -778,6 +803,7 @@ gisportal.setState = function(state) {
 
 /**
  * This code runs once the page has loaded - jQuery initialised.
+ * It is called from portal.js
  */
 gisportal.main = function() {
  
@@ -785,7 +811,7 @@ gisportal.main = function() {
    // any layer dependent code is called in a callback in mapInit
    gisportal.mapInit();
 
-  gisportal.initStart();
+   gisportal.initStart();
 
    // Compile Templates
    gisportal.templates = {};
@@ -798,6 +824,8 @@ gisportal.main = function() {
  
    // Setup the gritter so we can use it for error messages
    gisportal.gritter.setup();
+
+   // Initiate the DOM for panels
    gisportal.configurePanel.initDOM();
    gisportal.indicatorsPanel.initDOM();
    gisportal.graphs.initDOM();
@@ -819,7 +847,6 @@ gisportal.main = function() {
 
    // Start setting up anything that is not layer dependent
    gisportal.nonLayerDependent();
-  
 
    // Grab the url of any state.
    var stateID = gisportal.utils.getURLParameter('state');
@@ -833,41 +860,36 @@ gisportal.main = function() {
       console.log('Loading Default State...');
    }
 
+   // Replaces all .icon-svg with actual SVG elements,
+   // so that they can be styled with CSS
+   // which cannot be done with SVG in background-image
+   // or <img>
    gisportal.replaceAllIcons(); 
 };
 
-
+/**
+ * This uses ajax to get the state from the database
+ * based on the id (shortlink) provided.
+ * @param {string} id - The shortlink/id to state
+ */
 gisportal.ajaxState = function(id) { 
-      // Async to get state object
-      gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
-         if(data.output.status == 200) {
-            gisportal.setState($.parseJSON(data.output.state));
-            console.log('Success! State retrieved');
-         } else {
-            console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
-         }
-      }, function(request, errorType, exception) {
-         console.log('Error: Failed to retrieved state. Ajax failed!');
-      }, 'json', {});
-   } 
-
-gisportal.getTopLayer = function() {
-	var layer = null;
-	$.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
-      if($(this).is(':checked')) {
-         var layerID = $(this).parent('li').attr('id');
-         layer = gisportal.getLayerByID(layerID);
+   // Async to get state object
+   gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
+      if(data.output.status == 200) {
+         gisportal.setState($.parseJSON(data.output.state));
+         console.log('Success! State retrieved');
+      } else {
+         console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
       }
-   });
-   return layer;
-};
+   }, function(request, errorType, exception) {
+      console.log('Error: Failed to retrieved state. Ajax failed!');
+   }, 'json', {});
+} 
 
-gisportal.updateLayerData = function(layerID)  {
-   var layer = gisportal.getLayerByID(layerID);
-   $('#graphcreator-baseurl').val(layer.wcsURL);
-   $('#graphcreator-coverage option[value=' + layer.origName + ']').prop('selected', true);
-};
-
+/**
+ * This zooms the map so that all of the selected layers
+ * fit into the viewport.
+ */
 gisportal.zoomOverall = function()  {
    if (Object.keys(gisportal.selectedLayers).length > 0)  {
 
@@ -891,12 +913,17 @@ gisportal.zoomOverall = function()  {
    }
 };
 
-// Automatically goes through all icons
+/**
+ * Replaces all icons with the actual SVG.
+ */
 gisportal.replaceAllIcons = function()  {
    gisportal.replaceSubtreeIcons('body');
 };
 
-// Goes through all icons in a subtree
+/**
+ * Replaces icons in a DOM subtree with the actual SVG.
+ * @param {jQuery Element} el - The parent of the subtree
+ */
 gisportal.replaceSubtreeIcons = function(el)  {
    $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
       var e = $(e); 
@@ -914,7 +941,10 @@ gisportal.replaceSubtreeIcons = function(el)  {
    });
 };
 
-// Should probably be using Mustache for this
+/**
+ * Replace links on start splash from config file
+ * Should probably be using Mustache for this
+ */
 gisportal.initStart = function()  {
    var list = $('.start .examples li');
    for (var i = 0; i < list.length; i++)  {
