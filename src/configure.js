@@ -63,9 +63,7 @@ gisportal.configurePanel.initDOM = function()  {
    });
    
    $('.indicator-select').on('click', '.indicator-dropdown', function()  {
-      if ($(this).siblings('select').height() > 50)  {
         $(this).siblings('ul').toggleClass('hidden'); 
-      }
    });
 
    $('.js-configure-indicators').on('click', '.js-remove', function()  {

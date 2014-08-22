@@ -47,12 +47,12 @@ gisportal.refinePanel.initDOM = function(data)  {
    });
 
    var change = function()  {
-      var ids = $('option:selected', this).val().split(',');
+      var ids = $(this).val().split(',');
       var current = gisportal.refinePanel.currentData.id;
       gisportal.refinePanel.refineData(ids, current);
    };
    
-   $('#refinePanel').on('change', '.indicator-select select', change);
+   $('#refinePanel').on('change', '.indicator-select input[type="radio"]', change);
 
    if (data && data.refine && data.refine.cat && data.refine.tag)  {
       var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();
@@ -175,30 +175,33 @@ gisportal.refinePanel.render = function(data, group)  {
    indicator.name = name;
    indicator.modified = gisportal.utils.nameToId(name);
    indicator.groupedNames = group;
-   var template = '{{#tag}}<option value="{{value}}" data-key="{{key}}">{{key}}</option>{{/tag}}';
+   var template = '{{#tag}}<li >      <p class="grid-cell fill">{{key}}</p>      <label class="icon_checkbox icon-svg no-stroke grid-cell icon-column bg-removed" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="svg-checkbox" viewBox="0 0 24 24" version="1.1" xml:space="preserve" x="0px" y="0px" width="24px" height="24px">	<g>		<g id="tick">			<path d="M 10.1319 18.0093 C 9.9995 18.0093 9.872 17.9565 9.7783 17.8628 L 4.7771 12.8628 C 4.5817 12.6675 4.5817 12.3511 4.7771 12.1563 C 4.9725 11.9609 5.2889 11.9609 5.4843 12.1563 L 10.0918 16.7622 L 22.2455 1.6963 C 22.4189 1.4805 22.733 1.4473 22.9488 1.6201 C 23.1637 1.7939 23.1974 2.1084 23.024 2.3232 L 10.5211 17.8228 C 10.4322 17.9341 10.3004 18.0015 10.1587 18.0083 C 10.1495 18.0093 10.1407 18.0093 10.1319 18.0093 Z"></path>		</g>		<g id="box">			<path d="M 19.6341 23.0093 L 1.6299 23.0093 C 1.3535 23.0093 1.1298 22.7856 1.1298 22.5093 L 1.1298 4.5098 C 1.1298 4.2334 1.3535 4.0098 1.6299 4.0098 L 14.6329 4.0098 C 14.9094 4.0098 15.133 4.2334 15.133 4.5098 C 15.133 4.7861 14.9094 5.0098 14.6329 5.0098 L 2.13 5.0098 L 2.13 22.0093 L 19.134 22.0093 L 19.134 11.5098 C 19.134 11.2334 19.3577 11.0098 19.6341 11.0098 C 19.9105 11.0098 20.1342 11.2334 20.1342 11.5098 L 20.1342 22.5093 C 20.1342 22.7856 19.9105 23.0093 19.6341 23.0093 Z"></path>		</g>	</g></svg></label>   </li>{{/tag}}';
 
    if (!refined)  {
       indicator.tag = indicator.groupedNames['region'];
       var rendered = Mustache.render(template, indicator);
-      var placeholder = '<option class="js-placeholder">Choose Region</option>';
-      if (group.region.length <= 1) placeholder = '';
-      $('#refine-region').html(placeholder + rendered);
+      $('#refine-region').html(rendered).find('input[type="radio"]').change(function(){
+         var label = $(this).parent();
+	     label.addClass('active');
+      });
+   }else{
+	   
    }
+   
    $('#refine-interval').parent().toggleClass('hidden', true);
    $('#refine-confidence').parent().toggleClass('hidden', true);
+   $('#refine-reliability').parent().toggleClass('hidden', true);
    
    if (indicator.hasInterval)  {
       indicator.tag = indicator.groupedNames['interval'];
       var rendered = Mustache.render(template, indicator);
-      var placeholder = '<option class="js-placeholder">Choose Interval</option>';
-      $('#refine-interval').html(placeholder + rendered).parent().toggleClass('hidden', false);
+      $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
    }
 
    if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1 )) {
       indicator.tag = indicator.groupedNames['Confidence'];
       var rendered = Mustache.render(template, indicator);
-      var placeholder = '<option class="js-placeholder">Choose Reliability</option>';
-      $('#refine-reliability').html(placeholder + rendered).parent().toggleClass('hidden', false); 
+      $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false); 
    } 
 
    if (refined)  {

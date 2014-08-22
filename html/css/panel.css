@@ -207,12 +207,7 @@
 }
 
 #refinePanel .indicator-select li {
-   border-bottom: 1px solid #e0dce4;
-
-   padding-left: 15px;
-   padding-right: 15px;
-   padding-bottom: 9px;
-   padding-top: 10px;
+   padding-left: 5px;
 }
 
 #refinePanel .panel-list .text-button  {
@@ -314,4 +309,8 @@ select,
    position: absolute;
    -webkit-appearance: none;
    -moz-appearance: none;
+}
+
+#refinePanel .panel-container{
+	padding: 10px;
 }

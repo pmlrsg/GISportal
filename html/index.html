@@ -143,33 +143,39 @@
          <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
       </div>
       <div class="panel-container indicator-select">
-         <ul class="panel-list indicator-select">
-            <li class="js-refine-section-region">
-               <label for="refine-region">Region</label>
-               <select id="refine-region">
-                  <option class="js-placeholder">Choose Region</option>
-               </select>
-            </li>
-            <!-- If Interval: -->
-            <li class="js-refine-section-interval hidden">
-               <label for="refine-interval">Interval</label>
-               <select id="refine-interval">
-                  <option class="js-placeholder">Choose Interval</option>
-               </select>
-            </li>
-            <!-- If Confidence: -->
-            <li class="js-refine-section-reliabiliy hidden">
-               <label for="refine-reliability">Reliability</label>
-               <select id="refine-reliability">
-                  <option class="js-placeholder">Choose Reliability</option>
-               </select>
-            </li>
-            
-            <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+         
+         <div class="js-refine-section-region">
+            <label for="refine-region" class="indicator-dropdown">
+               Region
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-region" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
          
          
-            <button class="text-button js-refine-configure">Cancel</button>
-         </ul>
+         
+         <div class="js-refine-section-interval">
+            <label for="refine-interval" class="indicator-dropdown">
+               Interval
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-interval" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
+         
+         
+         <div class="js-refine-section-reliability">
+            <label for="refine-reliability" class="indicator-dropdown">
+               Reliability
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-reliability" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
+         
+         <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+         <button class="text-button js-refine-configure">Cancel</button>
 
       </div>
    </div>
