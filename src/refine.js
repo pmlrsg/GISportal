@@ -85,15 +85,15 @@ gisportal.refinePanel.refineData = function(ids, current)  {
       var name = indicator.name.toLowerCase();
       var groupedNames = gisportal.groupNames()[name];
       var results = groupedNames;
-      for (var i = 0; i < Object.keys(groupedNames).length; i++)  {
-         var cat = Object.keys(groupedNames)[i];
-         for (var j = 0; j < Object.keys(groupedNames[cat]).length; j++)
+      var names = Object.keys(groupedNames);
+      for (var i = 0; i < names.length; i++)  {
+         var cat = names[i];
+         var tags = Object.keys(groupedNames[cat]);
+         for (var j = 0; j < tags.length; j++)
          {
-            var tag = groupedNames[cat][Object.keys(groupedNames[cat])[j]];
-            console.log('Before',tag);
+            var tag = groupedNames[cat][tags[j]];
             var result = _.intersection(tag, ids);
-            results[cat][Object.keys(groupedNames[cat])[j]] = result; 
-            console.log('After', result);
+            results[cat][tags[j]] = result; 
          }
       }
       var indicator = gisportal.layers[current] || {};
