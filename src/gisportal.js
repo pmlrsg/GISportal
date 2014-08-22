@@ -22,7 +22,7 @@ gisportal.VERSION = "0.4.0";
 // Path to the python flask middleware
 gisportal.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
-// Flask url paths
+// Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
 gisportal.wfsLocation = gisportal.middlewarePath + '/wfs?';
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
@@ -826,10 +826,10 @@ gisportal.main = function() {
    gisportal.gritter.setup();
 
    // Initiate the DOM for panels
-   gisportal.configurePanel.initDOM();
-   gisportal.indicatorsPanel.initDOM();
-   gisportal.graphs.initDOM();
-   gisportal.analytics.initGA();
+   gisportal.configurePanel.initDOM();   // configure.js
+   gisportal.indicatorsPanel.initDOM();  // indicators.js
+   gisportal.graphs.initDOM();           // graphing.js
+   gisportal.analytics.initGA();         // analytics.js
 
    $('.js-show-tools').on('click', showPanel);
 
@@ -848,10 +848,9 @@ gisportal.main = function() {
    // Start setting up anything that is not layer dependent
    gisportal.nonLayerDependent();
 
-   // Grab the url of any state.
+   // Grab the url of any state and store it as an id to be used
+   // for retrieving a state object.
    var stateID = gisportal.utils.getURLParameter('state');
-   
-   // Check if there is a state to load.
    if(stateID !== null) {
       console.log('Retrieving State...');
       gisportal.ajaxState(stateID);

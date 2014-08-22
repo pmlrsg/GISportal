@@ -233,9 +233,8 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
       
       gisportal.indicatorsPanel.checkTabFromState(id);
 
-      gisportal.indicatorsPanel.initialiseSliders(id);      
-
       gisportal.replaceAllIcons();
+      gisportal.indicatorsPanel.initialiseSliders(id);      
 
  });
 };
@@ -287,7 +286,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
 
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id,firstDate, lastDate)  {
-
    // The dates stored in layer are DD-MM-YYYY instead of YYYY-MM-DD
    var firstDateLayer = gisportal.layers[id].firstDate;
    firstDateLayer = firstDateLayer.split('-').reverse().join('-');
@@ -301,14 +299,13 @@ gisportal.indicatorsPanel.initialiseSliders = function(id,firstDate, lastDate)  
       var firstDate = firstDate || '';
       var lastDate = lastDate || '';
    } 
-   
-   if (firstDate !== '' && lastDate !== '')  { 
+ 
+   var from = $('.js-min[data-id="' + id + '"]');
+   var to   = $('.js-max[data-id="' + id + '"]');
+  
+   if (firstDate !== '' && lastDate !== '' && from.length > 0 && to.length > 0)  { 
       var min = new Date(firstDate).getTime();
       var max = new Date(lastDate).getTime();
-
-      var from = $('.js-min[data-id="' + id + '"]');
-      var to   = $('.js-max[data-id="' + id + '"]');
-
       var Link = $.noUiSlider.Link;
       var slider = $('.range-slider[data-id="' + id + '"]');
       slider.noUiSlider({
@@ -424,7 +421,7 @@ gisportal.indicatorsPanel.getParams = function(id)  {
    // TODO: add bins for histogram!
    var graphParams = {
       baseurl: indicator.wcsURL,
-      coverage: indicator.origName,
+      coverage: indicator.urlName,
       type: $('#tab-' + id + '-graph-type option:selected').val(),
       bins: '',
       time: dateRange,
@@ -433,7 +430,7 @@ gisportal.indicatorsPanel.getParams = function(id)  {
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,
-      graphZAxis: indicator.id
+      graphZAxis: indicator.urlName
    };
    return graphParams;
 };
@@ -468,7 +465,7 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
       options.title = title;
       options.provider = indicator.providerTag;
       options.labelCount = 5; // TO DO: make custom
-      options.id = indicator.id;
+      options.id = indicator.urlName;
       gisportal.graphs.data(graphParams, options);
    }
    else {

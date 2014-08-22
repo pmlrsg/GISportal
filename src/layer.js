@@ -1,19 +1,24 @@
-/* @param {string} firstDate - The first date for which data is available
- * @param {string} lastDate - The last date for which data is available
- * @param {string} serverName - The server name which serves the layer
- * @param {string} wmsURL - The URL for the WMS service
- * @param {string} wcsURL - The URL for the WCS service
- * @param {string} sensorName - The name of the sensor for this layer (unescaped)
- * @param {string} exBoundingBox - The geographic bounds for data in this layer
+/**
+ * layer.js
+ * This file represents a Layer class-like object.
+ * The layers are stored in gisportal.layers and 
+ * the selected layers' ids are stored in gisportal.selectedLayers
  */
 
+
 /**
- * Represents a joint OpenLayers and Cesium layer allowing interaction with 
- * both layers through one API.
- * 
+ * All data of a particular indicator is stored in a gisportal.layer object. 
  * @constructor
  * 
- * @param {Object} microlayer - The microlayer to use as a basis for the layer.
+ * Some params will need renaming in the future.
+ * For instance, name is actually ID and
+ * title is not currently being used.
+ *
+ * @param {string} name - The ID of the layer
+ * @param {string} title - The display title
+ * @param {string} productAbstract - The description of the layer
+ * @param {string} type - opLayers or refLayers
+ * @param {object} opts - Options to extend the defaults
  */
 gisportal.layer = function(name, title, productAbstract, type, opts) {
    var layer = this;
@@ -49,6 +54,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    
    $.extend(true, this, this.defaults, opts);
 
+   // Used for sensor data from SOS, not tested as we have no sensor data
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/\s+/g, "") : null;
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/[\.,]+/g, "") : null;
    
@@ -76,19 +82,26 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
    }
 
-
- 
+   // I do not like the metadataQueue but it is used to
+   // prevent race conditions of AJAX calls such as
+   // for the scalebar.
+   // Essentially, if metadata is complete then the scalebar
+   // will use the data otherwise it will put a callback into
+   // the queue.
    this.metadataComplete = false;
    this.metadataQueue = []; 
+
    this.times = []; // The times for each of the layers stored
    this.openlayers = {}; // OpenLayers layers
    this.cesiumLayers = {}; // Cesium layers
    
-   // Maintains the order of layers 
+   // Maintains the order of microlayers (not fully implemented) 
    this.order = [];
    
-   
-   // Is the layer selected for display in the GUI or not
+   // Is the layer selected.
+   // This is left over from the old design, it could probably
+   // be deprecated as selected layers can be found in
+   // gisportal.selectedLayers now.
    this.selected = false;
    
    // Date Range
@@ -136,11 +149,13 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.spinner = false;
    
    /**
-    * Constructor for the layer.
+    * When data is available, initialise the layer
+    * so that it can be used.
+    * @param {object} layerData - The data
+    * @param {object} options - The options
     */
    this.init = function(layerData, options) {
       var self = this;
-      console.log(layerData); 
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       
       // A list of styles available for the layer
@@ -205,26 +220,39 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.elevationUnits = value.Units;
          }
       });
-      
+      gisportal.indicatorsPanel.initialiseSliders(layer.id, layer.firstDate, layer.lastDate);
    };
    
    //--------------------------------------------------------------------------
    
+   /**
+    * When params are changed, such as minScaleVal, pass them
+    * to this function as an object and it will merge them into
+    * the correct OpenLayers WMS Layer. Note that it currently assumes there is only
+    * one WMS layer per layer.
+    *
+    * @param {object} object - The object to extend the WMS layer params
+    */
    this.mergeNewParams = function(object) {
-      //this.openlayers['anID'] = $.extend(this.openlayers['anID'], object);   
       if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
    };
    
-   // Is the layer visible? Even if selected, it might not be 
-   // visible without a selected date.
+   /**
+    * By default the layer is visible, to hide it
+    * just call layer.setVisibility(false);
+    *
+    * @param {boolean} visibility - True if visible, false if hidden
+    */
    this.isVisible = true;  
    this.setVisibility = function(visibility) {
       if (this.openlayers['anID']) this.openlayers['anID'].setVisibility(visibility);
       this.isVisible = visibility;
    };
    
-   // Layer opacity for OL or Cesium layers that don't have one.
-   // OL or Cesium layers may have individual values set.
+   /**
+    * Set the opacity of the layer.
+    * @param {double} opacityValue - 0 is transparent, 1 is opaque.
+    */
    this.opacity = null;
    this.setOpacity = function(opacityValue) {
       var self = this;
@@ -374,10 +402,11 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    /**
     * Function which gets layers metadata asynchronously and sets up the 
     * map scale min and max parameters.
+    *
+    * It uses the metadataQueue so that if there is anything in the queue
+    * it will run the callbacks. Then it sets metadataComplete so that
+    * functions (such as scalebar) will know they are able to use the metadata.
     * 
-    * @method
-    * 
-    * @param {Object} layer - The OpenLayers.Layer object
     */
    this.getMetadata = function() {
       var layer = this;
@@ -418,7 +447,21 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          }
       });
    };
-   
+
+   /**
+    * This function creates an Open Layers layer, such as a WMS Layer.
+    * These are stored in layer.openlayers. Currently the implementation
+    * only allows a single OL layer per gisportal.layer known as 'anID'
+    * but in the future this should change to allow multiple OL layers.
+    *
+    * opLayers refer to operational layers, generally temporal WMS layers
+    * refLayers refer to reference layers, generally WFS or KML.
+    *
+    * History:
+    * The previous implementation had the idea of microlayers but over time
+    * they grew into a confusing mess than has now been removed and merged
+    * with gisportal.layer. 
+    */
    this.createOLLayer = function() {
       var self = this,
          layer = null;
@@ -536,38 +579,42 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       return layer;
    };
-   
+  
+   /**
+    * Adds the OL layer to the map, to show the data.
+    * It also increases numOpLayers or numRefLayers to show
+    * how many operational and reference layers are on the map.
+    *
+    * @param {OL Layer} layer - The Open Layers layer to be added to map
+    * @param {string} id - The id of the layer (Unused)
+    * */
    this.addOLLayer = function(layer, id) {      
       
       // Add the layer to the map
       map.addLayer(layer);
  
-      // TODO: be able to deal with all layer types.
       if(this.type == 'opLayers') {
-         //map.events.register("click", layer, getFeatureInfo);
-         // Increase the count of OpLayers
          gisportal.numOpLayers++;
       } else if (this.type == 'refLayers') {
          gisportal.numRefLayers++;
       }
 
    };
-   
+  
+   /**
+    * Removes the Open Layers layer from layer.openlayers and the map
+    * Also decrements the numOpLayers and numRefLayers counters.
+    * 
+    * @param {OL Layer} layer - The Open Layers layer to be added to map
+    * @param {string} id - The id of the layer (Unused)
+    */ 
    this.removeOLLayer = function(layer, id) {
       // Remove the layer from the map.
+      // In this case layer.id is the id of the OL Layer
+      // not of the indicator.
       map.removeLayer(map.getLayer(layer.id));
       
-      // Remove layer from the order array.
-      for(var i = 0, len = this.order.length; i < len; i++) {
-         if(id === this.order[i]) {
-            gisportal.utils.arrayRemove(this.order, i, i);
-         }
-      }
-
-      // TODO: be able to deal with all layer types.
       if(this.type == 'opLayers') {
-         //map.events.unregister("click", layer, getFeatureInfo);
-         // Decrease the count of OpLayers
          gisportal.numOpLayers--;
       } else if(this.type == 'refLayers') {
          gisportal.numRefLayers--;
@@ -576,7 +623,12 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    };
    
    //--------------------------------------------------------------------------
-   
+  
+   /**
+    * Toggles the loading spinner.
+    * Currently not being used but will be once a loading spinner
+    * has been added back into the portal.
+    */ 
    this.updateSpinner = function() {
       /*if(this.spinner === false && $element.is(':visible')) {
          $element.hide();
@@ -592,14 +644,13 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    gisportal.layers[this.id] = this;
 };
 
-gisportal.addNewLayer = function(id, options)  {
-   var layer = gisportal.layers[id];
-   var options = options || {};
-   if (layer)  {
-      gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer,options);
-   }
-};
-
+/**
+ * Setups up the layer, calls addOLLayer and updates scalebar
+ * and visibility. 
+ * 
+ * @param {object} layer - The gisportal.layer object
+ * @param {object} options - Extend the layer with options
+ */
 gisportal.addLayer = function(layer, options) {
    var options = options || {};   
   
@@ -616,22 +667,41 @@ gisportal.addLayer = function(layer, options) {
    }
   
    layer.setVisibility(options.visible); 
-
-   /* loading icon here */
 };
 
+/**
+ * Removes a layer when passed the entire layer object
+ * This function should be used because it removes
+ * from selectedLayers as well as the map.
+ * 
+ * @param {object} layer - A gisportal.layer object
+ */
 gisportal.removeLayer = function(layer) {
-  var index = _.indexOf(gisportal.selectedLayers, layer.id); 
+   var index = _.indexOf(gisportal.selectedLayers, layer.id);
+   
+   // Using splice to remove the index from selectedLayers 
    if (index > -1) gisportal.selectedLayers.splice(index,1);
+
    var keys = Object.keys(layer.openlayers);
    for(var i = 0, len = keys.length; i < len; i++) {
       layer.removeOLLayer(layer.openlayers[keys[i]], keys[i]);
    }
 };
 
+/**
+ * This function is used to order the layers correctly
+ * on the map.
+ * Please note - the index should be relative to
+ * the other layers in gisportal.selectedLayers.
+ * This function handles positioning the layer
+ * correctly relative to base layers.
+ * It also moves the vector layer to always be on top.
+ *
+ * @param {object} layer - A gisportal.layer object
+ * @param {integer} index - The index to set the layer
+ */
 gisportal.setLayerIndex = function(layer, index) {
    var noLayers = gisportal.selectedLayers.length;
-   // Assume that we want them before the last layer, which is vector
    var startIndex = map.layers.length - noLayers;
    var name = layer.openlayers['anID'].name;
    map.setLayerIndex(layer.openlayers['anID'], index);
@@ -641,11 +711,9 @@ gisportal.setLayerIndex = function(layer, index) {
 };
 
 /**
- * Function to filter layers with date-time dependencies to given date
- * Used as the onselect callback function for the jQuery UI current view date DatePicker control
+ * Function to filter layers with date-time dependencies to given date.
  * 
- * @param {string} dateText - yyyy-mm-dd format date string to filter to
- * @param {Object} inst - The instance of the jQuery UI DatePicker view date control
+ * @param {string} date - yyyy-mm-dd format date string to filter to
  *
  */
 gisportal.filterLayersByDate = function(date) {
@@ -658,8 +726,9 @@ gisportal.filterLayersByDate = function(date) {
 };
 
 /**
- * Map function which gets data layers asynchronously and creates operational layers for each one
- * 
+ * Gets data layers asynchronously and creates operational layers for each one. 
+ * This is the main function for dealing with new layers.
+ *
  * @param {string} fileName - The file name for the specific JSON layer cache
  * @param {string} microLayer - The microLayer for the layer to be downloaded
  * @param {object} options - Any extra options for the layer
@@ -674,10 +743,9 @@ gisportal.getLayerData = function(fileName, layer, options) {
       async: true,
       cache: false,
       success: function(data) {
+         // Initialises the layer with the data from the AJAX call
          gisportal.layers[id].init(data, options);
-         gisportal.configurePanel.refreshIndicators();
-         
-         
+
          // Track the indicator change
          gisportal.analytics.events.layerChange( layer )
       },

@@ -1,6 +1,9 @@
 /**
- * Custom JavaScript functionality
- * @namespace
+ * utils.js
+ * This file is full of useful utlities
+ * for use in the rest of the portal.
+ *
+ * @namespace utils
  */
 gisportal.utils = {};
 
@@ -46,6 +49,8 @@ gisportal.utils.replace = function(search, replace, subject, count) {
 
 /**
  * Extension to JavaScript Arrays to de-duplicate them
+ * @param {array} array - The array to remove duplications from
+ * @return {array} The array with the duplications removed
  */ 
 gisportal.utils.arrayDeDupe = function(array) {
    var i,
@@ -87,6 +92,8 @@ getNearestInArray = function(arr, goal) {
 
 /**
  * Turn JavaScript date, d into ISO8601 date part (no time)
+ * @param {string} d - A date to turn into ISO8601 
+ * @return {string} The ISO8601 date string
  */ 
 gisportal.utils.ISODateString = function(d) {
    function pad(n){
