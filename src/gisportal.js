@@ -670,7 +670,7 @@ gisportal.loadState = function(state) {
    }
    for (var i = 0, len = keys.length; i < len; i++) {
       var indicator = gisportal.layers[keys[i]];
-      if (indicator && !gisportal.selectedLayers[keys[i]]) {
+      if (indicator && !gisportal.selectedLayers[indicator.id]) {
          gisportal.configurePanel.close();
          gisportal.refinePanel.foundIndicator(state.selectedIndicators[i]);
         
