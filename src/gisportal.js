@@ -361,7 +361,9 @@ gisportal.createOpLayers = function() {
          return 0;
       });
    }
-
+   
+   var state = gisportal.cache.state;
+   if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
 };
@@ -392,17 +394,18 @@ gisportal.isSelected = function(id) {
 gisportal.checkNameUnique = function(layer, count) {
    var id = null;
    
-   if(typeof count === "undefined" || count === 0) {
+   if (typeof count === "undefined" || count === 0) {
       id = layer.id;
       count = 0;
-   } else {
+   } 
+   else {
       id = layer.id + count;
    }
    
-   if (id in gisportal.layers) {
+   if (id in gisportal.layers && layer.wcsURL !== gisportal.layers[layer.id].wcsURL) {
       gisportal.checkNameUnique(layer, ++count);
    } else {
-      if(count !== 0) { 
+      if (count !== 0) { 
          layer.id = layer.id + count; 
       }
    }
@@ -656,6 +659,7 @@ gisportal.saveState = function(state) {
  * @param {object} state - The saved state object
  */
 gisportal.loadState = function(state) {
+   gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    var state = state || {};
 
@@ -795,10 +799,9 @@ gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
    gisportal.cache.state = state;
-   // TODO: Merge with default state.
+   // TODO: Merge with default state. 
+   if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    
-   // TODO: Set states of components.
-   gisportal.loadState(state);
 };
 
 /*===========================================================================*/
