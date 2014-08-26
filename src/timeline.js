@@ -328,7 +328,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             // Time Bar
             d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
               .enter().append('svg:line')
-               .attr('stroke', '#fff')
+               .attr('stroke', '#59476D')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
@@ -516,7 +516,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.layerbars.push(newTimebar); 
 
    // TODO: Move asap. tidy up
-   if (Object.keys(gisportal.layers).length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
+   if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
       this.reHeight();
       // redraw is done in zoom
       var data = gisportal.timeline.layerbars[0];

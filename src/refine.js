@@ -52,11 +52,11 @@ gisportal.refinePanel.initDOM = function(data)  {
       gisportal.refinePanel.refineData(ids, current);
    };
    
-   $('#refinePanel').on('change', '.indicator-select input[type="radio"]', change);
+   $('#refinePanel').one('click', '.indicator-select input[type="radio"]', change);
 
    if (data && data.refine && data.refine.cat && data.refine.tag)  {
       var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();
-      $('#refine-region').val(val).change();
+      $('#refine-region [value="' + val + '"]').click();
    }
 
    var click = function()  {

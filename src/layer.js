@@ -105,6 +105,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.selected = false;
    
    // Date Range
+   // These are set with getDimensions
    this.firstDate = '';
    this.lastDate = '';
    
@@ -159,12 +160,11 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       
       // A list of styles available for the layer
-      this.styles = null; // Can be 'Null'.
+      this.styles = null;
       this.style = null;
       
       // The BoundingBox for the layer
       this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
-      
 
       if(this.type == "opLayers") {
          this.getMetadata();
@@ -266,24 +266,35 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       this.opacity = opacityValue;
    };
 
+   /**
+    * Sets the style from the layer.styles list.
+    * These style names represent colour palettes.
+    *
+    * @param {string} style - The name of the style
+    */
    this.setStyle = function(style)  {
       var indicator = this;
       indicator.style = style;
       gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
    }; 
-   
+  
+   /**
+    * This function is the main way to select layers
+    */
    this.select = function() {
       // Just in case it tries to add a duplicate
       if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
       var layer = this;
       
       layer.selected = true;
+      
+      // Adds the layer ID to the beginning of the gisportal.selectedLayers array
       gisportal.selectedLayers.unshift(layer.id);
+
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
          var currentDate = gisportal.timeline.getDate();
-         layer.selectDateTimeLayer(currentDate);
          
          
          // Now display the layer on the timeline
@@ -717,8 +728,9 @@ gisportal.setLayerIndex = function(layer, index) {
  *
  */
 gisportal.filterLayersByDate = function(date) {
-   $.each(gisportal.selectedLayers, function(index, layer) {
+   $.each(gisportal.selectedLayers, function(index, id) {
       // Only filter date-dependent layers
+      var layer = gisportal.layers[id];
       if (layer.temporal) {
          layer.selectDateTimeLayer(date);
       }

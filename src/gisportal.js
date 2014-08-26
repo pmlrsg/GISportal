@@ -681,7 +681,7 @@ gisportal.loadState = function(state) {
    indicator = {};
    if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
       var layer = map.getLayersBy('type', 'poiLayer')[0];
-      layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
+      if (layer) layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
     }
    
    // Load position
