@@ -245,11 +245,11 @@ gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
    $.get('templates/tab-scalebar.mst', function(template)  {
       var onMetadata = function()  {
          var indicator = gisportal.layers[id];
-            if (indicator.elevationCache.length > 0)  {         
+            if (indicator.elevationCache && indicator.elevationCache.length > 0)  {         
                indicator.hasElevation = true;
             }
             
-            if (indicator.styles.length > 0)  {
+            if (indicator.styles && indicator.styles.length > 0)  {
                indicator.hasStyles = true;
             }
 
