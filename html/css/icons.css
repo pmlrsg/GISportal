@@ -82,16 +82,16 @@
    background-image: url('../img/icons/graph.svg');
 }
 
-.icon_session_share  {
-  background-image: url('../img/icons/session-share.svg');
+.icon_collaboration  {
+  background-image: url('../img/icons/collaboration.svg');
 } 
 
-.icon_session_share_member  {
-  background-image: url('../img/icons/session-share-member.svg');
+.icon_collaboration_member  {
+  background-image: url('../img/icons/collaboration-member.svg');
 } 
 
-.icon_session_share_presenter  {
-  background-image: url('../img/icons/session-share-presenter.svg');
+.icon_collaboration_presenter  {
+  background-image: url('../img/icons/collaboration-presenter.svg');
 } 
 
 .icon_share  {

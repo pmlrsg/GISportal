@@ -1,8 +1,8 @@
-.panel-content-session-sharing {background: #fff; padding: 10px; position: relative;}
+.panel-content-collaboration {background: #fff; padding: 10px; position: relative;}
 
-.panel-content-session-sharing .icon_close { position: absolute; top: 10px; right:4px; }
-.panel-content-session-sharing p {padding: 8px 0px; }
+.panel-content-collaboration .icon_close { position: absolute; top: 10px; right:4px; }
+.panel-content-collaboration p {padding: 8px 0px; }
 
-.js-session-sharing-console { margin-top: 10px; }
-.js-session-sharing-status-msg { padding: 10px; background: #444; color: #fff; margin-top: 10px; }
-.js-session-sharing-status-msg a {color: #fff; font-weight: bold; }
+.js-collaboration-console { margin-top: 10px; }
+.js-collaboration-status-msg { padding: 10px; background: #444; color: #fff; margin-top: 10px; }
+.js-collaboration-status-msg a {color: #fff; font-weight: bold; }

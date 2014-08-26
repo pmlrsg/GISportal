@@ -501,10 +501,10 @@ gisportal.mapInit = function() {
             zoomOutId: "mapZoomOut"
         })
       ],
-      eventListeners: {
-         "moveend" : EventManager.publish("map-moveend"),
-         "zoomend" : EventManager.publish("map-zoomend"),
-      }
+      // eventListeners: {
+      //    "moveend" : EventManager.publish("map-moveend"),
+      //    "zoomend" : EventManager.publish("map-zoomend"),
+      // }
    });
    
    //map.setupGlobe(map, 'map', {

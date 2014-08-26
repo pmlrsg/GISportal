@@ -176,3 +176,7 @@
 [2014-08-14 11:51:46,749] [DEBUG]: Checking logger[in proxy.py:31]
 [2014-08-14 11:51:46,749] [DEBUG]: https://wci.earth2observe.eu/thredds/wms/ecmwf/met_forcing_v0/swdown_3hourly.nc?item=layerDetails&layerName=SWdown&coverage=SWdown&request=GetMetadata[in proxy.py:32]
 [2014-08-14 11:51:46,749] [DEBUG]: wci.earth2observe.eu[in proxy.py:36]
+[2014-08-26 12:27:32,359] [DEBUG]: In debug mode: True[in __init__.py:90]
+[2014-08-26 12:27:32,561] [DEBUG]: Checking logger[in proxy.py:31]
+[2014-08-26 12:27:32,562] [DEBUG]: https://wci.earth2observe.eu/thredds/wms/ecmwf/met_forcing_v0/rainf_3hourly.nc?item=layerDetails&layerName=Rainf&coverage=Rainf&request=GetMetadata[in proxy.py:32]
+[2014-08-26 12:27:32,562] [DEBUG]: wci.earth2observe.eu[in proxy.py:36]

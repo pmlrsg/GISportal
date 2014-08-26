@@ -1460,7 +1460,7 @@ input[type="text"]  {
    top: 10px;
 }
 
-.panel-header button.icon_session_share  {
+.panel-header button.icon_collaboration  {
    right: 43px;
 }
 
@@ -1878,16 +1878,16 @@ select,
    background-image: url('../img/icons/graph.svg');
 }
 
-.icon_session_share  {
-  background-image: url('../img/icons/session-share.svg');
+.icon_collaboration  {
+  background-image: url('../img/icons/collaboration.svg');
 } 
 
-.icon_session_share_member  {
-  background-image: url('../img/icons/session-share-member.svg');
+.icon_collaboration_member  {
+  background-image: url('../img/icons/collaboration-member.svg');
 } 
 
-.icon_session_share_presenter  {
-  background-image: url('../img/icons/session-share-presenter.svg');
+.icon_collaboration_presenter  {
+  background-image: url('../img/icons/collaboration-presenter.svg');
 } 
 
 .icon_share  {
@@ -2968,11 +2968,11 @@ fill-opacity: 0 !important;
 
 .panel-content-map-tools select {height: 35px; }
 .panel-content-map-tools li {margin-top:10px;}
-.panel-content-session-sharing {background: #fff; padding: 10px; position: relative;}
+.panel-content-collaboration {background: #fff; padding: 10px; position: relative;}
 
-.panel-content-session-sharing .icon_close { position: absolute; top: 10px; right:4px; }
-.panel-content-session-sharing p {padding: 8px 0px; }
+.panel-content-collaboration .icon_close { position: absolute; top: 10px; right:4px; }
+.panel-content-collaboration p {padding: 8px 0px; }
 
-.js-session-sharing-console { margin-top: 10px; }
-.js-session-sharing-status-msg { padding: 10px; background: #444; color: #fff; margin-top: 10px; }
-.js-session-sharing-status-msg a {color: #fff; font-weight: bold; }
+.js-collaboration-console { margin-top: 10px; }
+.js-collaboration-status-msg { padding: 10px; background: #444; color: #fff; margin-top: 10px; }
+.js-collaboration-status-msg a {color: #fff; font-weight: bold; }

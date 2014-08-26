@@ -2,23 +2,24 @@
 collaboration = {};
 
 // socket.io location settings
-collaboration.protocol = 'http'; 
+collaboration.protocol = 'http'; 														// 'http' or 'https'; the connection is automagically upgraded to a websocket connection
 collaboration.host = 'pmpc1465.npm.ac.uk';
 collaboration.port = '6789';
+collaboration.path = '';
 
 // jquery selectors for various control elements
-collaboration.startButton = '.js-start-session-sharing';							// the button to initiate a collaboration session
-collaboration.consoleWrapper = '.js-session-sharing-console';					// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
-collaboration.historyConsole = '.js-session-sharing-history';					// a div that historical message log as appended to
-collaboration.statusMessage = '.js-session-sharing-status-msg';					// element where the status message is displayed
+collaboration.startButton = '.js-start-collaboration';							// the button to initiate a collaboration session
+collaboration.consoleWrapper = '.js-collaboration-console';					// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
+collaboration.historyConsole = '.js-collaboration-history';					// a div that historical message log as appended to
+collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
 
 collaboration.active = false;
 collaboration.role = 'member';
 
 collaboration.initDOM = function() {
 	// this should really be done somewhere else in a much more elegant way than this, but for now...
-	$('.js-session-sharing-toggle').on('click', function() {
-      $('#sessionSharingPanel').toggleClass('hidden', false).toggleClass('active', true);      
+	$('.js-collaboration-toggle').on('click', function() {
+      $('#collaborationPanel').toggleClass('hidden', false).toggleClass('active', true);      
       $('#mapToolsPanel').toggleClass('hidden', true).toggleClass('active', false);
       $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
       $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);      
@@ -37,7 +38,7 @@ collaboration.initSession = function() {
 	$(collaboration.consoleWrapper).toggleClass('hidden', false);
 
 	// line up the URL 
-	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port;
+	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
 
 	// get the socket.io script and open a connection
 	$.getScript(collaboration.socket_url+"/socket.io/socket.io.js")
@@ -70,7 +71,14 @@ collaboration.initSession = function() {
 
 		  	socket.on('error', function (reason){
 		   	collaboration.active = false;
-		   	$(collaboration.statusMessage).html('The connection failed; '+reason);
+		   	if (reason == 'handshake error') { // user not logged into Google
+		   		$(collaboration.consoleWrapper).toggleClass('hidden', true);
+		   		$(collaboration.authenticationWrapper).toggleClass('hidden', false);
+					window.open(collaboration.socket_url +'/auth/google');
+		   	} else {
+		   		$(collaboration.statusMessage).html('The connection failed; '+reason);	
+		   	}
+		   	
 		  	});
 
 		  	// -------------------------------------------------
