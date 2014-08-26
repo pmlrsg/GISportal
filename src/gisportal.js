@@ -780,6 +780,7 @@ gisportal.main = function() {
 
    gisportal.configurePanel.initDOM();
    gisportal.indicatorsPanel.initDOM();
+
    gisportal.graphs.initDOM();
    gisportal.analytics.initGA();
 

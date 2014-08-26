@@ -144,4 +144,10 @@ input[type="text"]  {
    z-index: 100;
 }
 
+.pull-left{
+	float: left;
+}
+.pull-right{
+	float: right;
+}
 

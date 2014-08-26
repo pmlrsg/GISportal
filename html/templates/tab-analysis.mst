@@ -15,28 +15,10 @@
             <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>
             <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
          </div>
-      </div>
-      </li>
-      <li>
-      <p class="number grid-cell">2</p>
-      <div class="grid-cell fill">
-         <p>Set a date range using the timeline below</p>
-         <input data-id="{{id}}" placeholder="Start" class="js-min min grid-cell" type="text">
-         <input data-id="{{id}}" placeholder="End" class="js-max max grid-cell" type="text">
-         <div data-id="{{id}}" class="range-slider grid-cell fill"></div>
-      </div>
-      </li>
-      <li>
-      <p class="number grid-cell">3</p>
-      <div class="grid-cell fill">
-         <label for="tab-{{id}}-graph-type">Choose a graph type</label>
-         <select id="tab-{{id}}-graph-type">
-            <option selected value="timeseries">Timeseries (default)</option>
-            <option value="histogram">Histogram</option>
-            <!--<option value="hovmollerLat">Hovmoller Latitude</option>
-            <option value="hovmollerLon">Hovmoller Longitude</option>-->
-         </select>
-         <button data-id="{{id}}" class="brand create-graph js-create-graph">Create graph</button>
+         
+         <div class="grid-cell fill">
+            <button data-id="{{id}}" class="brand add-to-plot js-add-to-plot">Add to plot</button>
+         </div>
       </div>
       </li>
       <li class="export-button">

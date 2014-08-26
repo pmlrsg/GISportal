@@ -20,12 +20,9 @@ gisportal.indicatorsPanel.initDOM = function()  {
       } 
    });
 
-   $('.js-indicators').on('click', '.js-create-graph', function()  {
+   $('.js-indicators').on('click', '.js-add-to-plot', function()  {
       var id = $(this).data('id');
-      $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
-      gisportal.indicatorsPanel.createGraph(id);
-      //$(this).toggleClass("loading", true);
+      gisportal.indicatorsPanel.addToPlot(id);
    });
 
    $('.js-indicators').on('click', '.js-draw-box', function()  {
@@ -451,7 +448,8 @@ gisportal.indicatorsPanel.refineData = function(ids, current)  {
 
 // Needs a refactor
 gisportal.indicatorsPanel.initialiseSliders = function(id,firstDate, lastDate)  {
-     
+   return;
+   /*
    if (gisportal.microLayers[id])  {
       var firstDate = gisportal.microLayers[id].firstDate || firstDate || '';
       var lastDate = gisportal.microLayers[id].lastDate || lastDate || '';
@@ -520,6 +518,7 @@ gisportal.indicatorsPanel.initialiseSliders = function(id,firstDate, lastDate)  
          to.val(new Date(+val[1]).toISOString().substring(0,10));
       });
    }
+   */
 };
 
 function setDate(value){
@@ -596,43 +595,15 @@ gisportal.indicatorsPanel.getParams = function(id)  {
    };
    return graphParams;
 };
-gisportal.indicatorsPanel.createGraph = function(id)  {
+gisportal.indicatorsPanel.addToPlot = function(id)  {
    var graphParams = this.getParams(id);
    var indicator = gisportal.microLayers[id];
-   if (graphParams.baseurl && graphParams.coverage)  {
-      var title = graphParams.type + " of " + indicator.name;
-      
-      var graphObject = {};
-      graphObject.graphData = graphParams;      
-      graphObject.description = title;
-      graphObject.title = title;
-
-      // Async post the state
-      gisportal.genericAsync(
-         'POST', 
-         gisportal.graphLocation, 
-         { 
-            graph: JSON.stringify(graphObject)
-         }, 
-         function(data, opts) {
-            console.log('POSTED graph!');
-         }, function(request, errorType, exception) {
-            console.log('Failed to post graph!');
-         }, 
-         'json', 
-         {}
-      );
-
-      var options = {};
-      options.title = title;
-      options.provider = indicator.providerTag;
-      options.labelCount = 5; // TO DO: make custom
-      options.id = indicator.id;
-      gisportal.graphs.data(graphParams, options);
-   }
-   else {
-      gisportal.gritter.showNotification ('dataNotSelected', null);
-   }
+   
+   gisportal.graphs.addComponentToGraph({
+	   indicator: id,
+	   bbox: graphParams.bbox
+   });
+   
 };
 
 

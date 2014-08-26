@@ -1,0 +1,53 @@
+<div class="remove-active-graph close-side-panel-icon icon_close" ></div>
+
+<ol class="steps grid-list panel-list">
+	<li>
+		<p class="number grid-cell">1</p>
+		<div class="grid-cell fill">
+			<p>Title:</p>
+			<input type="text" class="active-plot-title" value="{{title}}" />
+		</div>
+	</li>
+	
+	<li>
+		<p class="number grid-cell">2</p>
+		<div class="grid-cell fill">
+			<p>Choose a graph type</p>
+			<select class="active-plot-type">
+				<option selected="" value="timeseries">Timeseries (default)</option>
+				<option value="histogram">Histogram</option>
+				<!--<option value="hovmollerLat">Hovmoller Latitude</option>
+				<option value="hovmollerLon">Hovmoller Longitude</option>-->
+			 </select>
+		</div>
+	</li>
+
+	<li>
+		<p class="number grid-cell">3</p>
+		<div class="grid-cell fill">
+			<p>Set a date range using the timeline below</p>
+			<input placeholder="Start" class="js-min min grid-cell active-plot-start-datetime" type="text">
+			<input placeholder="End" class="js-max max grid-cell active-plot-end-datetime" type="text">
+			<div class="range-slider grid-cell fill"></div>
+		</div>
+	</li>
+	
+	
+	<li>
+		<p class="number grid-cell">4</p>
+		<div class="grid-cell fill">
+			<p>Choose a graph type</p>
+			<table>
+				<tbody class="components"></tbody>
+			</table>
+		</div>
+	</li>
+	
+	<li>
+		<p class="number grid-cell">5</p>
+		<div class="grid-cell fill">
+			<button class="brand create-graph js-create-graph">Create graph</button>
+		</div>
+	</li>
+
+</ol>

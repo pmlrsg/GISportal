@@ -18,3 +18,80 @@
    text-align: center;
    padding: 10px;
 }
+
+.active-plot-slideout{
+	padding: 0px;
+}
+
+
+.active-plot-slideout table{
+	width: 100%;
+}
+.active-plot-slideout .components td{
+	height: auto;
+	padding: 0px 5px;
+}
+
+.active-plot-slideout .components td:nth-child(2){
+	width: 100%;
+}
+.active-plot-slideout .components td:nth-child(1), .active-plot-slideout .components td:nth-child(3){
+	width: 19px;
+}
+
+.close-acitve-plot-component{
+	cursor: pointer;
+}
+
+
+[class^="has-data-in-range"]{
+	padding: 0px;
+	
+}
+.has-data-in-range-yes{
+	background-color: #dff0d8 !important;
+}
+.has-data-in-range-yes .icon-data:before{
+	color: green;
+	content: "\e303";
+}
+
+.has-data-in-range-no{
+	background-color: #f2dede !important;
+}
+.has-data-in-range-no .icon-data:before{
+	color: red;
+	content: "\e2c3";
+}
+.has-data-in-range-partial{
+	background-color: #fcf8e3 !important;
+}
+.has-data-in-range-partial .icon-data:before{
+	color: orange;
+	content: "\e333";
+}
+
+.graph-job{
+	padding: 6px;
+}
+
+.graph-job .loading-image{
+	background-image: url('../img/ajax-loader.gif');
+	background-size: contain;
+	background-position: center center;
+	background-repeat: no-repeat;
+	align-self: center;
+}
+
+
+.graph-job > div{
+	width: 100%;
+	display: flex;
+}
+
+
+.graph-job > div div:nth-child(1){
+	flex-basis: 16px;
+	flex-shrink: 0;
+	margin-right: 5px;
+}

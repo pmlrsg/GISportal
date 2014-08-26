@@ -3,6 +3,8 @@
    "files": [
       "html/css/reset.css",
       "html/css/fonts.css",
+      "html/css/streamline.css",
+      "html/css/streamline-filled-in.css",
       "html/css/type.css",
       "html/css/overlay.css",      
       "html/css/start.css",
@@ -19,9 +21,10 @@
       "html/css/icons.css",
       "html/css/scalebar.css",
       "html/css/indicators.css",
-      "html/css/graph.css",
       "html/css/tables.css",
+      "html/css/graph.css",
       "html/css/nv.d3.css",
+      "html/css/history.css",
       "html/css/mapcontrols.css"
    ]
 }

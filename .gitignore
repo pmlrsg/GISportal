@@ -5,3 +5,5 @@ html/cache/*
 html/GISPortal.js
 middleware/portalflask/settings.py
 config/*
+.DS_Store
+apache_log
