@@ -669,7 +669,9 @@ gisportal.loadState = function(state) {
       gisportal.indicatorsPanel.open();
    }
    for (var i = 0, len = keys.length; i < len; i++) {
-      var indicator = gisportal.layers[keys[i]];
+      var indicator = null;
+      if (typeof keys[i] === "object") indicator = gisportal.layers[keys[i].id];
+      else indicator = gisportal.layers[keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
          gisportal.configurePanel.close();
          gisportal.refinePanel.foundIndicator(indicator.id);
