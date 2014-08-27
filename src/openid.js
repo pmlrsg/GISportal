@@ -66,11 +66,6 @@ gisportal.openid.setup = function(containerID) {
       $('.js-logged-out').html(rendered);
    });
 
-   $('.js-close-share').on('click', function()  {
-      $('.share').toggleClass('hidden', true);
-   });
-
-
    $('.js-logged-out').on('click', '.js-login-button', function() {
       gisportal.openid.openPopup($(this).attr('data-url'));  
    });
@@ -87,7 +82,12 @@ gisportal.openid.setup = function(containerID) {
 
 // getLink to state
 gisportal.openid.getLink = function()  {
-   gisportal.genericAsync('POST', gisportal.stateLocation, { state: JSON.stringify(gisportal.getState())}, function(data, opts) { 
+   // Move this back to setup when openid is being used again 
+   $('.js-close-share').on('click', function()  {
+      $('.share').toggleClass('hidden', true);
+   });
+
+  gisportal.genericAsync('POST', gisportal.stateLocation, { state: JSON.stringify(gisportal.getState())}, function(data, opts) { 
       if (data['output']['url']) {
          console.log(data['output']);
          $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);

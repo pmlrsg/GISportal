@@ -11,6 +11,7 @@
       "config/analytics_config.js",
       "src/configure.js",
       "src/scalebar.js",
+      "src/refine.js",
       "src/indicators.js",
       "src/selectiontools.js",
       "src/libs/jquery-gritter/jquery.gritter.js",

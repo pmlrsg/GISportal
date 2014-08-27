@@ -81,7 +81,7 @@
          <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
          <div id="timeline" class="grid-cell fill"></div>
          <div class="js-current-date"></div>
-         <a href="http://marine-opec.eu/portal.html" class="grid-cell">About</a>
+         <a href="http://portaldev.marineopec.eu/about.html" class="grid-cell">About</a>
       </div>
    </div>
 
@@ -137,6 +137,49 @@
       </div>
     </div>
 
+   <div id="refinePanel" class="panel hidden">
+      <div class="panel-header">
+         <h2 class="js-refine-name">Refine Indicator</h2>
+         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
+      </div>
+      <div class="panel-container indicator-select">
+         
+         <div class="js-refine-section-region">
+            <label for="refine-region" class="indicator-dropdown">
+               Region
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-region" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
+         
+         
+         
+         <div class="js-refine-section-interval">
+            <label for="refine-interval" class="indicator-dropdown">
+               Interval
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-interval" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
+         
+         
+         <div class="js-refine-section-reliability">
+            <label for="refine-reliability" class="indicator-dropdown">
+               Reliability
+               <span class="icon_arrow"></span>
+            </label>
+            <ul id="refine-reliability" class=" fake-select panel-list grid-list">
+            </ul>
+         </div>
+         
+         <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+         <button class="text-button js-refine-configure">Cancel</button>
+
+      </div>
+   </div>
+
     <div id="indicatorsPanel" class="panel hidden">
       <div class="panel-header">
          <h2>Map Tools</h2>
@@ -171,7 +214,7 @@
 
     <div id="graphPanel" class="panel hidden">
       <div class="panel-header">
-        <button class="js-return-analysis">Return to Analysis</button>
+        <button class="js-return-analysis text-button back-button">Return to Analysis</button>
       </div>
       <div class="panel-container">
          <div class="graph-wait-message">
