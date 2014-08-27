@@ -220,7 +220,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.elevationUnits = value.Units;
          }
       });
-      gisportal.indicatorsPanel.initialiseSliders(layer.id, layer.firstDate, layer.lastDate);
+      gisportal.indicatorsPanel.initialiseSliders(layer.id);
    };
    
    //--------------------------------------------------------------------------
