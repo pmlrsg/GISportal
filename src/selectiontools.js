@@ -29,9 +29,7 @@ gisportal.selectionTools.init = function()  {
 
    vectorLayer.controlID = "poiLayer";
    vectorLayer.displayInLayerSwitcher = false;
-
    map.addLayer(vectorLayer);
-
    gisportal.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
 
    map.addControls([gisportal.mapControls.box]);

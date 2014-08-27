@@ -1,5 +1,10 @@
 /*------------------------------------*\
-    jQuery Ready
+   ui.js
+   This is an alternative entry point
+   that should be used for DOM
+   manipulation only.
+
+   jQuery Ready
     - This is *only* for UI elements
     - This should *not* be used for
       GIS Portal functionality.

@@ -328,7 +328,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             // Time Bar
             d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
               .enter().append('svg:line')
-               .attr('stroke', '#fff')
+               .attr('stroke', '#59476D')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
@@ -456,7 +456,12 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
       // The 300 below is ARBITARY. In Firefox it can get massive
       // whereas in Chrome it is required occasionally. TO DO: fix.
       if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
-      $('.js-timeline-labels').append('<li style="top: ' + positionTop + 'px">' + this.timebars[i].label + '</li>');
+      var id = this.timebars[i].id;
+
+      var label = $('.indicator-header[data-id="' + id +'"] > p').html();
+      if (!label || label === "") label =  this.timebars[i].label + ' - ' + gisportal.layers[id].tags.region; 
+      
+      $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
    }
 };
 
@@ -495,9 +500,10 @@ gisportal.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
 };
 
 // Add a new time bar using detailed parameters
-gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDate, dateTimes) {
+gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
    newTimebar.name = name;
+   newTimebar.id = id;
    newTimebar.label = label;
    newTimebar.startDate = startDate;
    newTimebar.endDate = endDate;
@@ -510,7 +516,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, label, startDate, endDa
    this.layerbars.push(newTimebar); 
 
    // TODO: Move asap. tidy up
-   if (Object.keys(gisportal.layers).length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
+   if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
       this.reHeight();
       // redraw is done in zoom
       var data = gisportal.timeline.layerbars[0];
@@ -576,8 +582,8 @@ gisportal.TimeLine.prototype.removeTimeBarById = function(id)  {
    if (this.has(id))  {
       this.removeTimeBarByName(id);
    }
-   else if (gisportal.microLayers[id]) {
-      var name = gisportal.microLayers[id].name;
+   else if (gisportal.layers[id]) {
+      var name = gisportal.layers[id].name;
       if (this.has(name))  {
          this.removeTimeBarByName(name); 
       }
