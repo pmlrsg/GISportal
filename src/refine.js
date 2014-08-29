@@ -6,9 +6,22 @@
 
 gisportal.refinePanel = {};
 
+/**
+ * The benefit of having a single refine panel
+ * is that it means we can easily get access to the data.
+ * Beforehand there was a lot of guesswork and DOM manipulation
+ * but now we can just hold it in currentData.
+ */
 gisportal.refinePanel.currentData = null;
 
 gisportal.refinePanel.found = false;
+
+/**
+ * This both opens the panel and initates it
+ * with data.
+ *
+ * @param {object} data - The indicators that have the same name
+ */
 gisportal.refinePanel.open = function(data)  {
    this.found = false;
    this.initDOM();
@@ -18,12 +31,23 @@ gisportal.refinePanel.open = function(data)  {
    this.refreshData(data);
 }; 
 
+/**
+ * Closes the refine panel
+ */
 gisportal.refinePanel.close = function()  {
    $('#js-refine-section-interval').toggleClass('hidden', true);
    $('#js-refine-section-reliability').toggleClass('hidden', true);
    $('#refinePanel').toggleClass('hidden', true).toggleClass('active', false);
 };
 
+/**
+ * When an indicator has been found (refined) then
+ * call this function to set gisportal.refinePanel.found to true
+ * and adds the indicator to the correct places, then opens the indicators
+ * panel.
+ *
+ * @params {object} data - The indicator
+ */
 gisportal.refinePanel.foundIndicator = function(data)  {
    var id = data.id || data;
    if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found)) return false;
@@ -40,6 +64,11 @@ gisportal.refinePanel.foundIndicator = function(data)  {
    gisportal.indicatorsPanel.open();
 };
 
+/**
+ * This initiates the DOM event handlers.
+ * 
+ * @param {object} data - This object holds all the data needed
+ */
 gisportal.refinePanel.initDOM = function(data)  {
    $('.js-refine-configure').on('click', function()  {
       gisportal.configurePanel.open();
@@ -74,11 +103,23 @@ gisportal.refinePanel.initDOM = function(data)  {
    $('#refinePanel').one('click', '.js-reset-options', click);
 };
 
-
+/**
+ * Currently refreshData just renders the panel
+ */
 gisportal.refinePanel.refreshData = function(data)  {
    gisportal.refinePanel.render(data); 
 };
 
+/**
+ * The refineData function takes an array of possible ids
+ * and the current id (which could possibly be deprecated
+ * now that the refinePanel is split away from indicators).
+ * It refines down the selection of ids to show the available
+ * options (such as interval and confidence).
+ *
+ * @params {object} ids - Array of possible ids
+ * @params {string} current - Current id (deprecate?)
+ */
 gisportal.refinePanel.refineData = function(ids, current)  {
    var indicator = gisportal.layers[ids[0]];
    if (indicator)  {
@@ -108,6 +149,12 @@ gisportal.refinePanel.refineData = function(ids, current)  {
    }
 };
 
+/**
+ * This function renders the refinePanel.
+ *
+ * @param {object} data - Object including id, name and boolean called refined
+ * @param {object} group - The groupNames() making it easy to find ids with the name
+ */
 gisportal.refinePanel.render = function(data, group)  {
    var indicator = data.indicator || {};
    var id = data.id;
