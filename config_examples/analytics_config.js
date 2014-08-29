@@ -10,8 +10,8 @@
 \*------------------------------------*/
 
 gisportal.config.analytics = {
-  active: true,
-  UATrackingId: 'UA-52647976-2',
+  active: false,                    // set to 'true' to enable tracking
+  UATrackingId: 'UA-XXXXXXXX-X',    // replace with a valid tracking id if enabled
   
   customDefinitions: {
         "cd1": 'indicator_name',
