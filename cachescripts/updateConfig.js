@@ -5,7 +5,7 @@
 *
 */
 
-var currentDir = __dirname + '/';
+var currentDir = __dirname + '/../config/';
 
 var newConfigPath = currentDir + 'wmsLayers.py';
 
@@ -72,12 +72,11 @@ Object.keys( servers ).forEach(function( serverName ){
 	
 });
 
-console.log(map)
 
 Object.keys( layers ).forEach(function( providerName ){
 
 	var provider = layers[ providerName ];
-	console.log(providerName)
+	console.log("Updating provider:" + providerName)
 	var serverConfig = map[ providerName ];
 	
 	if( ! serverConfig || ! provider )

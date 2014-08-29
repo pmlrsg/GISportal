@@ -7,7 +7,7 @@ if [ ! -f config/wmsLayers.py ] && [ ! -f config/wmsLayerTags.py ] && [ ! -f con
 fi
 if [ ! -f config/wmsLayers.py ]; then
     echo "config/wmsLayers.py not found. Upgrading old files"
-    node config/updateConfig.js
+    node cachescripts/updateConfig.js
 fi
 
 python cachescripts/wmsCapabilities.py 
