@@ -1,22 +1,27 @@
 
 collaboration = {};
 
+collaboration.enabled = true;																// indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
+
 // socket.io location settings
 collaboration.protocol = 'http'; 														// 'http' or 'https'; the connection is automagically upgraded to a websocket connection
 collaboration.host = 'pmpc1465.npm.ac.uk';
 collaboration.port = '6789';
-collaboration.path = '';
+collaboration.path = '';																	// optional path; must start with a /
 
 // jquery selectors for various control elements
 collaboration.startButton = '.js-start-collaboration';							// the button to initiate a collaboration session
-collaboration.consoleWrapper = '.js-collaboration-console';					// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
-collaboration.historyConsole = '.js-collaboration-history';					// a div that historical message log as appended to
+collaboration.consoleWrapper = '.js-collaboration-console';						// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
+collaboration.historyConsole = '.js-collaboration-history';						// a div that historical message log is appended to
 collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
 
 collaboration.active = false;
 collaboration.role = 'member';
 
 collaboration.initDOM = function() {
+	// line up the URL 
+	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
+
 	// this should really be done somewhere else in a much more elegant way than this, but for now...
 	$('.js-collaboration-toggle').on('click', function() {
       $('#collaborationPanel').toggleClass('hidden', false).toggleClass('active', true);      
@@ -26,19 +31,23 @@ collaboration.initDOM = function() {
       
    });
 
-   $(collaboration.startButton).click(function() {
-   	// let it begin...
-   	collaboration.initSession();
-   });
+	if (collaboration.enabled) {
+		$('.js-google-auth-button').click(function() {
+			var authWin = window.open(collaboration.socket_url +'/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');	
+		});
+
+		$(collaboration.startButton).click(function() {
+	   	// let it begin...
+	   	collaboration.initSession();
+	   });	
+	}
+   
 }	
 
 collaboration.initSession = function() {
 	// hide the start button and show the options
 	$(collaboration.startButton).toggleClass('hidden', true);
 	$(collaboration.consoleWrapper).toggleClass('hidden', false);
-
-	// line up the URL 
-	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
 
 	// get the socket.io script and open a connection
 	$.getScript(collaboration.socket_url+"/socket.io/socket.io.js")

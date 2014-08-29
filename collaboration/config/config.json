@@ -1,0 +1,19 @@
+{
+  "redisURL": "http://localhost:6379/",
+  "auth": {
+    "google": {
+      "scope" : "https://www.googleapis.com/auth/userinfo.email",
+      "clientid" : "741961836801-nmj59jhukedtfuu8em2kjncpi1of3sc7.apps.googleusercontent.com",
+      "clientsecret" : "bo7zPAzmqk2KOEArX6iFe8fP",
+      "callback" : "http://pmpc1465.npm.ac.uk:6789/auth/google/callback",
+      "prompt": "select_account"
+    }
+  },
+  "session" : {
+    "secret" : "DcWUw4G6aGTi9JvLXhzOTxfp11Q21pVqKHIyF879",
+    "age" : 0
+  },
+  "app": {
+    "port": 6789
+  }
+}

@@ -40,8 +40,6 @@
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
-
-
 </head>
 <body role="application">
    
@@ -202,6 +200,13 @@
           <button class="icon_close icon-svg dark js-hide-collaboration">Close Collaboration</button>
           <h3>Collaboration</h3>
           <p>To find out more about sharing a session please have a look at the <a href="sharing" class="">collaboration help page</a></p>
+          
+          <div id="gSignInWrapper">
+            <div id="gSignInButtonHolder">
+              <a href="javascript:void(0)" class="js-google-auth-button"><img src="img/sign-in-with-google.png" width="200" /></a>
+            </div>
+          </div>
+
           <div class="js-collaboration-holder">
             <button class="brand start-collaboration js-start-collaboration" />Start Collaboration Session</button>
             <div class="js-collaboration-console hidden">
@@ -219,7 +224,7 @@
       <div class="panel-header">
         <h2>Map Tools</h2>
         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
-        <button class="icon_session_share icon-svg light js-collaboration-toggle">Collaboration</button>
+        <button class="icon_collaboration icon-svg light js-collaboration-toggle">Collaboration</button>
         <button class="icon_map_tools icon-svg light js-map-tools active">Map Tools</button>
       </div>
       <div class="panel-container">

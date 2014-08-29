@@ -5,3 +5,5 @@ html/cache/*
 html/GISPortal.js
 middleware/portalflask/settings.py
 config/*
+collaboration/node_modules
+collaboration/node_modules/*
