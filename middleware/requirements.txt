@@ -7,3 +7,4 @@ lxml
 PyYAML
 flask_script
 BeautifulSoup
+Pillow
