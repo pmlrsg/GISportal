@@ -301,7 +301,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
          gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
-        			
+                 
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
          $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
@@ -318,20 +318,20 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    };
     
    this.unselect = function() {
-		var layer = this; 
+      var layer = this; 
       $('#scalebar-' + layer.id).remove(); 
-		layer.selected = false;
-		layer.setVisibility(false);
+      layer.selected = false;
+      layer.setVisibility(false);
       gisportal.selectedLayers = _.pull(gisportal.selectedLayers, layer.id);
-		if (layer.temporal) {
-			if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
-				gisportal.timeline.removeTimeBarByName(layer.name);
-			}
-			
-			gisportal.refreshDateCache();
-		   gisportal.zoomOverall();
+      if (layer.temporal) {
+         if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
+            gisportal.timeline.removeTimeBarByName(layer.name);
+         }
+         
+         gisportal.refreshDateCache();
+         gisportal.zoomOverall();
       }
-	};
+   };
    
    //--------------------------------------------------------------------------
    
@@ -421,7 +421,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.getMetadata = function() {
       var layer = this;
-		console.log(layer);
+      console.log(layer);
       $.ajax({
          type: 'GET',
          url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
@@ -568,15 +568,11 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       
       if (layer.events)  { 
-         // Show the img when we are loading data for the layer
-         layer.events.register("loadstart", layer, function(e) {
-            gisportal.loading.increment();
-         });
          
-         // Hide the img when we have finished loading data
-         layer.events.register("loadend", layer, function(e) {
-            gisportal.loading.decrement();
-         });
+         layer.events.on({
+            "loadstart": gisportal.loading.increment,
+            "loadend": gisportal.loading.decrement
+         })
          
          if(layer.type != 'baseLayers') {   
             // Check the layer state when its visibility is changed

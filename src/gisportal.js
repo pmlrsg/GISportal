@@ -215,6 +215,11 @@ gisportal.createBaseLayers = function() {
       layer.type = 'baseLayers';
       layer.displayTitle = name;
       layer.name = name;
+      
+      layer.events.on({
+         "loadstart": gisportal.loading.increment,
+         "loadend": gisportal.loading.decrement
+      })
       map.addLayer(layer);
       gisportal.baseLayers[name] = layer;
    }

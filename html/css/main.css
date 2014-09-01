@@ -146,6 +146,8 @@ input[type="text"]  {
 
 /* Global Loading Icon */
 .global-loading-icon{
+	display: none;
+	
 	background-color: rgba(0,0,0,0.53);
 	background-image: url('../img/ajax-loader-2.gif');
 	background-size: 50%;
