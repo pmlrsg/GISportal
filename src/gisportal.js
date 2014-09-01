@@ -835,7 +835,10 @@ gisportal.main = function() {
    gisportal.indicatorsPanel.initDOM();  // indicators.js
    gisportal.graphs.initDOM();           // graphing.js
    gisportal.analytics.initGA();         // analytics.js
-
+   
+   //Set the global loading icon
+   gisportal.loading.loadingElement= jQuery('.global-loading-icon')
+   
    $('.js-show-tools').on('click', showPanel);
 
    function showPanel()  {
@@ -961,3 +964,66 @@ gisportal.initStart = function()  {
       }
    }
 };
+
+
+gisportal.loading = {};
+gisportal.loading.counter = 0;
+gisportal.loading.loadingElement = jQuery('');
+gisportal.loading.loadingTimeout = null;
+
+
+/**
+ * Increases the counter of how many things are currently loading
+ */
+gisportal.loading.increment = function(){
+   gisportal.loading.counter++;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Drecreases the counter of how many things are currently loading
+ */
+gisportal.loading.decrement = function(){
+   gisportal.loading.counter--;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Either show or hide the loading icon.
+ *  A delay is added to show because layers can update in a few milliseconds causing a horrible flash
+ */
+gisportal.loading.updateLoadingIcon = function(){
+   
+   if( gisportal.loading.loadingTimeout != null )
+      return ;
+   
+   gisportal.loading.loadingTimeout = setTimeout(function(){
+      gisportal.loading.loadingTimeout = null
+      if( gisportal.loading.counter > 0 ){
+         gisportal.loading.loadingElement.show();
+      
+      }else{
+         gisportal.loading.loadingElement.hide();
+      }
+   }, 500);
+
+/*
+   if( gisportal.loading.counter > 0 ){
+      if( gisportal.loading.loadingTimeout == null )
+         gisportal.loading.loadingTimeout = setTimeout(function(){
+              gisportal.loading.loadingElement.show();
+            gisportal.loading.loadingTimeout = null;
+         }, 500)
+   }else{
+      clearTimeout(gisportal.loading.loadingTimeout);
+      gisportal.loading.loadingTimeout = null;
+      
+      if( gisportal.loading.unLoadingTimeout == null )
+         gisportal.loading.loadingTimeout = setTimeout(function(){
+              gisportal.loading.loadingElement.show();
+            gisportal.loading.loadingTimeout = null;
+         }, 500)
+      gisportal.loading.loadingElement.hide();
+   }
+     */
+}

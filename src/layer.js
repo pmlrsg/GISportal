@@ -147,7 +147,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    
    this.WFSDatesToIDs = {};
    
-   this.spinner = false;
    
    /**
     * When data is available, initialise the layer
@@ -177,6 +176,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
       
       var olLayer = this.createOLLayer(); // Create OL layer.
+      
       this.openlayers['anID'] = olLayer;
 
       if (options.show !== false)  { 
@@ -570,14 +570,12 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       if (layer.events)  { 
          // Show the img when we are loading data for the layer
          layer.events.register("loadstart", layer, function(e) {
-            self.spinner = true;
-            self.updateSpinner();
+            gisportal.loading.increment();
          });
          
          // Hide the img when we have finished loading data
          layer.events.register("loadend", layer, function(e) {
-            self.spinner = false;
-            self.updateSpinner();
+            gisportal.loading.decrement();
          });
          
          if(layer.type != 'baseLayers') {   
@@ -632,23 +630,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
 
    };
-   
-   //--------------------------------------------------------------------------
-  
-   /**
-    * Toggles the loading spinner.
-    * Currently not being used but will be once a loading spinner
-    * has been added back into the portal.
-    */ 
-   this.updateSpinner = function() {
-      /*if(this.spinner === false && $element.is(':visible')) {
-         $element.hide();
-      } else if(this.spinner !== false && $element.is(':hidden')) {
-         $element.show();
-      }*/
-   };
-     
-   //--------------------------------------------------------------------------
    
    
    // Store new layer.
@@ -773,3 +754,4 @@ gisportal.getLayerData = function(fileName, layer, options) {
       }
    });
 };
+
