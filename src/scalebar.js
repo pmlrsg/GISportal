@@ -31,12 +31,26 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       $('.js-scale-max[data-id="' + id + '"]').val(indicator.maxScaleVal);
       
       var scalePoints = [];
-      for( var i = 0; i < scaleSteps; i++ ){
+      
+      
+      if( indicator.log ){
+         var range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
+         var minScaleLog =  Math.log(indicator.minScaleVal);
+         for( var i = 0; i < scaleSteps; i++ ){
+            var step = (range / (scaleSteps-1)) * i;
+            var value = minScaleLog + step;
+            value = Math.exp( value );
+	        scalePoints.push( value );
+         }
+      }else{
          var range = indicator.maxScaleVal - indicator.minScaleVal;
-         var step = (range / (scaleSteps-1)) * i;
-	     scalePoints.push( indicator.minScaleVal + step );
+         for( var i = 0; i < scaleSteps; i++ ){
+            var step = (range / (scaleSteps-1)) * i;
+            var value = indicator.minScaleVal + step;
+	        scalePoints.push( value );
+         }
       }
-     
+      
 
       return {
          url: url,

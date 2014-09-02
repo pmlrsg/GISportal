@@ -222,26 +222,23 @@ gisportal.indicatorsPanel.detailsTab = function(id)  {
 };
 
 gisportal.indicatorsPanel.analysisTab = function(id)  {
-   $.get('templates/tab-analysis.mst', function(template)  {
-      var indicator = gisportal.layers[id];      
-      var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
-      indicator.modified = gisportal.utils.nameToId(indicator.name); 
-      indicator.modifiedName = modifiedName;
-      var rendered = Mustache.render(template, indicator);
-      $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
-      $('[data-id="' + id + '"] .icon_analyse').toggleClass('hidden', false);
-      
-      gisportal.indicatorsPanel.checkTabFromState(id);
-
-      gisportal.replaceAllIcons();
-      gisportal.indicatorsPanel.initialiseSliders(id);      
-
- });
+   var indicator = gisportal.layers[id];      
+   var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
+   indicator.modified = gisportal.utils.nameToId(indicator.name); 
+   indicator.modifiedName = modifiedName;
+   var rendered = gisportal.templates['tab-analysis'](indicator);
+   $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
+   $('[data-id="' + id + '"] .icon_analyse').toggleClass('hidden', false);
+  
+   gisportal.indicatorsPanel.checkTabFromState(id);
+ 
+   gisportal.replaceAllIcons();
+   gisportal.indicatorsPanel.initialiseSliders(id);
 };
 
 gisportal.indicatorsPanel.redrawScalebar = function( layerId ){
-   var indicator = gisportal.layers[id];
-   var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
+   var indicator = gisportal.layers[ layerId ];
+   var scalebarDetails = gisportal.scalebars.getScalebarDetails( layerId ); 
    if (scalebarDetails){
       indicator.legend = scalebarDetails.url;
       indicator.scalePoints = scalebarDetails.scalePoints;
@@ -270,6 +267,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
          indicator.modified = gisportal.utils.nameToId(indicator.name);
          
          gisportal.indicatorsPanel.redrawScalebar( id );
+         
+         var rendered = gisportal.templates['tab-dimensions'](indicator);
          
          $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);      
          $('[data-id="' + indicator.id + '"] .icon_scalebar').toggleClass('hidden', false);

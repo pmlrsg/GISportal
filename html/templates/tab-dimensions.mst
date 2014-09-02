@@ -1,6 +1,5 @@
-<input type="radio" id="tab-{{id}}-scalebar" name="tabs-{{modifiedName}}" {{#showScalebar}}checked{{/showScalebar}} class="js-tab-trigger panel-tab-trigger">
-<div class="panel-tab scalebar-tab">
-   {{#if units}}<p>Scale - {{units}}</p>{{/if}}
+<input type="radio" id="tab-{{id}}-dimensions" name="tabs-{{modifiedName}}" {{#showScalebar}}checked{{/showScalebar}} class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab dimensions-tab">
    <div class="scale-options">
       <div class="grid">
          <input class="js-scale-min min grid-cell" placeholder="Min" value="{{minScaleVal}}" data-id="{{id}}">

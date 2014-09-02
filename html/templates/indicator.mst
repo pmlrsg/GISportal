@@ -1,8 +1,9 @@
+<input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
 <li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}">
    <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
       <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
       <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column active" title="Show/Hide">Show/Hide</button>
-      <label class="icon_scalebar hidden icon-svg light  icon-column js-closable" for="tab-{{id}}-scalebar" title="Scalebar">Scalebar</label>
+      <label class="icon_scalebar hidden icon-svg light  icon-column js-closable" for="tab-{{id}}-dimensions" title="Scalebar">Scalebar</label>
       <label class="icon_details hidden icon-svg light icon-column js-closable" for="tab-{{id}}-details" title="Details">Details</label>
       <label class="icon_analyse hidden icon-svg light icon-column js-closable" for="tab-{{id}}-analysis" title="Analysis">Analysis</label>      
       <button class="icon_remove js-remove icon-svg light icon-column" data-name="{{name}}" title="Remove">Remove</button>
@@ -12,9 +13,10 @@
    <ul>
 
       <li  data-name="{{name}}" data-id="{{id}}">
-	      <div class="panel-tab scalebar-tab">
-	      	<div class="js-scalebar"></div>
-	      </div>
+         <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
+         <div class="panel-tab dimensions-tab">
+            <div class="js-scalebar"></div>
+         </div>
       </li>
       
       <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>

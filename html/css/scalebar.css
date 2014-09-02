@@ -31,7 +31,7 @@ input.max  {
    float: right;
 }
 
-.panel-tab.scalebar-tab  {
+.panel-tab.dimensions-tab  {
   background-color: #fbfafb;
   padding: 9px;
 }
@@ -58,6 +58,7 @@ input.max  {
 .scalebar-outer {
    position: relative;
    height: 32px;
+   margin-bottom: 10px;
 }
 
 .scalebar  {
@@ -74,11 +75,26 @@ input.max  {
 	text-align: center;
 }
 
+.scalebar-overlay span{
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 100%;
+}
+
+.scalebar-overlay:first-of-type span{
+	margin-left: -5px;
+}
+.scalebar-overlay:last-of-type span{
+	margin-right: -5px;
+}
+
 .scalebar-overlay:first-of-type{
 	margin-left: 0px;
 	text-align: left;
 	left: 0%;
 }
+
 .scalebar-overlay:nth-of-type(2){
 	left: 25%;
 }
@@ -94,12 +110,11 @@ input.max  {
 	right: 0%;
 }
 
-
 .scalebar-overlay::before{
 	content: " ";
 	width: 1px;
 	height: 7px;
-	background-color: rgb(255, 233, 233);
+	background-color: black;
 	position: absolute;
 	bottom: 100%;
 	left: 50%;
