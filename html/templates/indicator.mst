@@ -6,11 +6,18 @@
       <label class="icon_details hidden icon-svg light icon-column js-closable" for="tab-{{id}}-details" title="Details">Details</label>
       <label class="icon_analyse hidden icon-svg light icon-column js-closable" for="tab-{{id}}-analysis" title="Analysis">Analysis</label>      
       <button class="icon_remove js-remove icon-svg light icon-column" data-name="{{name}}" title="Remove">Remove</button>
+      
    </div>
 
    <ul>
 
-      <li class="js-tab-scalebar" data-name="{{name}}" data-id="{{id}}"></li>
+      <li  data-name="{{name}}" data-id="{{id}}">
+	      <div class="panel-tab scalebar-tab">
+	      	<div class="js-scalebar"></div>
+	      </div>
+      </li>
+      
+      <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
 
       <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
    

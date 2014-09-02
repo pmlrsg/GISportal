@@ -239,49 +239,58 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
  });
 };
 
-gisportal.indicatorsPanel.scalebarTab = function(id, toggleOn)  {
-   var toggleOn = toggleOn || false; 
+gisportal.indicatorsPanel.redrawScalebar = function( layerId ){
+   var indicator = gisportal.layers[id];
+   var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
+   if (scalebarDetails){
+      indicator.legend = scalebarDetails.url;
+      indicator.scalePoints = scalebarDetails.scalePoints;
+      var rendered = gisportal.templates['scalebar'](indicator);
+      $('[data-id="' + indicator.id + '"] .js-scalebar').html(rendered);
+   }else{
+      $('[data-id="' + indicator.id + '"] .js-scalebar').html("");
+   };
+}
+
+gisportal.indicatorsPanel.scalebarTab = function(id)  {
    var layer = gisportal.layers[id];
-   $.get('templates/tab-scalebar.mst', function(template)  {
-      var onMetadata = function()  {
-         var indicator = gisportal.layers[id];
-            if (indicator.elevationCache && indicator.elevationCache.length > 0)  {         
-               indicator.hasElevation = true;
-            }
-            
-            if (indicator.styles && indicator.styles.length > 0)  {
-               indicator.hasStyles = true;
-            }
+   var onMetadata = function()  {
+      var indicator = gisportal.layers[id];
+         if (indicator.elevationCache && indicator.elevationCache.length > 0)  {         
+            indicator.hasElevation = true;
+         }
+         
+         if (indicator.styles && indicator.styles.length > 0)  {
+            indicator.hasStyles = true;
+         }
+ 
 
+         var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
+         indicator.modifiedName = modifiedName;
+         indicator.modified = gisportal.utils.nameToId(indicator.name);
+         
+         gisportal.indicatorsPanel.redrawScalebar( id );
+         
+         $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);      
+         $('[data-id="' + indicator.id + '"] .icon_scalebar').toggleClass('hidden', false);
+ 
+         $('#tab-' + indicator.id + '-elevation').on('change', function()  {
+            var value = $(this).val();
+            indicator.selectedElevation = value; 
+            indicator.mergeNewParams({elevation: value});
+         }); 
 
-            var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
-            indicator.modifiedName = modifiedName;
-            indicator.modified = gisportal.utils.nameToId(indicator.name);
-            var scalebarDetails = gisportal.scalebars.getScalebarDetails(id); 
-            if (scalebarDetails) indicator.legend = scalebarDetails.url;
-            if (toggleOn) indicator.showScalebar = true;
-            var rendered = Mustache.render(template, indicator);
-            $('[data-id="' + indicator.id + '"] .js-tab-scalebar').html(rendered);      
-            $('[data-id="' + indicator.id + '"] .icon_scalebar').toggleClass('hidden', false);
-
-            $('#tab-' + indicator.id + '-elevation').on('change', function()  {
-               var value = $(this).val();
-               indicator.selectedElevation = value; 
-               indicator.mergeNewParams({elevation: value});
-            });
-
-            $('#tab-' + indicator.id + '-layer-style').on('change', function()  {
-               var value = $(this).val();
-               indicator.style = value;
-               indicator.mergeNewParams({ styles: value });
-               gisportal.indicatorsPanel.scalebarTab(id, true);
-            });
-            gisportal.indicatorsPanel.checkTabFromState(id);
-      }
-      
-      if (layer.metadataComplete) onMetadata();
-      else layer.metadataQueue.push(onMetadata);
-   });
+         $('#tab-' + indicator.id + '-layer-style').on('change', function()  {
+            var value = $(this).val();
+            indicator.style = value;
+            indicator.mergeNewParams({ styles: value });
+            gisportal.indicatorsPanel.scalebarTab(id);
+         });
+         gisportal.indicatorsPanel.checkTabFromState(id);
+   }
+   
+   if (layer.metadataComplete) onMetadata();
+   else layer.metadataQueue.push(onMetadata);
 };
 
 // Needs a refactor

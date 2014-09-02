@@ -54,20 +54,62 @@ input.max  {
 /* Rotated scalebar with help from Ana Tudor
    https://twitter.com/thebabydino/status/471630268726788096 */
 
+
+.scalebar-outer {
+   position: relative;
+   height: 32px;
+}
+
 .scalebar  {
-   transform: rotate(-90deg) translateY(-100%) translateX(-50%);
-   transform-origin: 0 0;
-   display: block;
-   width: 97%;
+   height: 20px;
+   width: 100%;
+   background-size: 100%;
+   margin-bottom: 7px;
 }
 
-.scalebar-outer  {
-   display: inline-block; /* so that its width = the width of the image */
+.scalebar-overlay{
+	position: absolute;
+	width: calc( 100% / 6 );
+	margin-left: calc( 0px - (100% / 6 / 2) );
+	text-align: center;
 }
 
-.scalebar-inner  {
-   height: 0;
-   padding: 50% 0; /* both padding-top & padding bottom = 50% the width of parent = 50% width of image => space taken vertically with height: 0 is the width of image */
-   transform: scaleX(-1);
-   transform-origin: 0 0;
+.scalebar-overlay:first-of-type{
+	margin-left: 0px;
+	text-align: left;
+	left: 0%;
 }
+.scalebar-overlay:nth-of-type(2){
+	left: 25%;
+}
+.scalebar-overlay:nth-of-type(3){
+	left: 50%;
+}
+.scalebar-overlay:nth-of-type(4){
+	left: 75%;
+}
+.scalebar-overlay:last-of-type{
+	margin-left: 0px;
+	text-align: right;
+	right: 0%;
+}
+
+
+.scalebar-overlay::before{
+	content: " ";
+	width: 1px;
+	height: 7px;
+	background-color: rgb(255, 233, 233);
+	position: absolute;
+	bottom: 100%;
+	left: 50%;
+}
+
+.scalebar-overlay:first-of-type::before{
+	left: 0%;
+}
+.scalebar-overlay:last-of-type::before{
+	left: auto;
+	right: 0%;
+}
+

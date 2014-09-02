@@ -5,8 +5,9 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
    if (indicator)  {
       // Setup defaults
       var url = null;
-      var width = 110;
-      var height = 256;
+      var width = 1;
+      var height = 500;
+      var scaleSteps = 5;
      
       // Iter over styles
       $.each(indicator.styles, function(index, value)
@@ -28,22 +29,31 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
   
       $('.js-scale-min[data-id="' + id + '"]').val(indicator.minScaleVal);
       $('.js-scale-max[data-id="' + id + '"]').val(indicator.maxScaleVal);
-   
+      
+      var scalePoints = [];
+      for( var i = 0; i < scaleSteps; i++ ){
+         var range = indicator.maxScaleVal - indicator.minScaleVal;
+         var step = (range / (scaleSteps-1)) * i;
+	     scalePoints.push( indicator.minScaleVal + step );
+      }
+     
 
       return {
          url: url,
          width: width,
-         height: height
+         height: height,
+         scalePoints: scalePoints
       }; 
    }
 };
 
 gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
-   var height = $('.js-tab-scalebar').width();
+   var height = 500;
+   var width = 3;
    if (hasBase)
-      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=25&HEIGHT=' + height;
+      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
    else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=25&HEIGHT=' + height;
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
 };
 
 gisportal.scalebars.autoScale = function(id)  {
@@ -108,7 +118,6 @@ gisportal.scalebars.updateScalebar = function(id)  {
    var scale = this.getScalebarDetails(id);
    var indicator = gisportal.layers[id];
    
-
    var params = {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
       logscale: indicator.log
@@ -116,4 +125,5 @@ gisportal.scalebars.updateScalebar = function(id)  {
    
    gisportal.layers[id].mergeNewParams(params);
    
+   gisportal.indicatorsPanel.redrawScalebar( id );
 };

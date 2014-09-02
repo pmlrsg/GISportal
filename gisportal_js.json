@@ -5,6 +5,7 @@
    ],
    "files": [
       "src/gisportal.js",
+      "src/templates.js",
       "src/portal.js",
       "src/ui.js",
       "config/config.js",

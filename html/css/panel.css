@@ -314,3 +314,11 @@ select,
 #refinePanel .panel-container{
 	padding: 10px;
 }
+
+.ellipsisOverflow {
+	text-overflow: ellipsis;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 100%;
+}

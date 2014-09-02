@@ -275,7 +275,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.setStyle = function(style)  {
       var indicator = this;
       indicator.style = style;
-      gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
+      gisportal.indicatorsPanel.scalebarTab(indicator.id);
    }; 
   
    /**

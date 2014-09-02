@@ -824,7 +824,8 @@ gisportal.main = function() {
    gisportal.initStart();
 
    // Compile Templates
-   gisportal.templates = {};
+   gisportal.loadTemplates();
+
 
    $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
   
@@ -1012,23 +1013,4 @@ gisportal.loading.updateLoadingIcon = function(){
       }
    }, 500);
 
-/*
-   if( gisportal.loading.counter > 0 ){
-      if( gisportal.loading.loadingTimeout == null )
-         gisportal.loading.loadingTimeout = setTimeout(function(){
-              gisportal.loading.loadingElement.show();
-            gisportal.loading.loadingTimeout = null;
-         }, 500)
-   }else{
-      clearTimeout(gisportal.loading.loadingTimeout);
-      gisportal.loading.loadingTimeout = null;
-      
-      if( gisportal.loading.unLoadingTimeout == null )
-         gisportal.loading.loadingTimeout = setTimeout(function(){
-              gisportal.loading.loadingElement.show();
-            gisportal.loading.loadingTimeout = null;
-         }, 500)
-      gisportal.loading.loadingElement.hide();
-   }
-     */
 }
