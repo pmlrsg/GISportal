@@ -299,6 +299,9 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       if(layer.temporal) {
          var currentDate = gisportal.timeline.getDate();
          
+         //Nope
+         //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
+         layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
          
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);

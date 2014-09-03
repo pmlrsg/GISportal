@@ -155,10 +155,11 @@ input[type="text"]  {
 	background-position: center 20%;
 	
 	position: absolute;
-	right: 10px;
-	bottom: 100px;
+	left: 50%;
+	top: 20px;
+	margin-left: -25px;
 	
-	width: 49px;
+	width: 50px;
 	height: 48px;
 	
 	text-align: center;
