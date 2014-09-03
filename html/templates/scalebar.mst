@@ -1,6 +1,6 @@
 {{#if units}}<p>Scale - {{units}}</p>{{/if}}
 <div class="scalebar-outer {{#if log}}scalebar-log{{else}}scalebar-linear{{/if}} ">
-	<div class="scalebar" style="background-image: url('{{rotate_image legend 90}}')"></div>
+	<div class="scalebar" style="background-image: url('{{rotate_image legend 270}}')"></div>
 	{{#scalePoints}}
 		<span class="scalebar-overlay"><span title="{{original}}">{{nicePrint}}</span></span>
 	{{/scalePoints}}
