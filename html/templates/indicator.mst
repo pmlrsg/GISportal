@@ -14,7 +14,7 @@
 
       <li  data-name="{{name}}" data-id="{{id}}">
          <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-         <div class="panel-tab dimensions-tab">
+         <div class="panel-tab scalebar-tab">
             <div class="js-scalebar"></div>
          </div>
       </li>

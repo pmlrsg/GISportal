@@ -31,6 +31,9 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.title = title;  
    this.productAbstract = productAbstract;
    this.type = type;
+   
+   this.visibleTab = "details";
+   
    // These queues feel like a hack, refactor?
    this.metadataComplete = false;
    this.metadataQueue = [];

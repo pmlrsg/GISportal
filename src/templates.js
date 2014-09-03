@@ -31,7 +31,7 @@ Handlebars.registerHelper('rotate_image', function(imgUrl, angle) {
   return "/service/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
 });
 
-Handlebars.registerHelper('equals', function(attr1, attr2, options) {
+Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
    if( attr1 == attr2 )
       return options.fn();
 });

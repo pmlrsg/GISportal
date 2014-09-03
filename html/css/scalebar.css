@@ -51,9 +51,14 @@ input.max  {
 }
 
 
-/* Rotated scalebar with help from Ana Tudor
-   https://twitter.com/thebabydino/status/471630268726788096 */
+.panel-tab.scalebar-tab{
+	padding: 9px;
+	border-bottom: 1px solid #e0dce4;
+}
 
+.js-scalebar{
+	cursor: pointer;
+}
 
 .scalebar-outer {
    position: relative;

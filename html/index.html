@@ -40,6 +40,9 @@
 <!-- Fuse -->
 <script type="text/javascript" src="js-libs/fuse/fuse.js"></script>
 
+<!-- Tooltipster -->
+<script type="text/javascript" src="js-libs/tooltipster/js/jquery.tooltipster.min.js"></script>
+
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
@@ -223,7 +226,7 @@
             <h3>Processing</h3>
             <div class="icon_loading grid-cell icon-column">loading</div>
             <p>Your chart is processing, keep this browser window open</p>
-            <p>If you are signed in, you can add charts to a queue and we'll notifty you when they're processed</p>
+            <p>If you are signed in, you can add charts to a queue and we'll notify you when they're processed</p>
           </div>
 
          <div class="graph-holder"></div>
@@ -252,24 +255,6 @@
       <button class="icon_zoomin icon-svg dark separator js-zoomin" id="mapZoomIn">Zoom In</button>
       <button class="icon_zoomout icon-svg dark js-zoomout" id="mapZoomOut">Zoom Out</button>
     </div>
-    <div class="map_quick_regions hidden">
-      <ul class="panel-list grid-list">
-        <li>
-          <p class="grid-cell fill"><label for="map-view-world_view">World View</label>
-          <input type="radio" name="quick_region" id="map-view-world_view" data-name="World View" class="js-quick-region" /></p>
-        </li>
-        <li class="">
-          <p class="grid-cell fill"><label for="map-view-north_sea">North Sea</label>
-          <input type="radio" name="quick_region" id="map-view-north_sea" data-name="North Sea" class="js-quick-region" /></p>
-        </li>
-        <li>
-          <p class="grid-cell fill"><label for="map-view-english_channel">English Channel</label>
-          <input type="radio" name="quick_region" id="map-view-english_channel" data-name="English Channel" class="js-quick-region" /></p>
-        </li>
-
-      </ul>
-    </div>
-
    <div class="global-loading-icon">
    </div>
 </body>

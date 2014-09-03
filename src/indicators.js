@@ -65,15 +65,39 @@ gisportal.indicatorsPanel.initDOM = function()  {
    $('.js-close-export').on('click', function()  {
       $('.export.overlay').toggleClass('hidden', true);
    });
-
+   
+   // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function()  {
       var id = $(this).data('id');
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
    });
+   
+   //Auto scale range
+   $('.js-indicators').on('click', '.js-auto', function()  {
+      var id = $(this).data('id');
+      gisportal.scalebars.autoScale(id);
+   });
+   
+   // Rest scale range
+   $('.js-indicators').on('click', '.js-reset', function()  {
+      var id = $(this).data('id');
+      gisportal.scalebars.resetScale(id);
+   });
+   
+   
+   // Show the demisions panel when you click the scale bar 
+   $('.js-indicators').on('click', '.js-scalebar', function()  {
+      var id = $(this).closest('[data-id]').data('id');
+      var layer = gisportal.layers[id];
+      $('.js-indicators .indicator-header[data-id="' + id + '"] [title="Scalebar"]').click();
+   });
+   
+   
+   
 
-
+   //  Zoom to data region
    $('.js-indicators').on('click', '.js-zoom-data', function()  {
    var indicator = gisportal.layers[$(this).data('id')];
    if(indicator === null)
@@ -88,21 +112,19 @@ gisportal.indicatorsPanel.initDOM = function()  {
        
       map.zoomToExtent(bbox);
    });
-
-   $('.js-indicators').on('click', '.js-auto', function()  {
-      var id = $(this).data('id');
-      gisportal.scalebars.autoScale(id);
-   });
-
-   $('.js-indicators').on('click', '.js-reset', function()  {
-      var id = $(this).data('id');
-      gisportal.scalebars.resetScale(id);
-   });
-
+   //Share this map
    $('.js-share').on('click', function()  {
       gisportal.openid.showShare();
       gisportal.openid.getLink();
    });
+   
+   // Store a layers current tab being viewed
+   $('.js-indicators').on('change','.js-tab-trigger', function(){
+      var layerId = $(this).closest('[data-id]').data('id');
+      var layer = gisportal.layers[layerId];
+      layer.visibleTab = $(this).data('tab-name');
+   });
+   
 }
 
 gisportal.indicatorsPanel.refreshData = function(indicators)  {
@@ -169,7 +191,18 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
          gisportal.indicatorsPanel.detailsTab(id);
          gisportal.indicatorsPanel.analysisTab(id);
       }   
-
+      
+      
+      //Add the scale bar tooltip
+      var renderedTooltip = gisportal.templates['tooltip-scalebar'](gisportal.layers[id]);
+      $('[data-id="' + id + '"] .js-scalebar').tooltipster({
+	      //interactive: true,
+	      contentAsHTML: true,
+	      content: renderedTooltip,
+	      position: "right",
+	      maxWidth: 200
+      })
+      
       gisportal.replaceSubtreeIcons($('.js-indicators'));
    });
 };
@@ -208,17 +241,15 @@ gisportal.indicatorsPanel.showLayer = function(id)  {
 };
 
 gisportal.indicatorsPanel.detailsTab = function(id)  {
-   $.get('templates/tab-details.mst', function(template)  {
-      var indicator = gisportal.layers[id];
-
-      var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
-      indicator.modifiedName = modifiedName;
-      indicator.modified = gisportal.utils.nameToId(indicator.name); 
-      var rendered = Mustache.render(template, indicator);
-      $('[data-id="' + id + '"] .js-tab-details').html(rendered);
-      $('[data-id="' + id + '"] .icon_details').toggleClass('hidden', false);
-      gisportal.indicatorsPanel.checkTabFromState(id);
-   });
+   var indicator = gisportal.layers[id];
+ 
+   var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
+   indicator.modifiedName = modifiedName;
+   indicator.modified = gisportal.utils.nameToId(indicator.name); 
+   var rendered = gisportal.templates['tab-details'](indicator);
+   $('[data-id="' + id + '"] .js-tab-details').html(rendered);
+   $('[data-id="' + id + '"] .icon_details').toggleClass('hidden', false);
+   gisportal.indicatorsPanel.checkTabFromState(id);
 };
 
 gisportal.indicatorsPanel.analysisTab = function(id)  {
@@ -236,14 +267,20 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
    gisportal.indicatorsPanel.initialiseSliders(id);
 };
 
+/**
+ * Redraws the legend bar which will reflect changes to the legend colour and rage
+ * 
+ * @param String layerId The ID of the layer to reload
+ */
 gisportal.indicatorsPanel.redrawScalebar = function( layerId ){
    var indicator = gisportal.layers[ layerId ];
    var scalebarDetails = gisportal.scalebars.getScalebarDetails( layerId ); 
    if (scalebarDetails){
       indicator.legend = scalebarDetails.url;
       indicator.scalePoints = scalebarDetails.scalePoints;
-      var rendered = gisportal.templates['scalebar'](indicator);
-      $('[data-id="' + indicator.id + '"] .js-scalebar').html(rendered);
+      var renderedScalebar = gisportal.templates['scalebar'](indicator);
+      $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
+      
    }else{
       $('[data-id="' + indicator.id + '"] .js-scalebar').html("");
    };

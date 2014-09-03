@@ -61,6 +61,29 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
          }
       }
       
+      var isExponentOver4 = scalePoints.some(function( point ){
+         //return point.toExponential().match(/\.(.+)e/)[1].length > 4
+         return ( Number(point.toExponential().split('e+')[1]) > 4 )
+      })
+      
+      if( isExponentOver4 ){
+	      var makePointReadable = function( point ){
+	         point = point.toExponential();
+	         if( point.indexOf('.') == -1 )
+	            return point;
+	         var original = point.match(/\.(.+)e/)[1];
+	         return point.replace( original, original.substr(0,2) );
+	      }
+      }else{
+	      var makePointReadable = function( point ){ return Math.round(point * 10) / 10; }
+      }
+      
+      scalePoints = scalePoints.map(function( point ){
+	      return {
+	         original: isExponentOver4 ? point.toExponential() : point,
+	         nicePrint: makePointReadable(point)
+	      }
+      })
 
       return {
          url: url,

@@ -22,6 +22,11 @@
       "html/css/graph.css",
       "html/css/tables.css",
       "html/css/nv.d3.css",
-      "html/css/mapcontrols.css"
+      "html/css/mapcontrols.css",
+      "html/js-libs/tooltipster/css/tooltipster.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-light.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-noir.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-punk.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css"
    ]
 }

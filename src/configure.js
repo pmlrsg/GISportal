@@ -559,3 +559,10 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
    arr.splice(index, 0, obj);
    return arr;
 };
+
+/**
+ * Default tool tip styling
+ */
+$.fn.tooltipster('setDefaults', {
+  theme: 'tooltipster-shadow'
+});
