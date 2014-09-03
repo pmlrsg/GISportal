@@ -566,3 +566,9 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
 $.fn.tooltipster('setDefaults', {
   theme: 'tooltipster-shadow'
 });
+
+/**
+ * Provides all local storage.
+ * API - http://www.jstorage.info/
+ */
+gisportal.storage = $.jStorage;

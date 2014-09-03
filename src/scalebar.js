@@ -63,7 +63,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       
       var isExponentOver4 = scalePoints.some(function( point ){
          //return point.toExponential().match(/\.(.+)e/)[1].length > 4
-         return ( Number(point.toExponential().split('e+')[1]) > 4 )
+         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 4 )
       })
       
       if( isExponentOver4 ){
