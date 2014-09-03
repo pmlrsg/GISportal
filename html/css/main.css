@@ -177,3 +177,7 @@ input[type="text"]  {
 	
 	width: 100%;
 }
+
+.tooltipster-content{
+	font-family: inherit !important;
+}
