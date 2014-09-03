@@ -163,7 +163,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       // A list of styles available for the layer
       this.styles = null;
-      this.style = null;
       
       // The BoundingBox for the layer
       this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
@@ -173,6 +172,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          this.getDimensions(layerData); // Get dimensions.
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
+         this.style = "boxfill/rainbow";
          
       } else if(this.type == "refLayers") {
          this.style = new OpenLayers.StyleMap(this.options.style);
