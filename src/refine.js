@@ -25,7 +25,7 @@ gisportal.refinePanel.found = false;
 gisportal.refinePanel.open = function(data)  {
    this.found = false;
    this.initDOM();
-   $('#refinePanel').toggleClass('hidden', false).toggleClass('active', true);
+   gisportal.panels.showPanel( 'refine-indicator' );
    this.currentData = data;
    $('.js-refine-name').html(this.currentData.name);
    this.refreshData(data);
@@ -37,7 +37,7 @@ gisportal.refinePanel.open = function(data)  {
 gisportal.refinePanel.close = function()  {
    $('#js-refine-section-interval').toggleClass('hidden', true);
    $('#js-refine-section-reliability').toggleClass('hidden', true);
-   $('#refinePanel').toggleClass('hidden', true).toggleClass('active', false);
+   gisportal.panels.showPanel( 'choose-indicator' );
 };
 
 /**
@@ -81,7 +81,7 @@ gisportal.refinePanel.initDOM = function(data)  {
       gisportal.refinePanel.refineData(ids, current);
    };
    
-   $('#refinePanel').one('click', '.indicator-select input[type="radio"]', change);
+   $('#refinePanel').one('click', 'input[type="radio"]', change);
 
    if (data && data.refine && data.refine.cat && data.refine.tag)  {
       var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();

@@ -34,14 +34,14 @@ gisportal.configurePanel.refreshData = function()  {
  * All panels have an open function.
  */
 gisportal.configurePanel.open = function()  {
-   $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
+   gisportal.panels.showPanel( 'choose-indicator' );
 };
 
 /**
  * All panels have a close function.
  */
 gisportal.configurePanel.close = function()  {
-   $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
+   //$('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
    gisportal.configurePanel.refreshData();
 };
 
@@ -62,7 +62,7 @@ gisportal.configurePanel.initDOM = function()  {
          //options.refined = true;
       }
 
-      if ($(this).is(':checked'))  {
+      if ($(this).is(':checked')) {
          gisportal.configurePanel.selectLayer(name, options);
       }
       else  {

@@ -15,7 +15,6 @@
    <ul data-id="{{tag}}" class="hidden fake-select panel-list grid-list">
       {{#indicators}}
          <li data-name="{{name}}">
-            <div class="icon_loading icon-svg grid-cell icon-column">loading</div>
             <p class="grid-cell fill">{{name}}</p>
             <label for="cat-{{tagModified}}-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke icon-column grid-cell" title="Show/Hide {{name}}">Show/Hide</label>
             <input type="checkbox" id="cat-{{tagModified}}-toggleVisibility-{{modified}}" data-tag="{{tag}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">

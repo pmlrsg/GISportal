@@ -10,8 +10,7 @@
  */
 gisportal.graphs.initDOM = function() {
    $('.js-return-analysis').on('click', function() {
-      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);      
+      gisportal.panels.showPanel( 'active-layers' );  
       $('.graph-wait-message').toggleClass("hidden", false);
       $('.graph-holder').html('');   
    });

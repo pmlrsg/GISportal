@@ -10,11 +10,11 @@
 gisportal.indicatorsPanel = {};
 
 gisportal.indicatorsPanel.close = function()  {
-  $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
+  //$('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
 };
 
 gisportal.indicatorsPanel.open = function()  {
-  $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+  gisportal.panels.showPanel('active-layers');
 };
 
 gisportal.indicatorsPanel.initDOM = function()  {
@@ -30,10 +30,8 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-indicators').on('click', '.js-create-graph', function()  {
       var id = $(this).data('id');
-      $('#graphPanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
+      gisportal.panels.showPanel('graph');
       gisportal.indicatorsPanel.createGraph(id);
-      //$(this).toggleClass("loading", true);
    });
 
    $('.js-indicators').on('click', '.js-draw-box', function()  {
@@ -42,8 +40,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-indicators').on('click', '.js-remove', function()  {
      if (gisportal.selectedLayers.length <= 1)  {
-         $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
-         $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
+         gisportal.panels.showPanel( 'choose-indicator' );
       }
       var id = $(this).parent().data('id');
       gisportal.indicatorsPanel.removeFromPanel(id);
@@ -51,8 +48,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
       
    $('.js-start-again').on('click', function() {
-      $('#configurePanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#indicatorsPanel').toggleClass('hidden', true).toggleClass('active', false);
+         gisportal.panels.showPanel( 'choose-indicator' );
    });
    
 

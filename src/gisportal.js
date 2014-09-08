@@ -838,6 +838,7 @@ gisportal.main = function() {
    gisportal.gritter.setup();
 
    // Initiate the DOM for panels
+   gisportal.panels.initDOM();
    gisportal.configurePanel.initDOM();   // configure.js
    gisportal.indicatorsPanel.initDOM();  // indicators.js
    gisportal.graphs.initDOM();           // graphing.js
@@ -849,14 +850,14 @@ gisportal.main = function() {
    $('.js-show-tools').on('click', showPanel);
 
    function showPanel()  {
-      $(this).toggleClass('hidden', true);
+      $('.js-show-tools').toggleClass('hidden', true);
       $('.panel.active').toggleClass('hidden', false);
    }
 
    $('.js-hide-panel').on('click', hidePanel);
 
    function hidePanel()  {
-      $(this).parents('.panel').toggleClass('hidden', true);
+      $('.panel.active').toggleClass('hidden', true);
       $('.js-show-tools').toggleClass('hidden', false);
    }
 

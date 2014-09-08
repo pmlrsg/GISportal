@@ -95,63 +95,60 @@
 
    <button class="js-show-tools show-tools hidden"><span class="icon_show"></span>Show tools</button>
    
-   <!-- Configure Your Map panel  -->
-   <div id="configurePanel" class="panel active">
-      <div class="panel-header">
-         <h2>Choose your indicators</h2>
-         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
-      </div>
-      <div class="panel-container">
-         <!-- These are on the same line to avoid white-space bug with inline-block -->
-        <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
-        <ul class="panel-tabs">
-          <li>
-            <input type="radio" checked id="tab-browse" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
-            <div class="panel-tab">
-               <div class="panel-tab-content">
-                  <h3>Popular indicators</h3>
-                  <ul class="js-popular panel-list grid-list"></ul>
-               </div>
-              <!-- These are on the same line to avoid white-space bug with inline-block -->
-              <label class="panel-tab-name browse-tabs active dark" for="tab-browse-1">1</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-2">2</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-3">3</label>
-              <ul class="panel-tabs dark">
-                <li>
-                  <input type="radio" checked id="tab-browse-1" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
-                  <div class="panel-tab panel-tab-content indicator-select"></div>
-                </li>
-                <li>
-                  <input type="radio" id="tab-browse-2" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
-                  <div class="panel-tab panel-tab-content indicator-select"></div>
-                </li>
-                <li>
-                  <input type="radio" id="tab-browse-3" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
-                  <div class="panel-tab panel-tab-content indicator-select"></div>
-                </li>
-              </ul>
-            </div>
-          </li>
-          <li>
-            <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
-            <div class="panel-tab full-height">
-              <input type="search" placeholder="Search for an indicator" class="js-search search">
-              <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="panel-footer">
-         <button class="brand with-border js-build hidden">Next</button>
-      </div>
-    </div>
-
-   <div id="refinePanel" class="panel hidden">
-      <div class="panel-header">
-         <h2 class="js-refine-name">Refine Indicator</h2>
-         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
-      </div>
-      <div class="panel-container indicator-select">
+   
+   <div class="panel active">
+      <div class="panel-header" style="">
+         <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
+         <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
+         <span class="icon-hide icon-btn js-hide-panel icon-tab"></button>
+      </div>
+       
+       
+      <!-- Choose Indicators  -->
+      <div class="panel-container" data-panel-name="choose-indicator" id="configurePanel" >
+         <!-- These are on the same line to avoid white-space bug with inline-block -->
+         <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
+         <ul class="panel-tabs">
+            <li>
+               <input type="radio" checked id="tab-browse" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
+               <div class="panel-tab">
+                  <div class="panel-tab-content">
+                     <h3>Popular indicators</h3>
+                     <ul class="js-popular panel-list grid-list"></ul>
+                  </div>
+                  <!-- These are on the same line to avoid white-space bug with inline-block -->
+                  <label class="panel-tab-name browse-tabs active dark" for="tab-browse-1">1</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-2">2</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-3">3</label>
+                  <ul class="panel-tabs dark">
+                     <li>
+                        <input type="radio" checked id="tab-browse-1" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                        <div class="panel-tab panel-tab-content indicator-select"></div>
+                     </li>
+                     <li>
+                        <input type="radio" id="tab-browse-2" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                        <div class="panel-tab panel-tab-content indicator-select"></div>
+                     </li>
+                     <li>
+                        <input type="radio" id="tab-browse-3" name="tabs-browse" class="js-tab-trigger panel-tab-trigger">
+                        <div class="panel-tab panel-tab-content indicator-select"></div>
+                     </li>
+                  </ul>
+               </div>
+            </li>
+            <li>
+               <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
+               <div class="panel-tab full-height">
+                  <input type="search" placeholder="Search for an indicator" class="js-search search">
+                  <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+               </div>
+            </li>
+         </ul>
+      </div>
+      
+      
+      <!-- Refine the chosen indicator by region/interval/etc..  -->
+      <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select padded">
+	       
          <div class="js-refine-section-region">
             <label for="refine-region" class="indicator-dropdown">
                Region
@@ -160,7 +157,6 @@
             <ul id="refine-region" class=" fake-select panel-list grid-list">
             </ul>
          </div>
-         
          
          
          <div class="js-refine-section-interval">
@@ -184,28 +180,38 @@
          
          <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
          <button class="text-button js-refine-configure">Cancel</button>
+	      
+      </div>
+      
+      
+      <!-- Refine the chosen indicator by region/interval/etc..  -->
+      <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
+         <ul class="js-indicators indicator-list grid-list">
+         </ul>
+      </div>
+      
+      <!-- Graphing panel  -->
+      <div  id="graphPanel"  data-panel-name="graph" class="panel-container">
+         <div class="graph-wait-message">
+            <h3>Processing</h3>
+            <div class="icon_loading grid-cell icon-column">loading</div>
+            <p>Your chart is processing, keep this browser window open</p>
+            <p>If you are signed in, you can add charts to a queue and we'll notify you when they're processed</p>
+          </div>
 
+         <div class="graph-holder"></div>
+      </div>
+      
+      <div class="panel-footer">
+           <label for="share-map">Share this map with colleagues</label>
+           <button id="share-map" class="js-share brand secondary">
+            <span class="icon-filled-link icon-btn"> </span>
+              Share
+          </button>
       </div>
    </div>
+   
 
-    <div id="indicatorsPanel" class="panel hidden">
-      <div class="panel-header">
-         <h2>Map Tools</h2>
-         <button class="icon_hide icon-svg light js-hide-panel">Hide</button>
-      </div>
-      <div class="panel-container">
-        <ul class="js-indicators indicator-list grid-list">
-        </ul>
-        <div class="share-map-button">
-           <label for="share-map">Share this map with colleagues</label>
-           <button id="share-map" class="js-share brand secondary"><span class="icon_share icon-svg light"></span>Share</button>
-        </div>
-      </div>
-      <div class="panel-footer">
-         <button class="brand with-border js-start-again">Add Indicators</button>
-      </div>
-    </div>   
-  
    <!-- The share box. -->
     <div class="share overlay hidden">
       <div class="share-container overlay-container">
@@ -220,11 +226,11 @@
       </div>
     </div>
 
-    <div id="graphPanel" class="panel hidden">
+    <div class="panel hidden">
       <div class="panel-header">
         <button class="js-return-analysis text-button back-button">Return to Analysis</button>
       </div>
-      <div class="panel-container">
+      <div  id="graphPanel" class="panel-container">
          <div class="graph-wait-message">
             <h3>Processing</h3>
             <div class="icon_loading grid-cell icon-column">loading</div>

@@ -36,3 +36,13 @@
    margin-top: 5px;
    width: 100%;
 }
+
+#share-map {
+   cursor: pointer;
+}
+
+#share-map span{
+   position: relative;
+   top: 3px;
+   font-size: 16px;
+}

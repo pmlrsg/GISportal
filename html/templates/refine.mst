@@ -1,5 +1,5 @@
 <input type="radio" id="tab-{{modified}}-options" checked name="tabs-{{modified}}" class="js-tab-trigger panel-tab-trigger">
-<ul class="panel-list panel-tab indicator-select">
+<ul class="panel-list panel-tab indicator-select padding">
    <!-- These should be multi-select boxes so that
      indicators can be chosen within each option -->
    <li>
