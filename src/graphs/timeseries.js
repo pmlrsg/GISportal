@@ -8,6 +8,10 @@ gisportal.graphs.timeseries = function(data, options)  {
        mean   = [];
    
    var sorted = Object.keys(data.output.data).sort(function(a,b) { return new Date(a) - new Date(b) });
+   
+   var startDate = new Date(sorted[0]);
+   var endDate = new Date(sorted[ sorted.length - 1 ]).getTime();
+
    for (var i = 0; i < sorted.length; i++)  {
       var date = new Date(sorted[i]).getTime();
       var value = data.output.data[sorted[i]];
@@ -68,6 +72,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          
          //svg.onresize = function() { chart.update() };
          nv.utils.windowResize(chart.update);
+         chart.brushExtent([, endDate]).update()
          return chart;
       }, 
    });

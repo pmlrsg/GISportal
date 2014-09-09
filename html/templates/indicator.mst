@@ -19,11 +19,11 @@
 
       <li  data-name="{{name}}" data-id="{{id}}">
          <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-         <label for="">   
-            <div class="panel-tab scalebar-tab">
+         <div class="panel-tab scalebar-tab">
+            <label for="tab-{{id}}-dimensions">   
                <div class="js-scalebar"></div>
-            </div>
-         </label>
+            </label>
+         </div>
       </li>
       
       <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
