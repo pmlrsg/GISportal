@@ -24,6 +24,10 @@ p  {
 
 sup { vertical-align: super; font-size: 65%;}
 
+button, .btn{
+  cursor: pointer;
+}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;

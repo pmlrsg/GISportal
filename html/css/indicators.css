@@ -82,3 +82,10 @@
 .indicator-header .remove{
   float: right;
 }
+
+.toggleVisibility:before {
+  content: "\e00f";
+}
+.toggleVisibility.active:before {
+  content: "\e02b";
+}

@@ -11,6 +11,7 @@
 
 
 gisportal.config = {
+   siteMode: "development", //(development|production)
    browseCategories : {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
@@ -22,19 +23,23 @@ gisportal.config = {
    defaultStates: [
       {
          "name" : "Cod in the North East Atlantic",
-         "url" : "http://portaldev.marineopec.eu/?state=b8czastdcoioi"
+         "url" : "http://portaldev.marineopec.eu/?state=b8czastdcoioi",
+         "icon" : "icon_map"
       },
       {
          "name" : "Seasonal Changes in Chlorophyll levels in the Med",
-         "url" : "http://portaldev.marineopec.eu/?state=a9bmsjjtthehe"
+         "url" : "http://portaldev.marineopec.eu/?state=a9bmsjjtthehe",
+         "icon" : "icon_analyse"
       },
       {
          "name" : "Interannual Nitrogen in the Baltic",
-         "url" : "http://portaldev.marineopec.eu/?state=c7ebs12wvvmvm"
+         "url" : "http://portaldev.marineopec.eu/?state=c7ebs12wvvmvm",
+         "icon" : "icon_analyse"
       },
       {
          "name" : "Summer zooplankton growth in the Black Sea",
-         "url" : "http://portaldev.marineopec.eu/?state=bqua1n6lk2yky"
+         "url" : "http://portaldev.marineopec.eu/?state=bqua1n6lk2yky",
+         "icon" : "icon_map"
      }
    ],
 };

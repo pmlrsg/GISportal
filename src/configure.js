@@ -314,39 +314,77 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
          // For each tag name, if it has values then render the mustache
-         // template. The template should probably be cached more heavily.
-         $.get('templates/categories.mst', (function(index, cat) {
-            var indicators = [];
-            // Do not allow duplicates, and all values should be lowercase
-            vals = _.unique(vals, function(d)  {
-               return d.toLowerCase();
-            });
-            
-            _.forEach(vals, function(d)  {
-               var tmp = {};
-               var d = d.toLowerCase();
-               tmp.name = d;
-               // Modified is used when a unique id is required
-               // in the actual html, for radio buttons for example.
-               tmp.modified = gisportal.utils.nameToId(d);
-               indicators.push(tmp);
-            });
-               
-            return function(template) { 
-               var rendered = Mustache.render(template, {
-                  tag : tagNames[index],
-                  tagModified : gisportal.utils.nameToId(tagNames[index]),
-                  indicators : indicators 
-               });
-               $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
-               $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-               // Inline all SVG icons 
-               gisportal.replaceAllIcons();
-            }
-         })(i));
+         var indicators = [];
+         // Do not allow duplicates, and all values should be lowercase
+         vals = _.unique(vals, function(d)  {
+            return d.toLowerCase();
+         });
+         
+         _.forEach(vals, function(d)  {
+            var tmp = {};
+            var d = d.toLowerCase();
+            tmp.name = d;
+            // Modified is used when a unique id is required
+            // in the actual html, for radio buttons for example.
+            tmp.modified = gisportal.utils.nameToId(d);
+            indicators.push(tmp);
+         });
+
+         var rendered = gisportal.templates['categories'] ({
+            tag : tagNames[i],
+            tagModified : gisportal.utils.nameToId(tagNames[i]),
+            indicators : indicators 
+         });
+         $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
+         $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
+         // Inline all SVG icons 
+         gisportal.replaceAllIcons();
       }
    }
+
+   gisportal.configurePanel.sortNamesAlphabetically()
+
 };
+
+/**
+ * Sorts all of the indicator groups from A-Z and the indicators in that group
+ */
+gisportal.configurePanel.sortNamesAlphabetically = function(){
+
+   function sortCompare( strA, strB ){
+
+      var compare = strA.localeCompare( strB );
+
+      if( compare > 0 )
+         return 1;
+      else if( compare < 0 )
+         return -1;
+      else
+         return 0;
+   }
+
+   $('.js-indicator-select').each(function(){
+      // Sort the groups
+      $(this).children().sort(function(a,b){
+         var aVal = $(a).find('label').first().text();
+         var bVal = $(b).find('label').first().text();
+         return sortCompare( aVal, bVal );
+      }).appendTo( this );
+
+      //Sort the indicators in the groups
+      $(this).children().each(function(){
+         var fakeSelect = $(this).find('.fake-select');
+
+         fakeSelect.children().sort(function(a,b){
+            var aVal = $(a).find('p').first().text();
+            var bVal = $(b).find('p').first().text();
+            return sortCompare( aVal, bVal );
+         }).appendTo( fakeSelect );
+      });
+
+
+   });
+}
 
 
 /**

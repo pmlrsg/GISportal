@@ -348,6 +348,12 @@ input.search  {
    -moz-appearance: none;
 }
 
+.show-tools span{
+  font-size: 20px;
+  position: relative;
+  top: 4px;
+}
+
 
 .ellipsisOverflow {
 	text-overflow: ellipsis;

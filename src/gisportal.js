@@ -589,6 +589,19 @@ gisportal.nonLayerDependent = function() {
 
 /*===========================================================================*/
 
+gisportal.autoSaveState = function(){
+   var state = JSON.stringify(gisportal.saveState())
+   gisportal.storage.set( 'stateAutoSave', state )
+}
+
+gisportal.getAutoSaveState = function(){
+   var state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ))
+   return state;
+}
+gisportal.hasAutoSaveState = function(){
+   return ( gisportal.storage.get( 'stateAutoSave' ) != null );
+}
+
 /**
  * Creates an object that contains the current state
  * @param {object} state - Optional, allows a previous state to be extended 
@@ -808,69 +821,67 @@ gisportal.setState = function(state) {
  * It is called from portal.js
  */
 gisportal.main = function() {
- 
-   // Set up the map
-   // any layer dependent code is called in a callback in mapInit
-   gisportal.mapInit();
 
-   gisportal.initStart();
 
    // Compile Templates
-   gisportal.loadTemplates();
+   gisportal.loadTemplates(function(){
+      
+      gisportal.initStart();
 
+      // Set up the map
+      // any layer dependent code is called in a callback in mapInit
+      gisportal.mapInit();
 
-   $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-  
-   $('.js-start').click(function()  {
-      $('.start').toggleClass('hidden', true);
+      $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
+    
+      // Setup the gritter so we can use it for error messages
+      gisportal.gritter.setup();
+
+      // Initiate the DOM for panels
+      gisportal.panels.initDOM();
+      gisportal.configurePanel.initDOM();   // configure.js
+      gisportal.indicatorsPanel.initDOM();  // indicators.js
+      gisportal.graphs.initDOM();           // graphing.js
+      gisportal.analytics.initGA();         // analytics.js
+      
+      //Set the global loading icon
+      gisportal.loading.loadingElement= jQuery('.global-loading-icon')
+      
+      $('.js-show-tools').on('click', showPanel);
+
+      function showPanel()  {
+         $('.js-show-tools').toggleClass('hidden', true);
+         $('.panel.active').toggleClass('hidden', false);
+      }
+
+      $('.js-hide-panel').on('click', hidePanel);
+
+      function hidePanel()  {
+         $('.panel.active').toggleClass('hidden', true);
+         $('.js-show-tools').toggleClass('hidden', false);
+      }
+
+      // Start setting up anything that is not layer dependent
+      gisportal.nonLayerDependent();
+
+      // Grab the url of any state and store it as an id to be used
+      // for retrieving a state object.
+      var stateID = gisportal.utils.getURLParameter('state');
+      if(stateID !== null) {
+         console.log('Retrieving State...');
+         gisportal.ajaxState(stateID);
+      }
+      else {
+         console.log('Loading Default State...');
+      }
+
+      // Replaces all .icon-svg with actual SVG elements,
+      // so that they can be styled with CSS
+      // which cannot be done with SVG in background-image
+      // or <img>
+      gisportal.replaceAllIcons(); 
+      
    });
- 
-   // Setup the gritter so we can use it for error messages
-   gisportal.gritter.setup();
-
-   // Initiate the DOM for panels
-   gisportal.panels.initDOM();
-   gisportal.configurePanel.initDOM();   // configure.js
-   gisportal.indicatorsPanel.initDOM();  // indicators.js
-   gisportal.graphs.initDOM();           // graphing.js
-   gisportal.analytics.initGA();         // analytics.js
-   
-   //Set the global loading icon
-   gisportal.loading.loadingElement= jQuery('.global-loading-icon')
-   
-   $('.js-show-tools').on('click', showPanel);
-
-   function showPanel()  {
-      $('.js-show-tools').toggleClass('hidden', true);
-      $('.panel.active').toggleClass('hidden', false);
-   }
-
-   $('.js-hide-panel').on('click', hidePanel);
-
-   function hidePanel()  {
-      $('.panel.active').toggleClass('hidden', true);
-      $('.js-show-tools').toggleClass('hidden', false);
-   }
-
-   // Start setting up anything that is not layer dependent
-   gisportal.nonLayerDependent();
-
-   // Grab the url of any state and store it as an id to be used
-   // for retrieving a state object.
-   var stateID = gisportal.utils.getURLParameter('state');
-   if(stateID !== null) {
-      console.log('Retrieving State...');
-      gisportal.ajaxState(stateID);
-   }
-   else {
-      console.log('Loading Default State...');
-   }
-
-   // Replaces all .icon-svg with actual SVG elements,
-   // so that they can be styled with CSS
-   // which cannot be done with SVG in background-image
-   // or <img>
-   gisportal.replaceAllIcons(); 
 };
 
 /**
@@ -952,16 +963,36 @@ gisportal.replaceSubtreeIcons = function(el)  {
  * Should probably be using Mustache for this
  */
 gisportal.initStart = function()  {
-   var list = $('.start .examples li');
-   for (var i = 0; i < list.length; i++)  {
-      var current = gisportal.config.defaultStates[i];
-      var currentLi = $(list[i]);
-      if (!current) $(currentLi).remove();
-      else  {
-         $('a', currentLi).attr("href", current.url);
-         $('span', currentLi).text(current.name);
-      }
-   }
+
+   var data = {
+      defaultStates: gisportal.config.defaultStates,
+      hasAutoSaveState: gisportal.hasAutoSaveState()
+   };
+
+   var rendered = gisportal.templates['start']( data );
+   $('.js-start-container').html( rendered );
+
+   // Load there previously saved state
+   $('.js-load-last-state').click(function(){
+      gisportal.loadState( gisportal.getAutoSaveState() );
+      setInterval( gisportal.autoSaveState, 60000 );
+   });
+
+     
+   $('.js-start').click(function()  {
+      $('.start').toggleClass('hidden', true);
+
+      setInterval( gisportal.autoSaveState, 60000 );
+
+      //Once they are past the splash page warn them if they leave
+      window.onbeforeunload = function(){
+         gisportal.autoSaveState();
+         if( gisportal.config.sideMode == "production")
+            return "Warning. Your about to leave the page";
+         else
+            return;
+      };
+   });
 };
 
 

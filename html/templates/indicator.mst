@@ -4,13 +4,11 @@
       <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
 
 
-      <span class="js-toggleVisibility hidden icon-btn indicator-header-icon icon-preview-1 " data-name="{{name}}" title="Remove"></span>
+      <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Remove"></span>
       
       <label class="hidden js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon" for="tab-{{id}}-dimensions" title="Adjustments"></label>
 
       <label class="active js-icon-details js-closable icon-btn icon-information indicator-header-icon" for="tab-{{id}}-details" title="Details"></label>
-
-      <label class="icon_analyse hidden icon-svg light icon-column js-closable" for="tab-{{id}}-analysis" title="Analysis">Analysis</label>
 
       <label class="js-icon-analyse hidden icon-btn js-closable icon-business-chart-2 indicator-header-icon" for="tab-{{id}}-analysis" title="Analysis"></label>
       
@@ -21,9 +19,11 @@
 
       <li  data-name="{{name}}" data-id="{{id}}">
          <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-         <div class="panel-tab scalebar-tab">
-            <div class="js-scalebar"></div>
-         </div>
+         <label for="">   
+            <div class="panel-tab scalebar-tab">
+               <div class="js-scalebar"></div>
+            </div>
+         </label>
       </li>
       
       <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
