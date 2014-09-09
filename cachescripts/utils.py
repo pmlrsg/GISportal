@@ -12,7 +12,7 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
    change = False
    
    # Go through each server
-   for key, server in serverList.items():
+   for server in serverList:
       
       # Check if we are just passing a layer
       if 'passthrough' in server['options'] and server['options']['passthrough']:
@@ -24,13 +24,23 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
       
       # Check if cache is valid
       if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONXML, cacheLife):        
-         oldXML = None
-         newXML = None       
+         oldCapabilitiesXML = None
+         newCapabilitiesXML = None     
+         oldCoverageXML = None
+         newCoverageXML = None
+         
+         
          try:
-            url = server['url'] + urllib.urlencode(server['params'])          
-            # Try to contact the server for the newXML
+            url = server['services']['wms']['url'] + urllib.urlencode(server['services']['wms']['params']['GetCapabilities'])
+            print 'Getting: ' + url
             resp = urllib2.urlopen(url, timeout=30)
-            newXML = resp.read()
+            newCapabilitiesXML = resp.read()
+            
+            url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
+            print 'Getting: ' + url
+            resp = urllib2.urlopen(url, timeout=30)
+            newCoverageXML = resp.read()
+            
          except urllib2.URLError as e:
             print 'Failed to open url to ' + url
             print e
@@ -40,17 +50,18 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             print e
             
          # Check that we have the xml file
-         if newXML == None:
+         if newCapabilitiesXML == None or newCoverageXML == None:
             dirtyCaches.append(server)
             continue
          
          try:
-            oldXML = getFile(cachePath + server['name'] + FILEEXTENSIONXML)
+            oldCapabilitiesXML = getFile(cachePath + server['name'] + '-GetCapabilities' + FILEEXTENSIONXML)
+            oldCoverageXML = getFile(cachePath + server['name'] + '-DescribeCoverage' + FILEEXTENSIONXML)
          except IOError as e:
             print 'Failed to open xml file at "' + cachePath + server['name'] + FILEEXTENSIONXML + '"'       
             print e
             # We don't have the oldXML so we want to skip the md5 check
-            createCache(server, newXML) 
+            createCache(server, newCapabilitiesXML, newCoverageXML) 
             change = True
             continue
          
@@ -59,10 +70,10 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             oldXML = "old"
          
          # Check the md5s   
-         if checkMD5(oldXML, newXML):
+         if checkMD5(oldCapabilitiesXML, newCapabilitiesXML) or checkMD5(oldCoverageXML, newCoverageXML):
             print 'md5 check failed...'
             # Create the caches for this server
-            createCache(server, newXML)
+            createCache(server, newCapabilitiesXML, newCoverageXML )
             change = True
             continue
          else: 
@@ -83,9 +94,10 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
 def createMasterCache(servers, cachePath, masterCachePath):
    import json
    masterCache = []
-   for key, server in servers.items():
+   for server in servers:
       file = None
       try:
+         print 'Reading : ' + cachePath + server['name'] + FILEEXTENSIONJSON;
          file = getFile(cachePath + server['name'] + FILEEXTENSIONJSON)
       except IOError as e:
          print 'Failed to open json file at "' + cachePath + server['name'] + FILEEXTENSIONJSON + '"'       
@@ -105,7 +117,7 @@ def regenerateCache(dirtyServer, dirtyCaches, createCache):
          dirtyCaches.remove(dirtyServer)
       if i < 10:
          try:
-            url = dirtyServer['url'] + urllib.urlencode(dirtyServer['params'])
+            url = dirtyServer['services']['wms']['url'] + urllib.urlencode(dirtyServer['services']['wms']['params']['GetCapabilities'])
             resp = urllib2.urlopen(url, timeout=30)
             newXML = resp.read()
             createCache(dirtyServer, newXML)
