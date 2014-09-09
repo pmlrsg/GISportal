@@ -141,7 +141,10 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
 
 
     # Some of these settings may needs changing depending on your setup
-    cp config_samples/settings.py middleware/portalflask/settings.py
+    cp config_samples/examples.py middleware/portalflask/settings.py
+    
+    # Change OPENID_FOLDER to a path correct to your machine
+    vi middleware/portalflask/settings.py
     
     python middleware/manage.py syncdb
     
