@@ -76,16 +76,23 @@
 }
 
 .indicator-header-icon.active{
-  border-bottom: 1px solid #a19d63;
+  border-bottom: 2px solid #a19d63;
 }
 
 .indicator-header .remove{
   float: right;
 }
 
+.toggleVisibility{
+  border-bottom: none !important;
+}
 .toggleVisibility:before {
   content: "\e00f";
 }
 .toggleVisibility.active:before {
   content: "\e02b";
+}
+
+.indicator-list > li:not(:last-child){
+  margin-bottom: 20px;
 }

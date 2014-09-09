@@ -15,7 +15,7 @@ gisportal.config = {
    browseCategories : {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
-      "MSFD" : "MSFD"
+      "MSFD" : "EU MSFD"
    },
    popularIndicators : [
       "Heterotrophic flagellates biomass", "Net Primary Production", "Oxygen", "Temperature"

@@ -987,7 +987,7 @@ gisportal.initStart = function()  {
       //Once they are past the splash page warn them if they leave
       window.onbeforeunload = function(){
          gisportal.autoSaveState();
-         if( gisportal.config.sideMode == "production")
+         if( gisportal.config.siteMode == "production")
             return "Warning. Your about to leave the page";
          else
             return;
