@@ -90,17 +90,6 @@ gisportal.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
-// Provider logos, each use an object with logo for image and url for link
-gisportal.providers = {
-   "CCI" : { "logo": "img/cci.png" },
-   "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
-   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true", "url" : "http://www.dmi.dk/en/vejr/" },
-   "HCMR" : { "logo" : "img/hcmr.png", "url" : "http://innovator.ath.hcmr.gr/newhcmr1/" },
-   "IMS-METU" : { "logo" : "img/metu.png", "url" : "http://www.ims.metu.edu.tr/" },
-   "OGS" : {"logo" : "img/ogs.png", "url" :  "http://www.ogs.trieste.it/" },
-   "PML" : { "logo" : "img/pml.png", "url" : "http://www.pml.ac.uk/default.aspx" }  
-};
-
 /**
  * The OpenLayers map object
  * Soon to be attached to gisportal namespace
@@ -307,6 +296,8 @@ gisportal.createOpLayers = function() {
                            "exBoundingBox": item.EX_GeographicBoundingBox, 
                            "providerTag": providerTag,
                            "positive" : positive, 
+                           "contactDetails" : item.ContactDetails, 
+                           "offsetVectors" : item.OffsetVectors, 
                            "tags": item.tags
                         }
                      );

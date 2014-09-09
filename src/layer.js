@@ -52,7 +52,10 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       providerTag : null,
       tags : null,
-      options : null
+      options : null,
+
+      contactDetails: {},
+      offsetVectors: null
    };
    
    $.extend(true, this, this.defaults, opts);

@@ -8,6 +8,7 @@ import re
 sys.path.append(os.path.join(sys.path[0],'..','config'))
 # server list
 import wmsLayers
+from providers import providers
 
 # Change the python working directory to be where this script is located
 abspath = os.path.abspath(__file__)
@@ -100,6 +101,11 @@ def createCache(server, capabilitiesXML, coverageXML):
             abstract = layer.find('./%sAbstract' % (WMS_NAMESPACE)).text
             temporal = False
             
+
+            if name not in server['indicators']:
+               print "NOTICE: Indicator '" + name + "' found on WMS server but not in local config file, ignoring."
+               continue
+
             #Find the CoverageOffering from DescribeCoverage
             
             
@@ -128,7 +134,17 @@ def createCache(server, capabilitiesXML, coverageXML):
             temporal = dimensions['temporal']
             styles = createStylesArray(layer)
 
+            if server['options']['providerShortTag'] not in providers:
+               raise Exception("Provider shortTag " + server['options']['providerShortTag'] + " was not in the 'providers.py' file")
 
+            # Get the default details for the provider
+            contactDetails =  providers[ server['options']['providerShortTag'] ]
+
+
+            if 'contactDetails' in server['indicators'][name]:
+               # Overwrite any details with the indicator specific details
+               for i in server['indicators'][name]['contactDetails']:
+                  contactDetails[ i ] = server['indicators'][name]['contactDetails'][ i ]
 
             if utils.blackfilter(name, layerBlackList):
                
@@ -138,6 +154,7 @@ def createCache(server, capabilitiesXML, coverageXML):
                               "FirstDate": dimensions['firstDate'],
                               "LastDate": dimensions['lastDate'],
                               "OffsetVectors": offsetVectors,
+                              "ContactDetails": contactDetails,
                               "EX_GeographicBoundingBox": exGeographicBoundingBox }
                               
                if name in server['indicators']:

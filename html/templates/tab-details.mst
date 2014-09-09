@@ -14,5 +14,17 @@
          <label style="color: blue">{{exBoundingBox.WestBoundLongitude}}</label>   W 
       </td></tr>
       <tr><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
+      {{#if contactDetails.email}}
+         <tr>
+            <td>Email</td>
+            <td><a target="_top" href="mailto:{{contactDetails.email}}">{{contactDetails.email}}</td>
+         </tr>
+      {{/if}}
+      {{#if contactDetails.website}}
+         <tr>
+            <td>Website</td>
+            <td><a target="_top" href="{{contactDetails.website}}">{{contactDetails.website}}</td>
+         </tr>
+      {{/if}}
    </tbody>
 </table>
