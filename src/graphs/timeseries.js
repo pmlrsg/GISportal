@@ -9,8 +9,8 @@ gisportal.graphs.timeseries = function(data, options)  {
    
    var sorted = Object.keys(data.output.data).sort(function(a,b) { return new Date(a) - new Date(b) });
    
-   var startDate = new Date(sorted[0]);
-   var endDate = new Date(sorted[ sorted.length - 1 ]).getTime();
+   var startDate = new Date(sorted[0]).getTime();
+   var endDate = new Date(sorted[ sorted.length - 1 ]).getTime() ;
 
    for (var i = 0; i < sorted.length; i++)  {
       var date = new Date(sorted[i]).getTime();
@@ -59,7 +59,7 @@ gisportal.graphs.timeseries = function(data, options)  {
             return num;
          });
 
-         var panel = $('#graphPanel .panel-container');
+         var panel = $('#graphPanel');
          d3.select('[data-id="' + options.id + '"] .graph svg')
               //.attr('viewBox', '0 0 ' + window.innerWidth + ' ' + window.innerHeight)
               //.attr('preserveAspectRatio', "xMinYMin meet")
@@ -72,7 +72,7 @@ gisportal.graphs.timeseries = function(data, options)  {
          
          //svg.onresize = function() { chart.update() };
          nv.utils.windowResize(chart.update);
-         chart.brushExtent([, endDate]).update()
+         chart.brushExtent([startDate, endDate]).update()
          return chart;
       }, 
    });

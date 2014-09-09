@@ -30,7 +30,6 @@ gisportal.indicatorsPanel.initDOM = function()  {
 
    $('.js-indicators').on('click', '.js-create-graph', function()  {
       var id = $(this).data('id');
-      gisportal.panels.showPanel('graph');
       gisportal.indicatorsPanel.createGraph(id);
    });
 
@@ -481,6 +480,11 @@ gisportal.indicatorsPanel.createGraph = function(id)  {
    var graphParams = this.getParams(id);
    var indicator = gisportal.layers[id];
    if (graphParams.baseurl && graphParams.coverage)  {
+      //Remove current Graph
+      $('.graph-wait-message').removeClass('hidden');
+      $('.graph-holder').html('');
+      gisportal.panels.showPanel('graph');
+
       var title = graphParams.type + " of " + indicator.name;
       
       var graphObject = {};
