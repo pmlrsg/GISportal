@@ -22,7 +22,6 @@ gisportal.configurePanel.refreshData = function()  {
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
-   this.renderPopular();
    $("[id^='tab-browse']+.indicator-select").html('');
    for (var cat in gisportal.config.browseCategories)  {
       this.renderTags(cat, groupedTags);
@@ -349,40 +348,6 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
    }
 };
 
-/**
- * This function renders the popular indicators part of the
- * configure panel. It is fairly simple compared to the 
- * rest of the panel
- */
-gisportal.configurePanel.renderPopular = function()  {
-   var indicators = [];
-   var groupedNames = gisportal.groupNames();
-   // The popular indicators are manually stored in config.js for now
-   // It would be good to have this come from analytics
-   var popular = gisportal.config.popularIndicators;
-   popular = _.unique(popular, function(d)  {
-      return d.toLowerCase();
-   });
-   _.forEach(popular, function(d)  {
-      var tmp = {};
-      var d = d.toLowerCase();
-      if (groupedNames[d])  {
-         tmp.name = d;
-         tmp.modified = d.replace(/ /g, '__');
-         indicators.push(tmp);
-      }
-   });
-
-   $.get('templates/browseIndicators.mst', function(template) {
-      var rendered = Mustache.render(template, {
-         location : 'popular',
-         indicators : indicators
-      });
-      
-      $('.js-popular').html(rendered);
-      gisportal.replaceAllIcons();
-   });
-};
 
 /**
  * We use Fuse for searching the layers.
@@ -405,8 +370,16 @@ gisportal.configurePanel.searchInit = function()  {
       keys : [ 'id', 'name']
    };
    this.fuse = new Fuse(all, options);
+   $('.js-search').addClear({
+      onClear: function(){
+         $('.js-search').change();
+      },
+      right: '14px',
+      top: '2px',
+      fontSize: '17px'
+   });
 
-   $('.js-search').on('keyup', function()  {
+   $('.js-search').on('keyup change', function()  {
       gisportal.configurePanel.search($(this).val());
    });
 };
@@ -420,46 +393,45 @@ gisportal.configurePanel.searchInit = function()  {
 gisportal.configurePanel.search = function(val)  {
    var results = this.fuse.search(val);
 
-   $.get('templates/browseIndicators.mst', function(template) {
-      
-      var indicators = [];
-      
-      results = _.uniq(results, function(val) {
-         return val.name.toLowerCase();
-      }); 
+   var indicators = [];
+   
+   results = _.uniq(results, function(val) {
+      return val.name.toLowerCase();
+   }); 
 
-      _.forEach(results, function(d)  {
-         var tmp = {};
-         tmp.name = d.name.toLowerCase();
-         tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
-         indicators.push(tmp);
-      });
-      var rendered = Mustache.render(template, {
-         location: 'search',
-         indicators : indicators
-      });
-      
-      $('.js-search-results').html(rendered);
-     
-      var selected = [];
-      // This shows a check for selected layers
-      // but because we no longer have multiple select enabled, I have commented it out.
-      /*
-      $('.js-toggleVisibility[data-name]:checked').each(function(i,d) { 
-          var name = $(d).data('name').toLowerCase();
-          if ($.inArray(name, selected) === -1)  {
-              selected.push(name);
-          } 
-      })
-      
-      for (var i = 0; i < selected.length; i++)  {
-         $('.js-toggleVisibility[data-name="' + selected[i] + '"]').prop("checked", true).toggleClass('active', true).change();
-      } */
-
-
-      // Inline SVG icons
-      gisportal.replaceAllIcons();
+   _.forEach(results, function(d)  {
+      var tmp = {};
+      tmp.name = d.name.toLowerCase();
+      tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
+      indicators.push(tmp);
    });
+   var rendered = gisportal.templates['browseIndicators']({
+      location: 'search',
+      indicators : indicators,
+      search_term: val,
+      empty_search: (val == "")
+   });
+   
+   $('.js-search-results').html(rendered);
+  
+   var selected = [];
+   // This shows a check for selected layers
+   // but because we no longer have multiple select enabled, I have commented it out.
+   /*
+   $('.js-toggleVisibility[data-name]:checked').each(function(i,d) { 
+       var name = $(d).data('name').toLowerCase();
+       if ($.inArray(name, selected) === -1)  {
+           selected.push(name);
+       } 
+   })
+   
+   for (var i = 0; i < selected.length; i++)  {
+      $('.js-toggleVisibility[data-name="' + selected[i] + '"]').prop("checked", true).toggleClass('active', true).change();
+   } */
+
+
+   // Inline SVG icons
+   gisportal.replaceAllIcons();
 
 };
 

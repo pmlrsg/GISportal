@@ -67,3 +67,18 @@
    float: right;
    margin-top: 20px;
 }
+
+.indicator-header-icon{
+  font-size: 23px;
+  width: 35px;
+  display: inline-block;
+  text-align: center;
+}
+
+.indicator-header-icon.active{
+  border-bottom: 1px solid #a19d63;
+}
+
+.indicator-header .remove{
+  float: right;
+}

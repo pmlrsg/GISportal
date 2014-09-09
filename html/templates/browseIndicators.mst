@@ -2,11 +2,16 @@
    id - The indicator id
    name - The name to be shown for the indicator
 }}
-
-{{#indicators}}
-   <li data-name="{{name}}">
-      <p class="grid-cell fill">{{name}}</p>
-      <label for="{{location}}-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke grid-cell icon-column" title="Show/Hide {{name}}">Show/Hide</label>
-      <input type="checkbox" id="{{location}}-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
-   </li>
-{{/indicators}}
+{{#unless empty_search}}
+	{{#each indicators}}
+	   <li data-name="{{name}}">
+	      <p class="grid-cell fill">{{name}}</p>
+	      <label for="{{location}}-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke grid-cell icon-column" title="Show/Hide {{name}}">Show/Hide</label>
+	      <input type="checkbox" id="{{location}}-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
+	   </li>
+	{{else}}
+	  <li class="align-center">
+	    No results for "{{search_term}}"
+	  </li>
+	{{/each}}
+{{/unless}}

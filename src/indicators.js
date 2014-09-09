@@ -135,7 +135,7 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
       if ($('.js-indicators [data-id="' + data.id + '"]').length  > 0) return false;
       var id = data.id || "none";
       var refined = data.refined || false;
-      var name = data.name;
+      var name = data.name.toLowerCase();
       var index = data.index || 0;
       if (refined && !name)  {
          name = gisportal.layers[id].name;
@@ -182,7 +182,9 @@ gisportal.indicatorsPanel.addToPanel = function(data)  {
       }
       
       if (gisportal.layers[id])  { 
-         $('[data-name="' + name.toLowerCase() + '"] .js-toggleVisibility').toggleClass('hidden', false);
+         $('[data-name="' + name.toLowerCase() + '"] .js-toggleVisibility')
+            .toggleClass('hidden', false)
+            .toggleClass('active', gisportal.layers[id].isVisible );
          gisportal.indicatorsPanel.scalebarTab(id);
          gisportal.indicatorsPanel.detailsTab(id);
          gisportal.indicatorsPanel.analysisTab(id);
@@ -244,7 +246,7 @@ gisportal.indicatorsPanel.detailsTab = function(id)  {
    indicator.modified = gisportal.utils.nameToId(indicator.name); 
    var rendered = gisportal.templates['tab-details'](indicator);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
-   $('[data-id="' + id + '"] .icon_details').toggleClass('hidden', false);
+   $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
    gisportal.indicatorsPanel.checkTabFromState(id);
 };
 
@@ -255,7 +257,7 @@ gisportal.indicatorsPanel.analysisTab = function(id)  {
    indicator.modifiedName = modifiedName;
    var rendered = gisportal.templates['tab-analysis'](indicator);
    $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
-   $('[data-id="' + id + '"] .icon_analyse').toggleClass('hidden', false);
+   $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
   
    gisportal.indicatorsPanel.checkTabFromState(id);
  
@@ -304,7 +306,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id)  {
          var rendered = gisportal.templates['tab-dimensions'](indicator);
          
          $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);      
-         $('[data-id="' + indicator.id + '"] .icon_scalebar').toggleClass('hidden', false);
+         $('[data-id="' + indicator.id + '"] .js-icon-scalebar').toggleClass('hidden', false);
  
          $('#tab-' + indicator.id + '-elevation').on('change', function()  {
             var value = $(this).val();

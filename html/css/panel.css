@@ -50,7 +50,7 @@
 
 
 
-.panel-header .icon-tab{
+.panel-header .panel-icon-tab{
     float: right;
     font-size: 22px;
     margin: 7px;
@@ -66,7 +66,7 @@
 }
 
 .panel-container  {
-    background-color: #efedf1;
+    background-color: rgba(239, 237, 241, 0.5);
     flex: 1;
     height: 100%;
     overflow-x: hidden;
@@ -80,6 +80,11 @@
 
 .panel-container.active{
 	display: block;
+}
+
+.panel-container-solid-backdrop{
+  background-color: rgb(239, 237, 241);
+  padding: 8px;
 }
 
 .icon-btn{
@@ -98,6 +103,13 @@
   width: 100%;
   display: none;
   padding-top: 20px;
+}
+
+.panel-tab.no-gap  {
+  padding-top: 5px;
+}
+.panel-tab.active{
+  display: block;
 }
 
 .panel-tab-content  {
@@ -294,6 +306,10 @@ select,
    height: 100%;
 }
 
+.search-results{
+  padding-left: 15px;
+}
+
 .search-results p  {
    text-transform: capitalize; 
 }
@@ -308,14 +324,14 @@ select,
    margin-top: -35px !important; 
 }
 
-.search  {
+input.search  {
    border: 1px solid #d8d3dd;
-   display: block;
+   display: inline-block;
    height: 45px;
    padding: 5px;
    padding-left: 10px;
-   margin: 0 auto; 
-   width: 95%;
+   margin: 0 10px; 
+   width: calc(100% - 20px);
 }
 
 .show-tools  {
@@ -339,5 +355,9 @@ select,
 	white-space: nowrap;
 	overflow: hidden;
 	max-width: 100%;
+}
+
+#configurePanel .instructions{
+  padding: 9px;
 }
 

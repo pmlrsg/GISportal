@@ -22,6 +22,9 @@
 <!-- jQuery no UI slider -->
 <script src="js-libs/jquery-nouislider/jquery.nouislider.min.js"></script>
 
+<!-- jQuery no UI slider -->
+<script src="js-libs/jquery.add-clear.js"></script>
+
 <!-- Lodash (_) -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
@@ -101,22 +104,29 @@
          <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
-         <span class="icon-hide icon-btn js-hide-panel icon-tab"></button>
+         <span class="icon-left-arrow icon-btn js-hide-panel panel-icon-tab"></button>
       </div>
        
        
       <!-- Choose Indicators  -->
       <div class="panel-container" data-panel-name="choose-indicator" id="configurePanel" >
          <!-- These are on the same line to avoid white-space bug with inline-block -->
-         <label class="panel-tab-name active" for="tab-browse">Browse</label><label class="panel-tab-name" for="tab-search">Search</label>
          <ul class="panel-tabs">
+            <li class="">
+              <div class="panel-tab no-gap active clearix instructions">
+                <span>
+                  Choose an indicator from list below 
+                </span>
+              </div>
+            </li>
             <li>
-               <input type="radio" checked id="tab-browse" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
-               <div class="panel-tab">
-                  <div class="panel-tab-content">
-                     <h3>Popular indicators</h3>
-                     <ul class="js-popular panel-list grid-list"></ul>
-                  </div>
+               <div class="panel-tab no-gap active full-height">
+                  <input type="text" placeholder="Search for an indicator" class="js-search search">
+                  <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+               </div>
+            </li>
+            <li>
+               <div class="panel-tab no-gap active">
                   <!-- These are on the same line to avoid white-space bug with inline-block -->
                   <label class="panel-tab-name browse-tabs active dark" for="tab-browse-1">1</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-2">2</label><label class="panel-tab-name browse-tabs dark" for="tab-browse-3">3</label>
                   <ul class="panel-tabs dark">
@@ -135,52 +145,45 @@
                   </ul>
                </div>
             </li>
-            <li>
-               <input type="radio" id="tab-search" name="tabs-configure" class="js-tab-trigger panel-tab-trigger">
-               <div class="panel-tab full-height">
-                  <input type="search" placeholder="Search for an indicator" class="js-search search">
-                  <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
-               </div>
-            </li>
          </ul>
       </div>
       
       
       <!-- Refine the chosen indicator by region/interval/etc..  -->
-      <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select padded">
-	       
-         <div class="js-refine-section-region">
-            <label for="refine-region" class="indicator-dropdown">
-               Region
-               <span class="icon_arrow"></span>
-            </label>
-            <ul id="refine-region" class=" fake-select panel-list grid-list">
-            </ul>
-         </div>
-         
-         
-         <div class="js-refine-section-interval">
-            <label for="refine-interval" class="indicator-dropdown">
-               Interval
-               <span class="icon_arrow"></span>
-            </label>
-            <ul id="refine-interval" class=" fake-select panel-list grid-list">
-            </ul>
-         </div>
-         
-         
-         <div class="js-refine-section-reliability">
-            <label for="refine-reliability" class="indicator-dropdown">
-               Reliability
-               <span class="icon_arrow"></span>
-            </label>
-            <ul id="refine-reliability" class=" fake-select panel-list grid-list">
-            </ul>
-         </div>
-         
-         <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
-         <button class="text-button js-refine-configure">Cancel</button>
-	      
+      <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select">
+	       <div class="panel-container-solid-backdrop">
+           <div class="js-refine-section-region">
+              <label for="refine-region" class="indicator-dropdown">
+                 Region
+                 <span class="icon_arrow"></span>
+              </label>
+              <ul id="refine-region" class=" fake-select panel-list grid-list">
+              </ul>
+           </div>
+           
+           
+           <div class="js-refine-section-interval">
+              <label for="refine-interval" class="indicator-dropdown">
+                 Interval
+                 <span class="icon_arrow"></span>
+              </label>
+              <ul id="refine-interval" class=" fake-select panel-list grid-list">
+              </ul>
+           </div>
+           
+           
+           <div class="js-refine-section-reliability">
+              <label for="refine-reliability" class="indicator-dropdown">
+                 Reliability
+                 <span class="icon_arrow"></span>
+              </label>
+              <ul id="refine-reliability" class=" fake-select panel-list grid-list">
+              </ul>
+           </div>
+           
+           <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+           <button class="text-button js-refine-configure">Cancel</button>
+	      </div>
       </div>
       
       
