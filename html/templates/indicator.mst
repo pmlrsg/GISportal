@@ -4,13 +4,13 @@
       <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
 
 
-      <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Remove"></span>
+      <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
       
-      <label class="hidden js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon" for="tab-{{id}}-dimensions" title="Adjustments"></label>
+      <label class="hidden js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon" for="tab-{{id}}-dimensions" title="Layer Settings"></label>
 
-      <label class="active js-icon-details js-closable icon-btn icon-information indicator-header-icon" for="tab-{{id}}-details" title="Details"></label>
+      <label class="active js-icon-details js-closable icon-btn icon-information indicator-header-icon" for="tab-{{id}}-details" title="Layer Information"></label>
 
-      <label class="js-icon-analyse hidden icon-btn js-closable icon-business-chart-2 indicator-header-icon" for="tab-{{id}}-analysis" title="Analysis"></label>
+      <label class="js-icon-analyse hidden icon-btn js-closable icon-business-chart-2 indicator-header-icon" for="tab-{{id}}-analysis" title="Layer Analysis"></label>
       
       <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
    </div>

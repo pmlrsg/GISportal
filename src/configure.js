@@ -405,7 +405,7 @@ gisportal.configurePanel.searchInit = function()  {
 
    var options = {
       threshold : 0.2,
-      keys : [ 'id', 'name']
+      keys : [ 'name']
    };
    this.fuse = new Fuse(all, options);
    $('.js-search').addClear({

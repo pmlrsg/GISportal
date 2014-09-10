@@ -1037,11 +1037,21 @@ gisportal.loading.updateLoadingIcon = function(){
       }else{
          gisportal.loading.loadingElement.hide();
       }
-   }, 500);
+   }, gisportal.loading.counter ? 300 : 600);
 
 }
 
 gisportal.startRemoteErrorLogging = function(){
    Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
-   window.onerror = Raven.process
+   window.onerror = function(e){
+
+      var tags = { 
+         state: JSON.stringify(gisportal.saveState())
+      }
+
+      if( window.event && window.event.target )
+         tags.domEvemtTarget =  $( window.event.target ).html();
+
+      Raven.captureException(e, { tags: tags} )
+   }
 }
