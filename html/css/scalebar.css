@@ -21,14 +21,18 @@
    border-radius: 25px;
 }
 
-input.min,
-input.max  {
-  margin: 10px 0;
-  width: 90px;
+.scale-editor{
+	display: inline-block;
+	text-align: left;;
 }
 
-input.max  {
-   float: right;
+.scale-editor input  {
+  margin: 4px 0px 11px 0px;
+  width: 90px;
+}
+.scale-editor b {
+	font-weight: bold;
+	display: block;
 }
 
 .panel-tab.dimensions-tab  {
