@@ -1,5 +1,5 @@
 # GIS Portal #
- 
+
 The [GIS portal](https://github.com/pmlrsg/GISportal) is a web-based visualisation system delivering data in a form that allows for rapid interpretation at a regional scale to support policy implementation, environmental management and relevant commercial uses.
 
 The GIS portal was developed as part of the [European Commission FP7](http://cordis.europa.eu/projects/rcn/100881_en.html) project OPEC. 
@@ -142,7 +142,7 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
 
 
     # Some of these settings may needs changing depending on your setup
-    cp config_samples/examples.py middleware/portalflask/settings.py
+    cp config_examples/settings.py middleware/portalflask/settings.py
     
     # Change OPENID_FOLDER to a path correct to your machine
     vi middleware/portalflask/settings.py
