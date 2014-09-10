@@ -16,7 +16,7 @@
       {{#indicators}}
          <li data-name="{{name}}">
             <p class="grid-cell fill">{{name}}</p>
-            <label for="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" class="icon_checkbox icon-svg no-stroke icon-column grid-cell" title="Show/Hide {{name}}">Show/Hide</label>
+            <label for="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" class="icon-checkbox grid-cell indicator-checkbox" title="Show/Hide {{name}}"></label>
             <input type="checkbox" id="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" data-tag="{{@root.tag}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
          </li>
       {{/indicators}}

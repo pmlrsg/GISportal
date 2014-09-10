@@ -96,3 +96,17 @@
 .indicator-list > li:not(:last-child){
   margin-bottom: 20px;
 }
+
+.icon-checkbox:before{
+  content: "\e506";
+  font-size: 80%;
+}
+.icon-checkbox.active:before, .icon-checkbox:hover:before{
+  content: "\e300";
+  font-size: 100%;
+}
+.indicator-checkbox{
+  cursor: pointer;
+  font-size: 22px;
+  width: 40px;
+}

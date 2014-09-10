@@ -417,8 +417,15 @@ gisportal.configurePanel.searchInit = function()  {
       fontSize: '17px'
    });
 
+   // If statement is needed to stop the change event trigger on lose of focus
+   // This caused issues when selecting indicators (its needed....)
+   var currentSearchValue = "";
    $('.js-search').on('keyup change', function()  {
-      gisportal.configurePanel.search($(this).val());
+      var searchBoxVal = $(this).val();
+      if( currentSearchValue != searchBoxVal ){
+         currentSearchValue = searchBoxVal;
+         gisportal.configurePanel.search(searchBoxVal);
+      }
    });
 };
 
