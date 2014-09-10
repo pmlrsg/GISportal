@@ -2,7 +2,7 @@
     Graph Panel
 \*------------------------------------*/
 
-#graphPanel .panel-container { 
+#graphPanel.panel-container { 
    width: 150%;
    max-width: 150%;
    z-index: 20;
@@ -17,4 +17,17 @@
    background: #fff;
    text-align: center;
    padding: 10px;
+}
+
+input.graph-min, input.graph-max{
+	margin: 4px 0px 11px 0px;
+	width: 90px;
+}
+
+.graph-min{
+	float: left;
+}
+
+.graph-max{
+	float: right;
 }

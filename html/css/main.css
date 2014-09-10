@@ -24,6 +24,10 @@ p  {
 
 sup { vertical-align: super; font-size: 65%;}
 
+button, .btn{
+  cursor: pointer;
+}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;
@@ -37,7 +41,7 @@ sup { vertical-align: super; font-size: 65%;}
    padding: 0;
 }
 
-button.brand  {
+.brand  {
   background-color: #a19d63;
   border-style: none;
   border-radius: 5px;
@@ -45,14 +49,15 @@ button.brand  {
 
   line-height: 35px;
   padding: 0 35px 0 30px;
+  display: inline-block;
 }
 
-button.brand.with-border  {
+.brand.with-border  {
   border-top: 6px solid #bab67c;
   height: 41px;
 }
 
-button.secondary  {
+.secondary  {
    background-color: #b1a7bc;
    border: none;
    color: #fff;
@@ -60,11 +65,11 @@ button.secondary  {
    border-radius: 5px;
 }
 
-button.brand.secondary:active  {
+.brand.secondary:active  {
    background-color: #59476d;
 }
 
-button.secondary svg  {
+.secondary svg  {
    margin: inherit;
 }
 
@@ -77,17 +82,21 @@ button.secondary svg  {
    text-decoration: underline;
 }
 
-button.brand:active,
-button.brand.loading {
+.brand:active,
+.brand.loading {
    background-color: #bab67c;
 }
 
-button.brand.loading  {
+.brand.loading  {
    background-image: url('../img/ajax-loader-green.gif');
    background-repeat: no-repeat;
    background-size: 20px;
    background-position: 10px 8px;
    padding-left: 40px;
+}
+
+.brand.small{
+  padding: 0px 6px;
 }
 
 .hidden  {
@@ -144,4 +153,62 @@ input[type="text"]  {
    z-index: 100;
 }
 
+/* Global Loading Icon */
+.global-loading-icon{
+	display: none;
+	
+	background-color: rgba(0,0,0,0.53);
+	background-image: url('../img/ajax-loading-halo-1.gif');
+	background-size: 50%;
+	background-repeat: no-repeat;
+	background-position: center 20%;
+	
+	position: absolute;
+	left: 50%;
+	top: 20px;
+	margin-left: -45px;
+	
+	width: 90px;
+	height: 84px;
+	
+	text-align: center;
+}
 
+.global-loading-icon::after{
+	content: "Loading...";
+	color: white;
+	font-size: 15px;
+	text-align: center;
+	
+	position: absolute;
+	bottom: 4px;
+	left: 0px;
+	
+	width: 100%;
+}
+
+.tooltipster-content{
+	font-family: inherit !important;
+}
+
+.align-center{
+  text-align: center;
+}
+.pull-left{
+  float: left;
+}
+
+.pull-right{
+  float: right;
+}
+
+.clearfix:after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+  }
+* html .clearfix             { zoom: 1; } /* IE6 */
+*:first-child+html .clearfix { zoom: 1; } /* IE7 */

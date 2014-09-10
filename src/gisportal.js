@@ -90,17 +90,6 @@ gisportal.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
-// Provider logos, each use an object with logo for image and url for link
-gisportal.providers = {
-   "CCI" : { "logo": "img/cci.png" },
-   "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
-   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true", "url" : "http://www.dmi.dk/en/vejr/" },
-   "HCMR" : { "logo" : "img/hcmr.png", "url" : "http://innovator.ath.hcmr.gr/newhcmr1/" },
-   "IMS-METU" : { "logo" : "img/metu.png", "url" : "http://www.ims.metu.edu.tr/" },
-   "OGS" : {"logo" : "img/ogs.png", "url" :  "http://www.ogs.trieste.it/" },
-   "PML" : { "logo" : "img/pml.png", "url" : "http://www.pml.ac.uk/default.aspx" }  
-};
-
 /**
  * The OpenLayers map object
  * Soon to be attached to gisportal namespace
@@ -215,6 +204,11 @@ gisportal.createBaseLayers = function() {
       layer.type = 'baseLayers';
       layer.displayTitle = name;
       layer.name = name;
+      
+      layer.events.on({
+         "loadstart": gisportal.loading.increment,
+         "loadend": gisportal.loading.decrement
+      })
       map.addLayer(layer);
       gisportal.baseLayers[name] = layer;
    }
@@ -302,6 +296,8 @@ gisportal.createOpLayers = function() {
                            "exBoundingBox": item.EX_GeographicBoundingBox, 
                            "providerTag": providerTag,
                            "positive" : positive, 
+                           "contactDetails" : item.ContactDetails, 
+                           "offsetVectors" : item.OffsetVectors, 
                            "tags": item.tags
                         }
                      );
@@ -593,6 +589,19 @@ gisportal.nonLayerDependent = function() {
 
 /*===========================================================================*/
 
+gisportal.autoSaveState = function(){
+   var state = JSON.stringify(gisportal.saveState())
+   gisportal.storage.set( 'stateAutoSave', state )
+}
+
+gisportal.getAutoSaveState = function(){
+   var state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ))
+   return state;
+}
+gisportal.hasAutoSaveState = function(){
+   return ( gisportal.storage.get( 'stateAutoSave' ) != null );
+}
+
 /**
  * Creates an object that contains the current state
  * @param {object} state - Optional, allows a previous state to be extended 
@@ -812,64 +821,69 @@ gisportal.setState = function(state) {
  * It is called from portal.js
  */
 gisportal.main = function() {
- 
-   // Set up the map
-   // any layer dependent code is called in a callback in mapInit
-   gisportal.mapInit();
 
-   gisportal.initStart();
+   if( gisportal.config.siteMode == "production" )
+      gisportal.startRemoteErrorLogging();
 
    // Compile Templates
-   gisportal.templates = {};
+   gisportal.loadTemplates(function(){
+      
+      gisportal.initStart();
 
-   $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-  
-   $('.js-start').click(function()  {
-      $('.start').toggleClass('hidden', true);
+      // Set up the map
+      // any layer dependent code is called in a callback in mapInit
+      gisportal.mapInit();
+
+      $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
+    
+      // Setup the gritter so we can use it for error messages
+      gisportal.gritter.setup();
+
+      // Initiate the DOM for panels
+      gisportal.panels.initDOM();
+      gisportal.configurePanel.initDOM();   // configure.js
+      gisportal.indicatorsPanel.initDOM();  // indicators.js
+      gisportal.graphs.initDOM();           // graphing.js
+      gisportal.analytics.initGA();         // analytics.js
+      
+      //Set the global loading icon
+      gisportal.loading.loadingElement= jQuery('.global-loading-icon')
+      
+      $('.js-show-tools').on('click', showPanel);
+
+      function showPanel()  {
+         $('.js-show-tools').toggleClass('hidden', true);
+         $('.panel.active').toggleClass('hidden', false);
+      }
+
+      $('.js-hide-panel').on('click', hidePanel);
+
+      function hidePanel()  {
+         $('.panel.active').toggleClass('hidden', true);
+         $('.js-show-tools').toggleClass('hidden', false);
+      }
+
+      // Start setting up anything that is not layer dependent
+      gisportal.nonLayerDependent();
+
+      // Grab the url of any state and store it as an id to be used
+      // for retrieving a state object.
+      var stateID = gisportal.utils.getURLParameter('state');
+      if(stateID !== null) {
+         console.log('Retrieving State...');
+         gisportal.ajaxState(stateID);
+      }
+      else {
+         console.log('Loading Default State...');
+      }
+
+      // Replaces all .icon-svg with actual SVG elements,
+      // so that they can be styled with CSS
+      // which cannot be done with SVG in background-image
+      // or <img>
+      gisportal.replaceAllIcons(); 
+      
    });
- 
-   // Setup the gritter so we can use it for error messages
-   gisportal.gritter.setup();
-
-   // Initiate the DOM for panels
-   gisportal.configurePanel.initDOM();   // configure.js
-   gisportal.indicatorsPanel.initDOM();  // indicators.js
-   gisportal.graphs.initDOM();           // graphing.js
-   gisportal.analytics.initGA();         // analytics.js
-
-   $('.js-show-tools').on('click', showPanel);
-
-   function showPanel()  {
-      $(this).toggleClass('hidden', true);
-      $('.panel.active').toggleClass('hidden', false);
-   }
-
-   $('.js-hide-panel').on('click', hidePanel);
-
-   function hidePanel()  {
-      $(this).parents('.panel').toggleClass('hidden', true);
-      $('.js-show-tools').toggleClass('hidden', false);
-   }
-
-   // Start setting up anything that is not layer dependent
-   gisportal.nonLayerDependent();
-
-   // Grab the url of any state and store it as an id to be used
-   // for retrieving a state object.
-   var stateID = gisportal.utils.getURLParameter('state');
-   if(stateID !== null) {
-      console.log('Retrieving State...');
-      gisportal.ajaxState(stateID);
-   }
-   else {
-      console.log('Loading Default State...');
-   }
-
-   // Replaces all .icon-svg with actual SVG elements,
-   // so that they can be styled with CSS
-   // which cannot be done with SVG in background-image
-   // or <img>
-   gisportal.replaceAllIcons(); 
 };
 
 /**
@@ -951,14 +965,93 @@ gisportal.replaceSubtreeIcons = function(el)  {
  * Should probably be using Mustache for this
  */
 gisportal.initStart = function()  {
-   var list = $('.start .examples li');
-   for (var i = 0; i < list.length; i++)  {
-      var current = gisportal.config.defaultStates[i];
-      var currentLi = $(list[i]);
-      if (!current) $(currentLi).remove();
-      else  {
-         $('a', currentLi).attr("href", current.url);
-         $('span', currentLi).text(current.name);
-      }
-   }
+
+   var data = {
+      defaultStates: gisportal.config.defaultStates,
+      hasAutoSaveState: gisportal.hasAutoSaveState()
+   };
+
+   var rendered = gisportal.templates['start']( data );
+   $('.js-start-container').html( rendered );
+
+   // Load there previously saved state
+   $('.js-load-last-state').click(function(){
+      gisportal.loadState( gisportal.getAutoSaveState() );
+      setInterval( gisportal.autoSaveState, 60000 );
+   });
+
+     
+   $('.js-start').click(function()  {
+      $('.start').toggleClass('hidden', true);
+
+      setInterval( gisportal.autoSaveState, 60000 );
+
+      //Once they are past the splash page warn them if they leave
+      window.onbeforeunload = function(){
+         gisportal.autoSaveState();
+         if( gisportal.config.siteMode == "production")
+            return "Warning. Your about to leave the page";
+         else
+            return;
+      };
+   });
 };
+
+
+gisportal.loading = {};
+gisportal.loading.counter = 0;
+gisportal.loading.loadingElement = jQuery('');
+gisportal.loading.loadingTimeout = null;
+
+
+/**
+ * Increases the counter of how many things are currently loading
+ */
+gisportal.loading.increment = function(){
+   gisportal.loading.counter++;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Drecreases the counter of how many things are currently loading
+ */
+gisportal.loading.decrement = function(){
+   gisportal.loading.counter--;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Either show or hide the loading icon.
+ *  A delay is added to show because layers can update in a few milliseconds causing a horrible flash
+ */
+gisportal.loading.updateLoadingIcon = function(){
+   
+   if( gisportal.loading.loadingTimeout != null )
+      return ;
+   
+   gisportal.loading.loadingTimeout = setTimeout(function(){
+      gisportal.loading.loadingTimeout = null
+      if( gisportal.loading.counter > 0 ){
+         gisportal.loading.loadingElement.show();
+      
+      }else{
+         gisportal.loading.loadingElement.hide();
+      }
+   }, gisportal.loading.counter ? 300 : 600);
+
+}
+
+gisportal.startRemoteErrorLogging = function(){
+   Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
+   window.onerror = function(e){
+
+      var tags = { 
+         state: JSON.stringify(gisportal.saveState())
+      }
+
+      if( window.event && window.event.target )
+         tags.domEvemtTarget =  $( window.event.target ).html();
+
+      Raven.captureException(e, { tags: tags} )
+   }
+}

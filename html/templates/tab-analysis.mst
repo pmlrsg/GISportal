@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-analysis" name="tabs-{{modifiedName}}" class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-analysis" name="tabs-{{modifiedName}}" data-tab-name="analysis" {{#if_equals visibleTab "analysis"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <li>
@@ -21,8 +21,10 @@
       <p class="number grid-cell">2</p>
       <div class="grid-cell fill">
          <p>Set a date range using the timeline below</p>
-         <input data-id="{{id}}" placeholder="Start" class="js-min min grid-cell" type="text">
-         <input data-id="{{id}}" placeholder="End" class="js-max max grid-cell" type="text">
+         <div class="clearfix">
+            <input data-id="{{id}}" placeholder="Start" class="js-min graph-min grid-cell" type="text">
+            <input data-id="{{id}}" placeholder="End" class="js-max graph-max grid-cell" type="text">
+         </div>
          <div data-id="{{id}}" class="range-slider grid-cell fill"></div>
       </div>
       </li>

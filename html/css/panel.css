@@ -17,10 +17,6 @@
   user-select: none;
 }
 
-.panel.large  {
-  /*min-width: 500px;*/
-}
-
 .panel-header,
 .panel-footer  {
   background-color: #32253f;
@@ -29,50 +25,77 @@
 .panel-header  {
   color: #fff;
   height: 45px;
+  border-bottom: 2px solid #EFEDF3;
+  box-shadow: 0px 1px 5px -2px #000000;
+  z-index: 42;
 }
 
-.panel-header h2  {
-   line-height: 45px;
-   padding-left: 15px;
+.panel-header .tab{
+    float: left;
+    display: inline;
+    border-bottom: 0px;
+    
+    margin: 7px 7px 0px 7px;
+    padding: 8px 8px 9px 8px;
+    
+    background-color: #32253f;
+    cursor: pointer;
+
 }
 
-.panel-header .back-button  {
-   color: #fff;
-   line-height: 40px;
-   padding-left: 15px;
+.panel-header .tab.active{
+    background-color: #f0eef3;
+    color: black;
 }
 
-.panel-header .icon_hide  {
-   position: absolute;
-   right: 3px;
-   top: 10px;
+
+
+.panel-header .panel-icon-tab{
+    float: right;
+    font-size: 22px;
+    margin: 7px;
 }
 
 .panel-footer  {
-  padding-top: 19px;
-  padding-bottom: 18px;
-  padding-right: 9px;
-  padding-left: 9px;
-}
-
-#configurePanel .panel-footer  {
+  padding: 10px 9px 18 9px;
+  box-shadow: 0px -1px 5px -2px #000000;
+  z-index: 42;
   text-align: right;
+  color: white;
+  padding: 3px;
 }
 
 .panel-container  {
-    background-color: #efedf1;
+    background-color: rgba(239, 237, 241, 0.5);
     flex: 1;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
- }
-
-#configurePanel .panel-container  {
-   padding-top: 10px;
+    display: none;
 }
 
-.panel-footer  {
-  padding-top: 10px;
+.panel-container.padded{
+  padding: 8px;
+}
+
+.panel-container.active{
+	display: block;
+}
+
+.panel-container-solid-backdrop{
+  background-color: rgb(239, 237, 241);
+  padding: 8px;
+}
+
+.icon-btn{
+	color: white;
+	opacity: 0.5;
+}
+.icon-btn:hover{
+	opacity: 0.8;
+}
+.icon-btn.active{
+	opacity: 1;
 }
 
 .panel-tab  {
@@ -82,9 +105,14 @@
   padding-top: 20px;
 }
 
+.panel-tab.no-gap  {
+  padding-top: 5px;
+}
+.panel-tab.active{
+  display: block;
+}
+
 .panel-tab-content  {
-  /*overflow-y: auto;*/
-  /*overflow-y: hidden;*/
   position: relative;
   width: 100%;
 }
@@ -159,7 +187,6 @@
 }
 
 .panel-list  {
-  margin-bottom: 20px;
   overflow-x: hidden;
 }
 
@@ -167,9 +194,6 @@
   background-color: #ffffff;
 }
 
-.panel-list p {
-  text-transform: capitalize;
-}
 
 /* over specified */
 .panel-list p.grid-cell.fill  {
@@ -264,6 +288,11 @@ select,
   border-top: 0 none;
 }
 
+.fake-select li{
+  padding-left: 45px;
+
+}
+
 .panel-list .text-button {
   line-height: 30px;
   padding-left: 8px; 
@@ -271,6 +300,10 @@ select,
 
 .full-height  {
    height: 100%;
+}
+
+.search-results{
+  padding-left: 15px;
 }
 
 .search-results p  {
@@ -287,14 +320,14 @@ select,
    margin-top: -35px !important; 
 }
 
-.search  {
+input.search  {
    border: 1px solid #d8d3dd;
-   display: block;
+   display: inline-block;
    height: 45px;
    padding: 5px;
    padding-left: 10px;
-   margin: 0 auto; 
-   width: 95%;
+   margin: 0 10px; 
+   width: calc(100% - 20px);
 }
 
 .show-tools  {
@@ -311,6 +344,22 @@ select,
    -moz-appearance: none;
 }
 
-#refinePanel .panel-container{
-	padding: 10px;
+.show-tools span{
+  font-size: 20px;
+  position: relative;
+  top: 4px;
 }
+
+
+.ellipsisOverflow {
+	text-overflow: ellipsis;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 100%;
+}
+
+#configurePanel .instructions{
+  padding: 9px;
+}
+

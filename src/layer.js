@@ -31,6 +31,9 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.title = title;  
    this.productAbstract = productAbstract;
    this.type = type;
+   
+   this.visibleTab = "details";
+   
    // These queues feel like a hack, refactor?
    this.metadataComplete = false;
    this.metadataQueue = [];
@@ -49,7 +52,10 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       providerTag : null,
       tags : null,
-      options : null
+      options : null,
+
+      contactDetails: {},
+      offsetVectors: null
    };
    
    $.extend(true, this, this.defaults, opts);
@@ -147,7 +153,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    
    this.WFSDatesToIDs = {};
    
-   this.spinner = false;
    
    /**
     * When data is available, initialise the layer
@@ -161,7 +166,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       // A list of styles available for the layer
       this.styles = null;
-      this.style = null;
       
       // The BoundingBox for the layer
       this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
@@ -171,12 +175,14 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          this.getDimensions(layerData); // Get dimensions.
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
+         this.style = "boxfill/rainbow";
          
       } else if(this.type == "refLayers") {
          this.style = new OpenLayers.StyleMap(this.options.style);
       }
       
       var olLayer = this.createOLLayer(); // Create OL layer.
+      
       this.openlayers['anID'] = olLayer;
 
       if (options.show !== false)  { 
@@ -275,7 +281,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.setStyle = function(style)  {
       var indicator = this;
       indicator.style = style;
-      gisportal.indicatorsPanel.scalebarTab(indicator.id, true);
+      gisportal.indicatorsPanel.scalebarTab(indicator.id);
    }; 
   
    /**
@@ -296,12 +302,15 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       if(layer.temporal) {
          var currentDate = gisportal.timeline.getDate();
          
+         //Nope
+         //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
+         layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
          
          // Now display the layer on the timeline
          var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
          var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
          gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
-        			
+                 
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
          $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
@@ -318,20 +327,20 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    };
     
    this.unselect = function() {
-		var layer = this; 
+      var layer = this; 
       $('#scalebar-' + layer.id).remove(); 
-		layer.selected = false;
-		layer.setVisibility(false);
+      layer.selected = false;
+      layer.setVisibility(false);
       gisportal.selectedLayers = _.pull(gisportal.selectedLayers, layer.id);
-		if (layer.temporal) {
-			if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
-				gisportal.timeline.removeTimeBarByName(layer.name);
-			}
-			
-			gisportal.refreshDateCache();
-		   gisportal.zoomOverall();
+      if (layer.temporal) {
+         if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
+            gisportal.timeline.removeTimeBarByName(layer.name);
+         }
+         
+         gisportal.refreshDateCache();
+         gisportal.zoomOverall();
       }
-	};
+   };
    
    //--------------------------------------------------------------------------
    
@@ -421,7 +430,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.getMetadata = function() {
       var layer = this;
-		console.log(layer);
+      console.log(layer);
       $.ajax({
          type: 'GET',
          url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
@@ -568,17 +577,11 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       
       
       if (layer.events)  { 
-         // Show the img when we are loading data for the layer
-         layer.events.register("loadstart", layer, function(e) {
-            self.spinner = true;
-            self.updateSpinner();
-         });
          
-         // Hide the img when we have finished loading data
-         layer.events.register("loadend", layer, function(e) {
-            self.spinner = false;
-            self.updateSpinner();
-         });
+         layer.events.on({
+            "loadstart": gisportal.loading.increment,
+            "loadend": gisportal.loading.decrement
+         })
          
          if(layer.type != 'baseLayers') {   
             // Check the layer state when its visibility is changed
@@ -632,23 +635,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
 
    };
-   
-   //--------------------------------------------------------------------------
-  
-   /**
-    * Toggles the loading spinner.
-    * Currently not being used but will be once a loading spinner
-    * has been added back into the portal.
-    */ 
-   this.updateSpinner = function() {
-      /*if(this.spinner === false && $element.is(':visible')) {
-         $element.hide();
-      } else if(this.spinner !== false && $element.is(':hidden')) {
-         $element.show();
-      }*/
-   };
-     
-   //--------------------------------------------------------------------------
    
    
    // Store new layer.
@@ -773,3 +759,4 @@ gisportal.getLayerData = function(fileName, layer, options) {
       }
    });
 };
+

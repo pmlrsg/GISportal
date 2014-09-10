@@ -7,7 +7,8 @@ from views.wcs import portal_wcs, getWcsData
 
 routes = [
    ((portal_proxy, ''),
-      ('/proxy', proxy)
+      ('/proxy', proxy),
+      ('/rotate', rotate)
    ),
    ((portal_state, '/state'),
       ('/getstate', getState),

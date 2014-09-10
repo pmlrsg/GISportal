@@ -63,6 +63,7 @@ For development, you still need to run the build script but without minification
 **Notes**  
 Java 7 is required for the build process.  
 Make sure you are in the same directory as ``build.py``.  
+Edit ``config/config.js`` and change ``siteMode`` from ``development`` to ``production``.
 
 4. **Create database**  
 Make sure you are in ``middleware/portalflask``  
@@ -141,7 +142,10 @@ These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 
 
 
     # Some of these settings may needs changing depending on your setup
-    cp config_samples/settings.py middleware/portalflask/settings.py
+    cp config_examples/settings.py middleware/portalflask/settings.py
+    
+    # Change OPENID_FOLDER to a path correct to your machine
+    vi middleware/portalflask/settings.py
     
     python middleware/manage.py syncdb
     

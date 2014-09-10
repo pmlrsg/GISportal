@@ -1,12 +1,23 @@
+/*------------------------------------*\
+    Scalebars
+    This file is for the logic
+    behind scalebars.
+\*------------------------------------*/
+
 gisportal.scalebars = {};
 
+/**
+ * This is the main function for getting the scalebar image.
+ * @param {string} id - The id of the layer
+ */
 gisportal.scalebars.getScalebarDetails = function(id)  {
    var indicator = gisportal.layers[id];
    if (indicator)  {
       // Setup defaults
       var url = null;
-      var width = 110;
-      var height = 256;
+      var width = 1;
+      var height = 500;
+      var scaleSteps = 5;
      
       // Iter over styles
       $.each(indicator.styles, function(index, value)
@@ -25,27 +36,82 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
          url = gisportal.scalebars.createGetLegendURL(indicator, false);
      
       
-  
+      // Set the scalebar inputs to be correct 
       $('.js-scale-min[data-id="' + id + '"]').val(indicator.minScaleVal);
       $('.js-scale-max[data-id="' + id + '"]').val(indicator.maxScaleVal);
-   
+      
+      var scalePoints = [];
+      
+      
+      if( indicator.log ){
+         var range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
+         var minScaleLog =  Math.log(indicator.minScaleVal);
+         for( var i = 0; i < scaleSteps; i++ ){
+            var step = (range / (scaleSteps-1)) * i;
+            var value = minScaleLog + step;
+            value = Math.exp( value );
+	        scalePoints.push( value );
+         }
+      }else{
+         var range = indicator.maxScaleVal - indicator.minScaleVal;
+         for( var i = 0; i < scaleSteps; i++ ){
+            var step = (range / (scaleSteps-1)) * i;
+            var value = indicator.minScaleVal + step;
+	        scalePoints.push( value );
+         }
+      }
+      
+      var isExponentOver4 = scalePoints.some(function( point ){
+         //return point.toExponential().match(/\.(.+)e/)[1].length > 4
+         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 4 )
+      })
+      
+      if( isExponentOver4 ){
+	      var makePointReadable = function( point ){
+	         point = point.toExponential();
+	         if( point.indexOf('.') == -1 )
+	            return point;
+	         var original = point.match(/\.(.+)e/)[1];
+	         return point.replace( original, original.substr(0,2) );
+	      }
+      }else{
+	      var makePointReadable = function( point ){ return Math.round(point * 10) / 10; }
+      }
+      
+      scalePoints = scalePoints.map(function( point ){
+	      return {
+	         original: isExponentOver4 ? point.toExponential() : point,
+	         nicePrint: makePointReadable(point)
+	      }
+      })
 
       return {
          url: url,
          width: width,
-         height: height
+         height: height,
+         scalePoints: scalePoints
       }; 
    }
 };
 
+/**
+ * This creates the scalebar image.
+ * @param {object} layer - The gisportal.layer
+ * @parama {boolean} hasBase - True if you have the base URL (wmsURL)
+ */
 gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
-   var height = $('.js-tab-scalebar').width();
+   var height = 500;
+   var width = 3;
    if (hasBase)
-      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=25&HEIGHT=' + height;
+      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
    else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=25&HEIGHT=' + height;
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
 };
 
+/**
+ * This gets an automatically generated scale.
+ * @param {string} id - The id of the layer
+ */
 gisportal.scalebars.autoScale = function(id)  {
    var l = gisportal.layers[id];     
    gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=-180,-90,180,90&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
@@ -53,12 +119,25 @@ gisportal.scalebars.autoScale = function(id)  {
    }, null, 'json', {});    
 }
 
+/**
+ * This resets the scale to the original values.
+ *
+ * @param {string} id - The id of the layer
+ */
 gisportal.scalebars.resetScale = function(id)  {
    min = gisportal.layers[id].origMinScaleVal;
    max = gisportal.layers[id].origMaxScaleVal;
    gisportal.scalebars.validateScale(id, min, max);
 };
 
+/**
+ * This function makes sure the scale is valid by
+ * checking it is within the correct bounds.
+ *
+ * @param {string} id - The id of the layer
+ * @param {number} newMin - The min scale
+ * @param {number} newMax - The max scale
+ */
 gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
    var indicator = gisportal.layers[id];
 
@@ -104,11 +183,16 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
    }
 };
 
+/**
+ * This function updates the scale of the map by
+ * merging the params.
+ *
+ * @param {string} id - The id of the layer
+ */
 gisportal.scalebars.updateScalebar = function(id)  {
    var scale = this.getScalebarDetails(id);
    var indicator = gisportal.layers[id];
    
-
    var params = {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
       logscale: indicator.log
@@ -116,4 +200,5 @@ gisportal.scalebars.updateScalebar = function(id)  {
    
    gisportal.layers[id].mergeNewParams(params);
    
+   gisportal.indicatorsPanel.redrawScalebar( id );
 };

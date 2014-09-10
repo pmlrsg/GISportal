@@ -39,18 +39,18 @@
    margin-right: 10px;
 }
 
-.example-1  {
+[class^="example"]:nth-child(4n+1)  {
    background: #643d72;
 }
 
-.example-2  {
+[class^="example"]:nth-child(4n+2)   {
    background: #683766;
 }
 
-.example-3  {
+[class^="example"]:nth-child(4n+3)  {
    background: #47355b;
 }
 
-.example-4  {
+[class^="example"]:nth-child(4n+4)  {
    background: #473d72;
 }
