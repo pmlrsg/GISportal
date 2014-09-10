@@ -194,9 +194,6 @@
   background-color: #ffffff;
 }
 
-.panel-list p {
-  text-transform: capitalize;
-}
 
 /* over specified */
 .panel-list p.grid-cell.fill  {
