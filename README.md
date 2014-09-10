@@ -63,6 +63,7 @@ For development, you still need to run the build script but without minification
 **Notes**  
 Java 7 is required for the build process.  
 Make sure you are in the same directory as ``build.py``.  
+Edit ``config/config.js`` and change ``siteMode`` from ``development`` to ``production``.
 
 4. **Create database**  
 Make sure you are in ``middleware/portalflask``  

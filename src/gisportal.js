@@ -822,6 +822,8 @@ gisportal.setState = function(state) {
  */
 gisportal.main = function() {
 
+   if( gisportal.config.siteMode == "production" )
+      gisportal.startRemoteErrorLogging();
 
    // Compile Templates
    gisportal.loadTemplates(function(){
@@ -1037,4 +1039,9 @@ gisportal.loading.updateLoadingIcon = function(){
       }
    }, 500);
 
+}
+
+gisportal.startRemoteErrorLogging = function(){
+   Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
+   window.onerror = Raven.process
 }
