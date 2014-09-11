@@ -22,13 +22,19 @@ $(document).ready(function()  {
     Tabs
 \*------------------------------------*/
 
-function changeTab()  {
-    var e = $(this)[0];
+function changeTab( tabElement )  {
 
-    $.each($('[name="' + e.name + '"]'), function(i,e)  {
-      $('[for="' + e.id + '"]').removeClass('active');
-    });
-    $('[for="' + e.id + '"]').addClass('active');
+  if( tabElement && tabElement instanceof HTMLElement )
+    var tabElement = tabElement;
+  else
+    var tabElement = this;
+
+  var e = $(tabElement)[0];
+
+  $.each($('[name="' + e.name + '"]'), function(i,e)  {
+    $('[for="' + e.id + '"]').removeClass('active');
+  });
+  $('[for="' + e.id + '"]').addClass('active');
 }
 
 // http://stackoverflow.com/questions/4957207/how-to-check-uncheck-radio-button-on-click
