@@ -8,6 +8,7 @@
       "src/gisportal.js",
       "src/libs/dialog.js",
       "src/portal.js",
+      "src/templates.js",
       "src/window.js",
       "src/windows/scalebar.js",
       "src/windows/graphcreator.js",

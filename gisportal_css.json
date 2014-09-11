@@ -1,6 +1,8 @@
 {
    "id": "gisportal",
    "files": [
+      "html/css/streamline.css",
+      "html/css/streamline-filled-in.css",
       "html/css/reset.css",
       "html/css/fonts.css",
       "html/css/streamline.css",
@@ -16,15 +18,24 @@
       "html/js-libs/jquery-gritter/css/jquery.gritter.css",
       "html/css/timeline.css",
       "html/css/main.css",
-      "html/css/panel.css",
       "html/css/grid.css",
       "html/css/icons.css",
+      "html/css/panel.css",
       "html/css/scalebar.css",
       "html/css/indicators.css",
       "html/css/tables.css",
       "html/css/graph.css",
       "html/css/nv.d3.css",
+<<<<<<< HEAD
       "html/css/history.css",
       "html/css/mapcontrols.css"
+=======
+      "html/css/mapcontrols.css",
+      "html/js-libs/tooltipster/css/tooltipster.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-light.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-noir.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-punk.css",
+      "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css"
+>>>>>>> dev
    ]
 }

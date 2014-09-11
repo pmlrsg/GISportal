@@ -1,19 +1,28 @@
 /**
+ * gisportal.js
+ * This file is the main portion of the codebase,
+ * it is the namespace. It is called by portal.js
+ * and is responsible for all of the other files.
+ */
+
+
+/**
  * Create namespace object
- * @namespace
+ * @namespace gisportal
  */ 
 var gisportal = gisportal || (gisportal = {});
 
 gisportal.VERSION = "0.4.0";
-gisportal.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
+// This used to get the specific revision number from SVN. Need to change for Git
+//gisportal.SVN_VERSION = "$Rev$".replace(/[^\d.]/g, ""); // Return only version number
 
 /*==========================================================================*/
 //Initialise javascript variables and objects
 
-// Path to the flask middleware
+// Path to the python flask middleware
 gisportal.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
-// Flask url paths
+// Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
 gisportal.wfsLocation = gisportal.middlewarePath + '/wfs?';
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
@@ -28,19 +37,15 @@ gisportal.cache = {};
 gisportal.cache.wmsLayers = [];
 gisportal.cache.wfsLayers = [];
 
-// Temporary version of microLayer and layer storage.
-gisportal.layerStore = {}; // NOT IN USE!
-
-gisportal.microLayers = {};
+// gisportal.layers has all of the actual layer details
 gisportal.layers = {};
-gisportal.selectedLayers = {};
-gisportal.nonSelectedLayers = {};
-gisportal.baseLayers = {};
 
-gisportal.graphs = {};
-// A list of layer names that will be selected by default
-// This should be moved to the middleware at some point...
-gisportal.sampleLayers = [ "metOffice: no3", "ogs: chl", "Motherloade: v_wind", "HiOOS: CRW_SST" ];
+// gisportal.selectedLayers is an array of the ids of your selected layers
+// to get the layer use gisportal.layers[gisportal.selectedLayers[i]]
+gisportal.selectedLayers = [];
+
+// Base layers are the map layers that show under the data
+gisportal.baseLayers = {};
 
 // Array of ALL available date-times for all date-time layers where data's available
 // The array is populated once all the date-time layers have loaded
@@ -58,14 +63,19 @@ gisportal.selection.layer = undefined;
 gisportal.selection.bbox = undefined;
 gisportal.selection.time = undefined;
 
+// gisportal.graphs is used as the object for graphing.js
+gisportal.graphs = {};
+
+// gisportal.selectionTools is used as the object for selection.js
 gisportal.selectionTools = null;
 
+// gisportal.timeline is used as the object for timeline.js
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
 gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
 
-// Quick regions array in the format "Name",W,S,E,N - TODO: Needs to be moved at some point
+// Quick regions array in the format "Name",W,S,E,N
 gisportal.quickRegion = [
    ["World View", -150, -90, 150, 90],
    ["European Seas", -23.44, 20.14, 39.88, 68.82],
@@ -80,20 +90,9 @@ gisportal.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
-// Provider logos
-gisportal.providers = {
-   "CCI" : { "logo": "img/cci.png" },
-   "Cefas" : { "logo": "img/cefas.png", "url" : "http://www.cefas.defra.gov.uk/" },
-   "DMI" : { "logo" : "img/dmi.png", "vertical" : "true", "url" : "http://www.dmi.dk/en/vejr/" },
-   "HCMR" : { "logo" : "img/hcmr.png", "url" : "http://innovator.ath.hcmr.gr/newhcmr1/" },
-   "IMS-METU" : { "logo" : "img/metu.png", "url" : "http://www.ims.metu.edu.tr/" },
-   "OGS" : {"logo" : "img/ogs.png", "url" :  "http://www.ogs.trieste.it/" },
-   "PML" : { "logo" : "img/pml.png", "url" : "http://www.pml.ac.uk/default.aspx" }  
-};
-
 /**
  * The OpenLayers map object
- * Soon to be attached to namespace
+ * Soon to be attached to gisportal namespace
  */
 var map;
 
@@ -116,11 +115,18 @@ gisportal.loadLayers = function() {
       gritterErrorHandler(data); 
    };
     
-   // Get WMS and WFS caches
+   // Get WMS cache
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
+   // Get WFS cache
    //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
+/**
+ * Used to show points and popup information about WFS features
+ * @param {object} layer - The gisportal.layers layer
+ * @param {object} olLayer - The Open Layers map layer
+ * @time {string} time - The date of the feature
+ */
 gisportal.getFeature = function(layer, olLayer, time) {
    
    var errorHandling = function(request, errorType, exception) {
@@ -169,7 +175,6 @@ gisportal.getFeature = function(layer, olLayer, time) {
  * @param {object} opts - Object to pass to success function
  */
 gisportal.genericAsync = function(type, url, data, success, error, dataType, opts) {
-   //var map = this;
    $.ajax({
       type: type,
       url: url, 
@@ -196,9 +201,14 @@ gisportal.createBaseLayers = function() {
       );
       
       layer.id = name;
-      layer.controlID = 'baseLayers';
+      layer.type = 'baseLayers';
       layer.displayTitle = name;
       layer.name = name;
+      
+      layer.events.on({
+         "loadstart": gisportal.loading.increment,
+         "loadend": gisportal.loading.decrement
+      })
       map.addLayer(layer);
       gisportal.baseLayers[name] = layer;
    }
@@ -214,6 +224,8 @@ gisportal.createBaseLayers = function() {
 
 /**
  * Create all the reference layers for the map.
+ * Iterates over the gisportal.cache.wfslayers and adds all the correct
+ * layers to gisportal.layers
  */
 gisportal.createRefLayers = function() {  
    
@@ -226,7 +238,7 @@ gisportal.createRefLayers = function() {
                item.productAbstract = "None Provided";
                //item.tags = {};
                
-               var microLayer = new gisportal.MicroLayer(item.name, item.name, 
+               var layer = new gisportal.layer(item.name, item.name, 
                      item.productAbstract, "refLayers", {
                         'serverName': serverName, 
                         'wfsURL': url, 
@@ -237,8 +249,8 @@ gisportal.createRefLayers = function() {
                      }
                );
                      
-               microLayer = gisportal.checkNameUnique(microLayer);   
-               gisportal.microLayers[microLayer.id] = microLayer;
+               layer = gisportal.checkNameUnique(layer);   
+               gisportal.layers[layer.id] = layer;
             }
          });
       } 
@@ -246,12 +258,12 @@ gisportal.createRefLayers = function() {
    
    gisportal.configurePanel.refreshData();
    // Get and store the number of reference layers
-   gisportal.numRefLayers = map.getLayersBy('controlID', 'refLayers').length;
+   gisportal.numRefLayers = map.getLayersBy('type', 'refLayers').length;
 };
 
 /** 
- * Create MicroLayers from the getCapabilities request to 
- * be used in the layer selector.
+ * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
+ * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
    var layers = [];
@@ -273,7 +285,7 @@ gisportal.createOpLayers = function() {
                // Go through each layer and load it
                $.each(item, function(i, item) {
                   if(item.Name && item.Name !== "") {
-                     var microLayer = new gisportal.MicroLayer(item.Name, item.Title, 
+                     var layer = new gisportal.layer(item.Name, item.Title, 
                         item.Abstract, "opLayers", { 
                            "firstDate": item.FirstDate, 
                            "lastDate": item.LastDate, 
@@ -284,33 +296,48 @@ gisportal.createOpLayers = function() {
                            "exBoundingBox": item.EX_GeographicBoundingBox, 
                            "providerTag": providerTag,
                            "positive" : positive, 
+                           "contactDetails" : item.ContactDetails, 
+                           "offsetVectors" : item.OffsetVectors, 
                            "tags": item.tags
                         }
                      );
                                
-                     microLayer = gisportal.checkNameUnique(microLayer);   
-                     gisportal.microLayers[microLayer.id] = microLayer;
-                     if (microLayer.tags)  {
+                     layer = gisportal.checkNameUnique(layer);   
+                     gisportal.layers[layer.id] = layer;
+                     // Each layer tag needs to be lowercase so that they can compare
+                     if (layer.tags)  {
                         var tags = [];
-                        $.each(microLayer.tags, function(d, i) {
-                           if (microLayer.tags[d]) tags.push({ "tag" : d.toString(), "value" : microLayer.tags[d] }); 
+                        $.each(layer.tags, function(d, i) {
+                           if (layer.tags[d])  {
+                              var value = layer.tags[d];
+                              if (value instanceof Object) {
+                                 value = _.map(layer.tags[d], function(d) { return d.toLowerCase(); });
+                              }
+                              else  {
+                                 value = value.toLowerCase();
+                              }
+                              tags.push({
+                                 "tag" : d.toString(), 
+                                 "value" : value
+                              }); 
+                           }
                         });
                      }
                      
                      layers.push({
                         "meta" : {
-                           'id': microLayer.id,
-                           'name': microLayer.name, 
+                           'id': layer.id,
+                           'name': layer.name, 
                            'provider': providerTag,
                            'positive': positive, 
-                           'title': microLayer.displayTitle, 
-                           'abstract': microLayer.productAbstract,
+                           'title': layer.displayTitle, 
+                           'abstract': layer.productAbstract,
                            'tags': tags,
-                           'bounds': microLayer.exBoundingBox,
-                           'firstDate': microLayer.firstDate,
-                           'lastDate': microLayer.lastDate
+                           'bounds': layer.exBoundingBox,
+                           'firstDate': layer.firstDate,
+                           'lastDate': layer.lastDate
                         },
-                        "tags": microLayer.tags
+                        "tags": layer.tags
                      });                         
                   }
                });
@@ -321,64 +348,65 @@ gisportal.createOpLayers = function() {
   
    if (layers.length > 0)  {
       layers.sort(function(a,b)  {
-         var a = a.meta.name.toLowerCase();
-         var b = b.meta.name.toLowerCase();
-         if (a > b) return 1;
-         if (a < b) return -1;
+         if (a.meta.name && b.meta.name)  {
+            var a = a.meta.name.toLowerCase();
+            var b = b.meta.name.toLowerCase();
+            if (a > b) return 1;
+            if (a < b) return -1;
+         }
          return 0;
       });
-
-      $.each(layers, function(i, item) {
-      });
    }
-
+   
+   var state = gisportal.cache.state;
+   gisportal.layersLoaded = true;
+   if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
 };
 
 /**
  * Get a layer that has been added to the map by its id.
- * In future this function will return a generic layer
- * rather than a OpenLayers layer.
+ * This is the same as gisportal.layers[id], it is rarely used.
+ * @param {string} id - The id of the layer
  */
 gisportal.getLayerByID = function(id) {
-   //return map.getLayersBy('id', id)[0];
    return gisportal.layers[id];
 };
 
 /**
- * @param {Object} name - name of layer to check
+ * Checks if a layer is selected
+ * @param {string} id - id of layer to check
  */
-gisportal.isSelected = function(name) {
-   if(map)
-      return $.inArray(name, gisportal.sampleLayers) > -1 ? true : false;
+gisportal.isSelected = function(id) {
+   if (gisportal.selectedLayers[id]) return true;
 };
 
 /**
- * Checks if a layer name is unique recursively
+ * Checks if a layer ID is unique recursively
  * 
- * @param {OPEC.MicroLayer} microLayer - The layer to check 
+ * @param {gisportal.layer} layer - The layer to check 
  * @param {number} count - Number of other layers with the same name (optional)
  */
-gisportal.checkNameUnique = function(microLayer, count) {
+gisportal.checkNameUnique = function(layer, count) {
    var id = null;
    
-   if(typeof count === "undefined" || count === 0) {
-      id = microLayer.id;
+   if (typeof count === "undefined" || count === 0) {
+      id = layer.id;
       count = 0;
-   } else {
-      id = microLayer.id + count;
+   } 
+   else {
+      id = layer.id + count;
    }
    
-   if(id in gisportal.microLayers) {
-      gisportal.checkNameUnique(microLayer, ++count);
+   if (id in gisportal.layers && layer.wcsURL !== gisportal.layers[layer.id].wcsURL) {
+      gisportal.checkNameUnique(layer, ++count);
    } else {
-      if(count !== 0) { 
-         microLayer.id = microLayer.id + count; 
+      if (count !== 0) { 
+         layer.id = layer.id + count; 
       }
    }
-   
-   return microLayer;
+   return layer;
 };
 
 /**
@@ -420,21 +448,7 @@ gisportal.refreshDateCache = function() {
    
    gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);  
    
-   // Not too keen on this being here
-   gisportal.configurePanel.refreshIndicators(); 
-   
    console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
-};
-
-/**
- * Creates a list of custom args that will be added to the
- * permalink url.
- */
-gisportal.customPermalinkArgs = function()
-{
-   var args = OpenLayers.Control.Permalink.prototype.createParams.apply(
-      this, arguments
-   );
 };
 
 /**
@@ -451,7 +465,9 @@ gisportal.mapInit = function() {
         })
       ]
    });
-   
+
+   // This feature is currently deprecated but it allows
+   // Cesium to be used for 3D globes.   
    //map.setupGlobe(map, 'map', {
       //is3D: false,
       //proxy: '/service/proxy?url='
@@ -463,6 +479,7 @@ gisportal.mapInit = function() {
 
    // Create the base layers and then add them to the map
    gisportal.createBaseLayers();
+   
    // Create the reference layers and then add them to the map
    //gisportal.createRefLayers();
 
@@ -501,7 +518,9 @@ gisportal.mapInit = function() {
 };
 
 /**
- * Anything that needs to be done after the layers are loaded goes here.
+ * The initiation of WMS layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
    if (data !== null)  {
@@ -514,6 +533,11 @@ gisportal.initWMSlayers = function(data, opts) {
    }
 };
 
+/**
+ * The initiation of WMS layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
+ */ 
 gisportal.initWFSLayers = function(data, opts) {
    if (data !== null)  {
       gisportal.cache.wfsLayers = data;
@@ -525,14 +549,15 @@ gisportal.initWFSLayers = function(data, opts) {
 /*===========================================================================*/
 
 /**
- * Loads anything that is not dependent on layer data. 
+ * Loads anything that is not dependent on layer data.
+ * This is used to set the layer index to be the correct order 
  */
 gisportal.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
-      var refLayers = map.getLayersBy('controlID', 'refLayers');
-      var poiLayers = map.getLayersBy('controlID', 'poiLayer');
+      var refLayers = map.getLayersBy('type', 'refLayers');
+      var poiLayers = map.getLayersBy('type', 'poiLayer');
 
       $.each(refLayers, function(index, value) {
          map.setLayerIndex(value, map.layers.length - index - 1);
@@ -543,13 +568,7 @@ gisportal.nonLayerDependent = function() {
       });
    });
    
-   //--------------------------------------------------------------------------
-  
-   //Configure and generate the UI elements
-   
-   gisportal.openid.setup('shareOptions');
-
-   // Setup timeline
+   // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
       selectedDate: new Date("2006-06-05T00:00:00Z"),
@@ -567,6 +586,23 @@ gisportal.nonLayerDependent = function() {
 
 /*===========================================================================*/
 
+gisportal.autoSaveState = function(){
+   var state = JSON.stringify(gisportal.saveState())
+   gisportal.storage.set( 'stateAutoSave', state )
+}
+
+gisportal.getAutoSaveState = function(){
+   var state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ))
+   return state;
+}
+gisportal.hasAutoSaveState = function(){
+   return ( gisportal.storage.get( 'stateAutoSave' ) != null );
+}
+
+/**
+ * Creates an object that contains the current state
+ * @param {object} state - Optional, allows a previous state to be extended 
+ */
 gisportal.saveState = function(state) {
    var state = state || {}; 
    // Save layers
@@ -576,24 +612,24 @@ gisportal.saveState = function(state) {
    state.timeline = {}; 
 
    // Get the current layers and any settings/options for them.
-   var keys = gisportal.configurePanel.selectedIndicators;
+   var keys = gisportal.selectedLayers;
    for(var i = 0, len = keys.length; i < len; i++) {
-      var selectedIndicator = gisportal.configurePanel.selectedIndicators[i];
+      var selectedIndicator = gisportal.selectedLayers[i];
 
-      if (selectedIndicator && selectedIndicator.id)  {
-         var indicator = gisportal.layers[selectedIndicator.id];
+      if (selectedIndicator)  {
+         var indicator = gisportal.layers[selectedIndicator];
          state.map.layers[indicator.id] = {
             'selected': indicator.selected,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
             'maxScaleVal': indicator.maxScaleVal,
-            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] .active').attr('for')
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
          };    
       }
    }
    // outside of loop so it can be easily ordered 
-   state.selectedIndicators = gisportal.configurePanel.selectedIndicators;
+   state.selectedIndicators = gisportal.selectedLayers;
    
    // Get currently selected date.
    if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
@@ -625,7 +661,12 @@ gisportal.saveState = function(state) {
    return state;
 };
 
+/**
+ * To load the state, provide a state object (created with saveState)
+ * @param {object} state - The saved state object
+ */
 gisportal.loadState = function(state) {
+   gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    var state = state || {};
 
@@ -635,25 +676,25 @@ gisportal.loadState = function(state) {
    // Load layers for state
    var keys = state.selectedIndicators;
    if (keys.length > 0)  {
-      $('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
+      gisportal.configurePanel.close();
+      gisportal.indicatorsPanel.open();
    }
    for (var i = 0, len = keys.length; i < len; i++) {
-      var indicator = gisportal.layers[state.selectedIndicators[i]];
-      if (!indicator) {
-         gisportal.configurePanel.buildMap();
-         var options = {};
-         options.id = state.selectedIndicators[i].id;
-         gisportal.configurePanel.selectLayer(state.selectedIndicators[i].name, options);
+      var indicator = null;
+      if (typeof keys[i] === "object") indicator = gisportal.layers[keys[i].id];
+      else indicator = gisportal.layers[keys[i]];
+      if (indicator && !gisportal.selectedLayers[indicator.id]) {
+         gisportal.configurePanel.close();
+         gisportal.refinePanel.foundIndicator(indicator.id);
         
       }
    }
- 
+   
    // Create the feature if there is one
-         indicator = {};
+   indicator = {};
    if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
-      var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-      layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
+      var layer = map.getLayersBy('type', 'poiLayer')[0];
+      if (layer) layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
     }
    
    // Load position
@@ -678,16 +719,29 @@ gisportal.loadState = function(state) {
 
 };
 
+/**
+ * This converts from Feature to GeoJSON
+ * @param {object} feature - The feature
+ */
 gisportal.featureToGeoJSON = function(feature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.write(feature);
 };
 
+/**
+ * This converts from GeoJSON to Feature
+ * @param {string} geoJSONFeature - The GeoJSON
+ */
 gisportal.geoJSONToFeature = function(geoJSONFeature) {
    var geoJSON = new OpenLayers.Format.GeoJSON();
    return geoJSON.read(geoJSONFeature); 
 };
 
+/**
+ * This applies the changes from the state
+ * to the layer once it is selected.
+ * @param {object} layer - The gisportal.layer[i] 
+ */
 gisportal.checkIfLayerFromState = function(layer) {
    if(typeof gisportal.cache.state !== "undefined") {
       var keys = Object.keys(gisportal.cache.state.map.layers);
@@ -708,7 +762,7 @@ gisportal.checkIfLayerFromState = function(layer) {
 /*===========================================================================*/
 
 /**
- * Any code that should be run when user logs in
+ * This will run when a user logs in using openID
  */
 gisportal.login = function() {
    $('.js-logged-out').toggleClass('hidden', true);
@@ -718,7 +772,7 @@ gisportal.login = function() {
 };
 
 /**
- * Any code that should be run when the user logs out
+ * This will run when a user logs out
  */
 gisportal.logout = function() {
    $('.js-logged-out').toggleClass('hidden', false);
@@ -735,7 +789,7 @@ gisportal.logout = function() {
 gisportal.getState = function() {
    var state = {};
    
-   // TODO: Get states from component.
+   // TODO: Split state into components
    state = gisportal.saveState(state);
 
    // TODO: Merge state with default state.
@@ -744,111 +798,114 @@ gisportal.getState = function() {
    return state; 
 };
 
+/**
+ * Loads the state and adds into cache
+ * @param {object} state - The state object
+ */
 gisportal.setState = function(state) {
    var state = state || {}; 
    // Cache state for access by others
    gisportal.cache.state = state;
-   // TODO: Merge with default state.
+   // TODO: Merge with default state. 
+   if (!gisportal.stateLoadStarted && state && gisportal.layersLoaded) gisportal.loadState(state);
    
-   // TODO: Set states of components.
-   gisportal.loadState(state);
 };
 
 /*===========================================================================*/
 
 /**
  * This code runs once the page has loaded - jQuery initialised.
+ * It is called from portal.js
  */
 gisportal.main = function() {
-   gisportal.initStart();
+
+   if( gisportal.config.siteMode == "production" )
+      gisportal.startRemoteErrorLogging();
 
    // Compile Templates
-   gisportal.templates = {};
+   gisportal.loadTemplates(function(){
+      
+      gisportal.initStart();
 
-   $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-  
-   $('.js-start').click(function()  {
-      $('.start').toggleClass('hidden', true);
-   });
- 
-   // Setup the gritter so we can use it for error messages
-   gisportal.gritter.setup();
+      // Set up the map
+      // any layer dependent code is called in a callback in mapInit
+      gisportal.mapInit();
 
-   // Set up the map
-   // any layer dependent code is called in a callback in mapInit
-   gisportal.mapInit();
+      $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
+    
+      // Setup the gritter so we can use it for error messages
+      gisportal.gritter.setup();
 
-   gisportal.configurePanel.initDOM();
-   gisportal.indicatorsPanel.initDOM();
+      // Initiate the DOM for panels
+      gisportal.panels.initDOM();
+      gisportal.configurePanel.initDOM();   // configure.js
+      gisportal.indicatorsPanel.initDOM();  // indicators.js
+      gisportal.graphs.initDOM();           // graphing.js
+      gisportal.analytics.initGA();         // analytics.js
+      
+      //Set the global loading icon
+      gisportal.loading.loadingElement= jQuery('.global-loading-icon')
+      
+      $('.js-show-tools').on('click', showPanel);
 
-   gisportal.graphs.initDOM();
-   gisportal.analytics.initGA();
-
-   $('.js-show-tools').on('click', showPanel);
-
-   function showPanel()  {
-      $(this).toggleClass('hidden', true);
-      $('.panel.active').toggleClass('hidden', false);
-   }
-
-   $('.js-hide-panel').on('click', hidePanel);
-
-   function hidePanel()  {
-      $(this).parents('.panel').toggleClass('hidden', true);
-      $('.js-show-tools').toggleClass('hidden', false);
-   }
-
-   // Start setting up anything that is not layer dependent
-   gisportal.nonLayerDependent();
-  
-
-   // Grab the url of any state.
-   var stateID = gisportal.utils.getURLParameter('state');
-   
-   // Check if there is a state to load.
-   if(stateID !== null) {
-      console.log('Retrieving State...');
-      gisportal.ajaxState(stateID);
-   }
-   else {
-      console.log('Loading Default State...');
-   }
-
-   gisportal.replaceAllIcons(); 
-};
-
-
-gisportal.ajaxState = function(id) { 
-      // Async to get state object
-      gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
-         if(data.output.status == 200) {
-            gisportal.setState($.parseJSON(data.output.state));
-            console.log('Success! State retrieved');
-         } else {
-            console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
-         }
-      }, function(request, errorType, exception) {
-         console.log('Error: Failed to retrieved state. Ajax failed!');
-      }, 'json', {});
-   } 
-
-gisportal.getTopLayer = function() {
-	var layer = null;
-	$.each($('.sensor-accordion').children('li').children(':checkbox').get().reverse(), function(index, value) {
-      if($(this).is(':checked')) {
-         var layerID = $(this).parent('li').attr('id');
-         layer = gisportal.getLayerByID(layerID);
+      function showPanel()  {
+         $('.js-show-tools').toggleClass('hidden', true);
+         $('.panel.active').toggleClass('hidden', false);
       }
+
+      $('.js-hide-panel').on('click', hidePanel);
+
+      function hidePanel()  {
+         $('.panel.active').toggleClass('hidden', true);
+         $('.js-show-tools').toggleClass('hidden', false);
+      }
+
+      // Start setting up anything that is not layer dependent
+      gisportal.nonLayerDependent();
+
+      // Grab the url of any state and store it as an id to be used
+      // for retrieving a state object.
+      var stateID = gisportal.utils.getURLParameter('state');
+      if(stateID !== null) {
+         console.log('Retrieving State...');
+         gisportal.ajaxState(stateID);
+      }
+      else {
+         console.log('Loading Default State...');
+      }
+
+      // Replaces all .icon-svg with actual SVG elements,
+      // so that they can be styled with CSS
+      // which cannot be done with SVG in background-image
+      // or <img>
+      gisportal.replaceAllIcons(); 
+      
    });
-   return layer;
 };
 
-gisportal.updateLayerData = function(layerID)  {
-   var layer = gisportal.getLayerByID(layerID);
-   $('#graphcreator-baseurl').val(layer.wcsURL);
-   $('#graphcreator-coverage option[value=' + layer.origName + ']').prop('selected', true);
-};
+/**
+ * This uses ajax to get the state from the database
+ * based on the id (shortlink) provided.
+ * @param {string} id - The shortlink/id to state
+ */
+gisportal.ajaxState = function(id) { 
+   // Async to get state object
+   gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
+      if(data.output.status == 200) {
+         gisportal.setState($.parseJSON(data.output.state));
+         console.log('Success! State retrieved');
+      } else {
+         console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
+      }
+   }, function(request, errorType, exception) {
+      console.log('Error: Failed to retrieved state. Ajax failed!');
+   }, 'json', {});
+} 
 
+/**
+ * This zooms the map so that all of the selected layers
+ * fit into the viewport.
+ */
 gisportal.zoomOverall = function()  {
    if (Object.keys(gisportal.selectedLayers).length > 0)  {
 
@@ -860,8 +917,8 @@ gisportal.zoomOverall = function()  {
          Number.MIN_VALUE
       ];
 
-      for (var i = 0; i < Object.keys(gisportal.selectedLayers).length; i++)  {
-         var layer = gisportal.selectedLayers[Object.keys(gisportal.selectedLayers)[i]].boundingBox;
+      for (var i = 0; i < gisportal.selectedLayers.length; i++)  {
+         var layer = gisportal.layers[gisportal.selectedLayers[i]].boundingBox;
          if (+layer.MinX < +largestBounds[0]) largestBounds[0] = layer.MinX; // left 
          if (+layer.MinY < +largestBounds[1]) largestBounds[1] = layer.MinY; // bottom
          if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = layer.MaxX; // right 
@@ -872,12 +929,17 @@ gisportal.zoomOverall = function()  {
    }
 };
 
-// Automatically goes through all icons
+/**
+ * Replaces all icons with the actual SVG.
+ */
 gisportal.replaceAllIcons = function()  {
    gisportal.replaceSubtreeIcons('body');
 };
 
-// Goes through all icons in a subtree
+/**
+ * Replaces icons in a DOM subtree with the actual SVG.
+ * @param {jQuery Element} el - The parent of the subtree
+ */
 gisportal.replaceSubtreeIcons = function(el)  {
    $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
       var e = $(e); 
@@ -895,16 +957,103 @@ gisportal.replaceSubtreeIcons = function(el)  {
    });
 };
 
-// Should probably be using Mustache for this
+/**
+ * Replace links on start splash from config file
+ * Should probably be using Mustache for this
+ */
 gisportal.initStart = function()  {
-   var list = $('.start .examples li');
-   for (var i = 0; i < list.length; i++)  {
-      var current = gisportal.config.defaultStates[i];
-      var currentLi = $(list[i]);
-      if (!current) $(currentLi).remove();
-      else  {
-         $('a', currentLi).attr("href", current.url);
-         $('span', currentLi).text(current.name);
-      }
-   }
+
+   var data = {
+      defaultStates: gisportal.config.defaultStates,
+      hasAutoSaveState: gisportal.hasAutoSaveState()
+   };
+
+   var rendered = gisportal.templates['start']( data );
+   $('.js-start-container').html( rendered );
+
+   // Load there previously saved state
+   $('.js-load-last-state').click(function(){
+      gisportal.loadState( gisportal.getAutoSaveState() );
+      setInterval( gisportal.autoSaveState, 60000 );
+   });
+
+     
+   $('.js-start').click(function()  {
+      $('.start').toggleClass('hidden', true);
+
+      setInterval( gisportal.autoSaveState, 60000 );
+
+      //Once they are past the splash page warn them if they leave
+      window.onbeforeunload = function(){
+         gisportal.autoSaveState();
+         if( gisportal.config.siteMode == "production")
+            return "Warning. Your about to leave the page";
+         else
+            return;
+      };
+   });
 };
+
+
+gisportal.loading = {};
+gisportal.loading.counter = 0;
+gisportal.loading.loadingElement = jQuery('');
+gisportal.loading.loadingTimeout = null;
+
+
+/**
+ * Increases the counter of how many things are currently loading
+ */
+gisportal.loading.increment = function(){
+   gisportal.loading.counter++;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Drecreases the counter of how many things are currently loading
+ */
+gisportal.loading.decrement = function(){
+   gisportal.loading.counter--;
+   gisportal.loading.updateLoadingIcon();
+}
+
+/**
+ * Either show or hide the loading icon.
+ *  A delay is added to show because layers can update in a few milliseconds causing a horrible flash
+ */
+gisportal.loading.updateLoadingIcon = function(){
+   
+   if( gisportal.loading.loadingTimeout != null )
+      return ;
+   
+   gisportal.loading.loadingTimeout = setTimeout(function(){
+      gisportal.loading.loadingTimeout = null
+      if( gisportal.loading.counter > 0 ){
+         gisportal.loading.loadingElement.show();
+      
+      }else{
+         gisportal.loading.loadingElement.hide();
+      }
+   }, gisportal.loading.counter ? 300 : 600);
+
+}
+
+/**
+ * Sends all error to get sentry.
+ */
+gisportal.startRemoteErrorLogging = function(){
+   Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
+   window.onerror = function(e){
+      var tags = {};
+
+      //Attempt to store information about the errro.
+      try{
+         tags.state = JSON.stringify(gisportal.saveState());
+
+         if( window.event && window.event.target && $.contains( window.document.body, window.event.target ) )
+            tags.domEvemtTarget =  $( window.event.target ).html();
+      }catch(e){};
+
+      Raven.captureException(e, { tags: tags} )
+   }
+}

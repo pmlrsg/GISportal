@@ -1,6 +1,9 @@
 /**
- * Custom JavaScript functionality
- * @namespace
+ * utils.js
+ * This file is full of useful utlities
+ * for use in the rest of the portal.
+ *
+ * @namespace utils
  */
 gisportal.utils = {};
 
@@ -46,6 +49,8 @@ gisportal.utils.replace = function(search, replace, subject, count) {
 
 /**
  * Extension to JavaScript Arrays to de-duplicate them
+ * @param {array} array - The array to remove duplications from
+ * @return {array} The array with the duplications removed
  */ 
 gisportal.utils.arrayDeDupe = function(array) {
    var i,
@@ -87,6 +92,8 @@ getNearestInArray = function(arr, goal) {
 
 /**
  * Turn JavaScript date, d into ISO8601 date part (no time)
+ * @param {string} d - A date to turn into ISO8601 
+ * @return {string} The ISO8601 date string
  */ 
 gisportal.utils.ISODateString = function(d) {
    function pad(n){
@@ -99,6 +106,11 @@ gisportal.utils.ISODateString = function(d) {
 
 /**
  * Returns true if first date is smaller than second
+ * so that it can be used as the comparasion operator
+ * in sorts.
+ *
+ * @param {string} firstDate - The first date
+ * @param {string} secondDate - The second date
  */ 
 gisportal.utils.compareDates = function(firstDate, secondDate) { 
    var firstDate = gisportal.utils.ISODateString(firstDate);
@@ -109,7 +121,11 @@ gisportal.utils.compareDates = function(firstDate, secondDate) {
    
 
 /**
- * Format date string so it can be displayed
+ * Format date string so it can be displayed,
+ * essentially just reversing the formatting
+ * of the date. The result is day-month-year,
+ * this is for display only and most
+ * dates should use year-month-day to avoid confusion.
  */ 
 gisportal.utils.displayDateString = function(date) {
    var year = date.substring(0, 4);
@@ -118,16 +134,14 @@ gisportal.utils.displayDateString = function(date) {
    return day + '-' + month + '-' + year;
 };
 
-function getObjectKey(obj, value) {
-   for(var key in obj) {
-      // TEST
-      if(obj[key] == value) {
-         return key;
-      }
-   }
-   return null;
-}
-
+/**
+ * This converts objects into a key value pair
+ * that makes larger data structures easier to
+ * traverse using mustache.
+ * 
+ * @param {object} o - The initial object
+ * @returns The formatted object with "key" "value" items
+ */
 gisportal.utils.mustacheFormat = function(o)  {
    var data = [];
    for (var prop in o) {
@@ -143,31 +157,45 @@ gisportal.utils.mustacheFormat = function(o)  {
    return data;
 }
 
-gisportal.utils.sortDates = function(a, b) {
-   return a[0] - b[0];
-};
-
-gisportal.utils.ceil1places = function(num) {
-   return Math.ceil(num * 10) / 10;
-};
-
-gisportal.utils.ceil3places = function(num) {
-   return Math.ceil(num * 1000) / 1000;
-};
-
+/**
+ * Clamps the number between the min and max.
+ * @param {number} num - The value to clamp
+ * @param {number} min - The lowest the value can go
+ * @param {number} max - The highest the value can go
+ * @returns The clamped number
+ */
 gisportal.utils.clamp = function (num, min, max) {
    return Math.min(Math.max(num, min), max);
 };
 
+/**
+ * This function finds part of the URL.
+ * It is used for finding the state id (shortlink).
+ * 
+ * @param {string} name - The name of the URL parameter
+ * @returns The decoded URI component matching the name
+ */
 gisportal.utils.getURLParameter = function(name) {
    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
 };
 
-// A function for getting unique identifier, generic function so that it can easily be changed throughout the codebase
+/**
+ * A function for getting unique identifier, 
+ * generic function so that it can easily be 
+ * changed throughout the codebase.
+ * Currently it simply returns the date.
+ * @returns A unique ID
+ */
 gisportal.utils.uniqueID = function()  {
    return new Date().getTime();
 };
 
+/**
+ * This function checks whether an object is
+ * null or undefined.
+ * @param {object} object - The object to check
+ * @returns True if null/undefined 
+ */
 gisportal.utils.isNullorUndefined = function(object) {
    if(object === null || typeof object === "undefined") {
       return true;
@@ -176,7 +204,8 @@ gisportal.utils.isNullorUndefined = function(object) {
    return false;
 };
 
-/* Taken from:
+/**
+ * Taken from:
  *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
  *    Apache 2.0 License
  * 
@@ -208,7 +237,8 @@ gisportal.utils.getWindowInnerSize = function() {
   return [width, height];
 };
 
-/* Taken from:
+/**
+ * Taken from:
  *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
  *    Apache 2.0 License
  * 
@@ -230,7 +260,8 @@ gisportal.utils.getParentCoords = function() {
   return [width, height];
 };
 
-/* Taken from:
+/**
+ * Taken from:
  *    https://code.google.com/p/step2/source/browse/code/java/trunk/example-consumer/src/main/webapp/popuplib.js 
  *    Apache 2.0 License
  * 
@@ -247,6 +278,15 @@ gisportal.utils.getCenteredCoords = function(width, height) {
    return [xPos, yPos];
 };
 
+/**
+ * This function opens a popup for openid
+ * @param {string} width - The width, including "px"
+ * @param {string} height - The height, including "px"
+ * @param {string} url - The url to show in the popup
+ * @param {function} onOpenHandler - A callback for when the popup opens
+ * @param {function} checkforCloseHandler - A callback to check if it has closed
+ * @returns Object with details about the popup 
+ */
 gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
    if(onOpenHandler !== null) {
       onOpenHandler();
@@ -264,9 +304,13 @@ gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkfor
    return {'popupWindow':popupWindow, 'interval': interval};
 };
 
-/* Changes a name so that it can
+/**
+ * Changes a name so that it can
  * be used as an HTML id.
- * Use as a HASH. Compare don't decipher. */
+ * Use as a HASH. Compare don't decipher.
+ * @param {string} name - The original name
+ * @returns The modified version of the name.
+ */
 gisportal.utils.nameToId = function(name)  {
    if (!name) return null;
    name = name.replace(/\ /g, '__');

@@ -671,16 +671,16 @@ gisportal.graphs.Plot =(function(){
 
 
 gisportal.graphs.close_export_data = function(){
-	$('.export-data').removeClass('show-all').html('');
+   $('.export-data').removeClass('show-all').html('');
 }
 
 gisportal.graphs.export_data = function( indicator ){
-	var indicator = gisportal.microLayers[ indicator ];
-	$('.export-data').addClass('show-all');
-	
-	
-	$('.export-data').html( "Pull from the template at some point" );
-	
+   var indicator = gisportal.microLayers[ indicator ];
+   $('.export-data').addClass('show-all');
+   
+   
+   $('.export-data').html( "Pull from the template at some point" );
+   
 }
 
 

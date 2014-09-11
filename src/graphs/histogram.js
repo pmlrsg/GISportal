@@ -13,7 +13,7 @@ gisportal.graphs.histogram = function(data, options)  {
              .margin({left:25});
              //.useInteractiveGuideline(true);
 
-         var panel = $('#graphPanel .panel-container');
+         var panel = $('#graphPanel');
          d3.select('[data-id="' + data.coverage + '"] .graph svg')
            .datum(bars())              
            .attr("width", $(panel).innerWidth() - 40).attr("height", $(panel).innerHeight() - 40 )
