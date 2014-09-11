@@ -1041,16 +1041,21 @@ gisportal.loading.updateLoadingIcon = function(){
 
 }
 
+/**
+ * Sends all error to get sentry.
+ */
 gisportal.startRemoteErrorLogging = function(){
    Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
    window.onerror = function(e){
+      var tags = {};
 
-      var tags = { 
-         state: JSON.stringify(gisportal.saveState())
-      }
+      //Attempt to store information about the errro.
+      try{
+         var tags.state: JSON.stringify(gisportal.saveState());
 
-      if( window.event && window.event.target )
-         tags.domEvemtTarget =  $( window.event.target ).html();
+         if( window.event && window.event.target && $.contains( window.document.body, window.event.target ) )
+            tags.domEvemtTarget =  $( window.event.target ).html();
+      }catch(e){};
 
       Raven.captureException(e, { tags: tags} )
    }
