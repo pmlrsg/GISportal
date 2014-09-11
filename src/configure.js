@@ -41,7 +41,6 @@ gisportal.configurePanel.open = function()  {
  */
 gisportal.configurePanel.close = function()  {
    //$('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
-   gisportal.configurePanel.refreshData();
 };
 
 /**
@@ -69,10 +68,6 @@ gisportal.configurePanel.initDOM = function()  {
       }
    }
 
-   $('.js-build').click(function()  {
-      gisportal.configurePanel.buildMap();
-   });
-
    /* Temp */
    $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
    
@@ -92,12 +87,20 @@ gisportal.configurePanel.initDOM = function()  {
 }
 
 /**
+ * Resets the tabs and search box on the portal
+ */
+gisportal.configurePanel.reset = function(){
+   $('.js-search').val("").change();
+   changeTab( $('#configurePanel .js-default-tab'));
+   gisportal.configurePanel.refreshData();
+}
+
+/**
  * This used to be triggered by a button, that still exists
  * for when an indicator already exists but now when a new indicator
  * is added, this function automatically gets called.
  */
 gisportal.configurePanel.buildMap = function(indicator)  {
-   gisportal.configurePanel.close();
    if (indicator) gisportal.refinePanel.open(indicator);
    else gisportal.indicatorsPanel.open();
 };
@@ -107,25 +110,6 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * It used to show the indicators that are selected but that
  * has been removed.
  */
-gisportal.configurePanel.refreshIndicators = function()  {
-
-   /* Show selected indicators
-   $.get('templates/configureIndicators.mst', function(template) {
-      var indicators = gisportal.selectedLayers;
-      var rendered = Mustache.render(template, {
-         indicators : indicators 
-      });
-      $('.js-configure-indicators').html(rendered);
-   }); */
-
-
-   if (gisportal.selectedLayers.length > 0)  {
-      $('.js-build').toggleClass('hidden', false);
-   }  
-   else  {
-      $('.js-build').toggleClass('hidden', true);
-   }
-};
 
 /**
  * This is quite a complicated function.
@@ -460,20 +444,6 @@ gisportal.configurePanel.search = function(val)  {
    $('.js-search-results').html(rendered);
   
    var selected = [];
-   // This shows a check for selected layers
-   // but because we no longer have multiple select enabled, I have commented it out.
-   /*
-   $('.js-toggleVisibility[data-name]:checked').each(function(i,d) { 
-       var name = $(d).data('name').toLowerCase();
-       if ($.inArray(name, selected) === -1)  {
-           selected.push(name);
-       } 
-   })
-   
-   for (var i = 0; i < selected.length; i++)  {
-      $('.js-toggleVisibility[data-name="' + selected[i] + '"]').prop("checked", true).toggleClass('active', true).change();
-   } */
-
 
    // Inline SVG icons
    gisportal.replaceAllIcons();
@@ -489,7 +459,8 @@ gisportal.configurePanel.search = function(val)  {
 gisportal.configurePanel.selectLayer = function(name, options)  {
    // Trigger the analytics event
    gisportal.analytics.events.selectLayer( { name: name } );
-   
+
+
    var options = options || {};
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);  
@@ -501,15 +472,14 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    
    name = name.replace(/__/g, ' ');
 
-   $('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true);   
-   $('.js-toggleVisibility[data-name="' + name + '"]').prev('label').toggleClass('active', true).prop('checked', true);
+   //$('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true);   
+   //$('.js-toggleVisibility[data-name="' + name + '"]').prev('label').toggleClass('active', true).prop('checked', true);
 
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
    if (options.refine) tmp.refine = options.refine;
    if (options.refined !== undefined) tmp.refined = options.refined;
-   gisportal.configurePanel.refreshIndicators();
 
    this.buildMap(tmp);
 };
@@ -526,13 +496,12 @@ gisportal.configurePanel.deselectLayer = function(name)  {
    var name = name.toLowerCase();
    var id = this.hasIndicator(name);
    gisportal.configurePanel.unselectIndicator(name);
-   $('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
+   //$('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
    $('.js-configure-indicators [data-name="' + name + '"]').remove();
    // If there is an index then it is a 'real' layer, otherwise just a placeholder 
    if (id)  {
       gisportal.indicatorsPanel.removeIndicators(id);
    }
-   gisportal.configurePanel.refreshIndicators();
    
 
 };

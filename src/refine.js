@@ -62,6 +62,7 @@ gisportal.refinePanel.foundIndicator = function(data)  {
    gisportal.indicatorsPanel.addToPanel(tmp);
    gisportal.refinePanel.close();
    gisportal.indicatorsPanel.open();
+   gisportal.configurePanel.reset();
 };
 
 /**
