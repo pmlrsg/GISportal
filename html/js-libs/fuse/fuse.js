@@ -1,3 +1,4 @@
+
 /**
  * @license
  * Fuse - Lightweight fuzzy-search
@@ -254,11 +255,18 @@
   function Fuse(list, options) {
     this.list = list;
     this.options = options = options || {};
-    this.options.sort = 'sort' in options ? options.sort : Fuse.defaultOptions.sort,
-    this.options.includeScore = 'includeScore' in options ? options.includeScore : Fuse.defaultOptions.includeScore,
-    this.options.searchFn = options.searchFn || Fuse.defaultOptions.searchFn,
-    this.options.sortFn = options.sortFn || Fuse.defaultOptions.sortFn,
-    this.options.keys = options.keys || Fuse.defaultOptions.keys;
+
+    var i, len, key;
+    // Add boolean type options
+    for (i = 0, keys = ['sort', 'includeScore', 'shouldSort'], len = keys.length; i < len; i++) {
+      key = keys[i];
+      this.options[key] = key in options ? options[key] : Fuse.defaultOptions[key];
+    }
+    // Add all other options
+    for (i = 0, keys = ['searchFn', 'sortFn', 'keys', 'getFn'], len = keys.length; i < len; i++) {
+      key = keys[i];
+      this.options[key] = options[key] || Fuse.defaultOptions[key];
+    }
   };
 
   Fuse.defaultOptions = {
@@ -274,7 +282,7 @@
     shouldSort: true,
 
     // The search function to use
-    // Note that the default search function ([[Function]]) must conform the following API:
+    // Note that the default search function ([[Function]]) must conform to the following API:
     //
     //  @param pattern The pattern string to search
     //  @param options The search option
@@ -292,6 +300,9 @@
       return a.score - b.score;
     },
 
+    // Default get function
+    getFn: Utils.deepValue,
+
     keys: []
   };
 
@@ -303,9 +314,10 @@
    */
   Fuse.prototype.search = function(pattern) {
     var searcher = new(this.options.searchFn)(pattern, this.options),
-      i, j, item, text,
+      i, j, item,
       list = this.list,
       dataLen = list.length,
+      options = this.options,
       searchKeys = this.options.keys,
       searchKeysLen = searchKeys.length,
       bitapResult,
@@ -366,37 +378,39 @@
         item = list[i];
         // Iterate over every key
         for (j = 0; j < searchKeysLen; j++) {
-          analyzeText(Utils.deepValue(item, searchKeys[j]), item, i);
+          analyzeText(options.getFn(item, searchKeys[j]), item, i);
         }
       }
     }
 
-    if (this.options.shouldSort) {
-      rawResults.sort(this.options.sortFn);
+    if (options.shouldSort) {
+      rawResults.sort(options.sortFn);
     }
 
     // Helper function, here for speed-up, which returns the
     // the raw item, including the score, or simply the item itself, depending
     // on the specified option
-    var getItem = this.options.includeScore ? function(i) {
-        return rawResults[i];
-      } : function(i) {
-        return rawResults[i].item;
-      };
+    var getItem = options.includeScore ? function(i) {
+      return rawResults[i];
+    } : function(i) {
+      return rawResults[i].item;
+    };
 
-    // Helper function, here for speed-up, which returns the idenfifer (via deepValue),
+    // Helper function, here for speed-up, which replaces the item with its value,
     // if the options specifies it,
-    var getValue = this.options.id ? function(i) {
-        return Utils.deepValue(getItem(i), options.id);
-      } : function(i) {
-        return getItem(i);
-      };
+    var replaceValue = options.id ? function(i) {
+      rawResults[i].item = options.getFn(rawResults[i].item, options.id);
+    } : function(i) {
+      return; // no-op
+    };
 
     // From the results, push into a new array only the item identifier (if specified)
     // of the entire item.  This is because we don't want to return the <rawResults>,
     // since it contains other metadata;
     for (var i = 0, len = rawResults.length; i < len; i++) {
-      results.push(getValue(i));
+      // replace the item with its value, which can be its id if the options specifies it
+      replaceValue(i);
+      results.push(getItem(i));
     }
 
     return results;

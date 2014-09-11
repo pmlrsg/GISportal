@@ -5,12 +5,15 @@
    ],
    "files": [
       "src/gisportal.js",
+      "src/templates.js",
       "src/portal.js",
+      "src/panels.js",
       "src/ui.js",
       "config/config.js",
       "config/analytics_config.js",
       "src/configure.js",
       "src/scalebar.js",
+      "src/refine.js",
       "src/indicators.js",
       "src/selectiontools.js",
       "src/libs/jquery-gritter/jquery.gritter.js",
@@ -24,6 +27,6 @@
       "src/graphs/timeseries.js",
       "src/graphs/histogram.js",
       "src/utils.js",
-      "src/analytics.js" 
+      "src/analytics.js"
    ]
 }

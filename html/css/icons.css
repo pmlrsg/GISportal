@@ -2,7 +2,7 @@
     Icons
 \*------------------------------------*/
 
-*[class^="icon"]  {
+*[class^="icon_"]  {
    border: 0;
    background-color: transparent;
    background-repeat: no-repeat;

@@ -1,17 +1,30 @@
+/**
+ * graphing.js
+ * This is the file responsible for setting up graphing.
+ * The actual graphs are in src/graphs/
+ */
 
-
+/**
+ * initDOM is called in gisportal.js
+ * It sets up all of the DOM events.
+ */
 gisportal.graphs.initDOM = function() {
    $('.js-return-analysis').on('click', function() {
-      $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-      $('#graphPanel').toggleClass('hidden', true).toggleClass('active', false);      
+      gisportal.panels.showPanel( 'active-layers' );  
       $('.graph-wait-message').toggleClass("hidden", false);
       $('.graph-holder').html('');   
    });
 
 }
 
-
-// Options currently requires a title
+/**
+ * This function produces the url request for the AJAX call
+ * to get data. It then calls addGraph on success.
+ * 
+ * @param {object} params - The parametres for the request
+ * @param {object} options - The options to be passed through to
+ * the creation of the graph.
+ */
 gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
@@ -33,6 +46,15 @@ gisportal.graphs.data = function(params, options)  {
    gisportal.genericAsync('GET', gisportal.wcsLocation + request, null, success, error, 'json', null);
 }
 
+/**
+ * This is where the calls to the creation of the graphs are made.
+ * It checks data.type for the type of the graph, which it then
+ * calls from src/graphs/<type>.js
+ *
+ * @param {object} data - The actual data of the graph
+ * @param {object} options - The options that control the output
+ * and creation of the graph.
+ */ 
 gisportal.graphs.create = function(data, options)  {
    if (data.error !== "") {
       var d = { error: data.error };
@@ -55,6 +77,18 @@ gisportal.graphs.create = function(data, options)  {
    }
 }
 
+/**
+ * This function adds the setup of the graph to the DOM,
+ * this includes titles and other features that are
+ * controlled by the options.
+ * At this point the graph itself does not exist, but
+ * the mustache template has an SVG element for the graph
+ * to go into.
+ *
+ * @param {data} data - The data of the graph, to be passed
+ * into create so that the graph can be created
+ * @param {options} options - The options such as title and id
+ */
 gisportal.graphs.addGraph = function(data, options)  {
    var uid = 'wcsgraph' + Date.now();
    var title = options.title || "Graph";
@@ -62,7 +96,7 @@ gisportal.graphs.addGraph = function(data, options)  {
 
    $.get('templates/graph.mst', function(template) {
       var rendered = Mustache.render(template, {
-         id : data.coverage,
+         id : options.id,
          title : title,
          units: units
       });
