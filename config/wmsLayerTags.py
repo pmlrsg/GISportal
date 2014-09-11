@@ -104,6 +104,19 @@ layers = {
             "region": "Global",
         }
     },
+    "esa_cci_soilmoisture": {
+        "sm": {
+            "Confidence": "Unknown",
+            "interval": "Daily",
+            "niceName": "Soil Moisture",
+            "data_provider": "Technische Universitat Wien",
+            "indicator_type": [
+                "Physics"
+
+            ],
+            "region": "Global",
+        }
+    },
     
 
 }

@@ -46,10 +46,11 @@ app.use(session({
 	key: 'collaboration',
 	secret: config.session.secret, 
 	store: app.get('sessionStore'),
-    cookie: {
-        maxAge: config.session.age || null
-    }
-}));
+   	cookie: {
+      	maxAge: config.session.age || null
+   	}
+	})
+);
 
 app.use(passport.initialize());
 
@@ -77,18 +78,18 @@ passport.deserializeUser(function(user, done) {
 // Configure Paths
 // -----------------------------------------------------------------------------
 
-app.get('/auth/google', passport.authenticate('google'));
+app.get('/node/auth/google', passport.authenticate('google'));
 
-app.get('/auth/google/callback', 
+app.get('/node/auth/google/callback', 
    passport.authenticate('google', {
-     successRedirect: '/authorised',
-     failureRedirect: '/auth-failed'
+     successRedirect: '/node/authorised',
+     failureRedirect: '/node/auth-failed'
    })
  );
 
-app.get('/authorised', function(req, res) {
-	res.send('authorised');
-	console.log(typeof(req.cookies) +': '+req.cookies);
+app.get('/node/authorised', function(req, res) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.sendFile(__dirname +'/html/authorised.html');
 })
 
 
@@ -112,7 +113,7 @@ io.set('authorization', function (handshakeData, accept) {
 	         	return accept('Error retrieving session!', false);
 	        	}
 
-	        	console.log(session);
+	        	//console.log(session);
 			});
 
       } catch(e) {
@@ -130,18 +131,50 @@ io.set('authorization', function (handshakeData, accept) {
 }); 
 
 io.on('connection', function(socket){
-	console.log('user connected');
 
-	socket.on('disconnect', function(){
+	var cookies = cookieParser.signedCookies(cookie.parse(socket.request.headers.cookie), config.session.secret);
+   var sid = cookies['collaboration'];
+
+   var user = {};
+   var sessionStore = app.get('sessionStore');
+	sessionStore.load(sid, function(err, session) {
+		if (err || !session) {
+			return 'no passport';
+		}
+
+		var emails = session.passport.user.emails;
+
+		user.email = emails[0].value;
+		user.name = session.passport.user.displayName;
+		user.provider = session.passport.user.provider;
+		
+		console.log(user.email +' connected: '+sid);
+	});
+	
+   socket.on('disconnect', function(){
+   	redisClient.del('sess:'+sid);
 		console.log('user disconnected');
+	})
+
+	socket.on('startNewRoom', function() {
+	   var shasum = crypto.createHash('sha1');
+	   shasum.update(Date.now().toString());
+	   var roomId = shasum.digest('hex').substr(0,6);
+
+	   socket.join(roomId);
+	   console.log(user.email +' is now is room '+ roomId);
+
+	   io.sockets.in(roomId).emit('roomCreated', {
+	   	"roomId": roomId
+	   });
 	})
 
 	// sets the value of an element using the ID as the selector
 	socket.on('setValueById', function(data) {
       console.log(data.logmsg);
       io.emit('setValueById', {
-         // nickname: nickname,
-         // provider: provider,
+         "presenter": user.email,
+         "provider": user.provider,
          "params" : data
       });
    });  
@@ -150,28 +183,37 @@ io.on('connection', function(socket){
    socket.on('setValueByClass', function(data) {
       console.log(data.logmsg);
       io.emit('setValueByClass', {
-   	   // nickname: nickname,
-         // provider: provider,
+   	   "presenter": user.email,
+         "provider": user.provider,
+         "params" : data
+      });
+   });  
+
+   socket.on('setSavedState', function(data) {
+      console.log(data);
+      io.emit('setSavedState', {
+   	   "presenter": user.email,
+         "provider": user.provider,
          "params" : data
       });
    });  
 
    // moves the map to new lat/lon centre point
    socket.on('mapMove', function(data) {
-      console.log(data.logmsg);
+      console.log(data);
       io.emit('mapMove', {
-        	// nickname: nickname,
-         // provider: provider,
+        	"presenter": user.email,
+         "provider": user.provider,
          "params" : data
       });
    });  
 
    // sets the zoom level of the map
    socket.on('mapZoom', function(data) {
-      console.log(data.logmsg);
+      console.log(data);
       io.emit('mapZoom', {
-         // nickname: nickname,
-         // provider: provider,
+         "presenter": user.email,
+         "provider": user.provider,
          "params" : data
       });
    });  

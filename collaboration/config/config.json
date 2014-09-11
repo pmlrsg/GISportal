@@ -5,7 +5,7 @@
       "scope" : "https://www.googleapis.com/auth/userinfo.email",
       "clientid" : "741961836801-nmj59jhukedtfuu8em2kjncpi1of3sc7.apps.googleusercontent.com",
       "clientsecret" : "bo7zPAzmqk2KOEArX6iFe8fP",
-      "callback" : "http://pmpc1465.npm.ac.uk:6789/auth/google/callback",
+      "callback" : "http://pmpc1465.npm.ac.uk:6789/node/auth/google/callback",
       "prompt": "select_account"
     }
   },

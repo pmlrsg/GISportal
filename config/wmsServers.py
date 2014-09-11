@@ -109,5 +109,18 @@ servers = {
       },
       'wcsurl': 'https://wci.earth2observe.eu/thredds/wcs/ecmwf/met_forcing_v0/wind_3hourly.nc?'
    },
+   'esa_cci_soilmoisture': { 
+      'name': 'esa_cci_soilmoisture',
+      'url': 'https://wci.earth2observe.eu/thredds/wms/tuw/esa-cci-soilmoisture-daily-agg.nc?',
+      'params': {
+         'SERVICE': 'WMS',
+         'request': 'GetCapabilities',
+         'version': '1.3.0'
+      },
+      'options': {
+         'providerShortTag': 'TUW'
+      },
+      'wcsurl': 'https://wci.earth2observe.eu/thredds/wcs/tuw/esa-cci-soilmoisture-daily-agg.nc?'
+   },
     
   }

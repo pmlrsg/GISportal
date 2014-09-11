@@ -207,8 +207,18 @@
             </div>
           </div>
 
-          <div class="js-collaboration-holder">
-            <button class="brand start-collaboration js-start-collaboration" />Start Collaboration Session</button>
+          <div class="js-collaboration-holder hidden">
+            <div class="js-collaboration-start-options">
+              <h4>Join an existing collaboration session</h4>
+              <p>If you have a collaboration reference number (a code of six letters and numbers) please enter it below to join the session</p>
+              <input type="text" id="collaboration-room-id" class="" placeholder="Collaboration reference number" />
+              <button class="brand join-collaboration js-join-collaboration" />Join</button>
+              
+              <h4>Start a new collaboration session</h4>
+              <p>To begin sharing your view of the portal with colleagues click the Start button below</p>
+              <button class="brand start-collaboration js-start-collaboration" />Start a new session</button>
+            </div>
+
             <div class="js-collaboration-console hidden">
               <button id="btn-presenter">Presenter</button>
               <button id="btn-member">Member</button>

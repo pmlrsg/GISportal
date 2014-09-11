@@ -485,13 +485,7 @@ gisportal.customPermalinkArgs = function()
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
-   /* 
-    * Set up event handling for the map 
-    */
-   function mapEvent(event) {
-      sessionSharingShareEvent(event.type);
-   }
-
+   
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
@@ -501,16 +495,19 @@ gisportal.mapInit = function() {
             zoomOutId: "mapZoomOut"
         })
       ],
-      // eventListeners: {
-      //    "moveend" : EventManager.publish("map-moveend"),
-      //    "zoomend" : EventManager.publish("map-zoomend"),
-      // }
    });
-   
-   //map.setupGlobe(map, 'map', {
-      //is3D: false,
-      //proxy: '/service/proxy?url='
-   //});
+
+   map.events.on({
+      moveend: triggerMoveend,
+      zoomend: triggerZoomend
+   });
+
+   function triggerMoveend () {
+      portalevent.trigger('map.move', map.getCenter());
+   }
+   function triggerZoomend () {
+      portalevent.trigger('map.zoom', map.getScale());
+   }
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
@@ -593,8 +590,8 @@ gisportal.nonLayerDependent = function() {
       });
    });
    
-   // map.events.register("moveend", map, EventManager.publish("map-moveend"));
-   // map.events.register("zoomend", map, collaboration.mapZoom);
+   // map.events.register("moveend", map, portalevent.trigger('map.move', [map.center.lat, map.center.lon] ));
+   // map.events.register("zoomend", map, portalevent.trigger('map.zoom', map.getScale()));
 
    //--------------------------------------------------------------------------
   
@@ -673,7 +670,6 @@ gisportal.saveState = function(state) {
    // Get timeline zoom
    state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
-
 
    return state;
 };

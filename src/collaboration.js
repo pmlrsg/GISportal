@@ -33,12 +33,13 @@ collaboration.initDOM = function() {
 
 	if (collaboration.enabled) {
 		$('.js-google-auth-button').click(function() {
-			var authWin = window.open(collaboration.socket_url +'/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');	
+			var authWin = window.open(collaboration.socket_url +'/node/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');	
 		});
 
 		$(collaboration.startButton).click(function() {
 	   	// let it begin...
 	   	collaboration.initSession();
+	   	//collaboration.startNewRoom();
 	   });	
 	}
    
@@ -91,14 +92,23 @@ collaboration.initSession = function() {
 		  	});
 
 		  	// -------------------------------------------------
+		  	// room and user management
+		  	// -------------------------------------------------
+		  	socket.on('roomCreated', function(data) {
+		  		var roomId = data.roomId;
+		  		$(collaboration.historyConsole).prepend('<p>A new session has been created; your collaboration reference is '+params.roomId+'</p>');
+		  	})
+
+		  	// -------------------------------------------------
     		// socket collaboration event functions
     		// -------------------------------------------------
 		  	
-		  	// set's the value of an element using the element's id
+		  	// sets the value of an element using the element's id
 		  	socket.on('setValueById', function(data) {
 		  		var params = data.params;
-		  		$(collaboration.historyConsole).prepend('<p>'+params.logmsg+'</p>');
+		  		$(collaboration.historyConsole).prepend('<p>'+data.presenter +': '+params.logmsg+'</p>');
 		   	if (collaboration.role == "member") {
+		   		//console.log('setting value by id');
 		   		$('#'+params.id).val(params.value);
 		   		$('#'+params.id).trigger('change');
 		   	}
@@ -106,9 +116,8 @@ collaboration.initSession = function() {
 
 		  	// map Zoom
 		  	socket.on('mapZoom', function(data) {
-		  		console.log(data);
 		  		var params = data.params;
-		  		$(collaboration.historyConsole).prepend('<p>Zoom adjusted to '+params.zoomlevel+'</p>');
+		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Zoom adjusted to '+params.zoomlevel+'</p>');
 		   	if (collaboration.role == "member") {
 		   		map.zoomToScale(params.zoomlevel);
 		   	}
@@ -117,9 +126,19 @@ collaboration.initSession = function() {
 		  	// map Move
 		  	socket.on('mapMove', function(data) {
 		  		var params = data.params;
-		  		$(collaboration.historyConsole).prepend('<p>Map centred to '+params.lat+', '+params.lon+'</p>');
+		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Map centred to '+params.lat+', '+params.lon+'</p>');
 		   	if (collaboration.role == "member") {
 		   		map.setCenter(new OpenLayers.LonLat([params.lon, params.lat]))
+		   	}
+		  	});
+
+			// User saved state
+			socket.on('setSavedState', function(data) {
+		  		console.log(data);
+		  		var params = data.params;
+		  		$(collaboration.historyConsole).prepend('<p>State restored</p>');
+		   	if (collaboration.role == "member") {
+		   		map.zoomToScale(params.zoomlevel);
 		   	}
 		  	});
 
@@ -139,6 +158,11 @@ collaboration.initSession = function() {
 	   });
 } // end initSession
 
+collaboration.startNewRoom = function() {
+	var params = { "a": "b" };
+	collaboration._emit('startNewRoom', params);
+}
+
 collaboration.setValueById = function(id, value, logmsg) {
 	var params = {
 		"id" : id,
@@ -148,19 +172,21 @@ collaboration.setValueById = function(id, value, logmsg) {
 	collaboration._emit('setValueById', params)
 }
 
-collaboration.mapZoom = function() {
+collaboration.mapZoom = function(zoomLevel) {
 	var params = {
-		"zoomlevel" : map.getScale()
+		"zoomlevel" : zoomLevel
 	}
 	collaboration._emit('mapZoom', params);
 }
 
-collaboration.mapMove = function() {
-	var params = {
-		"lat" : map.center.lat,
-		"lon" : map.center.lon
-	}
-	collaboration._emit('mapMove', params);
+collaboration.mapMove = function(center) {
+	collaboration._emit('mapMove', center);
+}
+
+collaboration.setUserSavedState = function() {
+	var params = gisportal.saveState();
+	console.log(params);
+	collaboration._emit('setSavedState', params);
 }
 
 // This is the function actually sends the message if the collaboration is active and the user is the presenter
@@ -168,4 +194,12 @@ collaboration._emit = function(cmd, params) {
 	if (collaboration.active && collaboration.role == "presenter") {
 		socket.emit(cmd, params);	
 	}
+}
+
+collaboration.userAuthorised = function() {
+	console.log('user authorised');
+	$('#gSignInWrapper').toggleClass('hidden', true);
+	$('.js-collaboration-holder').toggleClass('hidden', false);
+
+	return true;
 }
