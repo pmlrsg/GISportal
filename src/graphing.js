@@ -26,7 +26,7 @@ gisportal.graphs.defaultRequests = {
 
 
 function getIndicatorDateRange( indicator ){
-   var indicator = gisportal.microLayers[indicator];
+   var indicator = gisportal.layers[indicator];
    
    var firstDate = new Date(indicator.firstDate);
    var lastDate = new Date(indicator.lastDate);
@@ -149,7 +149,7 @@ gisportal.graphs.Plot =(function(){
       //var element = $('<div></div>').appendTo('#')
       
       if( this._components.length == 0 && this.title() == "" ){
-         var indicator = gisportal.microLayers[ component.indicator ];
+         var indicator = gisportal.layers[ component.indicator ];
          this.title( indicator.name + " - " + (new Date()) );
       }
       
@@ -177,7 +177,7 @@ gisportal.graphs.Plot =(function(){
                      .join(' - ');
                   
                   var rendered = template( {
-                     indicatorObj: gisportal.microLayers[ component.indicator ],
+                     indicatorObj: gisportal.layers[ component.indicator ],
                      bbox: this.bbox,
                      hasDataInRange: this.hasDataInRange
                   });
@@ -242,7 +242,7 @@ gisportal.graphs.Plot =(function(){
       var activePlotSlideout = gisportal.graphs.activePlotSlideout;
       
       
-      activePlotSlideout.html('').append( rendered ).addClass('show-all');
+      activePlotSlideout.addClass('show-all').find('.js-slideout-content').html('').append( rendered );
       
       //Setup the event listeners for the plot title and plot tpye fields
       rendered
@@ -504,7 +504,7 @@ gisportal.graphs.Plot =(function(){
       // Check is each indicator has data in range. If not, tell the users.
       var _this = this;
       this._components.forEach(function( component ){
-         var indicator = gisportal.microLayers[component.indicator];
+         var indicator = gisportal.layers[component.indicator];
          
          var firstDate = new Date(indicator.firstDate);
          var lastDate = new Date(indicator.lastDate);
@@ -571,7 +571,7 @@ gisportal.graphs.Plot =(function(){
       var max = null;
       
       this._components.forEach(function( component ){
-         var indicator = gisportal.microLayers[component.indicator];
+         var indicator = gisportal.layers[component.indicator];
          
          var firstDate = new Date(indicator.firstDate);
          var lastDate = new Date(indicator.lastDate);
@@ -675,7 +675,7 @@ gisportal.graphs.close_export_data = function(){
 }
 
 gisportal.graphs.export_data = function( indicator ){
-   var indicator = gisportal.microLayers[ indicator ];
+   var indicator = gisportal.layers[ indicator ];
    $('.export-data').addClass('show-all');
    
    
@@ -687,7 +687,7 @@ gisportal.graphs.export_data = function( indicator ){
 gisportal.graphs.initDOM = function() {
    gisportal.graphs.oldInitDOM();
    
-   gisportal.graphs.activePlotSlideout = $('.active-plot-slideout');
+   gisportal.graphs.activePlotSlideout = $('.js-active-plot-slideout');
    
    $('body').on('click', '.remove-active-graph', function(){
          gisportal.graphs.activePlot.activePlot( false );

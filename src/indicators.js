@@ -28,7 +28,7 @@ gisportal.indicatorsPanel.initDOM = function()  {
       } 
    });
 
-   $('.js-indicators').on('click', '.js-create-graph', function()  {
+   $('.js-indicators').on('click', '.js-add-to-plot', function()  {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.addToPlot(id);
    });
@@ -564,7 +564,7 @@ gisportal.indicatorsPanel.exportProcessed = function(id)  {
 
 gisportal.indicatorsPanel.addToPlot = function(id)  {
    var graphParams = this.getParams(id);
-   var indicator = gisportal.microLayers[id];
+   var indicator = gisportal.layers[id];
    
    gisportal.graphs.addComponentToGraph({
       indicator: id,
