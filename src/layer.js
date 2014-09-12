@@ -638,7 +638,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    
    
    // Store new layer.
-   gisportal.layers[this.id] = this;
+   //gisportal.layers[this.id] = this;
 };
 
 /**
