@@ -246,7 +246,7 @@ gisportal.groupNames = function()  {
                // Convert tagName to lowercase so that it doesn't produce duplicates
                tagName = tagName.toLowerCase();
                // If the cat already exists, use that, otherwise create a new array for it
-               if (!group[name][cat]) group[name][cat] = [];
+               if (!group[name][cat]) group[name][cat] = {};
                // If the tagName already exists, use that, otherwise create a new array for it
                if (!group[name][cat][tagName]) group[name][cat][tagName] = [];
                // Add the id to the tagName array
@@ -258,7 +258,7 @@ gisportal.groupNames = function()  {
                   // innerTagName is the actual tag name, needs to be lowercase
                   var innerTagName = tagName[k].toLowerCase();
                   // If cat has an array, use that, otherwise create one
-                  if (!group[name][cat]) group[name][cat] = []; 
+                  if (!group[name][cat]) group[name][cat] = {}; 
                   // If innerTagName has an array, use that, otherwise create one
                   if (!group[name][cat][innerTagName]) group[name][cat][innerTagName] = [];
                   // Add the id to the innerTagName array
