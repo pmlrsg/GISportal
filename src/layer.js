@@ -39,8 +39,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.metadataQueue = [];
 
    this.defaults = {
-      firstDate : null,
-      lastDate : null,
+      firstDate : '',
+      lastDate : '',
       scalebarOpen : null,
       serverName : null,
       wfsURL : null,
@@ -109,11 +109,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    // be deprecated as selected layers can be found in
    // gisportal.selectedLayers now.
    this.selected = false;
-   
-   // Date Range
-   // These are set with getDimensions
-   this.firstDate = '';
-   this.lastDate = '';
    
    //--------------------------------------------------------------------------
    // The min and max scale range, used by the scalebar
