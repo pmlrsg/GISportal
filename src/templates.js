@@ -47,3 +47,13 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
 Handlebars.registerHelper('index_plus_one', function( options ) {
    return options.data.index + 1;
 });
+
+
+/* Add some usefull handlebars calls */
+Handlebars.registerHelper('truncate', function(text, max_length) {
+   
+   if(text.length > max_length)
+      return new Handlebars.SafeString('<span title="' + text + '">' + text.substring( 0 , max_length - 3 ) + '...</span>');
+   else
+      return text;
+});

@@ -35,45 +35,26 @@ function getIndicatorDateRange( indicator ){
 }
 
 
-gisportal.graphs.templates = {};
-
-
-/* Add some usefull handlebars calls */
-Handlebars.registerHelper('truncate', function(text, max_length) {
-   
-   if(text.length > max_length)
-      return new Handlebars.SafeString('<span title="' + text + '">' + text.substring( 0 , max_length - 3 ) + '...</span>');
-   else
-      return text;
-});
+gisportal.templates = {};
 
 
 
-$.get('templates/active-plot.mst', function( template ){
-   gisportal.graphs.templates['active-plot'] = Handlebars.compile(template);
-});
-
-$.get('templates/active-plot-component.mst', function( template ){
-   gisportal.graphs.templates['active-plot-component'] = Handlebars.compile(template);
-});
-
-
-$.get('templates/graph-job.mst', function(template) {
-   gisportal.graphs.templates['graph-job'] = Handlebars.compile(template);
-});
-
-
-gisportal.graphs.activePlot = null;
+gisportal.graphs.activePlotEditor = null;
 
 gisportal.graphs.addComponentToGraph = function( component ){
    
    if( gisportal.graphs.activePlot == null ){
-      var newPlot = new (gisportal.graphs.Plot)();
-         newPlot
-         .plotType( 'timeseries' )
-          .activePlot(true) //this will set 'gisportal.graphs.activePlot'
+      var PlotEditor = gisportal.graphs.PlotEditor;
+      var Plot = gisportal.graphs.Plot;
+
+      var plot = new Plot();
+      var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
+
+   gisportal.graphs.activePlotEditor = plotEditor;
+
+      plot.plotType( 'timeseries' )
    }
-   gisportal.graphs.activePlot.addComponent( component )
+   gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
 
 
@@ -168,7 +149,7 @@ gisportal.graphs.Plot =(function(){
             // Update the UI to inform the user 
             if( plot.activePlot() ){
                if( this.slideOutElement == void(0) ){
-                  var template = gisportal.graphs.templates['active-plot-component'];
+                  var template = gisportal.templates['active-plot-component'];
                   
                   var indicatorDateRange = getIndicatorDateRange( this.indicator )
                      .map(function( date ){
@@ -225,100 +206,8 @@ gisportal.graphs.Plot =(function(){
    * Setups up the active plot window and binds all the events
    */
    Plot.prototype.setupActivePlotSlideout = function(){
+      ///////////////////////////////////////////////////////////////////REMOVE
       
-      var _this = this;
-      
-      var template = gisportal.graphs.templates['active-plot'];
-   
-      var rendered = template({
-         title : this._title,
-         components: this.components
-      });
-      
-      var rendered = $( rendered );
-      
-      this.slideout = rendered;
-      
-      var activePlotSlideout = gisportal.graphs.activePlotSlideout;
-      
-      
-      activePlotSlideout.addClass('show-all').find('.js-slideout-content').html('').append( rendered );
-      
-      //Setup the event listeners for the plot title and plot tpye fields
-      rendered
-         .on('change', '.active-plot-title', function(){
-            _this.title( $(this).val() );
-         })
-         .on('change', '.active-plot-type', function(){
-            _this.plotType( $(this).val() );
-         })
-      
-      //Setup the date slider
-      rendered.find('.range-slider').noUiSlider({
-         start: [
-            this.tBounds()[0].getTime(),
-            this.tBounds()[1].getTime(),
-         ],
-         connect: true,
-         behaviour: 'tap-drag',
-         range: {
-            'min': this.dateRangeBounds().min.getTime(),
-            'max': this.dateRangeBounds().max.getTime()
-         },
-         serialization: {
-            lower: [
-               $.Link({
-                  target: rendered.find('.active-plot-start-datetime'),
-                  method: setDate 
-               })
-            ],
-            upper: [
-               $.Link({
-                  target: rendered.find('.active-plot-end-datetime'),
-                  method: setDate
-               })
-            ],
-            format: {
-               decimals: 0
-            }
-         }
-      })
-      // Listen for when the user moves the slider and update the tBounds
-      .on('slide', function(event, val){
-         var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp) });
-         _this.tBounds( tBounds );
-      })
-      
-      // The start date input element is manually typed update  dataRangeBounds
-      rendered.find('.active-plot-start-datetime').change(function(){
-         var newDate = new Date( $(this).val() );
-         var currentTBounds = _this.tBounds();
-         
-         if( isNaN( newDate.getTime() ) )
-            setDate.call(this, currentTBounds[0] );
-         else
-            _this.tBounds( [ newDate, currentTBounds[1] ] );
-      })
-      
-      // The end date input element is manually typed update  dataRangeBounds
-      rendered.find('.active-plot-end-datetime').change(function(){
-         var newDate = new Date( $(this).val() );
-         var currentTBounds = _this.tBounds();
-         
-         if( isNaN( newDate.getTime() ) )
-            setDate.call(this, currentTBounds[1] );
-         else
-            _this.tBounds( [ currentTBounds[0] , newDate ] );
-      })
-      
-      
-      //Setup the active "create graph" button
-      rendered.on('click', '.create-graph', function(){
-         _this.activePlot( false );
-         _this.submitRequest();
-         $('.panel.active').removeClass('active').addClass('hidden');
-         $('#historyPanel').removeClass('hidden').addClass('active')
-      })
       
    }
    
@@ -375,7 +264,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.addStatusElementToDom = function(){
       var _this = this;
       
-      var template = gisportal.graphs.templates['graph-job'] ;
+      var template = gisportal.templates['graph-job'] ;
          
       var rendered = template({
          title : _this._title,
@@ -631,43 +520,156 @@ gisportal.graphs.Plot =(function(){
    }
    
    
-   /**
-   * If set to true it setups up the active graph slider automaticlly.
-   * This will remove any currently active plot
-   */
-   Plot.prototype.activePlot = function( _ ){
-      if( !arguments.length ) return this._activePlot;
-      
-      if( _ == true ){
-         //If the plot is becoming active connect it to the UI
-         this._activePlot = _;
-         
-         //Remove the last active plot
-         var lastActivePlot = gisportal.graphs.activePlot;
-         if( lastActivePlot instanceof Plot  )
-            lastActivePlot.activePlot( false );
-         
-         //Setup self as new active plot
-         gisportal.graphs.activePlot = this;
-         this.setupActivePlotSlideout();
-         
-      }else if( _ == false  ){
-         //Unset the current graph from being the active plot
-         this._activePlot = _;
-         if( gisportal.graphs.activePlot == this ){
-            gisportal.graphs.activePlot = null;
-            this.removeActivePlotSlideout();
-         }
-      }
-      
-      return this;
-   }
-   
-   
-   
    
    return Plot;
 })(); 
+
+
+
+
+
+
+
+gisportal.graphs.PlotEditor = (function(){
+
+   /**
+    * Creates a new PlotEditer object which will edit a plot object
+    *
+    * @param {Plot} plot The plot object to edit
+    * @dom {HTMLElement} editorParent The html object where the editor will be placed.
+    */
+   var PlotEditor = function( plot, editorParent ){
+      this._plot = plot;
+
+      this._editorParent = $(editorParent);
+
+      this.rebuildEditor();
+   }
+
+
+   PlotEditor.prototype.rebuildEditor = function(){
+
+      var rendered = gisportal.templates['active-plot']({
+         plot: this._plot,
+      });
+
+      this._editorParent.html( rendered );
+
+
+      var _this = this;
+      //Setup the event listeners for the plot title and plot tpye fields
+      this._editorParent
+         .on('change', '.active-plot-title', function(){
+            _this.title( $(this).val() );
+         })
+         .on('change', '.active-plot-type', function(){
+            _this.plotType( $(this).val() );
+         })
+      
+      //Setup the date slider
+      this._editorParent.find('.range-slider').noUiSlider({
+         start: [
+            this.tBounds()[0].getTime(),
+            this.tBounds()[1].getTime(),
+         ],
+         connect: true,
+         behaviour: 'tap-drag',
+         range: {
+            'min': this.dateRangeBounds().min.getTime(),
+            'max': this.dateRangeBounds().max.getTime()
+         },
+         serialization: {
+            lower: [
+               $.Link({
+                  target: this._editorParent.find('.active-plot-start-datetime'),
+                  method: setDate 
+               })
+            ],
+            upper: [
+               $.Link({
+                  target: this._editorParent.find('.active-plot-end-datetime'),
+                  method: setDate
+               })
+            ],
+            format: {
+               decimals: 0
+            }
+         }
+      })
+      // Listen for when the user moves the slider and update the tBounds
+      .on('slide', function(event, val){
+         var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp) });
+         _this.tBounds( tBounds );
+      })
+      
+      // The start date input element is manually typed update  dataRangeBounds
+      this._editorParent.find('.active-plot-start-datetime').change(function(){
+         var newDate = new Date( $(this).val() );
+         var currentTBounds = _this.tBounds();
+         
+         if( isNaN( newDate.getTime() ) )
+            setDate.call(this, currentTBounds[0] );
+         else
+            _this.tBounds( [ newDate, currentTBounds[1] ] );
+      })
+      
+      // The end date input element is manually typed update  dataRangeBounds
+      this._editorParent.find('.active-plot-end-datetime').change(function(){
+         var newDate = new Date( $(this).val() );
+         var currentTBounds = _this.tBounds();
+         
+         if( isNaN( newDate.getTime() ) )
+            setDate.call(this, currentTBounds[1] );
+         else
+            _this.tBounds( [ currentTBounds[0] , newDate ] );
+      })
+      
+      
+      //Setup the active "create graph" button
+      this._editorParent.on('click', '.create-graph', function(){
+         _this.submitRequest();
+         $('.panel.active').removeClass('active').addClass('hidden');
+         $('#historyPanel').removeClass('hidden').addClass('active')
+      })
+
+
+
+   }
+
+
+   PlotEditor.prototype.plot = function(){
+      return this._plot;
+   }
+
+
+   return PlotEditor;
+})();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 gisportal.graphs.close_export_data = function(){

@@ -5,7 +5,7 @@
 		<p class="number grid-cell">1</p>
 		<div class="grid-cell fill">
 			<p>Title:</p>
-			<input type="text" class="active-plot-title" value="{{title}}" />
+			<input type="text" class="active-plot-title" value="{{plot.title}}" />
 		</div>
 	</li>
 	
