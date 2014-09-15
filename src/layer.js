@@ -88,6 +88,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
    }
 
+   this.tags['providerTag'] = this.providerTag;
+
    // I do not like the metadataQueue but it is used to
    // prevent race conditions of AJAX calls such as
    // for the scalebar.

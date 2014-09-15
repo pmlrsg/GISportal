@@ -137,7 +137,7 @@ gisportal.TimeLine = function(id, options) {
          return;
       }
       
-      var x = d3.mouse(this)[0];       
+      var x = d3.mouse(this)[0];
       
       // Prevent dragging the selector off-scale
       x = (x > self.xScale.range()[0] && x < self.xScale.range()[1]) ? x : (x - d3.event.layerX);
