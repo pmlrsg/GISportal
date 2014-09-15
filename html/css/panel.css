@@ -34,7 +34,7 @@
   z-index: -1;
 
   position: absolute;
-	left: calc( 100% - 2px );
+	left: calc( 100% );
 	top: 50px;
 	bottom: 75px;
   transition: 500ms width;
@@ -45,24 +45,25 @@
 .panel-slideout-content{
   transition: 500ms left;
   background-color: white;
-  width: 300px;
+  width: 400px;
   position: absolute;
   overflow-y: scroll;
-  left: -300px;
+  left: -400px;
 
   max-height: 100%;
+  height: 100%;
 }
 .panel-slideout.show-side {
   width: 30px;
 }
 
 .panel-slideout.show-side .panel-slideout-content{
-	left: calc( -300px + 30px );
+	left: calc( -400px + 30px );
 }
 	
 
 .panel-slideout.show-all {
-  width: 300px;
+  width: 400px;
 }
 .panel-slideout.show-all .panel-slideout-content{
 	left: 0px;
