@@ -50,7 +50,8 @@ gisportal.refinePanel.close = function()  {
  */
 gisportal.refinePanel.foundIndicator = function(data)  {
    var id = data.id || data;
-   if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found)) return false;
+   if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found))
+      gisportal.configurePanel.deselectLayer( id );
    this.found = true;
    gisportal.indicatorsPanel.selectLayer(id);
    var tmp = {
@@ -182,6 +183,7 @@ gisportal.refinePanel.render = function(data, group)  {
       
    indicator.hasInterval = false;
    indicator.hasConfidence = false;
+   indicator.hasProvider = false;
    if ((refined && gisportal.refinePanel.found !== false) || group.region.length === 1)  {
       indicator.refined = true;
       var found = true;
@@ -193,6 +195,10 @@ gisportal.refinePanel.render = function(data, group)  {
       
       if (group.Confidence.length > 1)  {
          indicator.hasConfidence = true;
+         found = false;
+      }
+      if (group.providerTag.length > 1)  {
+         indicator.hasProvider = true;
          found = false;
       }
       
@@ -239,6 +245,7 @@ gisportal.refinePanel.render = function(data, group)  {
    $('#refine-interval').parent().toggleClass('hidden', true);
    $('#refine-confidence').parent().toggleClass('hidden', true);
    $('#refine-reliability').parent().toggleClass('hidden', true);
+   $('#refine-provider').parent().toggleClass('hidden', true);
    
    if (indicator.hasInterval)  {
       indicator.tag = indicator.groupedNames['interval'];
@@ -250,6 +257,13 @@ gisportal.refinePanel.render = function(data, group)  {
       indicator.tag = indicator.groupedNames['Confidence'];
       var rendered = Mustache.render(template, indicator);
       $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false); 
+   }
+
+
+   if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1 ) && (!indicator.hasConfidence || group.Confidence.length <= 1 )) {
+      indicator.tag = indicator.groupedNames['providerTag'];
+      var rendered = Mustache.render(template, indicator);
+      $('#refine-provider').html(rendered).parent().toggleClass('hidden', false); 
    } 
 
    if (refined)  {
