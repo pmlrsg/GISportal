@@ -51,9 +51,6 @@
 <!-- jStorage - Used for large local storage -->
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
 
-
-<!-- Error logging -->
-<script src="//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js"></script>
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
@@ -141,7 +138,7 @@
       <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select">
 	       <div class="panel-container-solid-backdrop">
             <div class="js-refine-section-region">
-              Select a region:
+              Select a Region:
               <label for="refine-region" class="indicator-dropdown">
                  Region
                  <span class="icon_arrow"></span>
@@ -152,7 +149,7 @@
            
            
            <div class="js-refine-section-interval">
-              Interval a region:
+              Select a Interval:
               <label for="refine-interval" class="indicator-dropdown">
                  Interval
                  <span class="icon_arrow"></span>
@@ -161,7 +158,6 @@
               </ul>
            </div>
            
-           
            <div class="js-refine-section-reliability">
               Select a Reliability:
               <label for="refine-reliability" class="indicator-dropdown">
@@ -169,6 +165,17 @@
                  <span class="icon_arrow"></span>
               </label>
               <ul id="refine-reliability" class=" fake-select panel-list grid-list">
+              </ul>
+           </div>
+           
+
+           <div class="js-refine-section-provider">
+              Select a Provider:
+              <label for="refine-provider" class="indicator-dropdown">
+                 Provider
+                 <span class="icon_arrow"></span>
+              </label>
+              <ul id="refine-provider" class=" fake-select panel-list grid-list">
               </ul>
            </div>
            
@@ -202,6 +209,16 @@
             <span class="icon-filled-link icon-btn"> </span>
               Share
           </button>
+      </div>
+   
+
+      <!-- Slideout example -->
+      <div class="panel-slideout" data-slideout-name="example">
+        <div class="panel-slideout-content js-slideout-content">
+          <!-- Slideout contents should go here -->
+          <button class="js-slideout-close">Close</button>
+          <button class="js-slideout-peak">Peak</button>
+        </div>
       </div>
    </div>
    

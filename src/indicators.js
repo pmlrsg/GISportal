@@ -328,20 +328,12 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 };
 
 // Needs a refactor
-gisportal.indicatorsPanel.initialiseSliders = function(id, firstDate, lastDate) {
-   // The dates stored in layer are DD-MM-YYYY instead of YYYY-MM-DD
-   var firstDateLayer = gisportal.layers[id].firstDate;
-   firstDateLayer = firstDateLayer.split('-').reverse().join('-');
-   var lastDateLayer = gisportal.layers[id].lastDate;
-   lastDateLayer = lastDateLayer.split('-').reverse().join('-');
-   if (_.findIndex(gisportal.selectedLayers, id)) {
-      var firstDate = firstDate || firstDateLayer || '';
-      var lastDate = lastDate || lastDateLayer || '';
-   } else {
-      var firstDate = firstDate || '';
-      var lastDate = lastDate || '';
-   }
 
+gisportal.indicatorsPanel.initialiseSliders = function(id)  {
+   // The dates stored in layer are DD-MM-YYYY instead of YYYY-MM-DD
+   var firstDate = gisportal.layers[id].firstDate;
+   var lastDate = gisportal.layers[id].lastDate;
+ 
    var from = $('.js-min[data-id="' + id + '"]');
    var to = $('.js-max[data-id="' + id + '"]');
 
