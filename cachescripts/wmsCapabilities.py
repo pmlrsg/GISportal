@@ -4,6 +4,8 @@ import os
 import utils
 import sys
 import re
+import dateutil.parser
+import calendar
 
 sys.path.append(os.path.join(sys.path[0],'..','config'))
 # server list
@@ -194,7 +196,18 @@ def createCache(server, capabilitiesXML, coverageXML):
       
    # Return and save out the cache for this server
    return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
-                     
+
+def isoToTimestamp( strDate ):
+   dt = dateutil.parser.parse(strDate)
+   return calendar.timegm(dt.utctimetuple())
+
+
+def compareDateStrings( a, b ):
+   if isoToTimestamp(a) > isoToTimestamp(b):
+      return 1
+   else:
+      return -1
+
 def createDimensionsArray(layer, server):
    import string
    dimensions = {}
@@ -231,6 +244,8 @@ def createDimensionsArray(layer, server):
             if dateTime.find('-') != 4:
                newDates.pop()
          
+         newDates.sort( compareDateStrings )
+
          if len(newDates) > 0:
             dimensions['firstDate'] = newDates[0].strip()[:10]
             dimensions['lastDate'] = newDates[len(newDates) - 1].strip()[:10]
