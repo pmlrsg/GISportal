@@ -4,6 +4,7 @@
       "html/js-libs/"
    ],
    "files": [
+      "src/EventManagers.js",
       "src/gisportal.js",
       "src/templates.js",
       "src/portal.js",
