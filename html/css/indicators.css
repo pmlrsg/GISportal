@@ -37,6 +37,13 @@
    float: right;
 }
 
+.icon_line {
+  float: right;
+}
+
+.icon_poly {
+  float: right;
+}
 .coordinates  {
    margin-top: 15px;
 }
