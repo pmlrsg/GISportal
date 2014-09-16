@@ -223,7 +223,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.elevationUnits = value.Units;
          }
       });
-      gisportal.indicatorsPanel.initialiseSliders(layer.id);
    };
    
    //--------------------------------------------------------------------------
@@ -427,7 +426,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.getMetadata = function() {
       var layer = this;
-      console.log(layer);
+      
       $.ajax({
          type: 'GET',
          url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
