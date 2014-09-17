@@ -727,6 +727,7 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options) {  
   var options = options || {};
   var id = layer.id; 
+
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
