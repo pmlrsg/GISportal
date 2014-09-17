@@ -112,10 +112,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    // gisportal.selectedLayers now.
    this.selected = false;
    
-<<<<<<< HEAD
-   
-=======
->>>>>>> dev
    //--------------------------------------------------------------------------
    // The min and max scale range, used by the scalebar
    this.maxScaleVal = null;
@@ -214,12 +210,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.temporal = true;
             var datetimes = dimension.Value.split(',');           
             layer.DTCache = datetimes;
-<<<<<<< HEAD
-=======
-            //layer.firstDate = gisportal.utils.displayDateString(datetimes[0]);
-            //layer.lastDate = gisportal.utils.displayDateString(datetimes[datetimes.length - 1]);
->>>>>>> dev
-         
+
          // Elevation dimension   
          } else if (value.Name.toLowerCase() == 'elevation') {
             layer.elevation = true;
@@ -316,11 +307,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
                  
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
-<<<<<<< HEAD
+         
          $('#viewDate').datepicker("option", "defaultDate", endDate);
-=======
-         $('#viewDate').datepicker("option", "defaultDate", new Date('dd-mm-yy', layer.lastDate));
->>>>>>> dev
 
          gisportal.zoomOverall();
       } else {

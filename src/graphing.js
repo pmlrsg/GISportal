@@ -50,9 +50,10 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var plot = new Plot();
       var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
 
-   gisportal.graphs.activePlotEditor = plotEditor;
+      gisportal.graphs.activePlotEditor = plotEditor;
+      gisportal.panelSlideout.openSlideout( 'active-plot' );
 
-      plot.plotType( 'timeseries' )
+      plot.plotType( 'timeseries' );
    }
    gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
@@ -412,12 +413,6 @@ gisportal.graphs.Plot =(function(){
       //Update the slide with the new range ONLY if the slider doesnt already have this range
       var currentSliderValues = this.slideout.find('.range-slider').val().map(Number);
       if( ! currentSliderValues.equals( this._tBounds.map(Number) ) ){
-         _this.slideout.find('.range-slider').noUiSlider({
-            start: [
-               this._tBounds[0].getTime(),
-               this._tBounds[1].getTime()
-            ]
-         }, true);
       };
       
       return this;
@@ -479,43 +474,33 @@ gisportal.graphs.Plot =(function(){
    }
    
    /**
-   * The data range is the maxium range that covers all the components
+   * The data range is the maximum range that covers all the components
    * When this is called and if this graph is the active plot it updates the slide out :
    *  - Updates the date range slider
    *  - Calls set tBounds to check that all the indicators are in range 
    */
    Plot.prototype.dateRangeBounds = function( _ ){
       if( !arguments.length ) return this._dateRangeBounds;
+
       var oldDateRange = this._dateRangeBounds;
       this._dateRangeBounds = _;
       
-      if( this.activePlot() ){
-         
-         //Update the slide with the new range
-         this.slideout.find('.range-slider').noUiSlider({
-            range:{
-               min: this._dateRangeBounds.min.getTime(),
-               max: this._dateRangeBounds.max.getTime()
-            }
-         }, true);
-         
          // Adjust the tBounds to a new width 
          //  If a bound was equal to the old date range, the user probably wants the full time scale
-         var newtBounds = [];
-         
-         if( this.tBounds()[0].getTime() == oldDateRange.min.getTime() )
-            newtBounds[0] = this._dateRangeBounds.min;
-         else
-            newtBounds[0] = this.tBounds()[0];
-            
-         if( this.tBounds()[1].getTime() == oldDateRange.max.getTime() )
-            newtBounds[1] = this._dateRangeBounds.max;
-         else
-            newtBounds[1] = this.tBounds()[1];
-         
-         this.tBounds( newtBounds );
-      }
+      var newtBounds = [];
       
+      if( this.tBounds()[0].getTime() == oldDateRange.min.getTime() )
+         newtBounds[0] = this._dateRangeBounds.min;
+      else
+         newtBounds[0] = this.tBounds()[0];
+         
+      if( this.tBounds()[1].getTime() == oldDateRange.max.getTime() )
+         newtBounds[1] = this._dateRangeBounds.max;
+      else
+         newtBounds[1] = this.tBounds()[1];
+      
+      this.tBounds( newtBounds );
+
       return this;
    }
    
@@ -558,25 +543,76 @@ gisportal.graphs.PlotEditor = (function(){
 
       var _this = this;
       //Setup the event listeners for the plot title and plot tpye fields
+
       this._editorParent
          .on('change', '.active-plot-title', function(){
-            _this.title( $(this).val() );
+            _this._plot.title( $(this).val() );
          })
          .on('change', '.active-plot-type', function(){
-            _this.plotType( $(this).val() );
+            _this._plot.plotType( $(this).val() );
          })
       
+      this.setupDateRangeSlider();
+      
+      //Setup the active "create graph" button
+      this._editorParent.on('click', '.create-graph', function(){
+         _this.submitRequest();
+      })
+
+   }
+
+   /**
+    * Finished the building of this graph.
+    *  - Closes the graph editor panel.
+    *  - Tells the plot to make the request.
+    *
+    */
+   PlotEditor.prototype.submitRequest = function(){
+         _this.plot().submitRequest();
+         gisportal.graphs.activePlotEditor = null;
+         gisportal.panelSlideout.closeSlideout( 'active-plot' );
+   }
+
+
+   PlotEditor.prototype.updateDateRangeSlider = function(){
+      var tBounds = this.plot().tBounds();
+      var dateRangeBounds = this.plot().dateRangeBounds();
+
+
+      _this.slideout.find('.range-slider').noUiSlider({
+         start: [
+            this._tBounds[0].getTime(),
+            this._tBounds[1].getTime()
+         ],
+         range:{
+            min: this._dateRangeBounds.min.getTime(),
+            max: this._dateRangeBounds.max.getTime()
+         }
+      }, true);
+
+   }
+
+   /**
+    * Setups the the date slider on graph apne.
+    * - Starts the slide and sets its initails values
+    * - Sets up the 2 date text boxes to accept change events
+    */
+   PlotEditor.prototype.setupDateRangeSlider = function(){
+      var tBounds = this.plot().tBounds();
+      var dateRangeBounds = this.plot().dateRangeBounds();
+
+
       //Setup the date slider
       this._editorParent.find('.range-slider').noUiSlider({
          start: [
-            this.tBounds()[0].getTime(),
-            this.tBounds()[1].getTime(),
+            tBounds[0].getTime(),
+            tBounds[1].getTime(),
          ],
          connect: true,
          behaviour: 'tap-drag',
          range: {
-            'min': this.dateRangeBounds().min.getTime(),
-            'max': this.dateRangeBounds().max.getTime()
+            'min': dateRangeBounds.min.getTime(),
+            'max': dateRangeBounds.max.getTime()
          },
          serialization: {
             lower: [
@@ -623,17 +659,6 @@ gisportal.graphs.PlotEditor = (function(){
          else
             _this.tBounds( [ currentTBounds[0] , newDate ] );
       })
-      
-      
-      //Setup the active "create graph" button
-      this._editorParent.on('click', '.create-graph', function(){
-         _this.submitRequest();
-         $('.panel.active').removeClass('active').addClass('hidden');
-         $('#historyPanel').removeClass('hidden').addClass('active')
-      })
-
-
-
    }
 
 
