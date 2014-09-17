@@ -75,6 +75,13 @@
    background-image: url('../img/icons/select-rect.svg');
 }
 
+.icon_line {
+   background-image: url('../img/icons/line.svg');
+}
+
+.icon_poly {
+   background-image: url('../img/icons/polygon.svg');
+}
 .icon_analyse  {
    background-image: url('../img/icons/graph.svg');
 }

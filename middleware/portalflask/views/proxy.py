@@ -21,7 +21,7 @@ allowedHosts = ['localhost','localhost:8080','localhost:86','localhost:85',
          'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
          'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu',
          'thredds.met.no','thredds.met.no:8080', 'irs.gis-lab.info',
-         'demonstrator.vegaspace.com', 'grid.bodc.nerc.ac.uk', 'ogc.hcmr.gr:8080' ]
+         'demonstrator.vegaspace.com', 'grid.bodc.nerc.ac.uk', 'ogc.hcmr.gr:8080','wci.earth2observe.eu' ]
          
 """
 Standard proxy
