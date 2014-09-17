@@ -202,6 +202,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
 };
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
+
    $('.js-indicators > li[data-id="' + id + '"]').remove();
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
