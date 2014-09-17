@@ -343,6 +343,8 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
       var max = new Date(lastDate).getTime();
       var Link = $.noUiSlider.Link;
       var slider = $('.range-slider[data-id="' + id + '"]');
+
+try{
       slider.noUiSlider({
          start: [min, max],
          connect: true,
@@ -369,7 +371,7 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
             }
          }
       });
-
+}catch(e){};
 
       slider.on('slide', function(event, val) {
          var interval;
