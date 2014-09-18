@@ -11,6 +11,7 @@ gisportal.selectionTools = {};
 gisportal.selectionTools.init = function()  {
    gisportal.selectionTools.initDOM();
    var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
+
       style : {
          strokeColor : 'white',
          fillColor : 'green',
@@ -215,7 +216,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       case 'circle':
          // set the .bbox-info div to show lat/long of the centre, the radius, width, height and area
          break;
-      case 'polgon':
+      case 'polygon':
          // set the .bbox-info div to show the centroid lat/long and area
          $('.js-bbox-width').html('');
          $('.js-bbox-height').html('');
