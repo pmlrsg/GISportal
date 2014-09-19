@@ -463,6 +463,10 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       });
    };
 
+   this.cacheUrl = function(){
+     return location.href + 'cache/layers/' + layer.serverName + '_' + layer.origName + '.json'
+   }
+
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
     * These are stored in layer.openlayers. Currently the implementation

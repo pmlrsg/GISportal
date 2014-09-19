@@ -249,17 +249,23 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
    var indicator = gisportal.layers[id];
-   var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
-   indicator.modified = gisportal.utils.nameToId(indicator.name);
-   indicator.modifiedName = modifiedName;
-   var rendered = gisportal.templates['tab-analysis'](indicator);
-   $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
-   $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
-   gisportal.indicatorsPanel.checkTabFromState(id);
+   var onMetadata = function() {
+      var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
+      indicator.modified = gisportal.utils.nameToId(indicator.name);
+      indicator.modifiedName = modifiedName;
+      var rendered = gisportal.templates['tab-analysis'](indicator);
+      $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
+      $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
-   gisportal.replaceAllIcons();
-   //gisportal.indicatorsPanel.initialiseSliders(id);
+      gisportal.indicatorsPanel.checkTabFromState(id);
+
+      gisportal.replaceAllIcons();
+   }
+
+   if (indicator.metadataComplete) onMetadata();
+   else indicator.metadataQueue.push(onMetadata);
+
 };
 
 /**
@@ -320,6 +326,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
             styles: value
          });
          gisportal.indicatorsPanel.scalebarTab(id);
+
       });
       gisportal.indicatorsPanel.checkTabFromState(id);
    }
@@ -571,10 +578,17 @@ gisportal.indicatorsPanel.addToPlot = function(id)  {
    var graphParams = this.getParams(id);
    var indicator = gisportal.layers[id];
    
-   gisportal.graphs.addComponentToGraph({
+   var component = {
       indicator: id,
       bbox: graphParams.bbox
-   });
+   };
+
+
+   var elevationSelect = $('.js-tab-analysis[data-id="' + id + '"] .js-analysis-elevation');
+   if( elevationSelect.length == 1 )
+      component.elevation = elevationSelect.val();
+
+   gisportal.graphs.addComponentToGraph( component );
    
 };
 

@@ -23,7 +23,7 @@
          <label for="tab-{{id}}-elevation">Elevation</label>
          <select id="tab-{{id}}-elevation">
             {{#elevationCache}}
-               <option {{#if_equals this @root.selectedElevation}}selected{{/if_equals}} value="{{.}}">{{.}} {{@root.elevationUnits}}</option>
+               <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
             {{/elevationCache}}
          </select>
       </div>
@@ -34,7 +34,7 @@
          <label for="tab-{{id}}-layer-style">Layer style</label>
          <select id="tab-{{id}}-layer-style">
             {{#styles}}                  
-               <option {{#if_equals Name @root.style}}selected{{/if_equals}} value="{{Name}}">{{Name}}</option>
+               <option {{selected Name @root.style}} value="{{Name}}">{{Name}}</option>
             {{/styles}}
          </select>
       </div>

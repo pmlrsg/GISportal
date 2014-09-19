@@ -977,7 +977,6 @@ gisportal.initStart = function()  {
       gisportal.loadState( gisportal.getAutoSaveState() );
       setInterval( gisportal.autoSaveState, 60000 );
    });
-
      
    $('.js-start').click(function()  {
       $('.start').toggleClass('hidden', true);

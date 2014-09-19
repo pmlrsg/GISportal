@@ -34,6 +34,12 @@ gisportal.loadTemplates = function( callback ){
 	})
 }
 
+/**
+ * Runs an image through the middleware to rotate it on the server
+ * @param  {[string]} imgUrl URL of the original image you want to rotate
+ * @param  {[init]} angle The angle to rotate the image by
+ * @return {[string]} The new image URL
+ */
 Handlebars.registerHelper('rotate_image', function(imgUrl, angle) {
   return "/service/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
 });
@@ -44,12 +50,23 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
 });
 
 
+/**
+ * Returns the index of the current handelbars loop + 1
+ */
 Handlebars.registerHelper('index_plus_one', function( options ) {
    return options.data.index + 1;
 });
 
 
-/* Add some usefull handlebars calls */
+
+/**
+ * Truncates a string to a certain length
+ * and puts a tool tip on it with the full text.
+ *
+ * @param {string} text The text to shorten
+ * @param {int} decimals The maximum lets to show
+ * @return {string} The text shortened possible in a span tag for the tooltip
+ */
 Handlebars.registerHelper('truncate', function(text, max_length) {
    
    if(text.length > max_length)
@@ -57,3 +74,27 @@ Handlebars.registerHelper('truncate', function(text, max_length) {
    else
       return text;
 });
+
+
+/**
+ * Can be used in with <option> tags. It compares to 2 
+ * input parameters, if they match it prints "select" which
+ * will set the option tag as selected.
+ */
+Handlebars.registerHelper('selected', function(attr1, attr2, options) {
+   if( attr1 == attr2 )
+      return 'selected'
+});
+
+/**
+ * Rounds the input to a certain precision
+ * @param {float} number The number to round
+ * @param {int} decimals OPTIONAL How many decimals to round to, defaults to 0
+ * @return {float} The rounded number
+ */
+Handlebars.registerHelper('round', function(number, decimals, options) {
+   var decimals = decimals || 0;
+   var offset = Math.pow( 10 ,decimals  );
+   return Math.round( number * offset ) / offset;
+});
+

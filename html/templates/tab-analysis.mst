@@ -18,6 +18,17 @@
             <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
          </div>
 
+         {{#elevation}}
+            <p>Choose a layer elevation:</p>
+            <div class="elevation">
+               <select class="js-analysis-elevation">
+                  {{#elevationCache}}
+                     <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
+                  {{/elevationCache}}
+               </select>
+            </div>
+         {{/elevation}}
+
          <div class="grid-cell fill">
             <button data-id="{{id}}" class="brand add-to-plot js-add-to-plot">Add to plot</button>
          </div>

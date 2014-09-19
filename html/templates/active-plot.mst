@@ -5,7 +5,7 @@
 		<p class="number grid-cell">1</p>
 		<div class="grid-cell fill">
 			<p>Title:</p>
-			<input type="text" class="active-plot-title" value="{{plot.title}}" />
+			<input type="text" class="js-active-plot-title" value="{{plot._title}}" />
 		</div>
 	</li>
 	
@@ -13,22 +13,24 @@
 		<p class="number grid-cell">2</p>
 		<div class="grid-cell fill">
 			<p>Choose a graph type</p>
-			<select class="active-plot-type">
-				<option selected="" value="timeseries">Timeseries (default)</option>
-				<option value="histogram">Histogram</option>
+			<select class="js-active-plot-type">
+				<option value="timeseries" {{selected "timeseries" plot._plotType}} >Timeseries (default)</option>
+				<option value="histogram" {{selected "histogram" plot._plotType}}>Histogram</option>
 				<!--<option value="hovmollerLat">Hovmoller Latitude</option>
 				<option value="hovmollerLon">Hovmoller Longitude</option>-->
 			 </select>
 		</div>
 	</li>
-
+	
 	<li>
 		<p class="number grid-cell">3</p>
 		<div class="grid-cell fill">
 			<p>Set a date range using the timeline below</p>
-			<input placeholder="Start" class="js-min min grid-cell active-plot-start-datetime" type="text">
-			<input placeholder="End" class="js-max max grid-cell active-plot-end-datetime" type="text">
-			<div class="range-slider grid-cell fill"></div>
+			<div class="clearfix">
+				<input placeholder="Start" class="js-min graph-min grid-cell js-active-plot-start-date" type="text">
+				<input placeholder="End" class="js-max graph-max grid-cell js-active-plot-end-date" type="text">
+			</div>
+			<div class="js-range-slider grid-cell fill"></div>
 		</div>
 	</li>
 	
@@ -36,9 +38,8 @@
 	<li>
 		<p class="number grid-cell">4</p>
 		<div class="grid-cell fill">
-			<p>Choose a graph type</p>
 			<table>
-				<tbody class="components"></tbody>
+				<tbody class="js-components"></tbody>
 			</table>
 		</div>
 	</li>
