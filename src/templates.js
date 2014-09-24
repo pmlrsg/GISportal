@@ -50,6 +50,11 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
 });
 
 
+Handlebars.registerHelper('equals', function(attr1, attr2, options) {
+   return ( attr1 == attr2 )
+});
+
+
 /**
  * Returns the index of the current handelbars loop + 1
  */
@@ -96,5 +101,32 @@ Handlebars.registerHelper('round', function(number, decimals, options) {
    var decimals = decimals || 0;
    var offset = Math.pow( 10 ,decimals  );
    return Math.round( number * offset ) / offset;
+});
+
+
+/**
+ * Allows you to pass a string of a path. The function
+ * at the end of the path will be called with the correct context
+ * as if it was running in the normal javascript runtime
+ * @return {[type]}
+ */
+Handlebars.registerHelper('call', function() {
+   var method = arguments[ 0 ];
+   var methodArgs = new Array(arguments.length - 2);
+   for( var i = 1; i < arguments.length - 1; i++ )
+      methodArgs[i - 1] = arguments[ i ];
+   var options = arguments[ arguments.length - 1 ];
+
+   var lastLocation;
+   var currentLocation = options.data.root;
+   var path = method.split('.');
+
+   for( var i = 0; path.length > i; i++ ){
+      lastLocation = currentLocation;
+      currentLocation = currentLocation[ path[i] ];
+   };
+
+   return currentLocation.apply( lastLocation, methodArgs );
+
 });
 

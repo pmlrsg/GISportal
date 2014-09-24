@@ -154,10 +154,10 @@ input[type="text"]  {
 }
 
 .pull-left{
-	float: left;
+	float: left !important;
 }
 .pull-right{
-	float: right;
+	float: right !important;
 }
 /* Global Loading Icon */
 .global-loading-icon{

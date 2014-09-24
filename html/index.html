@@ -89,7 +89,12 @@
          <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
          <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
-         <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
+         <div class="pull-right">
+           <div data-panel-name="history" class="js-show-panel tab ">
+            <span  class="icon-box-2"></span>     
+           </div>
+           <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
+        </div>
       </div>
        
        
@@ -194,14 +199,14 @@
 
       <div id="historyPanel" data-panel-name="history" class="panel-container" >
         <div class="half">
-          <h3>States</h3>
-          <div id="states-saved-list"></div>
+          <h3>Saved States</h3>
+          <div class="js-states-saved-list"></div>
         </div>
         <div  class="half" >
-          <h3>Graphs</h3>
+          <h3>Saved Graphs</h3>
           <div>
-            <div id="graphs-saved-list"></div>
-            <div id="graphs-history-list"></div>
+            <div class="js-graphs-saved-list" ></div>
+            <div class="js-graphs-history-list" ></div>
           </div>
         </div>
       </div>

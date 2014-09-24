@@ -37,7 +37,7 @@ gisportal.graphs.PlotEditor = (function(){
       this.setupComponents();
       
       //Setup the active "create graph" button
-      this._editorParent.on('click', '.create-graph', function(){
+      this._editorParent.find('.create-graph').click(function(){
          _this.submitRequest();
       })
 
@@ -49,7 +49,7 @@ gisportal.graphs.PlotEditor = (function(){
       this._plotTitleInput = this._editorParent.find('.js-active-plot-title');
 
       // Setup the title input box sync
-      this.plot().on('title-changed', function(value){
+      this.plot().on('title-change', function(value){
          var currentValue = _this._plotTitleInput.val();
          if( currentValue != value['new'] )
             _this._plotTitleInput.val(value['new'])
@@ -66,7 +66,7 @@ gisportal.graphs.PlotEditor = (function(){
       this._plotTypeSelect = this._editorParent.find('.js-active-plot-type');
 
       // Setup the title input box sync
-      this.plot().on('plotType-changed', function(value){
+      this.plot().on('plotType-change', function(value){
          var currentValue = _this._plotTypeSelect.val();
          if( currentValue != value['new'] )
             _this._plotTypeSelect.val(value['new'])
@@ -86,8 +86,7 @@ gisportal.graphs.PlotEditor = (function(){
     */
    PlotEditor.prototype.submitRequest = function(){
          this.plot().submitRequest();
-         gisportal.graphs.activePlotEditor = null;
-         gisportal.panelSlideout.closeSlideout( 'active-plot' );
+         gisportal.graphs.activeGraphSubmitted();
    }
 
 
@@ -123,7 +122,7 @@ gisportal.graphs.PlotEditor = (function(){
    }
 
    /**
-    * Setups the the date slider on graph apne.
+    * Setups the the date slider on graph pane.
     * - Starts the slide and sets its initails values
     * - Sets up the 2 date text boxes to accept change events
     */
@@ -224,10 +223,18 @@ gisportal.graphs.PlotEditor = (function(){
 
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];
          var rendered = gisportal.templates['active-plot-component']( componentCopy );
-         var element = $(rendered).data('component', componentCopy);
+         var element = $(rendered).data('component', data.component);
 
 
          _this._componentsTable.append( element );
+
+
+         _this.setComponentHasDataInRange( element );
+
+         // On click X remove the component
+         element.on('click', '.js-close-acitve-plot-component', function(){
+            _this.plot().removeComponent( data.component );
+         });
 
          // The tooltip which tells the user about the range of available data
          var component = $(this).data('component');
@@ -270,32 +277,34 @@ gisportal.graphs.PlotEditor = (function(){
 
       this.plot().on('tBounds-change', function(){
          _this._componentsTable.children().each(function(){
-            var component = $(this).data('component');
-            var indicator = gisportal.layers[ component.indicator ];
-
-            var firstDate = new Date(indicator.firstDate);
-            var lastDate = new Date(indicator.lastDate);
             
-            var tBounds = _this.plot().tBounds();
-
-            var result;
-
-            if( firstDate <= tBounds[0] && tBounds[1] <= lastDate )
-               result = "yes";
-            else if(  lastDate < tBounds[0]  || tBounds[1] < firstDate )
-               result = "no";
-            else
-               result = "partial";
-
-            $(this).attr('has-data-in-range', result);
+            _this.setComponentHasDataInRange( this );
 
          });
       });
-
-      
-
    }
 
+   PlotEditor.prototype.setComponentHasDataInRange = function( componentElement ){
+      var component = $(componentElement).data('component');
+      var indicator = gisportal.layers[ component.indicator ];
+
+      var firstDate = new Date(indicator.firstDate);
+      var lastDate = new Date(indicator.lastDate);
+      
+      var tBounds = this.plot().tBounds();
+
+      var result;
+
+      if( firstDate <= tBounds[0] && tBounds[1] <= lastDate )
+         result = "yes";
+      else if(  lastDate < tBounds[0]  || tBounds[1] < firstDate )
+         result = "no";
+      else
+         result = "partial";
+
+      $(componentElement).attr('has-data-in-range', result);
+
+   }
 
 
 

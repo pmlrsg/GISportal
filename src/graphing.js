@@ -41,53 +41,33 @@ gisportal.graphs.addComponentToGraph = function( component ){
 }
 
 
+/**
+ * When a graph has finished, the active GraphEditor calls this function.
+ * It will remove the editor
+ * Setup a status object for the history panel
+ * Close the editor slideout and show the history panel
+ */
+gisportal.graphs.activeGraphSubmitted = function(){
+   var plot = gisportal.graphs.activePlotEditor.plot();
+   var plotStatus = new gisportal.graphs.PlotStatus( plot );
+   var plotStatusElement = plotStatus.element();
+   gisportal.graphs.graphsHistoryList.prepend( plotStatusElement );
 
-gisportal.graphs.close_export_data = function(){
-   $('.export-data').removeClass('show-all').html('');
+   gisportal.graphs.activePlotEditor = null;
+
+   gisportal.panelSlideout.closeSlideout( 'active-plot' );
+   gisportal.panels.showPanel( 'history' );
 }
-
-gisportal.graphs.export_data = function( indicator ){
-   var indicator = gisportal.layers[ indicator ];
-   $('.export-data').addClass('show-all');
-   
-   
-   $('.export-data').html( "Pull from the template at some point" );
-   
-}
-
 
 gisportal.graphs.initDOM = function() {
    gisportal.graphs.oldInitDOM();
    
    gisportal.graphs.activePlotSlideout = $('.js-active-plot-slideout');
-   
-   $('body').on('click', '.remove-active-graph', function(){
-         gisportal.graphs.activePlot.activePlot( false );
-   })
-   
-   $('body').on('mousemove tap click', '.tooltips', function(){
-         var $tooltip = $(this).find('.tooltip')
-      var positon = $(this).offset();
-      
-      $tooltip.css({
-         top: positon.top,
-         left: positon.left + $(this).outerWidth(),
-      })
-   })
-   
-   
-   $('body').on('click', '.js-export-button', function(){
-      gisportal.graphs.export_data( $(this).data('id') );
-   })
-   
-   $('body').on('click', '.js-close-export-data', function(){
-      gisportal.graphs.close_export_data();
-   })
-   
-   $('.js-return-analysis').on('click', function() {
-        $('#historyPanel').toggleClass('hidden', true).toggleClass('active', false); 
-        $('#indicatorsPanel').toggleClass('hidden', false).toggleClass('active', true);
-   });
+
+   gisportal.graphs.statesSavedList = $('.js-states-saved-list');
+
+   gisportal.graphs.graphsHistoryList = $('.js-graphs-history-list');
+   gisportal.graphs.graphsSavedList = $('.js-graphs-saved-list');
    
 }
 

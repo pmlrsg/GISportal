@@ -1,9 +1,8 @@
 
 gisportal.graphs.Plot =(function(){
    
-   var graphServerUrl = gisportal.config.graphServer;
+   var graphServerUrl = gisportal.config.graphServer || 'http://localhost:3000/';
    var defaultRequests = gisportal.graphs.defaultRequests;
-   var middlewareUrl = 'http://portaldev.marineopec.eu/service/wcs';
    
    var Plot = function(){
       
@@ -32,15 +31,9 @@ gisportal.graphs.Plot =(function(){
       
       this._activePlot = false;
       
-      this._status = {
-         state: "",
-         message: ""
-      };
+      this._state = "building";
       
-      this._serverStatus = {
-         state: "building",
-         message: "Designing graph"
-      }
+      this._serverStatus = null;
       
       //Any old daterange so with can initalise the slider. Its updated later
       this._dateRangeBounds = {
@@ -90,6 +83,9 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.removeComponent= function( component ){
       var index = this._components.indexOf( component );
       
+      if( index == -1 )
+         return;
+
       this._components.splice( index, 1);
       
       this.emit('component-removed', { component: component });
@@ -128,6 +124,10 @@ gisportal.graphs.Plot =(function(){
       requestPlot.style = "basic";
    }
    
+   /**
+    * Adds the Axis options to a plot request.
+    * @param  {Object} The request object to add the values to
+    */
    Plot.prototype.buildRequestAxis = function( requestPlot ){
 
       var xAxis =  {
@@ -204,13 +204,15 @@ gisportal.graphs.Plot =(function(){
          var component = this._components[ i ];
          var indicator = gisportal.layers[ component.indicator ];
 
-         // 
+         // Add all 5 timeseires values
+         var showByDefault = 'mean';
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
                "label" : indicator.name + " " + metric,
                "key"  : metric,
-               "yAxis": indicator.yAxis,
+               "yAxis": component.yAxis,
                "type": "line",
+               "disabled": metric != showByDefault
             };
          });
 
@@ -222,9 +224,9 @@ gisportal.graphs.Plot =(function(){
                "bbox": component.bbox,
                "depth": component.elevation,
                
-               "threddsUrl"  : indicator.wscURL,
+               "threddsUrl"  : indicator.wcsURL,
                "metaCacheUrl" : indicator.cacheUrl(),
-               "middlewareUrl" : location.origin + gisportal.middlewarePath + '/wcs'
+               "middlewareUrl" : gisportal.middlewarePath + '/wcs'
             },
             "sub_series" : sub_series
             
@@ -242,40 +244,23 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       
       var request = this.buildRequest();
-      console.log( request );
-      return;
-      this.addStatusElementToDom();
       
       $.ajax({
          method: 'post',
          url: graphServerUrl + 'plot',
-         post: request,
+         data: JSON.stringify(request),
          dataType: 'json',
          success: function( data ){
             
             _this.id = data.job_id;
             _this.monitorJobStatus();
             
+         }, error: function(){
+            gisportal.gritter.showNotification('graphError', {'error':''});
          }
       })
    }
-   
-   /**
-   * Adds the status element to the dom.
-   *  This element will allow the user to save, view, delete, and view the progress of their graph
-   */
-   Plot.prototype.addStatusElementToDom = function(){
-      var _this = this;
-      
-      var template = gisportal.templates['graph-job'] ;
-         
-      var rendered = template({
-         title : _this._title,
-      });
-      
-      _this._statusElement = $( rendered ).appendTo( '#graphs-history-list' );         
-   }
-   
+
    /**
    * Starts firing requests to the server monitoring the jobs status.
    */
@@ -287,7 +272,7 @@ gisportal.graphs.Plot =(function(){
       function updateStatus(){
          $.ajax({
             dataType: 'json',
-            url: graphServerUrl + '/job/' + _this.id + '/status',
+            url: graphServerUrl + 'job/' + _this.id + '/status',
             cache: false,
             success: function( serverStatus ){
                _this.serverStatus( serverStatus );
@@ -297,77 +282,44 @@ gisportal.graphs.Plot =(function(){
                   _this.error( "Job not found on server" );
                else
                   _this.error( "Invalid reply from server. It possibly crashed." );
+
+               clearInterval( _this._monitorJobStatusInterval );
             }
          })
       }
       
       this._monitorJobStatusInterval = setInterval(updateStatus, 1000);
       updateStatus();
-   }
+   };
+
+
+   Plot.prototype.stopMonitoringJobStatus = function(){
+      clearInterval( this._monitorJobStatusInterval );
+   };
    
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   /**
-   * Gets a Plot based on its server id
-   * 
-   * @return Plot A new graph job object which the settings will be loaded into.
-   */
-   Plot.loadFromId = function(){
-      
-      var job = new Plot();
-      
-      $.ajax({
-         url: graphServerUrl + 'job/request',
-         dataType: 'json',
-         success: function( data ){
-            job.restoreRequest( data );
-         },
-         error: function(){
-            job.error("Could not get job details from server.");
-         }
-      })
-   }
-   
-   
-   /**
-   * Takes a JSON of a graph job, and loads it up internally.
-   * 
-   */
-   Plot.prototype.restorePlot = function( graphVaribles ){
-      
-   }
-   
-   Plot.prototype.error = function( errorMessage ){
-      this.querySubmited = true;
-      $(this._statusElement).find('.error').show().text( errorMessage );
-   }
-   
-   Plot.prototype.statusElement = function(){
-      return this._statusElement;
-   }
    
    //---------------
    // Getters and settings
-   
-   Plot.prototype.status = function( _new ){
-      if( !arguments.length ) return this._status;
-      this._status = _new;
+   Plot.prototype.state = function( _new ){
+      if( !arguments.length ) return this._state;
+      this._state = _new;
       return this;
    }
    Plot.prototype.serverStatus = function( _new ){
       if( !arguments.length ) return this._serverStatus;
+      var old = this._serverStatus;
       this._serverStatus = _new;
+
+      this.state( _new.state );
+
+      this.emit('serverStatus-change', {
+         'old': old,
+         'new': _new
+      });
       
-      $(this._statusElement).find('pre.json').html( _new );
-      
+      if( _new.completed == true )
+         this.stopMonitoringJobStatus();
+
       return this;
    }
   
@@ -377,7 +329,7 @@ gisportal.graphs.Plot =(function(){
       this._plotType = _new;
       
       if( _new != old )
-         this.emit('plotType-changed', { 'new': _new, 'old': old });
+         this.emit('plotType-change', { 'new': _new, 'old': old });
       
       return this;
    }
@@ -389,7 +341,7 @@ gisportal.graphs.Plot =(function(){
       this._title = _new;
 
       if( _new != old )
-         this.emit('title-changed', { 'new': _new, 'old': old });
+         this.emit('title-change', { 'new': _new, 'old': old });
 
       return this;
    }
@@ -493,6 +445,10 @@ gisportal.graphs.Plot =(function(){
       return this;
    }
    
+
+   Plot.prototype.interactiveUrl = function(){
+      return graphServerUrl + 'job/' + this.id + '/interactive'
+   };
    
    
    return Plot;

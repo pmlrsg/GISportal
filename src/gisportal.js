@@ -20,7 +20,7 @@ gisportal.VERSION = "0.4.0";
 //Initialise javascript variables and objects
 
 // Path to the python flask middleware
-gisportal.middlewarePath = '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = window.location.origin + '/service'; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
@@ -1057,4 +1057,16 @@ gisportal.startRemoteErrorLogging = function(){
 
       Raven.captureException(e, { extra: extra} )
    }
+}
+
+/**
+ * Returns the currently location of portal including origin and path
+ * @return {[type]} [description]
+ */
+function portalLocation(){
+   var origin = location.origin;
+   var path = location.pathname;
+   var endSlash = path.lastIndexOf( '/' );
+   path = path.substring( 0, endSlash + 1 );
+   return origin + path;
 }

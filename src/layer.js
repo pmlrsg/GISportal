@@ -464,7 +464,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    };
 
    this.cacheUrl = function(){
-     return location.href + 'cache/layers/' + layer.serverName + '_' + layer.origName + '.json'
+     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.origName + '.json'
    }
 
    /**

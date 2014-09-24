@@ -19,8 +19,8 @@
          </div>
 
          {{#elevation}}
-            <p>Choose a layer elevation:</p>
             <div class="elevation">
+               <p>Choose a layer elevation:</p>
                <select class="js-analysis-elevation">
                   {{#elevationCache}}
                      <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>

@@ -14,8 +14,8 @@
 		<div class="grid-cell fill">
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
-				<option value="timeseries" {{selected "timeseries" plot._plotType}} >Timeseries (default)</option>
-				<option value="histogram" {{selected "histogram" plot._plotType}}>Histogram</option>
+				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries (default)</option>
+				<option value="histogram" {{selected "histogram" (call 'plot.plotType')}}>Histogram</option>
 				<!--<option value="hovmollerLat">Hovmoller Latitude</option>
 				<option value="hovmollerLon">Hovmoller Longitude</option>-->
 			 </select>

@@ -113,8 +113,12 @@ gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
  * @param {string} id - The id of the layer
  */
 gisportal.scalebars.autoScale = function(id)  {
-   var l = gisportal.layers[id];     
-   gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=-180,-90,180,90&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
+   var l = gisportal.layers[id];
+   var bbox = l.exBoundingBox.WestBoundLongitude + ","
+      + l.exBoundingBox.SouthBoundLatitude + ","
+      + l.exBoundingBox.EastBoundLongitude + ","
+      + l.exBoundingBox.NorthBoundLatitude;
+   gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=100&height=100&request=GetMetadata') , null, function(d) {
       gisportal.scalebars.validateScale(id, d.min, d.max);
    }, null, 'json', {});    
 }

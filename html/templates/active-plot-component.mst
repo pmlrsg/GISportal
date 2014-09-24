@@ -1,5 +1,5 @@
 <tr has-data-in-range="yes" class="active-plot-component">
-	<td><div class="close-acitve-plot-component icon-cross"></div></td>
+	<td><div class="js-close-acitve-plot-component icon-cross btn"></div></td>
 	<td>
 		<b>Indicator:</b> <span>{{indicatorObj.name}} - {{indicatorObj.tags.region}}</span>
        {{#if bbox}}
