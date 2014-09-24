@@ -842,6 +842,7 @@ gisportal.main = function() {
       gisportal.indicatorsPanel.initDOM();  // indicators.js
       gisportal.graphs.initDOM();           // graphing.js
       gisportal.analytics.initGA();         // analytics.js
+      gisportal.panelSlideout.initDOM();    //panel-slideout.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon')
@@ -1042,18 +1043,19 @@ gisportal.loading.updateLoadingIcon = function(){
  * Sends all error to get sentry.
  */
 gisportal.startRemoteErrorLogging = function(){
+   document.write('//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js');
    Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
    window.onerror = function(e){
-      var tags = {};
+      var extra = {};
 
       //Attempt to store information about the errro.
       try{
-         tags.state = JSON.stringify(gisportal.saveState());
+         extra.state = JSON.stringify(gisportal.saveState());
 
          if( window.event && window.event.target && $.contains( window.document.body, window.event.target ) )
-            tags.domEvemtTarget =  $( window.event.target ).html();
+            extra.domEvemtTarget =  $( window.event.target ).html();
       }catch(e){};
 
-      Raven.captureException(e, { tags: tags} )
+      Raven.captureException(e, { extra: extra} )
    }
 }

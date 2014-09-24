@@ -60,12 +60,7 @@ gisportal.configurePanel.initDOM = function()  {
          //options.refined = true;
       }
 
-      if ($(this).is(':checked')) {
-         gisportal.configurePanel.selectLayer(name, options);
-      }
-      else  {
-         gisportal.configurePanel.deselectLayer(name);
-      }
+      gisportal.configurePanel.selectLayer(name, options);
    }
 
    /* Temp */
@@ -80,9 +75,6 @@ gisportal.configurePanel.initDOM = function()  {
         $(this).siblings('ul').toggleClass('hidden'); 
    });
 
-   $('.js-configure-indicators').on('click', '.js-remove', function()  {
-      gisportal.configurePanel.deselectLayer($(this).data('name'));
-   });
 
 }
 
@@ -482,37 +474,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    if (options.refined !== undefined) tmp.refined = options.refined;
 
    this.buildMap(tmp);
-};
-
-/**
- * Deselects the layer from configure panel.
- *
- * @param {string} name - The name of the layer
- */
-gisportal.configurePanel.deselectLayer = function(name)  {
-   // Trigger the analytics event
-   gisportal.analytics.events.deselectLayer( { name: name } );
-   
-   var name = name.toLowerCase();
-   var id = this.hasIndicator(name);
-   gisportal.configurePanel.unselectIndicator(name);
-   //$('.js-toggleVisibility[data-name="' + name + '"]').removeClass('active').prop('checked', false).change();
-   $('.js-configure-indicators [data-name="' + name + '"]').remove();
-   // If there is an index then it is a 'real' layer, otherwise just a placeholder 
-   if (id)  {
-      gisportal.indicatorsPanel.removeIndicators(id);
-   }
-   
-
-};
-
-/**
- * Remove all layers
- */
-gisportal.configurePanel.removeAll = function()  {
-   for (var name in gisportal.selectedIndicators)  {
-      gisportal.configurePanel.deselectLayer(name);
-   }
 };
 
 /**

@@ -1,4 +1,4 @@
-from flask import Blueprint, abort, request, Response, jsonify, g, current_app
+from flask import Blueprint, abort, request, Response, jsonify, g, current_app, send_file
 from portalflask.core.param import Param
 from portalflask.core import error_handler
 
@@ -7,9 +7,16 @@ import urllib2
 import tempfile
 import numpy as np
 import netCDF4 as netCDF
+from shapely import wkt
+from PIL import Image, ImageDraw
  
 
 portal_wcs = Blueprint('portal_wcs', __name__)
+
+trim_sizes = {
+   "polygon" : slice(9,-2),
+   "line" : slice(11,-2)
+}
 
 """
 Gets wcs data from a specified server, then performs a requested function
@@ -33,11 +40,24 @@ def getWcsData():
       output = getBboxData(params, histogram)
    elif type == 'timeseries': # Outputs a set of standard statistics  
       if params.get('output_format') is not None:
-         if params['output_format']._value == 'csv':
-            data = getBboxData(params, basic)
-            output = toCSV(data)
+            if params['output_format']._value == 'csv':
+               if 'polygon' in params :
+                  data = getIrregularData(params)
+               elif 'line' in params:
+                  data = getIrregularData(params, poly_type='line') 
+               else:
+                  data = getBboxData(params, basic)
+               output = toCSV(data)
+            
       else:
-         output = getBboxData(params, basic)
+         if 'polygon' in params :
+            output = getIrregularData(params)
+         if 'line' in params:
+            output = getIrregularData(params, poly_type='line')
+         else:
+            output = getBboxData(params, basic)
+      
+
    elif type == 'scatter': # Outputs a scatter graph
       output = getBboxData(params, scatter)
    elif type == 'hovmollerLon' or 'hovmollerLat': # outputs a hovmoller graph
@@ -72,6 +92,7 @@ def getWcsData():
    try:
       if params.get('output_format') is not None:
          if params['output_format']._value == 'csv':
+            current_app.logger.debug(output)
             outputData = Response(output, mimetype='text/csv')
       else:
          outputData = jsonify(output = output, type = params['type'].value, coverage = params['coverage'].value, error = g.graphError)
@@ -86,6 +107,36 @@ def getWcsData():
    current_app.logger.debug('Request complete, Sending results') # DEBUG
    
    return outputData
+
+
+@portal_wcs.route('/download', methods=["get"])
+def download_netcdf():
+   params = getParams() # Gets any parameters
+   params = checkParams(params) # Checks what parameters where entered
+   import pprint
+   current_app.logger.debug(pprint.pprint(params))
+   params['url'] = createURL(params)
+   polygon = params['bbox'].value
+   if 'line' in params:
+      masked, data, mask, tfile, variable  = create_mask(polygon, params, poly_type='line')
+   else: 
+      masked, data, mask, tfile, variable = create_mask(polygon, params)
+   #current_app.logger.debug('------------------------------------------------------------~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-------------------------------');
+   #current_app.logger.debug(type(data))
+   #current_app.logger.debug(type(mask))
+
+   lat = getCoordinateVariable(data, 'Lat')._name
+   lon = getCoordinateVariable(data, 'Lon')._name
+   maskVar = data.createVariable('mask', 'i', (lat,lon,), fill_value=0)
+   maskVar
+   maskVar[:] = mask[:]
+   
+   for x in range(len(data.variables[variable])):
+      #print type(masked_chl[x])
+      data.variables[variable][x] = masked[x][::]
+   #original_file.variables['chlor_a']= masked_chl[:][::]
+   data.close()
+   return send_file(tfile, mimetype='application/x-netcdf')
 
 """
 Gets any parameters.
@@ -105,11 +156,13 @@ def getParams():
    # Optional extras
    nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
    nameToParam["vertical"] = Param("vertical", True, True, request.args.get('depth', None))
+   nameToParam["polygon"] = Param("polygon", True, True, request.args.get('isPolygon', None))
+   nameToParam["line"] = Param("polygon", True, True, request.args.get('isLine', None))
    
    # One Required
    nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
    nameToParam["circle"] = Param("circle", True, True, request.args.get('circle', None))
-   nameToParam["polygon"] = Param("polygon", True, True, request.args.get('polygon', None))
+   #nameToParam["polygon"] = Param("polygon", True, True, request.args.get('polygon', None))
    nameToParam["point"] = Param("point", True, True, request.args.get('point', None))
    
    # Custom
@@ -148,7 +201,90 @@ def createMask(params):
    if params["bbox"] != None:
       pass
    
-   
+def find_closest(arr, val):
+   """
+  Finds the position in the array where the array value matches
+  the value specified by the user
+   - poached from JAD
+  """
+   current_closest = 120310231023
+   current_idx = None
+   for i in range(len(arr)):
+      if abs(arr[i]-val)<current_closest:
+         current_closest = abs(arr[i]-val)
+         current_idx=i
+   return current_idx
+
+def create_mask(poly, params, poly_type="polygon"):
+   '''
+   takes a Well Known Text polygon or line 
+   and produces a masking array for use with numpy
+   @param poly - WKT polygon or line
+   @param variable - WCS variable to mask off
+   @param type - one from [polygon, line]
+   '''
+   current_app.logger.debug('##########')
+   current_app.logger.debug(poly)
+   loaded_poly = wkt.loads(poly)
+   wcs_envelope = loaded_poly.envelope
+   bounds =  wcs_envelope.bounds
+   bb = ','.join(map(str,bounds))
+   params['bbox']._value = bb
+   params['url'] = createURL(params)
+   variable = params['coverage'].value
+   #wcs_url = wcs_base_url % (bounds[0],bounds[1],bounds[2],bounds[3])
+   wcs_url = params['url'].value
+   current_app.logger.debug(wcs_url)
+   #testfile=urllib.URLopener()
+   #testfile.retrieve(wcs_url,"%s.nc" % variable)
+   try:
+      resp = contactWCSServer(wcs_url)
+   except urllib2.HTTPError:
+      params["vertical"]._value = params["vertical"].value[1:]
+      params['url'] = createURL(params)
+      wcs_url = params['url'].value
+      resp = contactWCSServer(wcs_url)
+   tfile = saveOutTempFile(resp)
+   to_be_masked = netCDF.Dataset(tfile, 'r+')
+
+   chl = to_be_masked.variables[variable][:]
+
+   latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
+   lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
+
+   poly = poly[trim_sizes[poly_type]]
+   print poly
+   poly = poly.split(',')
+   poly = [x.split() for x in poly]
+
+   found_lats = [find_closest(latvals, float(x[1])) for x in poly]
+   found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
+
+   found = zip(found_lons,found_lats)
+   # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
+   img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
+
+   if poly_type == 'polygon':
+      ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
+   if poly_type == 'line':
+      ImageDraw.Draw(img).line(found,   fill=2)
+
+   masker = np.array(img)
+   #fig = plt.figure()
+   masked_variable = []
+   for i in range(chl.shape[0]):
+      #print i
+      masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
+      masked_variable[i].filled(-999)
+    
+   #    a = fig.add_subplot(1,5,i+1)
+   #    imgplot = plt.imshow(masked_variable)
+
+   # plt.show()
+   return masked_variable, to_be_masked, masker, tfile, variable
+
+
+
 
 """
 Create the url that will be used to contact the wcs server.
@@ -259,7 +395,7 @@ def toCSV(data):
    import csv
    import json
    import collections
-
+   #current_app.logger.debug(data)
    temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
 
    data = data['data'] # To get the actual data, with the dates
@@ -278,7 +414,22 @@ def toCSV(data):
       csv_data.writerow(row_data)
    
    current_app.logger.debug(csv_data)
+   current_app.logger.debug("return tempfile")
+   current_app.logger.debug(temp)
+
    return temp
+
+def getIrregularData(params, poly_type=None):
+   current_app.logger.debug("in my new irregular function")
+   polygon = params['bbox'].value
+   if poly_type:
+      mask, data,_,_,_ = create_mask(polygon, params, poly_type)
+   else: 
+      mask, data,_,_,_ = create_mask(polygon, params)
+
+   return basic(mask, params, irregular=True, original=data)
+
+
 
 def getBboxData(params, method):
    import os, errno
@@ -321,9 +472,14 @@ def getBboxData(params, method):
 """
 Performs a basic set of statistical functions on the provided data.
 """
-def basic(dataset, params):
-   arr = np.array(dataset.variables[params['coverage'].value])
+def basic(dataset, params, irregular=None, original=None):
+   if irregular:
+      arr = dataset
+   else:
+      arr = np.array(dataset.variables[params['coverage'].value])
    # Create a masked array ignoring nan's
+   if original is not None:
+      dataset = original
    maskedArray = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
    time = getCoordinateVariable(dataset, 'Time')
       
