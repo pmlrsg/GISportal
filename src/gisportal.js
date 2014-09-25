@@ -819,8 +819,12 @@ gisportal.setState = function(state) {
  */
 gisportal.main = function() {
 
-   if( gisportal.config.siteMode == "production" )
+   if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
+   } else {
+      $('body').prepend('<div class="dev-warning">DEVELOPMENT MODE</div>')
+      $('.js-start-container').addClass('start-dev')
+   }
 
    // Compile Templates
    gisportal.loadTemplates(function(){
