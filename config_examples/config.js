@@ -1,12 +1,12 @@
 /*------------------------------------*\
-    Configuration
-    This file is for the configuration
-    of the GIS Portal.
+   Configuration
+   This file is for the configuration
+   of the GIS Portal.
 
-    browseCategories - Used to define
-    which categories to be shown in the
-    browse panel. This is currently
-    limited to 2.
+   browseCategories - Used to define
+   which categories to be shown in the
+   browse panel. This is currently
+   limited to 2.
 \*------------------------------------*/
 
 
@@ -16,6 +16,10 @@ gisportal.config = {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
       "MSFD" : "EU MSFD"
+   },
+   paths: {
+    graphServer: 'http://localhost:3000/',
+    middlewarePath: '/service'
    },
    popularIndicators : [
       "Heterotrophic flagellates biomass", "Net Primary Production", "Oxygen", "Temperature"

@@ -37,6 +37,18 @@ gisportal.graphs.PlotStatus = (function(){
 
       this._element = newElement;
       newElement.data('plot', plot);
+
+
+      this._element
+         .on('click', '.js-graph-status-delete', function(){
+            $(this).closest('.graph-job').remove();
+         })
+         .on('click', '.js-graph-status-open', function(){
+
+            var interactiveUrl = plot.interactiveUrl();
+
+            window.open( interactiveUrl, plot.title(), 'width=640,height=480,toolbar=no' );
+         });
    };
 
    PlotStatus.prototype.setupPlotStatusChange = function(){
@@ -77,28 +89,6 @@ gisportal.graphs.PlotStatus = (function(){
       if( this.renderedState != "success" )
          this.rebuildElement();
 
-      var _this = this;
-      this._element
-         .find('.js-graph-status-open')
-         .click(function(){
-             var plot = _this.plot();
-
-            var interactiveUrl = plot.interactiveUrl();
-
-            window.open( interactiveUrl, plot.title(), 'width=640,height=480,toolbar=no' );
-         });
-
-      this._element
-         .find('.js-graph-status-edit')
-         .click(function(){
-            alert( "Feature coming soon!" );
-         });
-
-      this._element
-         .find('.js-graph-status-delete')
-         .click(function(){
-            $(this).closest('.graph-job').remove();
-         });
    };
 
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
@@ -109,15 +99,16 @@ gisportal.graphs.PlotStatus = (function(){
       if( this.renderedState != "processing" )
          this.rebuildElement();
 
-      for( var serverId in serverStatus.series ){
-         var series = serverStatus.series[ seriesId ];
+      for( var sourceId = 0; sourceId < serverStatus.sources.length; sourceId++ ){
+         var source = serverStatus.sources[ sourceId ];
 
-         switch( series.estimation.state ){
+         switch( source.estimation.state ){
             case "calculating":
                isCalculating = true;
                break;
             case "success":
-               var estimatedEst = new Date( series.estimation );
+               hasEstimation = true;
+               var estimatedEst = new Date( source.estimation );
                if( estimatedEst.getTime() > worestCaseEstimation.getTime() )
                   worestCaseEstimation = estimatedEst;
                break;
@@ -128,20 +119,21 @@ gisportal.graphs.PlotStatus = (function(){
       var message = serverStatus.message;
 
       if( isCalculating && ! hasEstimation )
-         message += "\nCalculating est";
+         message += "<br>Calculating est";
       if( hasEstimation )
-         message += "\nEstimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
+         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
 
       this._element
          .find('.js-message')
-         .text( message );
+         .html( message );
 
    };
 
    /**
     * Takes in a Date object and return the differnce between then and now
     * in the format of **m**s
-    * @param  {[type]} endTime
+    * @param  {Date} endTime The time to take the differnce between
+    * @param {bool} allowNegative If true it can return minus numbers, if false it stops at 0m0s
     * @return {[type]}
     */
    PlotStatus.prototype.printSmallTimeDiffernce = function( endTime, allowNegative ){
@@ -150,7 +142,7 @@ gisportal.graphs.PlotStatus = (function(){
 
       var differnceInSecs = ( endTime.getTime() - startTime.getTime() ) / 1000;
 
-      if( allowNegative && differnceInSecs == 0 )
+      if( ! allowNegative && differnceInSecs == 0 )
          return "0m0s";
 
       var flip = false;
@@ -159,8 +151,8 @@ gisportal.graphs.PlotStatus = (function(){
          differnceInSecs = Math.abs( differnceInSecs );
       }
 
-      var minutes  = differnceInSecs / 60;
-      var seconds  = differnceInSecs % 60;
+      var minutes  = Math.floor(differnceInSecs / 60);
+      var seconds  = Math.floor(differnceInSecs % 60);
 
       var output = flip ? "-":"+";
 

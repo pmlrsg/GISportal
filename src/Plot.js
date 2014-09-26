@@ -1,8 +1,7 @@
 
 gisportal.graphs.Plot =(function(){
    
-   var graphServerUrl = gisportal.config.graphServer || 'http://localhost:3000/';
-   var defaultRequests = gisportal.graphs.defaultRequests;
+   var graphServerUrl = gisportal.config.paths.graphServer;
    
    var Plot = function(){
       
@@ -65,7 +64,7 @@ gisportal.graphs.Plot =(function(){
       
       if( this._components.length == 0 && this.title() == "" ){
          var indicator = gisportal.layers[ component.indicator ];
-         this.title( indicator.name + " - " + (new Date()) );
+         this.title( indicator.displayTitle + " - " + (new Date()).toLocaleString() );
       }
 
       component.yAxis = 1;
@@ -98,37 +97,54 @@ gisportal.graphs.Plot =(function(){
    * Builds a request to send to the graphing server
    *
    * @return Object The graph object to be sent to the graphing server
-   */
+   */ 
    Plot.prototype.buildRequest = function(){
       //Loads the basic graph request
-      var requestPlot = {};
+      var plotRequest = {};
+      var plotStyle = {};
       
-      this.buildRequestBasics( requestPlot );
-      this.buildRequestAxis( requestPlot );
-      this.buildRequestData( requestPlot );
-
-      switch( this._plotType ){
-         case "":
-            
-            break;
-         
-      }
+      this.buildRequestBasics( plotRequest );
+      this.buildRequestAxis( plotRequest );
+      this.buildRequestData( plotRequest );
+      this.buildRequestLogos( plotStyle );
       
-      var request = { plot: requestPlot };
+      var request = { plot: plotRequest, style: plotStyle };
       return request;
    }
    
-   Plot.prototype.buildRequestBasics = function( requestPlot ){
-      requestPlot.type = this.plotType();
-      requestPlot.title = this.title();
-      requestPlot.style = "basic";
+   Plot.prototype.buildRequestBasics = function( plotRequest ){
+      plotRequest.type = this.plotType();
+      plotRequest.title = this.title();
+      plotRequest.style = "basic";
    }
    
+
+   /**
+    * Adds the logos for the providers used int this graph.
+    * @param  {Object} The request object to add the values to
+    */
+   Plot.prototype.buildRequestLogos = function( plotStyle ){
+      var providers = [];
+      this._components.forEach(function( component ){
+         var layer = gisportal.layers[ component.indicator ];
+
+         if( ! layer.contactDetails.logo )
+            return;
+
+         var providerLogo = portalLocation() + layer.contactDetails.logo;
+         if( providers.indexOf( providerLogo ) == -1 )
+            providers.push( providerLogo );
+      });
+
+      plotStyle.logos = providers;
+
+   }
+
    /**
     * Adds the Axis options to a plot request.
     * @param  {Object} The request object to add the values to
     */
-   Plot.prototype.buildRequestAxis = function( requestPlot ){
+   Plot.prototype.buildRequestAxis = function( plotRequest ){
 
       var xAxis =  {
          "label" : "Sample Date/Time",
@@ -136,7 +152,7 @@ gisportal.graphs.Plot =(function(){
          "weight" : "auto",
          "tickFormat" : this.plotType() == "timeseries" ? "%d/%m/%Y" : ",.2f"
       };
-      requestPlot.xAxis = xAxis;
+      plotRequest.xAxis = xAxis;
 
       var leftHandSideComoponents = this._components.filter(function( component ){
          return component.yAxis == 1;
@@ -155,9 +171,9 @@ gisportal.graphs.Plot =(function(){
             "label" : yAxis1Label,
             "ticks" : "auto",
             "weight" : "auto",
-            "tickFormat" : ",.2f"
+            "tickFormat" : "auto"
          };
-         requestPlot.y1Axis = y1Axis;
+         plotRequest.y1Axis = y1Axis;
       };
 
 
@@ -178,23 +194,23 @@ gisportal.graphs.Plot =(function(){
             "label" : yAxis2Label,
             "ticks" : "auto",
             "weight" : "auto",
-            "tickFormat" : ",.2f"
+            "tickFormat" : "auto"
          };
-         requestPlot.y2Axis = y2Axis;
+         plotRequest.y2Axis = y2Axis;
       };
 
 
    }
 
 
-   Plot.prototype.buildRequestData = function( requestPlot ){
-      requestPlot.data = {
+   Plot.prototype.buildRequestData = function( plotRequest ){
+      plotRequest.data = {
          series: []
       };
 
       switch( this._plotType ){
          case "timeseries":
-            this.buildRequestDataTimeSeries( requestPlot.data.series );
+            this.buildRequestDataTimeSeries( plotRequest.data.series );
             break;
       }
    }

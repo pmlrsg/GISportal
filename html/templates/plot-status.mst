@@ -1,0 +1,35 @@
+<div class="graph-job" state="{{call 'state'}}" >
+	<div>
+		{{#if id}}
+			{{#if saved}}
+				<div class="save js-graph-save" data-graph-id="{{id}}"></div>
+			{{else}}
+				<div class="unsave js-graph-unsave" data-graph-id="{{id}}" ></div>
+			{{/if}}
+		{{/if}}
+		<div>
+			<h2 class="title ellipsisOverflow" title="{{call 'title'}}">{{call 'title'}}</h2>
+		</div>
+	</div>
+	<div>
+		{{#if_equals (call 'state') 'processing' }}
+			<div class="loading-image"></div>
+			<div class="js-message"></div>
+		{{/if_equals}}
+		{{#if_equals (call 'state') 'success' }}
+			<div></div>
+			<div>
+				<button class="js-graph-status-delete">Delete</button>
+				<button class="js-graph-status-open">Open</button>
+			</div>
+		{{/if_equals}}
+		{{#if_equals (call 'state') 'error' }}
+			<div></div>
+			<div>
+				The server failed to build the graph.
+				<button class="js-graph-status-delete">Delete</button>
+				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
+			</div>
+		{{/if_equals}}
+	</div>
+</div>

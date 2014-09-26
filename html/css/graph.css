@@ -72,7 +72,8 @@
 }
 
 .graph-job{
-	padding: 6px;
+	padding: 6px 0px;
+	background: #fbfafb;
 }
 
 .graph-job .loading-image{
