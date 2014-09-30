@@ -24,10 +24,14 @@
          </tr>
       {{/if}}
       {{#if moreIndicatorInfo}}
+      <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
+      {{else}}
+        {{#if moreProviderInfo}}
+        <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
+        {{/if}}
 
       {{/if}}
 
-      <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
 
    </tbody>
 </table>
