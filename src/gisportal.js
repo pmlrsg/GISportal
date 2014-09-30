@@ -823,8 +823,12 @@ gisportal.setState = function(state) {
  */
 gisportal.main = function() {
 
-   if( gisportal.config.siteMode == "production" )
+   if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
+   } else {
+      $('body').prepend('<div class="dev-warning">DEVELOPMENT MODE</div>')
+      $('.js-start-container').addClass('start-dev')
+   }
 
    // Compile Templates
    gisportal.loadTemplates(function(){
@@ -1047,19 +1051,21 @@ gisportal.loading.updateLoadingIcon = function(){
  * Sends all error to get sentry.
  */
 gisportal.startRemoteErrorLogging = function(){
-   document.write('//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js');
-   Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
-   window.onerror = function(e){
-      var extra = {};
-
-      //Attempt to store information about the errro.
-      try{
-         extra.state = JSON.stringify(gisportal.saveState());
-
-         if( window.event && window.event.target && $.contains( window.document.body, window.event.target ) )
-            extra.domEvemtTarget =  $( window.event.target ).html();
-      }catch(e){};
-
-      Raven.captureException(e, { extra: extra} )
-   }
+   $.getScript('//cdn.ravenjs.com/1.1.15/jquery,native/raven.min.js')
+   .done(function(){
+      Raven.config('https://552996d22b5b405783091fdc4aa3664a@app.getsentry.com/30024', {}).install();
+      window.onerror = function(e){
+         var extra = {};
+   
+         //Attempt to store information about the error.
+         try{
+            extra.state = JSON.stringify(gisportal.saveState());
+   
+            if( window.event && window.event.target && $.contains( window.document.body, window.event.target ) )
+               extra.domEvemtTarget =  $( window.event.target ).html();
+         }catch(e){};
+   
+         Raven.captureException(e, { extra: extra} );
+      };
+   });
 }
