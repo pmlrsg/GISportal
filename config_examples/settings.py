@@ -19,6 +19,6 @@ LOG_PATH = ''
 ERROR_LEVEL = "W"
 
 # section to define root folder for markdown metadata files
-MARKDOWN_ROOT = "/users/rsg/kij/scratch/GISportal-RSG/markdown"
+MARKDOWN_ROOT = "/change/to/markdown/directory"
 
 MARKDOWN_DIRS = ['provider', 'indicator']
