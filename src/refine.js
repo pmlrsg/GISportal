@@ -233,7 +233,7 @@ gisportal.refinePanel.render = function(data, group) {
    indicator.name = name;
    indicator.modified = gisportal.utils.nameToId(name);
    indicator.groupedNames = group;
-   var template = '{{#tag}}<li >      <p class="grid-cell fill">{{key}}</p>      <label class="icon-checkbox grid-cell indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label> </p>  </li>{{/tag}}';
+   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <p class="grid-cell fill">{{key}}</p>      <label class="icon-checkbox grid-cell indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label> </p>  </li>{{/tag}}';
 
    if (!refined) {
       indicator.tag = indicator.groupedNames['region'];
@@ -248,8 +248,8 @@ gisportal.refinePanel.render = function(data, group) {
 
    $('#refine-interval').parent().toggleClass('hidden', true);
    $('#refine-confidence').parent().toggleClass('hidden', true);
-   $('#refine-reliability').parent().toggleClass('hidden', true);
    $('#refine-provider').parent().toggleClass('hidden', true);
+   $('#refine-reliability').parent().toggleClass('hidden', true);
 
    if (indicator.hasInterval) {
       indicator.tag = indicator.groupedNames['interval'];
@@ -257,18 +257,26 @@ gisportal.refinePanel.render = function(data, group) {
       $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
    }
 
-   if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1)) {
+
+   if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1) ) {
+      indicator.tag = indicator.groupedNames['providerTag'];
+      indicator.tag.forEach(function( provider ){
+         if( gisportal.providers && gisportal.providers[provider.key.toUpperCase()] && gisportal.providers[provider.key.toUpperCase()].model )
+            provider.moreInfo = gisportal.providers[provider.key.toUpperCase()].model;
+      });
+
+      var rendered = Mustache.render(template, indicator);
+      $('#refine-provider').html(rendered).parent().toggleClass('hidden', false);
+      $('#refine-provider .tooltip').tooltipster();
+   }
+
+   if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasProvider || group.providerTag.length <= 1)) {
       indicator.tag = indicator.groupedNames['Confidence'];
       var rendered = Mustache.render(template, indicator);
       $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false);
    }
 
 
-   if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasConfidence || group.Confidence.length <= 1)) {
-      indicator.tag = indicator.groupedNames['providerTag'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-provider').html(rendered).parent().toggleClass('hidden', false);
-   }
 
    if (refined) {
       $('.js-reset-options[data-name="' + name.toLowerCase() + '"]').removeClass('hidden');

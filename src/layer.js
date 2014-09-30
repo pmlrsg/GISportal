@@ -54,7 +54,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       tags : null,
       options : null,
 
-      contactDetails: {},
+      providerDetails: {},
       offsetVectors: null
    };
    

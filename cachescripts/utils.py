@@ -2,10 +2,18 @@
 
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
-
+LAYERCACHEPATH = "../html/cache/layers/"
+   
+import json
 def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePath, cacheLife):
    import urllib, urllib2
    
+   from providers import providers
+
+   saveFile(LAYERCACHEPATH + '/../providers' + FILEEXTENSIONJSON, json.dumps(providers))
+               
+
+
    print 'Starting cache generation'
    #servers = csvToList(serverList)
    

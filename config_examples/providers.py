@@ -15,7 +15,8 @@ providers ={
   "HCMR": {
     "logo": "img/providers/hcmr.png",
     "website": "http://innovator.ath.hcmr.gr/newhcmr1/",
-    "email": "ktsiaras@hcmr.gr"
+    "email": "ktsiaras@hcmr.gr",
+    "model": "POSEIDON atmospheric forcing"
   },
   "IMSMETU": {
     "logo": "img/providers/metu.png",
@@ -25,7 +26,8 @@ providers ={
   "OGS": {
     "logo": "img/providers/ogs.png",
     "website": "http://www.ogs.trieste.it/",
-    "email": "gcossarini@ogs.trieste.it"
+    "email": "gcossarini@ogs.trieste.it",
+    "model": "MyOcean physical forcing"
   },
   "PML": {
     "logo": "img/providers/pml.png",

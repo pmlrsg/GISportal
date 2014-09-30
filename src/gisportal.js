@@ -117,6 +117,15 @@ gisportal.loadLayers = function() {
     
    // Get WMS cache
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
+   
+   $.ajax({
+      url:  './cache/providers.json',
+      dataType: 'json',
+      success: function( providers ){
+         gisportal.providers = providers;
+      }
+   });
+
    // Get WFS cache
    //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
@@ -296,7 +305,7 @@ gisportal.createOpLayers = function() {
                            "exBoundingBox": item.EX_GeographicBoundingBox, 
                            "providerTag": providerTag,
                            "positive" : positive, 
-                           "contactDetails" : item.ContactDetails, 
+                           "providerDetails" : item.ProviderDetails, 
                            "offsetVectors" : item.OffsetVectors, 
                            "tags": item.tags,
                            "moreProviderInfo" : item.MoreProviderInfo,

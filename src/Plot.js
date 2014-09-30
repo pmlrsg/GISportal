@@ -133,10 +133,10 @@ gisportal.graphs.Plot =(function(){
       this._components.forEach(function( component ){
          var layer = gisportal.layers[ component.indicator ];
 
-         if( ! layer.contactDetails.logo )
+         if( ! layer.providerDetails.logo )
             return;
 
-         var providerLogo = portalLocation() + layer.contactDetails.logo;
+         var providerLogo = portalLocation() + layer.providerDetails.logo;
          if( providers.indexOf( providerLogo ) == -1 )
             providers.push( providerLogo );
       });

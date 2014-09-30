@@ -303,7 +303,14 @@ select,
 
 .fake-select li{
   padding-left: 45px;
+  position: relative;
+}
 
+.fake-select .more-info{
+  position: absolute;
+  left: 20px;
+  font-size: 15px;
+  top: 11px;
 }
 
 .panel-list .text-button {

@@ -143,16 +143,16 @@ def createCache(server, capabilitiesXML, coverageXML):
                raise Exception("Provider shortTag " + server['options']['providerShortTag'] + " was not in the 'providers.py' file")
 
             # Get the default details for the provider
-            contactDetails =  providers[ server['options']['providerShortTag'] ]
+            providerDetails =  providers[ server['options']['providerShortTag'] ]
             if (layerHasMoreInfo(server['options']['providerShortTag'])):
                moreProviderInfo = True
             else:
                moreProviderInfo = False
 
-            if 'contactDetails' in server['indicators'][name]:
+            if 'providerDetails' in server['indicators'][name]:
                # Overwrite any details with the indicator specific details
-               for i in server['indicators'][name]['contactDetails']:
-                  contactDetails[ i ] = server['indicators'][name]['contactDetails'][ i ]
+               for i in server['indicators'][name]['providerDetails']:
+                  providerDetails[ i ] = server['indicators'][name]['providerDetails'][ i ]
 
             #import pprint
             #pprint.pprint(server['indicators'][name])
@@ -169,7 +169,7 @@ def createCache(server, capabilitiesXML, coverageXML):
                               "FirstDate": dimensions['firstDate'],
                               "LastDate": dimensions['lastDate'],
                               "OffsetVectors": offsetVectors,
-                              "ContactDetails": contactDetails,
+                              "ProviderDetails": providerDetails,
                               "EX_GeographicBoundingBox": exGeographicBoundingBox,
                               "MoreIndicatorInfo" : moreIndicatorInfo,
                               "MoreProviderInfo" : moreProviderInfo }
