@@ -29,6 +29,9 @@ WCS_NAMESPACE = '{http://www.opengis.net/wcs}'
 GML_NAMESPACE = '{http://www.opengis.net/gml}'
 XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 
+MARKDOWN_DIR = '../markdown'
+MARKDOWN_SUFFIX = '.md'
+
 PRODUCTFILTER = "productFilter.csv"
 LAYERFILTER = "layerFilter.csv"
 
@@ -141,15 +144,25 @@ def createCache(server, capabilitiesXML, coverageXML):
 
             # Get the default details for the provider
             contactDetails =  providers[ server['options']['providerShortTag'] ]
-
+            if (layerHasMoreInfo(server['options']['providerShortTag'])):
+               moreProviderInfo = True
+            else:
+               moreProviderInfo = False
 
             if 'contactDetails' in server['indicators'][name]:
                # Overwrite any details with the indicator specific details
                for i in server['indicators'][name]['contactDetails']:
                   contactDetails[ i ] = server['indicators'][name]['contactDetails'][ i ]
 
+            #import pprint
+            #pprint.pprint(server['indicators'][name])
+            #print '-'*40
+
             if utils.blackfilter(name, layerBlackList):
-               
+               if layerHasMoreInfo(server['indicators'][name]['niceName']):
+                  moreIndicatorInfo = True
+               else:
+                  moreIndicatorInfo = False
                masterLayer = {"Name": name,
                               "Title": title,
                               "Abstract": abstract,
@@ -157,7 +170,9 @@ def createCache(server, capabilitiesXML, coverageXML):
                               "LastDate": dimensions['lastDate'],
                               "OffsetVectors": offsetVectors,
                               "ContactDetails": contactDetails,
-                              "EX_GeographicBoundingBox": exGeographicBoundingBox }
+                              "EX_GeographicBoundingBox": exGeographicBoundingBox,
+                              "MoreIndicatorInfo" : moreIndicatorInfo,
+                              "MoreProviderInfo" : moreProviderInfo }
                               
                if name in server['indicators']:
                   masterLayer['tags'] = server['indicators'][name]
@@ -196,6 +211,18 @@ def createCache(server, capabilitiesXML, coverageXML):
       
    # Return and save out the cache for this server
    return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
+
+def layerHasMoreInfo( layerNiceName ):
+   print os.getcwd()
+   print "testing %s for more info" % layerNiceName
+   for root, dirs, files in os.walk(MARKDOWN_DIR):
+      for _file in files:
+         #print _file
+         if _file.lower() == '%s%s' % (layerNiceName.lower(), MARKDOWN_SUFFIX):
+            print 'found %s file' % layerNiceName
+            return True
+   return False
+
 
 def isoToTimestamp( strDate ):
    dt = dateutil.parser.parse(strDate)

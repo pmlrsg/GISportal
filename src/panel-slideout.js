@@ -29,32 +29,38 @@ gisportal.panelSlideout.initDOM = function(  ){
 		});
 
 
-}
+};
+
+
 function findRelatedSlideoutName( slideoutName ){
 
 	var slideout = $('[data-slideout-name="' + slideoutName + '"]');
 
-	if( slideout.length == 0 )
+	if( slideout.length === 0 )
 		throw new Error("Could not find panel related to that button");
 	else
 		return slideout;
 }
 
-
+gisportal.panelSlideout.isOut = function( slideoutName ){
+	var slideout = findRelatedSlideoutName( slideoutName );
+	return slideout.hasClass('show-all');
+};
 
 gisportal.panelSlideout.openSlideout = function( slideoutName ){
 	var slideout = findRelatedSlideoutName( slideoutName );
 	slideout.addClass( 'show-all' ).removeClass( 'show-peak' );
-}
+};
 
 
 gisportal.panelSlideout.closeSlideout = function( slideoutName ){
+	console.log('inside closeout');
 	var slideout = findRelatedSlideoutName( slideoutName );
 	slideout.removeClass( 'show-all show-peak' );
-}
+};
 
 
 gisportal.panelSlideout.peakSlideout = function( slideoutName ){
 	var slideout = findRelatedSlideoutName( slideoutName );
 	slideout.addClass( 'show-peak' ).removeClass( 'show-all' );
-}
+};

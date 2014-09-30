@@ -298,7 +298,9 @@ gisportal.createOpLayers = function() {
                            "positive" : positive, 
                            "contactDetails" : item.ContactDetails, 
                            "offsetVectors" : item.OffsetVectors, 
-                           "tags": item.tags
+                           "tags": item.tags,
+                           "moreProviderInfo" : item.MoreProviderInfo,
+                           "moreIndicatorInfo" : item.MoreIndicatorInfo,
                         }
                      );
                                
@@ -685,6 +687,8 @@ gisportal.loadState = function(state) {
       else indicator = gisportal.layers[keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
          gisportal.configurePanel.close();
+//         console.log(indicator);
+
          gisportal.refinePanel.foundIndicator(indicator.id);
         
       }

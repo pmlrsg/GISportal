@@ -9,7 +9,7 @@ gisportal.loadTemplates = function( callback ){
 	var callback = callback || function(){};
 
 	function compileTemplate( template, status, request ){
-		var templateName = request.fileName.substring( 0, request.fileName.length - 4 )
+		var templateName = request.fileName.substring( 0, request.fileName.length - 4 );
 		gisportal.templates[ templateName ] = Handlebars.compile( template );
 
 		waitingFor--;
@@ -27,12 +27,12 @@ gisportal.loadTemplates = function( callback ){
 				var request = $.ajax({
 					url: '/templates/' + match[1],
 					success: compileTemplate
-				})
+				});
 				request.fileName = match[1];
-			};
+			}
 		}
-	})
-}
+	});
+};
 
 Handlebars.registerHelper('rotate_image', function(imgUrl, angle) {
   return "/service/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
@@ -46,4 +46,10 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
 
 Handlebars.registerHelper('index_plus_one', function( options ) {
    return options.data.index + 1;
+});
+
+ Handlebars.registerHelper('round', function(number, decimals, options) {
+   var decimals = decimals || 0;
+   var offset = Math.pow( 10 ,decimals  );
+   return Math.round( number * offset ) / offset;
 });

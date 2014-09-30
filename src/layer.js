@@ -59,7 +59,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    };
    
    $.extend(true, this, this.defaults, opts);
-
+   //this.moreInfo = opts.moreInfo;
    // Used for sensor data from SOS, not tested as we have no sensor data
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/\s+/g, "") : null;
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/[\.,]+/g, "") : null;

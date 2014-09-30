@@ -19,10 +19,10 @@ tr:nth-child(even)  {
 }
 
 td  {
-  height: 40px;
-  line-height: 1.5;
+  /*height: 40px;     if tables are broken this is why*/
+  /*line-height: 1.5;
   padding-left: 15px;
-  vertical-align: middle;
-  user-select: initial;
+  vertical-align: middle;*/
+/*  user-select: initial;*/
 }
 

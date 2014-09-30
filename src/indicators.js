@@ -1,4 +1,4 @@
-/*------------------------------------*\
+/**------------------------------*\
     Indicators Panel
     This file is for the indicators 
     panel, which includes features such 
@@ -118,7 +118,91 @@ gisportal.indicatorsPanel.initDOM = function() {
       layer.visibleTab = $(this).data('tab-name');
    });
 
-}
+   $('.js-indicators').on('click', '#show_more', function(e) {
+      e.preventDefault();
+      var indicator = $(this).parents('ul').siblings('.indicator-header').data('name');
+      var provider = $(this).parents('ul').siblings('.indicator-header').data('provider');
+      console.log('closing slideout');
+      // grey out other things here - grey needs to be clickable to disable and hide.
+      $('.js-indicators > li[data-name!="' + indicator + '"]').each(function() {
+         console.log('greyaing out : ' + $(this).data('name'));
+         $(this).append("<div class='indicator-overlay'></div>");
+      });
+      if (gisportal.panelSlideout.isOut('metadata')) {
+         gisportal.panelSlideout.closeSlideout('metadata');
+         setTimeout(function() {
+            gisportal.indicatorsPanel.getMetadata(indicator, provider);
+         }, 500);
+      } else {
+         gisportal.indicatorsPanel.getMetadata(indicator, provider);
+
+      }
+
+      //gisportal.indicatorsPanel.getMetadata(indicator,provider);
+   });
+
+   $('.js-indicators').on('click', '.indicator-overlay', function(){
+      gisportal.events.trigger('metadata.close');
+   });
+
+   $('.metadata-slideout').on('click', '.js-close-extrainfo', function() {
+      gisportal.events.trigger('metadata.close');
+   });
+
+
+};
+
+gisportal.events.bind('metadata.close', function() {
+   $('.indicator-overlay').remove();
+   gisportal.panelSlideout.closeSlideout('metadata');
+});
+
+
+
+gisportal.indicatorsPanel.getMetadata = function(indicator, provider) {
+ $('.metadata_provider').html('');
+  $('.metadata_indicator').html('');
+var some = function(promises){
+    var d = $.Deferred(), results = [];
+    var remaining = promises.length;
+    for(var i = 0; i < promises.length; i++){
+        promises[i].then(function(res){
+            results.push(res); // on success, add to results
+        }).always(function(res){
+            remaining--; // always mark as finished
+            if(!remaining) d.resolve(results);
+        });
+    }
+    return d.promise(); // return a promise
+};
+
+var urls = ['service/metadata/provider/' + provider, 'service/metadata/indicator/' + indicator].map($.get);
+
+some(urls).then(function(results){
+for(var i = 0; i < results.length; i++) {
+       if (results[i].indexOf('Provider') != -1) {
+         $('.metadata_provider').html(results[i]);
+       }
+       else {
+          $('.metadata_indicator').html(results[i]);
+       }
+    }
+}).always(function(){
+   gisportal.panelSlideout.openSlideout('metadata');
+});
+   // $.when($.get('service/metadata/provider/' + provider).fail(function(){}), $.get('service/metadata/indicator/' + indicator).fail(function(){console.log("failed to get thing");}))
+   //    .then(function(provider, indicator) {
+   //       $('.metadata_indicator').html(indicator[0]);
+   //       $('.metadata_provider').html(provider[0]);
+   //       gisportal.panelSlideout.openSlideout('metadata');
+
+   //    }, function(d){console.log(d);});
+
+
+
+};
+
+
 
 gisportal.indicatorsPanel.refreshData = function(indicators) {
    $('.js-indicators').html('');
@@ -129,8 +213,12 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
    $.get('templates/indicator.mst', function(template) {
+      console.log(data);
+      //console.log("adding indicator to panel");
+      //console.log(data);
       if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
       var id = data.id || "none";
+      var provider = data.provider || "none";
       var refined = data.refined || false;
       var name = data.name.toLowerCase();
       var index = data.index || 0;
@@ -152,6 +240,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
          modified: modified,
          index: index,
          region: region,
+         provider: provider
       };
       var tags = gisportal.groupNames()[name.toLowerCase()];
       if (data.interval && Object.keys(tags['interval']).length > 1) tmp.interval = gisportal.layers[id].tags.interval;
@@ -195,7 +284,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
          content: renderedTooltip,
          position: "right",
          maxWidth: 200
-      })
+      });
 
       gisportal.replaceSubtreeIcons($('.js-indicators'));
    });
@@ -330,11 +419,11 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
 // Needs a refactor
 
-gisportal.indicatorsPanel.initialiseSliders = function(id)  {
+gisportal.indicatorsPanel.initialiseSliders = function(id) {
    // The dates stored in layer are DD-MM-YYYY instead of YYYY-MM-DD
    var firstDate = gisportal.layers[id].firstDate;
    var lastDate = gisportal.layers[id].lastDate;
- 
+
    var from = $('.js-min[data-id="' + id + '"]');
    var to = $('.js-max[data-id="' + id + '"]');
 
@@ -344,34 +433,34 @@ gisportal.indicatorsPanel.initialiseSliders = function(id)  {
       var Link = $.noUiSlider.Link;
       var slider = $('.range-slider[data-id="' + id + '"]');
 
-try{
-      slider.noUiSlider({
-         start: [min, max],
-         connect: true,
-         behaviour: 'tap-drag',
-         range: {
-            'min': min,
-            'max': max
-         },
-         serialization: {
-            lower: [
-               $.Link({
-                  target: from,
-                  method: setDate
-               })
-            ],
-            upper: [
-               $.Link({
-                  target: to,
-                  method: setDate
-               })
-            ],
-            format: {
-               decimals: 0
+      try {
+         slider.noUiSlider({
+            start: [min, max],
+            connect: true,
+            behaviour: 'tap-drag',
+            range: {
+               'min': min,
+               'max': max
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: from,
+                     method: setDate
+                  })
+               ],
+               upper: [
+                  $.Link({
+                     target: to,
+                     method: setDate
+                  })
+               ],
+               format: {
+                  decimals: 0
+               }
             }
-         }
-      });
-}catch(e){};
+         });
+      } catch (e) {};
 
       slider.on('slide', function(event, val) {
          var interval;
@@ -590,4 +679,4 @@ gisportal.indicatorsPanel.openURL = function(url, id)  {
    var link = $('.exportButton[data-id="' + id + '"]');
    $(link).attr('download', 'dataexport');
    $(link).attr('href', url);
-};*/
+};

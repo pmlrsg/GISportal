@@ -1,3 +1,4 @@
+var gisportal = gisportal || {};
 
 function EventManager() {
    this.eventBeacon = $(document.createElement("beacon"));
@@ -14,7 +15,7 @@ EventManager.prototype.on = function(eventType, callback) {
    jQuery.fn.bind.apply(this.eventBeacon, arguments );
  
    return(this);
-}
+};
 
 EventManager.prototype.bind = EventManager.prototype.on;
 
@@ -32,3 +33,5 @@ EventManager.prototype.preTrigger = function(event){
    event.target = this;
 };
 
+
+gisportal.events = new EventManager();
