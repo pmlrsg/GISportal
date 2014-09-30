@@ -117,3 +117,27 @@
   font-size: 22px;
   width: 40px;
 }
+
+table.stripe.panel-tab td {
+  /*height: 30px;*/
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-bottom: 5px;
+  vertical-align: middle;
+}
+
+/* added for allowing teh overlays*/
+.indicator-list li {
+  position:relative;
+}
+
+.indicator-overlay {
+  position:absolute;
+  top:0;
+  left:0;
+  height:100%;
+  width:100%;
+  background: rgba(100,100,100,0.5);
+  cursor: pointer;
+
+}

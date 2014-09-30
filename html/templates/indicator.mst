@@ -1,6 +1,6 @@
 <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}">
-   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
+<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{provider}}">
+   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{provider}}">
       <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
 
 

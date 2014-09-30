@@ -1,34 +1,4 @@
 
-function EventManager() {
-   this._events = new EventEmitter();
-}
-
-EventManager.prototype.bind = function( eventType, callback ){
-  this._events.on( eventType, callback );
-  return this;
-};
- 
-EventManager.prototype.trigger = function(eventType, data){
-   args = [ eventType, {} ];
-
-   for( var i = 1; i < arugments; i++ )
-    args.push( args[i] );
-   this._events.trigger.apply( this._events, args );
-   return ;
-};
-
-
-
-/**
- * The above code is for the EventManager.
- *  EventManager uses jQuery events. Which 
- * breaks where your also using real jQuery events.
- *
- * Bellow is a browser implementation of NodeJS of EventEmitter
- */
-
-
-
 (function (window) {"use strict";
 
   // (C) WebReflection - Mit Style License
@@ -149,3 +119,27 @@ EventManager.prototype.trigger = function(eventType, data){
   window.EventEmitter = EventEmitter;
 
 }(this));
+
+
+
+function EventManager() {
+   this._events = new EventEmitter();
+}
+
+EventManager.prototype.bind = function( eventType, callback ){
+  this._events.on( eventType, callback );
+  return this;
+};
+ 
+EventManager.prototype.trigger = function(eventType, data){
+   args = [ eventType, {} ];
+
+   for( var i = 1; i < arguments.length; i++ )
+    args.push( args[i] );
+   this._events.emit.apply( this._events, args );
+   return ;
+};
+
+
+gisportal = gisportal || {};
+gisportal.events = new EventManager();

@@ -9,7 +9,7 @@ gisportal.loadTemplates = function( callback ){
 	var callback = callback || function(){};
 
 	function compileTemplate( template, status, request ){
-		var templateName = request.fileName.substring( 0, request.fileName.length - 4 )
+		var templateName = request.fileName.substring( 0, request.fileName.length - 4 );
 		gisportal.templates[ templateName ] = Handlebars.compile( template );
 
 		waitingFor--;
@@ -27,12 +27,12 @@ gisportal.loadTemplates = function( callback ){
 				var request = $.ajax({
 					url: '/templates/' + match[1],
 					success: compileTemplate
-				})
+				});
 				request.fileName = match[1];
-			};
+			}
 		}
-	})
-}
+	});
+};
 
 /**
  * Runs an image through the middleware to rotate it on the server
@@ -61,7 +61,6 @@ Handlebars.registerHelper('equals', function(attr1, attr2, options) {
 Handlebars.registerHelper('index_plus_one', function( options ) {
    return options.data.index + 1;
 });
-
 
 
 /**
@@ -129,4 +128,3 @@ Handlebars.registerHelper('call', function() {
    return currentLocation.apply( lastLocation, methodArgs );
 
 });
-

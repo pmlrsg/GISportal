@@ -210,3 +210,5 @@ input[type="text"]  {
   }
 * html .clearfix             { zoom: 1; } /* IE6 */
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+.dev-warning { position: fixed; top: 0; width: 100%; background: #990000; text-align: center; color: #fff; font-weight: bold; }
