@@ -13,7 +13,6 @@
 	bottom: 75px;
   transition: 500ms width;
 
-	overflow-y: hidden;
 }
 
 .panel-slideout-content{
@@ -28,6 +27,14 @@
   max-height: 100%;
   height: 100%;
 }
+
+.panel-slideout-content-wrapper{
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
 .panel-slideout.show-peak {
   width: 30px;
 }
@@ -42,4 +49,41 @@
 }
 .panel-slideout.show-all .panel-slideout-content{
 	left: 0px;
+}
+
+.slideout-speak{
+  position: absolute;;
+  top: 8px;
+  right: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+
+.slideout-pulltab{
+  display: none;
+  position: absolute;
+  right: 0px;
+  top: 20%;
+  padding: 8px;
+  transform-origin: top right;
+  transform: rotateZ( -90deg );
+  background-color: white;
+  cursor: pointer;
+  width: 56px;
+  text-align: center;
+  
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border: 1px solid;
+  border-top: none;
+}
+.panel-slideout.show-all .slideout-pulltab, .panel-slideout.show-peak .slideout-pulltab{
+  display: block;
+}
+.panel-slideout.show-all .slideout-pulltab::before{
+  content: "Hide";
+}
+.panel-slideout.show-peak .slideout-pulltab::before{
+  content: "Show";
 }

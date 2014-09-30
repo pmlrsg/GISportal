@@ -1,4 +1,3 @@
-<div class="remove-active-graph close-side-panel-icon icon_close" ></div>
 
 <ol class="steps grid-list panel-list">
 	<li>
@@ -15,9 +14,9 @@
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries (default)</option>
-				<option value="histogram" {{selected "histogram" (call 'plot.plotType')}}>Histogram</option>
-				<!--<option value="hovmollerLat">Hovmoller Latitude</option>
-				<option value="hovmollerLon">Hovmoller Longitude</option>-->
+				<option value="histogram" {{selected "histogram" (call 'plot.plotType')}} disabled>Histogram - Coming Soon....</option>
+				<option value="hovmollerLat" disabled>Hovmoller Latitude - Coming Soon....</option>
+				<option value="hovmollerLon" disabled>Hovmoller Longitude - Coming Soon....</option>
 			 </select>
 		</div>
 	</li>

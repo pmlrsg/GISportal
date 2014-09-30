@@ -1,8 +1,4 @@
 
-
-
-gisportal.config.graphServer = "http://localhost:3000/";
-
 gisportal.graphs.jobs = [];
 
 
@@ -33,12 +29,13 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
 
       gisportal.graphs.activePlotEditor = plotEditor;
-      gisportal.panelSlideout.openSlideout( 'active-plot' );
 
       plot.plotType( 'timeseries' );
    }
+   gisportal.panelSlideout.openSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
+
 
 
 /**

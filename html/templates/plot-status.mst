@@ -6,8 +6,10 @@
 			{{else}}
 				<div class="unsave js-graph-unsave" data-graph-id="{{id}}" ></div>
 			{{/if}}
+		{{else}}
+			<div></div>
 		{{/if}}
-		<div>
+		<div class="plot-status-title">
 			<h2 class="title ellipsisOverflow" title="{{call 'title'}}">{{call 'title'}}</h2>
 		</div>
 	</div>
@@ -18,15 +20,15 @@
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'success' }}
 			<div></div>
-			<div>
-				<button class="js-graph-status-delete">Delete</button>
+			<div >
 				<button class="js-graph-status-open">Open</button>
+				<button class="js-graph-status-delete">Delete</button>
 			</div>
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'error' }}
 			<div></div>
 			<div>
-				The server failed to build the graph.
+				The server failed to build the graph.<br>
 				<button class="js-graph-status-delete">Delete</button>
 				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
 			</div>

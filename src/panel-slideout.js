@@ -19,6 +19,10 @@ gisportal.panelSlideout.initDOM = function(  ){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.openSlideout( slideoutName );
 		})
+		.on( 'click', '.js-slideout-pulltab-toggle-peak', function(){
+			var slideoutName = findRelatedSlideoutName( this );
+			gisportal.panelSlideout.togglePeak( slideoutName );
+		})
 		.on( 'click', '.js-slideout-close', function(){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.closeSlideout( slideoutName );
@@ -27,6 +31,8 @@ gisportal.panelSlideout.initDOM = function(  ){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.peakSlideout( slideoutName );
 		});
+
+
 
 
 }
@@ -57,4 +63,13 @@ gisportal.panelSlideout.closeSlideout = function( slideoutName ){
 gisportal.panelSlideout.peakSlideout = function( slideoutName ){
 	var slideout = findRelatedSlideoutName( slideoutName );
 	slideout.addClass( 'show-peak' ).removeClass( 'show-all' );
+}
+
+gisportal.panelSlideout.togglePeak = function( slideoutName ){
+	var slideout = findRelatedSlideoutName( slideoutName );
+
+	if( slideout.hasClass( 'show-all' ) )
+		slideout.addClass( 'show-peak' ).removeClass( 'show-all' );
+	else
+		slideout.removeClass( 'show-peak' ).addClass( 'show-all' );
 }

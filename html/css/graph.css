@@ -43,7 +43,11 @@
 	cursor: pointer;
 }
 
-
+.active-plot-component select{
+   height: 20px;
+   padding: 0px;
+   margin: 0px;
+}
 .active-plot-component["has-data-in-range"]{
 	padding: 0px;
 	
@@ -73,7 +77,9 @@
 
 .graph-job{
 	padding: 6px 0px;
-	background: #fbfafb;
+	background-color: #F5F3F6;
+   margin: 6px;
+   border: 1px solid #d8d3dd;
 }
 
 .graph-job .loading-image{
@@ -115,4 +121,9 @@ input.graph-min, input.graph-max{
 }
 .elevation select{
 	margin-top: 0px;
+}
+
+
+.plot-status-title{
+   font-weight: bold;
 }

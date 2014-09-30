@@ -47,7 +47,7 @@ gisportal.graphs.PlotStatus = (function(){
 
             var interactiveUrl = plot.interactiveUrl();
 
-            window.open( interactiveUrl, plot.title(), 'width=640,height=480,toolbar=no' );
+            window.open( interactiveUrl, plot.title(), 'width=' + window.innerWidth * 0.90 + ',height=' + window.innerHeight * 0.70  + ',toolbar=no' );
          });
    };
 
@@ -108,7 +108,7 @@ gisportal.graphs.PlotStatus = (function(){
                break;
             case "success":
                hasEstimation = true;
-               var estimatedEst = new Date( source.estimation );
+               var estimatedEst = new Date( source.estimation.endTime );
                if( estimatedEst.getTime() > worestCaseEstimation.getTime() )
                   worestCaseEstimation = estimatedEst;
                break;

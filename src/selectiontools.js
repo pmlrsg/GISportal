@@ -128,6 +128,7 @@ gisportal.selectionTools.updateROI = function()  {
    vectorLayer.redraw(); 
 };
 
+gisportal.currentSelectedRegion = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    var feature_type = map.ROI_Type;
    var bounds;
@@ -137,6 +138,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       console.log(wkt_feature);
       bounds = feature.geometry.bounds;
 
+      gisportal.currentSelectedRegion = wkt_feature;
       $('.js-coordinates').val(wkt_feature);
       $('.bbox-info').toggleClass('hidden', false);
    }
@@ -146,6 +148,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       console.log(wkt_feature);
       bounds = feature.geometry.bounds;
 
+      gisportal.currentSelectedRegion = wkt_feature;
       $('.js-coordinates').val(wkt_feature);
       $('.bbox-info').toggleClass('hidden', false);
    } else {
@@ -156,6 +159,8 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          coords += bounds.bottom + ",";
          coords += bounds.right + ",";
          coords += bounds.top;
+         
+         gisportal.currentSelectedRegion = coords;
          $('.js-coordinates').val(coords);
          $('.bbox-info').toggleClass('hidden', false);
       }

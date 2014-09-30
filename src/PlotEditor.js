@@ -85,8 +85,22 @@ gisportal.graphs.PlotEditor = (function(){
     *
     */
    PlotEditor.prototype.submitRequest = function(){
-         this.plot().submitRequest();
-         gisportal.graphs.activeGraphSubmitted();
+
+         if( this.plot().doesTBoundsCoverAllComponents() ){
+
+            this.plot().submitRequest();
+            gisportal.graphs.activeGraphSubmitted();
+         }else{
+            if( confirm("This chart contains 2 series out of range. To generate all sources must have valid dates. Allow change?") ){
+               try{
+                  var newTbounds = this.plot().getValidTBoundsForAllComponents();
+                  this.plot().tBounds( newTbounds );
+                  this.submitRequest();
+               }catch( e ){
+                  alert( e.message );
+               };
+            }
+         }
    }
 
 
@@ -234,6 +248,11 @@ gisportal.graphs.PlotEditor = (function(){
          // On click X remove the component
          element.on('click', '.js-close-acitve-plot-component', function(){
             _this.plot().removeComponent( data.component );
+         });
+
+
+         element.on('click', '.js-y-axis', function(){
+            data.component.yAxis = parseInt( $(this).val() );
          });
 
          // The tooltip which tells the user about the range of available data

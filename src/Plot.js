@@ -64,10 +64,15 @@ gisportal.graphs.Plot =(function(){
       
       if( this._components.length == 0 && this.title() == "" ){
          var indicator = gisportal.layers[ component.indicator ];
-         this.title( indicator.displayTitle + " - " + (new Date()).toLocaleString() );
+         this.title( indicator.displayName() + " - " + (new Date()).toLocaleString() );
       }
 
-      component.yAxis = 1;
+      if( !component.yAxis ){
+         if( this._components.length == 0 )
+            component.yAxis = 1;
+         else
+            component.yAxis = 2;
+      }
 
       this._components.push( component );
       
@@ -161,9 +166,11 @@ gisportal.graphs.Plot =(function(){
       if( leftHandSideComoponents.length > 0 ){
          var yAxis1Label = leftHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
-            var output = indicator.niceName;
+            var output = indicator.displayName();
             if( indicator.units )
-               output += " (" + indicator.units + ")"
+               output += " (" + indicator.units + ")";
+
+            return output;
          }).join(' / ');
 
          var y1Axis = {
@@ -184,9 +191,11 @@ gisportal.graphs.Plot =(function(){
       if( rightHandSideComoponents.length > 0 ){
          var yAxis2Label = rightHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
-            var output = indicator.niceName;
+            var output = indicator.displayName();
             if( indicator.units )
-               output += " (" + indicator.units + ")"
+               output += " (" + indicator.units + ")";
+
+            return output;
          }).join(' / ');
 
          var y2Axis = {
@@ -224,7 +233,7 @@ gisportal.graphs.Plot =(function(){
          var showByDefault = 'mean';
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
-               "label" : indicator.name + " " + metric,
+               "label" : indicator.displayTitle + " " + metric,
                "key"  : metric,
                "yAxis": component.yAxis,
                "type": "line",
@@ -263,7 +272,7 @@ gisportal.graphs.Plot =(function(){
       
       $.ajax({
          method: 'post',
-         url: graphServerUrl + 'plot',
+         url: graphServerUrl + '/plot',
          data: JSON.stringify(request),
          dataType: 'json',
          success: function( data ){
@@ -288,7 +297,7 @@ gisportal.graphs.Plot =(function(){
       function updateStatus(){
          $.ajax({
             dataType: 'json',
-            url: graphServerUrl + 'job/' + _this.id + '/status',
+            url: graphServerUrl + '/job/' + _this.id + '/status',
             cache: false,
             success: function( serverStatus ){
                _this.serverStatus( serverStatus );
@@ -427,6 +436,42 @@ gisportal.graphs.Plot =(function(){
 
       return this;
    }
+
+   Plot.prototype.doesTBoundsCoverAllComponents = function(){
+      var tBounds = this.tBounds();
+
+      return this._components.every(function( component ){
+         var layer = gisportal.layers[ component.indicator ];
+         var firstDate = new Date( layer.firstDate );
+         var lastDate = new Date( layer.lastDate );
+
+         return ( firstDate <= tBounds[0]  && tBounds[1] <= lastDate );
+      });
+
+   }
+
+   Plot.prototype.getValidTBoundsForAllComponents = function(){
+      var minTime = null;
+      var maxTime = null;
+
+      this._components.forEach(function( component ){
+         var layer = gisportal.layers[ component.indicator ];
+         var firstDate = new Date( layer.firstDate );
+         var lastDate = new Date( layer.lastDate );
+
+         if( firstDate > minTime || minTime == null )
+            minTime = firstDate;
+
+         if( lastDate < maxTime || maxTime == null )
+            maxTime = lastDate;
+      });
+
+      if( minTime > maxTime )
+         throw new Error("There is no date range that covers all request graph components");
+      else
+         return [ minTime, maxTime ];
+
+   };
    
 
    /**
@@ -463,7 +508,7 @@ gisportal.graphs.Plot =(function(){
    
 
    Plot.prototype.interactiveUrl = function(){
-      return graphServerUrl + 'job/' + this.id + '/interactive'
+      return graphServerUrl + '/job/' + this.id + '/interactive'
    };
    
    
