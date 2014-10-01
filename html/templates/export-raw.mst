@@ -3,6 +3,7 @@
    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon"></span>
 </div>
 <div class="export-raw-slideout">
+<p class="download-text">The NetCDF file that you download can be visualised by several free software packages, for instance on linux based systems you can use <a href="http://meteora.ucsd.edu/~pierce/ncview_home_page.html" target="_blank">ncview</a> and on windows based systems you can use <a href="http://www.qgis.org/en/site/" target="_blank">QGIS</a>.  For more information about the data format and available software take a look at the unidata <a href="http://www.unidata.ucar.edu/software/netcdf/docs/" target="_blank">help pages</a></p>
    <div class="clearfix">
       <input placeholder="Start" class="js-min graph-min grid-cell js-active-plot-start-date" type="text">
       <input placeholder="End" class="js-max graph-max grid-cell js-active-plot-end-date" type="text">

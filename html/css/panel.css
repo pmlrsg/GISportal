@@ -383,3 +383,17 @@ input.search  {
   padding: 9px;
 }
 
+.about-button {
+  float:left;
+}
+
+.download-text {
+  text-align:justify;
+  padding: 10px;
+  margin-bottom: 15px;
+  background: #fbfafb;
+}
+
+.download-text p {
+
+}
