@@ -40,8 +40,8 @@
 	<li>
 		<p class="number grid-cell">4</p>
 		<div class="grid-cell fill">
-			<table>
-				<tbody class="js-components"></tbody>
+			<table> 
+				<tbody class="js-components components"></tbody>
 			</table>
 		</div>
 	</li>

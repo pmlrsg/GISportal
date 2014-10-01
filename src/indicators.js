@@ -610,6 +610,23 @@ gisportal.indicatorsPanel.exportData = function(id) {
       }
    });
 
+   from.change(function(){
+      var currentRange = slider.val();
+      var newStart = new Date( $(this).val() ).getTime();
+      if( ! isNaN( newStart ) ){
+         var newRange = [ newStart, currentRange[1] ];
+         slider.val( newRange );
+      };
+   });
+   to.change(function(){
+      var currentRange = slider.val();
+      var newEnd = new Date( $(this).val() ).getTime();
+      if( ! isNaN( newEnd ) ){
+         var newRange = [ currentRange[0], newEnd ];
+         slider.val( newRange );
+      };
+   });
+
 
    content.find('.js-download').click(function(){
       var range = slider.val();
@@ -637,6 +654,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    urlParams['depth'] = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
 
 
+   graphParams['type'] = 'timeseries';
    graphParams['time'] = urlParams['time'];
    graphParams['bbox'] = urlParams['bbox'];
    graphParams['depth'] = urlParams['depth'];
@@ -659,7 +677,6 @@ gisportal.indicatorsPanel.addToPlot = function(id)  {
       indicator: id,
       bbox: graphParams.bbox
    };
-
 
    var elevationSelect = $('.js-tab-analysis[data-id="' + id + '"] .js-analysis-elevation');
    if( elevationSelect.length == 1 )
