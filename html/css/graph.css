@@ -30,6 +30,7 @@
 .active-plot-slideout .components td{
 	height: auto;
 	padding: 0px 5px;
+   vertical-align: middle;
 }
 
 .active-plot-slideout .components td:nth-child(2){
