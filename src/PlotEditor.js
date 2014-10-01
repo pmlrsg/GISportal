@@ -41,6 +41,10 @@ gisportal.graphs.PlotEditor = (function(){
          _this.submitRequest();
       })
 
+      this._editorParent.find('.js-close-active-plot').click(function(){
+         gisportal.deleteActiveGraph();
+      });
+
    }
 
    PlotEditor.prototype.setupTitleInput = function(  ){

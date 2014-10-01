@@ -53,12 +53,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators, #graphPanel').on('click', '.js-export-button', function() {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.exportData(id);
-      $('.export.overlay').toggleClass('hidden', false);
    });
 
-   $('.js-close-export').on('click', function() {
-      $('.export.overlay').toggleClass('hidden', true);
-   });
 
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function() {
@@ -525,18 +521,6 @@ gisportal.indicatorsPanel.getParams = function(id) {
    var graphXAxis = null,
       graphYAxis = null;
 
-   //var modified = gisportal.utils.nameToId(id);
-
-
-   /*   if ( $('#tab-' + modified + '-graph-type option[value="hovmollerLon"').prop("selected") ) {
-      graphXAxis = 'Lon';
-      graphYAxis = 'Time';
-   }
-   else if ( $('#tab-' + modified + '-graph-type option[value="hovmollerLat"]').prop("selected") ) {
-      graphXAxis = 'Time';
-      graphYAxis = 'Lat';
-   }*/
-
    // Some providers change direction of depth,
    // so this makes it match direction
    var depthDirection = function(id) {
@@ -579,58 +563,64 @@ gisportal.indicatorsPanel.getParams = function(id) {
    }
    return graphParams;
 };
-gisportal.indicatorsPanel.createGraph = function(id) {
-   var graphParams = this.getParams(id);
-   var indicator = gisportal.layers[id];
-   if (graphParams.baseurl && graphParams.coverage) {
-      //Remove current Graph
-      $('.graph-wait-message').removeClass('hidden');
-      $('.graph-holder').html('');
-      gisportal.panels.showPanel('graph');
-
-      var title = graphParams.type + " of " + indicator.name;
-
-      var graphObject = {};
-      graphObject.graphData = graphParams;
-      graphObject.description = title;
-      graphObject.title = title;
-
-      // Async post the state
-      gisportal.genericAsync(
-         'POST',
-         gisportal.graphLocation, {
-            graph: JSON.stringify(graphObject)
-         },
-         function(data, opts) {
-            console.log('POSTED graph!');
-         }, function(request, errorType, exception) {
-            console.log('Failed to post graph!');
-         },
-         'json', {}
-      );
-
-      var options = {};
-      options.title = title;
-      options.provider = indicator.providerTag;
-      options.labelCount = 5; // TO DO: make custom
-      options.id = indicator.urlName;
-      gisportal.graphs.data(graphParams, options);
-   } else {
-      gisportal.gritter.showNotification('dataNotSelected', null);
-   }
-};
 
 
 gisportal.indicatorsPanel.exportData = function(id) {
-   this.exportProcessed(id);
-   this.exportRaw(id);
+   gisportal.panelSlideout.openSlideout('export-raw');
+   var indicator = gisportal.layers[id];
+   var rendered = gisportal.templates['export-raw']({
+      indicator: indicator
+   });
+
+   var content = $('.js-export-raw-slideout  .js-slideout-content')
+      .html(rendered);
+   
+
+   var startDateStamp = new Date(indicator.firstDate).getTime();
+   var lastDateStamp = new Date(indicator.lastDate).getTime();
+
+   var from = content.find('.js-min');
+   var to = content.find('.js-max');
+   var slider = content.find('.js-range-slider');
+
+    slider.noUiSlider({
+      connect: true,
+      behaviour: 'tap-drag',
+      start: [startDateStamp, lastDateStamp],
+      range: {
+         'min': startDateStamp,
+         'max': lastDateStamp
+      },
+      serialization: {
+         lower: [
+            $.Link({
+               target: from,
+               method: setDate
+            })
+         ],
+         upper: [
+            $.Link({
+               target: to,
+               method: setDate
+            })
+         ],
+         format: {
+            decimals: 0
+         }
+      }
+   });
+
+
+   content.find('.js-download').click(function(){
+      var range = slider.val();
+      window.location = gisportal.indicatorsPanel.exportRawUrl( id );
+   });
+
 };
 
-gisportal.indicatorsPanel.exportRaw = function(id) {
-   var link = $('#export-netcdf');
-
+gisportal.indicatorsPanel.exportRawUrl = function(id) {
    var indicator = gisportal.layers[id];
-   var graphParams = $.param(this.getParams(id));
+   var graphParams = (this.getParams(id));
 
    var url = null;
    var urlParams = {
@@ -643,27 +633,22 @@ gisportal.indicatorsPanel.exportRaw = function(id) {
 
    urlParams['coverage'] = indicator.urlName;
    urlParams['bbox'] = $('[data-id="' + indicator.id + '"] .js-coordinates').val();
-   urlParams['time'] = $('.js-min[data-id="' + indicator.id + '"]').val() + "/" + $('.js-max[data-id="' + indicator.id + '"]').val();
+   urlParams['time'] = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
+   urlParams['depth'] = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
+
+
+   graphParams['time'] = urlParams['time'];
+   graphParams['bbox'] = urlParams['bbox'];
+   graphParams['depth'] = urlParams['depth'];
+
 
    var request = $.param(urlParams);
    if (urlParams['bbox'].indexOf("POLYGON") !== -1 || urlParams['bbox'].indexOf("LINESTRING") !== -1) {
-      url = "/service/download?" + graphParams;
+      url = "/service/download?" + $.param(graphParams);
    } else {
       url = indicator.wcsURL + request;
    }
-   $(link).attr('href', url);
-
-};
-
-gisportal.indicatorsPanel.exportProcessed = function(id) {
-   var link = $('#export-csv');
-   var params = this.getParams(id);
-   params['output_format'] = 'csv';
-   var request = $.param(params);
-
-
-   var csv = gisportal.wcsLocation + request;
-   $(link).attr('href', csv);
+   return url;
 };
 
 gisportal.indicatorsPanel.addToPlot = function(id)  {
@@ -684,27 +669,3 @@ gisportal.indicatorsPanel.addToPlot = function(id)  {
    
 };
 
-/*
-gisportal.indicatorsPanel.createURL = function(url, params)  {
-   var params = params || {};
-   var urlParams = {
-      service: 'WCS',
-      version: '1.0.0',
-      request: 'GetCoverage',
-      crs: 'OGC:CRS84',
-      format: 'NetCDF3',
-      coverage: '',
-      time: '',
-
-   }; 
-
-   urlParams = $.extend(urlParams, params);
-   urlParams = $.param(urlParams);
-   return url + urlParams;
-};
-
-gisportal.indicatorsPanel.openURL = function(url, id)  {
-   var link = $('.exportButton[data-id="' + id + '"]');
-   $(link).attr('download', 'dataexport');
-   $(link).attr('href', url);
-};

@@ -141,3 +141,7 @@ table.stripe.panel-tab td {
   cursor: pointer;
 
 }
+
+.export-raw-slideout{
+  padding: 19px;
+}

@@ -89,3 +89,19 @@
 .panel-slideout.show-peak .slideout-pulltab::before{
   content: "Show";
 }
+
+
+.slideout-header{
+  background-color: #59476d;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px; 
+  min-height: 38px;
+  text-transform: capitalize;
+}
+
+.slideout-header .right-icon{
+  float: right;
+  font-size: 22px;
+  line-height: 1px;
+}

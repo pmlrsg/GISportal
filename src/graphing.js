@@ -56,6 +56,11 @@ gisportal.graphs.activeGraphSubmitted = function(){
    gisportal.panels.showPanel( 'history' );
 }
 
+gisportal.graphs.deleteActiveGraph = function(){
+   gisportal.panelSlideout.closeSlideout( 'active-plot' );
+   gisportal.graphs.activePlotEditor = null;
+}
+
 gisportal.graphs.initDOM = function() {
    
    gisportal.graphs.activePlotSlideout = $('.js-active-plot-slideout');

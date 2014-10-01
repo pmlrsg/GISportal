@@ -50,6 +50,7 @@ gisportal.panelSlideout.isOut = function( slideoutName ){
 
 gisportal.panelSlideout.openSlideout = function( slideoutName ){
 	var slideout = findRelatedSlideoutName( slideoutName );
+	gisportal.panelSlideout.hideAllPanels();
 	slideout.addClass( 'show-all' ).removeClass( 'show-peak' );
 };
 
@@ -74,3 +75,15 @@ gisportal.panelSlideout.togglePeak = function( slideoutName ){
 	else
 		slideout.removeClass( 'show-peak' ).addClass( 'show-all' );
 };
+
+
+gisportal.panelSlideout.hideAllPanels = function(){
+	$('.panel-slideout.show-all').each(function(){
+		var newState = $(this).data('slideout-override-action');
+		$(this).removeClass('show-all');
+		if( newState == 'peak' )
+			$(this).addClass( 'show-peak' );
+	});
+
+	
+}

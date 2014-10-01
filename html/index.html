@@ -221,22 +221,29 @@
       </div>
 
 
-      <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot">
+      <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
         <div class="slideout-pulltab js-slideout-pulltab-toggle-peak"></div>
         <div class="panel-slideout-content-wrapper">
           <div class=" panel-slideout-content js-slideout-content"></div>
         </div>
       </div>
 
+
+      <div class="panel-slideout js-export-raw-slideout" data-slideout-name="export-raw" data-slideout-override-action="hide">
+        <div class="panel-slideout-content-wrapper">
+          <div class=" panel-slideout-content js-slideout-content"></div>
+        </div>
+      </div>
+
       <!-- Slideout metadata -->
-      <div class="panel-slideout" data-slideout-name="metadata">
+      <div class="panel-slideout" data-slideout-name="metadata" data-slideout-override-action="hide">
         <div class="panel-slideout-content-wrapper">
           <div class="panel-slideout-content js-slideout-content">
             <!-- Slideout contents should go here -->
             <div class="metadata-slideout">
-            <div class="indicator-header">
+            <div class="slideout-header">
               More Information
-            <span class="btn icon-arrow-left-1 icon-btn js-slideout-close panel-icon-tab js-close-extrainfo"></span>
+              <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
 
             </div>
             

@@ -1,4 +1,7 @@
-
+<div class="slideout-header">
+   Plot
+   <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon js-close-active-plot"></span>
+</div>
 <ol class="steps grid-list panel-list">
 	<li>
 		<p class="number grid-cell">1</p>
