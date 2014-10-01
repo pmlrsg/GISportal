@@ -42,7 +42,7 @@ gisportal.graphs.PlotEditor = (function(){
       })
 
       this._editorParent.find('.js-close-active-plot').click(function(){
-         gisportal.deleteActiveGraph();
+         gisportal.graphs.deleteActiveGraph();
       });
 
    }
