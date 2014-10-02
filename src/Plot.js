@@ -152,7 +152,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.buildRequestAxis = function( plotRequest ){
 
       var xAxis =  {
-         "label" : "Sample Date/Time",
+         "label" : "Date/Time",
          "ticks" : "auto",
          "weight" : "auto",
          "tickFormat" : this.plotType() == "timeseries" ? "%d/%m/%Y" : ",.2f"

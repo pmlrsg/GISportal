@@ -65,7 +65,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    //Auto scale range
-   $('.js-indicators').on('click', '.js-auto', function() {
+   $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
       gisportal.scalebars.autoScale(id);
    });

@@ -14,3 +14,16 @@
    padding: 4px 11px;
    display: inline-block;
 }
+
+@media (max-width:700px){
+   .map_controls { 
+      top: 15px; 
+      right: 15px;
+   }
+   .map_controls span{
+      border-right: none;
+      border-top: 1px solid #e0dce4;
+      display: block;
+   }
+
+}

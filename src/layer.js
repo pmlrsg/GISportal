@@ -55,7 +55,9 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       options : null,
 
       providerDetails: {},
-      offsetVectors: null
+      offsetVectors: null,
+
+      autoScale: gisportal.config.autoScale
    };
    
    $.extend(true, this, this.defaults, opts);
@@ -235,6 +237,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.mergeNewParams = function(object) {
       if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
+      gisportal.scalebars.autoScale( this.id );
    };
    
    /**
@@ -387,12 +390,12 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];            
-            
+            gisportal.scalebars.autoScale( this.id, true )
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
                if(layer.type == 'opLayers') {
-                  layer.openlayers[keys[i]].mergeNewParams({time: layer.selectedDateTime});
+                  layer.mergeNewParams({time: layer.selectedDateTime});
                } else {
                   if($.isFunction(layer.openlayers[keys[i]].removeAllFeatures)) {
                      layer.openlayers[keys[i]].removeAllFeatures();
@@ -437,7 +440,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             layer.units = data.units; 
-            layer.log = data.log == 'true' ? true : false;
+            layer.log = data.logScaling == true ? true : false;
 
             gisportal.layers[layer.id].metadataComplete = true; 
             layer.metadataComplete = true;

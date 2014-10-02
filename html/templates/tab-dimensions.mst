@@ -11,10 +11,12 @@
             <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}">
          </div>
      </div>
-   <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" data-id="{{id}}">
-
+   <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" class="js-indicator-is-log" data-id="{{id}}">
    <label for="tab-{{id}}-log">Logarithmic</label>
-   <button class="js-auto text-button" data-id="{{id}}">Auto</button>
+   <label>
+      <input type="checkbox" {{#if autoScale}}checked{{/if}} id="tab-{{id}}-autoScale" class="js-auto" data-id="{{id}}" />
+      Auto Scale
+   </label>
    <button class="js-reset text-button" data-id="{{id}}">Reset</button>
 
    <div class="indicator-options"> 
