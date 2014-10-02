@@ -276,18 +276,19 @@
       </div>
     </div>
 
-   <div class="export overlay hidden">
-      <div class="export-container overlay-container">
-         <button class="js-close-export text-button">Close</button>
-         <div>
-            <h2>Export the data</h2>
-            <ul>
-               <li><a id="export-csv" href="" download="processed.csv">Processed data - A CSV of the data used in the graph</a></li>
-               <li><a id="export-netcdf" href="" download="raw.nc">Raw data - The NetCDF for the selected area</a></li>
-            </ul>
-         </div>
-      </div> 
-   </div> 
+
+    <div class="js-tac-popup overlay hidden dark-background">
+      <div class=" tac-container">
+        <div class="js-tac-content"></div>
+        <div class="tac-container-bottom">
+          <a class="btn brand with-border js-tac-accept">Accept</a>
+
+          <a class="btn brand with-border js-tac-decline">Decline</a>
+        </div>
+      </div>
+    </div>
+
+
 
     <!-- Map controls -->
     <div class="map_controls">

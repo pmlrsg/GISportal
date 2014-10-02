@@ -21,6 +21,13 @@ gisportal.config = {
     graphServer: 'http://localhost:3000/',
     middlewarePath: '/service'
    },
+
+
+   // Should layers auto scale by default
+   autoScale: true,
+
+   requiresTermsAndCondictions: true,
+   
    popularIndicators : [
       "Heterotrophic flagellates biomass", "Net Primary Production", "Oxygen", "Temperature"
    ],

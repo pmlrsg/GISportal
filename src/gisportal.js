@@ -994,22 +994,56 @@ gisportal.initStart = function()  {
       gisportal.loadState( gisportal.getAutoSaveState() );
       setInterval( gisportal.autoSaveState, 60000 );
    });
-     
+   
+   $('.js-tac-content').html( gisportal.templates['terms-and-conditions-text']() );
+
+   $('.js-tac-accept').click(function(){
+      gisportal.storage.set( 'tac-agreed', true );
+      $('.js-tac-popup').toggleClass('hidden', true);
+      gisportal.launchMap();
+   });
+
+
+   $('.js-tac-decline').click(function(){
+      $('.js-tac-popup').toggleClass('hidden', true);
+   });
+
+
    $('.js-start').click(function()  {
-      $('.start').toggleClass('hidden', true);
 
-      setInterval( gisportal.autoSaveState, 60000 );
+      if( gisportal.config.requiresTermsAndCondictions == true &&  gisportal.hasAgreedToTermsAndCondictions() == false ){
+         $('.js-tac-popup').toggleClass('hidden', false);
+      }else{
+         gisportal.launchMap();
+      }
 
-      //Once they are past the splash page warn them if they leave
-      window.onbeforeunload = function(){
-         gisportal.autoSaveState();
-         if( gisportal.config.siteMode == "production")
-            return "Warning. Your about to leave the page";
-         else
-            return;
-      };
    });
 };
+
+/**
+ * Hides the start menu and launches the main part of the port
+ * @return {[type]} [description]
+ */
+gisportal.launchMap = function(){
+
+   $('.start').toggleClass('hidden', true);
+
+   setInterval( gisportal.autoSaveState, 60000 );
+
+   //Once they are past the splash page warn them if they leave
+   window.onbeforeunload = function(){
+      gisportal.autoSaveState();
+      if( gisportal.config.siteMode == "production")
+         return "Warning. Your about to leave the page";
+      else
+         return;
+   };
+
+}
+
+gisportal.hasAgreedToTermsAndCondictions = function(){
+   return gisportal.storage.get( 'tac-agreed', false );
+}
 
 
 gisportal.loading = {};
