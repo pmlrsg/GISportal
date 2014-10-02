@@ -28,14 +28,16 @@ gisportal.config = {
 
    requiresTermsAndCondictions: true,
 
-   homepageSlides: [
-      "img/homepage-slides/opec1.png",
-      "img/homepage-slides/opec2.png",
-      "img/homepage-slides/opec3.png",
-      "img/homepage-slides/opec4.png",
-      "img/homepage-slides/opec5.png",
-      "img/homepage-slides/opec6.png",
-      "img/homepage-slides/opec7.png"
+    homepageSlides: [
+      "img/homepage-slides/opec1.jpg",
+      "img/homepage-slides/opec2.jpg",
+      "img/homepage-slides/opec3.jpg",
+      "img/homepage-slides/opec4.jpg",
+      "img/homepage-slides/opec5.jpg",
+      "img/homepage-slides/opec6.jpg",
+      "img/homepage-slides/opec7.jpg"
    ]
+   
+
 };
 
