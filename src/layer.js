@@ -389,8 +389,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          if(matchedDate) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
-            layer.selectedDateTime = matchedDate[0];            
-            gisportal.scalebars.autoScale( this.id, true )
+            layer.selectedDateTime = matchedDate[0];
+            
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {

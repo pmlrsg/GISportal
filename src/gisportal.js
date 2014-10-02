@@ -19,6 +19,9 @@ gisportal.VERSION = "0.4.0";
 /*==========================================================================*/
 //Initialise javascript variables and objects
 
+if( ! window.location.origin )
+   window.location.origin = window.location.protocol + "//" + window.location.host
+
 // Path to the python flask middleware
 gisportal.middlewarePath = window.location.origin + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
 

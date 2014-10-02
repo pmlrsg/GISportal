@@ -117,8 +117,16 @@ gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
  * @param {bool} force - Should the autoScale be forced, ignoring the checkbox
  */
 gisportal.scalebars.autoScale = function(id, force)  {
-   if( ! $('#tab-' + id + '-autoScale').prop('checked') && force != true)
-      return;
+   var autoScaleCheck = $('#tab-' + id + '-autoScale');
+   if( force != true){
+      if( autoScaleCheck.length == 1 ){
+         if( ! autoScaleCheck.prop('checked') ){
+            return;
+         };
+      }else if( ! gisportal.config.autoScale ){
+         return;
+      };
+   };
 
    try{
       var l = gisportal.layers[id];
@@ -130,7 +138,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
          gisportal.scalebars.validateScale(id, d.min, d.max);
       }, null, 'json', {});    
    }catch(e){};
-}
+};
 
 /**
  * This resets the scale to the original values.
