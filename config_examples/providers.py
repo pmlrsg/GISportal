@@ -13,7 +13,7 @@ providers ={
     "email": "zw@dmi.dk"
   },
   "HCMR": {
-    "logo": "img/providers/hcmr.png",
+    "logo": "img/providers/hcmr.gif",
     "website": "http://innovator.ath.hcmr.gr/newhcmr1/",
     "email": "ktsiaras@hcmr.gr",
     "model": "POSEIDON atmospheric forcing"
