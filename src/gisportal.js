@@ -982,12 +982,19 @@ gisportal.replaceSubtreeIcons = function(el)  {
 gisportal.initStart = function()  {
 
    var data = {
-      defaultStates: gisportal.config.defaultStates,
+      homepageSlides  : gisportal.config.homepageSlides,
       hasAutoSaveState: gisportal.hasAutoSaveState()
    };
 
    var rendered = gisportal.templates['start']( data );
    $('.js-start-container').html( rendered );
+
+   window.mySwipe = new Swipe($('.homepageSlider')[0] , {
+     speed: 800,
+     auto: 3000,
+     continuous: true,
+     disableScroll: false,
+   });
 
    // Load there previously saved state
    $('.js-load-last-state').click(function(){

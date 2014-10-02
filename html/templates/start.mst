@@ -1,23 +1,23 @@
 <div class="start-container overlay-container">
-    <div class="intro-text">
-        <p>The Marine OPEC portal provides model simulated data for European Regional Seas.</p>
-        <p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>
-    </div>
-    <ul class="examples">
-        {{#each defaultStates}}
-            <li class="example-{{index_plus_one}}">
-                <a href="{{url}}" >
-                    <div class="{{icon}} icon-svg light">Map</div>
-                    <span>{{name}}</span>
-                </a>
-            </li>
-        {{/each}}
-    </ul>
+   <div class="intro-text">
+   <p>The Marine OPEC data portal provides model simulated ecosystem data for
+    European Regional Seas.</p>
+    <p>More information on OPEC is available on the project web site,
+    <a href="http://marineopec.eu" target="_blank">http://marineopec.eu</a></p>
+   </div>
+   <div class="homepageSlider">
+      <div class="homepageSlider-wrap">
+         {{#each homepageSlides}}
+            <div  style="background-image: url('{{.}}');" ></div>
+         {{/each}}
+      </div>
+   </div>
 
-    <nav class="start-nav">
-        {{#if hasAutoSaveState}}
-            <a class="btn brand with-border js-load-last-state">Load your previous map</a>
-        {{/if}}
-        <button class="brand with-border js-start">Start building a map</button>
-    </nav>
+   <nav class="start-nav">
+      {{#if hasAutoSaveState}}
+
+         <a class="btn brand with-border js-load-last-state">Load your previous map</a>
+      {{/if}}
+      <button class="brand with-border js-start">Start building a map</button>
+   </nav>
 </div>
