@@ -27,9 +27,15 @@ gisportal.config = {
    autoScale: true,
 
    requiresTermsAndCondictions: true,
-   
+
    homepageSlides: [
-      "http://s3.amazonaws.com/awesome_screenshot/6031237?AWSAccessKeyId=0R7FMW7AXRVCYMAPTPR2&Expires=1412255641&Signature=0ApcTLs7xDxJmCb9CNKeL1O%2FnV8%3D"
-   ],
+      "img/homepage-slides/opec1.png",
+      "img/homepage-slides/opec2.png",
+      "img/homepage-slides/opec3.png",
+      "img/homepage-slides/opec4.png",
+      "img/homepage-slides/opec5.png",
+      "img/homepage-slides/opec6.png",
+      "img/homepage-slides/opec7.png"
+   ]
 };
 
