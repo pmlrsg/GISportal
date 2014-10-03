@@ -116,23 +116,30 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '#show_more', function(e) {
       e.preventDefault();
-      var indicator = $(this).parents('ul').siblings('.indicator-header').data('name');
-      var provider = $(this).parents('ul').siblings('.indicator-header').data('provider');
-      console.log('closing slideout');
-      // grey out other things here - grey needs to be clickable to disable and hide.
-      $('.js-indicators > li[data-name!="' + indicator + '"]').each(function() {
-         console.log('greyaing out : ' + $(this).data('name'));
-         $(this).append("<div class='indicator-overlay'></div>");
-      });
-      if (gisportal.panelSlideout.isOut('metadata')) {
-         gisportal.panelSlideout.closeSlideout('metadata');
-         setTimeout(function() {
-            gisportal.indicatorsPanel.getMetadata(indicator, provider);
-         }, 500);
-      } else {
-         gisportal.indicatorsPanel.getMetadata(indicator, provider);
-
+      if(gisportal.panelSlideout.isOut('metadata')){
+         gisportal.events.trigger('metadata.close');
       }
+      else {
+         var indicator = $(this).parents('ul').siblings('.indicator-header').data('name');
+         var provider = $(this).parents('ul').siblings('.indicator-header').data('provider');
+         //console.log('closing slideout');
+         // grey out other things here - grey needs to be clickable to disable and hide.
+         $('.js-indicators > li[data-name!="' + indicator + '"]').each(function() {
+            console.log('greyaing out : ' + $(this).data('name'));
+            $(this).append("<div class='indicator-overlay'></div>");
+         });
+          gisportal.indicatorsPanel.getMetadata(indicator, provider);
+      }
+      
+      // if (gisportal.panelSlideout.isOut('metadata')) {
+      //    gisportal.panelSlideout.closeSlideout('metadata');
+      //    setTimeout(function() {
+      //       gisportal.indicatorsPanel.getMetadata(indicator, provider);
+      //    }, 500);
+      // } else {
+      //    gisportal.indicatorsPanel.getMetadata(indicator, provider);
+
+      // }
 
       //gisportal.indicatorsPanel.getMetadata(indicator,provider);
    });

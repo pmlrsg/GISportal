@@ -23,7 +23,6 @@ $(document).ready(function()  {
 \*------------------------------------*/
 
 function changeTab( tabElement )  {
-
   if( tabElement && tabElement instanceof HTMLElement )
     var tabElement = tabElement;
   else
@@ -35,6 +34,9 @@ function changeTab( tabElement )  {
     $('[for="' + e.id + '"]').removeClass('active');
   });
   $('[for="' + e.id + '"]').addClass('active');
+
+  gisportal.events.trigger('metadata.close');
+
 }
 
 // http://stackoverflow.com/questions/4957207/how-to-check-uncheck-radio-button-on-click
@@ -57,6 +59,7 @@ function closeTab(){
     };
     e.bind('mouseup',up);
     e.one('mouseout', unbind);
+    gisportal.events.trigger('metadata.close');
   }
 }
 
