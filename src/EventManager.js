@@ -135,7 +135,7 @@ EventManager.prototype.trigger = function(eventType, data){
    args = [ eventType, {} ];
 
    for( var i = 1; i < arguments.length; i++ )
-    args.push( args[i] );
+    args.push( arguments[i] );
    this._events.emit.apply( this._events, args );
    return ;
 };

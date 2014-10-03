@@ -28,9 +28,7 @@ gisportal.panels.showPanel = function(panelName) {
 gisportal.panels.bind('close-panel', function(ev, data) {
 
 	if (data['panel-name'] === 'active-layers') {
-		gisportal.panelSlideout.closeSlideout('metadata');
-
-		$('.indicator-overlay').remove();
+		gisportal.events.trigger('metadata.close');
 	}
 
 });
