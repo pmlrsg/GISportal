@@ -503,9 +503,6 @@ def getBboxData(params, method):
 Performs a basic set of statistical functions on the provided data.
 """
 def basic(dataset, params, irregular=False, original=None):
-   print '^'*40
-   print irregular
-   print type(dataset)
    if irregular:
       arr = np.ma.concatenate(dataset)
    else:
@@ -515,13 +512,10 @@ def basic(dataset, params, irregular=False, original=None):
    # Create a masked array ignoring nan's
    if original is not None:
       dataset = original
-   print '%'*40
-   print arr
-   print np.max(arr)
-   print '%'*40
+   
    maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
-   print np.max(maskedArray)
+   
    time = getCoordinateVariable(dataset, 'Time')
       
    if time == None:
@@ -564,8 +558,7 @@ def basic(dataset, params, irregular=False, original=None):
    for i, row in enumerate(maskedArray):
       #current_app.logger.debug(np.max(row))
       import pprint
-      print '-+-'*30
-      print np.max(row)
+     
       pprint.pprint(row)
       if timeUnits:
          date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
@@ -579,10 +572,8 @@ def basic(dataset, params, irregular=False, original=None):
       
       if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
          pass
-         #urrent_app.logger.debug('isnan true on all the things')
       else:
          output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
-         #current_app.logger.debug(output['data'][date])
    
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
