@@ -93,3 +93,8 @@ svg {
 #timeline.grid-cell  {
    flex-basis: initial;
 }
+
+.current-date{
+   min-width: 80px;
+   padding: 5px;
+}

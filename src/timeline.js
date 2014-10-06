@@ -247,7 +247,9 @@ gisportal.TimeLine.prototype.redraw = function() {
    var self = this;  // Useful for when the scope/meaning of "this" changes
    
    // Recalculate the x and y scales before redraw
-    this.xScale.range([0, this.width]);
+   // 
+   this.reWidth();
+    this.xScale.range([0, this.width ]);
    //this.xScale.domain([self.minDate, self.maxDate]).range([0, this.width]);
    this.yScale.domain([0, this.timebars.length]).range([0, this.height]);
    // Scale the chart and main drawing areas
@@ -370,7 +372,7 @@ gisportal.TimeLine.prototype.reHeight = function() {
 // Re-calculate the dynamic widget width
 gisportal.TimeLine.prototype.reWidth = function() {
    this.chartWidth = $('div#' + this.id).width();
-   this.width = this.chartWidth - this.margin.right - this.margin.left;
+   this.width = (this.chartWidth - this.margin.right - this.margin.left) ;
 };
 
 // Reset the timeline to its original data extents
@@ -413,7 +415,7 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime() + padding) : this.maxDate);
    console.log(minDate, maxDate);
    console.log(this.xScale.domain());
-   this.xScale.domain([this.minDate, this.maxDate]).range([0, this.width]);
+   this.xScale.domain([this.minDate * 0.9, this.maxDate * 1.1]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 };
@@ -459,11 +461,13 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       // redraw is done in zoom
       var data = gisportal.timeline.layerbars[0];
       gisportal.timeline.zoomDate(data.startDate, data.endDate);
+      //Fix
       gisportal.timeline.setDate(data.endDate);
-      // Already redraws within zoom - this.redraw();
+      
    }  
    
    this.reHeight();
+   this.reWidth();
    this.redraw(); 
 };
 
