@@ -637,7 +637,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
    content.find('.js-download').click(function(){
       var range = slider.val();
-      window.location = gisportal.indicatorsPanel.exportRawUrl( id );
+      window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
    });
 
 };
