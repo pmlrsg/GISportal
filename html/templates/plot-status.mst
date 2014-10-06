@@ -28,7 +28,7 @@
 		{{#if_equals (call 'state') 'error' }}
 			<div></div>
 			<div>
-				The server failed to build the graph.<br>
+				The graph could not be built. Downstream error.<br>
 				<button class="js-graph-status-delete">Delete</button>
 				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
 			</div>
