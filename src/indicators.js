@@ -673,7 +673,12 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    urlParams['coverage'] = indicator.urlName;
    urlParams['bbox'] = $('[data-id="' + indicator.id + '"] .js-coordinates').val();
    urlParams['time'] = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
-   urlParams['depth'] = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
+
+   var vert = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
+   if( indicator.positive == "down" )
+     urlParams['vertical'] = Math.abs( vert );
+  else
+      urlParams['vertical'] = indicator.positive + Math.abs( vert );
 
 
    graphParams['type'] = 'timeseries';
