@@ -467,7 +467,6 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    }  
    
    this.reHeight();
-   this.reWidth();
    this.redraw(); 
 };
 
