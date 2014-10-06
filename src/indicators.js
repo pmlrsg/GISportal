@@ -80,6 +80,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Auto scale range
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
+      gisportal.layers[id].autoScale = $(this).prop('checked');
+
       gisportal.scalebars.autoScale(id);
    });
 
