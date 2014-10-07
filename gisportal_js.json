@@ -12,7 +12,6 @@
       "src/panels.js",
       "src/panel-slideout.js",
       "src/ui.js",
-      "config/config.js",
       "config/analytics_config.js",
       "src/configure.js",
       "src/scalebar.js",

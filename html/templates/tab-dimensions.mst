@@ -11,11 +11,13 @@
             <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}">
          </div>
      </div>
-   <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" data-id="{{id}}">
-
+   <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" class="js-indicator-is-log" data-id="{{id}}">
    <label for="tab-{{id}}-log">Logarithmic</label>
-   <button class="js-auto text-button" data-id="{{id}}">Auto</button>
-   <button class="js-reset text-button" data-id="{{id}}">Reset</button>
+   <label>
+      <input type="checkbox" {{#if autoScale}}checked{{/if}} id="tab-{{id}}-autoScale" class="js-auto" data-id="{{id}}" />
+      Auto Scale
+   </label>
+   <a class="js-reset text-button" data-id="{{id}}">Reset</a>
 
    <div class="indicator-options"> 
       {{#hasElevation}}
@@ -23,7 +25,7 @@
          <label for="tab-{{id}}-elevation">Elevation</label>
          <select id="tab-{{id}}-elevation">
             {{#elevationCache}}
-               <option {{#if_equals this @root.selectedElevation}}selected{{/if_equals}} value="{{.}}">{{.}} {{@root.elevationUnits}}</option>
+               <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
             {{/elevationCache}}
          </select>
       </div>
@@ -34,7 +36,7 @@
          <label for="tab-{{id}}-layer-style">Layer style</label>
          <select id="tab-{{id}}-layer-style">
             {{#styles}}                  
-               <option {{#if_equals Name @root.style}}selected{{/if_equals}} value="{{Name}}">{{Name}}</option>
+               <option {{selected Name @root.style}} value="{{Name}}">{{Name}}</option>
             {{/styles}}
          </select>
       </div>
