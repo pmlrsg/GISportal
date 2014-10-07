@@ -1,20 +1,15 @@
-/**
- * graphing.js
- * This is the file responsible for setting up graphing.
- * The actual graphs are in src/graphs/
- */
 
-/**
- * initDOM is called in gisportal.js
- * It sets up all of the DOM events.
- */
-gisportal.graphs.initDOM = function() {
-   $('.js-return-analysis').on('click', function() {
-      gisportal.panels.showPanel( 'active-layers' );  
-      $('.graph-wait-message').toggleClass("hidden", false);
-      $('.graph-holder').html('');   
-   });
+gisportal.graphs.jobs = [];
 
+
+
+function getIndicatorDateRange( indicator ){
+   var indicator = gisportal.layers[indicator];
+   
+   var firstDate = new Date(indicator.firstDate);
+   var lastDate = new Date(indicator.lastDate);
+   
+   return [ firstDate, lastDate ];
 }
 
 /**
@@ -28,83 +23,64 @@ gisportal.graphs.initDOM = function() {
 gisportal.graphs.data = function(params, options)  {
    var request = $.param( params );    
 
-   function success(data) {
-      gisportal.graphs.addGraph(data, options);
-   }
-      
-   function error(request, errorType, exception) {
-      var data = {
-         type: 'wcs data',
-         request: request,
-         errorType: errorType,
-         exception: exception,
-         url: this.url
-      };          
-      gritterErrorHandler(data);
-   }
+gisportal.templates = {};
 
-   gisportal.genericAsync('GET', gisportal.wcsLocation + request, null, success, error, 'json', null);
+
+
+gisportal.graphs.activePlotEditor = null;
+
+gisportal.graphs.addComponentToGraph = function( component ){
+   
+   if( gisportal.graphs.activePlotEditor == null ){
+      var PlotEditor = gisportal.graphs.PlotEditor;
+      var Plot = gisportal.graphs.Plot;
+
+      var plot = new Plot();
+      var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
+
+      gisportal.graphs.activePlotEditor = plotEditor;
+
+      plot.plotType( 'timeseries' );
+   }
+   gisportal.panelSlideout.openSlideout( 'active-plot' );
+   gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
 
-/**
- * This is where the calls to the creation of the graphs are made.
- * It checks data.type for the type of the graph, which it then
- * calls from src/graphs/<type>.js
- *
- * @param {object} data - The actual data of the graph
- * @param {object} options - The options that control the output
- * and creation of the graph.
- */ 
-gisportal.graphs.create = function(data, options)  {
-   if (data.error !== "") {
-      var d = { error: data.error };
-      gisportal.gritter.showNotification('graphError', d);
-      return;
-   }
 
-   var graph;
-   switch (data.type)  {
-      case 'timeseries':
-         graph = gisportal.graphs.timeseries(data, options);
-         break;
-      case 'histogram':
-         graph = gisportal.graphs.histogram(data, options);
-         break;
-      case 'hovmollerLat':
-         break;
-      case 'hovmollerLon':
-         break;
-   }
-}
 
 /**
- * This function adds the setup of the graph to the DOM,
- * this includes titles and other features that are
- * controlled by the options.
- * At this point the graph itself does not exist, but
- * the mustache template has an SVG element for the graph
- * to go into.
- *
- * @param {data} data - The data of the graph, to be passed
- * into create so that the graph can be created
- * @param {options} options - The options such as title and id
+ * When a graph has finished, the active GraphEditor calls this function.
+ * It will remove the editor
+ * Setup a status object for the history panel
+ * Close the editor slideout and show the history panel
  */
-gisportal.graphs.addGraph = function(data, options)  {
-   var uid = 'wcsgraph' + Date.now();
-   var title = options.title || "Graph";
-   var units = gisportal.layers[options.id].units;
+gisportal.graphs.activeGraphSubmitted = function(){
+   var plot = gisportal.graphs.activePlotEditor.plot();
+   var plotStatus = new gisportal.graphs.PlotStatus( plot );
+   var plotStatusElement = plotStatus.element();
+   gisportal.graphs.graphsHistoryList.prepend( plotStatusElement );
 
-   $.get('templates/graph.mst', function(template) {
-      var rendered = Mustache.render(template, {
-         id : options.id,
-         title : title,
-         units: units
-      });
-      $('.graph-holder').html(rendered);    
-      $('.graph-wait-message').toggleClass("hidden", true);   
-      gisportal.graphs.create(data, options);
-      gisportal.replaceAllIcons();
-   });
+   gisportal.graphs.activePlotEditor = null;
 
+   gisportal.panelSlideout.closeSlideout( 'active-plot' );
+   gisportal.panels.showPanel( 'history' );
 }
+
+gisportal.graphs.deleteActiveGraph = function(){
+   gisportal.panelSlideout.closeSlideout( 'active-plot' );
+   gisportal.graphs.activePlotEditor = null;
+}
+
+gisportal.graphs.initDOM = function() {
+   
+   gisportal.graphs.activePlotSlideout = $('.js-active-plot-slideout');
+
+   gisportal.graphs.statesSavedList = $('.js-states-saved-list');
+
+   gisportal.graphs.graphsHistoryList = $('.js-graphs-history-list');
+   gisportal.graphs.graphsSavedList = $('.js-graphs-saved-list');
+   
+}
+
+
 

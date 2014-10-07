@@ -110,14 +110,35 @@ gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
 
 /**
  * This gets an automatically generated scale.
+ * When called it will check to see if the user 
+ * has the "Auto Scale" checkbox ticked.
+ * 
  * @param {string} id - The id of the layer
+ * @param {bool} force - Should the autoScale be forced, ignoring the checkbox
  */
-gisportal.scalebars.autoScale = function(id)  {
-   var l = gisportal.layers[id];     
-   gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=-180,-90,180,90&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
-      gisportal.scalebars.validateScale(id, d.min, d.max);
-   }, null, 'json', {});    
-}
+gisportal.scalebars.autoScale = function(id, force)  {
+   var autoScaleCheck = $('#tab-' + id + '-autoScale');
+   if( force != true){
+      if( autoScaleCheck.length == 1 ){
+         if( ! autoScaleCheck.prop('checked') ){
+            return;
+         };
+      }else if( ! gisportal.config.autoScale ){
+         return;
+      };
+   };
+
+   try{
+      var l = gisportal.layers[id];
+      var bbox = l.exBoundingBox.WestBoundLongitude + ","
+         + l.exBoundingBox.SouthBoundLatitude + ","
+         + l.exBoundingBox.EastBoundLongitude + ","
+         + l.exBoundingBox.NorthBoundLatitude;
+      gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
+         gisportal.scalebars.validateScale(id, d.min, d.max);
+      }, null, 'json', {});    
+   }catch(e){};
+};
 
 /**
  * This resets the scale to the original values.
@@ -150,6 +171,7 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
    var min = parseFloat(newMin);
    var max = parseFloat(newMax);
 
+
    var minEl = $('.js-scale-min[data-id="' + id +'"]');
    var maxEl = $('.js-scale-max[data-id="' + id +'"]');
 
@@ -160,15 +182,20 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
    if (min > max)  {
       min = max;
       max = min;
-   }   
+   }  
+
+   
+   // This stops it from looping 
+   if( gisportal.layers[id].minScaleVal == min && gisportal.layers[id].maxScaleVal == max && gisportal.layers[id].log == isLog )
+      return;
 
 
    if ((max !== undefined && max !== null) && (min !== undefined && min !== null))  {
       if (isLog && min <= 0)  {
          alert('Cannot use a logarithmic scale with negative or zero values');
          logEl.attr('checked', false);
+         isLog = false;
       }
-      else  {
 
          minEl.val(min);
          maxEl.val(max);
@@ -179,7 +206,7 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
          gisportal.layers[id].log = isLog;
 
          this.updateScalebar(id);
-      } 
+
    }
 };
 

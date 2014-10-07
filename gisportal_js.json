@@ -4,10 +4,13 @@
       "html/js-libs/"
    ],
    "files": [
+      "src/EventManager.js",
+      "config/config.js",
       "src/gisportal.js",
       "src/templates.js",
       "src/portal.js",
       "src/panels.js",
+      "src/panel-slideout.js",
       "src/ui.js",
       "config/config.js",
       "config/analytics_config.js",
@@ -23,6 +26,9 @@
       "src/quickRegions.js", 
       "src/timeline.js",
       "src/libs/nvd3/nv.d3.js",
+      "src/Plot.js",
+      "src/PlotEditor.js",
+      "src/PlotStatus.js",
       "src/graphing.js",
       "src/graphs/timeseries.js",
       "src/graphs/histogram.js",
