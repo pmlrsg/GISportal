@@ -32,5 +32,14 @@ gisportal.config = {
       "Near surface specific humidity",
       "Surface incident longwave radiation",
       "Surface incident shortwave radiation"
-   ]
+   ],
+   paths: {
+    graphServer: 'http://localhost:3000/',
+    middlewarePath: '/service'
+   },
+
+   // Should layers auto scale by default
+   autoScale: true,
+   requiresTermsAndCondictions: true,
+   
 };
