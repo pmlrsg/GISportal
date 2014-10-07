@@ -6,6 +6,5 @@ html/cache
 html/cache/*
 html/GISPortal.js
 html/css/GISPortal.css
-config/*
 .DS_Store
 apache_log
