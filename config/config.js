@@ -34,7 +34,7 @@ gisportal.config = {
       "Surface incident shortwave radiation"
    ],
    paths: {
-    graphServer: 'http://localhost:3000/',
+    graphServer: 'https://wci.earth2observe.eu/plotting',
     middlewarePath: '/service'
    },
 
