@@ -121,7 +121,7 @@ gisportal.analytics.initDomEvents = function(){
    
    // Adding an indicator panel
    $('body').on( 'click', '#configurePanel .js-toggleVisibility.active', function(){
-      var microLayer = gisportal.microLayers[ $(this).data('id') ];
+      var layer = gisportal.layers[ $(this).data('id') ];
       gisportal.analytics.events.selectLayer( { name: $(this).data('name') } );
    })
 

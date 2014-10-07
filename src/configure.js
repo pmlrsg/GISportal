@@ -491,12 +491,6 @@ gisportal.configurePanel.hasIndicator = function(name)  {
    return false;
 };
 
-gisportal.configurePanel.unselectIndicator = function(name)  {
-   _.remove(gisportal.configurePanel.selectedIndicators, function(d)  {
-      return d.name.toLowerCase() === name.toLowerCase();
-   });
-};
-
 
 /**
  * This make sures the indicators are in the correct order.

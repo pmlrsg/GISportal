@@ -12,16 +12,6 @@ function getIndicatorDateRange( indicator ){
    return [ firstDate, lastDate ];
 }
 
-/**
- * This function produces the url request for the AJAX call
- * to get data. It then calls addGraph on success.
- * 
- * @param {object} params - The parametres for the request
- * @param {object} options - The options to be passed through to
- * the creation of the graph.
- */
-gisportal.graphs.data = function(params, options)  {
-   var request = $.param( params );    
 
 gisportal.templates = {};
 

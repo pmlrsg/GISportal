@@ -44,19 +44,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.indicatorsPanel.removeFromPanel(id);
    });
 
-   $('.js-indicators').on('click', '.js-reset-options', function()  {
-      var id = $(this).data('id');
-      var name = $(this).data('name');
-      if (id !== "none") gisportal.indicatorsPanel.defaultOptionsTab(id);
-      else  {
-         var group = gisportal.groupNames()[name];
-         gisportal.indicatorsPanel.renderOptionsTab({
-         name: name,
-         id: id,
-         refined: false}, group);
-      }
-   });
-      
+
    $('.js-start-again').on('click', function() {
       gisportal.panels.showPanel('choose-indicator');
    });
