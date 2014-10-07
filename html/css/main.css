@@ -80,6 +80,9 @@ button, .btn{
    -moz-appearance: none;
    background: transparent;
    text-decoration: underline;
+  padding: 1px 6px;
+  margin: 2px;
+
 }
 
 .brand:active,
@@ -153,6 +156,12 @@ input[type="text"]  {
    z-index: 100;
 }
 
+.pull-left{
+	float: left !important;
+}
+.pull-right{
+	float: right !important;
+}
 /* Global Loading Icon */
 .global-loading-icon{
 	display: none;
@@ -194,14 +203,6 @@ input[type="text"]  {
 .align-center{
   text-align: center;
 }
-.pull-left{
-  float: left;
-}
-
-.pull-right{
-  float: right;
-}
-
 .clearfix:after {
   visibility: hidden;
   display: block;
@@ -212,3 +213,22 @@ input[type="text"]  {
   }
 * html .clearfix             { zoom: 1; } /* IE6 */
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+
+.dev-warning { position: fixed; top: 0; width: 100%; background: #990000; text-align: center; color: #fff; font-weight: bold; }
+
+.dark-background{
+  background-color: rgba(0,0,0,0.8);
+  display: inline-flex;
+}
+
+.tac-container{
+  background-color: #32273d;
+  color: #f7f6f8;
+  padding: 25px;
+  width: 500px;
+  margin: auto;
+}
+.tac-container-bottom {
+  text-align: right;
+  margin-top: 12px;
+}

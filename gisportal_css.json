@@ -5,6 +5,8 @@
       "html/css/streamline-filled-in.css",
       "html/css/reset.css",
       "html/css/fonts.css",
+      "html/css/streamline.css",
+      "html/css/streamline-filled-in.css",
       "html/css/type.css",
       "html/css/overlay.css",      
       "html/css/start.css",
@@ -19,16 +21,16 @@
       "html/css/grid.css",
       "html/css/icons.css",
       "html/css/panel.css",
+      "html/css/panel-slideout.css",
+      "html/css/metadata-panel.css",
       "html/css/scalebar.css",
       "html/css/indicators.css",
       "html/css/graph.css",
       "html/css/tables.css",
       "html/css/nv.d3.css",
+      "html/css/history.css",
       "html/css/mapcontrols.css",
       "html/js-libs/tooltipster/css/tooltipster.css",
-      "html/js-libs/tooltipster/css/themes/tooltipster-light.css",
-      "html/js-libs/tooltipster/css/themes/tooltipster-noir.css",
-      "html/js-libs/tooltipster/css/themes/tooltipster-punk.css",
       "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css"
    ]
 }

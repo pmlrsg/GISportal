@@ -1,13 +1,14 @@
 /*------------------------------------*\
-    Configuration
-    This file is for the configuration
-    of the GIS Portal.
+   Configuration
+   This file is for the configuration
+   of the GIS Portal.
 
-    browseCategories - Used to define
-    which categories to be shown in the
-    browse panel. This is currently
-    limited to 2.
+   browseCategories - Used to define
+   which categories to be shown in the
+   browse panel. This is currently
+   limited to 2.
 \*------------------------------------*/
+
 
 
 gisportal.config = {
@@ -17,30 +18,26 @@ gisportal.config = {
       "region": "Region",
       "MSFD" : "EU MSFD"
    },
-   popularIndicators : [
-      "Heterotrophic flagellates biomass", "Net Primary Production", "Oxygen", "Temperature"
-   ],
-   defaultStates: [
-      {
-         "name" : "Cod in the North East Atlantic",
-         "url" : "http://portaldev.marineopec.eu/?state=b8czastdcoioi",
-         "icon" : "icon_map"
-      },
-      {
-         "name" : "Seasonal Changes in Chlorophyll levels in the Med",
-         "url" : "http://portaldev.marineopec.eu/?state=a9bmsjjtthehe",
-         "icon" : "icon_analyse"
-      },
-      {
-         "name" : "Interannual Nitrogen in the Baltic",
-         "url" : "http://portaldev.marineopec.eu/?state=c7ebs12wvvmvm",
-         "icon" : "icon_analyse"
-      },
-      {
-         "name" : "Summer zooplankton growth in the Black Sea",
-         "url" : "http://portaldev.marineopec.eu/?state=bqua1n6lk2yky",
-         "icon" : "icon_map"
-     }
-   ],
+   paths: {
+    graphServer: 'http://localhost:3000/',
+    middlewarePath: '/service'
+   },
+
+   // Should layers auto scale by default
+   autoScale: true,
+
+   requiresTermsAndCondictions: true,
+
+    homepageSlides: [
+      "img/homepage-slides/opec1.jpg",
+      "img/homepage-slides/opec2.jpg",
+      "img/homepage-slides/opec3.jpg",
+      "img/homepage-slides/opec4.jpg",
+      "img/homepage-slides/opec5.jpg",
+      "img/homepage-slides/opec6.jpg",
+      "img/homepage-slides/opec7.jpg"
+   ]
+   
+
 };
 

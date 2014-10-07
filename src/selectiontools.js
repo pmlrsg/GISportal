@@ -11,6 +11,7 @@ gisportal.selectionTools = {};
 gisportal.selectionTools.init = function()  {
    gisportal.selectionTools.initDOM();
    var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
+
       style : {
          strokeColor : 'white',
          fillColor : 'green',
@@ -25,14 +26,27 @@ gisportal.selectionTools.init = function()  {
          gisportal.selectionTools.ROIAdded(feature);
       },
       rendererOptions: { zIndexing: true }
-   }); 
-
+   });
+   
    vectorLayer.controlID = "poiLayer";
    vectorLayer.displayInLayerSwitcher = false;
    map.addLayer(vectorLayer);
    gisportal.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
 
-   map.addControls([gisportal.mapControls.box]);
+   gisportal.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon, {
+      handlerOptions: {
+         persist: false
+      }
+   });
+
+   gisportal.mapControls.line = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Path, {
+      handlerOption : {
+         persist : false
+      }
+   });
+   gisportal.wkt = new OpenLayers.Format.WKT();
+
+   map.addControls([gisportal.mapControls.box, gisportal.mapControls.polygon, gisportal.mapControls.line]);
  
 };
 
@@ -42,6 +56,32 @@ gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('click', '.js-draw-box', function()  {
       gisportal.selectionTools.toggleTool('box');
    });
+   $('.js-indicators').on('click', '.js-draw-polygon', function() {
+      console.log('clicked th epolygon draw');
+      gisportal.selectionTools.toggleTool('polygon');
+   });
+   $('.js-indicators').on('click', '.js-draw-line', function() {
+      console.log('clicked the line draw');
+      gisportal.selectionTools.toggleTool('line');
+   });
+};
+
+gisportal.selectionTools.toggleBboxDisplay = function() {
+
+   $('.coordinates').disabled();
+
+
+
+};
+
+gisportal.selectionTools.getActiveControl = function() {
+   activeControl = '';
+   for (var key in gisportal.mapControls) {
+      if (gisportal.mapControls[key].active) {
+         activeControl = key;
+      }
+   }
+   return activeControl;
 };
 
 gisportal.selectionTools.toggleTool = function(tool)  {
@@ -89,20 +129,46 @@ gisportal.selectionTools.updateROI = function()  {
    vectorLayer.redraw(); 
 };
 
+gisportal.currentSelectedRegion = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    var feature_type = map.ROI_Type;
-   this.toggleTool('pan'); // So that people don't misclick
+   var bounds;
+   if (feature_type === "polygon") {
+      console.log('generation polygon WKT');
+      var wkt_feature = gisportal.wkt.write(feature);
+      console.log(wkt_feature);
+      bounds = feature.geometry.bounds;
 
-   var bounds = feature.geometry.bounds;
-   var coords = "";
-   if (bounds)  {
-      coords += bounds.left + ",";
-      coords += bounds.bottom + ",";
-      coords += bounds.right + ",";
-      coords += bounds.top;
-      $('.js-coordinates').val(coords);
+      gisportal.currentSelectedRegion = wkt_feature;
+      $('.js-coordinates').val(wkt_feature);
       $('.bbox-info').toggleClass('hidden', false);
    }
+   else if(feature_type === 'line') {
+      console.log('generation line WKT');
+      var wkt_feature = gisportal.wkt.write(feature);
+      console.log(wkt_feature);
+      bounds = feature.geometry.bounds;
+
+      gisportal.currentSelectedRegion = wkt_feature;
+      $('.js-coordinates').val(wkt_feature);
+      $('.bbox-info').toggleClass('hidden', false);
+   } else {
+      bounds = feature.geometry.bounds;
+      var coords = "";
+      if (bounds) {
+         coords += bounds.left + ",";
+         coords += bounds.bottom + ",";
+         coords += bounds.right + ",";
+         coords += bounds.top;
+         
+         gisportal.currentSelectedRegion = coords;
+         $('.js-coordinates').val(coords);
+         $('.bbox-info').toggleClass('hidden', false);
+      }
+   }
+   this.toggleTool('pan'); // So that people don't misclick
+
+  
    
    // Get the geometry of the drawn feature
    var geom = new OpenLayers.Geometry();
@@ -155,8 +221,11 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       case 'circle':
          // set the .bbox-info div to show lat/long of the centre, the radius, width, height and area
          break;
-      case 'polgon':
+      case 'polygon':
          // set the .bbox-info div to show the centroid lat/long and area
+         $('.js-bbox-width').html('');
+         $('.js-bbox-height').html('');
+         $('.js-bbox-area').html(pretty_area_km + ' km<sup>2</sup>');
          break;
    }
 

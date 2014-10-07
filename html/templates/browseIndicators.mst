@@ -7,7 +7,7 @@
 	   <li data-name="{{name}}">
 	      <p class="grid-cell fill">{{name}}</p>
 	      <label for="{{@root.location}}-toggleVisibility-{{modified}}" class="icon-checkbox grid-cell indicator-checkbox" title="Show/Hide {{name}}"></label>
-	      <input type="checkbox" id="{{@root.location}}-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility js-icon-trigger panel-tab-trigger">
+	      <input type="checkbox" id="{{@root.location}}-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility panel-tab-trigger">
 	   </li>
 	{{else}}
 	  <li class="align-center">

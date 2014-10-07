@@ -16,13 +16,12 @@ allowedHosts = ['localhost','localhost:8080','localhost:86','localhost:85',
          'vostok.npm.ac.uk','vostok.npm.ac.uk:8080',
          'vostok.pml.ac.uk','vostok.pml.ac.uk:8080',
          'vortices.npm.ac.uk', 'vortices.npm.ac.uk:8080',
-         'wci.earth2observe.eu',
          'rsg.pml.ac.uk','rsg.pml.ac.uk:8080',
          'motherlode.ucar.edu','motherlode.ucar.edu:8080',
          'www.openlayers.org', 'wms.jpl.nasa.gov', 'labs.metacarta.com', 
          'www.gebco.net', 'oos.soest.hawaii.edu:8080', 'oos.soest.hawaii.edu',
          'thredds.met.no','thredds.met.no:8080', 'irs.gis-lab.info',
-         'demonstrator.vegaspace.com', 'grid.bodc.nerc.ac.uk', 'ogc.hcmr.gr:8080' ]
+         'demonstrator.vegaspace.com', 'grid.bodc.nerc.ac.uk', 'ogc.hcmr.gr:8080','wci.earth2observe.eu' ]
          
 """
 Standard proxy

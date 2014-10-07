@@ -39,8 +39,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.metadataQueue = [];
 
    this.defaults = {
-      firstDate : null,
-      lastDate : null,
+      firstDate : '',
+      lastDate : '',
       scalebarOpen : null,
       serverName : null,
       wfsURL : null,
@@ -54,12 +54,14 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       tags : null,
       options : null,
 
-      contactDetails: {},
-      offsetVectors: null
+      providerDetails: {},
+      offsetVectors: null,
+
+      autoScale: gisportal.config.autoScale
    };
    
    $.extend(true, this, this.defaults, opts);
-
+   //this.moreInfo = opts.moreInfo;
    // Used for sensor data from SOS, not tested as we have no sensor data
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/\s+/g, "") : null;
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/[\.,]+/g, "") : null;
@@ -88,6 +90,8 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       }
    }
 
+   this.tags['providerTag'] = this.providerTag;
+
    // I do not like the metadataQueue but it is used to
    // prevent race conditions of AJAX calls such as
    // for the scalebar.
@@ -109,11 +113,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    // be deprecated as selected layers can be found in
    // gisportal.selectedLayers now.
    this.selected = false;
-   
-   // Date Range
-   // These are set with getDimensions
-   this.firstDate = '';
-   this.lastDate = '';
    
    //--------------------------------------------------------------------------
    // The min and max scale range, used by the scalebar
@@ -213,9 +212,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             layer.temporal = true;
             var datetimes = dimension.Value.split(',');           
             layer.DTCache = datetimes;
-            layer.firstDate = gisportal.utils.displayDateString(datetimes[0]);
-            layer.lastDate = gisportal.utils.displayDateString(datetimes[datetimes.length - 1]);
-         
+
          // Elevation dimension   
          } else if (value.Name.toLowerCase() == 'elevation') {
             layer.elevation = true;
@@ -241,6 +238,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.mergeNewParams = function(object) {
       if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
+      gisportal.scalebars.autoScale( this.id );
    };
    
    /**
@@ -307,13 +305,14 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
          
          // Now display the layer on the timeline
-         var startDate = $.datepicker.parseDate('dd-mm-yy', layer.firstDate);
-         var endDate = $.datepicker.parseDate('dd-mm-yy', layer.lastDate);
+         var startDate = new Date(layer.firstDate);
+         var endDate = new Date(layer.lastDate);
          gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
                  
          // Update map date cache now a new temporal layer has been added
          gisportal.refreshDateCache();
-         $('#viewDate').datepicker("option", "defaultDate", $.datepicker.parseDate('dd-mm-yy', layer.lastDate));
+         
+         $('#viewDate').datepicker("option", "defaultDate", endDate);
 
          gisportal.zoomOverall();
       } else {
@@ -392,13 +391,13 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          if(matchedDate) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
-            layer.selectedDateTime = matchedDate[0];            
+            layer.selectedDateTime = matchedDate[0];
             
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
                if(layer.type == 'opLayers') {
-                  layer.openlayers[keys[i]].mergeNewParams({time: layer.selectedDateTime});
+                  layer.mergeNewParams({time: layer.selectedDateTime});
                } else {
                   if($.isFunction(layer.openlayers[keys[i]].removeAllFeatures)) {
                      layer.openlayers[keys[i]].removeAllFeatures();
@@ -431,7 +430,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
     */
    this.getMetadata = function() {
       var layer = this;
-      console.log(layer);
+      
       $.ajax({
          type: 'GET',
          url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
@@ -443,7 +442,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
             if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
             if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
             layer.units = data.units; 
-            layer.log = data.log == 'true' ? true : false;
+            layer.log = data.logScaling == true ? true : false;
 
             gisportal.layers[layer.id].metadataComplete = true; 
             layer.metadataComplete = true;
@@ -468,6 +467,10 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
          }
       });
    };
+
+   this.cacheUrl = function(){
+     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.origName + '.json'
+   }
 
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
@@ -570,8 +573,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
                }
                self.DTCache = times;
                self.WFSDatesToIDs = dateToIDLookup;
-               //layer.firstDate = gisportal.utils.displayDateString(datetimes[0].startdate);
-               //layer.lastDate = gisportal.utils.displayDateString(datetimes[datetimes.length - 1].startdate);
             }
          }
       }
@@ -639,7 +640,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    
    
    // Store new layer.
-   gisportal.layers[this.id] = this;
+   //gisportal.layers[this.id] = this;
 };
 
 /**
@@ -737,6 +738,7 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options) {  
   var options = options || {};
   var id = layer.id; 
+
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,

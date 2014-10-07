@@ -4,6 +4,8 @@ import os
 import utils
 import sys
 import re
+import dateutil.parser
+import calendar
 
 sys.path.append(os.path.join(sys.path[0],'..','config'))
 # server list
@@ -26,6 +28,9 @@ WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 WCS_NAMESPACE = '{http://www.opengis.net/wcs}'
 GML_NAMESPACE = '{http://www.opengis.net/gml}'
 XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
+
+MARKDOWN_DIR = '../markdown'
+MARKDOWN_SUFFIX = '.md'
 
 PRODUCTFILTER = "productFilter.csv"
 LAYERFILTER = "layerFilter.csv"
@@ -138,24 +143,36 @@ def createCache(server, capabilitiesXML, coverageXML):
                raise Exception("Provider shortTag " + server['options']['providerShortTag'] + " was not in the 'providers.py' file")
 
             # Get the default details for the provider
-            contactDetails =  providers[ server['options']['providerShortTag'] ]
+            providerDetails =  providers[ server['options']['providerShortTag'] ]
+            if (layerHasMoreInfo(server['options']['providerShortTag'])):
+               moreProviderInfo = True
+            else:
+               moreProviderInfo = False
 
-
-            if 'contactDetails' in server['indicators'][name]:
+            if 'providerDetails' in server['indicators'][name]:
                # Overwrite any details with the indicator specific details
-               for i in server['indicators'][name]['contactDetails']:
-                  contactDetails[ i ] = server['indicators'][name]['contactDetails'][ i ]
+               for i in server['indicators'][name]['providerDetails']:
+                  providerDetails[ i ] = server['indicators'][name]['providerDetails'][ i ]
+
+            #import pprint
+            #pprint.pprint(server['indicators'][name])
+            #print '-'*40
 
             if utils.blackfilter(name, layerBlackList):
-               
+               if layerHasMoreInfo(server['indicators'][name]['niceName']):
+                  moreIndicatorInfo = True
+               else:
+                  moreIndicatorInfo = False
                masterLayer = {"Name": name,
                               "Title": title,
                               "Abstract": abstract,
                               "FirstDate": dimensions['firstDate'],
                               "LastDate": dimensions['lastDate'],
                               "OffsetVectors": offsetVectors,
-                              "ContactDetails": contactDetails,
-                              "EX_GeographicBoundingBox": exGeographicBoundingBox }
+                              "ProviderDetails": providerDetails,
+                              "EX_GeographicBoundingBox": exGeographicBoundingBox,
+                              "MoreIndicatorInfo" : moreIndicatorInfo,
+                              "MoreProviderInfo" : moreProviderInfo }
                               
                if name in server['indicators']:
                   masterLayer['tags'] = server['indicators'][name]
@@ -194,7 +211,30 @@ def createCache(server, capabilitiesXML, coverageXML):
       
    # Return and save out the cache for this server
    return utils.saveFile(SERVERCACHEPATH + server['name'] + FILEEXTENSIONJSON, json.dumps(subMasterCache))
-                     
+
+def layerHasMoreInfo( layerNiceName ):
+   print os.getcwd()
+   print "testing %s for more info" % layerNiceName
+   for root, dirs, files in os.walk(MARKDOWN_DIR):
+      for _file in files:
+         #print _file
+         if _file.lower() == '%s%s' % (layerNiceName.lower(), MARKDOWN_SUFFIX):
+            print 'found %s file' % layerNiceName
+            return True
+   return False
+
+
+def isoToTimestamp( strDate ):
+   dt = dateutil.parser.parse(strDate)
+   return calendar.timegm(dt.utctimetuple())
+
+
+def compareDateStrings( a, b ):
+   if isoToTimestamp(a) > isoToTimestamp(b):
+      return 1
+   else:
+      return -1
+
 def createDimensionsArray(layer, server):
    import string
    dimensions = {}
@@ -231,6 +271,8 @@ def createDimensionsArray(layer, server):
             if dateTime.find('-') != 4:
                newDates.pop()
          
+         newDates.sort( compareDateStrings )
+
          if len(newDates) > 0:
             dimensions['firstDate'] = newDates[0].strip()[:10]
             dimensions['lastDate'] = newDates[len(newDates) - 1].strip()[:10]
