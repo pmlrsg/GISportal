@@ -10,5 +10,5 @@
    </div>
    <div class="js-range-slider grid-cell fill"></div>
 
-   <button class="brand js-download">Continue</button>
+   <button class="brand js-download">Download</button>
 </div>
