@@ -47,7 +47,7 @@ gisportal.graphs.PlotStatus = (function(){
 
             var interactiveUrl = plot.interactiveUrl();
 
-            window.open( interactiveUrl, plot.title(), 'width=' + window.innerWidth * 0.90 + ',height=' + window.innerHeight * 0.70  + ',toolbar=no' );
+            window.open( interactiveUrl, '', 'width=' + window.innerWidth * 0.90 + ',height=' + window.innerHeight * 0.70  + ',toolbar=no' );
          });
    };
 

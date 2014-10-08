@@ -194,8 +194,8 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
       if (isLog && min <= 0)  {
          alert('Cannot use a logarithmic scale with negative or zero values');
          logEl.attr('checked', false);
+         isLog = false;
       }
-      else  {
 
          minEl.val(min);
          maxEl.val(max);
@@ -206,7 +206,7 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
          gisportal.layers[id].log = isLog;
 
          this.updateScalebar(id);
-      } 
+
    }
 };
 

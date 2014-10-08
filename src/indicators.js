@@ -57,6 +57,19 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
+   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max', function() {
+      var id = $(this).data('id');
+      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
+   });
+
+   // Scale range event handlers
+   $('.js-indicators').on('click', '.js-reset', function() {
+      var id = $(this).data('id');
+      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
+   });
+
+
+   // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function() {
       var id = $(this).data('id');
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
@@ -67,6 +80,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Auto scale range
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
+      gisportal.layers[id].autoScale = $(this).prop('checked');
+
       gisportal.scalebars.autoScale(id);
    });
 

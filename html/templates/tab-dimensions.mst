@@ -17,7 +17,7 @@
       <input type="checkbox" {{#if autoScale}}checked{{/if}} id="tab-{{id}}-autoScale" class="js-auto" data-id="{{id}}" />
       Auto Scale
    </label>
-   <button class="js-reset text-button" data-id="{{id}}">Reset</button>
+   <a class="js-reset text-button" data-id="{{id}}">Reset</a>
 
    <div class="indicator-options"> 
       {{#hasElevation}}

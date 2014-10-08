@@ -80,6 +80,9 @@ button, .btn{
    -moz-appearance: none;
    background: transparent;
    text-decoration: underline;
+  padding: 1px 6px;
+  margin: 2px;
+
 }
 
 .brand:active,
