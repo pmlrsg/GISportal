@@ -194,7 +194,7 @@ var some = function(promises){
     return d.promise(); // return a promise
 };
 
-var urls = ['service/metadata/provider/' + provider, 'service/metadata/indicator/' + indicator].map($.get);
+var urls = [gisportal.middlewarePath+'/metadata/provider/' + provider, gisportal.middlewarePath+'/metadata/indicator/' + indicator].map($.get);
 
 some(urls).then(function(results){
 for(var i = 0; i < results.length; i++) {
@@ -679,6 +679,10 @@ gisportal.indicatorsPanel.exportData = function(id) {
    content.find('.js-download').click(function(){
       var range = slider.val();
       window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
+      //$.get("/service/download_check", function(data){
+      //   console.log(data);
+      //   $('.js-download').text("Download "+data.format+" @ "+ data.size);
+      //});
    });
 
 };
