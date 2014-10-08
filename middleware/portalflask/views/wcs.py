@@ -109,6 +109,16 @@ def getWcsData():
    return outputData
 
 
+@portal_wcs.route('/download_check', methods=["get"])
+def download_check():
+
+   ret = {
+   "size" : "4GB",
+   "format" : "NetCDF"
+   }
+
+   return jsonify(ret)
+
 @portal_wcs.route('/download', methods=["get"])
 def download_netcdf():
    params = getParams() # Gets any parameters
@@ -122,7 +132,8 @@ def download_netcdf():
          masked, data, mask, tfile, variable  = create_mask(polygon, params, poly_type='line')
       else: 
          masked, data, mask, tfile, variable = create_mask(polygon, params)
-   except:
+   except Exception as e:
+      print e
       return abort(400)
    #current_app.logger.debug('------------------------------------------------------------~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-------------------------------');
    #current_app.logger.debug(type(data))
@@ -264,7 +275,8 @@ def create_mask(poly, params, poly_type="polygon"):
    maxlon = max(lonvals)
 
    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
-
+   print '#'*50
+   print lonlat_poly
    overlap_poly = loaded_poly.intersection(lonlat_poly)
    poly = poly[trim_sizes[poly_type]]
    
@@ -275,25 +287,38 @@ def create_mask(poly, params, poly_type="polygon"):
 
    #found_lats = [find_closest(latvals, float(x[1])) for x in poly]
    #found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
-   if poly_type is 'line':
-      found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
-      found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
-   else:
-      found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
-      found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
+   if overlap_poly.type == "MultiPolygon":
+      found = []
+      for poly in overlap_poly:
+         found_lats = [find_closest(latvals, float(x)) for x in poly.exterior.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in poly.exterior.xy[0]]
+         found.append(zip(found_lons,found_lats))
 
-   #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
-   found = zip(found_lons,found_lats)
+
+   else:
+      if poly_type is 'line':
+         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
+      else:
+         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
+
+      #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
+      found = zip(found_lons,found_lats)
    current_app.logger.debug('#'*40)
    current_app.logger.debug(found)
 
    # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
    img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
 
-   if poly_type == 'polygon':
-      ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
-   if poly_type == 'line':
-      ImageDraw.Draw(img).line(found,   fill=2)
+   if overlap_poly.type == "MultiPolygon":
+      for f in found:
+         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+   else:
+      if poly_type == 'polygon':
+         ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
+      if poly_type == 'line':
+         ImageDraw.Draw(img).line(found,   fill=2)
 
    masker = np.array(img)
 
