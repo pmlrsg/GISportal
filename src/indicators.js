@@ -651,12 +651,12 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
 
    content.find('.js-download').click(function(){
-      //var range = slider.val();
-      //window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
-      $.get("/service/download_check", function(data){
-         console.log(data);
-         $('.js-download').text("Download "+data.format+" @ "+ data.size);
-      });
+      var range = slider.val();
+      window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
+      //$.get("/service/download_check", function(data){
+      //   console.log(data);
+      //   $('.js-download').text("Download "+data.format+" @ "+ data.size);
+      //});
    });
 
 };
