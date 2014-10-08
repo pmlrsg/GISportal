@@ -275,8 +275,8 @@ def create_mask(poly, params, poly_type="polygon"):
    maxlon = max(lonvals)
 
    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
-   print '#'*50
-   print lonlat_poly
+   #print '#'*50
+   #print lonlat_poly
    overlap_poly = loaded_poly.intersection(lonlat_poly)
    poly = poly[trim_sizes[poly_type]]
    
