@@ -17,3 +17,8 @@ LOG_PATH = ''
 # The error level of logging into the database
 # E for errors only or W for warnings too
 ERROR_LEVEL = "W"
+
+# section to define root folder for markdown metadata files
+MARKDOWN_ROOT = "/var/www/earth2observe-GISportal/markdown"
+MARKDOWN_DIRS = ['provider', 'indicator']
+
