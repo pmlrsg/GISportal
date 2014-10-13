@@ -1,7 +1,12 @@
 *.pyc
 *.orig
+.DS_Store
+apache_log
 html/cache
 html/cache/*
 html/GISPortal.js
+html/css/GISPortal.css
 middleware/portalflask/settings.py
 config/*
+.DS_Store
+apache_log

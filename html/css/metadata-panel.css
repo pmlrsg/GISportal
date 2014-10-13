@@ -1,0 +1,13 @@
+.metadata-slideout p {
+   padding:10px;
+}
+.metadata-slideout strong {
+   display:block;
+   font-weight: bold;
+
+}
+
+.metadata-box {
+   background:#fbfafb;
+   margin-top:15px;
+}

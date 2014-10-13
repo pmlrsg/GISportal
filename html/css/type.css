@@ -35,7 +35,7 @@ h3  {
 
 /* Buttons */
 
-button.brand  {
+.brand  {
    /* Font was falling back to Arial, not sure why
       so for now explicitly making Open Sans */
    font-family: 'Open Sans', sans-serif;

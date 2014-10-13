@@ -1,5 +1,10 @@
 /*------------------------------------*\
-    jQuery Ready
+   ui.js
+   This is an alternative entry point
+   that should be used for DOM
+   manipulation only.
+
+   jQuery Ready
     - This is *only* for UI elements
     - This should *not* be used for
       GIS Portal functionality.
@@ -17,13 +22,21 @@ $(document).ready(function()  {
     Tabs
 \*------------------------------------*/
 
-function changeTab()  {
-    var e = $(this)[0];
+function changeTab( tabElement )  {
+  if( tabElement && tabElement instanceof HTMLElement )
+    var tabElement = tabElement;
+  else
+    var tabElement = this;
 
-    $.each($('[name="' + e.name + '"]'), function(i,e)  {
-      $('[for="' + e.id + '"]').removeClass('active');
-    });
-    $('[for="' + e.id + '"]').addClass('active');
+  var e = $(tabElement)[0];
+
+  $.each($('[name="' + e.name + '"]'), function(i,e)  {
+    $('[for="' + e.id + '"]').removeClass('active');
+  });
+  $('[for="' + e.id + '"]').addClass('active');
+
+  gisportal.events.trigger('metadata.close');
+
 }
 
 // http://stackoverflow.com/questions/4957207/how-to-check-uncheck-radio-button-on-click
@@ -46,6 +59,7 @@ function closeTab(){
     };
     e.bind('mouseup',up);
     e.one('mouseout', unbind);
+    gisportal.events.trigger('metadata.close');
   }
 }
 

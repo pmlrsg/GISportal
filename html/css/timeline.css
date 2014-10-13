@@ -55,7 +55,7 @@ svg {
 .selectedDateLine {
    rx: 5;
    ry: 5;
-   fill: #b1a7bc;
+   fill: #A19D63; /*#b1a7bc;*/
 }
 
 .laneText {
@@ -87,8 +87,14 @@ svg {
    position: absolute;
    left: 15px;
    top: 0;
+   text-transform: capitalize;
 }
 
 #timeline.grid-cell  {
    flex-basis: initial;
+}
+
+.current-date{
+   min-width: 80px;
+   padding: 5px;
 }

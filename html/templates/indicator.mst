@@ -1,18 +1,32 @@
-<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}">
-   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}">
-      <p>{{name}}</p>
-      <button class="icon_show hidden icon-svg light js-toggleVisibility icon-column active" title="Show/Hide">Show/Hide</button>
-      <label class="icon_options active icon-svg light icon-column js-closable" for="tab-{{modified}}-options" title="Refine Data">Options</label>
-      <label class="icon_scalebar hidden icon-svg light  icon-column js-closable" for="tab-{{modified}}-scalebar" title="Scalebar">Scalebar</label>
-      <label class="icon_details hidden icon-svg light icon-column js-closable" for="tab-{{modified}}-details" title="Details">Details</label>
-      <label class="icon_analyse hidden icon-svg light icon-column js-closable" for="tab-{{modified}}-analysis" title="Analysis">Analysis</label>      
-      <button class="icon_remove js-remove icon-svg light icon-column" data-name="{{name}}" title="Remove">Remove</button>
+<input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
+<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{provider}}">
+   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{provider}}">
+      <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
+
+
+      <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
+      
+      <label class="hidden js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon" for="tab-{{id}}-dimensions" title="Layer Settings"></label>
+
+      <label class="active js-icon-details js-closable icon-btn icon-information indicator-header-icon" for="tab-{{id}}-details" title="Layer Information"></label>
+
+      <label class="js-icon-analyse hidden icon-btn js-closable icon-business-chart-2 indicator-header-icon" for="tab-{{id}}-analysis" title="Layer Analysis"></label>
+      
+      <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
    </div>
 
    <ul>
-      <li class="js-tab-options" data-name="{{name}}" data-id="{{id}}"></li>
 
-      <li class="js-tab-scalebar" data-name="{{name}}" data-id="{{id}}"></li>
+      <li  data-name="{{name}}" data-id="{{id}}">
+         <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
+         <div class="panel-tab scalebar-tab">
+            <label for="tab-{{id}}-dimensions">   
+               <div class="js-scalebar"></div>
+            </label>
+         </div>
+      </li>
+      
+      <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
 
       <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
    

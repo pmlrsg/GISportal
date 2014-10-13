@@ -1,35 +1,29 @@
 .map_controls { 
    position: absolute; 
    top: 25px; 
-   right: 25px; 
-   margin-left: 320px; 
+   right: 25px;
    background-color: #fafafb;
    box-shadow: 4px 0 10px rgba(0,0,0,0.25);
    border: 1px solid #b1a7bc; 
    border-radius: 5px; 
 }
 
-.map_quick_regions { 
-   position: absolute;
-   top: 80px;
-   right: 25px;
-   margin-left: 320px;
-   background-color: #fafafb;
-   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
-   border: 1px solid #b1a7bc; 
-   min-width: 190px;
+.map_controls span{
+   border-right: 1px solid #e0dce4;
+   font-size: 16px;
+   padding: 4px 11px;
+   display: inline-block;
 }
 
-.map_quick_regions li { 
-   padding: 0px 10px;
-}
-.map_quick_regions label {
-   cursor: pointer;
-   display: block;
-}
-.map_quick_regions input {
-   position: absolute;
-   top: -100px;
-}
+@media (max-width:700px){
+   .map_controls { 
+      top: 15px; 
+      right: 15px;
+   }
+   .map_controls span{
+      border-right: none;
+      border-top: 1px solid #e0dce4;
+      display: block;
+   }
 
-.map_controls .icon-svg  { height: 44px; }
+}
