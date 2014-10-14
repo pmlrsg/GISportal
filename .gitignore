@@ -10,3 +10,6 @@ middleware/portalflask/settings.py
 config/*
 .DS_Store
 apache_log
+collaboration/node_modules
+collaboration/node_modules/*
+collaboration/config/config.json

@@ -26,6 +26,14 @@ gisportal.config = {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
    },
+   collaborationFeatures : {
+      enabled : true,                              // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'http';                           // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk';                 // the hostname of the node server running collaboration/index.js
+      port : '6789';                               // must match the port specified in collaboration/config/config.js
+      path : '';                                   // optional path; must start with a /
+   },
+   defaultBaseMap : "GEBCO",
    // Should layers auto scale by default
    autoScale: true,
 
