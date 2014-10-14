@@ -93,6 +93,14 @@ gisportal.quickRegion = [
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
 
+gisportal.countryBorderLayers = {
+   "none" : { "id" : "0", "name" : "No Borders", "url": ""},
+   "countries_all_white" : { "id" : "countries_all_white", "name" : "White border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+   "countries_all_black": { "id" : "countries_all_black", "name" : "Black border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+   "countries_all_default": { "id" : "countries_all_default", "name" : "Blue border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
+};
+
+
 /**
  * The OpenLayers map object
  * Soon to be attached to gisportal namespace
@@ -234,6 +242,43 @@ gisportal.createBaseLayers = function() {
    // Get and store the number of base layers
    gisportal.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
 };
+
+/** Create  the country borders overlay
+ *
+ */
+gisportal.createCountryBorderLayer = function(layerName) {
+   // first remove the old country border layer if it exists
+   var old_layer = map.getLayersByName('country_borders');
+   if (old_layer.length > 0) {
+      old_layer[0].destroy();
+   }
+
+   if (layerName != '0') {
+      // then add the selected one
+      var layer = new OpenLayers.Layer.WMS(
+         'country_borders',
+         //'https://rsg.pml.ac.uk/geoserver/wms?',
+         gisportal.countryBorderLayers[layerName].url,
+         { layers: gisportal.countryBorderLayers[layerName].id, transparent: true },
+         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
+      );
+
+      layer.id = 'country_borders';
+      layer.controlID = 'country_borders';
+      layer.displayTitle = 'Country Borders';
+      layer.name = 'country_borders';
+      
+      map.addLayer(layer);   
+   }
+ }
+
+gisportal.setCountryBordersToTopLayer = function() {
+   // if the country border layer is on the map move it to the top
+   var border_layer = map.getLayersByName('country_borders');
+   if (border_layer.length > 0) {
+      border_layer[0].setZIndex(2000);   
+   }
+}
 
 /**
  * Create all the reference layers for the map.
@@ -864,7 +909,7 @@ gisportal.main = function() {
       gisportal.graphs.initDOM();           // graphing.js
       gisportal.analytics.initGA();         // analytics.js
       gisportal.panelSlideout.initDOM();    //panel-slideout.js
-      
+      gisportal.map_settings.init();         // map-settings.js
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon')
       
