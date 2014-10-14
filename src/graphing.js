@@ -27,7 +27,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
 
       var plot = new Plot();
       var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
-
+      $('.panel').addClass('has-active-plot');
       gisportal.graphs.activePlotEditor = plotEditor;
 
       plot.plotType( 'timeseries' );
@@ -51,14 +51,19 @@ gisportal.graphs.activeGraphSubmitted = function(){
    gisportal.graphs.graphsHistoryList.prepend( plotStatusElement );
 
    gisportal.graphs.activePlotEditor = null;
+   $('.panel').removeClass('has-active-plot');
 
    gisportal.panelSlideout.closeSlideout( 'active-plot' );
    gisportal.panels.showPanel( 'history' );
 }
 
+/**
+ * Removes the active graph. Deletes the data and closes the pane;
+ */
 gisportal.graphs.deleteActiveGraph = function(){
    gisportal.panelSlideout.closeSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor = null;
+   $('.panel').removeClass('has-active-plot');
 }
 
 gisportal.graphs.initDOM = function() {

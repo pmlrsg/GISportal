@@ -31,9 +31,10 @@ gisportal.indicatorsPanel.initDOM = function() {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.addToPlot(id);
    });
-
-   $('.js-indicators').on('click', '.js-draw-box', function() {
+   $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
+      gisportal.graphs.deleteActiveGraph();
+      gisportal.indicatorsPanel.addToPlot(id);
    });
 
    $('.js-indicators').on('click', '.js-remove', function() {

@@ -1,25 +1,37 @@
 <input type="radio" id="tab-{{id}}-analysis" name="tabs-{{modifiedName}}" data-tab-name="analysis" {{#if_equals visibleTab "analysis"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
-      <li>
-      <p class="number grid-cell">1</p>
-      <div class="grid-cell fill">
-         <button class="icon_rect js-draw-box" data-id="{{id}}" title="Draw Box">Draw Box</button>
-         <button class="icon_poly js-draw-polygon" data-id="{{id}}" title="Draw Polygon">Draw Box</button>
-         <button class="icon_line js-draw-line" data-id="{{id}}" title="Draw Polygon">Draw Box</button>
+      <li class="full-size">
+      <div >
          <p>Draw a selection box on the map to refine the data before analysis</p>
-         <div class="coordinates">
-            <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
-            <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
+         
+         <div class="analysis-draw-bbox-buttons">
+            <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
+               <span class=" icon-cursor-select-area" data-id="Ph" title="Draw Polygon"></span>
+               Draw Polygon
+            </button>
+            <button class="brand secondary extra-small js-draw-polygon" data-id="{{id}}" title="Draw Irregular Polygon">
+               <span class=" icon-network-1-1" data-id="Ph" title="Draw Box" ></span>
+               Draw Irregular Polygon
+            </button>
+            <!--
+            <button class="icon_line js-draw-line" data-id="{{id}}" title="Draw Polygon">Draw Box</button>
+            -->
          </div>
-         <div class="bbox-info hidden">
+         <div class="coordinates clearfix">
+            <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+            <div class="analysis-coordinates">
+               <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates " type="text">
+            </div>
+         </div>
+         <div class="bbox-info hidden clearfix">
             <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>
             <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>
             <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
          </div>
 
          {{#elevation}}
-            <div class="elevation">
+            <div class="elevation clearfix">
                <p>Choose a layer elevation:</p>
                <select class="js-analysis-elevation">
                   {{#elevationCache}}
@@ -29,14 +41,14 @@
             </div>
          {{/elevation}}
 
-         <div class="grid-cell fill">
-            <button data-id="{{id}}" class="brand add-to-plot js-add-to-plot">Add to plot</button>
+         <div class="analysis-add-to-plot-buttons">
+            <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to existing plot</button>
+            <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new plot</button>
          </div>
       </div>
       </li>
       <li class="export-button">
-         <label for="export-{{id}}">Export/download selected data</label>
-         <button id="export-{{id}}" class="brand secondary js-export-button" data-id="{{id}}"><span class="icon_download icon-svg light"></span>Export</button>
+         <button id="export-{{id}}" class="brand secondary extra-small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
       </li>
    </ol>
 </div>
