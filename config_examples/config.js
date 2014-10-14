@@ -22,13 +22,16 @@ gisportal.config = {
     graphServer: 'http://localhost:3000/',
     middlewarePath: '/service'
    },
-
+   countryBorder : {
+      'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
+      'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
+   },
    // Should layers auto scale by default
    autoScale: true,
 
    requiresTermsAndCondictions: true,
 
-    homepageSlides: [
+   homepageSlides: [
       "img/homepage-slides/opec1.jpg",
       "img/homepage-slides/opec2.jpg",
       "img/homepage-slides/opec3.jpg",

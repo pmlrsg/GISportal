@@ -91,10 +91,13 @@
          <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
          <div class="pull-right">
-           <div data-panel-name="history" class="js-show-panel tab ">
-            <span  class="icon-briefcase"></span>
-           </div>
-           <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
+            <div data-panel-name="map-settings" class="js-show-panel tab ">
+               <span  class="icon-map-1"></span>
+            </div>
+            <div data-panel-name="history" class="js-show-panel tab ">
+               <span  class="icon-briefcase"></span>
+            </div>
+            <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
         </div>
       </div>
        
@@ -197,13 +200,18 @@
          </ul>
       </div>
       
+      <div id="mapSettingsPanel" data-panel-name="map-settings" class="panel-container">
+         <div class="panel-container-solid-backdrop js-map-options">
+            
+         </div>
+      </div>
 
       <div id="historyPanel" data-panel-name="history" class="panel-container" >
-        <div class="half" style="display: none;">
+        <div class="panel-container-solid-backdrop" style="display: none;">
           <h3>Saved States</h3>
           <div class="js-states-saved-list"></div>
         </div>
-        <div  class="half" >
+        <div class="panel-container-solid-backdrop" >
           <h3>Stored Plots</h3>
           <div>
             <div class="js-graphs-saved-list" ></div>
