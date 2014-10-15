@@ -278,6 +278,7 @@ def create_mask(poly, params, poly_type="polygon"):
    #print '#'*50
    #print lonlat_poly
    overlap_poly = loaded_poly.intersection(lonlat_poly)
+   print type(overlap_poly)
    poly = poly[trim_sizes[poly_type]]
    
    poly = poly.split(',')
@@ -294,6 +295,13 @@ def create_mask(poly, params, poly_type="polygon"):
          found_lons = [find_closest(lonvals, float(x)) for x in poly.exterior.xy[0]]
          found.append(zip(found_lons,found_lats))
 
+
+   elif overlap_poly.type == "MultiLineString":
+      found = []
+      for poly in overlap_poly:
+         found_lats = [find_closest(latvals, float(x)) for x in poly.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in poly.xy[0]]
+         found.append(zip(found_lons,found_lats))
 
    else:
       if poly_type is 'line':
@@ -312,6 +320,9 @@ def create_mask(poly, params, poly_type="polygon"):
    img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
 
    if overlap_poly.type == "MultiPolygon":
+      for f in found:
+         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+   elif overlap_poly.type == "MultiLineString":
       for f in found:
          ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
    else:
@@ -531,7 +542,6 @@ def basic(dataset, params, irregular=False, original=None):
    if irregular:
       arr = np.ma.concatenate(dataset)
    else:
-      print "i shoudl not ever get here !!!!!!!!!!!!!!!!!!!!!!"
       arr = np.array(dataset.variables[params['coverage'].value])
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
