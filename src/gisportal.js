@@ -533,6 +533,18 @@ gisportal.mapInit = function() {
       //proxy: '/service/proxy?url='
    //});
 
+   map.events.on({
+      moveend: triggerMoveend,
+      zoomend: triggerZoomend
+   });
+
+   function triggerMoveend () {
+      gisportal.events.trigger('map.move', map.getCenter());
+   }
+   function triggerZoomend () {
+      gisportal.events.trigger('map.zoom', map.getScale());
+   }
+
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
    gisportal.loadLayers();

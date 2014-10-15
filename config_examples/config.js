@@ -30,7 +30,7 @@ gisportal.config = {
       enabled : true,                              // (true|false) > If false the collaboration tab will be hidden
       protocol : 'http';                           // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
       host : 'pmpc1465.npm.ac.uk';                 // the hostname of the node server running collaboration/index.js
-      port : '6789';                               // must match the port specified in collaboration/config/config.js
+      port : '';                               // must match the port specified in collaboration/config/config.js
       path : '';                                   // optional path; must start with a /
    },
    defaultBaseMap : "GEBCO",

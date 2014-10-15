@@ -27,12 +27,6 @@ collaboration.initDOM = function() {
 		var authWin = window.open(collaboration.socket_url +'/node/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');	
 	});
 
-	$(collaboration.startButton).click(function() {
-   	// let it begin...
-   	collaboration.initSession();
-   	//collaboration.startNewRoom();
-   });	
-   
 }	
 
 
@@ -43,7 +37,7 @@ collaboration.initSession = function() {
 	$(collaboration.consoleWrapper).toggleClass('hidden', false);
 
 	// get the socket.io script and open a connection
-	$.getScript(collaboration.socket_url+"/socket.io/socket.io.js")
+	$.getScript(collaboration.socket_url+"/node/socket.io/socket.io.js")
 		.done(function( script, textStatus ) {
     		socket = io.connect(collaboration.socket_url+'/', {
 		   	"connect timeout": 1000
@@ -155,11 +149,11 @@ collaboration.startNewRoom = function() {
 	collaboration._emit('startNewRoom', params);
 }
 
-collaboration.setValueById = function(id, value, logmsg) {
+collaboration.setValueById = function(data) {
 	var params = {
-		"id" : id,
-		"value" : value,
-		"logmsg" : logmsg
+		"id" : data[0],
+		"value" : data[1],
+		"logmsg" : data[2]
 	};
 	collaboration._emit('setValueById', params)
 }
@@ -191,7 +185,62 @@ collaboration._emit = function(cmd, params) {
 collaboration.userAuthorised = function() {
 	console.log('user authorised');
 	$('#gSignInWrapper').toggleClass('hidden', true);
+
+	var data = {
+		user : {
+			fullname : 'Bob Monkhouse',
+			email : 'bob@nowhere.com'
+		}
+	}
+	
+	// add the collaboration template into the mix...
+	var rendered = gisportal.templates['collaboration'](data)
+   $('.js-collaboration-holder').html(rendered); 
 	$('.js-collaboration-holder').toggleClass('hidden', false);
+   // and add listners to the buttons
+	$(collaboration.startButton).click(function() {
+   	// let it begin...
+   	collaboration.initSession();
+   	//collaboration.startNewRoom();
+   });	
 
 	return true;
 }
+
+//--------------------------------------------------------------------------------------
+//
+//  Portal EventManager event bindings
+
+
+// user zooms in/out
+gisportal.events.bind(
+   "map.zoom",
+   function(event, zoomLevel) {
+      collaboration.mapZoom(zoomLevel);
+   }
+)
+
+// user moves the map
+gisportal.events.bind(
+   "map.move",
+   function(event, CenterLonLat) {
+      collaboration.mapMove(CenterLonLat);
+   }  
+)
+
+// Base map changed
+gisportal.events.bind(
+   "displayoptions.basemap",
+   function(event, id, value, logmsg) {
+      collaboration.setValueById(id, value, logmsg);
+   }
+)
+
+// Country borders changed
+gisportal.events.bind(
+   "displayoptions.countryborders",
+   function(event, id, value, logmsg) {
+      collaboration.setValueById(id, value, logmsg);
+   }
+)
+
