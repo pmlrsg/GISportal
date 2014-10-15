@@ -233,7 +233,7 @@ gisportal.refinePanel.render = function(data, group) {
    indicator.name = name;
    indicator.modified = gisportal.utils.nameToId(name);
    indicator.groupedNames = group;
-   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <p class="grid-cell fill">{{key}}</p>      <label class="icon-checkbox grid-cell indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label> </p>  </li>{{/tag}}';
+   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <span class="indicator-checkbox-text">{{key}}</span>      <label class="icon-checkbox indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label>  </li>{{/tag}}';
 
    if (!refined) {
       indicator.tag = indicator.groupedNames['region'];

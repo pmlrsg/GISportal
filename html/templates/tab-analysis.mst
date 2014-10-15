@@ -41,7 +41,7 @@
             </div>
          {{/elevation}}
 
-         <div class="analysis-add-to-plot-buttons">
+         <div class="analysis-add-to-plot-buttons clearfix">
             <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to existing plot</button>
             <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new plot</button>
          </div>

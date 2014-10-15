@@ -85,7 +85,13 @@
 
 .number  {
    color: #b1a7bc;
-   width: 85px;
+   width: 60px;
+  height: 100%;
+  display: inline-block;
+}
+.number + * {
+  display: inline-block;
+  width: calc(100% - 65px);
 }
 
 .bbox-info  {
@@ -153,7 +159,6 @@
 .indicator-checkbox{
   cursor: pointer;
   font-size: 22px;
-  width: 40px;
 }
 
 table.stripe.panel-tab td {

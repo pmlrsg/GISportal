@@ -15,10 +15,13 @@
 
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 <!-- jQuery UI -->
 <script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+
+<!-- Modernizer -->
+<script src="js-libs/modernizr.js"></script>
 
 
 <!-- jQuery no UI slider -->
@@ -63,6 +66,13 @@
          this should load before anything else. -->
     <div class="start overlay js-start-container"></div>
 
+
+    <div class="browse-not-compatible  overlay js-browse-not-compatible">
+      <h3>Browser out of date</h3>
+      <p>We have detected that your Internet browser does not
+      have the requirements needed to run the portal. Please update to a newer version.</p>
+    </div>
+
    <!-- JavaScript check -->
    <noscript>
       <div id="noscript-warning">
@@ -75,9 +85,9 @@
 
    <!-- The Timeline -->
    <div class="timeline-container">
-      <div class="timeline-inner grid">
-         <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
-         <div id="timeline" class="grid-cell fill"></div>
+      <div class="timeline-inner">
+         <ul class="js-timeline-labels timeline-labels"></ul>
+         <div id="timeline" class=""></div>
          <div class="js-current-date current-date"></div>
       </div>
    </div>

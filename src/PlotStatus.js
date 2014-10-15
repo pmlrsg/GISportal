@@ -55,7 +55,7 @@ gisportal.graphs.PlotStatus = (function(){
       var _this = this;
 
       this.plot().on('serverStatus-change', function( data ){
-         var serverStatus = data.new;
+         var serverStatus = data['new'];
          switch( serverStatus.state ){
             case "success":
                _this.stateSuccess( serverStatus );

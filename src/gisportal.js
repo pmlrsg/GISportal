@@ -881,6 +881,13 @@ gisportal.setState = function(state) {
  */
 gisportal.main = function() {
 
+   if( gisportal.config.browserRestristion ){
+      if( gisportal.validateBrowser() == false )
+         return;
+   }
+      
+
+
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
    } else {
@@ -1029,6 +1036,20 @@ gisportal.replaceSubtreeIcons = function(el)  {
  * Should probably be using Mustache for this
  */
 gisportal.initStart = function()  {
+   
+   var autoLoad = null;
+   if( gisportal.config.skipWelcomePage == true )
+      if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
+         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+      else
+         var autoLoad = function(){ gisportal.launchMap(); };
+
+   if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
+         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+
+   if( autoLoad != null)
+      return setTimeout(autoLoad, 1000);
+
 
    var data = {
       homepageSlides  : gisportal.config.homepageSlides,
@@ -1044,6 +1065,7 @@ gisportal.initStart = function()  {
      continuous: true,
      disableScroll: false,
    });
+
 
    // Load there previously saved state
    $('.js-load-last-state').click(function(){
@@ -1180,3 +1202,40 @@ function portalLocation(){
    path = path.substring( 0, endSlash + 1 );
    return origin + path;
 };
+
+
+/**
+ * Check the users version of the portal is valid.
+ *  - If the browser is valid it return true
+ *  - If the browser is NOT valid is returns false and those an error
+ */
+
+gisportal.validateBrowser = function(){
+   if( gisportal.config.browserRestristion == void(0) )
+      return true;
+
+   var level = gisportal.config.browserRestristion;
+   if( level == "none" )
+      return true;
+
+   var requirements = [ 'svg', 'boxsizing', 'csscalc','inlinesvg' ];
+
+   var valid = false;
+   for( var i =  0; i < requirements.length; i++ )
+      valid = (valid &&  Modernizr[requirements[i]] )
+
+   if( valid )
+      return true;
+
+   if( gisportal.config.browserRestristion == "advisory" ){
+      alert('Your browser is out of date, this site will not work correctly, if at all.');
+      return false;
+   }else if( gisportal.config.browserRestristion == "strict" ){
+      $('.js-browse-not-compatible').show();
+      $('.js-start').hide();
+      return false;
+   }else{
+      throw new Error( 'Invalid config.browserRestristion value "' + gisportal.config.browserRestristion + '"' );
+   }
+
+}
