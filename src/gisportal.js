@@ -1220,7 +1220,7 @@ gisportal.validateBrowser = function(){
 
    var requirements = [ 'svg', 'boxsizing', 'csscalc','inlinesvg' ];
 
-   var valid = false;
+   var valid = true;
    for( var i =  0; i < requirements.length; i++ )
       valid = (valid &&  Modernizr[requirements[i]] )
 
