@@ -5,33 +5,32 @@
  
 gisportal.templates = {};
 gisportal.loadTemplates = function( callback ){
-	var waitingFor = 0;
-	var callback = callback || function(){};
+   var waitingFor = 0;
+   var callback = callback || function(){};
 
-	function compileTemplate( template, status, request ){
-		var templateName = request.fileName.substring( 0, request.fileName.length - 4 );
-		gisportal.templates[ templateName ] = Handlebars.compile( template );
+   function compileTemplate( template, status, request ){
+      var templateName = request.fileName.substring( 0, request.fileName.length - 4 );
+      gisportal.templates[ templateName ] = Handlebars.compile( template );
 
-		waitingFor--;
-		if( waitingFor == 0 )
-			callback();
-	}
-	
-	$.ajax({
-		url: '/templates/',
-		success: function( data ){
-			reg = RegExp(/href="(.+.mst?)"/g);
-			var match;
-			while (match = reg.exec(data)) {
-				waitingFor++;
-				var request = $.ajax({
-					url: '/templates/' + match[1],
-					success: compileTemplate
-				});
-				request.fileName = match[1];
-			}
-		}
-	});
+      waitingFor--;
+      if( waitingFor == 0 )
+         callback();
+   }
+   
+   $.ajax({
+      url: '/service/templates',
+      success: function( data ){
+         var template_files = $.parseJSON(data);
+         for (var template in template_files) {
+            waitingFor++;
+            var request = $.ajax({
+               url: '/templates/' + template_files[template],
+               success: compileTemplate
+            });
+            request.fileName = template_files[template];
+         }
+      }
+   });
 };
 
 /**

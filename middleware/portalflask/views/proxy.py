@@ -1,8 +1,10 @@
-from flask import Blueprint, abort, request, make_response, g, current_app, send_file, Response
+from flask import Blueprint, abort, request, make_response, g, current_app, send_file, Response, jsonify
 from portalflask.core import error_handler
 from PIL import Image
 import StringIO
 import io
+import os
+import json
 
 portal_proxy = Blueprint('portal_proxy', __name__)
 
@@ -173,3 +175,18 @@ def rotate():
       abort(400)
 
    
+"""
+Return a rotated image
+"""
+@portal_proxy.route('/templates')
+def templates(): 
+   this_dir = os.getcwd()
+   template_dir = this_dir.replace('middleware', 'html/templates')
+   templates_list = []
+
+   files_in_dir = os.listdir(template_dir)
+   for file_in_dir in files_in_dir:
+      templates_list.append(file_in_dir)
+
+   response = make_response(json.dumps(templates_list), 200)
+   return response
