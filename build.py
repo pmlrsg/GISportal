@@ -121,7 +121,7 @@ virtual('mincss', 'html/css/GISPortal.min.css')
 def build_min_portal_css(t):
    t.info('Minifying CSS')
    t.output('%(JAVA)s', '-jar', YUICOMPRESSOR, CSS + 'GISPortal.css')
-   t.info('Finished minifying JS')
+   t.info('Finished minifying CSS')
          
 virtual('css', 'target-css')
 @target('target-css', YUICOMPRESSOR, phony=True)
@@ -137,6 +137,8 @@ def build_portal_css(t):
          destination.write(file.read())
          destination.write('\n')
    destination.close()
+   t.info('Prefixing CSS')
+   t.output('autoprefixer', 'html/css/GISPortal.css', '-b', '> 0.001%%')
    t.info('Finished building CSS')
 # -----------------------------------------------------------------------------
    
