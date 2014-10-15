@@ -30,8 +30,6 @@ def getWcsData():
 
    params = getParams() # Gets any parameters
    params = checkParams(params) # Checks what parameters where entered
-   import pprint
-   current_app.logger.debug(pprint.pprint(params))
    params['url'] = createURL(params)
    current_app.logger.debug('Processing request...') # DEBUG
    current_app.logger.debug(params['url'].value)
@@ -123,8 +121,6 @@ def download_check():
 def download_netcdf():
    params = getParams() # Gets any parameters
    params = checkParams(params) # Checks what parameters where entered
-   import pprint
-   current_app.logger.debug(pprint.pprint(params))
    params['url'] = createURL(params)
    polygon = params['bbox'].value
    try:
@@ -133,7 +129,6 @@ def download_netcdf():
       else: 
          masked, data, mask, tfile, variable = create_mask(polygon, params)
    except Exception as e:
-      print e
       return abort(400)
    #current_app.logger.debug('------------------------------------------------------------~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-------------------------------');
    #current_app.logger.debug(type(data))
@@ -278,9 +273,8 @@ def create_mask(poly, params, poly_type="polygon"):
    #print '#'*50
    #print lonlat_poly
    overlap_poly = loaded_poly.intersection(lonlat_poly)
-   print type(overlap_poly)
    poly = poly[trim_sizes[poly_type]]
-   
+
    poly = poly.split(',')
    poly = [x.split() for x in poly]
 
@@ -339,7 +333,6 @@ def create_mask(poly, params, poly_type="polygon"):
       #print i
       masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
       masked_variable[i].filled(-999)
-    
    #    a = fig.add_subplot(1,5,i+1)
    #    imgplot = plt.imshow(masked_variable)
 
@@ -496,7 +489,6 @@ def getIrregularData(params, poly_type=None):
 
 def getBboxData(params, method):
    import os, errno
-   print '5'*40
    try:
       return getData(params, method)
    except urllib2.URLError as e:
@@ -591,10 +583,7 @@ def basic(dataset, params, irregular=False, original=None):
    output['data'] = {}
    
    for i, row in enumerate(maskedArray):
-      #current_app.logger.debug(np.max(row))
-      import pprint
-     
-      pprint.pprint(row)
+
       if timeUnits:
          date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
       else:     
