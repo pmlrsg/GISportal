@@ -26,7 +26,7 @@ gisportal.config = {
    browseCategories : {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
-      "MSFD" : "EU MSFD"
+      "MSFD" : "EU MSFD Descriptor"
    },
    paths: {
     graphServer: 'http://localhost:3000/',

@@ -683,13 +683,13 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    if( indicator.positive == "down" )
      urlParams['vertical'] = Math.abs( vert );
   else
-      urlParams['vertical'] = indicator.positive + Math.abs( vert );
+      urlParams['vertical'] = '-' + Math.abs( vert );
 
 
    graphParams['type'] = 'timeseries';
    graphParams['time'] = urlParams['time'];
    graphParams['bbox'] = urlParams['bbox'];
-   graphParams['depth'] = urlParams['depth'];
+   graphParams['depth'] = urlParams['vertical'];
 
 
    var request = $.param(urlParams);
