@@ -49,7 +49,7 @@
 	<li>
 		<p class="number grid-cell">5</p>
 		<div class="grid-cell fill">
-			<button class="brand create-graph js-create-graph">Create graph</button>
+			<button class="brand create-graph js-create-graph">Create plot</button>
 		</div>
 	</li>
 
