@@ -305,6 +305,8 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       });
 
       gisportal.replaceSubtreeIcons($('.js-indicators'));
+
+      gisportal.events.trigger('layer.addtopanel', data)
    });
 };
 
@@ -313,6 +315,8 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
    $('.js-indicators > li[data-id="' + id + '"]').remove();
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
+
+   gisportal.events.trigger('layer.remove', id, gisportal.layers[id].name)
 };
 
 /* There is overlap here with configurePanel,
@@ -325,7 +329,8 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
       var name = layer.name.toLowerCase();
       options.visible = true;
       gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer, options);
-      gisportal.events.trigger('layerSelected', id)
+      
+      gisportal.events.trigger('layer.select', id, gisportal.layers[id].name)
    }
 };
 
@@ -333,6 +338,8 @@ gisportal.indicatorsPanel.hideLayer = function(id) {
    if (gisportal.layers[id]) {
       gisportal.layers[id].setVisibility(false);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', false);
+
+      gisportal.events.trigger('layer.hide', id, gisportal.layers[id].name)
    }
 };
 
@@ -340,6 +347,8 @@ gisportal.indicatorsPanel.showLayer = function(id) {
    if (gisportal.layers[id]) {
       gisportal.layers[id].setVisibility(true);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', true);
+
+      gisportal.events.trigger('layer.show', id, gisportal.layers[id].name)
    }
 };
 

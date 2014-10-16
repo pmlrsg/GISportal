@@ -199,9 +199,9 @@ io.on('connection', function(socket){
    });  
 
    // moves the map to new lat/lon centre point
-   socket.on('mapMove', function(data) {
+   socket.on('map.move', function(data) {
       console.log(data);
-      io.emit('mapMove', {
+      io.emit('map.move', {
         	"presenter": user.email,
          "provider": user.provider,
          "params" : data
@@ -209,20 +209,36 @@ io.on('connection', function(socket){
    });  
 
    // sets the zoom level of the map
-   socket.on('mapZoom', function(data) {
+   socket.on('map.zoom', function(data) {
       console.log(data);
-      io.emit('mapZoom', {
+      io.emit('map.zoom', {
          "presenter": user.email,
          "provider": user.provider,
          "params" : data
       });
    }); 
 
-   socket.on('selectLayer', function(id) {
+   socket.on('layer.addtopanel', function(data) {
       console.log(data);
-      io.emit('layerSelected', id)
+      io.emit('layer.addtopanel', {
+         "presenter": user.email,
+         "provider": user.provider,
+         "params" : data
+      })
    }) 
+
+   socket.on('layer.remove', function(data) {
+      console.log(data);
+      io.emit('layer.remove', {
+         "presenter": user.email,
+         "provider": user.provider,
+         "params" : data
+      })
+   }) 
+
+
 });
+
 
 /*
  * Catch uncaught exceptions
