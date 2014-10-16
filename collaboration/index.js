@@ -236,6 +236,15 @@ io.on('connection', function(socket){
       })
    }) 
 
+   socket.on('c_event', function(data) {
+      console.log(data);
+      io.emit(data.event, {
+         "presenter": user.email,
+         "provider": user.provider,
+         "params" : data
+      })
+   }) 
+
 
 });
 

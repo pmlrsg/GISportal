@@ -222,9 +222,10 @@ collaboration.userAuthorised = function() {
 // user zooms in/out
 gisportal.events.bind("map.zoom", function(event, zoomLevel) {
    var params = {
+   	"event" : "map.zoom",
 		"zoomlevel" : zoomLevel
 	}
-	collaboration._emit('map.zoom', params);
+	collaboration._emit('c_event', params);
 });
 
 // user moves the map
