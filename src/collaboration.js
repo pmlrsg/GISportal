@@ -118,6 +118,11 @@ collaboration.initSession = function() {
 		   	}
 		  	});
 
+		  	// layer selected
+		  	socket.on('layerSelected', function(data) {
+		  		gisportal.selectLayer(data);
+		  	});
+
 			// User saved state
 			socket.on('setSavedState', function(data) {
 		  		console.log(data);
@@ -169,6 +174,10 @@ collaboration.mapMove = function(center) {
 	collaboration._emit('mapMove', center);
 }
 
+collaboration.layerSelected = function(id) {
+	collaboration._emit('layerSelected', id);
+}
+
 collaboration.setUserSavedState = function() {
 	var params = gisportal.saveState();
 	console.log(params);
@@ -213,34 +222,25 @@ collaboration.userAuthorised = function() {
 
 
 // user zooms in/out
-gisportal.events.bind(
-   "map.zoom",
-   function(event, zoomLevel) {
-      collaboration.mapZoom(zoomLevel);
-   }
-)
+gisportal.events.bind("map.zoom", function(event, zoomLevel) {
+   collaboration.mapZoom(zoomLevel);
+});
 
 // user moves the map
-gisportal.events.bind(
-   "map.move",
-   function(event, CenterLonLat) {
-      collaboration.mapMove(CenterLonLat);
-   }  
-)
-
+gisportal.events.bind("map.move", function(event, CenterLonLat) {
+   collaboration.mapMove(CenterLonLat);
+});
 // Base map changed
-gisportal.events.bind(
-   "displayoptions.basemap",
-   function(event, id, value, logmsg) {
-      collaboration.setValueById(id, value, logmsg);
-   }
-)
+gisportal.events.bind("displayoptions.basemap", function(event, id, value, logmsg) {
+   collaboration.setValueById(id, value, logmsg);
+});
 
 // Country borders changed
-gisportal.events.bind(
-   "displayoptions.countryborders",
-   function(event, id, value, logmsg) {
-      collaboration.setValueById(id, value, logmsg);
-   }
-)
+gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
+   collaboration.setValueById(id, value, logmsg);
+});
 
+// new layer is selected
+gisportal.events.bind("layerSelected", function(event, id) {
+	collaboration.layerSelected(id);
+});

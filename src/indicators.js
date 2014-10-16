@@ -325,6 +325,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
       var name = layer.name.toLowerCase();
       options.visible = true;
       gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer, options);
+      gisportal.events.trigger('layerSelected', id)
    }
 };
 

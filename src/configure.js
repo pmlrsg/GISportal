@@ -434,7 +434,14 @@ gisportal.configurePanel.search = function(val)  {
    });
    
    $('.js-search-results').html(rendered);
-  
+   if (val == 'sombrero') {
+      $('#sb').find('audio')[0].play();
+      $('[class*="icon-"]').addClass('icon-sombrero');
+      $('[class*="icon-"]').addClass('jiggly');
+   } else {
+      $('[class*="icon-"]').removeClass('icon-sombrero');
+      $('[class*="icon-"]').removeClass('jiggly');
+   }
    var selected = [];
 
    // Inline SVG icons

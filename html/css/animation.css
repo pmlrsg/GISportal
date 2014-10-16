@@ -6,3 +6,29 @@
    from { transform: rotate(0deg); }
    to   { transform: rotate(359deg); }
 }
+
+.jiggly:before {
+    -webkit-animation: jiggle 0.5s infinite;
+    -moz-animation-duration: 0.5s;
+    -moz-animation-name: jiggle;
+    -moz-animation-iteration-count: infinite;
+    -webkit-transform: rotate(-10deg);
+    -moz-transform: rotate(-10deg);
+}
+@-moz-keyframes jiggle {
+    0% {
+        -moz-transform: rotate(-10deg);
+}
+50% {
+    -moz-transform: rotate(10deg);
+}
+}
+
+@-webkit-keyframes jiggle {
+    0% {
+        -webkit-transform: rotate(-10deg);
+}
+50% {
+    -webkit-transform: rotate(10deg);
+}
+}

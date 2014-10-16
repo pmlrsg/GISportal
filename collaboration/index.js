@@ -216,7 +216,12 @@ io.on('connection', function(socket){
          "provider": user.provider,
          "params" : data
       });
-   });  
+   }); 
+
+   socket.on('selectLayer', function(id) {
+      console.log(data);
+      io.emit('layerSelected', id)
+   }) 
 });
 
 /*
