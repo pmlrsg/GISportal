@@ -57,7 +57,7 @@ gisportal.refinePanel.foundIndicator = function(data) {
    var tmp = {
       id: id,
       name: gisportal.layers[id].name,
-      provider: gisportal.layers[id].providerTag.toLowerCase(),
+      provider: gisportal.layers[id].providerTag,
       moreIndicatorInfo: gisportal.layers[id].moreIndicatorInfo,
       moreProviderInfo: gisportal.layers[id].moreProviderInfo,
    };
@@ -131,7 +131,7 @@ gisportal.refinePanel.refreshData = function(data) {
 gisportal.refinePanel.refineData = function(ids, current) {
    var indicator = gisportal.layers[ids[0]];
    if (indicator) {
-      var name = indicator.name.toLowerCase();
+      var name = indicator.name;
       var groupedNames = gisportal.groupNames()[name];
       var results = groupedNames;
       var names = Object.keys(groupedNames);
@@ -279,7 +279,7 @@ gisportal.refinePanel.render = function(data, group) {
 
 
    if (refined) {
-      $('.js-reset-options[data-name="' + name.toLowerCase() + '"]').removeClass('hidden');
+      $('.js-reset-options[data-name="' + name + '"]').removeClass('hidden');
    }
    this.initDOM(data);
 };

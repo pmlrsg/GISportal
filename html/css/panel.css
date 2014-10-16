@@ -49,7 +49,7 @@
     display: inline;
     border-bottom: 0px;
     
-    margin: 7px 7px 0px 7px;
+    margin: 7px 4px 0px 4px;
     padding: 8px 8px 9px 8px;
     
     background-color: #32253f;
@@ -216,6 +216,7 @@
 
 .panel-list li  {
   background-color: #ffffff;
+  position: relative;
 }
 
 
@@ -327,9 +328,9 @@ select,
 
 .fake-select .more-info{
   position: absolute;
-  left: 20px;
+  left: 7px;
   font-size: 15px;
-  top: 11px;
+  top: 13px;
 }
 
 .panel-list .text-button {

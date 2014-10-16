@@ -62,6 +62,7 @@
 
 .has-active-plot .analysis-add-series{
    display: inline;
+   float: left;
 }
 
 .analysis-make-new-series{

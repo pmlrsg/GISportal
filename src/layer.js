@@ -18,30 +18,17 @@
  * @param {string} title - The display title
  * @param {string} productAbstract - The description of the layer
  * @param {string} type - opLayers or refLayers
- * @param {object} opts - Options to extend the defaults
+ *
+ * 
+ * @param {object} options - Options to extend the defaults
  */
-gisportal.layer = function(name, title, productAbstract, type, opts) {
+ //gisportal.layer = function(name, title, productAbstract, type, opts) {
+gisportal.layer = function( options ) {
    var layer = this;
-      
-   this.id = name;      
-   this.origName = name.replace("/","-");
-   this.name = name.replace("/","-");
-   this.urlName = name;
-   this.displayTitle = title.replace(/_/g, " ");
-   this.title = title;  
-   this.productAbstract = productAbstract;
-   this.type = type;
-   
-   this.visibleTab = "details";
-   
-   // These queues feel like a hack, refactor?
-   this.metadataComplete = false;
-   this.metadataQueue = [];
 
-   this.defaults = {
+   var defaults = {
       firstDate : '',
       lastDate : '',
-      scalebarOpen : null,
       serverName : null,
       wfsURL : null,
       wmsURL : null,
@@ -59,8 +46,29 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
 
       autoScale: gisportal.config.autoScale
    };
+
+   $.extend(true, this, defaults, options);
+
+
+
+      
+   this.id = options.name + "_" + options.providerTag;
+   this.origName = options.name.replace("/","-");
+   this.name = options.tags.niceName || options.name.replace("/","-");
+   this.urlName = options.name;
+   this.displayTitle = options.title.replace(/_/g, " ");
+   this.title = options.title;  
+   this.productAbstract = options.productAbstract;
+   this.type = options.type;
+   console.log( this.name );
+   // Default indicator tab to show
+   this.visibleTab = "details";
    
-   $.extend(true, this, this.defaults, opts);
+   // These queues feel like a hack, refactor?
+   this.metadataComplete = false;
+   this.metadataQueue = [];
+
+   
    //this.moreInfo = opts.moreInfo;
    // Used for sensor data from SOS, not tested as we have no sensor data
    this.sensorName = this.sensorName !== null ? this.sensorName.replace(/\s+/g, "") : null;
@@ -70,25 +78,6 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
       this.urlName = this.urlName.replace('-', ':');
    }
    
-   if (typeof this.tags !== 'undefined' && this.tags !== null) {
-      for(var tag in this.tags) {
-         if(tag === 'niceName') {
-            this.name = this.tags.niceName;
-            this.tags.niceName = null;
-         } else if(tag === 'niceTitle') {
-            this.displayTitle = this.tags.niceTitle;
-            this.tags.niceTitle = null;  
-         }
-         else  {
-            if (this.tags[tag] instanceof Object)  {
-               this.tags[tag] = _.map(this.tags[tag], function(d) { return d.toLowerCase(); });
-            } 
-            else  {
-               this.tags[tag] = this.tags[tag].toLowerCase();
-            }
-         }
-      }
-   }
 
    this.tags['providerTag'] = this.providerTag;
 
@@ -150,8 +139,7 @@ gisportal.layer = function(name, title, productAbstract, type, opts) {
    this.elevationCache = [];
    //--------------------------------------------------------------------------
    
-   this.WFSDatesToIDs = {};
-   
+
    
    /**
     * When data is available, initialise the layer

@@ -239,7 +239,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       var id = data.id || "none";
       var provider = data.provider || "none";
       var refined = data.refined || false;
-      var name = data.name.toLowerCase();
+      var name = data.name;
       var index = data.index || 0;
       if (refined && !name) {
          name = gisportal.layers[id].name;
@@ -261,7 +261,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
          region: region,
          provider: provider
       };
-      var tags = gisportal.groupNames()[name.toLowerCase()];
+      var tags = gisportal.groupNames()[name];
       if (data.interval && Object.keys(tags['interval']).length > 1) tmp.interval = gisportal.layers[id].tags.interval;
       if (data.confidence && Object.keys(tags['Confidence']).length > 1) tmp.confidence = gisportal.layers[id].tags.Confidence;
       var rendered = Mustache.render(template, tmp);
@@ -304,8 +304,6 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
          position: "right",
          maxWidth: 200
       });
-
-      gisportal.replaceSubtreeIcons($('.js-indicators'));
    });
 };
 
@@ -371,7 +369,6 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
       gisportal.indicatorsPanel.checkTabFromState(id);
 
-      gisportal.replaceAllIcons();
    }
 
    if (indicator.metadataComplete) onMetadata();

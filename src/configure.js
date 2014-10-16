@@ -48,7 +48,7 @@ gisportal.configurePanel.close = function()  {
  */
 gisportal.configurePanel.initDOM = function()  {
    function toggleIndicator()  {
-      var name = $(this).parent().data('name').toLowerCase();
+      var name = $(this).parent().data('name');
       var options = {};
       
       var cat = $(this).parents('[data-cat]');
@@ -215,7 +215,7 @@ gisportal.groupNames = function()  {
       // to keep finding it.
       var indicator = gisportal.layers[keys[i]];
       // Lowercase the name so that it can be used for comparisons
-      var name = indicator.name.toLowerCase();
+      var name = indicator.name;
       var id = indicator.id;
       var tags = indicator.tags;
       
@@ -236,7 +236,7 @@ gisportal.groupNames = function()  {
             // tagName may be a string or an array of strings
             if (typeof tagName === 'string')  {
                // Convert tagName to lowercase so that it doesn't produce duplicates
-               tagName = tagName.toLowerCase();
+               tagName = tagName;
                // If the cat already exists, use that, otherwise create a new array for it
                if (!group[name][cat]) group[name][cat] = {};
                // If the tagName already exists, use that, otherwise create a new array for it
@@ -248,7 +248,7 @@ gisportal.groupNames = function()  {
                // If tagName is an array, iterate over the strings
                for (var k = 0; k < tagName.length; k++)  {
                   // innerTagName is the actual tag name, needs to be lowercase
-                  var innerTagName = tagName[k].toLowerCase();
+                  var innerTagName = tagName[k];
                   // If cat has an array, use that, otherwise create one
                   if (!group[name][cat]) group[name][cat] = {}; 
                   // If innerTagName has an array, use that, otherwise create one
@@ -293,12 +293,11 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
          vals = _.unique(vals, function(d)  {
-            return d.toLowerCase();
+            return d;
          });
          
          _.forEach(vals, function(d)  {
             var tmp = {};
-            var d = d.toLowerCase();
             tmp.name = d;
             // Modified is used when a unique id is required
             // in the actual html, for radio buttons for example.
@@ -313,8 +312,7 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          });
          $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
          $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-         // Inline all SVG icons 
-         gisportal.replaceAllIcons();
+
       }
    }
 
@@ -417,12 +415,12 @@ gisportal.configurePanel.search = function(val)  {
    var indicators = [];
    
    results = _.uniq(results, function(val) {
-      return val.name.toLowerCase();
+      return val.name;
    }); 
 
    _.forEach(results, function(d)  {
       var tmp = {};
-      tmp.name = d.name.toLowerCase();
+      tmp.name = d.name;
       tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
       indicators.push(tmp);
    });
@@ -437,8 +435,6 @@ gisportal.configurePanel.search = function(val)  {
   
    var selected = [];
 
-   // Inline SVG icons
-   gisportal.replaceAllIcons();
 
 };
 
@@ -454,7 +450,7 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
 
 
    var options = options || {};
-   var name = name.toLowerCase();
+   var name = name;
    var id = this.hasIndicator(name);  
    
    if (options.id) {
