@@ -13,3 +13,4 @@ apache_log
 collaboration/node_modules
 collaboration/node_modules/*
 collaboration/config/config.json
+nbproject
