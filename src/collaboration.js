@@ -142,7 +142,7 @@ collaboration.initSession = function() {
 		  	socket.on('layer.remove', function(data) {
 		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer removed - '+ data.params.layerName+'</p>');
                                 if (collaboration.role == "member") {
-                                    gisportal.indicatorsPanel.selectLayer(data.params.id);
+                                    gisportal.indicatorsPanel.removeFromPanel(data.params.id);
                                 }
 		  	});
                         
@@ -161,6 +161,8 @@ collaboration.initSession = function() {
                                     gisportal.indicatorsPanel.showLayer(data.params.id);
                                 }
 		  	});
+                        
+                        
 
 			// User saved state
 			socket.on('setSavedState', function(data) {
