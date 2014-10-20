@@ -122,9 +122,9 @@ collaboration.initSession = function() {
 		  	socket.on('layer.addtopanel', function(data) {
 		  		//console.log('layer.addtopanel received');
 		  		//console.log(data);
-                            if (collaboration.role == "member") {	
-		  		gisportal.indicatorsPanel.addToPanel(data.params.layer);
-                            }
+            if (collaboration.role == "member") {	
+		  			gisportal.indicatorsPanel.addToPanel(data.params.layer);
+            }
 		  	});
 
 		  	// layer selected
@@ -133,36 +133,65 @@ collaboration.initSession = function() {
 		  		// console.log(data);
 		  		
 		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': New layer added - '+ data.params.layerName+'</p>');
-                                if (collaboration.role == "member") {
-                                    gisportal.indicatorsPanel.selectLayer(data.params.id);
-                                }
+            if (collaboration.role == "member") {
+            	gisportal.indicatorsPanel.selectLayer(data.params.id);
+            }
 		  	});
                         
-                        // layer selected
+         // layer selected
 		  	socket.on('layer.remove', function(data) {
+		  		console.log('layer.remove received');
+		  		console.log(data);
+
 		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer removed - '+ data.params.layerName+'</p>');
-                                if (collaboration.role == "member") {
-                                    gisportal.indicatorsPanel.removeFromPanel(data.params.id);
-                                }
+            if (collaboration.role == "member") {
+            	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
+            }
 		  	});
                         
-                        // layer hidden
+         // layer hidden
 		  	socket.on('layer.hide', function(data) {
 		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer hidden - '+ data.params.layerName+'</p>');
-                                if (collaboration.role == "member") {
-                                    gisportal.indicatorsPanel.hideLayer(data.params.id);
-                                }
+            if (collaboration.role == "member") {
+            	gisportal.indicatorsPanel.hideLayer(data.params.id);
+            }
 		  	});
                         
-                        // layer shown
+         // layer shown
 		  	socket.on('layer.show', function(data) {
 		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer un-hidden - '+ data.params.layerName+'</p>');
-                                if (collaboration.role == "member") {
-                                    gisportal.indicatorsPanel.showLayer(data.params.id);
-                                }
+            if (collaboration.role == "member") {
+            	gisportal.indicatorsPanel.showLayer(data.params.id);
+            }
 		  	});
                         
-                        
+         // panel selected/shown
+         socket.on('panels.showpanel', function(data) {
+		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Panel selected - '+ data.params.layerName+'</p>');
+            if (collaboration.role == "member") {
+            	gisportal.panels.showPanel(data.params.panelName);
+            }
+		  	});  
+
+		  	// autoscale
+         socket.on('scalebar.autoscale', function(data) {
+		  		console.log('scalebar.autoscale received');
+		  		console.log(data);
+		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Auto Scale - '+ data.params.layerName+'</p>');
+            if (collaboration.role == "member") {
+            	gisportal.scalebars.autoScale(data.params.id, data.params.force);
+            }
+		  	});            
+
+		  	// reset scalebar
+         socket.on('scalebar.reset', function(data) {
+		  		console.log('scalebar.reset received');
+		  		console.log(data);
+		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Scalebar was reset</p>');
+            if (collaboration.role == "member") {
+            	gisportal.scalebars.resetScale(data.params.id);
+            }
+		  	});            
 
 			// User saved state
 			socket.on('setSavedState', function(data) {
@@ -320,6 +349,34 @@ gisportal.events.bind("layer.show", function(event, id, layerName) {
         "event" : "layer.show",
         "id" : id,
         "layerName" : layerName
+    }
+    collaboration._emit('c_event', params);
+});
+
+// show a panel
+gisportal.events.bind("panels.showpanel", function(event, panelName) {
+   var params = {
+        "event" : "panels.showpanel",
+        "panelName" : panelName
+    }
+    collaboration._emit('c_event', params);
+});
+
+// auto scale a layer
+gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
+   var params = {
+        "event" : "scalebar.autoscale",
+        "id" : id,
+        "force" : force
+    }
+    collaboration._emit('c_event', params);
+});
+
+// auto scale a layer
+gisportal.events.bind("scalebar.reset", function(event, id) {
+   var params = {
+        "event" : "scalebar.autoscale",
+        "id" : id
     }
     collaboration._emit('c_event', params);
 });
