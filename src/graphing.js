@@ -22,17 +22,12 @@ gisportal.graphs.activePlotEditor = null;
 gisportal.graphs.addComponentToGraph = function( component ){
    
    if( gisportal.graphs.activePlotEditor == null ){
-      var PlotEditor = gisportal.graphs.PlotEditor;
       var Plot = gisportal.graphs.Plot;
 
       var plot = new Plot();
-      var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
-      $('.panel').addClass('has-active-plot');
-      gisportal.graphs.activePlotEditor = plotEditor;
-
+      gisportal.graphs.editPlot( plot );
       plot.plotType( 'timeseries' );
    }
-   gisportal.panelSlideout.openSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
 
@@ -77,5 +72,21 @@ gisportal.graphs.initDOM = function() {
    
 }
 
+/**
+ * Open a plot in the editor.
+ * Warn the user if they are going to delete an existing the graph
+ */
+gisportal.graphs.editPlot = function( plot ){
+   //If the user is editing a graph
+   // Warn them first
+   if( gisportal.graphs.activePlotEditor != null )
+      if( confirm( "This will delete your current plot" ) == false )
+         return false;
 
+   var PlotEditor = gisportal.graphs.PlotEditor;
+   var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
+   $('.panel').addClass('has-active-plot');
+   gisportal.graphs.activePlotEditor = plotEditor;
+   gisportal.panelSlideout.openSlideout( 'active-plot' );
+}
 

@@ -50,17 +50,26 @@ gisportal.layer = function( options ) {
    $.extend(true, this, defaults, options);
 
 
-
-      
+   // id used to identify the layer internally 
    this.id = options.name + "_" + options.providerTag;
-   this.origName = options.name.replace("/","-");
+
+   // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
+
+   // {indicator name} - {indicator region} - { indicator provider }
+   this.descriptiveName = this.name + ' - ' + this.tags.region + ' - ' + this.providerTag
+
+   // The original indicator name used by thedds/cache
    this.urlName = options.name;
    this.displayTitle = options.title.replace(/_/g, " ");
-   this.title = options.title;  
+
+   // The title as given by threads, not reliable 
+   this.title = options.title;
+
+
    this.productAbstract = options.productAbstract;
    this.type = options.type;
-   console.log( this.name );
+
    // Default indicator tab to show
    this.visibleTab = "details";
    
@@ -455,7 +464,7 @@ gisportal.layer = function( options ) {
    };
 
    this.cacheUrl = function(){
-     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.origName + '.json'
+     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json'
    }
 
    /**

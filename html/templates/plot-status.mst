@@ -23,6 +23,7 @@
 			<div></div>
 			<div >
 				<button class="js-graph-status-delete">Delete</button>
+				<button class="js-graph-status-copy">Copy/Edit</button>
 				<button class="js-graph-status-open">Open</button>
 			</div>
 		{{/if_equals}}

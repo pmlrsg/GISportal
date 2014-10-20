@@ -1,7 +1,7 @@
 <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{provider}}">
-   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{provider}}">
-      <p>{{name}}{{#region}} - {{region}}{{/region}}{{#interval}} - {{interval}}{{/interval}}{{#confidence}} - {{confidence}}{{/confidence}}</p>
+<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{providerTag}}">
+   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{providerTag}}">
+      <p>{{descriptiveName}}</p>
 
 
       <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>

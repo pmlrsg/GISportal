@@ -906,8 +906,8 @@ gisportal.initStart = function()  {
       else
          var autoLoad = function(){ gisportal.launchMap(); };
 
-   if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
-         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+   else if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
+      var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
 
    if( autoLoad != null)
       return setTimeout(autoLoad, 1000);

@@ -231,79 +231,50 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 };
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
-   $.get('templates/indicator.mst', function(template) {
-      console.log(data);
-      //console.log("adding indicator to panel");
-      //console.log(data);
-      if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
-      var id = data.id || "none";
-      var provider = data.provider || "none";
-      var refined = data.refined || false;
-      var name = data.name;
-      var index = data.index || 0;
-      if (refined && !name) {
-         name = gisportal.layers[id].name;
-      } else if (!gisportal.layers[id]) {
-         id = "none";
+      
+   if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
+
+   var id = data.id;
+
+   var layer = gisportal.layers[id];
+   
+   var rendered = gisportal.templates['indicator'](layer);
+
+   var index = data.index || 0;
+   var prevIndex = index - 1;
+
+   $('.js-indicators').prepend(rendered);
+
+   $('.js-indicators > li').sort(function(a, b) {
+      return $(a).data('order') > $(b).data('order');
+   }).appendTo('.js-indicators');
+
+   if (data.refine) {
+      var refine = data.refine;
+      var cat = refine.cat;
+      var tag = refine.tag;
+      if (cat && tag) {
+         var ids = group[cat][tag];
+         group = gisportal.indicatorsPanel.refineData(ids, "none");
+         refined = true;
       }
-      if (!name) {
-         name = id;
-      }
+   }
 
-      var group = gisportal.groupNames()[name];
-      var modified = gisportal.utils.nameToId(name);
-      var region = gisportal.layers[id].tags.region;
-      var tmp = {
-         id: id,
-         name: name,
-         modified: modified,
-         index: index,
-         region: region,
-         provider: provider
-      };
-      var tags = gisportal.groupNames()[name];
-      if (data.interval && Object.keys(tags['interval']).length > 1) tmp.interval = gisportal.layers[id].tags.interval;
-      if (data.confidence && Object.keys(tags['Confidence']).length > 1) tmp.confidence = gisportal.layers[id].tags.Confidence;
-      var rendered = Mustache.render(template, tmp);
+   $('[data-name="' + name + '"] .js-toggleVisibility')
+      .toggleClass('hidden', false)
+      .toggleClass('active', gisportal.layers[id].isVisible);
 
-      var prevIndex = index - 1;
+   gisportal.indicatorsPanel.scalebarTab(id);
+   gisportal.indicatorsPanel.detailsTab(id);
+   gisportal.indicatorsPanel.analysisTab(id);
 
-      $('.js-indicators').prepend(rendered);
-
-      $('.js-indicators > li').sort(function(a, b) {
-         return $(a).data('order') > $(b).data('order');
-      }).appendTo('.js-indicators');
-
-      if (data.refine) {
-         var refine = data.refine;
-         var cat = refine.cat;
-         var tag = refine.tag;
-         if (cat && tag) {
-            var ids = group[cat][tag];
-            group = gisportal.indicatorsPanel.refineData(ids, "none");
-            refined = true;
-         }
-      }
-
-      if (gisportal.layers[id]) {
-         $('[data-name="' + name.toLowerCase() + '"] .js-toggleVisibility')
-            .toggleClass('hidden', false)
-            .toggleClass('active', gisportal.layers[id].isVisible);
-         gisportal.indicatorsPanel.scalebarTab(id);
-         gisportal.indicatorsPanel.detailsTab(id);
-         gisportal.indicatorsPanel.analysisTab(id);
-      }
-
-
-      //Add the scale bar tooltip
-      var renderedTooltip = gisportal.templates['tooltip-scalebar'](gisportal.layers[id]);
-      $('[data-id="' + id + '"] .js-scalebar').tooltipster({
-         //interactive: true,
-         contentAsHTML: true,
-         content: renderedTooltip,
-         position: "right",
-         maxWidth: 200
-      });
+   //Add the scale bar tooltip
+   var renderedTooltip = gisportal.templates['tooltip-scalebar']( layer );
+   $('[data-id="' + id + '"] .js-scalebar').tooltipster({
+      contentAsHTML: true,
+      content: renderedTooltip,
+      position: "right",
+      maxWidth: 200
    });
 };
 
@@ -323,7 +294,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
    if (layer) {
       var name = layer.name.toLowerCase();
       options.visible = true;
-      gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer, options);
+      gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
    }
 };
 

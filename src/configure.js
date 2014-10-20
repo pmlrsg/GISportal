@@ -151,7 +151,7 @@ gisportal.groupTags = function()  {
                // There may be tag values with different
                // capitalisations, so to compare we need
                // to lowercase all of them.
-               tagVal = tagVal.toLowerCase();
+               tagVal = tagVal;
 
                // Create an array if needed at grouped[tag][tagVal]
                // then put the layer name into it.
@@ -160,7 +160,7 @@ gisportal.groupTags = function()  {
             } 
             else if (typeof tagVal === "object" && tagVal !== null)  {
                // Lowercase all tag values in the array
-               tagVal = _.map(tagVal, function(d) { return d.toLowerCase(); });
+               tagVal = _.map(tagVal, function(d) { return d; });
 
                // If the tag value isn't represented in the tag array
                // then create a new array.
@@ -173,7 +173,7 @@ gisportal.groupTags = function()  {
                // 'Adult Cod'
                for (var k = 0; k < tagVal.length; k++)  {
                   // Cache the lowercase actual tag value
-                  var t = tagVal[k].toLowerCase();
+                  var t = tagVal[k];
                   
                   // If the actual tag val isn't represented
                   // then create an array.

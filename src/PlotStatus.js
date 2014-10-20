@@ -43,6 +43,9 @@ gisportal.graphs.PlotStatus = (function(){
          .on('click', '.js-graph-status-delete', function(){
             $(this).closest('.graph-job').remove();
          })
+         .on('click', '.js-graph-status-copy', function(){
+            gisportal.graphs.editPlot( plot.copy() );
+         })
          .on('click', '.js-graph-status-open', function(){
 
             var interactiveUrl = plot.interactiveUrl();

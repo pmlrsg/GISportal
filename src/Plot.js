@@ -24,12 +24,7 @@ gisportal.graphs.Plot =(function(){
       
       //Place to store the interval id
       this._monitorJobStatusInterval = null;
-      
-      // Varibles to ignore when saving object
-      this._statusElement = null;
-      
-      this._activePlot = false;
-      
+
       this._state = "building";
       
       this._serverStatus = null;
@@ -166,7 +161,7 @@ gisportal.graphs.Plot =(function(){
       if( leftHandSideComoponents.length > 0 ){
          var yAxis1Label = leftHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
-            var output = indicator.displayName();
+            var output = indicator.descriptiveName;
             if( indicator.units )
                output += " (" + indicator.units + ")";
 
@@ -234,7 +229,7 @@ gisportal.graphs.Plot =(function(){
          var showByDefault = 'mean';
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
-               "label" : (totalCount++) + ') ' + indicator.title + " " + metric ,
+               "label" : (totalCount++) + ') ' + indicator.descriptiveName + " " + metric ,
                "key"  : metric,
                "yAxis": component.yAxis,
                "type": "line",
@@ -369,6 +364,10 @@ gisportal.graphs.Plot =(function(){
       if( _new != old )
          this.emit('title-change', { 'new': _new, 'old': old });
 
+      return this;
+   }
+   Plot.prototype.components = function( _new ){
+      if( !arguments.length ) return this._components;
       return this;
    }
    
@@ -510,6 +509,21 @@ gisportal.graphs.Plot =(function(){
 
    Plot.prototype.interactiveUrl = function(){
       return graphServerUrl + '/job/' + this.id + '/interactive'
+   };
+   
+
+   Plot.prototype.copy = function(){
+      var newCopy = new Plot();
+      newCopy.title( this.title() );
+      newCopy.plotType( this.plotType() );
+      newCopy.dateRangeBounds( this.dateRangeBounds() );
+      newCopy.tBounds( this.tBounds() );
+
+      this._components.forEach(function( component ){
+         newCopy.addComponent( component );
+      });
+
+      return newCopy;
    };
    
    
