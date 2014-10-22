@@ -203,7 +203,7 @@ gisportal.indicatorsPanel.getMetadata = function(layer, indicator, provider) {
                   break;
             }
             var confidence = '<p>' +
-                  '<strong>Forcing:</strong>' +
+                  '<strong>Confidence:</strong>' +
                   text +
                   '<br><i>Degree of confidence in data that the model provider has, based on a combination of skill assessment and expert judgment.</i>' +
                '</p>';
@@ -258,7 +258,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       }
    }
 
-   $('[data-name="' + name + '"] .js-toggleVisibility')
+   $('[data-id="' + id + '"] .js-toggleVisibility')
       .toggleClass('hidden', false)
       .toggleClass('active', gisportal.layers[id].isVisible);
 
@@ -672,12 +672,13 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    urlParams['bbox'] = $('[data-id="' + indicator.id + '"] .js-coordinates').val();
    urlParams['time'] = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
-   var vert = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
-   if( indicator.positive == "down" )
-     urlParams['vertical'] = Math.abs( vert );
-  else
-      urlParams['vertical'] = '-' + Math.abs( vert );
-
+   if( $('[data-id="' + indicator.id + '"] .js-analysis-elevation').length > 0 ){
+      var vert = $('[data-id="' + indicator.id + '"] .js-analysis-elevation').val();
+      if( indicator.positive == "down" )
+        urlParams['vertical'] = Math.abs( vert );
+     else
+         urlParams['vertical'] = '-' + Math.abs( vert );
+   }
 
    graphParams['type'] = 'timeseries';
    graphParams['time'] = urlParams['time'];
