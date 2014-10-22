@@ -50,6 +50,8 @@ The following dependencies will need to be installed by your package manager (fo
 ``httpd mod_wsgi python-devel numpy netcdf-devel libyaml libxml libxslt-devel openssl-devel gcc``
 We also need to install all the required libraries. This can be done in a few ways, the easiest using **pip** and the ``requirements.txt``. This may need sudo permissions.
 ``pip install -r middleware/requirements.txt``
+Finally we need autoprefixer from NPM, this will allow the portal to be run in IE9 and other older browsers
+``npm install -g autoprefixer``
 
 3. **Build JavaScript/CSS**  
 For production, JavaScript and CSS need to be minifed. This is done with a build script. This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
