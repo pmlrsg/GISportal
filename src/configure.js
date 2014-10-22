@@ -350,8 +350,8 @@ gisportal.configurePanel.sortNamesAlphabetically = function(){
          var fakeSelect = $(this).find('.fake-select');
 
          fakeSelect.children().sort(function(a,b){
-            var aVal = $(a).find('p').first().text();
-            var bVal = $(b).find('p').first().text();
+            var aVal = $(a).text();
+            var bVal = $(b).text();
             return sortCompare( aVal, bVal );
          }).appendTo( fakeSelect );
       });
