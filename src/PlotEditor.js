@@ -90,7 +90,7 @@ gisportal.graphs.PlotEditor = (function(){
     */
    PlotEditor.prototype.submitRequest = function(){
 
-         if( this.plot().doesTBoundsCoverAllComponents() ){
+         if( this.plot().doesTBoundsCoverAllComponents() || true ){
 
             this.plot().submitRequest();
             gisportal.graphs.activeGraphSubmitted();
