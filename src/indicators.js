@@ -136,28 +136,17 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.events.trigger('metadata.close');
       }
       else {
-         var indicator = $(this).parents('ul').siblings('.indicator-header').data('name');
-         var provider = $(this).parents('ul').siblings('.indicator-header').data('provider');
-         //console.log('closing slideout');
+         var indicator = $(this).closest('[data-name]').data('name');//('ul').siblings('.indicator-header').data('name');
+         var provider = $(this).closest('[data-provider]').data('provider'); //.parents('ul').siblings('.indicator-header').data('provider');
+         var layer = gisportal.layers[$(this).closest('[data-id]').data('id')];
          // grey out other things here - grey needs to be clickable to disable and hide.
          $('.js-indicators > li[data-name!="' + indicator + '"]').each(function() {
-            console.log('greyaing out : ' + $(this).data('name'));
+
             $(this).append("<div class='indicator-overlay'></div>");
          });
-          gisportal.indicatorsPanel.getMetadata(indicator, provider);
+          gisportal.indicatorsPanel.getMetadata(layer, indicator, provider);
       }
       
-      // if (gisportal.panelSlideout.isOut('metadata')) {
-      //    gisportal.panelSlideout.closeSlideout('metadata');
-      //    setTimeout(function() {
-      //       gisportal.indicatorsPanel.getMetadata(indicator, provider);
-      //    }, 500);
-      // } else {
-      //    gisportal.indicatorsPanel.getMetadata(indicator, provider);
-
-      // }
-
-      //gisportal.indicatorsPanel.getMetadata(indicator,provider);
    });
 
    $('.js-indicators').on('click', '.indicator-overlay', function(){
@@ -178,46 +167,55 @@ gisportal.events.bind('metadata.close', function() {
 
 
 
-gisportal.indicatorsPanel.getMetadata = function(indicator, provider) {
- $('.metadata_provider').html('');
-  $('.metadata_indicator').html('');
-var some = function(promises){
-    var d = $.Deferred(), results = [];
-    var remaining = promises.length;
-    for(var i = 0; i < promises.length; i++){
-        promises[i].then(function(res){
+gisportal.indicatorsPanel.getMetadata = function(layer, indicator, provider) {
+   $('.metadata_provider').html('');
+   $('.metadata_indicator').html('');
+   var some = function(promises){
+      var d = $.Deferred(), results = [];
+      var remaining = promises.length;
+      for(var i = 0; i < promises.length; i++){
+         promises[i].then(function(res){
             results.push(res); // on success, add to results
-        }).always(function(res){
+         }).always(function(res){
             remaining--; // always mark as finished
             if(!remaining) d.resolve(results);
-        });
-    }
-    return d.promise(); // return a promise
-};
-
-var urls = [gisportal.middlewarePath+'/metadata/provider/' + provider, gisportal.middlewarePath+'/metadata/indicator/' + indicator].map($.get);
-
-some(urls).then(function(results){
-for(var i = 0; i < results.length; i++) {
-       if (results[i].indexOf('Provider') != -1) {
-         $('.metadata_provider').html(results[i]);
+         });
        }
-       else {
-          $('.metadata_indicator').html(results[i]);
-       }
-    }
-}).always(function(){
-   gisportal.panelSlideout.openSlideout('metadata');
-});
-   // $.when($.get('service/metadata/provider/' + provider).fail(function(){}), $.get('service/metadata/indicator/' + indicator).fail(function(){console.log("failed to get thing");}))
-   //    .then(function(provider, indicator) {
-   //       $('.metadata_indicator').html(indicator[0]);
-   //       $('.metadata_provider').html(provider[0]);
-   //       gisportal.panelSlideout.openSlideout('metadata');
+       return d.promise(); // return a promise
+   };
 
-   //    }, function(d){console.log(d);});
+   var urls = [gisportal.middlewarePath+'/metadata/provider/' + provider, gisportal.middlewarePath+'/metadata/indicator/' + indicator].map($.get);
 
+   some(urls).then(function(results){
+      for(var i = 0; i < results.length; i++) {
+         if (results[i].indexOf('Provider') != -1) {
+            $('.metadata_provider').html(results[i]);
 
+            switch( layer.tags.Confidence ){
+               case"Low":
+                  var text = "&#9785; Low";
+                  break;
+               case"Medium":
+                  var text = "&#128528; Medium";
+                  break;
+               case"High":
+                  var text = "&#9786; High";
+                  break;
+            }
+            var confidence = '<p>' +
+                  '<strong>Forcing:</strong>' +
+                  text +
+                  '<br><i>Degree of confidence in data that the model provider has, based on a combination of skill assessment and expert judgment.</i>' +
+               '</p>';
+            $('.metadata_provider').append(confidence);
+
+         }else {
+            $('.metadata_indicator').html(results[i]);
+         }
+      }
+   }).always(function(){
+      gisportal.panelSlideout.openSlideout('metadata');
+   });
 
 };
 

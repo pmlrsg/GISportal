@@ -12,6 +12,7 @@ portal_metadata = Blueprint('metadata', __name__)
 
 @portal_metadata.route('/metadata/<metadata_type>/<metadata_id>', methods=["get"])
 def metadata(metadata_type, metadata_id):
+   metadata_id = metadata_id.lower()
    if (metadata_type in current_app.config.get('MARKDOWN_DIRS')):
       markdown_dir = current_app.config.get('MARKDOWN_ROOT')
       type_dir = '%s/%s' % (markdown_dir, metadata_type)

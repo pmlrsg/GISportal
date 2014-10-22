@@ -10,21 +10,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc id nulla vel nisl 
 [example@pml.ac.uk](mailto:example@pml.ac.uk)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**Forcing:**
+😞 Low
+😐 Medium
 

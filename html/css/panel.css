@@ -110,6 +110,7 @@
 .icon-btn{
 	color: white;
 	opacity: 0.5;
+  cursor: pointer;
 }
 .icon-btn:hover{
 	opacity: 0.8;

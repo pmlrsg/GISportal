@@ -368,20 +368,28 @@ gisportal.configurePanel.sortNamesAlphabetically = function(){
  */
 gisportal.configurePanel.searchInit = function()  {
    $('.js-search-results').html('');
-   var all = [];
+   var records = [];
    var layers = Object.keys(gisportal.layers);
-   for (var i = 0; i < layers.length; i++)  {
-     var tmp = {};
-     tmp.id = gisportal.layers[i];
-     tmp.name = gisportal.layers[layers[i]].name;
-     all.push(tmp)
+   for (var i = 0; i < layers.length; i++){
+      
+      var layer = gisportal.layers[layers[i]];
+
+      var searchRecord = {
+         name: layer.name,
+         providerTag: layer.providerTag,
+         region: layer.tags.region,
+     };
+
+     records.push(searchRecord);
    }
 
    var options = {
       threshold : 0.2,
-      keys : [ 'name']
+      keys : [ 'name', 'providerTag', 'region' ]
    };
-   this.fuse = new Fuse(all, options);
+
+   this.fuse = new Fuse(records, options);
+
    $('.js-search').addClear({
       onClear: function(){
          $('.js-search').change();
