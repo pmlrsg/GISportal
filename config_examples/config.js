@@ -36,6 +36,7 @@ gisportal.config = {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
    },
+   defaultBaseMap: 'EOX',
    // Should layers auto scale by default
    autoScale: true,
 

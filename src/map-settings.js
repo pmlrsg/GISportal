@@ -45,6 +45,11 @@ gisportal.map_settings.init = function() {
 			$('#select-country-borders').val(gisportal.config.countryBorder.defaultLayer);
 			gisportal.createCountryBorderLayer($('#select-country-borders').val());
 		}
+
+      if (typeof gisportal.config.defaultBaseMap != 'undefined' && typeof(gisportal.baseLayers[gisportal.config.defaultBaseMap]) != 'undefined') {
+         $('#select-basemap').val(gisportal.config.defaultBaseMap);
+         map.setBaseLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
+      }
    });
 
 };
