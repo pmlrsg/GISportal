@@ -390,6 +390,33 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);
       $('[data-id="' + indicator.id + '"] .js-icon-scalebar').toggleClass('hidden', false);
 
+      $('#tab-' + indicator.id + '-opacity').noUiSlider({
+         start: [ 100 ],
+         step: 10,
+         margin: 20,
+         connect: "lower",
+         range: {
+            'min': [   0 ],
+            'max': [ 100 ]
+         },
+         serialization: {
+            lower: [
+               $.Link({
+                  target: $('#tab-' + indicator.id + '-opacity-value'),
+                  method: setOpacityValue
+               })
+            ],
+         }
+      });
+      
+      function setOpacityValue(value) {
+         $(this).html(parseInt(value) +'%');
+      }
+
+      $('#tab-' + indicator.id + '-opacity').on('set', function() {
+         gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
+      });
+
       $('#tab-' + indicator.id + '-elevation').on('change', function() {
          var value = $(this).val();
          indicator.selectedElevation = value;

@@ -20,6 +20,11 @@
    <a class="js-reset text-button" data-id="{{id}}">Reset</a>
 
    <div class="indicator-options"> 
+      <div class="indicator-option">
+         <label for="tab-{{id}}-opacity">Layer Opacity</label> - <span id="tab-{{id}}-opacity-value">100%</span>
+         <div id="tab-{{id}}-opacity" class="layer-opacity-slider"></div>
+      </div>
+
       {{#hasElevation}}
       <div class="indicator-option">
          <label for="tab-{{id}}-elevation">Elevation</label>
