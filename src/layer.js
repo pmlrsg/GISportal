@@ -253,7 +253,7 @@ gisportal.layer = function( options ) {
     * Set the opacity of the layer.
     * @param {double} opacityValue - 0 is transparent, 1 is opaque.
     */
-   this.opacity = null;
+   this.opacity = 100;
    this.setOpacity = function(opacityValue) {
       var self = this;
       

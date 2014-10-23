@@ -389,7 +389,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('[data-id="' + indicator.id + '"] .js-icon-scalebar').toggleClass('hidden', false);
 
       $('#tab-' + indicator.id + '-opacity').noUiSlider({
-         start: [ 100 ],
+         start: [ indicator.opacity * 100 ],
          step: 10,
          margin: 20,
          connect: "lower",
