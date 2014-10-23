@@ -205,7 +205,7 @@ gisportal.indicatorsPanel.getMetadata = function(layer, indicator, provider) {
             var confidence = '<p>' +
                   '<strong>Confidence:</strong>' +
                   text +
-                  '<br><i>Model providers level of confidence in the data based on a combination of skill assessment and their expert judgment.</i>' +
+                  '<br><i>Model provider\'s level of confidence in the data based on a combination of skill assessment and their expert judgment.</i>' +
                '</p>';
             $('.metadata_provider').append(confidence);
 
