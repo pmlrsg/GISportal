@@ -80,6 +80,14 @@ Handlebars.registerHelper('truncate', function(text, max_length) {
 });
 
 
+Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
+   if( arrayToJoin == void(0) ) return "";
+   separator = separator || "";
+   return arrayToJoin.join( separator );
+});
+
+
+
 /**
  * Can be used in with <option> tags. It compares to 2 
  * input parameters, if they match it prints "select" which

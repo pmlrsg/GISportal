@@ -57,10 +57,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.addComponent= function( component ){
       var plot = this;
       
-      if( this._components.length == 0 && this.title() == "" ){
-         var indicator = gisportal.layers[ component.indicator ];
-         this.title( indicator.displayName() + " - " + (new Date()).toLocaleString() );
-      }
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
 
       if( !component.yAxis ){
          if( this._components.length == 0 )
@@ -74,6 +71,9 @@ gisportal.graphs.Plot =(function(){
       this.emit('component-added', { component: component });
 
       this.dateRangeBounds( this.calculateDateRangeBounds() );
+
+      if( updateGraphTitle )
+         this.title( this.getGraphTitle( this._components ) );
    }
    
    /**
@@ -85,13 +85,29 @@ gisportal.graphs.Plot =(function(){
       if( index == -1 )
          return;
 
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
+
       this._components.splice( index, 1);
+      
+      if( updateGraphTitle )
+         this.title( this.getGraphTitle( this._components ) );
       
       this.emit('component-removed', { component: component });
 
       this.dateRangeBounds( this.calculateDateRangeBounds() );
    };
-   
+
+   /**
+    * Returns the graph title for the components given
+    * @param  {Array}  components The components to build the title
+    * @return {String}            The new title
+    */
+   Plot.prototype.getGraphTitle = function( components ){
+      return _.uniq(components.map(function( component ){
+         var indicator = gisportal.layers[ component.indicator ];
+         return indicator.displayName();
+      })).join(" / ");
+   }
    
    /**
    * Builds a request to send to the graphing server

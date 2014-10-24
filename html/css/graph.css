@@ -128,3 +128,11 @@ input.graph-min, input.graph-max{
 .plot-status-title{
    font-weight: bold;
 }
+
+.y-axis{
+   display: none;
+}
+
+.multiple-components .y-axis{
+   display: block;
+}

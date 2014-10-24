@@ -283,6 +283,7 @@ gisportal.TimeLine.prototype.redraw = function() {
    //--------------------------------------------------------------------------
    // Draw the time bars
    // Note: Had to use closures to move variables from each into the .attr etc.
+   
    this.bars = this.barArea.selectAll('rect').data(this.timebars);
    this.bars
       .enter().append('svg:rect')
@@ -299,7 +300,6 @@ gisportal.TimeLine.prototype.redraw = function() {
       
    // Time bar removal
    this.bars.exit().remove();
-   
    // Re-scale the x values and widths of ALL the time bars
    this.bars
       .attr('x', function(d) { 
@@ -316,6 +316,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             return 0; 
          } 
       });
+   
       
    //--------------------------------------------------------------------------
    
@@ -384,6 +385,8 @@ gisportal.TimeLine.prototype.reset = function() {
 };
 
 gisportal.TimeLine.prototype.drawLabels = function()  {
+
+   
    // Draw the time bar labels
    $('.js-timeline-labels').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
@@ -420,25 +423,6 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.redraw();
 };
 
-// Show the timebar
-gisportal.TimeLine.prototype.hide = function() {
-   $('div#' + this.id).animate({bottom: '-' + ($('div#timeline').height() - 2) + 'px'});
-   $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-n'} );
-};
-
-// Hide the timebar
-gisportal.TimeLine.prototype.show = function() {
-   $('div#' + this.id).animate({bottom: 0 });
-   $('div#' + this.id + ' .togglePanel').button( "option", "icons", { primary: 'ui-icon-triangle-1-s'} );
-};
-
-// Add a new time bar to the chart in JSON timeBar notation
-gisportal.TimeLine.prototype.addTimeBarJSON = function(timeBar) {
-   this.timebars.push(timeBar);
-   this.reHeight();
-   this.redraw();
-};
-
 // Add a new time bar using detailed parameters
 gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
@@ -470,42 +454,6 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.redraw(); 
 };
 
-gisportal.TimeLine.prototype.addRangeBar = function(name, callback) {
-   var newRangebar = {};
-   newRangebar.name = gisportal.utils.uniqueID();
-   newRangebar.label = name;
-   newRangebar.callback = callback;
-   newRangebar.type = 'range';
-   newRangebar.dateTimes = [];
-   newRangebar.selectedStart = 0;
-   newRangebar.selectedEnd = 0;
-   newRangebar.y = ''; // So that the y can be specifically set to avoid bugs and complications with other types of timebars
-   newRangebar.isDragging = false; // Each bar needs to know if it is being modified so that it doesn't draw over over bars
-   newRangebar.colour = '';
-   this.timebars.push(newRangebar);
-   
-   this.reHeight();
-   this.redraw(); 
-
-};
-
-// NOTE: There may be problems with duplicated unique IDs
-gisportal.TimeLine.prototype.addRangeBarCopy = function(rangebar)  {
-   if (rangebar.selectedEnd) rangebar.selectedEnd = new Date(rangebar.selectedEnd);
-   if (rangebar.selectedStart) rangebar.selectedStart = new Date(rangebar.selectedStart);
-
-   this.timebars.push(rangebar);
-
-   this.reHeight();
-   this.redraw();
-}
-
-// Rename timebar
-gisportal.TimeLine.prototype.rename = function(name, label)  {
-   this.timebars.filter(function(d) { return d.name == name; })[0].label = label;
-   this.reHeight();
-   this.redraw();
-}
 
 gisportal.TimeLine.prototype.has = function(name)  {
    var has = _.where(gisportal.timeline.timebars, function(d)  {

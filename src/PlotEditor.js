@@ -37,12 +37,13 @@ gisportal.graphs.PlotEditor = (function(){
       this.setupComponents();
       
       //Setup the active "create graph" button
-      this._editorParent.find('.create-graph').click(function(){
+      this._editorParent.find('.js-create-graph').click(function(){
          _this.submitRequest();
       })
 
       this._editorParent.find('.js-close-active-plot').click(function(){
-         gisportal.graphs.deleteActiveGraph();
+         if( cofirm('Warning this will delete this plot. Try "Hide" to keep this plot.') )
+            gisportal.graphs.deleteActiveGraph();
       });
 
    }
@@ -90,21 +91,19 @@ gisportal.graphs.PlotEditor = (function(){
     */
    PlotEditor.prototype.submitRequest = function(){
 
-         if( this.plot().doesTBoundsCoverAllComponents() || true ){
+     var hasLeftHandSeries = this.plot().components().some(function( component ){
+         return component.yAxis == 1;
+      });
 
-            this.plot().submitRequest();
-            gisportal.graphs.activeGraphSubmitted();
-         }else{
-            if( confirm("This chart contains 2 series out of range. To generate all sources must have valid dates. Allow change?") ){
-               try{
-                  var newTbounds = this.plot().getValidTBoundsForAllComponents();
-                  this.plot().tBounds( newTbounds );
-                  this.submitRequest();
-               }catch( e ){
-                  alert( e.message );
-               };
-            }
-         }
+     if( this.plot().components().length == 1 )
+      this.plot().components()[0].yAxis = 1;
+
+      if( this.plot().components().length == 1 || hasLeftHandSeries ){
+         this.plot().submitRequest();
+         gisportal.graphs.activeGraphSubmitted();
+      }else{
+         alert("A series on the left Y axis is required.");
+      }
    }
 
 
@@ -237,6 +236,9 @@ gisportal.graphs.PlotEditor = (function(){
 
       function addComponent( component ){
 
+         if( _this.plot().components().length > 1 )
+            _this._editorParent.find('.js-slideout-content').addClass('multiple-components')
+
          var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];
          var rendered = gisportal.templates['active-plot-component']( componentCopy );
@@ -286,6 +288,9 @@ gisportal.graphs.PlotEditor = (function(){
       
       // When a component is removed from the Plot remove it from the UI
       this.plot().on('component-removed', function( data ){
+         if( _this.plot().components().length <= 1 )
+            _this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
+
 
          _this._componentsTable.children().each(function(){
             if( $(this).data('component') == data.component ){

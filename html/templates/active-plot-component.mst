@@ -12,7 +12,7 @@
          <b>Elev:</b>
          <span> {{round elevation 2}} {{indicatorObj.elevationUnits}} </span>
       {{/if}}
-      <select class="js-y-axis">
+      <select class="js-y-axis y-axis">
          <option value="1" {{selected "1" yAxis}}>Left Axis</option>
          <option value="2" {{selected "2" yAxis}}>Right Axis</option>
       </select>
