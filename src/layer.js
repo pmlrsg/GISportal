@@ -51,7 +51,7 @@ gisportal.layer = function( options ) {
 
 
    // id used to identify the layer internally 
-   this.id = options.name + "_" + options.providerTag;
+   this.id = options.name.replace(/[^a-zA-Z0-9]/g, '-' ) + "_" + options.providerTag;
 
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
