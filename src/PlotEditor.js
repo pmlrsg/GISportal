@@ -42,8 +42,10 @@ gisportal.graphs.PlotEditor = (function(){
       })
 
       this._editorParent.find('.js-close-active-plot').click(function(){
-         if( cofirm('Warning this will delete this plot. Try "Hide" to keep this plot.') )
+         if( confirm('Warning this will delete this plot. Try "Hide" to keep this plot.') )
             gisportal.graphs.deleteActiveGraph();
+         else
+            return false;
       });
 
    }
