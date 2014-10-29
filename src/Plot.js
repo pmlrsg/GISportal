@@ -250,6 +250,7 @@ gisportal.graphs.Plot =(function(){
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
                "label" : (totalCount++) + ') ' + indicator.descriptiveName + " " + metric ,
+               "subSeriesLabel":  totalCount + ') ' +metric,
                "key"  : metric,
                "yAxis": component.yAxis,
                "type": "line",
