@@ -31,8 +31,8 @@ gisportal.graphs.PlotEditor = (function(){
       //Store all the relevent varibles
       this.setupTitleInput();
       this.setupPlotTypeSelect();
-
       this.setupDateRangeSlider();
+      this.setupAddIndicatorBtn();
 
       this.setupComponents();
       
@@ -82,6 +82,21 @@ gisportal.graphs.PlotEditor = (function(){
          _this.plot().plotType( $(this).val() );
       });
 
+   }
+
+   /**
+    * Setup the Add Indicator button
+    * When a user clicks the button we need to make sure it
+    * currently has a list of the active indicators
+    * @return {[type]} [description]
+    */
+   PlotEditor.prototype.setupAddIndicatorBtn = function(){
+      this._editorParent.find('.js-add-indicator-dropdown').click(function(){
+         var layers = gisportal.selectedLayers.map( gisportal.getLayerByID );
+         var rendered = gisportal.templates['add-indicator-dropdown']( { layers: layers } );
+         $(this).next('.js-dropdown-menu').html( rendered );
+      });
+      
    }
 
 

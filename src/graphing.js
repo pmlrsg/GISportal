@@ -28,6 +28,8 @@ gisportal.graphs.addComponentToGraph = function( component ){
       gisportal.graphs.editPlot( plot );
       plot.plotType( 'timeseries' );
    }
+   
+   gisportal.panelSlideout.openSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor.plot().addComponent( component )
 }
 

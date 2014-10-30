@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-dimensions" name="tabs-{{modifiedName}}" data-tab-name="dimensions" {{#if_equals visibleTab "dimensions"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-dimensions" name="tabs" data-tab-name="dimensions" {{checked visibleTab "dimensions"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab dimensions-tab">
    <div class="scale-options">
       <div class="clearfix">

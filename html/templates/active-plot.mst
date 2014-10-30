@@ -45,7 +45,13 @@
 			</table>
 		</div>
 		<div class="clearfix">
-			<button class="brand js-show-panel pull-right" data-panel-name="choose-indicator">Add another indicator</button>
+			<div class="pull-right dropdown-holder">
+				<button class="brand dropdown-toggle js-add-indicator-dropdown" data-toggle="dropdown" >
+					Add indicator
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu js-dropdown-menu" role="menu">
+			   </ul>
 		</div>
 	</li>
 	

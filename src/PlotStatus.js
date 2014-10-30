@@ -94,6 +94,15 @@ gisportal.graphs.PlotStatus = (function(){
 
    };
 
+   /**
+    * When a Plot reuqest is sent away the plot returns status
+    * messages about how the progress of the graph on the server
+    *
+    * This function takes in the status object and displays
+    * that information to the user
+    * 
+    * @param  {[type]} serverStatus Status object from the start
+    */
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
       var isCalculating = false;
       var hasEstimation = false;
@@ -122,7 +131,7 @@ gisportal.graphs.PlotStatus = (function(){
       var message = serverStatus.message;
 
       if( isCalculating && ! hasEstimation )
-         message += "<br>Calculating est";
+         message += "<br>Estimated time remaining: calculating";
       if( hasEstimation )
          message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
 

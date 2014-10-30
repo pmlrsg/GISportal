@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-analysis" name="tabs-{{modifiedName}}" data-tab-name="analysis" {{#if_equals visibleTab "analysis"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-analysis" name="tabs" data-tab-name="analysis" {{checked visibleTab "analysis"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <li class="full-size">

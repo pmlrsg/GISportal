@@ -297,6 +297,9 @@ select,
    }
 }
 
+#indicatorsPanel{
+  position: relative;
+}
 
 .indicator-select .icon_arrow  {
    float: right;

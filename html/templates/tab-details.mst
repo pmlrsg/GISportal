@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-details" name="tabs-{{modifiedName}}" data-tab-name="details" {{#if_equals visibleTab "details"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
    <tbody>
       {{#if providerDetails.website}}

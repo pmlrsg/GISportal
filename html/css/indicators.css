@@ -29,12 +29,12 @@
    padding: 0;
 }
 
-.steps li  {
+.steps > li  {
    padding: 20px 20px 20px 0;
 }
 
 
-.steps li.full-size{
+.steps > li.full-size{
   padding: 12px;
 }
 
@@ -58,15 +58,16 @@
 .analysis-add-series{
    display: none;
    background-color: #B3AE3F;
+   float: left;
 }
 
 .has-active-plot .analysis-add-series{
    display: inline;
-   float: left;
 }
 
-.analysis-make-new-series{
 
+.has-active-plot .analysis-make-new-series{
+  display: none;
 }
 
 .analysis-draw-bbox-buttons button{
@@ -78,9 +79,6 @@
 }
 .analysis-add-to-plot-buttons{
   margin-top: 10px;
-}
-.has-active-plot .analysis-add-to-plot-buttons button{
-  max-width: 48%;
 }
 
 

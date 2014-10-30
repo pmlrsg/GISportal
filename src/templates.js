@@ -98,6 +98,12 @@ Handlebars.registerHelper('selected', function(attr1, attr2, options) {
       return 'selected'
 });
 
+
+Handlebars.registerHelper('checked', function(attr1, attr2, options) {
+   if( attr1 == attr2 )
+      return 'checked'
+});
+
 /**
  * Rounds the input to a certain precision
  * @param {float} number The number to round

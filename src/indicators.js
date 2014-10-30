@@ -157,6 +157,18 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('metadata.close');
    });
 
+   $('body').on('click', '.js-focus-on-build-graph-component', function(){
+      gisportal.indicatorsPanel.focusOnBuildGraphCompoent( $(this).data('id') );
+   });
+
+
+   $('.js-indicators').on('click', '.js-select-layer-tab', function(){
+      var layerId = $(this).closest('[data-id]').data('id');
+      var tabName = $(this).closest('[data-tab-name]').data('tab-name');
+      gisportal.indicatorsPanel.selectTab( layerId, tabName );
+   });
+
+
 
 };
 
@@ -274,6 +286,9 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       position: "right",
       maxWidth: 200
    });
+
+
+   gisportal.indicatorsPanel.selectTab( id, layer.visibleTab );
 };
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
@@ -695,8 +710,8 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    return url;
 };
 
-gisportal.indicatorsPanel.addToPlot = function(id)  {
-   var graphParams = this.getParams(id);
+gisportal.indicatorsPanel.addToPlot = function( id )  {
+   var graphParams = this.getParams( id );
    var indicator = gisportal.layers[id];
    
    var component = {
@@ -712,3 +727,24 @@ gisportal.indicatorsPanel.addToPlot = function(id)  {
    
 };
 
+gisportal.indicatorsPanel.focusOnBuildGraphCompoent = function( layerId ){
+   gisportal.panelSlideout.peakSlideout( 'active-plot' );
+   gisportal.panels.showPanel( 'active-layers' );
+   gisportal.indicatorsPanel.selectTab( layerId, 'analysis' );
+}
+
+gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
+   // Select tab
+   $('#tab-' + layerId + '-' + tabName).prop( 'checked', true ).trigger('change');
+
+   //Scroll to layer
+   var containerScroll = $('#indicatorsPanel').scrollTop();
+   var layerTop = $('#indicatorsPanel > ul > [data-id="' + layerId + '"]').position().top;
+
+   var newLocation = containerScroll + layerTop;
+   $('#indicatorsPanel').stop().animate({
+      scrollTop: newLocation
+   }, 2000).one('mousewheel', function(){
+      $(this).stop();
+   });
+}
