@@ -91,10 +91,13 @@ gisportal.graphs.PlotEditor = (function(){
     * @return {[type]} [description]
     */
    PlotEditor.prototype.setupAddIndicatorBtn = function(){
+      var _this = this;
+      
       this._editorParent.find('.js-add-indicator-dropdown').click(function(){
          var layers = gisportal.selectedLayers.map( gisportal.getLayerByID );
          var rendered = gisportal.templates['add-indicator-dropdown']( { layers: layers } );
          $(this).next('.js-dropdown-menu').html( rendered );
+         _this._editorParent.find('.js-slideout-content').scrollTop(10000);
       });
       
    }

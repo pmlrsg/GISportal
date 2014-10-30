@@ -71,7 +71,10 @@ gisportal.layer = function( options ) {
    this.type = options.type;
 
    // Default indicator tab to show
-   this.visibleTab = "details";
+   if( gisportal.graphs.activePlotEditor )
+     this.visibleTab = "details";
+   else
+     this.visibleTab = "analysis";
    
    // These queues feel like a hack, refactor?
    this.metadataComplete = false;

@@ -58,7 +58,7 @@
 .analysis-add-series{
    display: none;
    background-color: #B3AE3F;
-   float: left;
+   float: right;
 }
 
 .has-active-plot .analysis-add-series{
