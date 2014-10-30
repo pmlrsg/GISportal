@@ -98,10 +98,15 @@ Handlebars.registerHelper('selected', function(attr1, attr2, options) {
       return 'selected'
 });
 
-
 Handlebars.registerHelper('checked', function(attr1, attr2, options) {
    if( attr1 == attr2 )
       return 'checked'
+});
+
+
+Handlebars.registerHelper('active', function(attr1, attr2, options) {
+   if( attr1 == attr2 )
+      return 'active'
 });
 
 /**

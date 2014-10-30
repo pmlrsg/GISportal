@@ -247,6 +247,9 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    var id = data.id;
 
    var layer = gisportal.layers[id];
+
+   if( gisportal.graphs.activePlotEditor )
+      layer.visibleTab = "analysis"
    
    var rendered = gisportal.templates['indicator'](layer);
 

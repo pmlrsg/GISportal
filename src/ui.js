@@ -11,12 +11,12 @@
 \*------------------------------------*/
 
 $(document).ready(function()  {
-   $('.panel').on('change', '.js-indicator-tab-trigger', function(){
+   $('.panel').on('click', '.js-indicator-tab-trigger', function(){
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
    });
-   $('.panel').on('change', '.js-indicator-tab-trigger', changeTab);
+   $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);
    $('.panel').on('mousedown', '.js-closable', closeTab);
 });

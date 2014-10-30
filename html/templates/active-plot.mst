@@ -1,5 +1,5 @@
 <div class="slideout-header">
-   Plot
+   Graph
    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon js-close-active-plot"></span>
 </div>
 <ol class="steps panel-list">
@@ -58,7 +58,7 @@
 	<li>
 		<p class="number">5</p>
 		<div class="">
-			<button class="brand create-graph js-create-graph">Create plot</button>
+			<button class="brand create-graph js-create-graph">Create graph</button>
 		</div>
 	</li>
 
