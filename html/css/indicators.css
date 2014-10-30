@@ -133,6 +133,15 @@
   float: right;
 }
 
+
+.indicator-header p {
+  background-color: #442D5C;
+  margin: -10px -15px 3px -15px;
+  padding: 4px 9px 6px 9px;
+  background: linear-gradient(to bottom, #442d5c 75%,#5b496f 100%);
+  font-weight: bold;
+}
+
 .toggleVisibility{
   border-bottom: none !important;
 }
