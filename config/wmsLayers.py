@@ -446,7 +446,7 @@ layers = [
             "niceName": "Actual Evapotranspiration (monthly)",
             "data_provider": "Deltares",
             "indicator_type": [
-               "Pyhsics"
+               "Physics"
             ],
             "region": "Australasia"
          },
@@ -456,7 +456,7 @@ layers = [
             "niceName": "Actual Evapotranspiration uncertainty (monthly)",
             "data_provider": "Deltares",
             "indicator_type": [
-               "Pyhsics"
+               "Physics"
             ],
             "region": "Australasia"
          }
