@@ -48,7 +48,7 @@ gisportal.configurePanel.close = function()  {
  */
 gisportal.configurePanel.initDOM = function()  {
    function toggleIndicator()  {
-      var name = $(this).parent().data('name').toLowerCase();
+      var name = $(this).parent().data('name');
       var options = {};
       
       var cat = $(this).parents('[data-cat]');
@@ -151,7 +151,7 @@ gisportal.groupTags = function()  {
                // There may be tag values with different
                // capitalisations, so to compare we need
                // to lowercase all of them.
-               tagVal = tagVal.toLowerCase();
+               tagVal = tagVal;
 
                // Create an array if needed at grouped[tag][tagVal]
                // then put the layer name into it.
@@ -160,7 +160,7 @@ gisportal.groupTags = function()  {
             } 
             else if (typeof tagVal === "object" && tagVal !== null)  {
                // Lowercase all tag values in the array
-               tagVal = _.map(tagVal, function(d) { return d.toLowerCase(); });
+               tagVal = _.map(tagVal, function(d) { return d; });
 
                // If the tag value isn't represented in the tag array
                // then create a new array.
@@ -173,7 +173,7 @@ gisportal.groupTags = function()  {
                // 'Adult Cod'
                for (var k = 0; k < tagVal.length; k++)  {
                   // Cache the lowercase actual tag value
-                  var t = tagVal[k].toLowerCase();
+                  var t = tagVal[k];
                   
                   // If the actual tag val isn't represented
                   // then create an array.
@@ -215,7 +215,7 @@ gisportal.groupNames = function()  {
       // to keep finding it.
       var indicator = gisportal.layers[keys[i]];
       // Lowercase the name so that it can be used for comparisons
-      var name = indicator.name.toLowerCase();
+      var name = indicator.name;
       var id = indicator.id;
       var tags = indicator.tags;
       
@@ -236,7 +236,7 @@ gisportal.groupNames = function()  {
             // tagName may be a string or an array of strings
             if (typeof tagName === 'string')  {
                // Convert tagName to lowercase so that it doesn't produce duplicates
-               tagName = tagName.toLowerCase();
+               tagName = tagName;
                // If the cat already exists, use that, otherwise create a new array for it
                if (!group[name][cat]) group[name][cat] = {};
                // If the tagName already exists, use that, otherwise create a new array for it
@@ -248,7 +248,7 @@ gisportal.groupNames = function()  {
                // If tagName is an array, iterate over the strings
                for (var k = 0; k < tagName.length; k++)  {
                   // innerTagName is the actual tag name, needs to be lowercase
-                  var innerTagName = tagName[k].toLowerCase();
+                  var innerTagName = tagName[k];
                   // If cat has an array, use that, otherwise create one
                   if (!group[name][cat]) group[name][cat] = {}; 
                   // If innerTagName has an array, use that, otherwise create one
@@ -293,12 +293,11 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
          vals = _.unique(vals, function(d)  {
-            return d.toLowerCase();
+            return d;
          });
          
          _.forEach(vals, function(d)  {
             var tmp = {};
-            var d = d.toLowerCase();
             tmp.name = d;
             // Modified is used when a unique id is required
             // in the actual html, for radio buttons for example.
@@ -313,8 +312,7 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          });
          $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
          $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-         // Inline all SVG icons 
-         gisportal.replaceAllIcons();
+
       }
    }
 
@@ -352,8 +350,8 @@ gisportal.configurePanel.sortNamesAlphabetically = function(){
          var fakeSelect = $(this).find('.fake-select');
 
          fakeSelect.children().sort(function(a,b){
-            var aVal = $(a).find('p').first().text();
-            var bVal = $(b).find('p').first().text();
+            var aVal = $(a).text();
+            var bVal = $(b).text();
             return sortCompare( aVal, bVal );
          }).appendTo( fakeSelect );
       });
@@ -370,20 +368,28 @@ gisportal.configurePanel.sortNamesAlphabetically = function(){
  */
 gisportal.configurePanel.searchInit = function()  {
    $('.js-search-results').html('');
-   var all = [];
+   var records = [];
    var layers = Object.keys(gisportal.layers);
-   for (var i = 0; i < layers.length; i++)  {
-     var tmp = {};
-     tmp.id = gisportal.layers[i];
-     tmp.name = gisportal.layers[layers[i]].name;
-     all.push(tmp)
+   for (var i = 0; i < layers.length; i++){
+      
+      var layer = gisportal.layers[layers[i]];
+
+      var searchRecord = {
+         name: layer.name,
+         providerTag: layer.providerTag,
+         region: layer.tags.region,
+     };
+
+     records.push(searchRecord);
    }
 
    var options = {
       threshold : 0.2,
-      keys : [ 'name']
+      keys : [ 'name', 'providerTag', 'region' ]
    };
-   this.fuse = new Fuse(all, options);
+
+   this.fuse = new Fuse(records, options);
+
    $('.js-search').addClear({
       onClear: function(){
          $('.js-search').change();
@@ -417,12 +423,12 @@ gisportal.configurePanel.search = function(val)  {
    var indicators = [];
    
    results = _.uniq(results, function(val) {
-      return val.name.toLowerCase();
+      return val.name;
    }); 
 
    _.forEach(results, function(d)  {
       var tmp = {};
-      tmp.name = d.name.toLowerCase();
+      tmp.name = d.name;
       tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
       indicators.push(tmp);
    });
@@ -437,8 +443,6 @@ gisportal.configurePanel.search = function(val)  {
   
    var selected = [];
 
-   // Inline SVG icons
-   gisportal.replaceAllIcons();
 
 };
 
@@ -454,7 +458,7 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
 
 
    var options = options || {};
-   var name = name.toLowerCase();
+   var name = name;
    var id = this.hasIndicator(name);  
    
    if (options.id) {

@@ -43,6 +43,9 @@ gisportal.graphs.PlotStatus = (function(){
          .on('click', '.js-graph-status-delete', function(){
             $(this).closest('.graph-job').remove();
          })
+         .on('click', '.js-graph-status-copy', function(){
+            gisportal.graphs.editPlot( plot.copy() );
+         })
          .on('click', '.js-graph-status-open', function(){
 
             var interactiveUrl = plot.interactiveUrl();
@@ -55,7 +58,7 @@ gisportal.graphs.PlotStatus = (function(){
       var _this = this;
 
       this.plot().on('serverStatus-change', function( data ){
-         var serverStatus = data.new;
+         var serverStatus = data['new'];
          switch( serverStatus.state ){
             case "success":
                _this.stateSuccess( serverStatus );
@@ -91,6 +94,15 @@ gisportal.graphs.PlotStatus = (function(){
 
    };
 
+   /**
+    * When a Plot reuqest is sent away the plot returns status
+    * messages about how the progress of the graph on the server
+    *
+    * This function takes in the status object and displays
+    * that information to the user
+    * 
+    * @param  {[type]} serverStatus Status object from the start
+    */
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
       var isCalculating = false;
       var hasEstimation = false;
@@ -119,7 +131,7 @@ gisportal.graphs.PlotStatus = (function(){
       var message = serverStatus.message;
 
       if( isCalculating && ! hasEstimation )
-         message += "<br>Calculating est";
+         message += "<br>Estimated time remaining: calculating";
       if( hasEstimation )
          message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
 

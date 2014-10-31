@@ -1,0 +1,5 @@
+{{#each layers}}
+   <li><a class="js-focus-on-build-graph-component" data-id="{{id}}" href="#">{{ descriptiveName }}</a></li>
+{{/each}}
+<li class="divider"></li>
+<li><a class="js-show-panel js-slideout-toggle-peak" data-panel-name="choose-indicator" href="#">New Indicator</a></li>

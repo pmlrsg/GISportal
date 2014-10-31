@@ -57,7 +57,7 @@ gisportal.refinePanel.foundIndicator = function(data) {
    var tmp = {
       id: id,
       name: gisportal.layers[id].name,
-      provider: gisportal.layers[id].providerTag.toLowerCase(),
+      provider: gisportal.layers[id].providerTag,
       moreIndicatorInfo: gisportal.layers[id].moreIndicatorInfo,
       moreProviderInfo: gisportal.layers[id].moreProviderInfo,
    };
@@ -131,7 +131,7 @@ gisportal.refinePanel.refreshData = function(data) {
 gisportal.refinePanel.refineData = function(ids, current) {
    var indicator = gisportal.layers[ids[0]];
    if (indicator) {
-      var name = indicator.name.toLowerCase();
+      var name = indicator.name;
       var groupedNames = gisportal.groupNames()[name];
       var results = groupedNames;
       var names = Object.keys(groupedNames);
@@ -233,7 +233,7 @@ gisportal.refinePanel.render = function(data, group) {
    indicator.name = name;
    indicator.modified = gisportal.utils.nameToId(name);
    indicator.groupedNames = group;
-   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <p class="grid-cell fill">{{key}}</p>      <label class="icon-checkbox grid-cell indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label> </p>  </li>{{/tag}}';
+   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <span class="indicator-checkbox-text">{{key}}</span>      <label class="icon-checkbox indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label>  </li>{{/tag}}';
 
    if (!refined) {
       indicator.tag = indicator.groupedNames['region'];
@@ -279,7 +279,7 @@ gisportal.refinePanel.render = function(data, group) {
 
 
    if (refined) {
-      $('.js-reset-options[data-name="' + name.toLowerCase() + '"]').removeClass('hidden');
+      $('.js-reset-options[data-name="' + name + '"]').removeClass('hidden');
    }
    this.initDOM(data);
 };
