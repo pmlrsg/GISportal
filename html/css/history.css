@@ -21,36 +21,6 @@
 	width: 100%;
 }
 
-/*
-#historyPanel .panel-container{
-	display: flex;
-	flex-direction: column;
-}
-*/
-
-#historyPanel .half{
-	padding: 5px;
-	background-color: white;
-}
-
-/*
-#historyPanel .half{
-	display: flex;
-	height: 50%;
-	overflow: hidden;
-	flex-direction: column;
-}
-
-#historyPanel .half > h3{
-	flex-grow: 0;
-}
-
-#historyPanel .half > div{
-	overflow: auto;
-}
-*/
-
-
 .saved, .not-saved, .loading-image{
 	width: 16px;
 	height: 16px;

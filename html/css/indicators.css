@@ -29,8 +29,13 @@
    padding: 0;
 }
 
-.steps li  {
+.steps > li  {
    padding: 20px 20px 20px 0;
+}
+
+
+.steps > li.full-size{
+  padding: 12px;
 }
 
 .icon_rect  {
@@ -48,9 +53,44 @@
    margin-top: 15px;
 }
 
+
+
+.analysis-add-series{
+   display: none;
+   background-color: #B3AE3F;
+   float: right;
+}
+
+.has-active-plot .analysis-add-series{
+   display: inline;
+}
+
+
+.has-active-plot .analysis-make-new-series{
+  display: none;
+}
+
+.analysis-draw-bbox-buttons button{
+  background-color: gray;
+}
+.analysis-draw-bbox-buttons .icon-cursor-select-area{
+    position: relative;
+    top: 3px;
+}
+.analysis-add-to-plot-buttons{
+  margin-top: 10px;
+}
+
+
 .number  {
    color: #b1a7bc;
-   width: 85px;
+   width: 60px;
+  height: 100%;
+  display: inline-block;
+}
+.number + * {
+  display: inline-block;
+  width: calc(100% - 65px);
 }
 
 .bbox-info  {
@@ -59,11 +99,14 @@
 
 .bbox-info div {
    display: inline-block;
+   width: 32%;
+   text-align: center;
+   float: left;
 }
 
 .bbox-info dd,
 .bbox-info dt  {
-   display: inline;
+   display: block;
 }
 
 .bbox-info dt  {
@@ -88,6 +131,15 @@
 
 .indicator-header .remove{
   float: right;
+}
+
+
+.indicator-header p {
+  background-color: #442D5C;
+  margin: -10px -15px 3px -15px;
+  padding: 4px 9px 6px 9px;
+  background: linear-gradient(to bottom, #442d5c 75%,#5b496f 100%);
+  font-weight: bold;
 }
 
 .toggleVisibility{
@@ -115,7 +167,6 @@
 .indicator-checkbox{
   cursor: pointer;
   font-size: 22px;
-  width: 40px;
 }
 
 table.stripe.panel-tab td {

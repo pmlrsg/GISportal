@@ -42,7 +42,6 @@ h3  {
    font-size: 14px;
    font-size: 0.875rem; /* 18/16 = 1.125 */
    font-weight: 600;
-   line-height: 35px;
 }
 
 /* Panel */
@@ -52,7 +51,6 @@ h3  {
    font-size: 13px;
    font-size: 0.8125rem; /* 13/16=0.8125 */
    font-weight: 600;
-   line-height: 40px;
    text-align: center;
 }
 

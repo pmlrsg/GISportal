@@ -1,19 +1,19 @@
 <div class="slideout-header">
-   Plot
+   Graph
    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon js-close-active-plot"></span>
 </div>
-<ol class="steps grid-list panel-list">
+<ol class="steps panel-list">
 	<li>
-		<p class="number grid-cell">1</p>
-		<div class="grid-cell fill">
+		<p class="number">1</p>
+		<div class="">
 			<p>Title:</p>
 			<input type="text" class="js-active-plot-title" value="{{plot._title}}" />
 		</div>
 	</li>
 	
 	<li>
-		<p class="number grid-cell">2</p>
-		<div class="grid-cell fill">
+		<p class="number">2</p>
+		<div class="">
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries (default)</option>
@@ -25,30 +25,39 @@
 	</li>
 	
 	<li>
-		<p class="number grid-cell">3</p>
-		<div class="grid-cell fill">
+		<p class="number">3</p>
+		<div class="">
 			<p>Set a date range using the timeline below</p>
 			<div class="clearfix">
-				<input placeholder="Start" class="js-min graph-min grid-cell js-active-plot-start-date" type="text">
-				<input placeholder="End" class="js-max graph-max grid-cell js-active-plot-end-date" type="text">
+				<input placeholder="Start" class="js-min graph-min js-active-plot-start-date" type="text">
+				<input placeholder="End" class="js-max graph-max js-active-plot-end-date" type="text">
 			</div>
-			<div class="js-range-slider grid-cell fill"></div>
+			<div class="js-range-slider "></div>
 		</div>
 	</li>
 	
 	
 	<li>
-		<p class="number grid-cell">4</p>
-		<div class="grid-cell fill">
+		<p class="number">4</p>
+		<div class="">
 			<table> 
 				<tbody class="js-components components"></tbody>
 			</table>
 		</div>
+		<div class="clearfix">
+			<div class="pull-right dropdown-holder ">
+				<button class="brand dropdown-toggle js-add-indicator-dropdown" data-toggle="dropdown" >
+					Add indicator
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu js-dropdown-menu" role="menu">
+			   </ul>
+		</div>
 	</li>
 	
 	<li>
-		<p class="number grid-cell">5</p>
-		<div class="grid-cell fill">
+		<p class="number">5</p>
+		<div class="">
 			<button class="brand create-graph js-create-graph">Create graph</button>
 		</div>
 	</li>

@@ -31,18 +31,21 @@ gisportal.graphs.PlotEditor = (function(){
       //Store all the relevent varibles
       this.setupTitleInput();
       this.setupPlotTypeSelect();
-
       this.setupDateRangeSlider();
+      this.setupAddIndicatorBtn();
 
       this.setupComponents();
       
       //Setup the active "create graph" button
-      this._editorParent.find('.create-graph').click(function(){
+      this._editorParent.find('.js-create-graph').click(function(){
          _this.submitRequest();
       })
 
       this._editorParent.find('.js-close-active-plot').click(function(){
-         gisportal.graphs.deleteActiveGraph();
+         if( confirm('Warning this will delete this plot. Try "Hide" to keep this plot.') )
+            gisportal.graphs.deleteActiveGraph();
+         else
+            return false;
       });
 
    }
@@ -81,6 +84,24 @@ gisportal.graphs.PlotEditor = (function(){
 
    }
 
+   /**
+    * Setup the Add Indicator button
+    * When a user clicks the button we need to make sure it
+    * currently has a list of the active indicators
+    * @return {[type]} [description]
+    */
+   PlotEditor.prototype.setupAddIndicatorBtn = function(){
+      var _this = this;
+      
+      this._editorParent.find('.js-add-indicator-dropdown').click(function(){
+         var layers = gisportal.selectedLayers.map( gisportal.getLayerByID );
+         var rendered = gisportal.templates['add-indicator-dropdown']( { layers: layers } );
+         $(this).next('.js-dropdown-menu').html( rendered );
+         _this._editorParent.find('.js-slideout-content').scrollTop(10000);
+      });
+      
+   }
+
 
    /**
     * Finished the building of this graph.
@@ -90,21 +111,19 @@ gisportal.graphs.PlotEditor = (function(){
     */
    PlotEditor.prototype.submitRequest = function(){
 
-         if( this.plot().doesTBoundsCoverAllComponents() ){
+     var hasLeftHandSeries = this.plot().components().some(function( component ){
+         return component.yAxis == 1;
+      });
 
-            this.plot().submitRequest();
-            gisportal.graphs.activeGraphSubmitted();
-         }else{
-            if( confirm("This chart contains 2 series out of range. To generate all sources must have valid dates. Allow change?") ){
-               try{
-                  var newTbounds = this.plot().getValidTBoundsForAllComponents();
-                  this.plot().tBounds( newTbounds );
-                  this.submitRequest();
-               }catch( e ){
-                  alert( e.message );
-               };
-            }
-         }
+     if( this.plot().components().length == 1 )
+      this.plot().components()[0].yAxis = 1;
+
+      if( this.plot().components().length == 1 || hasLeftHandSeries ){
+         this.plot().submitRequest();
+         gisportal.graphs.activeGraphSubmitted();
+      }else{
+         alert("A series on the left Y axis is required.");
+      }
    }
 
 
@@ -235,13 +254,15 @@ gisportal.graphs.PlotEditor = (function(){
 
       var _this = this;
 
-      // When a component is added to Plot add it to the UI
-      this.plot().on('component-added', function( data ){
-         var componentCopy = _.clone(data.component);
+      function addComponent( component ){
 
+         if( _this.plot().components().length > 1 )
+            _this._editorParent.find('.js-slideout-content').addClass('multiple-components')
+
+         var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];
          var rendered = gisportal.templates['active-plot-component']( componentCopy );
-         var element = $(rendered).data('component', data.component);
+         var element = $(rendered).data('component', component);
 
 
          _this._componentsTable.append( element );
@@ -251,16 +272,15 @@ gisportal.graphs.PlotEditor = (function(){
 
          // On click X remove the component
          element.on('click', '.js-close-acitve-plot-component', function(){
-            _this.plot().removeComponent( data.component );
+            _this.plot().removeComponent( component );
          });
 
 
          element.on('click', '.js-y-axis', function(){
-            data.component.yAxis = parseInt( $(this).val() );
+            component.yAxis = parseInt( $(this).val() );
          });
 
          // The tooltip which tells the user about the range of available data
-         var component = $(this).data('component');
          var indicator = gisportal.layers[componentCopy.indicator];
          var validRange =  indicator.firstDate + " - " + indicator.lastDate;
 
@@ -279,16 +299,21 @@ gisportal.graphs.PlotEditor = (function(){
                };
             }
          });
+      }
 
-
+      // When a component is added to Plot add it to the UI
+      this.plot().on('component-added', function( data ){
+         addComponent( data.component )
       });
       
       // When a component is removed from the Plot remove it from the UI
       this.plot().on('component-removed', function( data ){
-         var component = data.component;
+         if( _this.plot().components().length <= 1 )
+            _this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
+
 
          _this._componentsTable.children().each(function(){
-            if( $(this).data('component') == component ){
+            if( $(this).data('component') == data.component ){
                $(this).remove();
                return false;
             }
@@ -305,6 +330,9 @@ gisportal.graphs.PlotEditor = (function(){
 
          });
       });
+
+      // Reload any exisitng components
+      this.plot().components().forEach( addComponent );
    }
 
    PlotEditor.prototype.setComponentHasDataInRange = function( componentElement ){
