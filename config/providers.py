@@ -1,4 +1,14 @@
 providers ={
+  "CNR": {
+    "logo": "",
+    "website": "http://www.cnr.it/",
+    "email": ""
+   },
+  "Deltares": {
+    "logo": "",
+    "website": "http://www.deltares.nl/",
+    "email": ""
+   },
   "ECMWF": {
     "logo": "",
     "website": "http://www.ecmwf.int",
@@ -9,9 +19,4 @@ providers ={
     "website": "http://geo.tuwien.ac.at/",
     "email": ""
   },
-  "CNR": {
-    "logo": "",
-    "website": "http://www.cnr.it/",
-    "email": ""
-   }
 }

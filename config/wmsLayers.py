@@ -411,5 +411,105 @@ layers = [
             "region": "Africa"
          }
       }
+   },
+   {
+      "name": "mod16_monthly_aet",
+      "options": {
+         "providerShortTag": "Deltares"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "AET": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Actual Evapotranspiration (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         }
+         "Uncertainty": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Actual Evapotranspiration uncertainty (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         }
+      }
+   },
+   {
+      "name": "mod16_monthly_pet",
+      "options": {
+         "providerShortTag": "Deltares"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "PET": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Potential Evapotranspiration (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         }
+         "Uncertainty": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Potential Evapotranspiration uncertainty (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         }
+      }
    }
 ]
