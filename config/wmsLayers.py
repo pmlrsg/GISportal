@@ -449,7 +449,7 @@ layers = [
                "Pyhsics"
             ],
             "region": "Australasia"
-         }
+         },
          "Uncertainty": {
             "Confidence": "Unknown",
             "interval": "Monthly",
@@ -499,7 +499,7 @@ layers = [
                "Pyhsics"
             ],
             "region": "Australasia"
-         }
+         },
          "Uncertainty": {
             "Confidence": "Unknown",
             "interval": "Monthly",
