@@ -9,5 +9,9 @@ providers ={
     "website": "http://geo.tuwien.ac.at/",
     "email": ""
   },
-  
+  "CNR": {
+    "logo": "",
+    "website": "http://www.cnr.it/",
+    "email": ""
+   }
 }

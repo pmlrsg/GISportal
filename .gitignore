@@ -8,3 +8,4 @@ html/GISPortal.js
 html/css/GISPortal.css
 .DS_Store
 apache_log
+/nbproject/private/

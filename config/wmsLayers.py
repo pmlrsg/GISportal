@@ -354,7 +354,7 @@ layers = [
             "Confidence": "Unknown",
             "interval": "daily",
             "niceName": "Soil moisture",
-            "data_provider": "Technische Universit&auml;t Wien",
+            "data_provider": "Technische Universitat Wien",
             "indicator_type": [
                "Physics"
             ],
@@ -364,11 +364,51 @@ layers = [
             "Confidence": "Unknown",
             "interval": "daily",
             "niceName": "Soil moisture uncertainty",
-            "data_provider": "Technische Universit&auml;t Wien",
+            "data_provider": "Technische Universitat Wien",
             "indicator_type": [
                "Physics"
             ],
             "region": "Global"
+         }
+      }
+   },
+   {
+      "name": "tamsat_rfe_dekadal",
+      "options": {
+         "providerShortTag": "CNR"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/rfe-dekadal-agg.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/rfe-dekadal-agg.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "rfe": {
+            "Confidence": "Unknown",
+            "interval": "Dekadal",
+            "niceName": "Rainfall Estimate",
+            "data_provider": "CNR",
+            "indicator_type": [
+               "Precipitation"
+            ],
+            "region": "Africa"
          }
       }
    }
