@@ -9,7 +9,7 @@
       {{/if}}
       {{#if elevation}}
          <br>
-         <b>Elev:</b>
+         <b>Depth:</b>
          <span> {{round elevation 2}} {{indicatorObj.elevationUnits}} </span>
       {{/if}}
       <select class="js-y-axis y-axis">

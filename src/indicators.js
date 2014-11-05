@@ -746,7 +746,8 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
 
    var newLocation = containerScroll + layerTop;
    $('#indicatorsPanel').stop().animate({
-      scrollTop: newLocation
+      scrollTop: newLocation,
+      duration: 150
    }, 2000).one('mousewheel', function(){
       $(this).stop();
    });

@@ -240,17 +240,20 @@ gisportal.graphs.Plot =(function(){
    }
 
    Plot.prototype.buildRequestDataTimeSeries = function( seriesArray ){
-      var totalCount = 1;
+      var totalCount = 0;
       for( var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
          var indicator = gisportal.layers[ component.indicator ];
+
+         var groupKey = indicator.descriptiveName;
 
          // Add all 5 timeseires values
          var showByDefault = 'mean';
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
-               "label" : (totalCount++) + ') ' + indicator.descriptiveName + " " + metric ,
-               "subSeriesLabel":  totalCount + ') ' +metric,
+               "label" : (++totalCount) + ') ' + indicator.descriptiveName + " " + metric ,
+               "groupLabel":  totalCount + ') ' + metric,
+               "groupKey": groupKey,
                "key"  : metric,
                "yAxis": component.yAxis,
                "type": "line",
@@ -270,7 +273,11 @@ gisportal.graphs.Plot =(function(){
                "metaCacheUrl" : indicator.cacheUrl(),
                "middlewareUrl" : gisportal.middlewarePath + '/wcs'
             },
-            "sub_series" : sub_series
+            "sub_series" : sub_series,
+            group:{
+               groupLabel: indicator.descriptiveName,
+               groupKey: groupKey
+            }
             
          };
          seriesArray.push( newSeries );

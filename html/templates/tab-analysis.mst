@@ -32,7 +32,7 @@
 
          {{#elevation}}
             <div class="elevation clearfix">
-               <p>Choose a layer elevation:</p>
+               <p>Choose a layer depth:</p>
                <select class="js-analysis-elevation">
                   {{#elevationCache}}
                      <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
