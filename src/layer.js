@@ -51,7 +51,7 @@ gisportal.layer = function( options ) {
 
 
    // id used to identify the layer internally 
-   this.id = options.name + "_" + options.providerTag;
+   this.id = options.name.replace(/[^a-zA-Z0-9]/g, '_' ).replace(/_+/g, '_' ) + "__" + options.providerTag;
 
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
@@ -253,7 +253,7 @@ gisportal.layer = function( options ) {
     * Set the opacity of the layer.
     * @param {double} opacityValue - 0 is transparent, 1 is opaque.
     */
-   this.opacity = null;
+   this.opacity = 1;
    this.setOpacity = function(opacityValue) {
       var self = this;
       

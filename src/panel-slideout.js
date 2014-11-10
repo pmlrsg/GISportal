@@ -19,7 +19,7 @@ gisportal.panelSlideout.initDOM = function(  ){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.openSlideout( slideoutName );
 		})
-		.on( 'click', '.js-slideout-pulltab-toggle-peak', function(){
+		.on( 'click', '.js-slideout-toggle-peak', function(){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.togglePeak( slideoutName );
 		})

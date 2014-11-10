@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-analysis" name="tabs-{{modifiedName}}" data-tab-name="analysis" {{#if_equals visibleTab "analysis"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-analysis" name="tabs" data-tab-name="analysis" {{checked visibleTab "analysis"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <li class="full-size">
@@ -32,7 +32,7 @@
 
          {{#elevation}}
             <div class="elevation clearfix">
-               <p>Choose a layer elevation:</p>
+               <p>Choose a layer depth:</p>
                <select class="js-analysis-elevation">
                   {{#elevationCache}}
                      <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
@@ -42,8 +42,8 @@
          {{/elevation}}
 
          <div class="analysis-add-to-plot-buttons clearfix">
-            <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to existing plot</button>
-            <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new plot</button>
+            <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to existing graph</button>
+            <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new graph</button>
          </div>
       </div>
       </li>

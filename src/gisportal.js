@@ -931,8 +931,8 @@ gisportal.initStart = function()  {
 
    // Load there previously saved state
    $('.js-load-last-state').click(function(){
+      gisportal.launchMap();
       gisportal.loadState( gisportal.getAutoSaveState() );
-      setInterval( gisportal.autoSaveState, 60000 );
    });
    
    $('.js-tac-content').html( gisportal.templates['terms-and-conditions-text']() );
