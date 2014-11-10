@@ -11,12 +11,25 @@
   text-transform: capitalize;
 }
 
-.indicator-header > p  {
+.indicator-header-moving { 
+  background: repeating-linear-gradient(
+  -45deg,
+  #59476d,
+  #59476d 10px,
+  #32253f 10px,
+  #32253f 20px
+);
+}
+
+.indicator-name  {
    margin-bottom: 5px;
 }
 
 .indicator-header .panel-tab-name  {
-  border-bottom: 0 none;
+   border-bottom: 0 none;
+}
+.sortable-list .indicator-header {
+   cursor: ns-resize;
 }
 
 @media only screen and (min-width : 1270px)  {

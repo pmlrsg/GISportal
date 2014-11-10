@@ -168,7 +168,21 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('metadata.close');
    });
 
+   $('.js-set-layer-order').on('click', function() {
+      // change the layer order
+      var layers = [];
+      $('.sortable-list .indicator-header').each(function() {
+         layers.push($(this).data('provider') + ': ' + $(this).data('name'));
+      })
+      gisportal.indicatorsPanel.reorderLayers(layers);
 
+      // show the details again and then turn off sortable   
+      $('.indicator-actions').toggleClass('hidden', false);
+      $('.indicator-properties').toggleClass('hidden', false);
+      $('.sortable-list').sortable('destroy');
+      $('.js-set-layer-order').toggleClass('hidden', true);
+      $('ul.js-indicators').removeClass('sortable-list');
+   });
 };
 
 gisportal.events.bind('metadata.close', function() {
@@ -276,7 +290,57 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       position: "right",
       maxWidth: 200
    });
+
+   if (gisportal.selectedLayers.length > 0) {
+      var layerTooltip = gisportal.templates['tooltip-layerorder']( layer );
+      // $('.indicator-name').tooltipster({
+      //    contentAsHTML: true,
+      //    content: layerTooltip,
+      //    position: "right",
+      // });
+   }
+
+   // make the selected indicators list sortable, and the event to fire after sorting
+   $('.js-icon-change-order').click(function() { 
+      $('ul.js-indicators').addClass('sortable-list');
+      $('.indicator-properties').toggleClass('hidden', true);
+      $('.indicator-actions').toggleClass('hidden', true);
+      $('.js-set-layer-order').toggleClass('hidden', false);
+
+      // add/remove the tooltips
+      //$('.indicator-name').tooltipster('disable');
+      var layerTooltip = gisportal.templates['tooltip-layerordermove']( layer );
+      // $('.js-indicators.sortable-list').tooltipster({
+      //    contentAsHTML: true,
+      //    content: layerTooltip,
+      //    position: "bottom",
+      //    maxWidth: 300
+      // });
+
+      $(".sortable-list").sortable({
+         start: function(event, ui) {
+            $(ui.item).children('.indicator-header').addClass('indicator-header-moving');
+         },
+         stop : function(event, ui) {
+            $(ui.item).children('div.indicator-header').removeClass('indicator-header-moving'); 
+         }
+      });
+      $(".sortable-list").disableSelection();
+      
+   });
+
+
 };
+
+gisportal.indicatorsPanel.reorderLayers = function(layers) {
+   var index = layers.length;
+   for(var i = 0; i < layers.length; i++) {
+      var layer = map.getLayersByName(layers[i])[0];
+      console.log('setting '+layer.name+' as '+ parseInt(index - i));
+      map.setLayerIndex(layer, index-i);
+   }
+
+}
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
 
