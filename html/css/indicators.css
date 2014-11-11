@@ -29,8 +29,11 @@
    border-bottom: 0 none;
 }
 .sortable-list .indicator-header {
-   cursor: ns-resize;
+   cursor: -webkit-grab;
+   cursor: grab;
 }
+
+.moveable { margin: 10px;}
 
 @media only screen and (min-width : 1270px)  {
    .indicator-header .icon_remove {
