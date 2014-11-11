@@ -19,7 +19,7 @@ gisportal.indicatorsPanel.open = function() {
 
 gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-toggleVisibility', function() {
-      var id = $(this).parent().data('id');
+      var id = $(this).closest('[data-id]').data('id');
       if (gisportal.layers[id].isVisible) {
          gisportal.indicatorsPanel.hideLayer(id);
       } else {
@@ -41,7 +41,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       if (gisportal.selectedLayers.length <= 1) {
          gisportal.panels.showPanel('choose-indicator');
       }
-      var id = $(this).parent().data('id');
+      var id = $(this).closest('[data-id]').data('id');
       gisportal.indicatorsPanel.removeFromPanel(id);
    });
 
@@ -159,6 +159,25 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('body').on('click', '.js-focus-on-build-graph-component', function(){
       gisportal.indicatorsPanel.focusOnBuildGraphCompoent( $(this).data('id') );
+   });
+
+
+   $('.js-indicators').on('click', '.js-select-layer-tab', function(){
+      var layerId = $(this).closest('[data-id]').data('id');
+      var tabName = $(this).closest('[data-tab-name]').data('tab-name');
+      gisportal.indicatorsPanel.selectTab( layerId, tabName );
+   });
+
+
+   $('.js-set-layer-order').on('click', function() {
+      // show the details again and then turn off sortable   
+      $('.indicator-header').toggleClass('moveable', false);
+      $('.indicator-actions').toggleClass('hidden', false);
+      $('.indicator-properties').toggleClass('hidden', false);
+      $('.sortable-list').sortable('destroy');
+      $('.js-set-layer-order').toggleClass('hidden', true);
+      $('ul.js-indicators').removeClass('sortable-list');
+
    });
 
 
@@ -290,9 +309,67 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       maxWidth: 200
    });
 
+   // make the selected indicators list sortable, and the event to fire after sorting
+   $('.js-icon-change-order').click(function() { 
+      $('ul.js-indicators').addClass('sortable-list');
+      $('.indicator-header').toggleClass('moveable', true);
+      $('.indicator-properties').toggleClass('hidden', true);
+      $('.indicator-actions').toggleClass('hidden', true);
+      $('.js-set-layer-order').toggleClass('hidden', false);
+
+      // add/remove the tooltips
+      var layerTooltip = gisportal.templates['tooltip-layerordermove']( layer );
+      $('.js-indicators.sortable-list').tooltipster({
+         contentAsHTML: true,
+         content: layerTooltip,
+         position: "right",
+         maxWidth: 300
+      });
+      $('.js-indicators.sortable-list').tooltipster('show');
+
+      $(".sortable-list").sortable({
+         start: function(event, ui) {
+            $(ui.item).children('.indicator-header').addClass('indicator-header-moving');
+            try {
+               $('.js-indicators.sortable-list').tooltipster('destroy');
+               $('.js-indicators.sortable-list').attr('title', '');
+            } catch(err) {
+               // no need to do anything, it's quite possible the tooltip has already been destroyed
+            };
+         },
+         stop : function(event, ui) {
+            $(ui.item).children('div.indicator-header').removeClass('indicator-header-moving'); 
+            // change the layer order
+            var layers = [];
+            $('.sortable-list .indicator-header').each(function() {
+               layers.push($(this).data('provider') + ': ' + $(this).data('name'));
+            })
+            gisportal.indicatorsPanel.reorderLayers(layers);
+            try {
+               $('.js-indicators.sortable-list').tooltipster('destroy');
+               $('.js-indicators.sortable-list').attr('title', '');
+            } catch(err) {
+               // no need to do anything, it's quite possible the tooltip has already been destroyed
+            };
+         }
+      });
+      $(".sortable-list").disableSelection();
+      
+   });
+
 
    gisportal.indicatorsPanel.selectTab( id, layer.visibleTab );
 };
+
+gisportal.indicatorsPanel.reorderLayers = function(layers) {
+   var index = layers.length;
+   for(var i = 0; i < layers.length; i++) {
+      var layer = map.getLayersByName(layers[i])[0];
+      console.log('setting '+layer.name+' as '+ parseInt(index - i));
+      map.setLayerIndex(layer, index-i);
+   }
+
+}
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
 

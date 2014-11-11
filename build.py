@@ -89,7 +89,6 @@ def build_portal_js(t):
    portal_js = open('gisportal_js.json', 'r')
    json_js = json.load(portal_js)
    portal_js.close()
-   #os.remove('html/GISPortal.js')
    destination = open('html/GISPortal.js', 'wb')
    for filename in json_js["files"]:
       with open(filename, 'rb') as file:

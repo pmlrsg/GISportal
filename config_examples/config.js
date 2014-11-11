@@ -37,6 +37,7 @@ gisportal.config = {
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
    },
    defaultBaseMap: 'EOX',
+
    // Should layers auto scale by default
    autoScale: true,
 
