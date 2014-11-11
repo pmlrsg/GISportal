@@ -47,8 +47,7 @@ button, .btn{
   border-radius: 5px;
   color: #fff;
 
-  line-height: 35px;
-  padding: 0 35px 0 30px;
+  padding: 7px 35px;
   display: inline-block;
 }
 
@@ -61,8 +60,16 @@ button, .btn{
    background-color: #b1a7bc;
    border: none;
    color: #fff;
-   padding: 2px 10px;
+   padding: 6px 12px;
    border-radius: 5px;
+}
+
+.brand.extra-small{
+  font-size: 12px;
+  padding: 5px 15px;
+}
+.brand.small{
+  padding: 5px 15px;
 }
 
 .brand.secondary:active  {
@@ -98,9 +105,6 @@ button, .btn{
    padding-left: 40px;
 }
 
-.brand.small{
-  padding: 0px 6px;
-}
 
 .hidden  {
   display: none !important;

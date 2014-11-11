@@ -128,3 +128,15 @@ input.graph-min, input.graph-max{
 .plot-status-title{
    font-weight: bold;
 }
+
+.y-axis{
+   display: none;
+}
+
+.multiple-components .y-axis{
+   display: block;
+}
+
+.active-plot-slideout .panel-list{
+   min-height: calc(100% - 40px);
+}

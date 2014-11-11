@@ -24,12 +24,7 @@ gisportal.graphs.Plot =(function(){
       
       //Place to store the interval id
       this._monitorJobStatusInterval = null;
-      
-      // Varibles to ignore when saving object
-      this._statusElement = null;
-      
-      this._activePlot = false;
-      
+
       this._state = "building";
       
       this._serverStatus = null;
@@ -62,10 +57,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.addComponent= function( component ){
       var plot = this;
       
-      if( this._components.length == 0 && this.title() == "" ){
-         var indicator = gisportal.layers[ component.indicator ];
-         this.title( indicator.displayName() + " - " + (new Date()).toLocaleString() );
-      }
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
 
       if( !component.yAxis ){
          if( this._components.length == 0 )
@@ -79,6 +71,9 @@ gisportal.graphs.Plot =(function(){
       this.emit('component-added', { component: component });
 
       this.dateRangeBounds( this.calculateDateRangeBounds() );
+
+      if( updateGraphTitle )
+         this.title( this.getGraphTitle( this._components ) );
    }
    
    /**
@@ -90,13 +85,29 @@ gisportal.graphs.Plot =(function(){
       if( index == -1 )
          return;
 
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
+
       this._components.splice( index, 1);
+
+      if( updateGraphTitle )
+         this.title( this.getGraphTitle( this._components ) );
       
       this.emit('component-removed', { component: component });
 
       this.dateRangeBounds( this.calculateDateRangeBounds() );
    };
-   
+
+   /**
+    * Returns the graph title for the components given
+    * @param  {Array}  components The components to build the title
+    * @return {String}            The new title
+    */
+   Plot.prototype.getGraphTitle = function( components ){
+      return _.uniq(components.map(function( component ){
+         var indicator = gisportal.layers[ component.indicator ];
+         return indicator.displayName();
+      })).join(" / ");
+   }
    
    /**
    * Builds a request to send to the graphing server
@@ -166,7 +177,9 @@ gisportal.graphs.Plot =(function(){
       if( leftHandSideComoponents.length > 0 ){
          var yAxis1Label = leftHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
-            var output = indicator.displayName();
+            var output = indicator.name;
+            if( 'elevation' in component )
+               output += ' Elv:' + component.elevation + 'M'
             if( indicator.units )
                output += " (" + indicator.units + ")";
 
@@ -191,7 +204,9 @@ gisportal.graphs.Plot =(function(){
       if( rightHandSideComoponents.length > 0 ){
          var yAxis2Label = rightHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
-            var output = indicator.displayName();
+            var output = indicator.name;
+            if( 'elevation' in component )
+               output += ' Elv:' + component.elevation + 'M'
             if( indicator.units )
                output += " (" + indicator.units + ")";
 
@@ -225,16 +240,20 @@ gisportal.graphs.Plot =(function(){
    }
 
    Plot.prototype.buildRequestDataTimeSeries = function( seriesArray ){
-      var totalCount = 1;
+      var totalCount = 0;
       for( var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
          var indicator = gisportal.layers[ component.indicator ];
+
+         var groupKey = indicator.descriptiveName;
 
          // Add all 5 timeseires values
          var showByDefault = 'mean';
          var sub_series = [ 'std', 'min', 'max', 'median', 'mean' ].map(function( metric ){
             return {
-               "label" : (totalCount++) + ') ' + indicator.title + " " + metric ,
+               "label" : (++totalCount) + ') ' + indicator.descriptiveName + " " + metric ,
+               "groupLabel":  totalCount + ') ' + metric,
+               "groupKey": groupKey,
                "key"  : metric,
                "yAxis": component.yAxis,
                "type": "line",
@@ -254,7 +273,11 @@ gisportal.graphs.Plot =(function(){
                "metaCacheUrl" : indicator.cacheUrl(),
                "middlewareUrl" : gisportal.middlewarePath + '/wcs'
             },
-            "sub_series" : sub_series
+            "sub_series" : sub_series,
+            group:{
+               groupLabel: indicator.descriptiveName,
+               groupKey: groupKey
+            }
             
          };
          seriesArray.push( newSeries );
@@ -304,12 +327,13 @@ gisportal.graphs.Plot =(function(){
                _this.serverStatus( serverStatus );
             },
             error: function( response ){
+
+               clearInterval( _this._monitorJobStatusInterval );
+
                if( response.status == 404 )
                   _this.error( "Job not found on server" );
                else
                   _this.error( "Invalid reply from server. It possibly crashed." );
-
-               clearInterval( _this._monitorJobStatusInterval );
             }
          })
       }
@@ -371,6 +395,10 @@ gisportal.graphs.Plot =(function(){
 
       return this;
    }
+   Plot.prototype.components = function( _new ){
+      if( !arguments.length ) return this._components;
+      return this;
+   }
    
    /**
    * Finds the widest time range that covers all the indicators data sets.
@@ -378,7 +406,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.calculateDateRangeBounds = function(){
       //If theres no components return the current bounds
       if( this._components.length == 0 )
-         return this.dataRangeBounds();
+         return this.dateRangeBounds();
       
       var min = null;
       var max = null;
@@ -510,6 +538,21 @@ gisportal.graphs.Plot =(function(){
 
    Plot.prototype.interactiveUrl = function(){
       return graphServerUrl + '/job/' + this.id + '/interactive'
+   };
+   
+
+   Plot.prototype.copy = function(){
+      var newCopy = new Plot();
+      newCopy.title( this.title() );
+      newCopy.plotType( this.plotType() );
+      newCopy.dateRangeBounds( this.dateRangeBounds() );
+      newCopy.tBounds( this.tBounds() );
+
+      this._components.forEach(function( component ){
+         newCopy.addComponent( component );
+      });
+
+      return newCopy;
    };
    
    

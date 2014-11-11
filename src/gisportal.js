@@ -56,7 +56,6 @@ gisportal.enabledDays = [];
 
 // Used as offsets when sorting layers in groups
 gisportal.numBaseLayers = 0;
-gisportal.numRefLayers = 0;
 gisportal.numOpLayers = 0;
 
 // Stores the current user selection. Any changes should trigger the correct event.
@@ -137,8 +136,6 @@ gisportal.loadLayers = function() {
       }
    });
 
-   // Get WFS cache
-   //gisportal.genericAsync('GET', './cache/wfsMasterCache.json', null, gisportal.initWFSLayers, errorHandling, 'json', {});
 };
 
 /**
@@ -280,44 +277,6 @@ gisportal.setCountryBordersToTopLayer = function() {
    }
 }
 
-/**
- * Create all the reference layers for the map.
- * Iterates over the gisportal.cache.wfslayers and adds all the correct
- * layers to gisportal.layers
- */
-gisportal.createRefLayers = function() {  
-   
-   $.each(gisportal.cache.wfsLayers, function(i, item) {
-      if(typeof item.url !== 'undefined' && typeof item.serverName !== 'undefined' && typeof item.layers !== 'undefined') {
-         var url = item.url;
-         var serverName = item.serverName;
-         $.each(item.layers, function(i, item) {
-            if(typeof item.name !== 'undefined' && typeof item.options !== 'undefined') {
-               item.productAbstract = "None Provided";
-               //item.tags = {};
-               
-               var layer = new gisportal.layer(item.name, item.name, 
-                     item.productAbstract, "refLayers", {
-                        'serverName': serverName, 
-                        'wfsURL': url, 
-                        'providerTag': item.options.providerShortTag,
-                        'tags': item.tags,
-                        'options': item.options,
-                        'times' : item.times
-                     }
-               );
-                     
-               layer = gisportal.checkNameUnique(layer);   
-               gisportal.layers[layer.id] = layer;
-            }
-         });
-      } 
-   });
-   
-   gisportal.configurePanel.refreshData();
-   // Get and store the number of reference layers
-   gisportal.numRefLayers = map.getLayersBy('type', 'refLayers').length;
-};
 
 /** 
  * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
@@ -325,99 +284,59 @@ gisportal.createRefLayers = function() {
  */
 gisportal.createOpLayers = function() {
    var layers = [];
-   $.each(gisportal.cache.wmsLayers, function(i, item) {
-      // Make sure important data is not missing...
-      if(typeof item.server !== "undefined" && 
-      typeof item.wmsURL !== "undefined" && 
-      typeof item.wcsURL !== "undefined" && 
-      typeof item.serverName !== "undefined" && 
-      typeof item.options !== "undefined") {
-         var providerTag = typeof item.options.providerShortTag !== "undefined" ? item.options.providerShortTag : '';
-         var positive = typeof item.options.positive !== "undefined" ? item.options.positive : 'up';       
-         var wmsURL = item.wmsURL;
-         var wcsURL = item.wcsURL;
-         var serverName = item.serverName;
-         $.each(item.server, function(index, item) {
-            if(item.length) {
-               var sensorName = index;
-               // Go through each layer and load it
-               $.each(item, function(i, item) {
-                  if(item.Name && item.Name !== "") {
-                     var layer = new gisportal.layer(item.Name, item.Title, 
-                        item.Abstract, "opLayers", { 
-                           "firstDate": item.FirstDate, 
-                           "lastDate": item.LastDate, 
-                           "serverName": serverName, 
-                           "wmsURL": wmsURL, 
-                           "wcsURL": wcsURL, 
-                           "sensor": sensorName, 
-                           "exBoundingBox": item.EX_GeographicBoundingBox, 
-                           "providerTag": providerTag,
-                           "positive" : positive, 
-                           "providerDetails" : item.ProviderDetails, 
-                           "offsetVectors" : item.OffsetVectors, 
-                           "tags": item.tags,
-                           "moreProviderInfo" : item.MoreProviderInfo,
-                           "moreIndicatorInfo" : item.MoreIndicatorInfo,
-                        }
-                     );
-                               
-                     layer = gisportal.checkNameUnique(layer);   
-                     gisportal.layers[layer.id] = layer;
-                     // Each layer tag needs to be lowercase so that they can compare
-                     if (layer.tags)  {
-                        var tags = [];
-                        $.each(layer.tags, function(d, i) {
-                           if (layer.tags[d])  {
-                              var value = layer.tags[d];
-                              if (value instanceof Object) {
-                                 value = _.map(layer.tags[d], function(d) { return d.toLowerCase(); });
-                              }
-                              else  {
-                                 value = value.toLowerCase();
-                              }
-                              tags.push({
-                                 "tag" : d.toString(), 
-                                 "value" : value
-                              }); 
-                           }
-                        });
-                     }
-                     
-                     layers.push({
-                        "meta" : {
-                           'id': layer.id,
-                           'name': layer.name, 
-                           'provider': providerTag,
-                           'positive': positive, 
-                           'title': layer.displayTitle, 
-                           'abstract': layer.productAbstract,
-                           'tags': tags,
-                           'bounds': layer.exBoundingBox,
-                           'firstDate': layer.firstDate,
-                           'lastDate': layer.lastDate
-                        },
-                        "tags": layer.tags
-                     });                         
-                  }
-               });
-            }
-         });
-      }
+
+   // Loop over each server
+   gisportal.cache.wmsLayers.forEach(function( server ){
+      processServer( server );
    });
-  
-   if (layers.length > 0)  {
-      layers.sort(function(a,b)  {
-         if (a.meta.name && b.meta.name)  {
-            var a = a.meta.name.toLowerCase();
-            var b = b.meta.name.toLowerCase();
-            if (a > b) return 1;
-            if (a < b) return -1;
-         }
-         return 0;
-      });
-   }
-   
+
+   // Processing the indicators at each indicator
+   function processServer( server ){
+      for(var sensorName in server.server ){
+         server.server[sensorName].forEach(function( indicator ){
+            processIndicator( server, sensorName, indicator );
+         });
+      };
+   };
+
+   // Turn an indicator into a later and adding to gisporta.layers
+   function processIndicator( server, sensorName, indicator ){
+
+      var layerOptions = { 
+         //new
+         "name": indicator.Name,
+         "title": indicator.Title,
+         "productAbstract": indicator.productAbstract,
+         "type": "opLayers",
+
+         //orginal
+         "firstDate": indicator.FirstDate, 
+         "lastDate": indicator.LastDate, 
+         "serverName": server.serverName, 
+         "wmsURL": server.wmsURL, 
+         "wcsURL": server.wcsURL, 
+         "sensor": sensorName, 
+         "exBoundingBox": indicator.EX_GeographicBoundingBox, 
+         "providerTag": server.options.providerShortTag,
+         "positive" : server.options.positive, 
+         "providerDetails" : indicator.ProviderDetails, 
+         "offsetVectors" : indicator.OffsetVectors, 
+         "tags": indicator.tags,
+         "moreProviderInfo" : indicator.MoreProviderInfo,
+         "moreIndicatorInfo" : indicator.MoreIndicatorInfo,
+      };
+
+      var layer = new gisportal.layer( layerOptions );
+
+      // If theres a duplicate id, increase a counter
+      var postfix = "";
+      while( gisportal.layers[layer.id + postfix ] !== void(0) )
+         postfix++; // will convert the "" into a number
+
+      gisportal.layers[layer.id + postfix] = layer;
+
+   };
+
    var state = gisportal.cache.state;
    gisportal.layersLoaded = true;
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
@@ -526,12 +445,6 @@ gisportal.mapInit = function() {
       ]
    });
 
-   // This feature is currently deprecated but it allows
-   // Cesium to be used for 3D globes.   
-   //map.setupGlobe(map, 'map', {
-      //is3D: false,
-      //proxy: '/service/proxy?url='
-   //});
 
    map.events.on({
       moveend: triggerMoveend,
@@ -552,12 +465,6 @@ gisportal.mapInit = function() {
    // Create the base layers and then add them to the map
    gisportal.createBaseLayers();
    
-   // Create the reference layers and then add them to the map
-   //gisportal.createRefLayers();
-
-   /* 
-    * Set up event handling for the map 
-    */
    
    // Create map controls identified by key values which can be activated and deactivated
    gisportal.mapControls = {
@@ -605,18 +512,7 @@ gisportal.initWMSlayers = function(data, opts) {
    }
 };
 
-/**
- * The initiation of WMS layers, such as adding to gisportal.cache.
- * @param {object} data - The actual layer
- * @param {object} opts - Options, not currently used
- */ 
-gisportal.initWFSLayers = function(data, opts) {
-   if (data !== null)  {
-      gisportal.cache.wfsLayers = data;
-      // Create WFS layers from the data
-      gisportal.createRefLayers();
-   }
-};
+
 
 /*===========================================================================*/
 
@@ -628,12 +524,7 @@ gisportal.nonLayerDependent = function() {
    // Keeps the vectorLayers at the top of the map
    map.events.register("addlayer", map, function() { 
        // Get and store the number of reference layers
-      var refLayers = map.getLayersBy('type', 'refLayers');
       var poiLayers = map.getLayersBy('type', 'poiLayer');
-
-      $.each(refLayers, function(index, value) {
-         map.setLayerIndex(value, map.layers.length - index - 1);
-      });
 
       $.each(poiLayers, function(index, value) {
          map.setLayerIndex(value, map.layers.length - 1);
@@ -893,6 +784,13 @@ gisportal.setState = function(state) {
  */
 gisportal.main = function() {
 
+   if( gisportal.config.browserRestristion ){
+      if( gisportal.validateBrowser() == false )
+         return;
+   }
+      
+
+
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
    } else {
@@ -961,7 +859,6 @@ gisportal.main = function() {
       // so that they can be styled with CSS
       // which cannot be done with SVG in background-image
       // or <img>
-      gisportal.replaceAllIcons(); 
       
    });
 };
@@ -1013,38 +910,24 @@ gisportal.zoomOverall = function()  {
 };
 
 /**
- * Replaces all icons with the actual SVG.
- */
-gisportal.replaceAllIcons = function()  {
-   gisportal.replaceSubtreeIcons('body');
-};
-
-/**
- * Replaces icons in a DOM subtree with the actual SVG.
- * @param {jQuery Element} el - The parent of the subtree
- */
-gisportal.replaceSubtreeIcons = function(el)  {
-   $.each($('.icon-svg', el).not(".bg-removed, .bg-being-removed"), function(i,e)  {
-      var e = $(e); 
-      e.addClass('bg-being-removed');
-      var url = e.css('background-image').replace('url(','').replace(')','').replace(/\"/g, "");
-      $.ajax({
-         url: url,
-         dataType: "xml"
-      }).done(function(svg){
-         var ele = document.importNode(svg.documentElement,true);
-         e.prepend(ele);
-         e.addClass('bg-removed');
-         e.removeClass('bg-being-removed');
-      });
-   });
-};
-
-/**
  * Replace links on start splash from config file
  * Should probably be using Mustache for this
  */
 gisportal.initStart = function()  {
+   
+   var autoLoad = null;
+   if( gisportal.config.skipWelcomePage == true )
+      if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
+         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+      else
+         var autoLoad = function(){ gisportal.launchMap(); };
+
+   else if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
+      var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+
+   if( autoLoad != null)
+      return setTimeout(autoLoad, 1000);
+
 
    var data = {
       homepageSlides  : gisportal.config.homepageSlides,
@@ -1061,10 +944,11 @@ gisportal.initStart = function()  {
      disableScroll: false,
    });
 
+
    // Load there previously saved state
    $('.js-load-last-state').click(function(){
+      gisportal.launchMap();
       gisportal.loadState( gisportal.getAutoSaveState() );
-      setInterval( gisportal.autoSaveState, 60000 );
    });
    
    $('.js-tac-content').html( gisportal.templates['terms-and-conditions-text']() );
@@ -1196,3 +1080,40 @@ function portalLocation(){
    path = path.substring( 0, endSlash + 1 );
    return origin + path;
 };
+
+
+/**
+ * Check the users version of the portal is valid.
+ *  - If the browser is valid it return true
+ *  - If the browser is NOT valid is returns false and those an error
+ */
+
+gisportal.validateBrowser = function(){
+   if( gisportal.config.browserRestristion == void(0) )
+      return true;
+
+   var level = gisportal.config.browserRestristion;
+   if( level == "none" )
+      return true;
+
+   var requirements = [ 'svg', 'boxsizing', 'csscalc','inlinesvg' ];
+
+   var valid = true;
+   for( var i =  0; i < requirements.length; i++ )
+      valid = (valid &&  Modernizr[requirements[i]] )
+
+   if( valid )
+      return true;
+
+   if( gisportal.config.browserRestristion == "advisory" ){
+      alert('Your browser is out of date, this site will not work correctly, if at all.');
+      return false;
+   }else if( gisportal.config.browserRestristion == "strict" ){
+      $('.js-browse-not-compatible').show();
+      $('.js-start').hide();
+      return false;
+   }else{
+      throw new Error( 'Invalid config.browserRestristion value "' + gisportal.config.browserRestristion + '"' );
+   }
+
+}

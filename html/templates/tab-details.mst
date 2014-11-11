@@ -1,4 +1,4 @@
-<input type="radio" id="tab-{{id}}-details" name="tabs-{{modifiedName}}" data-tab-name="details" {{#if_equals visibleTab "details"}}checked{{/if_equals}} class="js-tab-trigger panel-tab-trigger">
+<input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
    <tbody>
       {{#if providerDetails.website}}
@@ -9,7 +9,7 @@
       {{!-- <tr><td>Region</td><td>{{tags.region}}</td></tr> --}}
       <tr><td>Interval</td><td>{{tags.interval}}</td></tr>
       <tr><td>Ecosystem element</td><td>{{tags.Ecosystem_Element}}</td></tr>
-      <tr><td>EU MSFD Descriptor</td><td>{{#tags.MSFD}}{{.}}{{# if @last }} {{else}}, {{/if}} {{/tags.MSFD}}</td></tr>
+      <tr><td>EU MSFD Descriptor</td><td>{{str_join tags.MSFD ", "}}</td></tr>
       <tr><td>Bounding box</td><td>
          <label>{{round exBoundingBox.NorthBoundLatitude 2}}</label> N, 
          <label>{{round exBoundingBox.EastBoundLongitude 2}}</label>   E, 

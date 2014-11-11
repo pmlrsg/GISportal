@@ -49,6 +49,5 @@ gisportal.map_settings.init = function() {
       $('#select-basemap').val(gisportal.config.defaultBaseMap);
       map.setBaseLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);
    }
-
 };
 

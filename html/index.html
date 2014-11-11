@@ -15,10 +15,13 @@
 
 <!-- ============================ JavaScript libraries ============================ -->
 <!-- Latest jQuery from jQuery.com -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 <!-- jQuery UI -->
-<script src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+<!-- Modernizer -->
+<script src="js-libs/modernizr.js"></script>
 
 
 <!-- jQuery no UI slider -->
@@ -53,6 +56,11 @@
 <!-- jStorage - Used for large local storage -->
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
 
+
+<!-- Dropdown Library - Pulled from bootstrap -->
+<link rel="stylesheet" type="text/css" href="js-libs/dropdowns/bootstrap.css" />
+<script type="text/javascript" src="js-libs/dropdowns/bootstrap.min.js"></script>
+
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="GISPortal.js"></script>
 
@@ -62,6 +70,13 @@
    <!-- The start page,
          this should load before anything else. -->
     <div class="start overlay js-start-container" style="display:none;"></div>
+
+
+    <div class="browse-not-compatible  overlay js-browse-not-compatible">
+      <h3>Browser out of date</h3>
+      <p>We have detected that your Internet browser does not
+      have the requirements needed to run the portal. Please update to a newer version.</p>
+    </div>
 
    <!-- JavaScript check -->
    <noscript>
@@ -75,9 +90,9 @@
 
    <!-- The Timeline -->
    <div class="timeline-container">
-      <div class="timeline-inner grid">
-         <ul class="js-timeline-labels timeline-labels grid-cell"></ul>
-         <div id="timeline" class="grid-cell fill"></div>
+      <div class="timeline-inner">
+         <ul class="js-timeline-labels timeline-labels"></ul>
+         <div id="timeline" class=""></div>
          <div class="js-current-date current-date"></div>
       </div>
    </div>
@@ -95,10 +110,10 @@
                <span  class="icon-connection-2"></span>
             </div>
             <div data-panel-name="map-settings" class="js-show-panel tab ">
-               <span  class="icon-map-1"></span>
+               <span  class="icon-map-1" title="Display settings"></span>
             </div>
             <div data-panel-name="history" class="js-show-panel tab ">
-               <span  class="icon-briefcase"></span>
+               <span  class="icon-briefcase" title="Stored graphs"></span>
             </div>
             <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
         </div>
@@ -155,7 +170,7 @@
                  Region
                  <span class="icon_arrow"></span>
               </label>
-              <ul id="refine-region" class=" fake-select panel-list grid-list">
+              <ul id="refine-region" class=" fake-select panel-list">
               </ul>
            </div>
            
@@ -166,7 +181,7 @@
                  Interval
                  <span class="icon_arrow"></span>
               </label>
-              <ul id="refine-interval" class=" fake-select panel-list grid-list">
+              <ul id="refine-interval" class=" fake-select panel-list ">
               </ul>
            </div>
 
@@ -176,7 +191,7 @@
                  Provider
                  <span class="icon_arrow"></span>
               </label>
-              <ul id="refine-provider" class=" fake-select panel-list grid-list">
+              <ul id="refine-provider" class=" fake-select panel-list ">
               </ul>
            </div>
 
@@ -186,7 +201,7 @@
                  Reliability
                  <span class="icon_arrow"></span>
               </label>
-              <ul id="refine-reliability" class=" fake-select panel-list grid-list">
+              <ul id="refine-reliability" class=" fake-select panel-list ">
               </ul>
            </div>
            
@@ -201,6 +216,9 @@
       <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
          <ul class="js-indicators indicator-list grid-list">
          </ul>
+         <div class="panel-container-solid-backdrop" >
+            <button class="js-set-layer-order hidden button brand" title="Set Layer Order">Set Layer Order</button> 
+         </div>
       </div>
       
       <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
@@ -230,7 +248,7 @@
           <div class="js-states-saved-list"></div>
         </div>
         <div class="panel-container-solid-backdrop" >
-          <h3>Stored Plots</h3>
+          <h3>Stored Graphs</h3>
           <div>
             <div class="js-graphs-saved-list" ></div>
             <div class="js-graphs-history-list" ></div>
@@ -256,7 +274,7 @@
 
 
       <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
-        <div class="slideout-pulltab js-slideout-pulltab-toggle-peak"></div>
+        <div class="slideout-pulltab js-slideout-toggle-peak"></div>
         <div class="panel-slideout-content-wrapper">
           <div class=" panel-slideout-content js-slideout-content"></div>
         </div>

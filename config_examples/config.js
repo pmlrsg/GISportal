@@ -13,10 +13,20 @@
 
 gisportal.config = {
    siteMode: "development", //(development|production)
+
+    // Skip start screen only is the user has a saved state, requires T&C
+   autoResumeSavedState: false,
+   
+   // Always skip the welcome page, also skips T&C
+   skipWelcomePage: false,
+
+   // Do we require terms and conditions agreement to use the portal
+   requiresTermsAndCondictions: true,
+
    browseCategories : {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
-      "MSFD" : "EU MSFD"
+      "MSFD" : "EU MSFD Descriptor"
    },
    paths: {
     graphServer: 'http://localhost:3000/',
@@ -47,8 +57,11 @@ gisportal.config = {
       "img/homepage-slides/opec5.jpg",
       "img/homepage-slides/opec6.jpg",
       "img/homepage-slides/opec7.jpg"
-   ]
-   
+   ],
+
+   // Deny access to older browsers
+   // none=Allow, advisory=Tell them only, strict=Stop them
+   browserRestristion: "strict" //(none|advisory|strict)
 
 };
 
