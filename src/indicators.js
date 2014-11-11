@@ -355,9 +355,6 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       });
       $(".sortable-list").disableSelection();
       
-   });
-
-
       gisportal.events.trigger('layer.addtopanel', data)
    });
 };
@@ -390,7 +387,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
    if (layer) {
       var name = layer.name.toLowerCase();
       options.visible = true;
-      gisportal.getLayerData(layer.serverName + '_' + layer.origName + '.json', layer, options);
+      gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
       
       gisportal.events.trigger('layer.select', id, gisportal.layers[id].name)
    }
