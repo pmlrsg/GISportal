@@ -5,6 +5,8 @@ Authors:
 > Martyn J Atkins  
 > Robert Beecher-Brigden  
 > Shane Hudson  
+> Ben Calton
+> Kieran Jones
 
 Copyright (c) 2013 PML Applications Ltd  
 http://www.pml-applications.co.uk/
