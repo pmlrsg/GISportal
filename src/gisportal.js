@@ -446,6 +446,18 @@ gisportal.mapInit = function() {
    });
 
 
+   map.events.on({
+      moveend: triggerMoveend,
+      zoomend: triggerZoomend
+   });
+
+   function triggerMoveend () {
+      gisportal.events.trigger('map.move', map.getCenter());
+   }
+   function triggerZoomend () {
+      gisportal.events.trigger('map.zoom', map.getScale());
+   }
+
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
    gisportal.loadLayers();
@@ -839,6 +851,10 @@ gisportal.main = function() {
          console.log('Loading Default State...');
       }
 
+      // if collaboration features are enabled, switch 'em on...
+      if (collaboration.enabled) {
+         collaboration.initDOM();
+      }
       // Replaces all .icon-svg with actual SVG elements,
       // so that they can be styled with CSS
       // which cannot be done with SVG in background-image

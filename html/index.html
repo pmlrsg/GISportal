@@ -69,7 +69,7 @@
    
    <!-- The start page,
          this should load before anything else. -->
-    <div class="start overlay js-start-container"></div>
+    <div class="start overlay js-start-container" style="display:none;"></div>
 
 
     <div class="browse-not-compatible  overlay js-browse-not-compatible">
@@ -106,6 +106,9 @@
          <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
          <div class="pull-right">
+            <div data-panel-name="collaboration" class="js-show-panel tab hidden">
+               <span  class="icon-connection-2"></span>
+            </div>
             <div data-panel-name="map-settings" class="js-show-panel tab ">
                <span  class="icon-map-1" title="Display settings"></span>
             </div>
@@ -218,6 +221,21 @@
          </div>
       </div>
       
+      <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
+         <div class="panel-container-solid-backdrop">
+            <h3>Collaboration</h3>
+            <p>To find out more about sharing a session please have a look at the <a href="sharing" class="">collaboration help page</a></p>
+
+            <div id="gSignInWrapper">
+               <div id="gSignInButtonHolder">
+                  <a href="javascript:void(0)" class="js-google-auth-button"><img src="img/sign-in-with-google.png" width="200" /></a>
+               </div>
+            </div>
+
+            <div class="js-collaboration-holder hidden"></div>
+         </div>
+      </div>
+
       <div id="mapSettingsPanel" data-panel-name="map-settings" class="panel-container">
          <div class="panel-container-solid-backdrop js-map-options">
             
@@ -324,6 +342,10 @@
       <span class="icon-zoom-out btn" id="mapZoomOut"></span>
     </div>
    <div class="global-loading-icon">
+   </div>
+
+   <div id="sb">
+      <audio src="img/s.mp3" preload="auto"></audio>
    </div>
 </body>
 </html>
