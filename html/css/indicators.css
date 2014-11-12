@@ -134,6 +134,11 @@
    margin-top: 20px;
 }
 
+.indicator-list {
+   overflow: auto;
+   position: static;
+}
+
 .indicator-header-icon{
   font-size: 23px;
   width: 35px;
