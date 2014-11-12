@@ -46,7 +46,7 @@
 }
 
 .steps > li  {
-   padding: 20px 20px 20px 0;
+   padding: 16px;
 }
 
 
@@ -73,7 +73,7 @@
 
 .analysis-add-series{
    display: none;
-   background-color: #B3AE3F;
+   /*background-color: #B3AE3F;*/
    float: right;
 }
 
@@ -127,11 +127,6 @@
 
 .bbox-info dt  {
    margin: 0 10px 0 5px;
-}
-
-.create-graph  {
-   float: right;
-   margin-top: 20px;
 }
 
 .indicator-list {
