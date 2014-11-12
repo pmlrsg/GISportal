@@ -4,8 +4,6 @@
       <div class="indicator-name">{{descriptiveName}}</div>
 
       <div class="indicator-actions">
-         <label class="js-icon-change-order icon-btn icon-scroll-vertical-2 indicator-header-icon" for="{{name}}" title="Change Layer Order"></label>
-
          <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
          
          <span class="{{active visibleTab "dimensions"}} js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon js-indicator-tab-trigger" data-tab-name="dimensions" for="tab-{{id}}-dimensions" title="Layer Settings"></span>
