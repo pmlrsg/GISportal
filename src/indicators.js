@@ -440,7 +440,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       $('#tab-' + indicator.id + '-opacity').noUiSlider({
          start: [ indicator.opacity * 100 ],
-         step: 10,
          margin: 20,
          connect: "lower",
          range: {
