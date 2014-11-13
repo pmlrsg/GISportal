@@ -461,7 +461,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          $(this).html(parseInt(value) +'%');
       }
 
-      $('#tab-' + indicator.id + '-opacity').on('set', function() {
+      $('#tab-' + indicator.id + '-opacity').on('slide', function() {
          gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
       });
 
