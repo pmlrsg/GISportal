@@ -185,8 +185,6 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.indicatorsPanel.reorderLayers(layers);
       }
    });
-   $(".sortable-list").disableSelection();
-
 };
 
 gisportal.events.bind('metadata.close', function() {
