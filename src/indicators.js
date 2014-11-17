@@ -168,16 +168,22 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
    });
 
+   // make the selected indicators list sortable, and the event to fire after sorting
+   $('ul.js-indicators').addClass('sortable-list');
 
-   $('.js-set-layer-order').on('click', function() {
-      // show the details again and then turn off sortable   
-      $('.indicator-header').toggleClass('moveable', false);
-      $('.indicator-actions').toggleClass('hidden', false);
-      $('.indicator-properties').toggleClass('hidden', false);
-      $('.sortable-list').sortable('destroy');
-      $('.js-set-layer-order').toggleClass('hidden', true);
-      $('ul.js-indicators').removeClass('sortable-list');
-
+   $(".sortable-list").sortable({
+      start: function(event, ui) {
+         $(ui.item).children('.indicator-header').addClass('indicator-header-moving');
+      },
+      stop : function(event, ui) {
+         $(ui.item).children('div.indicator-header').removeClass('indicator-header-moving'); 
+         // change the layer order
+         var layers = [];
+         $('.sortable-list .indicator-header').each(function() {
+            layers.push($(this).data('provider') + ': ' + $(this).data('name'));
+         })
+         gisportal.indicatorsPanel.reorderLayers(layers);
+      }
    });
 
 
@@ -309,54 +315,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       maxWidth: 200
    });
 
-   // make the selected indicators list sortable, and the event to fire after sorting
-   $('.js-icon-change-order').click(function() { 
-      $('ul.js-indicators').addClass('sortable-list');
-      $('.indicator-header').toggleClass('moveable', true);
-      $('.indicator-properties').toggleClass('hidden', true);
-      $('.indicator-actions').toggleClass('hidden', true);
-      $('.js-set-layer-order').toggleClass('hidden', false);
-
-      // add/remove the tooltips
-      var layerTooltip = gisportal.templates['tooltip-layerordermove']( layer );
-      $('.js-indicators.sortable-list').tooltipster({
-         contentAsHTML: true,
-         content: layerTooltip,
-         position: "right",
-         maxWidth: 300
-      });
-      $('.js-indicators.sortable-list').tooltipster('show');
-
-      $(".sortable-list").sortable({
-         start: function(event, ui) {
-            $(ui.item).children('.indicator-header').addClass('indicator-header-moving');
-            try {
-               $('.js-indicators.sortable-list').tooltipster('destroy');
-               $('.js-indicators.sortable-list').attr('title', '');
-            } catch(err) {
-               // no need to do anything, it's quite possible the tooltip has already been destroyed
-            };
-         },
-         stop : function(event, ui) {
-            $(ui.item).children('div.indicator-header').removeClass('indicator-header-moving'); 
-            // change the layer order
-            var layers = [];
-            $('.sortable-list .indicator-header').each(function() {
-               layers.push($(this).data('provider') + ': ' + $(this).data('name'));
-            })
-            gisportal.indicatorsPanel.reorderLayers(layers);
-            try {
-               $('.js-indicators.sortable-list').tooltipster('destroy');
-               $('.js-indicators.sortable-list').attr('title', '');
-            } catch(err) {
-               // no need to do anything, it's quite possible the tooltip has already been destroyed
-            };
-         }
-      });
-      $(".sortable-list").disableSelection();
-      
-      gisportal.events.trigger('layer.addtopanel', data)
-   });
+   gisportal.events.trigger('layer.addtopanel', data)
 };
 
 gisportal.indicatorsPanel.reorderLayers = function(layers) {
@@ -491,7 +450,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       $('#tab-' + indicator.id + '-opacity').noUiSlider({
          start: [ indicator.opacity * 100 ],
-         step: 10,
          margin: 20,
          connect: "lower",
          range: {
@@ -512,7 +470,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          $(this).html(parseInt(value) +'%');
       }
 
-      $('#tab-' + indicator.id + '-opacity').on('set', function() {
+      $('#tab-' + indicator.id + '-opacity').on('slide', function() {
          gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
       });
 
