@@ -320,26 +320,39 @@ gisportal.TimeLine.prototype.redraw = function() {
       
    //--------------------------------------------------------------------------
    
-   // Position the date time detail lines (if available) for each time bar
-   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
-
-   this.dateDetails.enter().append('svg:g')
-      .each(function(d1, i1) {
+   function updateLines(d1, i1) {
          if(d1.type == 'layer')  {
             // Time Bar
-            d3.select(this).selectAll('g').data(d1.dateTimes)  // <-- second level data-join
-              .enter().append('svg:line')
+            var takenSpaces = {};
+            var dateTimes = d1.dateTimes.filter(function( dateStr ){
+               var x = d3.round(self.xScale(new Date(dateStr)) + 0.5);
+               if( takenSpaces[x] === true )
+                  return false;
+               takenSpaces[x] = true;
+               return (0 < x && x < self.width);
+            });
+
+            var g = d3.select(this).selectAll('line').data(dateTimes, function(d) { return(d); });  // <-- second level data-join
+             g.enter().append('svg:line')
                .attr('stroke', '#59476D')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
+            g.exit()
+              .remove();
          }
-      });
-      
-   //--------------------------------------------------------------------------
+      }
+   // Position the date time detail lines (if available) for each time bar
+   this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
+
+   // Add new required g elements
+   this.dateDetails.enter().append('svg:g')
    
-   // Date detail removal at time bar level
+   // Remove unneeded g elements
    this.dateDetails.exit().remove(); 
+
+   // Update all elements!
+   this.dateDetailArea.selectAll('g').attr('d', updateLines);
    
    // Re-scale the x values for all the detail lines for each time bar
    this.main.selectAll('.detailLine')

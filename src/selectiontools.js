@@ -25,7 +25,8 @@ gisportal.selectionTools.init = function()  {
       onFeatureInsert : function(feature) {
          gisportal.selectionTools.ROIAdded(feature);
       },
-      rendererOptions: { zIndexing: true }
+      rendererOptions: { zIndexing: true },
+      renderers: ['Canvas', 'VML']
    });
    
    vectorLayer.controlID = "poiLayer";
