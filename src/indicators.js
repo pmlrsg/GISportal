@@ -185,6 +185,16 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.indicatorsPanel.reorderLayers(layers);
       }
    });
+
+
+   $('.js-indicators').on('click', '.js-select-layer-tab', function(){
+      var layerId = $(this).closest('[data-id]').data('id');
+      var tabName = $(this).closest('[data-tab-name]').data('tab-name');
+      gisportal.indicatorsPanel.selectTab( layerId, tabName );
+   });
+
+
+
 };
 
 gisportal.events.bind('metadata.close', function() {

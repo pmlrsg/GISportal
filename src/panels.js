@@ -22,7 +22,7 @@ gisportal.panels.showPanel = function(panelName) {
 		});
 	}
 	gisportal.panels.activePanel = panelName;
-
+	gisportal.events.trigger('panels.showpanel', panelName);
 };
 
 gisportal.panels.bind('close-panel', function(ev, data) {

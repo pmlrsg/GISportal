@@ -33,6 +33,7 @@
       "src/graphs/histogram.js",
       "src/utils.js",
       "src/map-settings.js",
+      "src/collaboration.js",
       "src/analytics.js"
    ]
 }
