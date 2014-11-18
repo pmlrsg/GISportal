@@ -252,8 +252,8 @@ collaboration.userAuthorised = function() {
 
 	var data = {
 		user : {
-			fullname : 'Bob Monkhouse',
-			email : 'bob@nowhere.com'
+			fullname : '<Full Name>',
+			email : '<email address>'
 		}
 	}
 	
