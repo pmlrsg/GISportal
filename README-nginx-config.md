@@ -10,6 +10,10 @@ upstream node_servers {
     server localhost:6789;
 }
 
+upstream plotting_servers {
+    server localhost:8112;
+}
+
 server {
     listen *:80;
 
@@ -25,8 +29,14 @@ server {
         try_files @uri @location_socketio;
     }
 
+    # any request for collaboration services will be sent via /node so send this to the node collaboration servers
     location /node {
         try_files @uri @location_node;
+    }
+
+    # any request for eplotting services will be sent via /plotting so send this to the node plotting servers
+    location /plotting {
+        try_files @uri @location_plotting_node;
     }
 
     # handle middleware requests and send them to the uwsgi proxy
@@ -80,6 +90,13 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+    }
+
+    location @location_plotting_node {
+        # rewrite request path to take the /plotting/ part out
+        rewrite ^/plotting/(.*) /$1 break;
+        proxy_pass http://plotting_servers;
+        proxy_http_version 1.1;
     }
 
     location @location_socketio {
