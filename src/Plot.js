@@ -295,7 +295,8 @@ gisportal.graphs.Plot =(function(){
       $.ajax({
          method: 'post',
          url: graphServerUrl + '/plot',
-         data: JSON.stringify(request),
+         contentType : 'application/json',
+         data: JSON.stringify({ request: request }),
          dataType: 'json',
          success: function( data ){
             
