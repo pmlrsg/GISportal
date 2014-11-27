@@ -132,6 +132,13 @@ gisportal.graphs.Plot =(function(){
       plotRequest.type = this.plotType();
       plotRequest.title = this.title();
       plotRequest.style = "basic";
+      plotRequest.downloadTypes = [
+         { key: 'csv', label: 'CSV' },
+         { key: 'png', label: 'PNG' },
+         { key: 'meta-data', label: 'Meta Data' },
+         { key: 'logos', label: 'Logos' },
+         { key: 'svg', label: 'SVG' }
+      ];
    }
    
 
@@ -243,19 +250,19 @@ gisportal.graphs.Plot =(function(){
       var totalCount = 0;
       for( var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
-         var indicator = gisportal.layers[ component.indicator ];
+         var layer = gisportal.layers[ component.indicator ];
 
-         var groupKey = indicator.descriptiveName;
+         var groupKey = layer.descriptiveName;
 
          var meta = "";
 
-         meta += "Region: " + indicator.tags.region + "<br>";
-         meta += "Confidence: " + indicator.tags.Confidence + "<br>";
-         meta += "Provider: " + indicator.providerTag + "<br>";
-         meta += "Interval: " + indicator.tags.interval + "<br>";
+         meta += "Region: " + layer.tags.region + "<br>";
+         meta += "Confidence: " + layer.tags.Confidence + "<br>";
+         meta += "Provider: " + layer.providerTag + "<br>";
+         meta += "Interval: " + layer.tags.interval + "<br>";
 
          if( component.elevation )
-            meta += "Depth: " + component.elevation + indicator.elevationUnits + "<br>";
+            meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
 
          if( component.bbox )
             meta += "BBox: " + component.bbox + "<br>";
@@ -263,20 +270,20 @@ gisportal.graphs.Plot =(function(){
          var newSeries = {
             "handler" : "OPEC_SERVICE_WCS",
             "data_source" : {
-               "coverage"  : indicator.urlName,
+               "coverage"  : layer.urlName,
                "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
                "bbox": component.bbox,
                "depth": component.elevation,
                
-               "threddsUrl"  : indicator.wcsURL,
-               "metaCacheUrl" : indicator.cacheUrl(),
+               "threddsUrl"  : layer.wcsURL,
+               "metaCacheUrl" : layer.cacheUrl(),
                "middlewareUrl" : gisportal.middlewarePath + '/wcs'
             },
-            "label": (++totalCount) + ') ' + indicator.descriptiveName,
+            "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
             "type": "line",
-            "meta": meta
-            
+            "meta": meta,
+            "logo": layer.provider.logo
          };
          seriesArray.push( newSeries );
       }
