@@ -512,6 +512,9 @@ gisportal.mapInit = function() {
       ]
    });
 
+   // Add a makers layer for SOS markers
+   var markers = new OpenLayers.Layer.Markers( "markers" );
+   map.addLayer(markers);
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.

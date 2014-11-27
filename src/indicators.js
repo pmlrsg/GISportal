@@ -292,9 +292,22 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       .toggleClass('hidden', false)
       .toggleClass('active', gisportal.layers[id].isVisible);
 
-   gisportal.indicatorsPanel.scalebarTab(id);
-   gisportal.indicatorsPanel.detailsTab(id);
-   gisportal.indicatorsPanel.analysisTab(id);
+   if (layer.type == 'opLayers') {
+      gisportal.indicatorsPanel.scalebarTab(id);
+      gisportal.indicatorsPanel.detailsTab(id);
+      gisportal.indicatorsPanel.analysisTab(id);
+   } 
+   if (layer.type == 'sosLayers') {
+      gisportal.indicatorsPanel.detailsTab(id);
+
+      // add the marker to the map.markers layer
+      var size = new OpenLayers.Size(48,48);
+      var offset = new OpenLayers.Pixel(-(size.w/2), -size.h);
+      var icon = new OpenLayers.Icon('https://cdn1.iconfinder.com/data/icons/Map-Markers-Icons-Demo-PNG/48/Map-Marker-Marker-Outside-Chartreuse.png',size,offset);
+      
+      var markers = map.getLayersByName('markers');
+      markers.addMarker(new OpenLayers.Marker(new OpenLayers.LonLat(0,0),icon));
+   } 
 
    //Add the scale bar tooltip
    var renderedTooltip = gisportal.templates['tooltip-scalebar']( layer );

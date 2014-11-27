@@ -125,11 +125,12 @@ def createCache(server, capabilitiesXML, coverageXML):
             if coverage == None:
                print serverTitle + "  " + name + " could not be found in DescribeSensor. Not including."
                continue
-            
-            offsetVectorsArray = coverage.findall( './/%soffsetVector' % (GML_NAMESPACE) )
-            offsetVectors = []
-            for i in range( 0 , len( offsetVectorsArray )):
-               offsetVectors.append(float(offsetVectorsArray[i].text.split(" ")[i]))
+
+                        
+            # offsetVectorsArray = coverage.findall( './/%soffsetVector' % (GML_NAMESPACE) )
+            # offsetVectors = []
+            # for i in range( 0 , len( offsetVectorsArray )):
+            #    offsetVectors.append(float(offsetVectorsArray[i].text.split(" ")[i]))
             
             exGeographicBoundingBox = {"WestBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%swestBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
                                        "EastBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%seastBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
