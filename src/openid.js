@@ -87,16 +87,23 @@ gisportal.openid.getLink = function()  {
       $('.share').toggleClass('hidden', true);
    });
 
-  gisportal.genericAsync('POST', gisportal.stateLocation, { state: JSON.stringify(gisportal.getState())}, function(data, opts) { 
-      if (data['output']['url']) {
-         console.log(data['output']);
-         $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+   $.ajax({
+      method: 'POST',
+      url: gisportal.stateLocation,
+      data: {
+         state: JSON.stringify(gisportal.getState())
+      },
+      dataType: 'json',
+      success: function( data ) { 
+         if (data['output']['url']) {
+            $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+         }
+      },
+      error: function( request, errorType, exception ) {
+         if (exception === 'UNAUTHORIZED')
+            gisportal.openid.showLogin();
       }
-   }, 
-   function(request, errorType, exception) {
-      console.log(request, errorType, exception);
-      if (exception === 'UNAUTHORIZED') gisportal.openid.showLogin();
-   }, 'json', {});
+   });
 };
 
 gisportal.openid.showShare = function()  {
@@ -106,17 +113,15 @@ gisportal.openid.showShare = function()  {
    }
 };
 
-gisportal.openid.logout = function() { gisportal.genericAsync('GET', gisportal.openid.logoutLocation, null, function(data, opts) {
-      console.log(data); 
-      if (data == '200')  {
+gisportal.openid.logout = function() { 
+
+   $.ajax({
+      url: gisportal.openid.logoutLocation,
+      success: function( data ) {
          gisportal.openid.loggedIn = false;
          gisportal.openid.showLogin();
       }
-   }, 
-   function(request, errorType, exception) {
-      console.log(request, errorType, exception);
-      if (exception === 'UNAUTHORIZED') gisportal.openid.showLogin();
-   }, 'json', {});
+   });
 };
 
 gisportal.openid.login = function()  {

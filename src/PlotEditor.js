@@ -13,11 +13,11 @@ gisportal.graphs.PlotEditor = (function(){
 
       this._editorParent = $(editorParent);
 
-      this.rebuildEditor();
+      this.buildEditor();
    }
 
 
-   PlotEditor.prototype.rebuildEditor = function(){
+   PlotEditor.prototype.buildEditor = function(){
 
       var rendered = gisportal.templates['active-plot']({
          plot: this._plot,
@@ -50,6 +50,11 @@ gisportal.graphs.PlotEditor = (function(){
 
    }
 
+   /**
+    * Setup the plot title element.
+    * Adds a 2 way binding so if the INPUT is edited it updates the Plot
+    * and if the Plot is updates it updates the INPUT.
+    */
    PlotEditor.prototype.setupTitleInput = function(  ){
       var _this = this;
 
@@ -66,7 +71,11 @@ gisportal.graphs.PlotEditor = (function(){
       });
    }
 
-
+   /**
+    * Setup the plot type SELECT element.
+    * Adds a 2 way binding so if the select is edited it updates the Plot
+    * and if the Plot is updates it updates the SELECT.
+    */
    PlotEditor.prototype.setupPlotTypeSelect = function(  ){
       var _this = this;
 
@@ -126,7 +135,9 @@ gisportal.graphs.PlotEditor = (function(){
       }
    }
 
-
+   /**
+    * Updates the UI time bounds slider's currently selection
+    */
    PlotEditor.prototype.updateDateRangeSliderTBounds = function(){
 
       var tBounds = this.plot().tBounds();
@@ -145,7 +156,10 @@ gisportal.graphs.PlotEditor = (function(){
 
    }
 
-
+   /**
+    * Updates the UI time bounds slider's out bounds
+    * @return {[type]} [description]
+    */
    PlotEditor.prototype.updateDateRangeSliderBounds = function(){
       var dateRangeBounds = this.plot().dateRangeBounds();
 
@@ -335,10 +349,20 @@ gisportal.graphs.PlotEditor = (function(){
       this.plot().components().forEach( addComponent );
    }
 
+   /**
+    * Find out if the component passed in has data in range.
+    * It will then update the component element with an 
+    * attribute depending on if the component has data in 
+    * range, not in range or partially in range.
+    * 
+    * @param {Object} componentElement Component element
+    */
    PlotEditor.prototype.setComponentHasDataInRange = function( componentElement ){
+      // The the layer of the current component
       var component = $(componentElement).data('component');
       var indicator = gisportal.layers[ component.indicator ];
 
+      // Date range of the components layer
       var firstDate = new Date(indicator.firstDate);
       var lastDate = new Date(indicator.lastDate);
       
@@ -346,6 +370,7 @@ gisportal.graphs.PlotEditor = (function(){
 
       var result;
 
+      // Find the coverage
       if( firstDate <= tBounds[0] && tBounds[1] <= lastDate )
          result = "yes";
       else if(  lastDate < tBounds[0]  || tBounds[1] < firstDate )
@@ -353,19 +378,18 @@ gisportal.graphs.PlotEditor = (function(){
       else
          result = "partial";
 
+       // Set the attribute of the result
       $(componentElement).attr('has-data-in-range', result);
 
    }
 
-
-
-
+   /**
+    * Returns the Plot that this editor is editing
+    * @return {Plot} The current Plot
+    */
    PlotEditor.prototype.plot = function(){
       return this._plot;
    }
-
-
-
 
    return PlotEditor;
 })();

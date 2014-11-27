@@ -27,7 +27,6 @@ gisportal.middlewarePath = window.location.origin + gisportal.config.paths.middl
 
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
-gisportal.wfsLocation = gisportal.middlewarePath + '/wfs?';
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
 gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
@@ -38,7 +37,6 @@ OpenLayers.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Pyt
 // includes layer names, titles, abstracts, etc.
 gisportal.cache = {};
 gisportal.cache.wmsLayers = [];
-gisportal.cache.wfsLayers = [];
 
 // gisportal.layers has all of the actual layer details
 gisportal.layers = {};
@@ -125,84 +123,28 @@ gisportal.loadLayers = function() {
       gritterErrorHandler(data); 
    };
     
-   // Get WMS cache
-   gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
-   
+   //Provider cache
    $.ajax({
       url:  './cache/providers.json',
       dataType: 'json',
       success: function( providers ){
          gisportal.providers = providers;
+         loadWmsLayers();
       }
    });
 
-};
-
-/**
- * Used to show points and popup information about WFS features
- * @param {object} layer - The gisportal.layers layer
- * @param {object} olLayer - The Open Layers map layer
- * @time {string} time - The date of the feature
- */
-gisportal.getFeature = function(layer, olLayer, time) {
-   
-   var errorHandling = function(request, errorType, exception) {
-      var data = {
-         type: 'getFeature',
-         request: request,
-         errorType: errorType,
-         exception: exception,
-         url: this.url
-      };  
-      gritterErrorHandler(data); 
-   };
-  
-   var featureID = layer.WFSDatesToIDs[time];   
-   var updateLayer = function(data, opts) {
-      var output = data.output;
-      var pos = output.position.split(' ');
-      var point = new OpenLayers.Geometry.Point(pos[1], pos[0]);
-      var feature = new OpenLayers.Feature.Vector(point, {
-         message: $('<div/>').html(output.content).html(),
-         location: 'Lon: ' + pos[1] + ' Lat: ' + pos[0] 
+   function loadWmsLayers(){
+      // Get WMS cache
+      $.ajax({
+         url:  './cache/mastercache.json',
+         dataType: 'json',
+         success: gisportal.initWMSlayers,
+         error: errorHandling,
       });
-      olLayer.addFeatures(feature);
    };
-   
-   var params = {
-      baseurl: layer.wfsURL,
-      request: 'GetFeature',
-      version: '1.1.0',
-      featureID: featureID,
-      typeName: layer.urlName
-   };   
-   var request = $.param(params);   
-   
-   gisportal.genericAsync('GET', gisportal.wfsLocation, request, updateLayer, errorHandling, 'json', {layer: layer}); 
+
 };
 
-/**
- * Generic Asyc Ajax to save having lots of different ones all over the place.
- * 
- * @param {string} url - The url to use as part of the ajax call
- * @param {Object} data - The data to be sent
- * @param {Function} success - Called if everything goes ok.
- * @param {Function} error - Called if problems arise from the ajax call.
- * @param {string} dataType - What data type will be returned, xml, json, etc
- * @param {object} opts - Object to pass to success function
- */
-gisportal.genericAsync = function(type, url, data, success, error, dataType, opts) {
-   $.ajax({
-      type: type,
-      url: url, 
-      data: data,
-      dataType: dataType,
-      async: true,
-      cache: false,
-      success: function(data) { success(data, opts); },
-      error: error
-   });
-};
 
 /**
  * Create all the base layers for the map.
@@ -854,16 +796,18 @@ gisportal.main = function() {
  */
 gisportal.ajaxState = function(id) { 
    // Async to get state object
-   gisportal.genericAsync('GET', gisportal.stateLocation + '/' + id, null, function(data, opts) {         
-      if(data.output.status == 200) {
-         gisportal.setState($.parseJSON(data.output.state));
+   
+   $.ajax({
+      url: gisportal.stateLocation + '/' + id,
+      dataType: 'json',
+      success: function( data ) {         
+         gisportal.setState( data );
          console.log('Success! State retrieved');
-      } else {
+      },
+      error: function( request ){
          console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
       }
-   }, function(request, errorType, exception) {
-      console.log('Error: Failed to retrieved state. Ajax failed!');
-   }, 'json', {});
+   });
 } 
 
 /**

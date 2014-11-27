@@ -90,7 +90,7 @@ gisportal.layer = function( options ) {
 
    this.tags['providerTag'] = this.providerTag;
 
-   this.provider = gisportal.provider[ this.providerTag ]
+   this.provider = gisportal.providers[ this.providerTag ]
 
    // I do not like the metadataQueue but it is used to
    // prevent race conditions of AJAX calls such as

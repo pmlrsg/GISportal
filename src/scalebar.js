@@ -134,9 +134,14 @@ gisportal.scalebars.autoScale = function(id, force)  {
          + l.exBoundingBox.SouthBoundLatitude + ","
          + l.exBoundingBox.EastBoundLongitude + ","
          + l.exBoundingBox.NorthBoundLatitude;
-      gisportal.genericAsync('GET', OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata') , null, function(d) {
-         gisportal.scalebars.validateScale(id, d.min, d.max);
-      }, null, 'json', {});    
+
+      $.ajax({
+         url: OpenLayers.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.lonlat.projCode + '&srs=' + gisportal.lonlat.projCode + '&width=50&height=50&request=GetMetadata'),
+         dataType: 'json',
+         success: function( data ) {
+            gisportal.scalebars.validateScale(id, data.min, data.max);
+         }
+      });
    }catch(e){};
 };
 
