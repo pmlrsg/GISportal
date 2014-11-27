@@ -39,15 +39,28 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
          
          
          try:
-            url = server['services']['wms']['url'] + urllib.urlencode(server['services']['wms']['params']['GetCapabilities'])
-            print 'Getting: ' + url
-            resp = urllib2.urlopen(url, timeout=30)
-            newCapabilitiesXML = resp.read()
-            
-            url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
-            print 'Getting: ' + url
-            resp = urllib2.urlopen(url, timeout=30)
-            newCoverageXML = resp.read()
+            if 'wms' in server['services']:
+               url = server['services']['wms']['url'] + urllib.urlencode(server['services']['wms']['params']['GetCapabilities'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCapabilitiesXML = resp.read()
+
+            if 'wcs' in server['services']:
+               url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCoverageXML = resp.read()
+
+            if 'sos' in server['services']:
+               url = server['services']['sos']['url'] + urllib.urlencode(server['services']['sos']['params']['GetCapabilities'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCapabilitiesXML = resp.read()
+
+               url = server['services']['sos']['url'] + urllib.urlencode(server['services']['sos']['params']['DescribeSensor'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCoverageXML = resp.read()
             
          except urllib2.URLError as e:
             print 'Failed to open url to ' + url

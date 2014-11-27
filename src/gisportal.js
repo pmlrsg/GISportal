@@ -128,6 +128,9 @@ gisportal.loadLayers = function() {
    // Get WMS cache
    gisportal.genericAsync('GET', './cache/mastercache.json', null, gisportal.initWMSlayers, errorHandling, 'json', {}); 
    
+   // Get SOS cache
+   gisportal.genericAsync('GET', './cache/sosmastercache.json', null, gisportal.initSOSlayers, errorHandling, 'json', {}); 
+   
    $.ajax({
       url:  './cache/providers.json',
       dataType: 'json',
@@ -282,7 +285,7 @@ gisportal.setCountryBordersToTopLayer = function() {
  * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
  * iterates over each and adds to gisportal.layers 
  */
-gisportal.createOpLayers = function() {
+gisportal.createWMSLayers = function() {
    var layers = [];
 
    // Loop over each server
@@ -321,6 +324,70 @@ gisportal.createOpLayers = function() {
          "positive" : server.options.positive, 
          "providerDetails" : indicator.ProviderDetails, 
          "offsetVectors" : indicator.OffsetVectors, 
+         "tags": indicator.tags,
+         "moreProviderInfo" : indicator.MoreProviderInfo,
+         "moreIndicatorInfo" : indicator.MoreIndicatorInfo,
+      };
+
+      var layer = new gisportal.layer( layerOptions );
+
+      // If theres a duplicate id, increase a counter
+      var postfix = "";
+      while( gisportal.layers[layer.id + postfix ] !== void(0) )
+         postfix++; // will convert the "" into a number
+
+      gisportal.layers[layer.id + postfix] = layer;
+
+   };
+
+   var state = gisportal.cache.state;
+   gisportal.layersLoaded = true;
+   if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
+   gisportal.configurePanel.refreshData();
+   // Batch add here in future.
+};
+
+/** 
+ * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
+ * iterates over each and adds to gisportal.layers 
+ */
+gisportal.createSOSLayers = function() {
+   var layers = [];
+
+   // Loop over each server
+   gisportal.cache.sosLayers.forEach(function( server ){
+      processServer( server );
+   });
+
+   // Processing the indicators at each indicator
+   function processServer( server ){
+      for(var sensorName in server.server ){
+         server.server[sensorName].forEach(function( indicator ){
+            processIndicator( server, sensorName, indicator );
+         });
+      };
+   };
+
+   // Turn an indicator into a later and adding to gisporta.layers
+   function processIndicator( server, sensorName, indicator ){
+
+      var layerOptions = { 
+         //new
+         "name": indicator.Name,
+         "title": indicator.Title,
+         "productAbstract": indicator.productAbstract,
+         "type": "sosLayers",
+
+         //orginal
+         "firstDate": indicator.FirstDate, 
+         "lastDate": indicator.LastDate, 
+         "serverName": server.serverName, 
+         "sosURL": server.sosURL, 
+         "sensor": sensorName, 
+         "exBoundingBox": indicator.EX_GeographicBoundingBox, 
+         "providerTag": server.options.providerShortTag,
+         "positive" : server.options.positive, 
+         "providerDetails" : indicator.ProviderDetails, 
          "tags": indicator.tags,
          "moreProviderInfo" : indicator.MoreProviderInfo,
          "moreIndicatorInfo" : indicator.MoreIndicatorInfo,
@@ -493,10 +560,23 @@ gisportal.initWMSlayers = function(data, opts) {
    if (data !== null)  {
       gisportal.cache.wmsLayers = data;
       // Create WMS layers from the data
-      gisportal.createOpLayers();
+      gisportal.createWMSLayers();
       
       //var ows = new OpenLayers.Format.OWSContext();
       //var doc = ows.write(map);
+   }
+};
+
+/**
+ * The initiation of SOS observed property markers, such as adding to gisportal.cache.
+ * @param {object} data - 
+ * @param {object} opts - Options, not currently used
+ */ 
+gisportal.initSOSlayers = function(data, opts) {
+   if (data !== null)  {
+      gisportal.cache.sosLayers = data;
+      // Create SOS layers from the data
+      gisportal.createSOSLayers();
    }
 };
 
