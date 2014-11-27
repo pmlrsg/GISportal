@@ -843,6 +843,9 @@ gisportal.zoomOverall = function()  {
  */
 gisportal.initStart = function()  {
    
+   // Work out if we should skip the splash page
+   // Should we auto resume ?
+   // Do we have to show the T&C box first ?
    var autoLoad = null;
    if( gisportal.config.skipWelcomePage == true )
       if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
@@ -856,15 +859,17 @@ gisportal.initStart = function()  {
    if( autoLoad != null)
       return setTimeout(autoLoad, 1000);
 
-
+   // Splash page parameters
    var data = {
       homepageSlides  : gisportal.config.homepageSlides,
       hasAutoSaveState: gisportal.hasAutoSaveState()
    };
 
+   // Render the spasl page HTML
    var rendered = gisportal.templates['start']( data );
    $('.js-start-container').html( rendered );
 
+   // Start JS slider library
    window.mySwipe = new Swipe($('.homepageSlider')[0] , {
      speed: 800,
      auto: 3000,
@@ -873,12 +878,13 @@ gisportal.initStart = function()  {
    });
 
 
-   // Load there previously saved state
+   // If clicked - Load the users previously saved state
    $('.js-load-last-state').click(function(){
       gisportal.launchMap();
       gisportal.loadState( gisportal.getAutoSaveState() );
    });
    
+   // Make the terms and conditions template
    $('.js-tac-content').html( gisportal.templates['terms-and-conditions-text']() );
 
    $('.js-tac-accept').click(function(){
@@ -925,52 +931,13 @@ gisportal.launchMap = function(){
 
 }
 
+/**
+ * Returns if the user has agree to the
+ * terms and conditions in the past
+ * @return {Boolean} True is they have agreed, False if not
+ */
 gisportal.hasAgreedToTermsAndCondictions = function(){
    return gisportal.storage.get( 'tac-agreed', false );
-}
-
-
-gisportal.loading = {};
-gisportal.loading.counter = 0;
-gisportal.loading.loadingElement = jQuery('');
-gisportal.loading.loadingTimeout = null;
-
-
-/**
- * Increases the counter of how many things are currently loading
- */
-gisportal.loading.increment = function(){
-   gisportal.loading.counter++;
-   gisportal.loading.updateLoadingIcon();
-}
-
-/**
- * Drecreases the counter of how many things are currently loading
- */
-gisportal.loading.decrement = function(){
-   gisportal.loading.counter--;
-   gisportal.loading.updateLoadingIcon();
-}
-
-/**
- * Either show or hide the loading icon.
- *  A delay is added to show because layers can update in a few milliseconds causing a horrible flash
- */
-gisportal.loading.updateLoadingIcon = function(){
-   
-   if( gisportal.loading.loadingTimeout != null )
-      return ;
-   
-   gisportal.loading.loadingTimeout = setTimeout(function(){
-      gisportal.loading.loadingTimeout = null
-      if( gisportal.loading.counter > 0 ){
-         gisportal.loading.loadingElement.show();
-      
-      }else{
-         gisportal.loading.loadingElement.hide();
-      }
-   }, gisportal.loading.counter ? 300 : 600);
-
 }
 
 /**
