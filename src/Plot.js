@@ -262,18 +262,17 @@ gisportal.graphs.Plot =(function(){
          meta += "Interval: " + layer.tags.interval + "<br>";
          if( component.bbox )
             meta += "Bounding Box: " + component.bbox + "<br>";
+         else
+            meta += "BBox: All coverage<br>";
 
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
 
-         if( component.bbox )
-            meta += "BBox: " + component.bbox + "<br>";
-
          var markdowns = [];
          if( layer.moreIndicatorInfo )
-            markdowns.push( gisportal.middlewarePath + '/indicator/' + layer.name );
+            markdowns.push( gisportal.middlewarePath + '/metadata/indicator/' + layer.name );
          if( layer.moreProviderInfo )
-            markdowns.push( gisportal.middlewarePath + '/provider/' + layer.providerTag );
+            markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
 
          var newSeries = {
             "handler" : "OPEC_SERVICE_WCS",
