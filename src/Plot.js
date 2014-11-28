@@ -151,10 +151,10 @@ gisportal.graphs.Plot =(function(){
       this._components.forEach(function( component ){
          var layer = gisportal.layers[ component.indicator ];
 
-         if( ! layer.providerDetails.logo )
+         if( ! layer.provider.logo )
             return;
 
-         var providerLogo = portalLocation() + layer.providerDetails.logo;
+         var providerLogo = portalLocation() + layer.provider.logo;
          if( providers.indexOf( providerLogo ) == -1 )
             providers.push( providerLogo );
       });
@@ -260,12 +260,20 @@ gisportal.graphs.Plot =(function(){
          meta += "Confidence: " + layer.tags.Confidence + "<br>";
          meta += "Provider: " + layer.providerTag + "<br>";
          meta += "Interval: " + layer.tags.interval + "<br>";
+         if( component.bbox )
+            meta += "Bounding Box: " + component.bbox + "<br>";
 
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
 
          if( component.bbox )
             meta += "BBox: " + component.bbox + "<br>";
+
+         var markdowns = [];
+         if( layer.moreIndicatorInfo )
+            markdowns.push( gisportal.middlewarePath + '/indicator/' + layer.name );
+         if( layer.moreProviderInfo )
+            markdowns.push( gisportal.middlewarePath + '/provider/' + layer.providerTag );
 
          var newSeries = {
             "handler" : "OPEC_SERVICE_WCS",
@@ -283,7 +291,8 @@ gisportal.graphs.Plot =(function(){
             "yAxis": component.yAxis,
             "type": "line",
             "meta": meta,
-            "logo": layer.provider.logo
+            "markdown": markdowns,
+            "logo": portalLocation() + layer.provider.logo
          };
          seriesArray.push( newSeries );
       }

@@ -41,7 +41,7 @@ gisportal.layer = function( options ) {
       tags : null,
       options : null,
 
-      providerDetails: {},
+      provider: {},
       offsetVectors: null,
 
       autoScale: gisportal.config.autoScale

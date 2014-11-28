@@ -261,7 +261,7 @@ gisportal.createOpLayers = function() {
          "exBoundingBox": indicator.EX_GeographicBoundingBox, 
          "providerTag": server.options.providerShortTag,
          "positive" : server.options.positive, 
-         "providerDetails" : indicator.ProviderDetails, 
+         "provider" : indicator.providerDetails, 
          "offsetVectors" : indicator.OffsetVectors, 
          "tags": indicator.tags,
          "moreProviderInfo" : indicator.MoreProviderInfo,

@@ -1,8 +1,8 @@
 <input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
    <tbody>
-      {{#if providerDetails.website}}
-       <tr><td>Provider</td><td><a target="_blank" href="{{providerDetails.website}}">{{providerTag}}</a></td></tr>
+      {{#if provider.website}}
+       <tr><td>Provider</td><td><a target="_blank" href="{{provider.website}}">{{providerTag}}</a></td></tr>
       {{else}} 
       <tr><td>Provider</td><td>{{providerTag}}</td></tr>
       {{/if}}
@@ -17,10 +17,10 @@
          <label>{{round exBoundingBox.WestBoundLongitude 2}}</label>   W 
       </td></tr>
       <tr><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
-      {{#if providerDetails.email}}
+      {{#if provider.email}}
          <tr>
             <td>Email</td>
-            <td><a target="_blank" href="mailto:{{providerDetails.email}}">{{providerDetails.email}}</a></td>
+            <td><a target="_blank" href="mailto:{{provider.email}}">{{provider.email}}</a></td>
          </tr>
       {{/if}}
       {{#if moreIndicatorInfo}}
