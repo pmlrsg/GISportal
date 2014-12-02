@@ -1,5 +1,265 @@
 layers = [
    {
+      "name": "3b42_rainfall_3h",
+      "options": {
+         "providerShortTag": "CNR"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/3B42-rainfall-3h-agg.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/3B42-rainfall-3h-agg.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "rfe": {
+            "Confidence": "Unknown",
+            "interval": "3-Hourly",
+            "niceName": "Rainfall (3B42), 3-hourly",
+            "data_provider": "CNR",
+            "indicator_type": [
+               "Precipitation"
+            ],
+            "region": "Global"
+         }
+      }
+   },
+{
+      "name": "3b42_rainfall_daily",
+      "options": {
+         "providerShortTag": "CNR"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/3b42-rainfall-daily-agg.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/3b42-rainfall-daily-agg.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "rfe": {
+            "Confidence": "Unknown",
+            "interval": "Daily",
+            "niceName": "Rainfall (3B42), daily",
+            "data_provider": "CNR",
+            "indicator_type": [
+               "Precipitation"
+            ],
+            "region": "Global"
+         }
+      }
+   },   
+   {
+      "name": "cmorph_rainfall_daily",
+      "options": {
+         "providerShortTag": "CNR"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/cmorph-daily-rainfall-agg.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/cmorph-daily-rainfall-agg.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "rfe": {
+            "Confidence": "Unknown",
+            "interval": "Daily",
+            "niceName": "Rainfall (CMORPH), daily",
+            "data_provider": "CNR",
+            "indicator_type": [
+               "Precipitation"
+            ],
+            "region": "Global"
+         }
+      }
+   },   
+   {
+      "name": "tamsat_rfe_dekadal",
+      "options": {
+         "providerShortTag": "CNR"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/rfe-dekadal-agg.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/rfe-dekadal-agg.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "rfe": {
+            "Confidence": "Unknown",
+            "interval": "Dekadal",
+            "niceName": "Rainfall Estimate",
+            "data_provider": "CNR",
+            "indicator_type": [
+               "Precipitation"
+            ],
+            "region": "Africa"
+         }
+      }
+   },
+   {
+      "name": "mod16_monthly_aet",
+      "options": {
+         "providerShortTag": "Deltares"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "AET": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Actual Evapotranspiration (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         },
+         "Uncertainty": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Actual Evapotranspiration uncertainty (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Pyhsics"
+            ],
+            "region": "Australasia"
+         }
+      }
+   },
+   {
+      "name": "mod16_monthly_pet",
+      "options": {
+         "providerShortTag": "Deltares"
+      },
+      "services": {
+         "wms": {
+            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "GetCapabilities": {
+                  "SERVICE": "WMS",
+                  "request": "GetCapabilities",
+                  "version": "1.3.0"
+               }
+            }
+         },
+         "wcs": {
+            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
+            "params": {
+               "DescribeCoverage": {
+                  "SERVICE": "WCS",
+                  "request": "describeCoverage",
+                  "version": "1.0.0"
+               }
+            }
+         }
+      },
+      "indicators": {
+         "PET": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Potential Evapotranspiration (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Physics"
+            ],
+            "region": "Australasia"
+         },
+         "Uncertainty": {
+            "Confidence": "Unknown",
+            "interval": "Monthly",
+            "niceName": "Potential Evapotranspiration uncertainty (monthly)",
+            "data_provider": "Deltares",
+            "indicator_type": [
+               "Physics"
+            ],
+            "region": "Australasia"
+         }
+      }
+   },
+   {
       "name": "ecmwf_forcing_lwdown",
       "options": {
          "providerShortTag": "ECMWF"
@@ -371,145 +631,6 @@ layers = [
             "region": "Global"
          }
       }
-   },
-   {
-      "name": "tamsat_rfe_dekadal",
-      "options": {
-         "providerShortTag": "CNR"
-      },
-      "services": {
-         "wms": {
-            "url": "https://wci.earth2observe.eu/thredds/wms/cnr/rfe-dekadal-agg.nc?",
-            "params": {
-               "GetCapabilities": {
-                  "SERVICE": "WMS",
-                  "request": "GetCapabilities",
-                  "version": "1.3.0"
-               }
-            }
-         },
-         "wcs": {
-            "url": "https://wci.earth2observe.eu/thredds/wcs/cnr/rfe-dekadal-agg.nc?",
-            "params": {
-               "DescribeCoverage": {
-                  "SERVICE": "WCS",
-                  "request": "describeCoverage",
-                  "version": "1.0.0"
-               }
-            }
-         }
-      },
-      "indicators": {
-         "rfe": {
-            "Confidence": "Unknown",
-            "interval": "Dekadal",
-            "niceName": "Rainfall Estimate",
-            "data_provider": "CNR",
-            "indicator_type": [
-               "Precipitation"
-            ],
-            "region": "Africa"
-         }
-      }
-   },
-   {
-      "name": "mod16_monthly_aet",
-      "options": {
-         "providerShortTag": "Deltares"
-      },
-      "services": {
-         "wms": {
-            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
-            "params": {
-               "GetCapabilities": {
-                  "SERVICE": "WMS",
-                  "request": "GetCapabilities",
-                  "version": "1.3.0"
-               }
-            }
-         },
-         "wcs": {
-            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc?",
-            "params": {
-               "DescribeCoverage": {
-                  "SERVICE": "WCS",
-                  "request": "describeCoverage",
-                  "version": "1.0.0"
-               }
-            }
-         }
-      },
-      "indicators": {
-         "AET": {
-            "Confidence": "Unknown",
-            "interval": "Monthly",
-            "niceName": "Actual Evapotranspiration (monthly)",
-            "data_provider": "Deltares",
-            "indicator_type": [
-               "Physics"
-            ],
-            "region": "Australasia"
-         },
-         "Uncertainty": {
-            "Confidence": "Unknown",
-            "interval": "Monthly",
-            "niceName": "Actual Evapotranspiration uncertainty (monthly)",
-            "data_provider": "Deltares",
-            "indicator_type": [
-               "Physics"
-            ],
-            "region": "Australasia"
-         }
-      }
-   },
-   {
-      "name": "mod16_monthly_pet",
-      "options": {
-         "providerShortTag": "Deltares"
-      },
-      "services": {
-         "wms": {
-            "url": "https://wci.earth2observe.eu/thredds/wms/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
-            "params": {
-               "GetCapabilities": {
-                  "SERVICE": "WMS",
-                  "request": "GetCapabilities",
-                  "version": "1.3.0"
-               }
-            }
-         },
-         "wcs": {
-            "url": "https://wci.earth2observe.eu/thredds/wcs/deltares/aet-pet/MOD16_PET_corr_monthly_2000_2013.nc?",
-            "params": {
-               "DescribeCoverage": {
-                  "SERVICE": "WCS",
-                  "request": "describeCoverage",
-                  "version": "1.0.0"
-               }
-            }
-         }
-      },
-      "indicators": {
-         "PET": {
-            "Confidence": "Unknown",
-            "interval": "Monthly",
-            "niceName": "Potential Evapotranspiration (monthly)",
-            "data_provider": "Deltares",
-            "indicator_type": [
-               "Physics"
-            ],
-            "region": "Australasia"
-         },
-         "Uncertainty": {
-            "Confidence": "Unknown",
-            "interval": "Monthly",
-            "niceName": "Potential Evapotranspiration uncertainty (monthly)",
-            "data_provider": "Deltares",
-            "indicator_type": [
-               "Physics"
-            ],
-            "region": "Australasia"
-         }
-      }
    }
+
 ]
