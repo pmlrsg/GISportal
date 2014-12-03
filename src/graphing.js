@@ -203,7 +203,11 @@ function createGraph(graphOptions) {
          for (var i = 0; i < graphOptions.data[0].data.length; i++) {
             var line = '';
             for (var j = 0; j < graphOptions.data.length; j++) {
-               if (j === 0) line += graphOptions.data[j].data[i][0] + ',';
+               if (j === 0){
+                  var myDate = (new Date(graphOptions.data[j].data[i][0])).toISOString().match( /^(.*?)T(.*)\..*Z$/ );
+
+                  line += myDate[1] + " " + myDate[2] + ",";
+               };
                line += j === graphOptions.data.length -1 ? graphOptions.data[j].data[i][1]: graphOptions.data[j].data[i][1] + ',';
             }
             csv += line + "\n";

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from flask_script import Command, Manager
 from flask_sqlalchemy import SQLAlchemy
 
