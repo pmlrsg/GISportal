@@ -33,7 +33,8 @@
       "src/libs/jquery.multi-open-accordion-1.5.3.js",
       "src/libs/filtrify/js/filtrify.js",
       "src/libs/quicksand/js/quicksand.js",
-      "src/analytics.js" 
+      "src/analytics.js" ,
+      "src/user_feedback.js" 
    ],
    
    "externs": [
