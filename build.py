@@ -82,8 +82,8 @@ def build_min_portal_js(t):
    report_sizes(t)
    t.info('Finished minifying JS')
 
-virtual('js', 'html/GISPortal.js')
-@target('html/GISPortal.js', SRC)
+virtual('js', 'target-js')
+@target('target-js', SRC)
 def build_portal_js(t):
    t.info('building non-compiled version')
    portal_js = open('gisportal_js.json', 'r')
