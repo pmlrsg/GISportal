@@ -744,9 +744,6 @@ gisportal.getLayerData = function(fileName, layer, options) {
       success: function(data) {
          // Initialises the layer with the data from the AJAX call
          gisportal.layers[id].init(data, options);
-
-         // Track the indicator change
-         gisportal.analytics.events.layerChange( layer )
       },
       error: function(request, errorType, exception) {
          var data = {
