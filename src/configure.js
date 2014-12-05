@@ -64,7 +64,7 @@ gisportal.configurePanel.initDOM = function()  {
    }
 
    /* Temp */
-   $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
+   $('.indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
    
    
    $('.js-indicators').on('change', '.hide-select', function()  {
@@ -453,9 +453,6 @@ gisportal.configurePanel.search = function(val)  {
  * @param {object} options - This includes the id if it is known
  */
 gisportal.configurePanel.selectLayer = function(name, options)  {
-   // Trigger the analytics event
-   gisportal.analytics.events.selectLayer( { name: name } );
-
 
    var options = options || {};
    var name = name;

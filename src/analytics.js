@@ -83,6 +83,12 @@ gisportal.analytics.initDomEvents = function(){
       if( layer != null )
          gisportal.analytics.events.selectionBoxDrawn( layer )
    })
+   // Someone drew a bounding box
+   $('body').on( 'click', '.js-draw-polygon', function(){
+      var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
+      if( layer != null )
+         gisportal.analytics.events.selectionPolygonDrawn( layer )
+   })
    
    // Someone typed a bounding box
    $('body').on( 'change', '.js-coordinates', function(){
@@ -91,52 +97,89 @@ gisportal.analytics.initDomEvents = function(){
          gisportal.analytics.events.selectionBoxTyped( layer )
    })
    
-   // Someone used the date range cool
-   $('body').on( 'mouseup', '.range-slider[data-id]', function(){
-      var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.dateRangeUsed( layer )
-   })
-   
-   
-   
-   // User hides and openLayer
-   $('body').on( 'mousedown', '.indicator-header .js-toggleVisibility:not(.active)', function(){
-      var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.showLayer( layer );
-   })
-   
-   
-   // User shows an openLayer
-   $('body').on( 'mousedown', '.indicator-header .js-toggleVisibility.active', function(){
-      var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.hideLayer( layer );
-   })
-   
-    
-   
-   // Adding an indicator panel
-   $('body').on( 'click', '#configurePanel .js-toggleVisibility.active', function(){
-      var layer = gisportal.layers[ $(this).data('id') ];
-      gisportal.analytics.events.selectLayer( { name: $(this).data('name') } );
-   })
-
-
-   
    // Created a graph button
    $('body').on( 'click', '.js-create-graph', function(){
       gisportal.analytics.events.createGraph( gisportal.layers[ $(this).data('id') ] );
    });
    
+   gisportal.events.on( 'layer.select', function( id ){
+      var layer = gisportal.layers[ id ];
+      gisportal.analytics.events.selectLayer( layer );
+   });
+   
+   gisportal.events.on( 'layer.remove', function( id ){
+      var layer = gisportal.layers[ id ];
+      gisportal.analytics.events.removeLayer( layer );
+   });
    
 }
 
-//Settigns for the custom dimesion ids and what the values shoudl be
-gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
+//Settings for the custom dimensions ids and what the values should be
 gisportal.analytics.customDefinitionsUsedInEvents  = gisportal.config.analytics.customDefinitionsUsedInEvents;
 
+gisportal.analytics.customDefinitions = {
+     
+     
+     createGraph: [
+        'graph_type',
+        'used_in_graph',
+        'graph_components_count'
+     ],
+     
+     
+     selectLayer: [
+        'indicator_name',
+        'indicator_id',
+        'indicator_region',
+        'indicator_interval',
+        'indicator_provider',
+        'indicator_confidence'
+     ],
+     
+     removeLayer: [
+        'indicator_name',
+        'indicator_id',
+        'indicator_region',
+        'indicator_interval',
+        'indicator_provider',
+        'indicator_confidence'
+     ]
+}
+
+
+//A list of common functions used when tracking analytics
+gisportal.analytics.customDefinitionFunctions = {
+   //Indicator nice name
+   'indicator_name': function( indicator ){ return indicator.name; },
+   
+   //Indicator ID
+   'indicator_id': function( indicator ){ return indicator.id; },
+   
+   //Indicator region
+   'indicator_region': function( indicator ){ return indicator.tags.region; },
+
+   //Indicator provider
+   'indicator_provider': function( indicator ){ return indicator.providerTag; },
+   
+   //Indicator interval
+   'indicator_interval': function( indicator ){ return indicator.tags.interval; },
+   
+   //Indicator confidence
+   'indicator_confidence': function( indicator ){ return indicator.tags.Confidence; },
+
+   // Returns the plot type of any actively in use graph
+   'graph_type': function( plot ){
+       return plot.type();
+   },
+
+   // Returns the number of graph components in each graph
+   'graph_components_count': function( plot ){
+       return plot.components().length;
+   },
+
+   'used_in_layer': 1,
+   'used_in_graph': 1
+};
 
 
 /**
@@ -239,191 +282,53 @@ gisportal.analytics.events.selectLayer = function( indicator ){
 }
 
 //Called when a layer is removed
-gisportal.analytics.events.deselectLayer = function( indicator ){
+gisportal.analytics.events.removeLayer = function( indicator ){
    var toSend = {
       'hitType': 'event',
       'eventCategory': 'Indicators',
       'eventAction': 'Remove'
    };
    
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'deselectLayer', indicator );
+   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'removeLayer', indicator );
    
    toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
 }
 
-//Called when a the openLayer is hidden
-gisportal.analytics.events.hideLayer = function( indicator ){
-   var toSend = {
-      'hitType': 'event',
-      'eventCategory': 'Indicators',
-      'eventAction': 'Hide'
-   };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'hideLayer', indicator );
-   
-   toSend = $.extend( toSend, CDs );
-   gisportal.analytics.send( toSend );
-}
-
-// Called when the open layer is show
-gisportal.analytics.events.showLayer = function( indicator ){
-   var toSend = {
-      'hitType': 'event',
-      'eventCategory': 'Indicators',
-      'eventAction': 'Show'
-   };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'showLayer', indicator );
-   
-   toSend = $.extend( toSend, CDs );
-   gisportal.analytics.send( toSend );
-}
-
-// Called when the timeline is updated
-gisportal.analytics.events.timelineUpdate = function(  ){
-   var toSend = {
-      'hitType': 'event',
-      'eventCategory': 'Timeline',
-      'eventAction': 'Date change'
-   };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'timelineUpdate' );
-   
-   toSend = $.extend( toSend, CDs );
-   gisportal.analytics.send( toSend );
-}
-
-
-/*
-* Can be used to make sure events only fire at the end of a "perod"
-* This will stop lots of events being fired for what you would consider a single action.
-* 
-* @param {string} key A key to use for unqiueness
-* @param {Function} func A function to call back, also used for unqiueness
-* @param {int} int A long to wait before a "period" ends
-* @return {boolean} Tells the calling function if it is allowed to run
-*/
-gisportal.analytics.avoidRepeat = function(key,  func, length ){
-   
-   var pendingChanges = gisportal.analytics.pendingChanges;
-   
-   // Look at the current list of pending changes
-   for( i in pendingChanges ){
-      var change = pendingChanges[i];
-      
-      //Find the current list
-      if( change.key == key ){
-         
-         // Has it been allowed to run ?
-         if( change.allow == true ){
-            
-            //Remove it from the list
-            pendingChanges.splice( i, 1 );
-            
-            // Tells the calling function to run
-            return true;
-         }
-         
-         // Rest the time out
-         clearTimeout( change.timeout );
-         
-         change.timeout = setTimeout( function(){
-            change.allow = true;
-            change.func();
-         }, length );
-         
-         // Tells the calling function not to run
-         return false;
-      }
-   }
-   
-   // If its not already in the pendingChanges que add it
-   gisportal.analytics.pendingChanges.push( {
-      func: func,
-      key: key,
-      timeout: -1,
-      allow: false
-   } );
-   
-   // Triggers the timeout
-   gisportal.analytics.avoidRepeat(key,  func, length );
-   
-   // Tells the calling function not to run
-   return false;
-}
-
-
-
-////// Events relateing to the graph
 
 // Called when a used uses the the draw a bounding box tool
 gisportal.analytics.events.selectionBoxDrawn = function( indicator ){
-   
-   var callSelf = function(){
-      gisportal.analytics.events.selectionBoxDrawn( indicator );
-   };
-   var canRun = gisportal.analytics.avoidRepeat( 'selectionBoxDrawn' + indicator.name, callSelf,  1000 );
-   
-   if( canRun == false ) return;
-   
-   
    var toSend = {
       'hitType': 'event',
       'eventCategory': 'Graph',
       'eventAction': 'Tool used',
       'eventLabel': 'Selection box drawn'
    };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'selectionBoxDrawn', indicator );
-   
-   toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
 }
 
+
+// Called when a used uses the the draw a bounding box tool
+gisportal.analytics.events.selectionPolygonDrawn = function( indicator ){
+   var toSend = {
+      'hitType': 'event',
+      'eventCategory': 'Graph',
+      'eventAction': 'Tool used',
+      'eventLabel': 'Selection polygon drawn'
+   };
+   gisportal.analytics.send( toSend );
+}
+
+
+
 // Called when a user manually inserts a bounding box
 gisportal.analytics.events.selectionBoxTyped = function( indicator ){
-   
-   
-   var callSelf = function(){
-      gisportal.analytics.events.selectionBoxTyped( indicator );
-   };
-   var canRun = gisportal.analytics.avoidRepeat( 'selectionBoxTyped' + indicator.name, callSelf,  1000 );
-   
-   if( canRun == false ) return;
-   
    var toSend = {
       'hitType': 'event',
       'eventCategory': 'Graph',
       'eventAction': 'Tool used',
       'eventLabel': 'Selection box typed'
    };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'selectionBoxTyped', indicator );
-   
-   toSend = $.extend( toSend, CDs );
-   gisportal.analytics.send( toSend );
-}
-
-// Called with the date range tool is used
-gisportal.analytics.events.dateRangeUsed = function( indicator ){
-   
-   var callSelf = function(){
-      gisportal.analytics.events.dateRangeUsed( indicator );
-   };
-   var canRun = gisportal.analytics.avoidRepeat( 'dateRangeUsed' + indicator.name, callSelf,  1000 );
-   
-   if( canRun == false ) return;
-   
-   var toSend = {
-      'hitType': 'event',
-      'eventCategory': 'Graph',
-      'eventAction': 'Tool used'
-   };
-   
-   var CDs = gisportal.analytics.getCustomDefinitionsValues( 'dateRangeUsed', indicator );
-   
-   toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
 }
 
