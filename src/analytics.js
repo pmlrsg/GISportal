@@ -115,9 +115,9 @@ gisportal.analytics.initDomEvents = function(){
 }
 
 //Settings for the custom dimensions ids and what the values should be
-gisportal.analytics.customDefinitionsUsedInEvents  = gisportal.config.analytics.customDefinitionsUsedInEvents;
+gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
 
-gisportal.analytics.customDefinitions = {
+gisportal.analytics.customDefinitionsUsedInEvents = {
      
      
      createGraph: [
@@ -220,7 +220,7 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
       try{
          // Get the value for the definition
          var valueFunction = gisportal.analytics.customDefinitionFunctions[ customDefinitionKey ];
-         var value = valueFunction.call( indicator, paramaters );
+         var value = valueFunction.apply( indicator, paramaters );
          
          // Return if the value is exactly false
          if( value === false )
