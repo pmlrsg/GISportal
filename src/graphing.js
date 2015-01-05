@@ -30,7 +30,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
    }
    
    gisportal.panelSlideout.openSlideout( 'active-plot' );
-   gisportal.graphs.activePlotEditor.plot().addComponent( component )
+   gisportal.graphs.activePlotEditor.addComponent( component )
 }
 
 

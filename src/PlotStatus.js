@@ -13,7 +13,7 @@
 gisportal.graphs.PlotStatus = (function(){
 
    /**
-    * Creates a new PlotEditer object which will edit a plot object
+    * Creates a new PlotEditor object which will edit a plot object
     *
     * @param {Plot} plot The plot object to edit
     */

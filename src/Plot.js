@@ -55,6 +55,9 @@ gisportal.graphs.Plot =(function(){
    * 
    */
    Plot.prototype.addComponent= function( component ){
+      if( this._allowMultipleSeries == false && this.components().length >= 1 )
+         return new Error( "This graph type can only have 1 series" );
+
       var plot = this;
       
       var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
@@ -163,6 +166,32 @@ gisportal.graphs.Plot =(function(){
 
    }
 
+
+
+   /**
+    * Tells the editor to allow multiple series
+    */
+   Plot.prototype.allowMultipleSeries = function(){
+      this._allowMultipleSeries = true;
+   }
+
+   /**
+    * Tells the editor to not allow multiple series.
+    * Will also check the current state and remove any
+    * extra if needed
+    */
+   Plot.prototype.allowSingleSeries = function(){
+      var _this = this;
+      this._allowMultipleSeries = false;
+
+      // Remove all but the first series
+      if( this.components().length > 1 )
+         this.components().slice( 1 ).forEach(  function( component ){
+            _this.removeComponent( component );
+         });
+
+   }
+
    /**
     * Adds the Axis options to a plot request.
     * @param  {Object} The request object to add the values to
@@ -239,20 +268,14 @@ gisportal.graphs.Plot =(function(){
          series: []
       };
 
-      switch( this._plotType ){
-         case "timeseries":
-            this.buildRequestDataTimeSeries( plotRequest.data.series );
-            break;
-      }
+      this.buildRequestDataGeneric( plotRequest.data.series );
    }
 
-   Plot.prototype.buildRequestDataTimeSeries = function( seriesArray ){
+   Plot.prototype.buildRequestDataGeneric = function( seriesArray ){
       var totalCount = 0;
       for( var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
          var layer = gisportal.layers[ component.indicator ];
-
-         var groupKey = layer.descriptiveName;
 
          var meta = "";
 
@@ -293,6 +316,18 @@ gisportal.graphs.Plot =(function(){
             "markdown": markdowns,
             "logo": portalLocation() + layer.provider.logo
          };
+
+         if( this.plotType() == "hovmollerLat" ){
+            newSeries.data_source.graphXAxis = "Time";
+            newSeries.data_source.graphYAxis = "Lat";
+            newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
+         }else 
+         if( this.plotType() == "hovmollerLon" ){
+            newSeries.data_source.graphXAxis = "Lon";
+            newSeries.data_source.graphYAxis = "Time";
+            newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
+         }
+
          seriesArray.push( newSeries );
       }
    }
@@ -395,6 +430,12 @@ gisportal.graphs.Plot =(function(){
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
       
+
+      if( _new == 'timeseries' )
+        this.allowMultipleSeries();
+      else
+        this.allowSingleSeries();
+
       return this;
    }
    
@@ -553,6 +594,8 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.interactiveUrl = function(){
       return graphServerUrl + '/job/' + this.id + '/interactive'
    };
+
+
    
 
    Plot.prototype.copy = function(){

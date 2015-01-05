@@ -79,4 +79,10 @@ function activeIcon()  {
    }
 }
 
+$(function(){
+  // Close alert butto.n
+  $('body').on( 'click', '.js-alert-close', function(){
+    $(this).closest( '.alert' ).remove();
+  });
 
+});
