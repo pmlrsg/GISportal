@@ -99,7 +99,7 @@ gisportal.analytics.initDomEvents = function(){
    
    // Created a graph button
    $('body').on( 'click', '.js-create-graph', function(){
-      gisportal.analytics.events.createGraph( gisportal.layers[ $(this).data('id') ] );
+      gisportal.analytics.events.createGraph( gisportal.graphs.activePlotEditor.plot() );
    });
    
    gisportal.events.on( 'layer.select', function( id ){
