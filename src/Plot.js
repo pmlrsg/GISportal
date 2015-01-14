@@ -1,8 +1,17 @@
+/**
+ * This is a Plot class that works as a model
+ * to contain all the data related to a plot
+ * as well as support functions and event listeners
+ * so multiple views can interactive with the plot
+ * at the same time
+ */
 
+// Encapsulation it for neatness
 gisportal.graphs.Plot =(function(){
-   
+   // Location of the graphing server
    var graphServerUrl = gisportal.config.paths.graphServer;
    
+   //
    var Plot = function(){
       
       EventEmitter.call( this );
@@ -55,13 +64,22 @@ gisportal.graphs.Plot =(function(){
    * 
    */
    Plot.prototype.addComponent= function( component ){
+      // Check the plot type id allowed more then 1 series
       if( this._allowMultipleSeries == false && this.components().length >= 1 )
          return new Error( "This graph type can only have 1 series" );
 
       var plot = this;
       
+      // Does the current graph title match the generated one ?
+      // If it does then remember that because we want to update
+      // it when the new component has been added
+      // 
+      // If it doesn't match that means the user manually edited
+      // it so we shouldn't touch it
       var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
 
+      // Was the yAxis set manually?
+      // If not auto set it
       if( !component.yAxis ){
          if( this._components.length == 0 )
             component.yAxis = 1;
@@ -69,12 +87,18 @@ gisportal.graphs.Plot =(function(){
             component.yAxis = 2;
       }
 
+      // Add the component to the list of components
       this._components.push( component );
       
+      // Fire an event so listeners no it was added
       this.emit('component-added', { component: component });
 
+      // Update the date bounds, this is the outter date
+      // limit covered by at least 1 series
       this.dateRangeBounds( this.calculateDateRangeBounds() );
 
+      // Update the graph title is the user hasnt
+      // edited it
       if( updateGraphTitle )
          this.title( this.getGraphTitle( this._components ) );
    }
@@ -83,20 +107,32 @@ gisportal.graphs.Plot =(function(){
    * Removes a components from the array and the active plot window
    */
    Plot.prototype.removeComponent= function( component ){
+      // Find the component index
       var index = this._components.indexOf( component );
       
+      // Is the component in the components array ?
       if( index == -1 )
          return;
 
+      // Does the current graph title match the generated one ?
+      // If it does then remember that because we want to update
+      // it when the new component has been added
+      // 
+      // If it doesn't match that means the user manually edited
+      // it so we shouldn't touch it
       var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
 
       this._components.splice( index, 1);
 
+      // Update the graph title
       if( updateGraphTitle )
          this.title( this.getGraphTitle( this._components ) );
       
+      // Event emit so listeners know it went
       this.emit('component-removed', { component: component });
 
+      // Update the date bounds, this is the outter date
+      // limit covered by at least 1 series
       this.dateRangeBounds( this.calculateDateRangeBounds() );
    };
 
@@ -131,6 +167,12 @@ gisportal.graphs.Plot =(function(){
       return request;
    }
    
+   /**
+    * Adds basic information, the plot type,
+    * the title and what formats can be downloaded
+    * @param  Object  plotRequest  The plot request to
+    *                              add the settings to
+    */
    Plot.prototype.buildRequestBasics = function( plotRequest ){
       plotRequest.type = this.plotType();
       plotRequest.title = this.title();
@@ -170,6 +212,7 @@ gisportal.graphs.Plot =(function(){
 
    /**
     * Tells the editor to allow multiple series
+    * for the current graph type
     */
    Plot.prototype.allowMultipleSeries = function(){
       this._allowMultipleSeries = true;
@@ -194,7 +237,7 @@ gisportal.graphs.Plot =(function(){
 
    /**
     * Adds the Axis options to a plot request.
-    * @param  {Object} The request object to add the values to
+    * @param  Object  plotRequest The request object to add the values to
     */
    Plot.prototype.buildRequestAxis = function( plotRequest ){
 
@@ -206,11 +249,14 @@ gisportal.graphs.Plot =(function(){
       };
       plotRequest.xAxis = xAxis;
 
+      // Get components that will go on the left Y axis
       var leftHandSideComoponents = this._components.filter(function( component ){
          return component.yAxis == 1;
       });
       
       if( leftHandSideComoponents.length > 0 ){
+         // Using the left of left Y axis components build
+         // axis names including the elevation and provider
          var yAxis1Label = leftHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
             var output = indicator.name;
@@ -233,11 +279,14 @@ gisportal.graphs.Plot =(function(){
       };
 
 
+      // Get components that will go on the left Y axis
       var rightHandSideComoponents = this._components.filter(function( component ){
          return component.yAxis == 2;
       });
       
       if( rightHandSideComoponents.length > 0 ){
+         // Using the left of left Y axis components build
+         // axis names including the elevation and provider
          var yAxis2Label = rightHandSideComoponents.map(function( component ){
             var indicator = gisportal.layers[ component.indicator ];
             var output = indicator.name;
@@ -258,11 +307,14 @@ gisportal.graphs.Plot =(function(){
          };
          plotRequest.y2Axis = y2Axis;
       };
-
-
    }
 
-
+   /**
+    * Added for the possibly to change the function
+    * based on the current graph type but it was
+    * never used.
+    * @param  Object  plotRequest The request object to add the values to
+    */
    Plot.prototype.buildRequestData = function( plotRequest ){
       plotRequest.data = {
          series: []
@@ -271,14 +323,20 @@ gisportal.graphs.Plot =(function(){
       this.buildRequestDataGeneric( plotRequest.data.series );
    }
 
+   /**
+    * Adds all the request series to the array
+    * pass in. It builds the series from the 
+    * components array
+    * @param  Array  seriesArray 
+    */
    Plot.prototype.buildRequestDataGeneric = function( seriesArray ){
       var totalCount = 0;
       for( var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
          var layer = gisportal.layers[ component.indicator ];
 
+         // Add the drop down meta data
          var meta = "";
-
          meta += "Region: " + layer.tags.region + "<br>";
          meta += "Confidence: " + layer.tags.Confidence + "<br>";
          meta += "Provider: " + layer.providerTag + "<br>";
@@ -291,22 +349,32 @@ gisportal.graphs.Plot =(function(){
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
 
+         // Add the external meta data URLS
          var markdowns = [];
          if( layer.moreIndicatorInfo )
             markdowns.push( gisportal.middlewarePath + '/metadata/indicator/' + layer.name );
          if( layer.moreProviderInfo )
             markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
 
+         // Gumph needed for the plotting serving to its thing
          var newSeries = {
+            // Source handler file to use
             "handler" : "OPEC_SERVICE_WCS",
             "data_source" : {
+               // Variable name
                "coverage"  : layer.urlName,
+               // Time range of the data
                "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
+               // Bounds box of the data, also supports WKT
                "bbox": component.bbox,
+               // Depth, optional
                "depth": component.elevation,
                
+               // Threads URL, passed to the middleware URL
                "threddsUrl"  : layer.wcsURL,
+               // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
+               // Location of the middle ware to do the analytics 
                "middlewareUrl" : gisportal.middlewarePath + '/wcs'
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
@@ -317,6 +385,8 @@ gisportal.graphs.Plot =(function(){
             "logo": portalLocation() + layer.provider.logo
          };
 
+         // If its a hovmoller then 
+         // set the correct axis'
          if( this.plotType() == "hovmollerLat" ){
             newSeries.data_source.graphXAxis = "Time";
             newSeries.data_source.graphYAxis = "Lat";
@@ -340,8 +410,10 @@ gisportal.graphs.Plot =(function(){
       this._querySubmited = true;
       var _this = this;
       
+      // Generate the request object
       var request = this.buildRequest();
       
+      // Post it to the server
       $.ajax({
          method: 'post',
          url: graphServerUrl + '/plot',
@@ -349,7 +421,9 @@ gisportal.graphs.Plot =(function(){
          data: JSON.stringify({ request: request }),
          dataType: 'json',
          success: function( data ){
-            
+            // Start monitoring the job, this will
+            // also add a status box into the stored
+            // graphs panel
             _this.id = data.job_id;
             _this.monitorJobStatus();
             
@@ -363,6 +437,8 @@ gisportal.graphs.Plot =(function(){
    * Starts firing requests to the server monitoring the jobs status.
    */
    Plot.prototype.monitorJobStatus = function(){
+      // If we are already monitoring the job then
+      // dont start another monitor ! Makes sense right ?
       if( this._monitorJobStatusInterval !== null )
          return;
       
@@ -391,7 +467,10 @@ gisportal.graphs.Plot =(function(){
       updateStatus();
    };
 
-
+   /**
+    * Storing monitor the job on the server
+    * Just stops the interval on the ajax function
+    */
    Plot.prototype.stopMonitoringJobStatus = function(){
       clearInterval( this._monitorJobStatusInterval );
    };
@@ -520,7 +599,7 @@ gisportal.graphs.Plot =(function(){
 
       return this;
    }
-
+   // Works out 
    Plot.prototype.doesTBoundsCoverAllComponents = function(){
       var tBounds = this.tBounds();
 
