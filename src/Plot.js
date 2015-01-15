@@ -483,6 +483,12 @@ gisportal.graphs.Plot =(function(){
       this._state = _new;
       return this;
    }
+
+   /**
+    * Get the server status if no parameter provided
+    * If parameter is provided then store it and 
+    * fire and event
+    */
    Plot.prototype.serverStatus = function( _new ){
       if( !arguments.length ) return this._serverStatus;
       var old = this._serverStatus;
@@ -501,6 +507,12 @@ gisportal.graphs.Plot =(function(){
       return this;
    }
   
+   /**
+    * Get the server status if no parameter provided
+    * If parameter is provided then store it and 
+    * fire and event. Also set whether this graph
+    * is allowed multiple series
+    */
    Plot.prototype.plotType = function( _new ){
       if( !arguments.length ) return this._plotType;
       var old = this._plotType;
@@ -519,6 +531,11 @@ gisportal.graphs.Plot =(function(){
    }
    
    
+   /**
+    * Get the server status if no parameter provided
+    * If parameter is provided then store it and 
+    * fire and event
+    */
    Plot.prototype.title = function( _new ){
       if( !arguments.length ) return this._title;
       var old = this._title;
@@ -529,6 +546,10 @@ gisportal.graphs.Plot =(function(){
 
       return this;
    }
+   
+   /**
+    * Get the server status if no parameter provided
+    */
    Plot.prototype.components = function( _new ){
       if( !arguments.length ) return this._components;
       return this;
@@ -599,43 +620,6 @@ gisportal.graphs.Plot =(function(){
 
       return this;
    }
-   // Works out 
-   Plot.prototype.doesTBoundsCoverAllComponents = function(){
-      var tBounds = this.tBounds();
-
-      return this._components.every(function( component ){
-         var layer = gisportal.layers[ component.indicator ];
-         var firstDate = new Date( layer.firstDate );
-         var lastDate = new Date( layer.lastDate );
-
-         return ( firstDate <= tBounds[0]  && tBounds[1] <= lastDate );
-      });
-
-   }
-
-   Plot.prototype.getValidTBoundsForAllComponents = function(){
-      var minTime = null;
-      var maxTime = null;
-
-      this._components.forEach(function( component ){
-         var layer = gisportal.layers[ component.indicator ];
-         var firstDate = new Date( layer.firstDate );
-         var lastDate = new Date( layer.lastDate );
-
-         if( firstDate > minTime || minTime == null )
-            minTime = firstDate;
-
-         if( lastDate < maxTime || maxTime == null )
-            maxTime = lastDate;
-      });
-
-      if( minTime > maxTime )
-         throw new Error("There is no date range that covers all request graph components");
-      else
-         return [ minTime, maxTime ];
-
-   };
-   
 
    /**
    * Checks that the new tBounds is with the allowed date range
@@ -669,14 +653,21 @@ gisportal.graphs.Plot =(function(){
       return this;
    }
    
-
+   /**
+    * This returns the URL to the graph
+    * which can be used in the popup or iframe
+    * @return String   URL to the popup
+    */
    Plot.prototype.interactiveUrl = function(){
       return graphServerUrl + '/job/' + this.id + '/interactive'
    };
 
 
    
-
+   /**
+    * Produces a copy of the current Plot object
+    * @return Plot A copy of the current plot
+    */
    Plot.prototype.copy = function(){
       var newCopy = new Plot();
       newCopy.title( this.title() );

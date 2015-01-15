@@ -1,7 +1,10 @@
-
+// Unique session ID which is posted to UserVioice
+// When a request is made you can go into the
+// state's database and retrieve the information
 window.session_id = (new Date).getTime() + "-" + Math.floor( Math.random() * 1000000 );
 
 $(function(){
+  // When a user clients the user voice icon store the state
    $('body').on('click', '.uv-icon', function(){
        $.ajax({
             method: 'POST',
@@ -16,6 +19,7 @@ $(function(){
 
 UserVoice=window.UserVoice||[];
 
+// Set the ID
 UserVoice.push(['setCustomFields',{  'Session ID': window.session_id }]);
 
 // Set colors
@@ -28,9 +32,6 @@ UserVoice.push(['set', {
 
 // Add default trigger to the bottom-right corner of the window:
 UserVoice.push(['addTrigger', { mode: 'contact', trigger_position: 'bottom-right' }]);
-
-// Or, use your own custom trigger:
-//UserVoice.push(['addTrigger', '#id', { mode: 'contact' }]);
 
 // Autoprompt for Satisfaction and SmartVote (only displayed under certain conditions)
 UserVoice.push(['autoprompt', {}]);

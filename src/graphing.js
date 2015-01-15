@@ -19,6 +19,13 @@ gisportal.templates = {};
 
 gisportal.graphs.activePlotEditor = null;
 
+/**
+ * Adds a component to the active plot.
+ * Create a plot and plot editor to the 
+ * if one doesnt exist
+ * 
+ * @param Object component 
+ */
 gisportal.graphs.addComponentToGraph = function( component ){
    
    if( gisportal.graphs.activePlotEditor == null ){
@@ -43,6 +50,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
  */
 gisportal.graphs.activeGraphSubmitted = function(){
    var plot = gisportal.graphs.activePlotEditor.plot();
+   gisportal.analytics.events.createGraph( plot );
    var plotStatus = new gisportal.graphs.PlotStatus( plot );
    var plotStatusElement = plotStatus.element();
    gisportal.graphs.graphsHistoryList.prepend( plotStatusElement );
