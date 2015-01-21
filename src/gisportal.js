@@ -384,6 +384,7 @@ gisportal.mapInit = function() {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
       controls: [
+         graticuleCtl1,
          new OpenLayers.Control.Zoom({
             zoomInId: "mapZoomIn",
             zoomOutId: "mapZoomOut"
