@@ -39,6 +39,16 @@ gisportal.map_settings.init = function() {
 		gisportal.events.emit('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
 	});
 
+   // set an action for the graticules select changing
+   $('#select-graticules').change(function() {
+      if ($(this).val() == 'On') {
+         graticule_control.activate();
+      } else {
+         graticule_control.deactivate();
+      }
+      gisportal.events.emit('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
+   });
+
    // set the default value if one exists in config.js
 	if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
 		$('#select-country-borders').val(gisportal.config.countryBorder.defaultLayer);

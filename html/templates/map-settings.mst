@@ -16,4 +16,11 @@
 			{{/countryBorders}}
 		</select>
 	</li>
+	<li>
+		<label for="select-graticules">Display Lat/Lon Graticules</label>
+		<select id="select-graticules">
+			<option value="Off">Off</option>
+			<option value="On">On</option>
+		</select>
+	</li>
 </ul>
