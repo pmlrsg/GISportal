@@ -82,24 +82,20 @@ gisportal.analytics.initDomEvents = function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
       if( layer != null )
          gisportal.analytics.events.selectionBoxDrawn( layer )
-   })
+   });
+
    // Someone drew a bounding box
    $('body').on( 'click', '.js-draw-polygon', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
       if( layer != null )
          gisportal.analytics.events.selectionPolygonDrawn( layer )
-   })
+   });
    
    // Someone typed a bounding box
    $('body').on( 'change', '.js-coordinates', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
       if( layer != null )
          gisportal.analytics.events.selectionBoxTyped( layer )
-   })
-   
-   // Created a graph button
-   $('body').on( 'click', '.js-create-graph', function(){
-      gisportal.analytics.events.createGraph( gisportal.layers[ $(this).data('id') ] );
    });
    
    gisportal.events.on( 'layer.select', function( id ){
@@ -111,6 +107,7 @@ gisportal.analytics.initDomEvents = function(){
       var layer = gisportal.layers[ id ];
       gisportal.analytics.events.removeLayer( layer );
    });
+   
    
 }
 

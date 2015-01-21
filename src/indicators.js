@@ -746,6 +746,16 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 
 gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
+
+   if( ! doesCurrentlySelectedRegionFallInLayerBounds( id ) ){
+      errorHtml = '<div class="alert alert-danger">The bounding box selected contains no data for this indicator.</div>';
+      var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
+      setTimeout( function(){
+         errorElement.remove()
+      }, 6000 );
+      return;
+   }
+
    var indicator = gisportal.layers[id];
    
    var component = {
@@ -782,4 +792,66 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
    }, 2000).one('mousewheel', function(){
       $(this).stop();
    });
+}
+
+function bboxToWKT( bboxString ){
+   var elements = bboxString.split( "," );
+   if( elements.length == false )
+      return false;
+   var newPoints = [
+      elements[0] + " " + elements[1],
+      elements[0] + " " + elements[3],
+
+      elements[2] + " " + elements[3],
+      elements[0] + " " + elements[1],
+
+      elements[0] + " " + elements[1],
+   ];
+
+   return 'POLYGON((' + newPoints.join(",") + '))';
+
+}
+
+function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
+   // Skip if empty
+   if( gisportal.currentSelectedRegion == "" )
+      return true;
+
+   // Try to see if its WKT string
+   try{
+      var bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
+   }catch( e ){
+      // Assume the old bbox style
+      var bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
+   };
+
+   var layer = gisportal.layers[ layerId ];
+   var bounds = layer.exBoundingBox;
+
+   var arr = [
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
+      ],
+      [
+         Number(bounds.EastBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
+      ],
+      [
+         Number(bounds.EastBoundLongitude),
+         Number(bounds.SouthBoundLatitude)
+      ],
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.SouthBoundLatitude)
+      ]
+   ];
+
+   var bb2 = new Terraformer.Polygon( {
+      "type": "Polygon",
+      "coordinates": [arr] 
+   });
+
+   return bb1.intersects( bb2 ) || bb1.contains( bb2 ) || bb1.within( bb2 );
+
 }

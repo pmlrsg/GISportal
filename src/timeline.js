@@ -63,6 +63,13 @@ gisportal.TimeLine = function(id, options) {
       console.error('No DIV with ID, "' + id + '" exists. Cannot render TimeLine.');
       return;
    }
+
+    $('.js-current-date').pikaday({
+      format: "YYYY-MM-DD",
+      onSelect: function(){
+         self.setDate( this.getDate() );
+      }
+    });
    
    //--------------------------------------------------------------------------
    
@@ -395,6 +402,7 @@ gisportal.TimeLine.prototype.reset = function() {
    this.reHeight();
    this.reWidth();
    this.redraw();
+   this.updatePickerBounds();
 };
 
 gisportal.TimeLine.prototype.drawLabels = function()  {
@@ -465,6 +473,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    
    this.reHeight();
    this.redraw(); 
+   this.updatePickerBounds();
 };
 
 
@@ -518,6 +527,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.timebars = temp;
    this.reHeight();
    this.redraw();
+   this.updatePickerBounds();
 };
 
 // Set the currently selected date and animated the transition
@@ -536,12 +546,32 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 };
 
 gisportal.TimeLine.prototype.showDate = function(date) {
-   var d = date.toDateString().substring(4);
-   $('.js-current-date').html(d);
+   var current = $('.js-current-date').data('date');
+   if( !current || new Date(date).getTime() != current.getTime() )
+      $('.js-current-date').data('date', date).pikaday( 'setDate', date );
 }
 
 // Get the currently selected date 
 gisportal.TimeLine.prototype.getDate = function() {
    var selectedDate = new Date(this.selectedDate);
    return ((selectedDate instanceof Date) ? selectedDate : null);
+};
+
+
+
+// Get the currently selected date 
+gisportal.TimeLine.prototype.updatePickerBounds = function() {
+   var dates = this.timebars.map(function( bar ){
+      return [
+         bar.startDate,
+         bar.endDate,
+      ];
+   }).reduce(function(d1,d2){ return d1.concat(d2) },[]);
+
+   var extent = d3.extent( dates );
+
+   $('.js-current-date')
+      .pikaday( 'setMinDate', extent[0] )
+      .pikaday( 'setMaxDate', extent[1] );
+
 };

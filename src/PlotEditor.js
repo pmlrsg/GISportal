@@ -3,7 +3,7 @@
 gisportal.graphs.PlotEditor = (function(){
 
    /**
-    * Creates a new PlotEditer object which will edit a plot object
+    * Creates a new PlotEditor object which will edit a plot object
     *
     * @param {Plot} plot The plot object to edit
     * @dom {HTMLElement} editorParent The html object where the editor will be placed.
@@ -12,6 +12,8 @@ gisportal.graphs.PlotEditor = (function(){
       this._plot = plot;
 
       this._editorParent = $(editorParent);
+
+      this._allowMultipleSeries = 1;
 
       this.buildEditor();
    }
@@ -92,6 +94,30 @@ gisportal.graphs.PlotEditor = (function(){
       });
 
    }
+
+   /**
+    * Adds a component to the Editors plot.
+    * Also catches any errors and displays them to the user
+    * @param {Object} component Component to add
+    */
+   PlotEditor.prototype.addComponent = function( component ){
+
+      var result = this.plot().addComponent( component );
+      // Couldnt add component, show error
+      if( result instanceof Error ){
+         var alert = $('<div>')
+         .addClass( 'alert alert-danger' )
+         .text( result.toString() )
+         .append( '<span class="pull-right btn js-alert-close icon-filled-delete-2-2" ></span>' );
+
+         setTimeout(function(){ alert.remove(); }, 5000);
+         this._editorParent.find( '.js-components-area' ).prepend( alert );
+
+      }
+
+   }
+
+   
 
    /**
     * Setup the Add Indicator button

@@ -698,10 +698,8 @@ def hovmoller(dataset, params):
          
          mean = getMean(row)
          
-         if np.isnan(mean):
-            mean = 0
-
-         output['data'].append([date, float(pos), mean])
+         if not np.isnan(mean):
+            output['data'].append([date, float(pos), mean])
             
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"

@@ -382,7 +382,6 @@ gisportal.mapInit = function() {
       labelled: true,
       autoActivate: false
     });
-
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
@@ -394,8 +393,7 @@ gisportal.mapInit = function() {
         })
       ]
    });
-   //hide the graticules by default
-   //graticule_layer.deactivate();
+
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.

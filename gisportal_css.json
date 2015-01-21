@@ -3,6 +3,7 @@
    "files": [
       "html/css/reset.css",
       "html/css/fonts.css",
+      "html/css/alerts.css",
       "html/css/streamline.css",
       "html/css/streamline-filled-in.css",
       "html/css/type.css",
