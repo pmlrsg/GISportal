@@ -376,17 +376,26 @@ gisportal.refreshDateCache = function() {
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
+
+   graticule_control = new OpenLayers.Control.Graticule({
+      numPoints: 2, 
+      labelled: true,
+      autoActivate: false
+    });
+
    map = new OpenLayers.Map('map', {
       projection: gisportal.lonlat,
       displayProjection: gisportal.lonlat,
       controls: [
+         graticule_control,
          new OpenLayers.Control.Zoom({
             zoomInId: "mapZoomIn",
             zoomOutId: "mapZoomOut"
         })
       ]
    });
-
+   //hide the graticules by default
+   //graticule_layer.deactivate();
 
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
