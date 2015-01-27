@@ -7,8 +7,8 @@ gisportal.map_settings.init = function() {
    var layers = [];
    _.forEach(gisportal.baseLayers, function(d)  {
       var layer = {};
-      layer.id = d.id;
-      layer.name = d.name;
+      layer.id = d.getProperties().id;
+      layer.name = d.getProperties().title;
       layers.push(layer);
    });
 
@@ -29,7 +29,14 @@ gisportal.map_settings.init = function() {
 
    // set an action for the base map select changing
    $('#select-basemap').change(function() {
-   	map.setBaseLayer(gisportal.baseLayers[$('#select-basemap').val()]);
+   	// take off all the base maps
+      _.forEach(gisportal.baseLayers, function(d)  {
+         map.removeLayer(d)
+      });
+      // then add the selected option and send it to the bottom
+      map.addLayer(gisportal.baseLayers[$('#select-basemap').val()]);
+      
+
    	gisportal.events.emit('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
    });
 
@@ -39,12 +46,15 @@ gisportal.map_settings.init = function() {
 		gisportal.events.emit('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
 	});
 
+   if (typeof gisportal.config.showGraticules != 'undefined' && gisportal.config.showGraticules) {
+      $('#select-graticules').val('On');
+   }
    // set an action for the graticules select changing
    $('#select-graticules').change(function() {
       if ($(this).val() == 'On') {
-         graticule_control.activate();
+         graticule_control.setMap(map);
       } else {
-         graticule_control.deactivate();
+         graticule_control.setMap();
       }
       gisportal.events.emit('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
    });

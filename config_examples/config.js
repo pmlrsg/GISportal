@@ -37,7 +37,8 @@ gisportal.config = {
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
    },
    defaultBaseMap: 'EOX',
-
+   showGraticules: true,                           // (true|false)   Display latitude and longitude lines on the map
+   
    // Should layers auto scale by default
    autoScale: true,
 

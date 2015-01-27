@@ -30,7 +30,6 @@
       "html/css/history.css",
       "html/css/mapcontrols.css",
       "html/js-libs/tooltipster/css/tooltipster.css",
-      "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
-      "html/css/override.css"
+      "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css"
    ]
 }

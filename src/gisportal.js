@@ -31,7 +31,7 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-OpenLayers.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
+//OpenLayers.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -73,7 +73,7 @@ gisportal.selectionTools = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
-gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
+//gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
 
 // Quick regions array in the format "Name",W,S,E,N
 gisportal.quickRegion = [
@@ -150,73 +150,108 @@ gisportal.loadLayers = function() {
  * Create all the base layers for the map.
  */
 gisportal.createBaseLayers = function() {
-   
-   function createBaseLayer(name, url, opts) {
-      var layer = new OpenLayers.Layer.WMS(
-         name,
-         url,
-         opts,
-         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }      
-      );
-      
-      layer.id = name;
-      layer.type = 'baseLayers';
-      layer.displayTitle = name;
-      layer.name = name;
-      
-      layer.events.on({
-         "loadstart": gisportal.loading.increment,
-         "loadend": gisportal.loading.decrement
+
+   gisportal.baseLayers = {
+      EOX: new ol.layer.Tile({
+         id: 'EOX',
+         title: 'EOX',
+         source: new ol.source.TileWMS({
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: 'anonymous',
+            params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: 'EPSG:4326'},
+         }) 
+      }),
+      GEBCO: new ol.layer.Tile({
+         id: 'GEBCO',
+         title: 'GEBCO',
+         source: new ol.source.TileWMS({
+            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
+            crossOrigin: 'anonymous',
+            params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: 'EPSG:4326', FORMAT: 'image/jpeg'},
+         }) 
+      }),
+      MetacartaBasic: new ol.layer.Tile({
+         id: 'MetacartaBasic',
+         title: 'Metacarta Basic',
+         source: new ol.source.TileWMS({
+            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
+            crossOrigin: 'anonymous',
+            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: 'EPSG:4326'},
+         }) 
+      }),
+      Landsat: new ol.layer.Tile({
+         id: 'Landsat',
+         title: 'Landsat',
+         source: new ol.source.TileWMS({
+            url: 'http://irs.gis-lab.info/?',
+            crossOrigin: 'anonymous',
+            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: 'EPSG:4326'},
+         }) 
+      }),
+      BlueMarble: new ol.layer.Tile({
+         id: 'BlueMarble',
+         title: 'Blue Marble',
+         source: new ol.source.TileWMS({
+            url: 'http://demonstrator.vegaspace.com/wmspub/?',
+            crossOrigin: 'anonymous',
+            params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: 'EPSG:4326'},
+         }) 
       })
-      map.addLayer(layer);
-      gisportal.baseLayers[name] = layer;
    }
-   
-   createBaseLayer('GEBCO', 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?', { layers: 'gebco_08_grid' });
-   createBaseLayer('EOX', 'https://tiles.maps.eox.at/wms/?' , {layers : 'terrain-light'});
-   createBaseLayer('Metacarta Basic', 'http://vmap0.tiles.osgeo.org/wms/vmap0?', { layers: 'basic' });
-   createBaseLayer('Landsat', 'http://irs.gis-lab.info/?', { layers: 'landsat' });
-   createBaseLayer('Blue Marble', 'http://demonstrator.vegaspace.com/wmspub', {layers: "BlueMarble" });
-   
-   // Get and store the number of base layers
-   gisportal.numBaseLayers = map.getLayersBy('isBaseLayer', true).length;
+
+   if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
+      map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
+   } else {
+      map.addLayer(gisportal.baseLayers.EOX);   
+   }
+
 };
 
 /** Create  the country borders overlay
  *
  */
 gisportal.createCountryBorderLayer = function(layerName) {
-   // first remove the old country border layer if it exists
-   var old_layer = map.getLayersByName('country_borders');
-   if (old_layer.length > 0) {
-      old_layer[0].destroy();
-   }
+   // // first remove the old country border layer if it exists
+   // var old_layer = map.getLayersByName('country_borders');
+   // if (old_layer.length > 0) {
+   //    old_layer[0].destroy();
+   // }
 
-   if (layerName != '0') {
-      // then add the selected one
-      var layer = new OpenLayers.Layer.WMS(
-         'country_borders',
-         //'https://rsg.pml.ac.uk/geoserver/wms?',
-         gisportal.countryBorderLayers[layerName].url,
-         { layers: gisportal.countryBorderLayers[layerName].id, transparent: true },
-         { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
-      );
+   // if (layerName != '0') {
+   //    // then add the selected one
+   //    var layer = new OpenLayers.Layer.WMS(
+   //       'country_borders',
+   //       //'https://rsg.pml.ac.uk/geoserver/wms?',
+   //       gisportal.countryBorderLayers[layerName].url,
+   //       { layers: gisportal.countryBorderLayers[layerName].id, transparent: true },
+   //       { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
+   //    );
 
-      layer.id = 'country_borders';
-      layer.controlID = 'country_borders';
-      layer.displayTitle = 'Country Borders';
-      layer.name = 'country_borders';
+   //    layer.id = 'country_borders';
+   //    layer.controlID = 'country_borders';
+   //    layer.displayTitle = 'Country Borders';
+   //    layer.name = 'country_borders';
       
-      map.addLayer(layer);   
-   }
+   //    map.addLayer(layer);   
+   // }
+
+   gisportal.countryBorderLayer = new ol.layer.Tile({
+          source: new ol.source.TileJSON({
+            url: 'http://api.tiles.mapbox.com/v3/' +
+                'mapbox.world-borders-light.jsonp',
+            crossOrigin: 'anonymous'
+          })
+        })
+
+   map.addLayer(gisportal.countryBorderLayer);
  }
 
 gisportal.setCountryBordersToTopLayer = function() {
-   // if the country border layer is on the map move it to the top
-   var border_layer = map.getLayersByName('country_borders');
-   if (border_layer.length > 0) {
-      border_layer[0].setZIndex(2000);   
-   }
+   // // if the country border layer is on the map move it to the top
+   // var border_layer = map.getLayersByName('country_borders');
+   // if (border_layer.length > 0) {
+   //    border_layer[0].setZIndex(2000);   
+   // }
 }
 
 
@@ -377,58 +412,82 @@ gisportal.refreshDateCache = function() {
  */
 gisportal.mapInit = function() {
 
-   graticule_control = new OpenLayers.Control.Graticule({
-      numPoints: 2, 
-      labelled: true,
-      autoActivate: false
-    });
-   map = new OpenLayers.Map('map', {
-      projection: gisportal.lonlat,
-      displayProjection: gisportal.lonlat,
-      controls: [
-         graticule_control,
-         new OpenLayers.Control.Zoom({
-            zoomInId: "mapZoomIn",
-            zoomOutId: "mapZoomOut"
-        })
-      ]
+   // graticule_control = new OpenLayers.Control.Graticule({
+   //    numPoints: 2, 
+   //    labelled: true,
+   //    autoActivate: false
+   //  });
+   // map = new OpenLayers.Map('map', {
+   //    projection: gisportal.lonlat,
+   //    displayProjection: gisportal.lonlat,
+   //    controls: [
+   //       graticule_control,
+   //       new OpenLayers.Control.Zoom({
+   //          zoomInId: "mapZoomIn",
+   //          zoomOutId: "mapZoomOut"
+   //      })
+   //    ]
+   // });
+   
+   
+   map = new ol.Map({
+      target: 'map',
+      view: new ol.View({
+         projection: 'EPSG:4326',
+         center: [0, 0],
+         zoom: 2,
+         maxResolution: 0.703125
+      }),
+      logo: false
+   })
+
+   graticule_control = new ol.Graticule({
+      // the style to use for the lines, optional.
+      strokeStyle: new ol.style.Stroke({
+         color: 'rgba(255,255,255,0.9)',
+         width: 1,
+         lineDash: [0.5, 4]
+      })
    });
+   if (gisportal.config.showGraticules) {
+      graticule_control.setMap(map);
+   }
 
-
-   // Get both master cache files from the server. These files tells the server
-   // what layers to load for Operation (wms) and Reference (wcs) layers.
-   gisportal.loadLayers();
+   // // Get both master cache files from the server. These files tells the server
+   // // what layers to load for Operation (wms) and Reference (wcs) layers.
+   // gisportal.loadLayers();
 
    // Create the base layers and then add them to the map
    gisportal.createBaseLayers();
    
+   gisportal.map_settings.init();         // map-settings.js
    
-   // Create map controls identified by key values which can be activated and deactivated
-   gisportal.mapControls = {
-      zoomIn: new OpenLayers.Control.ZoomBox(
-         { out: false, alwaysZoom: true }
-      ),
-      zoomOut: new OpenLayers.Control.ZoomBox(
-         { out: true, alwaysZoom: true }
-      ),
-      pan: new OpenLayers.Control.Navigation(),
-      selector: new OpenLayers.Control.SelectFeature([], {
-         hover: false,
-         autoActive: true
-      })
-   };
+   // // Create map controls identified by key values which can be activated and deactivated
+   // gisportal.mapControls = {
+   //    zoomIn: new OpenLayers.Control.ZoomBox(
+   //       { out: false, alwaysZoom: true }
+   //    ),
+   //    zoomOut: new OpenLayers.Control.ZoomBox(
+   //       { out: true, alwaysZoom: true }
+   //    ),
+   //    pan: new OpenLayers.Control.Navigation(),
+   //    selector: new OpenLayers.Control.SelectFeature([], {
+   //       hover: false,
+   //       autoActive: true
+   //    })
+   // };
 
-   // Add all the controls to the map
-   for (var key in gisportal.mapControls) {
-      var control = gisportal.mapControls[key];
-      map.addControl(control);
-   }
+   // // Add all the controls to the map
+   // for (var key in gisportal.mapControls) {
+   //    var control = gisportal.mapControls[key];
+   //    map.addControl(control);
+   // }
 
-   gisportal.quickRegions.setup();
-   gisportal.selectionTools.init();
+   // gisportal.quickRegions.setup();
+   // gisportal.selectionTools.init();
 
-   if(!map.getCenter())
-      map.zoomTo(3);
+   // if(!map.getCenter())
+   //    map.zoomTo(3);
 
 
 };
@@ -458,15 +517,15 @@ gisportal.initWMSlayers = function(data, opts) {
  * This is used to set the layer index to be the correct order 
  */
 gisportal.nonLayerDependent = function() {
-   // Keeps the vectorLayers at the top of the map
-   map.events.register("addlayer", map, function() { 
-       // Get and store the number of reference layers
-      var poiLayers = map.getLayersBy('type', 'poiLayer');
+   // // Keeps the vectorLayers at the top of the map
+   // map.events.register("addlayer", map, function() { 
+   //     // Get and store the number of reference layers
+   //    var poiLayers = map.getLayersBy('type', 'poiLayer');
 
-      $.each(poiLayers, function(index, value) {
-         map.setLayerIndex(value, map.layers.length - 1);
-      });
-   });
+   //    $.each(poiLayers, function(index, value) {
+   //       map.setLayerIndex(value, map.layers.length - 1);
+   //    });
+   // });
    
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
@@ -756,7 +815,7 @@ gisportal.main = function() {
       gisportal.graphs.initDOM();           // graphing.js
       gisportal.analytics.initGA();         // analytics.js
       gisportal.panelSlideout.initDOM();    //panel-slideout.js
-      gisportal.map_settings.init();         // map-settings.js
+      
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon')
       
