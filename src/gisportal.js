@@ -31,7 +31,7 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-//OpenLayers.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
+gisportal.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -73,7 +73,7 @@ gisportal.selectionTools = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
-//gisportal.lonlat = new OpenLayers.Projection("EPSG:4326");
+gisportal.lonlat = 'EPSG:4326';
 
 // Quick regions array in the format "Name",W,S,E,N
 gisportal.quickRegion = [
@@ -89,13 +89,6 @@ gisportal.quickRegion = [
    ["Western Med.", -6.00, 30.80, 16.50, 48.10],
    ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
 ];
-
-gisportal.countryBorderLayers = {
-   "none" : { "id" : "0", "name" : "No Borders", "url": ""},
-   "countries_all_white" : { "id" : "countries_all_white", "name" : "White border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
-   "countries_all_black": { "id" : "countries_all_black", "name" : "Black border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
-   "countries_all_default": { "id" : "countries_all_default", "name" : "Blue border lines", "url": "https://rsg.pml.ac.uk/geoserver/wms?"},
-};
 
 
 /**
@@ -145,114 +138,6 @@ gisportal.loadLayers = function() {
 
 };
 
-
-/**
- * Create all the base layers for the map.
- */
-gisportal.createBaseLayers = function() {
-
-   gisportal.baseLayers = {
-      EOX: new ol.layer.Tile({
-         id: 'EOX',
-         title: 'EOX',
-         source: new ol.source.TileWMS({
-            url: 'https://tiles.maps.eox.at/wms/?',
-            crossOrigin: 'anonymous',
-            params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: 'EPSG:4326'},
-         }) 
-      }),
-      GEBCO: new ol.layer.Tile({
-         id: 'GEBCO',
-         title: 'GEBCO',
-         source: new ol.source.TileWMS({
-            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
-            crossOrigin: 'anonymous',
-            params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: 'EPSG:4326', FORMAT: 'image/jpeg'},
-         }) 
-      }),
-      MetacartaBasic: new ol.layer.Tile({
-         id: 'MetacartaBasic',
-         title: 'Metacarta Basic',
-         source: new ol.source.TileWMS({
-            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
-            crossOrigin: 'anonymous',
-            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: 'EPSG:4326'},
-         }) 
-      }),
-      Landsat: new ol.layer.Tile({
-         id: 'Landsat',
-         title: 'Landsat',
-         source: new ol.source.TileWMS({
-            url: 'http://irs.gis-lab.info/?',
-            crossOrigin: 'anonymous',
-            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: 'EPSG:4326'},
-         }) 
-      }),
-      BlueMarble: new ol.layer.Tile({
-         id: 'BlueMarble',
-         title: 'Blue Marble',
-         source: new ol.source.TileWMS({
-            url: 'http://demonstrator.vegaspace.com/wmspub/?',
-            crossOrigin: 'anonymous',
-            params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: 'EPSG:4326'},
-         }) 
-      })
-   }
-
-   if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
-      map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
-   } else {
-      map.addLayer(gisportal.baseLayers.EOX);   
-   }
-
-};
-
-/** Create  the country borders overlay
- *
- */
-gisportal.createCountryBorderLayer = function(layerName) {
-   // // first remove the old country border layer if it exists
-   // var old_layer = map.getLayersByName('country_borders');
-   // if (old_layer.length > 0) {
-   //    old_layer[0].destroy();
-   // }
-
-   // if (layerName != '0') {
-   //    // then add the selected one
-   //    var layer = new OpenLayers.Layer.WMS(
-   //       'country_borders',
-   //       //'https://rsg.pml.ac.uk/geoserver/wms?',
-   //       gisportal.countryBorderLayers[layerName].url,
-   //       { layers: gisportal.countryBorderLayers[layerName].id, transparent: true },
-   //       { projection: gisportal.lonlat, wrapDateLine: true, transitionEffect: 'resize' }
-   //    );
-
-   //    layer.id = 'country_borders';
-   //    layer.controlID = 'country_borders';
-   //    layer.displayTitle = 'Country Borders';
-   //    layer.name = 'country_borders';
-      
-   //    map.addLayer(layer);   
-   // }
-
-   gisportal.countryBorderLayer = new ol.layer.Tile({
-          source: new ol.source.TileJSON({
-            url: 'http://api.tiles.mapbox.com/v3/' +
-                'mapbox.world-borders-light.jsonp',
-            crossOrigin: 'anonymous'
-          })
-        })
-
-   map.addLayer(gisportal.countryBorderLayer);
- }
-
-gisportal.setCountryBordersToTopLayer = function() {
-   // // if the country border layer is on the map move it to the top
-   // var border_layer = map.getLayersByName('country_borders');
-   // if (border_layer.length > 0) {
-   //    border_layer[0].setZIndex(2000);   
-   // }
-}
 
 
 /** 
@@ -412,56 +297,28 @@ gisportal.refreshDateCache = function() {
  */
 gisportal.mapInit = function() {
 
-   // graticule_control = new OpenLayers.Control.Graticule({
-   //    numPoints: 2, 
-   //    labelled: true,
-   //    autoActivate: false
-   //  });
-   // map = new OpenLayers.Map('map', {
-   //    projection: gisportal.lonlat,
-   //    displayProjection: gisportal.lonlat,
-   //    controls: [
-   //       graticule_control,
-   //       new OpenLayers.Control.Zoom({
-   //          zoomInId: "mapZoomIn",
-   //          zoomOutId: "mapZoomOut"
-   //      })
-   //    ]
-   // });
-   
-   
    map = new ol.Map({
       target: 'map',
+      controls: ol.control.defaults().extend([
+         new ol.control.FullScreen()
+      ]),
       view: new ol.View({
-         projection: 'EPSG:4326',
+         projection: gisportal.lonlat,
          center: [0, 0],
          zoom: 2,
-         maxResolution: 0.703125
+         maxResolution: 0.703125,
       }),
       logo: false
    })
 
-   graticule_control = new ol.Graticule({
-      // the style to use for the lines, optional.
-      strokeStyle: new ol.style.Stroke({
-         color: 'rgba(255,255,255,0.9)',
-         width: 1,
-         lineDash: [0.5, 4]
-      })
-   });
-   if (gisportal.config.showGraticules) {
-      graticule_control.setMap(map);
-   }
+   // Get both master cache files from the server. These files tells the server
+   // what layers to load for Operation (wms) and Reference (wcs) layers.
+   gisportal.loadLayers();
 
-   // // Get both master cache files from the server. These files tells the server
-   // // what layers to load for Operation (wms) and Reference (wcs) layers.
-   // gisportal.loadLayers();
-
-   // Create the base layers and then add them to the map
-   gisportal.createBaseLayers();
-   
+   // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    
+   // TODO: re-implement zoomy buttons
    // // Create map controls identified by key values which can be activated and deactivated
    // gisportal.mapControls = {
    //    zoomIn: new OpenLayers.Control.ZoomBox(
@@ -563,61 +420,62 @@ gisportal.hasAutoSaveState = function(){
  * @param {object} state - Optional, allows a previous state to be extended 
  */
 gisportal.saveState = function(state) {
-   var state = state || {}; 
-   // Save layers
-   state.map = {};
-   state.selectedIndicators = [];
-   state.map.layers = {}; 
-   state.timeline = {}; 
+// TODO: Re-enable 
+   // var state = state || {}; 
+   // // Save layers
+   // state.map = {};
+   // state.selectedIndicators = [];
+   // state.map.layers = {}; 
+   // state.timeline = {}; 
 
-   // Get the current layers and any settings/options for them.
-   var keys = gisportal.selectedLayers;
-   for(var i = 0, len = keys.length; i < len; i++) {
-      var selectedIndicator = gisportal.selectedLayers[i];
+   // // Get the current layers and any settings/options for them.
+   // var keys = gisportal.selectedLayers;
+   // for(var i = 0, len = keys.length; i < len; i++) {
+   //    var selectedIndicator = gisportal.selectedLayers[i];
 
-      if (selectedIndicator)  {
-         var indicator = gisportal.layers[selectedIndicator];
-         state.map.layers[indicator.id] = {
-            'selected': indicator.selected,
-            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
-            'style': indicator.style !== null ? indicator.style : '',
-            'minScaleVal': indicator.minScaleVal,
-            'maxScaleVal': indicator.maxScaleVal,
-            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
-         };    
-      }
-   }
-   // outside of loop so it can be easily ordered 
-   state.selectedIndicators = gisportal.selectedLayers;
+   //    if (selectedIndicator)  {
+   //       var indicator = gisportal.layers[selectedIndicator];
+   //       state.map.layers[indicator.id] = {
+   //          'selected': indicator.selected,
+   //          'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+   //          'style': indicator.style !== null ? indicator.style : '',
+   //          'minScaleVal': indicator.minScaleVal,
+   //          'maxScaleVal': indicator.maxScaleVal,
+   //          'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
+   //       };    
+   //    }
+   // }
+   // // outside of loop so it can be easily ordered 
+   // state.selectedIndicators = gisportal.selectedLayers;
    
-   // Get currently selected date.
-   if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
-      state.map.date = gisportal.timeline.getDate();
-   }
+   // // Get currently selected date.
+   // if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
+   //    state.map.date = gisportal.timeline.getDate();
+   // }
      
-   // Get selection from the map
-   var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-   if(layer.features.length > 0) {
-      var feature = layer.features[0];
-      state.map.feature = gisportal.featureToGeoJSON(feature);
-   }
+   // // Get selection from the map
+   // var layer = map.getLayersBy('controlID', 'poiLayer')[0];
+   // if(layer.features.length > 0) {
+   //    var feature = layer.features[0];
+   //    state.map.feature = gisportal.featureToGeoJSON(feature);
+   // }
    
-   // Get zoom level
-   state.map.zoom = map.zoom;
+   // // Get zoom level
+   // state.map.zoom = map.zoom;
 
-   // Get position
-   state.map.extent = map.getExtent();
+   // // Get position
+   // state.map.extent = map.getExtent();
 
-   // Get quick regions
-   state.map.regions = gisportal.quickRegion;
-   state.map.selectedRegion = $('#quickRegion option:selected').val();
+   // // Get quick regions
+   // state.map.regions = gisportal.quickRegion;
+   // state.map.selectedRegion = $('#quickRegion option:selected').val();
 
-   // Get timeline zoom
-   state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
-   state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
+   // // Get timeline zoom
+   // state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
+   // state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
 
-   return state;
+   // return state;
 };
 
 /**
@@ -899,7 +757,8 @@ gisportal.zoomOverall = function()  {
          if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = layer.MaxY; // top
       }
 
-      map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
+      // TODO: update the zoom to bounds for ol3
+      //map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
    }
 };
 

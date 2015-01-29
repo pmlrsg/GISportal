@@ -235,7 +235,12 @@ gisportal.layer = function( options ) {
     * @param {object} object - The object to extend the WMS layer params
     */
    this.mergeNewParams = function(object) {
-      if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
+      //if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
+      var params = this.openlayers['anID'].getSource().getParams();
+      for(var prop in object) {
+         params[prop] = object[prop];
+      }
+      this.openlayers['anID'].getSource().updateParams(params);
       gisportal.scalebars.autoScale( this.id );
    };
    
@@ -247,7 +252,7 @@ gisportal.layer = function( options ) {
     */
    this.isVisible = true;  
    this.setVisibility = function(visibility) {
-      if (this.openlayers['anID']) this.openlayers['anID'].setVisibility(visibility);
+      if (this.openlayers['anID']) this.openlayers['anID'].setVisible(visibility);
       this.isVisible = visibility;
    };
    
@@ -430,7 +435,7 @@ gisportal.layer = function( options ) {
       
       $.ajax({
          type: 'GET',
-         url: OpenLayers.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
+         url: gisportal.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
          dataType: 'json',
          async: true,
          success: function(data) {
@@ -489,106 +494,115 @@ gisportal.layer = function( options ) {
       
       // Create WMS layer.
       if(this.type == 'opLayers') {    
-         
-         layer = new OpenLayers.Layer.WMS (
-            this.displayName(),
-            this.wmsURL,
-            { layers: this.urlName, transparent: true}, 
-            { opacity: 1, wrapDateLine: true, transitionEffect: 'resize' }
-         );
-         layer.type = 'opLayers';
-         
-      } else if(this.type == 'refLayers') {
-         
-         if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
-            // GML or KML
-            layer = new OpenLayers.Layer.Vector(self.name, {
-               projection: gisportal.lonlat,
-               strategies: [new OpenLayers.Strategy.Fixed()],    
-               protocol: new OpenLayers.Protocol.HTTP({
-                  url: self.wfsURL,
-                  //format: new OpenLayers.Format.GML()
-                  format: this.options.format == 'GML2' ? new OpenLayers.Format.GML() : new OpenLayers.Format.KML({ extractStyles: true, extractAttributes: true}) 
-               }),                         
-               styleMap: self.style
-            });
-            layer.type = 'refLayers';
-               
-         } else {
 
-            // Vector      
-            layer = new OpenLayers.Layer.Vector(this.name, {
-               projection: gisportal.lonlat,
-               styleMap: self.style,
-               eventListeners: {
-                  'featureselected': function(event) {
-                     var feature = event.feature;
-                     var popup = new OpenLayers.Popup.FramedCloud("popup",
-                        OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
-                        null,
-                        feature.attributes.message + "<br>" + feature.attributes.location,
-                        null,
-                        true,
-                        null
-                     );
-                     popup.autoSize = true;
-                     popup.maxSize = new OpenLayers.Size(400, 500);
-                     popup.fixedRelativePosition = true;
-                     feature.popup = popup;
-                     map.addPopup(popup);
-                  },
-                  'featureunselected': function(event) {
-                     var feature = event.feature;
-                     map.removePopup(feature.popup);
-                     feature.popup.destroy();
-                     feature.popup = null;
-                  }
+         layer = new ol.layer.Tile({
+            title: this.displayName(),
+            source: new ol.source.TileWMS({
+               url:  this.wmsURL,
+               crossOrigin: null,
+               params: {
+                  layers: this.urlName,
+                  transparent: true,
+                  wrapDateLine: true,
+                  srs: gisportal.lonlat,
+                  VERSION: '1.1.1'
                }
-            }, {
-               typeName: self.name, format: 'image/png', transparent: true, 
-               exceptions: 'XML', version: '1.0', layers: '1'
-            });
-            layer.type = 'refLayers';
-            
-            var selector = gisportal.mapControls.selector;
-            var layers = selector.layers;
-   
-            if (typeof layers === 'undefined' || layers === null)
-               layers = [];
-   
-            layers.push(layer);     
-            gisportal.mapControls.selector.setLayer(layers);
-            
-            if (typeof self.times !== 'undefined' && self.times && self.times.length) {
-               self.temporal = true;
-               var times = [];
-               var dateToIDLookup = {};
-               for(var i = 0; i < self.times.length; i++) {
-                  var time = self.times[i];
-                  times.push(time.startdate);
-                  dateToIDLookup[time.startdate] = time.id;          
-               }
-               self.DTCache = times;
-               self.WFSDatesToIDs = dateToIDLookup;
-            }
-         }
-      }
-      
-      
-      if (layer.events)  { 
-         
-         layer.events.on({
-            "loadstart": gisportal.loading.increment,
-            "loadend": gisportal.loading.decrement
+            })
          })
          
-         if(layer.type != 'baseLayers') {   
-            // Check the layer state when its visibility is changed
-            layer.events.register("visibilitychanged", layer, function() {
-            });
-         }
+      } else if(this.type == 'refLayers') {
+         // TODO: Does this need re-9
+         // if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
+         //    // GML or KML
+         //    layer = new OpenLayers.Layer.Vector(self.name, {
+         //       projection: gisportal.lonlat,
+         //       strategies: [new OpenLayers.Strategy.Fixed()],    
+         //       protocol: new OpenLayers.Protocol.HTTP({
+         //          url: self.wfsURL,
+         //          //format: new OpenLayers.Format.GML()
+         //          format: this.options.format == 'GML2' ? new OpenLayers.Format.GML() : new OpenLayers.Format.KML({ extractStyles: true, extractAttributes: true}) 
+         //       }),                         
+         //       styleMap: self.style
+         //    });
+         //    layer.type = 'refLayers';
+               
+         // } else {
 
+         //    // Vector      
+         //    layer = new OpenLayers.Layer.Vector(this.name, {
+         //       projection: gisportal.lonlat,
+         //       styleMap: self.style,
+         //       eventListeners: {
+         //          'featureselected': function(event) {
+         //             var feature = event.feature;
+         //             var popup = new OpenLayers.Popup.FramedCloud("popup",
+         //                OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
+         //                null,
+         //                feature.attributes.message + "<br>" + feature.attributes.location,
+         //                null,
+         //                true,
+         //                null
+         //             );
+         //             popup.autoSize = true;
+         //             popup.maxSize = new OpenLayers.Size(400, 500);
+         //             popup.fixedRelativePosition = true;
+         //             feature.popup = popup;
+         //             map.addPopup(popup);
+         //          },
+         //          'featureunselected': function(event) {
+         //             var feature = event.feature;
+         //             map.removePopup(feature.popup);
+         //             feature.popup.destroy();
+         //             feature.popup = null;
+         //          }
+         //       }
+         //    }, {
+         //       typeName: self.name, format: 'image/png', transparent: true, 
+         //       exceptions: 'XML', version: '1.0', layers: '1'
+         //    });
+         //    layer.type = 'refLayers';
+            
+         //    var selector = gisportal.mapControls.selector;
+         //    var layers = selector.layers;
+   
+         //    if (typeof layers === 'undefined' || layers === null)
+         //       layers = [];
+   
+         //    layers.push(layer);     
+         //    gisportal.mapControls.selector.setLayer(layers);
+            
+         //    if (typeof self.times !== 'undefined' && self.times && self.times.length) {
+         //       self.temporal = true;
+         //       var times = [];
+         //       var dateToIDLookup = {};
+         //       for(var i = 0; i < self.times.length; i++) {
+         //          var time = self.times[i];
+         //          times.push(time.startdate);
+         //          dateToIDLookup[time.startdate] = time.id;          
+         //       }
+         //       self.DTCache = times;
+         //       self.WFSDatesToIDs = dateToIDLookup;
+         //    }
+         // }
       }
+      
+      layer.on('precompose', gisportal.loading.increment);
+      layer.on('postcompose', gisportal.loading.decrement);
+
+      // if (layer.events)  { 
+         
+      //    layer.events.on({
+      //       "loadstart": gisportal.loading.increment,
+      //       "loadend": gisportal.loading.decrement
+      //    })
+         
+      //    if(layer.type != 'baseLayers') {   
+      //       // Check the layer state when its visibility is changed
+      //       layer.events.register("visibilitychanged", layer, function() {
+      //       });
+      //    }
+
+      // }
       
       return layer;
    };
@@ -623,9 +637,7 @@ gisportal.layer = function( options ) {
     */ 
    this.removeOLLayer = function(layer, id) {
       // Remove the layer from the map.
-      // In this case layer.id is the id of the OL Layer
-      // not of the indicator.
-      map.removeLayer(map.getLayer(layer.id));
+      map.removeLayer(layer);
       
       if(this.type == 'opLayers') {
          gisportal.numOpLayers--;
