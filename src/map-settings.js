@@ -34,11 +34,25 @@ gisportal.map_settings.init = function() {
    var rendered = gisportal.templates['map-settings'](data)
    $('.js-map-options').html(rendered);    
 
+   // set the default value for the base map
+   if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
+      map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
+   } else {
+      map.addLayer(gisportal.baseLayers.EOX);   
+   }
+
    // set an action for the base map select changing
    $('#select-basemap').change(function() {
-   	gisporta.selectBaseLayer($('#select-basemap').val())
+   	gisportal.selectBaseLayer($('#select-basemap').val())
+      gisportal.indicatorsPanel.reorderLayers();
    	gisportal.events.emit('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
    });
+
+   // set the default value if one exists in config.js
+   if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
+      $('#select-country-borders').val(gisportal.config.countryBorder.defaultLayer);
+      gisportal.selectCountryBorderLayer(gisportal.config.countryBorder.defaultLayer);
+   };
 
    // set an action for the country borders select changing
    $('#select-country-borders').change(function() {
@@ -97,29 +111,26 @@ gisportal.createCountryBorderLayers = function() {
       })
    };
 
-   // set the default value if one exists in config.js
-   if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
-      $('#select-country-borders').val(gisportal.config.countryBorder.defaultLayer);
-      gisportal.selectCountryBorderLayer($('#select-country-borders').val());
-   };
 
 }
 
 gisportal.setCountryBordersToTopLayer = function() {
-   // // if the country border layer is on the map move it to the top
-   // var border_layer = map.getLayersByName('country_borders');
-   // if (border_layer.length > 0) {
-   //    border_layer[0].setZIndex(2000);   
-   // }
+   gisportal.selectCountryBorderLayer($('#select-country-borders').val());
 }
 
 gisportal.selectCountryBorderLayer = function(id) {
-   // first remove all other country layers that might be on the map
+   // // first remove all other country layers that might be on the map
    for (var prop in gisportal.countryBorderLayers) {
-      map.removeLayer(gisportal.countryBorderLayers[prop])
+      try {
+         map.removeLayer(gisportal.countryBorderLayers[prop])   
+      } catch(e) {
+         // nowt to do really, the layer may not be on the map
+      }
    }
-   // then add the selected one
-   map.addLayer(gisportal.countryBorderLayers[id]);
+   // then add the selected one, as long as it's not 'None' (0)
+   if (id != '0') {
+      map.addLayer(gisportal.countryBorderLayers[id]);
+   }  
 }
 
 
@@ -175,20 +186,17 @@ gisportal.createBaseLayers = function() {
          }) 
       })
    }
-
-   if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
-      map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
-   } else {
-      map.addLayer(gisportal.baseLayers.EOX);   
-   }
-
 };
 
 gisportal.selectBaseLayer = function(id) {
    // take off all the base maps
-   for (var prop in gisportal.baseLayers)
-      map.removeLayer(gisportal.baseLayers[prop])
-   });
+   for (var prop in gisportal.baseLayers) {
+      try {
+         map.removeLayer(gisportal.baseLayers[prop])
+      } catch(e) {
+         // nowt to do really, the base layer may not be on the map
+      }
+   }
    // then add the selected option and send it to the bottom
    map.addLayer(gisportal.baseLayers[id]);
 }

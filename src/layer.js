@@ -710,13 +710,13 @@ gisportal.removeLayer = function(layer) {
  * @param {integer} index - The index to set the layer
  */
 gisportal.setLayerIndex = function(layer, index) {
-   var noLayers = gisportal.selectedLayers.length;
-   var startIndex = map.layers.length - noLayers;
-   var name = layer.openlayers['anID'].name;
-   map.setLayerIndex(layer.openlayers['anID'], index);
+   // var noLayers = gisportal.selectedLayers.length;
+   // var startIndex = map.layers.length - noLayers;
+   // var name = layer.openlayers['anID'].name;
+   // map.setLayerIndex(layer.openlayers['anID'], index);
 
-   var vector = map.getLayersByName('POI Layer')[0];
-   map.setLayerIndex(vector, map.layers.length - 1);
+   // var vector = map.getLayersByName('POI Layer')[0];
+   // map.setLayerIndex(vector, map.layers.length - 1);
 };
 
 /**

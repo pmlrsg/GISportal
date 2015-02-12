@@ -8,50 +8,125 @@
 
 gisportal.selectionTools = {};
 
+var drawLayer;
+var draw;
+
 gisportal.selectionTools.init = function()  {
    gisportal.selectionTools.initDOM();
-   var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
+   // var vectorLayer = new OpenLayers.Layer.Vector('POI Layer', {
 
-      style : {
-         strokeColor : 'white',
-         fillColor : 'green',
-         strokeWidth : 2,
-         fillOpacity : 0.3,
-         pointRadius: 5
-      },
-      preFeatureInsert : function(feature) {
-         this.removeAllFeatures();
-      },
-      onFeatureInsert : function(feature) {
-         gisportal.selectionTools.ROIAdded(feature);
-      },
-      rendererOptions: { zIndexing: true },
-      renderers: ['Canvas', 'VML']
-   });
+   //    style : {
+   //       strokeColor : 'white',
+   //       fillColor : 'green',
+   //       strokeWidth : 2,
+   //       fillOpacity : 0.3,
+   //       pointRadius: 5
+   //    },
+   //    preFeatureInsert : function(feature) {
+   //       this.removeAllFeatures();
+   //    },
+   //    onFeatureInsert : function(feature) {
+   //       gisportal.selectionTools.ROIAdded(feature);
+   //    },
+   //    rendererOptions: { zIndexing: true },
+   //    renderers: ['Canvas', 'VML']
+   // });
    
-   vectorLayer.controlID = "poiLayer";
-   vectorLayer.displayInLayerSwitcher = false;
+   // vectorLayer.controlID = "poiLayer";
+   // vectorLayer.displayInLayerSwitcher = false;
 
-   map.addLayer(vectorLayer);
+   // map.addLayer(vectorLayer);
 
-   gisportal.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
+                                                // var featureOverlay = new ol.FeatureOverlay({
+                                                //    style: new ol.style.Style({
+                                                //       fill: new ol.style.Fill({
+                                                //       color: 'rgba(255, 255, 255, 0.2)'
+                                                //       }),
+                                                //       stroke: new ol.style.Stroke({
+                                                //          color: '#ffcc33',
+                                                //          width: 2
+                                                //       }),
+                                                //       image: new ol.style.Circle({
+                                                //          radius: 7,
+                                                //          fill: new ol.style.Fill({
+                                                //          color: '#ffcc33'
+                                                //          })
+                                                //       })
+                                                //    })
+                                                // });
 
-   gisportal.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon, {
-      handlerOptions: {
-         persist: false
-      }
+                                                // featureOverlay.setMap(map);
+
+                                                // var modify = new ol.interaction.Modify({
+                                                //    features: featureOverlay.getFeatures(),
+                                                //    // the SHIFT key must be pressed to delete vertices, so
+                                                //    // that new vertices can be drawn at the same position
+                                                //    // of existing vertices
+                                                //    deleteCondition: function(event) {
+                                                //       return ol.events.condition.shiftKeyOnly(event) &&
+                                                //          ol.events.condition.singleClick(event);
+                                                //    }
+                                                // });
+                                                // map.addInteraction(modify);
+
+                                                // var draw; // global so we can remove it later
+                                                
+                                                // function addInteraction() {
+                                                //    draw = new ol.interaction.Draw({
+                                                //       features: featureOverlay.getFeatures(),
+                                                //       type: /** @type {ol.geom.GeometryType} */ (typeSelect.value)
+                                                //    });
+                                                //    map.addInteraction(draw);
+                                                // }
+
+
+   
+
+   drawLayer = new ol.layer.Vector({
+      source : new ol.source.Vector(),
+         style : new ol.style.Style({
+            fill : new ol.style.Fill({
+            color : 'rgba(255, 255, 255, 0.2)'
+         }),
+         stroke : new ol.style.Stroke({
+            color : '#ffcc33',
+            width : 2
+         }),
+         image : new ol.style.Circle({
+            radius : 7,
+            fill : new ol.style.Fill({
+               color : '#ffcc33'
+            })
+         })
+      })
    });
 
-   gisportal.mapControls.line = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Path, {
-      handlerOption : {
-         persist : false
-      }
-   });
-   gisportal.wkt = new OpenLayers.Format.WKT();
+   map.addLayer(drawLayer);
 
-   map.addControls([gisportal.mapControls.box, gisportal.mapControls.polygon, gisportal.mapControls.line]);
+   // gisportal.mapControls.box = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.RegularPolygon, {handlerOptions:{sides: 4, irregular: true, persist: false }});
+
+   // gisportal.mapControls.polygon = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Polygon, {
+   //    handlerOptions: {
+   //       persist: false
+   //    }
+   // });
+
+   // gisportal.mapControls.line = new OpenLayers.Control.DrawFeature(vectorLayer, OpenLayers.Handler.Path, {
+   //    handlerOption : {
+   //       persist : false
+   //    }
+   // });
+   // gisportal.wkt = new OpenLayers.Format.WKT();
+
+   // map.addControls([gisportal.mapControls.box, gisportal.mapControls.polygon, gisportal.mapControls.line]);
  
 };
+
+function cancelDraw() {
+   if(draw == null)return;
+   
+   map.removeInteraction(draw);
+}
 
 gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI);
@@ -67,6 +142,19 @@ gisportal.selectionTools.initDOM = function()  {
       console.log('clicked the line draw');
       gisportal.selectionTools.toggleTool('line');
    });
+
+   // map image export - problems with cross origin tainting the canvas are preventing this from working. 
+   // With cross origin set to 'anonymous' it should work but the headers at rsg.pml.ac.uk then prevent the 
+   // country borders from loading
+   $('<button class="js-export-image" title="Download current view as image" download="map.png"><span class="icon-download-10"></span></button>').appendTo('.ol-full-screen');
+   $('.js-export-image').on('click', function(e) {
+      map.once('postcompose', function(event) {
+      var canvas = event.context.canvas;
+         $('.js-export-image').href = canvas.toDataURL('image/png');
+      });
+      map.renderSync();
+   })
+
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {
@@ -87,27 +175,38 @@ gisportal.selectionTools.getActiveControl = function() {
    return activeControl;
 };
 
-gisportal.selectionTools.toggleTool = function(tool)  {
-   var vectorLayer = map.layers[map.layers.length - 1];
-
-   var isActive = false;
-   for (var key in gisportal.mapControls)  {
-      var control = gisportal.mapControls[key];
-      if (key === tool) {
-         control.activate();
-         isActive = true;
-      }
-      else  {
-         control.deactivate();
-      }
-   } 
-
-   if (!isActive) {
-      console.log('There were no tools toggled, so pan has been activated');
-      gisportal.mapControls['pan'].activate();
+gisportal.selectionTools.toggleTool = function(type)  {
+   if (draw != null) {
+      cancelDraw();
    }
+   
+   draw = new ol.interaction.Draw({
+      source:drawLayer.getSource(),
+      type:'MultiPolygon',
+      sides: 4
+   });
+   map.addInteraction(draw);
 
-   map.ROI_Type = tool;
+   // var vectorLayer = map.layers[map.layers.length - 1];
+
+   // var isActive = false;
+   // for (var key in gisportal.mapControls)  {
+   //    var control = gisportal.mapControls[key];
+   //    if (key === tool) {
+   //       control.activate();
+   //       isActive = true;
+   //    }
+   //    else  {
+   //       control.deactivate();
+   //    }
+   // } 
+
+   // if (!isActive) {
+   //    console.log('There were no tools toggled, so pan has been activated');
+   //    gisportal.mapControls['pan'].activate();
+   // }
+
+   // map.ROI_Type = tool;
 
 };
 
@@ -241,8 +340,10 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          $('.js-bbox-area').html(pretty_area_km + ' km<sup>2</sup>');
          break;
    }
+ 
+};
 
-
-
-   
+gisportal.selectionTools.setDrawLayerToTop = function() {
+   map.removeLayer(drawLayer);
+   map.addLayer(drawLayer);
 };

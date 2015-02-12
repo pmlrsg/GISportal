@@ -299,9 +299,15 @@ gisportal.mapInit = function() {
 
    map = new ol.Map({
       target: 'map',
-      controls: ol.control.defaults().extend([
-         new ol.control.FullScreen()
-      ]),
+      controls: [
+         new ol.control.FullScreen({
+            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+         }),
+         new ol.control.Zoom({
+            zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
+            zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
+         })
+      ],
       view: new ol.View({
          projection: gisportal.lonlat,
          center: [0, 0],
@@ -318,34 +324,8 @@ gisportal.mapInit = function() {
    // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    
-   // TODO: re-implement zoomy buttons
-   // // Create map controls identified by key values which can be activated and deactivated
-   // gisportal.mapControls = {
-   //    zoomIn: new OpenLayers.Control.ZoomBox(
-   //       { out: false, alwaysZoom: true }
-   //    ),
-   //    zoomOut: new OpenLayers.Control.ZoomBox(
-   //       { out: true, alwaysZoom: true }
-   //    ),
-   //    pan: new OpenLayers.Control.Navigation(),
-   //    selector: new OpenLayers.Control.SelectFeature([], {
-   //       hover: false,
-   //       autoActive: true
-   //    })
-   // };
-
-   // // Add all the controls to the map
-   // for (var key in gisportal.mapControls) {
-   //    var control = gisportal.mapControls[key];
-   //    map.addControl(control);
-   // }
-
-   // gisportal.quickRegions.setup();
-   // gisportal.selectionTools.init();
-
-   // if(!map.getCenter())
-   //    map.zoomTo(3);
-
+   // add vector layer for drawing area of interest polygons, and set up tools
+   gisportal.selectionTools.init();
 
 };
 

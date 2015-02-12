@@ -177,12 +177,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       },
       stop : function(event, ui) {
          $(ui.item).children('div.indicator-header').removeClass('indicator-header-moving'); 
-         // change the layer order
-         var layers = [];
-         $('.sortable-list .indicator-header').each(function() {
-            layers.push($(this).data('provider') + ': ' + $(this).data('name'));
-         })
-         gisportal.indicatorsPanel.reorderLayers(layers);
+         gisportal.indicatorsPanel.reorderLayers();
       }
    });
 };
@@ -308,14 +303,27 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    gisportal.events.emit('layer.addtopanel', data)
 };
 
-gisportal.indicatorsPanel.reorderLayers = function(layers) {
-   var index = layers.length;
-   for(var i = 0; i < layers.length; i++) {
-      var layer = map.getLayersByName(layers[i])[0];
-      console.log('setting '+layer.name+' as '+ parseInt(index - i));
-      map.setLayerIndex(layer, index-i);
+gisportal.indicatorsPanel.reorderLayers = function() {
+   var layers = [];
+   $('.sortable-list .indicator-header').each(function() {
+      layers.push($(this).parent().data('id'));
+   })
+
+   // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
+   for (var i = 0; i < map.getLayers().a.length + 1; i++) {
+      map.removeLayer(map.getLayers().a[0]);
    }
 
+   // stick the base layer back on
+   map.addLayer(gisportal.baseLayers[$('#select-basemap').val()]);
+
+   // then the indicator layers
+   for (var l = layers.length - 1; l > -1; l--) {
+      map.addLayer(gisportal.layers[layers[l]].openlayers['anID']);
+   }
+
+   gisportal.setCountryBordersToTopLayer();
+   gisportal.selectionTools.setDrawLayerToTop();
 }
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
