@@ -509,12 +509,13 @@ gisportal.layer = function( options ) {
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
                // that existed in ol2. It is planned so this function could be replaced in time
+
+               // TODO - work out how to handle tiles that don't finish loading before the map has been moved
                tileLoadFunction: function(tile, src) {
                   gisportal.loading.increment();
 
                   var tileElement = tile.getImage();
                   tileElement.onload = function() {
-                     console.log(tileElement +' loaded');
                      gisportal.loading.decrement();
                   };
                   tileElement.src = src;

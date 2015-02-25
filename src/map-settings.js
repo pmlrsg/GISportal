@@ -94,7 +94,6 @@ gisportal.createCountryBorderLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -113,7 +112,6 @@ gisportal.createCountryBorderLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -132,7 +130,6 @@ gisportal.createCountryBorderLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -182,7 +179,6 @@ gisportal.createBaseLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -201,7 +197,6 @@ gisportal.createBaseLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -220,7 +215,6 @@ gisportal.createBaseLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -239,7 +233,6 @@ gisportal.createBaseLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;
@@ -258,7 +251,6 @@ gisportal.createBaseLayers = function() {
 
                var tileElement = tile.getImage();
                tileElement.onload = function() {
-                  console.log(tileElement +' loaded');
                   gisportal.loading.decrement();
                };
                tileElement.src = src;

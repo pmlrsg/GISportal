@@ -454,6 +454,9 @@ gisportal.saveState = function(state) {
    state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
+   state.map.baselayer = $('#select-basemap').val()
+   state.map.countryborders = $('#select-country-borders').val()
+   state.map.graticules = $('#select-graticules').val()
 
    return state;
 };
@@ -520,6 +523,19 @@ gisportal.loadState = function(state) {
       if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
    }
 
+   if (stateMap.baselayer) {
+      gisportal.selectBaseLayer(stateMap.baselayer);
+      $('#select-basemap').val(stateMap.baselayer);
+   }
+
+   if (stateMap.countryborders) {
+      gisportal.selectCountryBorderLayer(stateMap.countryborders);
+      $('#select-country-borders').val(stateMap.countryborders);
+   }
+
+   if (stateMap.graticules) {
+      $('#select-graticules').val(stateMap.graticules);
+   }
 
 };
 
