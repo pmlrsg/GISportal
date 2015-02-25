@@ -88,7 +88,17 @@ gisportal.createCountryBorderLayers = function() {
          source: new ol.source.TileWMS({
             url: 'https://rsg.pml.ac.uk/geoserver/wms?',
             crossOrigin: null,
-            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line-white', SRS: gisportal.lonlat}
+            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line-white', SRS: gisportal.lonlat},
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }),
       }),
       countries_all_black: new ol.layer.Tile({ 
@@ -97,7 +107,17 @@ gisportal.createCountryBorderLayers = function() {
          source: new ol.source.TileWMS({
             url: 'https://rsg.pml.ac.uk/geoserver/wms?',
             crossOrigin: null,
-            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line_black', SRS: gisportal.lonlat}
+            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line_black', SRS: gisportal.lonlat},
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }),
       }),
       countries_all_blue: new ol.layer.Tile({ 
@@ -106,7 +126,17 @@ gisportal.createCountryBorderLayers = function() {
          source: new ol.source.TileWMS({
             url: 'https://rsg.pml.ac.uk/geoserver/wms?',
             crossOrigin: null,
-            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line', SRS: gisportal.lonlat}
+            params: { LAYERS: 'rsg:full_10m_borders', VERSION: '1.1.0', STYLES: 'line', SRS: gisportal.lonlat},
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }),
       })
    };
@@ -147,6 +177,16 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.lonlat, wrapDateLine: true },
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }) 
       }),
       GEBCO: new ol.layer.Tile({
@@ -156,6 +196,16 @@ gisportal.createBaseLayers = function() {
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.lonlat, FORMAT: 'image/jpeg', wrapDateLine: true },
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }) 
       }),
       MetacartaBasic: new ol.layer.Tile({
@@ -165,6 +215,16 @@ gisportal.createBaseLayers = function() {
             url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
             crossOrigin: null,
             params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.lonlat, wrapDateLine: true },
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }) 
       }),
       Landsat: new ol.layer.Tile({
@@ -174,6 +234,16 @@ gisportal.createBaseLayers = function() {
             url: 'http://irs.gis-lab.info/?',
             crossOrigin: null,
             params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.lonlat, wrapDateLine: true },
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }) 
       }),
       BlueMarble: new ol.layer.Tile({
@@ -183,6 +253,16 @@ gisportal.createBaseLayers = function() {
             url: 'http://demonstrator.vegaspace.com/wmspub/?',
             crossOrigin: null,
             params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.lonlat, wrapDateLine: true },
+            tileLoadFunction: function(tile, src) {
+               gisportal.loading.increment();
+
+               var tileElement = tile.getImage();
+               tileElement.onload = function() {
+                  console.log(tileElement +' loaded');
+                  gisportal.loading.decrement();
+               };
+               tileElement.src = src;
+            }
          }) 
       })
    }

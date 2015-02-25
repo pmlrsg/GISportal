@@ -506,10 +506,22 @@ gisportal.layer = function( options ) {
                   wrapDateLine: true,
                   srs: gisportal.lonlat,
                   VERSION: '1.1.1'
+               },
+               // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
+               // that existed in ol2. It is planned so this function could be replaced in time
+               tileLoadFunction: function(tile, src) {
+                  gisportal.loading.increment();
+
+                  var tileElement = tile.getImage();
+                  tileElement.onload = function() {
+                     console.log(tileElement +' loaded');
+                     gisportal.loading.decrement();
+                  };
+                  tileElement.src = src;
                }
             })
          })
-         
+
       } else if(this.type == 'refLayers') {
          // TODO: Does this need re-9
          // if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
@@ -585,24 +597,6 @@ gisportal.layer = function( options ) {
          //    }
          // }
       }
-      
-      layer.on('precompose', gisportal.loading.increment);
-      layer.on('postcompose', gisportal.loading.decrement);
-
-      // if (layer.events)  { 
-         
-      //    layer.events.on({
-      //       "loadstart": gisportal.loading.increment,
-      //       "loadend": gisportal.loading.decrement
-      //    })
-         
-      //    if(layer.type != 'baseLayers') {   
-      //       // Check the layer state when its visibility is changed
-      //       layer.events.register("visibilitychanged", layer, function() {
-      //       });
-      //    }
-
-      // }
       
       return layer;
    };

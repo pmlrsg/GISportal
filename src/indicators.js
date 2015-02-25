@@ -310,10 +310,13 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    })
 
    // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
-   for (var i = 0; i < map.getLayers().a.length + 1; i++) {
-      map.removeLayer(map.getLayers().a[0]);
+   var currentLayers = map.getLayers().a;
+   if (currentLayers) {
+      for (var i = 0; i < map.getLayers().a.length + 1; i++) {
+         map.removeLayer(map.getLayers().a[0]);
+      }
    }
-
+   
    // stick the base layer back on
    map.addLayer(gisportal.baseLayers[$('#select-basemap').val()]);
 
