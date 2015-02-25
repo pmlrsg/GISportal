@@ -406,25 +406,29 @@ gisportal.saveState = function(state) {
    state.map.layers = {}; 
    state.timeline = {}; 
 
-   // Get the current layers and any settings/options for them.
-   var keys = gisportal.selectedLayers;
-   for(var i = 0, len = keys.length; i < len; i++) {
-      var selectedIndicator = gisportal.selectedLayers[i];
+   // // Get the current layers and any settings/options for them.
+   // var keys = gisportal.selectedLayers;
+   // for(var i = 0, len = keys.length; i < len; i++) {
+   //    var selectedIndicator = gisportal.selectedLayers[i];
 
-      if (selectedIndicator)  {
-         var indicator = gisportal.layers[selectedIndicator];
-         state.map.layers[indicator.id] = {
-            'selected': indicator.selected,
-            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
-            'style': indicator.style !== null ? indicator.style : '',
-            'minScaleVal': indicator.minScaleVal,
-            'maxScaleVal': indicator.maxScaleVal,
-            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
-         };    
-      }
-   }
+   //    if (selectedIndicator)  {
+   //       var indicator = gisportal.layers[selectedIndicator];
+   //       state.map.layers[indicator.id] = {
+   //          'selected': indicator.selected,
+   //          'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+   //          'style': indicator.style !== null ? indicator.style : '',
+   //          'minScaleVal': indicator.minScaleVal,
+   //          'maxScaleVal': indicator.maxScaleVal,
+   //          'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
+   //       };    
+   //    }
+   // }
    // outside of loop so it can be easily ordered 
-   state.selectedIndicators = gisportal.selectedLayers;
+   var layers = [];
+   $('.sortable-list .indicator-header').each(function() {
+      layers.unshift($(this).parent().data('id'));
+   })
+   state.selectedIndicators = layers;
    
    // Get currently selected date.
    if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
