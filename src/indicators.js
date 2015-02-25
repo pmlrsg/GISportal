@@ -323,7 +323,7 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    }
 
    gisportal.setCountryBordersToTopLayer();
-   gisportal.selectionTools.setDrawLayerToTop();
+   gisportal.selectionTools.setVectorLayerToTop();
 }
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {

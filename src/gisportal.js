@@ -400,62 +400,63 @@ gisportal.hasAutoSaveState = function(){
  * @param {object} state - Optional, allows a previous state to be extended 
  */
 gisportal.saveState = function(state) {
-// TODO: Re-enable 
-   // var state = state || {}; 
-   // // Save layers
-   // state.map = {};
-   // state.selectedIndicators = [];
-   // state.map.layers = {}; 
-   // state.timeline = {}; 
+   var state = state || {}; 
+   // Save layers
+   state.map = {};
+   state.selectedIndicators = [];
+   state.map.layers = {}; 
+   state.timeline = {}; 
 
-   // // Get the current layers and any settings/options for them.
-   // var keys = gisportal.selectedLayers;
-   // for(var i = 0, len = keys.length; i < len; i++) {
-   //    var selectedIndicator = gisportal.selectedLayers[i];
+   // Get the current layers and any settings/options for them.
+   var keys = gisportal.selectedLayers;
+   for(var i = 0, len = keys.length; i < len; i++) {
+      var selectedIndicator = gisportal.selectedLayers[i];
 
-   //    if (selectedIndicator)  {
-   //       var indicator = gisportal.layers[selectedIndicator];
-   //       state.map.layers[indicator.id] = {
-   //          'selected': indicator.selected,
-   //          'opacity': indicator.opacity !== null ? indicator.opacity : 1,
-   //          'style': indicator.style !== null ? indicator.style : '',
-   //          'minScaleVal': indicator.minScaleVal,
-   //          'maxScaleVal': indicator.maxScaleVal,
-   //          'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
-   //       };    
-   //    }
-   // }
-   // // outside of loop so it can be easily ordered 
-   // state.selectedIndicators = gisportal.selectedLayers;
+      if (selectedIndicator)  {
+         var indicator = gisportal.layers[selectedIndicator];
+         state.map.layers[indicator.id] = {
+            'selected': indicator.selected,
+            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+            'style': indicator.style !== null ? indicator.style : '',
+            'minScaleVal': indicator.minScaleVal,
+            'maxScaleVal': indicator.maxScaleVal,
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
+         };    
+      }
+   }
+   // outside of loop so it can be easily ordered 
+   state.selectedIndicators = gisportal.selectedLayers;
    
-   // // Get currently selected date.
-   // if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
-   //    state.map.date = gisportal.timeline.getDate();
-   // }
+   // Get currently selected date.
+   if(!gisportal.utils.isNullorUndefined($('.js-current-date').val())) {
+      state.map.date = gisportal.timeline.getDate();
+   }
      
-   // // Get selection from the map
-   // var layer = map.getLayersBy('controlID', 'poiLayer')[0];
-   // if(layer.features.length > 0) {
-   //    var feature = layer.features[0];
-   //    state.map.feature = gisportal.featureToGeoJSON(feature);
-   // }
+   // Get selection from the map
+   var features = gisportal.vectorLayer.getSource().getFeatures();
+   var geoJsonFormat = new ol.format.GeoJSON;
+   var featureOptions = {
+      'dataProjection': gisportal.lonlat,
+      'featureProjection': gisportal.lonlat
+   }
+   state.map.feature = geoJsonFormat.writeFeatures(features, featureOptions);   
    
-   // // Get zoom level
-   // state.map.zoom = map.zoom;
+   // Get zoom level
+   state.map.zoom = map.getView().getZoom();
 
-   // // Get position
-   // state.map.extent = map.getExtent();
+   // Get position
+   state.map.centre = map.getView().getCenter();
 
-   // // Get quick regions
-   // state.map.regions = gisportal.quickRegion;
-   // state.map.selectedRegion = $('#quickRegion option:selected').val();
+   // Get quick regions
+   state.map.regions = gisportal.quickRegion;
+   state.map.selectedRegion = $('#quickRegion option:selected').val();
 
-   // // Get timeline zoom
-   // state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
-   // state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
+   // Get timeline zoom
+   state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
+   state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
 
-   // return state;
+   return state;
 };
 
 /**
@@ -490,15 +491,20 @@ gisportal.loadState = function(state) {
    }
    
    // Create the feature if there is one
-   indicator = {};
-   if(!gisportal.utils.isNullorUndefined(stateMap.feature)) {
-      var layer = map.getLayersBy('type', 'poiLayer')[0];
-      if (layer) layer.addFeatures(gisportal.geoJSONToFeature(stateMap.feature));
-    }
+   if (stateMap.feature) {    // Array.<ol.Feature>
+      var geoJsonFormat = new ol.format.GeoJSON;
+      var featureOptions = {
+         'dataProjection': gisportal.lonlat,
+         'featureProjection': gisportal.lonlat
+      };
+      var features = geoJsonFormat.readFeatures(stateMap.feature, featureOptions);
+      gisportal.vectorLayer.getSource().addFeatures(features);
+   }
    
-   // Load position
-   if (stateMap.extent)
-      map.zoomToExtent(new OpenLayers.Bounds([stateMap.extent.left,stateMap.extent.bottom, stateMap.extent.right, stateMap.extent.top]));
+   // Load position & zoom
+   var view = map.getView();
+   view.setZoom(stateMap.zoom);
+   view.setCenter(stateMap.centre)
 
    // Load Quick Regions
    if (stateMap.regions) {
@@ -685,11 +691,6 @@ gisportal.main = function() {
          console.log('Loading Default State...');
       }
 
-      // Replaces all .icon-svg with actual SVG elements,
-      // so that they can be styled with CSS
-      // which cannot be done with SVG in background-image
-      // or <img>
-      
    });
 };
 
@@ -754,12 +755,12 @@ gisportal.initStart = function()  {
    var autoLoad = null;
    if( gisportal.config.skipWelcomePage == true )
       if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
-         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+         var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
       else
          var autoLoad = function(){ gisportal.launchMap(); };
 
    else if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
-      var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); };
+      var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
 
    if( autoLoad != null)
       return setTimeout(autoLoad, 1000);

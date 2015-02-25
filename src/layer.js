@@ -676,6 +676,7 @@ gisportal.addLayer = function(layer, options) {
   
    layer.setVisibility(options.visible); 
    gisportal.setCountryBordersToTopLayer();
+   gisportal.selectionTools.setVectorLayerToTop();
 };
 
 /**
