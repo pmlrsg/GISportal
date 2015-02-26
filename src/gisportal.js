@@ -317,6 +317,12 @@ gisportal.mapInit = function() {
       logo: false
    })
 
+   map.addInteraction(new ol.interaction.Select({
+      condition: function(e) {
+         return e.originalEvent.type=='mousemove';
+      }
+   }));
+   
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
    gisportal.loadLayers();
