@@ -6,7 +6,7 @@ collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false;
 // socket.io location settings
 collaboration.protocol = gisportal.config.collaborationFeatures.protocol || 'http'; 	// 'http' or 'https'; the connection is automagically upgraded to a websocket connection
 collaboration.host = gisportal.config.collaborationFeatures.host || 'localhost';
-collaboration.port = gisportal.config.collaborationFeatures.port || '6789';
+collaboration.port = gisportal.config.collaborationFeatures.port || '';
 collaboration.path = gisportal.config.collaborationFeatures.path || '';				// optional path; must start with a /
 
 // jquery selectors for various control elements

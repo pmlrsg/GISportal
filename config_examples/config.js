@@ -37,11 +37,11 @@ gisportal.config = {
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
    },
    collaborationFeatures : {
-      enabled : true,                              // (true|false) > If false the collaboration tab will be hidden
-      protocol : 'http';                           // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
-      host : 'pmpc1465.npm.ac.uk';                 // the hostname of the node server running collaboration/index.js
-      port : '';                               // must match the port specified in collaboration/config/config.js
-      path : '';                                   // optional path; must start with a /
+      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      port : '',                                    // must match the port specified in collaboration/config/config.js
+      path : '',                                    // optional path; must start with a /
    },
    defaultBaseMap : "GEBCO",
    // Should layers auto scale by default
