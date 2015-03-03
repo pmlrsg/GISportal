@@ -108,15 +108,15 @@ gisportal.indicatorsPanel.initDOM = function() {
       if (indicator === null)
          return;
 
-      var bbox = new OpenLayers.Bounds(
-         indicator.exBoundingBox.WestBoundLongitude,
-         indicator.exBoundingBox.SouthBoundLatitude,
-         indicator.exBoundingBox.EastBoundLongitude,
-         indicator.exBoundingBox.NorthBoundLatitude
-      ).transform(map.displayProjection, map.projection);
-
-      map.zoomToExtent(bbox);
+      var bbox = [
+         parseFloat(indicator.exBoundingBox.WestBoundLongitude),
+         parseFloat(indicator.exBoundingBox.SouthBoundLatitude),
+         parseFloat(indicator.exBoundingBox.EastBoundLongitude),
+         parseFloat(indicator.exBoundingBox.NorthBoundLatitude)
+      ]
+      map.getView().fitExtent(bbox, map.getSize());
    });
+
    //Share this map
    $('.js-share').on('click', function() {
       gisportal.openid.showShare();

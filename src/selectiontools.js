@@ -50,7 +50,7 @@ gisportal.selectionTools.init = function()  {
          feature = features[0];
 
       }
-      console.log('feature')
+      //console.log('feature')
    });
    map.on('postrender', function(renderEvent) {
       if (feature) {
@@ -158,22 +158,7 @@ gisportal.selectionTools.toggleTool = function(type)  {
 };
 
 gisportal.selectionTools.updateROI = function()  {
-   var values = $(this).val().split(',');
-   values[0] = gisportal.utils.clamp(values[0], -180, 180); // Long
-   values[2] = gisportal.utils.clamp(values[2], -180, 180); // Long
-   values[1] = gisportal.utils.clamp(values[1], -90, 90); // Lat
-   values[3] = gisportal.utils.clamp(values[3], -90, 90); // Lat
-   $(this).val(values[0] + ',' + values[1] + ',' + values[2] + ',' + values[3]);
-   var feature = new OpenLayers.Feature.Vector(new OpenLayers.Bounds(values[0], values[1], values[2], values[3]).toGeometry());
-   
-   // map.layers corrosponds to layers of the map,
-   // such as base layer and vector, not indicators on the map
-   var vectorLayer = map.layers[map.layers.length - 1];
-   feature.layer = vectorLayer;
-   var features = vectorLayer.features;
-   if (features[0]) vectorLayer.features[0].destroy();
-   vectorLayer.features[0] = feature;
-   vectorLayer.redraw(); 
+   // this will all change with the pre-saved area selection options that are coming   
 };
 
 gisportal.currentSelectedRegion = "";

@@ -176,7 +176,7 @@ gisportal.layer = function( options ) {
          this.style = "boxfill/rainbow";
          
       } else if(this.type == "refLayers") {
-         this.style = new OpenLayers.StyleMap(this.options.style);
+         // intended for WFS type layers that are not time related
       }
       
       var olLayer = this.createOLLayer(); // Create OL layer.
@@ -317,7 +317,9 @@ gisportal.layer = function( options ) {
          
          $('#viewDate').datepicker("option", "defaultDate", endDate);
 
-         gisportal.zoomOverall();
+         if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
+            gisportal.zoomOverall();   
+         }
       } else {
          layer.setVisibility(true);
       } 
@@ -524,79 +526,7 @@ gisportal.layer = function( options ) {
          })
 
       } else if(this.type == 'refLayers') {
-         // TODO: Does this need re-9
-         // if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
-         //    // GML or KML
-         //    layer = new OpenLayers.Layer.Vector(self.name, {
-         //       projection: gisportal.projection,
-         //       strategies: [new OpenLayers.Strategy.Fixed()],    
-         //       protocol: new OpenLayers.Protocol.HTTP({
-         //          url: self.wfsURL,
-         //          //format: new OpenLayers.Format.GML()
-         //          format: this.options.format == 'GML2' ? new OpenLayers.Format.GML() : new OpenLayers.Format.KML({ extractStyles: true, extractAttributes: true}) 
-         //       }),                         
-         //       styleMap: self.style
-         //    });
-         //    layer.type = 'refLayers';
-               
-         // } else {
-
-         //    // Vector      
-         //    layer = new OpenLayers.Layer.Vector(this.name, {
-         //       projection: gisportal.projection,
-         //       styleMap: self.style,
-         //       eventListeners: {
-         //          'featureselected': function(event) {
-         //             var feature = event.feature;
-         //             var popup = new OpenLayers.Popup.FramedCloud("popup",
-         //                OpenLayers.LonLat.fromString(feature.geometry.toShortString()),
-         //                null,
-         //                feature.attributes.message + "<br>" + feature.attributes.location,
-         //                null,
-         //                true,
-         //                null
-         //             );
-         //             popup.autoSize = true;
-         //             popup.maxSize = new OpenLayers.Size(400, 500);
-         //             popup.fixedRelativePosition = true;
-         //             feature.popup = popup;
-         //             map.addPopup(popup);
-         //          },
-         //          'featureunselected': function(event) {
-         //             var feature = event.feature;
-         //             map.removePopup(feature.popup);
-         //             feature.popup.destroy();
-         //             feature.popup = null;
-         //          }
-         //       }
-         //    }, {
-         //       typeName: self.name, format: 'image/png', transparent: true, 
-         //       exceptions: 'XML', version: '1.0', layers: '1'
-         //    });
-         //    layer.type = 'refLayers';
-            
-         //    var selector = gisportal.mapControls.selector;
-         //    var layers = selector.layers;
-   
-         //    if (typeof layers === 'undefined' || layers === null)
-         //       layers = [];
-   
-         //    layers.push(layer);     
-         //    gisportal.mapControls.selector.setLayer(layers);
-            
-         //    if (typeof self.times !== 'undefined' && self.times && self.times.length) {
-         //       self.temporal = true;
-         //       var times = [];
-         //       var dateToIDLookup = {};
-         //       for(var i = 0; i < self.times.length; i++) {
-         //          var time = self.times[i];
-         //          times.push(time.startdate);
-         //          dateToIDLookup[time.startdate] = time.id;          
-         //       }
-         //       self.DTCache = times;
-         //       self.WFSDatesToIDs = dateToIDLookup;
-         //    }
-         // }
+         // intended for WFS type layers that are not time related
       }
       
       return layer;

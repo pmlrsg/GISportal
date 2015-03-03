@@ -75,22 +75,6 @@ gisportal.timeline = null;
 // Predefined map coordinate systems
 gisportal.projection = 'EPSG:4326';
 
-// Quick regions array in the format "Name",W,S,E,N
-gisportal.quickRegion = [
-   ["World View", -150, -90, 150, 90],
-   ["European Seas", -23.44, 20.14, 39.88, 68.82],
-   ["Adriatic", 11.83, 39.00, 20.67, 45.80],
-   ["Baltic", 9.00, 51.08, 30.50, 67.62],
-   ["Biscay", -10, 43.00, 0, 49.00],
-   ["Black Sea", 27.30, 38.50, 42.00, 49.80],
-   ["English Channel", -5.00, 46.67, 4.30, 53.83],
-   ["Eastern Med.", 20.00, 29.35, 36.00, 41.65],
-   ["North Sea", -4.50, 50.20, 8.90, 60.50],
-   ["Western Med.", -6.00, 30.80, 16.50, 48.10],
-   ["Mediterranean", -6.00, 29.35, 36.00, 48.10]
-];
-
-
 /**
  * The OpenLayers map object
  * Soon to be attached to gisportal namespace
@@ -444,10 +428,6 @@ gisportal.saveState = function(state) {
    // Get position
    state.map.centre = map.getView().getCenter();
 
-   // Get quick regions
-   state.map.regions = gisportal.quickRegion;
-   state.map.selectedRegion = $('#quickRegion option:selected').val();
-
    // Get timeline zoom
    state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
@@ -464,6 +444,7 @@ gisportal.saveState = function(state) {
  * @param {object} state - The saved state object
  */
 gisportal.loadState = function(state) {
+   
    gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    var state = state || {};
@@ -483,7 +464,8 @@ gisportal.loadState = function(state) {
       else indicator = gisportal.layers[keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
          gisportal.configurePanel.close();
-//         console.log(indicator);
+         // this stops the map from auto zooming to the max extent of all loaded layers
+         indicator.preventAutoZoom = true;
 
          gisportal.refinePanel.foundIndicator(indicator.id);
         
@@ -501,19 +483,10 @@ gisportal.loadState = function(state) {
       gisportal.vectorLayer.getSource().addFeatures(features);
    }
    
-   // Load position & zoom
-   var view = map.getView();
-   view.setZoom(stateMap.zoom);
-   view.setCenter(stateMap.centre)
-
    // Load Quick Regions
    if (stateMap.regions) {
       gisportal.quickRegion = stateMap.regions;
       gisportal.quickRegions.setup();
-   }
-
-   if (stateMap.selectedRegion)  {
-      $('#quickRegion').val(stateMap.selectedRegion);
    }
 
    if (stateTimeline)  {
@@ -535,6 +508,11 @@ gisportal.loadState = function(state) {
       $('#select-graticules').val(stateMap.graticules);
    }
 
+   // Load position & zoom
+   var view = map.getView();
+   view.setZoom(stateMap.zoom);
+   view.setCenter(stateMap.centre);
+
 };
 
 /**
@@ -542,8 +520,8 @@ gisportal.loadState = function(state) {
  * @param {object} feature - The feature
  */
 gisportal.featureToGeoJSON = function(feature) {
-   var geoJSON = new OpenLayers.Format.GeoJSON();
-   return geoJSON.write(feature);
+   var geoJSON = new ol.format.GeoJSON();
+   return geoJSON.writeFeature(feature);
 };
 
 /**
@@ -551,8 +529,8 @@ gisportal.featureToGeoJSON = function(feature) {
  * @param {string} geoJSONFeature - The GeoJSON
  */
 gisportal.geoJSONToFeature = function(geoJSONFeature) {
-   var geoJSON = new OpenLayers.Format.GeoJSON();
-   return geoJSON.read(geoJSONFeature); 
+   var geoJSON = new ol.format.GeoJSON();
+   return geoJSON.readFeature(geoJSONFeature); 
 };
 
 /**
@@ -736,23 +714,18 @@ gisportal.zoomOverall = function()  {
    if (Object.keys(gisportal.selectedLayers).length > 0)  {
 
       // minX, minY, maxX, maxY
-      var largestBounds = [ 
-         Number.MAX_VALUE,
-         Number.MAX_VALUE,
-         Number.MIN_VALUE,
-         Number.MIN_VALUE
-      ];
+      var largestBounds = [ 180, 90, -180, -90 ]
 
       for (var i = 0; i < gisportal.selectedLayers.length; i++)  {
          var layer = gisportal.layers[gisportal.selectedLayers[i]].boundingBox;
-         if (+layer.MinX < +largestBounds[0]) largestBounds[0] = layer.MinX; // left 
-         if (+layer.MinY < +largestBounds[1]) largestBounds[1] = layer.MinY; // bottom
-         if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = layer.MaxX; // right 
-         if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = layer.MaxY; // top
+         if (+layer.MinX < +largestBounds[0]) largestBounds[0] = parseFloat(layer.MinX); // left 
+         if (+layer.MinY < +largestBounds[1]) largestBounds[1] = parseFloat(layer.MinY); // bottom
+         if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = parseFloat(layer.MaxX); // right 
+         if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(layer.MaxY); // top
       }
 
       // TODO: update the zoom to bounds for ol3
-      //map.zoomToExtent(new OpenLayers.Bounds(largestBounds));
+      map.getView().fitExtent(largestBounds, map.getSize());
    }
 };
 
