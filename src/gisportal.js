@@ -73,7 +73,7 @@ gisportal.selectionTools = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
-gisportal.lonlat = 'EPSG:4326';
+gisportal.projection = 'EPSG:4326';
 
 // Quick regions array in the format "Name",W,S,E,N
 gisportal.quickRegion = [
@@ -309,7 +309,7 @@ gisportal.mapInit = function() {
          })
       ],
       view: new ol.View({
-         projection: gisportal.lonlat,
+         projection: gisportal.projection,
          center: [0, 0],
          zoom: 2,
          maxResolution: 0.703125,
@@ -345,9 +345,6 @@ gisportal.initWMSlayers = function(data, opts) {
       gisportal.cache.wmsLayers = data;
       // Create WMS layers from the data
       gisportal.createOpLayers();
-      
-      //var ows = new OpenLayers.Format.OWSContext();
-      //var doc = ows.write(map);
    }
 };
 
@@ -359,15 +356,6 @@ gisportal.initWMSlayers = function(data, opts) {
  * This is used to set the layer index to be the correct order 
  */
 gisportal.nonLayerDependent = function() {
-   // // Keeps the vectorLayers at the top of the map
-   // map.events.register("addlayer", map, function() { 
-   //     // Get and store the number of reference layers
-   //    var poiLayers = map.getLayersBy('type', 'poiLayer');
-
-   //    $.each(poiLayers, function(index, value) {
-   //       map.setLayerIndex(value, map.layers.length - 1);
-   //    });
-   // });
    
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
@@ -445,8 +433,8 @@ gisportal.saveState = function(state) {
    var features = gisportal.vectorLayer.getSource().getFeatures();
    var geoJsonFormat = new ol.format.GeoJSON;
    var featureOptions = {
-      'dataProjection': gisportal.lonlat,
-      'featureProjection': gisportal.lonlat
+      'dataProjection': gisportal.projection,
+      'featureProjection': gisportal.projection
    }
    state.map.feature = geoJsonFormat.writeFeatures(features, featureOptions);   
    
@@ -506,8 +494,8 @@ gisportal.loadState = function(state) {
    if (stateMap.feature) {    // Array.<ol.Feature>
       var geoJsonFormat = new ol.format.GeoJSON;
       var featureOptions = {
-         'dataProjection': gisportal.lonlat,
-         'featureProjection': gisportal.lonlat
+         'dataProjection': gisportal.projection,
+         'featureProjection': gisportal.projection
       };
       var features = geoJsonFormat.readFeatures(stateMap.feature, featureOptions);
       gisportal.vectorLayer.getSource().addFeatures(features);

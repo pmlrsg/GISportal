@@ -504,7 +504,7 @@ gisportal.layer = function( options ) {
                   layers: this.urlName,
                   transparent: true,
                   wrapDateLine: true,
-                  srs: gisportal.lonlat,
+                  srs: gisportal.projection,
                   VERSION: '1.1.1'
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
@@ -528,7 +528,7 @@ gisportal.layer = function( options ) {
          // if(typeof this.options.passthrough !== 'undefined' && this.options.passthrough) {               
          //    // GML or KML
          //    layer = new OpenLayers.Layer.Vector(self.name, {
-         //       projection: gisportal.lonlat,
+         //       projection: gisportal.projection,
          //       strategies: [new OpenLayers.Strategy.Fixed()],    
          //       protocol: new OpenLayers.Protocol.HTTP({
          //          url: self.wfsURL,
@@ -543,7 +543,7 @@ gisportal.layer = function( options ) {
 
          //    // Vector      
          //    layer = new OpenLayers.Layer.Vector(this.name, {
-         //       projection: gisportal.lonlat,
+         //       projection: gisportal.projection,
          //       styleMap: self.style,
          //       eventListeners: {
          //          'featureselected': function(event) {

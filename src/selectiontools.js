@@ -43,21 +43,21 @@ gisportal.selectionTools.init = function()  {
    map.addLayer(gisportal.vectorLayer);
 
    var feature;
-   // map.on('mousemove', function(evt) {
-   //    feature = null;
-   //    var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
-   //    if (features.length) {
-   //       feature = features[0];
+   map.on('pointermove', function(evt) {
+      feature = null;
+      var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
+      if (features.length) {
+         feature = features[0];
 
-   //    }
-   //    console.log('feature')
-   // });
-   // map.on('postrender', function(renderEvent) {
-   //    if (feature) {
-   //       console.log(feature)
-   //       //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
-   //    }
-   // });
+      }
+      console.log('feature')
+   });
+   map.on('postrender', function(renderEvent) {
+      if (feature) {
+         console.log(feature)
+         //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
+      }
+   });
 
    gisportal.wkt = new ol.format.WKT();
 };
@@ -223,7 +223,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       
          gisportal.currentSelectedRegion = coords;
          $('.js-coordinates').val(coords);
-         $('.bbox-info').toggleClass('hidden', false);
+         //$('.bbox-info').toggleClass('hidden', false);
          $('.js-edit-polygon').attr('disabled', false);
       }
    }
