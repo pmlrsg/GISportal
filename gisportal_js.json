@@ -23,7 +23,6 @@
       "src/gritter.js",
       "src/layer.js",
       "src/openid.js",
-      "src/quickRegions.js", 
       "src/timeline.js",
       "src/Plot.js",
       "src/PlotEditor.js",
