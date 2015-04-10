@@ -32,7 +32,30 @@ gisportal.map_settings.init = function() {
       countryBorders: borders
    }
    var rendered = gisportal.templates['map-settings'](data)
-   $('.js-map-options').html(rendered);    
+   $('.js-map-options').html(rendered); 
+
+   // enable ddslick'ness
+   $('#select-basemap').ddslick({
+      onSelected: function(data) { 
+         if (data.selectedData) {
+            gisportal.selectBaseLayer(data.selectedData.value); 
+         }
+      }
+   });
+   $('#select-country-borders').ddslick({
+      onSelected: function(data) { 
+         if (data.selectedData) {
+            gisportal.selectCountryBorderLayer(data.selectedData.value); 
+         }
+      },
+   });
+   $('#select-graticules').ddslick({
+      onSelected: function(data) { 
+         if (data.selectedData) {
+            gisportal.setGraticuleVisibility(data.selectedData.value); 
+         }
+      },
+   });
 
    // set the default value for the base map
    if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
@@ -65,16 +88,25 @@ gisportal.map_settings.init = function() {
    }
    // set an action for the graticules select changing
    $('#select-graticules').change(function() {
-      if ($(this).val() == 'On') {
-         graticule_control.setMap(map);
-      } else {
-         graticule_control.setMap();
-      }
+      gisportal.setGraticuleVisibility($(this).val());
       gisportal.events.emit('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
    });
 
 };
 
+gisportal.setGraticuleVisibility = function(setTo) {
+   if (setTo == 'On') {
+      graticule_control.setMap(map);
+   } else {
+      try {
+         graticule_control.setMap();   
+      } catch(e) {
+         // setMap doesn't like being called before it's ready, so breaks when page first
+      }
+      
+   }
+}
+      
 
 /** Create  the country borders overlay
  *

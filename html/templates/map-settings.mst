@@ -4,7 +4,7 @@
 		<label for="select-basemap">Base Map Layer</label>
 		<select id="select-basemap">
 			{{#baseLayers}}
-				<option value="{{id}}">{{name}}</option>
+				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg">{{name}}</option>
 			{{/baseLayers}}
 		</select>
 	</li>

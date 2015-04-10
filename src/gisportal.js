@@ -296,7 +296,8 @@ gisportal.mapInit = function() {
          projection: gisportal.projection,
          center: [0, 0],
          zoom: 2,
-         maxResolution: 0.703125,
+         minZoom: 2,
+         //maxResolution: 0.703125,
       }),
       logo: false
    })

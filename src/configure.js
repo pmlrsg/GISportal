@@ -47,25 +47,24 @@ gisportal.configurePanel.close = function()  {
  * This function initiates the DOM event handlers
  */
 gisportal.configurePanel.initDOM = function()  {
-   function toggleIndicator()  {
-      var name = $(this).parent().data('name');
-      var options = {};
+   // // function toggleIndicator()  {
+   // //    var name = $(this).parent().data('name');
+   // //    var options = {};
       
-      var cat = $(this).parents('[data-cat]');
-      if (cat)  {
-         var refine = {};
-         refine.cat = cat.data('cat');
-         refine.tag = $(this).data('tag');
-         options.refine = refine;
-         //options.refined = true;
-      }
+   // //    var cat = $(this).parents('[data-cat]');
+   // //    if (cat)  {
+   // //       var refine = {};
+   // //       refine.cat = cat.data('cat');
+   // //       refine.tag = $(this).data('tag');
+   // //       options.refine = refine;
+   // //       //options.refined = true;
+   // //    }
 
-      gisportal.configurePanel.selectLayer(name, options);
-   }
+   // //    gisportal.configurePanel.selectLayer(name, options);
+   // // }
 
-   /* Temp */
-   $('.indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
-   
+   // // /* Temp */
+   // // $('.indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
    
    $('.js-indicators').on('change', '.hide-select', function()  {
      // togggle! important 
@@ -76,6 +75,17 @@ gisportal.configurePanel.initDOM = function()  {
    });
 
 
+}
+
+gisportal.configurePanel.toggleIndicator = function(name, tag)  {
+   var options = {};
+   
+   var refine = {};
+   refine.cat = ''; //category;
+   refine.tag = tag;
+   options.refine = refine;
+
+   gisportal.configurePanel.selectLayer(name, options);
 }
 
 /**
@@ -313,6 +323,14 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
          $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
 
+         $('#select-'+ tagNames[i]).ddslick({
+            selectText: tagNames[i],
+            onSelected: function(data) {
+               if (data.selectedData) {
+                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag);
+               }
+            }
+         });
       }
    }
 
