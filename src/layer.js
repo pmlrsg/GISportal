@@ -235,13 +235,14 @@ gisportal.layer = function( options ) {
     * @param {object} object - The object to extend the WMS layer params
     */
    this.mergeNewParams = function(object) {
-      //if (this.openlayers['anID']) this.openlayers['anID'].mergeNewParams(object);
-      var params = this.openlayers['anID'].getSource().getParams();
-      for(var prop in object) {
-         params[prop] = object[prop];
+      if (this.openlayers['anID']) {
+         var params = this.openlayers['anID'].getSource().getParams();
+         for(var prop in object) {
+            params[prop] = object[prop];
+         }
+         this.openlayers['anID'].getSource().updateParams(params);
+         gisportal.scalebars.autoScale( this.id );   
       }
-      this.openlayers['anID'].getSource().updateParams(params);
-      gisportal.scalebars.autoScale( this.id );
    };
    
    /**
