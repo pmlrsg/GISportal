@@ -36,7 +36,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
 <!-- OpenLayers Map Code -->
-<script src="js-libs/OpenLayers3/ol-debug-pmlrsg.js" type="text/javascript"></script>
+<script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
 
 <!-- D3 -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
@@ -56,7 +56,7 @@
 <!-- jStorage - Used for large local storage -->
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
 
-<!-- jStorage - Used for large local storage -->
+<!-- Pikaday - data picker -->
 <link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
 <script type="text/javascript" src="js-libs/moment.js"></script>
 <script type="text/javascript" src="js-libs/pikaday/pikaday.js"></script>
@@ -66,7 +66,6 @@
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer/1.0.4/terraformer.min.js"></script>
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.0.0/terraformer-wkt-parser.min.js"></script>
-
 
 <!-- Dropdown Library - Pulled from bootstrap -->
 <link rel="stylesheet" type="text/css" href="js-libs/dropdowns/bootstrap.css" />
@@ -173,49 +172,28 @@
       <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select">
          <div class="panel-container-solid-backdrop">
             <div class="js-refine-section-region">
-              Select a Region:
-              <label for="refine-region" class="indicator-dropdown">
-                 Region
-                 <span class="icon_arrow"></span>
-              </label>
-              <ul id="refine-region" class=" fake-select panel-list">
-              </ul>
-           </div>
+               Select a region:
+               <div id="refine-region"></div>              
+            </div>
            
-           
-           <div class="js-refine-section-interval">
-              Select a Interval:
-              <label for="refine-interval" class="indicator-dropdown">
-                 Interval
-                 <span class="icon_arrow"></span>
-              </label>
-              <ul id="refine-interval" class=" fake-select panel-list ">
-              </ul>
-           </div>
+            <div class="js-refine-section-interval">
+               Select an interval:
+               <div id="refine-interval"></div>
+            </div>
 
-           <div class="js-refine-section-provider">
-              Select a Provider:
-              <label for="refine-provider" class="indicator-dropdown">
-                 Provider
-                 <span class="icon_arrow"></span>
-              </label>
-              <ul id="refine-provider" class=" fake-select panel-list ">
-              </ul>
-           </div>
+            <div class="js-refine-section-provider">
+               Select a provider:
+               <div id="refine-provider"></div>
+            </div>
 
-           <div class="js-refine-section-reliability">
-              Select a Reliability:
-              <label for="refine-reliability" class="indicator-dropdown">
-                 Reliability
-                 <span class="icon_arrow"></span>
-              </label>
-              <ul id="refine-reliability" class=" fake-select panel-list ">
-              </ul>
-           </div>
+            <div class="js-refine-section-reliability">
+               Select a reliability:
+               <div id="refine-reliability"></div>
+            </div>
            
            
-           <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
-           <button class="text-button js-refine-configure">Cancel</button>
+            <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+            <button class="text-button js-refine-configure">Cancel</button>
         </div>
       </div>
       

@@ -148,7 +148,7 @@ gisportal.utils.mustacheFormat = function(o)  {
       if (o.hasOwnProperty(prop)) {
          if (o[prop].length > 0)  {
             data.push({
-               'key' : prop,
+               'text' : prop,
                'value' : o[prop]
             });
          }

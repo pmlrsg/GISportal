@@ -67,6 +67,7 @@ gisportal.refinePanel.foundIndicator = function(data) {
 
    gisportal.indicatorsPanel.addToPanel(tmp);
    gisportal.refinePanel.close();
+   gisportal.refinePanel.reset();
    gisportal.indicatorsPanel.open();
    gisportal.configurePanel.reset();
 };
@@ -81,14 +82,6 @@ gisportal.refinePanel.initDOM = function(data) {
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
    });
-
-   var change = function() {
-      var ids = $(this).val().split(',');
-      var current = gisportal.refinePanel.currentData.id;
-      gisportal.refinePanel.refineData(ids, current);
-   };
-
-   $('#refinePanel').one('click', 'input[type="radio"]', change);
 
    if (data && data.refine && data.refine.cat && data.refine.tag) {
       var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();
@@ -233,17 +226,22 @@ gisportal.refinePanel.render = function(data, group) {
    indicator.name = name;
    indicator.modified = gisportal.utils.nameToId(name);
    indicator.groupedNames = group;
-   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <span class="indicator-checkbox-text">{{key}}</span>      <label class="icon-checkbox indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label>  </li>{{/tag}}';
-
+   
    if (!refined) {
-      indicator.tag = indicator.groupedNames['region'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-region').html(rendered).find('input[type="radio"]').change(function() {
-         var label = $(this).parent();
-         label.addClass('active');
-      });
+      $('#refine-region').ddslick({
+         data: indicator.groupedNames['region'],
+         initialState: "open",
+         selectText: "Select a Region",
+         onSelected: function(data) {
+            if (data.selectedData) {
+               var ids = data.selectedData.value;
+               var current = gisportal.refinePanel.currentData.id;
+               gisportal.refinePanel.refineData(ids, current);
+            }
+         }
+      })
    } else {
-
+      // ? - not sure why this is here
    }
 
    $('#refine-interval').parent().toggleClass('hidden', true);
@@ -251,30 +249,46 @@ gisportal.refinePanel.render = function(data, group) {
    $('#refine-provider').parent().toggleClass('hidden', true);
    $('#refine-reliability').parent().toggleClass('hidden', true);
 
-   if (indicator.hasInterval) {
-      indicator.tag = indicator.groupedNames['interval'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
-   }
+   // TODO: This will break if enabled; the Moustache template method has been changed to ddslick drop downs but I couldn't find an indicator where this 
+   // would have come into effect
+   // 
+   // if (indicator.hasInterval) {
+   //    indicator.tag = indicator.groupedNames['interval'];
+   //    var rendered = Mustache.render(template, indicator);
+   //    $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
+   // }
 
 
    if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1) ) {
       indicator.tag = indicator.groupedNames['providerTag'];
       indicator.tag.forEach(function( provider ){
-         if( gisportal.providers && gisportal.providers[provider.key.toUpperCase()] && gisportal.providers[provider.key.toUpperCase()].model )
-            provider.moreInfo = gisportal.providers[provider.key.toUpperCase()].model;
+         if( gisportal.providers && gisportal.providers[provider.text.toUpperCase()] && gisportal.providers[provider.text.toUpperCase()].model )
+            provider.moreInfo = gisportal.providers[provider.text.toUpperCase()].model;
       });
 
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-provider').html(rendered).parent().toggleClass('hidden', false);
-      $('#refine-provider .tooltip').tooltipster();
+      $('#refine-provider').ddslick({
+         data: indicator.tag,
+         initialState: "open",
+         selectText: "Select a provider",
+         onSelected: function(data) {
+            if (data.selectedData) {
+               var ids = data.selectedData.value;
+               var current = gisportal.refinePanel.currentData.id;
+               gisportal.refinePanel.refineData(ids, current);
+            }
+         }
+      });
+      $('.js-refine-section-provider').removeClass('hidden');
    }
 
-   if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasProvider || group.providerTag.length <= 1)) {
-      indicator.tag = indicator.groupedNames['Confidence'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false);
-   }
+   // TODO: This will break if enabled; the Moustache template method has been changed to ddslick drop downs but I couldn't find an indicator where this 
+   // would have come into effect
+   // 
+   // if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasProvider || group.providerTag.length <= 1)) {
+   //    indicator.tag = indicator.groupedNames['Confidence'];
+   //    var rendered = Mustache.render(template, indicator);
+   //    $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false);
+   // }
 
 
 
@@ -283,3 +297,12 @@ gisportal.refinePanel.render = function(data, group) {
    }
    this.initDOM(data);
 };
+
+gisportal.refinePanel.reset = function() {
+
+   $('#refine-region').ddslick('destroy');
+   $('#refine-provider').ddslick('destroy');
+   $('#refine-reliability').ddslick('destroy');
+   $('#refine-interval').ddslick('destroy');
+
+}

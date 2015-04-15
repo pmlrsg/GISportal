@@ -47,35 +47,19 @@ gisportal.configurePanel.close = function()  {
  * This function initiates the DOM event handlers
  */
 gisportal.configurePanel.initDOM = function()  {
-   function toggleIndicator()  {
-      var name = $(this).parent().data('name');
-      var options = {};
-      
-      var cat = $(this).parents('[data-cat]');
-      if (cat)  {
-         var refine = {};
-         refine.cat = cat.data('cat');
-         refine.tag = $(this).data('tag');
-         options.refine = refine;
-         //options.refined = true;
-      }
+   // nothing to see here any more
+}
 
-      gisportal.configurePanel.selectLayer(name, options);
-   }
-
-   /* Temp */
-   $('.indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
+gisportal.configurePanel.toggleIndicator = function(name, tag)  {
+   var options = {};
    
-   
-   $('.js-indicators').on('change', '.hide-select', function()  {
-     // togggle! important 
-   });
-   
-   $('.indicator-select').on('click', '.indicator-dropdown', function()  {
-        $(this).siblings('ul').toggleClass('hidden'); 
-   });
+   var refine = {};
+   refine.cat = undefined; //category;
+   refine.tag = tag;
+   options.refine = refine;
 
-
+   gisportal.refinePanel.reset();
+   gisportal.configurePanel.selectLayer(name, options);
 }
 
 /**
@@ -277,7 +261,11 @@ gisportal.groupNames = function()  {
 gisportal.configurePanel.renderTags = function(cat, grouped)  {
    var tagVals = grouped[cat];
    var tagNames = [];
-   if (grouped[cat]) tagNames = Object.keys(grouped[cat]);
+   if (grouped[cat]) {
+      tagNames = Object.keys(grouped[cat]);
+      // sort it before it's rendered
+      tagNames.sort() 
+   } 
    var catName = gisportal.config.browseCategories[cat];
    var catNameKeys = Object.keys(gisportal.config.browseCategories);
    // tabNumber is a hack used to give different logic to the region (middle) tab,
@@ -289,6 +277,8 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
+         // sort them
+         vals.sort();
          // For each tag name, if it has values then render the mustache
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
@@ -313,53 +303,17 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
          $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
          $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
 
+         $('#select-'+ tagNames[i]).ddslick({
+            selectText: tagNames[i],
+            onSelected: function(data) {
+               if (data.selectedData) {
+                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag);
+               }
+            }
+         });
       }
    }
-
-   gisportal.configurePanel.sortNamesAlphabetically()
-
 };
-
-/**
- * Sorts all of the indicator groups from A-Z and the indicators in that group
- */
-gisportal.configurePanel.sortNamesAlphabetically = function(){
-
-   function sortCompare( strA, strB ){
-
-      var compare = strA.localeCompare( strB );
-
-      if( compare > 0 )
-         return 1;
-      else if( compare < 0 )
-         return -1;
-      else
-         return 0;
-   }
-
-   $('.js-indicator-select').each(function(){
-      // Sort the groups
-      $(this).children().sort(function(a,b){
-         var aVal = $(a).find('label').first().text();
-         var bVal = $(b).find('label').first().text();
-         return sortCompare( aVal, bVal );
-      }).appendTo( this );
-
-      //Sort the indicators in the groups
-      $(this).children().each(function(){
-         var fakeSelect = $(this).find('.fake-select');
-
-         fakeSelect.children().sort(function(a,b){
-            var aVal = $(a).text();
-            var bVal = $(b).text();
-            return sortCompare( aVal, bVal );
-         }).appendTo( fakeSelect );
-      });
-
-
-   });
-}
-
 
 /**
  * We use Fuse for searching the layers.
@@ -393,10 +347,12 @@ gisportal.configurePanel.searchInit = function()  {
    $('.js-search').addClear({
       onClear: function(){
          $('.js-search').change();
+         $('.js-search-results').css('display', 'none');
       },
-      right: '14px',
+      right: '20px',
       top: '2px',
-      fontSize: '17px'
+      fontSize: '17px',
+      closeSymbol: '<img src="img/cross.png" width="14" />'
    });
 
    // If statement is needed to stop the change event trigger on lose of focus
@@ -440,9 +396,12 @@ gisportal.configurePanel.search = function(val)  {
    });
    
    $('.js-search-results').html(rendered);
-  
+   $('.js-search-results a').click(function() {
+      gisportal.configurePanel.toggleIndicator($(this).text(), '');
+      $('.js-search-results').css('display', 'none');   
+   });
+   $('.js-search-results').css('display', 'block');
    var selected = [];
-
 
 };
 
@@ -462,11 +421,7 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
       id = options.id;
    }
 
-   
    name = name.replace(/__/g, ' ');
-
-   //$('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true);   
-   //$('.js-toggleVisibility[data-name="' + name + '"]').prev('label').toggleClass('active', true).prop('checked', true);
 
    var tmp = {};
    tmp.name = name;

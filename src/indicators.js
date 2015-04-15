@@ -318,7 +318,7 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    }
    
    // stick the base layer back on
-   map.addLayer(gisportal.baseLayers[$('#select-basemap').val()]);
+   map.addLayer(gisportal.baseLayers[$('#select-basemap').data().ddslick.selectedData.value]);
 
    // then the indicator layers
    for (var l = layers.length - 1; l > -1; l--) {
