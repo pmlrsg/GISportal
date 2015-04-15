@@ -377,6 +377,21 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
    var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
    indicator.modifiedName = modifiedName;
    indicator.modified = gisportal.utils.nameToId(indicator.name);
+
+   // load the tag values based on the currently enabled gisportal.config.browseCategories
+   indicator.displayTags = [];
+   for (var index in gisportal.config.browseCategories) {
+      var name = gisportal.config.browseCategories[index];
+      var val = indicator.tags[index];
+      if (val) {
+         if (typeof(val) == "string") val = val.split(',');
+         indicator.displayTags.push({
+            displayName: name,
+            displayValues: val
+         });      
+      }
+   }
+   
    var rendered = gisportal.templates['tab-details'](indicator);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);

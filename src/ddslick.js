@@ -16,10 +16,10 @@
         }
     };
 
-    var methods = {},
+    var methods = {}
 
     //Set defauls for the control
-    defaults = {
+    var defaults = {
         data: [],
         keepJSONItemsOnTop: false,
         width: "100%",
@@ -32,10 +32,10 @@
         showSelectedHTML: true,
         clickOffToClose: false,
         onSelected: function () { }
-    },
+    }
 
-    ddSelectHtml = '<div class="dd-select"><input class="dd-selected-value" type="hidden" /><a class="dd-selected"></a><span class="dd-pointer dd-pointer-down"></span></div>',
-    ddOptionsHtml = '<ul class="dd-options"></ul>',
+    var ddSelectHtml = '<div class="dd-select"><input class="dd-selected-value" type="hidden" /><a class="dd-selected"></a><span class="dd-pointer dd-pointer-down"></span></div>';
+    var ddOptionsHtml = '<ul class="dd-options"></ul>';
 
     //Public methods 
     methods.init = function (options) {

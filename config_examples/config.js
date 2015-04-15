@@ -23,11 +23,16 @@ gisportal.config = {
    // Do we require terms and conditions agreement to use the portal
    requiresTermsAndCondictions: true,
 
+   // these define how the user can search for indicators; this object uses the key as defined in the wmsLayers.py file
+   // and assigns display names to each. If the `browseMode` flag is set to 'tabs' only the first three values are taken 
+   // notice of to build the tabs on the indicator selection panel, but all categories are displayed on the indicator details
+   // panel (provided a value has been set) once the indicator has been loaded onto the map.
    browseCategories : {
       "Ecosystem_Element" : "Ecosystem",
       "region": "Region",
       "MSFD" : "EU MSFD Descriptor"
    },
+   browseMode : 'tabs',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
    paths: {
     graphServer: 'http://localhost:3000/',
     middlewarePath: '/service'

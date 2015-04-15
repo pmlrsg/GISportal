@@ -6,10 +6,10 @@
       {{else}} 
       <tr><td>Provider</td><td>{{providerTag}}</td></tr>
       {{/if}}
-      {{!-- <tr><td>Region</td><td>{{tags.region}}</td></tr> --}}
-      <tr><td>Interval</td><td>{{tags.interval}}</td></tr>
-      <tr><td>Ecosystem element</td><td>{{tags.Ecosystem_Element}}</td></tr>
-      <tr><td>EU MSFD Descriptor</td><td>{{str_join tags.MSFD ", "}}</td></tr>
+      {{#displayTags}}
+         <tr><td>{{&displayName}}</td><td>{{str_join displayValues ", "}}</td></tr>
+      {{/displayTags}}
+
       <tr><td>Bounding box</td><td>
          <label>{{round exBoundingBox.NorthBoundLatitude 2}}</label> N, 
          <label>{{round exBoundingBox.EastBoundLongitude 2}}</label>   E, 

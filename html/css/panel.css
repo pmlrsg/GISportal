@@ -351,7 +351,7 @@ select,
 }
 
 .search-results li.no-result {
-   padding-left: 10px;
+   padding: 10px;
 }
 /* Hide select so that mobile gets mobile version
  * and desktop gets custom */
