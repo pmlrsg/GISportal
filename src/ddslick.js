@@ -24,8 +24,8 @@
         keepJSONItemsOnTop: false,
         width: "100%",
         height: null,
-        background: "#fff",
         selectText: "",
+        initialState: "closed",
         defaultSelectedIndex: null,
         truncateDescription: true,
         imagePosition: "left",
@@ -39,12 +39,14 @@
 
     //CSS for ddSlick
     ddslickCSS = '<style id="css-ddslick" type="text/css">' +
-                '.dd-select{ border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}' +
+                '.dd-select{ background: #fff; border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}' +
+                '.dd-select.active { background:#59476d; color:#fff; }' +
+                '.dd-select.active .dd-selected { color:#fff; }' +
                 '.dd-desc { color:#aaa; display:block; overflow: hidden; font-weight:normal; line-height: 1.4em; }' +
                 '.dd-selected{ overflow:hidden; display:block; padding:10px; color: #8a7b9b;}' +
                 '.dd-pointer{ width:0; height:0; position:absolute; right:14px; top:50%; margin-top:-8px;}' +
                 '.dd-pointer-down{ border-right: 1px solid #8a7b9b; border-bottom:1px solid #8a7b9b; width:12px; height:12px; transform: rotate(45deg); -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg);}' +
-                '.dd-pointer-up{ border-right:1px solid #8a7b9b; border-bottom:1px solid #8a7b9b; width:12px; height:12px; transform: rotate(-135deg); -webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); margin-top: -2px; }' +
+                '.dd-pointer-up{ border-right:1px solid #fff; border-bottom:1px solid #fff; width:12px; height:12px; transform: rotate(-135deg); -webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); margin-top: -2px; }' +
                 '.dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 5px #ddd; display:none; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto;}' +
                 '.dd-option{ padding:10px; display:block; border-bottom:solid 1px #ddd; overflow:hidden; text-decoration:none; color:#333; cursor:pointer;-webkit-transition: all 0.25s ease-in-out; -moz-transition: all 0.25s ease-in-out;-o-transition: all 0.25s ease-in-out;-ms-transition: all 0.25s ease-in-out; }' +
                 '.dd-options > li:last-child > .dd-option{ border-bottom:none;}' +
@@ -110,7 +112,7 @@
 
                 //Set widths
                 ddOptions.css({ width: options.width });
-                ddSelect.css({ width: options.width, background: options.background });
+                ddSelect.css({ width: options.width });
                 obj.css({ width: options.width });
 
                 //Set height
@@ -152,6 +154,9 @@
                     selectIndex(obj, index);
                 }
 
+                if (options.initialState == "open") {
+                    open(obj);
+                }
                 //EVENTS
                 //Displaying options
                 obj.find('.dd-select').on('click.ddslick', function () {
@@ -178,8 +183,12 @@
     //Public method to select an option by its index
     methods.select = function (options) {
         return this.each(function () {
-            if (options.index)
+            if (typeof(options.index) !== 'undefined') {
                 selectIndex($(this), options.index);
+            }
+            if (typeof(options.value) !== 'undefined') {
+                selectValue($(this), options.value);
+            }
         });
     }
 
@@ -219,6 +228,15 @@
                 $this.removeData('ddslick').unbind('.ddslick').replaceWith(originalElement);
             }
         });
+    }
+
+    function selectValue(obj, value) {
+
+        var ddOptions = obj.find('.dd-options li');
+        var selectedOption = obj.find('.dd-option [value="' + value + '"]').closest('li');
+        var index = ddOptions.index(selectedOption);
+
+        selectIndex(obj, index);
     }
 
     //Private: Select index
@@ -292,10 +310,12 @@
         if (wasOpen) {
             ddOptions.slideUp('fast');
             ddPointer.removeClass('dd-pointer-up');
+            ddPointer.parent().removeClass('active');
         }
         else {
             ddOptions.slideDown('fast');
             ddPointer.addClass('dd-pointer-up');
+            ddPointer.parent().addClass('active');
         }
 
         //Fix text height (i.e. display title in center), if there is no description
@@ -306,7 +326,7 @@
     function close(obj) {
         //Close drop down and adjust pointer direction
         obj.find('.dd-options').slideUp(50);
-        obj.find('.dd-pointer').removeClass('dd-pointer-up').removeClass('dd-pointer-up');
+        obj.find('.dd-pointer').removeClass('dd-pointer-up').parent().removeClass('active');
     }
 
     //Private: Adjust appearence for selected option (move title to middle), when no desripction
@@ -319,7 +339,7 @@
         var descriptionSelected = obj.find('.dd-selected-description');
         var imgSelected = obj.find('.dd-selected-image');
         if (descriptionSelected.length <= 0 && imgSelected.length > 0) {
-            //obj.find('.dd-selected-text').css('lineHeight', lSHeight);
+            //obj.find('.dd-selected-text').css('lineHeight', lSHeight);        // this makes the line height expand each time the drop down is opened and closed
         }
     }
 
@@ -331,7 +351,7 @@
             var descriptionOption = $this.find('.dd-option-description');
             var imgOption = obj.find('.dd-option-image');
             if (descriptionOption.length <= 0 && imgOption.length > 0) {
-                //$this.find('.dd-option-text').css('lineHeight', lOHeight);
+                //$this.find('.dd-option-text').css('lineHeight', lOHeight);        // this makes the line height expand each time the drop down is opened and closed
             }
         });
     }

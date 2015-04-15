@@ -139,6 +139,7 @@ button, .btn{
 }
 
 input[type="text"]  {
+  font-family: "Open Sans";
   background-color: #fff;
   border: 1px solid #d8d3dd;
   color: #8a7b9b;

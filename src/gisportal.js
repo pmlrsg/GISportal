@@ -295,9 +295,9 @@ gisportal.mapInit = function() {
       view: new ol.View({
          projection: gisportal.projection,
          center: [0, 0],
-         zoom: 2,
-         minZoom: 2,
-         //maxResolution: 0.703125,
+         minZoom: 3,
+         maxZoom: 12,
+         resolution: 0.175,
       }),
       logo: false
    })
@@ -433,9 +433,9 @@ gisportal.saveState = function(state) {
    state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
    state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
 
-   state.map.baselayer = $('#select-basemap').val()
-   state.map.countryborders = $('#select-country-borders').val()
-   state.map.graticules = $('#select-graticules').val()
+   state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
+   state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
+   state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
 
    return state;
 };

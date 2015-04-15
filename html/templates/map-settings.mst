@@ -7,6 +7,7 @@
 				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg">{{name}}</option>
 			{{/baseLayers}}
 		</select>
+		<input type="hidden" id="select-basemap-value" />
 	</li>
 	<li>
 		<label for="select-country-borders">Country Borders</label>

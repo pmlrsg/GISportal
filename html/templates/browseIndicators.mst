@@ -5,12 +5,10 @@
 {{#unless empty_search}}
 	{{#each indicators}}
 	   <li data-name="{{name}}">
-	      <span class="indicator-checkbox-text">{{name}}</span>
-	      <label for="{{@root.location}}-toggleVisibility-{{modified}}" class="icon-checkbox indicator-checkbox" title="Show/Hide {{name}}"></label>
-	      <input type="checkbox" id="{{@root.location}}-toggleVisibility-{{modified}}" data-name="{{name}}" class="js-toggleVisibility panel-tab-trigger">
+	   	<a class="dd-option" data-optionid="{{@root.location}}-toggleVisibility-{{modified}}" data-name="{{name}}">{{name}}</a>
 	   </li>
 	{{else}}
-	  <li class="align-center">
+	  <li class="no-result">
 	    No results for "{{search_term}}"
 	  </li>
 	{{/each}}

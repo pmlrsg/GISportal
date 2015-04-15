@@ -60,37 +60,43 @@ gisportal.map_settings.init = function() {
    // set the default value for the base map
    if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
       map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
+      $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap })
    } else {
       map.addLayer(gisportal.baseLayers.EOX);   
+      $('#select-basemap').ddslick('select', { value: "EOX" })
    }
 
-   // set an action for the base map select changing
-   $('#select-basemap').change(function() {
-   	gisportal.selectBaseLayer($('#select-basemap').val())
-      gisportal.indicatorsPanel.reorderLayers();
-   	gisportal.events.emit('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
-   });
+   // NEEDS TO UPDATED FOR COLLABORATION
+   //  // set an action for the base map select changing
+   // $('#select-basemap').change(function() {
+   // 	gisportal.selectBaseLayer($('#select-basemap').val())
+   //    gisportal.indicatorsPanel.reorderLayers();
+   // 	gisportal.events.emit('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
+   // });
 
    // set the default value if one exists in config.js
    if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
-      $('#select-country-borders').val(gisportal.config.countryBorder.defaultLayer);
+      $('#select-country-borders').ddslick('select', { value: gisportal.config.countryBorder.defaultLayer });
       gisportal.selectCountryBorderLayer(gisportal.config.countryBorder.defaultLayer);
    };
 
-   // set an action for the country borders select changing
-   $('#select-country-borders').change(function() {
-		gisportal.selectCountryBorderLayer($('#select-country-borders').val());
-		gisportal.events.emit('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
-	});
+   // NEEDS TO UPDATED FOR COLLABORATION
+   //   // set an action for the country borders select changing
+   //   $('#select-country-borders').change(function() {
+	// 	gisportal.selectCountryBorderLayer($('#select-country-borders').val());
+	// 	gisportal.events.emit('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
+	// });
 
    if (typeof gisportal.config.showGraticules != 'undefined' && gisportal.config.showGraticules) {
-      $('#select-graticules').val('On');
+      $('#select-graticules').ddslick('select', { value: "On" });
    }
-   // set an action for the graticules select changing
-   $('#select-graticules').change(function() {
-      gisportal.setGraticuleVisibility($(this).val());
-      gisportal.events.emit('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
-   });
+
+   // NEEDS TO UPDATED FOR COLLABORATION
+   // // set an action for the graticules select changing
+   // $('#select-graticules').change(function() {
+   //    gisportal.setGraticuleVisibility($(this).val());
+   //    gisportal.events.emit('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
+   // });
 
 };
 
@@ -101,7 +107,7 @@ gisportal.setGraticuleVisibility = function(setTo) {
       try {
          graticule_control.setMap();   
       } catch(e) {
-         // setMap doesn't like being called before it's ready, so breaks when page first
+         // setMap doesn't like being called before it's ready, so breaks when page first loads
       }
       
    }
@@ -174,7 +180,11 @@ gisportal.createCountryBorderLayers = function() {
 }
 
 gisportal.setCountryBordersToTopLayer = function() {
-   gisportal.selectCountryBorderLayer($('#select-country-borders').val());
+   try { // because it might not exist yet
+      gisportal.selectCountryBorderLayer($('#select-country-borders').data().ddslick.selectedData.value);
+   } catch(e) {
+
+   }
 }
 
 gisportal.selectCountryBorderLayer = function(id) {
@@ -303,6 +313,8 @@ gisportal.selectBaseLayer = function(id) {
    }
    // then add the selected option and send it to the bottom
    map.addLayer(gisportal.baseLayers[id]);
+   // and make sure that the country borders are on top
+   gisportal.setCountryBordersToTopLayer();
 }
 
 gisportal.createGraticules = function() {
