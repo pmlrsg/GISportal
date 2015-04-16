@@ -79,6 +79,7 @@ gisportal.refinePanel.foundIndicator = function(data) {
  */
 gisportal.refinePanel.initDOM = function(data) {
    $('.js-refine-configure').on('click', function() {
+      gisportal.configurePanel.reset();
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
    });

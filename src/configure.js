@@ -19,14 +19,17 @@ gisportal.configurePanel = {};
  * to have a way to reset the panel.
  */
 gisportal.configurePanel.refreshData = function()  {
+   this.searchInit();
+
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
-   $("[id^='tab-browse']+.indicator-select").html('');
-   for (var cat in gisportal.config.browseCategories)  {
-      this.renderTags(cat, groupedTags);
+   if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'tabs') {
+      this.renderTagsAsTabs();
+   } else if (gisportal.config.browseMode == 'selectlist') {
+      this.renderTagsAsSelectlist();
    }
-   this.searchInit();
+
 };
 
 /**
@@ -50,11 +53,11 @@ gisportal.configurePanel.initDOM = function()  {
    // nothing to see here any more
 }
 
-gisportal.configurePanel.toggleIndicator = function(name, tag)  {
+gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
    var options = {};
    
    var refine = {};
-   refine.cat = undefined; //category;
+   refine.cat = tagname;
    refine.tag = tag;
    options.refine = refine;
 
@@ -68,7 +71,15 @@ gisportal.configurePanel.toggleIndicator = function(name, tag)  {
 gisportal.configurePanel.reset = function(){
    $('.js-search').val("").change();
    changeTab( $('#configurePanel .js-default-tab'));
-   gisportal.configurePanel.refreshData();
+   
+   // This seems most unnecessary as it reloads the data and the templates each time an indicator is selected
+   //  // gisportal.configurePanel.refreshData();
+     
+   // reset the options when browseMode = selectlist
+   $('.selectoptions .dd-container').ddslick('reset');
+   // and when browseMode = tabs
+   $('.js-indicator-select .dd-container').ddslick('reset');
+   
 }
 
 /**
@@ -258,7 +269,116 @@ gisportal.groupNames = function()  {
  * @param {object} cat - The category, such as 'Ecosystem Element'
  * @param {object} grouped - The grouped tags, using gisportal.groupTags()
  */
-gisportal.configurePanel.renderTags = function(cat, grouped)  {
+gisportal.configurePanel.renderTagsAsTabs = function()  {
+   var grouped = gisportal.groupTags();
+
+   // load the template
+   var catFilter = gisportal.templates['category-filter-tabs']();
+   $('.js-category-filter').html(catFilter);
+
+   // iterate over each category
+   for (var cat in gisportal.config.browseCategories)  {
+
+      var tagVals = grouped[cat];
+      var tagNames = [];
+      if (grouped[cat]) {
+         tagNames = Object.keys(grouped[cat]);
+         // sort it before it's rendered
+         tagNames.sort() 
+      } 
+      var catName = gisportal.config.browseCategories[cat];
+      var catNameKeys = Object.keys(gisportal.config.browseCategories);
+      
+      // tabNumber is a hack used to give different logic to the region (middle) tab,
+      // so that clicking a region will automatically show that region in the refine panel.
+      var tabNumber = _.indexOf(catNameKeys, cat) + 1;
+      $('#tab-browse-2 + .panel-tab').attr('data-cat', catNameKeys[1]);
+
+
+      for (var i = 0; i < tagNames.length; i++)  {
+         var vals = tagVals[tagNames[i]];
+         if (vals.length > 0)  {
+            // sort them
+            vals.sort();
+            // For each tag name, if it has values then render the mustache
+            var indicators = [];
+            // Do not allow duplicates, and all values should be lowercase
+            vals = _.unique(vals, function(d)  {
+               return d;
+            });
+            
+            _.forEach(vals, function(d)  {
+               var tmp = {};
+               tmp.name = d;
+               // Modified is used when a unique id is required
+               // in the actual html, for radio buttons for example.
+               tmp.modified = gisportal.utils.nameToId(d);
+               tmp.tagname = cat;
+               tmp.tagvalue = tagNames[i];
+               indicators.push(tmp);
+            });
+
+            var rendered = gisportal.templates['categories'] ({
+               tag : tagNames[i],
+               tagModified : gisportal.utils.nameToId(tagNames[i]),
+               indicators : indicators 
+            });
+            $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
+            $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
+
+            $('#select-'+ tagNames[i]).ddslick({
+               selectText: tagNames[i],
+               onSelected: function(data) {
+                  if (data.selectedData) {
+                     gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
+                  }
+               }
+            });
+         }
+      }
+   }
+};
+
+/**
+ * An alternative method of grouping/filtering categories. This 
+ * method adds a select list instead of the three tabs, and lists
+ * each of the categories specified in gisportal.config.browseCategories
+ */
+gisportal.configurePanel.renderTagsAsSelectlist = function() {
+   // load the template
+   var catFilter = gisportal.templates['category-filter-selectlist']();
+   $('.js-category-filter').html(catFilter);
+
+   var categories = [];
+   for (var category in gisportal.config.browseCategories) {
+      var c = {
+         value: category,
+         text: gisportal.config.browseCategories[category],
+      }
+      categories.push(c);
+   }
+
+   $('#js-category-filter-select').ddslick({
+      data: categories,
+      onSelected: function(data) {
+         if (data.selectedData) {
+            gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value);
+         }
+      }
+   });
+   // set the index to 1 to trigger the population of the category selects
+   var defaultValue = { index: 0 };
+   if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
+      defaultValue = { value: gisportal.config.defaultCategory };
+   } 
+   $('#js-category-filter-select').ddslick('select', defaultValue);
+}
+
+gisportal.configurePanel.renderIndicatorsByTag = function(cat) {
+   $('.js-category-filter-options').html('');
+
+   var grouped = gisportal.groupTags();
+
    var tagVals = grouped[cat];
    var tagNames = [];
    if (grouped[cat]) {
@@ -268,12 +388,7 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
    } 
    var catName = gisportal.config.browseCategories[cat];
    var catNameKeys = Object.keys(gisportal.config.browseCategories);
-   // tabNumber is a hack used to give different logic to the region (middle) tab,
-   // so that clicking a region will automatically show that region in the refine panel.
-   var tabNumber = _.indexOf(catNameKeys, cat) + 1;
-   $('#tab-browse-2 + .panel-tab').attr('data-cat', catNameKeys[1]);
-
-
+   
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
@@ -292,6 +407,8 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
             // Modified is used when a unique id is required
             // in the actual html, for radio buttons for example.
             tmp.modified = gisportal.utils.nameToId(d);
+            tmp.tagname = cat;
+            tmp.tagvalue = tagNames[i];
             indicators.push(tmp);
          });
 
@@ -300,20 +417,20 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
             tagModified : gisportal.utils.nameToId(tagNames[i]),
             indicators : indicators 
          });
-         $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
-         $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-
+         $('.js-category-filter-options').append(rendered);
+         
          $('#select-'+ tagNames[i]).ddslick({
             selectText: tagNames[i],
             onSelected: function(data) {
                if (data.selectedData) {
-                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag);
+                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
                }
             }
          });
       }
    }
-};
+}
+
 
 /**
  * We use Fuse for searching the layers.

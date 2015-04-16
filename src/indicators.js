@@ -490,23 +490,38 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
       });
 
-      $('#tab-' + indicator.id + '-elevation').on('change', function() {
-         var value = $(this).val();
-         indicator.selectedElevation = value;
-         indicator.mergeNewParams({
-            elevation: value
-         });
-      });
+      $('#tab-' + indicator.id + '-elevation').ddslick({
+         onSelected: function(data) {
+            if (data.selectedData) {
+               indicator.selectedElevation = data.selectedData.value;
+               indicator.mergeNewParams({
+                  elevation: data.selectedData.value
+               });   
+            }
+         }
+      })
 
-      $('#tab-' + indicator.id + '-layer-style').on('change', function() {
-         var value = $(this).val();
-         indicator.style = value;
-         indicator.mergeNewParams({
-            styles: value
-         });
-         gisportal.indicatorsPanel.scalebarTab(id);
+      $('#tab-' + indicator.id + '-layer-style').ddslick({
+         onSelected: function(data) {
+            if (data.selectedData) {
+               indicator.style = data.selectedData.value;
+               indicator.mergeNewParams({
+                  styles: data.selectedData.value
+               });
+               gisportal.indicatorsPanel.scalebarTab(id);
+            }
+         }
+      })
+      
+      // $('#tab-' + indicator.id + '-layer-style').on('change', function() {
+      //    var value = $(this).val();
+      //    indicator.style = value;
+      //    indicator.mergeNewParams({
+      //       styles: value
+      //    });
+      //    gisportal.indicatorsPanel.scalebarTab(id);
 
-      });
+      // });
       gisportal.indicatorsPanel.checkTabFromState(id);
    }
 

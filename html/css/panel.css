@@ -253,6 +253,34 @@
    padding-top: 10px;
 }
 
+.category-select-list {
+  background: #efedf1;
+}
+
+.category-select-list .selectlist, .category-select-list .selectoptions {
+  padding: 10px;
+}
+
+.category-select-list .selectlist { 
+  background: #ccc;
+}
+.category-select-list .selectlist .dd-container {
+  font-weight: bold;
+}
+.category-select-list .dd-container {
+  margin-top: 8px;
+}
+.category-select-list .selectlist .dd-select { 
+  border-color: #999;
+}
+
+.js-category-filter-select label {
+  color: #444;
+}
+.js-category-filter-select .active label {
+  color: #fff;
+}
+
 #refinePanel .panel-header h2  {
    text-transform: capitalize;
 }

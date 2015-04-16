@@ -258,8 +258,10 @@ input[type="text"]  {
 .dd-pointer{ width:0; height:0; position:absolute; right:14px; top:50%; margin-top:-8px;}
 .dd-pointer-down{ border-right: 1px solid #8a7b9b; border-bottom:1px solid #8a7b9b; width:12px; height:12px; transform: rotate(45deg); -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg);}
 .dd-pointer-up{ border-right:1px solid #fff; border-bottom:1px solid #fff; width:12px; height:12px; transform: rotate(-135deg); -webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); margin-top: -2px; }
-.dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 5px #ddd; display:none; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto;}
+.dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 5px #ddd; display:none; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto; }
 .dd-option{ padding:10px; display:block; border-bottom:solid 1px #ddd; overflow:hidden; text-decoration:none; color:#333; cursor:pointer;-webkit-transition: all 0.25s ease-in-out; -moz-transition: all 0.25s ease-in-out;-o-transition: all 0.25s ease-in-out;-ms-transition: all 0.25s ease-in-out; }
+.dd-options li.selected { position: relative; }
+.dd-options li.selected:after { content: "\e2fe"; font-family: "streamline-24px" !important; font-style: normal !important; font-weight: normal !important; font-variant: normal !important; text-transform: none !important; speak: none; line-height: 1; -webkit-font-smoothing: antialiased; font-size: 17px; position: absolute; right: 13px; top: 10px; color: #090;} 
 .dd-options > li:last-child > .dd-option{ border-bottom:none;}
 .dd-option:hover{ background:#f3f3f3; color:#000;}
 .dd-selected-description-truncated { text-overflow: ellipsis; white-space:nowrap; }

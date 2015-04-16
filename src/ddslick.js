@@ -63,7 +63,9 @@
                         icon: thisData.icon,
                         optionid: thisData.optionid,
                         tag: thisData.tag,
-                        name: thisData.name
+                        name: thisData.name,
+                        tagname: thisData.tagname,
+                        tagvalue: thisData.tagvalue,
                     });
                 });
 
@@ -97,7 +99,13 @@
                 $.each(options.data, function (index, item) {
                     if (item.selected) options.defaultSelectedIndex = index;
                     ddOptions.append('<li>' +
-                        '<a class="dd-option" data-optionid="' + item.optionid +'" data-tag="' + item.tag + '" data-name="' + item.name +'">' +
+                        '<a class="dd-option"' +
+                            (item.optionid ? ' data-optionid="' + item.optionid +'"' : '') +
+                            (item.tag ? ' data-tag="' + item.tag + '"' : '') +
+                            (item.name ? ' data-name="' + item.name +'"' : '') +
+                            (item.tagname ? ' data-tagname="' + item.tagname +'"' : '') +
+                            (item.tagvalue ? ' data-tagvalue="' + item.tagvalue +'"' : '') +
+                            '>' +
                             (item.value ? ' <input class="dd-option-value" type="hidden" value="' + item.value + '" />' : '') +
                             (item.imageSrc ? ' <img class="dd-option-image' + (options.imagePosition == "right" ? ' dd-image-right' : '') + '" src="' + item.imageSrc + '" />' : '') +
                             (item.icon ? ' <span class="dd-option-icon icon-' + item.icon + '" ></span>' : '') +
@@ -125,7 +133,7 @@
                     var index = (options.defaultSelectedIndex != null && options.defaultSelectedIndex >= 0 && options.defaultSelectedIndex < options.data.length)
                                 ? options.defaultSelectedIndex
                                 : 0;
-                    selectIndex(obj, index);
+                    selectIndex(obj, index, false);
                 }
 
                 if (options.initialState == "open") {
@@ -190,6 +198,18 @@
         });
     };
 
+    //Public method to reset to its original unselected state
+    methods.reset = function() {
+        return this.each(function() {
+            var $this = $(this),
+                pluginData = $this.data('ddslick');
+
+            //Check if plugin is initialized
+            if (pluginData)
+                reset($this); 
+        })
+    };
+
     //Public method to destroy. Unbind all events and restore the original Html select/options
     methods.destroy = function () {
         return this.each(function () {
@@ -214,7 +234,12 @@
     }
 
     //Private: Select index
-    function selectIndex(obj, index) {
+    function selectIndex(obj, index, doCallback) {
+
+        // If true, fire the onSelected callback; true by if not specified
+        if (typeof doCallback === 'undefined') {
+            doCallback = true;
+        }
 
         //Get plugin data
         var pluginData = obj.data('ddslick');
@@ -231,7 +256,9 @@
 
         //Highlight selected option
         obj.find('.dd-option').removeClass('dd-option-selected');
+        obj.find('li.selected').removeClass('selected');
         selectedOption.addClass('dd-option-selected');
+        selectedLiItem.addClass('selected');
 
         //Update or Set plugin data with new selection
         pluginData.selectedIndex = index;
@@ -264,7 +291,7 @@
         adjustSelectedHeight(obj);
 
         //Callback function on selection
-        if (typeof settings.onSelected == 'function') {
+        if (doCallback && typeof settings.onSelected == 'function') {
             settings.onSelected.call(this, pluginData);
         }
     }
@@ -315,6 +342,16 @@
         if (descriptionSelected.length <= 0 && imgSelected.length > 0) {
             //obj.find('.dd-selected-text').css('lineHeight', lSHeight);        // this makes the line height expand each time the drop down is opened and closed
         }
+    }
+
+    function reset(obj) {
+        var pluginData = obj.data('ddslick');
+
+        pluginData.selectedData = null;
+        pluginData.selectedIndex = -1;
+        obj.find('.dd-selected').html(pluginData.settings.selectText);
+        obj.find('.dd-option-selected').removeClass('dd-option-selected');
+        obj.find('li.selected').removeClass('selected');
     }
 
     //Private: Adjust appearence for drop down options (move title to middle), when no desripction

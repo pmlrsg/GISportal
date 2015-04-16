@@ -6,7 +6,14 @@
 <div>
    <select multiple id="select-{{tag}}" class="hide-select" data-id="{{tag}}">
       {{#indicators}}
-         <option value="{{name}}" data-optionid="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" data-tag="{{@root.tag}}" data-name="{{name}}">{{name}}</option>
+         <option value="{{name}}" 
+            data-optionid="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" 
+            data-tag="{{@root.tag}}" 
+            data-tagname="{{tagname}}" 
+            data-tagvalue="{{tagvalue}}" 
+            data-name="{{name}}"
+         >{{name}}</option>
+         
       {{/indicators}}
    </select>
 </div>

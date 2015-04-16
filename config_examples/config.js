@@ -33,6 +33,7 @@ gisportal.config = {
       "MSFD" : "EU MSFD Descriptor"
    },
    browseMode : 'tabs',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
+   defaultCategory: '',                     // only used when browseMode = selectlist; any key value from browseCategories
    paths: {
     graphServer: 'http://localhost:3000/',
     middlewarePath: '/service'
