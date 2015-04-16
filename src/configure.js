@@ -266,8 +266,6 @@ gisportal.groupNames = function()  {
  * with a category each, with multiple tag names
  * and tag values.
  *
- * @param {object} cat - The category, such as 'Ecosystem Element'
- * @param {object} grouped - The grouped tags, using gisportal.groupTags()
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
    var grouped = gisportal.groupTags();
@@ -279,63 +277,12 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    // iterate over each category
    for (var cat in gisportal.config.browseCategories)  {
 
-      var tagVals = grouped[cat];
-      var tagNames = [];
-      if (grouped[cat]) {
-         tagNames = Object.keys(grouped[cat]);
-         // sort it before it's rendered
-         tagNames.sort() 
-      } 
-      var catName = gisportal.config.browseCategories[cat];
       var catNameKeys = Object.keys(gisportal.config.browseCategories);
-      
-      // tabNumber is a hack used to give different logic to the region (middle) tab,
-      // so that clicking a region will automatically show that region in the refine panel.
       var tabNumber = _.indexOf(catNameKeys, cat) + 1;
-      $('#tab-browse-2 + .panel-tab').attr('data-cat', catNameKeys[1]);
+      var targetDiv = $('#tab-browse-'+ tabNumber+' + .indicator-select');
 
+      gisportal.configurePanel.renderIndicatorsByTag(cat, targetDiv, tabNumber);
 
-      for (var i = 0; i < tagNames.length; i++)  {
-         var vals = tagVals[tagNames[i]];
-         if (vals.length > 0)  {
-            // sort them
-            vals.sort();
-            // For each tag name, if it has values then render the mustache
-            var indicators = [];
-            // Do not allow duplicates, and all values should be lowercase
-            vals = _.unique(vals, function(d)  {
-               return d;
-            });
-            
-            _.forEach(vals, function(d)  {
-               var tmp = {};
-               tmp.name = d;
-               // Modified is used when a unique id is required
-               // in the actual html, for radio buttons for example.
-               tmp.modified = gisportal.utils.nameToId(d);
-               tmp.tagname = cat;
-               tmp.tagvalue = tagNames[i];
-               indicators.push(tmp);
-            });
-
-            var rendered = gisportal.templates['categories'] ({
-               tag : tagNames[i],
-               tagModified : gisportal.utils.nameToId(tagNames[i]),
-               indicators : indicators 
-            });
-            $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
-            $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-
-            $('#select-'+ tagNames[i]).ddslick({
-               selectText: tagNames[i],
-               onSelected: function(data) {
-                  if (data.selectedData) {
-                     gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
-                  }
-               }
-            });
-         }
-      }
    }
 };
 
@@ -358,15 +305,17 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       categories.push(c);
    }
 
+   var targetDiv = $('.js-category-filter-options');
+
    $('#js-category-filter-select').ddslick({
       data: categories,
       onSelected: function(data) {
          if (data.selectedData) {
-            gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value);
+            gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
          }
       }
    });
-   // set the index to 1 to trigger the population of the category selects
+   // set the index to 0, or if a defaultCategory is set use that instead
    var defaultValue = { index: 0 };
    if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
       defaultValue = { value: gisportal.config.defaultCategory };
@@ -374,8 +323,13 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('#js-category-filter-select').ddslick('select', defaultValue);
 }
 
-gisportal.configurePanel.renderIndicatorsByTag = function(cat) {
-   $('.js-category-filter-options').html('');
+/**
+ * [renderIndicatorsByTag description]
+ * @param  {[type]} cat       the name of the category to render
+ * @param  {[type]} targetDiv a jQuery object of the div where the drop down list should be created
+  */
+gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNumber) {
+   targetDiv.html('');
 
    var grouped = gisportal.groupTags();
 
@@ -417,7 +371,10 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat) {
             tagModified : gisportal.utils.nameToId(tagNames[i]),
             indicators : indicators 
          });
-         $('.js-category-filter-options').append(rendered);
+         targetDiv.append(rendered);
+         // only for browseMode = tabs <!--
+         if (tabNumber) $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
+         // -->
          
          $('#select-'+ tagNames[i]).ddslick({
             selectText: tagNames[i],
