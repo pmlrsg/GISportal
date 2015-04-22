@@ -54,12 +54,12 @@ gisportal.configurePanel.initDOM = function()  {
 }
 
 gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
-   var options = {};
+   var options = [];
    
    var refine = {};
    refine.cat = tagname;
    refine.tag = tag;
-   options.refine = refine;
+   options.push(refine);
 
    gisportal.refinePanel.reset();
    gisportal.configurePanel.selectLayer(name, options);
@@ -315,7 +315,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          }
       }
    });
-   // set the index to 0, or if a defaultCategory is set use that instead
+   // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
    var defaultValue = { index: 0 };
    if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
       defaultValue = { value: gisportal.config.defaultCategory };
@@ -500,8 +500,8 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
-   if (options.refine) tmp.refine = options.refine;
-   if (options.refined !== undefined) tmp.refined = options.refined;
+   if (options) tmp.refine = options;
+   //if (options.refined !== undefined) tmp.refined = options.refined;
 
    this.buildMap(tmp);
 };
