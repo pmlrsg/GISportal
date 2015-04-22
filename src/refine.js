@@ -23,11 +23,11 @@ gisportal.refinePanel.found = false;
  * @param {object} data - The indicators that have the same name
  */
 gisportal.refinePanel.open = function(data) {
-   this.found = false;
+
    this.initDOM();
    gisportal.panels.showPanel('refine-indicator');
    this.currentData = data;
-   $('.js-refine-name').html(this.currentData.name);
+//   $('.js-refine-name').html(this.currentData.name);
    this.refreshData(data);
 };
 
@@ -40,38 +40,6 @@ gisportal.refinePanel.close = function() {
    gisportal.panels.showPanel('choose-indicator');
 };
 
-// /**
-//  * When an indicator has been found (refined) then
-//  * call this function to set gisportal.refinePanel.found to true
-//  * and adds the indicator to the correct places, then opens the indicators
-//  * panel.
-//  *
-//  * @params {object} data - The indicator
-//  */
-// gisportal.refinePanel.foundIndicator = function(data) {
-//    var id = data.id || data;
-//    if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found)) return;
-
-//    this.found = true;
-//    gisportal.indicatorsPanel.selectLayer(id);
-//    var tmp = {
-//       id: id,
-//       name: gisportal.layers[id].name,
-//       provider: gisportal.layers[id].providerTag,
-//       moreIndicatorInfo: gisportal.layers[id].moreIndicatorInfo,
-//       moreProviderInfo: gisportal.layers[id].moreProviderInfo,
-//    };
-//    if (data.interval) tmp.interval = data.interval;
-//    if (data.confidence) tmp.confidence = data.confidence;
-//    if (data.provider) tmp.provider = data.provider;
-
-//    gisportal.indicatorsPanel.addToPanel(tmp);
-//    gisportal.refinePanel.close();
-//    gisportal.refinePanel.reset();
-//    gisportal.indicatorsPanel.open();
-//    gisportal.configurePanel.reset();
-// };
-
 /**
  * This initiates the DOM event handlers.
  *
@@ -83,26 +51,6 @@ gisportal.refinePanel.initDOM = function(data) {
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
    });
-
-   // // if (data && data.refine && data.refine.cat && data.refine.tag) {
-   // //    var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();
-   // //    $('#refine-region [value="' + val + '"]').click();
-   // // }
-
-   var click = function() {
-      var id = $(this).data('id');
-      var name = $(this).data('name');
-      //if (id !== "none") gisportal.refinePanel.render(id);
-      //else  {
-      var group = gisportal.groupNames()[name];
-      gisportal.refinePanel.render({
-         name: name,
-         id: id,
-         refined: false
-      }, group);
-      //}
-   };
-   $('#refinePanel').one('click', '.js-reset-options', click);
 };
 
 /**
@@ -216,198 +164,6 @@ gisportal.refinePanel.refreshData = function() {
    }
 };
 
-/**
- * The refineData function takes an array of possible ids
- * and the current id (which could possibly be deprecated
- * now that the refinePanel is split away from indicators).
- * It refines down the selection of ids to show the available
- * options (such as interval and confidence).
- *
- * @params {object} ids - Array of possible ids
- * @params {string} current - Current id (deprecate?)
- */
-gisportal.refinePanel.refineData = function(ids, current) {
-   var indicator = gisportal.layers[ids[0]];
-   if (indicator) {
-      var name = indicator.name;
-      var groupedNames = gisportal.groupNames()[name];
-      var results = groupedNames;
-      var names = Object.keys(groupedNames);
-      for (var i = 0; i < names.length; i++) {
-         var cat = names[i];
-         var tags = Object.keys(groupedNames[cat]);
-         for (var j = 0; j < tags.length; j++) {
-            var tag = groupedNames[cat][tags[j]];
-            var result = _.intersection(tag, ids);
-            results[cat][tags[j]] = result;
-         }
-      }
-      var indicator = gisportal.layers[current] || {};
-      indicator.groupedNames = {};
-
-      this.render({
-         indicator: indicator,
-         id: current,
-         name: name,
-         refined: true
-      }, results);
-   }
-};
-
-// /**
-//  * This function renders the refinePanel.
-//  *
-//  * @param {object} data - Object including id, name and boolean called refined
-//  * @param {object} group - The groupNames() making it easy to find ids with the name
-//  */
-// gisportal.refinePanel.render = function(data, group) {
-//    var indicator = data.indicator || {};
-//    var id = data.id;
-//    var name = data.name;
-//    var refined = data.refine;
-
-//    if (!group) group = gisportal.groupNames()[name] || {};
-//    for (var cat in group) {
-//       group[cat] = gisportal.utils.mustacheFormat(group[cat]);
-//    }
-//    group.region = group.region || [];
-//    /*if (data.refine)  {
-//       var index = _.findIndex(group[data.refine.cat], function(d) { return d.key === data.refine.tag; });
-//       if (index > -1)  {
-//          group.region = [group[data.refine.cat][index]];
-//          var ids = [];
-//          _.forEach(group.region, function(d) {
-//             ids.push(d.value);
-//          });
-//          ids = _.flatten(ids);
-//          if (ids.length === 1) gisportal.refinePanel.refineData(ids, gisportal.refinePanel.currentData);
-//       }
-//    } */
-
-//    indicator.hasInterval = false;
-//    indicator.hasConfidence = false;
-//    indicator.hasProvider = false;
-//    if ((refined && gisportal.refinePanel.found !== false) || group.region.length === 1) {
-//       indicator.refined = true;
-//       var found = true;
-
-//       if (group.interval.length > 1) {
-//          indicator.hasInterval = true;
-//          found = false;
-//       }
-
-//       if (group.Confidence.length > 1) {
-//          indicator.hasConfidence = true;
-//          found = false;
-//       }
-//       if (group.providerTag.length > 1) {
-//          indicator.hasProvider = true;
-//          found = false;
-//       }
-
-//       if (found === true) {
-//          var newId = group.region[0].value[0];
-//          var newName;
-
-//          if (id !== "none" && id) {
-//             if (_.indexOf(gisportal.selectedLayers, newId) === -1) {
-//                var tmp = {};
-//                tmp.id = newId;
-//                tmp.interval = group.interval[0];
-//                tmp.confidence = group.Confidence[0];
-//                tmp.provider = group.providerTag[0].key;
-//                gisportal.refinePanel.foundIndicator(tmp);
-//             } else {
-//                gisportal.refinePanel.close();
-//                gisportal.indicatorsPanel.open();
-//             }
-//          }
-//       }
-//    } else {
-//       indicator.refined = false;
-//    }
-
-//    indicator.id = id || "none";
-//    indicator.name = name;
-//    indicator.modified = gisportal.utils.nameToId(name);
-//    indicator.groupedNames = group;
-   
-//    if (!refined) {
-//       $('#refine-region').ddslick({
-//          data: indicator.groupedNames['region'],
-//          initialState: "open",
-//          selectText: "Select a Region",
-//          onSelected: function(data) {
-//             if (data.selectedData) {
-//                var ids = data.selectedData.value;
-//                var current = gisportal.refinePanel.currentData.id;
-//                gisportal.refinePanel.refineData(ids, current);
-//             }
-//          }
-//       })
-//    } else {
-//       // ? - not sure why this is here
-//    }
-
-//    $('#refine-interval').parent().toggleClass('hidden', true);
-//    $('#refine-confidence').parent().toggleClass('hidden', true);
-//    $('#refine-provider').parent().toggleClass('hidden', true);
-//    $('#refine-reliability').parent().toggleClass('hidden', true);
-
-//    // TODO: This will break if enabled; the Moustache template method has been changed to ddslick drop downs but I couldn't find an indicator where this 
-//    // would have come into effect
-//    // 
-//    // if (indicator.hasInterval) {
-//    //    indicator.tag = indicator.groupedNames['interval'];
-//    //    var rendered = Mustache.render(template, indicator);
-//    //    $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
-//    // }
-
-
-//    if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1) ) {
-//       indicator.tag = indicator.groupedNames['providerTag'];
-//       indicator.tag.forEach(function( provider ){
-//          if( gisportal.providers && gisportal.providers[provider.text.toUpperCase()] && gisportal.providers[provider.text.toUpperCase()].model )
-//             provider.moreInfo = gisportal.providers[provider.text.toUpperCase()].model;
-//       });
-
-//       $('#refine-provider').ddslick({
-//          data: indicator.tag,
-//          initialState: "open",
-//          selectText: "Select a provider",
-//          onSelected: function(data) {
-//             if (data.selectedData) {
-//                var ids = data.selectedData.value;
-//                var current = gisportal.refinePanel.currentData.id;
-//                gisportal.refinePanel.refineData(ids, current);
-//             }
-//          }
-//       });
-//       $('.js-refine-section-provider').removeClass('hidden');
-//    }
-
-//    // TODO: This will break if enabled; the Moustache template method has been changed to ddslick drop downs but I couldn't find an indicator where this 
-//    // would have come into effect
-//    // 
-//    // if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasProvider || group.providerTag.length <= 1)) {
-//    //    indicator.tag = indicator.groupedNames['Confidence'];
-//    //    var rendered = Mustache.render(template, indicator);
-//    //    $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false);
-//    // }
-
-
-
-//    if (refined) {
-//       $('.js-reset-options[data-name="' + name + '"]').removeClass('hidden');
-//    }
-//    this.initDOM(data);
-// };
-
 gisportal.refinePanel.reset = function() {
    $('.js-refine-section').html('');
-   // $('#refine-region').ddslick('destroy');
-   // $('#refine-provider').ddslick('destroy');
-   // $('#refine-reliability').ddslick('destroy');
-   // $('#refine-interval').ddslick('destroy');
-
 }
