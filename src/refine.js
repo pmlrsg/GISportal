@@ -101,9 +101,13 @@ gisportal.refinePanel.refreshData = function() {
    for (var i = 0; i < data.refine.length; i++) {
       var category = data.refine[i].cat;
       var tag = data.refine[i].tag;
-      var indicators = indicatorCategories[category][tag];
-
-      possibleIndicators.push(indicators);
+      if (category !== 'undefined' && tag !== '') {  // they didn't use the search results
+         var indicators = indicatorCategories[category][tag];
+         possibleIndicators.push(indicators);
+      } else {                                       // they clicked on a search result, so there won't be a refine category so use the niceName
+         var indicators = indicatorCategories.niceName[name];
+         possibleIndicators.push(indicators);
+      }
    }
 
    // refinedIndicators is an array of values that exist in *all* possibleIndicators arrays
@@ -111,15 +115,10 @@ gisportal.refinePanel.refreshData = function() {
 
    // and if there's only 1 then we have our winner - load it up baby
    if (refinedIndicators.length == 1) {
-      var data = {};
-      data.id = refinedIndicators[0];
-      
-      gisportal.indicatorsPanel.selectLayer(data.id);
-      gisportal.indicatorsPanel.addToPanel(data);
-      gisportal.indicatorsPanel.open();
-      gisportal.refinePanel.reset();
-      gisportal.configurePanel.reset();
+      gisportal.refinePanel.layerFound(refinedIndicators[0]);
       return;
+   } else {
+      console.log('refinedIndicators: ' + refinedIndicators.length);
    }
 
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
@@ -163,6 +162,17 @@ gisportal.refinePanel.refreshData = function() {
 
    }
 };
+
+gisportal.refinePanel.layerFound = function(layerId) {
+   var data = {};
+   data.id = layerId;
+
+   gisportal.indicatorsPanel.selectLayer(layerId);
+   gisportal.indicatorsPanel.addToPanel(data);
+   gisportal.indicatorsPanel.open();
+   gisportal.refinePanel.reset();
+   gisportal.configurePanel.reset();
+}
 
 gisportal.refinePanel.reset = function() {
    $('.js-refine-section').html('');
