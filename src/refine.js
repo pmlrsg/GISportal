@@ -70,7 +70,7 @@ gisportal.refinePanel.refreshData = function() {
 
    for (var tag in tags_flat) {
       if (tags_flat.hasOwnProperty(tag)){
-         if (tags_flat[tag] === name) {
+         if (tags_flat[tag] === name) {   // the tag applies to this indicator
             matchingTags[tag] = tags_flat[tag];
          }
       }
@@ -79,6 +79,7 @@ gisportal.refinePanel.refreshData = function() {
 
    // an array to hold the filters that could be available
    var furtherFilters = [];
+
    // work out if any of the browseCategories for the selected indicator name has more than one option
    for (var tag in indicatorTags) {
       if (indicatorTags.hasOwnProperty(tag)) {
@@ -118,7 +119,19 @@ gisportal.refinePanel.refreshData = function() {
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
       return;
    } else {
+      // 
+      // This is along the right lines but doesn't quite work; it produces a furtherFilters object that's the wrong shape
+      //
+      //
+      //
+      // if not, then get the tags that apply to all refinedIndicators so that the user can further refine
       console.log('refinedIndicators: ' + refinedIndicators.length);
+      var refinedTags = [];
+      for (var i in refinedIndicators) {
+         var id = refinedIndicators[i];
+         refinedTags.push(gisportal.layers[id].tags)  // need to make sure that a) it exists in browseCateogories, and b) it hasn't already been refined
+      }
+      furtherFilters = _.merge.apply(_, refinedTags); 
    }
 
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
@@ -128,10 +141,23 @@ gisportal.refinePanel.refreshData = function() {
 
       indicator.group = gisportal.groupNames()[name];
 
+      var selectedValues = [];
+
       // create drop downs for each of the further filters
       for (var tag in furtherFilters) {
          var tagName = furtherFilters[tag];
          var tagDisplayName = gisportal.config.browseCategories[tagName];
+
+         // we only want to show tags that haven't already been selected, so if the tag's in refine.data don't bother with it (or maybe show it but pre-selected?)
+         var tagRefinedAlready = _.findKey(refine, function(chr) { return chr.cat == tagName; });
+         var refineValue = undefined;
+         if (tagRefinedAlready > -1) {
+            var tmp = {
+               tag: tagName,
+               value: refine[tagRefinedAlready].tag
+            }
+            selectedValues.push(tmp);
+         }
 
          // first create a div and append it to the filter section
          var placeholder = $('<div class="js-refine-section-' + tagName + '"><div id="refine-' + tagName + '"></div></div>')
@@ -147,14 +173,53 @@ gisportal.refinePanel.refreshData = function() {
                   tmp.cat = data.original.attr('id').replace('refine-', '');     // == tagName, but that's not available here hence the apparently slightly odd method of getting it
                   tmp.tag = data.selectedData.text;
                   var data = gisportal.refinePanel.currentData;
-
+   
                   data.refine.push(tmp);
                   gisportal.refinePanel.currentData = data;
                   gisportal.refinePanel.refreshData();
                }
             }
-
          })
+         // this doesn't work because the dropdown isn't actually rendered until in we're in the next loop, and by then `tagName` has changed value
+         // try getting the index using _.findIndex with refineValue
+         //
+         //
+         // .ready(function() {
+         // if (refineValue != undefined) {
+         //   $('#refine-' + tagName).ddslick('select', { value: refineValue});
+         // }
+         // });
+      }
+
+      // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
+      for (var indicator in refinedIndicators) {
+         var id = refinedIndicators[indicator];
+         var holder = $('input[value="' + id + '"]').parent()
+         
+         var tags = [];
+         for (cat in gisportal.config.browseCategories) {
+            var tmp = {
+               name: gisportal.config.browseCategories[cat],
+               value: gisportal.layers[id].tags[cat]
+            }
+            tags.push(tmp);
+         }
+
+         var data = {
+            provider: gisportal.layers[id].providerTag,
+            dateStart: gisportal.layers[id].firstDate,
+            dateEnd: gisportal.layers[id].lastDate,
+            tags: tags 
+         }
+
+         var info = gisportal.templates['tooltip-refinedetails'](data);
+
+         if (holder.length > 0) {
+            holder.tooltipster({
+               content: $(info),
+               position: 'right',
+            })
+         }
       }
 
    } else {

@@ -147,9 +147,14 @@ gisportal.utils.mustacheFormat = function(o)  {
    for (var prop in o) {
       if (o.hasOwnProperty(prop)) {
          if (o[prop].length > 0)  {
+            var d = '';
+            if (o[prop].length > 1) {
+               d = o[prop].length +' matches';
+            } 
             data.push({
                'text' : prop,
-               'value' : o[prop]
+               'value' : o[prop],
+               'description': d
             });
          }
       }

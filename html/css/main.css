@@ -238,6 +238,9 @@ input[type="text"]  {
   margin-top: 12px;
 }
 
+dl { width: 320px; display: block; line-height: 1.5em; clear: both;}
+dt { width: 120px; float: left; font-style: italic; }
+dd { width: 200px; float: left; }
 
 
 @media( max-width: 800px ){
