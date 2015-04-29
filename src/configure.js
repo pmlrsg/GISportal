@@ -352,6 +352,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
+         var tagNameSafe = tagNames[i].replace(/ /g, '').toLowerCase();
          // sort them
          vals.sort();
          // For each tag name, if it has values then render the mustache
@@ -374,6 +375,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
 
          var rendered = gisportal.templates['categories'] ({
             tag : tagNames[i],
+            tagnamesafe: tagNameSafe,
             tagModified : gisportal.utils.nameToId(tagNames[i]),
             indicators : indicators 
          });
@@ -382,7 +384,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
          if (tabNumber) $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
          // -->
          
-         $('#select-'+ tagNames[i]).ddslick({
+         $('#select-'+ tagNameSafe).ddslick({
             selectText: tagNames[i],
             onSelected: function(data) {
                if (data.selectedData) {
