@@ -109,10 +109,13 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * This function creates a data structure with an array of
  * names accessed with gisportal.groupTags()[tag][value].
  *
+ * @param   {object} an object of layers to build the tags for; this can be null in which case gisportal.layers, i.e. all layers, are used
  * @returns {object} Data structure with tags as keys
  */
-gisportal.groupTags = function()  {
-   var layers = gisportal.layers;
+gisportal.groupTags = function(layers)  {
+   if (layers == undefined) {
+      layers = gisportal.layers;
+   }
    var grouped = {};
    
    // Iterate over the ids in gisportal.layers
@@ -198,17 +201,20 @@ gisportal.groupTags = function()  {
  *
  * @returns {object} Data structure with names as keys
  */
-gisportal.groupNames = function()  {
+gisportal.groupNames = function(layers)  {
+   if (layers == undefined) {
+      layers = gisportal.layers;
+   }
    var group = {};
 
-   // Iterate over gisportal.layers so that
+   // Iterate over layers so that
    // we can get the name and tags of each
    // layer. 
-   var keys = Object.keys(gisportal.layers);
+   var keys = Object.keys(layers);
    for (var i = 0; i < keys.length; i++)  {
       // Cache the indicator so that we don't need
       // to keep finding it.
-      var indicator = gisportal.layers[keys[i]];
+      var indicator = layers[keys[i]];
       // Lowercase the name so that it can be used for comparisons
       var name = indicator.name;
       var id = indicator.id;

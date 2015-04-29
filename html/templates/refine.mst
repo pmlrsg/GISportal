@@ -1,0 +1,10 @@
+<p>There are now <span>{{indicatorCount}} {{indicatorName}}</span> indicators to choose from. Use the select lists below to refine your selection</p>
+{{#refine}}
+<div class="refined">
+   <a class="refine-remove" data-cat={{rawCat}}>
+      <span class="refined-tag">{{cat}}</span>
+      <span class="refined-value">{{tag}}</span>
+   </a>
+</div>
+{{/refine}}
+

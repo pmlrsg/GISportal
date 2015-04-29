@@ -113,25 +113,48 @@ gisportal.refinePanel.refreshData = function() {
 
    // refinedIndicators is an array of values that exist in *all* possibleIndicators arrays
    var refinedIndicators =  _.intersection.apply(_, possibleIndicators);
+   var refinedIndicatorLayers = undefined;
 
    // and if there's only 1 then we have our winner - load it up baby
    if (refinedIndicators.length == 1) {
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
       return;
    } else {
-      // 
-      // This is along the right lines but doesn't quite work; it produces a furtherFilters object that's the wrong shape
-      //
-      //
-      //
-      // if not, then get the tags that apply to all refinedIndicators so that the user can further refine
-      console.log('refinedIndicators: ' + refinedIndicators.length);
-      var refinedTags = [];
-      for (var i in refinedIndicators) {
-         var id = refinedIndicators[i];
-         refinedTags.push(gisportal.layers[id].tags)  // need to make sure that a) it exists in browseCateogories, and b) it hasn't already been refined
+      // more refinement is required. Show the user what they have selected so far
+      var selectedTags = [];
+      for (var r in refine) {
+         var tmp = {
+            cat: gisportal.config.browseCategories[refine[r].cat],
+            tag: refine[r].tag,
+            rawCat: refine[r].cat
+         }
+         selectedTags.push(tmp);
       }
-      furtherFilters = _.merge.apply(_, refinedTags); 
+
+      var data = {
+         indicatorCount: refinedIndicators.length,
+         indicatorName: name,
+         refine: selectedTags
+      };
+
+      var rendered = gisportal.templates['refine'](data);
+      $('.js-refined-tags').html(rendered);
+
+      // add some magic to allow them to remove selected categories
+      $('.refine-remove').click(function() {
+         var cat = $(this).data('cat');
+         gisportal.refinePanel.removeCategory(cat);
+      });
+
+      // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 
+      // the gisportal.groupNames function to get a set of matching tags in the right structure
+      refinedIndicatorLayers = {};
+
+      for (var i in refinedIndicators){
+         var id = refinedIndicators[i];
+         refinedIndicatorLayers[id] = gisportal.layers[id];
+      }
+      
    }
 
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
@@ -139,9 +162,7 @@ gisportal.refinePanel.refreshData = function() {
       var refineSection = $('.js-refine-section')
       refineSection.html('');
 
-      indicator.group = gisportal.groupNames()[name];
-
-      var selectedValues = [];
+      indicator.group = gisportal.groupNames(refinedIndicatorLayers)[name];
 
       // create drop downs for each of the further filters
       for (var tag in furtherFilters) {
@@ -150,45 +171,36 @@ gisportal.refinePanel.refreshData = function() {
 
          // we only want to show tags that haven't already been selected, so if the tag's in refine.data don't bother with it (or maybe show it but pre-selected?)
          var tagRefinedAlready = _.findKey(refine, function(chr) { return chr.cat == tagName; });
-         var refineValue = undefined;
-         if (tagRefinedAlready > -1) {
-            var tmp = {
-               tag: tagName,
-               value: refine[tagRefinedAlready].tag
-            }
-            selectedValues.push(tmp);
+         
+         if (tagRefinedAlready == undefined) {  // it hasn't been refined so we can show it
+            // first create a div and append it to the filter section
+            var placeholder = $('<div class="js-refine-section-' + tagName + '"><div id="refine-' + tagName + '"></div></div>')
+            placeholder.appendTo(refineSection);
+            
+            var a = 'a';
+            if (_.indexOf(['a','e','i','o','u'], tagDisplayName.substring(0,1).toLowerCase()) > -1) a = 'an';
+
+            // then add a ddslick drop down to it populated with tagName options
+            $('#refine-' + tagName).ddslick({
+               data: gisportal.utils.mustacheFormat(indicator.group[tagName]),
+               initialState: 'open',
+               selectText: 'Select '+ a + ' ' + tagDisplayName,
+               onSelected: function(data) {
+                  if (data.selectedData) {
+                     var tmp = {};
+                     tmp.cat = data.original.attr('id').replace('refine-', '');     // == tagName, but that's not available here hence the apparently slightly odd method of getting it
+                     tmp.tag = data.selectedData.text;
+                     var data = gisportal.refinePanel.currentData;
+      
+                     data.refine.push(tmp);
+                     gisportal.refinePanel.currentData = data;
+                     gisportal.refinePanel.refreshData();
+                  }
+               }
+            })   
          }
 
-         // first create a div and append it to the filter section
-         var placeholder = $('<div class="js-refine-section-' + tagName + '"><div id="refine-' + tagName + '"></div></div>')
-         placeholder.appendTo(refineSection);
-         // then add a ddslick drop down to it populated with tagName options
-         $('#refine-' + tagName).ddslick({
-            data: gisportal.utils.mustacheFormat(indicator.group[tagName]),
-            initialState: "open",
-            selectText: "Select a " + tagDisplayName,
-            onSelected: function(data) {
-               if (data.selectedData) {
-                  var tmp = {};
-                  tmp.cat = data.original.attr('id').replace('refine-', '');     // == tagName, but that's not available here hence the apparently slightly odd method of getting it
-                  tmp.tag = data.selectedData.text;
-                  var data = gisportal.refinePanel.currentData;
-   
-                  data.refine.push(tmp);
-                  gisportal.refinePanel.currentData = data;
-                  gisportal.refinePanel.refreshData();
-               }
-            }
-         })
-         // this doesn't work because the dropdown isn't actually rendered until in we're in the next loop, and by then `tagName` has changed value
-         // try getting the index using _.findIndex with refineValue
-         //
-         //
-         // .ready(function() {
-         // if (refineValue != undefined) {
-         //   $('#refine-' + tagName).ddslick('select', { value: refineValue});
-         // }
-         // });
+         
       }
 
       // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
@@ -237,6 +249,23 @@ gisportal.refinePanel.layerFound = function(layerId) {
    gisportal.indicatorsPanel.open();
    gisportal.refinePanel.reset();
    gisportal.configurePanel.reset();
+}
+
+gisportal.refinePanel.removeCategory = function(cat) {
+   var refine = gisportal.refinePanel.currentData.refine;
+   var refineTmp = [];
+
+   for (var r in refine) {
+      if (refine[r].cat != cat) refineTmp.push(refine[r]);
+   }
+
+   gisportal.refinePanel.currentData.refine = refineTmp;
+
+   if (refineTmp.length == 0) {
+      gisportal.refinePanel.close();
+   } else {
+      gisportal.refinePanel.refreshData();
+   }
 }
 
 gisportal.refinePanel.reset = function() {
