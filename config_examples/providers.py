@@ -1,6 +1,6 @@
 providers ={
   "CCI": {
-    "website": "http://www.http://oceancolour.org/"
+    "website": "http://www.oceancolour.org/"
   },
   "CEFAS": {
     "logo": "img/providers/cefas.png",

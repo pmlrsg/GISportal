@@ -179,7 +179,8 @@ gisportal.createOpLayers = function() {
       while( gisportal.layers[layer.id + postfix ] !== void(0) )
          postfix++; // will convert the "" into a number
 
-      gisportal.layers[layer.id + postfix] = layer;
+      layer.id = layer.id + postfix;
+      gisportal.layers[layer.id] = layer;
 
    };
 
