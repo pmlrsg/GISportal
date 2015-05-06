@@ -10,6 +10,12 @@ gisportal.map_settings.init = function() {
 
    // load the template and set values for base map options and country border options
    var layers = [];
+   
+   var layer = {};
+   layer.id = 'none';
+   layer.name = 'No Base Map';
+   layers.push(layer);
+
    _.forEach(gisportal.baseLayers, function(d)  {
       var layer = {};
       layer.id = d.getProperties().id;
@@ -312,9 +318,14 @@ gisportal.selectBaseLayer = function(id) {
       }
    }
    // then add the selected option and send it to the bottom
-   map.addLayer(gisportal.baseLayers[id]);
+   if (id !== 'none') {
+      map.addLayer(gisportal.baseLayers[id]);
+   }
    // and make sure that they are in the correct order
-   gisportal.indicatorsPanel.reorderLayers();
+   if (gisportal.selectedLayers.length > 0) {
+      gisportal.indicatorsPanel.reorderLayers();   
+   }
+   
 }
 
 gisportal.createGraticules = function() {
