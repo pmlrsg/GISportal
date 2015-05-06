@@ -313,8 +313,8 @@ gisportal.selectBaseLayer = function(id) {
    }
    // then add the selected option and send it to the bottom
    map.addLayer(gisportal.baseLayers[id]);
-   // and make sure that the country borders are on top
-   gisportal.setCountryBordersToTopLayer();
+   // and make sure that they are in the correct order
+   gisportal.indicatorsPanel.reorderLayers();
 }
 
 gisportal.createGraticules = function() {

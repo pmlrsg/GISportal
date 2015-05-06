@@ -57,7 +57,9 @@ gisportal.layer = function( options ) {
    this.name = options.tags.niceName || options.name.replace("/","-");
 
    // {indicator name} - {indicator region} - { indicator provider }
-   this.descriptiveName = this.name + ' - ' + this.tags.region + ' - ' + this.providerTag
+   this.descriptiveName = this.name;
+   if (this.tags.region) this.descriptiveName += ' - ' + this.tags.region;
+   if (this.providerTag) this.descriptiveName += ' - ' + this.providerTag
 
    // The original indicator name used by thedds/cache
    this.urlName = options.name;

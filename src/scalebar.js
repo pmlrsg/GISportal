@@ -61,12 +61,12 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
          }
       }
       
-      var isExponentOver4 = scalePoints.some(function( point ){
+      var isExponentOver3 = scalePoints.some(function( point ){
          //return point.toExponential().match(/\.(.+)e/)[1].length > 4
-         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 4 )
+         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 3 )
       })
       
-      if( isExponentOver4 ){
+      if( isExponentOver3 ){
 	      var makePointReadable = function( point ){
 	         point = point.toExponential();
 	         if( point.indexOf('.') == -1 )
@@ -80,7 +80,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       
       scalePoints = scalePoints.map(function( point ){
 	      return {
-	         original: isExponentOver4 ? point.toExponential() : point,
+	         original: isExponentOver3 ? point.toExponential() : point,
 	         nicePrint: makePointReadable(point)
 	      }
       })
