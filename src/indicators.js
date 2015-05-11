@@ -133,7 +133,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '#show_more', function(e) {
       e.preventDefault();
       if(gisportal.panelSlideout.isOut('metadata')){
-         gisportal.events.emit('metadata.close');
+         gisportal.events.trigger('metadata.close');
       }
       else {
          var indicator = $(this).closest('[data-name]').data('name');//('ul').siblings('.indicator-header').data('name');
@@ -150,11 +150,11 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    $('.js-indicators').on('click', '.indicator-overlay', function(){
-      gisportal.events.emit('metadata.close');
+      gisportal.events.trigger('metadata.close');
    });
 
    $('.metadata-slideout').on('click', '.js-close-extrainfo', function() {
-      gisportal.events.emit('metadata.close');
+      gisportal.events.trigger('metadata.close');
    });
 
    $('body').on('click', '.js-focus-on-build-graph-component', function(){
@@ -192,7 +192,7 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 };
 
-gisportal.events.on('metadata.close', function() {
+gisportal.events.bind('metadata.close', function() {
    $('.indicator-overlay').remove();
    gisportal.panelSlideout.closeSlideout('metadata');
 });
@@ -310,7 +310,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       maxWidth: 200
    });
 
-   gisportal.events.emit('layer.addtopanel', data)
+   gisportal.events.trigger('layer.addtopanel', data)
 };
 
 gisportal.indicatorsPanel.reorderLayers = function() {
@@ -349,7 +349,7 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
 
-   gisportal.events.emit('layer.remove', id, gisportal.layers[id].name)
+   gisportal.events.trigger('layer.remove', id, gisportal.layers[id].name)
 };
 
 /* There is overlap here with configurePanel,
@@ -363,7 +363,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
       options.visible = true;
       gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
       
-      gisportal.events.emit('layer.select', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.select', id, gisportal.layers[id].name)
    }
 };
 
@@ -372,7 +372,7 @@ gisportal.indicatorsPanel.hideLayer = function(id) {
       gisportal.layers[id].setVisibility(false);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', false);
 
-      gisportal.events.emit('layer.hide', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.hide', id, gisportal.layers[id].name)
    }
 };
 
@@ -381,7 +381,7 @@ gisportal.indicatorsPanel.showLayer = function(id) {
       gisportal.layers[id].setVisibility(true);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', true);
 
-      gisportal.events.emit('layer.show', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.show', id, gisportal.layers[id].name)
    }
 };
 

@@ -275,108 +275,108 @@ collaboration.userAuthorised = function() {
 //  Portal EventManager event bindings
 //--------------------------------------------------------------------------------------
 
-// // user zooms in/out
-// gisportal.events.bind("map.zoom", function(event, zoomLevel) {
-//    var params = {
-//       "event" : "map.zoom",
-//       "zoomlevel" : zoomLevel
-//    }
-//    collaboration._emit('c_event', params);
-// });
+// user zooms in/out
+gisportal.events.bind("map.zoom", function(event, zoomLevel) {
+   var params = {
+      "event" : "map.zoom",
+      "zoomlevel" : zoomLevel
+   }
+   collaboration._emit('c_event', params);
+});
 
-// // user moves the map
-// gisportal.events.bind("map.move", function(event, CenterLonLat) {
-//    var params = { 
-//       "event" : "map.move",
-//       "lat" : CenterLonLat.lat,
-//       "lon" : CenterLonLat. lon
-//    }
-//    collaboration._emit('c_event', params);
-// });
+// user moves the map
+gisportal.events.bind("map.move", function(event, CenterLonLat) {
+   var params = { 
+      "event" : "map.move",
+      "lat" : CenterLonLat.lat,
+      "lon" : CenterLonLat. lon
+   }
+   collaboration._emit('c_event', params);
+});
 
-// // Base map changed
-// gisportal.events.bind("displayoptions.basemap", function(event, id, value, logmsg) {
-//    collaboration.setValueById(id, value, logmsg);
-// });
+// Base map changed
+gisportal.events.bind("displayoptions.basemap", function(event, id, value, logmsg) {
+   collaboration.setValueById(id, value, logmsg);
+});
 
-// // Country borders changed
-// gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
-//    collaboration.setValueById(id, value, logmsg);
-// });
+// Country borders changed
+gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
+   collaboration.setValueById(id, value, logmsg);
+});
 
-// // new layer added
-// gisportal.events.bind("layer.addtopanel", function(event, data) {
-//    var params = {
-//        "event" : "layer.addtopanel",
-//        "layer" : data
-//    }
-//    collaboration._emit('c_event', params);
-// });
+// new layer added
+gisportal.events.bind("layer.addtopanel", function(event, data) {
+   var params = {
+       "event" : "layer.addtopanel",
+       "layer" : data
+   }
+   collaboration._emit('c_event', params);
+});
 
-// // layer is selected
-// gisportal.events.bind("layer.select", function(event, id, layerName) {
-//     var params = {
-//         "event" : "layer.select",
-//         "id" : id,
-//         "layerName" : layerName
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// layer is selected
+gisportal.events.bind("layer.select", function(event, id, layerName) {
+    var params = {
+        "event" : "layer.select",
+        "id" : id,
+        "layerName" : layerName
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // layer removed from panel
-// gisportal.events.bind("layer.remove", function(event, id, layerName) {
-//    var params = {
-//         "event" : "layer.remove",
-//         "id" : id,
-//         "layerName" : layerName
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// layer removed from panel
+gisportal.events.bind("layer.remove", function(event, id, layerName) {
+   var params = {
+        "event" : "layer.remove",
+        "id" : id,
+        "layerName" : layerName
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // hide a layer
-// gisportal.events.bind("layer.hide", function(event, id, layerName) {
-//    var params = {
-//         "event" : "layer.hide",
-//         "id" : id,
-//         "layerName" : layerName
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// hide a layer
+gisportal.events.bind("layer.hide", function(event, id, layerName) {
+   var params = {
+        "event" : "layer.hide",
+        "id" : id,
+        "layerName" : layerName
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // hide a layer
-// gisportal.events.bind("layer.show", function(event, id, layerName) {
-//    var params = {
-//         "event" : "layer.show",
-//         "id" : id,
-//         "layerName" : layerName
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// hide a layer
+gisportal.events.bind("layer.show", function(event, id, layerName) {
+   var params = {
+        "event" : "layer.show",
+        "id" : id,
+        "layerName" : layerName
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // show a panel
-// gisportal.events.bind("panels.showpanel", function(event, panelName) {
-//    var params = {
-//         "event" : "panels.showpanel",
-//         "panelName" : panelName
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// show a panel
+gisportal.events.bind("panels.showpanel", function(event, panelName) {
+   var params = {
+        "event" : "panels.showpanel",
+        "panelName" : panelName
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // auto scale a layer
-// gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
-//    var params = {
-//         "event" : "scalebar.autoscale",
-//         "id" : id,
-//         "force" : force
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// auto scale a layer
+gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
+   var params = {
+        "event" : "scalebar.autoscale",
+        "id" : id,
+        "force" : force
+    }
+    collaboration._emit('c_event', params);
+});
 
-// // auto scale a layer
-// gisportal.events.bind("scalebar.reset", function(event, id) {
-//    var params = {
-//         "event" : "scalebar.autoscale",
-//         "id" : id
-//     }
-//     collaboration._emit('c_event', params);
-// });
+// auto scale a layer
+gisportal.events.bind("scalebar.reset", function(event, id) {
+   var params = {
+        "event" : "scalebar.autoscale",
+        "id" : id
+    }
+    collaboration._emit('c_event', params);
+});
