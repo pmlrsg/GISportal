@@ -145,7 +145,7 @@ def download_netcdf():
       data.variables[variable][x] = masked[x][::]
    #original_file.variables['chlor_a']= masked_chl[:][::]
    data.close()
-   return send_file(tfile, mimetype='application/x-netcdf')
+   return send_file(tfile, mimetype='application/x-netcdf', as_attachment=True, attachment_filename="download.nc")
 
 """
 Gets any parameters.
@@ -698,10 +698,8 @@ def hovmoller(dataset, params):
          
          mean = getMean(row)
          
-         if np.isnan(mean):
-            mean = 0
-
-         output['data'].append([date, float(pos), mean])
+         if not np.isnan(mean):
+            output['data'].append([date, float(pos), mean])
             
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"

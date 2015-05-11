@@ -22,13 +22,13 @@ gisportal.panels.showPanel = function(panelName) {
 		});
 	}
 	gisportal.panels.activePanel = panelName;
-	gisportal.events.trigger('panels.showpanel', panelName);
+	//gisportal.events.trigger('panels.showpanel', panelName);
 };
 
 gisportal.panels.bind('close-panel', function(ev, data) {
 
 	if (data['panel-name'] === 'active-layers') {
-		gisportal.events.trigger('metadata.close');
+		gisportal.events.emit('metadata.close');
 	}
 
 });

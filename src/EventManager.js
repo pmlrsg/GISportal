@@ -141,4 +141,4 @@ EventManager.prototype.trigger = function(eventType, data){
 
 
 gisportal = gisportal || {};
-gisportal.events = new EventManager();
+gisportal.events = new EventEmitter();

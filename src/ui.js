@@ -40,7 +40,7 @@ function changeTab( tabElement )  {
   });
   $('[for="' + e.id + '"]').addClass('active');
 
-  gisportal.events.trigger('metadata.close');
+  gisportal.events.emit('metadata.close');
 
 }
 
@@ -64,7 +64,7 @@ function closeTab(){
     };
     e.bind('mouseup',up);
     e.one('mouseout', unbind);
-    gisportal.events.trigger('metadata.close');
+    gisportal.events.emit('metadata.close');
   }
 }
 
@@ -79,4 +79,10 @@ function activeIcon()  {
    }
 }
 
+$(function(){
+  // Close alert butto.n
+  $('body').on( 'click', '.js-alert-close', function(){
+    $(this).closest( '.alert' ).remove();
+  });
 
+});

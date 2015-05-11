@@ -1,15 +1,15 @@
 <input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
    <tbody>
-      {{#if providerDetails.website}}
-       <tr><td>Provider</td><td><a target="_blank" href="{{providerDetails.website}}">{{providerTag}}</a></td></tr>
+      {{#if provider.website}}
+       <tr><td>Provider</td><td><a target="_blank" href="{{provider.website}}">{{providerTag}}</a></td></tr>
       {{else}} 
       <tr><td>Provider</td><td>{{providerTag}}</td></tr>
       {{/if}}
-      {{!-- <tr><td>Region</td><td>{{tags.region}}</td></tr> --}}
-      <tr><td>Interval</td><td>{{tags.interval}}</td></tr>
-      <tr><td>Ecosystem element</td><td>{{tags.Ecosystem_Element}}</td></tr>
-      <tr><td>EU MSFD Descriptor</td><td>{{str_join tags.MSFD ", "}}</td></tr>
+      {{#displayTags}}
+         <tr><td>{{&displayName}}</td><td>{{str_join displayValues ", "}}</td></tr>
+      {{/displayTags}}
+
       <tr><td>Bounding box</td><td>
          <label>{{round exBoundingBox.NorthBoundLatitude 2}}</label> N, 
          <label>{{round exBoundingBox.EastBoundLongitude 2}}</label>   E, 
@@ -17,10 +17,10 @@
          <label>{{round exBoundingBox.WestBoundLongitude 2}}</label>   W 
       </td></tr>
       <tr><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
-      {{#if providerDetails.email}}
+      {{#if provider.email}}
          <tr>
             <td>Email</td>
-            <td><a target="_blank" href="mailto:{{providerDetails.email}}">{{providerDetails.email}}</a></td>
+            <td><a target="_blank" href="mailto:{{provider.email}}">{{provider.email}}</a></td>
          </tr>
       {{/if}}
       {{#if moreIndicatorInfo}}

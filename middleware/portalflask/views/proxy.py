@@ -176,12 +176,12 @@ def rotate():
 
    
 """
-Return a rotated image
+Return a list of template files
 """
 @portal_proxy.route('/templates')
 def templates(): 
-   this_dir = os.getcwd()
-   template_dir = this_dir.replace('middleware', 'html/templates')
+   this_dir = os.path.dirname(os.path.realpath(__file__))
+   template_dir = this_dir.replace('middleware/portalflask/views', 'html/templates')
    templates_list = []
 
    files_in_dir = os.listdir(template_dir)

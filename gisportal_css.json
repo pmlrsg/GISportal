@@ -3,6 +3,7 @@
    "files": [
       "html/css/reset.css",
       "html/css/fonts.css",
+      "html/css/alerts.css",
       "html/css/streamline.css",
       "html/css/streamline-filled-in.css",
       "html/css/type.css",
@@ -11,7 +12,6 @@
       "html/css/export.css",
       "html/css/share.css",
       "html/css/animation.css",
-      "html/js-libs/OpenLayers/theme/default/style.css",
       "html/css/jquery.nouislider.css",
       "html/js-libs/jquery-gritter/css/jquery.gritter.css",
       "html/css/timeline.css",

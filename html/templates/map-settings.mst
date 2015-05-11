@@ -4,9 +4,10 @@
 		<label for="select-basemap">Base Map Layer</label>
 		<select id="select-basemap">
 			{{#baseLayers}}
-				<option value="{{id}}">{{name}}</option>
+				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg">{{name}}</option>
 			{{/baseLayers}}
 		</select>
+		<input type="hidden" id="select-basemap-value" />
 	</li>
 	<li>
 		<label for="select-country-borders">Country Borders</label>
@@ -14,6 +15,13 @@
 			{{#countryBorders}}
 				<option value="{{id}}">{{name}}</option>
 			{{/countryBorders}}
+		</select>
+	</li>
+	<li>
+		<label for="select-graticules">Display Lat/Lon Graticules</label>
+		<select id="select-graticules">
+			<option value="Off">Off</option>
+			<option value="On">On</option>
 		</select>
 	</li>
 </ul>

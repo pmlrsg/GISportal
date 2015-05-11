@@ -12,6 +12,7 @@ class State(Base):
    version = Column(Float, unique=False)
    views = Column(Integer, unique=False)
    last_used = Column(DateTime, unique=False)
+   session_id = Column(String, unique=False)
    checksum = Column(String, unique=False)
 
    def __init__(self, user_id=None, state=None):  

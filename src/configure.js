@@ -19,14 +19,17 @@ gisportal.configurePanel = {};
  * to have a way to reset the panel.
  */
 gisportal.configurePanel.refreshData = function()  {
+   this.searchInit();
+
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
-   $("[id^='tab-browse']+.indicator-select").html('');
-   for (var cat in gisportal.config.browseCategories)  {
-      this.renderTags(cat, groupedTags);
+   if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'tabs') {
+      this.renderTagsAsTabs();
+   } else if (gisportal.config.browseMode == 'selectlist') {
+      this.renderTagsAsSelectlist();
    }
-   this.searchInit();
+
 };
 
 /**
@@ -47,35 +50,19 @@ gisportal.configurePanel.close = function()  {
  * This function initiates the DOM event handlers
  */
 gisportal.configurePanel.initDOM = function()  {
-   function toggleIndicator()  {
-      var name = $(this).parent().data('name');
-      var options = {};
-      
-      var cat = $(this).parents('[data-cat]');
-      if (cat)  {
-         var refine = {};
-         refine.cat = cat.data('cat');
-         refine.tag = $(this).data('tag');
-         options.refine = refine;
-         //options.refined = true;
-      }
+   // nothing to see here any more
+}
 
-      gisportal.configurePanel.selectLayer(name, options);
-   }
-
-   /* Temp */
-   $('.js-popular, .indicator-select, .js-search-results').on('click', ".js-toggleVisibility, .js-toggleVisibility~label", toggleIndicator);
+gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
+   var options = [];
    
-   
-   $('.js-indicators').on('change', '.hide-select', function()  {
-     // togggle! important 
-   });
-   
-   $('.indicator-select').on('click', '.indicator-dropdown', function()  {
-        $(this).siblings('ul').toggleClass('hidden'); 
-   });
+   var refine = {};
+   refine.cat = tagname;
+   refine.tag = tag;
+   options.push(refine);
 
-
+   gisportal.refinePanel.reset();
+   gisportal.configurePanel.selectLayer(name, options);
 }
 
 /**
@@ -84,7 +71,15 @@ gisportal.configurePanel.initDOM = function()  {
 gisportal.configurePanel.reset = function(){
    $('.js-search').val("").change();
    changeTab( $('#configurePanel .js-default-tab'));
-   gisportal.configurePanel.refreshData();
+   
+   // This seems most unnecessary as it reloads the data and the templates each time an indicator is selected
+   //  // gisportal.configurePanel.refreshData();
+     
+   // reset the options when browseMode = selectlist
+   $('.selectoptions .dd-container').ddslick('reset');
+   // and when browseMode = tabs
+   $('.js-indicator-select .dd-container').ddslick('reset');
+   
 }
 
 /**
@@ -114,10 +109,13 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * This function creates a data structure with an array of
  * names accessed with gisportal.groupTags()[tag][value].
  *
+ * @param   {object} an object of layers to build the tags for; this can be null in which case gisportal.layers, i.e. all layers, are used
  * @returns {object} Data structure with tags as keys
  */
-gisportal.groupTags = function()  {
-   var layers = gisportal.layers;
+gisportal.groupTags = function(layers)  {
+   if (layers == undefined) {
+      layers = gisportal.layers;
+   }
    var grouped = {};
    
    // Iterate over the ids in gisportal.layers
@@ -203,17 +201,20 @@ gisportal.groupTags = function()  {
  *
  * @returns {object} Data structure with names as keys
  */
-gisportal.groupNames = function()  {
+gisportal.groupNames = function(layers)  {
+   if (layers == undefined) {
+      layers = gisportal.layers;
+   }
    var group = {};
 
-   // Iterate over gisportal.layers so that
+   // Iterate over layers so that
    // we can get the name and tags of each
    // layer. 
-   var keys = Object.keys(gisportal.layers);
+   var keys = Object.keys(layers);
    for (var i = 0; i < keys.length; i++)  {
       // Cache the indicator so that we don't need
       // to keep finding it.
-      var indicator = gisportal.layers[keys[i]];
+      var indicator = layers[keys[i]];
       // Lowercase the name so that it can be used for comparisons
       var name = indicator.name;
       var id = indicator.id;
@@ -271,24 +272,89 @@ gisportal.groupNames = function()  {
  * with a category each, with multiple tag names
  * and tag values.
  *
- * @param {object} cat - The category, such as 'Ecosystem Element'
- * @param {object} grouped - The grouped tags, using gisportal.groupTags()
  */
-gisportal.configurePanel.renderTags = function(cat, grouped)  {
+gisportal.configurePanel.renderTagsAsTabs = function()  {
+   var grouped = gisportal.groupTags();
+
+   // load the template
+   var catFilter = gisportal.templates['category-filter-tabs']();
+   $('.js-category-filter').html(catFilter);
+
+   // iterate over each category
+   for (var cat in gisportal.config.browseCategories)  {
+
+      var catNameKeys = Object.keys(gisportal.config.browseCategories);
+      var tabNumber = _.indexOf(catNameKeys, cat) + 1;
+      var targetDiv = $('#tab-browse-'+ tabNumber+' + .indicator-select');
+
+      gisportal.configurePanel.renderIndicatorsByTag(cat, targetDiv, tabNumber);
+
+   }
+};
+
+/**
+ * An alternative method of grouping/filtering categories. This 
+ * method adds a select list instead of the three tabs, and lists
+ * each of the categories specified in gisportal.config.browseCategories
+ */
+gisportal.configurePanel.renderTagsAsSelectlist = function() {
+   // load the template
+   var catFilter = gisportal.templates['category-filter-selectlist']();
+   $('.js-category-filter').html(catFilter);
+
+   var categories = [];
+   for (var category in gisportal.config.browseCategories) {
+      var c = {
+         value: category,
+         text: gisportal.config.browseCategories[category],
+      }
+      categories.push(c);
+   }
+
+   var targetDiv = $('.js-category-filter-options');
+
+   $('#js-category-filter-select').ddslick({
+      data: categories,
+      onSelected: function(data) {
+         if (data.selectedData) {
+            gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
+         }
+      }
+   });
+   // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
+   var defaultValue = { index: 0 };
+   if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
+      defaultValue = { value: gisportal.config.defaultCategory };
+   } 
+   $('#js-category-filter-select').ddslick('select', defaultValue);
+}
+
+/**
+ * [renderIndicatorsByTag description]
+ * @param  {[type]} cat       the name of the category to render
+ * @param  {[type]} targetDiv a jQuery object of the div where the drop down list should be created
+  */
+gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNumber) {
+   targetDiv.html('');
+
+   var grouped = gisportal.groupTags();
+
    var tagVals = grouped[cat];
    var tagNames = [];
-   if (grouped[cat]) tagNames = Object.keys(grouped[cat]);
+   if (grouped[cat]) {
+      tagNames = Object.keys(grouped[cat]);
+      // sort it before it's rendered
+      tagNames.sort() 
+   } 
    var catName = gisportal.config.browseCategories[cat];
    var catNameKeys = Object.keys(gisportal.config.browseCategories);
-   // tabNumber is a hack used to give different logic to the region (middle) tab,
-   // so that clicking a region will automatically show that region in the refine panel.
-   var tabNumber = _.indexOf(catNameKeys, cat) + 1;
-   $('#tab-browse-2 + .panel-tab').attr('data-cat', catNameKeys[1]);
-
-
+   
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
+         var tagNameSafe = gisportal.utils.replace(['\ ','.',';',':'], ['_','_','_','_'], tagNames[i]);
+         // sort them
+         vals.sort();
          // For each tag name, if it has values then render the mustache
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
@@ -302,62 +368,32 @@ gisportal.configurePanel.renderTags = function(cat, grouped)  {
             // Modified is used when a unique id is required
             // in the actual html, for radio buttons for example.
             tmp.modified = gisportal.utils.nameToId(d);
+            tmp.tagname = cat;
+            tmp.tagvalue = tagNames[i];
             indicators.push(tmp);
          });
 
          var rendered = gisportal.templates['categories'] ({
             tag : tagNames[i],
+            tagnamesafe: tagNameSafe,
             tagModified : gisportal.utils.nameToId(tagNames[i]),
             indicators : indicators 
          });
-         $('#tab-browse-'+ tabNumber+' + .indicator-select').append(rendered);
-         $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
-
+         targetDiv.append(rendered);
+         // only for browseMode = tabs <!--
+         if (tabNumber) $('label[for="tab-browse-' + tabNumber + '"]').html(catName);
+         // -->
+         
+         $('#select-'+ tagNameSafe).ddslick({
+            selectText: tagNames[i],
+            onSelected: function(data) {
+               if (data.selectedData) {
+                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
+               }
+            }
+         });
       }
    }
-
-   gisportal.configurePanel.sortNamesAlphabetically()
-
-};
-
-/**
- * Sorts all of the indicator groups from A-Z and the indicators in that group
- */
-gisportal.configurePanel.sortNamesAlphabetically = function(){
-
-   function sortCompare( strA, strB ){
-
-      var compare = strA.localeCompare( strB );
-
-      if( compare > 0 )
-         return 1;
-      else if( compare < 0 )
-         return -1;
-      else
-         return 0;
-   }
-
-   $('.js-indicator-select').each(function(){
-      // Sort the groups
-      $(this).children().sort(function(a,b){
-         var aVal = $(a).find('label').first().text();
-         var bVal = $(b).find('label').first().text();
-         return sortCompare( aVal, bVal );
-      }).appendTo( this );
-
-      //Sort the indicators in the groups
-      $(this).children().each(function(){
-         var fakeSelect = $(this).find('.fake-select');
-
-         fakeSelect.children().sort(function(a,b){
-            var aVal = $(a).text();
-            var bVal = $(b).text();
-            return sortCompare( aVal, bVal );
-         }).appendTo( fakeSelect );
-      });
-
-
-   });
 }
 
 
@@ -393,10 +429,12 @@ gisportal.configurePanel.searchInit = function()  {
    $('.js-search').addClear({
       onClear: function(){
          $('.js-search').change();
+         $('.js-search-results').css('display', 'none');
       },
-      right: '14px',
+      right: '20px',
       top: '2px',
-      fontSize: '17px'
+      fontSize: '17px',
+      closeSymbol: '<img src="img/cross.png" width="14" />'
    });
 
    // If statement is needed to stop the change event trigger on lose of focus
@@ -440,6 +478,11 @@ gisportal.configurePanel.search = function(val)  {
    });
    
    $('.js-search-results').html(rendered);
+   $('.js-search-results a').click(function() {
+      gisportal.configurePanel.toggleIndicator($(this).text(), '');
+      $('.js-search-results').css('display', 'none');   
+   });
+   $('.js-search-results').css('display', 'block');
    if (val == 'sombrero') {
       $('#sb').find('audio')[0].play();
       $('[class*="icon-"]').addClass('icon-sombrero');
@@ -450,7 +493,6 @@ gisportal.configurePanel.search = function(val)  {
    }
    var selected = [];
 
-
 };
 
 /**
@@ -460,9 +502,6 @@ gisportal.configurePanel.search = function(val)  {
  * @param {object} options - This includes the id if it is known
  */
 gisportal.configurePanel.selectLayer = function(name, options)  {
-   // Trigger the analytics event
-   gisportal.analytics.events.selectLayer( { name: name } );
-
 
    var options = options || {};
    var name = name;
@@ -472,17 +511,13 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
       id = options.id;
    }
 
-   
    name = name.replace(/__/g, ' ');
-
-   //$('.js-toggleVisibility[data-name="' + name + '"]').toggleClass('active', true).prop('checked', true);   
-   //$('.js-toggleVisibility[data-name="' + name + '"]').prev('label').toggleClass('active', true).prop('checked', true);
 
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
-   if (options.refine) tmp.refine = options.refine;
-   if (options.refined !== undefined) tmp.refined = options.refined;
+   if (options) tmp.refine = options;
+   //if (options.refined !== undefined) tmp.refined = options.refined;
 
    this.buildMap(tmp);
 };

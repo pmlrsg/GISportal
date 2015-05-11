@@ -1,0 +1,14 @@
+<dl>
+   <dt>Provider<dt>
+   <dd>{{provider}}</dd>
+</dl>
+<dl>
+   <dt>Date Range<dt>
+   <dd>{{dateStart}} &raquo; {{dateEnd}}</dd>
+</dl>
+{{#tags}}
+   <dl>
+      <dt>{{name}}<dt>
+      <dd>{{value}}</dd>
+   </dl>
+{{/tags}}

@@ -4,6 +4,11 @@
  */
  
 gisportal.templates = {};
+/**
+ * Reads the /templates/ directory on the server
+ * and downloads all the .mst files and caches them
+ * @param  {Function} callback Callback on completion 
+ */
 gisportal.loadTemplates = function( callback ){
    var waitingFor = 0;
    var callback = callback || function(){};
@@ -78,7 +83,11 @@ Handlebars.registerHelper('truncate', function(text, max_length) {
       return text;
 });
 
-
+/**
+ * Helper to join a array of strings in handlebars
+ * @param  Array arrayToJoin  Array of variables to join
+ * @param  e]} separator    
+ */
 Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
    if( arrayToJoin == void(0) ) return "";
    separator = separator || "";
@@ -97,12 +106,20 @@ Handlebars.registerHelper('selected', function(attr1, attr2, options) {
       return 'selected'
 });
 
+/**
+ * Useful with checkbox's if the 2 parameters given 
+ * are the same it returns "checked" otherwise ""
+ */
 Handlebars.registerHelper('checked', function(attr1, attr2, options) {
    if( attr1 == attr2 )
       return 'checked'
 });
 
 
+/**
+ * Useful with customer elements that use a `active` class
+ *  if the 2 parameters given are the same it returns "active" otherwise ""
+ */
 Handlebars.registerHelper('active', function(attr1, attr2, options) {
    if( attr1 == attr2 )
       return 'active'

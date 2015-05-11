@@ -7,6 +7,7 @@
       "src/EventManager.js",
       "config/config.js",
       "src/gisportal.js",
+      "src/loading.js",
       "src/templates.js",
       "src/portal.js",
       "src/panels.js",
@@ -22,18 +23,16 @@
       "src/gritter.js",
       "src/layer.js",
       "src/openid.js",
-      "src/quickRegions.js", 
       "src/timeline.js",
-      "src/libs/nvd3/nv.d3.js",
       "src/Plot.js",
       "src/PlotEditor.js",
       "src/PlotStatus.js",
       "src/graphing.js",
-      "src/graphs/timeseries.js",
-      "src/graphs/histogram.js",
       "src/utils.js",
       "src/map-settings.js",
-      "src/collaboration.js",
-      "src/analytics.js"
+      "src/analytics.js",
+      "src/user_feedback.js",
+      "src/ddslick.js",
+      "src/collaboration.js"
    ]
 }

@@ -1,0 +1,8 @@
+<ul class="category-select-list">
+   <li class="selectlist">Show indicators sorted/grouped by:
+      <div id="js-category-filter-select"></div>
+   </li>
+   <li class="selectoptions">Available indicators:
+      <div class="js-category-filter-options"></div>
+   </li>
+</ul>

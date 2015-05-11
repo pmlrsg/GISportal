@@ -23,11 +23,11 @@ gisportal.refinePanel.found = false;
  * @param {object} data - The indicators that have the same name
  */
 gisportal.refinePanel.open = function(data) {
-   this.found = false;
+
    this.initDOM();
    gisportal.panels.showPanel('refine-indicator');
    this.currentData = data;
-   $('.js-refine-name').html(this.currentData.name);
+//   $('.js-refine-name').html(this.currentData.name);
    this.refreshData(data);
 };
 
@@ -41,245 +41,233 @@ gisportal.refinePanel.close = function() {
 };
 
 /**
- * When an indicator has been found (refined) then
- * call this function to set gisportal.refinePanel.found to true
- * and adds the indicator to the correct places, then opens the indicators
- * panel.
- *
- * @params {object} data - The indicator
- */
-gisportal.refinePanel.foundIndicator = function(data) {
-   var id = data.id || data;
-   if (_.indexOf(gisportal.selectedLayers, id) > -1 || (data.id && this.found)) return;
-
-   this.found = true;
-   gisportal.indicatorsPanel.selectLayer(id);
-   var tmp = {
-      id: id,
-      name: gisportal.layers[id].name,
-      provider: gisportal.layers[id].providerTag,
-      moreIndicatorInfo: gisportal.layers[id].moreIndicatorInfo,
-      moreProviderInfo: gisportal.layers[id].moreProviderInfo,
-   };
-   if (data.interval) tmp.interval = data.interval;
-   if (data.confidence) tmp.confidence = data.confidence;
-   if (data.provider) tmp.provider = data.provider;
-
-   gisportal.indicatorsPanel.addToPanel(tmp);
-   gisportal.refinePanel.close();
-   gisportal.indicatorsPanel.open();
-   gisportal.configurePanel.reset();
-};
-
-/**
  * This initiates the DOM event handlers.
  *
  * @param {object} data - This object holds all the data needed
  */
 gisportal.refinePanel.initDOM = function(data) {
    $('.js-refine-configure').on('click', function() {
+      gisportal.configurePanel.reset();
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
    });
-
-   var change = function() {
-      var ids = $(this).val().split(',');
-      var current = gisportal.refinePanel.currentData.id;
-      gisportal.refinePanel.refineData(ids, current);
-   };
-
-   $('#refinePanel').one('click', 'input[type="radio"]', change);
-
-   if (data && data.refine && data.refine.cat && data.refine.tag) {
-      var val = $('#refine-region [data-key="' + data.refine.tag + '"]').val();
-      $('#refine-region [value="' + val + '"]').click();
-   }
-
-   var click = function() {
-      var id = $(this).data('id');
-      var name = $(this).data('name');
-      //if (id !== "none") gisportal.refinePanel.render(id);
-      //else  {
-      var group = gisportal.groupNames()[name];
-      gisportal.refinePanel.render({
-         name: name,
-         id: id,
-         refined: false
-      }, group);
-      //}
-   };
-   $('#refinePanel').one('click', '.js-reset-options', click);
 };
 
 /**
  * Currently refreshData just renders the panel
  */
-gisportal.refinePanel.refreshData = function(data) {
-   gisportal.refinePanel.render(data);
-};
+gisportal.refinePanel.refreshData = function() {
+   var data = gisportal.refinePanel.currentData;
 
-/**
- * The refineData function takes an array of possible ids
- * and the current id (which could possibly be deprecated
- * now that the refinePanel is split away from indicators).
- * It refines down the selection of ids to show the available
- * options (such as interval and confidence).
- *
- * @params {object} ids - Array of possible ids
- * @params {string} current - Current id (deprecate?)
- */
-gisportal.refinePanel.refineData = function(ids, current) {
-   var indicator = gisportal.layers[ids[0]];
-   if (indicator) {
-      var name = indicator.name;
-      var groupedNames = gisportal.groupNames()[name];
-      var results = groupedNames;
-      var names = Object.keys(groupedNames);
-      for (var i = 0; i < names.length; i++) {
-         var cat = names[i];
-         var tags = Object.keys(groupedNames[cat]);
-         for (var j = 0; j < tags.length; j++) {
-            var tag = groupedNames[cat][tags[j]];
-            var result = _.intersection(tag, ids);
-            results[cat][tags[j]] = result;
-         }
-      }
-      var indicator = gisportal.layers[current] || {};
-      indicator.groupedNames = {};
-
-      this.render({
-         indicator: indicator,
-         id: current,
-         name: name,
-         refined: true
-      }, results);
-   }
-};
-
-/**
- * This function renders the refinePanel.
- *
- * @param {object} data - Object including id, name and boolean called refined
- * @param {object} group - The groupNames() making it easy to find ids with the name
- */
-gisportal.refinePanel.render = function(data, group) {
    var indicator = data.indicator || {};
    var id = data.id;
    var name = data.name;
-   var refined = data.refined;
+   var refine = data.refine;
 
-   if (!group) group = gisportal.groupNames()[name] || {};
-   for (var cat in group) {
-      group[cat] = gisportal.utils.mustacheFormat(group[cat]);
+   // get a filtered version of groupTags (indicatorTags) that just apply to the selected indicator name
+   var tags_flat = gisportal.utils.flattenObject(gisportal.groupTags())
+   var matchingTags = {};
+
+   for (var tag in tags_flat) {
+      if (tags_flat.hasOwnProperty(tag)){
+         if (tags_flat[tag] === name) {   // the tag applies to this indicator
+            matchingTags[tag] = tags_flat[tag];
+         }
+      }
    }
-   group.region = group.region || [];
-   /*if (data.refine)  {
-      var index = _.findIndex(group[data.refine.cat], function(d) { return d.key === data.refine.tag; });
-      if (index > -1)  {
-         group.region = [group[data.refine.cat][index]];
-         var ids = [];
-         _.forEach(group.region, function(d) {
-            ids.push(d.value);
-         });
-         ids = _.flatten(ids);
-         if (ids.length === 1) gisportal.refinePanel.refineData(ids, gisportal.refinePanel.currentData);
-      }
-   } */
+   var indicatorTags = gisportal.utils.unflattenObject(matchingTags);
 
-   indicator.hasInterval = false;
-   indicator.hasConfidence = false;
-   indicator.hasProvider = false;
-   if ((refined && gisportal.refinePanel.found !== false) || group.region.length === 1) {
-      indicator.refined = true;
-      var found = true;
+   // an array to hold the filters that could be available
+   var furtherFilters = [];
 
-      if (group.interval.length > 1) {
-         indicator.hasInterval = true;
-         found = false;
-      }
-
-      if (group.Confidence.length > 1) {
-         indicator.hasConfidence = true;
-         found = false;
-      }
-      if (group.providerTag.length > 1) {
-         indicator.hasProvider = true;
-         found = false;
-      }
-
-      if (found === true) {
-         var newId = group.region[0].value[0];
-         var newName;
-
-         if (id !== "none" && id) {
-            if (_.indexOf(gisportal.selectedLayers, newId) === -1) {
-               var tmp = {};
-               tmp.id = newId;
-               tmp.interval = group.interval[0];
-               tmp.confidence = group.Confidence[0];
-               tmp.provider = group.providerTag[0].key;
-               gisportal.refinePanel.foundIndicator(tmp);
-            } else {
-               gisportal.refinePanel.close();
-               gisportal.indicatorsPanel.open();
+   // work out if any of the browseCategories for the selected indicator name has more than one option
+   for (var tag in indicatorTags) {
+      if (indicatorTags.hasOwnProperty(tag)) {
+         if ( _.keys(indicatorTags[tag]).length > 1 && gisportal.config.browseCategories[tag]) {
+            // has the category already been added to the refine array
+            for (var i = 0; i < data.refine.length; i++) {
+               if (data.refine[i].cat !== tag) {
+                  furtherFilters.push( tag );
+                  break;   // to only add it once
+               }
             }
          }
       }
+   }
+
+   // get an array of ids that are in each refine category
+   var indicatorCategories = gisportal.groupNames()[data.name];
+   var possibleIndicators = [];
+
+   for (var i = 0; i < data.refine.length; i++) {
+      var category = data.refine[i].cat;
+      var tag = data.refine[i].tag;
+      if (category !== 'undefined' && tag !== '') {  // they didn't use the search results
+         var indicators = indicatorCategories[category][tag];
+         possibleIndicators.push(indicators);
+      } else {                                       // they clicked on a search result, so there won't be a refine category so use the niceName
+         var indicators = indicatorCategories.niceName[name];
+         possibleIndicators.push(indicators);
+      }
+   }
+
+   // refinedIndicators is an array of values that exist in *all* possibleIndicators arrays
+   var refinedIndicators =  _.intersection.apply(_, possibleIndicators);
+   var refinedIndicatorLayers = undefined;
+
+   // and if there's only 1 then we have our winner - load it up baby
+   if (refinedIndicators.length == 1) {
+      gisportal.refinePanel.layerFound(refinedIndicators[0]);
+      return;
    } else {
-      indicator.refined = false;
+      // more refinement is required. Show the user what they have selected so far
+      var selectedTags = [];
+      for (var r in refine) {
+         var tmp = {
+            cat: gisportal.config.browseCategories[refine[r].cat],
+            tag: refine[r].tag,
+            rawCat: refine[r].cat
+         }
+         selectedTags.push(tmp);
+      }
+
+      var data = {
+         indicatorCount: refinedIndicators.length,
+         indicatorName: name,
+         refine: selectedTags
+      };
+
+      var rendered = gisportal.templates['refine'](data);
+      $('.js-refined-tags').html(rendered);
+
+      // add some magic to allow them to remove selected categories
+      $('.refine-remove').click(function() {
+         var cat = $(this).data('cat');
+         gisportal.refinePanel.removeCategory(cat);
+      });
+
+      // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 
+      // the gisportal.groupNames function to get a set of matching tags in the right structure
+      refinedIndicatorLayers = {};
+
+      for (var i in refinedIndicators){
+         var id = refinedIndicators[i];
+         refinedIndicatorLayers[id] = gisportal.layers[id];
+      }
+      
    }
 
-   indicator.id = id || "none";
-   indicator.name = name;
-   indicator.modified = gisportal.utils.nameToId(name);
-   indicator.groupedNames = group;
-   var template = '{{#tag}}<li >  {{#moreInfo}}<span class="icon-filled-information more-info tooltip" title="Model driven by {{moreInfo}}" ></span>{{/moreInfo}}    <span class="indicator-checkbox-text">{{key}}</span>      <label class="icon-checkbox indicator-checkbox" title="Enable {{key}}">      <input type="radio" class="hidden" value="{{value}}" data-key="{{key}}" />     </label>  </li>{{/tag}}';
+   // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
+   if (furtherFilters.length > 0) {    // there's at least one more user selection required to identify a single indicator
+      var refineSection = $('.js-refine-section')
+      refineSection.html('');
 
-   if (!refined) {
-      indicator.tag = indicator.groupedNames['region'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-region').html(rendered).find('input[type="radio"]').change(function() {
-         var label = $(this).parent();
-         label.addClass('active');
-      });
+      indicator.group = gisportal.groupNames(refinedIndicatorLayers)[name];
+
+      // create drop downs for each of the further filters
+      for (var tag in furtherFilters) {
+         var tagName = furtherFilters[tag];
+         var tagDisplayName = gisportal.config.browseCategories[tagName];
+
+         // we only want to show tags that haven't already been selected, so if the tag's in refine.data don't bother with it (or maybe show it but pre-selected?)
+         var tagRefinedAlready = _.findKey(refine, function(chr) { return chr.cat == tagName; });
+         
+         if (tagRefinedAlready == undefined) {  // it hasn't been refined so we can show it
+            // first create a div and append it to the filter section
+            var placeholder = $('<div class="js-refine-section-' + tagName + '"><div id="refine-' + tagName + '"></div></div>')
+            placeholder.appendTo(refineSection);
+            
+            var a = 'a';
+            if (_.indexOf(['a','e','i','o','u'], tagDisplayName.substring(0,1).toLowerCase()) > -1) a = 'an';
+
+            // then add a ddslick drop down to it populated with tagName options
+            $('#refine-' + tagName).ddslick({
+               data: gisportal.utils.mustacheFormat(indicator.group[tagName]),
+               initialState: 'open',
+               selectText: 'Select '+ a + ' ' + tagDisplayName,
+               onSelected: function(data) {
+                  if (data.selectedData) {
+                     var tmp = {};
+                     tmp.cat = data.original.attr('id').replace('refine-', '');     // == tagName, but that's not available here hence the apparently slightly odd method of getting it
+                     tmp.tag = data.selectedData.text;
+                     var data = gisportal.refinePanel.currentData;
+      
+                     data.refine.push(tmp);
+                     gisportal.refinePanel.currentData = data;
+                     gisportal.refinePanel.refreshData();
+                  }
+               }
+            })   
+         }
+
+         
+      }
+
+      // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
+      for (var indicator in refinedIndicators) {
+         var id = refinedIndicators[indicator];
+         var holder = $('input[value="' + id + '"]').parent()
+         
+         var tags = [];
+         for (cat in gisportal.config.browseCategories) {
+            var tmp = {
+               name: gisportal.config.browseCategories[cat],
+               value: gisportal.layers[id].tags[cat]
+            }
+            tags.push(tmp);
+         }
+
+         var data = {
+            provider: gisportal.layers[id].providerTag,
+            dateStart: gisportal.layers[id].firstDate,
+            dateEnd: gisportal.layers[id].lastDate,
+            tags: tags 
+         }
+
+         var info = gisportal.templates['tooltip-refinedetails'](data);
+
+         if (holder.length > 0) {
+            holder.tooltipster({
+               content: $(info),
+               position: 'right',
+            })
+         }
+      }
+
    } else {
+      console.log('addToPanel');
 
    }
-
-   $('#refine-interval').parent().toggleClass('hidden', true);
-   $('#refine-confidence').parent().toggleClass('hidden', true);
-   $('#refine-provider').parent().toggleClass('hidden', true);
-   $('#refine-reliability').parent().toggleClass('hidden', true);
-
-   if (indicator.hasInterval) {
-      indicator.tag = indicator.groupedNames['interval'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-interval').html(rendered).parent().toggleClass('hidden', false);
-   }
-
-
-   if (indicator.hasProvider && (!indicator.hasInterval || group.interval.length <= 1) ) {
-      indicator.tag = indicator.groupedNames['providerTag'];
-      indicator.tag.forEach(function( provider ){
-         if( gisportal.providers && gisportal.providers[provider.key.toUpperCase()] && gisportal.providers[provider.key.toUpperCase()].model )
-            provider.moreInfo = gisportal.providers[provider.key.toUpperCase()].model;
-      });
-
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-provider').html(rendered).parent().toggleClass('hidden', false);
-      $('#refine-provider .tooltip').tooltipster();
-   }
-
-   if (indicator.hasConfidence && (!indicator.hasInterval || group.interval.length <= 1) && (!indicator.hasProvider || group.providerTag.length <= 1)) {
-      indicator.tag = indicator.groupedNames['Confidence'];
-      var rendered = Mustache.render(template, indicator);
-      $('#refine-reliability').html(rendered).parent().toggleClass('hidden', false);
-   }
-
-
-
-   if (refined) {
-      $('.js-reset-options[data-name="' + name + '"]').removeClass('hidden');
-   }
-   this.initDOM(data);
 };
+
+gisportal.refinePanel.layerFound = function(layerId) {
+   var data = {};
+   data.id = layerId;
+
+   gisportal.indicatorsPanel.selectLayer(layerId);
+   gisportal.indicatorsPanel.addToPanel(data);
+   gisportal.indicatorsPanel.open();
+   gisportal.refinePanel.reset();
+   gisportal.configurePanel.reset();
+}
+
+gisportal.refinePanel.removeCategory = function(cat) {
+   var refine = gisportal.refinePanel.currentData.refine;
+   var refineTmp = [];
+
+   for (var r in refine) {
+      if (refine[r].cat != cat) refineTmp.push(refine[r]);
+   }
+
+   gisportal.refinePanel.currentData.refine = refineTmp;
+
+   if (refineTmp.length == 0) {
+      gisportal.refinePanel.close();
+   } else {
+      gisportal.refinePanel.refreshData();
+   }
+}
+
+gisportal.refinePanel.reset = function() {
+   $('.js-refine-section').html('');
+}

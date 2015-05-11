@@ -6,6 +6,7 @@
    "inputs": [
       "src/libs/jquery-walkthrough/jquery.walkthrough.js",
       "src/gisportal.js",
+      "src/loading.js",
       "src/libs/dialog.js",
       "src/portal.js",
       "src/templates.js",
@@ -32,7 +33,8 @@
       "src/libs/jquery.multi-open-accordion-1.5.3.js",
       "src/libs/filtrify/js/filtrify.js",
       "src/libs/quicksand/js/quicksand.js",
-      "src/analytics.js" 
+      "src/analytics.js" ,
+      "src/user_feedback.js" 
    ],
    
    "externs": [

@@ -1,3 +1,4 @@
+/*
 .map_controls { 
    position: absolute; 
    top: 25px; 
@@ -27,3 +28,30 @@
    }
 
 }
+
+*/
+.ol-zoom, .ol-full-screen {
+   position: absolute; 
+   top: 25px; 
+   right: 25px;
+   background-color: #fafafb;
+   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
+   border: 1px solid #b1a7bc; 
+   border-radius: 5px; 
+}
+
+.ol-full-screen {
+   right: 120px;
+}
+
+.ol-zoom button, .ol-full-screen button {
+   border: 0;
+   cursor: pointer;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   background: transparent;
+  padding: 5px 10px;
+  margin: 2px;
+  font-size: 16px;
+}
+

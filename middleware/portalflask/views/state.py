@@ -175,6 +175,8 @@ def setState():
          user_id = user.id
          
       s = State(user_id, state)
+      s.session_id = request.values.get('session_id', None);
+      print s.session_id
       checksumMatch = State.query.filter(State.checksum == s.checksum).first()
       if checksumMatch == None:
          db_session.add(s)

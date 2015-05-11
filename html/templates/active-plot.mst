@@ -18,8 +18,8 @@
 			<select class="js-active-plot-type">
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries (default)</option>
 				<option value="histogram" {{selected "histogram" (call 'plot.plotType')}} disabled>Histogram - Coming Soon....</option>
-				<option value="hovmollerLat" disabled>Hovmoller Latitude - Coming Soon....</option>
-				<option value="hovmollerLon" disabled>Hovmoller Longitude - Coming Soon....</option>
+				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
+				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
 			 </select>
 		</div>
 	</li>
@@ -37,7 +37,7 @@
 	</li>
 	
 	
-	<li>
+	<li class="js-components-area" >
 		<!-- <p class="number">4</p> -->
 		<div class="">
 			<table> 

@@ -147,9 +147,14 @@ gisportal.utils.mustacheFormat = function(o)  {
    for (var prop in o) {
       if (o.hasOwnProperty(prop)) {
          if (o[prop].length > 0)  {
+            var d = '';
+            if (o[prop].length > 1) {
+               d = o[prop].length +' matches';
+            } 
             data.push({
-               'key' : prop,
-               'value' : o[prop]
+               'text' : prop,
+               'value' : o[prop],
+               'description': d
             });
          }
       }
@@ -321,3 +326,120 @@ gisportal.utils.nameToId = function(name)  {
    name = name.replace(/\//g, '_');
    return name.toLowerCase();
 }
+
+/**
+ * Takes an object a returns a flattened object
+ * @param  {[type]} obj  the object to be flattened
+ * @param  {[type]} keep [description]
+ * @return {[type]}      [description]
+ */
+gisportal.utils.flattenObject = function(obj, keep) {
+
+   // normalize parameters
+   keep = keep || { contains: function () { return true; } };
+
+   var result = {};
+
+   var traverse = function (current, prefix) {
+      switch (Object.prototype.toString.call(current))
+      {
+         case "[object Object]":
+            for (var prop in current)
+            {
+               traverse(current[prop], (prefix.length ? prefix + "." : "") + prop);
+            }
+            // when there were no properties it's an empty object instance
+            if (!prop && keep.contains(prefix))
+            {
+               result[prefix] = {};
+            }
+            break;
+         case "[object Array]":
+            // arrays
+            for (var i = 0, l = current.length; i < l; i++)
+            {
+               traverse(current[i], (prefix.length ? prefix : "") + "[" + i + "]");
+            }
+            // when there were no elements it's an empty array instance'
+            if (l === 0 && keep.contains(prefix))
+            {
+               result[prefix] = [];
+            }
+            break;
+         case "[object Null]":
+         case "[object Undefined]":
+         case "[object Function]":
+            // don't use nulls, undefineds or functions
+            break;
+         default:
+            // primitive values: string, number, boolean, date, regexp
+            if (keep.contains(prefix))
+            {
+               result[prefix] = current;
+            }
+      }
+   };
+
+   traverse(obj, "");
+   return result;
+};
+
+gisportal.utils.unflattenObject = function unflatten(obj) {
+   var result = {},
+      current,
+      prop,
+      currIdx,
+      normalized;
+
+   for (var props in obj)
+   {
+      normalized = props.replace(/\[(\d+)\]/gi, ".$1");
+      current = result;
+      currIdx = -2;
+      while (currIdx !== -1)
+      {
+         prop = normalized.substring(
+            ++currIdx,
+            (currIdx = normalized.indexOf(".", currIdx)) !== -1 ? currIdx : undefined
+         );
+         if (currIdx > 0)
+         {
+            current = current[prop] || (current[prop] = isNaN(parseInt(normalized.substring(currIdx + 1))) ? {} : []);
+         }
+      }
+      current[prop] = obj[props];
+   }
+
+   return result;
+};
+
+var hashMapRx = /\[\d*\]/gi;
+
+// Fast dictionary-like searching
+var HashMap = function constructor(stringArray) {
+   this.hash = {};
+
+   for (var i = 0, l = stringArray.length; i < l; i++)
+   {
+      this.hash[this.normalize(stringArray[i])] = true;
+   }
+};
+
+HashMap.prototype.contains = function contains(value) {
+   var val = this.normalize(value);
+   return !!this.hash[val] || this.any(val);
+};
+
+HashMap.prototype.normalize = function normalize(value) {
+   return value.replace(hashMapRx, "[]");
+};
+
+HashMap.prototype.any = function any(value) {
+   var result = false;
+   for (var key in this.hash)
+   {
+      if (value === key || value.substr(0, key.length) === key)
+         return true;
+   }
+   return false;
+};
