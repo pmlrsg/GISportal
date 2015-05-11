@@ -13,7 +13,7 @@ gisportal.map_settings.init = function() {
    
    var layer = {};
    layer.id = 'none';
-   layer.name = 'No Base Map';
+   layer.name = 'No map (plain black background)';
    layers.push(layer);
 
    _.forEach(gisportal.baseLayers, function(d)  {
