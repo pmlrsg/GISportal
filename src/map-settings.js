@@ -107,6 +107,8 @@ gisportal.map_settings.init = function() {
 };
 
 gisportal.setGraticuleVisibility = function(setTo) {
+   gisportal.events.trigger('map-setting.graticules', setTo);
+   
    if (setTo == 'On') {
       graticule_control.setMap(map);
    } else {
@@ -194,7 +196,7 @@ gisportal.setCountryBordersToTopLayer = function() {
 }
 
 gisportal.selectCountryBorderLayer = function(id) {
-   // // first remove all other country layers that might be on the map
+   // first remove all other country layers that might be on the map
    for (var prop in gisportal.countryBorderLayers) {
       try {
          map.removeLayer(gisportal.countryBorderLayers[prop])   
@@ -309,6 +311,8 @@ gisportal.createBaseLayers = function() {
 };
 
 gisportal.selectBaseLayer = function(id) {
+   gisportal.events.trigger('map-setting.basemap-change', id);
+
    // take off all the base maps
    for (var prop in gisportal.baseLayers) {
       try {

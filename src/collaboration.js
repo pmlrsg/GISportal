@@ -295,8 +295,13 @@ gisportal.events.bind("map.move", function(event, CenterLonLat) {
 });
 
 // Base map changed
-gisportal.events.bind("displayoptions.basemap", function(event, id, value, logmsg) {
+gisportal.events.bind('map-setting.basemap-change', function(event, id, value, logmsg) {
    collaboration.setValueById(id, value, logmsg);
+});
+
+// Set the graticule visibility
+gisportal.events.bind('map-setting.graticules', function(event, setTo) {
+   collaboration.setGraticules(setTo);
 });
 
 // Country borders changed
