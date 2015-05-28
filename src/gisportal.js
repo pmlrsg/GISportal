@@ -469,7 +469,7 @@ gisportal.loadState = function(state) {
          // this stops the map from auto zooming to the max extent of all loaded layers
          indicator.preventAutoZoom = true;
 
-         gisportal.refinePanel.foundIndicator(indicator.id);
+         gisportal.refinePanel.layerFound(indicator.id);
         
       }
    }
