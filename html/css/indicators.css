@@ -191,6 +191,10 @@ table.stripe.panel-tab td {
   vertical-align: middle;
 }
 
+table.stripe td:nth-child(odd) {
+  min-width: 110px;
+}
+
 /* added for allowing teh overlays*/
 .indicator-list li {
   position:relative;
