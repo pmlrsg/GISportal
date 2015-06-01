@@ -1,4 +1,3 @@
-h5py
 Flask
 Flask-OpenID
 SQLAlchemy
