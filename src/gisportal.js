@@ -346,7 +346,7 @@ gisportal.nonLayerDependent = function() {
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
-      selectedDate: new Date("2006-06-05T00:00:00Z"),
+      selectedDate: new Date(),
       chartMargins: {
          top: 7,
          right: 0,
