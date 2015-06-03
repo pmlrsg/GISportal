@@ -14,6 +14,7 @@ collaboration.startButton = '.js-start-collaboration';							// the button to in
 collaboration.consoleWrapper = '.js-collaboration-console';						// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
 collaboration.historyConsole = '.js-collaboration-history';						// a div that historical message log is appended to
 collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
+collaboration.displayLog = true;                                           // if true the history is shown in `collaboration.historyConsole`
 
 collaboration.active = false;
 collaboration.role = 'member';
@@ -82,7 +83,7 @@ collaboration.initSession = function() {
 		  	// -------------------------------------------------
 		  	socket.on('roomCreated', function(data) {
 		  		var roomId = data.roomId;
-		  		$(collaboration.historyConsole).prepend('<p>A new session has been created; your collaboration reference is '+params.roomId+'</p>');
+		  		collaboration.log('<p>A new session has been created; your collaboration reference is '+params.roomId);
 		  	})
 
 		  	// -------------------------------------------------
@@ -92,7 +93,7 @@ collaboration.initSession = function() {
 		  	// sets the value of an element using the element's id
 		  	socket.on('setValueById', function(data) {
 		  		var params = data.params;
-		  		$(collaboration.historyConsole).prepend('<p>'+data.presenter +': '+params.logmsg+'</p>');
+		  		collaboration.log('<p>'+data.presenter +': '+params.logmsg);
 		   	if (collaboration.role == "member") {
 		   		//console.log('setting value by id');
 		   		$('#'+params.id).val(params.value);
@@ -100,22 +101,48 @@ collaboration.initSession = function() {
 		   	}
 		  	});
 
-		  	// map Zoom
-		  	socket.on('map.zoom', function(data) {
-		  		var params = data.params;
-		  		//$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Zoom adjusted to '+params.zoomlevel+'</p>');
-		   	if (collaboration.role == "member") {
-		   		map.zoomToScale(params.zoomlevel);
-		   	}
-		  	});
+         socket.on('configurepanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               $('#configurePanel').scrollTop(data.params.scrollTop);
+            }
+         })
+
+         socket.on('ddslick.open', function(data) {
+            if (collaboration.role == "member") {
+               var obj = data.params.obj;
+               $('#' + obj).ddslick('open');   
+            }
+            collaboration.log(obj +' drop down opened');
+         })
+
+         socket.on('ddslick.close', function(data) {
+            if (collaboration.role == "member") {
+               var obj = data.params.obj;
+               $('#' + obj).ddslick('close');   
+            }
+            collaboration.log(obj +' drop down closed');
+         })
+
+         socket.on('ddslick.selectIndex', function(data) {
+            if (collaboration.role == "member") {
+               var obj = data.params.obj;
+               var index = data.params.index;
+               $('#' + obj).ddslick('select', { "index": index });   
+            }
+            collaboration.log(obj +' selectedIndex: ' + index);
+         })
 
 		  	// map Move
 		  	socket.on('map.move', function(data) {
 		  		var params = data.params;
-		  		//$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Map centred to '+params.lat+', '+params.lon+'</p>');
-                            if (collaboration.role == "member") {
-		   		map.setCenter(new OpenLayers.LonLat([params.lon, params.lat]))
-                            }
+		  		collaboration.log(data.presenter +': Map centred to '+params.centre+', with a zoom of '+params.zoom);
+            if (collaboration.role == "member") {
+		   		var view = map.getView();
+               if (view) {
+                  if (params.zoom) view.setZoom(params.zoom);
+                  if (params.centre) view.setCenter(params.centre);
+               }
+            }
 		  	});
 
 		  	// layer added
@@ -132,7 +159,7 @@ collaboration.initSession = function() {
 		  		// console.log('layer.select received');
 		  		// console.log(data);
 		  		
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': New layer added - '+ data.params.layerName+'</p>');
+		  		collaboration.log(data.presenter +': New layer added - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.selectLayer(data.params.id);
             }
@@ -143,7 +170,7 @@ collaboration.initSession = function() {
 		  		console.log('layer.remove received');
 		  		console.log(data);
 
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer removed - '+ data.params.layerName+'</p>');
+		  		collaboration.log(data.presenter +': Layer removed - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
             }
@@ -151,7 +178,7 @@ collaboration.initSession = function() {
                         
          // layer hidden
 		  	socket.on('layer.hide', function(data) {
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer hidden - '+ data.params.layerName+'</p>');
+		  		collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.hideLayer(data.params.id);
             }
@@ -159,7 +186,7 @@ collaboration.initSession = function() {
                         
          // layer shown
 		  	socket.on('layer.show', function(data) {
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Layer un-hidden - '+ data.params.layerName+'</p>');
+		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.showLayer(data.params.id);
             }
@@ -167,7 +194,7 @@ collaboration.initSession = function() {
                         
          // panel selected/shown
          socket.on('panels.showpanel', function(data) {
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Panel selected - '+ data.params.layerName+'</p>');
+		  		collaboration.log(data.presenter +': Panel selected - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.panels.showPanel(data.params.panelName);
             }
@@ -177,7 +204,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.autoscale', function(data) {
 		  		console.log('scalebar.autoscale received');
 		  		console.log(data);
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Auto Scale - '+ data.params.layerName+'</p>');
+		  		$(collaboration.historyConsole).prepend(data.presenter +': Auto Scale - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.scalebars.autoScale(data.params.id, data.params.force);
             }
@@ -187,7 +214,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.reset', function(data) {
 		  		console.log('scalebar.reset received');
 		  		console.log(data);
-		  		$(collaboration.historyConsole).prepend('<p>'+ data.presenter +': Scalebar was reset</p>');
+		  		collaboration.log(data.presenter +': Scalebar was reset');
             if (collaboration.role == "member") {
             	gisportal.scalebars.resetScale(data.params.id);
             }
@@ -197,7 +224,7 @@ collaboration.initSession = function() {
 			socket.on('setSavedState', function(data) {
 		  		console.log(data);
 		  		
-		  		$(collaboration.historyConsole).prepend('<p>State restored</p>');
+		  		collaboration.log('State restored');
 		   	if (collaboration.role == "member") {
 		   		map.zoomToScale(data.params.zoomlevel);
 		   	}
@@ -220,8 +247,7 @@ collaboration.initSession = function() {
 } // end initSession
 
 collaboration.startNewRoom = function() {
-	var params = { "a": "b" };
-	collaboration._emit('startNewRoom', params);
+	collaboration._emit('startNewRoom');
 }
 
 collaboration.setValueById = function(id, value, logmsg) {
@@ -265,123 +291,15 @@ collaboration.userAuthorised = function() {
 	$(collaboration.startButton).click(function() {
    	// let it begin...
    	collaboration.initSession();
-   	//collaboration.startNewRoom();
+   	collaboration.startNewRoom();
    });	
 
 	return true;
 }
 
-//--------------------------------------------------------------------------------------
-//  Portal EventManager event bindings
-//--------------------------------------------------------------------------------------
-
-// user zooms in/out
-gisportal.events.bind("map.zoom", function(event, zoomLevel) {
-   var params = {
-      "event" : "map.zoom",
-      "zoomlevel" : zoomLevel
+collaboration.log = function(msg) {
+   if (collaboration.displayLog) {
+      $(collaboration.historyConsole).prepend('<p>' + msg + '</p>');
    }
-   collaboration._emit('c_event', params);
-});
 
-// user moves the map
-gisportal.events.bind("map.move", function(event, CenterLonLat) {
-   var params = { 
-      "event" : "map.move",
-      "lat" : CenterLonLat.lat,
-      "lon" : CenterLonLat. lon
-   }
-   collaboration._emit('c_event', params);
-});
-
-// Base map changed
-gisportal.events.bind('map-setting.basemap-change', function(event, id, value, logmsg) {
-   collaboration.setValueById(id, value, logmsg);
-});
-
-// Set the graticule visibility
-gisportal.events.bind('map-setting.graticules', function(event, setTo) {
-   collaboration.setGraticules(setTo);
-});
-
-// Country borders changed
-gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
-   collaboration.setValueById(id, value, logmsg);
-});
-
-// new layer added
-gisportal.events.bind("layer.addtopanel", function(event, data) {
-   var params = {
-       "event" : "layer.addtopanel",
-       "layer" : data
-   }
-   collaboration._emit('c_event', params);
-});
-
-// layer is selected
-gisportal.events.bind("layer.select", function(event, id, layerName) {
-    var params = {
-        "event" : "layer.select",
-        "id" : id,
-        "layerName" : layerName
-    }
-    collaboration._emit('c_event', params);
-});
-
-// layer removed from panel
-gisportal.events.bind("layer.remove", function(event, id, layerName) {
-   var params = {
-        "event" : "layer.remove",
-        "id" : id,
-        "layerName" : layerName
-    }
-    collaboration._emit('c_event', params);
-});
-
-// hide a layer
-gisportal.events.bind("layer.hide", function(event, id, layerName) {
-   var params = {
-        "event" : "layer.hide",
-        "id" : id,
-        "layerName" : layerName
-    }
-    collaboration._emit('c_event', params);
-});
-
-// hide a layer
-gisportal.events.bind("layer.show", function(event, id, layerName) {
-   var params = {
-        "event" : "layer.show",
-        "id" : id,
-        "layerName" : layerName
-    }
-    collaboration._emit('c_event', params);
-});
-
-// show a panel
-gisportal.events.bind("panels.showpanel", function(event, panelName) {
-   var params = {
-        "event" : "panels.showpanel",
-        "panelName" : panelName
-    }
-    collaboration._emit('c_event', params);
-});
-
-// auto scale a layer
-gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
-   var params = {
-        "event" : "scalebar.autoscale",
-        "id" : id,
-        "force" : force
-    }
-    collaboration._emit('c_event', params);
-});
-
-// auto scale a layer
-gisportal.events.bind("scalebar.reset", function(event, id) {
-   var params = {
-        "event" : "scalebar.autoscale",
-        "id" : id
-    }
-    collaboration._emit('c_event', params);
-});
+}

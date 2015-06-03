@@ -30,6 +30,10 @@ gisportal.configurePanel.refreshData = function()  {
       this.renderTagsAsSelectlist();
    }
 
+
+   $('#configurePanel').bind('scroll', function() {
+     gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop())
+   })
 };
 
 /**

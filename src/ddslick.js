@@ -294,6 +294,8 @@
         if (doCallback && typeof settings.onSelected == 'function') {
             settings.onSelected.call(this, pluginData);
         }
+
+        gisportal.events.trigger('ddslick.selectIndex', obj, index, doCallback);
     }
 
     //Private: Close the drop down options
@@ -321,6 +323,7 @@
 
         //Fix text height (i.e. display title in center), if there is no description
         adjustOptionsHeight(obj);
+        gisportal.events.trigger('ddslick.open', obj);
     }
 
     //Private: Close the drop down options
@@ -328,6 +331,8 @@
         //Close drop down and adjust pointer direction
         obj.find('.dd-options').slideUp(50);
         obj.find('.dd-pointer').removeClass('dd-pointer-up').parent().removeClass('active');
+        
+        gisportal.events.trigger('ddslick.close', obj);
     }
 
     //Private: Adjust appearence for selected option (move title to middle), when no desripction
@@ -352,6 +357,8 @@
         obj.find('.dd-selected').html(pluginData.settings.selectText);
         obj.find('.dd-option-selected').removeClass('dd-option-selected');
         obj.find('li.selected').removeClass('selected');
+
+        gisportal.events.trigger('ddslick.reset', obj);
     }
 
     //Private: Adjust appearence for drop down options (move title to middle), when no desripction

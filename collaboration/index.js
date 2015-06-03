@@ -8,6 +8,7 @@ var cookie = require('cookie');
 var cookieParser = require('cookie-parser');
 var connect = require('connect');
 var session = require('express-session');
+var crypto = require("crypto");
 
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -139,6 +140,7 @@ io.on('connection', function(socket){
    var sessionStore = app.get('sessionStore');
 	sessionStore.load(sid, function(err, session) {
 		if (err || !session) {
+         console.log('no passport');
 			return 'no passport';
 		}
 
