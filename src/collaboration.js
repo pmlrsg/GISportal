@@ -135,19 +135,6 @@ collaboration.initSession = function() {
             collaboration.log(obj +' selectedIndex: ' + index);
          })
 
-		  	// map Move
-		  	socket.on('map.move', function(data) {
-		  		var params = data.params;
-		  		collaboration.log(data.presenter +': Map centred to '+params.centre+', with a zoom of '+params.zoom);
-            if (collaboration.role == "member") {
-		   		var view = map.getView();
-               if (view) {
-                  if (params.zoom) view.setZoom(params.zoom);
-                  if (params.centre) view.setCenter(params.centre);
-               }
-            }
-		  	});
-
 		  	// layer added
 		  	socket.on('layer.addtopanel', function(data) {
 		  		//console.log('layer.addtopanel received');
@@ -157,17 +144,14 @@ collaboration.initSession = function() {
             }
 		  	});
 
-		  	// layer selected
-		  	socket.on('layer.select', function(data) {
-		  		// console.log('layer.select received');
-		  		// console.log(data);
-		  		
-		  		collaboration.log(data.presenter +': New layer added - '+ data.params.layerName);
+         // layer hidden
+         socket.on('layer.hide', function(data) {
+            collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
-            	gisportal.indicatorsPanel.selectLayer(data.params.id);
+               gisportal.indicatorsPanel.hideLayer(data.params.id);
             }
-		  	});
-                        
+         });
+
          // layer selected
 		  	socket.on('layer.remove', function(data) {
 		  		console.log('layer.remove received');
@@ -178,15 +162,34 @@ collaboration.initSession = function() {
             	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
             }
 		  	});
-                        
-         // layer hidden
-		  	socket.on('layer.hide', function(data) {
-		  		collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
+
+         // layer order changed
+         socket.on('layer.reorder', function(data) {
+            var newLayerOrder = data.params.newLayerOrder;
+            var ul = $('ul.js-indicators');
+
+            collaboration.log(data.presenter +': Layers re-ordered: '+ newLayerOrder);
             if (collaboration.role == "member") {
-            	gisportal.indicatorsPanel.hideLayer(data.params.id);
+               for (var i = newLayerOrder.length; i > -1; i--) {
+                  var li = $('.indicator-header').parent('[data-id="'+ newLayerOrder[i] +'"]');
+                  li.remove();                            // take it out of its current position 
+                  ul.prepend(li).hide().slideDown();      // and put it back at the start of the list
+               }
+               gisportal.indicatorsPanel.reorderLayers();
             }
-		  	});
-                        
+         });
+
+         // layer selected
+         socket.on('layer.select', function(data) {
+            // console.log('layer.select received');
+            // console.log(data);
+            
+            collaboration.log(data.presenter +': New layer added - '+ data.params.layerName);
+            if (collaboration.role == "member") {
+               gisportal.indicatorsPanel.selectLayer(data.params.id);
+            }
+         });
+
          // layer shown
 		  	socket.on('layer.show', function(data) {
 		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
@@ -195,6 +198,19 @@ collaboration.initSession = function() {
             }
 		  	});
                         
+         // map Move
+         socket.on('map.move', function(data) {
+            var params = data.params;
+            collaboration.log(data.presenter +': Map centred to '+params.centre+', with a zoom of '+params.zoom);
+            if (collaboration.role == "member") {
+               var view = map.getView();
+               if (view) {
+                  if (params.zoom) view.setZoom(params.zoom);
+                  if (params.centre) view.setCenter(params.centre);
+               }
+            }
+         });
+
          // panel selected/shown
          socket.on('panels.showpanel', function(data) {
             var p = data.params.panelName

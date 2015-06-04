@@ -57,6 +57,15 @@ gisportal.events.bind("layer.remove", function(event, id, layerName) {
     collaboration._emit('c_event', params);
 });
 
+// layer order changed
+gisportal.events.bind("layer.reorder", function(event, newLayerOrder) {
+   var params = {
+        "event" : "layer.reorder",
+        "newLayerOrder" : newLayerOrder
+    }
+    collaboration._emit('c_event', params);
+});
+
 // layer is selected
 gisportal.events.bind("layer.select", function(event, id, layerName) {
     var params = {

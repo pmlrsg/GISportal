@@ -188,9 +188,6 @@ gisportal.indicatorsPanel.initDOM = function() {
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
    });
-
-
-
 };
 
 gisportal.events.bind('metadata.close', function() {
