@@ -217,11 +217,10 @@ collaboration.initSession = function() {
 
 		  	// reset scalebar
          socket.on('scalebar.reset', function(data) {
-		  		console.log('scalebar.reset received');
-		  		console.log(data);
 		  		collaboration.log(data.presenter +': Scalebar was reset');
             if (collaboration.role == "member") {
-            	gisportal.scalebars.resetScale(data.params.id);
+               collaboration.highlightElement($('.js-reset[data-id="'+ data.params.id +'"]'));
+            	$('.js-reset[data-id="'+ data.params.id +'"] span').click();
             }
 		  	});            
 

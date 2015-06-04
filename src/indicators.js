@@ -86,10 +86,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.scalebars.autoScale(id);
    });
 
-   // Rest scale range
+   // Reset scale range
    $('.js-indicators').on('click', '.js-reset', function() {
       var id = $(this).data('id');
       gisportal.scalebars.resetScale(id);
+      gisportal.events.trigger('scale.reset', id);
    });
 
 

@@ -109,7 +109,7 @@ gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
 // auto scale a layer
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
-        "event" : "scalebar.autoscale",
+        "event" : "scalebar.reset",
         "id" : id
     }
     collaboration._emit('c_event', params);
