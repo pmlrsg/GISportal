@@ -342,6 +342,8 @@ gisportal.indicatorsPanel.reorderLayers = function() {
 
    gisportal.setCountryBordersToTopLayer();
    gisportal.selectionTools.setVectorLayerToTop();
+
+   gisportal.events.trigger('layer.reorder', layers);
 }
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {

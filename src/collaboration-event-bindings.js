@@ -28,16 +28,6 @@ gisportal.events.bind("ddslick.selectIndex", function(event, obj, index, doCallb
    collaboration._emit('c_event', params);
 });
 
-// user moves the map, or zooms in/out
-gisportal.events.bind("map.move", function(event, CentreLonLat, zoomLevel) {
-   var params = { 
-      "event" : "map.move",
-      "centre" : CentreLonLat,
-      "zoom": zoomLevel
-   }
-   collaboration._emit('c_event', params);
-});
-
 // new layer added
 gisportal.events.bind("layer.addtopanel", function(event, data) {
    var params = {
@@ -47,10 +37,10 @@ gisportal.events.bind("layer.addtopanel", function(event, data) {
    collaboration._emit('c_event', params);
 });
 
-// layer is selected
-gisportal.events.bind("layer.select", function(event, id, layerName) {
-    var params = {
-        "event" : "layer.select",
+// hide a layer
+gisportal.events.bind("layer.hide", function(event, id, layerName) {
+   var params = {
+        "event" : "layer.hide",
         "id" : id,
         "layerName" : layerName
     }
@@ -67,17 +57,17 @@ gisportal.events.bind("layer.remove", function(event, id, layerName) {
     collaboration._emit('c_event', params);
 });
 
-// hide a layer
-gisportal.events.bind("layer.hide", function(event, id, layerName) {
-   var params = {
-        "event" : "layer.hide",
+// layer is selected
+gisportal.events.bind("layer.select", function(event, id, layerName) {
+    var params = {
+        "event" : "layer.select",
         "id" : id,
         "layerName" : layerName
     }
     collaboration._emit('c_event', params);
 });
 
-// hide a layer
+// show a layer
 gisportal.events.bind("layer.show", function(event, id, layerName) {
    var params = {
         "event" : "layer.show",
@@ -85,6 +75,16 @@ gisportal.events.bind("layer.show", function(event, id, layerName) {
         "layerName" : layerName
     }
     collaboration._emit('c_event', params);
+});
+
+// user moves the map, or zooms in/out
+gisportal.events.bind("map.move", function(event, CentreLonLat, zoomLevel) {
+   var params = { 
+      "event" : "map.move",
+      "centre" : CentreLonLat,
+      "zoom": zoomLevel
+   }
+   collaboration._emit('c_event', params);
 });
 
 // show a panel
