@@ -109,25 +109,28 @@ collaboration.initSession = function() {
 
          socket.on('ddslick.open', function(data) {
             if (collaboration.role == "member") {
-               var obj = data.params.obj;
-               $('#' + obj).ddslick('open');   
+               var obj = $('#' + data.params.obj);
+               collaboration.highlightElement(obj);
+               obj.ddslick('open');   
             }
             collaboration.log(obj +' drop down opened');
          })
 
          socket.on('ddslick.close', function(data) {
             if (collaboration.role == "member") {
-               var obj = data.params.obj;
-               $('#' + obj).ddslick('close');   
+               var obj = $('#' + data.params.obj);
+               collaboration.highlightElement(obj);
+               obj.ddslick('close');   
             }
             collaboration.log(obj +' drop down closed');
          })
 
          socket.on('ddslick.selectIndex', function(data) {
             if (collaboration.role == "member") {
-               var obj = data.params.obj;
+               var obj = $('#' + data.params.obj);
                var index = data.params.index;
-               $('#' + obj).ddslick('select', { "index": index });   
+               collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
+               obj.ddslick('select', { "index": index });   
             }
             collaboration.log(obj +' selectedIndex: ' + index);
          })
@@ -197,7 +200,7 @@ collaboration.initSession = function() {
             var p = data.params.panelName
 		  		collaboration.log(data.presenter +': Panel selected - '+ data.params.layerName);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('[data-panel-name="' + p + '"]'))
+               collaboration.highlightElement($('[data-panel-name="' + p + '"].tab'))
             	gisportal.panels.showPanel(p);
             }
 		  	});  
@@ -248,6 +251,17 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                gisportal.configurePanel.toggleIndicator(searchResult, '');
                $('.js-search-results').css('display', 'none');
+            }
+         });
+
+         // Layer tab selected
+         socket.on('tab.select', function(data) {
+            var layerId = data.params.layerId;
+            var tabName = data.params.tabName;
+            collaboration.log(data.presenter +': ' + tabName + ' selected for ' + layerId);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('[data-tab-name="'+ tabName +'"]'));
+               gisportal.indicatorsPanel.selectTab( layerId, tabName );
             }
          });
 

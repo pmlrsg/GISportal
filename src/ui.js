@@ -15,6 +15,8 @@ $(document).ready(function()  {
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
+
+      gisportal.events.trigger('tab.select', layerId, tabName);
    });
    $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);

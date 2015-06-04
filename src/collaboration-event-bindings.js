@@ -38,21 +38,6 @@ gisportal.events.bind("map.move", function(event, CentreLonLat, zoomLevel) {
    collaboration._emit('c_event', params);
 });
 
-// // Base map changed
-// gisportal.events.bind('map-setting.basemap-change', function(event, id, value, logmsg) {
-//    collaboration.setValueById(id, value, logmsg);
-// });
-
-// // Set the graticule visibility
-// gisportal.events.bind('map-setting.graticules', function(event, setTo) {
-//    collaboration.setGraticules(setTo);
-// });
-
-// // Country borders changed
-// gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
-//    collaboration.setValueById(id, value, logmsg);
-// });
-
 // new layer added
 gisportal.events.bind("layer.addtopanel", function(event, data) {
    var params = {
@@ -157,6 +142,15 @@ gisportal.events.bind("search.resultselected", function(event, searchResult) {
     collaboration._emit('c_event', params);
 });
 
+// Layer tab selected
+gisportal.events.bind("tab.select", function(event, layerId, tabName) {
+   var params = {
+        "event" : "tab.select",
+        "layerId": layerId,
+        "tabName": tabName
+    }
+    collaboration._emit('c_event', params);
+});
 
 
 // jQuery events 
