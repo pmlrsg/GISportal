@@ -194,9 +194,11 @@ collaboration.initSession = function() {
                         
          // panel selected/shown
          socket.on('panels.showpanel', function(data) {
+            var p = data.params.panelName
 		  		collaboration.log(data.presenter +': Panel selected - '+ data.params.layerName);
             if (collaboration.role == "member") {
-            	gisportal.panels.showPanel(data.params.panelName);
+               collaboration.highlightElement($('[data-panel-name="' + p + '"]'))
+            	gisportal.panels.showPanel(p);
             }
 		  	});  
 
@@ -219,6 +221,35 @@ collaboration.initSession = function() {
             	gisportal.scalebars.resetScale(data.params.id);
             }
 		  	});            
+
+         // search value changed
+         socket.on('search.typing', function(data) {
+            var searchValue = data.params.searchValue;
+            collaboration.log(data.presenter +': search term: ' + searchValue);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-search'));
+               $('.js-search').val(searchValue);
+               gisportal.configurePanel.search(searchValue);
+            }
+         });
+
+         // search cancelled
+         socket.on('search.cancel', function(data) {
+            collaboration.log(data.presenter +': search cancelled');
+            if (collaboration.role == "member") {
+               $('.js-search-results').css('display', 'none');
+            }
+         });
+
+         // search value changed
+         socket.on('search.resultselected', function(data) {
+            var searchResult = data.params.searchResult;
+            collaboration.log(data.presenter +': search result selected: ' + searchResult);
+            if (collaboration.role == "member") {
+               gisportal.configurePanel.toggleIndicator(searchResult, '');
+               $('.js-search-results').css('display', 'none');
+            }
+         });
 
 			// User saved state
 			socket.on('setSavedState', function(data) {
@@ -302,4 +333,9 @@ collaboration.log = function(msg) {
       $(collaboration.historyConsole).prepend('<p>' + msg + '</p>');
    }
 
+}
+
+collaboration.highlightElement = function(element) {
+   element.addClass('highlight-click');
+   setTimeout(function() { element.removeClass('highlight-click'); }, 500);
 }

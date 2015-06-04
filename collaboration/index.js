@@ -200,44 +200,6 @@ io.on('connection', function(socket){
       });
    });  
 
-   // // moves the map to new lat/lon centre point
-   // socket.on('map.move', function(data) {
-   //    console.log(data);
-   //    io.emit('map.move', {
-   //      	"presenter": user.email,
-   //       "provider": user.provider,
-   //       "params" : data
-   //    });
-   // });  
-
-   // // sets the zoom level of the map
-   // socket.on('map.zoom', function(data) {
-   //    console.log(data);
-   //    io.emit('map.zoom', {
-   //       "presenter": user.email,
-   //       "provider": user.provider,
-   //       "params" : data
-   //    });
-   // }); 
-
-   // socket.on('layer.addtopanel', function(data) {
-   //    console.log(data);
-   //    io.emit('layer.addtopanel', {
-   //       "presenter": user.email,
-   //       "provider": user.provider,
-   //       "params" : data
-   //    })
-   // }) 
-
-   // socket.on('layer.remove', function(data) {
-   //    console.log(data);
-   //    io.emit('layer.remove', {
-   //       "presenter": user.email,
-   //       "provider": user.provider,
-   //       "params" : data
-   //    })
-   // }) 
-
    // a simple collaboration event; just echo back what was sent with details of who sent it
    socket.on('c_event', function(data) {
       console.log(data);

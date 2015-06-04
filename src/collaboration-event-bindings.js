@@ -38,20 +38,20 @@ gisportal.events.bind("map.move", function(event, CentreLonLat, zoomLevel) {
    collaboration._emit('c_event', params);
 });
 
-// Base map changed
-gisportal.events.bind('map-setting.basemap-change', function(event, id, value, logmsg) {
-   collaboration.setValueById(id, value, logmsg);
-});
+// // Base map changed
+// gisportal.events.bind('map-setting.basemap-change', function(event, id, value, logmsg) {
+//    collaboration.setValueById(id, value, logmsg);
+// });
 
-// Set the graticule visibility
-gisportal.events.bind('map-setting.graticules', function(event, setTo) {
-   collaboration.setGraticules(setTo);
-});
+// // Set the graticule visibility
+// gisportal.events.bind('map-setting.graticules', function(event, setTo) {
+//    collaboration.setGraticules(setTo);
+// });
 
-// Country borders changed
-gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
-   collaboration.setValueById(id, value, logmsg);
-});
+// // Country borders changed
+// gisportal.events.bind("displayoptions.countryborders", function(event, id, value, logmsg) {
+//    collaboration.setValueById(id, value, logmsg);
+// });
 
 // new layer added
 gisportal.events.bind("layer.addtopanel", function(event, data) {
@@ -129,6 +129,35 @@ gisportal.events.bind("scalebar.reset", function(event, id) {
     }
     collaboration._emit('c_event', params);
 });
+
+
+// search string changes
+gisportal.events.bind("search.typing", function(event, searchValue) {
+   var params = {
+        "event" : "search.typing",
+        "searchValue" : searchValue
+    }
+    collaboration._emit('c_event', params);
+});
+
+// search string changes
+gisportal.events.bind("search.cancel", function(event) {
+   var params = {
+        "event" : "search.cancel"
+    }
+    collaboration._emit('c_event', params);
+});
+
+// search string changes
+gisportal.events.bind("search.resultselected", function(event, searchResult) {
+   var params = {
+        "event" : "search.resultselected",
+        "searchResult" : searchResult
+    }
+    collaboration._emit('c_event', params);
+});
+
+
 
 // jQuery events 
 
