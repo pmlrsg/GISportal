@@ -223,13 +223,62 @@ collaboration.initSession = function() {
 
 		  	// autoscale
          socket.on('scalebar.autoscale', function(data) {
-		  		console.log('scalebar.autoscale received');
-		  		console.log(data);
 		  		$(collaboration.historyConsole).prepend(data.presenter +': Auto Scale - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.scalebars.autoScale(data.params.id, data.params.force);
             }
-		  	});            
+		  	});
+
+         // autoscale checkbox clicked
+         socket.on('scalebar.autoscale-checkbox', function(data) {
+            var id = data.params.id;
+            var isChecked = data.params.isChecked;
+
+            $(collaboration.historyConsole).prepend(data.presenter +': Auto Scale checkbox checked: '+ isChecked);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]').parent())
+               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked );
+            }
+         });
+
+         // Logarithmis checkbox clicked
+         socket.on('scalebar.log-set', function(data) {
+            var id = data.params.id;
+            var isLog = data.params.isLog;
+
+            $(collaboration.historyConsole).prepend(data.presenter +': Logarithmic checkbox checked: '+ isLog);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]').parent())
+               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog );
+               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-indicator-is-log[data-id="' + id + '"]'));
+            }
+         });
+
+         // Maximum scalebar value set
+         socket.on('scalebar.max-set', function(data) {
+            var id = data.params.id;
+            var value = data.params.value;
+
+            $(collaboration.historyConsole).prepend(data.presenter +': Maximum set to '+ value);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
+               $('.js-scale-max[data-id="' + id + '"]').val(value).change();
+               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-scale-max[data-id="' + id + '"]'))
+            }
+         });
+
+         // Minimum scalebar value set
+         socket.on('scalebar.min-set', function(data) {
+            var id = data.params.id;
+            var value = data.params.value;
+
+            $(collaboration.historyConsole).prepend(data.presenter +': Minimum set to '+ value);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
+               $('.js-scale-min[data-id="' + id + '"]').val(value).change();
+               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-scale-min[data-id="' + id + '"]'));
+            }
+         });
 
 		  	// reset scalebar
          socket.on('scalebar.reset', function(data) {

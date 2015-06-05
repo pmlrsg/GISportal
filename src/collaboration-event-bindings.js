@@ -116,6 +116,46 @@ gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
 });
 
 // auto scale a layer
+gisportal.events.bind("scalebar.autoscale-checkbox", function(event, id, isChecked) {
+   var params = {
+        "event" : "scalebar.autoscale-checkbox",
+        "id" : id,
+        "isChecked" : isChecked
+    }
+    collaboration._emit('c_event', params);
+});
+
+// indicator has logarithmic scale
+gisportal.events.bind("scalebar.log-set", function(event, id, isLog) {
+   var params = {
+        "event" : "scalebar.log-set",
+        "id" : id,
+        "isLog": isLog
+    }
+    collaboration._emit('c_event', params);
+});
+
+// scalebar maximum value set
+gisportal.events.bind("scalebar.max-set", function(event, id, value) {
+   var params = {
+        "event" : "scalebar.max-set",
+        "id" : id,
+        "value": value
+    }
+    collaboration._emit('c_event', params);
+});
+
+// scalebar minimum value set
+gisportal.events.bind("scalebar.min-set", function(event, id, value) {
+   var params = {
+        "event" : "scalebar.min-set",
+        "id" : id,
+        "value": value
+    }
+    collaboration._emit('c_event', params);
+});
+
+// auto scale a layer
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
         "event" : "scalebar.reset",

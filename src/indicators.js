@@ -71,11 +71,25 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
-   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function() {
-      var id = $(this).data('id');
+   gisportal.indicatorsPanel.scalebarRangeChanged = function(changedElement) {
+      var id = changedElement.data('id');
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
+   }
+
+   $('.js-indicators').on('change', '.js-scale-min', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.min-set', $(this).data('id'), $(this).val()) 
+   });
+   $('.js-indicators').on('change', '.js-scale-max', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val()) 
+   });
+
+   $('.js-indicators').on('change', '.js-indicator-is-log', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.log-set', $(this).data('id'), $(this).prop('checked')) 
    });
 
    //Auto scale range
@@ -84,6 +98,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.layers[id].autoScale = $(this).prop('checked');
 
       gisportal.scalebars.autoScale(id);
+      gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'))
    });
 
    // Reset scale range
