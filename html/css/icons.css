@@ -104,7 +104,7 @@
 }
 
 .icon_loading.active  {
-   animation: rotation: 2s infinite linear;
+   animation: rotation 2s infinite linear;
    opacity: 0.3;
 }
 

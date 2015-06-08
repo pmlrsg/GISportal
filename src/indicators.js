@@ -203,6 +203,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
    });
+
+   $('#indicatorsPanel').bind('scroll', function() {
+     gisportal.events.trigger('indicatorspanel.scroll', $(this).scrollTop())
+   })
+
 };
 
 gisportal.events.bind('metadata.close', function() {
@@ -516,7 +521,10 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       }
 
       $('#tab-' + indicator.id + '-opacity').on('slide', function() {
-         gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
+         var opacity = $(this).val() / 100;
+
+         gisportal.events.trigger('scalebar.opacity', indicator.id, opacity)
+         gisportal.layers[indicator.id].setOpacity( opacity )
       });
 
       $('#tab-' + indicator.id + '-elevation').ddslick({

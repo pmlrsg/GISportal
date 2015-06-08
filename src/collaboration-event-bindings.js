@@ -28,6 +28,7 @@ gisportal.events.bind("ddslick.selectIndex", function(event, obj, index, doCallb
    collaboration._emit('c_event', params);
 });
 
+
 // new layer added
 gisportal.events.bind("layer.addtopanel", function(event, data) {
    var params = {
@@ -155,6 +156,16 @@ gisportal.events.bind("scalebar.min-set", function(event, id, value) {
     collaboration._emit('c_event', params);
 });
 
+// layer opacity changed
+gisportal.events.bind("scalebar.opacity", function(event, id, value) {
+   var params = {
+        "event" : "scalebar.opacity",
+        "id" : id,
+        "value": value
+    }
+    collaboration._emit('c_event', params);
+});
+
 // auto scale a layer
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
@@ -208,6 +219,14 @@ gisportal.events.bind("tab.select", function(event, layerId, tabName) {
 gisportal.events.bind('configurepanel.scroll', function(event, scrollTop) {
   var params = {
     "event": "configurepanel.scroll",
+    "scrollTop": scrollTop
+  }
+  collaboration._emit('c_event', params);
+})
+
+gisportal.events.bind('indicatorspanel.scroll', function(event, scrollTop) {
+  var params = {
+    "event": "indicatorspanel.scroll",
     "scrollTop": scrollTop
   }
   collaboration._emit('c_event', params);

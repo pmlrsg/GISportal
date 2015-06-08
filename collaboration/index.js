@@ -9,6 +9,7 @@ var cookieParser = require('cookie-parser');
 var connect = require('connect');
 var session = require('express-session');
 var crypto = require("crypto");
+var jade = require("jade");
 
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -37,7 +38,7 @@ redisClient
 	});
 
 app.set('sessionStore', new RedisStore({client: redisClient}));
-
+app.set('view engine', 'jade');
 
 // Configure Express app with:
 // * Cookie parser
@@ -79,6 +80,38 @@ passport.deserializeUser(function(user, done) {
 // Configure Paths
 // -----------------------------------------------------------------------------
 
+
+// default path; check for cookie and if it's not there send them to the login page
+app.get('/node', function(req, res) {
+   res.render('index', {
+      title: 'GISportal collaboration'
+   });
+});
+
+app.get('/node/dashboard', isLoggedIn, function(req, res) {
+   var userId = req._passport.session.user.id;
+   var displayName = req._passport.session.user.displayName;
+   var userEmail = req._passport.session.user.emails[0].value;
+   var userPicture = req._passport.session.user._json.picture;
+   
+   res.render('dashboard', {
+      title: 'Collaboration Dashboard',
+      userId: userId,
+      displayName: displayName,
+      userEmail: userEmail,
+      userPicture: userPicture
+   })
+});
+
+function isLoggedIn(req, res, next) {
+   console.log(req._passport.session.user);
+   
+   if (typeof req._passport.session.user != 'undefined') {
+      return next();
+   }
+   res.redirect('/node');
+}
+
 app.get('/node/auth/google', passport.authenticate('google'));
 
 app.get('/node/auth/google/callback', 
@@ -90,9 +123,13 @@ app.get('/node/auth/google/callback',
 
 app.get('/node/authorised', function(req, res) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.sendFile(__dirname +'/html/authorised.html');
+	res.render('authorised', {});
 })
 
+app.get('/node/logout', function(req, res) {
+   req._passport = null;
+   res.redirect('/node');
+})
 
 // Start listening...
 server = http.createServer(app)

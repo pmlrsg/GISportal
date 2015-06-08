@@ -24,22 +24,23 @@ collaboration.initDOM = function() {
 	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
 
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
-	$('.js-google-auth-button').click(function() {
-		var authWin = window.open(collaboration.socket_url +'/node/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');	
-	});
+   var rendered = gisportal.templates['collaboration']
+   $('.js-collaboration-holder').html(rendered);
 
 }	
 
 
 
 collaboration.initSession = function() {
-	// hide the start button and show the options
-	$(collaboration.startButton).toggleClass('hidden', true);
-	$(collaboration.consoleWrapper).toggleClass('hidden', false);
 
 	// get the socket.io script and open a connection
 	$.getScript(collaboration.socket_url+"/node/socket.io/socket.io.js")
 		.done(function( script, textStatus ) {
+         // add the status indicator
+         var statusMsg = gisportal.templates['collaboration-status']
+         $('.ol-overlaycontainer').append(statusMsg);
+
+         // then get connected
     		socket = io.connect(collaboration.socket_url+'/', {
 		   	"connect timeout": 1000
 		  	});
@@ -135,7 +136,13 @@ collaboration.initSession = function() {
             collaboration.log(obj +' selectedIndex: ' + index);
          })
 
-		  	// layer added
+   	  	socket.on('indicatorspanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               $('#indicatorsPanel').scrollTop(data.params.scrollTop);
+            }
+         })
+
+         // layer added
 		  	socket.on('layer.addtopanel', function(data) {
 		  		//console.log('layer.addtopanel received');
 		  		//console.log(data);
@@ -280,6 +287,25 @@ collaboration.initSession = function() {
             }
          });
 
+         // Layer opacity value changed
+         socket.on('scalebar.opacity', function(data) {
+            var id = data.params.id;
+            var value = data.params.value;
+
+            if (typeof value != 'undefined') {
+               var opacity = value * 100;
+
+               $(collaboration.historyConsole).prepend(data.presenter +': Opacity set to '+ value);
+               if (collaboration.role == "member") {
+                  collaboration.highlightElement($('#tab-' + id + '-opacity'));
+                  
+                  $('#tab-' + id + '-opacity').val(opacity)
+                  gisportal.layers[id].setOpacity(value)
+               }
+            }
+            
+         });
+
 		  	// reset scalebar
          socket.on('scalebar.reset', function(data) {
 		  		collaboration.log(data.presenter +': Scalebar was reset');
@@ -383,25 +409,17 @@ collaboration._emit = function(cmd, params) {
 
 collaboration.userAuthorised = function() {
 	console.log('user authorised');
-	$('#gSignInWrapper').toggleClass('hidden', true);
-
-	var data = {
-		user : {
-			fullname : '<Full Name>',
-			email : '<email address>'
-		}
-	}
 	
 	// add the collaboration template into the mix...
-	var rendered = gisportal.templates['collaboration'](data)
-   $('.js-collaboration-holder').html(rendered); 
-	$('.js-collaboration-holder').toggleClass('hidden', false);
-   // and add listners to the buttons
-	$(collaboration.startButton).click(function() {
-   	// let it begin...
-   	collaboration.initSession();
-   	collaboration.startNewRoom();
-   });	
+	var rendered = gisportal.templates['collaboration']
+   $('.js-collaboration-holder').html('').html(rendered); 
+	
+ //   // and add listners to the buttons
+	// $(collaboration.startButton).click(function() {
+ //   	// let it begin...
+ //   	collaboration.initSession();
+ //   	collaboration.startNewRoom();
+ //   });	
 
 	return true;
 }

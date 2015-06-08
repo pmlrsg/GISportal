@@ -1,0 +1,107 @@
+
+
+.collabIframe {
+  background: rgb(239, 237, 241);
+}
+.collabIframe p {margin: 7px 0px;}
+
+.collabIframe .userDetails {
+
+}
+.collabIframe .name {
+   font-weight: bold;
+}
+.collabIframe .email {
+   font-style: italic;
+}
+.collabIframe .logout {
+   text-align: right;
+   margin-top: 10px;
+}
+
+.collabIframe .avatar {
+   width: 75px;
+   height: auto;
+   border-radius: 50%;
+   float: left;
+   margin-right: 10px;
+}
+
+.collabIframe .join, .collabIframe .host {
+   clear: both;
+   margin-top: 20px;
+}
+
+
+
+
+.collaboration-status {
+   top: 25px;
+   right: 176px;
+   height: 35px;
+   min-width: 50px;
+   position: absolute;
+   background-color: #fafafb;
+   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
+   border: 1px solid #b1a7bc;
+   border-radius: 5px;
+   padding: 7px 10px;
+}
+
+.collaboration-status div {
+   display: inline;
+}
+
+.collaboration-status div.icon-filled-connection-2 {
+   font-size: 24px;
+}
+
+
+.highlight-click {
+    -webkit-animation: glow 0.25s 0.25s 2;
+}
+
+@-webkit-keyframes glow {
+    to {
+        -webkit-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
+        -moz-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
+        box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
+        border: 2px solid rgba(153,0,0,0.7);
+    }
+}
+
+.highlight-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.2em;
+  height: 0.2em;
+  background-color: #97f4ff;
+  box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 0 black, 0 0 0 0 #298df4;
+  opacity: 0;
+  -webkit-animation: dot-anim linear 1.834s 1;
+  border-radius: 50%;
+}
+
+@-webkit-keyframes dot-anim {
+  45% {
+    opacity: 1;
+  }
+  46% {
+    box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 0 black, 0 0 5px 10px #298df4;
+  }
+  50% {
+    box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 101px black, 0 0 0 173px #298df4;
+  }
+  52% {
+    box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 245px black, 0 0 0 255px #298df4;
+  }
+  55% {
+    opacity: 1;
+    box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 317px black, 0 0 0 320px #298df4;
+  }
+  81% {
+    opacity: 0;
+    box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 549px black, 0 0 0 549px #298df4;
+  }
+}

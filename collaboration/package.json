@@ -14,7 +14,8 @@
     "passport-google": "~0.3.0",
     "passport-google-oauth": "~0.1.5",
     "redis": "~0.12.1",
-    "connect-redis": "~2.0.0"
+    "connect-redis": "~2.0.0",
+    "jade": "~1.10.0"
   },
   "engines": {
     "node": ">= 0.8.0",

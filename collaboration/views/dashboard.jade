@@ -1,0 +1,35 @@
+doctype html
+html(lang="en")
+   head
+      title= pageTitle
+      link(rel='stylesheet', href='/css/GISPortal.css')
+      script(type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
+      script(type='text/javascript')
+         $( document ).ready(function() {
+         $('.js-start-new').click(window.parent.collaboration.initSession());
+         });
+   body
+      div.collabIframe
+         h3 Collaboration Dashboard
+         p You are now logged in
+         
+         div.userDetails
+            img(src=userPicture class='avatar')
+            div.name= displayName
+            div.email= userEmail
+            p.logout 
+               a(href='/node/logout') Logout
+
+         div.join
+            h3 Join a session
+            p If you have a collaboration reference enter it here to join the session
+            form(name="join", action="/node/room/join", method="post")
+               input(type="text", name="roomId", placeholder="Collaboration reference")
+               input(type="submit", value="Join Session", class="brand small pull-right analysis-add-to-plot-buttons")
+
+         div.host
+            h3 Host a session
+            p Select this option to host a new session and invite people to join you
+            //form(name="join", action="/node/room/new", method="post")
+            //   input(type="submit", value="Host Session", class="brand small pull-right analysis-add-to-plot-buttons")            
+            a(href='javascript:void(0);' class=".js-start-new") Start new
