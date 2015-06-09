@@ -14,10 +14,11 @@ collaboration.startButton = '.js-start-collaboration';							// the button to in
 collaboration.consoleWrapper = '.js-collaboration-console';						// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
 collaboration.historyConsole = '.js-collaboration-history';						// a div that historical message log is appended to
 collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
+collaboration.statusIcon = '.js-collaboration-status-icon';                // element where the status icon is displayed
 collaboration.displayLog = true;                                           // if true the history is shown in `collaboration.historyConsole`
 
 collaboration.active = false;
-collaboration.role = 'member';
+collaboration.role = '';
 
 collaboration.initDOM = function() {
 	// line up the URL 
@@ -36,12 +37,7 @@ collaboration.initSession = function() {
 	// get the socket.io script and open a connection
 	$.getScript(collaboration.socket_url+"/node/socket.io/socket.io.js")
 		.done(function( script, textStatus ) {
-         // add the status indicator
-         var statusMsg = gisportal.templates['collaboration-status']
-         $('.ol-overlaycontainer').append(statusMsg);
-
-         // then get connected
-    		socket = io.connect(collaboration.socket_url+'/', {
+         socket = io.connect(collaboration.socket_url+'/', {
 		   	"connect timeout": 1000
 		  	});
 
@@ -50,21 +46,21 @@ collaboration.initSession = function() {
     		// -------------------------------------------------
 		  	socket.on('connect', function (){
 		  		collaboration.active = true;
-		   	$(collaboration.statusMessage).html('Succuessfully connected.');
+            collaboration.setStatus('connected', 'Connected')
 		  	});
 
 		  	socket.on('connect_error', function (reason){
-		   	$(collaboration.statusMessage).html('Could not connect to server; '+ reason);
+		   	collaboration.setStatus('error', 'Could not connect to server; '+ reason);
 		  	});
 
 		  	socket.on('disconnect', function (reason){
 		  		collaboration.active = false;
-		   	$(collaboration.statusMessage).html('Unexpectedly disconnected, trying to reconnect...');
+		   	collaboration.setStatus('error', 'Unexpectedly disconnected, trying to reconnect...');
 		  	});
 
 		  	// doesn't appear to work as the reconnect timeout is incrementally increased with each attempt; might have to monitor it outside of socket.io
 		  	socket.on('reconnect_error', function (reason){
-		   	$(collaboration.statusMessage).html('Could not re-establish a connection, sorry');
+		   	collaboration.setStatus('error', 'Could not re-establish a connection, sorry');
 		  	});
 
 		  	socket.on('error', function (reason){
@@ -74,7 +70,10 @@ collaboration.initSession = function() {
 		   		$(collaboration.authenticationWrapper).toggleClass('hidden', false);
 					window.open(collaboration.socket_url +'/auth/google');
 		   	} else {
-		   		$(collaboration.statusMessage).html('The connection failed; '+reason);	
+		   		collaboration.setStatus('error', 'The connection failed; '+reason);	
+               // reset the iframe
+               var rendered = gisportal.templates['collaboration']
+               $('.js-collaboration-holder').html('').html(rendered);
 		   	}
 		   	
 		  	});
@@ -84,7 +83,11 @@ collaboration.initSession = function() {
 		  	// -------------------------------------------------
 		  	socket.on('roomCreated', function(data) {
 		  		var roomId = data.roomId;
-		  		collaboration.log('<p>A new session has been created; your collaboration reference is '+params.roomId);
+            console.log('Room created: '+ data.roomId);
+		  		collaboration.roomId = data.roomId;
+            collaboration.role = "presenter";
+
+            collaboration.setStatus('connected', 'Connected. You are the Presenter');
 		  	})
 
 		  	// -------------------------------------------------
@@ -382,7 +385,8 @@ collaboration.initSession = function() {
 } // end initSession
 
 collaboration.startNewRoom = function() {
-	collaboration._emit('startNewRoom');
+   collaboration.role = 'presenter';
+   collaboration._emit('startNewRoom');
 }
 
 collaboration.setValueById = function(id, value, logmsg) {
@@ -414,14 +418,7 @@ collaboration.userAuthorised = function() {
 	var rendered = gisportal.templates['collaboration']
    $('.js-collaboration-holder').html('').html(rendered); 
 	
- //   // and add listners to the buttons
-	// $(collaboration.startButton).click(function() {
- //   	// let it begin...
- //   	collaboration.initSession();
- //   	collaboration.startNewRoom();
- //   });	
-
-	return true;
+ 	return true;
 }
 
 collaboration.log = function(msg) {
@@ -434,4 +431,21 @@ collaboration.log = function(msg) {
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');
    setTimeout(function() { element.removeClass('highlight-click'); }, 500);
+}
+
+collaboration.setStatus = function(icon, message) {
+   if ($('.collaboration-status').length == 0) {
+      var statusMsg = gisportal.templates['collaboration-status']
+      $('.ol-overlaycontainer').append(statusMsg);   
+   }
+   
+   if (icon == 'connected') {
+      $(collaboration.statusIcon).toggleClass('error', false);
+      $(collaboration.statusIcon).toggleClass('connected', true);
+   }
+   if (icon == 'error') {
+      $(collaboration.statusIcon).toggleClass('error', true);
+      $(collaboration.statusIcon).toggleClass('connected', false);
+   }
+   $(collaboration.statusMessage).html(message);
 }

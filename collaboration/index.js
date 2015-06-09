@@ -191,21 +191,24 @@ io.on('connection', function(socket){
 	});
 	
    socket.on('disconnect', function(){
-   	redisClient.del('sess:'+sid);
+   	//redisClient.del('sess:'+sid);    can't delete the session on disconnect because joining a room causes users to disconnect
 		console.log('user disconnected');
 	})
 
 	socket.on('startNewRoom', function() {
-	   var shasum = crypto.createHash('sha1');
+	   console.log('starting room');
+      var shasum = crypto.createHash('sha1');
 	   shasum.update(Date.now().toString());
 	   var roomId = shasum.digest('hex').substr(0,6);
 
-	   socket.join(roomId);
+      socket.room = roomId;
+	   socket.join(socket.room, function() {
+         io.sockets.in(socket.room).emit('roomCreated', {
+            "roomId": roomId
+         });
+      });
 	   console.log(user.email +' is now is room '+ roomId);
-
-	   io.sockets.in(roomId).emit('roomCreated', {
-	   	"roomId": roomId
-	   });
+      
 	})
 
 	// sets the value of an element using the ID as the selector

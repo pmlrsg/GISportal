@@ -1,7 +1,6 @@
 <div class="collaboration-status">
-   <div class="icon-filled-connection-2" title="Collaboration Status"></div>
-   <div class="js-collaboration-status-icon hidden"></div>
-   <div class="js-collaboration-status-presenter hidden"></div>
-   <div class="js-collaboration-status-member hidden"></div>
-   <div class="js-collaboration-status-msg">Initialising connection...</div>
+   <div class="js-collaboration-status-icon"></div>
+   <span class="js-collaboration-status-presenter hidden"></span>
+   <span class="js-collaboration-status-member hidden"></span>
+   <span class="js-collaboration-status-msg">Initialising connection...</span>
 </div>
