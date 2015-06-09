@@ -6,7 +6,7 @@ html(lang="en")
       script(type='text/javascript' src='//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js')
       script(type='text/javascript')
          |$( document ).ready(function() {
-         |   $('.js-start-new-room').click(window.top.collaboration.startNewRoom());
+         |   $('.js-start-new-room').on('click', function() { window.top.collaboration.initSession()});
          |});
    body
       div.collabIframe
@@ -29,4 +29,4 @@ html(lang="en")
          div.host
             h3 Host a session
             p Select this option to host a new session and invite people to join you
-            button(class=".js-start-new-room brand small pull-right") Start new
+            button(class="js-start-new-room brand small pull-right") Start new

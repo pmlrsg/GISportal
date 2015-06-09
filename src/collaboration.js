@@ -85,9 +85,15 @@ collaboration.initSession = function() {
 		  		var roomId = data.roomId;
             console.log('Room created: '+ data.roomId);
 		  		collaboration.roomId = data.roomId;
-            collaboration.role = "presenter";
-
+            
             collaboration.setStatus('connected', 'Connected. You are the Presenter');
+
+            // load the room template
+            var data = {
+               roomId: roomId.toUpperCase()
+            }
+            var rendered = gisportal.templates['collaboration-room'](data)
+            $('.js-collaboration-holder').html(rendered);
 		  	})
 
 		  	// -------------------------------------------------
