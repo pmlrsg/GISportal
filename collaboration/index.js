@@ -131,6 +131,9 @@ app.get('/node/logout', function(req, res) {
    res.redirect('/node');
 })
 
+// stuff for managing rooms and users (should be in redis)
+rooms = {}
+
 // Start listening...
 server = http.createServer(app)
 server.listen(config.app.port, function() {
@@ -201,15 +204,38 @@ io.on('connection', function(socket){
 	   shasum.update(Date.now().toString());
 	   var roomId = shasum.digest('hex').substr(0,6);
 
+      rooms[roomId] = {
+         'presenter': user.email,
+         'members': [user.email]
+      }
       socket.room = roomId;
 	   socket.join(socket.room, function() {
          io.sockets.in(socket.room).emit('roomCreated', {
-            "roomId": roomId
+            "roomId": roomId,
+            "people": rooms[roomId]
          });
       });
 	   console.log(user.email +' is now is room '+ roomId);
       
 	})
+
+   socket.on('joinRoom', function(roomId) {
+      console.log(user.email +' is joining room '+ roomId);
+      // does the room actually exist
+      if (rooms[roomId]) { // yes, add the user to it and let everyone in the room know
+         socket.room = roomId;
+         socket.join(socket.room, function() {
+            io.sockets.in(socket.room).emit('memberJoined', {
+               "roomId": roomId,
+               "sessionId": socket.id,
+               "user": user
+            })
+         })
+      } else { // no, tell the user
+         console.log(roomId +' does not exist')
+         io.sockets.connected[socket.id].emit('invalidRoomId');
+      }
+   })
 
 	// sets the value of an element using the ID as the selector
 	socket.on('setValueById', function(data) {

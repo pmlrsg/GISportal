@@ -63,14 +63,9 @@
    background: #990000;
 }
 
-.collaboration-status div {
-   display: inline;
+#roomId {
+   text-transform: uppercase;
 }
-
-.collaboration-status div.icon-filled-connection-2 {
-   font-size: 24px;
-}
-
 
 .highlight-click {
     -webkit-animation: glow 0.25s 0.25s 2;

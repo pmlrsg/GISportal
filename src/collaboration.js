@@ -46,7 +46,7 @@ collaboration.initSession = function() {
     		// -------------------------------------------------
 		  	socket.on('connect', function (){
 		  		collaboration.active = true;
-            collaboration.setStatus('connected', 'Connected')
+            collaboration.setStatus('connected', 'Ready')
 		  	});
 
 		  	socket.on('connect_error', function (reason){
@@ -81,7 +81,14 @@ collaboration.initSession = function() {
 		  	// -------------------------------------------------
 		  	// room and user management
 		  	// -------------------------------------------------
-		  	socket.on('roomCreated', function(data) {
+		  	
+         socket.on('invalidRoomId', function(data) {
+            console.log('invalid Room Id requested');
+            var iframe = $('iframe');
+            $('.js-room-id-message', iframe.contents()).html('The collaboration reference you entered does not exist, please check and try again').removeClass('hidden');
+         });
+         
+         socket.on('roomCreated', function(data) {
 		  		var roomId = data.roomId;
             console.log('Room created: '+ data.roomId);
 		  		collaboration.roomId = data.roomId;
@@ -94,7 +101,37 @@ collaboration.initSession = function() {
             }
             var rendered = gisportal.templates['collaboration-room'](data)
             $('.js-collaboration-holder').html(rendered);
-		  	})
+		  	});
+
+         socket.on('memberJoined', function(data) {
+            console.log('member joined room');
+            
+            // is this confirmation that I have joined?
+            if (data.sessionId == socket.io.engine.id) { // yes, so set the role, status and show the room details
+               collaboration.role = 'member';
+               collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
+
+               // load the room template
+               var rendered = gisportal.templates['collaboration-room'](data)
+               $('.js-collaboration-holder').html(rendered);
+            }
+
+            // if I am the presenter send my state so that the new member can catch up
+            if (collaboration.role == 'presenter') {
+               var state = gisportal.saveState();
+               var params = {
+                  "event": "state.presenter-state-update",
+                  "state": state
+               }
+               collaboration._emit('c_event', params)
+            }
+            // update the member listings
+         });
+
+         socket.on('memberLeft', function(data) {
+            console.log('member left room');
+         });
+
 
 		  	// -------------------------------------------------
     		// socket collaboration event functions
@@ -103,7 +140,7 @@ collaboration.initSession = function() {
 		  	// sets the value of an element using the element's id
 		  	socket.on('setValueById', function(data) {
 		  		var params = data.params;
-		  		collaboration.log('<p>'+data.presenter +': '+params.logmsg);
+		  		collaboration.log(data.presenter +': '+params.logmsg);
 		   	if (collaboration.role == "member") {
 		   		//console.log('setting value by id');
 		   		$('#'+params.id).val(params.value);
@@ -115,6 +152,27 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                $('#configurePanel').scrollTop(data.params.scrollTop);
             }
+         })
+
+         socket.on('date.selected', function(data) {
+            var date = new Date(data.params.date);
+
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.js-current-date'));
+               gisportal.timeline.setDate(date); 
+            }
+            collaboration.log('Date changed to '+ date);
+         })
+
+         socket.on('date.zoom', function(data) {
+            var startDate = new Date(data.params.startDate);
+            var endDate = new Date(data.params.endDate);
+
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('#timeline'));
+               gisportal.timeline.zoom(startDate, endDate); 
+            }
+            collaboration.log('Timeline zoom changed');
          })
 
          socket.on('ddslick.open', function(data) {
@@ -353,6 +411,13 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('state.presenter-state-update', function(data) {
+            var state = data.params.state;
+            if (collaboration.role == "member") {
+               gisportal.loadState(state);
+            }
+         })
+
          // Layer tab selected
          socket.on('tab.select', function(data) {
             var layerId = data.params.layerId;
@@ -395,6 +460,10 @@ collaboration.startNewRoom = function() {
    collaboration._emit('startNewRoom');
 }
 
+collaboration.joinRoom = function(roomId) {
+   collaboration._emit('joinRoom', roomId.toLowerCase(), true);
+}
+
 collaboration.setValueById = function(id, value, logmsg) {
 	var params = {
 		"id" : id,
@@ -411,8 +480,8 @@ collaboration.setUserSavedState = function() {
 }
 
 // This is the function actually sends the message if the collaboration is active and the user is the presenter
-collaboration._emit = function(cmd, params) {
-	if (collaboration.active && collaboration.role == "presenter") {
+collaboration._emit = function(cmd, params, force) {
+	if (collaboration.active && (collaboration.role == "presenter" || force)) {
 		socket.emit(cmd, params);	
 	}
 }
@@ -424,6 +493,7 @@ collaboration.userAuthorised = function() {
 	var rendered = gisportal.templates['collaboration']
    $('.js-collaboration-holder').html('').html(rendered); 
 	
+   collaboration.initSession();
  	return true;
 }
 

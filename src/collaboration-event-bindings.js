@@ -2,6 +2,23 @@
 //  Portal EventManager event bindings
 //--------------------------------------------------------------------------------------
 
+gisportal.events.bind("date.selected", function(event, date) {
+   var params = {
+       "event" : "date.selected",
+       "date" : date
+   }
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind("date.zoom", function(event, startDate, endDate) {
+   var params = {
+       "event" : "date.zoom",
+       "startDate" : startDate,
+       "endDate": endDate
+   }
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind("ddslick.open", function(event, obj) {
    var params = {
        "event" : "ddslick.open",

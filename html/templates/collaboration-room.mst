@@ -1,0 +1,4 @@
+<h3>Collaboration Room - {{roomId}}</h3>
+<p><a href="javascript:void(0)" class="js-view-collaboration-dashboard">&laquo; Return to the Dashboard</a></p>
+
+<h4>Connected people in this room:</h4>
