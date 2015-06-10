@@ -1,4 +1,16 @@
-<h3>Collaboration Room - {{roomId}}</h3>
-<p><a href="javascript:void(0)" class="js-view-collaboration-dashboard">&laquo; Return to the Dashboard</a></p>
+<h3>Collaboration Room - <span class="roomId">{{roomId}}</span></h3>
+<p>
+   <a href="javascript:void(0)" class="js-view-collaboration-dashboard">&laquo; Leave the room</a> | 
+   <a href="javascript:void(0)" class="js-view-collaboration-dashboard">Invite People</a> | 
+   <a href="javascript:void(0)" class="js-view-collaboration-dashboard">Record the session</a> | 
+</p>
 
-<h4>Connected people in this room:</h4>
+<p>Connected people in this room:</p>
+
+{{#people}}
+<div class="person">
+   {{#presenter}}<div class="presenter"></div>{{/presenter}}
+   {{^presenter}}<div class="js-promote-as-presenter" data-id="{{id}}"></div>{{/presenter}}
+   {{name}} ({{email}})
+</div>
+{{/people}}

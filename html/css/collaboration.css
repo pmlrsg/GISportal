@@ -63,10 +63,40 @@
    background: #990000;
 }
 
-#roomId {
+#roomId, .roomId {
    text-transform: uppercase;
 }
 
+.person {
+  border: 1px solid #ccc;
+  background-color: #fff;
+  padding: 8px 8px 8px 28px;
+  margin-top: 5px;
+  position: relative;
+}
+.presenter {
+   position:absolute;
+   top: 12px;
+   left: 10px;
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background: radial-gradient(circle at 3px 3px, #5cabff, #000);
+}
+
+.js-promote-as-presenter {
+   position:absolute;
+   top: 12px;
+   left: 10px;
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background: #fff;
+}
+
+.js-promote-as-presenter:hover {
+   background: radial-gradient(circle at 3px 3px, #25FC16, #000);
+}
 .highlight-click {
     -webkit-animation: glow 0.25s 0.25s 2;
 }

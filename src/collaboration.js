@@ -96,11 +96,7 @@ collaboration.initSession = function() {
             collaboration.setStatus('connected', 'Connected. You are the Presenter');
 
             // load the room template
-            var data = {
-               roomId: roomId.toUpperCase()
-            }
-            var rendered = gisportal.templates['collaboration-room'](data)
-            $('.js-collaboration-holder').html(rendered);
+            collaboration.buildMembersList(data);
 		  	});
 
          socket.on('memberJoined', function(data) {
@@ -110,10 +106,6 @@ collaboration.initSession = function() {
             if (data.sessionId == socket.io.engine.id) { // yes, so set the role, status and show the room details
                collaboration.role = 'member';
                collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
-
-               // load the room template
-               var rendered = gisportal.templates['collaboration-room'](data)
-               $('.js-collaboration-holder').html(rendered);
             }
 
             // if I am the presenter send my state so that the new member can catch up
@@ -125,7 +117,8 @@ collaboration.initSession = function() {
                }
                collaboration._emit('c_event', params)
             }
-            // update the member listings
+            // load/update the member listings
+            collaboration.buildMembersList(data);
          });
 
          socket.on('memberLeft', function(data) {
@@ -462,6 +455,18 @@ collaboration.startNewRoom = function() {
 
 collaboration.joinRoom = function(roomId) {
    collaboration._emit('joinRoom', roomId.toLowerCase(), true);
+}
+
+collaboration.buildMembersList = function(data) {
+   var rendered = gisportal.templates['collaboration-room'](data)
+   $('.js-collaboration-holder').html('').html(rendered);
+
+   if (collaboration.role == 'presenter') { // add a click event to other members to allow you to make them presenter
+      $('.js-promote-as-presenter').click(function() {
+         var id = $(this).data('id');
+         collaboration._emit('setPresenter', id);
+      })
+   }
 }
 
 collaboration.setValueById = function(id, value, logmsg) {

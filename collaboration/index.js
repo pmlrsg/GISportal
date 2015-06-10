@@ -104,8 +104,6 @@ app.get('/node/dashboard', isLoggedIn, function(req, res) {
 });
 
 function isLoggedIn(req, res, next) {
-   console.log(req._passport.session.user);
-   
    if (typeof req._passport.session.user != 'undefined') {
       return next();
    }
@@ -204,10 +202,12 @@ io.on('connection', function(socket){
 	   shasum.update(Date.now().toString());
 	   var roomId = shasum.digest('hex').substr(0,6);
 
-      rooms[roomId] = {
-         'presenter': user.email,
-         'members': [user.email]
-      }
+      rooms[roomId] = [{
+         "id": socket.id,
+         "email": user.email,
+         "name": user.name,
+         "presenter": true
+      }]
       socket.room = roomId;
 	   socket.join(socket.room, function() {
          io.sockets.in(socket.room).emit('roomCreated', {
@@ -225,10 +225,20 @@ io.on('connection', function(socket){
       if (rooms[roomId]) { // yes, add the user to it and let everyone in the room know
          socket.room = roomId;
          socket.join(socket.room, function() {
+            // add the new user to the room's members array
+            var member = {
+               "id": socket.id,
+               "email": user.email,
+               "name": user.name,
+               "presenter": false
+            }
+            rooms[roomId].push(member);
+
             io.sockets.in(socket.room).emit('memberJoined', {
                "roomId": roomId,
                "sessionId": socket.id,
-               "user": user
+               "user": user,
+               "people": rooms[roomId]
             })
          })
       } else { // no, tell the user
