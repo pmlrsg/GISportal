@@ -42,13 +42,13 @@
    box-shadow: 4px 0 10px rgba(0,0,0,0.25);
    border: 1px solid #b1a7bc;
    border-radius: 5px;
-   padding: 7px 10px 7px 28px;
+   padding: 7px 10px 7px 24px;
 }
 .js-collaboration-status-icon {
-   width: 15px;
-   height: 15px;
+   width: 10px;
+   height: 10px;
    position: absolute;
-   margin-top: 0px;
+   margin-top: 2px;
    border-radius: 50%;
    top: 9px;
    left: 9px;
@@ -56,17 +56,24 @@
 }
 
 .js-collaboration-status-icon.connected {
-   background: #009619;
+   background: radial-gradient(circle at 3px 3px, #25FC16, #000);
 }
 
 .js-collaboration-status-icon.error {
-   background: #990000;
+   background: radial-gradient(circle at 3px 3px,#FC3535, #420000);
 }
 
 #roomId, .roomId {
    text-transform: uppercase;
 }
+#roomId.error { border: 2px solid #900; color: #900;}
+.js-room-id-message { padding: 4px; }
+.js-room-id-message.error { color: #900;}
 
+
+.collaboration-actions { 
+   margin: 10px 0px;
+}
 .person {
   border: 1px solid #ccc;
   background-color: #fff;
@@ -84,7 +91,7 @@
    background: radial-gradient(circle at 3px 3px, #5cabff, #000);
 }
 
-.js-promote-as-presenter {
+.js-make-presenter {
    position:absolute;
    top: 12px;
    left: 10px;
@@ -94,8 +101,8 @@
    background: #fff;
 }
 
-.js-promote-as-presenter:hover {
-   background: radial-gradient(circle at 3px 3px, #25FC16, #000);
+.js-make-presenter:hover {
+   background: radial-gradient(circle at 3px 3px, #FF916F, #7C1700);
 }
 .highlight-click {
     -webkit-animation: glow 0.25s 0.25s 2;

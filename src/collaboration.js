@@ -47,6 +47,10 @@ collaboration.initSession = function() {
 		  	socket.on('connect', function (){
 		  		collaboration.active = true;
             collaboration.setStatus('connected', 'Ready')
+
+            if (typeof collaboration.roomId != 'undefined') {
+               collaboration.joinRoom(collaboration.roomId);
+            }
 		  	});
 
 		  	socket.on('connect_error', function (reason){
@@ -82,13 +86,14 @@ collaboration.initSession = function() {
 		  	// room and user management
 		  	// -------------------------------------------------
 		  	
-         socket.on('invalidRoomId', function(data) {
+         socket.on('room.invalid-id', function(data) {
             console.log('invalid Room Id requested');
             var iframe = $('iframe');
-            $('.js-room-id-message', iframe.contents()).html('The collaboration reference you entered does not exist, please check and try again').removeClass('hidden');
+            $('.js-room-id-message', iframe.contents()).html('The collaboration reference you entered does not exist, please check and try again').removeClass('hidden').addClass('error');
+            $('#roomId', iframe.contents()).addClass('error');
          });
          
-         socket.on('roomCreated', function(data) {
+         socket.on('room.created', function(data) {
 		  		var roomId = data.roomId;
             console.log('Room created: '+ data.roomId);
 		  		collaboration.roomId = data.roomId;
@@ -99,11 +104,12 @@ collaboration.initSession = function() {
             collaboration.buildMembersList(data);
 		  	});
 
-         socket.on('memberJoined', function(data) {
+         socket.on('room.member-joined', function(data) {
             console.log('member joined room');
             
             // is this confirmation that I have joined?
             if (data.sessionId == socket.io.engine.id) { // yes, so set the role, status and show the room details
+               collaboration.roomId = data.roomId;
                collaboration.role = 'member';
                collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
             }
@@ -112,7 +118,7 @@ collaboration.initSession = function() {
             if (collaboration.role == 'presenter') {
                var state = gisportal.saveState();
                var params = {
-                  "event": "state.presenter-state-update",
+                  "event": "room.presenter-state-update",
                   "state": state
                }
                collaboration._emit('c_event', params)
@@ -121,12 +127,35 @@ collaboration.initSession = function() {
             collaboration.buildMembersList(data);
          });
 
-         socket.on('memberLeft', function(data) {
+         socket.on('room.member-left', function(data) {
             console.log('member left room');
+            collaboration.buildMembersList(data);
          });
 
+         socket.on('room.presenter-changed', function(data) {
+            console.log('change of presenter');
+            // am I now the presenter?
+            for (var p in data.people) {
+               if (data.people[p].presenter && data.people[p].id == socket.io.engine.id) {
+                  collaboration.role = "presenter";
+                  collaboration.setStatus('connected', 'Connected. You are the presenter');
+                  break;
+               } else {
+                  collaboration.role = "member";
+                  collaboration.setStatus('connected', 'Connected. .....');
+               }
+            }
+            collaboration.buildMembersList(data);
+         });
 
-		  	// -------------------------------------------------
+         socket.on('room.presenter-state-update', function(data) {
+            var state = data.params.state;
+            if (collaboration.role == "member") {
+               gisportal.loadState(state);
+            }
+         })
+
+ 		  	// -------------------------------------------------
     		// socket collaboration event functions
     		// -------------------------------------------------
 		  	
@@ -404,14 +433,7 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('state.presenter-state-update', function(data) {
-            var state = data.params.state;
-            if (collaboration.role == "member") {
-               gisportal.loadState(state);
-            }
-         })
-
-         // Layer tab selected
+        // Layer tab selected
          socket.on('tab.select', function(data) {
             var layerId = data.params.layerId;
             var tabName = data.params.tabName;
@@ -450,21 +472,42 @@ collaboration.initSession = function() {
 
 collaboration.startNewRoom = function() {
    collaboration.role = 'presenter';
-   collaboration._emit('startNewRoom');
+   collaboration._emit('room.new');
 }
 
 collaboration.joinRoom = function(roomId) {
-   collaboration._emit('joinRoom', roomId.toLowerCase(), true);
+   collaboration._emit('room.join', roomId.toLowerCase(), true);
 }
 
 collaboration.buildMembersList = function(data) {
    var rendered = gisportal.templates['collaboration-room'](data)
    $('.js-collaboration-holder').html('').html(rendered);
 
-   if (collaboration.role == 'presenter') { // add a click event to other members to allow you to make them presenter
-      $('.js-promote-as-presenter').click(function() {
+   // add events to the various action links
+   $('.js-leave-room').click(function() {
+      socket.disconnect();
+      collaboration.roomId = undefined;
+
+      var rendered = gisportal.templates['collaboration']
+      $('.js-collaboration-holder').html('').html(rendered);
+
+      collaboration.setStatus('error', 'You have left the room');
+      setTimeout(function() {
+         $('.collaboration-status').remove()
+      }, 3000);
+   });
+
+   if (collaboration.role == 'presenter') { 
+      // add a link to other members to allow you to make them presenter
+      $('.person').each(function() {
          var id = $(this).data('id');
-         collaboration._emit('setPresenter', id);
+         var link = $('<a href="javascript:void(0)" class="js-make-presenter" title="Make this person the presenter" data-id="' + id + '"></a>')
+         $(this).prepend(link);
+      });
+
+      $('.js-make-presenter').click(function() {
+         var id = $(this).data('id');
+         collaboration._emit('room.make-presenter', id);
       })
    }
 }

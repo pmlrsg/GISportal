@@ -171,6 +171,8 @@ io.set('authorization', function (handshakeData, accept) {
 
 io.on('connection', function(socket){
 
+   socket.room = '';
+   
 	var cookies = cookieParser.signedCookies(cookie.parse(socket.request.headers.cookie), config.session.secret);
    var sid = cookies['collaboration'];
 
@@ -192,11 +194,27 @@ io.on('connection', function(socket){
 	});
 	
    socket.on('disconnect', function(){
-   	//redisClient.del('sess:'+sid);    can't delete the session on disconnect because joining a room causes users to disconnect
+   	//redisClient.del('sess:'+sid);    can't delete the session on disconnect because joining a room causes users to disconnect (but perphaps it shouldn't?)
 		console.log('user disconnected');
+
+      var leavingUserId = socket.id;
+      var roomId = socket.room;
+      var people = rooms[roomId];
+      if (typeof people != 'undefined') {
+         for (var i = 0; i < people.length; i++) {
+            if (people[i].id == leavingUserId) {
+               rooms[roomId].splice(i, 1);
+               break;
+            }
+         }
+         io.sockets.in(socket.room).emit('room.member-left', {
+            "roomId": roomId,
+            "people": rooms[roomId]
+         });
+      }
 	})
 
-	socket.on('startNewRoom', function() {
+	socket.on('room.new', function() {
 	   console.log('starting room');
       var shasum = crypto.createHash('sha1');
 	   shasum.update(Date.now().toString());
@@ -210,7 +228,7 @@ io.on('connection', function(socket){
       }]
       socket.room = roomId;
 	   socket.join(socket.room, function() {
-         io.sockets.in(socket.room).emit('roomCreated', {
+         io.sockets.in(socket.room).emit('room.created', {
             "roomId": roomId,
             "people": rooms[roomId]
          });
@@ -219,7 +237,7 @@ io.on('connection', function(socket){
       
 	})
 
-   socket.on('joinRoom', function(roomId) {
+   socket.on('room.join', function(roomId) {
       console.log(user.email +' is joining room '+ roomId);
       // does the room actually exist
       if (rooms[roomId]) { // yes, add the user to it and let everyone in the room know
@@ -234,7 +252,7 @@ io.on('connection', function(socket){
             }
             rooms[roomId].push(member);
 
-            io.sockets.in(socket.room).emit('memberJoined', {
+            io.sockets.in(socket.room).emit('room.member-joined', {
                "roomId": roomId,
                "sessionId": socket.id,
                "user": user,
@@ -243,14 +261,32 @@ io.on('connection', function(socket){
          })
       } else { // no, tell the user
          console.log(roomId +' does not exist')
-         io.sockets.connected[socket.id].emit('invalidRoomId');
+         io.sockets.connected[socket.id].emit('room.invalid-id');
       }
-   })
+   });
+
+   socket.on('room.make-presenter', function(id) {
+      console.log('changing presenter to '+ id)
+      
+      var people = rooms[socket.room];
+      for (var p in people) {
+         if (people[p].id == id) {
+            people[p].presenter = true;
+         } else {
+            people[p].presenter = false;
+         }
+      }
+
+      io.sockets.in(socket.room).emit('room.presenter-changed', {
+         "roomId": socket.room,
+         "people": people
+      });
+   });
 
 	// sets the value of an element using the ID as the selector
 	socket.on('setValueById', function(data) {
       console.log(data.logmsg);
-      io.emit('setValueById', {
+      io.sockets.in(socket.room).emit('setValueById', {
          "presenter": user.email,
          "provider": user.provider,
          "params" : data
@@ -260,7 +296,7 @@ io.on('connection', function(socket){
 	// sets the value of an element using the class as the selector
    socket.on('setValueByClass', function(data) {
       console.log(data.logmsg);
-      io.emit('setValueByClass', {
+      io.sockets.in(socket.room).emit('setValueByClass', {
    	   "presenter": user.email,
          "provider": user.provider,
          "params" : data
@@ -269,7 +305,7 @@ io.on('connection', function(socket){
 
    socket.on('setSavedState', function(data) {
       console.log(data);
-      io.emit('setSavedState', {
+      io.sockets.in(socket.room).emit('setSavedState', {
    	   "presenter": user.email,
          "provider": user.provider,
          "params" : data
@@ -279,7 +315,7 @@ io.on('connection', function(socket){
    // a simple collaboration event; just echo back what was sent with details of who sent it
    socket.on('c_event', function(data) {
       console.log(data);
-      io.emit(data.event, {
+      io.sockets.in(socket.room).emit(data.event, {
          "presenter": user.email,
          "provider": user.provider,
          "params" : data

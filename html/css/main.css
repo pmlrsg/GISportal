@@ -65,8 +65,13 @@ button, .btn{
 }
 
 .brand.extra-small{
-  font-size: 12px;
+  /*font-size: 12px;*/
   padding: 5px 15px;
+  font-weight: normal;
+  margin: 0px 4px 4px 0px;
+}
+.brand.extra-small span{
+  padding-right: 5px;
 }
 .brand.small{
   padding: 5px 15px;
@@ -74,6 +79,9 @@ button, .btn{
 
 .brand.secondary:active  {
    background-color: #59476d;
+}
+.brand.secondary.gray {
+   background-color: gray;
 }
 
 .secondary svg  {
