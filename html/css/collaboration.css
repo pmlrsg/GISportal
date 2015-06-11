@@ -98,7 +98,7 @@
    width: 10px;
    height: 10px;
    border-radius: 50%;
-   background: #fff;
+   background: #bbb;
 }
 
 .js-make-presenter:hover {
@@ -107,6 +107,8 @@
 .highlight-click {
     -webkit-animation: glow 0.25s 0.25s 2;
 }
+
+.js-collaboration-popup .overlay-container { width:auto;}
 
 @-webkit-keyframes glow {
     to {
