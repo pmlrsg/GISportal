@@ -296,7 +296,7 @@ gisportal.mapInit = function() {
       view: new ol.View({
          projection: gisportal.projection,
          center: [0, 0],
-         minZoom: 3,
+         minZoom: 2,
          maxZoom: 12,
          resolution: 0.175,
       }),

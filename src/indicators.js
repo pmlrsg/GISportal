@@ -543,7 +543,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
             if (data.selectedData) {
                indicator.style = data.selectedData.value;
                indicator.mergeNewParams({
-                  styles: data.selectedData.value
+                  STYLES: data.selectedData.value
                });
                gisportal.indicatorsPanel.scalebarTab(id);
             }
