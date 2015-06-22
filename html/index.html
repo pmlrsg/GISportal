@@ -36,7 +36,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
 <!-- OpenLayers Map Code -->
-<script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
+<script src="js-libs/OpenLayers3/ol-debug-pmlrsg.js" type="text/javascript"></script>
 
 <!-- D3 -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
@@ -116,6 +116,10 @@
 
    <!-- The Map -->
    <div id="map" class=""></div>
+   <div id="data-reading-popup" class="ol-popup">
+      <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
+      <div id="data-reading-popup-content"></div>
+   </div>
 
    <!-- The Timeline -->
    <div class="timeline-container">
