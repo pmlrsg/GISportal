@@ -30,6 +30,7 @@
       "html/css/mapcontrols.css",
       "html/js-libs/tooltipster/css/tooltipster.css",
       "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
-      "html/css/collaboration.css"
+      "html/css/collaboration.css",
+      "html/css/popup.css"
    ]
 }

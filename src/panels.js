@@ -13,7 +13,8 @@ gisportal.panels.initDOM = function() {
 };
 
 gisportal.panels.showPanel = function(panelName) {
-
+	gisportal.hideAllPopups();
+	
 	$('[data-panel-name="' + gisportal.panels.activePanel + '"]').removeClass('active');
 	$('[data-panel-name="' + panelName + '"]').addClass('active');
 	if (gisportal.panels.activePanel !== null) {

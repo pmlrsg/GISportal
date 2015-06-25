@@ -173,20 +173,3 @@ def rotate():
    except Exception, e:
       g.error = "Failed to rotate image. Error Message: " + str(e)
       abort(400)
-
-   
-"""
-Return a list of template files
-"""
-@portal_proxy.route('/templates')
-def templates(): 
-   this_dir = os.path.dirname(os.path.realpath(__file__))
-   template_dir = this_dir.replace('middleware/portalflask/views', 'html/templates')
-   templates_list = []
-
-   files_in_dir = os.listdir(template_dir)
-   for file_in_dir in files_in_dir:
-      templates_list.append(file_in_dir)
-
-   response = make_response(json.dumps(templates_list), 200)
-   return response

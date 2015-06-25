@@ -41,9 +41,6 @@
 <!-- D3 -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
 
-<!-- mustache -->
-<script type="text/javascript" src="js-libs/mustache/jquery.mustache.js"></script>
-
 <!-- Handlebars - Like mustache, but better. -->
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.4/handlebars.min.js"></script>
 
@@ -115,6 +112,10 @@
 
    <!-- The Map -->
    <div id="map" class=""></div>
+   <div id="data-reading-popup" class="ol-popup">
+      <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
+      <div id="data-reading-popup-content"></div>
+   </div>
 
    <!-- The Timeline -->
    <div class="timeline-container">

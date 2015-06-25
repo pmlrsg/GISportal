@@ -6,6 +6,7 @@ html/cache
 html/cache/*
 html/GISPortal.js
 html/css/GISPortal.css
+html/templates/all_templates.mst
 middleware/portalflask/settings.py
 config/*
 .DS_Store

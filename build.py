@@ -68,10 +68,10 @@ def report_sizes(t):
 virtual('build-all', 'build', 'doc')
 
 # normal build
-virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build')
+virtual('build', 'minjs', 'css', 'mincss', 'images', 'replace-build', 'templates')
 
 # dev build
-virtual('dev', 'js', 'css', 'images', 'replace-dev')
+virtual('dev', 'templates', 'js', 'css', 'images', 'replace-dev')
 
 # -----------------------------------------------------------------------------
 virtual('minjs', 'html/GISPortal.min.js')
@@ -182,6 +182,29 @@ virtual('replace-dev', 'replaceDev')
 @target('replaceDev', phony=True)
 def replaceDev(t):
    replacePath(t, 'dev')
+
+virtual('templates', 'build_templates')
+@target('build_templates', phony=True)
+def build_templates(t):
+   t.info('Building templates')
+   t_folder = os.path.join(dname, 'html/templates/')
+   t_file = os.path.join(t_folder, 'all_templates.mst')
+   try:
+      os.remove(t_file)
+   except Exception, e:
+      t.info('No existing template file to remove')
+   
+   templates = os.listdir(t_folder)
+
+   with open('html/templates/all_templates.mst', 'w') as outfile:
+      for template in templates:
+         outfile.write(template)
+         outfile.write('###')
+         with open(os.path.join(t_folder, template)) as infile:
+            for line in infile:
+               outfile.write(line)
+            outfile.write('#####')
+      
 
 def replacePath(t, env):
    t.info('Replacing paths')

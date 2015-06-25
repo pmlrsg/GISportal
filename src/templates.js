@@ -10,32 +10,25 @@ gisportal.templates = {};
  * @param  {Function} callback Callback on completion 
  */
 gisportal.loadTemplates = function( callback ){
-   var waitingFor = 0;
-   var callback = callback || function(){};
-
-   function compileTemplate( template, status, request ){
-      var templateName = request.fileName.substring( 0, request.fileName.length - 4 );
-      gisportal.templates[ templateName ] = Handlebars.compile( template );
-
-      waitingFor--;
-      if( waitingFor == 0 )
-         callback();
-   }
+	var callback = callback || function(){};
    
-   $.ajax({
-      url: '/service/templates',
-      success: function( data ){
-         var template_files = $.parseJSON(data);
-         for (var template in template_files) {
-            waitingFor++;
-            var request = $.ajax({
-               url: '/templates/' + template_files[template],
-               success: compileTemplate
-            });
-            request.fileName = template_files[template];
+   function compileTemplates(all_templates, status, request) {
+      var templates = all_templates.split('#####')
+      for (var i = 0; i< templates.length; i++) {
+         if (templates[i].length > 0) {
+            var t = templates[i].split('###')
+            var templateName = t[0].substring( 0, t[0].length - 4 );
+            gisportal.templates[ templateName ] = Handlebars.compile( t[1] );   
          }
       }
-   });
+      callback();
+   }
+
+   $.ajax({
+      url: 'templates/all_templates.mst',
+      success: compileTemplates
+   })
+
 };
 
 /**
