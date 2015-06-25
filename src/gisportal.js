@@ -281,7 +281,7 @@ gisportal.refreshDateCache = function() {
  * Sets up the map, plus its controls, layers, styling and events.
  */
 gisportal.mapInit = function() {
-   // these need to be declared using 'old school' getElementById or functions with the ol3 js don't work properly
+   // these need to be declared using 'old school' getElementById or functions within the ol3 js don't work properly
    var dataReadingPopupDiv = document.getElementById('data-reading-popup');
    var dataReadingPopupContent = document.getElementById('data-reading-popup-content');
    var dataReadingPopupCloser = document.getElementById('data-reading-popup-closer');
@@ -947,7 +947,6 @@ gisportal.getPointReading = function(e) {
 
    var elementId = '#dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
 
-   //for (var i = 0; i < gisportal.selectedLayers.length; i++) {
    $.each(gisportal.selectedLayers, function(i, selectedLayer) {
       var layer = gisportal.layers[selectedLayer];
       // build the request URL, starting with the WMS URL
@@ -961,7 +960,7 @@ gisportal.getPointReading = function(e) {
       } else {
          request += '&ELEVATION=0';
       }
-      request += '&TIME=' + gisportal.timeline.selectedDate.toISOString();
+      request += '&TIME=' + layer.selectedDateTime;
       request += '&TRANSPARENT=true';
       request += '&STYLES=boxfill/rainbow';
       request += '&CRS=EPSG:4326';
@@ -984,6 +983,7 @@ gisportal.getPointReading = function(e) {
       request += '&server='+ layer.wmsURL;
 
       var jqxhr = $.get(request, function(data) {
+         console.log(data);
          var value = data.documentElement.getElementsByTagName('value')[0].childNodes[0].nodeValue;
          if (value) {
             $(elementId +' .loading').remove();
@@ -997,4 +997,15 @@ gisportal.getPointReading = function(e) {
 
    });
    
+}
+
+/**
+ *  Hides all ol popups/overlays
+ */
+gisportal.hideAllPopups = function() {
+   var overlays = map.getOverlays().getArray();
+
+   $.each(overlays, function(i, overlay) {
+      overlay.setPosition(undefined);
+   })
 }
