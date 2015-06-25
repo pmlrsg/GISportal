@@ -30,6 +30,10 @@ gisportal.configurePanel.refreshData = function()  {
       this.renderTagsAsSelectlist();
    }
 
+
+   $('#configurePanel').bind('scroll', function() {
+     gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop())
+   })
 };
 
 /**
@@ -444,6 +448,9 @@ gisportal.configurePanel.searchInit = function()  {
       var searchBoxVal = $(this).val();
       if( currentSearchValue != searchBoxVal ){
          currentSearchValue = searchBoxVal;
+         
+         gisportal.events.trigger('search.typing', searchBoxVal);
+
          gisportal.configurePanel.search(searchBoxVal);
       }
    });
@@ -481,8 +488,17 @@ gisportal.configurePanel.search = function(val)  {
    $('.js-search-results a').click(function() {
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
       $('.js-search-results').css('display', 'none');   
+      gisportal.events.trigger('search.resultselected', $(this).text())
    });
    $('.js-search-results').css('display', 'block');
+   if (val == 'sombrero') {
+      $('#sb').find('audio')[0].play();
+      $('[class*="icon-"]').addClass('icon-sombrero');
+      $('[class*="icon-"]').addClass('jiggly');
+   } else {
+      $('[class*="icon-"]').removeClass('icon-sombrero');
+      $('[class*="icon-"]').removeClass('jiggly');
+   }
    var selected = [];
 
 };

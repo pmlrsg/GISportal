@@ -71,11 +71,25 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
-   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function() {
-      var id = $(this).data('id');
+   gisportal.indicatorsPanel.scalebarRangeChanged = function(changedElement) {
+      var id = changedElement.data('id');
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
+   }
+
+   $('.js-indicators').on('change', '.js-scale-min', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.min-set', $(this).data('id'), $(this).val()) 
+   });
+   $('.js-indicators').on('change', '.js-scale-max', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val()) 
+   });
+
+   $('.js-indicators').on('change', '.js-indicator-is-log', function() { 
+      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
+      gisportal.events.trigger('scalebar.log-set', $(this).data('id'), $(this).prop('checked')) 
    });
 
    //Auto scale range
@@ -84,12 +98,14 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.layers[id].autoScale = $(this).prop('checked');
 
       gisportal.scalebars.autoScale(id);
+      gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'))
    });
 
-   // Rest scale range
+   // Reset scale range
    $('.js-indicators').on('click', '.js-reset', function() {
       var id = $(this).data('id');
       gisportal.scalebars.resetScale(id);
+      gisportal.events.trigger('scale.reset', id);
    });
 
 
@@ -133,7 +149,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '#show_more', function(e) {
       e.preventDefault();
       if(gisportal.panelSlideout.isOut('metadata')){
-         gisportal.events.emit('metadata.close');
+         gisportal.events.trigger('metadata.close');
       }
       else {
          var indicator = $(this).closest('[data-name]').data('name');//('ul').siblings('.indicator-header').data('name');
@@ -150,11 +166,11 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    $('.js-indicators').on('click', '.indicator-overlay', function(){
-      gisportal.events.emit('metadata.close');
+      gisportal.events.trigger('metadata.close');
    });
 
    $('.metadata-slideout').on('click', '.js-close-extrainfo', function() {
-      gisportal.events.emit('metadata.close');
+      gisportal.events.trigger('metadata.close');
    });
 
    $('body').on('click', '.js-focus-on-build-graph-component', function(){
@@ -180,9 +196,21 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.indicatorsPanel.reorderLayers();
       }
    });
+
+
+   $('.js-indicators').on('click', '.js-select-layer-tab', function(){
+      var layerId = $(this).closest('[data-id]').data('id');
+      var tabName = $(this).closest('[data-tab-name]').data('tab-name');
+      gisportal.indicatorsPanel.selectTab( layerId, tabName );
+   });
+
+   $('#indicatorsPanel').bind('scroll', function() {
+     gisportal.events.trigger('indicatorspanel.scroll', $(this).scrollTop())
+   })
+
 };
 
-gisportal.events.on('metadata.close', function() {
+gisportal.events.bind('metadata.close', function() {
    $('.indicator-overlay').remove();
    gisportal.panelSlideout.closeSlideout('metadata');
 });
@@ -300,7 +328,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       maxWidth: 200
    });
 
-   gisportal.events.emit('layer.addtopanel', data)
+   gisportal.events.trigger('layer.addtopanel', data)
 };
 
 gisportal.indicatorsPanel.reorderLayers = function() {
@@ -331,6 +359,8 @@ gisportal.indicatorsPanel.reorderLayers = function() {
 
    gisportal.setCountryBordersToTopLayer();
    gisportal.selectionTools.setVectorLayerToTop();
+
+   gisportal.events.trigger('layer.reorder', layers);
 }
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
@@ -339,7 +369,7 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
 
-   gisportal.events.emit('layer.remove', id, gisportal.layers[id].name)
+   gisportal.events.trigger('layer.remove', id, gisportal.layers[id].name)
 };
 
 /* There is overlap here with configurePanel,
@@ -353,7 +383,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
       options.visible = true;
       gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
       
-      gisportal.events.emit('layer.select', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.select', id, gisportal.layers[id].name)
    }
 };
 
@@ -362,7 +392,7 @@ gisportal.indicatorsPanel.hideLayer = function(id) {
       gisportal.layers[id].setVisibility(false);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', false);
 
-      gisportal.events.emit('layer.hide', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.hide', id, gisportal.layers[id].name)
    }
 };
 
@@ -371,7 +401,7 @@ gisportal.indicatorsPanel.showLayer = function(id) {
       gisportal.layers[id].setVisibility(true);
       $('[data-id="' + id + '"] .indicator-header .js-toggleVisibility').toggleClass('active', true);
 
-      gisportal.events.emit('layer.show', id, gisportal.layers[id].name)
+      gisportal.events.trigger('layer.show', id, gisportal.layers[id].name)
    }
 };
 
@@ -491,7 +521,10 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       }
 
       $('#tab-' + indicator.id + '-opacity').on('slide', function() {
-         gisportal.layers[indicator.id].setOpacity( $(this).val() / 100 )
+         var opacity = $(this).val() / 100;
+
+         gisportal.events.trigger('scalebar.opacity', indicator.id, opacity)
+         gisportal.layers[indicator.id].setOpacity( opacity )
       });
 
       $('#tab-' + indicator.id + '-elevation').ddslick({

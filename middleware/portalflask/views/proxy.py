@@ -1,8 +1,10 @@
-from flask import Blueprint, abort, request, make_response, g, current_app, send_file, Response
+from flask import Blueprint, abort, request, make_response, g, current_app, send_file, Response, jsonify
 from portalflask.core import error_handler
 from PIL import Image
 import StringIO
 import io
+import os
+import json
 
 portal_proxy = Blueprint('portal_proxy', __name__)
 
@@ -171,5 +173,3 @@ def rotate():
    except Exception, e:
       g.error = "Failed to rotate image. Error Message: " + str(e)
       abort(400)
-
-   

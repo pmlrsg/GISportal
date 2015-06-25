@@ -1,3 +1,17 @@
+/*
+
+   ###    ##       ##           #######  ########    ######## ##     ## ####  ######     ##    ## ######## ######## ########   ######     ########  #######      ######    #######  
+  ## ##   ##       ##          ##     ## ##             ##    ##     ##  ##  ##    ##    ###   ## ##       ##       ##     ## ##    ##       ##    ##     ##    ##    ##  ##     ## 
+ ##   ##  ##       ##          ##     ## ##             ##    ##     ##  ##  ##          ####  ## ##       ##       ##     ## ##             ##    ##     ##    ##        ##     ## 
+##     ## ##       ##          ##     ## ######         ##    #########  ##   ######     ## ## ## ######   ######   ##     ##  ######        ##    ##     ##    ##   #### ##     ## 
+######### ##       ##          ##     ## ##             ##    ##     ##  ##        ##    ##  #### ##       ##       ##     ##       ##       ##    ##     ##    ##    ##  ##     ## 
+##     ## ##       ##          ##     ## ##             ##    ##     ##  ##  ##    ##    ##   ### ##       ##       ##     ## ##    ##       ##    ##     ##    ##    ##  ##     ## 
+##     ## ######## ########     #######  ##             ##    ##     ## ####  ######     ##    ## ######## ######## ########   ######        ##     #######      ######    #######  
+
+It's badly written and overly complicated; it really belongs in indicators.js when the indicator.mst template is rendered.
+
+ */
+
 /*------------------------------------*\
    ui.js
    This is an alternative entry point
@@ -15,6 +29,8 @@ $(document).ready(function()  {
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
+
+      gisportal.events.trigger('tab.select', layerId, tabName);
    });
    $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);
@@ -40,7 +56,7 @@ function changeTab( tabElement )  {
   });
   $('[for="' + e.id + '"]').addClass('active');
 
-  gisportal.events.emit('metadata.close');
+  gisportal.events.trigger('metadata.close');
 
 }
 
@@ -64,7 +80,7 @@ function closeTab(){
     };
     e.bind('mouseup',up);
     e.one('mouseout', unbind);
-    gisportal.events.emit('metadata.close');
+    gisportal.events.trigger('metadata.close');
   }
 }
 

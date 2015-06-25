@@ -17,10 +17,10 @@
 }
 
 .share  {
-   background-color: rgba(0,0,0,0.8);
+   
 }
 
-.share-container  {
+/*.share-container  {
    background-color: #32273d;
    color: #f7f6f8;
    padding: 25px;
@@ -30,7 +30,7 @@
    color: #f7f6f8;
    float: right;
 }
-
+*/
 .js-shareurl  {
    padding: 5px;
    margin-top: 5px;

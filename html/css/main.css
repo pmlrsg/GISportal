@@ -65,8 +65,13 @@ button, .btn{
 }
 
 .brand.extra-small{
-  font-size: 12px;
+  /*font-size: 12px;*/
   padding: 5px 15px;
+  font-weight: normal;
+  margin: 0px 4px 4px 0px;
+}
+.brand.extra-small span{
+  padding-right: 5px;
 }
 .brand.small{
   padding: 5px 15px;
@@ -74,6 +79,9 @@ button, .btn{
 
 .brand.secondary:active  {
    background-color: #59476d;
+}
+.brand.secondary.gray {
+   background-color: gray;
 }
 
 .secondary svg  {
@@ -272,4 +280,5 @@ dd { width: 200px; float: left; }
 .dd-option-image, .dd-selected-image { vertical-align:middle; float:left; margin-right:5px; max-width:64px;}
 .dd-option-icon { font-size: 17px; line-height: 19px; margin-right: 5px; }
 .dd-image-right { float:right; margin-right:15px; margin-left:5px;}
-.dd-container{ position:relative; margin-bottom:10px;}​ .dd-selected-text { font-weight:bold}​
+.dd-container{ position:relative; margin-bottom:10px;}​ .dd-selected-text { font-weight:bold; }​
+

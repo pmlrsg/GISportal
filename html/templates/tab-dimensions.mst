@@ -4,20 +4,22 @@
       <div class="clearfix">
          <div class="pull-left scale-editor">
             <b>Min:</b>
-            <input class="js-scale-min grid-cell" placeholder="Min" value="{{minScaleVal}}" data-id="{{id}}">
+            <input class="js-scale-min grid-cell" placeholder="Min" value="{{minScaleVal}}" data-id="{{id}}" />
          </div>
          <div class="pull-right scale-editor">
             <b>Max:</b>
-            <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}">
+            <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}" />
          </div>
      </div>
-   <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" class="js-indicator-is-log" data-id="{{id}}">
-   <label for="tab-{{id}}-log">Logarithmic</label>
-   <label>
+   <label for="tab-{{id}}-log">
+      <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" class="js-indicator-is-log" data-id="{{id}}" />
+      Logarithmic
+   </label>
+   <label for="tab-{{id}}-autoScale">
       <input type="checkbox" {{#if autoScale}}checked{{/if}} id="tab-{{id}}-autoScale" class="js-auto" data-id="{{id}}" />
       Auto Scale
    </label>
-   <a class="js-reset text-button" data-id="{{id}}">Reset</a>
+   <a class="js-reset text-button" data-id="{{id}}" id="scale-reset-{{id}}"><span>Reset</span></a>
 
    <div class="indicator-options"> 
       <div class="indicator-option">

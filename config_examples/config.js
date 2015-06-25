@@ -45,9 +45,17 @@ gisportal.config = {
    defaultBaseMap: 'EOX',
    showGraticules: true,                           // (true|false)   Display latitude and longitude lines on the map
    
+   collaborationFeatures : {
+      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      port : '',                                    // must match the port specified in collaboration/config/config.js
+      path : '',                                    // optional path; must start with a /
+   },
    // Should layers auto scale by default
    autoScale: true,
 
+   requiresTermsAndCondictions: true,
 
    homepageSlides: [
       "img/homepage-slides/opec1.jpg",
