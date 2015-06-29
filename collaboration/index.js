@@ -224,7 +224,8 @@ io.on('connection', function(socket){
          "id": socket.id,
          "email": user.email,
          "name": user.name,
-         "presenter": true
+         "presenter": true,
+         "owner": true
       }]
       socket.room = roomId;
 	   socket.join(socket.room, function() {
@@ -248,7 +249,8 @@ io.on('connection', function(socket){
                "id": socket.id,
                "email": user.email,
                "name": user.name,
-               "presenter": false
+               "presenter": false,
+               "owner": false
             }
             rooms[roomId].push(member);
 
