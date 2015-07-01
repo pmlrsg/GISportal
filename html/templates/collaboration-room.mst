@@ -10,6 +10,6 @@
 {{#people}}
 <div data-id="{{id}}" class="person">
    {{#presenter}}<div class="presenter"></div>{{/presenter}}
-   {{name}} ({{email}})
+   {{name}} ({{email}}) <span class="pull-right rtc-control"></span>
 </div>
 {{/people}}

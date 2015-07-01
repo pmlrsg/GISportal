@@ -324,6 +324,11 @@ io.on('connection', function(socket){
       })
    }) 
 
+   socket.on('RTCmessage', function(data) {
+      console.log(data);
+      io.sockets.in(socket.room).emit('RTCmessage', data)
+   })
+
 
 });
 
