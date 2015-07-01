@@ -144,6 +144,7 @@ collaboration.initSession = function() {
                   if (data.people[p].presenter && data.people[p].id == socket.io.engine.id) {
                      collaboration.role = "presenter";
                      collaboration.setStatus('connected', 'Connected. You are the presenter');
+                     $('.overlay-message').text('You are now the presenter');
                      $('.js-collaboration-popup').toggleClass('hidden', false);
                      setTimeout(function() {
                         $('.js-collaboration-popup').toggleClass('hidden', true)
@@ -695,6 +696,9 @@ function handleUserMediaError(error) {
 
 function maybeStart() {
    if (!isStarted && localStream && isChannelReady) {
+      // show the videos and controls
+      $('.collaboration-video').toggleClass('hidden', false);
+
       createPeerConnection();
       peerConn.addStream(localStream);
       isStarted = true;
@@ -725,69 +729,7 @@ function createPeerConnection() {
    peerConn.onaddstream = handleRemoteStreamAdded;
    peerConn.onremovestream = handleRemoteStreamRemoved;
 
-   // if (isInitiator) {
-   //    try {
-   //       // Reliable Data Channels not yet supported in Chrome
-   //       sendChannel = peerConn.createDataChannel("sendDataChannel", {
-   //          reliable: false
-   //       });
-   //       sendChannel.onmessage = handleMessage;
-   //       trace('Created send data channel');
-   //    } catch (e) {
-   //       alert('Failed to create data channel. ' +
-   //          'You need Chrome M25 or later with RtpDataChannel enabled');
-   //       trace('createDataChannel() failed with exception: ' + e.message);
-   //    }
-   //    sendChannel.onopen = handleSendChannelStateChange;
-   //    sendChannel.onclose = handleSendChannelStateChange;
-   // } else {
-   //    peerConn.ondatachannel = gotReceiveChannel;
-   // }
 }
-
-// function sendData() {
-//    var data = sendTextarea.value;
-//    sendChannel.send(data);
-//    trace('Sent data: ' + data);
-// }
-
-
-// function gotReceiveChannel(event) {
-//    trace('Receive Channel Callback');
-//    sendChannel = event.channel;
-//    sendChannel.onmessage = handleMessage;
-//    sendChannel.onopen = handleReceiveChannelStateChange;
-//    sendChannel.onclose = handleReceiveChannelStateChange;
-// }
-
-// function handleMessage(event) {
-//    trace('Received message: ' + event.data);
-//    receiveTextarea.value = event.data;
-// }
-
-// function handleSendChannelStateChange() {
-//    var readyState = sendChannel.readyState;
-//    trace('Send channel state is: ' + readyState);
-//    enableMessageInterface(readyState == "open");
-// }
-
-// function handleReceiveChannelStateChange() {
-//    var readyState = sendChannel.readyState;
-//    trace('Receive channel state is: ' + readyState);
-//    enableMessageInterface(readyState == "open");
-// }
-
-// function enableMessageInterface(shouldEnable) {
-//    if (shouldEnable) {
-//       dataChannelSend.disabled = false;
-//       dataChannelSend.focus();
-//       dataChannelSend.placeholder = "";
-//       sendButton.disabled = false;
-//    } else {
-//       dataChannelSend.disabled = true;
-//       sendButton.disabled = true;
-//    }
-// }
 
 function handleIceCandidate(event) {
    console.log('handleIceCandidate event: ', event);
@@ -894,6 +836,12 @@ function hangup() {
 
 function handleRemoteHangup() {
    console.log('Session terminated.');
+   $('.collaboration-video').toggleClass('hidden', true);
+   $('.overlay-message').text('Call ended');
+   $('.js-collaboration-popup').toggleClass('hidden', false);
+   setTimeout(function() {
+      $('.js-collaboration-popup').toggleClass('hidden', true)
+   }, 2000);
    stop();
    isInitiator = false;
 }

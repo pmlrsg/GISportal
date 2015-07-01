@@ -288,7 +288,7 @@
 
    <div class="overlay js-collaboration-popup hidden">
       <div class="overlay-container">
-         <h2>You are now the presenter</h2>
+         <h2 class="overlay-message"></h2>
       </div>
    </div>
 
@@ -305,8 +305,19 @@
    <div class="global-loading-icon">
    </div>
 
-   <video id="localVideo" autoplay muted width="150"></video>
-   <video id="remoteVideo" autoplay controls></video>
+   <div class="collaboration-video hidden">
+      <video id="localVideo" autoplay muted width="150"></video>
+      <video id="remoteVideo" autoplay></video>
+
+      <div class="video-controls-holder">
+         <div class="video-controls">
+            <span class="icon-webcam" title="Turn off video"></span>
+            <span class="icon-volume-mute-1" title="Mute microphone"></span>
+            <span class="icon-scale-reduce-2" title="Small screen"></span>
+            <span class="icon-delete-2-1" title="End call"></span>
+         </div>
+      </div>
+   </div>
 
    <div class="helpBox">
    <script>

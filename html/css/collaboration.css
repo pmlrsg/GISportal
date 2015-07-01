@@ -181,11 +181,21 @@
    }
 }
 
-#localVideo {
+.collaboration-video {
    position: absolute;
    top: 70px;
    right: 25px;
+   width: 640px;
+   height: 480px;
+}
+
+.collaboration-video video {
    border: 2px solid #fff;
+}
+#localVideo {
+   position: absolute;
+   top: 0px;
+   right: 0px;
    z-index: 1000;
    -moz-transform: scaleX(-1);
    -o-transform: scaleX(-1);
@@ -197,8 +207,29 @@
 
 #remoteVideo {
    position: absolute;
-   top: 70px;
-   right: 25px;
-   border: 2px solid #fff;
+   top: 0px;
+   right: 0px;
    z-index: 999;
+}
+
+.video-controls-holder {
+   position: absolute;
+   bottom: 10px;
+   text-align: center;
+   width: 100%;   
+   z-index: 1001;
+}
+
+.video-controls {
+   margin: 0 auto;
+   background: rgba(0, 0, 0, 0.8);
+   color: #fff;
+   font-size: 20px;
+   display: inline;
+   padding: 10px 15px 10px 20px;
+   border-radius: 4px;
+}
+
+.video-controls span {
+   margin-right: 5px;
 }
