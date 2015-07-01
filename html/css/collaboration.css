@@ -185,11 +185,20 @@
    position: absolute;
    top: 70px;
    right: 25px;
-   width: 150px;
+   border: 2px solid #fff;
+   z-index: 1000;
    -moz-transform: scaleX(-1);
    -o-transform: scaleX(-1);
    -webkit-transform: scaleX(-1);
    transform: scaleX(-1);
    filter: FlipH;
    -ms-filter: "FlipH";
+}
+
+#remoteVideo {
+   position: absolute;
+   top: 70px;
+   right: 25px;
+   border: 2px solid #fff;
+   z-index: 999;
 }

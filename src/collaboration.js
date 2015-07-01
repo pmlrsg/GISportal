@@ -103,6 +103,8 @@ collaboration.initSession = function() {
 
                // load the room template
                collaboration.buildMembersList(data);
+
+               isInitiator = true;
             });
 
             socket.on('room.member-joined', function(data) {
@@ -113,6 +115,8 @@ collaboration.initSession = function() {
                   collaboration.roomId = data.roomId;
                   collaboration.role = 'member';
                   collaboration.setStatus('connected', 'Connected. You are in room ' + data.roomId.toUpperCase());
+
+                  isChannelReady = true;
                }
 
                // if I am the presenter send my state so that the new member can catch up
@@ -514,9 +518,9 @@ collaboration.buildMembersList = function(data) {
    }
 
    // call button
-   $('.js-start-call').click(function() {
+   $('.js-start-rtc').click(function() {
       var id = $(this).parent().data('id');
-      collaboration.startRTC(id);
+      collaboration.initWebRTC();
    })
 }
 
@@ -600,7 +604,6 @@ collaboration.initWebRTC = function() {
       }]
    };
 
-   
    var constraints = {
       video: true,
       audio: true
@@ -674,6 +677,7 @@ function sendMessage(message){
 function handleUserMedia(stream) {
    localStream = stream;
    attachMediaStream(localVideo, stream);
+   isChannelReady = true;
    console.log('Adding local stream.');
    sendMessage('got user media');
    if (isInitiator) {
@@ -685,14 +689,14 @@ function handleUserMediaError(error) {
    console.log('getUserMedia error: ', error);
 }
 
-if (location.hostname != "localhost") {
-   requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
-}
+// if (location.hostname != "localhost") {
+//    requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
+// }
 
 function maybeStart() {
    if (!isStarted && localStream && isChannelReady) {
       createPeerConnection();
-      pc.addStream(localStream);
+      peerConn.addStream(localStream);
       isStarted = true;
       if (isInitiator) {
          doCall();
@@ -708,8 +712,8 @@ window.onbeforeunload = function(e) {
 
 function createPeerConnection() {
    try {
-      pc = new RTCPeerConnection(pc_config, pc_constraints);
-      pc.onicecandidate = handleIceCandidate;
+      peerConn = new RTCPeerConnection(pc_config, pc_constraints);
+      peerConn.onicecandidate = handleIceCandidate;
       console.log('Created RTCPeerConnnection with:\n' +
          '  config: \'' + JSON.stringify(pc_config) + '\';\n' +
          '  constraints: \'' + JSON.stringify(pc_constraints) + '\'.');
@@ -718,91 +722,72 @@ function createPeerConnection() {
       alert('Cannot create RTCPeerConnection object.');
       return;
    }
-   pc.onaddstream = handleRemoteStreamAdded;
-   pc.onremovestream = handleRemoteStreamRemoved;
+   peerConn.onaddstream = handleRemoteStreamAdded;
+   peerConn.onremovestream = handleRemoteStreamRemoved;
 
-   if (isInitiator) {
-      try {
-         // Reliable Data Channels not yet supported in Chrome
-         sendChannel = pc.createDataChannel("sendDataChannel", {
-            reliable: false
-         });
-         sendChannel.onmessage = handleMessage;
-         trace('Created send data channel');
-      } catch (e) {
-         alert('Failed to create data channel. ' +
-            'You need Chrome M25 or later with RtpDataChannel enabled');
-         trace('createDataChannel() failed with exception: ' + e.message);
-      }
-      sendChannel.onopen = handleSendChannelStateChange;
-      sendChannel.onclose = handleSendChannelStateChange;
-   } else {
-      pc.ondatachannel = gotReceiveChannel;
-   }
+   // if (isInitiator) {
+   //    try {
+   //       // Reliable Data Channels not yet supported in Chrome
+   //       sendChannel = peerConn.createDataChannel("sendDataChannel", {
+   //          reliable: false
+   //       });
+   //       sendChannel.onmessage = handleMessage;
+   //       trace('Created send data channel');
+   //    } catch (e) {
+   //       alert('Failed to create data channel. ' +
+   //          'You need Chrome M25 or later with RtpDataChannel enabled');
+   //       trace('createDataChannel() failed with exception: ' + e.message);
+   //    }
+   //    sendChannel.onopen = handleSendChannelStateChange;
+   //    sendChannel.onclose = handleSendChannelStateChange;
+   // } else {
+   //    peerConn.ondatachannel = gotReceiveChannel;
+   // }
 }
 
-function sendData() {
-   var data = sendTextarea.value;
-   sendChannel.send(data);
-   trace('Sent data: ' + data);
-}
-
-// function closeDataChannels() {
-//   trace('Closing data channels');
-//   sendChannel.close();
-//   trace('Closed data channel with label: ' + sendChannel.label);
-//   receiveChannel.close();
-//   trace('Closed data channel with label: ' + receiveChannel.label);
-//   localPeerConnection.close();
-//   remotePeerConnection.close();
-//   localPeerConnection = null;
-//   remotePeerConnection = null;
-//   trace('Closed peer connections');
-//   startButton.disabled = false;
-//   sendButton.disabled = true;
-//   closeButton.disabled = true;
-//   dataChannelSend.value = "";
-//   dataChannelReceive.value = "";
-//   dataChannelSend.disabled = true;
-//   dataChannelSend.placeholder = "Press Start, enter some text, then press Send.";
+// function sendData() {
+//    var data = sendTextarea.value;
+//    sendChannel.send(data);
+//    trace('Sent data: ' + data);
 // }
 
-function gotReceiveChannel(event) {
-   trace('Receive Channel Callback');
-   sendChannel = event.channel;
-   sendChannel.onmessage = handleMessage;
-   sendChannel.onopen = handleReceiveChannelStateChange;
-   sendChannel.onclose = handleReceiveChannelStateChange;
-}
 
-function handleMessage(event) {
-   trace('Received message: ' + event.data);
-   receiveTextarea.value = event.data;
-}
+// function gotReceiveChannel(event) {
+//    trace('Receive Channel Callback');
+//    sendChannel = event.channel;
+//    sendChannel.onmessage = handleMessage;
+//    sendChannel.onopen = handleReceiveChannelStateChange;
+//    sendChannel.onclose = handleReceiveChannelStateChange;
+// }
 
-function handleSendChannelStateChange() {
-   var readyState = sendChannel.readyState;
-   trace('Send channel state is: ' + readyState);
-   enableMessageInterface(readyState == "open");
-}
+// function handleMessage(event) {
+//    trace('Received message: ' + event.data);
+//    receiveTextarea.value = event.data;
+// }
 
-function handleReceiveChannelStateChange() {
-   var readyState = sendChannel.readyState;
-   trace('Receive channel state is: ' + readyState);
-   enableMessageInterface(readyState == "open");
-}
+// function handleSendChannelStateChange() {
+//    var readyState = sendChannel.readyState;
+//    trace('Send channel state is: ' + readyState);
+//    enableMessageInterface(readyState == "open");
+// }
 
-function enableMessageInterface(shouldEnable) {
-   if (shouldEnable) {
-      dataChannelSend.disabled = false;
-      dataChannelSend.focus();
-      dataChannelSend.placeholder = "";
-      sendButton.disabled = false;
-   } else {
-      dataChannelSend.disabled = true;
-      sendButton.disabled = true;
-   }
-}
+// function handleReceiveChannelStateChange() {
+//    var readyState = sendChannel.readyState;
+//    trace('Receive channel state is: ' + readyState);
+//    enableMessageInterface(readyState == "open");
+// }
+
+// function enableMessageInterface(shouldEnable) {
+//    if (shouldEnable) {
+//       dataChannelSend.disabled = false;
+//       dataChannelSend.focus();
+//       dataChannelSend.placeholder = "";
+//       sendButton.disabled = false;
+//    } else {
+//       dataChannelSend.disabled = true;
+//       sendButton.disabled = true;
+//    }
+// }
 
 function handleIceCandidate(event) {
    console.log('handleIceCandidate event: ', event);
@@ -836,12 +821,12 @@ function doCall() {
    constraints = mergeConstraints(constraints, sdpConstraints);
    console.log('Sending offer to peer, with constraints: \n' +
       '  \'' + JSON.stringify(constraints) + '\'.');
-   pc.createOffer(setLocalAndSendMessage, null, constraints);
+   peerConn.createOffer(setLocalAndSendMessage, null, constraints);
 }
 
 function doAnswer() {
    console.log('Sending answer to peer.');
-   pc.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+   peerConn.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
 }
 
 function mergeConstraints(cons1, cons2) {
@@ -856,7 +841,7 @@ function mergeConstraints(cons1, cons2) {
 function setLocalAndSendMessage(sessionDescription) {
    // Set Opus as the preferred codec in SDP if Opus is present.
    sessionDescription.sdp = preferOpus(sessionDescription.sdp);
-   pc.setLocalDescription(sessionDescription);
+   peerConn.setLocalDescription(sessionDescription);
    sendMessage(sessionDescription);
 }
 
@@ -917,8 +902,8 @@ function stop() {
    isStarted = false;
    // isAudioMuted = false;
    // isVideoMuted = false;
-   pc.close();
-   pc = null;
+   peerConn.close();
+   peerConn = null;
 }
 
 ///////////////////////////////////////////
@@ -998,98 +983,3 @@ function removeCN(sdpLines, mLineIndex) {
    return sdpLines;
 }
 
-// // User Media
-
-// collaboration.grabMedia = function() {
-//    console.log('Getting user media (video) ...');
-//    getUserMedia({
-//       video: true
-//    }, collaboration.getMediaSuccessCallback, collaboration.getMediaErrorCallback);
-// }
-
-// collaboration.getMediaSuccessCallback = function(stream) {
-//    var streamURL = window.URL.createObjectURL(stream);
-//    console.log('getUserMedia video stream URL:', streamURL);
-//    window.stream = stream; // stream available to console
-
-//    collaboration.localVideo.src = streamURL;
-// }
-
-// collaboration.getMediaErrorCallback = function(error) {
-//    console.log("getUserMedia error:", error);
-// }
-
-// /**************************************************************************** 
-//  * WebRTC peer connection and data channel
-//  ****************************************************************************/
-
-// var peerConn;
-// var dataChannel;
-// var isInitiator = false;
-
-// collaboration.RTCMessageCallback = function(message) {
-//    if (message.type === 'offer' && isInitiator === false) {
-//       console.log('Got offer. Sending answer to peer.');
-//       peerConn.setRemoteDescription(new RTCSessionDescription(message), function() {}, logError);
-//       peerConn.createAnswer(collaboration.onLocalSessionCreated, logError);
-
-//    } else if (message.type === 'answer') {
-//       console.log('Got answer.');
-//       peerConn.setRemoteDescription(new RTCSessionDescription(message), function() {}, logError);
-
-//    } else if (message.type === 'candidate') {
-//       peerConn.addIceCandidate(new RTCIceCandidate({
-//          candidate: message.candidate
-//       }));
-
-//    } else if (message === 'bye') {
-//       // TODO: cleanup RTC connection?
-//    }
-// }
-
-// collaboration.createPeerConnection = function(isInitiator, config) {
-//    console.log('Creating Peer connection as initiator?', isInitiator, 'config:', config);
-//    peerConn = new RTCPeerConnection(config);
-
-//    // send any ice candidates to the other peer
-//    peerConn.onicecandidate = function(event) {
-//       console.log('onIceCandidate event:', event);
-//       if (event.candidate) {
-//          collaboration._emit('RTCmessage', {
-//             type: 'candidate',
-//             label: event.candidate.sdpMLineIndex,
-//             id: event.candidate.sdpMid,
-//             candidate: event.candidate.candidate
-//          }, true);
-//       } else {
-//          console.log('End of candidates.');
-//       }
-//    };
-
-//    if (isInitiator) {
-//       // console.log('Creating Data Channel');
-//       // dataChannel = peerConn.createDataChannel("photos");
-//       // onDataChannelCreated(dataChannel);
-
-//       console.log('Creating an offer');
-//       peerConn.createOffer(collaboration.onLocalSessionCreated, logError);
-//    } else {
-//       // peerConn.ondatachannel = function (event) {
-//       //     console.log('ondatachannel:', event.channel);
-//       //     dataChannel = event.channel;
-//       //     onDataChannelCreated(dataChannel);
-//       //};
-//    }
-// }
-
-// collaboration.onLocalSessionCreated = function(desc) {
-//    console.log('local session created:', desc);
-//    peerConn.setLocalDescription(desc, function() {
-//       console.log('sending local desc:', peerConn.localDescription);
-//       collaboration._emit('RTCmessage', peerConn.localDescription, true);
-//    }, logError);
-// }
-
-// function logError(err) {
-//    console.log(err.toString(), err);
-// }
