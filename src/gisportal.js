@@ -522,12 +522,6 @@ gisportal.loadState = function(state) {
       gisportal.vectorLayer.getSource().addFeatures(features);
    }
    
-   // Load Quick Regions
-   if (stateMap.regions) {
-      gisportal.quickRegion = stateMap.regions;
-      gisportal.quickRegions.setup();
-   }
-
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
       if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
