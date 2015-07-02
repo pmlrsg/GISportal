@@ -139,10 +139,7 @@ collaboration.initSession = function() {
                if (data.people[p].presenter && data.people[p].id == socket.io.engine.id) {
                   collaboration.role = "presenter";
                   collaboration.setStatus('connected', 'Connected. You are the presenter');
-                  $('.js-collaboration-popup').toggleClass('hidden', false);
-                  setTimeout(function() {
-                     $('.js-collaboration-popup').toggleClass('hidden', true)
-                  }, 2000);
+                  gisportal.showModalMessage('You are now the presenter');
                   break;
                } else {
                   collaboration.role = "member";
