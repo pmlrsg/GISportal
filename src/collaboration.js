@@ -609,6 +609,42 @@ collaboration.initWebRTC = function() {
    getUserMedia(constraints, handleUserMedia, handleUserMediaError);
    console.log('Getting user media with constraints', constraints);
 
+   $('.js-toggle-webcam').on('click', function() {
+      var localStreams = peerConn.getLocalStreams()[0];
+      var video = localStreams.getVideoTracks()[0]
+      video.enabled = !video.enabled;
+
+      $(this).toggleClass('active', video.enabled);
+      $(this).toggleClass('disabled', !video.enabled);
+      if (video.enabled) {
+         $(this).attr('title', 'Webcam enabled; click to turn off');
+      } else {
+         $(this).attr('title', 'Webcam disabled; click to turn on');
+      }
+   });
+
+   $('.js-toggle-microphone').on('click', function() {
+      var localStreams = peerConn.getLocalStreams()[0];
+      var mic = localStreams.getAudioTracks()[0]
+      mic.enabled = !mic.enabled;
+
+      $(this).toggleClass('active', mic.enabled);
+      $(this).toggleClass('disabled', !mic.enabled);
+      if (mic.enabled) {
+         $(this).attr('title', 'Microphone on; click to mute');
+         $(this).toggleClass('icon-volume-medium-1', true);
+         $(this).toggleClass('icon-volume-mute-1', false);
+      } else {
+         $(this).attr('title', 'Microphone muted; click to un-mute');
+         $(this).toggleClass('icon-volume-medium-1', false);
+         $(this).toggleClass('icon-volume-mute-1', true);
+      }
+   });
+
+   $('.js-end-webrtc-call').on('click', function() { 
+      hangup() 
+   });
+
 }
 var pc_config = webrtcDetectedBrowser === 'firefox' ? {
       'iceServers': [{
@@ -652,7 +688,9 @@ collaboration.RTCMessageCallback = function(message) {
          maybeStart();
       }
       peerConn.setRemoteDescription(new RTCSessionDescription(message));
-      doAnswer();
+      if (!isInitiator) {
+         acceptIncomingCall(message.caller);
+      }
    } else if (message.type === 'answer' && isStarted) {
       peerConn.setRemoteDescription(new RTCSessionDescription(message));
    } else if (message.type === 'candidate' && isStarted) {
@@ -692,14 +730,13 @@ function handleUserMediaError(error) {
 
 function maybeStart() {
    if (!isStarted && localStream && isChannelReady) {
-      // show the videos and controls
-      $('.collaboration-video').toggleClass('hidden', false);
-
       createPeerConnection();
       peerConn.addStream(localStream);
       isStarted = true;
       if (isInitiator) {
          doCall();
+         // show the videos and controls
+         $('.collaboration-video').toggleClass('hidden', false);
       }
    }
 }
@@ -762,6 +799,26 @@ function doCall() {
    peerConn.createOffer(setLocalAndSendMessage, null, constraints);
 }
 
+function acceptIncomingCall(caller) {
+   var data = {
+      caller: 'caller'
+   }
+   var rendered = gisportal.templates['webrtc-inbound-call'](data)
+   gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
+
+   $('.js-answer-webrtc-call').click(function() { 
+      // hide the message
+      gisportal.hideModalMessage();
+      // show the videos and controls
+      $('.collaboration-video').toggleClass('hidden', false);
+      // actually answer the call
+      doAnswer(); 
+   });
+   $('.js-reject-webrtc-call').click(function() { 
+      gisportal.hideModalMessage();
+      hangup();
+   });
+}
 function doAnswer() {
    console.log('Sending answer to peer.');
    peerConn.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
@@ -833,16 +890,15 @@ function hangup() {
 function handleRemoteHangup() {
    console.log('Session terminated.');
    $('.collaboration-video').toggleClass('hidden', true);
-   $('.overlay-message').text('Call ended');
-   $('.js-collaboration-popup').toggleClass('hidden', false);
-   setTimeout(function() {
-      $('.js-collaboration-popup').toggleClass('hidden', true)
-   }, 2000);
+   
    stop();
    isInitiator = false;
 }
 
 function stop() {
+   $('.collaboration-video').toggleClass('hidden', true);
+   gisportal.showModalMessage('Call ended');
+
    isStarted = false;
    // isAudioMuted = false;
    // isVideoMuted = false;

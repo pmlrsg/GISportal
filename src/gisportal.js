@@ -1030,3 +1030,7 @@ gisportal.showModalMessage = function(html, timeout) {
       holder.toggleClass('hidden', true)
    }, t);
 }
+
+gisportal.hideModalMessage = function() {
+   $('.js-modal-message-popup').toggleClass('hidden', true);
+}

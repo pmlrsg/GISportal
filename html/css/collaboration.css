@@ -192,6 +192,7 @@
 .collaboration-video video {
    border: 2px solid #fff;
 }
+
 #localVideo {
    position: absolute;
    top: 0px;
@@ -216,7 +217,7 @@
    position: absolute;
    bottom: 10px;
    text-align: center;
-   width: 100%;   
+   width: 100%;
    z-index: 1001;
 }
 
@@ -232,4 +233,34 @@
 
 .video-controls span {
    margin-right: 5px;
+   cursor: pointer;
+}
+
+.video-controls .active {
+   color: rgb(28, 218, 28);
+}
+
+.video-controls .disabled {
+   color: rgb(255, 0, 0);
+}
+
+.accpet-reject-buttons {
+   text-align: center;
+   margin-top: 20px;
+}
+.accpet-reject-buttons button {
+   font-size: 20px;
+   margin: 0px 10px;
+}
+
+.accpet-reject-buttons span {
+   margin-right: 12px;
+}
+
+.js-answer-webrtc-call {
+   background-color: #080;
+}
+
+.js-reject-webrtc-call {
+   background-color: #900;
 }

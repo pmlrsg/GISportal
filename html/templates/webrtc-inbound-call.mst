@@ -1,0 +1,5 @@
+<p>{{caller}} is calling</p>
+<div class="accpet-reject-buttons">
+<button class="button js-answer-webrtc-call brand secondary"><span class="icon-call-3"></span>Answer</button>
+<button class="button js-reject-webrtc-call brand secondary"><span class="icon-hang-up"></span>Reject</button>
+</p>
