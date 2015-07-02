@@ -522,12 +522,6 @@ gisportal.loadState = function(state) {
       gisportal.vectorLayer.getSource().addFeatures(features);
    }
    
-   // Load Quick Regions
-   if (stateMap.regions) {
-      gisportal.quickRegion = stateMap.regions;
-      gisportal.quickRegions.setup();
-   }
-
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
       if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
@@ -1023,4 +1017,16 @@ gisportal.hideAllPopups = function() {
    $.each(overlays, function(i, overlay) {
       overlay.setPosition(undefined);
    })
+}
+
+gisportal.showModalMessage = function(html, timeout) {
+   var t = parseInt(timeout) || 2000;
+   var holder = $('.js-modal-message-popup');
+   var target = $('.js-modal-message-html');
+
+   target.html(html);
+   holder.toggleClass('hidden', false);
+   setTimeout(function() {
+      holder.toggleClass('hidden', true)
+   }, t);
 }
