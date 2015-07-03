@@ -35,6 +35,7 @@
       "src/ddslick.js",
       "src/collaboration.js",
       "src/collaboration-event-bindings.js",
-      "src/webrtc_adapter.js"
+      "src/webrtc_adapter.js",
+      "src/webrtc_control.js"
    ]
 }
