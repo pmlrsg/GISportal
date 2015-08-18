@@ -33,7 +33,7 @@ MARKDOWN_DIR = '../markdown'
 MARKDOWN_SUFFIX = '.md'
 
 PRODUCTFILTER = "productFilter.csv"
-LAYERFILTER = "layerFilter.csv"
+LAYERFILTER = "/users/rsg/olcl/scratch/portal_rsg/GISportal/config/layerFilter.csv"
 
 dirtyCaches = [] # List of caches that may need recreating
 #extraInfo = wmsLayerTags.layers
@@ -69,7 +69,8 @@ def createCache(server, capabilitiesXML, coverageXML):
    
    # Save out the xml file for later
    utils.saveFile(SERVERCACHEPATH + server['name'] + '-GetCapabilities' + FILEEXTENSIONXML, capabilitiesXML)
-   utils.saveFile(SERVERCACHEPATH + server['name'] + '-DescribeCoverage' + FILEEXTENSIONXML, coverageXML)
+   if coverageXML is not None:
+      utils.saveFile(SERVERCACHEPATH + server['name'] + '-DescribeCoverage' + FILEEXTENSIONXML, coverageXML)
    
    print 'Creating caches...'
    subMasterCache = {}
@@ -82,7 +83,10 @@ def createCache(server, capabilitiesXML, coverageXML):
    root = ET.fromstring( removeNonUTF8(capabilitiesXML) )
    
    # Parse the DescribeCoverage XML
-   coverageRoot = ET.fromstring(  removeNonUTF8(coverageXML) )
+   if coverageXML is not None:
+      coverageRoot = ET.fromstring(  removeNonUTF8(coverageXML) )
+   else:
+      coverageRoot = None
     
    if root.find('./%sCapability/%sLayer/%sLayer' % (WMS_NAMESPACE,WMS_NAMESPACE,WMS_NAMESPACE)) == None:
       dirtyCaches.append(server)
@@ -113,17 +117,17 @@ def createCache(server, capabilitiesXML, coverageXML):
 
             #Find the CoverageOffering from DescribeCoverage
             
-            
-            coverage = findCoverageNode( coverageRoot, name )
-            if coverage == None:
-               print serverTitle + "  " + name + " could not be found in DescribeCoverage. Not including."
-               continue
-            
-            offsetVectorsArray = coverage.findall( './/%soffsetVector' % (GML_NAMESPACE) )
-            offsetVectors = []
-            for i in range( 0 , len( offsetVectorsArray )):
-               offsetVectors.append(float(offsetVectorsArray[i].text.split(" ")[i]))
-            
+            if coverageRoot is not None:
+               coverage = findCoverageNode( coverageRoot, name )
+            else:
+               coverage = None
+            if coverage is not None:
+               offsetVectorsArray = coverage.findall( './/%soffsetVector' % (GML_NAMESPACE) )
+               offsetVectors = []
+               for i in range( 0 , len( offsetVectorsArray )):
+                  offsetVectors.append(float(offsetVectorsArray[i].text.split(" ")[i]))
+            else:
+               offsetVectors = None
             exGeographicBoundingBox = {"WestBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%swestBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
                                        "EastBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%seastBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
                                        "SouthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%ssouthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
@@ -199,12 +203,14 @@ def createCache(server, capabilitiesXML, coverageXML):
                
                # Save out layer cache
                utils.saveFile(LAYERCACHEPATH + cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON, json.dumps(layer))
+            else:
+               print "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
                
          subMasterCache['server'][sensorName] = layers
    
    subMasterCache['options'] = server['options']
    subMasterCache['wmsURL'] = server['services']['wms']['url']
-   subMasterCache['wcsURL'] = server['services']['wcs']['url']
+   subMasterCache['wcsURL'] = server['services']['wcs']['url'] if server['options']['wcs'] else None
    subMasterCache['serverName'] = server['name']
    
    print 'Cache creation complete...'
@@ -315,3 +321,4 @@ def genDateRange(startDate, endDate, interval):
 layerBlackList = utils.csvToList(LAYERFILTER)
 productBlackList = utils.csvToList(PRODUCTFILTER)
 utils.updateCaches(createCache, dirtyCaches,  wmsLayers.layers, SERVERCACHEPATH, MASTERCACHEPATH, CACHELIFE)
+# def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePath, cacheLife):

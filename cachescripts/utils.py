@@ -23,13 +23,16 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
    for server in serverList:
       
       # Check if we are just passing a layer
-      if 'passthrough' in server['options'] and server['options']['passthrough']:
-         # Check if cache is valid
-         if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONJSON, cacheLife):        
-            createCache(server, None)
-            
-         continue
-      
+      #
+      # COMMENTED OUT AS I DONT THINK ITS USED  
+      #
+      #if 'passthrough' in server['options'] and server['options']['passthrough']:
+      #   # Check if cache is valid
+      #   if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONJSON, cacheLife):        
+      #      createCache(server, None)
+      #      
+      #   continue
+      #
       # Check if cache is valid
       if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONXML, cacheLife):        
          oldCapabilitiesXML = None
@@ -44,10 +47,14 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             resp = urllib2.urlopen(url, timeout=30)
             newCapabilitiesXML = resp.read()
             
-            url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
-            print 'Getting: ' + url
-            resp = urllib2.urlopen(url, timeout=30)
-            newCoverageXML = resp.read()
+            # test if wcs element exists or if it has been turned off in server options
+            if 'wcs' in server['services'] and server['options']['wcs']:
+               url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCoverageXML = resp.read()
+            else:
+               pass
             
          except urllib2.URLError as e:
             print 'Failed to open url to ' + url
@@ -57,19 +64,27 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             print 'Failed to open url to ' + url
             print e
             
-         # Check that we have the xml file
-         if newCapabilitiesXML == None or newCoverageXML == None:
+         # Check that we have the xml file for WMS and that we have teh file for WCS as well as teh True flag in server options
+         if newCapabilitiesXML == None or (newCoverageXML == None and server['options']['wcs']):
             dirtyCaches.append(server)
             continue
          
          try:
             oldCapabilitiesXML = getFile(cachePath + server['name'] + '-GetCapabilities' + FILEEXTENSIONXML)
-            oldCoverageXML = getFile(cachePath + server['name'] + '-DescribeCoverage' + FILEEXTENSIONXML)
+            if 'wcs' in server['services'] and server['options']['wcs']:
+               oldCoverageXML = getFile(cachePath + server['name'] + '-DescribeCoverage' + FILEEXTENSIONXML)
+            
+               
          except IOError as e:
             print 'Failed to open xml file at "' + cachePath + server['name'] + FILEEXTENSIONXML + '"'       
             print e
             # We don't have the oldXML so we want to skip the md5 check
-            createCache(server, newCapabilitiesXML, newCoverageXML) 
+            # if we dont want WCS we just call createCache with None for WCS xml
+            if 'wcs' not in server['services'] or not server['options']['wcs']:
+               print "#"*100
+               createCache(server, newCapabilitiesXML, None)
+            else:
+               createCache(server, newCapabilitiesXML, newCoverageXML) 
             change = True
             continue
          
@@ -166,7 +181,7 @@ def csvToList(file):
       print 'Could not open csv file at "' + file + '"'
       print e
       return []
-         
+   print data
    return data
 
 def checkCacheValid(file, life):
@@ -203,8 +218,11 @@ def replaceAll(text, dic):
     return text
  
 def blackfilter(stringToTest, filterList):
+   print "I WAS CALLED"*3
+   print len(filterList)
    if len(filterList) != 0:
       for v in filterList:
+         print "testing %s vs %s" % (stringToTest, v['name'])
          if stringToTest.find(v['name']) != -1:
             return False
       

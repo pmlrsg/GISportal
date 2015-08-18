@@ -2,11 +2,12 @@ layers = [
    {
       "name": "cci",
       "options": {
-         "providerShortTag": "CCI"
+         "providerShortTag": "CCI",
+         "wcs": False
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/CCI-v1.0-D?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/CCI-v1.0-D?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -16,7 +17,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/CCI-v1.0-D?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/CCI-v1.0-D?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -32,11 +33,12 @@ layers = [
       "name": "hcmr",
       "options": {
          "positive": "down",
-         "providerShortTag": "HCMR"
+         "providerShortTag": "HCMR",
+         "wcs" : True
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/HCMR-M-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/HCMR-M-AGGSLOW?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -46,7 +48,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/HCMR-M-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/HCMR-M-AGGSLOW?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -137,7 +139,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/PML-Y-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/PML-Y-AGGSLOW?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -147,7 +149,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/PML-Y-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/PML-Y-AGGSLOW?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -253,7 +255,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/PML-S-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/PML-S-AGGSLOW?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -263,7 +265,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/PML-S-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/PML-S-AGGSLOW?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -305,7 +307,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/PML-M-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/PML-M-AGGSLOW?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -315,7 +317,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/PML-M-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/PML-M-AGGSLOW?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -565,7 +567,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/PML-D-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/PML-D-AGGSLOW?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -575,7 +577,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/PML-D-AGGSLOW?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/PML-D-AGGSLOW?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -644,7 +646,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -654,7 +656,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/IMSMETU-Y/BIMS0.1_HC_IMSMETU_blacksea_19900101-20090101_ANNUAL.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -710,7 +712,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/CEFAS/resoutcut.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/CEFAS/resoutcut.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -720,7 +722,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/CEFAS/resoutcut.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/CEFAS/resoutcut.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -841,7 +843,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/DMI_M/DMI_1990_2009_monthly_mean.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/DMI_M/DMI_1990_2009_monthly_mean.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -851,7 +853,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/DMI_M/DMI_1990_2009_monthly_mean.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/DMI_M/DMI_1990_2009_monthly_mean.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -958,7 +960,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/DMI_Y/DMI_1990_2009_annual_mean.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/DMI_Y/DMI_1990_2009_annual_mean.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -968,7 +970,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/DMI_Y/DMI_1990_2009_annual_mean.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/DMI_Y/DMI_1990_2009_annual_mean.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1030,7 +1032,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1040,7 +1042,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/DMI_S/DMI_1990_2009_seasonal_anomaly.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1072,7 +1074,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ammonia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ammonia.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1082,7 +1084,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ammonia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ammonia.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1112,7 +1114,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_CarnMesozoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_CarnMesozoo.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1122,7 +1124,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_CarnMesozoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_CarnMesozoo.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1154,7 +1156,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cdia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cdia.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1164,7 +1166,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cdia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cdia.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1196,7 +1198,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-dia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-dia.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1206,7 +1208,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-dia.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-dia.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1238,7 +1240,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-largephy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-largephy.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1248,7 +1250,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-largephy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-largephy.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1280,7 +1282,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-nflag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-nflag.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1290,7 +1292,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-nflag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-nflag.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1322,7 +1324,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1332,7 +1334,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_chl-picophy.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1364,7 +1366,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Clargephy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Clargephy.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1374,7 +1376,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Clargephy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Clargephy.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1405,7 +1407,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cnflag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cnflag.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1415,7 +1417,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cnflag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cnflag.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1446,7 +1448,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cpicophy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cpicophy.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1456,7 +1458,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cpicophy.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Cpicophy.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1487,7 +1489,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_HeteroFlag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_HeteroFlag.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1497,7 +1499,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_HeteroFlag.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_HeteroFlag.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1529,7 +1531,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Microzoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Microzoo.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1539,7 +1541,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Microzoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Microzoo.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1571,7 +1573,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_nitrate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_nitrate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1581,7 +1583,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_nitrate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_nitrate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1601,7 +1603,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_OmniMesozoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_OmniMesozoo.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1611,7 +1613,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_OmniMesozoo.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_OmniMesozoo.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1643,7 +1645,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_oxygen.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_oxygen.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1653,7 +1655,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_oxygen.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_oxygen.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1683,7 +1685,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_pCO.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_pCO.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1693,7 +1695,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_pCO.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_pCO.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1723,7 +1725,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_phosphate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_phosphate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1733,7 +1735,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_phosphate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_phosphate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1753,7 +1755,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ppn.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ppn.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1763,7 +1765,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ppn.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_ppn.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1795,7 +1797,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3NH4_PO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3NH4_PO4.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1805,7 +1807,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3NH4_PO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3NH4_PO4.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1825,7 +1827,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_PO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_PO4.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1835,7 +1837,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_PO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_PO4.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1866,7 +1868,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_SIO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_SIO4.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1876,7 +1878,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_SIO4.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_R_NO3_SIO4.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1907,7 +1909,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1917,7 +1919,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_sal.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1948,7 +1950,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_silicate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_silicate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1958,7 +1960,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_silicate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_silicate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -1978,7 +1980,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_tem_Anomaly.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_tem_Anomaly.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -1988,7 +1990,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_tem_Anomaly.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_tem_Anomaly.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2019,7 +2021,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_temp.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_temp.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2029,7 +2031,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_temp.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_temp.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2060,7 +2062,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalchlorophyll.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalchlorophyll.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2070,7 +2072,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalchlorophyll.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalchlorophyll.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2102,7 +2104,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_TotalPhytoC.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_TotalPhytoC.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2112,7 +2114,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_TotalPhytoC.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_TotalPhytoC.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2144,7 +2146,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalzooplankton.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalzooplankton.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2154,7 +2156,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalzooplankton.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Totalzooplankton.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2186,7 +2188,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_nitrate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_nitrate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2196,7 +2198,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_nitrate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_nitrate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2227,7 +2229,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_phosphate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_phosphate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2237,7 +2239,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_phosphate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_phosphate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
@@ -2268,7 +2270,7 @@ layers = [
       },
       "services": {
          "wms": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_silicate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wms/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_silicate.nc?",
             "params": {
                "GetCapabilities": {
                   "SERVICE": "WMS",
@@ -2278,7 +2280,7 @@ layers = [
             }
          },
          "wcs": {
-            "url": "http://earthserver.pml.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_silicate.nc?",
+            "url": "http://vortices.npm.ac.uk/thredds/wcs/OGS/OPATMBFM3_OGS_HC_Med_19990101_20111231_Wmin_silicate.nc?",
             "params": {
                "DescribeCoverage": {
                   "SERVICE": "WCS",
