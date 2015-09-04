@@ -140,6 +140,7 @@ gisportal.createOpLayers = function() {
    function processServer( server ){
       for(var sensorName in server.server ){
          server.server[sensorName].forEach(function( indicator ){
+
             processIndicator( server, sensorName, indicator );
          });
       };
@@ -173,7 +174,8 @@ gisportal.createOpLayers = function() {
       };
 
       var layer = new gisportal.layer( layerOptions );
-
+console.log("adding info for Indicator : ");
+            console.log(layer);
       // If theres a duplicate id, increase a counter
       var postfix = "";
       while( gisportal.layers[layer.id + postfix ] !== void(0) )
@@ -303,6 +305,7 @@ gisportal.mapInit = function() {
    map = new ol.Map({
       target: 'map',
       controls: [
+
          new ol.control.FullScreen({
             label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
          }),
@@ -320,13 +323,17 @@ gisportal.mapInit = function() {
          resolution: 0.175,
       }),
       logo: false
-   })
+   });
 
    map.addInteraction(new ol.interaction.Select({
       condition: function(e) {
          return e.originalEvent.type=='mousemove';
       }
    }));
+
+   // Pan by mouse seems to be broken in ol3.8
+   // This seems to be the new syntax for adding it
+   map.addInteraction(new ol.interaction.DragPan({}));
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
@@ -338,8 +345,7 @@ gisportal.mapInit = function() {
       dataReadingPopupOverlay.setPosition(e.coordinate);
 
       gisportal.getPointReading(e);
-   })
-   
+   });
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
    gisportal.loadLayers();
@@ -752,7 +758,11 @@ gisportal.zoomOverall = function()  {
       }
 
       // TODO: update the zoom to bounds for ol3
-      map.getView().fitExtent(largestBounds, map.getSize());
+      //map.getView().fitExtent(largestBounds, map.getSize());
+      // The below is the updated OL3 API replacement for fitExtent
+      // It is however still "experimental" but it works for now
+      map.getView().fit(largestBounds, map.getSize());
+
    }
 };
 
