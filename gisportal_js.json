@@ -22,6 +22,7 @@
       "src/libs/jquery-gritter/jquery.gritter.js",
       "src/gritter.js",
       "src/layer.js",
+      "src/vector_layer.js",
       "src/openid.js",
       "src/timeline.js",
       "src/Plot.js",

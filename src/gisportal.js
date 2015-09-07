@@ -122,7 +122,59 @@ gisportal.loadLayers = function() {
 
 };
 
+/**
+ * Map function to load the vector layers from cache
+ */
+gisportal.loadVectorLayers = function() {
+  var errorHandling = function(request, errorType, exception) {
+      var data = {
+         type: 'vector cache',
+         request: request,
+         errorType: errorType,
+         exception: exception,
+         url: this.url
+      };
+      gritterErrorHandler(data);
+   };
 
+   $.ajax({
+      url: './cache/vectorLayers.json',
+      dataType: 'json',
+      success: gisportal.initVectorLayers,
+      error: errorHandling
+
+   });
+
+};
+
+
+gisportal.createVectorLayers = function() {
+   var vectorLayers = [];
+   gisportal.cache.vectorLayers.forEach(function( vector ){
+      console.log(vector);
+      vector.services.wfs.vectors.forEach(function( v ){
+      processVectorLayer(vector.services.wfs.url, v);
+
+      });
+   });
+
+   function processVectorLayer(serverUrl, vector) {
+      var vectorOptions = {
+         "name": vector.name,
+         "description": vector.desc,
+         "endpoint" : serverUrl,
+         "serviceType" : "WFS",
+         "variableName" : vector.variableName
+      };
+      console.log("  CREATING WITH VECTOR FUNCTION   ");
+      var vectorLayer = new gisportal.Vector(vectorOptions);
+      console.log(vectorLayer);
+      vectorLayer = vectorLayer.createOLLayer();
+      console.log(vectorLayer);
+      gisportal.vlayers = [vectorLayer];
+   }
+
+};
 
 /** 
  * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
@@ -350,6 +402,9 @@ gisportal.mapInit = function() {
    // what layers to load for Operation (wms) and Reference (wcs) layers.
    gisportal.loadLayers();
 
+   // new load of vector layers
+   gisportal.loadVectorLayers();
+
    // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    
@@ -370,6 +425,21 @@ gisportal.initWMSlayers = function(data, opts) {
       gisportal.createOpLayers();
    }
 };
+
+/**
+ * The initiation of Vector layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
+ */ 
+gisportal.initVectorLayers = function(data, opts) {
+   if (data !== null)  {
+
+      gisportal.cache.vectorLayers = data;
+      // Create WMS layers from the data
+      gisportal.createVectorLayers();
+   }
+};
+
 
 
 /*===========================================================================*/
