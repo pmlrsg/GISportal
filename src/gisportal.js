@@ -149,7 +149,7 @@ gisportal.loadVectorLayers = function() {
 
 
 gisportal.createVectorLayers = function() {
-   var vectorLayers = [];
+   gisportal.vlayers = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       console.log(vector);
       vector.services.wfs.vectors.forEach(function( v ){
@@ -169,9 +169,9 @@ gisportal.createVectorLayers = function() {
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
       console.log(vectorLayer);
-      vectorLayer = vectorLayer.createOLLayer();
-      console.log(vectorLayer);
-      gisportal.vlayers = [vectorLayer];
+      vectorLayerOL = vectorLayer.createOLLayer();
+      console.log(vectorLayerOL);
+      gisportal.vlayers.push(vectorLayerOL);
    }
 
 };

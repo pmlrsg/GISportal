@@ -22,12 +22,12 @@ gisportal.Vector = function(options) {
       serviceVersion: null, // version of OGC service
       variableName: null, // the WFS variable name
       srsName: 'EPSG:4326', // SRS for teh vector layer
-      defaultStyle : new ol.style.Style({
-        stroke: new ol.style.Stroke({
+      defaultStyle: new ol.style.Style({
+         stroke: new ol.style.Stroke({
             color: 'rgba(0, 0, 255, 1.0)',
             width: 2
-            })
-        })
+         })
+      })
    };
 
 
@@ -47,6 +47,30 @@ gisportal.Vector = function(options) {
       this.isVisible = visibility;
    };
 
+   this.init = function() {
+      console.log('initialiseing"');
+   };
+
+
+var buildLoader = function($vector) {
+    return function(extent, resolution, projection) {
+      console.log('inside loader');
+        vectorSource = this;
+        var url = $vector.endpoint +
+            '?service=WFS' +
+            '&version=1.1.0' +
+            '&request=GetFeature' +
+            '&typename=' + $vector.variableName +
+            '&srs=' + $vector.srsName +
+            '&bbox=' + extent ;
+        $.ajax({
+            url: url
+        })
+        .done(function(response) {
+            vectorSource.addFeatures(vectorSource.readFeatures(response));
+        });
+    };
+};
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
     * These are stored in layer.openlayers. Currently the implementation
@@ -62,35 +86,30 @@ gisportal.Vector = function(options) {
     * with gisportal.layer. 
     */
    this.createOLLayer = function() {
-
+      var vec = this;
       if (this.serviceType === 'WFS') {
-         vector.sourcevector = new ol.layer.Vector({
 
-            loader: function(extent) {
-               $.ajax(vector.endpoint, {
-                  type: 'GET',
-                  data: {
-                     service: 'WFS',
-                     version: '1.1.0',
-                     request: 'GetFeature',
-                     type_name: vector.variableName,
-                     srsname: vector.srsName,
-                     bbox: extent.join(',') + ',' + vector.srsName
-                  },
-               }).done(vector.loadFeatures);
-            },
-            strategy: ol.loadingstrategy.tile(new ol.tilegrid.createXYZ({
-               maxZoom: 19
-            }))
-
+         console.log("================================");
+         var sourceVector = new ol.source.Vector({
+            loader: buildLoader(vec),
+            strategy: ol.loadingstrategy.tile(new ol.tilegrid.createXYZ({})),
          });
 
-         vector.layer = new ol.layer.Vector({
-            source: vector.sourcevector,
-            style: new ol.style.Style(vector.defaultStyle)
+
+
+         var layerVector = new ol.layer.Vector({
+            source: sourceVector,
+            style: new ol.style.Style({
+               stroke: new ol.style.Stroke({
+                  color: 'rgba(0, 0, 255, 1.0)',
+                  width: 2
+               })
+            })
          });
 
-         return vector.layer;
+         return layerVector;
+
+
 
       }
 
@@ -110,7 +129,7 @@ gisportal.Vector = function(options) {
    };
 
    this.loadFeatures = function(reponse) {
-      console.log("attempting to load features");
+      console.log("attempting to load features into");
       formatWFS = ol.format.WFS();
       var features = formatWFS.readFeatures(response);
       for (var i = 0; i < features.length; i++) {
@@ -123,7 +142,7 @@ gisportal.Vector = function(options) {
             }
          });
       }
-      vector.sourcevector.addFeatures(features);
+      this.sourcevector.addFeatures(features);
    };
 
    return this;
