@@ -52,25 +52,7 @@ gisportal.Vector = function(options) {
    };
 
 
-var buildLoader = function($vector) {
-    return function(extent, resolution, projection) {
-      console.log('inside loader');
-        vectorSource = this;
-        var url = $vector.endpoint +
-            '?service=WFS' +
-            '&version=1.1.0' +
-            '&request=GetFeature' +
-            '&typename=' + $vector.variableName +
-            '&srs=' + $vector.srsName +
-            '&bbox=' + extent ;
-        $.ajax({
-            url: url
-        })
-        .done(function(response) {
-            vectorSource.addFeatures(vectorSource.readFeatures(response));
-        });
-    };
-};
+
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
     * These are stored in layer.openlayers. Currently the implementation
@@ -86,65 +68,113 @@ var buildLoader = function($vector) {
     * with gisportal.layer. 
     */
    this.createOLLayer = function() {
+      var styles = {
+         "POINT": new ol.style.Style({
+            image: new ol.style.Circle({
+               radius: 2,
+               fill: new ol.style.Fill({
+                  color: 'rgba(0,0,255,0.5)'
+               }),
+               stroke: new ol.style.Stroke({
+                  width: 0.5,
+                  color: 'rgba(0,0,255,1)'
+               })
+            })
+         }),
+         "POLYGON": new ol.style.Style({
+            stroke: new ol.style.Stroke({
+               color: 'rgba(0, 0, 255, 1.0)',
+               width: 2
+            })
+         })
+      };
+      createStyle = function(vec) {
+         var styleType = vec.vectorType;
+         return styles[styleType];
+
+      };
+
       var vec = this;
+      var loadFeatures = function(response) {
+         var wfsFormat = new ol.format.WFS();
+         sourceVector.addFeatures(wfsFormat.readFeatures(response));
+      };
+      var buildLoader = function($vector, $source) {
+         return function(extent, resolution, projection) {
+            console.log('inside loader');
+            vectorSource = $source;
+            console.log(vectorSource);
+            console.log($source);
+            var url = $vector.endpoint +
+               '?service=WFS&maxFeatures=10' +
+               '&version=1.1.0' +
+               '&request=GetFeature' +
+               '&typename=' + $vector.variableName +
+               '&srs=' + $vector.srsName +
+               '&bbox=' + extent;
+            $.ajax({
+                  url: url
+               })
+               .done(loadFeatures);
+         };
+      };
+
+
       if (this.serviceType === 'WFS') {
 
          console.log("================================");
-         var sourceVector = new ol.source.Vector({
-            loader: buildLoader(vec),
-            strategy: ol.loadingstrategy.tile(new ol.tilegrid.createXYZ({})),
-         });
 
+         var sourceVector = new ol.source.Vector({
+            loader: buildLoader(vec, sourceVector),
+            strategy: ol.loadingstrategy.bbox,
+         });
 
 
          var layerVector = new ol.layer.Vector({
             source: sourceVector,
-            style: new ol.style.Style({
-               stroke: new ol.style.Stroke({
-                  color: 'rgba(0, 0, 255, 1.0)',
-                  width: 2
-               })
-            })
+            style: createStyle(vec),
+
          });
+      
 
-         return layerVector;
-
-
-
-      }
-
-      if (this.serviceType === 'SOS') {
-         // TODO custom support for rendering SOS
-      }
+   return layerVector;
 
 
-   };
 
-   this.addOLLayer = function(layer, id) {
-      map.addLayer(layer);
-   };
+}
 
-   this.removeOLLayer = function(layer, id) {
-      map.removeLayer(layer);
-   };
+if (this.serviceType === 'SOS') {
+   // TODO custom support for rendering SOS
+}
 
-   this.loadFeatures = function(reponse) {
-      console.log("attempting to load features into");
-      formatWFS = ol.format.WFS();
-      var features = formatWFS.readFeatures(response);
-      for (var i = 0; i < features.length; i++) {
-         features[i].getGeometry().applyTransform(function(coords, coords2, stride) {
-            for (var j = 0; j < coords.length; j += stride) {
-               var y = coords[j];
-               var x = coords[j + 1];
-               coords[j] = x;
-               coords[j + 1] = y;
-            }
-         });
-      }
-      this.sourcevector.addFeatures(features);
-   };
 
-   return this;
+};
+
+this.addOLLayer = function(layer, id) {
+   map.addLayer(layer);
+};
+
+this.removeOLLayer = function(layer, id) {
+   map.removeLayer(layer);
+};
+
+this.loadFeatures = function(reponse) {
+   console.log("attempting to load features into");
+   formatWFS = ol.format.WFS();
+   var features = formatWFS.readFeatures(response);
+   for (var i = 0; i < features.length; i++) {
+      features[i].getGeometry().applyTransform(function(coords, coords2, stride) {
+         for (var j = 0; j < coords.length; j += stride) {
+            var y = coords[j];
+            var x = coords[j + 1];
+            coords[j] = x;
+            coords[j + 1] = y;
+         }
+      });
+   }
+   this.sourcevector.addFeatures(features);
+};
+
+return this;
 
 };

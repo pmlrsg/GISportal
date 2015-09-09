@@ -1,7 +1,7 @@
 gisportal.add_vector_demo = function() {
 
 
-   sourceVector = new ol.source.Vector({
+   var sourceVector = new ol.source.Vector({
       loader: function(extent) {
          console.log('called');
          $.ajax('https://vortices.npm.ac.uk/geoserver/rsg/ows', {
@@ -49,4 +49,4 @@ gisportal.add_vector_demo = function() {
 
    map.addLayer(layerVector);
 
-}
+};
