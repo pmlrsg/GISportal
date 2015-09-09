@@ -94,6 +94,13 @@ gisportal.Vector = function(options) {
 
       };
 
+      var maxFeatures = function(vec) {
+         console.log('testing maxFeatures');
+         console.log(vec.maxFeatures);
+         console.log(vec.maxFeatures !== 'ALL' ? '&maxFeatures=' + vec.maxFeatures : '');
+         return vec.maxFeatures !== 'ALL' ? '&maxFeatures=' + vec.maxFeatures : '';
+      };
+
       var vec = this;
       var loadFeatures = function(response) {
          var wfsFormat = new ol.format.WFS();
@@ -106,7 +113,8 @@ gisportal.Vector = function(options) {
             console.log(vectorSource);
             console.log($source);
             var url = $vector.endpoint +
-               '?service=WFS&maxFeatures=10' +
+               '?service=WFS' +
+               maxFeatures($vector) +
                '&version=1.1.0' +
                '&request=GetFeature' +
                '&typename=' + $vector.variableName +
@@ -130,18 +138,21 @@ gisportal.Vector = function(options) {
          });
 
 
-         var layerVector = new ol.layer.Vector({
-            source: sourceVector,
-            style: createStyle(vec),
+         var layerVector = new ol.layer.Image({
+            source: new ol.source.ImageVector({
+               source: sourceVector,
+               style: createStyle(vec)
+            })
 
          });
+
       
 
    return layerVector;
-
-
-
 }
+
+
+
 
 if (this.serviceType === 'SOS') {
    // TODO custom support for rendering SOS

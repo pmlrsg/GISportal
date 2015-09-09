@@ -164,7 +164,8 @@ gisportal.createVectorLayers = function() {
          "description": vector.desc,
          "endpoint" : serverUrl,
          "serviceType" : "WFS",
-         "variableName" : vector.variableName
+         "variableName" : vector.variableName,
+         "maxFeatures" : vector.maxFeatures
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
