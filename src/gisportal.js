@@ -150,6 +150,7 @@ gisportal.loadVectorLayers = function() {
 
 gisportal.createVectorLayers = function() {
    gisportal.vlayers = [];
+   gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       console.log(vector);
       vector.services.wfs.vectors.forEach(function( v ){
@@ -169,6 +170,7 @@ gisportal.createVectorLayers = function() {
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
+      gisportal.vectors.push(vectorLayer);
       console.log(vectorLayer);
       vectorLayerOL = vectorLayer.createOLLayer();
       console.log(vectorLayerOL);

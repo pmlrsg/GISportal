@@ -147,7 +147,7 @@ gisportal.Vector = function(options) {
          });
 
       
-
+         vector.OLLayer = layerVector;
    return layerVector;
 }
 
