@@ -55,6 +55,7 @@ Finally we need autoprefixer from NPM, this will allow the portal to be run in I
 
 3. **Install SASS**
 To compile the CSS for the project we use SASS. This relies on a ruby gem called sass.
+
 ``sudo gem install sass``
 
 
