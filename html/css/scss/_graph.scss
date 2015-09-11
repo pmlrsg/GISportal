@@ -49,10 +49,10 @@
    padding: 0px;
    margin: 0px;
 }
-// .active-plot-component["has-data-in-range"]{
-// 	padding: 0px;
+.active-plot-component[has-data-in-range]{
+ 	padding: 0px;
 	
-// }
+}
 .active-plot-component[has-data-in-range="yes"]{
 	background-color: #dff0d8 !important;
 }
