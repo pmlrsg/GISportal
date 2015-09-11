@@ -1,6 +1,11 @@
+@import "colours";
+
 /*------------------------------------*\
     Common Elements
 \*------------------------------------*/
+
+
+
 
 *  {
   -webkit-box-sizing: border-box;
@@ -42,7 +47,7 @@ button, .btn{
 }
 
 .brand  {
-  background-color: #a19d63;
+  background-color: $button-primary;
   border-style: none;
   border-radius: 5px;
   color: #fff;
@@ -52,12 +57,12 @@ button, .btn{
 }
 
 .brand.with-border  {
-  border-top: 6px solid #bab67c;
+  border-top: 6px solid $button-border ;
   height: 41px;
 }
 
 .secondary  {
-   background-color: #b1a7bc;
+   background-color: $secondary-background ;
    border: none;
    color: #fff;
    padding: 6px 12px;
@@ -219,7 +224,7 @@ input[type="text"]  {
 * html .clearfix             { zoom: 1; } /* IE6 */
 *:first-child+html .clearfix { zoom: 1; } /* IE7 */
 
-.dev-warning { position: fixed; top: 0; width: 100%; background: #990000; text-align: center; color: #fff; font-weight: bold; }
+.dev-warning { position: fixed; top: 0; width: 100%; background: $dev-warning; text-align: center; color: #fff; font-weight: bold; }
 
 .dark-background{
   background-color: rgba(0,0,0,0.8);
@@ -238,9 +243,21 @@ input[type="text"]  {
   margin-top: 12px;
 }
 
-dl { width: 320px; display: block; line-height: 1.5em; clear: both;}
-dt { width: 120px; float: left; font-style: italic; }
-dd { width: 200px; float: left; }
+dl { 
+  width: 320px; 
+  display: block; 
+  line-height: 1.5em; 
+  clear: both;
+}
+dt { 
+  width: 120px;
+  float: left; 
+  font-style: italic; 
+}
+dd { 
+  width: 200px;
+   float: left;
+}
 
 
 @media( max-width: 800px ){
@@ -250,6 +267,7 @@ dd { width: 200px; float: left; }
     bottom: 0px;
   } 
 }
+
 
 
 /* ddslisk CSS */
@@ -272,4 +290,4 @@ dd { width: 200px; float: left; }
 .dd-option-image, .dd-selected-image { vertical-align:middle; float:left; margin-right:5px; max-width:64px;}
 .dd-option-icon { font-size: 17px; line-height: 19px; margin-right: 5px; }
 .dd-image-right { float:right; margin-right:15px; margin-left:5px;}
-.dd-container{ position:relative; margin-bottom:10px;}​ .dd-selected-text { font-weight:bold}​
+.dd-container{ position:relative; margin-bottom:10px;}​ .dd-selected-text { font-weight:bold; }

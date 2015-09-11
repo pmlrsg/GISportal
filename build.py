@@ -127,16 +127,17 @@ virtual('css', 'target-css')
 @target('target-css', YUICOMPRESSOR, phony=True)
 def build_portal_css(t):
    t.info('Building CSS')
-   portal_css = open('gisportal_css.json', 'r')
-   json_css = json.load(portal_css)
-   portal_css.close()
-   destination = open('html/css/GISPortal.css', 'w')
-   for filename in json_css["files"]:
-      with open(filename, 'rb') as file:
-         t.info('-- Adding ' + filename)
-         destination.write(file.read())
-         destination.write('\n')
-   destination.close()
+   # portal_css = open('gisportal_css.json', 'r')
+   # json_css = json.load(portal_css)
+   # portal_css.close()
+   # destination = open('html/css/GISPortal.css', 'w')
+   # for filename in json_css["files"]:
+   #    with open(filename, 'rb') as file:
+   #       t.info('-- Adding ' + filename)
+   #       destination.write(file.read())
+   #       destination.write('\n')
+   # destination.close()
+   t.output('sass', 'html/css/scss/gisportal.scss', 'html/css/GISPortal.css')
    t.info('Prefixing CSS')
    t.output('autoprefixer', 'html/css/GISPortal.css', '-b', '> 0.001%%')
    t.info('Finished building CSS')

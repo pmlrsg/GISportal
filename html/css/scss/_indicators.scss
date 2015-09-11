@@ -2,8 +2,10 @@
     Indicators
 \*------------------------------------*/
 
+@import "colours";
+
 .indicator-header  {
-  background-color: #59476d;
+  background-color: $panel-content-header ;
   color: #fff;
   line-height: 1.5;
   padding: 10px 15px;
@@ -85,7 +87,7 @@
 }
 
 .analysis-draw-bbox-buttons button{
-  background-color: gray;
+  background-color: $analysis-button;
 }
 .analysis-draw-bbox-buttons .icon-cursor-select-area{
     position: relative;

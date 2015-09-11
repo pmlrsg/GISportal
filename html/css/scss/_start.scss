@@ -12,11 +12,11 @@
    overflow-y: auto;
 }
 .start-dev { 
-   background: #383a25; 
+   background: $splash-background ; 
 }
 
 .start-container  {
-   background: #32273d;
+   background: $primary-purple;
    color: #f7f6f8;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .start-nav  {
-   background: #251d2d;
+   background: $primary-purple;
    padding: 20px 15px;
    text-align: right;
 }
