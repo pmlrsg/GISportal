@@ -1,0 +1,24 @@
+[
+   {
+      "name": "rsg_wfs", 
+      "options": {
+
+      },
+      "services": { 
+         "wfs" : {
+            "url" : "https://vortices.npm.ac.uk/geoserver/rsg/ows",
+            "params" : "",
+            "vectors" : [
+               {
+                  "name" : "Full Borders",
+                  "id" : "rsg:full_10m_borders",
+                  "variableName" : "rsg:full_10m_borders",
+                  "desc": "A complete world  border at 10 meter resolution",
+                  "maxFeatures" : 100,
+                  "vectorType" : "POLYGON"
+               }
+            ]
+         }
+      }
+   }
+]
