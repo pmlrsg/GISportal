@@ -112,9 +112,12 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * @param   {object} an object of layers to build the tags for; this can be null in which case gisportal.layers, i.e. all layers, are used
  * @returns {object} Data structure with tags as keys
  */
-gisportal.groupTags = function(layers)  {
+gisportal.groupTags = function(layers, vectorLayers)  {
    if (layers == undefined) {
       layers = gisportal.layers;
+   }
+   if (vectorLayers == undefined) {
+      vectorLayers = gisportal.vectors;
    }
    var grouped = {};
    

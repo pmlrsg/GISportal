@@ -15,7 +15,10 @@
                   "variableName" : "rsg:full_10m_borders",
                   "desc": "A complete world  border at 10 meter resolution",
                   "maxFeatures" : 100,
-                  "vectorType" : "POLYGON"
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "global"
+                  }
                }
             ]
          }
