@@ -207,6 +207,7 @@ Go over each custom definition key in the config file and change it the one in y
  #cd8 - Confidence  
  #cd9 - Year   
  #cd10 - Click Location  
+ #cd11 - Indicator Provider  
 
 ***Metrics:***  
  #cm1 - Used in graph  

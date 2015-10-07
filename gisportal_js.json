@@ -32,6 +32,7 @@
       "src/map-settings.js",
       "src/analytics.js",
       "src/user_feedback.js",
-      "src/ddslick.js"
+      "src/ddslick.js",
+      "src/autoLayer.js"
    ]
 }

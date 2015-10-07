@@ -189,6 +189,8 @@ gisportal.createOpLayers = function() {
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
+
+   gisportal.events.trigger('layers-loaded');
 };
 
 /**
@@ -708,7 +710,6 @@ gisportal.main = function() {
       else {
          console.log('Loading Default State...');
       }
-
    });
 };
 
@@ -774,6 +775,10 @@ gisportal.initStart = function()  {
 
    else if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
       var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
+
+   if(gisportal.autoLayer.url_get('wms_url') || gisportal.autoLayer.url_get('url_name')){
+      var autoLoad = function(){ gisportal.launchMap();};
+   }
 
    if( autoLoad != null)
       return setTimeout(autoLoad, 1000);
