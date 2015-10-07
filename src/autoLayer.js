@@ -2,31 +2,34 @@ gisportal.autoLayer = {};
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
-   given_wms_url = gisportal.utils.getURLParameter('wms_url');
-   if(given_wms_url){
+   var given_wms_url = gisportal.utils.getURLParameter('wms_url');
+   if(given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
    }
-   given_url_name = gisportal.utils.getURLParameter('url_name');
+   var given_url_name = gisportal.utils.getURLParameter('url_name');
 
-   // This passes the variables given in the URL to the getLayers function to get the matching layer(s)
-   gisportal.given_layers = gisportal.autoLayer.getLayers(given_wms_url, given_url_name);
+   if(given_wms_url.length > 0 || given_url_name.length > 0){
+      // This passes the variables given in the URL to the getLayers function to get the matching layer(s)
+      gisportal.given_layers = gisportal.autoLayer.getLayers(given_wms_url, given_url_name);
 
-   // If there is a single layer, then it is loaded.
-   if(_.size(gisportal.given_layers) == 1){
-      try{
-         gisportal.refinePanel.layerFound(_.values(gisportal.given_layers)[0].id);
+      // If there is a single layer, then it is loaded.
+      if(_.size(gisportal.given_layers) == 1){
+         try{
+            gisportal.refinePanel.layerFound(_.values(gisportal.given_layers)[0].id);
+         }
+         catch(e){
+            gisportal.gritter.showNotification('layerLoadError', {'layer': given_layers[0].id, 'e' : e});
+         }
+         return;
+      }else if(_.size(gisportal.given_layers) > 1){
+         // If there are more than one layers then it adds them to the panel.
+         gisportal.configurePanel.resetPanel(gisportal.given_layers);
+         return;
+      }else{
+         // Otherwise, an informative message is logged.
+         gisportal.gritter.showNotification('noMatchingLayersError', null);
       }
-      catch(e){
-         gisportal.gritter.showNotification('layerLoadError', {'layer': given_layers[0].id, 'e' : e});
-      }
-   }else if(_.size(gisportal.given_layers) > 1){
-      // If there are more than one layers then it adds them to the panel.
-      gisportal.configurePanel.resetPanel(gisportal.given_layers);
-   }else{
-      // Otherwise, an informative message is logged.
-      gisportal.gritter.showNotification('noMatchingLayersError', null);
-   }
-   
+   }  
 
 };
 
