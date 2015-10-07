@@ -40,7 +40,7 @@ function changeTab( tabElement )  {
   });
   $('[for="' + e.id + '"]').addClass('active');
 
-  gisportal.events.emit('metadata.close');
+  gisportal.events.trigger('metadata.close');
 
 }
 
@@ -64,7 +64,7 @@ function closeTab(){
     };
     e.bind('mouseup',up);
     e.one('mouseout', unbind);
-    gisportal.events.emit('metadata.close');
+    gisportal.events.trigger('metadata.close');
   }
 }
 

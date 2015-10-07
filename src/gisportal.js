@@ -189,6 +189,8 @@ gisportal.createOpLayers = function() {
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
+
+   gisportal.events.trigger('layers-loaded');
 };
 
 /**
@@ -708,7 +710,6 @@ gisportal.main = function() {
       else {
          console.log('Loading Default State...');
       }
-
    });
 };
 

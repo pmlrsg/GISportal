@@ -42,6 +42,11 @@ HTML = [path
 # Reorder to move gisportal.js to the front
 SRC.remove('src/gisportal.js')
 SRC.insert(0, 'src/gisportal.js')
+
+# Reorder to move EventManager.js infront of gisportal.js
+SRC.remove('src/EventManager.js')
+SRC.insert(0, 'src/EventManager.js')
+
 # Reorder to move portal to the back
 SRC.remove('src/portal.js')
 SRC.append('src/portal.js')

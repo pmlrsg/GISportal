@@ -484,3 +484,12 @@ input.search:focus  {
 .download-text p {
 
 }
+
+
+.list-button-div{
+  text-align: right;
+}
+
+#list-message{
+  padding-bottom:5px;
+}

@@ -59,7 +59,6 @@ gisportal.refinePanel.initDOM = function(data) {
 gisportal.refinePanel.refreshData = function() {
    var data = gisportal.refinePanel.currentData;
 
-   var indicator = data.indicator || {};
    var id = data.id;
    var name = data.name;
    var refine = data.refine;
@@ -156,13 +155,21 @@ gisportal.refinePanel.refreshData = function() {
       }
       
    }
+   gisportal.refinePanel.renderRefreshedData(furtherFilters, refinedIndicatorLayers, refine, name, refinedIndicators);
+};
 
+gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndicatorLayers, refine, name, refinedIndicators){
+
+   if (refinedIndicators.length == 1) {
+      gisportal.refinePanel.layerFound(refinedIndicators[0]);
+      return;
+   }
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
    if (furtherFilters.length > 0) {    // there's at least one more user selection required to identify a single indicator
       var refineSection = $('.js-refine-section')
       refineSection.html('');
 
-      indicator.group = gisportal.groupNames(refinedIndicatorLayers)[name];
+      var matching_tags = gisportal.groupNames(refinedIndicatorLayers)[name];
 
       // create drop downs for each of the further filters
       for (var tag in furtherFilters) {
@@ -182,7 +189,7 @@ gisportal.refinePanel.refreshData = function() {
 
             // then add a ddslick drop down to it populated with tagName options
             $('#refine-' + tagName).ddslick({
-               data: gisportal.utils.mustacheFormat(indicator.group[tagName]),
+               data: gisportal.utils.mustacheFormat(matching_tags[tagName]),
                initialState: 'open',
                selectText: 'Select '+ a + ' ' + tagDisplayName,
                onSelected: function(data) {
