@@ -776,10 +776,6 @@ gisportal.initStart = function()  {
    else if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
       var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
 
-   if(gisportal.autoLayer.url_get('wms_url') || gisportal.autoLayer.url_get('url_name')){
-      var autoLoad = function(){ gisportal.launchMap();};
-   }
-
    if( autoLoad != null)
       return setTimeout(autoLoad, 1000);
 

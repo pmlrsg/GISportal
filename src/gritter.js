@@ -581,4 +581,23 @@ function createHelpMessages()
          return 'I\'m afraid we are not currently able to plot that amount of data on this type of graph.'
       }
    };
+
+   gisportal.gritter._notifications['layerLoadError'] = {
+      title: function() {
+         return 'Sorry, we failed to load a layer';
+      },
+      text: function(data) {
+         return 'There was an error adding the layer with ID ' +
+         data.layer + ' : ' + data.e;
+      }
+   };
+
+   gisportal.gritter._notifications['noMatchingLayersError'] = {
+      title: function() {
+         return 'Sorry, we failed to load any layers';
+      },
+      text: function(data) {
+         return 'Unfortunately no matching layers were found, please check the parameters that you gave are correct. ';
+      }
+   };
 }

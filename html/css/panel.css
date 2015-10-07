@@ -486,15 +486,8 @@ input.search:focus  {
 }
 
 
-#reset-list-button-div,
-#undo-list-button-div{
+.list-button-div{
   text-align: right;
-}
-
-.unfiltered-list-message{
-  color: #3b8a44;
-  background-color:#dff0d8;
-  border-color:#cbface;
 }
 
 #list-message{
