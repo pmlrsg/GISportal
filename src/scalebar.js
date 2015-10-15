@@ -103,9 +103,9 @@ gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
    var height = 500;
    var width = 3;
    if (hasBase)
-      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
+      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height + '&version=1.3.0&format=png';
    else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height + '&version=1.3.0&format=png';
 };
 
 /**

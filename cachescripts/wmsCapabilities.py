@@ -60,9 +60,11 @@ def removeNonUTF8( text ):
    
 
 def createCache(server, capabilitiesXML, coverageXML):
+
+   print "Hello"
+   print server
    #import xml.etree.ElementTree as ET
    #from xml.etree.ElementTree import XMLParser
-   
    from lxml import etree as ET
    
    import json

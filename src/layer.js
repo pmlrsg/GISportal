@@ -437,23 +437,28 @@ gisportal.layer = function( options ) {
     */
    this.getMetadata = function() {
       var layer = this;
-      
       $.ajax({
          type: 'GET',
          url: gisportal.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
-         dataType: 'json',
+         //dataType: 'json',
          async: true,
          success: function(data) {
-            if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
-            if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
-            if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
-            if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-            layer.units = data.units; 
-            layer.log = data.logScaling == true ? true : false;
+            try{
+              json_data = JSON.parse(data);
+              if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
+              if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
+              if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
+              if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
+              layer.units = json_data.units; 
+              layer.log = json_data.logScaling == true ? true : false;
 
-            gisportal.layers[layer.id].metadataComplete = true; 
-            layer.metadataComplete = true;
-            _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
+            }catch(e){
+              //var layer.scaling = 'raw';
+            }
+
+        gisportal.layers[layer.id].metadataComplete = true; 
+        layer.metadataComplete = true;
+        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
 
          },
          error: function(request, errorType, exception) {

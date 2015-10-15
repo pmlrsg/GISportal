@@ -592,12 +592,39 @@ function createHelpMessages()
       }
    };
 
-   gisportal.gritter._notifications['noMatchingLayersError'] = {
+   gisportal.gritter._notifications['noMatchingURLLayers'] = {
       title: function() {
-         return 'Sorry, we failed to load any layers';
+         return 'Getting Layer(s)';
+      },
+      text: function() {
+         return 'We are working to retrieve the layer(s) from this URL';
+      }
+   };
+
+   gisportal.gritter._notifications['noMatchingNameLayers'] = {
+      title: function() {
+         return 'Sorry, we were unable to load any layers';
       },
       text: function(data) {
-         return 'Unfortunately no matching layers were found, please check the parameters that you gave are correct. ';
+         return 'We have no layers with the Tag: ' + data.url_name;
+      }
+   };
+
+   gisportal.gritter._notifications['layersRetrieved'] = {
+      title: function() {
+         return 'Layers Retrieved';
+      },
+      text: function(data) {
+         return 'We have succefully retrieved the layers you aksed for';
+      }
+   };
+
+   gisportal.gritter._notifications['findGivenLayerFail'] = {
+      title: function() {
+         return 'Sorry there was an unexpected error';
+      },
+      text: function(data) {
+         return 'There was an error thrown by the server: ' + data.message;
       }
    };
 }

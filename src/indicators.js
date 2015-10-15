@@ -426,7 +426,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 };
 
 /**
- * Redraws the legend bar which will reflect changes to the legend colour and rage
+ * Redraws the legend bar which will reflect changes to the legend colour and range
  *
  * @param String layerId The ID of the layer to reload
  */
