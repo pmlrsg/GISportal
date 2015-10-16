@@ -10,6 +10,7 @@ import json
 import dateutil.parser
 import calendar
 
+CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
 SERVERCACHEPATH = "../../../html/cache/"
 MASTERCACHEPATH = "../../../html/cache/mastercache"
@@ -198,100 +199,62 @@ def load_new_wms_layer():
 
 
 def createCache(root, url):
-   subMasterCache = {}
-   subMasterCache['server'] = {}
-   currentPath = os.path.dirname(os.path.realpath(__file__))
+   sub_master_cache = {}
+   sub_master_cache['server'] = {}
    clean_url = url.replace('http://', '').replace('https://', '').replace('/', '-').replace('?', '')
-   layer_found = False
 
    filename = clean_url + FILEEXTENSIONJSON
-   path = os.path.join(currentPath, SERVERCACHEPATH, filename)
-
-   layers = []
+   path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
 
    if not os.path.isfile(path):
-      for product in root.findall('./%sCapability//%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)): 
-         sensorName = product.find('./%sTitle' % (WMS_NAMESPACE)).text
-         sensorName = replaceAll(sensorName, {' ':'_', '(':'_', ')':'_', '/':'_'})
-         for layer in product.findall('./%sLayer' % (WMS_NAMESPACE)):
-            if ET.iselement(layer.find('./%sName' % (WMS_NAMESPACE))) and ET.iselement(layer.find('./%sTitle' % (WMS_NAMESPACE))) and ET.iselement(layer.find('./%sAbstract' % (WMS_NAMESPACE))) and ET.iselement(layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))) and ET.iselement(layer.find('./%sStyle' % (WMS_NAMESPACE))):
-               layer_found = True
-               name = layer.find('./%sName' % (WMS_NAMESPACE)).text
-               title = layer.find('./%sTitle' % (WMS_NAMESPACE)).text
-               abstract = layer.find('./%sAbstract' % (WMS_NAMESPACE)).text
-               niceName = title.title()
-               temporal = False
-               
-               
-               exGeographicBoundingBox = {"WestBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%swestBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
-                                          "EastBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%seastBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
-                                          "SouthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%ssouthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
-                                          "NorthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%snorthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text}
-               
-               boundingBox = {"CRS": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('CRS'),
-                              "MinX": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('minx'),
-                              "MaxX": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('maxx'),
-                              "MinY": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('miny'),
-                              "MaxY": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('maxy')}
-               
-               dimensions = createDimensionsArray(layer)
-               temporal = dimensions['temporal']
-               styles = createStylesArray(layer)
+      for parent_layer in root.findall('./%sCapability/%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)):
+         layers = []
+         name = None
+         sensor_name = None
+         title = None
+         abstract = None
+         bounding_boxes = None
+         dimensions = createDimensionsArray(parent_layer)
+         style = None
 
-               moreIndicatorInfo = False
-               masterLayer = {"Name": name,
-                              "Title": title,
-                              "tags":{
-                                 "indicator_type": [
-                                    sensorName
-                                 ],
-                                 "niceName": niceName
-                              },
-                              "FirstDate": dimensions['firstDate'],
-                              "LastDate": dimensions['lastDate'],
-                              "EX_GeographicBoundingBox": exGeographicBoundingBox,
-                              "MoreIndicatorInfo" : moreIndicatorInfo}
-                              
-               
-               # Data to be sent in the mastercache
-               layers.append(masterLayer)
-               
-               # Data to be saved out
-               layer = {#"Name": name,
-                        #"wmsURL": server['wmsURL'],
-                        #"wcsURL": server['wcsURL'],
-                        #"Title": title,
-                        #"Abstract": abstract,
-                        "FirstDate": dimensions['firstDate'],
-                        "LastDate": dimensions['lastDate'],
-                        "EX_GeographicBoundingBox": exGeographicBoundingBox,
-                        "BoundingBox": boundingBox,
-                        "Dimensions": dimensions['dimensions'] ,
-                        "Styles": styles }
-               
-               cleanServerName = clean_url
-               cleanLayerName = name.replace('/', '-')
-               
-               # Save out layer cache
-               path = os.path.join(currentPath, LAYERCACHEPATH, cleanServerName + "_" + cleanLayerName + FILEEXTENSIONJSON)
-               saveFile(path, json.dumps(layer))
+         name_elem = parent_layer.find('./%sName' % (WMS_NAMESPACE))
+         title_elem = parent_layer.find('./%sTitle' % (WMS_NAMESPACE))
+         abstract_elem = parent_layer.find('./%sAbstract' % (WMS_NAMESPACE))
+         bounding_elem = parent_layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+         style_elem = parent_layer.find('./%sStyle' % (WMS_NAMESPACE))
 
-      if layer_found:      
-         subMasterCache['server'][sensorName] = layers
+         if ET.iselement(title_elem):
+            sensor_name = title_elem.text
+            sensor_name = replaceAll(sensor_name, {' ':'_', '(':'_', ')':'_', '/':'_'})
+
+         if ET.iselement(abstract_elem):
+            abstract = abstract_elem.text
+
+         if ET.iselement(bounding_elem):
+            bounding_boxes = createBoundingBoxesArray(parent_layer)
+
+         if ET.iselement(style_elem):
+            styles_list = createStylesArray(parent_layer)
+            if len(styles_list) > 0:
+               style = styles_list
+
+
+         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
+      if len(layers) > 0:
+         sub_master_cache['server'][sensor_name] = layers
+         sub_master_cache['options'] = {"providerShortTag": "TemporaryLayer"}
+         sub_master_cache['wmsURL'] = url
+         sub_master_cache['wcsURL'] = "wcs_url_temp"
+         sub_master_cache['serverName'] = clean_url
          
-         subMasterCache['options'] = {"providerShortTag": "TemporaryLayer"}
-         subMasterCache['wmsURL'] = url
-         subMasterCache['wcsURL'] = "wcs_url_temp"
-         subMasterCache['serverName'] = clean_url
-         
-         # Return and save out the cache for this server
-         path = os.path.join(currentPath, SERVERCACHEPATH, filename)
-         data = json.dumps(subMasterCache)
+         path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+         data = json.dumps(sub_master_cache)
          saveFile(path, data)
-         return data
+         return data         
       else:
          return json.dumps({"Error": "Could not find any loadable layers in this WMS: " + url})
-   json_file = open(path, 'r')
+
+   json_fale = open(path, 'r')
    layer_return = json_file.read()
    return layer_return
 
@@ -323,10 +286,10 @@ def createDimensionsArray(layer):
             if dateTime.find('/'):
                range = dateTime.split('/')
                # Check for corrupted or unexpected data range format and remove it if found
-               if len(range) == 3:
-                  dateTimeRange = genDateRange(range[0], range[1], range[2])
-                  newDates.pop()
-                  newDates = newDates + dateTimeRange
+               #if len(range) == 3:
+                  #dateTimeRange = genDateRange(range[0], range[1], range[2])
+                  #newDates.pop()
+                  #newDates = newDates + dateTimeRange
             
             # Is there a corrupted date present - if so, remove it
             if dateTime.find('-') != 4:
@@ -342,6 +305,23 @@ def createDimensionsArray(layer):
                                        'Default': dimension.get('default'),
                                        'Value': dimensionValue})
    return dimensions
+
+def createBoundingBoxesArray(layer):
+   bounding_boxes = {}
+   exGeographicBoundingBox = {"WestBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%swestBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
+                                "EastBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%seastBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
+                                "SouthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%ssouthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
+                                "NorthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%snorthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text}
+   
+   boundingBox = {"CRS": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('CRS'),
+                  "MinX": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('minx'),
+                  "MaxX": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('maxx'),
+                  "MinY": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('miny'),
+                  "MaxY": layer.find('./%sBoundingBox' % (WMS_NAMESPACE)).get('maxy')}
+   bounding_boxes['exGeographicBoundingBox'] = exGeographicBoundingBox
+   bounding_boxes['boundingBox'] = boundingBox
+   return bounding_boxes
+
 def saveFile(path, data):
    with open(path, 'wb') as file:
       file.write(data)
@@ -354,10 +334,57 @@ def replaceAll(text, dic):
 def createStylesArray(layer):
    styles = []
    for style in layer.findall('./%sStyle' % (WMS_NAMESPACE)):
-      styles.append({"Name": style.find('./%sName' % (WMS_NAMESPACE)).text,
-                         #"Abstract": style.find('./%sAbstract' % (WMS_NAMESPACE)).text,
-                         "LegendURL": style.find('./%sLegendURL/%sOnlineResource' % (WMS_NAMESPACE,WMS_NAMESPACE)).get('%shref' % (XLINKNAMESPACE)),
-                         "Width": style.find('./%sLegendURL' % (WMS_NAMESPACE)).get('width'),
-                         "Height": style.find('./%sLegendURL' % (WMS_NAMESPACE)).get('height')})
       
+      name_elem = style.find('./%sName' % (WMS_NAMESPACE))
+      legend_elem = style.find('./%sLegendURL' % (WMS_NAMESPACE))
+      
+      if ET.iselement(name_elem) and ET.iselement(legend_elem):
+           styles.append({"Name": name_elem.text,
+                         "LegendURL": legend_elem.find('./%sOnlineResource' % (WMS_NAMESPACE)).get('%shref' % (XLINKNAMESPACE)),
+                         "Width": legend_elem.get('width'),
+                         "Height": legend_elem.get('height')})
    return styles
+
+def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers):
+   for layer in parent_layer.findall('.%sLayer' % (WMS_NAMESPACE)):
+      name_elem = layer.find('./%sName' % (WMS_NAMESPACE))
+      title_elem = layer.find('./%sTitle' % (WMS_NAMESPACE))
+      abstract_elem = layer.find('./%sAbstract' % (WMS_NAMESPACE))
+      bounding_elem = layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+      dimension_elem = layer.find('./%sDimension' % (WMS_NAMESPACE))
+      style_elem = layer.find('./%sStyle' % (WMS_NAMESPACE))
+        
+      if ET.iselement(name_elem):
+         name = name_elem.text
+            
+      if ET.iselement(title_elem):
+         title = title_elem.text
+            
+      if ET.iselement(abstract_elem):
+         abstract = abstract_elem.text
+            
+      if ET.iselement(dimension_elem):
+         dimensions = createDimensionsArray(layer)
+            
+      if ET.iselement(bounding_elem):
+         bounding_boxes = createBoundingBoxesArray(layer)
+            
+      if ET.iselement(style_elem):
+         styles_list = createStylesArray(layer)
+         if len(styles_list) > 0:
+            style = styles_list
+        
+            
+      if name and sensor_name and title and abstract and bounding_boxes and style:
+         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name],"niceName": title.title()}, "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "MoreIndicatorInfo" : False})
+         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
+         clean_server_name = clean_url
+         clean_layer_name = name.replace('/', '-')
+         print
+         print
+         print layers
+         
+         path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + clean_layer_name + FILEEXTENSIONJSON)
+         saveFile(path, json.dumps(layer_data))
+      else:
+         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
