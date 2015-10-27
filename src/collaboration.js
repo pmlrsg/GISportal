@@ -463,9 +463,9 @@ collaboration.initSession = function() {
             });
 
             // WebRTC gubbins...
-            socket.on('RTCmessage', function(message) {
-               console.log('Client received message:', message);
-               webRTC.messageCallback(message);
+            socket.on('webrtc_event', function(data) {
+               console.log('Client received message:', data.message);
+               webRTC.messageCallback(data);
             });
          })
          .fail(function(jqxhr, settings, exception) {
@@ -522,10 +522,15 @@ collaboration.buildMembersList = function(data) {
          $(this).find('.btn-value').text('Disable Video/Audio');
       } else {
          webRTC.deinitMedia();
+         $('.js-webrtc-online').toggleClass('hidden', true);
          $(this).find('.btn-value').text('Enable Video/Audio');
       }
-      
-   })
+   });
+
+   $('.js-webrtc-online').on('click', function() {
+      webRTC.isInitiator = true;
+      maybeStart();
+   });
 }
 
 collaboration.setValueById = function(id, value, logmsg) {

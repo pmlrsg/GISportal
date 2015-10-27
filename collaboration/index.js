@@ -324,10 +324,20 @@ io.on('connection', function(socket){
       })
    }) 
 
-   socket.on('RTCmessage', function(data) {
+   socket.on('webrtc_event', function(data) {
       console.log(data);
-      io.sockets.in(socket.room).emit('RTCmessage', data)
-   })
+      io.sockets.in(socket.room).emit(data.event, {
+         "presenter": user.email,
+         "provider": user.provider,
+         "socketId": socket.id,
+         "params" : data
+      })
+   }) 
+
+   // socket.on('RTCmessage', function(data) {
+   //    console.log(data);
+   //    io.sockets.in(socket.room).emit('RTCmessage', data)
+   // })
 
 
 });

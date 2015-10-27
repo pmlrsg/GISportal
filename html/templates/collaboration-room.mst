@@ -11,6 +11,9 @@
 {{#people}}
 <div data-id="{{id}}" class="person">
    {{#presenter}}<div class="presenter"></div>{{/presenter}}
-   {{name}} ({{email}}) <span class="pull-right rtc-control"></span>
+   {{name}} ({{email}}) 
+   <span class="pull-right rtc-control">
+      <span class="icon-webcam js-webrtc-online hidden" title="Call {{name}}"></span>
+   </span>
 </div>
 {{/people}}
