@@ -21,7 +21,7 @@
          <label>{{round exBoundingBox.SouthBoundLatitude 2}}</label> S,
          <label>{{round exBoundingBox.WestBoundLongitude 2}}</label>   W 
       </td></tr>
-      <tr class = "date-range-detail"><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
+      <tr class="date-range-detail"><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
       {{#if provider.email}}
          <tr>
             <td>Email</td>

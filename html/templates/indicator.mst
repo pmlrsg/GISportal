@@ -18,7 +18,7 @@
 
    <ul class="indicator-properties">
 
-      <li  data-name="{{name}}" data-id="{{id}}" class="scalebar-li">
+      <li  data-name="{{name}}" data-id="{{id}}">
          <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
          <div class="panel-tab scalebar-tab">
             <label for="tab-{{id}}-dimensions">   
