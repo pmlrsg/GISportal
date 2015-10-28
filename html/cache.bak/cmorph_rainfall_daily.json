@@ -1,1 +1,0 @@
-{"wmsURL": "https://vortices.npm.ac.uk/thredds/wms/cnr/cmorph-daily-rainfall-agg.nc?", "wcsURL": "https://vortices.npm.ac.uk/thredds/wcs/cnr/cmorph-daily-rainfall-agg.nc?", "serverName": "cmorph_rainfall_daily", "options": {"providerShortTag": "CNR"}, "server": {"cmorph-daily-rainfall-agg.nc": []}}
