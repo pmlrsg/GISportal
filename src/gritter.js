@@ -624,7 +624,17 @@ function createHelpMessages()
          return 'Sorry there was an unexpected error';
       },
       text: function(data) {
-         return 'There was an error thrown by the server: ' + data.message;
+         return 'There was an error thrown by the server: ' + data;
       }
+   };
+
+   gisportal.gritter._notifications['retrievingLayers'] = {
+      title: function() {
+         return 'Finding layers';
+      },
+      text: function(data) {
+         return 'We are trying to load layers from the URL you have provided.';
+      },
+      time: '500',
    };
 }

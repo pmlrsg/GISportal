@@ -173,9 +173,16 @@ gisportal.layer = function( options ) {
       if(this.type == "opLayers") {
          this.getMetadata();
          this.getDimensions(layerData); // Get dimensions.
+         if(!this.temporal) $('li[data-id="' + this.id + '"] .date-range-detail').hide();
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
-         this.style = "boxfill/rainbow";
+         var default_style = null;
+         $.each(this.styles, function(index, value){
+            if(value.Name == gisportal.config.defaultStyle){
+               default_style = value.Name;
+            }
+         });
+         this.style = default_style || this.styles[0].Name;
          
       } else if(this.type == "refLayers") {
          // intended for WFS type layers that are not time related
@@ -320,12 +327,12 @@ gisportal.layer = function( options ) {
          
          $('#viewDate').datepicker("option", "defaultDate", endDate);
 
-         if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
-            gisportal.zoomOverall();   
-         }
       } else {
          layer.setVisibility(true);
-      } 
+      }
+      if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
+         gisportal.zoomOverall();   
+      }
       
       
       var index = _.findIndex(gisportal.selectedLayers, function(d) { return d === layer.id;  });
@@ -511,10 +518,10 @@ gisportal.layer = function( options ) {
                url:  this.wmsURL,
                crossOrigin: null,
                params: {
-                  layers: this.urlName,
-                  transparent: true,
+                  LAYERS: this.urlName,
+                  TRANSPARENT: true,
                   wrapDateLine: true,
-                  srs: gisportal.projection,
+                  SRS: gisportal.projection,
                   VERSION: '1.1.1'
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 

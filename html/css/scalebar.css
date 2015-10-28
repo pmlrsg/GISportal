@@ -46,8 +46,8 @@
   padding-bottom: 10px;
 }
 
-.indicator-options  {
-  padding-top: 10px;
+.scalevalues  {
+  padding-bottom: 10px;
 }
 
 .indicator-option  {
@@ -69,15 +69,27 @@
 
 .scalebar-outer {
    position: relative;
-   height: 32px;
+   height: 42px;
    margin-bottom: 10px;
 }
 
+.scalebar-outer-loose {
+   position: relative;
+}
+
 .scalebar  {
-   height: 20px;
+   height: 30px;
    width: 100%;
    background-size: 100%;
    margin-bottom: 7px;
+}
+
+.scalebar-loose  {
+   width: 100%;
+}
+
+.legend-img{
+   max-width: 100%;
 }
 
 .scalebar-overlay{

@@ -18,6 +18,7 @@ FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 
 WMS_NAMESPACE = '{http://www.opengis.net/wms}'
+FEATURE_WMS_NAMESPACE = '{http://www.esri.com/wms}'
 WCS_NAMESPACE = '{http://www.opengis.net/wcs}'
 GML_NAMESPACE = '{http://www.opengis.net/gml}'
 XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
@@ -43,7 +44,7 @@ allowedHosts = ['localhost','localhost:8080','localhost:86','localhost:85',
          'map.bgs.ac.uk', 'gis.srh.noaa.gov' ]
          
 """
-Standard proxy
+Proxy Handler
 """
 @portal_proxy.route('/proxy')
 def proxy():  
@@ -55,42 +56,8 @@ def proxy():
    try:
       host = url.split("/")[2]
       current_app.logger.debug(host)
-      if host and allowedHosts and not host in allowedHosts:
-         error_handler.setError('2-01', None, g.user.id, "views/proxy.py:proxy - Host is not in the whitelist, returning 502 to user.", request)
-         abort(502)
          
-      if url.startswith("http://") or url.startswith("https://"):      
-         if request.method == "POST":
-            contentType = request.environ["CONTENT_TYPE"]
-            headers = {"Content-Type": request.environ["CONTENT_TYPE"]}
-            body = request
-            r = urllib2.Request(url, body, headers)
-            y = urllib2.urlopen(r)
-         else:
-            y = urllib2.urlopen(url)
-         
-         # print content type header
-         i = y.info()
-         #if i.has_key("Content-Type"):
-         #    print "Content-Type: %s" % (i["Content-Type"])
-         #else:
-         #    print "Content-Type: text/plain"
-         #print
-         
-         #resp = y.read()
-         resp = make_response(y.read(), y.code)
-         if i.has_key("Content-Type"):
-            resp.headers.add('Content-Type', i['Content-Type'])
-            
-         #for key in y.headers.dict.iterkeys():
-            #resp.headers[key] = y.headers.dict[key]
-         
-         y.close()
-         return resp
-      else:
-         g.error = 'Missing protocol. Add "http://" or "https://" to the front of your request url.'
-         error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - The protocol is missing, returning 400 to user.", request)
-         abort(400)
+      return basic_proxy(url)
    
    except urllib2.URLError as e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
@@ -101,7 +68,7 @@ def proxy():
          abort(400)
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
-      error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
+      error_handler.setError('2-06', None, None, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
    except Exception, e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
@@ -110,17 +77,48 @@ def proxy():
          abort(e.code)
          
       g.error = "Failed to access url, make sure you have entered the correct parameters"
-      error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
+      error_handler.setError('2-06', None, None, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
 
+
+def basic_proxy(url):
+   if url.startswith("http://") or url.startswith("https://"):      
+      if request.method == "POST":
+         contentType = request.environ["CONTENT_TYPE"]
+         headers = {"Content-Type": request.environ["CONTENT_TYPE"]}
+         body = request
+         r = urllib2.Request(url, body, headers)
+         y = urllib2.urlopen(r)
+      else:
+         y = urllib2.urlopen(url)
+      
+      # print content type header
+      i = y.info()
+      
+      #resp = y.read()
+      resp = make_response(y.read(), y.code)
+      if i.has_key("Content-Type"):
+         resp.headers.remove('Content-Type')
+         resp.headers.add('Content-Type', i['Content-Type'])
+         
+      #for key in y.headers.dict.iterkeys():
+         #resp.headers[key] = y.headers.dict[key]
+      
+      y.close()
+      return resp
+   else:
+      g.error = 'Missing protocol. Add "http://" or "https://" to the front of your request url.'
+      error_handler.setError('2-06', None, None, "views/proxy.py:proxy - The protocol is missing, returning 400 to user.", request)
+      abort(400)
 
 """
 Return a rotated image
 """
 @portal_proxy.route('/rotate')
-def rotate():     
-   
-   angle = request.args.get('angle') 
+def rotate():
+   angle = request.args.get('angle')
+   if angle == "undefined":
+      angle = 0
    if( angle == None ):
          error_handler.setError('2-08', None, g.user.id, "views/proxy.py:proxy - Angle not set.", request)
          abort(502)
@@ -132,11 +130,6 @@ def rotate():
    try:
       host = url.split("/")[2]
       current_app.logger.debug(host)
-      
-      # Check if the image is at an allowed server
-      if host and allowedHosts and not host in allowedHosts:
-         error_handler.setError('2-01', None, g.user.id, "views/proxy.py:proxy - Host is not in the whitelist, returning 502 to user.", request)
-         abort(502)
       
       # Abort if the url doesnt start with http
       if not url.startswith("http://") and not url.startswith("https://"):
@@ -188,25 +181,116 @@ def rotate():
       abort(400)
 
 """
+Loads the Data Values
+"""
+@portal_proxy.route('/load_data_values')
+def load_data_values():
+   url = request.args.get('url')
+   name = request.args.get('name')
+   units = request.args.get('units')
+
+   xml_data_values = basic_proxy(url + '&INFO_FORMAT=text/xml')
+   content_type = xml_data_values.headers['Content-Type']
+
+   if content_type == 'application/xml;charset=UTF-8':
+      doc = xml_data_values.get_data()
+      root = ET.fromstring(doc)
+      value_elem = root.find('.//value')
+      if ET.iselement(value_elem):
+         return name + ': ' + value_elem.text + ' ' + units
+      else:
+         return 'Sorry, could not calculate a value for: ' + name
+   elif content_type == 'text/xml':
+      doc = xml_data_values.get_data()
+      root = ET.fromstring(doc)
+      fields_elem = root.find('.//%sFIELDS' % (FEATURE_WMS_NAMESPACE))
+      if ET.iselement(fields_elem):
+         output = "" + name + ":"
+         for key, value in fields_elem.attrib.items():
+            output = output + "<br/>" + key + ": " + value
+         return output
+      else:
+         return 'no features were found'
+
+
+
+   elif content_type == 'image/png':
+      text_data_values = basic_proxy(url + '&INFO_FORMAT=text/plain')
+      if text_data_values.headers['Content-Type'] == 'text/plain':
+         return name + ": <br/>" + text_data_values.get_data().replace('\r', '<br/>')
+      else:
+         return "Sorry, the feature information for " + name + " was not found"
+
+
+
+"""
 WMS Layer Load
 """
 @portal_proxy.route('/load_new_wms_layer')
 def load_new_wms_layer():
-   url = request.args.get('url') + "?service=WMS&request=GetCapabilities"
-   doc = urllib2.urlopen(url)
-   root = ET.parse(doc).getroot()
-   return createCache(root, request.args.get('url') + "?")
+   url = request.args.get('url')
+   refresh = request.args.get('refresh')
+   return createCache(url + "?", refresh)
 
-
-def createCache(root, url):
+def createCache(url, refresh):
    sub_master_cache = {}
    sub_master_cache['server'] = {}
    clean_url = url.replace('http://', '').replace('https://', '').replace('/', '-').replace('?', '')
+   contact_info = {}
+   address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
    path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
 
-   if not os.path.isfile(path):
+   if not os.path.isfile(path) or refresh == "true":
+      doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
+      root = ET.parse(doc).getroot()
+
+      contact_person_elem = root.find('./%sService/%sContactInformation//%sContactPerson' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_org_elem = root.find('./%sService/%sContactInformation//%sContactOrganization' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_position_elem = root.find('./%sService/%sContactInformation//%sContactPosition' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_address_elem = root.find('./%sService/%sContactInformation//%sAddress' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_city_elem = root.find('./%sService/%sContactInformation//%sCity' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_state_elem = root.find('./%sService/%sContactInformation//%sStateOrProvince' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_post_code_elem = root.find('./%sService/%sContactInformation//%sPostCode' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_country_elem = root.find('./%sService/%sContactInformation//%sCountry' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_phone_elem = root.find('./%sService/%sContactInformation//%sContactVoiceTelephone' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      contact_email_elem = root.find('./%sService/%sContactInformation//%sContactElectronicMailAddress' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
+      
+      if ET.iselement(contact_person_elem):
+         contact_info['person'] = contact_person_elem.text
+         
+      if ET.iselement(contact_org_elem):
+         contact_info['organization'] = contact_org_elem.text
+         
+      if ET.iselement(contact_position_elem):
+         contact_info['position'] = contact_position_elem.text
+         
+      if ET.iselement(contact_address_elem) and contact_address_elem.text:
+         address = address + contact_address_elem.text + "<br/>"
+         
+      if ET.iselement(contact_city_elem) and contact_city_elem.text:
+         address = address + contact_city_elem.text + "<br/>"
+         
+      if ET.iselement(contact_state_elem) and contact_state_elem.text:
+         address = address + contact_state_elem.text + "<br/>"
+         
+      if ET.iselement(contact_post_code_elem) and contact_post_code_elem.text:
+         address = address + contact_post_code_elem.text + "<br/>"
+         
+      if ET.iselement(contact_country_elem) and contact_country_elem.text:
+         address = address + contact_country_elem.text + "<br/>"
+         
+      if ET.iselement(contact_phone_elem):
+         contact_info['phone'] = contact_phone_elem.text
+         
+      if ET.iselement(contact_email_elem):
+         contact_info['email'] = contact_email_elem.text
+
+      if len(address) > 0:
+         contact_info['address'] = address
+
+
       for parent_layer in root.findall('./%sCapability/%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)):
          layers = []
          name = None
@@ -220,7 +304,8 @@ def createCache(root, url):
          name_elem = parent_layer.find('./%sName' % (WMS_NAMESPACE))
          title_elem = parent_layer.find('./%sTitle' % (WMS_NAMESPACE))
          abstract_elem = parent_layer.find('./%sAbstract' % (WMS_NAMESPACE))
-         bounding_elem = parent_layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+         ex_bounding_elem = parent_layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+         bounding_elem = parent_layer.find('./%sBoundingBox' % (WMS_NAMESPACE))
          style_elem = parent_layer.find('./%sStyle' % (WMS_NAMESPACE))
 
          if ET.iselement(title_elem):
@@ -228,9 +313,12 @@ def createCache(root, url):
             sensor_name = replaceAll(sensor_name, {' ':'_', '(':'_', ')':'_', '/':'_'})
 
          if ET.iselement(abstract_elem):
-            abstract = abstract_elem.text
+            if len(abstract_elem.text) > 0:
+               abstract = abstract_elem.text
+            else:
+               print "No Abstract"
 
-         if ET.iselement(bounding_elem):
+         if ET.iselement(bounding_elem) and ET.iselement(ex_bounding_elem):
             bounding_boxes = createBoundingBoxesArray(parent_layer)
 
          if ET.iselement(style_elem):
@@ -242,19 +330,20 @@ def createCache(root, url):
          digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
       if len(layers) > 0:
          sub_master_cache['server'][sensor_name] = layers
-         sub_master_cache['options'] = {"providerShortTag": "TemporaryLayer"}
+         sub_master_cache['options'] = {"providerShortTag": "UserDefinedLayer"}
          sub_master_cache['wmsURL'] = url
          sub_master_cache['wcsURL'] = "wcs_url_temp"
          sub_master_cache['serverName'] = clean_url
+         sub_master_cache['contactInfo'] = contact_info
          
          path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
          data = json.dumps(sub_master_cache)
          saveFile(path, data)
          return data         
       else:
-         return json.dumps({"Error": "Could not find any loadable layers in this WMS: " + url})
+         return json.dumps({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"})
 
-   json_fale = open(path, 'r')
+   json_file = open(path, 'r')
    layer_return = json_file.read()
    return layer_return
 
@@ -308,6 +397,7 @@ def createDimensionsArray(layer):
 
 def createBoundingBoxesArray(layer):
    bounding_boxes = {}
+
    exGeographicBoundingBox = {"WestBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%swestBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
                                 "EastBoundLongitude": layer.find('./%sEX_GeographicBoundingBox/%seastBoundLongitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
                                 "SouthBoundLatitude": layer.find('./%sEX_GeographicBoundingBox/%ssouthBoundLatitude' % (WMS_NAMESPACE,WMS_NAMESPACE)).text,
@@ -350,23 +440,27 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
       name_elem = layer.find('./%sName' % (WMS_NAMESPACE))
       title_elem = layer.find('./%sTitle' % (WMS_NAMESPACE))
       abstract_elem = layer.find('./%sAbstract' % (WMS_NAMESPACE))
-      bounding_elem = layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+      ex_bounding_elem = layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
+      bounding_elem = layer.find('./%sBoundingBox' % (WMS_NAMESPACE))
       dimension_elem = layer.find('./%sDimension' % (WMS_NAMESPACE))
       style_elem = layer.find('./%sStyle' % (WMS_NAMESPACE))
         
       if ET.iselement(name_elem):
-         name = name_elem.text
+         name = name_elem.text.replace('/', '_')
             
       if ET.iselement(title_elem):
          title = title_elem.text
             
       if ET.iselement(abstract_elem):
-         abstract = abstract_elem.text
+         if abstract_elem.text:
+            abstract = abstract_elem.text
+         else:
+            print "No Abstract"
             
       if ET.iselement(dimension_elem):
          dimensions = createDimensionsArray(layer)
             
-      if ET.iselement(bounding_elem):
+      if ET.iselement(bounding_elem) and ET.iselement(ex_bounding_elem):
          bounding_boxes = createBoundingBoxesArray(layer)
             
       if ET.iselement(style_elem):
@@ -375,16 +469,14 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
             style = styles_list
         
             
-      if name and sensor_name and title and abstract and bounding_boxes and style:
-         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name],"niceName": title.title()}, "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "MoreIndicatorInfo" : False})
-         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
+      if name and sensor_name and title and bounding_boxes and style:
+         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
+         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
          clean_layer_name = name.replace('/', '-')
-         print
-         print
-         print layers
          
          path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + clean_layer_name + FILEEXTENSIONJSON)
          saveFile(path, json.dumps(layer_data))
+         style = None
       else:
          digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
