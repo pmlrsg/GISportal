@@ -18,13 +18,13 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       var width = 1;
       var height = 500;
       var scaleSteps = 5;
-     
+
       // Iter over styles
       $.each(indicator.styles, function(index, value)
       {
          // If the style names match grab its info
          if(value.Name == indicator.style && url === null) {
-            url = value.LegendURL + gisportal.scalebars.createGetLegendURL(indicator, true);
+            url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL)
             width = parseInt(value.Width, 10);
             height = parseInt(value.Height, 10);
             return false; // Break loop
@@ -33,7 +33,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
    
       // If the url is still null then there were no matches, so use a generic url
       if(url === null)
-         url = gisportal.scalebars.createGetLegendURL(indicator, false);
+         url = gisportal.scalebars.createGetLegendURL(indicator, "");
      
       
       // Set the scalebar inputs to be correct 
@@ -99,13 +99,46 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
  * @param {object} layer - The gisportal.layer
  * @parama {boolean} hasBase - True if you have the base URL (wmsURL)
  */
-gisportal.scalebars.createGetLegendURL = function(layer, hasBase)  {
-   var height = 500;
-   var width = 3;
-   if (hasBase)
-      return '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
+gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
+   var given_parameters = undefined;
+   var parameters = ""
+
+   try{
+      given_parameters = layer.legendSettings.Parameters;
+   }catch(e){}
+   
+   try{
+      parameters += "&HEIGHT=" + given_parameters["height"];
+   }catch(e){}
+
+   try{
+      parameters += "&WIDTH=" + given_parameters["width"];
+   }catch(e){}
+
+   try{
+      parameters += "&colorbaronly=" + given_parameters["colorbaronly"];
+   }catch(e){}
+
+   try{
+      if(layer.minScaleVal && layer.maxScaleVal){
+         parameters += "&COLORSCALERANGE=" + layer.minScaleVal + ',' + layer.maxScaleVal;
+      }
+   }catch(e){}
+
+   try{
+      if(layer.log){
+         parameters += "&logscale=" + layer.log;
+      }
+   }catch(e){}
+
+   if(parameters.length > 0 && base.indexOf("?") ==-1){
+      parameters = "?" + parameters
+   }
+
+   if (base.length > 0)
+      return base + parameters;
    else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + '&COLORSCALERANGE=' + layer.minScaleVal + ',' + layer.maxScaleVal + '&logscale=' + layer.log + '&colorbaronly=true&WIDTH=' + width + '&HEIGHT=' + height;
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + 'format=image/png';
 };
 
 /**
@@ -233,4 +266,9 @@ gisportal.scalebars.updateScalebar = function(id)  {
    gisportal.layers[id].mergeNewParams(params);
    
    gisportal.indicatorsPanel.redrawScalebar( id );
+};
+
+gisportal.scalebars.scalebarImageError = function(layer_id){
+   $("li[data-id=" + layer_id + "] div.scalebar-tab").addClass("alert-danger");
+   $("li[data-id=" + layer_id + "] div.scalebar-linear").html("There was an error loading the scalebar from <a href='" + gisportal.layers[layer_id].legend + "'>this URL</a>");
 };

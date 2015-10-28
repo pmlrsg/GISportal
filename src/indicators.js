@@ -71,7 +71,7 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
-   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scale-options > input[type="checkbox"]', function() {
+   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scalevalues > input[type="checkbox"]', function() {
       var id = $(this).data('id');
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
@@ -426,7 +426,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 };
 
 /**
- * Redraws the legend bar which will reflect changes to the legend colour and rage
+ * Redraws the legend bar which will reflect changes to the legend colour and range
  *
  * @param String layerId The ID of the layer to reload
  */

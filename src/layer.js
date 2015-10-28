@@ -173,9 +173,16 @@ gisportal.layer = function( options ) {
       if(this.type == "opLayers") {
          this.getMetadata();
          this.getDimensions(layerData); // Get dimensions.
+         if(!this.temporal) $('li[data-id="' + this.id + '"] .date-range-detail').hide();
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
-         this.style = "boxfill/rainbow";
+         var default_style = null;
+         $.each(this.styles, function(index, value){
+            if(value.Name == gisportal.config.defaultStyle){
+               default_style = value.Name;
+            }
+         });
+         this.style = default_style || this.styles[0].Name;
          
       } else if(this.type == "refLayers") {
          // intended for WFS type layers that are not time related
@@ -320,12 +327,12 @@ gisportal.layer = function( options ) {
          
          $('#viewDate').datepicker("option", "defaultDate", endDate);
 
-         if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
-            gisportal.zoomOverall();   
-         }
       } else {
          layer.setVisibility(true);
-      } 
+      }
+      if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
+         gisportal.zoomOverall();   
+      }
       
       
       var index = _.findIndex(gisportal.selectedLayers, function(d) { return d === layer.id;  });
@@ -437,23 +444,28 @@ gisportal.layer = function( options ) {
     */
    this.getMetadata = function() {
       var layer = this;
-      
       $.ajax({
          type: 'GET',
          url: gisportal.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
-         dataType: 'json',
+         //dataType: 'json',
          async: true,
          success: function(data) {
-            if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(data.scaleRange[0]);
-            if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(data.scaleRange[1]);
-            if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
-            if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-            layer.units = data.units; 
-            layer.log = data.logScaling == true ? true : false;
+            try{
+              json_data = JSON.parse(data);
+              if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
+              if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
+              if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
+              if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
+              layer.units = json_data.units; 
+              layer.log = json_data.logScaling == true ? true : false;
 
-            gisportal.layers[layer.id].metadataComplete = true; 
-            layer.metadataComplete = true;
-            _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
+            }catch(e){
+              //var layer.scaling = 'raw';
+            }
+
+        gisportal.layers[layer.id].metadataComplete = true; 
+        layer.metadataComplete = true;
+        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
 
          },
          error: function(request, errorType, exception) {
@@ -506,10 +518,10 @@ gisportal.layer = function( options ) {
                url:  this.wmsURL,
                crossOrigin: null,
                params: {
-                  layers: this.urlName,
-                  transparent: true,
+                  LAYERS: this.urlName,
+                  TRANSPARENT: true,
                   wrapDateLine: true,
-                  srs: gisportal.projection,
+                  SRS: gisportal.projection,
                   VERSION: '1.1.1'
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 

@@ -6,11 +6,13 @@ import sys
 import re
 import dateutil.parser
 import calendar
+import json
 
 sys.path.append(os.path.join(sys.path[0],'..','config'))
 # server list
 import wmsLayers
 from providers import providers
+from legendSettings import legendSettings as defaultLegendSettings
 
 # Change the python working directory to be where this script is located
 abspath = os.path.abspath(__file__)
@@ -38,6 +40,8 @@ LAYERFILTER = "layerFilter.csv"
 dirtyCaches = [] # List of caches that may need recreating
 #extraInfo = wmsLayerTags.layers
 
+
+
 def findCoverageNode( coverageRoot, name ):
    possibleNodes = coverageRoot.findall('./%sCoverageOffering'  % (WCS_NAMESPACE))
    for node in possibleNodes:
@@ -60,9 +64,9 @@ def removeNonUTF8( text ):
    
 
 def createCache(server, capabilitiesXML, coverageXML):
+
    #import xml.etree.ElementTree as ET
    #from xml.etree.ElementTree import XMLParser
-   
    from lxml import etree as ET
    
    import json
@@ -154,6 +158,11 @@ def createCache(server, capabilitiesXML, coverageXML):
                for i in server['indicators'][name]['providerDetails']:
                   providerDetails[ i ] = server['indicators'][name]['providerDetails'][ i ]
 
+            if 'LegendSettings' in server['indicators'][name]:
+               legendSettings = server['indicators'][name]['LegendSettings']
+            else:
+               legendSettings = defaultLegendSettings
+
             #import pprint
             #pprint.pprint(server['indicators'][name])
             #print '-'*40
@@ -172,7 +181,8 @@ def createCache(server, capabilitiesXML, coverageXML):
                               "ProviderDetails": providerDetails,
                               "EX_GeographicBoundingBox": exGeographicBoundingBox,
                               "MoreIndicatorInfo" : moreIndicatorInfo,
-                              "MoreProviderInfo" : moreProviderInfo }
+                              "MoreProviderInfo" : moreProviderInfo,
+                              "LegendSettings": legendSettings }
                               
                if name in server['indicators']:
                   masterLayer['tags'] = server['indicators'][name]
