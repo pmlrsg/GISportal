@@ -74,7 +74,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.gritter.showNotification('retrievingLayers', null);
       gisportal.autoLayer.TriedToAddLayer = true;
       $.ajax({
-         url:  './service/load_new_wms_layer?url='+wms_url +'&refresh=' + given_cache_refresh,
+         url:  '/service/load_new_wms_layer?url='+wms_url +'&refresh=' + given_cache_refresh,
          dataType: 'text',
          success: function(layer){
             gisportal.autoLayer.addGivenLayer(layer);
