@@ -256,7 +256,9 @@ gisportal.refinePanel.layerFound = function(layerId) {
    gisportal.indicatorsPanel.open();
    gisportal.refinePanel.reset();
    gisportal.configurePanel.reset();
-   gisportal.scalebars.autoScale(layerId);
+   if(gisportal.config.autoScale){
+      gisportal.scalebars.autoScale(layerId);
+   }
 }
 
 gisportal.refinePanel.removeCategory = function(cat) {
