@@ -992,7 +992,6 @@ gisportal.getPointReading = function(e) {
          $.ajax({
             url:  '/service/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
-               console.log(data);
                try{
                   $(elementId +' .loading').remove();
                   $(elementId).prepend('<li>'+ data +'</li>');
@@ -1011,7 +1010,7 @@ gisportal.getPointReading = function(e) {
    });
    if(!feature_found){
       $(elementId +' .loading').remove();
-      $(elementId).prepend('<li>Sorry, you have clicked outside the bounds of any layers</li>')
+      $(elementId).prepend('<li>Sorry, you have clicked outside the bounds of all layers</li>')
    }
    
 }
@@ -1020,7 +1019,7 @@ gisportal.getPointReading = function(e) {
  *    Returns false otherwise
  */
 gisportal.pointInsideBox = function(coordinate, exBoundingBox){
-   return coordinate[0] >= exBoundingBox.WestBoundLongitude && coordinate[0] <= exBoundingBox.EastBoundLongitude && coordinate[0] >= exBoundingBox.SouthBoundLatitude && coordinate[0] >= exBoundingBox.NorthBoundLatitude;
+   return coordinate[0] >= exBoundingBox.WestBoundLongitude && coordinate[0] <= exBoundingBox.EastBoundLongitude && coordinate[1] >= exBoundingBox.SouthBoundLatitude && coordinate[1] <= exBoundingBox.NorthBoundLatitude;
 }
 
 /**

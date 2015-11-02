@@ -173,6 +173,7 @@ def load_data_values():
    name = request.args.get('name')
    units = request.args.get('units')
 
+
    xml_data_values = basic_proxy(url + '&INFO_FORMAT=text/xml')
    content_type = xml_data_values.headers['Content-Type']
 
@@ -184,26 +185,23 @@ def load_data_values():
          return name + ': ' + value_elem.text + ' ' + units
       else:
          return 'Sorry, could not calculate a value for: ' + name
-   elif content_type == 'text/xml':
-      doc = xml_data_values.get_data()
-      root = ET.fromstring(doc)
-      fields_elem = root.find('.//%sFIELDS' % (FEATURE_WMS_NAMESPACE))
-      if ET.iselement(fields_elem):
-         output = "" + name + ":"
-         for key, value in fields_elem.attrib.items():
-            output = output + "<br/>" + key + ": " + value
-         return output
-      else:
-         return 'no features were found'
+   else:
+      data_values = basic_proxy(url)
+      content_type = data_values.headers['Content-Type'].replace(';charset=UTF-8', '')
+      if content_type == 'text/xml':
+         doc = data_values.get_data()
+         root = ET.fromstring(doc)
+         fields_elem = root.find('.//%sFIELDS' % (FEATURE_WMS_NAMESPACE))
+         if ET.iselement(fields_elem):
+            output = "" + name + ":"
+            if len(fields_elem.attrib)<=0:
+               output = output + "<br/>no data found at this point"
+            for key, value in fields_elem.attrib.items():
+               output = output + "<br/>" + key + ": " + value
+            return output
+      elif content_type == 'text/plain':
+         return name + ": <br/>" + data_values.get_data().replace('\n', '<br/>')
 
-
-
-   elif content_type == 'image/png':
-      text_data_values = basic_proxy(url + '&INFO_FORMAT=text/plain')
-      if text_data_values.headers['Content-Type'] == 'text/plain':
-         return name + ": <br/>" + text_data_values.get_data().replace('\r', '<br/>')
-      else:
-         return "Sorry, the feature information for " + name + " was not found"
 
 
 

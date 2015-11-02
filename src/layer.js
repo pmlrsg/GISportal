@@ -446,7 +446,7 @@ gisportal.layer = function( options ) {
       var layer = this;
       $.ajax({
          type: 'GET',
-         url: gisportal.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
+         url: gisportal.ProxyHost + layer.wmsURL + encodeURIComponent('item=layerDetails&version=1.1.0&service=wms&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
          //dataType: 'json',
          async: true,
          success: function(data) {
