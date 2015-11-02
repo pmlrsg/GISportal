@@ -168,8 +168,15 @@ gisportal.scalebars.autoScale = function(id, force)  {
          + l.exBoundingBox.EastBoundLongitude + ","
          + l.exBoundingBox.NorthBoundLatitude;
 
+      try{
+         var time = '&time=' + new Date(l.selectedDateTime).toISOString();
+      }
+      catch(e){
+         var time = "";
+      }
+
       $.ajax({
-         url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + '&time='+ new Date(l.selectedDateTime).toISOString() + '&crs=' + gisportal.projection + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+         url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&crs=' + gisportal.projection + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
          dataType: 'json',
          success: function( data ) {
             gisportal.scalebars.validateScale(id, data.min, data.max);
