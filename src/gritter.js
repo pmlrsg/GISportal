@@ -637,13 +637,4 @@ function createHelpMessages()
       },
       time: '500',
    };
-
-   gisportal.gritter._notifications['addWCSURLFail'] = {
-      title: function() {
-         return 'Sorry there was an error with that URL';
-      },
-      text: function(data) {
-         return 'There was an error using that URL: ' + data;
-      }
-   };
 }
