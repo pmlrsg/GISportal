@@ -192,11 +192,11 @@ gisportal.indicatorsPanel.initDOM = function() {
 };
 
 gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
-   console.log("Entered");
    wcs_url = $('input.js-wcs-url')[0].value;
    layer = gisportal.layers[selected_this.closest('[data-id]').data('id')];
    filename = layer.serverName;
    name = layer.urlName;
+   sensor = layer.sensor;
    error_div = $("#" + layer.id + "-analysis-message");
 
    if(!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))){
@@ -205,7 +205,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }
    else{
       $.ajax({
-         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name,
+         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)

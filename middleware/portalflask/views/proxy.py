@@ -208,6 +208,7 @@ def add_wcs_url():
    url = request.args.get('url').split('?')[0]
    filename = request.args.get('filename')
    name = request.args.get('name')
+   sensor = request.args.get('sensor')
 
    wcs_url = url + "?service=WCS&version=1.0.0&request=GetCapabilities"
 
@@ -224,11 +225,11 @@ def add_wcs_url():
          with open(path, 'r+') as data_file:
             data = json.load(data_file)
             index = 0
-            for layer in data['server']['Layers']:
+            for layer in data['server'][sensor]:
                if str(layer['Name']) == name:
                   break
                index = index + 1
-            data['server']['Layers'][index]['wcsURL'] = url + "?"
+            data['server'][sensor][index]['wcsURL'] = url + "?"
             data_file.seek(0)
             json.dump(data, data_file)
             return url + "?"
