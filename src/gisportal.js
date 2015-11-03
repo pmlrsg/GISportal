@@ -148,6 +148,8 @@ gisportal.createOpLayers = function() {
    // Turn an indicator into a later and adding to gisporta.layers
    function processIndicator( server, sensorName, indicator ){
 
+      var wcs_url = indicator.wcsURL || server.wcsURL;
+
       var layerOptions = { 
          //new
          "abstract": indicator.Abstract,
@@ -163,7 +165,7 @@ gisportal.createOpLayers = function() {
          "lastDate": indicator.LastDate, 
          "serverName": server.serverName, 
          "wmsURL": server.wmsURL, 
-         "wcsURL": server.wcsURL, 
+         "wcsURL": wcs_url, 
          "sensor": sensorName, 
          "exBoundingBox": indicator.EX_GeographicBoundingBox, 
          "providerTag": server.options.providerShortTag,
@@ -335,9 +337,9 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-      var lon = e.coordinate[0].toFixed(3);
+      var lon = gisportal.normaliseCoordinate(e.coordinate[0]).toFixed(3);
       var lat = e.coordinate[1].toFixed(3);
-      var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+      var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
       dataReadingPopupContent.innerHTML = response;
       dataReadingPopupOverlay.setPosition(e.coordinate);
@@ -778,7 +780,7 @@ gisportal.initStart = function()  {
    // Should we auto resume ?
    // Do we have to show the T&C box first ?
    var autoLoad = null;
-   if( gisportal.config.skipWelcomePage == true )
+   if( gisportal.config.skipWelcomePage == true || gisportal.utils.getURLParameter('wms_url'))
       if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
          var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
       else
@@ -950,11 +952,14 @@ gisportal.validateBrowser = function(){
  *  
  */
 gisportal.getPointReading = function(e) {
+   var coordinates = [];
+   coordinates.push(gisportal.normaliseCoordinate(e.coordinate[0]));
+   coordinates.push(e.coordinate[1]);
 
-   var elementId = '#dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+   var elementId = '#dataValue'+ String(coordinates[0]).replace('.','') + String(coordinates[1]).replace('.','');
    var feature_found = false;
    $.each(gisportal.selectedLayers, function(i, selectedLayer) {
-      if(gisportal.pointInsideBox(e.coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+      if(gisportal.pointInsideBox(coordinates, gisportal.layers[selectedLayer].exBoundingBox)){
          feature_found = true;
          var layer = gisportal.layers[selectedLayer];
          // build the request URL, starting with the WMS URL
@@ -1020,6 +1025,16 @@ gisportal.getPointReading = function(e) {
  */
 gisportal.pointInsideBox = function(coordinate, exBoundingBox){
    return coordinate[0] >= exBoundingBox.WestBoundLongitude && coordinate[0] <= exBoundingBox.EastBoundLongitude && coordinate[1] >= exBoundingBox.SouthBoundLatitude && coordinate[1] <= exBoundingBox.NorthBoundLatitude;
+}
+
+gisportal.normaliseCoordinate = function(coordinate){
+   while(coordinate <= -180){
+      coordinate += 360;
+   }
+   while(coordinate >= 180){
+      coordinate -= 360;
+   }
+   return coordinate;
 }
 
 /**

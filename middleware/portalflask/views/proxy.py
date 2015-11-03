@@ -203,7 +203,38 @@ def load_data_values():
          return name + ": <br/>" + data_values.get_data().replace('\n', '<br/>')
 
 
+@portal_proxy.route('/add_wcs_url')
+def add_wcs_url():
+   url = request.args.get('url').split('?')[0]
+   filename = request.args.get('filename')
+   name = request.args.get('name')
+   sensor = request.args.get('sensor')
 
+   wcs_url = url + "?service=WCS&version=1.0.0&request=GetCapabilities"
+
+   try:
+      wcs_data = basic_proxy(wcs_url)
+   except Exception, e:
+      return e
+
+   content_type = wcs_data.headers['Content-Type'].replace(';charset=UTF-8', '')
+
+   if content_type == 'application/xml' or content_type == 'text/xml':
+      try:
+         path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename + FILEEXTENSIONJSON)
+         with open(path, 'r+') as data_file:
+            data = json.load(data_file)
+            index = 0
+            for layer in data['server'][sensor]:
+               if str(layer['Name']) == name:
+                  break
+               index = index + 1
+            data['server'][sensor][index]['wcsURL'] = url + "?"
+            data_file.seek(0)
+            json.dump(data, data_file)
+            return url + "?"
+      except Exception, e:
+         return e
 
 """
 WMS Layer Load
@@ -314,7 +345,6 @@ def createCache(url, refresh):
          sub_master_cache['server'][sensor_name] = layers
          sub_master_cache['options'] = {"providerShortTag": "UserDefinedLayer"}
          sub_master_cache['wmsURL'] = url
-         sub_master_cache['wcsURL'] = "wcs_url_temp"
          sub_master_cache['serverName'] = clean_url
          sub_master_cache['contactInfo'] = contact_info
          
@@ -436,8 +466,6 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
       if ET.iselement(abstract_elem):
          if abstract_elem.text:
             abstract = abstract_elem.text
-         else:
-            print "No Abstract"
             
       if ET.iselement(dimension_elem):
          dimensions = createDimensionsArray(layer)
@@ -455,9 +483,8 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
          layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
          layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
-         clean_layer_name = name.replace('/', '-')
          
-         path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + clean_layer_name + FILEEXTENSIONJSON)
+         path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + name + FILEEXTENSIONJSON)
          saveFile(path, json.dumps(layer_data))
          style = None
       else:
