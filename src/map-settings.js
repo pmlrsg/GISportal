@@ -333,7 +333,75 @@ gisportal.createBaseLayers = function() {
          source: new ol.source.OSM({
             projection: gisportal.projection
          })
-      })
+      }),
+   }
+
+   if (gisportal.config.bingMapsAPIKey) {
+      gisportal.baseLayers.BingMapsAerial = new ol.layer.Tile({
+         id: 'BingMapsAerial',
+         title: 'Bing Maps - Aerial imagery',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'Aerial'
+         })
+      });
+
+      gisportal.baseLayers.BingMapsAerialWithLabels = new ol.layer.Tile({
+         id: 'BingMapsAerialWithLabels',
+         title: 'Bing Maps - Aerial imagery with labels',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'AerialWithLabels'
+         })
+      });
+
+      gisportal.baseLayers.BingMapsRoad = new ol.layer.Tile({
+         id: 'BingMapsRoad',
+         title: 'Bing Maps - Road',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'Road'
+         })
+      });
+
+      gisportal.baseLayers.BingMapsCB = new ol.layer.Tile({
+         id: 'BingMapsCB',
+         title: 'Bing Maps - Collins Bart',
+         description: 'EPSG:3857 only, coverage of UK only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'collinsBart'
+         }),
+         viewSettings: {
+            minZoom: 10,
+            maxZoom: 13,
+            defaultCenter: [53.825564,-2.421976]
+         }
+      });
+
+      gisportal.baseLayers.BingMapsOS = new ol.layer.Tile({
+         id: 'BingMapsOS',
+         title: 'Bing Maps - Ordnance Survey',
+         description: 'EPSG:3857 only, coverage of UK only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.BingMaps({
+            key: gisportal.config.bingMapsAPIKey,
+            imagerySet: 'ordnanceSurvey'
+         }),
+         viewSettings: {
+            minZoom: 10,
+            maxZoom: 17,
+            defaultCenter: [53.825564,-2.421976]
+         }
+      });
+
    }
 };
 
@@ -349,7 +417,8 @@ gisportal.selectBaseLayer = function(id) {
    // check to see if we need to change projection
    var current_projection = map.getView().getProjection().getCode();
    var msg = '';
-   
+   var setViewRequired = true;
+
    // the selected base map isn't available in the current projection
    if (_.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
       // if there's only one available projection for the selected base map set the projection to that value and then load the base map
@@ -357,11 +426,12 @@ gisportal.selectBaseLayer = function(id) {
          msg = 'The projection has been changed to ' + gisportal.baseLayers[id].getProperties().projections[0] + ' in order to display the ' + gisportal.baseLayers[id].getProperties().title + ' base layer';
          gisportal.setProjection(gisportal.baseLayers[id].getProperties().projections[0])
          $('#select-projection').ddslick('select', { value: gisportal.baseLayers[id].getProperties().projections[0], doCallback: false })
+         setViewRequired = false;
       } else {
-         msg = 'The ' + gisportal.baseLayers[id].getProperties().title + ' base map is not available in the current projection. Try changing the projection first and then selecting the base map again';
+         msg = 'The \'' + gisportal.baseLayers[id].getProperties().title + '\' base map is not available in the current projection. Try changing the projection first and then selecting the base map again';
          return;
       }
-   }
+   } 
 
    // if there's a message as a result of reprojection display it
    if (msg.length > 0) {
@@ -377,7 +447,13 @@ gisportal.selectBaseLayer = function(id) {
    if (gisportal.selectedLayers.length > 0) {
       gisportal.indicatorsPanel.reorderLayers();   
    }
-   
+
+   if (setViewRequired) {
+      var centre = map.getView().getCenter();
+      var extent = map.getView().calculateExtent(map.getSize());
+      var projection = map.getView().getProjection().getCode();
+      gisportal.setView(centre, extent, projection);
+   }
 }
 
 gisportal.createGraticules = function() {
@@ -404,7 +480,7 @@ gisportal.setProjection = function(new_projection) {
    if (_.indexOf(gisportal.baseLayers[current_basemap].getProperties().projections, new_projection) < 0) {
       // no, tell the user then bail out
       $('.js-map-settings-message')
-         .html('The ' + gisportal.baseLayers[current_basemap].getProperties().title + ' base map cannot be used with '+ new_projection +'. Try changing the base map and then selecting the required projection.')
+         .html('The \'' + gisportal.baseLayers[current_basemap].getProperties().title + '\' base map cannot be used with '+ new_projection +'. Try changing the base map and then selecting the required projection.')
          .toggleClass('alert-danger', true)
          .toggleClass('hidden', false);
       // set the projection ddslick value back to original value
@@ -433,15 +509,31 @@ gisportal.setProjection = function(new_projection) {
    var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
    var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
 
+   var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
+   gisportal.setView(new_centre, new_extent, new_projection);
+}
+
+gisportal.setView = function(centre, extent, projection) {
+   var current_zoom = map.getView().getZoom();
+   var min_zoom = 3;
    var max_zoom = 12;
-   if (new_projection == 'EPSG:3857') max_zoom = 17;
+   if (projection == 'EPSG:3857') max_zoom = 17;
+
+   var viewSettings = gisportal.baseLayers[$('#select-basemap').data('ddslick').selectedData.value].getProperties().viewSettings;
+   if (typeof viewSettings !== 'undefined') {
+      if (typeof viewSettings.minZoom !== 'undefined') min_zoom = viewSettings.minZoom;
+      if (typeof viewSettings.maxZoom !== 'undefined') max_zoom = viewSettings.maxZoom;
+   }
 
    var view = new ol.View({
-         projection: new_projection,
-         center: ol.proj.transform(current_centre, current_projection, new_projection),
-         minZoom: 3,
+         projection: projection,
+         center: centre,
+         minZoom: min_zoom,
          maxZoom: max_zoom,
       })
    map.setView(view);
-   map.getView().fitExtent(new_extent, map.getSize());
+   map.getView().fitExtent(extent, map.getSize());
+
+//   if (current_zoom < min_zoom) map.getView().setZoom(min_zoom);
+//   if (current_zoom > max_zoom) map.getView().setZoom(max_zoom);
 }

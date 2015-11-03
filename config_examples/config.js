@@ -49,6 +49,9 @@ gisportal.config = {
    autoScale: true,
 
 
+   // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
+   //bingMapsAPIKey: 'xxxxxxxxxxxx',
+
    homepageSlides: [
       "img/homepage-slides/opec1.jpg",
       "img/homepage-slides/opec2.jpg",
