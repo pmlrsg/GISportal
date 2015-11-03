@@ -164,7 +164,7 @@
 
     //Public method to select an option by its index
     methods.select = function (options) {
-        var doCallback = true;
+        var doCallback = undefined;
         if (typeof options.doCallback !== 'undefined') doCallback = options.doCallback;
 
         return this.each(function () {

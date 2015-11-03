@@ -13,13 +13,15 @@ gisportal.map_settings.init = function() {
    
    var layer = {};
    layer.id = 'none';
-   layer.name = 'No map (plain black background)';
+   layer.name = 'No map';
+   layer.description = 'plain black background';
    layers.push(layer);
 
    _.forEach(gisportal.baseLayers, function(d)  {
       var layer = {};
       layer.id = d.getProperties().id;
       layer.name = d.getProperties().title;
+      layer.description = d.getProperties().description;
       layers.push(layer);
    });
 
@@ -33,9 +35,14 @@ gisportal.map_settings.init = function() {
       borders.push(border);
    })
 
+   var projections = [];
+   _.forEach(gisportal.availableProjections, function(d) {
+      projections.push(d)
+   })
    var data = {
       baseLayers: layers,
-      countryBorders: borders
+      countryBorders: borders,
+      projections: projections
    }
    var rendered = gisportal.templates['map-settings'](data)
    $('.js-map-options').html(rendered); 
@@ -59,6 +66,13 @@ gisportal.map_settings.init = function() {
       onSelected: function(data) { 
          if (data.selectedData) {
             gisportal.setGraticuleVisibility(data.selectedData.value); 
+         }
+      },
+   });
+   $('#select-projection').ddslick({
+      onSelected: function(data) { 
+         if (data.selectedData) {
+            gisportal.setProjection(data.selectedData.value); 
          }
       },
    });
@@ -118,7 +132,6 @@ gisportal.setGraticuleVisibility = function(setTo) {
       
    }
 }
-      
 
 /** Create  the country borders overlay
  *
@@ -218,6 +231,8 @@ gisportal.createBaseLayers = function() {
       EOX: new ol.layer.Tile({
          id: 'EOX',                       // required to populate the display options drop down list
          title: 'EOX',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
@@ -236,6 +251,7 @@ gisportal.createBaseLayers = function() {
       GEBCO: new ol.layer.Tile({
          id: 'GEBCO',
          title: 'GEBCO',
+         projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
@@ -254,6 +270,8 @@ gisportal.createBaseLayers = function() {
       MetacartaBasic: new ol.layer.Tile({
          id: 'MetacartaBasic',
          title: 'Metacarta Basic',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
             url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
             crossOrigin: null,
@@ -272,6 +290,7 @@ gisportal.createBaseLayers = function() {
       Landsat: new ol.layer.Tile({
          id: 'Landsat',
          title: 'Landsat',
+         projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
             url: 'http://irs.gis-lab.info/?',
             crossOrigin: null,
@@ -290,6 +309,7 @@ gisportal.createBaseLayers = function() {
       BlueMarble: new ol.layer.Tile({
          id: 'BlueMarble',
          title: 'Blue Marble',
+         projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
             url: 'http://demonstrator.vegaspace.com/wmspub/?',
             crossOrigin: null,
@@ -304,6 +324,15 @@ gisportal.createBaseLayers = function() {
                tileElement.src = src;
             }
          }) 
+      }),
+      OSM: new ol.layer.Tile({
+         id: 'OSM',
+         title: 'Open Street Map',
+         description: 'EPSG:3857 only',
+         projections: ['EPSG:3857'],
+         source: new ol.source.OSM({
+            projection: gisportal.projection
+         })
       })
    }
 };
@@ -316,6 +345,29 @@ gisportal.selectBaseLayer = function(id) {
       } catch(e) {
          // nowt to do really, the base layer may not be on the map
       }
+   }
+   // check to see if we need to change projection
+   var current_projection = map.getView().getProjection().getCode();
+   var msg = '';
+   
+   // the selected base map isn't available in the current projection
+   if (_.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
+      // if there's only one available projection for the selected base map set the projection to that value and then load the base map
+      if (gisportal.baseLayers[id].getProperties().projections.length == 1) {
+         msg = 'The projection has been changed to ' + gisportal.baseLayers[id].getProperties().projections[0] + ' in order to display the ' + gisportal.baseLayers[id].getProperties().title + ' base layer';
+         gisportal.setProjection(gisportal.baseLayers[id].getProperties().projections[0])
+         $('#select-projection').ddslick('select', { value: gisportal.baseLayers[id].getProperties().projections[0], doCallback: false })
+      } else {
+         msg = 'The ' + gisportal.baseLayers[id].getProperties().title + ' base map is not available in the current projection. Try changing the projection first and then selecting the base map again';
+         return;
+      }
+   }
+
+   // if there's a message as a result of reprojection display it
+   if (msg.length > 0) {
+      $('.js-map-settings-message').html(msg).toggleClass('alert-warning', true).toggleClass('hidden', false);
+   } else {
+      $('.js-map-settings-message').html('').toggleClass('alert-warning', false).toggleClass('hidden', true);
    }
    // then add the selected option and send it to the bottom
    if (id !== 'none') {
@@ -342,4 +394,54 @@ gisportal.createGraticules = function() {
       graticule_control.setMap(map);
    }
 
+}
+  
+gisportal.setProjection = function(new_projection) {
+   // first make sure that base layer can accept the projection
+   var current_basemap = $('#select-basemap').data('ddslick').selectedData.value;
+
+   // does the current base map allow the requested projection?
+   if (_.indexOf(gisportal.baseLayers[current_basemap].getProperties().projections, new_projection) < 0) {
+      // no, tell the user then bail out
+      $('.js-map-settings-message')
+         .html('The ' + gisportal.baseLayers[current_basemap].getProperties().title + ' base map cannot be used with '+ new_projection +'. Try changing the base map and then selecting the required projection.')
+         .toggleClass('alert-danger', true)
+         .toggleClass('hidden', false);
+      // set the projection ddslick value back to original value
+      $('#select-projection').ddslick('revertToPreviousValue')
+      return;
+   } else {
+      $('.js-map-settings-message').html('').toggleClass('alert-danger', false).toggleClass('hidden', true);
+   }
+   
+   // the centre point so that we know where we are
+   var current_centre = map.getView().getCenter();
+   // the projection so that we know what we're transforming from
+   var current_projection = map.getView().getProjection().getCode();
+   // the extent so that we can make sure the visible area remains visible in the new projection
+   var current_extent = map.getView().calculateExtent(map.getSize());
+   // make sure that extent is within the new projection's extent, and if not tweak it so that it is
+   var new_max_extent = gisportal.availableProjections[new_projection].bounds
+   
+   if (current_extent[0] < new_max_extent[0]) current_extent[0] = new_max_extent[0];
+   if (current_extent[1] < new_max_extent[1]) current_extent[1] = new_max_extent[1];
+   if (current_extent[2] > new_max_extent[2]) current_extent[2] = new_max_extent[2];
+   if (current_extent[3] > new_max_extent[3]) current_extent[3] = new_max_extent[3];
+
+   // the current extent reprojected
+   var sw_corner = ol.proj.transform([current_extent[0], current_extent[1]], current_projection, new_projection);
+   var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
+   var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
+
+   var max_zoom = 12;
+   if (new_projection == 'EPSG:3857') max_zoom = 17;
+
+   var view = new ol.View({
+         projection: new_projection,
+         center: ol.proj.transform(current_centre, current_projection, new_projection),
+         minZoom: 3,
+         maxZoom: max_zoom,
+      })
+   map.setView(view);
+   map.getView().fitExtent(new_extent, map.getSize());
 }

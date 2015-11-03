@@ -73,7 +73,21 @@ gisportal.selectionTools = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
-gisportal.projection = 'EPSG:4326';
+gisportal.availableProjections = {
+   'EPSG:4326': { 
+      code: 'EPSG:4326',
+      name: 'WGS 84',
+      bounds: [-180, -90, 180, 90]
+   },
+   'EPSG:3857': { 
+      code: 'EPSG:3857',
+      name: 'WGS 84 / Pseudo-Mercator',
+      bounds: [-180, -85, 180, 85]
+   }
+}
+
+gisportal.projection = gisportal.availableProjections['EPSG:4326'].code;
+
 
 /**
  * The OpenLayers map object
@@ -304,15 +318,20 @@ gisportal.mapInit = function() {
 
    map = new ol.Map({
       target: 'map',
-      controls: [
-         new ol.control.FullScreen({
-            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
-         }),
-         new ol.control.Zoom({
-            zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
-            zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
-         })
-      ],
+      controls: ol.control.defaults({
+         attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+            collapsible: false
+            })
+         }).extend([
+            new ol.control.ScaleLine(),
+            new ol.control.FullScreen({
+               label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+            }),
+            new ol.control.Zoom({
+               zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
+               zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
+            })
+         ]),
       overlays: [dataReadingPopupOverlay],
       view: new ol.View({
          projection: gisportal.projection,
