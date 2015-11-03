@@ -180,7 +180,49 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.indicatorsPanel.reorderLayers();
       }
    });
+
+   // WCS URL event handlers
+   $('.js-indicators').on('click', 'button.js-wcs-url', function()  {
+      gisportal.indicatorsPanel.add_wcs_url($(this));
+   });
+
+   $('.js-indicators').on('change', 'input.js-wcs-url', function()  {
+      gisportal.indicatorsPanel.add_wcs_url($(this));
+   });
 };
+
+gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
+   console.log("Entered");
+   wcs_url = $('input.js-wcs-url')[0].value;
+   layer = gisportal.layers[selected_this.closest('[data-id]').data('id')];
+   filename = layer.serverName;
+   name = layer.urlName;
+   error_div = $("#" + layer.id + "-analysis-message");
+
+   if(!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))){
+      error_div.toggleClass('hidden', false);
+      error_div.html("The URL must start with 'http://'' or 'https://'");
+   }
+   else{
+      $.ajax({
+         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name,
+         success: function(data){
+            layer.wcsURL = data
+            gisportal.indicatorsPanel.analysisTab(layer.id)
+            message_div = $("#" + layer.id + "-analysis-message");
+            message_div.toggleClass('hidden', false);
+            message_div.html('The WCS URL has been added to this layer.');
+            message_div.toggleClass('alert-danger', false);
+            message_div.toggleClass('alert-success', true);
+         },
+         error: function(e){
+            //show an error that tells the user what is wrong
+            error_div.toggleClass('hidden', false);
+            error_div.html('There was an error using that URL: ' + e.statusText);
+         }
+      });
+   }
+}
 
 gisportal.events.bind('metadata.close', function() {
    $('.indicator-overlay').remove();

@@ -35,7 +35,6 @@ gisportal.autoLayer.loadGivenLayer = function(){
          }
       }
    }
-   console.log("Loaded Given Layers");
 };
 
 
