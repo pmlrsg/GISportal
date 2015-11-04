@@ -318,20 +318,20 @@ gisportal.mapInit = function() {
 
    map = new ol.Map({
       target: 'map',
-      controls: ol.control.defaults({
-         attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-            collapsible: false
-            })
-         }).extend([
-            new ol.control.ScaleLine(),
-            new ol.control.FullScreen({
-               label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
-            }),
-            new ol.control.Zoom({
-               zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
-               zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
-            })
-         ]),
+      controls: [
+         new ol.control.FullScreen({
+            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+         }),
+         new ol.control.Zoom({
+            zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
+            zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
+         }),
+         new ol.control.Attribution({
+            collapsible: false,
+            collapsed: false,
+         }),
+         new ol.control.ScaleLine({})
+      ],
       overlays: [dataReadingPopupOverlay],
       view: new ol.View({
          projection: gisportal.projection,
