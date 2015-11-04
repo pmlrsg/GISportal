@@ -60,6 +60,7 @@
    bottom:0px;
    left:0px;
    background: rgba(255, 255, 255, 0.7);
+   padding-left: 4px;
 }
 .ol-attribution button { display: none; }
 .ol-attribution li { display: inline; margin-right: 5px; font-size: 0.75em;}
