@@ -82,7 +82,7 @@ gisportal.availableProjections = {
    'EPSG:3857': { 
       code: 'EPSG:3857',
       name: 'WGS 84 / Pseudo-Mercator',
-      bounds: [-180, -85, 180, 85]
+      bounds: [-20037508.342789244, -19971868.880408563, 20037508.342789244, 19971868.88040853]    // -180, -85, 180, 85
    }
 }
 

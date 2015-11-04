@@ -499,16 +499,14 @@ gisportal.setProjection = function(new_projection) {
    // make sure that extent is within the new projection's extent, and if not tweak it so that it is
    var new_max_extent = gisportal.availableProjections[new_projection].bounds
    
-   if (current_extent[0] < new_max_extent[0]) current_extent[0] = new_max_extent[0];
-   if (current_extent[1] < new_max_extent[1]) current_extent[1] = new_max_extent[1];
-   if (current_extent[2] > new_max_extent[2]) current_extent[2] = new_max_extent[2];
-   if (current_extent[3] > new_max_extent[3]) current_extent[3] = new_max_extent[3];
-
    // the current extent reprojected
    var sw_corner = ol.proj.transform([current_extent[0], current_extent[1]], current_projection, new_projection);
    var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
    var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
 
+   for (var i = 0; i < 4; i++) {
+      if (isNaN(new_extent[i])) new_extent[i] = new_max_extent[i];
+   }
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
 }
