@@ -195,6 +195,8 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       $('.js-edit-polygon').attr('disabled', false);
    } else {
       bounds = feature.getGeometry().getExtent();
+      bounds = gisportal.reprojectBoundingBox(bounds, map.getView().getProjection().getCode(), 'EPSG:4326');
+
       var coords = "";
       if (bounds) {
          coords += bounds[0] + ",";

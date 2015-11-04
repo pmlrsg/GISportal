@@ -496,17 +496,19 @@ gisportal.setProjection = function(new_projection) {
    var current_projection = map.getView().getProjection().getCode();
    // the extent so that we can make sure the visible area remains visible in the new projection
    var current_extent = map.getView().calculateExtent(map.getSize());
-   // make sure that extent is within the new projection's extent, and if not tweak it so that it is
-   var new_max_extent = gisportal.availableProjections[new_projection].bounds
+   // // make sure that extent is within the new projection's extent, and if not tweak it so that it is
+   // var new_max_extent = gisportal.availableProjections[new_projection].bounds
    
-   // the current extent reprojected
-   var sw_corner = ol.proj.transform([current_extent[0], current_extent[1]], current_projection, new_projection);
-   var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
-   var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
+   // // the current extent reprojected
+   // var sw_corner = ol.proj.transform([current_extent[0], current_extent[1]], current_projection, new_projection);
+   // var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
+   // var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
 
-   for (var i = 0; i < 4; i++) {
-      if (isNaN(new_extent[i])) new_extent[i] = new_max_extent[i];
-   }
+   // for (var i = 0; i < 4; i++) {
+   //    if (isNaN(new_extent[i])) new_extent[i] = new_max_extent[i];
+   // }
+   var new_extent = gisportal.reprojectBoundingBox(current_extent, current_projection, new_projection);
+
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
 }
@@ -532,4 +534,26 @@ gisportal.setView = function(centre, extent, projection) {
    map.setView(view);
    map.getView().fitExtent(extent, map.getSize());
 
+}
+
+gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
+   var new_bounds = bounds;
+
+   if (from_proj != to_proj) {
+      var new_max_extent = gisportal.availableProjections[to_proj].bounds
+
+      var sw_corner = gisportal.reprojectPoint([bounds[0], bounds[1]], from_proj, to_proj);
+      var ne_corner = gisportal.reprojectPoint([bounds[2], bounds[3]], from_proj, to_proj);
+      
+      var new_bounds = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
+
+      for (var i = 0; i < 4; i++) {
+         if (isNaN(new_bounds[i])) new_bounds[i] = new_max_extent[i];
+      }   
+   }
+   return new_bounds;
+}
+
+gisportal.reprojectPoint = function(point, from_proj, to_proj) {
+   return ol.proj.transform(point, from_proj, to_proj);
 }

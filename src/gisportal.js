@@ -351,8 +351,9 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-      var lon = e.coordinate[0].toFixed(3);
-      var lat = e.coordinate[1].toFixed(3);
+      var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+      var lon = point[0].toFixed(3);
+      var lat = point[1].toFixed(3);
       var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
       dataReadingPopupContent.innerHTML = response;
@@ -771,8 +772,8 @@ gisportal.zoomOverall = function()  {
          if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(layer.MaxY); // top
       }
 
-      // TODO: update the zoom to bounds for ol3
-      map.getView().fitExtent(largestBounds, map.getSize());
+      var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', map.getView().getProjection().getCode());
+      map.getView().fitExtent(extent, map.getSize());
    }
 };
 
@@ -977,7 +978,7 @@ gisportal.getPointReading = function(e) {
       request += '&TIME=' + layer.selectedDateTime;
       request += '&TRANSPARENT=true';
       request += '&STYLES=boxfill/rainbow';
-      request += '&CRS=EPSG:4326';
+      request += '&CRS='+ map.getView().getProjection().getCode();
       request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
       request += '&NUMCOLORBANDS=253';
       request += '&LOGSCALE=false';
@@ -985,7 +986,7 @@ gisportal.getPointReading = function(e) {
       request += '&REQUEST=GetFeatureInfo';
       request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
       request += '&FORMAT=image/png';
-      request += '&SRS=EPSG:4326';
+      request += '&SRS='+ map.getView().getProjection().getCode();
       request += '&BBOX='+ bbox;
       request += '&X='+ pixel[0];
       request += '&Y='+ pixel[1];
