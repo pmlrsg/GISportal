@@ -16,6 +16,7 @@ Things missing that ol3 doesn't do or I can't work out how to implement:
 */
 
 gisportal.selectionTools = {};
+gisportal.selectionTools.isDrawing = false;
 
 var draw;
 
@@ -66,6 +67,9 @@ function cancelDraw() {
    if(draw == null)return;
    
    map.removeInteraction(draw);
+   setTimeout(function() {
+      gisportal.selectionTools.isDrawing = false;
+   }, 500);
 }
 
 gisportal.selectionTools.initDOM = function()  {
@@ -122,6 +126,8 @@ gisportal.selectionTools.toggleTool = function(type)  {
    }
    
    if (type != 'None') {
+      gisportal.selectionTools.isDrawing = true;
+
       if (type == "Polygon") {
          draw = new ol.interaction.Draw({
             source:gisportal.vectorLayer.getSource(),
@@ -163,6 +169,9 @@ gisportal.selectionTools.updateROI = function()  {
 
 gisportal.currentSelectedRegion = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
+   setTimeout(function() {
+               gisportal.selectionTools.isDrawing = false;
+            }, 500);
    var feature_type = map.ROI_Type;
 
    // Get the geometry of the drawn feature

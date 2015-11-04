@@ -351,15 +351,17 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-      var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
-      var lon = point[0].toFixed(3);
-      var lat = point[1].toFixed(3);
-      var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-      var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-      dataReadingPopupContent.innerHTML = response;
-      dataReadingPopupOverlay.setPosition(e.coordinate);
+      if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
+         var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+         var lon = point[0].toFixed(3);
+         var lat = point[1].toFixed(3);
+         var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+         var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+         dataReadingPopupContent.innerHTML = response;
+         dataReadingPopupOverlay.setPosition(e.coordinate);
 
-      gisportal.getPointReading(e);
+         gisportal.getPointReading(e);
+      }
    })
    
    // Get both master cache files from the server. These files tells the server
@@ -959,7 +961,6 @@ gisportal.validateBrowser = function(){
  *  
  */
 gisportal.getPointReading = function(e) {
-
    var elementId = '#dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
 
    $.each(gisportal.selectedLayers, function(i, selectedLayer) {
@@ -1011,7 +1012,6 @@ gisportal.getPointReading = function(e) {
       });   
 
    });
-   
 }
 
 /**
