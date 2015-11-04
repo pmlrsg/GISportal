@@ -372,7 +372,7 @@ gisportal.createBaseLayers = function() {
 
       gisportal.baseLayers.BingMapsCB = new ol.layer.Tile({
          id: 'BingMapsCB',
-         title: 'Bing Maps - Collins Bart',
+         title: 'Collins Bart',
          description: 'EPSG:3857 only, coverage of UK only',
          projections: ['EPSG:3857'],
          source: new ol.source.BingMaps({
@@ -388,7 +388,7 @@ gisportal.createBaseLayers = function() {
 
       gisportal.baseLayers.BingMapsOS = new ol.layer.Tile({
          id: 'BingMapsOS',
-         title: 'Bing Maps - Ordnance Survey',
+         title: 'Ordnance Survey',
          description: 'EPSG:3857 only, coverage of UK only',
          projections: ['EPSG:3857'],
          source: new ol.source.BingMaps({
@@ -517,7 +517,7 @@ gisportal.setView = function(centre, extent, projection) {
    var current_zoom = map.getView().getZoom();
    var min_zoom = 3;
    var max_zoom = 12;
-   if (projection == 'EPSG:3857') max_zoom = 17;
+   if (projection == 'EPSG:3857') max_zoom = 19;
 
    var viewSettings = gisportal.baseLayers[$('#select-basemap').data('ddslick').selectedData.value].getProperties().viewSettings;
    if (typeof viewSettings !== 'undefined') {
@@ -534,6 +534,4 @@ gisportal.setView = function(centre, extent, projection) {
    map.setView(view);
    map.getView().fitExtent(extent, map.getSize());
 
-//   if (current_zoom < min_zoom) map.getView().setZoom(min_zoom);
-//   if (current_zoom > max_zoom) map.getView().setZoom(max_zoom);
 }
