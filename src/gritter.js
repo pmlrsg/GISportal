@@ -581,4 +581,60 @@ function createHelpMessages()
          return 'I\'m afraid we are not currently able to plot that amount of data on this type of graph.'
       }
    };
+
+   gisportal.gritter._notifications['layerLoadError'] = {
+      title: function() {
+         return 'Sorry, we failed to load a layer';
+      },
+      text: function(data) {
+         return 'There was an error adding the layer with ID ' +
+         data.layer + ' : ' + data.e;
+      }
+   };
+
+   gisportal.gritter._notifications['noMatchingURLLayers'] = {
+      title: function() {
+         return 'Getting Layer(s)';
+      },
+      text: function() {
+         return 'We are working to retrieve the layer(s) from this URL';
+      }
+   };
+
+   gisportal.gritter._notifications['noMatchingNameLayers'] = {
+      title: function() {
+         return 'Sorry, we were unable to load any layers';
+      },
+      text: function(data) {
+         return 'We have no layers with the Tag: ' + data.url_name;
+      }
+   };
+
+   gisportal.gritter._notifications['layersRetrieved'] = {
+      title: function() {
+         return 'Layers Retrieved';
+      },
+      text: function(data) {
+         return 'We have succefully retrieved the layers you aksed for';
+      }
+   };
+
+   gisportal.gritter._notifications['findGivenLayerFail'] = {
+      title: function() {
+         return 'Sorry there was an unexpected error';
+      },
+      text: function(data) {
+         return 'There was an error thrown by the server: ' + data;
+      }
+   };
+
+   gisportal.gritter._notifications['retrievingLayers'] = {
+      title: function() {
+         return 'Finding layers';
+      },
+      text: function(data) {
+         return 'We are trying to load layers from the URL you have provided.';
+      },
+      time: '500',
+   };
 }

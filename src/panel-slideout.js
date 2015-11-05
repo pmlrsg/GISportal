@@ -56,7 +56,6 @@ gisportal.panelSlideout.openSlideout = function( slideoutName ){
 
 
 gisportal.panelSlideout.closeSlideout = function( slideoutName ){
-	console.log('inside closeout');
 	var slideout = findRelatedSlideoutName( slideoutName );
 	slideout.removeClass( 'show-all show-peak' );
 };

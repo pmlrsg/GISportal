@@ -30,6 +30,7 @@ gisportal.configurePanel.refreshData = function()  {
       this.renderTagsAsSelectlist();
    }
 
+
 };
 
 /**
@@ -282,6 +283,19 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    // load the template
    var catFilter = gisportal.templates['category-filter-tabs']();
    $('.js-category-filter').html(catFilter);
+   $('.more-info').on('click', function() {
+      var message_block = $(this).prev();
+      if(message_block.is(':visible')){
+         $(this).html("more info...");
+         message_block.slideUp('slow');
+      }else{
+         $(this).html("less info...");
+         message_block.slideDown('slow');
+      }
+   });
+   $('button#reset-list').on('click', function() {
+      gisportal.configurePanel.resetPanel();
+   });
 
    // iterate over each category
    for (var cat in gisportal.config.browseCategories)  {
@@ -304,6 +318,19 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
    var catFilter = gisportal.templates['category-filter-selectlist']();
    $('.js-category-filter').html(catFilter);
+   $('.more-info').on('click', function() {
+      var message_block = $(this).prev();
+      if(message_block.is(':visible')){
+         $(this).html("more info...");
+         message_block.slideUp('slow');
+      }else{
+         $(this).html("less info...");
+         message_block.slideDown('slow');
+      }
+   });
+   $('button#reset-list').on('click', function() {
+      gisportal.configurePanel.resetPanel();
+   });
 
    var categories = [];
    for (var category in gisportal.config.browseCategories) {
@@ -547,6 +574,33 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
    arr.splice(index, 0, obj);
    return arr;
 };
+
+/**
+ * Takes an object of layers (like layers is) and resets the panel to display these layers only.
+ * If no layers are given then it resets to the original layers.
+ * @param {Object} given_layers - The layers you want to be loaded or NULL.
+ */
+gisportal.configurePanel.resetPanel = function(given_layers){
+   if(given_layers){
+      // Either keeps the original as it is or stores the layers if it is undefined
+      gisportal.original_layers = gisportal.original_layers || gisportal.layers;
+      gisportal.layers = given_layers;
+      gisportal.configurePanel.refreshData();
+         $('.filtered-list-message').show();
+   }else{
+      // Ensures the panel is only reset when it really needs to be
+      if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
+         gisportal.layers = gisportal.original_layers; // Resets back to the original layers
+         gisportal.configurePanel.refreshData();
+         $('.filtered-list-message').hide();
+         $('.unfiltered-list-message').show();
+         setTimeout(function(){
+            $('.unfiltered-list-message').slideUp('slow')
+         }, 5000);
+      }
+   }
+};
+
 
 /**
  * Default tool tip styling
