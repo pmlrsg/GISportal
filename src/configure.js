@@ -89,6 +89,9 @@ gisportal.configurePanel.reset = function(){
  * is added, this function automatically gets called.
  */
 gisportal.configurePanel.buildMap = function(indicator)  {
+   console.log("bla blah");
+   console.log(indicator);
+
    if (indicator) gisportal.refinePanel.open(indicator);
    else gisportal.indicatorsPanel.open();
 };
@@ -346,7 +349,14 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('#js-category-filter-select').ddslick({
       data: categories,
       onSelected: function(data) {
-         if (data.selectedData) {
+         console.log(data.selectedData);
+         if(data.selectedData.value=="vector"){
+            console.log("adding vector layers now");
+            targetDiv.html('');
+            gisportal.addVectorLayers(gisportal.vlayers);
+            gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
+         }
+         else if (data.selectedData) {
             gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
          }
       }
@@ -509,6 +519,7 @@ gisportal.configurePanel.search = function(val)  {
    
    $('.js-search-results').html(rendered);
    $('.js-search-results a').click(function() {
+      console.log("clicked/..................");
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
       $('.js-search-results').css('display', 'none');   
    });

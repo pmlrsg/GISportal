@@ -480,7 +480,7 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
         
             
       if name and sensor_name and title and bounding_boxes and style:
-         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
+         layers.append({"Name": name, "Title": title, "tags":{ "Ecosystem_Element": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
          layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
          

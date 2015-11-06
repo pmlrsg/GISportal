@@ -166,13 +166,20 @@ gisportal.createVectorLayers = function() {
          "endpoint" : serverUrl,
          "serviceType" : "WFS",
          "variableName" : vector.variableName,
-         "maxFeatures" : vector.maxFeatures
+         "maxFeatures" : vector.maxFeatures,
+         "tags" : vector.tags,
+         "id" : vector.id,
+         "metadataQueue" : []
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
+
+gisportal.layers[vectorOptions.id] = vectorLayer;
+
       console.log(vectorLayer);
       vectorLayerOL = vectorLayer.createOLLayer();
+      vectorLayer.openlayers['anID'] = vectorLayerOL;
       console.log(vectorLayerOL);
       gisportal.vlayers.push(vectorLayerOL);
    }
@@ -251,6 +258,7 @@ console.log("adding info for Indicator : ");
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
+
 
    gisportal.events.trigger('layers-loaded');
 };

@@ -35,6 +35,8 @@ gisportal.Vector = function(options) {
 
    this.selected = false;
 
+   this.openlayers = {};
+
    /**
     * By default the layer is visible, to hide it
     * just call layer.setVisibility(false);
@@ -47,8 +49,9 @@ gisportal.Vector = function(options) {
       this.isVisible = visibility;
    };
 
-   this.init = function() {
+   this.init = function(options,layer) {
       console.log('initialiseing"');
+      map.addLayer(layer.OLLayer)
    };
 
 
@@ -189,3 +192,12 @@ this.loadFeatures = function(reponse) {
 return this;
 
 };
+
+gisportal.getVectorLayerData = function(layer) {
+
+}
+
+
+gisportal.addVectorLayers = function(layers) {
+  console.log(layers);
+}
