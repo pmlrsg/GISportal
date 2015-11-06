@@ -196,7 +196,7 @@ gisportal.graphs.Plot =(function(){
       this._components.forEach(function( component ){
          var layer = gisportal.layers[ component.indicator ];
 
-         if( ! layer.provider.logo )
+         if( ! layer.provider || ! layer.provider.logo )
             return;
 
          var providerLogo = portalLocation() + layer.provider.logo;
@@ -356,6 +356,13 @@ gisportal.graphs.Plot =(function(){
          if( layer.moreProviderInfo )
             markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
 
+         if(layer.provider){
+            logo = layer.provider.logo;
+         }
+         else{
+            logo = "undefined"
+         }
+
          // Gumph needed for the plotting serving to its thing
          var newSeries = {
             // Source handler file to use
@@ -382,7 +389,7 @@ gisportal.graphs.Plot =(function(){
             "type": "line",
             "meta": meta,
             "markdown": markdowns,
-            "logo": portalLocation() + layer.provider.logo
+            "logo": portalLocation() + logo
          };
 
          // If its a hovmoller then 

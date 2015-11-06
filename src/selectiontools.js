@@ -51,11 +51,9 @@ gisportal.selectionTools.init = function()  {
          feature = features[0];
 
       }
-      //console.log('feature')
    });
    map.on('postrender', function(renderEvent) {
       if (feature) {
-         console.log(feature)
          //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
       }
    });
@@ -79,11 +77,9 @@ gisportal.selectionTools.initDOM = function()  {
       gisportal.selectionTools.toggleTool('Box');
    });
    $('.js-indicators').on('click', '.js-draw-polygon', function() {
-      console.log('clicked th epolygon draw');
       gisportal.selectionTools.toggleTool('Polygon');
    });
    $('.js-indicators').on('click', '.js-draw-line', function() {
-      console.log('clicked the line draw');
       gisportal.selectionTools.toggleTool('Line');
    });
 
