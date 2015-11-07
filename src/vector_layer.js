@@ -17,7 +17,8 @@ gisportal.Vector = function(options) {
       serviceType: null, // currently either SOS or WFS
       endpoint: null, // service enpoint URL
       dataType: null, // one of (point|polygon|line)
-      exBoundingBox: null, // bounding box of layer
+      exBoundingBox: null,
+      boundingBox: null, // bounding box of layer
       providerTag: null, //short provider name
       serviceVersion: null, // version of OGC service
       variableName: null, // the WFS variable name
@@ -52,9 +53,66 @@ gisportal.Vector = function(options) {
    this.init = function(options,layer) {
       console.log('initialiseing"');
       map.addLayer(layer.OLLayer)
+      this.select();
    };
 
+   this.select = function() {
+      // Just in case it tries to add a duplicate
+      if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
+      var layer = this;
+      
+      layer.selected = true;
+      
+      // Adds the layer ID to the beginning of the gisportal.selectedLayers array
+      gisportal.selectedLayers.unshift(layer.id);
 
+      // If the layer has date-time data, use special select routine
+      // that checks for valid data on the current date to decide if to show data
+      if(layer.temporal) {
+         var currentDate = gisportal.timeline.getDate();
+         
+         //Nope
+         //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
+         layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
+         
+         // Now display the layer on the timeline
+         var startDate = new Date(layer.firstDate);
+         var endDate = new Date(layer.lastDate);
+         gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
+                 
+         // Update map date cache now a new temporal layer has been added
+         gisportal.refreshDateCache();
+         
+         $('#viewDate').datepicker("option", "defaultDate", endDate);
+
+      } else {
+         layer.setVisibility(true);
+      }
+      if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
+         //gisportal.zoomOverall();   
+      }
+      
+      
+      var index = _.findIndex(gisportal.selectedLayers, function(d) { return d === layer.id;  });
+      gisportal.setLayerIndex(layer, gisportal.selectedLayers.length - index);
+      
+   };
+
+    this.unselect = function() {
+      var layer = this; 
+      $('#scalebar-' + layer.id).remove(); 
+      layer.selected = false;
+      layer.setVisibility(false);
+      gisportal.selectedLayers = _.pull(gisportal.selectedLayers, layer.id);
+      if (layer.temporal) {
+         if (gisportal.timeline.timebars.filter(function(l) { return l.name === layer.name; }).length > 0) {
+            gisportal.timeline.removeTimeBarByName(layer.name);
+         }
+         
+         gisportal.refreshDateCache();
+         gisportal.zoomOverall();
+      }
+   };
 
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.

@@ -169,6 +169,8 @@ gisportal.createVectorLayers = function() {
          "maxFeatures" : vector.maxFeatures,
          "tags" : vector.tags,
          "id" : vector.id,
+         "boundingBox" : vector.boundingBox,
+         "exBoundingBox" : vector.exBoundingBox,
          "metadataQueue" : []
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
@@ -349,6 +351,8 @@ gisportal.refreshDateCache = function() {
    console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
 };
 
+
+
 /**
  * Sets up the map, plus its controls, layers, styling and events.
  */
@@ -400,6 +404,18 @@ gisportal.mapInit = function() {
          return e.originalEvent.type=='mousemove';
       }
    }));
+var select = new ol.interaction.Select({});
+map.addInteraction(select);
+
+   select.on('select', function(e){
+      console.log("e.target at select :");
+      console.log(e);
+      console.log(e.target);
+     if (e.target.hasOwnProperty('getFeatures')) {
+      console.log(e.coordinate);
+      gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
+}
+   })
 
    // Pan by mouse seems to be broken in ol3.8
    // This seems to be the new syntax for adding it
@@ -407,6 +423,10 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
+      console.log("eeeeeee");
+  console.log("e.target at click :");
+      console.log(e.target.hasOwnProperty('getFeatures'));
+      if (!e.target.hasOwnProperty('getFeatures')) {
       var lon = gisportal.normaliseCoordinate(e.coordinate[0]).toFixed(3);
       var lat = e.coordinate[1].toFixed(3);
       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
@@ -415,6 +435,7 @@ gisportal.mapInit = function() {
       dataReadingPopupOverlay.setPosition(e.coordinate);
 
       gisportal.getPointReading(e);
+   }
    });
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
@@ -430,6 +451,29 @@ gisportal.mapInit = function() {
    gisportal.selectionTools.init();
 
 };
+
+gisportal.getWFSFeature = function(featureID) {
+   url = "https://vortices.npm.ac.uk/geoserver/rsg/ows?service=WFS&maxFeatures=10version=1.1.0&request=GetFeature&typename=rsg:MMO_Fish_Shellfish_Cages_A&srs=EPSG:4326&outputFormat=application/json&featureID="
+   url += featureID;
+   $.ajax({
+      url: url,
+      success : function(data){
+         console.log(data);
+          var wfsFormat = new ol.format.GeoJSON({
+            featureNS: "http://rsg.pml.ac.uk",
+            featureType : [featureID.split('.')[1]]
+          });
+          console.log("success getting feature info");
+          features = wfsFormat.readFeatures(data);
+         console.log(features);
+      },
+      error : function(err) {
+         console.log("wfs get feature error");
+      }
+      
+   })
+};
+
 
 /**
  * The initiation of WMS layers, such as adding to gisportal.cache.
@@ -1046,11 +1090,20 @@ gisportal.getPointReading = function(e) {
    var coordinates = [];
    coordinates.push(gisportal.normaliseCoordinate(e.coordinate[0]));
    coordinates.push(e.coordinate[1]);
+   console.log(e);
 
    var elementId = '#dataValue'+ String(coordinates[0]).replace('.','') + String(coordinates[1]).replace('.','');
    var feature_found = false;
    $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+      console.log(gisportal.layers[selectedLayer].serviceType);
+      
       if(gisportal.pointInsideBox(coordinates, gisportal.layers[selectedLayer].exBoundingBox)){
+         if(gisportal.layers[selectedLayer].serviceType="WFS"){
+
+         console.log("getting extra info from WFS");
+         feature_found=true;
+         }
+         else {
          feature_found = true;
          var layer = gisportal.layers[selectedLayer];
          // build the request URL, starting with the WMS URL
@@ -1102,6 +1155,7 @@ gisportal.getPointReading = function(e) {
                $(elementId).prepend('<li>Sorry, feature information unavailable for: '+ layer.descriptiveName +'</li>');
             }
          });
+      } //end else
       }
    });
    if(!feature_found){
@@ -1115,6 +1169,8 @@ gisportal.getPointReading = function(e) {
  *    Returns false otherwise
  */
 gisportal.pointInsideBox = function(coordinate, exBoundingBox){
+   console.log(coordinate);
+   console.log(exBoundingBox);
    return coordinate[0] >= exBoundingBox.WestBoundLongitude && coordinate[0] <= exBoundingBox.EastBoundLongitude && coordinate[1] >= exBoundingBox.SouthBoundLatitude && coordinate[1] <= exBoundingBox.NorthBoundLatitude;
 }
 
