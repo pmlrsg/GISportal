@@ -36,7 +36,11 @@ gisportal.Vector = function(options) {
 
    this.selected = false;
 
+   this.styles = [];
+
    this.openlayers = {};
+
+   this.metadataQueue = [];
 
    /**
     * By default the layer is visible, to hide it
@@ -54,6 +58,8 @@ gisportal.Vector = function(options) {
       console.log('initialiseing"');
       map.addLayer(layer.OLLayer)
       this.select();
+      this.getMetadata();
+
    };
 
    this.select = function() {
@@ -69,21 +75,22 @@ gisportal.Vector = function(options) {
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
-         var currentDate = gisportal.timeline.getDate();
+        console.log("inside setting timescale");
+         // var currentDate = gisportal.timeline.getDate();
          
-         //Nope
-         //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
-         layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
+         // //Nope
+         // //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
+         // layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
          
-         // Now display the layer on the timeline
-         var startDate = new Date(layer.firstDate);
-         var endDate = new Date(layer.lastDate);
-         gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
+         // // Now display the layer on the timeline
+         // var startDate = new Date(layer.firstDate);
+         // var endDate = new Date(layer.lastDate);
+         // gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
                  
-         // Update map date cache now a new temporal layer has been added
-         gisportal.refreshDateCache();
+         // // Update map date cache now a new temporal layer has been added
+         // gisportal.refreshDateCache();
          
-         $('#viewDate').datepicker("option", "defaultDate", endDate);
+         // $('#viewDate').datepicker("option", "defaultDate", endDate);
 
       } else {
          layer.setVisibility(true);
@@ -112,6 +119,17 @@ gisportal.Vector = function(options) {
          gisportal.refreshDateCache();
          gisportal.zoomOverall();
       }
+   };
+
+   this.getMetadata = function() {
+    var layer = this;
+ gisportal.layers[layer.id].metadataComplete = true; 
+        layer.metadataComplete = true;
+  //      console.log("in metadat");
+//        console.table(gisportal.layers[layer.id]);
+        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
+        //gisportal.indicatorsPanel.selectTab( layer.id, "details" );
+
    };
 
    /**

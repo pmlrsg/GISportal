@@ -329,11 +329,11 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       .toggleClass('hidden', false)
       .toggleClass('active', gisportal.layers[id].isVisible);
    console.log(layer);
-   //if(layer.serviceType != "WFS"){
+   if(layer.serviceType != "WFS"){
       console.log("adding scalebar");
    gisportal.indicatorsPanel.scalebarTab(id);
 
-   //}
+   }
    gisportal.indicatorsPanel.detailsTab(id);
    gisportal.indicatorsPanel.analysisTab(id);
 
@@ -428,6 +428,8 @@ gisportal.indicatorsPanel.showLayer = function(id) {
 };
 
 gisportal.indicatorsPanel.detailsTab = function(id) {
+   console.log("adding details");
+   console.log(id);
    var indicator = gisportal.layers[id];
 
    var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
@@ -447,17 +449,20 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
          });      
       }
    }
-   
+   console.log(indicator);
    var rendered = gisportal.templates['tab-details'](indicator);
+   console.log(rendered);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
    gisportal.indicatorsPanel.checkTabFromState(id);
 };
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
+   console.log("adding analysis");
    var indicator = gisportal.layers[id];
 
    var onMetadata = function() {
+      console.log("in Onmetdata");
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;

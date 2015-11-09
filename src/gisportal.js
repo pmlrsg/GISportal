@@ -171,7 +171,12 @@ gisportal.createVectorLayers = function() {
          "id" : vector.id,
          "boundingBox" : vector.boundingBox,
          "exBoundingBox" : vector.exBoundingBox,
-         "metadataQueue" : []
+         "metadataQueue" : [],
+         "abstract" : vector.abstract,
+         "provider" : vector.provider,
+         "contactInfo" : {
+            "organization" : vector.provider
+         }
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
@@ -408,13 +413,12 @@ var select = new ol.interaction.Select({});
 map.addInteraction(select);
 
    select.on('select', function(e){
-      console.log("e.target at select :");
+    
+    
+  console.log("e.target at select :");
       console.log(e);
-      console.log(e.target);
-     if (e.target.hasOwnProperty('getFeatures')) {
-      console.log(e.coordinate);
-      gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
-}
+          //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
+
    })
 
    // Pan by mouse seems to be broken in ol3.8
@@ -423,9 +427,8 @@ map.addInteraction(select);
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-      console.log("eeeeeee");
-  console.log("e.target at click :");
-      console.log(e.target.hasOwnProperty('getFeatures'));
+   
+      
       if (!e.target.hasOwnProperty('getFeatures')) {
       var lon = gisportal.normaliseCoordinate(e.coordinate[0]).toFixed(3);
       var lat = e.coordinate[1].toFixed(3);

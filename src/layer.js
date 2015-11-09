@@ -189,6 +189,7 @@ gisportal.layer = function( options ) {
          this.style = default_style || this.styles[0].Name;
          
       } else if(this.type == "refLayers") {
+        console.log("gett wfs metadat if block")
          // intended for WFS type layers that are not time related
       }
       
