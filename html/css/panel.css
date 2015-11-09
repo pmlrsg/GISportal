@@ -460,7 +460,7 @@ input.search:focus  {
 
 .ellipsisOverflow {
 	text-overflow: ellipsis;
-	display: inline-block;
+  display: inline-block;
 	white-space: nowrap;
 	overflow: hidden;
 	max-width: 100%;
@@ -483,4 +483,17 @@ input.search:focus  {
 
 .download-text p {
 
+}
+
+
+.list-button-div{
+  text-align: right;
+}
+
+#list-message{
+  padding-bottom:5px;
+}
+
+.js-analysis-message {
+  padding: 8px;
 }

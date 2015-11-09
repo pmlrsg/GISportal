@@ -1,10 +1,11 @@
 <h3>Display Options</h3>
+<div class="hidden js-map-settings-message"></div>
 <ul>
 	<li>
 		<label for="select-basemap">Base Map Layer</label>
 		<select id="select-basemap">
 			{{#baseLayers}}
-				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg">{{name}}</option>
+				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg" data-description="{{description}}">{{name}}</option>
 			{{/baseLayers}}
 		</select>
 		<input type="hidden" id="select-basemap-value" />
@@ -22,6 +23,14 @@
 		<select id="select-graticules">
 			<option value="Off">Off</option>
 			<option value="On">On</option>
+		</select>
+	</li>
+	<li>
+		<label for="select-projection">Display Projection</label>
+		<select id="select-projection">
+			{{#projections}}
+			   <option value="{{code}}" data-description="{{name}}">{{code}}</option>
+			{{/projections}}
 		</select>
 	</li>
 </ul>

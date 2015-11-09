@@ -164,14 +164,26 @@
 
     //Public method to select an option by its index
     methods.select = function (options) {
+        var doCallback = undefined;
+        if (typeof options.doCallback !== 'undefined') doCallback = options.doCallback;
+
         return this.each(function () {
             if (typeof(options.index) !== 'undefined') {
-                selectIndex($(this), options.index);
+                selectIndex($(this), options.index, doCallback);
             }
             if (typeof(options.value) !== 'undefined') {
-                selectValue($(this), options.value);
+                selectValue($(this), options.value, doCallback);
             }
         });
+    }
+
+    methods.revertToPreviousValue = function() {
+        //return this.each(function() {
+            var previousValue = $(this).data('ddslick').previouslySelectedValue;
+            if (typeof previousValue !== 'undefined') {
+                selectValue($(this), previousValue, false);
+            }
+        //});
     }
 
     //Public method to open drop down
@@ -224,13 +236,13 @@
         });
     }
 
-    function selectValue(obj, value) {
+    function selectValue(obj, value, doCallback) {
 
         var ddOptions = obj.find('.dd-options li');
         var selectedOption = obj.find('.dd-option [value="' + value + '"]').closest('li');
         var index = ddOptions.index(selectedOption);
 
-        selectIndex(obj, index);
+        selectIndex(obj, index, doCallback);
     }
 
     //Private: Select index
@@ -252,7 +264,8 @@
             selectedOption = obj.find('.dd-option').eq(index),
             selectedLiItem = selectedOption.closest('li'),
             settings = pluginData.settings,
-            selectedData = pluginData.settings.data[index];
+            selectedData = pluginData.settings.data[index],
+            previouslySelectedValue = obj.find('.dd-option-selected input').val()
 
         //Highlight selected option
         obj.find('.dd-option').removeClass('dd-option-selected');
@@ -264,6 +277,7 @@
         pluginData.selectedIndex = index;
         pluginData.selectedItem = selectedLiItem;
         pluginData.selectedData = selectedData;        
+        pluginData.previouslySelectedValue = previouslySelectedValue;
 
         //If set to display to full html, add html
         if (settings.showSelectedHTML) {

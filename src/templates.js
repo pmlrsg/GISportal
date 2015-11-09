@@ -28,6 +28,9 @@ gisportal.loadTemplates = function( callback ){
       url: 'templates/all_templates.mst',
       success: compileTemplates
    })
+   
+   gisportal.templatesLoaded = true;
+   gisportal.events.trigger("templates-loaded");
 
 };
 

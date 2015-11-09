@@ -73,7 +73,21 @@ gisportal.selectionTools = null;
 gisportal.timeline = null;
 
 // Predefined map coordinate systems
-gisportal.projection = 'EPSG:4326';
+gisportal.availableProjections = {
+   'EPSG:4326': { 
+      code: 'EPSG:4326',
+      name: 'WGS 84',
+      bounds: [-180, -90, 180, 90]
+   },
+   'EPSG:3857': { 
+      code: 'EPSG:3857',
+      name: 'WGS 84 / Pseudo-Mercator',
+      bounds: [-20037508.342789244, -19971868.880408563, 20037508.342789244, 19971868.88040853]    // -180, -85, 180, 85
+   }
+}
+
+gisportal.projection = gisportal.availableProjections['EPSG:4326'].code;
+
 
 /**
  * The OpenLayers map object
@@ -148,11 +162,16 @@ gisportal.createOpLayers = function() {
    // Turn an indicator into a later and adding to gisporta.layers
    function processIndicator( server, sensorName, indicator ){
 
+      var wcs_url = indicator.wcsURL || server.wcsURL;
+
       var layerOptions = { 
          //new
+         "abstract": indicator.Abstract,
+         "contactInfo": server.contactInfo,
          "name": indicator.Name,
          "title": indicator.Title,
          "productAbstract": indicator.productAbstract,
+         "legendSettings": indicator.LegendSettings,
          "type": "opLayers",
 
          //orginal
@@ -160,7 +179,7 @@ gisportal.createOpLayers = function() {
          "lastDate": indicator.LastDate, 
          "serverName": server.serverName, 
          "wmsURL": server.wmsURL, 
-         "wcsURL": server.wcsURL, 
+         "wcsURL": wcs_url, 
          "sensor": sensorName, 
          "exBoundingBox": indicator.EX_GeographicBoundingBox, 
          "providerTag": server.options.providerShortTag,
@@ -189,6 +208,8 @@ gisportal.createOpLayers = function() {
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
    // Batch add here in future.
+
+   gisportal.events.trigger('layers-loaded');
 };
 
 /**
@@ -309,37 +330,38 @@ gisportal.mapInit = function() {
          new ol.control.Zoom({
             zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
             zoomOutLabel: $('<span class="icon-zoom-out"></span>').appendTo('body')
-         })
+         }),
+         new ol.control.Attribution({
+            collapsible: false,
+            collapsed: false,
+         }),
+         new ol.control.ScaleLine({})
       ],
       overlays: [dataReadingPopupOverlay],
       view: new ol.View({
          projection: gisportal.projection,
          center: [0, 0],
          minZoom: 3,
-         maxZoom: 12,
+         maxZoom: 17,
          resolution: 0.175,
       }),
       logo: false
    })
 
-   map.addInteraction(new ol.interaction.Select({
-      condition: function(e) {
-         return e.originalEvent.type=='mousemove';
-      }
-   }));
-
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-      var lon = e.coordinate[0].toFixed(3);
-      var lat = e.coordinate[1].toFixed(3);
-      var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-      var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-      dataReadingPopupContent.innerHTML = response;
-      dataReadingPopupOverlay.setPosition(e.coordinate);
+      if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
+         var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+         var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
+         var lat = point[1].toFixed(3);
+         var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+         var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+         dataReadingPopupContent.innerHTML = response;
+         dataReadingPopupOverlay.setPosition(e.coordinate);
 
-      gisportal.getPointReading(e);
-   });
-
+         gisportal.getPointReading(e);
+      }
+   })
    map.on("moveend", function(data) {
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
@@ -493,14 +515,21 @@ gisportal.loadState = function(state) {
    
    // Load layers for state
    var keys = state.selectedIndicators;
-   if (keys.length > 0)  {
+   var available_keys = [];
+
+   for(key in keys){
+      if (gisportal.layers[keys[key]]){
+         available_keys.push(keys[key]);
+      }
+   }
+   if (available_keys.length > 0)  {
       gisportal.configurePanel.close();
       gisportal.indicatorsPanel.open();
    }
-   for (var i = 0, len = keys.length; i < len; i++) {
+   for (var i = 0, len = available_keys.length; i < len; i++) {
       var indicator = null;
-      if (typeof keys[i] === "object") indicator = gisportal.layers[keys[i].id];
-      else indicator = gisportal.layers[keys[i]];
+      if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
+      else indicator = gisportal.layers[available_keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
          gisportal.configurePanel.close();
          // this stops the map from auto zooming to the max extent of all loaded layers
@@ -766,8 +795,8 @@ gisportal.zoomOverall = function()  {
          if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(layer.MaxY); // top
       }
 
-      // TODO: update the zoom to bounds for ol3
-      map.getView().fitExtent(largestBounds, map.getSize());
+      var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', map.getView().getProjection().getCode());
+      map.getView().fit(extent, map.getSize());
    }
 };
 
@@ -781,7 +810,7 @@ gisportal.initStart = function()  {
    // Should we auto resume ?
    // Do we have to show the T&C box first ?
    var autoLoad = null;
-   if( gisportal.config.skipWelcomePage == true )
+   if( gisportal.config.skipWelcomePage == true || gisportal.utils.getURLParameter('wms_url'))
       if( gisportal.config.autoResumeSavedState == true && gisportal.hasAutoSaveState() )
          var autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
       else
@@ -953,59 +982,100 @@ gisportal.validateBrowser = function(){
  *  
  */
 gisportal.getPointReading = function(e) {
-
-   var elementId = '#dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-
-   $.each(gisportal.selectedLayers, function(i, selectedLayer) {
-      var layer = gisportal.layers[selectedLayer];
-      // build the request URL, starting with the WMS URL
-      var request = layer.wmsURL;
-      var pixel = e.pixel;
-      var bbox = map.getView().calculateExtent(map.getSize());
-
-      request += 'LAYERS=' + layer.urlName;
-      if (layer.elevation) {
-         // add the currently selected elevation
-      } else {
-         request += '&ELEVATION=0';
-      }
-      request += '&TIME=' + layer.selectedDateTime;
-      request += '&TRANSPARENT=true';
-      request += '&STYLES=boxfill/rainbow';
-      request += '&CRS=EPSG:4326';
-      request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
-      request += '&NUMCOLORBANDS=253';
-      request += '&LOGSCALE=false';
-      request += '&SERVICE=WMS&VERSION=1.1.1';
-      request += '&REQUEST=GetFeatureInfo';
-      request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
-      request += '&FORMAT=image/png';
-      request += '&SRS=EPSG:4326';
-      request += '&BBOX='+ bbox;
-      request += '&X='+ pixel[0];
-      request += '&Y='+ pixel[1];
-      request += '&INFO_FORMAT=text/xml';
-      request += '&QUERY_LAYERS='+ layer.urlName;
-      request += '&WIDTH='+ $('#map').width();
-      request += '&HEIGHT='+ $('#map').height();
-      request += '&url='+ layer.wmsURL;
-      request += '&server='+ layer.wmsURL;
-
-      var jqxhr = $.get(request, function(data) {
-         console.log(data);
-         var value = data.documentElement.getElementsByTagName('value')[0].childNodes[0].nodeValue;
-         if (value) {
-            $(elementId +' .loading').remove();
-            $(elementId).prepend('<li>'+ layer.descriptiveName +': '+ value +' '+ layer.units +'</li>');
-         }
-      })
-      .fail(function() {
-         $(elementId +' .loading').remove();
-         $(elementId).prepend('<li>Sorry, could not calculate value for '+ layer.descriptiveName +'</li>');
-      });   
-
-   });
    
+   var elementId = '#dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+   var feature_found = false;
+   $.each(gisportal.selectedLayers, function(i, selectedLayer) {
+      if(gisportal.pointInsideBox(e.coordinate, gisportal.layers[selectedLayer].exBoundingBox)){
+         feature_found = true;
+         var layer = gisportal.layers[selectedLayer];
+         // build the request URL, starting with the WMS URL
+         var request = layer.wmsURL;
+         var pixel = e.pixel;
+         var bbox = map.getView().calculateExtent(map.getSize());
+
+         request += 'LAYERS=' + layer.urlName;
+         if (layer.elevation) {
+            // add the currently selected elevation
+         } else {
+            request += '&ELEVATION=0';
+         }
+         request += '&TIME=' + layer.selectedDateTime;
+         request += '&TRANSPARENT=true';
+         request += '&CRS='+ map.getView().getProjection().getCode();
+         request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
+         request += '&NUMCOLORBANDS=253';
+         request += '&LOGSCALE=false';
+         request += '&SERVICE=WMS&VERSION=1.1.1';
+         request += '&REQUEST=GetFeatureInfo';
+         request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
+         request += '&FORMAT=image/png';
+         request += '&SRS='+ map.getView().getProjection().getCode();
+         request += '&BBOX='+ bbox;
+         request += '&X='+ pixel[0];
+         request += '&Y='+ pixel[1];
+         request += '&QUERY_LAYERS='+ layer.urlName;
+         request += '&WIDTH='+ $('#map').width();
+         request += '&HEIGHT='+ $('#map').height();
+         request += '&url='+ layer.wmsURL;
+         request += '&server='+ layer.wmsURL;
+
+
+         $.ajax({
+            url:  '/service/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            success: function(data){
+               try{
+                  $(elementId +' .loading').remove();
+                  $(elementId).prepend('<li>'+ data +'</li>');
+               }
+               catch(e){
+                  $(elementId +' .loading').remove();
+                  $(elementId).prepend('<li>Sorry, feature information unavailable for: '+ layer.descriptiveName +'</li>');
+               }
+            },
+            error: function(e){
+               $(elementId +' .loading').remove();
+               $(elementId).prepend('<li>Sorry, feature information unavailable for: '+ layer.descriptiveName +'</li>');
+            }
+         });
+      }
+   });
+   if(!feature_found){
+      $(elementId +' .loading').remove();
+      $(elementId).prepend('<li>Sorry, you have clicked outside the bounds of all layers</li>')
+   }
+   
+}
+/**
+ *    Returns true if the coordinate is inside the bounding box provided.
+ *    Returns false otherwise
+ */
+gisportal.pointInsideBox = function(coordinate, exBoundingBox){
+   // as the exBoundingBox is defined as EPSG:4326 first reproject the coordinate
+   var point = gisportal.reprojectPoint(coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+   point[0] = gisportal.normaliseLongitude(point[0], 'EPSG:4326');
+
+   return point[0] >= exBoundingBox.WestBoundLongitude && point[0] <= exBoundingBox.EastBoundLongitude && point[1] >= exBoundingBox.SouthBoundLatitude && point[1] <= exBoundingBox.NorthBoundLatitude;
+}
+
+/**
+ * When clicking on a map where the date line has been crossed returns the latitude incorrectly, e.g. scroll west over the date
+ * line and click on Hobart and you get -212 degrees. This function corrects this 
+ * 
+ * @param  {[type]} coordinate      Reported longitude of the point on the map
+ * @param  {[type]} projection_code The projection from which to use the bounds
+ * @return {[type]}                 corrected longitude that's within the bounds of the projection
+ */
+gisportal.normaliseLongitude = function(coordinate, projection_code){
+   var bounds = gisportal.availableProjections[projection_code].bounds;
+
+   while(coordinate <= bounds[0]){
+      coordinate += Math.abs(bounds[0] + bounds[0]);
+   }
+   while(coordinate >= bounds[2]){
+      coordinate -= Math.abs(bounds[2] + bounds[2]);
+   }
+   return coordinate;
 }
 
 /**

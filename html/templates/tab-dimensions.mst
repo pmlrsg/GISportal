@@ -1,6 +1,27 @@
 <input type="radio" id="tab-{{id}}-dimensions" name="tabs" data-tab-name="dimensions" {{checked visibleTab "dimensions"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab dimensions-tab">
    <div class="scale-options">
+      {{#if minScaleVal}}
+      <div class="scalevalues">
+         <div class="clearfix">
+            <div class="pull-left scale-editor">
+               <b>Min:</b>
+               <input class="js-scale-min grid-cell" placeholder="Min" value="{{minScaleVal}}" data-id="{{id}}">
+            </div>
+            <div class="pull-right scale-editor">
+               <b>Max:</b>
+               <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{maxScaleVal}}" data-id="{{id}}">
+            </div>
+        </div>
+         <input type="checkbox" {{#if log}}checked{{/if}} id="tab-{{id}}-log" class="js-indicator-is-log" data-id="{{id}}">
+         <label for="tab-{{id}}-log">Logarithmic</label>
+         <label>
+            <input type="checkbox" {{#if autoScale}}checked{{/if}} id="tab-{{id}}-autoScale" class="js-auto" data-id="{{id}}" />
+            Auto Scale
+         </label>
+         <a class="js-reset text-button" data-id="{{id}}">Reset</a>
+      </div>
+         {{/if}}
       <div class="clearfix">
          <div class="pull-left scale-editor">
             <b>Min:</b>
@@ -38,16 +59,18 @@
       </div>
       {{/hasElevation}}
 
-      {{#hasStyles}}
-      <div class="indicator-option">
-         <label for="tab-{{id}}-layer-style">Layer style</label>
-         <select id="tab-{{id}}-layer-style">
-            {{#styles}}                  
-               <option {{selected Name @root.style}} value="{{Name}}">{{Name}}</option>
-            {{/styles}}
-         </select>
-      </div>
-      {{/hasStyles}}
+      {{#if styles.[1]}}
+         {{#hasStyles}}
+         <div class="indicator-option">
+            <label for="tab-{{id}}-layer-style">Layer style</label>
+            <select id="tab-{{id}}-layer-style">
+               {{#styles}}                  
+                  <option {{selected Name @root.style}} value="{{Name}}">{{Name}}</option>
+               {{/styles}}
+            </select>
+         </div>
+         {{/hasStyles}}
+      {{/if}}
       <div class="indicator-option">
          <button class="js-zoom-data text-button" data-id="{{id}}">Zoom to data</button>
       </div>

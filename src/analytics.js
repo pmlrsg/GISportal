@@ -98,12 +98,12 @@ gisportal.analytics.initDomEvents = function(){
          gisportal.analytics.events.selectionBoxTyped( layer )
    });
    
-   gisportal.events.bind( 'layer.select', function( id ){
+   gisportal.events.bind( 'layer.select', function( event, id ){
       var layer = gisportal.layers[ id ];
       gisportal.analytics.events.selectLayer( layer );
    });
    
-   gisportal.events.bind( 'layer.remove', function( id ){
+   gisportal.events.bind( 'layer.remove', function( event, id ){
       var layer = gisportal.layers[ id ];
       gisportal.analytics.events.removeLayer( layer );
    });

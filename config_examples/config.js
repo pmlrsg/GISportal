@@ -44,6 +44,8 @@ gisportal.config = {
    },
    defaultBaseMap: 'EOX',
    showGraticules: true,                           // (true|false)   Display latitude and longitude lines on the map
+
+   defaultStyle: "boxfill/rainbow",
    
    collaborationFeatures : {
       enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
@@ -56,6 +58,9 @@ gisportal.config = {
    autoScale: true,
 
    requiresTermsAndCondictions: true,
+
+   // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
+   //bingMapsAPIKey: 'xxxxxxxxxxxx',
 
    homepageSlides: [
       "img/homepage-slides/opec1.jpg",
