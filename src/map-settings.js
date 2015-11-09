@@ -496,21 +496,11 @@ gisportal.setProjection = function(new_projection) {
    var current_projection = map.getView().getProjection().getCode();
    // the extent so that we can make sure the visible area remains visible in the new projection
    var current_extent = map.getView().calculateExtent(map.getSize());
-   // // make sure that extent is within the new projection's extent, and if not tweak it so that it is
-   // var new_max_extent = gisportal.availableProjections[new_projection].bounds
-   
-   // // the current extent reprojected
-   // var sw_corner = ol.proj.transform([current_extent[0], current_extent[1]], current_projection, new_projection);
-   // var ne_corner = ol.proj.transform([current_extent[2], current_extent[3]], current_projection, new_projection);
-   // var new_extent = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
-
-   // for (var i = 0; i < 4; i++) {
-   //    if (isNaN(new_extent[i])) new_extent[i] = new_max_extent[i];
-   // }
    var new_extent = gisportal.reprojectBoundingBox(current_extent, current_projection, new_projection);
 
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
+   gisportal.refreshLayers();
 }
 
 gisportal.setView = function(centre, extent, projection) {
@@ -532,7 +522,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       })
    map.setView(view);
-   map.getView().fitExtent(extent, map.getSize());
+   map.getView().fit(extent, map.getSize());
 
 }
 
@@ -556,4 +546,18 @@ gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
 
 gisportal.reprojectPoint = function(point, from_proj, to_proj) {
    return ol.proj.transform(point, from_proj, to_proj);
+}
+
+gisportal.refreshLayers = function() {
+   _.forEach(map.getLayers().a, function(layer) {
+      var params = null;
+      try {
+         params = layer.getSource().getParams();   
+      } catch(e) {}
+
+      if (params) {
+         params.t = new Date().getMilliseconds();
+         layer.getSource().updateParams(params);
+      }
+   });
 }

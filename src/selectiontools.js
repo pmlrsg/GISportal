@@ -133,12 +133,29 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
       if (type == "Box") {
-         draw = new ol.interaction.DrawBox({
-            source:gisportal.vectorLayer.getSource(),
-            type: type
+      
+         var geometryFunction = function(coordinates, geometry) {
+            if (!geometry) {
+               geometry = new ol.geom.Polygon(null);
+            }
+            var start = coordinates[0];
+            var end = coordinates[1];
+            geometry.setCoordinates([
+               [start, [start[0], end[1]], end, [end[0], start[1]], start]
+            ]);
+            return geometry;
+         };
+         
+         draw = new ol.interaction.Draw({
+            source: gisportal.vectorLayer.getSource(),
+            type: 'LineString',
+            geometryFunction: geometryFunction,
+            maxPoints: 2
          });
          map.addInteraction(draw);
       }
+
+
       
       draw.on('drawstart',
          function(evt) {
