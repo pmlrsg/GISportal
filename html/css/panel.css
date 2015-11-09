@@ -497,3 +497,7 @@ input.search:focus  {
 .js-analysis-message {
   padding: 8px;
 }
+
+.tooltipster-base{
+  word-break : break-word;
+}

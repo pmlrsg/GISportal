@@ -1,0 +1,26 @@
+{{#if name}}
+   <dl>
+      <dt>Title<dt>
+      <dd>{{name}}</dd>
+   </dl>
+{{/if}}
+{{#if firstDate}}
+   <dl>
+      <dt>Date Range<dt>
+      <dd>{{firstDate}} - {{lastDate}}</dd>
+   </dl>
+{{/if}}
+{{#if exBoundingBox}}
+   {{#with exBoundingBox}}
+      <dl>
+         <dt>Bounding Box<dt>
+         <dd>{{round NorthBoundLatitude 2}} N, {{round EastBoundLongitude 2}} E, {{round SouthBoundLatitude 2}} S, {{round WestBoundLongitude 2}} W</dd>
+      </dl>
+   {{/with}}
+{{/if}}
+{{#if abstract}}
+   <dl>
+      <dt>Abstract<dt>
+      <dd>{{abstract}}</dd>
+   </dl>
+{{/if}}

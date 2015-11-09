@@ -243,6 +243,36 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
 
    } else {
       console.log('addToPanel');
+      var matching_tags = gisportal.groupNames(refinedIndicatorLayers)[name];
+      var placeholder = $('<div class="js-refine-section-external' + '"><div id="refine-external"></div></div>')
+      $('.js-refined-tags').append(placeholder)
+      var data = {}
+      for (indicator in refinedIndicators){
+         data[refinedIndicators[indicator]] = [refinedIndicators[indicator]];
+      }
+
+      $('#refine-external').ddslick({
+         data: gisportal.utils.mustacheFormat(data),
+         initialState: 'open',
+         selectText: 'Select a Layer',
+         onSelected: function(data) {
+            gisportal.refinePanel.layerFound(data.selectedData.text)
+         }
+      })
+
+      for (indicator in refinedIndicators){
+         var id = refinedIndicators[indicator];
+         var info = gisportal.templates['tooltip-refine-external-details'](gisportal.layers[id]);
+         var holder = $('input[value="' + id + '"]').parent()
+         if (holder.length > 0) {
+            holder.tooltipster({
+               content: $(info),
+               position: 'right',
+            })
+         }
+      }
+
+
 
    }
 };
