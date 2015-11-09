@@ -76,12 +76,13 @@ gisportal.indicatorsPanel.initDOM = function() {
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
-   }
+   });
 
    $('.js-indicators').on('change', '.js-scale-min', function() { 
       gisportal.indicatorsPanel.scalebarRangeChanged($(this));
       gisportal.events.trigger('scalebar.min-set', $(this).data('id'), $(this).val()) 
    });
+
    $('.js-indicators').on('change', '.js-scale-max', function() { 
       gisportal.indicatorsPanel.scalebarRangeChanged($(this));
       gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val()) 
@@ -202,16 +203,18 @@ gisportal.indicatorsPanel.initDOM = function() {
    // WCS URL event handlers
    $('.js-indicators').on('click', 'button.js-wcs-url', function()  {
       gisportal.indicatorsPanel.add_wcs_url($(this));
+   });
 
+   $('.js-indicators').on('change', 'input.js-wcs-url', function()  {
+      gisportal.indicatorsPanel.add_wcs_url($(this));
+   });
+   
    $('.js-indicators').on('click', '.js-select-layer-tab', function(){
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
    });
 
-   $('.js-indicators').on('change', 'input.js-wcs-url', function()  {
-      gisportal.indicatorsPanel.add_wcs_url($(this));
-   });
    $('#indicatorsPanel').bind('scroll', function() {
      gisportal.events.trigger('indicatorspanel.scroll', $(this).scrollTop())
    })
