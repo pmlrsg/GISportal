@@ -176,7 +176,10 @@ gisportal.createVectorLayers = function() {
          "provider" : vector.provider,
          "contactInfo" : {
             "organization" : vector.provider
-         }
+         },
+         "ignoredParams" : vector.ignoredParams,
+         "vectorType" : vector.vectorType,
+         "styles" : vector.styles
       };
       console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
@@ -460,6 +463,12 @@ gisportal.mapInit = function() {
       map.forEachFeatureAtPixel(e.pixel,
     function (feature, layer) {
         if (feature) {
+         // clear existing style if any layers currently slected
+          _.each(gisportal.selectedFeatures, function(feature){
+               feature[0].setStyle(feature[1]);
+            })
+         console.log('====================');
+         var tlayer = gisportal.layers['rsg_'+feature.id_.split('.')[0]];
          isFeature = true;
                gisportal.selectedFeatures.push([feature, feature.getStyle()]);
 
@@ -483,8 +492,8 @@ gisportal.mapInit = function() {
             var props = feature.values_;
             for (var key in props) {
                if (props.hasOwnProperty(key)) {
-                  console.log(key, props[key]);
-                  if (key != "the_geom") {
+                  //console.log(key, props[key]);
+                  if (!_.contains(tlayer.ignoredParams, key)) {
                      response += "<li>" + key + " : " + props[key] + "</li>"
                   }
                }

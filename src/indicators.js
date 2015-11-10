@@ -449,9 +449,9 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
          });      
       }
    }
-   console.log(indicator);
+   //console.log(indicator);
    var rendered = gisportal.templates['tab-details'](indicator);
-   console.log(rendered);
+   //console.log(rendered);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
    gisportal.indicatorsPanel.checkTabFromState(id);

@@ -36,7 +36,7 @@ gisportal.Vector = function(options) {
 
    this.selected = false;
 
-   this.styles = [];
+   //this.styles = [];
 
    this.openlayers = {};
 
@@ -147,6 +147,7 @@ gisportal.Vector = function(options) {
     * with gisportal.layer. 
     */
    this.createOLLayer = function() {
+    var fillColour = "rgba(0,0,255,1)";
       var styles = {
          "POINT": new ol.style.Style({
             image: new ol.style.Circle({
@@ -156,18 +157,26 @@ gisportal.Vector = function(options) {
                }),
                stroke: new ol.style.Stroke({
                   width: 0.5,
-                  color: 'rgba(0,0,255,1)'
+                  color: 'rgba(255,0,0,1)'
                })
             })
          }),
          "POLYGON": new ol.style.Style({
             stroke: new ol.style.Stroke({
-               color: 'rgba(0, 0, 255, 1.0)',
+               color: fillColour,
                width: 2
             })
          })
       };
       createStyle = function(vec) {
+        console.log("#############################");
+
+        console.log(vec)
+        if(vec.styles){
+        console.log("#############################");
+        console.log(vec.styles);
+        console.log(vec.styleParam)
+        }
          var styleType = vec.vectorType;
          return styles[styleType];
 
@@ -218,11 +227,11 @@ gisportal.Vector = function(options) {
          });
 
 
-         var layerVector = new ol.layer.Image({
-            source: new ol.source.ImageVector({
+         var layerVector = new ol.layer.Vector({
+        
                source: sourceVector,
                style: createStyle(vec)
-            })
+          
 
          });
 

@@ -143,7 +143,7 @@ def build_portal_css(t):
          destination.write('\n')
    destination.close()
    t.info('Prefixing CSS')
-   t.output('autoprefixer', 'html/css/GISPortal.css', '-b', '> 0.001%%')
+   #t.output('autoprefixer', 'html/css/GISPortal.css', '-b', '> 0.001%%')
    t.info('Finished building CSS')
 # -----------------------------------------------------------------------------
    
