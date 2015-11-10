@@ -378,6 +378,10 @@ gisportal.mapInit = function() {
    dataReadingPopupCloser.onclick = function() {
       dataReadingPopupOverlay.setPosition(undefined);
       dataReadingPopupCloser.blur();
+      _.each(gisportal.selectedFeatures, function(feature){
+         feature[0].setStyle(feature[1]);
+      })
+      gisportal.selectedFeatures = [];
       return false;
    };
 
@@ -439,6 +443,16 @@ gisportal.mapInit = function() {
    // This seems to be the new syntax for adding it
    map.addInteraction(new ol.interaction.DragPan({}));
 
+
+   var genColour = function(opacity) {
+      var r = Math.floor(Math.random() * (255 - 0) + 0);
+      var g = Math.floor(Math.random() * (255 - 0) + 0);
+      var b = Math.floor(Math.random() * (255 - 0) + 0);
+    var colour = 'rgba('+ r.toString() +',' + g.toString() +',' + b.toString() + ',' +opacity.toString() + ')'
+    console.log(colour);
+    return colour
+   }
+
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
    var isFeature = false;
@@ -447,9 +461,19 @@ gisportal.mapInit = function() {
     function (feature, layer) {
         if (feature) {
          isFeature = true;
+               gisportal.selectedFeatures.push([feature, feature.getStyle()]);
+
             var geometry = feature.getGeometry();
             var coord = geometry.getCoordinates();
-
+           feature.setStyle(new ol.style.Style({
+                   stroke: new ol.style.Stroke({
+                        color: genColour(1),
+                        width: 2
+                     }),
+                   fill : new ol.style.Fill({
+                     color: genColour(0.3)
+                   })
+               }));
             console.log('coord ' + coord); // coord 307225.8888888889,361595.6666666666
 
             //console.log(feature.values_); // name undefined
@@ -461,12 +485,12 @@ gisportal.mapInit = function() {
                if (props.hasOwnProperty(key)) {
                   console.log(key, props[key]);
                   if (key != "the_geom") {
-                     response += "<li>" + key + ":" + props[key] + "</li>"
+                     response += "<li>" + key + " : " + props[key] + "</li>"
                   }
                }
             }
       response += "</ul>"
-      
+    
         }
     });
       dataReadingPopupContent.innerHTML = response;
@@ -496,6 +520,9 @@ gisportal.mapInit = function() {
    gisportal.selectionTools.init();
 
 };
+
+gisportal.selectedFeatures = [];
+
 
 gisportal.getWFSFeature = function(featureID) {
    url = "https://vortices.npm.ac.uk/geoserver/rsg/ows?service=WFS&maxFeatures=10version=1.1.0&request=GetFeature&typename=rsg:MMO_Fish_Shellfish_Cages_A&srs=EPSG:4326&outputFormat=application/json&featureID="
@@ -1138,7 +1165,6 @@ gisportal.getPointReading = function(e) {
    console.log(e);
 
    var elementId = '#dataValue'+ String(coordinates[0]).replace('.','') + String(coordinates[1]).replace('.','');
-   var feature_found = false;
    $.each(gisportal.selectedLayers, function(i, selectedLayer) {
       console.log(gisportal.layers[selectedLayer].serviceType);
       
@@ -1146,10 +1172,8 @@ gisportal.getPointReading = function(e) {
          if(gisportal.layers[selectedLayer].serviceType="WFS"){
 
          console.log("getting extra info from WFS");
-         feature_found=true;
          }
          else {
-         feature_found = true;
          var layer = gisportal.layers[selectedLayer];
          // build the request URL, starting with the WMS URL
          var request = layer.wmsURL;
@@ -1203,10 +1227,10 @@ gisportal.getPointReading = function(e) {
       } //end else
       }
    });
-   if(!feature_found){
+   
       $(elementId +' .loading').remove();
       $(elementId).prepend('<li>Sorry, you have clicked outside the bounds of all layers</li>')
-   }
+   
    
 }
 /**
