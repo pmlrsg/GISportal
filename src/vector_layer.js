@@ -199,6 +199,7 @@ gisportal.Vector = function(options) {
                '&typename=' + $vector.variableName +
                '&srs=' + $vector.srsName +
                '&bbox=' + extent;
+
             $.ajax({
                   url: url
                })

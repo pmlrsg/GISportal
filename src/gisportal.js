@@ -409,27 +409,69 @@ gisportal.mapInit = function() {
          return e.originalEvent.type=='mousemove';
       }
    }));
-var select = new ol.interaction.Select({});
-map.addInteraction(select);
 
-   select.on('select', function(e){
+
+// var select = new ol.interaction.Select({
+//    multi : true,
+//    layers : function(layer){
+//       console.log("-------------------------------");
+//       console.log(layer);
+//       return true
+//    }
+// });
+// map.addInteraction(select);
+
+//    select.on('select', function(e){
     
     
-  console.log("e.target at select :");
-      console.log(e);
-          //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
+//   console.log("e.target at select :");
+//       console.log(e);
 
-   })
+//       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
+//       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+//       dataReadingPopupContent.innerHTML = response;
+//       dataReadingPopupOverlay.setPosition(e.coordinate);
+//           //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
 
-   // Pan by mouse seems to be broken in ol3.8
+//    })
+
+//    // Pan by mouse seems to be broken in ol3.8
    // This seems to be the new syntax for adding it
    map.addInteraction(new ol.interaction.DragPan({}));
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
-   
+   var isFeature = false;
+   var response = ''
+      map.forEachFeatureAtPixel(e.pixel,
+    function (feature, layer) {
+        if (feature) {
+         isFeature = true;
+            var geometry = feature.getGeometry();
+            var coord = geometry.getCoordinates();
+
+            console.log('coord ' + coord); // coord 307225.8888888889,361595.6666666666
+
+            //console.log(feature.values_); // name undefined
+            // var ft = myGeoJSONSource.getClosestFeatureToCoordinate(coord);
+            // console.log('name ' + ft.get('Tenant_Name')); // name Shefton
+            response += '<p>vector details</p><ul>';
+            var props = feature.values_;
+            for (var key in props) {
+               if (props.hasOwnProperty(key)) {
+                  console.log(key, props[key]);
+                  if (key != "the_geom") {
+                     response += "<li>" + key + ":" + props[key] + "</li>"
+                  }
+               }
+            }
+      response += "</ul>"
       
-      if (!e.target.hasOwnProperty('getFeatures')) {
+        }
+    });
+      dataReadingPopupContent.innerHTML = response;
+      dataReadingPopupOverlay.setPosition(e.coordinate);
+      if (!isFeature) {
       var lon = gisportal.normaliseCoordinate(e.coordinate[0]).toFixed(3);
       var lat = e.coordinate[1].toFixed(3);
       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
