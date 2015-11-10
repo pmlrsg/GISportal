@@ -12,4 +12,13 @@
    <li class="selectoptions">Available indicators:
       <div class="js-category-filter-options"></div>
    </li>
+   <li class="full-size" style="padding:10px;">
+      <div>
+         <p>You can add an external wms URL here:</p>
+         <input type="text" class="js-wms-url" placeholder="WMS URL">
+         <div class="clearfix" style="padding-top:10px;">
+            <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
+         </div>
+      </div>
+   </li>
 </ul>

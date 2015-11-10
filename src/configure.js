@@ -354,6 +354,19 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       defaultValue = { value: gisportal.config.defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
+
+   // WMS URL event handlers
+   $('button.js-wms-url').on('click', function()  {
+      gisportal.autoLayer.TriedToAddLayer = false;
+      gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
+      gisportal.autoLayer.loadGivenLayer();
+   });
+
+   $('input.js-wms-url').on('change', function()  {
+      gisportal.autoLayer.TriedToAddLayer = false;
+      gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
+      gisportal.autoLayer.loadGivenLayer();
+   });
 }
 
 /**
@@ -530,8 +543,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
       id = options.id;
    }
 
-   name = name.replace(/__/g, ' ');
-
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
@@ -579,8 +590,8 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
  */
 gisportal.configurePanel.resetPanel = function(given_layers){
    if(given_layers){
-      // Either keeps the original as it is or stores the layers if it is undefined
-      gisportal.original_layers = gisportal.original_layers || gisportal.layers;
+      // Either add layers the original or stores the layers if it is undefined
+      gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
       gisportal.layers = given_layers;
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();

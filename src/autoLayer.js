@@ -3,7 +3,7 @@ gisportal.autoLayer.TriedToAddLayer = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
-   var given_wms_url = gisportal.utils.getURLParameter('wms_url');
+   var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(given_wms_url && given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
    }
