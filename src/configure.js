@@ -14,9 +14,6 @@ gisportal.configurePanel = {};
 /**
  * The refreshData function is used to initialise
  * all of the data within the configure panel.
- * Currently, there is no use-case for updating
- * more than once but it is useful to be able
- * to have a way to reset the panel.
  */
 gisportal.configurePanel.refreshData = function()  {
    this.searchInit();
@@ -355,17 +352,46 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
 
-   // WMS URL event handlers
-   $('button.js-wms-url').on('click', function()  {
-      gisportal.autoLayer.TriedToAddLayer = false;
+   // WMS URL event handler
+   $('button.js-wms-url').on('click', function(e)  {
+      e.preventDefault();
       gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
-      gisportal.autoLayer.loadGivenLayer();
+      gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
+
+      error_div = $("#wms-url-message");
+      if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
+         error_div.toggleClass('hidden', false);
+         error_div.html("The URL must start with 'http://'' or 'https://'");
+         $('#refresh-cache-div').toggleClass('hidden', true);
+      }else{
+         error_div.toggleClass('hidden', true);
+         error_div.html("The URL must start with 'http://'' or 'https://'");
+         gisportal.autoLayer.TriedToAddLayer = false;
+         gisportal.autoLayer.loadGivenLayer();
+      }
    });
 
-   $('input.js-wms-url').on('change', function()  {
-      gisportal.autoLayer.TriedToAddLayer = false;
-      gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
-      gisportal.autoLayer.loadGivenLayer();
+   // WMS URL event handler for refresh cache checkbox
+   $('input.js-wms-url').on('change', function(e)  {
+      var input_value = $('input.js-wms-url')[0].value
+      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
+      $.ajax({
+         url:  'cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+         dataType: 'json',
+         success: function(layer){
+            $('#refresh-cache-message').toggleClass('hidden', false);
+            $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+            if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
+               $('#refresh-cache-div').toggleClass('hidden', false);
+            }else{
+               $('#refresh-cache-div').toggleClass('hidden', true);
+            }
+         },
+         error: function(e){
+            $('#refresh-cache-message').toggleClass('hidden', true);
+            $('#refresh-cache-div').toggleClass('hidden', true);
+         }
+      });
    });
 }
 
@@ -595,10 +621,14 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.layers = given_layers;
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();
+      for(index in gisportal.selectedLayers){
+         given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
+      }
    }else{
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
+         gisportal.original_layers = {};
          gisportal.configurePanel.refreshData();
          $('.filtered-list-message').hide();
          $('.unfiltered-list-message').show();

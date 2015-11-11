@@ -54,6 +54,18 @@ Handlebars.registerHelper('equals', function(attr1, attr2, options) {
    return ( attr1 == attr2 )
 });
 
+Handlebars.registerHelper('dotdotdot', function(str) {
+   lenVal = 200
+   if (str.length > lenVal)
+      for(var index=lenVal; index<str.length; index++){
+         if([" ", "_"].indexOf(str[index])>=0){
+            return str.substring(0,index) + '...';
+         }
+      }
+      return str.substring(0,lenVal) + '...';
+   return str;
+});
+
 
 /**
  * Returns the index of the current handelbars loop + 1

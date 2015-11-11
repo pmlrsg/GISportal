@@ -1,13 +1,13 @@
 {{#if name}}
    <dl>
       <dt>Title<dt>
-      <dd>{{name}}</dd>
+      <dd>{{{name}}}</dd>
    </dl>
 {{/if}}
 {{#if firstDate}}
    <dl>
       <dt>Date Range<dt>
-      <dd>{{firstDate}} - {{lastDate}}</dd>
+      <dd>{{{firstDate}}} - {{lastDate}}</dd>
    </dl>
 {{/if}}
 {{#if exBoundingBox}}
@@ -21,6 +21,12 @@
 {{#if abstract}}
    <dl>
       <dt>Abstract<dt>
-      <dd>{{abstract}}</dd>
+      <dd>{{{dotdotdot abstract}}}</dd>
+   </dl>
+{{/if}}
+{{#if serverName}}
+   <dl>
+      <dt>Server Name<dt>
+      <dd>{{{serverName}}}</dd>
    </dl>
 {{/if}}

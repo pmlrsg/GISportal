@@ -8,7 +8,9 @@ import urllib2
 from lxml import etree as ET
 import json
 import dateutil.parser
+import datetime
 import calendar
+
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
@@ -256,6 +258,7 @@ def createCache(url, refresh):
    path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
 
    if not os.path.isfile(path) or refresh == "true":
+      
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
       root = ET.parse(doc).getroot()
 
@@ -347,6 +350,7 @@ def createCache(url, refresh):
          sub_master_cache['wmsURL'] = url
          sub_master_cache['serverName'] = clean_url
          sub_master_cache['contactInfo'] = contact_info
+         sub_master_cache['timeStamp'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
          
          path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
          data = json.dumps(sub_master_cache)

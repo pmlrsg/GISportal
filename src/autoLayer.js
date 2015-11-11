@@ -8,7 +8,8 @@ gisportal.autoLayer.loadGivenLayer = function(){
       given_wms_url = given_wms_url.split("?")[0];
    }
    var given_url_name = gisportal.utils.getURLParameter('url_name');
-   var given_cache_refresh = gisportal.utils.getURLParameter('refresh_cache') || "false";
+   gisportal.autoLayer.refresh_cache = gisportal.autoLayer.refresh_cache || gisportal.utils.getURLParameter('refresh_cache');
+   var given_cache_refresh = gisportal.autoLayer.refresh_cache || "false";
 
    if((given_wms_url &&given_wms_url.length > 0) ||(given_url_name && given_url_name.length > 0)){
       // This passes the variables given in the URL to the getLayers function to get the matching layer(s)
@@ -72,14 +73,36 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
    if(!gisportal.autoLayer.TriedToAddLayer){
       gisportal.gritter.showNotification('retrievingLayers', null);
       gisportal.autoLayer.TriedToAddLayer = true;
+
+      clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
+      clean_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh
+      if(given_cache_refresh == "false"){
+         request_url = "cache/"+clean_file+".json"
+      }else{
+         request_url = clean_url
+      }
       $.ajax({
-         url:  '/service/load_new_wms_layer?url='+wms_url +'&refresh=' + given_cache_refresh,
+         url:  request_url,
          dataType: 'text',
          success: function(layer){
             gisportal.autoLayer.addGivenLayer(layer);
          },
          error: function(e){
-            gisportal.gritter.showNotification('findGivenLayerFail', e.statusText);
+            if(given_cache_refresh == "false" && e.status == 404){
+               $.ajax({
+                  url:  clean_url,
+                  dataType: 'text',
+                  success: function(layer){
+                     gisportal.autoLayer.addGivenLayer(layer);
+                  },
+                  error: function(e){
+                     gisportal.gritter.showNotification('findGivenLayerFail', e.statusText);
+                  }
+               });
+            }
+            else{
+               gisportal.gritter.showNotification('findGivenLayerFail', e.statusText);
+            }
          }
       });
    }
