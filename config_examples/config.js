@@ -46,6 +46,8 @@ gisportal.config = {
    showGraticules: true,                           // (true|false)   Display latitude and longitude lines on the map
 
    defaultStyle: "boxfill/rainbow",
+
+   cacheTimeout: 60,
    
    // Should layers auto scale by default
    autoScale: true,
