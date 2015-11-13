@@ -326,6 +326,15 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       gisportal.configurePanel.resetPanel();
    });
 
+   $('button#js-add-layers-form').on('click', function() {
+      for(layer in gisportal.layers){
+         if(layer.endsWith("UserDefinedLayer")){
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer])
+         }
+      }
+      gisportal.addLayersForm.displayform(_.size(gisportal.addLayersForm.layers_list), 1, 'div.js-layer-form-html')
+   });
+
    var categories = [];
    for (var category in gisportal.config.browseCategories) {
       var c = {
@@ -380,7 +389,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          dataType: 'json',
          success: function(layer){
             $('#refresh-cache-message').toggleClass('hidden', false);
-            $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+            if(layer.timeStamp){
+               $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+            }
             if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
                $('#refresh-cache-div').toggleClass('hidden', false);
             }else{

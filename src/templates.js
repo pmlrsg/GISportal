@@ -66,6 +66,11 @@ Handlebars.registerHelper('dotdotdot', function(str) {
    return str;
 });
 
+String.prototype.endsWith = function(search) {
+   var result = this.indexOf(search, this.length - search.length);
+   return result !== -1;
+};
+
 
 /**
  * Returns the index of the current handelbars loop + 1
@@ -89,6 +94,18 @@ Handlebars.registerHelper('truncate', function(text, max_length) {
       return new Handlebars.SafeString('<span title="' + text + '">' + text.substring( 0 , max_length - 3 ) + '...</span>');
    else
       return text;
+});
+
+Handlebars.registerHelper('for', function(from, to, incr, block) {
+    var accum = '';
+    for(var i = from; i <= to; i += incr)
+        accum += block.fn(i);
+    return accum;
+});
+
+Handlebars.registerHelper("inc", function(value, options)
+{
+    return parseInt(value) + 1;
 });
 
 /**

@@ -1,0 +1,16 @@
+<div class="js-layer-form-paginator">
+   <ul class="pagination pull-right">
+      {{#if beggining}}
+      <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, 1, '{{form_div}}')"><a href="#"><<</a></li>
+      <li class="disabled"><a  href="#">...</a></li>
+      {{/if}}
+      {{#for from to 1}}
+      <li {{#if_equals ../current this }}class="disabled"{{/if_equals}}class="js-go-to-form-page" onclick="{{../function_name}}({{../max}}, {{this}}, '{{../form_div}}')" ><a href="#">{{this}}</a></li>
+      {{/for}}
+
+      {{#if end}}
+      <li class="disabled"><a  href="#">...</a></li>
+      <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, {{max}}, '{{form_div}}')"><a href="#">>></a></li>
+      {{/if}}
+   </ul>
+</div>

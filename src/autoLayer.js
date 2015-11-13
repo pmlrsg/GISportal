@@ -18,7 +18,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
       // If there is a single layer, then it is loaded.
       if(_.size(gisportal.given_layers) == 1){
          try{
-            gisportal.refinePanel.layerFound(_.values(gisportal.given_layers)[0].id);
+            gisportal.configurePanel.resetPanel(gisportal.given_layers);
          }
          catch(e){
             gisportal.gritter.showNotification('layerLoadError', {'layer': given_layers[0].id, 'e' : e});

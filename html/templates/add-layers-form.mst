@@ -1,0 +1,8 @@
+<span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
+<form>
+   <h1>{{layer}}<h1>
+   <p>{{{abstract}}}</p>
+</form>
+<div class="clearfix">
+   <button class="brand small js-layers-form-submit pull-right">Submit Layers</button>
+</div>

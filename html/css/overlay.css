@@ -34,3 +34,21 @@
 }
 
 .js-modal-message-popup .overlay-container { width: auto; font-size: 20px;}
+
+.js-layer-form-html {
+   width: 1000px;
+   background-color: white;
+   color: black;
+   padding: 15px;
+   max-height: 90%;
+   max-width: 90%;
+   overflow: auto;
+}
+
+.js-layer-form-html .right-icon{
+  float: right;
+  font-size: 22px;
+  line-height: 1px;
+  color: black;
+
+}
