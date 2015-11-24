@@ -1,4 +1,4 @@
-Operational Ecology (OPEC) Portal
+GIS Portal
 =================================
 
 Authors:
@@ -7,8 +7,9 @@ Authors:
 > Shane Hudson  
 > Ben Calton  
 > Kieran Jones
+> Oliver Standeven
 
-Copyright (c) 2013 PML Applications Ltd  
+Copyright (c) 2015 PML Applications Ltd  
 http://www.pml-applications.co.uk/
   
 Permission is hereby granted, free of charge, to any person obtaining
@@ -37,7 +38,7 @@ The following lists below are a work in progress and may not be exhaustive. 23/0
 Third-Party Software
 ====================
 
-OPEC includes or depends upon the following third-party software, either in whole or in part. Each third-party software package is provided under its own license.
+GIS Portal includes or depends upon the following third-party software, either in whole or in part. Each third-party software package is provided under its own license.
 
 ### jQuery
 
@@ -46,38 +47,6 @@ OPEC includes or depends upon the following third-party software, either in whol
 > Copyright 2013 jQuery Foundation and other contributors  
 > http://jquery.com/  
 >  
-> Permission is hereby granted, free of charge, to any person obtaining
-> a copy of this software and associated documentation files (the
-> "Software"), to deal in the Software without restriction, including
-> without limitation the rights to use, copy, modify, merge, publish,
-> distribute, sublicense, and/or sell copies of the Software, and to
-> permit persons to whom the Software is furnished to do so, subject to
-> the following conditions:
->
-> The above copyright notice and this permission notice shall be
-> included in all copies or substantial portions of the Software.
->
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-> NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-> LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-> OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-> WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-### jQuery UI
-
-[http://jqueryui.com/](http://jqueryui.com/)
-
-> Copyright 2013 jQuery Foundation and other contributors,  
-> http://jqueryui.com/
->
-> This software consists of voluntary contributions made by many
-> individuals (AUTHORS.txt, http://jqueryui.com/about) For exact
-> contribution history, see the revision history and logs, available
-> at http://jquery-ui.googlecode.com/svn/
->
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the
 > "Software"), to deal in the Software without restriction, including
@@ -226,7 +195,7 @@ OPEC includes or depends upon the following third-party software, either in whol
 Modified Third-Party Code
 =========================
 
-OPEC includes the following third-party code in a modified state.
+GIS Portal includes the following third-party code in a modified state.
 
 ### Filtrify
 
@@ -268,30 +237,12 @@ OPEC includes the following third-party code in a modified state.
 > Date: February 24, 2012  
 > Version: 1.7.4  
 
-
-### jQuery ContextMenu
-
-[http://medialize.github.io/jQuery-contextMenu/](http://medialize.github.io/jQuery-contextMenu/)
-
-> $.contextMenu is published under the [MIT license](http://www.opensource.org/licenses/mit-license) and [GPL v3](http://opensource.org/licenses/GPL-3.0)
-
-
-### jQuery UI Multi Open Accordion Plugin
-
-[http://anasnakawa.wordpress.com/](http://anasnakawa.wordpress.com/)
-
-> jQuery UI Multi Open Accordion Plugin  
-> Author    : Anas Nakawa [(http://anasnakawa.wordpress.com/)](http://anasnakawa.wordpress.com/)  
-> Date      : 22-Jul-2011  
-> Released Under MIT License  
-> You are welcome to enhance this plugin at [https://code.google.com/p/jquery-multi-open-accordion/](https://code.google.com/p/jquery-multi-open-accordion/ )
-
 ---
 
 Build or Tests Software
 =======================
 
-OPEC uses the following third-party libraries as part of its build process or for testing.
+GIS Portal uses the following third-party libraries as part of its build process or for testing.
 
 ### Closure Compiler
 
