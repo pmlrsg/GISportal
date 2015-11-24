@@ -2,7 +2,7 @@
 
 The [GIS portal](https://github.com/pmlrsg/GISportal) is a web-based visualisation system delivering data in a form that allows for rapid interpretation at a regional scale to support policy implementation, environmental management and relevant commercial uses.
 
-The GIS portal was developed as part of the [European Commission FP7](http://cordis.europa.eu/projects/rcn/100881_en.html) project OPEC. 
+The GIS portal was developed as part of the [European Commission FP7](http://cordis.europa.eu/projects/rcn/100881_en.html) project OPEC.
 
 ## Overview ##
 
@@ -107,8 +107,8 @@ It is very likely that the commands for apache will be different for you dependi
 &ensp;**windows**
 
 
-## Fedora 19 ##
-These are the exact steps we use to install the GIS Portal on a fresh Fedora 19 installation. You may have some of the dependancies already and some steps you might be able to skip (for eample if SELinux is already permissive).
+## Fedora/RedHat/Centos ##
+These are the exact steps we use to install the GIS Portal on a fresh Fedora, RedHat or Centos installation. You may have some of the dependencies already and some steps you might be able to skip (for eample if SELinux is already permissive).
 
     sudo yum install httpd mod_wsgi
     sudo service httpd enable
