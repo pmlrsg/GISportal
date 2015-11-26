@@ -5,8 +5,8 @@ gisportal.addLayersForm.validation_errors = {};
 
 
 gisportal.addLayersForm.validation_functions = {
-   'all_tags':function(value){if(!/^[a-zA-Z0-9:\-\.\& \:\;\_\,\/\\]+$|^$/.test(value)){
-                                 var invalid_chars = _.uniq(value.match(/[^a-zA-Z0-9:\-\.\& \:\;\_\,\/\\]+|^$/g));
+   'all_tags':function(value){if(!/^[a-zA-Z0-9:\-\& \:\;\_\,\/\\]+$|^$/.test(value)){
+                                 var invalid_chars = _.uniq(value.match(/[^a-zA-Z0-9:\-\& \:\;\_\,\/\\]+|^$/g));
                                  return "The following characters are invalid: '" + invalid_chars.join("") + "' . Please try agian.";
                               }
    },
@@ -152,7 +152,13 @@ gisportal.addLayersForm.displayform = function(total_pages, current_page, form_d
                   gisportal.addLayersForm.layers_list = {};
                   gisportal.addLayersForm.server_info = {};
                   gisportal.addLayersForm.refreshStorageInfo();
-                  location.reload();
+                  for(key in gisportal.layers){
+                     delete gisportal.original_layers[key];
+                  }
+                  gisportal.loadLayers();
+                  delete gisportal.autoLayer.given_wms_url;
+                  $('div.js-layer-form-popup').toggleClass('hidden', true);
+                  gisportal.configurePanel.resetPanel();
                },
                error: function(e){
                   console.log("Error" + e.Message);

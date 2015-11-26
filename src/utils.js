@@ -443,3 +443,7 @@ HashMap.prototype.any = function any(value) {
    }
    return false;
 };
+
+gisportal.utils.titleCase = function(str){
+   return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}

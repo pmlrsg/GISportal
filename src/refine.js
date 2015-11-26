@@ -82,7 +82,7 @@ gisportal.refinePanel.refreshData = function() {
    // work out if any of the browseCategories for the selected indicator name has more than one option
    for (var tag in indicatorTags) {
       if (indicatorTags.hasOwnProperty(tag)) {
-         if ( _.keys(indicatorTags[tag]).length > 1 && gisportal.config.browseCategories[tag]) {
+         if ( _.keys(indicatorTags[tag]).length > 1 && gisportal.browseCategories[tag]) {
             // has the category already been added to the refine array
             for (var i = 0; i < data.refine.length; i++) {
                if (data.refine[i].cat !== tag) {
@@ -123,7 +123,7 @@ gisportal.refinePanel.refreshData = function() {
       var selectedTags = [];
       for (var r in refine) {
          var tmp = {
-            cat: gisportal.config.browseCategories[refine[r].cat],
+            cat: gisportal.browseCategories[refine[r].cat],
             tag: refine[r].tag,
             rawCat: refine[r].cat
          }
@@ -174,7 +174,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       // create drop downs for each of the further filters
       for (var tag in furtherFilters) {
          var tagName = furtherFilters[tag];
-         var tagDisplayName = gisportal.config.browseCategories[tagName];
+         var tagDisplayName = gisportal.browseCategories[tagName];
 
          // we only want to show tags that haven't already been selected, so if the tag's in refine.data don't bother with it (or maybe show it but pre-selected?)
          var tagRefinedAlready = _.findKey(refine, function(chr) { return chr.cat == tagName; });
@@ -216,9 +216,9 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
          var holder = $('input[value="' + id + '"]').parent()
          
          var tags = [];
-         for (cat in gisportal.config.browseCategories) {
+         for (cat in gisportal.browseCategories) {
             var tmp = {
-               name: gisportal.config.browseCategories[cat],
+               name: gisportal.browseCategories[cat],
                value: gisportal.layers[id].tags[cat]
             }
             tags.push(tmp);

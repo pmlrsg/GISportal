@@ -387,8 +387,11 @@ gisportal.mapInit = function() {
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
+
    if (data !== null)  {
       gisportal.cache.wmsLayers = data;
+      // Create browse categories list
+      gisportal.loadBrowseCategories(data);
       // Create WMS layers from the data
       gisportal.createOpLayers();
    }
@@ -1090,4 +1093,32 @@ gisportal.showModalMessage = function(html, timeout) {
    setTimeout(function() {
       holder.toggleClass('hidden', true)
    }, t);
+}
+
+gisportal.loadBrowseCategories = function(data){
+   //get info
+   addCategory = function(cat){
+      if(!(cat in gisportal.browseCategories || cat == "niceName")){
+         gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+      }
+   }
+   gisportal.browseCategories = {};
+   if(data){
+      for(obj in data){
+         for(server in data[obj]['server']){
+            for(layers in data[obj]['server'][server]){
+               for(category in data[obj]['server'][server][layers]['tags']){
+                  addCategory(category);
+               }
+            }
+         }
+      }
+   }else{
+      for(layer in gisportal.layers){
+         for(category in gisportal.layers[layer]['tags']){
+            addCategory(category);
+         }
+      }
+   }
+
 }

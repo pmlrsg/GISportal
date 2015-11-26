@@ -292,9 +292,9 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    });
 
    // iterate over each category
-   for (var cat in gisportal.config.browseCategories)  {
+   for (var cat in gisportal.browseCategories)  {
 
-      var catNameKeys = Object.keys(gisportal.config.browseCategories);
+      var catNameKeys = Object.keys(gisportal.browseCategories);
       var tabNumber = _.indexOf(catNameKeys, cat) + 1;
       var targetDiv = $('#tab-browse-'+ tabNumber+' + .indicator-select');
 
@@ -306,7 +306,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 /**
  * An alternative method of grouping/filtering categories. This 
  * method adds a select list instead of the three tabs, and lists
- * each of the categories specified in gisportal.config.browseCategories
+ * each of the categories specified in gisportal.browseCategories
  */
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
@@ -339,10 +339,10 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
 
    var categories = [];
-   for (var category in gisportal.config.browseCategories) {
+   for (var category in gisportal.browseCategories) {
       var c = {
          value: category,
-         text: gisportal.config.browseCategories[category],
+         text: gisportal.browseCategories[category],
       }
       categories.push(c);
    }
@@ -359,8 +359,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
    var defaultValue = { index: 0 };
-   if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
-      defaultValue = { value: gisportal.config.defaultCategory };
+   var defaultCategory = gisportal.config.defaultCategory
+   if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.config.browseCategories) {
+      defaultValue = { value: defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
 
@@ -433,13 +434,16 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
       // sort it before it's rendered
       tagNames.sort() 
    } 
-   var catName = gisportal.config.browseCategories[cat];
-   var catNameKeys = Object.keys(gisportal.config.browseCategories);
+   var catName = gisportal.browseCategories[cat];
+   var catNameKeys = Object.keys(gisportal.browseCategories);
    
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
          var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';',',','(',')'], ['and','and','_','_','_','_','_','_'], tagNames[i]);
+         if(tagNameSafe.endsWith(':')){
+            tagNameSafe += "-"
+         }
          // sort them
          vals.sort();
          // For each tag name, if it has values then render the mustache
@@ -640,6 +644,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       // Either add layers the original or stores the layers if it is undefined
       gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
       gisportal.layers = given_layers;
+      gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();
       for(index in gisportal.selectedLayers){
@@ -653,6 +658,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
          gisportal.original_layers = {};
+         gisportal.loadBrowseCategories();
          gisportal.configurePanel.refreshData();
          $('.filtered-list-message').hide();
          $('.unfiltered-list-message').show();

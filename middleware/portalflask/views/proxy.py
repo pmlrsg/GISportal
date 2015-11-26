@@ -251,6 +251,7 @@ def get_cache():
 
    user_cache_path =os.path.join(CURRENT_PATH,USERCACHEPATH)
    for filename in os.listdir(user_cache_path):
+      print filename
       file_path = os.path.join(CURRENT_PATH, user_cache_path, filename)
       with open(file_path, 'r+') as layer_file:
          cache.extend([json.load(layer_file)])
