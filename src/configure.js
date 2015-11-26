@@ -310,7 +310,14 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
  */
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
-   var catFilter = gisportal.templates['category-filter-selectlist']();
+   var addable_layers = false;
+   for(layer in gisportal.layers){
+      if(layer.indexOf("UserDefinedLayer") > -1){
+         addable_layers = true;
+         break;
+      }
+   }
+   var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
    $('.more-info').on('click', function() {
       var message_block = $(this).prev();
@@ -440,7 +447,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
-         var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';',',','(',')'], ['and','and','_','_','_','_','_','_'], tagNames[i]);
+         var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';','.',',','(',')'], ['and','and','_','_','_','_','_','_','_'], tagNames[i]);
          if(tagNameSafe.endsWith(':')){
             tagNameSafe += "-"
          }

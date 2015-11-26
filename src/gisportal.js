@@ -1098,7 +1098,7 @@ gisportal.showModalMessage = function(html, timeout) {
 gisportal.loadBrowseCategories = function(data){
    //get info
    addCategory = function(cat){
-      if(!(cat in gisportal.browseCategories || cat == "niceName")){
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
          gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
       }
    }
