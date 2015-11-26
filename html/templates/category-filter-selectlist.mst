@@ -3,13 +3,15 @@
       <div id="js-category-filter-select"></div>
    </li>
    <li class="filtered-list-message selectoptions alert-warning" style="display: none" >
-      <p id="list-message">You are viewing a filtered list. Click the reset button to view the entire list.</p>
-      <p class="info-message" style="display: none" >The results shown below have been filtered to match your initial request, however, there are more indicators available for display. If you click the Reset button the panel below will reload to display all the available indicators.</p>
-      <a href="javascript:;" class="more-info">more info...</a><br/>
-      <div id="reset-list-button-div" class="clearfix">
-         <button id="reset-list" class="small pull-right brand">Reset</button>
+      <div reset-layers-div>
+         <p id="list-message">You are viewing a filtered list. Click the reset button to view the entire list.</p>
+         <p class="info-message" style="display: none" >The results shown below have been filtered to match your initial request, however, there are more indicators available for display. If you click the Reset button the panel below will reload to display all the available indicators.</p>
+         <a href="javascript:;" class="more-info">more info...</a><br/>
+         <div id="reset-list-button-div" class="clearfix">
+            <button id="reset-list" class="small pull-right brand">Reset</button>
+         </div>
       </div>
-      <div class="clearfix" style="padding-top:5px;">
+      <div class="clearfix add-layers-div">
          <p>Click here to add these layers to your account:</p>
          <button id="js-add-layers-form" class="brand small pull-right">Add Layers</button>
       </div>
@@ -20,7 +22,7 @@
       <div class="js-category-filter-options"></div>
    </li>
    <div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
-   <li class="full-size" style="padding:10px;">
+   <li class="full-size selectoptions">
       <div>
          <form>
             <p>You can add an external Web Map Service (WMS) URL here:</p>
@@ -32,7 +34,7 @@
                   <input type="checkbox" id="refresh-cache-box" />
                </label>
             </div>
-            <div class="clearfix" style="padding-top:10px;">
+            <div class="clearfix wms-url-div">
                <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
             </div>
          </form>

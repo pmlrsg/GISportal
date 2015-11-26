@@ -327,12 +327,15 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
 
    $('button#js-add-layers-form').on('click', function() {
+      var single_layer;
       for(layer in gisportal.layers){
-         if(layer.endsWith("UserDefinedLayer")){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            single_layer = gisportal.layers[layer]
             gisportal.addLayersForm.addlayerToList(gisportal.layers[layer])
          }
       }
-      gisportal.addLayersForm.displayform(_.size(gisportal.addLayersForm.layers_list), 1, 'div.js-layer-form-html')
+      gisportal.addLayersForm.validation_errors = {};
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
    });
 
    var categories = [];
@@ -364,28 +367,35 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
       e.preventDefault();
-      gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
-      gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
+      if(!gisportal.wms_submitted){
+         gisportal.wms_submitted = true;
+         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
+         gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
 
-      error_div = $("#wms-url-message");
-      if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
-         error_div.toggleClass('hidden', false);
-         error_div.html("The URL must start with 'http://'' or 'https://'");
-         $('#refresh-cache-div').toggleClass('hidden', true);
-      }else{
-         error_div.toggleClass('hidden', true);
-         error_div.html("The URL must start with 'http://'' or 'https://'");
-         gisportal.autoLayer.TriedToAddLayer = false;
-         gisportal.autoLayer.loadGivenLayer();
+         error_div = $("#wms-url-message");
+         if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
+            error_div.toggleClass('hidden', false);
+            error_div.html("The URL must start with 'http://'' or 'https://'");
+            $('#refresh-cache-div').toggleClass('hidden', true);
+            gisportal.wms_submitted = false;
+         }else{
+            error_div.toggleClass('hidden', true);
+            gisportal.autoLayer.TriedToAddLayer = false;
+            gisportal.autoLayer.loadGivenLayer();
+            gisportal.addLayersForm.layers_list = {};
+            gisportal.addLayersForm.server_info = {"wms_url":gisportal.autoLayer.given_wms_url};
+            gisportal.addLayersForm.refreshStorageInfo();
+         }
       }
    });
 
    // WMS URL event handler for refresh cache checkbox
    $('input.js-wms-url').on('change', function(e)  {
+      gisportal.wms_submitted = false;
       var input_value = $('input.js-wms-url')[0].value
       var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
       $.ajax({
-         url:  'cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+         url:  'cache/global_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
          dataType: 'json',
          success: function(layer){
             $('#refresh-cache-message').toggleClass('hidden', false);
@@ -429,7 +439,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
-         var tagNameSafe = gisportal.utils.replace(['\ ','.',';',':'], ['_','_','_','_'], tagNames[i]);
+         var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';',',','(',')'], ['and','and','_','_','_','_','_','_'], tagNames[i]);
          // sort them
          vals.sort();
          // For each tag name, if it has values then render the mustache
@@ -636,6 +646,9 @@ gisportal.configurePanel.resetPanel = function(given_layers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
    }else{
+      console.log("Are you sure: this will remove any changes made to the info");
+      gisportal.storage.set("layers_list", undefined);
+      gisportal.storage.set("server_info", undefined);
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers

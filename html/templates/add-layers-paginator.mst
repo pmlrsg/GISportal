@@ -1,16 +1,21 @@
-<div class="js-layer-form-paginator">
-   <ul class="pagination pull-right">
-      {{#if beggining}}
-      <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, 1, '{{form_div}}')"><a href="#"><<</a></li>
-      <li class="disabled"><a  href="#">...</a></li>
-      {{/if}}
-      {{#for from to 1}}
-      <li {{#if_equals ../current this }}class="disabled"{{/if_equals}}class="js-go-to-form-page" onclick="{{../function_name}}({{../max}}, {{this}}, '{{../form_div}}')" ><a href="#">{{this}}</a></li>
-      {{/for}}
+   <div class=" clearfix js-layer-form-paginator {{#if_equals max  1}}hidden{{/if_equals}}">
+      <ul class="pagination pull-right">
+         {{#if beggining}}
+         <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, 1, '{{form_div}}')"><a href="javascript:void(0)"><<</a></li>
+         <li class="disabled"><a  href="javascript:void(0)">...</a></li>
+         {{/if}}
+         {{#for from to 1}}
+         <li {{#if_equals ../current this }}class="disabled"{{/if_equals}}class="js-go-to-form-page" onclick="{{../function_name}}({{../max}}, {{this}}, '{{../form_div}}')" ><a href="javascript:void(0)">{{this}}</a></li>
+         {{/for}}
 
-      {{#if end}}
-      <li class="disabled"><a  href="#">...</a></li>
-      <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, {{max}}, '{{form_div}}')"><a href="#">>></a></li>
-      {{/if}}
-   </ul>
+         {{#if end}}
+         <li class="disabled"><a  href="javascript:void(0)">...</a></li>
+         <li class="js-go-to-form-page" onclick="{{function_name}}({{max}}, {{max}}, '{{form_div}}')"><a href="javascript:void(0)">>></a></li>
+         {{/if}}
+      </ul>
+   </div>
+
+<div class="{{#if_equals max  1}}clearfix{{/if_equals}} layers-form-buttons-div">
+   <button class="brand small js-layers-form-submit pull-right" href="javascript:void(0)">&#10004; Submit Layers</button>
+   <button class="brand small js-layers-form-cancel pull-right" href="javascript:void(0)">&#10006; Cancel Changes</button>
 </div>

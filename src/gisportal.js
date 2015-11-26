@@ -127,7 +127,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  './cache/mastercache.json',
+         url:  '/service/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: errorHandling,

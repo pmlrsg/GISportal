@@ -3,6 +3,7 @@ gisportal.autoLayer.TriedToAddLayer = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
+
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(given_wms_url && given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
@@ -43,12 +44,14 @@ gisportal.autoLayer.loadGivenLayer = function(){
 gisportal.events.bind("layers-loaded", function() {
    if(gisportal.templatesLoaded){
       gisportal.autoLayer.loadGivenLayer();
+      gisportal.autoLayer.loadPreviousLayers();
    }
  });
 
 gisportal.events.bind("templates-loaded", function() {
    if(gisportal.layersLoaded){
       gisportal.autoLayer.loadGivenLayer();
+      gisportal.autoLayer.loadPreviousLayers();
    }
  });
 
@@ -77,7 +80,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
       clean_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh
       if(given_cache_refresh == "false"){
-         request_url = "cache/"+clean_file+".json"
+         request_url = "cache/global_cache"+clean_file+".json"
       }else{
          request_url = clean_url
       }
@@ -115,5 +118,18 @@ gisportal.autoLayer.addGivenLayer = function(layer){
       gisportal.gritter.showNotification('findGivenLayerFail', json_layer["Error"]);
    }else{
       gisportal.initWMSlayers([json_layer]);
+   }
+};
+
+gisportal.autoLayer.loadPreviousLayers = function(){
+   gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list"));
+   gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info"));
+   if(gisportal.addLayersForm.server_info){
+
+      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.server_info["wms_url"];
+      gisportal.autoLayer.loadGivenLayer();
+      if(gisportal.addLayersForm.server_info["display_form"]){
+         gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , 1, 'div.js-layer-form-html', 'div.js-server-form-html');
+      }
    }
 };

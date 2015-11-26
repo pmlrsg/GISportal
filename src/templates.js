@@ -49,6 +49,11 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
       return options.fn();
 });
 
+Handlebars.registerHelper('unless_equals', function(attr1, attr2, options) {
+   if( attr1 != attr2 )
+      return options.fn();
+});
+
 
 Handlebars.registerHelper('equals', function(attr1, attr2, options) {
    return ( attr1 == attr2 )
@@ -64,6 +69,10 @@ Handlebars.registerHelper('dotdotdot', function(str) {
       }
       return str.substring(0,lenVal) + '...';
    return str;
+});
+
+Handlebars.registerHelper('title_case', function(str) {
+   return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 });
 
 String.prototype.endsWith = function(search) {

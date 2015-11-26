@@ -14,7 +14,8 @@ import calendar
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
-SERVERCACHEPATH = "../../../html/cache/"
+SERVERCACHEPATH = "../../../html/cache/global_cache"
+USERCACHEPATH = "../../../html/cache/user_cache"
 MASTERCACHEPATH = "../../../html/cache/mastercache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
@@ -27,7 +28,7 @@ XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 
 portal_proxy = Blueprint('portal_proxy', __name__)
 
-         
+   
 """
 Proxy Handler
 """
@@ -239,6 +240,89 @@ def add_wcs_url():
          return e
 
 """
+Loads the cache
+"""
+@portal_proxy.route('/get_cache')
+def get_cache():
+   cache = []
+   master_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH + FILEEXTENSIONJSON)
+   with open(master_path, 'r+') as master_file:
+      cache.extend( json.load(master_file))
+
+   user_cache_path =os.path.join(CURRENT_PATH,USERCACHEPATH)
+   for filename in os.listdir(user_cache_path):
+      file_path = os.path.join(CURRENT_PATH, user_cache_path, filename)
+      with open(file_path, 'r+') as layer_file:
+         cache.extend([json.load(layer_file)])
+
+   return json.dumps(cache)
+
+
+"""
+Add a user defined layer to the portal
+"""
+@portal_proxy.route('/add_user_layer', methods=['POST'])
+def add_user_layer():
+   layers_list = json.loads(request.form['layers_list'])
+   server_info = json.loads(request.form['server_info'])
+
+   if set(('unique_name', 'provider', 'wms_url')).issubset(server_info):
+
+      clean_url = replaceAll(server_info['wms_url'],{'http://': '', 'https://': '', '/': '-', '?': ''})
+      filename = clean_url + FILEEXTENSIONJSON
+      path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+      with open(path, 'r+') as data_file:
+         data = json.load(data_file)
+
+      new_data = []
+      for new_layer in layers_list:
+         this_new_layer = layers_list[new_layer]
+         if set(('abstract', 'id', 'list_id', 'nice_name', 'tags')).issubset(this_new_layer) and set(('indicator_type', 'region', 'interval', 'model_name')).issubset(this_new_layer['tags']):
+            for old_layer in data['server'][server_info['unique_name']]:
+               if old_layer['Name'] == this_new_layer['original_name']:
+                  if this_new_layer['include']:
+                     new_data_layer = old_layer
+                     new_data_layer['Title'] = this_new_layer['nice_name'].title()
+                     new_data_layer['Abstract'] = this_new_layer['abstract']
+                     for key in this_new_layer['tags']:
+                        val = this_new_layer['tags'][key]
+                        if len(val) > 0:
+                           new_data_layer['tags'][key] = val
+                        if len(server_info['provider']) > 0:
+                           new_data_layer['tags']['data_provider'] = server_info['provider']
+                     new_data_layer['tags']['niceName'] = this_new_layer['nice_name']
+                     new_data.append(new_data_layer)
+
+      data['server'][server_info['unique_name']] = new_data
+
+
+      if len(server_info['address']) > 0:
+         data['contactInfo']['address']= server_info['address'].replace('\n', '<br/>')
+      
+      if len(server_info['email']) > 0:
+         data['contactInfo']['email']= server_info['email']
+      
+      if len(server_info['person']) > 0:
+         data['contactInfo']['person']= server_info['person']
+      
+      if len(server_info['phone']) > 0:
+         data['contactInfo']['phone']= server_info['phone']
+
+      clean_provider = replaceAll(server_info['provider'], {"&amp":"and", "\\":'_', "/":'_', ".":'_', ",":'_', "(":'_', ")":'_', ":":'_', ";":'_'})
+
+      if len(server_info['provider']) > 0:
+         data['options']['providerShortTag'] = clean_provider
+      
+      if len(server_info['position']) > 0:
+         data['contactInfo']['position']= server_info['position']
+
+      path = os.path.join(CURRENT_PATH, USERCACHEPATH, filename)
+      
+      saveFile(path, json.dumps(data))
+      return ""
+
+
+"""
 WMS Layer Load
 """
 @portal_proxy.route('/load_new_wms_layer')
@@ -246,18 +330,18 @@ def load_new_wms_layer():
    url = request.args.get('url')
    refresh = request.args.get('refresh')
    return createCache(url + "?", refresh)
+   print "Hello"
 
 def createCache(url, refresh):
    sub_master_cache = {}
    sub_master_cache['server'] = {}
-   clean_url = url.replace('http://', '').replace('https://', '').replace('/', '-').replace('?', '')
+   clean_url = replaceAll(url, {'http://': '', 'https://': '', '/': '-', '?': ''})
    contact_info = {}
    address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
    path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
-
-   if not os.path.isfile(path) or refresh == "true":
+   if not os.path.isfile(path) or refresh == "true" or True:
       
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
       root = ET.parse(doc).getroot()
@@ -277,7 +361,7 @@ def createCache(url, refresh):
          contact_info['person'] = contact_person_elem.text
          
       if ET.iselement(contact_org_elem):
-         contact_info['organization'] = contact_org_elem.text
+         provider = contact_org_elem.text
          
       if ET.iselement(contact_position_elem):
          contact_info['position'] = contact_position_elem.text
@@ -343,13 +427,14 @@ def createCache(url, refresh):
                style = styles_list
 
 
-         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
+         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
       if len(layers) > 0:
          sub_master_cache['server'][sensor_name] = layers
          sub_master_cache['options'] = {"providerShortTag": "UserDefinedLayer"}
          sub_master_cache['wmsURL'] = url
          sub_master_cache['serverName'] = clean_url
          sub_master_cache['contactInfo'] = contact_info
+         sub_master_cache['provider'] = provider.replace('&amp;', '&')
          sub_master_cache['timeStamp'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
          
          path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
@@ -451,7 +536,7 @@ def createStylesArray(layer):
                          "Height": legend_elem.get('height')})
    return styles
 
-def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers):
+def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider):
    for layer in parent_layer.findall('.%sLayer' % (WMS_NAMESPACE)):
       name_elem = layer.find('./%sName' % (WMS_NAMESPACE))
       title_elem = layer.find('./%sTitle' % (WMS_NAMESPACE))
@@ -484,12 +569,12 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
         
             
       if name and sensor_name and title and bounding_boxes and style:
-         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
-         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "Dimensions": dimensions['dimensions'], "Styles": style}
+         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title(), "data_provider" : provider}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
+         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
          
          path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + name + FILEEXTENSIONJSON)
          saveFile(path, json.dumps(layer_data))
          style = None
       else:
-         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
+         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)

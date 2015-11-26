@@ -1,8 +1,32 @@
-<span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
-<form>
-   <h1>{{layer}}<h1>
-   <p>{{{abstract}}}</p>
-</form>
-<div class="clearfix">
-   <button class="brand small js-layers-form-submit pull-right">Submit Layers</button>
+<div class="form-header">
+   <p>{{nice_name}} &nbsp; ({{list_id}}/{{total_pages}})</p>
 </div>
+<div class="js-layers-form-validation form-validation-div alert-danger hidden"></div>
+<form class="layers-form">
+   <div class="layers-form-left">
+
+      {{#unless_equals total_pages "1"}}
+      <label>Do Not Include This Layer:</label>
+      <input type="checkbox" data-field="include" {{#unless ../include}}checked{{/unless}} data-id="{{../list_id}}"/></br>
+      {{/unless_equals}}
+
+      <label data-field="nice-name">Display Name:</label></br>
+      <input type="text" value="{{nice_name}}" data-field="nice-name" data-id="{{list_id}}"/></br>
+
+      <label data-field="abstract">Abstract:</label></br>
+      <textarea data-field="abstract" data-id="{{list_id}}">{{{abstract}}}</textarea>
+   </div>
+   <div class="layers-form-right">
+      {{#each tags}}
+         {{#if @first}}
+            <label data-field="{{@key}}"">{{title_case @key}} (comma seperated values):</label></br>
+            <textarea data-tag=true data-field="{{@key}}" data-id="{{../../list_id}}" >{{#each this}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</textarea>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="indicator-type"></span>{{/if_equals}}<br/>
+         {{/if}}
+         {{#unless @first}}
+            <label data-field="{{@key}}">{{title_case @key}}:</label></br>
+            <input data-tag=true type="text" value="{{this}}" data-field="{{@key}}" data-id="{{../../list_id}}"/>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="{{@key}}"></span>{{/if_equals}}</br>
+         {{/unless}}
+      {{/each}}
+      <span title="Add another Tag" data-total-pages="{{total_pages}}" data-current-page="{{list_id}}" class="add-tag-input icon-tag-add btn icon-btn left-icon"></span>
+   </div>
+</form>

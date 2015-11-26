@@ -9,8 +9,9 @@ import calendar
 import json
 
 sys.path.append(os.path.join(sys.path[0],'..','config'))
+sys.path.append(os.path.join(sys.path[0],'..','config/user_layers'))
 # server list
-import wmsLayers
+import PML_RSG_THREDDS_Data_Server as wmsLayers
 from providers import providers
 from legendSettings import legendSettings as defaultLegendSettings
 
@@ -214,7 +215,8 @@ def createCache(server, capabilitiesXML, coverageXML):
    
    subMasterCache['options'] = server['options']
    subMasterCache['wmsURL'] = server['services']['wms']['url']
-   subMasterCache['wcsURL'] = server['services']['wcs']['url']
+   if set(('wcs')).issubset(server['services']):
+      subMasterCache['wcsURL'] = server['services']['wcs']['url']
    subMasterCache['serverName'] = server['name']
    
    print 'Cache creation complete...'
