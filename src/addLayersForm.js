@@ -159,6 +159,7 @@ gisportal.addLayersForm.displayform = function(total_pages, current_page, form_d
                   delete gisportal.autoLayer.given_wms_url;
                   $('div.js-layer-form-popup').toggleClass('hidden', true);
                   gisportal.configurePanel.resetPanel();
+                  gisportal.gritter.showNotification('addLayersSuccess', null);
                },
                error: function(e){
                   console.log("Error" + e.Message);

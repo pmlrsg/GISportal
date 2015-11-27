@@ -390,6 +390,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
             error_div.toggleClass('hidden', true);
             gisportal.autoLayer.TriedToAddLayer = false;
             gisportal.autoLayer.loadGivenLayer();
+            gisportal.panels.showPanel('choose-indicator');
             gisportal.addLayersForm.layers_list = {};
             gisportal.addLayersForm.server_info = {"wms_url":gisportal.autoLayer.given_wms_url};
             gisportal.addLayersForm.refreshStorageInfo();
@@ -658,7 +659,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
    }else{
-      console.log("Are you sure: this will remove any changes made to the info");
+      //console.log("Are you sure: this will remove any changes made to the info");
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);
       // Ensures the panel is only reset when it really needs to be

@@ -250,9 +250,11 @@ def get_cache():
       cache.extend( json.load(master_file))
 
    user_cache_path =os.path.join(CURRENT_PATH,USERCACHEPATH)
+   if not os.path.isdir(user_cache_path):
+      os.makedirs(user_cache_path)
+
    for filename in os.listdir(user_cache_path):
-      print filename
-      file_path = os.path.join(CURRENT_PATH, user_cache_path, filename)
+      file_path = os.path.join(user_cache_path, filename)
       with open(file_path, 'r+') as layer_file:
          cache.extend([json.load(layer_file)])
 
@@ -341,7 +343,10 @@ def createCache(url, refresh):
    address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
-   path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+   directory = os.path.join(CURRENT_PATH, SERVERCACHEPATH)
+   if not os.path.exists(directory):
+      os.makedirs(directory)
+   path = os.path.join(directory, filename)
    if not os.path.isfile(path) or refresh == "true" or True:
       
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")

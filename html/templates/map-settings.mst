@@ -33,4 +33,23 @@
 			{{/projections}}
 		</select>
 	</li>
+   <div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
+	<li>
+      <div>
+         <form>
+            <label>You can add an external Web Map Service (WMS) URL here:</label>
+            <input type="text" class="js-wms-url" placeholder="WMS URL">
+            <div class="wms-url-message alert-info hidden" id="refresh-cache-message"/>
+            <div class="clearfix hidden" id="refresh-cache-div">
+               <label class="pull-right">
+                  Please check this box to refresh the cache
+                  <input type="checkbox" id="refresh-cache-box" />
+               </label>
+            </div>
+            <div class="clearfix wms-url-div">
+               <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
+            </div>
+         </form>
+      </div>
+   </li>
 </ul>
