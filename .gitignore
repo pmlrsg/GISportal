@@ -4,6 +4,8 @@
 apache_log
 html/cache
 html/cache/*
+html/cache.bak
+html/cache.bak/*
 html/GISPortal.js
 html/css/GISPortal.css
 html/templates/all_templates.mst
