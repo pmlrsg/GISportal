@@ -26,7 +26,7 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
       if 'passthrough' in server['options'] and server['options']['passthrough']:
          # Check if cache is valid
          if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONJSON, cacheLife):        
-            createCache(server, None)git rm --cached <file>
+            createCache(server, None)
             
          continue
       
