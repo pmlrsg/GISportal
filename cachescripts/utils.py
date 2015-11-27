@@ -26,7 +26,7 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
       if 'passthrough' in server['options'] and server['options']['passthrough']:
          # Check if cache is valid
          if not checkCacheValid(cachePath + server['name'] + FILEEXTENSIONJSON, cacheLife):        
-            createCache(server, None)
+            createCache(server, None)git rm --cached <file>
             
          continue
       
@@ -44,7 +44,7 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             resp = urllib2.urlopen(url, timeout=30)
             newCapabilitiesXML = resp.read()
             
-            if set(('wcs')).issubset(server['services']):
+            if set(('wcs')).issubset(server['services']): # Confirms that WCS is actually provided.
                url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
                print 'Getting: ' + url
                resp = urllib2.urlopen(url, timeout=30)

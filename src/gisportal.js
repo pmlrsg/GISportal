@@ -1095,14 +1095,19 @@ gisportal.showModalMessage = function(html, timeout) {
    }, t);
 }
 
+// This function gets a list of all the available tags
 gisportal.loadBrowseCategories = function(data){
-   //get info
+   // This takes a category (cat) in a versatile format e.g. indicator_type
    addCategory = function(cat){
+      // If the category is not in the list already
       if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+         // Add the category name as a key and convert it to a nice view for the value
          gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
       }
    }
    gisportal.browseCategories = {};
+   // If data is give (first loading of portal)
+   // Loop through each of the tags and run it through the addCategory function
    if(data){
       for(obj in data){
          for(server in data[obj]['server']){
@@ -1113,6 +1118,8 @@ gisportal.loadBrowseCategories = function(data){
             }
          }
       }
+   // Any other time
+   // Loop through each of the tags in gisportal.layers and run it through the addCategory function
    }else{
       for(layer in gisportal.layers){
          for(category in gisportal.layers[layer]['tags']){

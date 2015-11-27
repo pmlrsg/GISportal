@@ -4,6 +4,7 @@ gisportal.autoLayer.TriedToAddLayer = false;
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
 
+
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(given_wms_url && given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
@@ -71,7 +72,7 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    return only_matching_layer || matching_layers; // If there is a 'chosen one' it returns it, if not it returns the list of other matching ones.
 };
 
-// This returns the layer or layers that the user has selected in the url
+// This returns the layer or layers that the user has selected with the WMS url
 gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
    if(!gisportal.autoLayer.TriedToAddLayer){
       gisportal.gritter.showNotification('retrievingLayers', null);
@@ -84,6 +85,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       }else{
          request_url = clean_url
       }
+      // If the information is already available then it will be loaded from the file instead of the middleware doing so.
       $.ajax({
          url:  request_url,
          dataType: 'text',
@@ -121,6 +123,7 @@ gisportal.autoLayer.addGivenLayer = function(layer){
    }
 };
 
+// This function loads the WMS url that was previously selected, along with any information that the user added or changed in the form.
 gisportal.autoLayer.loadPreviousLayers = function(){
    gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list"));
    gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info"));

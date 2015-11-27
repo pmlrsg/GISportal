@@ -34,6 +34,7 @@ gisportal.panels.bind('close-panel', function(ev, data) {
 
 });
 
+// This produces a popup that takes a user input and runs it through a given function. recalls itself with a string_error boolean of true to display an error.
 gisportal.panels.userFeedback = function(message, given_function, string_error){
 	var popup = $('div.js-user-feedback-popup');
 	popup.toggleClass('hidden', false);
