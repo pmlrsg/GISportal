@@ -399,8 +399,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
             gisportal.autoLayer.loadGivenLayer();
             gisportal.panels.showPanel('choose-indicator');
             gisportal.addLayersForm.layers_list = {};
-            // The wms_url is stored in the server_info dict so that it can be loaded the next time the page is loaded
-            gisportal.addLayersForm.server_info = {"wms_url":gisportal.autoLayer.given_wms_url};
+            gisportal.addLayersForm.server_info = {};
+            // The wms_url is stored in the form_info dict so that it can be loaded the next time the page is loaded
+            gisportal.addLayersForm.form_info = {"wms_url":gisportal.autoLayer.given_wms_url};
             gisportal.addLayersForm.refreshStorageInfo();
          }
       }
@@ -673,6 +674,10 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       // Removes all changes made to the info 
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);
+      gisportal.storage.set("form_info", undefined);
+      $('#refresh-cache-message').toggleClass('hidden', true);
+      $('#refresh-cache-div').toggleClass('hidden', true);
+      $('input.js-wms-url').val("");
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers

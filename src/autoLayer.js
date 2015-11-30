@@ -81,7 +81,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
       clean_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh
       if(given_cache_refresh == "false"){
-         request_url = "cache/global_cache"+clean_file+".json"
+         request_url = "cache/global_cache/"+clean_file+".json"
       }else{
          request_url = clean_url
       }
@@ -125,14 +125,15 @@ gisportal.autoLayer.addGivenLayer = function(layer){
 
 // This function loads the WMS url that was previously selected, along with any information that the user added or changed in the form.
 gisportal.autoLayer.loadPreviousLayers = function(){
-   gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list"));
-   gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info"));
-   if(gisportal.addLayersForm.server_info){
+   gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list")) || {};
+   gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info")) || {};
+   gisportal.addLayersForm.form_info = JSON.parse(gisportal.storage.get("form_info")) || {};
+   if(gisportal.addLayersForm.form_info['wms_url']){
 
-      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.server_info["wms_url"];
+      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info["wms_url"];
       gisportal.autoLayer.loadGivenLayer();
-      if(gisportal.addLayersForm.server_info["display_form"]){
-         gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , 1, 'div.js-layer-form-html', 'div.js-server-form-html');
+      if(gisportal.addLayersForm.form_info["display_form"]){
+         gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html');
       }
    }
 };

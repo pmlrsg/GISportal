@@ -215,7 +215,7 @@ def createCache(server, capabilitiesXML, coverageXML):
    
    subMasterCache['options'] = server['options']
    subMasterCache['wmsURL'] = server['services']['wms']['url']
-   if set(('wcs')).issubset(server['services']):
+   if set(('wcs')).issubset(server['services']): # Confirms that the WCS information has been given.
       subMasterCache['wcsURL'] = server['services']['wcs']['url']
    subMasterCache['serverName'] = server['name']
    
