@@ -44,10 +44,11 @@ def updateCaches(createCache, dirtyCaches, serverList, cachePath, masterCachePat
             resp = urllib2.urlopen(url, timeout=30)
             newCapabilitiesXML = resp.read()
             
-            url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
-            print 'Getting: ' + url
-            resp = urllib2.urlopen(url, timeout=30)
-            newCoverageXML = resp.read()
+            if set(('wcs')).issubset(server['services']): # Confirms that WCS is actually provided.
+               url = server['services']['wcs']['url'] + urllib.urlencode(server['services']['wcs']['params']['DescribeCoverage'])
+               print 'Getting: ' + url
+               resp = urllib2.urlopen(url, timeout=30)
+               newCoverageXML = resp.read()
             
          except urllib2.URLError as e:
             print 'Failed to open url to ' + url

@@ -44,3 +44,20 @@
 .ol-popup-closer:after {
   content: "✖";
 }
+
+.js-user-feedback-html input{
+  min-width:250px;
+}
+
+button.js-user-feedback-submit{
+  margin-left:5px;
+}
+
+.user-feedback-buttons-div{
+  padding-top:5px;
+}
+
+.js-user-feedback-html{
+  color:#111111;
+  background-color:white;
+}

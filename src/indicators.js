@@ -426,10 +426,10 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
    indicator.modifiedName = modifiedName;
    indicator.modified = gisportal.utils.nameToId(indicator.name);
 
-   // load the tag values based on the currently enabled gisportal.config.browseCategories
+   // load the tag values based on the currently enabled gisportal.browseCategories
    indicator.displayTags = [];
-   for (var index in gisportal.config.browseCategories) {
-      var name = gisportal.config.browseCategories[index];
+   for (var index in gisportal.browseCategories) {
+      var name = gisportal.browseCategories[index];
       var val = indicator.tags[index];
       if (val) {
          if (typeof(val) == "string") val = val.split(',');

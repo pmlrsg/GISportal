@@ -14,9 +14,6 @@ gisportal.configurePanel = {};
 /**
  * The refreshData function is used to initialise
  * all of the data within the configure panel.
- * Currently, there is no use-case for updating
- * more than once but it is useful to be able
- * to have a way to reset the panel.
  */
 gisportal.configurePanel.refreshData = function()  {
    this.searchInit();
@@ -295,9 +292,9 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    });
 
    // iterate over each category
-   for (var cat in gisportal.config.browseCategories)  {
+   for (var cat in gisportal.browseCategories)  {
 
-      var catNameKeys = Object.keys(gisportal.config.browseCategories);
+      var catNameKeys = Object.keys(gisportal.browseCategories);
       var tabNumber = _.indexOf(catNameKeys, cat) + 1;
       var targetDiv = $('#tab-browse-'+ tabNumber+' + .indicator-select');
 
@@ -309,11 +306,19 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 /**
  * An alternative method of grouping/filtering categories. This 
  * method adds a select list instead of the three tabs, and lists
- * each of the categories specified in gisportal.config.browseCategories
+ * each of the categories specified in gisportal.browseCategories
  */
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
-   var catFilter = gisportal.templates['category-filter-selectlist']();
+   var addable_layers = false;
+   for(layer in gisportal.layers){
+      if(layer.indexOf("UserDefinedLayer") > -1){
+         addable_layers = true;
+         break;
+      }
+   }
+   // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
+   var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
    $('.more-info').on('click', function() {
       var message_block = $(this).prev();
@@ -329,11 +334,26 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       gisportal.configurePanel.resetPanel();
    });
 
+   // Listener is added to the add layers button
+   $('button#js-add-layers-form').on('click', function() {
+      var single_layer;
+      for(layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            single_layer = gisportal.layers[layer]
+            // Each of the user defined layers are added to the layers_list variable
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer])
+         }
+      }
+      gisportal.addLayersForm.validation_errors = {};
+      // The form is then loaded (loading the first layer)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
+   });
+
    var categories = [];
-   for (var category in gisportal.config.browseCategories) {
+   for (var category in gisportal.browseCategories) {
       var c = {
          value: category,
-         text: gisportal.config.browseCategories[category],
+         text: gisportal.browseCategories[category],
       }
       categories.push(c);
    }
@@ -350,10 +370,69 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
    var defaultValue = { index: 0 };
-   if (typeof(gisportal.config.defaultCategory) !== 'undefined' && gisportal.config.defaultCategory) {
-      defaultValue = { value: gisportal.config.defaultCategory };
+   var defaultCategory = gisportal.config.defaultCategory
+   if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.config.browseCategories) {
+      defaultValue = { value: defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
+
+   // WMS URL event handler
+   $('button.js-wms-url').on('click', function(e)  {
+      e.preventDefault();
+      if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
+         gisportal.wms_submitted = true;
+         // Gets the URL and refresh_cache boolean
+         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
+         gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
+
+         error_div = $("#wms-url-message");
+         // The URL goes through some simple validation before being sent
+         if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
+            error_div.toggleClass('hidden', false);
+            error_div.html("The URL must start with 'http://'' or 'https://'");
+            $('#refresh-cache-div').toggleClass('hidden', true);
+            gisportal.wms_submitted = false;
+         }else{
+            // If it passes the error div is hidden and the autoLayer functions are run using the given parameters
+            error_div.toggleClass('hidden', true);
+            gisportal.autoLayer.TriedToAddLayer = false;
+            gisportal.autoLayer.loadGivenLayer();
+            gisportal.panels.showPanel('choose-indicator');
+            gisportal.addLayersForm.layers_list = {};
+            gisportal.addLayersForm.server_info = {};
+            // The wms_url is stored in the form_info dict so that it can be loaded the next time the page is loaded
+            gisportal.addLayersForm.form_info = {"wms_url":gisportal.autoLayer.given_wms_url};
+            gisportal.addLayersForm.refreshStorageInfo();
+         }
+      }
+   });
+
+   // WMS URL event handler for refresh cache checkbox
+   $('input.js-wms-url').on('change', function(e)  {
+      gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
+      var input_value = $('input.js-wms-url')[0].value
+      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
+      // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
+      $.ajax({
+         url:  'cache/global_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+         dataType: 'json',
+         success: function(layer){
+            $('#refresh-cache-message').toggleClass('hidden', false);
+            if(layer.timeStamp){
+               $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+            }
+            if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
+               $('#refresh-cache-div').toggleClass('hidden', false);
+            }else{
+               $('#refresh-cache-div').toggleClass('hidden', true);
+            }
+         },
+         error: function(e){
+            $('#refresh-cache-message').toggleClass('hidden', true);
+            $('#refresh-cache-div').toggleClass('hidden', true);
+         }
+      });
+   });
 }
 
 /**
@@ -373,13 +452,17 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
       // sort it before it's rendered
       tagNames.sort() 
    } 
-   var catName = gisportal.config.browseCategories[cat];
-   var catNameKeys = Object.keys(gisportal.config.browseCategories);
+   var catName = gisportal.browseCategories[cat];
+   var catNameKeys = Object.keys(gisportal.browseCategories);
    
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
       if (vals.length > 0)  {
-         var tagNameSafe = gisportal.utils.replace(['\ ','.',';',':'], ['_','_','_','_'], tagNames[i]);
+         // The tag name is made safe as it is use to make an HTML ID (restricted chars)
+         var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';','.',',','(',')'], ['and','and','_','_','_','_','_','_','_'], tagNames[i]);
+         if(tagNameSafe.endsWith(':')){
+            tagNameSafe += "-"
+         }
          // sort them
          vals.sort();
          // For each tag name, if it has values then render the mustache
@@ -530,8 +613,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
       id = options.id;
    }
 
-   name = name.replace(/__/g, ' ');
-
    var tmp = {};
    tmp.name = name;
    if (id) tmp.id = id;
@@ -579,15 +660,29 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
  */
 gisportal.configurePanel.resetPanel = function(given_layers){
    if(given_layers){
-      // Either keeps the original as it is or stores the layers if it is undefined
-      gisportal.original_layers = gisportal.original_layers || gisportal.layers;
+      // Either add layers to the original or stores the layers if it is undefined
+      gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
       gisportal.layers = given_layers;
+      // Reloads the browse categories
+      gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();
+      for(index in gisportal.selectedLayers){
+         given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
+      }
    }else{
+      // Removes all changes made to the info 
+      gisportal.storage.set("layers_list", undefined);
+      gisportal.storage.set("server_info", undefined);
+      gisportal.storage.set("form_info", undefined);
+      $('#refresh-cache-message').toggleClass('hidden', true);
+      $('#refresh-cache-div').toggleClass('hidden', true);
+      $('input.js-wms-url').val("");
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
+         gisportal.original_layers = {};
+         gisportal.loadBrowseCategories();
          gisportal.configurePanel.refreshData();
          $('.filtered-list-message').hide();
          $('.unfiltered-list-message').show();

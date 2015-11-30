@@ -1,15 +1,6 @@
 <input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
    <tbody>
-      {{#if contactInfo.organization}}
-         <tr><td>Provider</td><td>{{contactInfo.organization}}</td></tr>
-      {{else}}
-         {{#if provider.website}}
-          <tr><td>Provider</td><td><a target="_blank" href="{{provider.website}}">{{providerTag}}</a></td></tr>
-         {{else}} 
-         <tr><td>Provider</td><td>{{providerTag}}</td></tr>
-         {{/if}}
-      {{/if}}
       
       {{#displayTags}}
          <tr><td>{{&displayName}}</td><td>{{str_join displayValues ", "}}</td></tr>

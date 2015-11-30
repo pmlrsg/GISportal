@@ -494,6 +494,11 @@ input.search:focus  {
   padding-bottom:5px;
 }
 
-.js-analysis-message {
+.js-analysis-message,
+.wms-url-message {
   padding: 8px;
+}
+
+.tooltipster-base{
+  word-break : break-word;
 }

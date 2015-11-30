@@ -26,3 +26,15 @@ td  {
 /*  user-select: initial;*/
 }
 
+table.layers-form-table{
+  border-collapse: separate;
+}
+
+table.layers-form-table td{
+  padding: 5px;
+  white-space:nowrap
+}
+
+table.layers-form-table th{
+  font-weight: bold;
+}

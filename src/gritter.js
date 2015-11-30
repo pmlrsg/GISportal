@@ -635,6 +635,15 @@ function createHelpMessages()
       text: function(data) {
          return 'We are trying to load layers from the URL you have provided.';
       },
-      time: '500',
+      time: '500'
+   };
+
+   gisportal.gritter._notifications['addLayersSuccess'] = {
+      title: function() {
+         return 'Success';
+      },
+      text: function(data) {
+         return 'We have now added the layers to your portal.';
+      }
    };
 }

@@ -138,7 +138,8 @@ button, .btn{
   display: block;
 }
 
-input[type="text"]  {
+input[type="text"],
+textarea  {
   font-family: "Open Sans";
   background-color: #fff;
   border: 1px solid #d8d3dd;

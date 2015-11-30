@@ -2,10 +2,19 @@
    <li class="selectlist">Show indicators sorted/grouped by:
       <div id="js-category-filter-select"></div>
    </li>
-   <li class="filtered-list-message selectoptions alert-warning" style="display: none" ><p id="list-message">You are viewing a filtered list. Click the reset button to view the entire list.</p>
-   <p class="info-message" style="display: none" >The results shown below have been filtered to match your initial request, however, there are more indicators available for display. If you click the Reset button the panel below will reload to display all the available indicators.</p>
-   <a href="javascript:;" class="more-info">more info...</a><br/>
-   <div id="reset-list-button-div" class="list-button-div"><button id="reset-list" class="reset-list-button  brand">Reset</button></div>
+   <li class="filtered-list-message selectoptions alert-warning" style="display: none" >
+      <div reset-layers-div>
+         <p id="list-message">You are viewing a filtered list. Click the reset button to view the entire list.</p>
+         <p class="info-message" style="display: none" >The results shown below have been filtered to match your initial request, however, there are more indicators available for display. If you click the Reset button the panel below will reload to display all the available indicators.</p>
+         <a href="javascript:;" class="more-info">more info...</a><br/>
+         <div id="reset-list-button-div" class="clearfix">
+            <button id="reset-list" class="small pull-right brand">Reset</button>
+         </div>
+      </div>
+      <div class="clearfix add-layers-div {{#unless addable_layers}}hidden{{/unless}}">
+         <p>Click here to add these layers to your account:</p>
+         <button id="js-add-layers-form" class="brand small pull-right">Add Layers</button>
+      </div>
    </li>
    <li class="unfiltered-list-message selectoptions alert-success" style="display: none"><p>You are now viewing the full list of available layers.</p>
    </li>

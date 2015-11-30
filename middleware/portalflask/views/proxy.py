@@ -8,11 +8,14 @@ import urllib2
 from lxml import etree as ET
 import json
 import dateutil.parser
+import datetime
 import calendar
+
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
-SERVERCACHEPATH = "../../../html/cache/"
+SERVERCACHEPATH = "../../../html/cache/global_cache"
+USERCACHEPATH = "../../../html/cache/user_cache"
 MASTERCACHEPATH = "../../../html/cache/mastercache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
@@ -25,7 +28,7 @@ XLINKNAMESPACE = '{http://www.w3.org/1999/xlink}'
 
 portal_proxy = Blueprint('portal_proxy', __name__)
 
-         
+   
 """
 Proxy Handler
 """
@@ -237,28 +240,122 @@ def add_wcs_url():
          return e
 
 """
+Loads the cache
+"""
+@portal_proxy.route('/get_cache')
+def get_cache():
+   cache = [] # The list to store all of the layers in.
+   master_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH + FILEEXTENSIONJSON)
+   with open(master_path, 'r+') as master_file:
+      cache.extend( json.load(master_file)) # Loads the mastercache and adds it to the cache to be returned.
+
+   user_cache_path =os.path.join(CURRENT_PATH,USERCACHEPATH)
+   if not os.path.isdir(user_cache_path):
+      os.makedirs(user_cache_path)  #if the user_cache path does not exist it is created.
+
+   for filename in os.listdir(user_cache_path): # Loops through all of the files int he cache folder
+      file_path = os.path.join(user_cache_path, filename)
+      with open(file_path, 'r+') as layer_file:
+         cache.extend([json.load(layer_file)]) # Adds the information in each file to the cache list to be returned.
+
+   return json.dumps(cache) # Returns the cache to the portal for loading the layers.
+
+
+"""
+Add a user defined layer to the portal
+"""
+@portal_proxy.route('/add_user_layer', methods=['POST'])
+def add_user_layer():
+   # Retrieves the given information from the form the user completed.
+   layers_list = json.loads(request.form['layers_list'])
+   server_info = json.loads(request.form['server_info'])
+
+   if set(('unique_name', 'provider', 'wms_url')).issubset(server_info): # Verifies that the necessary server information is provided
+
+      clean_url = replaceAll(server_info['wms_url'],{'http://': '', 'https://': '', '/': '-', '?': ''})
+      filename = clean_url + FILEEXTENSIONJSON
+      path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+      with open(path, 'r+') as data_file:
+         data = json.load(data_file) # Extracts the data from the global cache file
+
+      new_data = []
+      for new_layer in layers_list: #Loops through each new layer (user provided)
+         this_new_layer = layers_list[new_layer]
+         # This checks that the layer data passed is valid
+         if set(('abstract', 'id', 'list_id', 'nice_name', 'tags')).issubset(this_new_layer) and set(('indicator_type', 'region', 'interval', 'model_name')).issubset(this_new_layer['tags']):
+            for old_layer in data['server'][server_info['unique_name']]: # Loops through the old layers to find a match.
+               if old_layer['Name'] == this_new_layer['original_name']:
+                  if this_new_layer['include']: # Only add the information if the user asked for the layer to be included.
+                     # This block adds the information provided by the user to the new_data variable
+                     new_data_layer = old_layer
+                     new_data_layer['Title'] = this_new_layer['nice_name'].title()
+                     new_data_layer['Abstract'] = this_new_layer['abstract']
+                     for key in this_new_layer['tags']:
+                        val = this_new_layer['tags'][key]
+                        if len(val) > 0:
+                           new_data_layer['tags'][key] = val
+                        if len(server_info['provider']) > 0:
+                           new_data_layer['tags']['data_provider'] = server_info['provider']
+                     new_data_layer['tags']['niceName'] = this_new_layer['nice_name']
+                     new_data.append(new_data_layer)
+      # The new data is then put back into the data file to replace the previous information
+      data['server'][server_info['unique_name']] = new_data
+
+      # This adds all of the server information to the data file
+      if len(server_info['address']) > 0:
+         data['contactInfo']['address']= server_info['address'].replace('\n', '<br/>')
+      
+      if len(server_info['email']) > 0:
+         data['contactInfo']['email']= server_info['email']
+      
+      if len(server_info['person']) > 0:
+         data['contactInfo']['person']= server_info['person']
+      
+      if len(server_info['phone']) > 0:
+         data['contactInfo']['phone']= server_info['phone']
+
+      clean_provider = replaceAll(server_info['provider'], {"&amp":"and", "\\":'_', "/":'_', ".":'_', ",":'_', "(":'_', ")":'_', ":":'_', ";":'_'})
+
+      if len(server_info['provider']) > 0:
+         data['options']['providerShortTag'] = clean_provider
+      
+      if len(server_info['position']) > 0:
+         data['contactInfo']['position']= server_info['position']
+
+      path = os.path.join(CURRENT_PATH, USERCACHEPATH, filename)
+      
+      saveFile(path, json.dumps(data)) # The data file is then added to the user_cache folder.
+      return "" # Return of an empty string so that the portal knows the data transfer was successfull.
+
+
+"""
 WMS Layer Load
 """
 @portal_proxy.route('/load_new_wms_layer')
 def load_new_wms_layer():
-   url = request.args.get('url')
-   refresh = request.args.get('refresh')
+   url = request.args.get('url') # Gets the given URL.
+   refresh = request.args.get('refresh') # Gets the given refresh boolean.
    return createCache(url + "?", refresh)
 
+# This method creates the cache and adds it to the global_cache folder
 def createCache(url, refresh):
    sub_master_cache = {}
    sub_master_cache['server'] = {}
-   clean_url = url.replace('http://', '').replace('https://', '').replace('/', '-').replace('?', '')
+   clean_url = replaceAll(url, {'http://': '', 'https://': '', '/': '-', '?': ''})
    contact_info = {}
    address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
-   path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
-
-   if not os.path.isfile(path) or refresh == "true":
+   directory = os.path.join(CURRENT_PATH, SERVERCACHEPATH)
+   if not os.path.exists(directory):
+      os.makedirs(directory) # If the global_cache folder does not already exist it is created.
+   path = os.path.join(directory, filename)
+   if not os.path.isfile(path) or refresh == "true": # As long as the file does not exist or is to be refreshed the cache will be created.
+      
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
-      root = ET.parse(doc).getroot()
+      root = ET.parse(doc).getroot()# Gets the XML root from the url.
 
+      # Gets all of the contact information available from the WMS
       contact_person_elem = root.find('./%sService/%sContactInformation//%sContactPerson' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
       contact_org_elem = root.find('./%sService/%sContactInformation//%sContactOrganization' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
       contact_position_elem = root.find('./%sService/%sContactInformation//%sContactPosition' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
@@ -270,11 +367,12 @@ def createCache(url, refresh):
       contact_phone_elem = root.find('./%sService/%sContactInformation//%sContactVoiceTelephone' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
       contact_email_elem = root.find('./%sService/%sContactInformation//%sContactElectronicMailAddress' % (WMS_NAMESPACE, WMS_NAMESPACE, WMS_NAMESPACE))
       
+      # As long as each element exists it is added to the contact_info dict.
       if ET.iselement(contact_person_elem):
          contact_info['person'] = contact_person_elem.text
          
       if ET.iselement(contact_org_elem):
-         contact_info['organization'] = contact_org_elem.text
+         provider = contact_org_elem.text
          
       if ET.iselement(contact_position_elem):
          contact_info['position'] = contact_position_elem.text
@@ -304,7 +402,7 @@ def createCache(url, refresh):
          contact_info['address'] = address
 
 
-      for parent_layer in root.findall('./%sCapability/%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)):
+      for parent_layer in root.findall('./%sCapability/%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)): # Loops through each highest level layer tag in the WMS
          layers = []
          name = None
          sensor_name = None
@@ -314,6 +412,7 @@ def createCache(url, refresh):
          dimensions = createDimensionsArray(parent_layer)
          style = None
 
+         # Gets all of the required layer information available from the WMS
          name_elem = parent_layer.find('./%sName' % (WMS_NAMESPACE))
          title_elem = parent_layer.find('./%sTitle' % (WMS_NAMESPACE))
          abstract_elem = parent_layer.find('./%sAbstract' % (WMS_NAMESPACE))
@@ -321,6 +420,7 @@ def createCache(url, refresh):
          bounding_elem = parent_layer.find('./%sBoundingBox' % (WMS_NAMESPACE))
          style_elem = parent_layer.find('./%sStyle' % (WMS_NAMESPACE))
 
+         # As long as each element exists it is added to the corresponding variable. 
          if ET.iselement(title_elem):
             sensor_name = title_elem.text
             sensor_name = replaceAll(sensor_name, {' ':'_', '(':'_', ')':'_', '/':'_'})
@@ -340,13 +440,16 @@ def createCache(url, refresh):
                style = styles_list
 
 
-         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
-      if len(layers) > 0:
+         # Passes the information to the digForLayers function.
+         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
+      if len(layers) > 0: # As long as layers have been found it adds all of the info to the json cache file
          sub_master_cache['server'][sensor_name] = layers
          sub_master_cache['options'] = {"providerShortTag": "UserDefinedLayer"}
          sub_master_cache['wmsURL'] = url
          sub_master_cache['serverName'] = clean_url
          sub_master_cache['contactInfo'] = contact_info
+         sub_master_cache['provider'] = provider.replace('&amp;', '&')
+         sub_master_cache['timeStamp'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
          
          path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
          data = json.dumps(sub_master_cache)
@@ -355,7 +458,7 @@ def createCache(url, refresh):
       else:
          return json.dumps({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"})
 
-   json_file = open(path, 'r')
+   json_file = open(path, 'r') # If the file does not need to be refreshed, it goes off and gets te information that is already there.
    layer_return = json_file.read()
    return layer_return
 
@@ -407,6 +510,7 @@ def createDimensionsArray(layer):
                                        'Value': dimensionValue})
    return dimensions
 
+# Retrieves the bounding box information from a layer XML
 def createBoundingBoxesArray(layer):
    bounding_boxes = {}
 
@@ -424,15 +528,18 @@ def createBoundingBoxesArray(layer):
    bounding_boxes['boundingBox'] = boundingBox
    return bounding_boxes
 
+# Saves a file taking the path and data.
 def saveFile(path, data):
    with open(path, 'wb') as file:
       file.write(data)
 
+# Replaces a set of string values using a dictionary
 def replaceAll(text, dic):
     for i, j in dic.iteritems():
         text = text.replace(i, j)
     return text
 
+# This loops throught the Styles Tag of a layer, and creates an array in the correct format for the portal to understand.
 def createStylesArray(layer):
    styles = []
    for style in layer.findall('./%sStyle' % (WMS_NAMESPACE)):
@@ -447,8 +554,11 @@ def createStylesArray(layer):
                          "Height": legend_elem.get('height')})
    return styles
 
-def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers):
+# This function is used to scrape an XML file to exract all of the layers. It is a self calling method and keeps running until it finds a layer that is compatible with the portal.
+def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider):
+   # This loops through layers that are inside other layer tags.
    for layer in parent_layer.findall('.%sLayer' % (WMS_NAMESPACE)):
+      # Gets the tags that are needed.
       name_elem = layer.find('./%sName' % (WMS_NAMESPACE))
       title_elem = layer.find('./%sTitle' % (WMS_NAMESPACE))
       abstract_elem = layer.find('./%sAbstract' % (WMS_NAMESPACE))
@@ -456,7 +566,8 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
       bounding_elem = layer.find('./%sBoundingBox' % (WMS_NAMESPACE))
       dimension_elem = layer.find('./%sDimension' % (WMS_NAMESPACE))
       style_elem = layer.find('./%sStyle' % (WMS_NAMESPACE))
-        
+      
+      # Adds any tag data to the variables.
       if ET.iselement(name_elem):
          name = name_elem.text.replace('/', '_')
             
@@ -478,14 +589,16 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
          if len(styles_list) > 0:
             style = styles_list
         
-            
+      # If all of the required elements have been found then the layer is added to the layers list.
       if name and sensor_name and title and bounding_boxes and style:
-         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title()}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
-         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "Dimensions": dimensions['dimensions'], "Styles": style}
+         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title(), "data_provider" : provider}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
+         layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
          
          path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + name + FILEEXTENSIONJSON)
          saveFile(path, json.dumps(layer_data))
          style = None
-      else:
-         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers)
+      else: # Otherwise the function will run again (dig down one more layer).
+            # Variables are passed on because some apply to multiple layers and therefore can be stored in parental tags.
+            # Some information about the parent tag is also useful so this is one simple way to save it.
+         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)

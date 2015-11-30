@@ -49,10 +49,36 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
       return options.fn();
 });
 
+Handlebars.registerHelper('unless_equals', function(attr1, attr2, options) {
+   if( attr1 != attr2 )
+      return options.fn();
+});
+
 
 Handlebars.registerHelper('equals', function(attr1, attr2, options) {
    return ( attr1 == attr2 )
 });
+
+Handlebars.registerHelper('dotdotdot', function(str) {
+   lenVal = 200
+   if (str.length > lenVal)
+      for(var index=lenVal; index<str.length; index++){
+         if([" ", "_"].indexOf(str[index])>=0){
+            return str.substring(0,index) + '...';
+         }
+      }
+      return str.substring(0,lenVal) + '...';
+   return str;
+});
+
+Handlebars.registerHelper('title_case', function(str) {
+   return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+});
+
+String.prototype.endsWith = function(search) {
+   var result = this.indexOf(search, this.length - search.length);
+   return result !== -1;
+};
 
 
 /**
@@ -77,6 +103,18 @@ Handlebars.registerHelper('truncate', function(text, max_length) {
       return new Handlebars.SafeString('<span title="' + text + '">' + text.substring( 0 , max_length - 3 ) + '...</span>');
    else
       return text;
+});
+
+Handlebars.registerHelper('for', function(from, to, incr, block) {
+    var accum = '';
+    for(var i = from; i <= to; i += incr)
+        accum += block.fn(i);
+    return accum;
+});
+
+Handlebars.registerHelper("inc", function(value, options)
+{
+    return parseInt(value) + 1;
 });
 
 /**

@@ -127,7 +127,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  './cache/mastercache.json',
+         url:  '/service/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: errorHandling,
@@ -381,8 +381,11 @@ gisportal.mapInit = function() {
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
+
    if (data !== null)  {
       gisportal.cache.wmsLayers = data;
+      // Create browse categories list
+      gisportal.loadBrowseCategories(data);
       // Create WMS layers from the data
       gisportal.createOpLayers();
    }
@@ -1084,4 +1087,39 @@ gisportal.showModalMessage = function(html, timeout) {
    setTimeout(function() {
       holder.toggleClass('hidden', true)
    }, t);
+}
+
+// This function gets a list of all the available tags
+gisportal.loadBrowseCategories = function(data){
+   // This takes a category (cat) in a versatile format e.g. indicator_type
+   addCategory = function(cat){
+      // If the category is not in the list already
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+         // Add the category name as a key and convert it to a nice view for the value
+         gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+      }
+   }
+   gisportal.browseCategories = {};
+   // If data is give (first loading of portal)
+   // Loop through each of the tags and run it through the addCategory function
+   if(data){
+      for(obj in data){
+         for(server in data[obj]['server']){
+            for(layers in data[obj]['server'][server]){
+               for(category in data[obj]['server'][server][layers]['tags']){
+                  addCategory(category);
+               }
+            }
+         }
+      }
+   // Any other time
+   // Loop through each of the tags in gisportal.layers and run it through the addCategory function
+   }else{
+      for(layer in gisportal.layers){
+         for(category in gisportal.layers[layer]['tags']){
+            addCategory(category);
+         }
+      }
+   }
+
 }
