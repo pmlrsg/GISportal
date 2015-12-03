@@ -108,15 +108,21 @@ gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
    }catch(e){}
    
    try{
-      parameters += "&HEIGHT=" + given_parameters["height"];
+      if(given_parameters["height"]){
+         parameters += "&HEIGHT=" + given_parameters["height"];
+      }
    }catch(e){}
 
    try{
-      parameters += "&WIDTH=" + given_parameters["width"];
+      if(given_parameters["width"]){
+         parameters += "&WIDTH=" + given_parameters["width"];
+      }
    }catch(e){}
 
    try{
-      parameters += "&colorbaronly=" + given_parameters["colorbaronly"];
+      if(given_parameters["colorbaronly"]){
+         parameters += "&colorbaronly=" + given_parameters["colorbaronly"];
+      }
    }catch(e){}
 
    try{
@@ -179,7 +185,9 @@ gisportal.scalebars.autoScale = function(id, force)  {
          url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&crs=' + gisportal.projection + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
          dataType: 'json',
          success: function( data ) {
-            gisportal.scalebars.validateScale(id, data.min, data.max);
+            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+               gisportal.scalebars.validateScale(id, data.min, data.max);
+            }
          }
       });
    }catch(e){};

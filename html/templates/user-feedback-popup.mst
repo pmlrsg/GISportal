@@ -1,7 +1,7 @@
 {{message}}
 {{#if string_error}}
 <br/>
-<p class="alert-warning">Invalid string, you can only use 'a-z', 'A-Z', '0-9', ' ', '_'.</p>
+<p class="alert-warning">Invalid string, you can only use 'a-z', 'A-Z', '0-9', ' ', '_' and the string cannot start with a digit.</p>
 {{/if}}
 <form>
    <input class="user-feedback-input" type="text"/>

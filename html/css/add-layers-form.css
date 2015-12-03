@@ -3,10 +3,13 @@
    background-color: white;
    color: #111111;
    padding: 15px;
-   max-height: 90%;
    max-width: 90%;
    overflow: auto;
-   margin: 0 auto;
+   margin: 10px auto;
+}
+
+.overlay.js-layer-form-popup{
+  align-items: inherit;
 }
 
 .form-header{
@@ -186,4 +189,15 @@ label.invalid{
 
 .form-validation-div.alert-danger{
    margin-top:10px;
+}
+
+span[data-field="Rotation"]{
+  color:black;
+  font-size:22px;
+  display:inline-block;
+  padding:5px;
+}
+
+div.scalebar-preview img{
+  max-width:100%;
 }

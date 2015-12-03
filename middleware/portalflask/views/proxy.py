@@ -104,7 +104,7 @@ Return a rotated image
 @portal_proxy.route('/rotate')
 def rotate():
    angle = request.args.get('angle')
-   if angle == "undefined":
+   if angle == "undefined" or angle == "":
       angle = 0
    if( angle == None ):
          error_handler.setError('2-08', None, g.user.id, "views/proxy.py:proxy - Angle not set.", request)
@@ -297,6 +297,7 @@ def add_user_layer():
                         if len(server_info['provider']) > 0:
                            new_data_layer['tags']['data_provider'] = server_info['provider']
                      new_data_layer['tags']['niceName'] = this_new_layer['nice_name']
+                     new_data_layer['LegendSettings'] = this_new_layer['legendSettings']
                      new_data.append(new_data_layer)
       # The new data is then put back into the data file to replace the previous information
       data['server'][server_info['unique_name']] = new_data
@@ -314,7 +315,7 @@ def add_user_layer():
       if len(server_info['phone']) > 0:
          data['contactInfo']['phone']= server_info['phone']
 
-      clean_provider = replaceAll(server_info['provider'], {"&amp":"and", "\\":'_', "/":'_', ".":'_', ",":'_', "(":'_', ")":'_', ":":'_', ";":'_'})
+      clean_provider = replaceAll(server_info['provider'], {"&amp":"and", " ":"_", "\\":'_', "/":'_', ".":'_', ",":'_', "(":'_', ")":'_', ":":'_', ";":'_'})
 
       if len(server_info['provider']) > 0:
          data['options']['providerShortTag'] = clean_provider

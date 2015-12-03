@@ -15,6 +15,39 @@
 
       <label data-field="abstract">Abstract:</label></br>
       <textarea data-field="abstract" data-id="{{list_id}}">{{{abstract}}}</textarea>
+
+      <div class="clearfix legend-settings">
+
+         <label>Scale Points?</label>
+         <input type="checkbox" data-field="scalePoints" {{#if scalePoints}}checked{{/if}} data-id="{{list_id}}"/></br>
+
+         <label>Scalebar Custom URL:</label>
+         <input type="text" data-field="URL" value="{{URL}}" data-id="{{list_id}}"/></br>
+
+         <div class="clearfix legend-parameters">
+            {{#with legendSettings.Parameters}}
+               <label>Color Bar Only?</label>
+               <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/></br>
+
+               <label data-field="nice-name">Height:</label></br>
+               <input type="text" value="{{height}}" data-field="height" data-id="{{../list_id}}"/></br>
+
+               <label data-field="nice-name">Width:</label></br>
+               <input type="text" value="{{width}}" data-field="width" data-id="{{../list_id}}"/></br>
+            {{/with}}
+         </div>
+
+         <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
+         <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>
+         </span>
+         <span title="Rotate Right" class="add-to-all-layers icon-forward-3 btn icon-btn" data-field="Rotation">
+         <input class="hidden" data-field="Rotation" value="RIGHT" data-id="{{list_id}}"/>
+         </span>
+
+         <div class="scalebar-preview">
+         </div>
+
+      </div>
    </div>
    <div class="layers-form-right">
       {{#each tags}}

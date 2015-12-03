@@ -394,6 +394,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
             gisportal.wms_submitted = false;
          }else{
             // If it passes the error div is hidden and the autoLayer functions are run using the given parameters
+            $('input.js-wms-url').val("");
+            $('#refresh-cache-message').toggleClass('hidden', true);
+            $('#refresh-cache-div').toggleClass('hidden', true);
             error_div.toggleClass('hidden', true);
             gisportal.autoLayer.TriedToAddLayer = false;
             gisportal.autoLayer.loadGivenLayer();
@@ -411,27 +414,32 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('input.js-wms-url').on('change', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
       var input_value = $('input.js-wms-url')[0].value
-      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
-      // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
-      $.ajax({
-         url:  'cache/global_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
-         dataType: 'json',
-         success: function(layer){
-            $('#refresh-cache-message').toggleClass('hidden', false);
-            if(layer.timeStamp){
-               $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
-            }
-            if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
-               $('#refresh-cache-div').toggleClass('hidden', false);
-            }else{
+      if(input_value.length > 0){
+         var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
+         // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
+         $.ajax({
+            url:  'cache/global_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+            dataType: 'json',
+            success: function(layer){
+               $('#refresh-cache-message').toggleClass('hidden', false);
+               if(layer.timeStamp){
+                  $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+               }
+               if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
+                  $('#refresh-cache-div').toggleClass('hidden', false);
+               }else{
+                  $('#refresh-cache-div').toggleClass('hidden', true);
+               }
+            },
+            error: function(e){
+               $('#refresh-cache-message').toggleClass('hidden', true);
                $('#refresh-cache-div').toggleClass('hidden', true);
             }
-         },
-         error: function(e){
-            $('#refresh-cache-message').toggleClass('hidden', true);
-            $('#refresh-cache-div').toggleClass('hidden', true);
-         }
-      });
+         });
+      }else{
+         $('#refresh-cache-message').toggleClass('hidden', true);
+         $('#refresh-cache-div').toggleClass('hidden', true);
+      }
    });
 }
 
@@ -675,9 +683,6 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);
       gisportal.storage.set("form_info", undefined);
-      $('#refresh-cache-message').toggleClass('hidden', true);
-      $('#refresh-cache-div').toggleClass('hidden', true);
-      $('input.js-wms-url').val("");
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers

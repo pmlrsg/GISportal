@@ -480,6 +480,16 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
    if (scalebarDetails) {
       indicator.legend = scalebarDetails.url;
       indicator.scalePoints = scalebarDetails.scalePoints;
+      try{
+         indicator.angle = indicator.legendSettings.Rotation;
+      }catch(e){
+         indicator.angle = 0;
+      }
+      try{
+         indicator.legendURL = indicator.legendSettings.URL;
+      }catch(e){
+         indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
+      }
       var renderedScalebar = gisportal.templates['scalebar'](indicator);
       $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
 
