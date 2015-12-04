@@ -18,21 +18,21 @@
 
       <div class="clearfix legend-settings">
 
-         <label>Scale Points?</label>
-         <input type="checkbox" data-field="scalePoints" {{#if scalePoints}}checked{{/if}} data-id="{{list_id}}"/></br>
+         <label data-field="scalePoints" class="hidden">Scale Points?</label>
+         <input class="hidden" type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/></br>
 
-         <label>Scalebar Custom URL:</label>
+         <label data-field="URL">Scalebar Custom URL:</label>
          <input type="text" data-field="URL" value="{{URL}}" data-id="{{list_id}}"/></br>
 
          <div class="clearfix legend-parameters">
             {{#with legendSettings.Parameters}}
-               <label>Color Bar Only?</label>
+               <label data-field="colorbaronly">Color Bar Only?</label>
                <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/></br>
 
-               <label data-field="nice-name">Height:</label></br>
+               <label data-field="height">Height:</label></br>
                <input type="text" value="{{height}}" data-field="height" data-id="{{../list_id}}"/></br>
 
-               <label data-field="nice-name">Width:</label></br>
+               <label data-field="width">Width:</label></br>
                <input type="text" value="{{width}}" data-field="width" data-id="{{../list_id}}"/></br>
             {{/with}}
          </div>

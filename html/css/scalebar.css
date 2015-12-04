@@ -69,7 +69,6 @@
 
 .scalebar-outer {
    position: relative;
-   height: 42px;
    margin-bottom: 10px;
 }
 
@@ -78,10 +77,8 @@
 }
 
 .scalebar  {
-   height: 30px;
    width: 100%;
    background-size: 100%;
-   margin-bottom: 7px;
 }
 
 .scalebar-loose  {

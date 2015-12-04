@@ -201,3 +201,7 @@ span[data-field="Rotation"]{
 div.scalebar-preview img{
   max-width:100%;
 }
+
+div.scalebar-preview{
+  position:relative;
+}

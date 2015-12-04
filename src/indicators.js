@@ -486,7 +486,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
          indicator.angle = 0;
       }
       try{
-         indicator.legendURL = indicator.legendSettings.URL;
+         indicator.legendURL = indicator.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }catch(e){
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }

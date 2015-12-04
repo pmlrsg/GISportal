@@ -119,6 +119,36 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    gisportal.addLayersForm.validateForm('div.overlay-container-form');
    // The paginator is then added. The function called is this very function which is called when a paginator button is pressed.
    gisportal.addLayersForm.displayPaginator(total_pages, current_page, form_div, 'gisportal.addLayersForm.displayForm');
+
+   //The following block shows the scale Points option if it is available.
+   try{
+      l = gisportal.layers[gisportal.addLayersForm.layers_list[current_page]['id']];
+      var bbox = l.exBoundingBox.WestBoundLongitude + ","
+            + l.exBoundingBox.SouthBoundLatitude + ","
+            + l.exBoundingBox.EastBoundLongitude + ","
+            + l.exBoundingBox.NorthBoundLatitude;
+      try{
+         var time = '&time=' + new Date(l.lastDate).toISOString();
+      }
+      catch(e){
+         var time = "";
+      }
+
+      $.ajax({
+         url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+         dataType: 'json',
+         success: function( data ) {
+            // If there is a min & max value returned the label and input are both shown.
+            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+               $('label[data-field="scalePoints"').toggleClass('hidden', false);
+               $('input[data-field="scalePoints"').toggleClass('hidden', false);
+               console.log('display scalepoints available');
+            }else{
+               console.log(data);
+            }
+         }
+      });
+   }catch(e){};
    
    // The keydown event listener is removed from the document so that there is only ever one on there.
    $(document).off( 'keydown' );
@@ -459,6 +489,7 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
    if(layer['styles_url']){
       var legendURL = layer.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(layer, layer['styles_url']));
       var data = {
+         'scalePoints':layer['legendSettings']['scalePoints'],
          'angle':layer['legendSettings']['Rotation'],
          'legendURL':legendURL
       };
@@ -469,7 +500,7 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          url:  layer.styles_file,
          dataType: 'json',
          success: function( data ){
-            layer.styles_url = data.Styles[0].LegendURL;
+            gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[0].LegendURL;
             gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
          }
       });
