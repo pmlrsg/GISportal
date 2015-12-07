@@ -1,0 +1,311 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, inital-scale=1.0, maximum-scale=1.0" />
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<title>GIS Portal Prototype</title>
+
+<!-- ============================ Now for the styling ============================ -->
+
+<!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
+<link rel="stylesheet" type="text/css" href="css/@@GISportal.min.css" />
+
+
+
+<!-- ============================ JavaScript libraries ============================ -->
+<!-- Latest jQuery from jQuery.com -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+<!-- jQuery UI -->
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+
+<!-- Modernizer -->
+<script src="js-libs/modernizr.js"></script>
+
+
+<!-- jQuery no UI slider -->
+<script src="js-libs/jquery-nouislider/jquery.nouislider.min.js"></script>
+
+<script src="js-libs/swipe/swipe.js"></script>
+
+<!-- jQuery no UI slider -->
+<script src="js-libs/jquery.add-clear.js"></script>
+
+<!-- Lodash (_) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+
+<!-- OpenLayers Map Code -->
+<script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
+
+<!-- D3 -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+
+<!-- Handlebars - Like mustache, but better. -->
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.4/handlebars.min.js"></script>
+
+<!-- Fuse -->
+<script type="text/javascript" src="js-libs/fuse/fuse.js"></script>
+
+<!-- Tooltipster -->
+<script type="text/javascript" src="js-libs/tooltipster/js/jquery.tooltipster.min.js"></script>
+
+<!-- jStorage - Used for large local storage -->
+<script type="text/javascript" src="js-libs/jstorage.js"></script>
+
+<!-- Pikaday - data picker -->
+<link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
+<script type="text/javascript" src="js-libs/moment.js"></script>
+<script type="text/javascript" src="js-libs/pikaday/pikaday.js"></script>
+<script type="text/javascript" src="js-libs/pikaday/pikaday.jquery.js"></script>
+
+<!-- Terra former WKT editor -->
+<script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer/1.0.4/terraformer.min.js"></script>
+<script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
+<script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.0.0/terraformer-wkt-parser.min.js"></script>
+
+<!-- Dropdown Library - Pulled from bootstrap -->
+<link rel="stylesheet" type="text/css" href="js-libs/dropdowns/bootstrap.css" />
+<script type="text/javascript" src="js-libs/dropdowns/bootstrap.min.js"></script>
+
+<!-- Custom JavaScript -->
+<script type="text/javascript" src="@@GISportal.min.js"></script>
+
+
+<link rel="apple-touch-icon" sizes="57x57" href="favicon/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="favicon/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="favicon/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="favicon/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="favicon/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="favicon/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="favicon/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="favicon/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="favicon/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+<link rel="manifest" href="favicon/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="favicon/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+
+</head>
+<body role="application">
+   
+   <!-- The start page,
+         this should load before anything else. -->
+    <div class="start overlay js-start-container"></div>
+
+
+    <div class="browse-not-compatible  overlay js-browse-not-compatible">
+      <h3>Browser out of date</h3>
+      <p>We have detected that your Internet browser does not
+      have the requirements needed to run the portal. Please update to a newer version.</p>
+    </div>
+
+   <!-- JavaScript check -->
+   <noscript>
+      <div id="noscript-warning">
+         This website requires JavaScript to work. Please enable it in your browser.
+      </div>
+   </noscript>
+
+   <!-- The Map -->
+   <div id="map" class=""></div>
+   <div id="data-reading-popup" class="ol-popup">
+      <a href="#" id="data-reading-popup-closer" class="ol-popup-closer"></a>
+      <div id="data-reading-popup-content"></div>
+   </div>
+
+   <!-- The Timeline -->
+   <div class="timeline-container">
+      <div class="timeline-inner">
+         <ul class="js-timeline-labels timeline-labels"></ul>
+         <div id="timeline" class=""></div>
+         <input class="js-current-date current-date" type="input" />
+      </div>
+   </div>
+
+   <button class="js-show-tools show-tools hidden"><span class="icon-arrow-right-1"></span> Show tools</button>
+   
+   
+   <div class="panel active">
+      <div class="panel-header" style="">
+         <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
+         <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
+         
+         <div class="pull-right">
+            <div data-panel-name="map-settings" class="js-show-panel tab ">
+               <span  class="icon-map-1" title="Display settings"></span>
+            </div>
+            <div data-panel-name="history" class="js-show-panel tab ">
+               <span  class="icon-briefcase" title="Stored graphs"></span>
+            </div>
+            <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
+        </div>
+      </div>
+       
+       
+      <!-- Choose Indicators  -->
+      <div class="panel-container" data-panel-name="choose-indicator" id="configurePanel" >
+         <!-- These are on the same line to avoid white-space bug with inline-block -->
+         <ul class="panel-tabs">
+            <li class="">
+              <div class="panel-tab no-gap active clearix instructions">
+                <span>
+                  Choose an indicator below by searching or using the dropdowns. 
+                </span>
+              </div>
+            </li>
+            <li>
+               <div class="panel-tab no-gap active full-height">
+                  <input type="text" placeholder="Search for an indicator" class="js-search search">
+                  <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+               </div>
+            </li>
+            <li>
+               <div class="js-category-filter panel-tab no-gap active"></div>
+            </li>
+         </ul>
+      </div>
+      
+      
+      <!-- Refine the chosen indicator by region/interval/etc..  -->
+      <div id="refinePanel" data-panel-name="refine-indicator" class="panel-container indicator-select">
+         <div class="panel-container-solid-backdrop">
+            <div class="js-refined-tags"></div>
+            <div class="js-refine-section"></div>
+
+            <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
+            <button class="text-button js-refine-configure">Cancel</button>
+        </div>
+      </div>
+      
+      
+      <!-- View the active indicators  -->
+      <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
+         <ul class="js-indicators indicator-list grid-list">
+         </ul>
+      </div>
+      
+      <div id="mapSettingsPanel" data-panel-name="map-settings" class="panel-container">
+         <div class="panel-container-solid-backdrop js-map-options">
+            
+         </div>
+      </div>
+
+      <div id="historyPanel" data-panel-name="history" class="panel-container" >
+        <div class="panel-container-solid-backdrop" style="display: none;">
+          <h3>Saved States</h3>
+          <div class="js-states-saved-list"></div>
+        </div>
+        <div class="panel-container-solid-backdrop" >
+          <h3>Stored Graphs</h3>
+          <div>
+            <div class="js-graphs-saved-list" ></div>
+            <div class="js-graphs-history-list" ></div>
+          </div>
+        </div>
+      </div>
+      
+
+      <div class="panel-footer">
+          <label for="about"></label>
+           <a href="/" alt="link to about page" target="_blank">
+            <button id="about" class="about-button  brand secondary">
+            <span class="icon-btn"> </span>
+              About
+          </button>
+        </a>
+           <label for="share-map"></label>
+           <button id="share-map" class="js-share brand secondary">
+            <span class="icon-filled-link icon-btn"> </span>
+              Share
+          </button>
+      </div>
+
+
+      <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
+        <div class="slideout-pulltab js-slideout-toggle-peak"></div>
+        <div class="panel-slideout-content-wrapper">
+          <div class=" panel-slideout-content js-slideout-content"></div>
+        </div>
+      </div>
+
+
+      <div class="panel-slideout js-export-raw-slideout" data-slideout-name="export-raw" data-slideout-override-action="hide">
+        <div class="panel-slideout-content-wrapper">
+          <div class=" panel-slideout-content js-slideout-content">
+          </div>
+        </div>
+      </div>
+
+      <!-- Slideout metadata -->
+      <div class="panel-slideout" data-slideout-name="metadata" data-slideout-override-action="hide">
+        <div class="panel-slideout-content-wrapper">
+          <div class="panel-slideout-content js-slideout-content">
+            <!-- Slideout contents should go here -->
+            <div class="metadata-slideout">
+            <div class="slideout-header">
+              More Information
+              <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
+
+            </div>
+            
+              <div class="metadata-box metadata_indicator"></div>
+              <div class="metadata-box metadata_provider"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+   
+   <!-- The share box. -->
+    <div class="share overlay hidden">
+      <div class="share-container overlay-container">
+         <button class="js-close-share text-button">Close</button>
+         <div class="js-logged-in hidden"></div>
+         <div>
+            <h2>Share this map</h2>
+            <p>Here's a link to this map. Just copy and paste anywhere</p>
+            <input class="js-shareurl" placeholder="Loading...">
+         </div>
+         <div class="js-logged-out hidden"></div>
+      </div>
+    </div>
+
+
+    <div class="js-tac-popup overlay hidden dark-background">
+      <div class=" tac-container">
+        <div class="js-tac-content"></div>
+        <div class="tac-container-bottom">
+          <a class="btn brand with-border js-tac-accept">Accept</a>
+          <a class="btn brand with-border js-tac-decline">Decline</a>
+        </div>
+      </div>
+    </div>
+
+   <div class="overlay js-modal-message-popup hidden">
+      <div class="overlay-container js-modal-message-html"></div>
+   </div>
+
+
+    <!-- Map controls 
+    <div class="map_controls">
+      <span class="icon-zoom-in btn" id="mapZoomIn"></span>
+      <span class="icon-zoom-out btn" id="mapZoomOut"></span>
+    </div>-->
+   <div class="global-loading-icon">
+   </div>
+
+   <div class="helpBox">
+    <script>
+      // Include the UserVoice JavaScript SDK (only needed once on a page)
+      UserVoice=window.UserVoice||[];(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/Z20UXBXjq9ai4OIbESw8Hg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})();
+
+
+      </script>
+   </div>
+</body>
+</html>
