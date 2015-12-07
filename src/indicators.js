@@ -114,7 +114,9 @@ gisportal.indicatorsPanel.initDOM = function() {
          parseFloat(indicator.exBoundingBox.EastBoundLongitude),
          parseFloat(indicator.exBoundingBox.NorthBoundLatitude)
       ]
-      map.getView().fitExtent(bbox, map.getSize());
+      var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', map.getView().getProjection().getCode());
+      
+      map.getView().fit(extent, map.getSize());
    });
 
    //Share this map

@@ -16,6 +16,7 @@ Things missing that ol3 doesn't do or I can't work out how to implement:
 */
 
 gisportal.selectionTools = {};
+gisportal.selectionTools.isDrawing = false;
 
 var draw;
 
@@ -64,6 +65,9 @@ function cancelDraw() {
    if(draw == null)return;
    
    map.removeInteraction(draw);
+   setTimeout(function() {
+      gisportal.selectionTools.isDrawing = false;
+   }, 500);
 }
 
 gisportal.selectionTools.initDOM = function()  {
@@ -118,6 +122,8 @@ gisportal.selectionTools.toggleTool = function(type)  {
    }
    
    if (type != 'None') {
+      gisportal.selectionTools.isDrawing = true;
+
       if (type == "Polygon") {
          draw = new ol.interaction.Draw({
             source:gisportal.vectorLayer.getSource(),
@@ -127,12 +133,29 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
       if (type == "Box") {
-         draw = new ol.interaction.DrawBox({
-            source:gisportal.vectorLayer.getSource(),
-            type: type
+      
+         var geometryFunction = function(coordinates, geometry) {
+            if (!geometry) {
+               geometry = new ol.geom.Polygon(null);
+            }
+            var start = coordinates[0];
+            var end = coordinates[1];
+            geometry.setCoordinates([
+               [start, [start[0], end[1]], end, [end[0], start[1]], start]
+            ]);
+            return geometry;
+         };
+         
+         draw = new ol.interaction.Draw({
+            source: gisportal.vectorLayer.getSource(),
+            type: 'LineString',
+            geometryFunction: geometryFunction,
+            maxPoints: 2
          });
          map.addInteraction(draw);
       }
+
+
       
       draw.on('drawstart',
          function(evt) {
@@ -159,6 +182,9 @@ gisportal.selectionTools.updateROI = function()  {
 
 gisportal.currentSelectedRegion = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
+   setTimeout(function() {
+               gisportal.selectionTools.isDrawing = false;
+            }, 500);
    var feature_type = map.ROI_Type;
 
    // Get the geometry of the drawn feature
@@ -191,6 +217,8 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       $('.js-edit-polygon').attr('disabled', false);
    } else {
       bounds = feature.getGeometry().getExtent();
+      bounds = gisportal.reprojectBoundingBox(bounds, map.getView().getProjection().getCode(), 'EPSG:4326');
+
       var coords = "";
       if (bounds) {
          coords += bounds[0] + ",";
