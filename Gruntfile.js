@@ -155,6 +155,9 @@ module.exports = function(grunt) {
                {expand: true, flatten: true, src: ['src/index.html'], dest: 'html/'}
             ]
          }
+      },
+      jshint: {
+         all: coreFiles
       }
       
    });
@@ -163,11 +166,12 @@ module.exports = function(grunt) {
    grunt.loadNpmTasks('grunt-contrib-concat');
    grunt.loadNpmTasks('grunt-contrib-uglify');
    grunt.loadNpmTasks('grunt-contrib-cssmin');
+   grunt.loadNpmTasks('grunt-contrib-jshint');
    grunt.loadNpmTasks('grunt-replace');
    
 
    // Tasks
    grunt.registerTask('default', ['concat', 'uglify', 'cssmin', 'replace:build']);
-   grunt.registerTask('dev', ['concat', 'uglify', 'cssmin', 'replace:dev']);
+   grunt.registerTask('dev', ['concat', 'cssmin', 'replace:dev', 'jshint']);
 
 };
