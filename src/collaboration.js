@@ -25,7 +25,17 @@ collaboration.initDOM = function() {
 	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
 
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
-   var rendered = gisportal.templates['collaboration']
+
+   // if there's a room querystring parameter show the collaboration panel; they'll be put in the room if they are logged in already, otherwise prompt for login
+   var roomId = gisportal.utils.getURLParameter('room');
+   var data = {
+      message = 'You have been invited to join room '+ roomId +'; please login to enter the room'
+   }
+   if (roomId !== null && !collaboration.active) {
+      gisportal.panels.showPanel('collaboration')   
+   }
+   
+   var rendered = gisportal.templates['collaboration'](data)
    $('.js-collaboration-holder').html(rendered);
 
 }	
@@ -48,7 +58,13 @@ collaboration.initSession = function() {
 		  		collaboration.active = true;
             collaboration.setStatus('connected', 'Ready')
 
-            if (typeof collaboration.roomId != 'undefined') {
+            // if there's a room querystring parameter get the user into the room
+            var roomId = gisportal.utils.getURLParameter('room');
+            if (roomId !== null && typeof collaboration.roomId == 'undefined') { // the collaboration.roomId is set to `null` when leaving a room
+               collaboration.roomId = roomId;
+            }
+
+            if (typeof collaboration.roomId !== 'undefined' && collaboration.roomId !== null) {
                collaboration.joinRoom(collaboration.roomId);
             }
 		  	});
@@ -487,7 +503,7 @@ collaboration.buildMembersList = function(data) {
    // add events to the various action links
    $('.js-leave-room').click(function() {
       socket.disconnect();
-      collaboration.roomId = undefined;
+      collaboration.roomId = null;
 
       var rendered = gisportal.templates['collaboration']
       $('.js-collaboration-holder').html('').html(rendered);
@@ -496,6 +512,12 @@ collaboration.buildMembersList = function(data) {
       setTimeout(function() {
          $('.collaboration-status').remove()
       }, 3000);
+   });
+
+   $('.js-invite-people').click(function() {
+      $('.js-collab-invite').toggleClass('hidden');
+      $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
+      $('.js-collab-room-url').focus(function() { $(this).select(); } ).mouseup(function (e) {e.preventDefault(); });
    });
 
    if (collaboration.role == 'presenter') { 

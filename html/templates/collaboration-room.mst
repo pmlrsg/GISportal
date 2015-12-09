@@ -1,8 +1,15 @@
 <h3>Collaboration Room - <span class="roomId">{{roomId}}</span></h3>
 <div class="collaboration-actions">
    <button class="js-leave-room brand secondary extra-small gray"><span class="icon-log-out-1"></span>Leave the room</button> 
-   <button class="js-invite-people brand secondary extra-small gray"><span class="icon-mail-1"></span>Invite People</button> 
-   <button class="js-record-session brand secondary extra-small gray"><span class="icon-record-2"></span>Record session</button>  
+   <button class="js-invite-people brand secondary extra-small gray"><span class="icon-user-add-1"></span>Invite People</button> 
+   <button class="js-record-session brand secondary extra-small gray hidden"><span class="icon-record-2"></span>Record session</button>  
+</div>
+
+<div class="js-collab-invite hidden">
+   <h4>Invite People</h4>
+   <p>Copy the address in the text field below and paste into an email, Skype chat or IRC channel to invite people to your room. </p>
+   <input type="text" class="js-collab-room-url">
+   <p>Press <span class="bold">Ctrl+C</span> (or &#8984;+C on a Mac) to copy</p>
 </div>
 
 <p>Connected people in this room:</p>

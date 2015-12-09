@@ -74,6 +74,11 @@
 .collaboration-actions { 
    margin: 10px 0px;
 }
+
+.js-collab-invite { margin-bottom: 20px; }
+
+.sending { vertical-align: text-bottom; margin-right: 8px; }
+
 .person {
   border: 1px solid #ccc;
   background-color: #fff;

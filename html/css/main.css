@@ -146,7 +146,8 @@ button, .btn{
   display: block;
 }
 
-input[type="text"]  {
+input[type="text"], 
+textarea  {
   font-family: "Open Sans";
   background-color: #fff;
   border: 1px solid #d8d3dd;
@@ -156,7 +157,14 @@ input[type="text"]  {
   width: 100%;
 }
 
+textarea {
+  height: auto;
+  padding: 5px 10px;
+}
 
+input:focus, textarea:focus {
+  color: #444;
+}
 /* TEMP GRAPH stuff */
 
 #graph-container  {
