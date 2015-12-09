@@ -272,6 +272,7 @@ def create_mask(poly, params, poly_type="polygon"):
    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
    #print '#'*50
    #print lonlat_poly
+   lonlat_poly = lonlat_poly.buffer(0)
    overlap_poly = loaded_poly.intersection(lonlat_poly)
    poly = poly[trim_sizes[poly_type]]
 
@@ -326,7 +327,6 @@ def create_mask(poly, params, poly_type="polygon"):
          ImageDraw.Draw(img).line(found,   fill=2)
 
    masker = np.array(img)
-
    #fig = plt.figure()
    masked_variable = []
    for i in range(chl.shape[0]):
@@ -337,6 +337,7 @@ def create_mask(poly, params, poly_type="polygon"):
    #    imgplot = plt.imshow(masked_variable)
 
    # plt.show()
+
    return masked_variable, to_be_masked, masker, tfile, variable
 
 
@@ -367,14 +368,24 @@ def contactWCSServer(url):
    current_app.logger.debug('Request successful')
    return resp
       
-def saveOutTempFile(resp):
-   current_app.logger.debug('Saving out temporary file...')
-   temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
-   temp.write(resp.read())
-   temp.close()
-   resp.close()
-   current_app.logger.debug('Temporary file saved successfully')
-   return temp.name
+def saveOutTempFile(resp, notemp=False):
+   import time
+   if notemp:
+      pass
+      mytfilename = '/users/rsg/olcl/irregular_test/' + str(time.time()).split('.')[0]
+      outfile = open(mytfilename, 'w')
+      outfile.write(resp.read())
+      outfile.close()
+      resp.close()
+      return mytfilename
+   else:
+      current_app.logger.debug('Saving out temporary file...')
+      temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
+      temp.write(resp.read())
+      temp.close()
+      resp.close()
+      current_app.logger.debug('Temporary file saved successfully')
+      return temp.name
     
 def openNetCDFFile(fileName, params):
    current_app.logger.debug('Opening netCDF file...')
@@ -531,20 +542,38 @@ def getBboxData(params, method):
 Performs a basic set of statistical functions on the provided data.
 """
 def basic(dataset, params, irregular=False, original=None):
+   import matplotlib
+   matplotlib.use('Agg')
+   import matplotlib.pyplot as plt   
    if irregular:
-      arr = np.ma.concatenate(dataset)
+      # current_app.logger.debug('irregular shape')
+      # current_app.logger.debug([x.shape for x in dataset])
+
+      #arr = np.ma.concatenate(dataset)
+      arr = np.ma.array(dataset)
+
+      #_img = Image.fromarray(arr[0], 'RGB')
+      #_img.save('/users/rsg/olcl/irregular_test/my.png')
+      # plt.imshow(arr[0])
+      # plt.savefig('/users/rsg/olcl/irregular_test/my.png')
+      # current_app.logger.debug('irregular shape after concatonate')
+      # current_app.logger.debug(arr)
    else:
       arr = np.array(dataset.variables[params['coverage'].value])
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
    if original is not None:
       dataset = original
-   
-   maskedArray = np.ma.masked_invalid(arr)
+   if not irregular:
+      maskedArray = np.ma.masked_invalid(arr)
+   else:
+      maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
-   
+   # plt.imshow(maskedArray[0])
+   # plt.savefig('/users/rsg/olcl/irregular_test/my_masked.png')
    time = getCoordinateVariable(dataset, 'Time')
-      
+   # current_app.logger.debug('time channel test')
+   # current_app.logger.debug(time)
    if time == None:
       g.graphError = "could not find time dimension"
       return
@@ -583,7 +612,7 @@ def basic(dataset, params, irregular=False, original=None):
    output['data'] = {}
    
    for i, row in enumerate(maskedArray):
-
+      current_app.logger.debug(row)
       if timeUnits:
          date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
       else:     
