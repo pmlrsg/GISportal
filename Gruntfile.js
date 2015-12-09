@@ -117,6 +117,17 @@ module.exports = function(grunt) {
             }
          }
       },
+      postcss: {
+         options: {
+            processors: [
+               require('pixrem')(),
+               require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+            ]
+         },
+         dist: {
+            src: 'html/css/<%= pkg.name %>.css',
+         }
+      },
       cssmin: {
          options: {
             shorthandCompacting: false,
@@ -165,13 +176,14 @@ module.exports = function(grunt) {
    // Load the plugin that provides the 'uglify' task.
    grunt.loadNpmTasks('grunt-contrib-concat');
    grunt.loadNpmTasks('grunt-contrib-uglify');
-   grunt.loadNpmTasks('grunt-contrib-cssmin');
+   grunt.loadNpmTasks('grunt-postcss');
+   grunt.loadNpmTasks('grunt-contrib-cssmin');  // this is here because cssnano that's a plugin for postcss is too slow
    grunt.loadNpmTasks('grunt-contrib-jshint');
    grunt.loadNpmTasks('grunt-replace');
    
 
    // Tasks
-   grunt.registerTask('default', ['concat', 'uglify', 'cssmin', 'replace:build']);
-   grunt.registerTask('dev', ['concat', 'cssmin', 'replace:dev', 'jshint']);
+   grunt.registerTask('default', ['concat', 'uglify', 'postcss', 'cssmin', 'replace:build']);
+   grunt.registerTask('dev', ['concat', 'postcss', 'replace:dev', 'jshint']);
 
 };
