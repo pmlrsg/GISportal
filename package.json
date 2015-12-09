@@ -11,6 +11,6 @@
     "grunt-postcss": "~0.7.1",
     "autoprefixer": "~6.1.2",
     "pixrem": "~3.0.0",
-    "cssnano": "~3.4.0"
+    "grunt-contrib-cssmin": "~0.14.0"
   }
 }
