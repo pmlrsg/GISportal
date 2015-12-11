@@ -47,6 +47,7 @@ gisportal.events.bind("layers-loaded", function() {
       gisportal.autoLayer.loadGivenLayer();
       gisportal.autoLayer.loadPreviousLayers();
    }
+   // This refreshes the server list table when the user refreshes a server
    if(gisportal.refresh_server){
       gisportal.refresh_server = false;
       gisportal.editLayersForm.produceServerList();
@@ -86,7 +87,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
       clean_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh
       if(given_cache_refresh == "false"){
-         request_url = "cache/global_cache/"+clean_file+".json"
+         request_url = "cache/temporary_cache/"+clean_file+".json"
       }else{
          request_url = clean_url
       }

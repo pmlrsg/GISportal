@@ -14,7 +14,7 @@ import calendar
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
-SERVERCACHEPATH = "../../../html/cache/global_cache"
+SERVERCACHEPATH = "../../../html/cache/temporary_cache"
 USERCACHEPATH = "../../../html/cache/user_cache"
 USERDELETEDCACHEPATH = "../../../html/cache/user_cache/deleted_cache"
 MASTERCACHEPATH = "../../../html/cache/mastercache"

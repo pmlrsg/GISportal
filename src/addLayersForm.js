@@ -27,7 +27,7 @@ gisportal.addLayersForm.validation_functions = {
 */
 gisportal.addLayersForm.addlayerToList = function(layer){
    if(gisportal.selectedLayers.indexOf(layer.id) > -1){
-      gisportal.addLayersForm.selectedLayers.push(layer.id);
+      gisportal.addLayersForm.selectedLayers.push(layer.id); // Saves out all of the layers that are selected.
    }
    gisportal.addLayersForm.layers_list = gisportal.addLayersForm.layers_list || {};
    var list_id = _.size(gisportal.addLayersForm.layers_list)+1
@@ -595,7 +595,7 @@ gisportal.addLayersForm.validateForm = function(form_div){
 };
 
 /**
-* This function checks the validity of a sinle input againts the validation object
+* This function checks the validity of a single input againts the validation object
 * 
 * @method
 * 
@@ -622,9 +622,9 @@ gisportal.addLayersForm.checkValidity = function(field, value){
 * @param String server - the name of the server to be added to the form.
 */
 gisportal.addLayersForm.addServerToForm = function(server){
-   gisportal.addLayersForm.layers_list = {};
+   gisportal.addLayersForm.layers_list = {}; // Resets the form information
    gisportal.addLayersForm.server_info = {};
-   if(_.size(gisportal.original_layers) > 0){
+   if(_.size(gisportal.original_layers) > 0){ //gets the list of layers.
       var layers_list = gisportal.original_layers;
    }else{
       var layers_list = gisportal.layers;

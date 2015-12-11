@@ -418,7 +418,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
          $.ajax({
-            url:  'cache/global_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+            url:  'cache/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
             dataType: 'json',
             success: function(layer){
                $('#refresh-cache-message').toggleClass('hidden', false);

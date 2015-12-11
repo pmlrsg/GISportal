@@ -51,7 +51,7 @@
       </form>
       <div class="clearfix wms-url-div">
          <label>You can edit internal layers here:</label>
-         <button class="brand small js-edit-layers pull-right">Edit Internal Layers</button>
+         <button class="brand small js-edit-layers pull-right">Configure Internal Layers</button>
       </div>
    </li>
 </ul>

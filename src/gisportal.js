@@ -168,6 +168,8 @@ gisportal.createOpLayers = function() {
          //new
          "abstract": indicator.Abstract,
          "contactInfo": server.contactInfo,
+         "contactInfo": server.contactInfo,
+         "timeStamp":server.timeStamp,
          "name": indicator.Name,
          "title": indicator.Title,
          "productAbstract": indicator.productAbstract,
