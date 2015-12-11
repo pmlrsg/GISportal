@@ -205,3 +205,46 @@ div.scalebar-preview img{
 div.scalebar-preview{
   position:relative;
 }
+
+div.js-edit-layers-html{
+  max-width:90%;
+  width:auto;
+  max-height:90%;
+  overflow:auto;
+}
+
+div.js-edit-layers-html td,
+div.js-edit-layers-html th{
+  padding: 5px 10px 5px 10px;
+  text-align:left;
+}
+
+div.js-edit-layers-html span.js-edit-server-layers,
+div.js-edit-layers-html span.show-server-layers,
+div.js-edit-layers-html span.js-delete-server,
+div.js-edit-layers-html span.js-update-server{
+  color:black;
+  font-size:15px;
+}
+
+div.js-edit-layers-html span.js-delete-server:hover{
+  color:#990000;
+}
+
+div.js-edit-layers-html span.js-edit-server-layers:hover{
+  color:#B27300;
+}
+
+div.js-edit-layers-html span.js-update-server:hover{
+  color: #196619 ;
+}
+
+
+div.js-edit-layers-html table{
+  word-break:break-word;
+}
+
+div.js-edit-layers-popup{
+  align-items:inherit;
+  margin:10px auto;
+}

@@ -187,6 +187,7 @@ textarea  {
 	height: 84px;
 	
 	text-align: center;
+  z-index: 9999999;
 }
 
 .global-loading-icon::after{

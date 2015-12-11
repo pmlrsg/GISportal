@@ -1,0 +1,59 @@
+<div class="form-header">
+   Server List
+   <span class="icon-delete-3 js-edit-layers-close btn right-icon icon-btn"></span>
+</div>
+<table>
+   <tr>
+      <th/>
+      <th>Server Name</th>
+      <th>Provider</th>
+      <th>Contact Info</th>
+      <th colspan="100%">Server Tools</th>
+   </tr>
+   {{#each this}}
+      <tr>
+         <td><span title="Show Layers" class="show-server-layers icon-arrow-move-down btn icon-btn" data-server="{{serverName}}"></span></td>
+         <td>{{serverName}}</td>
+         <td>{{provider}}</td>
+         <td>
+
+         {{#if contactInfo}}
+            {{#with contactInfo}}
+               {{#if person}}
+                  {{person}}<br/>
+
+                  {{#if position}}
+                     {{position}}<br/>
+                  {{/if}}
+               {{/if}}
+               {{#if address}}
+                  {{{address}}}
+               {{/if}}
+               {{#if phone}}
+                  {{phone}}<br/>
+               {{/if}}
+               {{#if email}}
+                  {{email}}
+               {{/if}}
+            {{/with}}
+         {{/if}}
+
+         </td>
+         <td><span title="Edit" class="js-edit-server-layers icon-pencil-2 btn icon-btn" data-server="{{serverName}}"></span></td>
+         <td><span title="Delete/Hide" class="js-delete-server icon-delete-2 btn icon-btn" data-server="{{serverName}}"></span></td>
+         <td><span title="Update" class="js-update-server icon-refresh btn icon-btn" data-server="{{serverName}}" data-wms="{{wms_url}}"></span></td>
+
+      </tr>
+      <tr class="server-layers hidden" data-server="{{serverName}}">
+      <td/>
+      <td>
+      {{#each layers}}
+         {{title}}<br/>
+      {{/each}}
+      </td>
+      <td/>
+      <td/>
+      <td/>
+      </tr>
+   {{/each}}
+</table>

@@ -126,7 +126,7 @@ gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
    }catch(e){}
 
    try{
-      if(layer.minScaleVal && layer.maxScaleVal){
+      if(typeof layer.minScaleVal == "number" && typeof layer.maxScaleVal == "number" ){
          parameters += "&COLORSCALERANGE=" + layer.minScaleVal + ',' + layer.maxScaleVal;
       }
    }catch(e){}

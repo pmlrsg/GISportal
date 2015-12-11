@@ -1,6 +1,7 @@
 gisportal.addLayersForm = {};
 gisportal.addLayersForm.layers_list = {};
 gisportal.addLayersForm.server_info = {};
+gisportal.addLayersForm.selectedLayers = [];
 gisportal.addLayersForm.form_info = {};
 gisportal.addLayersForm.validation_errors = {};
 
@@ -25,6 +26,9 @@ gisportal.addLayersForm.validation_functions = {
 * @param {Object} layer - Object containing data about the layer. 
 */
 gisportal.addLayersForm.addlayerToList = function(layer){
+   if(gisportal.selectedLayers.indexOf(layer.id) > -1){
+      gisportal.addLayersForm.selectedLayers.push(layer.id);
+   }
    gisportal.addLayersForm.layers_list = gisportal.addLayersForm.layers_list || {};
    var list_id = _.size(gisportal.addLayersForm.layers_list)+1
    var indicator_type = layer.tags.indicator_type || "";
@@ -33,13 +37,21 @@ gisportal.addLayersForm.addlayerToList = function(layer){
    var model_name = layer.tags.model_name || "";
    var styles_file = './cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
 
+   // Makes a list of all the other wanted tags.
+   var other_tags = {};
+   for(tag in layer.tags){
+      if(!(tag == "data_provider" || tag == "niceName" || tag == "providerTag")){
+         other_tags[tag] = layer.tags[tag];
+      }
+   }
+
    var layer_info={
       "list_id":list_id,
       "nice_name":layer.tags.niceName,
       "original_name":layer.urlName, //used to input the data into the correct files int the end.
       "abstract":layer.abstract,
       "id":layer.id,
-      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model_name":model_name},
+      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model_name":model_name}, //ensures that these tags are displayed on the form
       "include":true,
       "styles_file":styles_file,
       "legendSettings":{
@@ -50,6 +62,9 @@ gisportal.addLayersForm.addlayerToList = function(layer){
          }
       }
    };
+
+   $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
+
    for(value in gisportal.addLayersForm.layers_list){ // Ensures that the layer can only be added once. 
       if(gisportal.addLayersForm.layers_list[value]['id'] == layer.id){
          return;
@@ -142,9 +157,6 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             if(typeof(data.min) == "number" && typeof(data.max) == "number"){
                $('label[data-field="scalePoints"').toggleClass('hidden', false);
                $('input[data-field="scalePoints"').toggleClass('hidden', false);
-               console.log('display scalepoints available');
-            }else{
-               console.log(data);
             }
          }
       });
@@ -207,7 +219,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    });
 
    // Adds a listener to the submit button on the form.
-   $('.layers-form-buttons-div button.js-layers-form-submit').on('click', function(e){
+   $('.layers-form-buttons-div button.js-layers-form-submit').one('click', function(e){
       e.preventDefault();
       // If there are errors on the server information form then do nothing (the errors will already be on display).
       if(_.size(gisportal.addLayersForm.validation_errors['server']) > 0){
@@ -240,6 +252,16 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info")},
                // If there is success
                success: function(layer){
+                  // This block removes any old selected layers
+                  for(i in gisportal.addLayersForm.selectedLayers){
+                     var id = gisportal.addLayersForm.selectedLayers[i];
+                     gisportal.indicatorsPanel.removeFromPanel(id);
+                     if(id.indexOf("UserDefinedLayer") > -1){
+                        var postfix = gisportal.addLayersForm.server_info.provider;
+                        var clean_postfix = postfix.replace(/[ \\\/.,\(\):;]/g, "_").replace(/&amp/g, "and");
+                        gisportal.addLayersForm.selectedLayers[i] = id.replace("UserDefinedLayer", clean_postfix);
+                     }
+                  }
                   // The temporary form information will be wiped
                   gisportal.addLayersForm.layers_list = {};
                   gisportal.addLayersForm.server_info = {};
@@ -320,7 +342,9 @@ gisportal.addLayersForm.addTagInput = function(tag){
 */
 gisportal.addLayersForm.displayServerform = function(layer, form_div){
    wms_url = layer['wmsURL'] || gisportal.addLayersForm.form_info['wms_url'];
-   wms_url = wms_url.split('?')[0];
+   if(wms_url){
+      wms_url = wms_url.split('?')[0];
+   }
    // If the data has not yet been added to the server_info object.
    if(_.size(gisportal.addLayersForm.server_info) <= 0){
       // The server inforation is extracted from the layer and put into the object.
@@ -379,6 +403,8 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
 * @param String server_div- The JQuery element selctor for the server form to go into
 */
 gisportal.addLayersForm.addLayersForm = function(list_size, single_layer, current_page, form_div, server_div){
+   // The HTML is cleared ready for the form
+   $('div.js-layer-form-html').html("");
    // The two forms are displayed
    gisportal.addLayersForm.displayForm(list_size, current_page, form_div)
    gisportal.addLayersForm.displayServerform(single_layer, server_div);
@@ -587,3 +613,30 @@ gisportal.addLayersForm.checkValidity = function(field, value){
    // Otherwise invalid is sent back as false.
    return {'invalid': false};
 };
+
+/**
+* This function adds a single server to the addLayers form
+* 
+* @method
+*
+* @param String server - the name of the server to be added to the form.
+*/
+gisportal.addLayersForm.addServerToForm = function(server){
+   gisportal.addLayersForm.layers_list = {};
+   gisportal.addLayersForm.server_info = {};
+   if(_.size(gisportal.original_layers) > 0){
+      var layers_list = gisportal.original_layers;
+   }else{
+      var layers_list = gisportal.layers;
+   }
+   var single_layer;
+   for(layer in layers_list){
+      if(layers_list[layer]['serverName'] == server){
+         single_layer = layers_list[layer];
+         gisportal.addLayersForm.addlayerToList(layers_list[layer]);
+      }
+   }
+   gisportal.addLayersForm.validation_errors = {};
+   // The form is then loaded (loading the first layer)
+   gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
+}

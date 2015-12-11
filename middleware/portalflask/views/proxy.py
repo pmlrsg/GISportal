@@ -16,6 +16,7 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
 SERVERCACHEPATH = "../../../html/cache/global_cache"
 USERCACHEPATH = "../../../html/cache/user_cache"
+USERDELETEDCACHEPATH = "../../../html/cache/user_cache/deleted_cache"
 MASTERCACHEPATH = "../../../html/cache/mastercache"
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
@@ -255,8 +256,9 @@ def get_cache():
 
    for filename in os.listdir(user_cache_path): # Loops through all of the files int he cache folder
       file_path = os.path.join(user_cache_path, filename)
-      with open(file_path, 'r+') as layer_file:
-         cache.extend([json.load(layer_file)]) # Adds the information in each file to the cache list to be returned.
+      if os.path.isfile(file_path):
+         with open(file_path, 'r+') as layer_file:
+            cache.extend([json.load(layer_file)]) # Adds the information in each file to the cache list to be returned.
 
    return json.dumps(cache) # Returns the cache to the portal for loading the layers.
 
@@ -603,3 +605,34 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
             # Variables are passed on because some apply to multiple layers and therefore can be stored in parental tags.
             # Some information about the parent tag is also useful so this is one simple way to save it.
          digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
+
+"""
+Moves the given server's cache to the deleted folder.
+"""
+@portal_proxy.route('/remove_server_cache')
+def remove_server_cache():
+   filename = request.args.get('filename')
+   clean_filename = filename + FILEEXTENSIONJSON
+   original_path = os.path.join(CURRENT_PATH, USERCACHEPATH, clean_filename)
+   new_path = os.path.join(CURRENT_PATH, USERDELETEDCACHEPATH, clean_filename)
+
+   deleted_cache_path =os.path.join(CURRENT_PATH,USERDELETEDCACHEPATH)
+   if not os.path.isdir(deleted_cache_path):
+      os.makedirs(deleted_cache_path)  #if the user_deleted_cache path does not exist it is created.
+
+   os.rename(original_path, new_path)
+   return filename
+
+
+"""
+Puts the updated data back into the file
+"""
+@portal_proxy.route('/update_layer', methods=['POST'])
+def update_layer():
+   data = json.loads(request.form['data'])
+   filename =  data['serverName']
+
+   path = os.path.join(CURRENT_PATH, USERCACHEPATH, filename + FILEEXTENSIONJSON)
+   saveFile(path, json.dumps(data))
+
+   return ""

@@ -344,6 +344,11 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       maxWidth: 200
    });
 
+   //Add the edit/add layers listener to add the server to the form
+   $('span.js-add-layer-server').on('click', function(){
+      gisportal.addLayersForm.addServerToForm($(this).data('server'));
+   })
+
    gisportal.events.trigger('layer.addtopanel', data)
 };
 
@@ -491,6 +496,8 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }
       var renderedScalebar = gisportal.templates['scalebar'](indicator);
+
+
       $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
 
    } else {

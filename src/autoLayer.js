@@ -47,6 +47,11 @@ gisportal.events.bind("layers-loaded", function() {
       gisportal.autoLayer.loadGivenLayer();
       gisportal.autoLayer.loadPreviousLayers();
    }
+   if(gisportal.refresh_server){
+      gisportal.refresh_server = false;
+      gisportal.editLayersForm.produceServerList();
+      gisportal.loading.decrement()
+   }
  });
 
 gisportal.events.bind("templates-loaded", function() {
@@ -132,8 +137,8 @@ gisportal.autoLayer.loadPreviousLayers = function(){
 
       gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info["wms_url"];
       gisportal.autoLayer.loadGivenLayer();
-      if(gisportal.addLayersForm.form_info["display_form"]){
-         gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html');
-      }
+   }
+   if(gisportal.addLayersForm.form_info["display_form"]){
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html');
    }
 };

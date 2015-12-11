@@ -45,7 +45,12 @@ gisportal.map_settings.init = function() {
       projections: projections
    }
    var rendered = gisportal.templates['map-settings'](data)
-   $('.js-map-options').html(rendered); 
+   $('.js-map-options').html(rendered);
+
+   $('button.js-edit-layers').on('click', function(e){
+      e.preventDefault();
+      gisportal.editLayersForm.produceServerList();
+   });
 
    // enable ddslick'ness
    $('#select-basemap').ddslick({

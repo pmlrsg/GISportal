@@ -203,6 +203,15 @@ gisportal.createOpLayers = function() {
 
    };
 
+   // This block restores the old selected layers using the new IDs that have just been set
+   for(i in gisportal.addLayersForm.selectedLayers){
+      var id = gisportal.addLayersForm.selectedLayers[i];
+      try{
+         gisportal.refinePanel.layerFound(id);
+      }catch(e){}
+   }
+   gisportal.addLayersForm.selectedLayers = [];
+
    var state = gisportal.cache.state;
    gisportal.layersLoaded = true;
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
