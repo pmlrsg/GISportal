@@ -179,12 +179,12 @@ io.on('connection', function(socket){
    var user = {};
    var sessionStore = app.get('sessionStore');
 	sessionStore.load(sid, function(err, session) {
-		if (err || !session) {
+      if (!session.passport.user || err) {
          console.log('no passport');
 			return 'no passport';
 		}
-
-		var emails = session.passport.user.emails;
+      
+      var emails = session.passport.user.emails;
 
 		user.email = emails[0].value;
 		user.name = session.passport.user.displayName;
@@ -200,17 +200,45 @@ io.on('connection', function(socket){
       var leavingUserId = socket.id;
       var roomId = socket.room;
       var people = rooms[roomId];
+      var departed = '';
+      var reassignPresenter = false;
+      var newPresenterId = null;
+
       if (typeof people != 'undefined') {
          for (var i = 0; i < people.length; i++) {
             if (people[i].id == leavingUserId) {
+               // is the person disconnecting either the current presenter or the owner?
+               if (people[i].presenter == true) {
+                  reassignPresenter = true;
+               }
+               // get their name so others can be warned that `departed` has left the building
+               departed = people[i].name;
+               // take the user out of the people array
                rooms[roomId].splice(i, 1);
                break;
             }
          }
+         if (reassignPresenter) { // give the presenter role to the room owner (who started the room)
+            for (var i = 0; i < people.length; i++) {
+               if (people[i].owner == true) {
+                  people[i].presenter = true;
+                  newPresenterId = people[i].id
+                  break;
+               }
+            }
+         }
          io.sockets.in(socket.room).emit('room.member-left', {
             "roomId": roomId,
-            "people": rooms[roomId]
+            "people": rooms[roomId],
+            "departed" : departed
          });
+
+         if (newPresenterId !== null) {
+            io.sockets.in(socket.room).emit('room.presenter-changed', {
+               "roomId": socket.room,
+               "people": people
+            });
+         }
       }
 	})
 

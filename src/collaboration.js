@@ -26,18 +26,19 @@ collaboration.initDOM = function() {
 
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
-   // if there's a room querystring parameter show the collaboration panel; they'll be put in the room if they are logged in already, otherwise prompt for login
-   var roomId = gisportal.utils.getURLParameter('room');
-   var data = {
-      message = 'You have been invited to join room '+ roomId +'; please login to enter the room'
-   }
-   if (roomId !== null && !collaboration.active) {
-      gisportal.panels.showPanel('collaboration')   
-   }
-   
-   var rendered = gisportal.templates['collaboration'](data)
+   var rendered = gisportal.templates['collaboration']
    $('.js-collaboration-holder').html(rendered);
 
+   // if there's a room querystring parameter show the collaboration panel; they'll be put in the room if they are logged in already, otherwise prompt for login
+   var roomId = gisportal.utils.getURLParameter('room');
+   
+   if (roomId !== null && !collaboration.active) {
+      gisportal.panels.showPanel('collaboration');
+      $('.js-collab-message')
+         .toggleClass('hidden', false)
+         .toggleClass('alert-warning', true)
+         .html('You have been invited to join room '+ roomId.toUpperCase() +'; please login to enter the room');
+   }
 }	
 
 
@@ -105,8 +106,17 @@ collaboration.initSession = function() {
          socket.on('room.invalid-id', function(data) {
             console.log('invalid Room Id requested');
             var iframe = $('iframe');
-            $('.js-room-id-message', iframe.contents()).html('The collaboration reference you entered does not exist, please check and try again').removeClass('hidden').addClass('error');
+            $('.js-room-id-message', iframe.contents()).html('The collaboration room ID does not exist, please check and try again').removeClass('hidden').addClass('error');
             $('#roomId', iframe.contents()).addClass('error');
+
+            // if there's a `room` url parameter alter the warning message
+            var roomId = gisportal.utils.getURLParameter('room');
+            if (roomId !== null) {
+               $('.js-collab-message')
+                  .toggleClass('hidden', false)
+                  .toggleClass('alert-danger', true)
+                  .html('The requested room does not exist; the room may have been closed by the organiser, or the link you clicked on could be wrong.');
+            }
          });
          
          socket.on('room.created', function(data) {
@@ -144,7 +154,7 @@ collaboration.initSession = function() {
          });
 
          socket.on('room.member-left', function(data) {
-            console.log('member left room');
+            console.log(data.departed +' has left the room');
             collaboration.buildMembersList(data);
          });
 
