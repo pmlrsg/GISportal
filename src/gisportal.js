@@ -350,12 +350,6 @@ gisportal.mapInit = function() {
       logo: false
    })
 
-   map.addInteraction(new ol.interaction.Select({
-      condition: function(e) {
-         return e.originalEvent.type=='mousemove';
-      }
-   }));
-
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e) {
       if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
@@ -789,7 +783,7 @@ gisportal.zoomOverall = function()  {
       }
 
       var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', map.getView().getProjection().getCode());
-      map.getView().fitExtent(extent, map.getSize());
+      map.getView().fit(extent, map.getSize());
    }
 };
 

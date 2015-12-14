@@ -116,7 +116,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       ]
       var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', map.getView().getProjection().getCode());
       
-      map.getView().fitExtent(extent, map.getSize());
+      map.getView().fit(extent, map.getSize());
    });
 
    //Share this map
