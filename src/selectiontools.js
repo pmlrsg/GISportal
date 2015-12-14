@@ -17,6 +17,7 @@ Things missing that ol3 doesn't do or I can't work out how to implement:
 
 gisportal.selectionTools = {};
 gisportal.selectionTools.isDrawing = false;
+gisportal.selectionTools.isSelecting = false;
 
 var draw;
 
@@ -44,14 +45,14 @@ gisportal.selectionTools.init = function()  {
    map.addLayer(gisportal.vectorLayer);
 
    var feature;
-   map.on('pointermove', function(evt) {
-      feature = null;
-      var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
-      if (features.length) {
-         feature = features[0];
+   // map.on('pointermove', function(evt) {
+   //    feature = null;
+   //    var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
+   //    if (features.length) {
+   //       feature = features[0];
 
-      }
-   });
+   //    }
+   // });
    map.on('postrender', function(renderEvent) {
       if (feature) {
          //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
@@ -82,6 +83,11 @@ gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('click', '.js-draw-line', function() {
       gisportal.selectionTools.toggleTool('Line');
    });
+   $('.js-indicators').on('click', '.js-draw-select-polygon', function() {
+      gisportal.selectionTools.toggleTool('SelectFromMap');
+
+   });
+
 
    // TODO, perhaps...
    // // map image export - problems with cross origin tainting the canvas are preventing this from working. 
@@ -153,6 +159,11 @@ gisportal.selectionTools.toggleTool = function(type)  {
             maxPoints: 2
          });
          map.addInteraction(draw);
+      }
+
+      if (type == 'SelectFromMap') {
+         gisportal.selectionTools.isSelecting = true;
+         console.log("starting polygon selection");
       }
 
 

@@ -3,7 +3,7 @@ gisportal.add_vector_demo = function() {
 
    var sourceVector = new ol.source.Vector({
       loader: function(extent) {
-         console.log('called');
+         //console.log('called');
          $.ajax('https://vortices.npm.ac.uk/geoserver/rsg/ows', {
             type: 'GET',
             data: {
@@ -16,7 +16,7 @@ gisportal.add_vector_demo = function() {
                bbox: extent.join(',') + ',EPSG:4326'
             },
          }).done(function(response) {
-            console.log(this);
+            //console.log(this);
             formatWFS = new ol.format.WFS();
             var features = formatWFS.readFeatures(response);
             for (var i = 0; i < features.length; i++) {

@@ -242,7 +242,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       }
 
    } else {
-      console.log('addToPanel');
+      //console.log('addToPanel');
 
    }
 };

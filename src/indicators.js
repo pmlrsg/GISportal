@@ -101,6 +101,15 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
 
+   // on change for vector style selection
+   $('.js-indicators').on('change', '.js-vector-style-select',function(evt) {
+      console.log("changing vector prop style");
+      var id = $(this).closest('[data-id]').data('id');
+      var prop = evt.target.value;
+      gisportal.layers[id].setStyleUI(gisportal.layers[id].OLLayer.getSource(), prop)
+
+   })
+
 
    //  Zoom to data region
    $('.js-indicators').on('click', '.js-zoom-data', function() {
@@ -295,7 +304,7 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 };
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
-      console.log("here");
+      //console.log("here");
    if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
 
    var id = data.id;
@@ -330,11 +339,14 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    $('[data-id="' + id + '"] .js-toggleVisibility')
       .toggleClass('hidden', false)
       .toggleClass('active', gisportal.layers[id].isVisible);
-   console.log(layer);
+   //console.log(layer);
    if(layer.serviceType != "WFS"){
-      console.log("adding scalebar");
+      //console.log("adding scalebar");
    gisportal.indicatorsPanel.scalebarTab(id);
 
+   }
+   else {
+      gisportal.indicatorsPanel.vectorStyleTab(id);
    }
    gisportal.indicatorsPanel.detailsTab(id);
    gisportal.indicatorsPanel.analysisTab(id);
@@ -396,8 +408,8 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
    if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
    var layer = gisportal.layers[id];
    var options = {};
-   console.log("fetching extra data for layer");
-   console.log(layer);
+   //console.log("fetching extra data for layer");
+   //console.log(layer);
    if (layer) {
       var name = layer.name.toLowerCase();
       options.visible = true;
@@ -430,8 +442,8 @@ gisportal.indicatorsPanel.showLayer = function(id) {
 };
 
 gisportal.indicatorsPanel.detailsTab = function(id) {
-   console.log("adding details");
-   console.log(id);
+   //console.log("adding details");
+   //console.log(id);
    var indicator = gisportal.layers[id];
 
    var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
@@ -451,20 +463,20 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
          });      
       }
    }
-   //console.log(indicator);
+   ////console.log(indicator);
    var rendered = gisportal.templates['tab-details'](indicator);
-   //console.log(rendered);
+   ////console.log(rendered);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
    gisportal.indicatorsPanel.checkTabFromState(id);
 };
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
-   console.log("adding analysis");
+   //console.log("adding analysis");
    var indicator = gisportal.layers[id];
 
    var onMetadata = function() {
-      console.log("in Onmetdata");
+      //console.log("in Onmetdata");
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;
@@ -503,11 +515,32 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
    };
 }
 
+gisportal.indicatorsPanel.vectorStyleTab = function(id) {
+   //console.log("INSIDE VECTOR STYLES TAB")
+         var layer = gisportal.layers[id];
+         //
+         //layer.setStyle();
+
+         var rendered = gisportal.templates['tab-vectorstyles'](layer);
+         //console.log(rendered);
+         //console.log(id);
+         //console.log('[data-id="' + id + '"] .js-tab-dimensions');
+         //console.log($('[data-id="' + id + '"] .js-tab-dimensions'));
+         $('[data-id="' + id + '"] .js-tab-dimensions').html(rendered);
+         //console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@");
+         //console.log(id+"__"+layer.defaultProperty);
+         if(id+"__"+layer.defaultProperty in gisportal.vectorStyles.cache) {
+      var renderedStyleUI = gisportal.templates['vector-style-ui'](gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
+      $('[data-id="' + layer.id + '"] .dimensions-tab .vector-style-container').html(renderedStyleUI);
+   }
+
+
+}
+
 gisportal.indicatorsPanel.scalebarTab = function(id) {
-   console.log("inside scalebar");
    var layer = gisportal.layers[id];
-   console.log(layer);
    var onMetadata = function() {
+      //console.log("inside on metadata");
       var indicator = gisportal.layers[id];
       if (indicator.elevationCache && indicator.elevationCache.length > 0) {
          indicator.hasElevation = true;
@@ -803,7 +836,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
       var range = slider.val();
       window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
       //$.get("/service/download_check", function(data){
-      //   console.log(data);
+      //   //console.log(data);
       //   $('.js-download').text("Download "+data.format+" @ "+ data.size);
       //});
    });
@@ -883,8 +916,21 @@ gisportal.indicatorsPanel.focusOnBuildGraphCompoent = function( layerId ){
    gisportal.indicatorsPanel.selectTab( layerId, 'analysis' );
 }
 
+gisportal.indicatorsPanel.vectorSelectSwitch = function( layerID , tabName) {
+
+
+
+}
+
 gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
+   //console.log("layer id on select tab = ");
+   //console.log(layerId);
    // Select tab
+   // temp solution
+   console.log(tabName);
+   if(tabName=="analysis"){
+      gisportal.vectorSelectionTest( layerId, tabName );
+   }
    $('#tab-' + layerId + '-' + tabName).prop( 'checked', true ).trigger('change');
 
    //Scroll to layer

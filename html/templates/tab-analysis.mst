@@ -16,6 +16,10 @@
                   <span class=" icon-network-1-1" data-id="Ph" title="Draw Box" ></span>
                   Draw Irregular Polygon
                </button>
+               <button class="brand secondary extra-small js-draw-select-polygon hidden" data-id="{{id}}" title="Select Existing Polygon">
+                  <span class=" icon-network-1-1" data-id="Ph" title="Draw Box" ></span>
+                  Select Polygon
+               </button>
                <!--
                <button class="icon_line js-draw-line" data-id="{{id}}" title="Draw Polygon">Draw Box</button>
                -->

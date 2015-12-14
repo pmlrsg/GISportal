@@ -22,6 +22,7 @@ gisportal.panels.showPanel = function(panelName) {
 			"panel-name": gisportal.panels.activePanel
 		});
 	}
+	
 	gisportal.panels.activePanel = panelName;
 
 };

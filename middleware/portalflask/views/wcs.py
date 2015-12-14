@@ -22,7 +22,7 @@ trim_sizes = {
 Gets wcs data from a specified server, then performs a requested function
 on the received data, before jsonifying the output and returning it.
 """
-@portal_wcs.route('/wcs', methods = ['GET'])
+@portal_wcs.route('/wcs', methods = ['GET','POST'])
 def getWcsData():
    import random
    
@@ -43,6 +43,8 @@ def getWcsData():
                   data = getIrregularData(params)
                elif 'line' in params:
                   data = getIrregularData(params, poly_type='line') 
+               elif 'multipolygon' in params:
+                  data = getIrregularData(params, poly_type='multipoly')
                else:
                   data = getBboxData(params, basic)
                output = toCSV(data)
@@ -153,36 +155,38 @@ Gets any parameters.
 def getParams():
    # Required for url
    nameToParam = {}
-   nameToParam["baseURL"] = Param("baseURL", False, False, request.args.get('baseurl'))
+   nameToParam["baseURL"] = Param("baseURL", False, False, request.values.get('baseurl'))
    nameToParam["service"] = Param("service", False, True, 'WCS')
    nameToParam["request"] = Param("request", False, True, 'GetCoverage')
-   nameToParam["version"] = Param("version", False, True, request.args.get('version', '1.0.0'))
-   nameToParam["format"] = Param("format", False, True, request.args.get('format', 'NetCDF3'))
-   nameToParam["output_format"] = Param("output_format", True, True, request.args.get('output_format', None))
-   nameToParam["coverage"] = Param("coverage", False, True, request.args.get('coverage'))
+   nameToParam["version"] = Param("version", False, True, request.values.get('version', '1.0.0'))
+   nameToParam["format"] = Param("format", False, True, request.values.get('format', 'NetCDF3'))
+   nameToParam["output_format"] = Param("output_format", True, True, request.values.get('output_format', None))
+   nameToParam["coverage"] = Param("coverage", False, True, request.values.get('coverage'))
    nameToParam["crs"] = Param("crs", False, True, 'OGC:CRS84')
    
    # Optional extras
-   nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
-   nameToParam["vertical"] = Param("vertical", True, True, request.args.get('depth', None))
-   nameToParam["polygon"] = Param("polygon", True, True, request.args.get('isPolygon', None))
-   nameToParam["line"] = Param("polygon", True, True, request.args.get('isLine', None))
+   nameToParam["time"] = Param("time", True, True, request.values.get('time', None))
+   nameToParam["vertical"] = Param("vertical", True, True, request.values.get('depth', None))
+   nameToParam["polygon"] = Param("polygon", True, True, request.values.get('isPolygon', None))
+   nameToParam["line"] = Param("polygon", True, True, request.values.get('isLine', None))
+   nameToParam["multipoly"] = Param("multipoly", True, True, request.values.get('isMultiPolygon', None))
+
    
    # One Required
-   nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
-   nameToParam["circle"] = Param("circle", True, True, request.args.get('circle', None))
+   nameToParam["bbox"] = Param("bbox", True, True, request.values.get('bbox', None))
+   nameToParam["circle"] = Param("circle", True, True, request.values.get('circle', None))
    #nameToParam["polygon"] = Param("polygon", True, True, request.args.get('polygon', None))
-   nameToParam["point"] = Param("point", True, True, request.args.get('point', None))
+   nameToParam["point"] = Param("point", True, True, request.values.get('point', None))
    
    # Custom
-   nameToParam["type"] = Param("type", False, False, request.args.get('type'))
-   nameToParam["graphXAxis"] = Param("graphXAxis", True, False, request.args.get('graphXAxis'))
-   nameToParam["graphYAxis"] = Param("graphYAxis", True, False, request.args.get('graphYAxis'))
-   nameToParam["graphZAxis"] = Param("graphZAxis", True, False, request.args.get('graphZAxis'))
+   nameToParam["type"] = Param("type", False, False, request.values.get('type'))
+   nameToParam["graphXAxis"] = Param("graphXAxis", True, False, request.values.get('graphXAxis'))
+   nameToParam["graphYAxis"] = Param("graphYAxis", True, False, request.values.get('graphYAxis'))
+   nameToParam["graphZAxis"] = Param("graphZAxis", True, False, request.values.get('graphZAxis'))
    
-   nameToParam["graphXFunc"] = Param("graphXFunc", True, False, request.args.get('graphXFunc'))
-   nameToParam["graphYFunc"] = Param("graphYFunc", True, False, request.args.get('graphYFunc'))
-   nameToParam["graphZFunc"] = Param("graphZFunc", True, False, request.args.get('graphZFunc'))
+   nameToParam["graphXFunc"] = Param("graphXFunc", True, False, request.values.get('graphXFunc'))
+   nameToParam["graphYFunc"] = Param("graphYFunc", True, False, request.values.get('graphYFunc'))
+   nameToParam["graphZFunc"] = Param("graphZFunc", True, False, request.values.get('graphZFunc'))
    
    return nameToParam
 
@@ -569,8 +573,8 @@ def basic(dataset, params, irregular=False, original=None):
    else:
       maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
-   # plt.imshow(maskedArray[0])
-   # plt.savefig('/users/rsg/olcl/irregular_test/my_masked.png')
+   plt.imshow(maskedArray[0])
+   plt.savefig('/users/rsg/olcl/irregular_test/my_masked.png')
    time = getCoordinateVariable(dataset, 'Time')
    # current_app.logger.debug('time channel test')
    # current_app.logger.debug(time)

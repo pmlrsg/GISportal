@@ -30,6 +30,7 @@
       "html/js-libs/tooltipster/css/tooltipster.css",
       "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
       "html/css/alerts.css",
-      "html/css/popup.css"
+      "html/css/popup.css",
+      "html/css/vector.css"
    ]
 }

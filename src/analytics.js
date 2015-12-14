@@ -230,7 +230,7 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
          toSend[ definitionIndex ] = value.toString();
       }catch(e){
          // Log the error and move on to the next
-         console.log( "Error processing definition " + customDefinitionKey + ": " + e.toString() );
+         //console.log( "Error processing definition " + customDefinitionKey + ": " + e.toString() );
       }
    }
 
