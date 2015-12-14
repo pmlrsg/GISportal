@@ -107,14 +107,14 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
                      gisportal.autoLayer.addGivenLayer(layer);
                   },
                   error: function(e){
-                     $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText);
+                     $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                      gisportal.addLayersForm.form_info = {};
                      gisportal.addLayersForm.refreshStorageInfo();
                   }
                });
             }
             else{
-               $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText);
+               $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                gisportal.addLayersForm.form_info = {};
                gisportal.addLayersForm.refreshStorageInfo();
             }
@@ -127,7 +127,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
 gisportal.autoLayer.addGivenLayer = function(layer){
    json_layer = JSON.parse(layer);
    if (json_layer["Error"] != undefined){
-      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"]);
+      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
    }else{
       gisportal.initWMSlayers([json_layer]);
    }
