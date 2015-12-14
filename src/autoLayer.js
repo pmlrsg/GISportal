@@ -23,7 +23,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
             gisportal.configurePanel.resetPanel(gisportal.given_layers);
          }
          catch(e){
-            gisportal.gritter.showNotification('layerLoadError', {'layer': given_layers[0].id, 'e' : e});
+            $.notify("Sorry:\nThere was an error loading " + given_layers[0].id + " : " + e, "error");
          }
          return;
       }else if(_.size(gisportal.given_layers) > 1){
@@ -34,7 +34,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
          if(given_wms_url && given_wms_url.length > 0){
             gisportal.autoLayer.findGivenLayer(given_wms_url, given_cache_refresh);
          }else{
-            gisportal.gritter.showNotification('noMatchingNameLayers', {'url_name': given_url_name});
+            $.notify("Sorry:\nThere are no layers with the tag: " + given_url_name + ".", "error");
          }
       }
    }
@@ -81,7 +81,7 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
 // This returns the layer or layers that the user has selected with the WMS url
 gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
    if(!gisportal.autoLayer.TriedToAddLayer){
-      gisportal.gritter.showNotification('retrievingLayers', null);
+      $.notify("Finding Layers\nWe are trying to load layers from the URL you have provided.");
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
@@ -107,12 +107,16 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
                      gisportal.autoLayer.addGivenLayer(layer);
                   },
                   error: function(e){
-                     gisportal.gritter.showNotification('findGivenLayerFail', e.statusText);
+                     $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText);
+                     gisportal.addLayersForm.form_info = {};
+                     gisportal.addLayersForm.refreshStorageInfo();
                   }
                });
             }
             else{
-               gisportal.gritter.showNotification('findGivenLayerFail', e.statusText);
+               $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText);
+               gisportal.addLayersForm.form_info = {};
+               gisportal.addLayersForm.refreshStorageInfo();
             }
          }
       });
@@ -123,7 +127,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
 gisportal.autoLayer.addGivenLayer = function(layer){
    json_layer = JSON.parse(layer);
    if (json_layer["Error"] != undefined){
-      gisportal.gritter.showNotification('findGivenLayerFail', json_layer["Error"]);
+      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"]);
    }else{
       gisportal.initWMSlayers([json_layer]);
    }

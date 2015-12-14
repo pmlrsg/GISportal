@@ -434,8 +434,10 @@ gisportal.graphs.Plot =(function(){
             _this.id = data.job_id;
             _this.monitorJobStatus();
             
-         }, error: function(){
-            gisportal.gritter.showNotification('graphError', {'error':''});
+         }, error: function(e){
+            var error = 'Sorry, we failed to create a graph: \n'+
+                           'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
+            $.notify(error, "error");
          }
       })
    }

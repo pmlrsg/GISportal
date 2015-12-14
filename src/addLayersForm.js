@@ -277,7 +277,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   // The form is hidden
                   $('div.js-layer-form-popup').toggleClass('hidden', true);
                   // A message is diaplyed to the user so they know the layers were added.
-                  gisportal.gritter.showNotification('addLayersSuccess', null);
+                  $.notify("Success \n We have now added the layers to the portal.", "success");
                },
                error: function(e){
                   console.log("Error " + e.Message);

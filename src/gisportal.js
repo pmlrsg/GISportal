@@ -1,3 +1,87 @@
+/*------------------------------------*\
+   Configuration
+   This file is for the configuration
+   of the GIS Portal.
+
+   browseCategories - Used to define
+   which categories to be shown in the
+   browse panel. This is currently
+   limited to 2.
+\*------------------------------------*/
+
+
+
+gisportal.config = {
+   siteMode: "development", //(development|production)
+   
+   // these define how the user can search for indicators; this object uses the key as defined in the wmsLayers.py file
+   // and assigns display names to each. If the `browseMode` flag is set to 'tabs', only the first three values are taken 
+   // notice of to build the tabs on the indicator selection panel, but all categories are displayed on the indicator details
+   // panel (provided a value has been set) once the indicator has been loaded onto the map. If there is more than 1 indicator
+   // with the same name the refine panel will use these categories in the order below to help the user to refine the list
+   browseCategories : {
+      "indicator_type" : "Indicator Type",
+      "data_provider" : "Data Provider",
+      "model": "Model Name",
+      "data_type" : "Data Type",
+      "interval": "Interval",
+      "region" : "Region"
+   },
+ 
+   browseMode : 'selectlist',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
+   defaultCategory: 'indicator_type',                     // only used when browseMode = selectlist; any key value from browseCategories
+   paths: {
+    graphServer: 'http://pmpc1465.npm.ac.uk/plotting',
+    middlewarePath: '/service'
+   },
+
+   // Should layers auto scale by default
+   autoScale: true,
+
+   defaultStyle: "boxfill/rainbow",
+
+   cacheTimeout: 2,
+   
+   //  Skip start screen only is the user has a saved state, requires T&C
+   autoResumeSavedState: true,
+   // Always skip the welcome page, also skips T&C
+   skipWelcomePage: true,
+   // Do we require terms and conditions agreement to use the port
+   requiresTermsAndCondictions: true,
+   
+   countryBorder : {
+      'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
+      'alwaysVisible' : true                      // (true|false)  > If true the defaultLayer will be visible at page load
+   },
+   defaultBaseMap: 'EOX',
+   showGraticules: false,
+
+   // Should layers auto scale by default
+   autoScale: true,
+
+   // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
+   bingMapsAPIKey: 'AhKuPSf-WHkV9oQvhOsdfwr8NOpsVwYaa6aJ3FmQfbC_xIorI3RT4NciBCYSZHz4',
+   
+   // do you want the cesium 3d globe available
+   // WARNING: THIS CURRENTLY BREAKS THE ABILITY TO DRAW ANY KIND OF POLYGON ON THE MAP 
+   enable3d: true,                                // (true|false) - If true, a button is added to the toolbar in the top right corner to enable 3D mode
+
+   // Deny access to older browsers
+   // none=Allow, advisory=Tell them only, strict=Stop them
+   browserRestristion: "advisory", //(none|advisory|strict)
+
+   // homepageSlides: [],
+   collaborationFeatures : {
+      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'https',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      port : '',                                    // must match the port specified in collaboration/config/config.js
+      path : '',                                    // optional path; must start with a /
+   },
+
+};
+
+
 /**
  * gisportal.js
  * This file is the main portion of the codebase,
@@ -102,17 +186,6 @@ var map;
  * start layer dependent code asynchronously
  */
 gisportal.loadLayers = function() { 
-   
-   var errorHandling = function(request, errorType, exception) {
-      var data = {
-         type: 'master cache',
-         request: request,
-         errorType: errorType,
-         exception: exception,
-         url: this.url
-      };  
-      gritterErrorHandler(data); 
-   };
     
    //Provider cache
    $.ajax({
@@ -130,7 +203,9 @@ gisportal.loadLayers = function() {
          url:  '/service/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
-         error: errorHandling,
+         error: function(e){
+            $.notify("Sorry\nThere was an unexpected error getting the cache. Try refreshing the page, or coming back later.", {autoHide:false});
+         }
       });
    };
 
@@ -716,9 +791,6 @@ gisportal.main = function() {
       gisportal.mapInit();
 
       $('#version').html('v' + gisportal.VERSION + ':' + gisportal.SVN_VERSION);
-    
-      // Setup the gritter so we can use it for error messages
-      gisportal.gritter.setup();
 
       // Initiate the DOM for panels
       gisportal.panels.initDOM();

@@ -111,6 +111,7 @@ gisportal.editLayersForm.produceServerList = function(){
 
    // Deletes the server from the portal.
    $('span.js-delete-server').one('click', function(){
+      var this_span = $(this);
       var server = $(this).data("server");
       $.ajax({
          url:  '/service/remove_server_cache?filename=' + server,
@@ -118,7 +119,7 @@ gisportal.editLayersForm.produceServerList = function(){
             gisportal.editLayersForm.deleteSuccess(server);
          },
          error: function(){
-            console.log("Failed to be deleted")
+            this_span.notify("Deletion Fail", "error");
          }
       });
    })
@@ -135,26 +136,39 @@ gisportal.editLayersForm.produceServerList = function(){
          dataType: 'json',
          success: function(global_data){
             if(!global_data.timeStamp || (+new Date() - +new Date(global_data.timeStamp))/60000 > gisportal.config.cacheTimeout){
-               var url = global_data.wmsURL.replace("?", "");
-               refresh_url = '/service/load_new_wms_layer?url='+url+'&refresh=true';
-               $.ajax({
-                  url:  refresh_url,
-                  dataType: 'json',
-                  success: function(new_global_data){
-                     gisportal.editLayersForm.refreshOldData(new_global_data, this_span);
-                  },
-                  error: function(e){
-                     console.log("Error refreshing cache.");
-                     this_span.toggleClass('green-spin', false);
-                  }
+               // Add a notify so the user can choose to refresh the cache.
+               this_span.notify({'title':"Would you like to refresh the cache?", "yes-text":"Yes", "no-text":"No"},{style:"option", autoHide:false, clickToHide: false});
+                //listen for click events from this style
+               $(document).one('click', '.notifyjs-option-base .no', function() {
+                  gisportal.editLayersForm.refreshOldData(global_data);
+                  //programmatically trigger propogating hide event
+                  $(this).trigger('notify-hide');
                });
+               $(document).one('click', '.notifyjs-option-base .yes', function() {
+                  var url = global_data.wmsURL.replace("?", "");
+                  refresh_url = '/service/load_new_wms_layer?url='+url+'&refresh=true';
+                  $.ajax({
+                     url:  refresh_url,
+                     dataType: 'json',
+                     success: function(new_global_data){
+                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span);
+                     },
+                     error: function(e){
+                        this_span.toggleClass('green-spin', false);
+                        this_span.notify("Refresh Failed", "error");
+                     }
+                  });
+                  //hide notification
+                  $(this).trigger('notify-hide');
+               });
+               
             }else{
                gisportal.editLayersForm.refreshOldData(global_data);
             }
          },
          error: function(e){
             this_span.toggleClass('green-spin', false);
-            console.log("Error getting timestamp");
+            this_span.notify("Could not find cache file", "error");
          }
       });
 
@@ -261,14 +275,14 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span){
                gisportal.loading.increment()
             }, error: function(){
                span.toggleClass('green-spin', false);
-               console.log("ERROR!");
+               span.notify("ERROR!", "error");
             }
          });
          
       },
       error: function(e){
          span.toggleClass('green-spin', false);
-         console.log("Error getting internal info");
+         span.notify("Could not get internal info", "error");
       }
    });
 }

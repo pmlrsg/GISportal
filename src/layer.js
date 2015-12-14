@@ -475,14 +475,7 @@ gisportal.layer = function( options ) {
             layer.maxScaleVal = layer.origMaxScaleVal;
             layer.log = false;
             
-            var data = {
-               type: 'layer MetaData',
-               request: request,
-               errorType: errorType,
-               exception: exception,
-               url: this.url
-            };          
-            gritterErrorHandler(data);
+            $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error")
          }
       });
    };
@@ -698,15 +691,8 @@ gisportal.getLayerData = function(fileName, layer, options) {
          // Initialises the layer with the data from the AJAX call
          gisportal.layers[id].init(data, options);
       },
-      error: function(request, errorType, exception) {
-         var data = {
-            type: 'layer cache',
-            request: request,
-            errorType: errorType,
-            exception: exception,
-            url: this.url
-         };          
-         gritterErrorHandler(data);
+      error: function() {
+         $.notify("Sorry\nThere was a problem loading this layer, please try again", "error")
       }
    });
 };
