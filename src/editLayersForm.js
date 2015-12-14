@@ -119,7 +119,7 @@ gisportal.editLayersForm.produceServerList = function(){
             gisportal.editLayersForm.deleteSuccess(server);
          },
          error: function(){
-            this_span.notify("Deletion Fail", "error");
+            this_span.notify("Deletion Fail", {position:"left", className:"error"});
          }
       });
    })
@@ -155,7 +155,7 @@ gisportal.editLayersForm.produceServerList = function(){
                      },
                      error: function(e){
                         this_span.toggleClass('green-spin', false);
-                        this_span.notify("Refresh Failed", "error");
+                        this_span.notify("Refresh Failed", {position:"left", className:"error"});
                      }
                   });
                   //hide notification
@@ -168,7 +168,7 @@ gisportal.editLayersForm.produceServerList = function(){
          },
          error: function(e){
             this_span.toggleClass('green-spin', false);
-            this_span.notify("Could not find cache file", "error");
+            this_span.notify("Could not find cache file", {position:"left", className:"error"});
          }
       });
 
@@ -275,14 +275,14 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span){
                gisportal.loading.increment()
             }, error: function(){
                span.toggleClass('green-spin', false);
-               span.notify("ERROR!", "error");
+               span.notify("ERROR!", {position:"left", className:"error"});
             }
          });
          
       },
       error: function(e){
          span.toggleClass('green-spin', false);
-         span.notify("Could not get internal info", "error");
+         span.notify("Could not get internal info", {position:"left", className:"error"});
       }
    });
 }
