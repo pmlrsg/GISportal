@@ -198,10 +198,11 @@ gisportal.editLayersForm.deleteSuccess = function(server){
          delete gisportal.layers[ids_to_remove[i]];
       }catch(e){};     
    }
-   // loadLayers() is run so that gisportal.layers is refreshed and will not include the deleted layers.
-   gisportal.loadLayers();
    gisportal.editLayersForm.server_list = [];
    gisportal.editLayersForm.produceServerList();
+   gisportal.layers = {};
+   // loadLayers() is run so that gisportal.layers is refreshed and will not include the deleted layers.
+   gisportal.loadLayers();
 }
 
 /**

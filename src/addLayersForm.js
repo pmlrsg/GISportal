@@ -255,11 +255,12 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   // This block removes any old selected layers
                   for(i in gisportal.addLayersForm.selectedLayers){
                      var id = gisportal.addLayersForm.selectedLayers[i];
+                     var original_provider = gisportal.addLayersForm.server_info.original_provider
                      gisportal.indicatorsPanel.removeFromPanel(id);
-                     if(id.indexOf("UserDefinedLayer") > -1){
+                     if(id.indexOf(original_provider) > -1){
                         var postfix = gisportal.addLayersForm.server_info.provider;
                         var clean_postfix = postfix.replace(/[ \\\/.,\(\):;]/g, "_").replace(/&amp/g, "and");
-                        gisportal.addLayersForm.selectedLayers[i] = id.replace("UserDefinedLayer", clean_postfix);
+                        gisportal.addLayersForm.selectedLayers[i] = id.replace(original_provider, clean_postfix);
                      }
                   }
                   // The temporary form information will be wiped
@@ -348,7 +349,8 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
    // If the data has not yet been added to the server_info object.
    if(_.size(gisportal.addLayersForm.server_info) <= 0){
       // The server inforation is extracted from the layer and put into the object.
-      var provider = layer.tags.data_provider || layer.tags.providerTag;
+      var provider = layer.tags.data_provider;
+      var original_provider = layer.providerTag;
       if(layer.contactInfo){
          if(layer.contactInfo.address){
             var address = layer.contactInfo.address.replace(/<br\/>/g, "\n")
@@ -369,6 +371,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
       }
       gisportal.addLayersForm.server_info={
          "provider":provider,
+         "original_provider":original_provider,
          "unique_name":layer.sensor,
          "address":address,
          "person":person,
