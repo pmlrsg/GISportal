@@ -359,10 +359,11 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    })
 
    // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
-   var currentLayers = map.getLayers().a;
+   var currentLayers = map.getLayers().getArray();
+   var something = currentLayers.length + 1;
    if (currentLayers) {
-      for (var i = 0; i < map.getLayers().a.length + 1; i++) {
-         map.removeLayer(map.getLayers().a[0]);
+      for (var i = 0; i < map.getLayers().getArray().length + something; i++) {
+         map.removeLayer(map.getLayers().getArray()[0]);
       }
    }
    

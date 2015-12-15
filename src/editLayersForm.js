@@ -191,11 +191,15 @@ gisportal.editLayersForm.deleteSuccess = function(server){
    }
    // Each of those Ids is then removed from both layers and original layers.
    for(i in ids_to_remove){
+      var id = ids_to_remove[i]
+      if(gisportal.selectedLayers.indexOf(id) > -1){
+         gisportal.indicatorsPanel.removeFromPanel(id);
+      }
       try{
-         delete gisportal.original_layers[ids_to_remove[i]];
+         delete gisportal.original_layers[id];
       }catch(e){};
       try{
-         delete gisportal.layers[ids_to_remove[i]];
+         delete gisportal.layers[id];
       }catch(e){};     
    }
    gisportal.editLayersForm.server_list = [];
