@@ -79,17 +79,14 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    $('.js-indicators').on('change', '.js-scale-min', function() { 
-      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
       gisportal.events.trigger('scalebar.min-set', $(this).data('id'), $(this).val()) 
    });
 
    $('.js-indicators').on('change', '.js-scale-max', function() { 
-      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
       gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val()) 
    });
 
    $('.js-indicators').on('change', '.js-indicator-is-log', function() { 
-      gisportal.indicatorsPanel.scalebarRangeChanged($(this));
       gisportal.events.trigger('scalebar.log-set', $(this).data('id'), $(this).prop('checked')) 
    });
 

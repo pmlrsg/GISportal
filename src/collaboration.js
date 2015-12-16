@@ -373,7 +373,6 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]').parent())
                $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog );
-               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-indicator-is-log[data-id="' + id + '"]'));
             }
          });
 
@@ -386,7 +385,6 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
                $('.js-scale-max[data-id="' + id + '"]').val(value).change();
-               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-scale-max[data-id="' + id + '"]'))
             }
          });
 
@@ -399,7 +397,6 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
                $('.js-scale-min[data-id="' + id + '"]').val(value).change();
-               gisportal.indicatorsPanel.scalebarRangeChanged($('.js-scale-min[data-id="' + id + '"]'));
             }
          });
 
