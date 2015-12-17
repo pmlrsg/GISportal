@@ -11,123 +11,52 @@ var session = require('express-session');
 var crypto = require("crypto");
 var jade = require("jade");
 
-var passport = require('passport');
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
+// Express setup
 var app = express();
 
 // Set the settings
-require('./config')(app);
+require('./config/index.js')(app);
 var config = app.get('config');
 
-// Redis config 
-var url = require('url');
-var redis = require('redis')
-var RedisStore = require('connect-redis')(session)
+// set up Redis as the session store
+var redisSetup = require('./lib/redissetup.js');
+var redisClient = redisSetup.startRedis(app, config);
+var redisStore = require('connect-redis')(session);
 
-var redisConfig = url.parse(config.redisURL);
-var redisClient = redis.createClient(redisConfig.port, redisConfig.hostname);
-
-redisClient
-	.on('error', function(err) {
-		console.log('Error connecting to redis %j', err);
-	}).on('connect', function() {
-		console.log('Connected to redis.');
-	}).on('ready', function() {
-		console.log('Redis client ready.');
-	});
-
-app.set('sessionStore', new RedisStore({client: redisClient}));
-app.set('view engine', 'jade');
+app.set('sessionStore', new redisStore({client: redisClient}));
 
 // Configure Express app with:
 // * Cookie parser
-// * Session manager
 app.use(cookieParser(config.session.secret));
+// * Session manager
 app.use(session({
-	key: 'collaboration',
-	secret: config.session.secret, 
-	store: app.get('sessionStore'),
-   	cookie: {
-      	maxAge: config.session.age || null
-   	}
-	})
+   key: 'collaboration',
+   secret: config.session.secret, 
+   store: app.get('sessionStore'),
+      cookie: {
+         maxAge: config.session.age || null
+      }
+   })
 );
 
+// template engine
+app.set('view engine', 'jade');
+
+// Passport settings
+var passportConfig = require('./lib/passport.js');
+passportConfig.init(config);
+
+var passport = require('passport');
 app.use(passport.initialize());
 
-passport.use(new GoogleStrategy({
-	clientID: config.auth.google.clientid,
-	clientSecret: config.auth.google.clientsecret,
-	callbackURL: config.auth.google.callback,
-	scope: config.auth.google.scope,
-	prompt: config.auth.google.prompt
-	},
-	function(token, tokenSecret, profile, done) {
-		return done(null, profile);
-	}
-));
+// Configure routes
+var routes = require('./lib/routes.js');
+app.use('/', routes);
 
 
-passport.serializeUser(function(user, done) {
- done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
- done(null, user);
-});
-
-// Configure Paths
-// -----------------------------------------------------------------------------
 
 
-// default path; check for cookie and if it's not there send them to the login page
-app.get('/node', function(req, res) {
-   res.render('index', {
-      title: 'GISportal collaboration'
-   });
-});
-
-app.get('/node/dashboard', isLoggedIn, function(req, res) {
-   var userId = req._passport.session.user.id;
-   var displayName = req._passport.session.user.displayName;
-   var userEmail = req._passport.session.user.emails[0].value;
-   var userPicture = req._passport.session.user._json.picture;
-   
-   res.render('dashboard', {
-      title: 'Collaboration Dashboard',
-      userId: userId,
-      displayName: displayName,
-      userEmail: userEmail,
-      userPicture: userPicture
-   })
-});
-
-function isLoggedIn(req, res, next) {
-   if (typeof req._passport.session.user != 'undefined') {
-      return next();
-   }
-   res.redirect('/node');
-}
-
-app.get('/node/auth/google', passport.authenticate('google'));
-
-app.get('/node/auth/google/callback', 
-   passport.authenticate('google', {
-     successRedirect: '/node/authorised',
-     failureRedirect: '/node/auth-failed'
-   })
- );
-
-app.get('/node/authorised', function(req, res) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.render('authorised', {});
-})
-
-app.get('/node/logout', function(req, res) {
-   req._passport = null;
-   res.redirect('/node');
-})
 
 // stuff for managing rooms and users (should be in redis)
 rooms = {}
@@ -179,9 +108,9 @@ io.on('connection', function(socket){
    var user = {};
    var sessionStore = app.get('sessionStore');
 	sessionStore.load(sid, function(err, session) {
-      if (!session.passport.user || err) {
-         console.log('no passport');
-			return 'no passport';
+      if (!session || !session.passport.user || err) {
+         console.log(session);
+         return 'no passport';
 		}
       
       var emails = session.passport.user.emails;
