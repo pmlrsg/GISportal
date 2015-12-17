@@ -68,10 +68,10 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 
    _.forIn(gisportal.layers, function( layer ){
-      if(layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name){
+      if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
          only_matching_layer = {};
          only_matching_layer[layer.id] = layer;
-      }else if(layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name){
+      }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
          matching_layers[layer.id] = layer;
       }
    });
@@ -129,6 +129,7 @@ gisportal.autoLayer.addGivenLayer = function(layer){
    if (json_layer["Error"] != undefined){
       $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
    }else{
+      json_layer.owner = gisportal.userPermissions.this_user_info.username;
       gisportal.initWMSlayers([json_layer]);
    }
 };
@@ -144,6 +145,6 @@ gisportal.autoLayer.loadPreviousLayers = function(){
       gisportal.autoLayer.loadGivenLayer();
    }
    if(gisportal.addLayersForm.form_info["display_form"]){
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html');
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info['owner']);
    }
 };

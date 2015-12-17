@@ -35,6 +35,7 @@
       "src/ddslick.js",
       "src/autoLayer.js",
       "src/addLayersForm.js",
-      "src/editLayersForm.js"
+      "src/editLayersForm.js",
+      "src/userPermissions.js"
    ]
 }

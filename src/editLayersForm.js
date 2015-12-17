@@ -1,6 +1,17 @@
 gisportal.editLayersForm = {};
 gisportal.editLayersForm.server_list = [];
 
+
+gisportal.editLayersForm.addSeverTable = function(){
+   gisportal.original_layers = {};
+   gisportal.layers = {};
+   // loadLayers() is run so that gisportal.layers is refreshed and will include any changed layers.
+   gisportal.refresh_server = true;
+   gisportal.loadLayers();
+   gisportal.editLayersForm.server_list = [];
+   gisportal.loading.increment()
+}
+
 /**
 * This function populates server_list with a unique list of servers from the layers (not user defined)
 * it then adds the form to display the server list and buttons to edit, delete and refresh the data.
@@ -15,35 +26,39 @@ gisportal.editLayersForm.produceServerList = function(){
    }else{
       var layers_obj = gisportal.layers;
    }
+   var data = undefined;
    //for each of the layers in the list.
    for(layer in layers_obj){
+      var this_layer = layers_obj[layer];
+      if(!gisportal.userPermissions.admin_clearance && this_layer.owner != gisportal.userPermissions.this_user_info.username){
+         continue;
+      }
       var contactInfo;
       var provider;
       var serverName
-      serverName = layers_obj[layer].serverName;
-      provider = layers_obj[layer].providerTag;
-      timeStamp = layers_obj[layer].timeStamp;
-      wms_url = layers_obj[layer].wmsURL;
-      if(provider == "UserDefinedLayer"){
-         continue; // Don't include any layers that are external.
-      }
+      serverName = this_layer.serverName;
+      provider = this_layer.providerTag;
+      timeStamp = this_layer.timeStamp;
+      wms_url = this_layer.wmsURL;
+      owner = this_layer.owner;
       // Gets the server information from the layer
       var server_info = {
          "serverName":serverName,
          "timeStamp":timeStamp,
          "provider":provider,
          "wms_url":wms_url,
+         "owner":owner,
          "layers":[]
       };
-      // Getst the unique layer information.
+      // Gets the unique layer information.
       var layer_info = {
          "id":layer,
-         "title":layers_obj[layer].name
+         "title":this_layer.name
       };
       var unique = true;
       // If the server has already been added the layer is added to it
       for(i in gisportal.editLayersForm.server_list){
-         if(gisportal.editLayersForm.server_list[i].serverName == server_info.serverName){
+         if(gisportal.editLayersForm.server_list[i].serverName == server_info.serverName && gisportal.editLayersForm.server_list[i].owner == server_info.owner){
             gisportal.editLayersForm.server_list[i]['layers'].push(layer_info);
             unique = false;
             break;
@@ -54,12 +69,21 @@ gisportal.editLayersForm.produceServerList = function(){
          server_info.layers.push(layer_info);
          gisportal.editLayersForm.server_list.push(server_info);
       }
+      data = {
+         "server_list": gisportal.editLayersForm.server_list,
+         "admin": gisportal.userPermissions.admin_clearance
+      }
    }
    // The server list is shown using the list previously created.
    $( '.js-edit-layers-popup' ).toggleClass('hidden', false);
-   var template = gisportal.templates['edit-layers-table'](gisportal.editLayersForm.server_list);
+   var template = gisportal.templates['edit-layers-table'](data);
    $( '.js-edit-layers-html' ).html(template);
 
+   gisportal.editLayersForm.addListeners();
+   
+};
+
+gisportal.editLayersForm.addListeners = function(){
    // Listener added to the close button.
    $('span.js-edit-layers-close').on('click', function() {
       $('div.js-edit-layers-html').html('');
@@ -104,7 +128,8 @@ gisportal.editLayersForm.produceServerList = function(){
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
+
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'))
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
@@ -113,10 +138,13 @@ gisportal.editLayersForm.produceServerList = function(){
    $('span.js-delete-server').one('click', function(){
       var this_span = $(this);
       var server = $(this).data("server");
+      var user = $(this).data("user");
+      var user_info = gisportal.userPermissions.this_user_info;
       $.ajax({
-         url:  '/service/remove_server_cache?filename=' + server,
-         success: function(server){
-            gisportal.editLayersForm.deleteSuccess(server);
+         url:  '/service/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         success: function(){
+            gisportal.editLayersForm.addSeverTable();
+            $.notify("Success\nThe server was successfuly removed", "success");
          },
          error: function(){
             this_span.notify("Deletion Fail", {position:"left", className:"error"});
@@ -129,6 +157,7 @@ gisportal.editLayersForm.produceServerList = function(){
       var this_span = $(this);
       $(this).toggleClass('green-spin', true);
       var url = $(this).data("wms");
+      var user = $(this).data("user");
       var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], url);
       // The timeout is measured to see if the cache can be refreshed.
       $.ajax({
@@ -140,7 +169,7 @@ gisportal.editLayersForm.produceServerList = function(){
                this_span.notify({'title':"Would you like to refresh the cache?", "yes-text":"Yes", "no-text":"No"},{style:"option", autoHide:false, clickToHide: false});
                 //listen for click events from this style
                $(document).one('click', '.notifyjs-option-base .no', function() {
-                  gisportal.editLayersForm.refreshOldData(global_data);
+                  gisportal.editLayersForm.refreshOldData(global_data, this_span, user);
                   //programmatically trigger propogating hide event
                   $(this).trigger('notify-hide');
                });
@@ -151,7 +180,7 @@ gisportal.editLayersForm.produceServerList = function(){
                      url:  refresh_url,
                      dataType: 'json',
                      success: function(new_global_data){
-                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span);
+                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user);
                      },
                      error: function(e){
                         this_span.toggleClass('green-spin', false);
@@ -163,7 +192,7 @@ gisportal.editLayersForm.produceServerList = function(){
                });
                
             }else{
-               gisportal.editLayersForm.refreshOldData(global_data);
+               gisportal.editLayersForm.refreshOldData(global_data, this_span, user);
             }
          },
          error: function(e){
@@ -171,42 +200,7 @@ gisportal.editLayersForm.produceServerList = function(){
             this_span.notify("Could not find cache file", {position:"left", className:"error"});
          }
       });
-
-      
    })
-};
-
-gisportal.editLayersForm.deleteSuccess = function(server){
-   if(_.size(gisportal.original_layers) > 0){
-      var layers_obj = gisportal.original_layers;
-   }else{
-      var layers_obj = gisportal.layers;
-   }
-   // A list is made of all of the ids to be removed from the portal.
-   var ids_to_remove = [];
-   for(i in layers_obj){
-      if(layers_obj[i].serverName == server){
-         ids_to_remove.push(i);
-      }
-   }
-   // Each of those Ids is then removed from both layers and original layers.
-   for(i in ids_to_remove){
-      var id = ids_to_remove[i]
-      if(gisportal.selectedLayers.indexOf(id) > -1){
-         gisportal.indicatorsPanel.removeFromPanel(id);
-      }
-      try{
-         delete gisportal.original_layers[id];
-      }catch(e){};
-      try{
-         delete gisportal.layers[id];
-      }catch(e){};     
-   }
-   gisportal.editLayersForm.server_list = [];
-   gisportal.editLayersForm.produceServerList();
-   gisportal.layers = {};
-   // loadLayers() is run so that gisportal.layers is refreshed and will not include the deleted layers.
-   gisportal.loadLayers();
 }
 
 /**
@@ -218,12 +212,14 @@ gisportal.editLayersForm.deleteSuccess = function(server){
 * @param Object new_data - The new data that is in the gloal cache.
 * @param jQuery Object span - The selector of the refresh span button.
 */
-gisportal.editLayersForm.refreshOldData = function(new_data, span){
-   var url = new_data.wmsURL;
+gisportal.editLayersForm.refreshOldData = function(new_data, span, user){
+   var wms_url = new_data.wmsURL;
 
-   var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], url);
+   var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
+
+   var ajax_url = 'cache/' + gisportal.userPermissions.domainName + "/user_" + user + "/" +clean_wms_url+".json?_="+ new Date().getMilliseconds()
    $.ajax({
-      url:  'cache/user_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(), // The user cache is the retrieved to be compared with the new data.
+      url:  ajax_url, // The user cache is the retrieved to be compared with the new data.
       dataType: 'json',
       success: function(user_data){
          // Lists for storing diffences.
@@ -265,19 +261,14 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span){
          // The new data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info.
          new_data['options'] = user_data['options'];
          new_data['contactInfo'] = user_data['contactInfo'];
+         var user_info = gisportal.userPermissions.this_user_info;
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: '/service/update_layer',
+            url: '/service/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
-               gisportal.original_layers = {};
-               gisportal.layers = {};
-               // loadLayers() is run so that gisportal.layers is refreshed and will include the changed layers.
-               gisportal.refresh_server = true;
-               gisportal.loadLayers();
-               gisportal.editLayersForm.server_list = [];
-               gisportal.loading.increment()
+               gisportal.editLayersForm.addSeverTable();
             }, error: function(){
                span.toggleClass('green-spin', false);
                span.notify("ERROR!", {position:"left", className:"error"});

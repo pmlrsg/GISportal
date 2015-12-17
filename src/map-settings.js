@@ -42,14 +42,15 @@ gisportal.map_settings.init = function() {
    var data = {
       baseLayers: layers,
       countryBorders: borders,
-      projections: projections
+      projections: projections,
+      user_clearance:gisportal.userPermissions.user_clearance
    }
    var rendered = gisportal.templates['map-settings'](data)
    $('.js-map-options').html(rendered);
 
    $('button.js-edit-layers').on('click', function(e){
       e.preventDefault();
-      gisportal.editLayersForm.produceServerList();
+      gisportal.editLayersForm.addSeverTable();
    });
 
    // enable ddslick'ness

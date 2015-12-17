@@ -15,9 +15,9 @@ import calendar
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
 SERVERCACHEPATH = "../../../html/cache/temporary_cache"
-USERCACHEPATH = "../../../html/cache/user_cache"
-USERDELETEDCACHEPATH = "../../../html/cache/user_cache/deleted_cache"
-MASTERCACHEPATH = "../../../html/cache/mastercache"
+USERCACHEPREFIX = "user_" #DO NOT CHANGE YET, USE CONFIG IN THE END!
+MASTERCACHEPATH = "../../../html/cache"
+BASEUSERCACHEPATH = MASTERCACHEPATH +"/" + USERCACHEPREFIX
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 
@@ -42,17 +42,16 @@ def proxy():
    
    try:
       host = url.split("/")[2]
-      current_app.logger.debug(host)
          
       return basic_proxy(url)
    
    except Exception, e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
          if e.code == 400:
-            g.error = "Failed to access url"
+            g.error = "Failed to permission url"
          abort(e.code)
          
-      g.error = "Failed to access url, make sure you have entered the correct parameters"
+      g.error = "Failed to permission url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, None, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
 
@@ -90,12 +89,12 @@ def basic_proxy(url):
    except urllib2.URLError as e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
          if e.code == 400:
-            g.error = "Failed to access url, make sure you have entered the correct parameters."
+            g.error = "Failed to permission url, make sure you have entered the correct parameters."
          if e.code == 500:
             g.error = "Sorry, looks like one of the servers you requested data from is having trouble at the moment. It returned a 500."
          abort(400)
          
-      g.error = "Failed to access url, make sure you have entered the correct parameters"
+      g.error = "Failed to permission url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, None, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
 
@@ -114,10 +113,8 @@ def rotate():
    
    url = request.args.get('url', 'http://www.openlayers.org')  
    current_app.logger.debug("Rotating image")
-   current_app.logger.debug(url)
    try:
       host = url.split("/")[2]
-      current_app.logger.debug(host)
       
       # Abort if the url doesnt start with http
       if not url.startswith("http://") and not url.startswith("https://"):
@@ -137,18 +134,18 @@ def rotate():
    
    except urllib2.URLError as e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
-         g.error = "Failed to access url, server replied with " + str(e.code) + "."
+         g.error = "Failed to permission url, server replied with " + str(e.code) + "."
          abort(400)
          
-      g.error = "Failed to access url, make sure you have entered the correct parameters"
+      g.error = "Failed to permission url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
    except Exception, e:
       if hasattr(e, 'code'): # check for the code attribute from urllib2.urlopen
-         g.error = "Failed to access url, server replied with " + str(e.code) + "."
+         g.error = "Failed to permission url, server replied with " + str(e.code) + "."
          abort(e.code)
          
-      g.error = "Failed to access url, make sure you have entered the correct parameters"
+      g.error = "Failed to permission url, make sure you have entered the correct parameters"
       error_handler.setError('2-06', None, g.user.id, "views/proxy.py:proxy - URL error, returning 400 to user. Exception %s" % e, request)
       abort(400) # return 400 if we can't get an exact code
    
@@ -245,20 +242,42 @@ Loads the cache
 """
 @portal_proxy.route('/get_cache')
 def get_cache():
+   usernames = [request.args.get('username')] # Gets the given username.
+   permission = request.args.get('permission') # Gets the given permission.
+   domain = request.args.get('domain') # Gets the given domain.
+
    cache = [] # The list to store all of the layers in.
-   master_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH + FILEEXTENSIONJSON)
-   with open(master_path, 'r+') as master_file:
-      cache.extend( json.load(master_file)) # Loads the mastercache and adds it to the cache to be returned.
-
-   user_cache_path =os.path.join(CURRENT_PATH,USERCACHEPATH)
-   if not os.path.isdir(user_cache_path):
-      os.makedirs(user_cache_path)  #if the user_cache path does not exist it is created.
-
-   for filename in os.listdir(user_cache_path): # Loops through all of the files int he cache folder
-      file_path = os.path.join(user_cache_path, filename)
-      if os.path.isfile(file_path):
+   master_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
+   for filename in os.listdir(master_path): # Loops through all of the files in the cache folder
+      file_path = os.path.join(master_path, filename)
+      if os.path.isfile(file_path) and filename != "providers.json":
          with open(file_path, 'r+') as layer_file:
-            cache.extend([json.load(layer_file)]) # Adds the information in each file to the cache list to be returned.
+            json_data = json.load(layer_file)
+            json_data['owner'] = domain
+            cache.extend([json_data]) # Adds the information in each file to the cache list to be returned.
+
+
+   if permission != "guest":
+      if permission == "admin":
+         for folder in os.listdir(master_path):
+            dir_path = os.path.join(master_path, folder)
+            if os.path.isdir(dir_path):
+               if folder.startswith(USERCACHEPREFIX):
+                  usernames.append(folder.replace(USERCACHEPREFIX, "", 1))
+      # Make the list unique
+      usernames = list(set(usernames))
+      for username in usernames:
+         user_cache_path = os.path.join(master_path,USERCACHEPREFIX + username)
+         if not os.path.isdir(user_cache_path):
+            os.makedirs(user_cache_path)  #if the user_cache path does not exist it is created.
+
+         for filename in os.listdir(user_cache_path): # Loops through all of the files in the cache folder
+            file_path = os.path.join(user_cache_path, filename)
+            if os.path.isfile(file_path):
+               with open(file_path, 'r+') as layer_file:
+                  json_data = json.load(layer_file)
+                  json_data['owner'] = username
+                  cache.extend([json_data]) # Adds the information in each file to the cache list to be returned.
 
    return json.dumps(cache) # Returns the cache to the portal for loading the layers.
 
@@ -271,6 +290,8 @@ def add_user_layer():
    # Retrieves the given information from the form the user completed.
    layers_list = json.loads(request.form['layers_list'])
    server_info = json.loads(request.form['server_info'])
+   domain = request.form['domain'] # Gets the given domain.
+   username = server_info['owner'] # Gets the given username.
 
    if set(('unique_name', 'provider', 'wms_url')).issubset(server_info): # Verifies that the necessary server information is provided
 
@@ -325,7 +346,7 @@ def add_user_layer():
       if len(server_info['position']) > 0:
          data['contactInfo']['position']= server_info['position']
 
-      path = os.path.join(CURRENT_PATH, USERCACHEPATH, filename)
+      path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename)
       
       saveFile(path, json.dumps(data)) # The data file is then added to the user_cache folder.
       return "" # Return of an empty string so that the portal knows the data transfer was successfull.
@@ -611,12 +632,16 @@ Moves the given server's cache to the deleted folder.
 """
 @portal_proxy.route('/remove_server_cache')
 def remove_server_cache():
+   username = request.args.get('username') # Gets the given username.
+   permission = request.args.get('permission') # Gets the given permission.
+   domain = request.args.get('domain') # Gets the given domain.
+
    filename = request.args.get('filename')
    clean_filename = filename + FILEEXTENSIONJSON
-   original_path = os.path.join(CURRENT_PATH, USERCACHEPATH, clean_filename)
-   new_path = os.path.join(CURRENT_PATH, USERDELETEDCACHEPATH, clean_filename)
+   original_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, clean_filename)
+   deleted_cache_path =os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username + "/deleted_cache")
+   new_path = os.path.join(deleted_cache_path, clean_filename)
 
-   deleted_cache_path =os.path.join(CURRENT_PATH,USERDELETEDCACHEPATH)
    if not os.path.isdir(deleted_cache_path):
       os.makedirs(deleted_cache_path)  #if the user_deleted_cache path does not exist it is created.
 
@@ -629,10 +654,14 @@ Puts the updated data back into the file
 """
 @portal_proxy.route('/update_layer', methods=['POST'])
 def update_layer():
+   username = request.args.get('username') # Gets the given username.
+   permission = request.args.get('permission') # Gets the given permission.
+   domain = request.args.get('domain') # Gets the given domain.
+
    data = json.loads(request.form['data'])
    filename =  data['serverName']
 
-   path = os.path.join(CURRENT_PATH, USERCACHEPATH, filename + FILEEXTENSIONJSON)
+   path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename + FILEEXTENSIONJSON)
    saveFile(path, json.dumps(data))
 
    return ""

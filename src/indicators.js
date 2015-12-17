@@ -304,8 +304,19 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
 
    if( gisportal.graphs.activePlotEditor )
       layer.visibleTab = "analysis"
-   
-   var rendered = gisportal.templates['indicator'](layer);
+
+   user_allowed_to_add = false;
+   user_allowed_to_edit = false;
+
+   if(gisportal.userPermissions.user_clearance && layer.providerTag == "UserDefinedLayer"){
+      user_allowed_to_add = true;
+   }
+   if(gisportal.userPermissions.user_clearance && layer.providerTag != "UserDefinedLayer"){
+      if(layer.owner!="domain" || gisportal.userPermissions.admin_clearance)
+      user_allowed_to_edit = true;
+   }
+
+   var rendered = gisportal.templates['indicator']({"layer":layer, "user_allowed_to_add":user_allowed_to_add, "user_allowed_to_edit":user_allowed_to_edit});
 
    var index = data.index || 0;
    var prevIndex = index - 1;
@@ -346,7 +357,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
 
    //Add the edit/add layers listener to add the server to the form
    $('span.js-add-layer-server').on('click', function(){
-      gisportal.addLayersForm.addServerToForm($(this).data('server'));
+      gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'));
    })
 
    gisportal.events.trigger('layer.addtopanel', data)

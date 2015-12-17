@@ -49,9 +49,11 @@
             <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
          </div>
       </form>
+      {{#if user_clearance}}
       <div class="clearfix wms-url-div">
          <label>You can edit internal layers here:</label>
          <button class="brand small js-edit-layers pull-right">Configure Internal Layers</button>
       </div>
+      {{/if}}
    </li>
 </ul>

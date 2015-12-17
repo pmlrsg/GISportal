@@ -115,12 +115,13 @@ gisportal.loadLayers = function() {
 
    function loadWmsLayers(){
       // Get WMS cache
+      var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  '/service/get_cache',
+         url:  '/service/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
-            $.notify("Sorry\nThere was an unexpected error getting the cache. Try refreshing the page, or coming back later.", {autoHide:false});
+            $.notify("Sorry\nThere was an unexpected error getting the cache. Try refreshing the page, or coming back later.", {autoHide:false, className:"error"});
          }
       });
    };
@@ -161,6 +162,7 @@ gisportal.createOpLayers = function() {
          "contactInfo": server.contactInfo,
          "contactInfo": server.contactInfo,
          "timeStamp":server.timeStamp,
+         "owner":server.owner,
          "name": indicator.Name,
          "title": indicator.Title,
          "productAbstract": indicator.productAbstract,
@@ -518,7 +520,7 @@ gisportal.loadState = function(state) {
    var available_keys = [];
 
    for(key in keys){
-      if (gisportal.layers[keys[key]]){
+      if (gisportal.layers[keys[key]] && (gisportal.userPermissions.admin_clearance || gisportal.layers[keys[key]].owner == gisportal.userPermissions..this_user_info.username)){
          available_keys.push(keys[key]);
       }
    }

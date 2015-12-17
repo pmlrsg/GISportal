@@ -1,43 +1,45 @@
-<input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-<li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{providerTag}}">
-   <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{providerTag}}">
-      <div class="indicator-name">{{descriptiveName}}</div>
+{{#layer}}
+   <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
+   <li data-id="{{id}}" data-order="{{index}}" data-name="{{name}}" data-provider="{{providerTag}}">
+      <div class="indicator-header" data-name="{{name}}" data-id="{{id}}" data-provider="{{providerTag}}">
+         <div class="indicator-name">{{descriptiveName}}</div>
 
-      <div class="indicator-actions">
-         <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
-         
-         <span class="{{active visibleTab "dimensions"}} js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon js-indicator-tab-trigger" data-tab-name="dimensions" for="tab-{{id}}-dimensions" title="Layer Settings"></span>
+         <div class="indicator-actions">
+            <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
+            
+            <span class="{{active visibleTab "dimensions"}} js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon js-indicator-tab-trigger" data-tab-name="dimensions" for="tab-{{id}}-dimensions" title="Layer Settings"></span>
 
-         <span class="{{active visibleTab "details"}} js-icon-details js-closable icon-btn icon-information indicator-header-icon js-indicator-tab-trigger" data-tab-name="details" for="tab-{{id}}-details" title="Layer Information"></span>
+            <span class="{{active visibleTab "details"}} js-icon-details js-closable icon-btn icon-information indicator-header-icon js-indicator-tab-trigger" data-tab-name="details" for="tab-{{id}}-details" title="Layer Information"></span>
 
-         <span class="{{active visibleTab "analysis"}} js-icon-analyse  icon-btn js-closable icon-business-chart-2 indicator-header-icon js-indicator-tab-trigger" data-tab-name="analysis" for="tab-{{id}}-analysis" title="Layer Analysis"></span>
+            <span class="{{active visibleTab "analysis"}} js-icon-analyse  icon-btn js-closable icon-business-chart-2 indicator-header-icon js-indicator-tab-trigger" data-tab-name="analysis" for="tab-{{id}}-analysis" title="Layer Analysis"></span>
 
-         {{#if_equals providerTag "UserDefinedLayer"}}
-            <span class="js-add-layer-server icon-btn indicator-header-icon icon-add-3" data-server="{{../serverName}}" title="Add Data"></span>
-         {{/if_equals}}
-         {{#unless_equals providerTag "UserDefinedLayer"}}
-            <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" title="Edit Data"></span>
-         {{/unless_equals}}
-         
-         <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
-      </div>
-   </div>
-
-   <ul class="indicator-properties">
-
-      <li  data-name="{{name}}" data-id="{{id}}">
-         <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
-         <div class="panel-tab scalebar-tab">
-            <label for="tab-{{id}}-dimensions">   
-               <div class="js-scalebar"></div>
-            </label>
+            {{#if ../user_allowed_to_add}}
+               <span class="js-add-layer-server icon-btn indicator-header-icon icon-add-3" data-server="{{../serverName}}" data-owner="{{../owner}}" title="Add Data"></span>
+            {{/if}}
+            {{#if ../user_allowed_to_edit}}
+               <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" title="Edit Data"></span>
+            {{/if}}
+            
+            <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
          </div>
-      </li>
-      
-      <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
+      </div>
 
-      <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
-   
-      <li class="js-tab-analysis" data-name="{{name}}" data-id="{{id}}"></li>
-   </ul>
-</li>
+      <ul class="indicator-properties">
+
+         <li  data-name="{{name}}" data-id="{{id}}">
+            <input type="checkbox" class="js-tab-trigger panel-tab-trigger" checked="checked">
+            <div class="panel-tab scalebar-tab">
+               <label for="tab-{{id}}-dimensions">   
+                  <div class="js-scalebar"></div>
+               </label>
+            </div>
+         </li>
+         
+         <li class="js-tab-dimensions" data-name="{{name}}" data-id="{{id}}"></li>
+
+         <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
+      
+         <li class="js-tab-analysis" data-name="{{name}}" data-id="{{id}}"></li>
+      </ul>
+   </li>
+{{/layer}}

@@ -12,6 +12,17 @@ gisportal.addLayersForm.validation_functions = {
                                  return "The following characters are invalid: '" + invalid_chars.join("") + "' . Please try agian.";
                               }
    },
+   'provider':function(value){if(!/^[a-zA-Z0-9:\-\& \:\;\_\,\/\\]+$|^$/.test(value)){
+                                 var invalid_chars = _.uniq(value.match(/[^a-zA-Z0-9:\-\& \:\;\_\,\/\\]+|^$/g));
+                                 return "The following characters are invalid: '" + invalid_chars.join("") + "' . Please try agian.";
+                              }
+                              if(value == "UserDefinedLayer"){
+                                 return "UserDefinadLayer is invalid. Please try again.";
+                              }
+                              if(value == ""){
+                                 return "cannot be null. Please try again.";
+                              }
+   },
    'email':function(value){if(!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$|^$/i.test(value)){
                                  return "The email you provided is invalid, please try again.";
                               }
@@ -221,8 +232,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // Adds a listener to the submit button on the form.
    $('.layers-form-buttons-div button.js-layers-form-submit').one('click', function(e){
       e.preventDefault();
-      // If there are errors on the server information form then do nothing (the errors will already be on display).
+      // If there are errors on the server information form then notify the user.
+      $.notify("Please correct the server information", "error");
       if(_.size(gisportal.addLayersForm.validation_errors['server']) > 0){
+
          return;
       }
       // Checks each layer in the list for errors with tags.
@@ -234,7 +247,8 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             for(tag in this_layer.tags){
                // If the tag is invalid
                if(invalid("all_tags", this_layer.tags[tag])['invalid']){
-                  // Load up the layer in the forma and return so nothing is actually submitted
+                  // Load up the layer in the form and return so nothing is actually submitted
+                  $.notify("Please correct the information on page " + layer, "error");
                   gisportal.addLayersForm.displayForm(_.size(gisportal.addLayersForm.layers_list), parseInt(layer), "div.js-layer-form-html")
                   return;
                }
@@ -245,11 +259,12 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       for(layer in gisportal.addLayersForm.layers_list){
          // As long as it is to be included
          if(gisportal.addLayersForm.layers_list[layer]['include']){
+            var user_info = gisportal.userPermissions.this_user_info;
             //Sends the layers to the middleware to be added to the json file
             $.ajax({
                url:  '/service/add_user_layer',
                method:'POST',
-               data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info")},
+               data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"), 'domain':gisportal.userPermissions.domainName},
                // If there is success
                success: function(layer){
                   // This block removes any old selected layers
@@ -289,7 +304,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       }
       // If there is no layer found that is 'included' this will tell the user to include one.
-      console.log("need to include at least one");
+      $.notify("You need to include at least one layer.", "error");
    });
 
    // The cancel button gets  a listener too.
@@ -341,7 +356,7 @@ gisportal.addLayersForm.addTagInput = function(tag){
 * @param {Object} layer - A Layer (containing the server info)
 * @param String form_div - The JQuery element selctor for the form to go into
 */
-gisportal.addLayersForm.displayServerform = function(layer, form_div){
+gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    wms_url = layer['wmsURL'] || gisportal.addLayersForm.form_info['wms_url'];
    if(wms_url){
       wms_url = wms_url.split('?')[0];
@@ -349,7 +364,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
    // If the data has not yet been added to the server_info object.
    if(_.size(gisportal.addLayersForm.server_info) <= 0){
       // The server inforation is extracted from the layer and put into the object.
-      var provider = layer.tags.data_provider;
+      var provider = layer.tags.data_provider || layer.tags.providerTag;
       var original_provider = layer.providerTag;
       if(layer.contactInfo){
          if(layer.contactInfo.address){
@@ -378,7 +393,8 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
          "position":position,
          "email":email,
          "phone":phone,
-         "wms_url":wms_url
+         "wms_url":wms_url,
+         "owner":owner
       };
    }
    // The display form variable is set to true so that the portal knows if the form was displayed last time the user was viewing it.
@@ -405,12 +421,12 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div){
 * @param String form_div- The JQuery element selctor for the layers form to go into
 * @param String server_div- The JQuery element selctor for the server form to go into
 */
-gisportal.addLayersForm.addLayersForm = function(list_size, single_layer, current_page, form_div, server_div){
+gisportal.addLayersForm.addLayersForm = function(list_size, single_layer, current_page, form_div, server_div, owner){
    // The HTML is cleared ready for the form
    $('div.js-layer-form-html').html("");
    // The two forms are displayed
    gisportal.addLayersForm.displayForm(list_size, current_page, form_div)
-   gisportal.addLayersForm.displayServerform(single_layer, server_div);
+   gisportal.addLayersForm.displayServerform(single_layer, server_div, owner);
    // The form is then shown
    $('div.js-layer-form-popup').toggleClass('hidden', false);
 }
@@ -560,7 +576,7 @@ gisportal.addLayersForm.validateForm = function(form_div){
       // The label is retrieved to give a neat and relatable reference to the user.
       var label = $('label[data-field='+field+']')
       // The field is set to 'all_tags' if the field is a tag because they are all validated in the same way.
-      if(tag || field == "provider"){
+      if(tag){
          field = "all_tags";
       }
 
@@ -624,7 +640,7 @@ gisportal.addLayersForm.checkValidity = function(field, value){
 *
 * @param String server - the name of the server to be added to the form.
 */
-gisportal.addLayersForm.addServerToForm = function(server){
+gisportal.addLayersForm.addServerToForm = function(server, owner){
    gisportal.addLayersForm.layers_list = {}; // Resets the form information
    gisportal.addLayersForm.server_info = {};
    if(_.size(gisportal.original_layers) > 0){ //gets the list of layers.
@@ -641,5 +657,5 @@ gisportal.addLayersForm.addServerToForm = function(server){
    }
    gisportal.addLayersForm.validation_errors = {};
    // The form is then loaded (loading the first layer)
-   gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
+   gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', owner)
 }

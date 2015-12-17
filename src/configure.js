@@ -317,6 +317,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          break;
       }
    }
+   if(!gisportal.userPermissions.user_clearance){
+      addable_layers = false;
+   }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
    var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
@@ -346,7 +349,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html')
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.userPermissions.this_user_info.username)
    });
 
    var categories = [];
@@ -421,14 +424,16 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
             url:  'cache/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
             dataType: 'json',
             success: function(layer){
-               $('#refresh-cache-message').toggleClass('hidden', false);
-               if(layer.timeStamp){
-                  $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
-               }
-               if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
-                  $('#refresh-cache-div').toggleClass('hidden', false);
-               }else{
-                  $('#refresh-cache-div').toggleClass('hidden', true);
+               if(!gisportal.wms_submitted){
+                  $('#refresh-cache-message').toggleClass('hidden', false);
+                  if(layer.timeStamp){
+                     $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
+                  }
+                  if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
+                     $('#refresh-cache-div').toggleClass('hidden', false);
+                  }else{
+                     $('#refresh-cache-div').toggleClass('hidden', true);
+                  }
                }
             },
             error: function(e){

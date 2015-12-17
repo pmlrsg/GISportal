@@ -6,6 +6,8 @@ html/cache
 html/cache/*
 html/cache.bak
 html/cache.bak/*
+html/cache.oldbak
+html/cache.oldbak/*
 html/GISPortal.js
 html/css/GISPortal.css
 html/templates/all_templates.mst

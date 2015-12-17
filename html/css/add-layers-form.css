@@ -207,7 +207,7 @@ div.scalebar-preview{
 }
 
 div.js-edit-layers-html{
-  width: 1000px;
+  width: 1250px;
   max-width:90%;
   max-height:90%;
   overflow:auto;
@@ -239,10 +239,12 @@ div.js-edit-layers-html span.js-update-server:hover{
   color: #196619 ;
 }
 
-
 div.js-edit-layers-html table{
-  word-break:break-word;
   width:100%;
+}
+
+div.js-edit-layers-html .break-word{
+  word-break:break-word;
 }
 
 div.js-edit-layers-popup{
