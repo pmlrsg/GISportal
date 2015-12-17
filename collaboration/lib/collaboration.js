@@ -9,6 +9,8 @@ module.exports = collaboration;
 
 collaboration.init = function(io, app, config) {
 
+   var rooms = {};
+
    io.set('authorization', function (handshakeData, accept) {
       // check if there's a cookie header
       if (handshakeData.headers.cookie) {

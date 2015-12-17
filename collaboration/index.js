@@ -54,12 +54,6 @@ var routes = require('./lib/routes.js');
 app.use('/', routes);
 
 
-
-
-
-// stuff for managing rooms and users (should be in redis)
-rooms = {}
-
 // Start listening...
 server = http.createServer(app)
 server.listen(config.app.port, function() {
@@ -67,6 +61,7 @@ server.listen(config.app.port, function() {
 });
 io = io.listen(server);
 
+// the collaboration websocket stuff
 var collaboration = require('./lib/collaboration.js');
 collaboration.init(io, app, config);
 
