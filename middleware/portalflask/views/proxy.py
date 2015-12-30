@@ -272,6 +272,7 @@ def get_cache():
             os.makedirs(user_cache_path)  #if the user_cache path does not exist it is created.
 
          for filename in os.listdir(user_cache_path): # Loops through all of the files in the cache folder
+            print filename
             file_path = os.path.join(user_cache_path, filename)
             if os.path.isfile(file_path):
                with open(file_path, 'r+') as layer_file:
@@ -292,16 +293,25 @@ def add_user_layer():
    server_info = json.loads(request.form['server_info'])
    domain = request.form['domain'] # Gets the given domain.
    username = server_info['owner'] # Gets the given username.
+   
 
-   if set(('unique_name', 'provider', 'wms_url')).issubset(server_info): # Verifies that the necessary server information is provided
+   if set(('unique_name', 'provider', 'server_name')).issubset(server_info): # Verifies that the necessary server information is provided
 
-      clean_url = replaceAll(server_info['wms_url'],{'http://': '', 'https://': '', '/': '-', '?': ''})
-      filename = clean_url + FILEEXTENSIONJSON
-      path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
-      with open(path, 'r+') as data_file:
+      filename = server_info['server_name'] + FILEEXTENSIONJSON
+      if domain == username:
+         cache_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, filename)
+         save_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, filename)
+      else:
+         cache_path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+         save_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename)
+
+      with open(cache_path, 'r+') as data_file:
          data = json.load(data_file) # Extracts the data from the global cache file
 
       new_data = []
+      print len(layers_list)
+      print len(data['server'][server_info['unique_name']])
+
       for new_layer in layers_list: #Loops through each new layer (user provided)
          this_new_layer = layers_list[new_layer]
          # This checks that the layer data passed is valid
@@ -323,6 +333,7 @@ def add_user_layer():
                      new_data_layer['LegendSettings'] = this_new_layer['legendSettings']
                      new_data.append(new_data_layer)
       # The new data is then put back into the data file to replace the previous information
+
       data['server'][server_info['unique_name']] = new_data
 
       # This adds all of the server information to the data file
@@ -345,11 +356,10 @@ def add_user_layer():
       
       if len(server_info['position']) > 0:
          data['contactInfo']['position']= server_info['position']
-
-      path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename)
       
-      saveFile(path, json.dumps(data)) # The data file is then added to the user_cache folder.
+      saveFile(save_path, json.dumps(data)) # The data file is then added to the user_cache folder.
       return "" # Return of an empty string so that the portal knows the data transfer was successfull.
+   return "Error"
 
 
 """
@@ -638,8 +648,13 @@ def remove_server_cache():
 
    filename = request.args.get('filename')
    clean_filename = filename + FILEEXTENSIONJSON
-   original_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, clean_filename)
-   deleted_cache_path =os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username + "/deleted_cache")
+   base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username)
+   for filename in os.listdir(os.path.join(CURRENT_PATH, MASTERCACHEPATH)):
+      if filename == username:
+         base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
+         continue
+   original_path = os.path.join(base_path, clean_filename)
+   deleted_cache_path =os.path.join(base_path + "/deleted_cache")
    new_path = os.path.join(deleted_cache_path, clean_filename)
 
    if not os.path.isdir(deleted_cache_path):
@@ -661,7 +676,13 @@ def update_layer():
    data = json.loads(request.form['data'])
    filename =  data['serverName']
 
-   path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename + FILEEXTENSIONJSON)
+   base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username)
+   for filename in os.listdir(os.path.join(CURRENT_PATH, MASTERCACHEPATH)):
+      if filename == username:
+         base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
+         continue
+
+   path = os.path.join(base_path, filename + FILEEXTENSIONJSON)
    saveFile(path, json.dumps(data))
 
    return ""

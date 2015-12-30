@@ -47,6 +47,22 @@ gisportal.addLayersForm.addlayerToList = function(layer){
    var interval = layer.tags.interval || "";
    var model_name = layer.tags.model_name || "";
    var styles_file = './cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
+   var legendSettings = layer.legendSettings || {
+         "scalePoints":false,
+         "Rotation":0,
+         "Parameters":{
+            "colorbaronly":false
+         }
+      };
+   if(!legendSettings.scalePoints){
+      legendSettings.scalePoints = false;
+   }
+   if(!legendSettings.Rotation){
+      legendSettings.Rotation = 0;
+   }
+   if(!legendSettings.Parameters && !legendSettings.Parameters.colorbaronly){
+      legendSettings.Parameters.colorbaronly = false;
+   }
 
    // Makes a list of all the other wanted tags.
    var other_tags = {};
@@ -65,13 +81,7 @@ gisportal.addLayersForm.addlayerToList = function(layer){
       "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model_name":model_name}, //ensures that these tags are displayed on the form
       "include":true,
       "styles_file":styles_file,
-      "legendSettings":{
-         "scalePoints":false,
-         "Rotation":0,
-         "Parameters":{
-            "colorbaronly":false
-         }
-      }
+      "legendSettings":legendSettings
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -154,7 +164,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             + l.exBoundingBox.EastBoundLongitude + ","
             + l.exBoundingBox.NorthBoundLatitude;
       try{
-         var time = '&time=' + new Date(l.lastDate).toISOString();
+         var time = '&time=' + new Date(l.selectedDateTime).toISOString();
       }
       catch(e){
          var time = "";
@@ -166,8 +176,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          success: function( data ) {
             // If there is a min & max value returned the label and input are both shown.
             if(typeof(data.min) == "number" && typeof(data.max) == "number"){
-               $('label[data-field="scalePoints"').toggleClass('hidden', false);
-               $('input[data-field="scalePoints"').toggleClass('hidden', false);
+               $('.scale-points-div').toggleClass('hidden', false);
             }
          }
       });
@@ -223,6 +232,30 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.addLayersForm.refreshStorageInfo();
    });
 
+   // This adds the click listener to the 'add scale points to all layers' spans
+   $('div.scale-points-div span.scale-to-all-layers').on( 'click', function () {
+
+      // The assumed values are is added to every layer in the list
+      for(value in gisportal.addLayersForm.layers_list){
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['scalePoints'] = true;
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['colorbaronly'] = true;
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['height'] = 500;
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['width'] = 30;
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['Rotation'] = 270;
+      }
+
+      //Sets the assumed values to the boxes:
+      $('input[data-field=scalePoints]').prop('checked', true);
+      $('input[data-field=colorbaronly]').prop('checked', true);
+      $('input[data-field=height]').val(500);
+      $('input[data-field=width]').val(30);
+
+      $('input[data-field=scalePoints]').trigger("change");
+
+      // The information is then updated to the browser cache so that it is there next time.
+      gisportal.addLayersForm.refreshStorageInfo();
+   });
+
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
@@ -233,9 +266,8 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    $('.layers-form-buttons-div button.js-layers-form-submit').one('click', function(e){
       e.preventDefault();
       // If there are errors on the server information form then notify the user.
-      $.notify("Please correct the server information", "error");
       if(_.size(gisportal.addLayersForm.validation_errors['server']) > 0){
-
+         $.notify("Please correct the server information", "error");
          return;
       }
       // Checks each layer in the list for errors with tags.
@@ -296,6 +328,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   $.notify("Success \n We have now added the layers to the portal.", "success");
                },
                error: function(e){
+                  $.notify("Error submitting this information, please try again", "error");
                   console.log("Error " + e.Message);
                }
             });
@@ -394,7 +427,8 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "email":email,
          "phone":phone,
          "wms_url":wms_url,
-         "owner":owner
+         "owner":owner,
+         "server_name":layer.serverName
       };
    }
    // The display form variable is set to true so that the portal knows if the form was displayed last time the user was viewing it.

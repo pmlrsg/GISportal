@@ -156,12 +156,20 @@ gisportal.editLayersForm.addListeners = function(){
    $('span.js-update-server').on('click', function(){
       var this_span = $(this);
       $(this).toggleClass('green-spin', true);
-      var url = $(this).data("wms");
+      var url = $(this).data("server");
       var user = $(this).data("user");
-      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], url);
+      var domain = gisportal.userPermissions.domainName
       // The timeout is measured to see if the cache can be refreshed.
+      if(user == domain){
+         this_span.notify("Feature currently unavailable.", {position:"left"});
+         return;
+         //var cache_url = 'cache/' + domain + "/" ;
+      }else{
+         var cache_url = 'cache/temporary_cache/';
+      }
+      cache_url += url+".json?_="+ new Date().getMilliseconds()
       $.ajax({
-         url:  'cache/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+         url:  cache_url,
          dataType: 'json',
          success: function(global_data){
             if(!global_data.timeStamp || (+new Date() - +new Date(global_data.timeStamp))/60000 > gisportal.config.cacheTimeout){
@@ -211,6 +219,7 @@ gisportal.editLayersForm.addListeners = function(){
 * 
 * @param Object new_data - The new data that is in the gloal cache.
 * @param jQuery Object span - The selector of the refresh span button.
+* @param jQuery String user - The owner of the cache.
 */
 gisportal.editLayersForm.refreshOldData = function(new_data, span, user){
    var wms_url = new_data.wmsURL;

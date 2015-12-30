@@ -20,4 +20,4 @@ gisportal.userPermissions.setPermissions = function(level){
    }
 };
 gisportal.userPermissions.setPermissions(gisportal.userPermissions.this_user_info.permission);
-gisportal.userPermissions.domainName = "pmpc1310_npm_ac_uk";
+gisportal.userPermissions.domainName = gisportal.utils.getURLParameter('domain') || "pmpc1310_npm_ac_uk";

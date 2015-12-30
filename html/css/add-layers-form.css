@@ -128,6 +128,13 @@
    padding-top: 5px;
 }
 
+.scale-points-div .icon-btn {
+   font-size: 22px;
+   line-height: 1px;
+   color:#111111;
+   padding-top: 5px;
+}
+
 .right-icon {
    float:right;
 }
@@ -200,6 +207,7 @@ span[data-field="Rotation"]{
 
 div.scalebar-preview img{
   max-width:100%;
+  padding-bottom:2px;
 }
 
 div.scalebar-preview{

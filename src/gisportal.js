@@ -520,7 +520,7 @@ gisportal.loadState = function(state) {
    var available_keys = [];
 
    for(key in keys){
-      if (gisportal.layers[keys[key]] && (gisportal.userPermissions.admin_clearance || gisportal.layers[keys[key]].owner == gisportal.userPermissions..this_user_info.username)){
+      if (gisportal.layers[keys[key]]){
          available_keys.push(keys[key]);
       }
    }

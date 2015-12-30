@@ -18,8 +18,11 @@
 
       <div class="clearfix legend-settings">
 
-         <label data-field="scalePoints" class="hidden">Scale Points?</label>
-         <input class="hidden" type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/></br>
+         <div class="scale-points-div hidden">
+            <label data-field="scalePoints" >Scale Points?</label>
+            <input type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/>
+            {{#if_equals list_id "1"}}<span title="Add Scale Points to all" class="scale-to-all-layers icon-clipboard-edit btn icon-btn"></span>{{/if_equals}}</br>
+         </div>
 
          <label data-field="URL">Scalebar Custom URL:</label>
          <input type="text" data-field="URL" value="{{URL}}" data-id="{{list_id}}"/></br>
