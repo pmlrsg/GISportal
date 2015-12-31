@@ -272,7 +272,6 @@ def get_cache():
             os.makedirs(user_cache_path)  #if the user_cache path does not exist it is created.
 
          for filename in os.listdir(user_cache_path): # Loops through all of the files in the cache folder
-            print filename
             file_path = os.path.join(user_cache_path, filename)
             if os.path.isfile(file_path):
                with open(file_path, 'r+') as layer_file:
@@ -309,8 +308,6 @@ def add_user_layer():
          data = json.load(data_file) # Extracts the data from the global cache file
 
       new_data = []
-      print len(layers_list)
-      print len(data['server'][server_info['unique_name']])
 
       for new_layer in layers_list: #Loops through each new layer (user provided)
          this_new_layer = layers_list[new_layer]
@@ -369,10 +366,14 @@ WMS Layer Load
 def load_new_wms_layer():
    url = request.args.get('url') # Gets the given URL.
    refresh = request.args.get('refresh') # Gets the given refresh boolean.
-   return createCache(url + "?", refresh)
+   username = request.args.get('username') # Gets the given username.
+   permission = request.args.get('permission') # Gets the given permission.
+   domain = request.args.get('domain') # Gets the given domain.
+
+   return createCache(url + "?", refresh, username, permission, domain)
 
 # This method creates the cache and adds it to the global_cache folder
-def createCache(url, refresh):
+def createCache(url, refresh, username, permission, domain):
    sub_master_cache = {}
    sub_master_cache['server'] = {}
    clean_url = replaceAll(url, {'http://': '', 'https://': '', '/': '-', '?': ''})
@@ -682,7 +683,7 @@ def update_layer():
          base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
          continue
 
-   path = os.path.join(base_path, filename + FILEEXTENSIONJSON)
+   path = os.path.join(base_path, data['serverName'] + FILEEXTENSIONJSON)
    saveFile(path, json.dumps(data))
 
    return ""

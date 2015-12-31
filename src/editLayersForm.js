@@ -37,7 +37,7 @@ gisportal.editLayersForm.produceServerList = function(){
       var provider;
       var serverName
       serverName = this_layer.serverName;
-      provider = this_layer.providerTag;
+      provider = this_layer.tags.data_provider || this_layer.providerTag;
       timeStamp = this_layer.timeStamp;
       wms_url = this_layer.wmsURL;
       owner = this_layer.owner;
@@ -161,6 +161,7 @@ gisportal.editLayersForm.addListeners = function(){
       var domain = gisportal.userPermissions.domainName
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
+         this_span.toggleClass('green-spin', false);
          this_span.notify("Feature currently unavailable.", {position:"left"});
          return;
          //var cache_url = 'cache/' + domain + "/" ;
@@ -183,7 +184,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-option-base .yes', function() {
                   var url = global_data.wmsURL.replace("?", "");
-                  refresh_url = '/service/load_new_wms_layer?url='+url+'&refresh=true';
+                  refresh_url = '/service/load_new_wms_layer?url='+url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
