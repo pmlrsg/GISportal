@@ -207,7 +207,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }
    else{
       $.ajax({
-         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor,
+         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor + '&domain=' + gisportal.userPermissions.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)

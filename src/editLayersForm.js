@@ -162,13 +162,25 @@ gisportal.editLayersForm.addListeners = function(){
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          this_span.toggleClass('green-spin', false);
-         this_span.notify("Feature currently unavailable.", {position:"left"});
+         //this_span.notify("Feature currently unavailable.", {position:"left"});
+         var wms_url = $(this).data("wms");
+         refresh_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+         $.ajax({
+            url:  refresh_url,
+            dataType: 'json',
+            success: function(new_global_data){
+               console.log("Success!!")
+               gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain, url);
+            },
+            error: function(e){
+               this_span.toggleClass('green-spin', false);
+               this_span.notify("Refresh Failed", {position:"left", className:"error"});
+            }
+         });
          return;
-         //var cache_url = 'cache/' + domain + "/" ;
-      }else{
-         var cache_url = 'cache/temporary_cache/';
       }
-      cache_url += url+".json?_="+ new Date().getMilliseconds()
+      var cache_url = 'cache/' + gisportal.userPermissions.domainName + '/temporary_cache/';
+      cache_url += url+".json?_="+ new Date().getMilliseconds();
       $.ajax({
          url:  cache_url,
          dataType: 'json',
@@ -178,18 +190,18 @@ gisportal.editLayersForm.addListeners = function(){
                this_span.notify({'title':"Would you like to refresh the cache?", "yes-text":"Yes", "no-text":"No"},{style:"option", autoHide:false, clickToHide: false});
                 //listen for click events from this style
                $(document).one('click', '.notifyjs-option-base .no', function() {
-                  gisportal.editLayersForm.refreshOldData(global_data, this_span, user);
+                  gisportal.editLayersForm.refreshOldData(global_data, this_span, user, domain);
                   //programmatically trigger propogating hide event
                   $(this).trigger('notify-hide');
                });
                $(document).one('click', '.notifyjs-option-base .yes', function() {
-                  var url = global_data.wmsURL.replace("?", "");
-                  refresh_url = '/service/load_new_wms_layer?url='+url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+                  var wms_url = global_data.wmsURL.replace("?", "");
+                  refresh_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
                      success: function(new_global_data){
-                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user);
+                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain);
                      },
                      error: function(e){
                         this_span.toggleClass('green-spin', false);
@@ -201,7 +213,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                
             }else{
-               gisportal.editLayersForm.refreshOldData(global_data, this_span, user);
+               gisportal.editLayersForm.refreshOldData(global_data, this_span, user, domain);
             }
          },
          error: function(e){
@@ -222,12 +234,15 @@ gisportal.editLayersForm.addListeners = function(){
 * @param jQuery Object span - The selector of the refresh span button.
 * @param jQuery String user - The owner of the cache.
 */
-gisportal.editLayersForm.refreshOldData = function(new_data, span, user){
-   var wms_url = new_data.wmsURL;
-
+gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain, wms_url){
+   var wms_url = wms_url || new_data.wmsURL;
    var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
 
-   var ajax_url = 'cache/' + gisportal.userPermissions.domainName + "/user_" + user + "/" +clean_wms_url+".json?_="+ new Date().getMilliseconds()
+   var ajax_url = 'cache/' + gisportal.userPermissions.domainName + "/";
+   if(user != domain){
+      ajax_url += "user_" + user + "/";
+   }
+   ajax_url += clean_wms_url+".json?_="+ new Date().getMilliseconds();
    $.ajax({
       url:  ajax_url, // The user cache is the retrieved to be compared with the new data.
       dataType: 'json',

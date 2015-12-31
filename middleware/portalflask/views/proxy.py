@@ -14,7 +14,6 @@ import calendar
 
 CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
-SERVERCACHEPATH = "../../../html/cache/temporary_cache"
 USERCACHEPREFIX = "user_" #DO NOT CHANGE YET, USE CONFIG IN THE END!
 MASTERCACHEPATH = "../../../html/cache"
 BASEUSERCACHEPATH = MASTERCACHEPATH +"/" + USERCACHEPREFIX
@@ -210,6 +209,7 @@ def add_wcs_url():
    filename = request.args.get('filename')
    name = request.args.get('name')
    sensor = request.args.get('sensor')
+   domain = request.args.get('domain')
 
    wcs_url = url + "?service=WCS&version=1.0.0&request=GetCapabilities"
 
@@ -222,7 +222,7 @@ def add_wcs_url():
 
    if content_type == 'application/xml' or content_type == 'text/xml':
       try:
-         path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename + FILEEXTENSIONJSON)
+         path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, "temporary_cache", filename + FILEEXTENSIONJSON)
          with open(path, 'r+') as data_file:
             data = json.load(data_file)
             index = 0
@@ -298,13 +298,18 @@ def add_user_layer():
 
       filename = server_info['server_name'] + FILEEXTENSIONJSON
       if domain == username:
-         cache_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, filename)
+         cache_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
          save_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, filename)
       else:
-         cache_path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
+         cache_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, "temporary_cache")
          save_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username, filename)
 
-      with open(cache_path, 'r+') as data_file:
+      if not os.path.exists(cache_path):
+         os.makedirs(cache_path) # If the global_cache folder does not already exist it is created.
+
+      cache_file = os.path.join(cache_path, filename)
+
+      with open(cache_file, 'r+') as data_file:
          data = json.load(data_file) # Extracts the data from the global cache file
 
       new_data = []
@@ -364,7 +369,7 @@ WMS Layer Load
 """
 @portal_proxy.route('/load_new_wms_layer')
 def load_new_wms_layer():
-   url = request.args.get('url') # Gets the given URL.
+   url = request.args.get('url').replace("?", "") # Gets the given URL.
    refresh = request.args.get('refresh') # Gets the given refresh boolean.
    username = request.args.get('username') # Gets the given username.
    permission = request.args.get('permission') # Gets the given permission.
@@ -381,12 +386,13 @@ def createCache(url, refresh, username, permission, domain):
    address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
-   directory = os.path.join(CURRENT_PATH, SERVERCACHEPATH)
+   directory = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
+   if not username == domain:
+      directory = os.path.join(directory, "temporary_cache")
    if not os.path.exists(directory):
       os.makedirs(directory) # If the global_cache folder does not already exist it is created.
    path = os.path.join(directory, filename)
    if not os.path.isfile(path) or refresh == "true": # As long as the file does not exist or is to be refreshed the cache will be created.
-      
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
       root = ET.parse(doc).getroot()# Gets the XML root from the url.
 
@@ -486,7 +492,6 @@ def createCache(url, refresh, username, permission, domain):
          sub_master_cache['provider'] = provider.replace('&amp;', '&')
          sub_master_cache['timeStamp'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
          
-         path = os.path.join(CURRENT_PATH, SERVERCACHEPATH, filename)
          data = json.dumps(sub_master_cache)
          saveFile(path, data)
          return data         
@@ -676,12 +681,17 @@ def update_layer():
 
    data = json.loads(request.form['data'])
    filename =  data['serverName']
+   print
+   print
+   print "server:"
+   print data
+   print "username:"
+   print username
 
-   base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username)
-   for filename in os.listdir(os.path.join(CURRENT_PATH, MASTERCACHEPATH)):
-      if filename == username:
-         base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
-         continue
+
+   base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
+   if not username == domain:
+      base_path = os.path.join(base_path, USERCACHEPREFIX + username)
 
    path = os.path.join(base_path, data['serverName'] + FILEEXTENSIONJSON)
    saveFile(path, json.dumps(data))
