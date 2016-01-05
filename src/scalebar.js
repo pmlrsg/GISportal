@@ -287,3 +287,7 @@ gisportal.scalebars.scalebarImageError = function(layer_id){
    $("li[data-id=" + layer_id + "] div.scalebar-tab").addClass("alert-danger");
    $("li[data-id=" + layer_id + "] div.scalebar-linear").html("There was an error loading the scalebar from <a href='" + gisportal.layers[layer_id].legend + "'>this URL</a>");
 };
+
+gisportal.scalebars.scalebarImageSuccess = function(layer_id){
+   $("li[data-id=" + layer_id + "] div.scalebar-tab").toggleClass("alert-danger", false);
+};

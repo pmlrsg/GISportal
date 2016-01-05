@@ -386,13 +386,12 @@ def createCache(url, refresh, username, permission, domain):
    address = ""
 
    filename = clean_url + FILEEXTENSIONJSON
-   directory = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
-   if not username == domain:
-      directory = os.path.join(directory, "temporary_cache")
+   directory = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, "temporary_cache")
    if not os.path.exists(directory):
       os.makedirs(directory) # If the global_cache folder does not already exist it is created.
    path = os.path.join(directory, filename)
    if not os.path.isfile(path) or refresh == "true": # As long as the file does not exist or is to be refreshed the cache will be created.
+      print url
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
       root = ET.parse(doc).getroot()# Gets the XML root from the url.
 
@@ -446,7 +445,7 @@ def createCache(url, refresh, username, permission, domain):
       for parent_layer in root.findall('./%sCapability/%sLayer' % (WMS_NAMESPACE, WMS_NAMESPACE)): # Loops through each highest level layer tag in the WMS
          layers = []
          name = None
-         sensor_name = None
+         service_title = None
          title = None
          abstract = None
          bounding_boxes = None
@@ -463,8 +462,8 @@ def createCache(url, refresh, username, permission, domain):
 
          # As long as each element exists it is added to the corresponding variable. 
          if ET.iselement(title_elem):
-            sensor_name = title_elem.text
-            sensor_name = replaceAll(sensor_name, {' ':'_', '(':'_', ')':'_', '/':'_'})
+            service_title = title_elem.text
+            service_title = replaceAll(service_title, {' ':'_', '(':'_', ')':'_', '/':'_'})
 
          if ET.iselement(abstract_elem):
             if len(abstract_elem.text) > 0:
@@ -482,9 +481,9 @@ def createCache(url, refresh, username, permission, domain):
 
 
          # Passes the information to the digForLayers function.
-         digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
+         digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
       if len(layers) > 0: # As long as layers have been found it adds all of the info to the json cache file
-         sub_master_cache['server'][sensor_name] = layers
+         sub_master_cache['server']["Layers"] = layers
          sub_master_cache['options'] = {"providerShortTag": "UserDefinedLayer"}
          sub_master_cache['wmsURL'] = url
          sub_master_cache['serverName'] = clean_url
@@ -595,7 +594,7 @@ def createStylesArray(layer):
    return styles
 
 # This function is used to scrape an XML file to exract all of the layers. It is a self calling method and keeps running until it finds a layer that is compatible with the portal.
-def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider):
+def digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider):
    # This loops through layers that are inside other layer tags.
    for layer in parent_layer.findall('.%sLayer' % (WMS_NAMESPACE)):
       # Gets the tags that are needed.
@@ -630,8 +629,8 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
             style = styles_list
         
       # If all of the required elements have been found then the layer is added to the layers list.
-      if name and sensor_name and title and bounding_boxes and style:
-         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ sensor_name.replace("_", " ")],"niceName": title.title(), "data_provider" : provider}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
+      if name and service_title and title and bounding_boxes and style:
+         layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace("_", " ")],"niceName": title.title(), "data_provider" : provider}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
          layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
          clean_server_name = clean_url
          
@@ -641,7 +640,7 @@ def digForLayers(parent_layer, name, sensor_name, title, abstract, bounding_boxe
       else: # Otherwise the function will run again (dig down one more layer).
             # Variables are passed on because some apply to multiple layers and therefore can be stored in parental tags.
             # Some information about the parent tag is also useful so this is one simple way to save it.
-         digForLayers(layer, name, sensor_name, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
+         digForLayers(layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider)
 
 """
 Moves the given server's cache to the deleted folder.
@@ -681,12 +680,6 @@ def update_layer():
 
    data = json.loads(request.form['data'])
    filename =  data['serverName']
-   print
-   print
-   print "server:"
-   print data
-   print "username:"
-   print username
 
 
    base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)

@@ -161,8 +161,6 @@ gisportal.editLayersForm.addListeners = function(){
       var domain = gisportal.userPermissions.domainName
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
-         this_span.toggleClass('green-spin', false);
-         //this_span.notify("Feature currently unavailable.", {position:"left"});
          var wms_url = $(this).data("wms");
          refresh_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
          $.ajax({
@@ -258,23 +256,27 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          for(user_layer in user_data['server'][server]){
             var found = false;
             // Loop through the new data and update the information of the matching layer.
-            for(new_layer in new_data['server'][server]){
-               if(user_data['server'][server][user_layer]['Name'] == new_data['server'][server][new_layer]['Name']){
-                  new_data['server'][server][new_layer]['Abstract'] = user_data['server'][server][user_layer]['Abstract'];
-                  new_data['server'][server][new_layer]['Title'] = user_data['server'][server][user_layer]['Title'];
-                  new_data['server'][server][new_layer]['tags'] = user_data['server'][server][user_layer]['tags'];
-                  new_data['server'][server][new_layer]['LegendSettings'] = user_data['server'][server][user_layer]['LegendSettings'];
+            var new_server = _.keys(new_data['server'])[0]
+            for(new_layer in new_data['server'][new_server]){
+               if(user_data['server'][server][user_layer]['Name'] == new_data['server'][new_server][new_layer]['Name']){
+                  new_data['server'][new_server][new_layer]['Abstract'] = user_data['server'][server][user_layer]['Abstract'];
+                  new_data['server'][new_server][new_layer]['Title'] = user_data['server'][server][user_layer]['Title'];
+                  new_data['server'][new_server][new_layer]['tags'] = user_data['server'][server][user_layer]['tags'];
+                  new_data['server'][new_server][new_layer]['LegendSettings'] = user_data['server'][server][user_layer]['LegendSettings'];
+                  new_data['server'][new_server][new_layer]['ProviderDetails'] = user_data['server'][server][user_layer]['ProviderDetails'] || undefined;
+                  // The provider is saved so that it can be out into the provider variable.
+                  var provider = user_data['server'][server][user_layer]['tags']['data_provider'];
                   found = true;
-               }else if(new_layers.indexOf(new_data['server'][server][new_layer]['Name']) == -1){
+               }else if(new_layers.indexOf(new_data['server'][new_server][new_layer]['Name']) == -1){
                   // for layers that don't match, loop back through the user data to check that there are no layers that are new to the server.
                   var missing = true;
                   for(second_user_layer in user_data['server'][server]){
-                     if(user_data['server'][server][second_user_layer]['Name'] == new_data['server'][server][new_layer]['Name']){
+                     if(user_data['server'][server][second_user_layer]['Name'] == new_data['server'][new_server][new_layer]['Name']){
                         missing = false;
                      }
                   }
                   if(missing){
-                     new_layers.push(new_data['server'][server][new_layer]['Name']);
+                     new_layers.push(new_data['server'][new_server][new_layer]['Name']);
                   }
                }
             }
@@ -284,8 +286,11 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
             }
          }
          // The new data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info.
+         // If present the wcsURL is also added.
          new_data['options'] = user_data['options'];
          new_data['contactInfo'] = user_data['contactInfo'];
+         new_data['wcsURL'] = user_data['wcsURL'] || undefined;
+         new_data['provider']= provider || user_data['options']['providerShortTag'];
          var user_info = gisportal.userPermissions.this_user_info;
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
