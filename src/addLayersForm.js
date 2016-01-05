@@ -81,7 +81,8 @@ gisportal.addLayersForm.addlayerToList = function(layer){
       "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model_name":model_name}, //ensures that these tags are displayed on the form
       "include":true,
       "styles_file":styles_file,
-      "legendSettings":legendSettings
+      "legendSettings":legendSettings,
+      "title":layer.serverName
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -579,7 +580,13 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          url:  layer.styles_file,
          dataType: 'json',
          success: function( data ){
-            gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[0].LegendURL;
+            var style_index = 0;
+            for(style in data.Styles){
+               if(data.Styles[style].Name == 'boxfill/rainbow'){
+                  style_index = style;
+               }
+            }
+            gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
             gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
          }
       });

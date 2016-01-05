@@ -1,5 +1,5 @@
 <div class="form-header">
-   {{unique_name}}
+   {{server_name}}
    <span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
 </div>
 <div class="js-server-form-validation form-validation-div alert-danger hidden"></div>
