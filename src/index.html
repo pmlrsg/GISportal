@@ -95,13 +95,12 @@
    
    <!-- The start page,
          this should load before anything else. -->
-    <div class="start overlay js-start-container"></div>
+   <div class="start overlay js-start-container"></div>
 
 
-    <div class="browse-not-compatible  overlay js-browse-not-compatible">
+   <div class="browse-not-compatible  overlay js-browse-not-compatible">
       <h3>Browser out of date</h3>
-      <p>We have detected that your Internet browser does not
-      have the requirements needed to run the portal. Please update to a newer version.</p>
+      <p>We have detected that your Internet browser does not have the requirements needed to run the portal. Please update to a newer version.</p>
     </div>
 
    <!-- JavaScript check -->
@@ -136,6 +135,9 @@
          <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
          
          <div class="pull-right">
+            <div data-panel-name="collaboration" class="js-show-panel tab hidden">
+               <span  class="icon-connection-2"></span>
+            </div>
             <div data-panel-name="map-settings" class="js-show-panel tab ">
                <span  class="icon-map-1" title="Display settings"></span>
             </div>
@@ -143,7 +145,7 @@
                <span  class="icon-briefcase" title="Stored graphs"></span>
             </div>
             <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
-        </div>
+         </div>
       </div>
        
        
@@ -160,7 +162,7 @@
             </li>
             <li>
                <div class="panel-tab no-gap active full-height">
-                  <input type="text" placeholder="Search for an indicator" class="js-search search">
+                  <input type="text" id="search" placeholder="Search for an indicator" class="js-search search">
                   <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
                </div>
             </li>
@@ -179,90 +181,99 @@
 
             <button class="js-reset-options hidden text-button" title="Reset">Reset</button>
             <button class="text-button js-refine-configure">Cancel</button>
-        </div>
+         </div>
       </div>
       
       
       <!-- View the active indicators  -->
       <div id="indicatorsPanel" data-panel-name="active-layers" class="panel-container">
-         <ul class="js-indicators indicator-list grid-list">
-         </ul>
+         <ul class="js-indicators indicator-list grid-list"></ul>
       </div>
       
-      <div id="mapSettingsPanel" data-panel-name="map-settings" class="panel-container">
-         <div class="panel-container-solid-backdrop js-map-options">
+      <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
+         <div class="panel-container-solid-backdrop">
             
+            <!-- <div id="gSignInWrapper">
+               <div id="gSignInButtonHolder">
+                  <a href="javascript:void(0)" class="js-google-auth-button"><img src="img/sign-in-with-google.png" width="200" /></a>
+               </div>
+            </div> -->
+
+            <div class="js-collaboration-holder"></div>
          </div>
       </div>
 
+      <div id="mapSettingsPanel" data-panel-name="map-settings" class="panel-container">
+         <div class="panel-container-solid-backdrop js-map-options"></div>
+      </div>
+
       <div id="historyPanel" data-panel-name="history" class="panel-container" >
-        <div class="panel-container-solid-backdrop" style="display: none;">
-          <h3>Saved States</h3>
-          <div class="js-states-saved-list"></div>
-        </div>
-        <div class="panel-container-solid-backdrop" >
-          <h3>Stored Graphs</h3>
-          <div>
-            <div class="js-graphs-saved-list" ></div>
-            <div class="js-graphs-history-list" ></div>
-          </div>
-        </div>
+         <div class="panel-container-solid-backdrop" style="display: none;">
+            <h3>Saved States</h3>
+            <div class="js-states-saved-list"></div>
+         </div>
+         <div class="panel-container-solid-backdrop" >
+            <h3>Stored Graphs</h3>
+            <div>
+               <div class="js-graphs-saved-list" ></div>
+               <div class="js-graphs-history-list" ></div>
+            </div>
+         </div>
       </div>
       
 
       <div class="panel-footer">
-          <label for="about"></label>
-           <a href="/" alt="link to about page" target="_blank">
+         <label for="about"></label>
+         <a href="/" alt="link to about page" target="_blank">
             <button id="about" class="about-button  brand secondary">
-            <span class="icon-btn"> </span>
-              About
-          </button>
-        </a>
-           <label for="share-map"></label>
-           <button id="share-map" class="js-share brand secondary">
+               <span class="icon-btn"> </span>
+               About
+             </button>
+         </a>
+         <label for="share-map"></label>
+         <button id="share-map" class="js-share brand secondary">
             <span class="icon-filled-link icon-btn"> </span>
-              Share
-          </button>
+            Share
+         </button>
       </div>
 
 
       <div class="panel-slideout js-active-plot-slideout active-plot-slideout" data-slideout-name="active-plot" data-slideout-override-action="peak">
-        <div class="slideout-pulltab js-slideout-toggle-peak"></div>
-        <div class="panel-slideout-content-wrapper">
-          <div class=" panel-slideout-content js-slideout-content"></div>
-        </div>
+         <div class="slideout-pulltab js-slideout-toggle-peak"></div>
+         <div class="panel-slideout-content-wrapper">
+            <div class=" panel-slideout-content js-slideout-content"></div>
+         </div>
       </div>
 
 
       <div class="panel-slideout js-export-raw-slideout" data-slideout-name="export-raw" data-slideout-override-action="hide">
-        <div class="panel-slideout-content-wrapper">
-          <div class=" panel-slideout-content js-slideout-content">
-          </div>
-        </div>
+         <div class="panel-slideout-content-wrapper">
+            <div class=" panel-slideout-content js-slideout-content"></div>
+         </div>
       </div>
 
       <!-- Slideout metadata -->
       <div class="panel-slideout" data-slideout-name="metadata" data-slideout-override-action="hide">
-        <div class="panel-slideout-content-wrapper">
-          <div class="panel-slideout-content js-slideout-content">
-            <!-- Slideout contents should go here -->
-            <div class="metadata-slideout">
-            <div class="slideout-header">
-              More Information
-              <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
+         <div class="panel-slideout-content-wrapper">
+            <div class="panel-slideout-content js-slideout-content">
+               <!-- Slideout contents should go here -->
+               <div class="metadata-slideout">
+                  <div class="slideout-header">
+                    More Information
+                    <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close panel-icon-tab right-icon js-close-extrainfo"></span>
 
+                  </div>
+               
+                  <div class="metadata-box metadata_indicator"></div>
+                  <div class="metadata-box metadata_provider"></div>
+               </div>
             </div>
-            
-              <div class="metadata-box metadata_indicator"></div>
-              <div class="metadata-box metadata_provider"></div>
-            </div>
-          </div>
-        </div>
+         </div>
       </div>
    </div>
    
    <!-- The share box. -->
-    <div class="share overlay hidden">
+   <div class="share overlay hidden">
       <div class="share-container overlay-container">
          <button class="js-close-share text-button">Close</button>
          <div class="js-logged-in hidden"></div>
@@ -273,10 +284,15 @@
          </div>
          <div class="js-logged-out hidden"></div>
       </div>
-    </div>
+   </div>
 
+   <div class="overlay js-collaboration-popup hidden">
+      <div class="overlay-container">
+         <h2>You are now the presenter</h2>
+      </div>
+   </div>
 
-    <div class="js-tac-popup overlay hidden dark-background">
+   <div class="js-tac-popup overlay hidden dark-background">
       <div class=" tac-container">
         <div class="js-tac-content"></div>
         <div class="tac-container-bottom">
@@ -301,22 +317,16 @@
       <div class="overlay-container js-user-feedback-html"></div>
    </div>
 
-
-    <!-- Map controls 
-    <div class="map_controls">
-      <span class="icon-zoom-in btn" id="mapZoomIn"></span>
-      <span class="icon-zoom-out btn" id="mapZoomOut"></span>
-    </div>-->
    <div class="global-loading-icon">
    </div>
 
    <div class="helpBox">
-    <script>
+   <script>
       // Include the UserVoice JavaScript SDK (only needed once on a page)
       UserVoice=window.UserVoice||[];(function(){var uv=document.createElement('script');uv.type='text/javascript';uv.async=true;uv.src='//widget.uservoice.com/Z20UXBXjq9ai4OIbESw8Hg.js';var s=document.getElementsByTagName('script')[0];s.parentNode.insertBefore(uv,s)})();
-
-
-      </script>
+   </script>
+   <div id="sb">
+      <audio src="img/s.mp3" preload="auto"></audio>
    </div>
 </body>
 </html>

@@ -360,6 +360,11 @@ gisportal.mapInit = function() {
          gisportal.getPointReading(e);
       }
    })
+   map.on("moveend", function(data) {
+      var centre = data.map.getView().getCenter();
+      var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
+      gisportal.events.trigger('map.move', centre, zoom);
+   });
    
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
@@ -401,7 +406,7 @@ gisportal.nonLayerDependent = function() {
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
-      selectedDate: new Date("2006-06-05T00:00:00Z"),
+      selectedDate: new Date("2015-06-05T00:00:00Z"),
       chartMargins: {
          top: 7,
          right: 0,
@@ -736,6 +741,16 @@ gisportal.main = function() {
       else {
          console.log('Loading Default State...');
       }
+
+      // if collaboration features are enabled, switch 'em on...
+      if (collaboration.enabled) {
+         collaboration.initDOM();
+      }
+      // Replaces all .icon-svg with actual SVG elements,
+      // so that they can be styled with CSS
+      // which cannot be done with SVG in background-image
+      // or <img>
+      
    });
 };
 

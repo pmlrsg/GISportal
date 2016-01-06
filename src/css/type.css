@@ -18,10 +18,19 @@ h3  {
    font-weight: 600;
 }
 
+h4  {
+   font-size: 14px;
+   font-size: 0.875rem; /* 14/16=0.875 */
+   font-weight: 600;
+}
+
+.bold { font-weight: 600; }
+
 /* Start Screen */
 
 .intro-text,
 .share-container h2,
+.overlay-container h2,
 .export-container h2  {
    color: #f7f6f8;
    font-size: 20px;

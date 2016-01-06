@@ -92,109 +92,21 @@ gisportal.map_settings.init = function() {
       $('#select-basemap').ddslick('select', { value: "EOX" })
    }
 
-   // NEEDS TO UPDATED FOR COLLABORATION
-   //  // set an action for the base map select changing
-   // $('#select-basemap').change(function() {
-   // 	gisportal.selectBaseLayer($('#select-basemap').val())
-   //    gisportal.indicatorsPanel.reorderLayers();
-   // 	gisportal.events.trigger('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
-   // });
-
    // set the default value if one exists in config.js
    if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
       $('#select-country-borders').ddslick('select', { value: gisportal.config.countryBorder.defaultLayer });
       gisportal.selectCountryBorderLayer(gisportal.config.countryBorder.defaultLayer);
    };
 
-   // NEEDS TO UPDATED FOR COLLABORATION
-   //   // set an action for the country borders select changing
-   //   $('#select-country-borders').change(function() {
-	// 	gisportal.selectCountryBorderLayer($('#select-country-borders').val());
-	// 	gisportal.events.trigger('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
-	// });
-
    if (typeof gisportal.config.showGraticules != 'undefined' && gisportal.config.showGraticules) {
       $('#select-graticules').ddslick('select', { value: "On" });
    }
 
-   // NEEDS TO UPDATED FOR COLLABORATION
-   // // set an action for the graticules select changing
-   // $('#select-graticules').change(function() {
-   //    gisportal.setGraticuleVisibility($(this).val());
-   //    gisportal.events.trigger('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
-   // });
-
-   // WMS URL event handler
-   $('button.js-wms-url').on('click', function(e)  {
-      e.preventDefault();
-      if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
-         gisportal.wms_submitted = true;
-         // Gets the URL and refresh_cache boolean
-         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
-         gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
-
-         error_div = $("#wms-url-message");
-         // The URL goes through some simple validation before being sent
-         if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
-            error_div.toggleClass('hidden', false);
-            error_div.html("The URL must start with 'http://'' or 'https://'");
-            $('#refresh-cache-div').toggleClass('hidden', true);
-            gisportal.wms_submitted = false;
-         }else{
-            // If it passes the error div is hidden and the autoLayer functions are run using the given parameters
-            $('input.js-wms-url').val("");
-            $('#refresh-cache-message').toggleClass('hidden', true);
-            $('#refresh-cache-div').toggleClass('hidden', true);
-            error_div.toggleClass('hidden', true);
-            gisportal.autoLayer.TriedToAddLayer = false;
-            gisportal.autoLayer.loadGivenLayer();
-            gisportal.panels.showPanel('choose-indicator');
-            gisportal.addLayersForm.layers_list = {};
-            gisportal.addLayersForm.server_info = {};
-            // The wms_url is stored in the form_info dict so that it can be loaded the next time the page is loaded
-            gisportal.addLayersForm.form_info = {"wms_url":gisportal.autoLayer.given_wms_url};
-            gisportal.addLayersForm.refreshStorageInfo();
-         }
-      }
-   });
-
-   // WMS URL event handler for refresh cache checkbox
-   $('input.js-wms-url').on('change', function(e)  {
-      gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var input_value = $('input.js-wms-url')[0].value
-      if(input_value.length > 0){
-         var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
-         // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
-         $.ajax({
-            url:  'cache/' + gisportal.userPermissions.domainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
-            dataType: 'json',
-            success: function(layer){
-               if(!gisportal.wms_submitted){
-                  $('#refresh-cache-message').toggleClass('hidden', false);
-                  if(layer.timeStamp){
-                     $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
-                  }
-                  if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
-                     $('#refresh-cache-div').toggleClass('hidden', false);
-                  }else{
-                     $('#refresh-cache-div').toggleClass('hidden', true);
-                  }
-               }
-            },
-            error: function(e){
-               $('#refresh-cache-message').toggleClass('hidden', true);
-               $('#refresh-cache-div').toggleClass('hidden', true);
-            }
-         });
-      }else{
-         $('#refresh-cache-message').toggleClass('hidden', true);
-         $('#refresh-cache-div').toggleClass('hidden', true);
-      }
-   });
-
 };
 
 gisportal.setGraticuleVisibility = function(setTo) {
+   gisportal.events.trigger('map-setting.graticules', setTo);
+   
    if (setTo == 'On') {
       graticule_control.setMap(map);
    } else {
@@ -281,7 +193,7 @@ gisportal.setCountryBordersToTopLayer = function() {
 }
 
 gisportal.selectCountryBorderLayer = function(id) {
-   // // first remove all other country layers that might be on the map
+   // first remove all other country layers that might be on the map
    for (var prop in gisportal.countryBorderLayers) {
       try {
          map.removeLayer(gisportal.countryBorderLayers[prop])   
@@ -480,6 +392,8 @@ gisportal.createBaseLayers = function() {
 };
 
 gisportal.selectBaseLayer = function(id) {
+   gisportal.events.trigger('map-setting.basemap-change', id);
+
    // take off all the base maps
    for (var prop in gisportal.baseLayers) {
       try {
