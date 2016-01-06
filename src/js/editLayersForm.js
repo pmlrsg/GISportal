@@ -3,8 +3,6 @@ gisportal.editLayersForm.server_list = [];
 
 
 gisportal.editLayersForm.addSeverTable = function(){
-   gisportal.original_layers = {};
-   gisportal.layers = {};
    // loadLayers() is run so that gisportal.layers is refreshed and will include any changed layers.
    gisportal.refresh_server = true;
    gisportal.loadLayers();
@@ -143,7 +141,18 @@ gisportal.editLayersForm.addListeners = function(){
       $.ajax({
          url:  '/service/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          success: function(){
-            gisportal.editLayersForm.addSeverTable();
+            var to_be_deleted = [];
+            for(index in gisportal.selectedLayers){
+                           if(this_span.data('server') == gisportal.layers[gisportal.selectedLayers[index]].serverName){
+                              to_be_deleted.push(gisportal.selectedLayers[index]);
+                           }
+                        }
+            for(id in to_be_deleted){
+               gisportal.indicatorsPanel.removeFromPanel(to_be_deleted[id]);
+            }
+            gisportal.loadLayers();
+            this_span.closest("tr").next().remove();
+            this_span.closest("tr").remove();
             $.notify("Success\nThe server was successfuly removed", "success");
          },
          error: function(){
@@ -156,6 +165,7 @@ gisportal.editLayersForm.addListeners = function(){
    $('span.js-update-server').on('click', function(){
       var this_span = $(this);
       $(this).toggleClass('green-spin', true);
+      $(this).parent("td").parent("tr").toggleClass('alert-warning', true);
       var url = $(this).data("server");
       var user = $(this).data("user");
       var domain = gisportal.userPermissions.domainName
@@ -167,11 +177,13 @@ gisportal.editLayersForm.addListeners = function(){
             url:  refresh_url,
             dataType: 'json',
             success: function(new_global_data){
-               console.log("Success!!")
                gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain, url);
             },
             error: function(e){
                this_span.toggleClass('green-spin', false);
+               this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
+               this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
+               setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
                this_span.notify("Refresh Failed", {position:"left", className:"error"});
             }
          });
@@ -203,6 +215,9 @@ gisportal.editLayersForm.addListeners = function(){
                      },
                      error: function(e){
                         this_span.toggleClass('green-spin', false);
+                        this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
+                        this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
+                        setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
                         this_span.notify("Refresh Failed", {position:"left", className:"error"});
                      }
                   });
@@ -216,6 +231,9 @@ gisportal.editLayersForm.addListeners = function(){
          },
          error: function(e){
             this_span.toggleClass('green-spin', false);
+            this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
+            this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
+            setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
             this_span.notify("Could not find cache file", {position:"left", className:"error"});
          }
       });
@@ -298,9 +316,19 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
             url: '/service/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
-               gisportal.editLayersForm.addSeverTable();
+               span.toggleClass('green-spin', false);
+               span.parent("td").parent("tr").toggleClass('alert-warning', false);
+               span.parent("td").parent("tr").toggleClass('alert-success', true);
+               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-success', false)},2000);
+               // Refreshes the timestamp.
+               span.parent("td").siblings(".time-stamp").html(new_data.timeStamp);
+               // The layers are then refreshed
+               gisportal.loadLayers();
             }, error: function(){
                span.toggleClass('green-spin', false);
+               span.parent("td").parent("tr").toggleClass('alert-warning', false);
+               span.parent("td").parent("tr").toggleClass('alert-danger', true);
+               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
                span.notify("ERROR!", {position:"left", className:"error"});
             }
          });
@@ -308,6 +336,9 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
       },
       error: function(e){
          span.toggleClass('green-spin', false);
+         span.parent("td").parent("tr").toggleClass('alert-warning', false);
+         span.parent("td").parent("tr").toggleClass('alert-danger', true);
+         setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
          span.notify("Could not get internal info", {position:"left", className:"error"});
       }
    });

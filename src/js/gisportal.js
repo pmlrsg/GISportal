@@ -102,6 +102,9 @@ var map;
  * start layer dependent code asynchronously
  */
 gisportal.loadLayers = function() { 
+   // The old layers will be removed from the portal
+   gisportal.original_layers = {};
+   gisportal.layers = {};
     
    //Provider cache
    $.ajax({

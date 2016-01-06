@@ -14,7 +14,7 @@ tr:first-child  {
   border-top: 1px solid #e0dce4;
 }
 
-tr:nth-child(even)  {
+table.stripe tr:nth-child(even)  {
   background-color: #fbfafb;
 }
 

@@ -3,8 +3,8 @@ gisportal.userPermissions = {};
 
 //Temporary variable placement for user info:
 gisportal.userPermissions.user_info = gisportal.config.user_information;
-gisportal.userPermissions.user = prompt("Please enter your username", "Username");
-gisportal.userPermissions.this_user_info = gisportal.userPermissions.user_info[gisportal.userPermissions.user] || gisportal.userPermissions.user_info["guest"];
+gisportal.userPermissions.user = "guest";
+gisportal.userPermissions.this_user_info = gisportal.userPermissions.user_info["guest"];
 
 gisportal.userPermissions.setPermissions = function(level){
    gisportal.userPermissions.admin_clearance = false;
@@ -20,4 +20,11 @@ gisportal.userPermissions.setPermissions = function(level){
    }
 };
 gisportal.userPermissions.setPermissions(gisportal.userPermissions.this_user_info.permission);
-gisportal.userPermissions.domainName = gisportal.utils.getURLParameter('domain') || "pmpc1310_npm_ac_uk";
+gisportal.userPermissions.domainName = window.location.href.replace("http://", "").replace("https://", "").split("?")[0].replace(/\/$/, '').replace(/\./g, "_").replace(/\//g, '_');
+
+gisportal.userPermissions.loginAs = function(username){
+   gisportal.userPermissions.user = username;
+   gisportal.userPermissions.this_user_info = gisportal.userPermissions.user_info[username] || gisportal.userPermissions.user_info["guest"];
+   gisportal.userPermissions.setPermissions(gisportal.userPermissions.this_user_info.permission);
+   gisportal.map_settings.init();
+}

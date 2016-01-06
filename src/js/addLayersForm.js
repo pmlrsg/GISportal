@@ -316,9 +316,6 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   gisportal.addLayersForm.server_info = {};
                   gisportal.addLayersForm.form_info = {};
                   gisportal.addLayersForm.refreshStorageInfo();
-                  // The old layers will be removed from the portal
-                  gisportal.original_layers = {};
-                  gisportal.layers = {};
                   // loadLayers() is run so that gisportal.layers is refreshed and will include the newly added layers.
                   gisportal.loadLayers();
                   // This variable is deleted so that the portal will not load the WMS again.
