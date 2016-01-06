@@ -2,7 +2,23 @@ gisportal.userPermissions = {};
 
 
 //Temporary variable placement for user info:
-gisportal.userPermissions.user_info = gisportal.config.user_information;
+gisportal.userPermissions.user_info ={
+      "admin":{
+         'id':'admin',
+         'username':'admin',
+         'permission':'admin',
+         'forename':'Admin',
+         'surname':'Account'
+      },
+      "guest":{
+         'id':'guest',
+         'username':'guest',
+         'permission':'guest',
+         'forename':'Guest',
+         'surname':'User'
+      }
+   };
+
 gisportal.userPermissions.user = "guest";
 gisportal.userPermissions.this_user_info = gisportal.userPermissions.user_info["guest"];
 
