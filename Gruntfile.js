@@ -32,7 +32,9 @@ var coreFiles = [
     "src/js/autoLayer.js",
     "src/js/addLayersForm.js",
     "src/js/editLayersForm.js",
-    "src/js/userPermissions.js"
+    "src/js/userPermissions.js",
+    "src/js/collaboration.js",
+    "src/js/collaboration-event-bindings.js"
   ];
 
 var cssFiles = [
@@ -66,7 +68,8 @@ var cssFiles = [
     "src/js-libs/tooltipster/css/tooltipster.css",
     "src/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
     "src/css/alerts.css",
-    "src/css/popup.css"
+    "src/css/popup.css",
+    "src/css/collaboration.css"
   ]
 
 function stripDirectory( file ) {
