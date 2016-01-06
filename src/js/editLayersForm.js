@@ -86,6 +86,11 @@ gisportal.editLayersForm.addListeners = function(){
    $('span.js-edit-layers-close').on('click', function() {
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
+      if(gisportal.addLayersForm.form_info.wms_url){
+         gisportal.autoLayer.TriedToAddLayer = false;
+         gisportal.autoLayer.loadGivenLayer();
+         gisportal.panels.showPanel('choose-indicator');
+      }
    });
 
    // This shows or hides the list of laers relating to the server.
