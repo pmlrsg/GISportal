@@ -250,7 +250,7 @@ def get_cache():
    master_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
    for filename in os.listdir(master_path): # Loops through all of the files in the cache folder
       file_path = os.path.join(master_path, filename)
-      if os.path.isfile(file_path) and filename != "providers.json":
+      if os.path.isfile(file_path):
          with open(file_path, 'r+') as layer_file:
             json_data = json.load(layer_file)
             json_data['owner'] = domain

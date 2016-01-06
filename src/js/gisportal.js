@@ -105,16 +105,7 @@ gisportal.loadLayers = function() {
    // The old layers will be removed from the portal
    gisportal.original_layers = {};
    gisportal.layers = {};
-    
-   //Provider cache
-   $.ajax({
-      url:  './cache/providers.json',
-      dataType: 'json',
-      success: function( providers ){
-         gisportal.providers = providers;
-         loadWmsLayers();
-      }
-   });
+   loadWmsLayers();
 
    function loadWmsLayers(){
       // Get WMS cache
