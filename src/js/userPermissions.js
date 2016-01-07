@@ -42,5 +42,8 @@ gisportal.userPermissions.loginAs = function(username){
    gisportal.userPermissions.user = username;
    gisportal.userPermissions.this_user_info = gisportal.userPermissions.user_info[username] || gisportal.userPermissions.user_info["guest"];
    gisportal.userPermissions.setPermissions(gisportal.userPermissions.this_user_info.permission);
+   gisportal.addLayersForm.form_info = {};
+   gisportal.addLayersForm.refreshStorageInfo();
+   gisportal.loadLayers();
    gisportal.map_settings.init();
 }

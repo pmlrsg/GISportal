@@ -251,7 +251,7 @@ def get_cache():
    for filename in os.listdir(master_path): # Loops through all of the files in the cache folder
       file_path = os.path.join(master_path, filename)
       if os.path.isfile(file_path):
-         with open(file_path, 'r+') as layer_file:
+         with open(file_path, 'r') as layer_file:
             json_data = json.load(layer_file)
             json_data['owner'] = domain
             cache.extend([json_data]) # Adds the information in each file to the cache list to be returned.
@@ -274,7 +274,7 @@ def get_cache():
          for filename in os.listdir(user_cache_path): # Loops through all of the files in the cache folder
             file_path = os.path.join(user_cache_path, filename)
             if os.path.isfile(file_path):
-               with open(file_path, 'r+') as layer_file:
+               with open(file_path, 'r') as layer_file:
                   json_data = json.load(layer_file)
                   json_data['owner'] = username
                   cache.extend([json_data]) # Adds the information in each file to the cache list to be returned.
@@ -309,7 +309,7 @@ def add_user_layer():
 
       cache_file = os.path.join(cache_path, filename)
 
-      with open(cache_file, 'r+') as data_file:
+      with open(cache_file, 'r') as data_file:
          data = json.load(data_file) # Extracts the data from the global cache file
 
       new_data = []
