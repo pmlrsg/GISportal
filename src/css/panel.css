@@ -95,10 +95,6 @@
     display: none;
 }
 
-.panel-container .alert-danger, .panel-container .alert-warning, .panel-container .alert-success {
-    margin: 10px -8px;
-    padding: 10px;
-}
 .panel-container.padded{
   padding: 8px;
 }
