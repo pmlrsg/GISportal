@@ -92,37 +92,15 @@ gisportal.map_settings.init = function() {
       $('#select-basemap').ddslick('select', { value: "EOX" })
    }
 
-   // NEEDS TO UPDATED FOR COLLABORATION
-   //  // set an action for the base map select changing
-   // $('#select-basemap').change(function() {
-   // 	gisportal.selectBaseLayer($('#select-basemap').val())
-   //    gisportal.indicatorsPanel.reorderLayers();
-   // 	gisportal.events.trigger('displayoptions.basemap', ['select-basemap', $(this).val(), 'Base map changed to '+ $('#select-basemap option:selected').text() ])
-   // });
-
    // set the default value if one exists in config.js
    if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
       $('#select-country-borders').ddslick('select', { value: gisportal.config.countryBorder.defaultLayer });
       gisportal.selectCountryBorderLayer(gisportal.config.countryBorder.defaultLayer);
    };
 
-   // NEEDS TO UPDATED FOR COLLABORATION
-   //   // set an action for the country borders select changing
-   //   $('#select-country-borders').change(function() {
-	// 	gisportal.selectCountryBorderLayer($('#select-country-borders').val());
-	// 	gisportal.events.trigger('displayoptions.basemap', ['select-country-borders', $(this).val(), 'Country borders set to \''+ $('#select-country-borders option:selected').text() +'\'' ])
-	// });
-
    if (typeof gisportal.config.showGraticules != 'undefined' && gisportal.config.showGraticules) {
       $('#select-graticules').ddslick('select', { value: "On" });
    }
-
-   // NEEDS TO UPDATED FOR COLLABORATION
-   // // set an action for the graticules select changing
-   // $('#select-graticules').change(function() {
-   //    gisportal.setGraticuleVisibility($(this).val());
-   //    gisportal.events.trigger('displayoptions.graticules', ['select-graticules', $(this).val(), 'Lat/Lon Graticules set to \''+ $('#select-graticules option:selected').text() +'\'' ])
-   // });
 
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
@@ -195,6 +173,8 @@ gisportal.map_settings.init = function() {
 };
 
 gisportal.setGraticuleVisibility = function(setTo) {
+   gisportal.events.trigger('map-setting.graticules', setTo);
+   
    if (setTo == 'On') {
       graticule_control.setMap(map);
    } else {
@@ -281,7 +261,7 @@ gisportal.setCountryBordersToTopLayer = function() {
 }
 
 gisportal.selectCountryBorderLayer = function(id) {
-   // // first remove all other country layers that might be on the map
+   // first remove all other country layers that might be on the map
    for (var prop in gisportal.countryBorderLayers) {
       try {
          map.removeLayer(gisportal.countryBorderLayers[prop])   
@@ -480,6 +460,8 @@ gisportal.createBaseLayers = function() {
 };
 
 gisportal.selectBaseLayer = function(id) {
+   gisportal.events.trigger('map-setting.basemap-change', id);
+
    // take off all the base maps
    for (var prop in gisportal.baseLayers) {
       try {

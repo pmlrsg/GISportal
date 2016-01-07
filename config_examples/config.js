@@ -40,9 +40,17 @@ gisportal.config = {
 
    cacheTimeout: 60,                               // Used to specify what time must elapse before the cache can be refreshed by the user
    
+   collaborationFeatures : {
+      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      port : '',                                    // must match the port specified in collaboration/config/config.js
+      path : '',                                    // optional path; must start with a /
+   },
    // Should layers auto scale by default
    autoScale: true,
 
+   requiresTermsAndCondictions: true,
 
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',

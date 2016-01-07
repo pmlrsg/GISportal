@@ -13,5 +13,7 @@ middleware/portalflask/settings.py
 config/*
 .DS_Store
 apache_log
-node_modules
-html/index.html
+collaboration/node_modules
+collaboration/node_modules/*
+collaboration/config/config.json
+nbproject
