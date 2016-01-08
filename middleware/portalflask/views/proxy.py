@@ -654,8 +654,8 @@ def remove_server_cache():
    filename = request.args.get('filename')
    clean_filename = filename + FILEEXTENSIONJSON
    base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, USERCACHEPREFIX + username)
-   for filename in os.listdir(os.path.join(CURRENT_PATH, MASTERCACHEPATH)):
-      if filename == username:
+   for value in os.listdir(os.path.join(CURRENT_PATH, MASTERCACHEPATH)):
+      if value == username:
          base_path = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain)
          continue
    original_path = os.path.join(base_path, clean_filename)
@@ -666,7 +666,7 @@ def remove_server_cache():
       os.makedirs(deleted_cache_path)  #if the user_deleted_cache path does not exist it is created.
 
    os.rename(original_path, new_path)
-   return filename
+   return clean_filename
 
 
 """
