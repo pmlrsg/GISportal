@@ -195,7 +195,10 @@ gisportal.createVectorLayers = function() {
          "vectorType" : vector.vectorType,
          "styles" : vector.styles,
          "defaultProperty" : vector.defaultProperty,
-         "defaultProperties" : vector.defaultProperties
+         "defaultProperties" : vector.defaultProperties,
+         "descriptiveName" : vector.tags.niceName,
+         "unit" : vector.unit,
+         "moreIndicatorInfo" : vector.moreIndicatorInfo
       };
       //console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
@@ -205,7 +208,7 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
 
       //console.log(vectorLayer);
       vectorLayerOL = vectorLayer.createOLLayer();
-      vectorLayer.openlayers['anID'] = vectorLayerOL;
+      //vectorLayer.openlayers['anID'] = vectorLayerOL;
       //console.log(vectorLayerOL);
       gisportal.vlayers.push(vectorLayerOL);
    }
@@ -571,11 +574,11 @@ gisportal.mapInit = function() {
    
    // Get both master cache files from the server. These files tells the server
    // what layers to load for Operation (wms) and Reference (wcs) layers.
-   gisportal.loadVectorLayers();
+   
 
  
    gisportal.loadLayers();
-
+gisportal.loadVectorLayers();
 
    // new load of vector layers
   // Create the base layers, country borders layers and graticules; set defaults

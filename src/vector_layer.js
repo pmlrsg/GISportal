@@ -35,7 +35,9 @@ gisportal.Vector = function(options) {
             })
         }),
         defaultProperty: null,
-        defaultProperties : []
+        defaultProperties : [],
+        unit : null,
+        moreIndicatorInfo : false
     };
 
 
@@ -46,7 +48,7 @@ gisportal.Vector = function(options) {
     //this.styles = [];
 
     this.openlayers = {};
-
+    this.name = this.tags.niceName;
     this.metadataQueue = [];
     this.visibleTab = "details";
     this.currentColour = '';
@@ -66,9 +68,13 @@ gisportal.Vector = function(options) {
 
     this.init = function(options, layer) {
         ////console.log('initialiseing"');
+
         map.addLayer(layer.OLLayer)
+
         this.select();
         this.getMetadata();
+                this.openlayers['anID'] = layer.OLLayer;
+
         //gisportal.indicatorsPanel.selectTab( this.id, 'details' );
         ////console.log('+=+++++++++++++++++++++++++');
         ////console.log(layer.OLLayer.getSource().getFeatures());
@@ -122,6 +128,8 @@ gisportal.Vector = function(options) {
 
     this.unselect = function() {
         var layer = this;
+        console.log("_----------------------------");
+        console.log("should be being called");
         $('#scalebar-' + layer.id).remove();
         layer.selected = false;
         layer.setVisibility(false);
@@ -158,16 +166,24 @@ gisportal.Vector = function(options) {
   
   this.setStyleUI = function(source,prop)  {
   
-      ////console.log("******************************");
-      ////console.log(prop);
+      console.log("******************************");
+      console.log(prop);
       if(!prop){
 
       }
       else {
+
+      //   if('currentProperty' in this){
+      //       console.log('current property found')
+      //   prop = this.currentProperty;
+      // };
+
+
       var _colour;
       if(this.currentColour.length>0){
         _colour = this.currentColour;
       }
+      
       else{
           for(colour in gisportal.vectorStyles.startingColours) {
             if(gisportal.vectorStyles.coloursInUse.indexOf(colour)==-1){
@@ -179,6 +195,9 @@ gisportal.Vector = function(options) {
           }
       } 
       var opts = this.createStyleFromProp(source,prop,_colour)
+      if ("unit" in this) {
+        opts.unit = this.unit;
+      }
       if(this.defaultProperties.length > 0){
         opts['defaultProps'] = true;
         opts['defaultProperties'] = this.defaultProperties;
@@ -190,46 +209,151 @@ gisportal.Vector = function(options) {
       }
    }; 
   
+   this.createStyleFromNumericalProp = function(source,prop,colour) {
+
+   };
+
+
 // gisportal.layers['rsg_MMO_Fish_Shellfish_Cages_A'].setStyleUI(gisportal.layers['rsg_MMO_Fish_Shellfish_Cages_A'].OLLayer.getSource(), 'CATMFA')
   this.createStyleFromProp = function(source,prop,colour){
       var features = source.getFeatures();
       var possibleOptions = [];
       var x = 0;
       var featureCount = features.length;
+      var isNumberProperty = false
       ////console.log(featureCount);
-      for(x;x<featureCount-1;x++) {
+      for(x;x<=featureCount-1;x++) {
         var props = features[x].getProperties();
-        //////console.log(props);
+
         if(!_.contains(possibleOptions, props[prop])){
             ////console.log("adding property value");
             ////console.log(props[this.defaultProperty]);
             possibleOptions.push( props[prop]);
         }
       }
-      ////console.log(possibleOptions);
+      console.log(possibleOptions);
+      var isAllNumeric = function(x) {
+        return !isNaN(x)
+      }
+      isNumberProperty = possibleOptions.every(isAllNumeric);
 
-      var colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
-      ////console.log(colorPalette);
-      var legend = [];
+      if(isNumberProperty) {
+
+        var options_number = possibleOptions.map(function(x) {
+            return (Number(x))//.toFixed(4);
+        })
+        console.log(options_number);
+        var min = Math.min.apply(Math, options_number);
+        var max = Math.max.apply(Math, options_number);
+        var diff = max - min;
+        var bin = Number((diff / (gisportal.vectorStyles.binSize )).toFixed(4));
+        var bins = []
+        for (b = 0; b <= gisportal.vectorStyles.binSize; b++) {
+            bins.push((min + (bin*b)).toFixed(4))
+        }
+        var colorPalette = gisportal.vectorStyles.createPalette(colour, bins.length);
+        isNumberProperty = true;
+
+        var legend = [];
       var legend_obj = {};
       var y = 0;
-      for(y;y<possibleOptions.length  ; y++){
-        legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
-        legend_obj[possibleOptions[y]] = colorPalette[y];
+      for(y, x=bins.length -1; y<bins.length -1  , x> 0; y++, x--){
+        var option = bins[y]+'-'+bins[y+1]
+        legend.push({'option':option,'colour':colorPalette[x]});
+        legend_obj[option] = colorPalette[x];
       }
+      }
+      else{
+           var colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
+          
+          ////console.log(colorPalette);
+          var legend = [];
+          var legend_obj = {};
+          //var y = 0;
+          for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
+            legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
+            legend_obj[possibleOptions[y]] = colorPalette[y];
+          }
+     }
       ////console.log(legend);
       var x = 0;
-      for(x;x<featureCount;x++) {
-        ////console.log("setting style for feature");
-        features[x].setStyle(
-            new ol.style.Style({
-                fill : new ol.style.Fill({
-                    color: legend_obj[features[x].getProperties()[prop]]
-                })
-            })
-        );
-      }
+        for (x; x < featureCount; x++) {
+            ////console.log("setting style for feature");
+            if (isNumberProperty) {
+                var p = 0;
+                var binsLength = bins.length;
+                for (p; p < binsLength - 1; p++) {
+                    var curVal = (Number(features[x].getProperties()[prop]));
 
+                    if (bins[p] <= curVal && bins[p + 1] >= curVal) {
+                        if (this.vectorType == "POINT") {
+                            console.log("adding point style")
+                            features[x].setStyle(
+                            new ol.style.Style({
+                                image: new ol.style.Circle({
+                                    radius: 5,
+                                    fill: new ol.style.Fill({
+                                        color: legend_obj[bins[p] + '-' + bins[p + 1]]
+                                    }),
+                                    stroke: new ol.style.Stroke({
+                                        width: 0.5,
+                                        color: 'rgba(255,0,0,1)'
+                                    })
+                                })
+                            }));
+                        }
+                        if (this.vectorType == "POLYGON") {
+                            features[x].setStyle(
+                                new ol.style.Style({
+                                    fill: new ol.style.Fill({
+                                        color: legend_obj[bins[p] + '-' + bins[p + 1]]
+                                    }),
+                                    stroke: new ol.style.Stroke({
+                                        color: "black",
+                                        width: 1
+
+                                    })
+                                }));
+                        }
+                    }
+                }
+            } else {
+                console.log(this.vectorType);
+                if (this.vectorType == "POINT") {
+                    console.log("adding point style")
+                    features[x].setStyle(
+                            new ol.style.Style({
+                                image: new ol.style.Circle({
+                                    radius: 5,
+                                    fill: new ol.style.Fill({
+                                        color:legend_obj[features[x].getProperties()[prop]]
+                                    }),
+                                    stroke: new ol.style.Stroke({
+                                        width: 0.5,
+                                        color: legend_obj[features[x].getProperties()[prop]]
+                                    })
+                                })
+                            })
+                            );
+
+                        }
+                        if (this.vectorType == "POLYGON") {
+                            features[x].setStyle(
+                                new ol.style.Style({
+                                    fill: new ol.style.Fill({
+                                        color: legend_obj[features[x].getProperties()[prop]]
+                                    }),
+                                    stroke: new ol.style.Stroke({
+                                        color: "black",
+                                        width: 1
+
+                                    })
+                                }));
+                        }
+            }
+        }
+
+      this.currentProperty = prop;
       opts = {};
       opts['currentProperty'] = prop ;
       opts['possibleOptions'] = possibleOptions;
@@ -258,7 +382,7 @@ gisportal.Vector = function(options) {
         var styles = {
             "POINT": new ol.style.Style({
                 image: new ol.style.Circle({
-                    radius: 2,
+                    radius: 5,
                     fill: new ol.style.Fill({
                         color: 'rgba(0,0,255,0.5)'
                     }),
@@ -304,7 +428,9 @@ gisportal.Vector = function(options) {
         };
 
         var setup_style_ui = function(source) {
-          vec.setStyleUI(source,vec.defaultProperty);
+          var prop = 'currentProperty' in vec ? vec.currentProperty : vec.defaultProperty;
+          
+          vec.setStyleUI(source,prop);
           //////console.table(source.getFeatures()[0].getProperties());
           //////console.log('[data-id="' + id + '"] .js-tab-dimensions');
         }

@@ -10,6 +10,8 @@ gisportal.vectorStyles = {};
 
 gisportal.vectorStyles.coloursInUse = [];
 
+gisportal.vectorStyles.binSize = 10;
+
 gisportal.vectorStyles.createOLStyle = function(options){
 	
 
@@ -78,6 +80,12 @@ gisportal.vectorStyles.startingColours = {
 		"g" : 0,
 		"b" : 0,
 		"a" : 1
+	},
+	"basic_blue" : {
+		"rgba" : "rgba(5,2,175,1)",
+		"r" : 5,
+		"g" : 2,
+		"b" : 175
 	}
 }
 

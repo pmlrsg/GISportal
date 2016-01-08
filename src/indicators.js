@@ -42,6 +42,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.panels.showPanel('choose-indicator');
       }
       var id = $(this).closest('[data-id]').data('id');
+      console.log("deleting based on id");
+      console.log(id);
       gisportal.indicatorsPanel.removeFromPanel(id);
    });
 
@@ -363,28 +365,41 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    gisportal.events.trigger('layer.addtopanel', data)
 };
 
+
+// this will be re-engineered when ol3 fixed layer ordering
 gisportal.indicatorsPanel.reorderLayers = function() {
-   var layers = [];
+ var layers = [];
    $('.sortable-list .indicator-header').each(function() {
       layers.push($(this).parent().data('id'));
    })
 
    // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
-   var currentLayers = map.getLayers().a;
+   var currentLayers = map.getLayers().getArray();
+   console.log(currentLayers);
+   console.log(layers);
+   console.log("map.layers before remove");
+   console.log(map.getLayers().getArray().length)
+   console.log(map.getLayers().getArray());
+   var oddFactor = 1 + currentLayers.length;
    if (currentLayers) {
-      for (var i = 0; i < map.getLayers().a.length + 1; i++) {
-         map.removeLayer(map.getLayers().a[0]);
+      for (var i = 0; i < map.getLayers().getArray().length + oddFactor; i++) {
+         console.log("removing layer ");
+         console.log(map.getLayers().getArray()[0]);
+         map.removeLayer(map.getLayers().getArray()[0]);
       }
    }
-   
+   console.log("map.layers after remove");
+   console.log(map.getLayers().getArray().length)
+   console.log(map.getLayers().getArray());
    // stick the base layer back on
    var selectedBaseMap = $('#select-basemap').data().ddslick.selectedData.value;
    if (selectedBaseMap !== 'none') {
       map.addLayer(gisportal.baseLayers[selectedBaseMap]);   
    }
    
-
-   // then the indicator layers
+   console.log("current after delete");
+   console.log(currentLayers);
+   // then the indicator layers;
    for (var l = layers.length - 1; l > -1; l--) {
       map.addLayer(gisportal.layers[layers[l]].openlayers['anID']);
    }
@@ -530,6 +545,8 @@ gisportal.indicatorsPanel.vectorStyleTab = function(id) {
          //console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@");
          //console.log(id+"__"+layer.defaultProperty);
          if(id+"__"+layer.defaultProperty in gisportal.vectorStyles.cache) {
+            gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty].unit = layer.unit;
+            console.log(gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
       var renderedStyleUI = gisportal.templates['vector-style-ui'](gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
       $('[data-id="' + layer.id + '"] .dimensions-tab .vector-style-container').html(renderedStyleUI);
    }

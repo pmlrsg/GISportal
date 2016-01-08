@@ -5,13 +5,15 @@
          <select id="setPropertyStyle" class="js-vector-style-select">
           <option value=""></option>
           {{#each defaultProperties}}
-          <option value="{{this}}">{{this}}</option>
+          <option value="{{this.[0]}}">{{this.[1]}}</option>
           {{/each}}
           </select>
          {{/if}}
-         <table class="legen-table">
-                  
+         <table class="legend-table">
+        <tr><th>{{unit}}</th><th></th></tr>
          {{#each legend}}
+        
+        
         <tr>
          <td> {{ option }} </td> <td class="legend-colour-block" style="background-color:{{ colour }}"></td>
         </tr>
