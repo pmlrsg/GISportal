@@ -36,7 +36,7 @@ gisportal.userPermissions.setPermissions = function(level){
    }
 };
 gisportal.userPermissions.setPermissions(gisportal.userPermissions.this_user_info.permission);
-gisportal.userPermissions.domainName = window.location.href.replace("http://", "").replace("https://", "").split("?")[0].replace(/\/$/, '').replace(/\./g, "_").replace(/\//g, '_');
+gisportal.userPermissions.domainName = window.location.href.replace("http://", "").replace("https://", "").split("?")[0].replace(/\/$/, '').replace(/\//g, '_');
 
 gisportal.userPermissions.loginAs = function(username){
    gisportal.userPermissions.user = username;

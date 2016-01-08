@@ -65,8 +65,8 @@ var cssFiles = [
     "src/css/nv.d3.css",
     "src/css/history.css",
     "src/css/mapcontrols.css",
-    "src/js-libs/tooltipster/css/tooltipster.css",
-    "src/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
+    "html/js-libs/tooltipster/css/tooltipster.css",
+    "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
     "src/css/alerts.css",
     "src/css/popup.css",
     "src/css/collaboration.css"
