@@ -15,3 +15,4 @@ config/*
 apache_log
 node_modules
 html/index.html
+collaboration/config/config.json
