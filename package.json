@@ -12,5 +12,8 @@
     "autoprefixer": "~6.1.2",
     "pixrem": "~3.0.0",
     "grunt-contrib-cssmin": "~0.14.0"
+  },
+  "dependencies": {
+    "express": "~4.13.3"
   }
 }

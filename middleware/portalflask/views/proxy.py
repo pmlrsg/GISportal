@@ -16,7 +16,6 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
 USERCACHEPREFIX = "user_" #DO NOT CHANGE YET, USE CONFIG IN THE END!
 MASTERCACHEPATH = "../../../html/cache"
-BASEUSERCACHEPATH = MASTERCACHEPATH +"/" + USERCACHEPREFIX
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 
@@ -666,7 +665,7 @@ def remove_server_cache():
       os.makedirs(deleted_cache_path)  #if the user_deleted_cache path does not exist it is created.
 
    os.rename(original_path, new_path)
-   return clean_filename
+   return CURRENT_PATH#clean_filename
 
 
 """

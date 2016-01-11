@@ -377,7 +377,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
    var defaultValue = { index: 0 };
    var defaultCategory = gisportal.config.defaultCategory
-   if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.config.browseCategories) {
+   if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.browseCategories) {
       defaultValue = { value: defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);

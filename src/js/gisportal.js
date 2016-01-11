@@ -111,7 +111,7 @@ gisportal.loadLayers = function() {
       // Get WMS cache
       var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  '/service/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  'http://127.0.0.1:1310/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
