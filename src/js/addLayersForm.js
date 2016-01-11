@@ -288,7 +288,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             }
          }
       }
-      // Adds each layer to the 
+      // Adds each layer to the cache
       for(layer in gisportal.addLayersForm.layers_list){
          // As long as it is to be included
          if(gisportal.addLayersForm.layers_list[layer]['include']){
@@ -327,7 +327,6 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                },
                error: function(e){
                   $.notify("Error submitting this information, please try again", "error");
-                  console.log("Error " + e.Message);
                }
             });
             // Returns so that they are only sent once.

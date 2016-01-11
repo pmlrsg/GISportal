@@ -16,7 +16,6 @@ CURRENT_PATH = os.path.dirname(os.path.realpath(__file__))
 LAYERCACHEPATH = "../../../html/cache/layers/"
 USERCACHEPREFIX = "user_" #DO NOT CHANGE YET, USE CONFIG IN THE END!
 MASTERCACHEPATH = "../../../html/cache"
-BASEUSERCACHEPATH = MASTERCACHEPATH +"/" + USERCACHEPREFIX
 FILEEXTENSIONJSON = ".json"
 FILEEXTENSIONXML = ".xml"
 

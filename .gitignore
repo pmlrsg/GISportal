@@ -16,3 +16,6 @@ apache_log
 node_modules
 html/index.html
 collaboration/config/config.json
+middleware/nodejs/
+middleware/nodejs/*
+middleware/python-flask.log
