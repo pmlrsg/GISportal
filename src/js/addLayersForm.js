@@ -182,6 +182,9 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       });
    }catch(e){};
+   if(l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
+      $('.scale-points-div').toggleClass('hidden', false);
+   }
    
    // The keydown event listener is removed from the document so that there is only ever one on there.
    $(document).off( 'keydown' );
@@ -242,7 +245,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['colorbaronly'] = true;
          gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['height'] = 500;
          gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['width'] = 30;
-         gisportal.addLayersForm.layers_list[value]['legendSettings']['Rotation'] = 270;
+         gisportal.addLayersForm.layers_list[value]['legendSettings']['Rotation'] = 90;
       }
 
       //Sets the assumed values to the boxes:
@@ -509,9 +512,9 @@ gisportal.addLayersForm.addInputListeners = function(){
          }else if($(this).parents('div.legend-settings').length > 0){
             if(key == "Rotation"){
                if(key_val == "LEFT"){
-                  key_val = gisportal.addLayersForm.layers_list[index]['legendSettings'][key] + 90;
-               }else if(key_val == "RIGHT"){
                   key_val = gisportal.addLayersForm.layers_list[index]['legendSettings'][key] - 90;
+               }else if(key_val == "RIGHT"){
+                  key_val = gisportal.addLayersForm.layers_list[index]['legendSettings'][key] + 90;
                }
                while(key_val < 0){
                   key_val += 360;
