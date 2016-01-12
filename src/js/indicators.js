@@ -232,7 +232,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }
    else{
       $.ajax({
-         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor + '&domain=' + gisportal.userPermissions.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)
@@ -844,7 +844,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
    content.find('.js-download').click(function(){
       var range = slider.val();
       window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
-      //$.get("/service/download_check", function(data){
+      //$.get(gisportal.middlewarePath + "/download_check", function(data){
       //   console.log(data);
       //   $('.js-download').text("Download "+data.format+" @ "+ data.size);
       //});
@@ -885,7 +885,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 
    var request = $.param(urlParams);
    if (urlParams['bbox'].indexOf("POLYGON") !== -1 || urlParams['bbox'].indexOf("LINESTRING") !== -1) {
-      url = "/service/download?" + $.param(graphParams);
+      url = gisportal.middlewarePath + "/download?" + $.param(graphParams);
    } else {
       url = indicator.wcsURL + request;
    }

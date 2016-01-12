@@ -23,7 +23,8 @@ if( ! window.location.origin )
    window.location.origin = window.location.protocol + "//" + window.location.host
 
 // Path to the python flask middleware
-gisportal.middlewarePath = window.location.origin + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+//gisportal.middlewarePath = window.location.origin + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
@@ -111,7 +112,7 @@ gisportal.loadLayers = function() {
       // Get WMS cache
       var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  '/service/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -1020,7 +1021,7 @@ gisportal.getPointReading = function(e) {
 
 
          $.ajax({
-            url:  '/service/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            url:  gisportal.middlewarePath + '/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
                try{
                   $(elementId +' .loading').remove();
