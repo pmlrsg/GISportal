@@ -2,12 +2,12 @@
 @import "_animation.scss";
 @import "_export.scss";
 @import "_fonts.scss";
+@import "_main.scss";
 @import "_graph.scss";
 @import "_grid.scss";
 @import "_history.scss";
 @import "_icons.scss";
 @import "_jquery.nouislider.scss";
-@import "_main.scss";
 @import "_indicators.scss";
 
 @import "_mapcontrols.scss";
@@ -28,3 +28,7 @@
 @import "_type.scss";
 @import "_walkthrough.scss";
 @import "_vector.scss";
+@import "../../js-libs/tooltipster/css/tooltipster.scss";
+@import "../../js-libs/tooltipster/css/themes/tooltipster-shadow.scss";
+@import "../../js-libs/jquery-gritter/css/jquery.gritter.scss";
+
