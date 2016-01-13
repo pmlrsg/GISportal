@@ -3,12 +3,12 @@
 \*------------------------------------*/
 
 .noUi-connect  {
-  background-color: #d8d3dd;
+  background-color: $slider-body;
   box-shadow: none;
 }
 
 .noUi-handle  {
-  background-color: #b1a7bc;
+  background-color: $slider-handles;
   border-radius: 50%;
   box-shadow: none;
 }
