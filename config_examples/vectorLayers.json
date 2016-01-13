@@ -6,22 +6,610 @@
       },
       "services": { 
          "wfs" : {
-            "url" : "https://vortices.npm.ac.uk/geoserver/rsg/ows",
+            "url" : "/service/proxy?url=https%3A%2F%2Fvortices.npm.ac.uk%2Fgeoserver%2Frsg%2Fows",
             "params" : "",
             "vectors" : [
                {
-                  "name" : "Full Borders",
-                  "id" : "rsg:full_10m_borders",
-                  "variableName" : "rsg:full_10m_borders",
-                  "desc": "A complete world  border at 10 meter resolution",
+                  "name" : "English counties with employment percentages",
+                  "id" : "rsg_Employ_Perc",
+                  "variableName" : "rsg:Employ_Perc",
+                  "desc": "Some english counties i think",
                   "maxFeatures" : 100,
                   "vectorType" : "POLYGON",
                   "tags" : {
-                     "region" : "global"
-                  }
+                     "region" : "England",
+                     "niceName" : "Employment percentage contributions"
+                  },
+                 "boundingBox" : {
+                     "MinX" : -6.419,
+                     "MinY" : 49.864,
+                     "MaxX" : 1.7689,
+                     "MaxY" : 55.8116
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-6.419", "NorthBoundLatitude": "55.8116", "EastBoundLongitude": "1.7689", "SouthBoundLatitude": " 49.864"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {}                 
+               },
+               {
+                  "name" : "GVA Percentage",
+                  "abstract" : "GVA percentage",
+                  "id" : "rsg_GVA_Perc_fina",
+                  "variableName" : "rsg:GVA_Perc_fina",
+                  "provider" : "PML",
+                  "desc": "GVA percentage contribution by type",
+                  "maxFeatures" : 100,
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "GVA percentages"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -7.5515,
+                     "MinY" : 50.0733,
+                     "MaxX" : 1.5951,
+                     "MaxY" : 60.7582
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-7.5515", "NorthBoundLatitude": "60.7582", "EastBoundLongitude": "1.5951", "SouthBoundLatitude": "50.0733"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {},
+                  "defaultProperty" : "GVA_FISH_P",
+                  "defaultProperties" : [["GVA_FISH_P", "Fish Farming Contribution"],["GVA_ACC_PC", "Accomodation Contribution"],["GVA_REC_PC", "Recreation Contribution"]],
+                  "unit" : "% contribution by employment type"
+               },
+               {
+                  "name" : "ices_rectangles",
+                  "abstract" : "ices_rectangles",
+                  "id" : "rsg_ices_rectangles",
+                  "variableName" : "rsg:ices_rectangles",
+                  "provider" : "PML",
+                  "desc": "Complete set of Longhurst Biogeographic Provices",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Global",
+                     "niceName": "ICES Rectangles"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -180,
+                     "MinY" : -78.5,
+                     "MaxX" : 180,
+                     "MaxY" : 90
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-180", "NorthBoundLatitude": "90", "EastBoundLongitude": "180", "SouthBoundLatitude": "-78.5"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {},
+                  "defaultProperty" : false
+
+               },
+               {
+                  "name" : "MMO_Fish_Shellfish_Cages_A",
+                  "abstract" : "MMO Fish cacge locations and catagories",
+                  "id" : "rsg_MMO_Fish_Shellfish_Cages_A",
+                  "variableName" : "rsg:MMO_Fish_Shellfish_Cages_A",
+                  "provider" : "MMO",
+                  "desc": "some data from amt cdt drops",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "MMO Fish/Shellfish Cage Locations"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -7.5515,
+                     "MinY" : 50.0733,
+                     "MaxX" : 1.5951,
+                     "MaxY" : 60.7582
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-7.5515", "NorthBoundLatitude": "60.7582", "EastBoundLongitude": "1.5951", "SouthBoundLatitude": "50.0733"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {
+                     "Agreement for Lease" : "rgba(255,0,0,0.5)",
+                     "Search Area Exclusivity" : "rgba(0,255,0,0.5)",
+                     "Lease" : "rgba(0,0,255,0.5)"
+                  },
+                  "defaultProperty" : "CATMFA",
+                  "defaultProperties" : [["CATMFA", "Catagory"], ["WATLEV", "Water Level"]]
+               },
+               {
+                  "name" : "MMO_Harbour_Facility_A",
+                  "abstract" : "MMO_Harbour_Facility_A",
+                  "id" : "rsg_MMO_Harbour_Facility_A",
+                  "variableName" : "rsg:MMO_Harbour_Facility_A",
+                  "provider" : "MMO",
+                  "desc": "some data from amt cdt drops",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "MMO Harbour Facilities for UK"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -7.5515,
+                     "MinY" : 49.502,
+                     "MaxX" : 2.347,
+                     "MaxY" : 60.7582
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-7.5515", "NorthBoundLatitude": "60.7582", "EastBoundLongitude": "2.347", "SouthBoundLatitude": "49.502"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {
+                     "Agreement for Lease" : "rgba(255,0,0,0.5)",
+                     "Search Area Exclusivity" : "rgba(0,255,0,0.5)",
+                     "Lease" : "rgba(0,0,255,0.5)"
+                  },
+                  "defaultProperty" : false
+               }, 
+               {
+                  "name" : "Employment Percentages by Sector",
+                  "abstract" : "Employment Percentages by Sector",
+                  "id" : "rsg_Employ_Perc",
+                  "variableName" : "rsg:Employ_Perc",
+                  "provider" : "PML",
+                  "desc": "Employment Percentages by Sector",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Employment Percentages"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -6.3516,
+                     "MinY" : 49.902,
+                     "MaxX" : 1.7630,
+                     "MaxY" : 55.8111
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-6.3516", "NorthBoundLatitude": "55.8111", "EastBoundLongitude": "1.7630", "SouthBoundLatitude": "49.902"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "EMP_Aqua_P",
+                  "defaultProperties" : [["EMP_Aqua_P", "Percentage Employed - Aquaculture"],["EMP_Acco_1","Percentage Employed - Accomodation"],["EMP_Rec_PC", "Percentage Employed - Recreation"]],
+                  "unit" : "% by sector"
+               }, 
+               {
+                  "name" : "MDSPA_SCOTLAND",
+                  "abstract" : "MDSPA_SCOTLAND",
+                  "id" : "rsg_mdspa_reduced",
+                  "variableName" : "rsg:mdspa_reduced",
+                  "provider" : "PML",
+                  "desc": "MDSPA_SCOTLAND",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "MDSPA_SCOTLAND"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -9.566,
+                     "MinY" : 54.377,
+                     "MaxX" : -0.8149,
+                     "MaxY" : 60.7155
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-9.566", "NorthBoundLatitude": "60.7155", "EastBoundLongitude": "-0.8149", "SouthBoundLatitude": "54.377"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "STATUS",
+                  "defaultProperties" : [["STATUS", "Site Status"]],
+                  "moreIndicatorInfo" : true
+
+               }, 
+               {
+                  "name" : "MPA_SCOTLAND",
+                  "abstract" : "MPA_SCOTLAND",
+                  "id" : "rsg_MPA_Scotland_reduced",
+                  "variableName" : "rsg:MPA_Scotland_reduced",
+                  "provider" : "PML",
+                  "desc": "MPA_SCOTLAND",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Marine Protected Areas (Scotland)"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -19.1475,
+                     "MinY" : 54.3014,
+                     "MaxX" : 2.6207,
+                     "MaxY" : 63.8935
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-19.1475", "NorthBoundLatitude": "63.8935", "EastBoundLongitude": "2.6207", "SouthBoundLatitude": "54.3014"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "STATUS",
+                  "defaultProperties" : [["STATUS", "Site Status"]]
+               }, 
+               {
+                  "name" : "Marine_Employment_2012_polygon",
+                  "abstract" : "Marine_Employment_2012_polygon",
+                  "id" : "rsg_Marine_Employment_2012_reduced",
+                  "variableName" : "rsg:Marine_Employment_2012_reduced",
+                  "provider" : "PML",
+                  "desc": "Marine Employment Scotland",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Marine Sector Employment Scotland 2012"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -9.566,
+                     "MinY" : 54.377,
+                     "MaxX" : -0.8149,
+                     "MaxY" : 60.7155
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-9.566", "NorthBoundLatitude": "60.7155", "EastBoundLongitude": "-0.8149", "SouthBoundLatitude": "54.377"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "CATEGORY",
+                  "defaultProperties" :[["CATEGORY", "Catagory"]]
+               }, 
+               {
+                  "name" : "aquaculture_active_sites_point",
+                  "abstract" : "aquaculture_active_sites_point",
+                  "id" : "rsg_aquaculture_active_sites_point",
+                  "variableName" : "rsg:aquaculture_active_sites_point",
+                  "provider" : "PML",
+                  "desc": "Active Aquaculture Sites Scotland",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POINT",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Active Aquaculture Sites Scotland"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -8.1447,
+                     "MinY" : 54.871,
+                     "MaxX" : -0.746,
+                     "MaxY" : 60.765
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-8.1447", "NorthBoundLatitude": "60.765", "EastBoundLongitude": "-0.746", "SouthBoundLatitude": "54.871"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "SITESTATUS",
+                  "defaultProperties" : [["SITESTATUS", "Site Status"],["WATERTYPE", "Water Type"],["SITECATAGO", "Site Catagory"],["SITETYPEDE", "Site Type"]]
+               }, 
+               {
+                  "name" : "OWP_Trade_Off_Analysis",
+                  "abstract" : "OWP_Trade_Off_Analysis",
+                  "id" : "rsg_final_owp_poly",
+                  "variableName" : "rsg:final_owp_poly",
+                  "provider" : "PML",
+                  "desc": "Trade-Off analysis shwoing impact on different sectors",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "OWP Trade Off Analysis"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -14.3100,
+                     "MinY" : 53.733,
+                     "MaxX" : 4.5180,
+                     "MaxY" : 61.8598
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-14.3100", "NorthBoundLatitude": "61.8598", "EastBoundLongitude": "4.5180", "SouthBoundLatitude": "53.733"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Id" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10","STAT_LEVL_"],
+                  "styles" : {},
+                  "defaultProperty" : "IMPACT",
+                  "defaultProperties" : [["REC_FUEL", "Recreational Fuel Use"],["SHIP_FUEL", "Commercial shipping Fuel Use"],["TOURISM", "Cost to Tourism"],["SITETYPEDE","Site Type"],["Landing", "Commercial Fish Landing"],["IMPACT", "Total Calculated Impact"]],
+                  "unit" : "£ Millions",
+                  "moreIndicatorInfo" : true
+               },
+               {
+                  "name" : "Wind Farm Options",
+                  "abstract" : "Wind farm locations",
+                  "id" : "rsg_WindDraftPlanOptions_polygon",
+                  "variableName" : "rsg:WindDraftPlanOptions_polygon",
+                  "provider" : "TCE",
+                  "desc": "Draft sectoral marine plans for offshore wind",
+                  "maxFeatures" : 100,
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Wind Farm Options"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -8.626,
+                     "MinY" : 54.415,
+                     "MaxX" : -0.4687,
+                     "MaxY" : 60.196
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-8.626", "NorthBoundLatitude": "60.196", "EastBoundLongitude": "-0.4687", "SouthBoundLatitude": "54.415"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {},
+                  "defaultProperty" : false,
+                  "defaultProperties" : [["Lease_Type", "Lease Type"], ["Status", "Status"], ["Windfarm_R", "License Round"]],
+                  "moreIndicatorInfo" : true
+
+
+               },
+               {
+                  "name" : "Wave Energy Options",
+                  "abstract" : "Wave Energy locations",
+                  "id" : "rsg_WaveDraftPlanOptions_polygon",
+                  "variableName" : "rsg:WaveDraftPlanOptions_polygon",
+                  "provider" : "TCE",
+                  "desc": "Draft sectoral marine plans for wave energy",
+                  "maxFeatures" : 100,
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Wave Energy Options"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -8.626,
+                     "MinY" : 54.415,
+                     "MaxX" : -0.4687,
+                     "MaxY" : 60.196
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-8.626", "NorthBoundLatitude": "60.196", "EastBoundLongitude": "-0.4687", "SouthBoundLatitude": "54.415"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {},
+                  "defaultProperty" : false,
+                  "defaultProperties" : [["Lease_Type", "Lease Type"], ["Status", "Status"], ["Windfarm_R", "License Round"]],
+                  "moreIndicatorInfo" : true
+
+
+               },
+               {
+                  "name" : "Tidal Energy Options",
+                  "abstract" : "Tidal Energy option locations",
+                  "id" : "rsg_TidalDraftPlanOptions_polygon",
+                  "variableName" : "rsg:TidalDraftPlanOptions_polygon",
+                  "provider" : "TCE",
+                  "desc": "Draft sectoral marine plans for tidal energy",
+                  "maxFeatures" : 100,
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Tidal Energy Options"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -8.626,
+                     "MinY" : 54.415,
+                     "MaxX" : -0.4687,
+                     "MaxY" : 60.196
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-8.626", "NorthBoundLatitude": "60.196", "EastBoundLongitude": "-0.4687", "SouthBoundLatitude": "54.415"
+                  },
+                  "ignoredParams" : ["the_geom" ,"Shape_Leng" ,"Shape_Area", "field_7", "field_8", "field_9", "field_10"],
+                  "styles" : {},
+                  "defaultProperty" : false,
+                  "defaultProperties" : [["Lease_Type", "Lease Type"], ["Status", "Status"], ["Windfarm_R", "License Round"]],
+                  "moreIndicatorInfo" : true
+
+
+               },
+               {
+                  "name" : "Deprivation Index (England)",
+                  "abstract" : "Deprivation Index (England)",
+                  "id" : "rsg_imd_super_simple",
+                  "variableName" : "rsg:super_simple",
+                  "provider" : "TCE",
+                  "desc": "Data showing the index of deprovation at LSAO level",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Deprivation Index (England)"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -7.052,
+                     "MinY" : 49.864,
+                     "MaxX" : 2.073,
+                     "MaxY" : 55.810
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-7.052", "NorthBoundLatitude": "55.810", "EastBoundLongitude": "2.073", "SouthBoundLatitude": "49.864"
+                  },
+                  "ignoredParams" : ["the_geom" ,"LSOA11CD" ,"LSOA11NM", "LSOA11NMW", "LSOA01CD", "LSOA01NM", "CHGIND","LAD11CD", "LAD11NM", "LSOAN11", "LAC", "LAN"],
+                  "styles" : {},
+                  "defaultProperty" : "IMDR15",
+                  "defaultProperties" : [["IMDS10", "Deprivation Index Score 2010"], ["IMDR10", "Deprivation Index Rank 2010"], ["IMDR15","Deprivation Index Rank 2015"],["IMDD15", "Deprivation Index Decile 2015"]],
+                  "moreIndicatorInfo" : true
+
+               },
+               {
+                  "name" : "Deprivation Index (South West)",
+                  "abstract" : "Deprivation Index (South West)",
+                  "id" : "rsg_south_west_IMD",
+                  "variableName" : "rsg:south_west_IMD",
+                  "provider" : "TCE",
+                  "desc": "Data showing the index of deprovation at LSAO level for the South West",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Deprivation Index (South West)"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -5.874,
+                     "MinY" : 49.942,
+                     "MaxX" : -1.292,
+                     "MaxY" : 51.703
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-5.874", "NorthBoundLatitude": "51.703", "EastBoundLongitude": "-1.292", "SouthBoundLatitude": "49.942"
+                  },
+                  "ignoredParams" : ["the_geom" ,"LSOA11CD" ,"LSOA11NM", "LSOA11NMW", "LSOA01CD", "LSOA01NM", "CHGIND","LAD11CD", "LAD11NM", "LSOAN11", "LAC", "LAN"],
+                  "styles" : {},
+                  "defaultProperty" : "IMDR15",
+                  "defaultProperties" : [["IMDS10", "Deprivation Index Score 2010"], ["IMDR10", "Deprivation Index Rank 2010"], ["IMDR15","Deprivation Index Rank 2015"],["IMDD15", "Deprivation Index Decile 2015"]],
+                  "moreIndicatorInfo" : true
+
+               },
+               {
+                  "name" : "Scottish Government Urban Rural Classification 2007-2008",
+                  "abstract" : "Scottish Government Urban Rural Classification 2007-2008",
+                  "id" : "rsg_SGUR_reduced",
+                  "variableName" : "rsg:SGUR_reduced",
+                  "provider" : "Scottish Government",
+                  "desc": "Scottish Government Urban Rural Classification",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Scottish Government Urban Rural Classification"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -9.229,
+                     "MinY" : 54.514,
+                     "MaxX" : -0.705,
+                     "MaxY" : 60.866
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-9.229", "NorthBoundLatitude": "60.866", "EastBoundLongitude": "-0.705", "SouthBoundLatitude": "54.514"
+                  },
+                  "ignoredParams" : ["the_geom"],
+                  "defaultProperty" : "UR8FOLD",
+                  "defaultProperties" : [["UR8FOLD", "Urban Rural Classification"]],
+                  "moreIndicatorInfo" : true
+
+               },
+               {
+                  "name" : "Shellfish Waters",
+                  "abstract" : "Shellfish Waters",
+                  "id" : "rsg_magswen_reduced",
+                  "variableName" : "rsg:magswen_reduced",
+                  "provider" : "PML",
+                  "desc": "Shellfish Waters",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Shellfish Waters"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -5.620,
+                     "MinY" : 50.077,
+                     "MaxX" : 1.908,
+                     "MaxY" : 55.663
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-5.620", "NorthBoundLatitude": "55.663", "EastBoundLongitude": "1.908", "SouthBoundLatitude": "50.077"
+                  },
+                  "ignoredParams" : ["the_geom"],
+                  "defaultProperty" : false,
+                  "moreIndicatorInfo" : true
+
+               },{
+                  "name" : "Diver Grid",
+                  "abstract" : "Diver Grid",
+                  "id" : "rsg_cd_diver_cat2_over_1",
+                  "variableName" : "rsg:cd_diver_cat2_over_1",
+                  "provider" : "PML",
+                  "desc": "Diver Grid",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Diver Grid"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -5.161,
+                     "MinY" : 49.864,
+                     "MaxX" : 1.904,
+                     "MaxY" : 53.060
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-5.161", "NorthBoundLatitude": "53.060", "EastBoundLongitude": "1.904", "SouthBoundLatitude": "49.864"
+                  },
+                  "ignoredParams" : ["the_geom"],
+                  "defaultProperty" : ["cb_diver_2"],
+                  "defaultProperties" : [["cb_diver_1", "class_1"],["cb_diver_2", "class_2"],["cb_diver_3", "class_3"],["cb_diver_a", "class_a"]],
+                  "moreIndicatorInfo" : true
+ 
+
+               },
+               {
+                  "name" : "SAC_Scotland",
+                  "abstract" : "SAC_Scotland",
+                  "id" : "rsg_SAC_reduced",
+                  "variableName" : "rsg:SAC_reduced",
+                  "provider" : "Scottish Government",
+                  "desc": "SAC Scotland",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "Scotland",
+                     "niceName" : "Special Areas Of Conservation Scotland"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -20.193,
+                     "MinY" : 53.659,
+                     "MaxX" : 1.710,
+                     "MaxY" : 60.822
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-20.193", "NorthBoundLatitude": "60.822", "EastBoundLongitude": "1.710", "SouthBoundLatitude": "53.659"
+                  },
+                  "ignoredParams" : ["the_geom"],
+                  "defaultProperty" : ["STATUS"],
+                  "defaultProperties" : [["STATUS", "Status"]],
+                  "moreIndicatorInfo" : true
+
+
+               },
+               {
+                  "name" : "Protected Wreks",
+                  "abstract" : "Protected Wrecks",
+                  "id" : "rsg_PROTECTEDWRECK",
+                  "variableName" : "rsg:PROTECTEDWRECK",
+                  "provider" : "PML",
+                  "desc": "Protected Wrecks",
+                  "maxFeatures" : "ALL",
+                  "vectorType" : "POLYGON",
+                  "tags" : {
+                     "region" : "England",
+                     "niceName" : "Protected Wrecks"
+                  },
+                  "boundingBox" : {
+                     "MinX" : -6.939,
+                     "MinY" : 49.860,
+                     "MaxX" : 1.865,
+                     "MaxY" : 54.661
+                  },
+                  "exBoundingBox"  : {
+                     "WestBoundLongitude": "-6.939", "NorthBoundLatitude": "54.661", "EastBoundLongitude": "1.865", "SouthBoundLatitude": "49.860"
+                  },
+                  "ignoredParams" : ["the_geom"],
+                  "defaultProperty" : ["Heritage_Ca"],
+		  "defaultProperties" : [["Heritage_Ca", "Catagory"],["Name", "Name"],["Grade", "Grade"]],
+                  "moreInformation" : true 
+
                }
+
+
             ]
          }
       }
    }
-]
+   ]
+
+
+

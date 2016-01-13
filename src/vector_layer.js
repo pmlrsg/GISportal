@@ -307,11 +307,6 @@ gisportal.Vector = function(options) {
                                 new ol.style.Style({
                                     fill: new ol.style.Fill({
                                         color: legend_obj[bins[p] + '-' + bins[p + 1]]
-                                    }),
-                                    stroke: new ol.style.Stroke({
-                                        color: "black",
-                                        width: 1
-
                                     })
                                 }));
                         }
@@ -342,11 +337,6 @@ gisportal.Vector = function(options) {
                                 new ol.style.Style({
                                     fill: new ol.style.Fill({
                                         color: legend_obj[features[x].getProperties()[prop]]
-                                    }),
-                                    stroke: new ol.style.Stroke({
-                                        color: "black",
-                                        width: 1
-
                                     })
                                 }));
                         }

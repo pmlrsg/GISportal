@@ -85,8 +85,23 @@ gisportal.vectorStyles.startingColours = {
 		"rgba" : "rgba(5,2,175,1)",
 		"r" : 5,
 		"g" : 2,
-		"b" : 175
-	}
+		"b" : 175,
+                "a" : 1 
+	},
+        "basic_orange" : {
+		"rgba" : "rgba(255,116,0,1)",
+                "r" : 255,
+                "g" : 116,
+                "b" : 0,
+                "a" : 1
+        },
+        "bright_green" : {
+                "rgba" : "rgba(161,242,0,1)",
+                "r" : 161,
+               	"g" : 242,
+            	"b" : 0,
+                "a" : 1
+        }
 }
 
 
