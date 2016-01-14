@@ -53,22 +53,16 @@ We also need to install all the required libraries. This can be done in a few wa
 Finally we need autoprefixer from NPM, this will allow the portal to be run in IE9 and other older browsers
 ``npm install -g autoprefixer``
 
-<<<<<<< HEAD
-3. **Install SASS**
+
+3. **Build JavaScript/CSS**  
+
+**Install SASS**
 To compile the CSS for the project we use SASS. This relies on a ruby gem called sass.
 
 ``sudo gem install sass``
 
 
-
-4. **Build JavaScript/CSS**  
-For production, JavaScript and CSS need to be minifed. This is done with a build script. This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
-``python build.py --clean``
-``python build.py build``
-=======
-3. **Build JavaScript/CSS**  
 For production, JavaScript and CSS should be minifed; the application is configured to offer compressed files unless you tell it to use `dev` mode. The build mechanism uses Grunt, which first needs to be installed. 
->>>>>>> collab-dev
 
     Make sure you have Grunt CLI tools
 
