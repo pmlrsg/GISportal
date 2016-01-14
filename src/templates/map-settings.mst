@@ -1,0 +1,59 @@
+<h3>Display Options</h3>
+<div class="hidden js-map-settings-message"></div>
+<ul>
+	<li>
+		<label for="select-basemap">Base Map Layer</label>
+		<select id="select-basemap">
+			{{#baseLayers}}
+				<option value="{{id}}" data-imagesrc="img/baselayer-{{id}}.jpg" data-description="{{description}}">{{name}}</option>
+			{{/baseLayers}}
+		</select>
+		<input type="hidden" id="select-basemap-value" />
+	</li>
+	<li>
+		<label for="select-country-borders">Country Borders</label>
+		<select id="select-country-borders">
+			{{#countryBorders}}
+				<option value="{{id}}">{{name}}</option>
+			{{/countryBorders}}
+		</select>
+	</li>
+	<li>
+		<label for="select-graticules">Display Lat/Lon Graticules</label>
+		<select id="select-graticules">
+			<option value="Off">Off</option>
+			<option value="On">On</option>
+		</select>
+	</li>
+	<li>
+		<label for="select-projection">Display Projection</label>
+		<select id="select-projection">
+			{{#projections}}
+			   <option value="{{code}}" data-description="{{name}}">{{code}}</option>
+			{{/projections}}
+		</select>
+	</li>
+   <div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
+	<li>
+      <form>
+         <label>You can add an external Web Map Service (WMS) URL here:</label>
+         <input type="text" class="js-wms-url" placeholder="WMS URL">
+         <div class="wms-url-message alert-info hidden" id="refresh-cache-message"/>
+         <div class="clearfix hidden" id="refresh-cache-div">
+            <label class="pull-right">
+               Please check this box to refresh the cache
+               <input type="checkbox" id="refresh-cache-box" />
+            </label>
+         </div>
+         <div class="clearfix wms-url-div">
+            <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
+         </div>
+      </form>
+      {{#if user_clearance}}
+      <div class="clearfix wms-url-div">
+         <label>You can edit internal layers here:</label>
+         <button class="brand small js-edit-layers pull-right">Configure Internal Layers</button>
+      </div>
+      {{/if}}
+   </li>
+</ul>

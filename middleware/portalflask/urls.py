@@ -9,6 +9,7 @@ routes = [
    ((portal_proxy, ''),
       ('/proxy', proxy),
       ('/rotate', rotate)
+      ('/templates', templates)
    ),
    ((portal_state, '/state'),
       ('/getstate', getState),

@@ -1,0 +1,29 @@
+<div class="indicator-options"> 
+      <div class="indicator-option">
+         <p>Current property : {{currentProperty}}</p>
+         {{#if defaultProps }}
+         <select id="setPropertyStyle" class="js-vector-style-select">
+          <option value=""></option>
+          {{#each defaultProperties}}
+          <option value="{{this.[0]}}">{{this.[1]}}</option>
+          {{/each}}
+          </select>
+         {{/if}}
+         <table class="legend-table">
+        <tr><th>{{unit}}</th><th></th></tr>
+         {{#each legend}}
+        
+        
+        <tr>
+         <td> {{ option }} </td> <td class="legend-colour-block" style="background-color:{{ colour }}"></td>
+        </tr>
+         {{/each}}
+         </table>
+      </div>
+
+     
+      
+      <div class="indicator-option">
+         <button class="js-zoom-data text-button" data-id="{{id}}">Zoom to data</button>
+      </div>
+   </div>

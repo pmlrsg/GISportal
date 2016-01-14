@@ -1,9 +1,0 @@
-{{#if units}}<p>Scale - {{units}}</p>{{/if}}
-<div class="scalebar-outer{{#unless legendSettings.scalePoints}}-loose{{/unless}} {{#if log}}scalebar-log{{else}}scalebar-linear{{/if}} ">
-	<div class="scalebar{{#unless legendSettings.scalePoints}}-loose{{/unless}}" ><img class="legend-img" onerror="gisportal.scalebars.scalebarImageError('{{id}}')" src='{{#if legendSettings.URL}}{{legendSettings.URL}}{{else}}{{rotate_image legend legendSettings.Rotation}}{{/if}}'></img></div>
-   {{#if legendSettings.scalePoints}}
-   	{{#scalePoints}}
-   		<span class="scalebar-overlay"><span title="{{original}}">{{nicePrint}}</span></span>
-   	{{/scalePoints}}
-   {{/if}}
-</div>

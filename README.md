@@ -53,6 +53,7 @@ We also need to install all the required libraries. This can be done in a few wa
 Finally we need autoprefixer from NPM, this will allow the portal to be run in IE9 and other older browsers
 ``npm install -g autoprefixer``
 
+<<<<<<< HEAD
 3. **Install SASS**
 To compile the CSS for the project we use SASS. This relies on a ruby gem called sass.
 
@@ -64,15 +65,28 @@ To compile the CSS for the project we use SASS. This relies on a ruby gem called
 For production, JavaScript and CSS need to be minifed. This is done with a build script. This will build all the jsdoc3 documentation, minify the javascript and css, and move any images to the correct locations.
 ``python build.py --clean``
 ``python build.py build``
+=======
+3. **Build JavaScript/CSS**  
+For production, JavaScript and CSS should be minifed; the application is configured to offer compressed files unless you tell it to use `dev` mode. The build mechanism uses Grunt, which first needs to be installed. 
+>>>>>>> collab-dev
 
-For development, you still need to run the build script but without minification.
+    Make sure you have Grunt CLI tools
 
-``python build.py --clean``
-``python build.py dev``
-**Notes**  
-Java 7 is required for the build process.  
-Make sure you are in the same directory as ``build.py``.  
-Edit ``config/config.js`` and change ``siteMode`` from ``development`` to ``production``.
+        npm install -g grunt-cli
+
+    Install the application dependencies
+
+        npm install
+
+    To build in **production** mode; this uses minified javascript and CSS
+
+        grunt
+
+    To build in **development** mode; this uses uncompressed javascript and CSS that can easily be debugged
+
+        grunt dev
+
+    Edit ``config/config.js`` and change ``siteMode`` from ``development`` to ``production``.
 
 4. **Create database**  
 Make sure you are in ``middleware/portalflask``  

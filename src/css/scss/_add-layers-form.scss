@@ -1,0 +1,260 @@
+.overlay-container-form {
+   width: 1000px;
+   background-color: white;
+   color: #111111;
+   padding: 15px;
+   max-width: 90%;
+   overflow: auto;
+   margin: 10px auto;
+}
+
+.overlay.js-layer-form-popup{
+  align-items: inherit;
+}
+
+.form-header{
+  background-color: #59476d;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px; 
+  min-height: 38px;
+}
+
+.form-header .right-icon{
+  float: right;
+  font-size: 22px;
+  line-height: 1px;
+}
+
+.layers-form-left{
+   float:left;
+   width:47.5%;
+}
+
+.layers-form-right{
+   float:right;
+   width:47.5%;
+}
+
+.js-layer-form-html .clearfix {
+   padding-top: 15px;
+   clear:both;
+}
+
+.layers-form,
+.server-form{
+  padding:15px;
+}
+
+
+
+.pagination {
+    display: inline-block;
+    padding-left: 0;
+    padding-right: 15px;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+
+.pagination>li {
+    display: inline;
+}
+
+.pagination>li>a:hover, .pagination>li>span:hover {
+  background-color: #59476d;
+}
+
+.pagination>li>a, .pagination>li>span {
+   position: relative;
+   float: left;
+   padding: 6px 12px;
+   margin-left: -1px;
+   line-height: 1.42857143;
+   color: #fff;
+   text-decoration: none;
+   background-color: #b1a7bc;
+   border: 1px solid #ddd;
+}
+
+.pagination>li:first-child>a, .pagination>li:first-child>span {
+   margin-left: 0;
+   border-top-left-radius: 4px;
+   border-bottom-left-radius: 4px;
+}
+
+.pagination>li:last-child>a, .pagination>li:last-child>span {
+   border-top-right-radius: 4px;
+   border-bottom-right-radius: 4px;
+}
+
+.pagination>.disabled>a, .pagination>.disabled>a:focus, .pagination>.disabled>a:hover, .pagination>.disabled>span, .pagination>.disabled>span:focus, .pagination>.disabled>span:hover {
+   color: #b1a7bc;
+   background-color: #fff;
+   border-color: #ddd;
+   cursor: default;
+}
+
+.layers-form-left textarea{
+   max-height:400px;
+   max-width:100%;
+   min-width:100%;
+   height:150px;
+}
+
+.server-form .layers-form-left textarea{
+   max-height:200px;
+   overflow: hidden;
+   height:100px;
+}
+
+.overlay-container-form label{
+   padding-top:10px;
+   display:inline-block;
+}
+.overlay-container-form label:first-of-type {
+   padding-top: 0 !important;
+}
+
+.overlay-container-form .js-layers-form-submit{
+   margin-left:5px;
+}
+
+.layers-form-right .right-icon {
+   float:right;
+   font-size: 22px;
+   line-height: 1px;
+   color:#111111;
+   padding-top: 5px;
+}
+
+.scale-points-div .icon-btn {
+   font-size: 22px;
+   line-height: 1px;
+   color:#111111;
+   padding-top: 5px;
+}
+
+.right-icon {
+   float:right;
+}
+
+.layers-form-right .left-icon {
+   float:left;
+   font-size: 22px;
+   line-height: 1px;
+   color:#111111;
+   padding-top: 5px;
+}
+
+.layers-form-right textarea {
+   height:50px;
+   max-height: 150px;
+}
+
+.layers-form-right textarea[data-id="1"] {
+   max-width:calc(100% - 30px);
+   min-width:calc(100% - 30px);
+}
+
+.layers-form-right input[data-id="1"] {
+   max-width:calc(100% - 30px);
+   min-width:calc(100% - 30px);
+}
+
+.add-layers-div p{
+   padding-bottom:5px;
+   padding-top:5px;
+}
+
+.reset-layers-div{
+   padding:5px;
+}
+
+.wms-url-div{
+   padding-top:10px;
+}
+textarea.invalid,
+input.invalid{
+   background-color:#f2dede;
+   border-color:#b55457;
+   color:#b55457;
+}
+
+label.invalid{
+   color:#a94442;
+}
+
+.form-validation-div.alert-danger p{
+   padding-left:5px;
+   padding-bottom:5px;
+}
+
+.form-validation-div.alert-danger p:first-child{
+   padding-top:5px;
+}
+
+.form-validation-div.alert-danger{
+   margin-top:10px;
+}
+
+span[data-field="Rotation"]{
+  color:black;
+  font-size:22px;
+  display:inline-block;
+  padding:5px;
+}
+
+div.scalebar-preview img{
+  max-width:100%;
+  padding-bottom:2px;
+}
+
+div.scalebar-preview{
+  position:relative;
+}
+
+div.js-edit-layers-html{
+  width: 1250px;
+  max-width:90%;
+  max-height:90%;
+  overflow:auto;
+}
+
+div.js-edit-layers-html td,
+div.js-edit-layers-html th{
+  padding: 5px 10px 5px 10px;
+  text-align:left;
+}
+
+div.js-edit-layers-html span.js-edit-server-layers,
+div.js-edit-layers-html span.show-server-layers,
+div.js-edit-layers-html span.js-delete-server,
+div.js-edit-layers-html span.js-update-server{
+  color:black;
+  font-size:15px;
+}
+
+div.js-edit-layers-html span.js-delete-server:hover{
+  color:#990000;
+}
+
+div.js-edit-layers-html span.js-edit-server-layers:hover{
+  color:#B27300;
+}
+
+div.js-edit-layers-html span.js-update-server:hover{
+  color: #196619 ;
+}
+
+div.js-edit-layers-html table{
+  width:100%;
+}
+
+div.js-edit-layers-html .break-word{
+  word-break:break-word;
+}
+
+div.js-edit-layers-popup{
+  align-items:inherit;
+  margin:10px auto;
+}

@@ -1,0 +1,42 @@
+<div class="form-header">
+   Server List
+   <span class="icon-delete-3 js-edit-layers-close btn right-icon icon-btn"></span>
+</div>
+{{#if this}}
+   <table class="edit-layers-table">
+      <tr>
+         <th/>
+         <th>Server Name</th>
+         {{#if admin}}<th>Owner</th>{{/if}}
+         <th>Provider</th>
+         <th>Cache Time Stamp</th>
+         <th colspan="100%">Configure Tools</th>
+      </tr>
+      {{#each server_list}}
+         <tr>
+            <td><span title="Show Layers" class="show-server-layers icon-arrow-move-down btn icon-btn" data-server="{{serverName}}"></span></td>
+            <td class="break-word">{{serverName}}</td>
+            {{#if ../admin}}<td>{{owner}}</td>{{/if}}
+            <td>{{provider}}</td>
+            <td class="time-stamp">{{timeStamp}}</td>
+            <td><span title="Update" class="js-update-server icon-refresh btn icon-btn" data-server="{{serverName}}" data-wms="{{wms_url}}" data-user="{{owner}}"></span></td>
+            <td><span title="Edit" class="js-edit-server-layers icon-pencil-2 btn icon-btn" data-server="{{serverName}}" data-user="{{owner}}"></span></td>
+            <td><span title="Delete/Hide" class="js-delete-server icon-delete-2 btn icon-btn" data-server="{{serverName}}" data-user="{{owner}}"></span></td>
+
+         </tr>
+         <tr class="server-layers hidden" data-server="{{serverName}}">
+         <td/>
+         <td>
+         {{#each layers}}
+            {{title}}<br/>
+         {{/each}}
+         </td>
+         <td/>
+         <td/>
+         <td colspan="100%"/>
+         </tr>
+      {{/each}}
+   </table>
+{{else}}
+There are currently no servers available for you to configure. Please close this form and add an external WMS URL to add it to your portal.
+{{/if}}

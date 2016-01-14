@@ -8,3 +8,5 @@ PyYAML
 flask_script
 BeautifulSoup
 Pillow
+Shapely
+Markdown

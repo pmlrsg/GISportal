@@ -23,17 +23,8 @@ gisportal.config = {
    // Do we require terms and conditions agreement to use the portal
    requiresTermsAndCondictions: true,
 
-   // these define how the user can search for indicators; this object uses the key as defined in the wmsLayers.py file
-   // and assigns display names to each. If the `browseMode` flag is set to 'tabs' only the first three values are taken 
-   // notice of to build the tabs on the indicator selection panel, but all categories are displayed on the indicator details
-   // panel (provided a value has been set) once the indicator has been loaded onto the map.
-   browseCategories : {
-      "Ecosystem_Element" : "Ecosystem",
-      "region": "Region",
-      "MSFD" : "EU MSFD Descriptor"
-   },
    browseMode : 'tabs',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
-   defaultCategory: '',                     // only used when browseMode = selectlist; any key value from browseCategories
+   defaultCategory: 'indicator_type',                     // used to give the default category to show.
    paths: {
     graphServer: 'http://localhost:3000/',
     middlewarePath: '/service'
@@ -46,10 +37,20 @@ gisportal.config = {
    showGraticules: true,                           // (true|false)   Display latitude and longitude lines on the map
 
    defaultStyle: "boxfill/rainbow",
+
+   cacheTimeout: 60,                               // Used to specify what time must elapse before the cache can be refreshed by the user
    
+   collaborationFeatures : {
+      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      port : '',                                    // must match the port specified in collaboration/config/config.js
+      path : '',                                    // optional path; must start with a /
+   },
    // Should layers auto scale by default
    autoScale: true,
 
+   requiresTermsAndCondictions: true,
 
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',

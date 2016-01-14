@@ -1,0 +1,217 @@
+/*------------------------------------*\
+    Indicators
+\*------------------------------------*/
+
+
+
+.indicator-header  {
+  background-color: $panel-content-header ;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px;
+  min-height: 45px;
+  text-transform: capitalize;
+}
+
+.indicator-header-moving { 
+  background: repeating-linear-gradient(
+  -45deg,
+  #59476d,
+  #59476d 10px,
+  #32253f 10px,
+  #32253f 20px
+);
+}
+
+.indicator-name  {
+   margin-bottom: 5px;
+}
+
+.indicator-header .panel-tab-name  {
+   border-bottom: 0 none;
+}
+.sortable-list .indicator-header {
+   cursor: -webkit-grab;
+   cursor: grab;
+}
+
+.moveable { margin: 10px;}
+
+@media only screen and (min-width : 1270px)  {
+   .indicator-header .icon_remove {
+      float: right;
+   }
+}
+
+.js-tab-analysis .panel-tab  {
+   padding: 0;
+}
+
+.steps > li  {
+   padding: 16px;
+}
+
+
+.steps > li.full-size{
+  padding: 12px;
+}
+
+.icon_rect  {
+   float: right;
+}
+
+.icon_line {
+  float: right;
+}
+
+.icon_poly {
+  float: right;
+}
+.coordinates  {
+   margin-top: 15px;
+}
+
+.analysis-add-series{
+   display: none ;
+  // background-color: #B3AE3F;
+   float: right;
+}
+
+.has-active-plot .analysis-add-series{
+   display: inline;
+}
+
+
+.has-active-plot .analysis-make-new-series{
+  display: none;
+}
+
+.analysis-draw-bbox-buttons button{
+  background-color: $analysis-button;
+}
+.analysis-draw-bbox-buttons .icon-cursor-select-area{
+    position: relative;
+    top: 3px;
+}
+.analysis-add-to-plot-buttons{
+  margin-top: 10px;
+}
+
+
+.number  {
+   color: #b1a7bc;
+   width: 60px;
+  height: 100%;
+  display: inline-block;
+}
+.number + * {
+  display: inline-block;
+  width: calc(100% - 65px);
+}
+
+.bbox-info  {
+   margin-top: 6px;
+}
+
+.bbox-info div {
+   display: inline-block;
+   width: 32%;
+   text-align: center;
+   float: left;
+}
+
+.bbox-info dd,
+.bbox-info dt  {
+   display: block;
+}
+
+.bbox-info dt  {
+   margin: 0 10px 0 5px;
+}
+
+.indicator-list {
+   position: static;
+}
+
+.indicator-header-icon{
+  font-size: 23px;
+  width: 35px;
+  display: inline-block;
+  text-align: center;
+}
+
+.indicator-header-icon.active{
+  border-bottom: 2px solid #a19d63;
+}
+
+.indicator-header .remove{
+  float: right;
+}
+
+
+.indicator-header p {
+  background-color: #442D5C;
+  margin: -10px -15px 3px -15px;
+  padding: 4px 9px 6px 9px;
+  background: linear-gradient(to bottom, #442d5c 75%,#5b496f 100%);
+  font-weight: bold;
+}
+
+.toggleVisibility{
+  border-bottom: none !important;
+}
+.toggleVisibility:before {
+  content: "\e00f";
+}
+.toggleVisibility.active:before {
+  content: "\e02b";
+}
+
+.indicator-list > li:not(:last-child){
+  margin-bottom: 20px;
+}
+
+.icon-checkbox:before{
+  content: "\e506";
+  font-size: 80%;
+}
+.icon-checkbox.active:before, .icon-checkbox:hover:before{
+  content: "\e300";
+  font-size: 100%;
+}
+.indicator-checkbox{
+  cursor: pointer;
+  font-size: 22px;
+}
+
+table.stripe.panel-tab td {
+  /*height: 30px;*/
+  padding-top: 5px;
+  padding-left: 15px;
+  padding-bottom: 5px;
+  vertical-align: middle;
+}
+
+table.stripe td:nth-child(odd) {
+  min-width: 110px;
+}
+
+/* added for allowing teh overlays*/
+.indicator-list li {
+  position:relative;
+}
+
+.indicator-overlay {
+  position:absolute;
+  top:0;
+  left:0;
+  height:100%;
+  width:100%;
+  background: rgba(100,100,100,0.5);
+  cursor: pointer;
+
+}
+
+.export-raw-slideout{
+  padding: 19px;
+}

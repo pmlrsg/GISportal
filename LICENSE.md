@@ -255,20 +255,6 @@ OPEC includes the following third-party code in a modified state.
 > THE SOFTWARE.
 
 
-### jQuery Gritter
-
-[http://www.boedesign.com/](http://www.boedesign.com/)
-
-> Gritter for jQuery  
-> http://www.boedesign.com/  
->
-> Copyright (c) 2012 Jordan Boesch  
-> Dual licensed under the MIT and GPL licenses.  
->
-> Date: February 24, 2012  
-> Version: 1.7.4  
-
-
 ### jQuery ContextMenu
 
 [http://medialize.github.io/jQuery-contextMenu/](http://medialize.github.io/jQuery-contextMenu/)
