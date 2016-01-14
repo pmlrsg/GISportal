@@ -159,3 +159,10 @@
     box-shadow: 0 0 .2em .13em #52a8e8, 0 0 0 549px black, 0 0 0 549px #298df4;
   }
 }
+
+div.panel-container[data-panel-name="collaboration"] .alert-danger,
+div.panel-container[data-panel-name="collaboration"] .alert-warning,
+div.panel-container[data-panel-name="collaboration"] .alert-success{
+  margin: 10px -8px;
+  padding: 10px;
+}

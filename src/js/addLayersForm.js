@@ -182,7 +182,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       });
    }catch(e){};
-   if(l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
+   if(l.legendSettings && l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
       $('.scale-points-div').toggleClass('hidden', false);
    }
    

@@ -16,6 +16,13 @@ gisportal.userPermissions.user_info ={
          'permission':'guest',
          'forename':'Guest',
          'surname':'User'
+      },
+      "ojsdude":{
+         'id':'ojsdude',
+         'username':'ojsdude',
+         'permission':'user',
+         'forename':'Oliver',
+         'surname':'Standeven'
       }
    };
 

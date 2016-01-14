@@ -219,26 +219,37 @@ gisportal.indicatorsPanel.initDOM = function() {
 };
 
 gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
-   wcs_url = $('input.js-wcs-url')[0].value;
-   layer = gisportal.layers[selected_this.closest('[data-id]').data('id')];
-   filename = layer.serverName;
-   name = layer.urlName;
-   sensor = layer.sensor;
+   var wcs_url = $('input.js-wcs-url')[0].value;
+   var layer = gisportal.layers[selected_this.closest('[data-id]').data('id')];
+   var filename = layer.serverName;
+   var user = layer.owner;
    error_div = $("#" + layer.id + "-analysis-message");
 
    if(!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))){
       error_div.toggleClass('hidden', false);
       error_div.html("The URL must start with 'http://'' or 'https://'");
-   }
-   else{
+   }else if(user = "guest"){
+      for(index in gisportal.layers){
+         this_layer = gisportal.layers[index];
+         if(this_layer.serverName = filename){
+            gisportal.layers[index].wcsURL = wcs_url.split("?")[0];
+         }
+      }
+      gisportal.indicatorsPanel.analysisTab(layer.id)
+      message_div = $("#" + layer.id + "-analysis-message");
+      message_div.toggleClass('hidden', false);
+      message_div.html('The WCS URL has been added to this server.');
+      message_div.toggleClass('alert-danger', false);
+      message_div.toggleClass('alert-success', true);
+   }else{
       $.ajax({
-         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&filename=' + filename + '&name=' + name + '&sensor=' + sensor + '&domain=' + gisportal.userPermissions.domainName,
+         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&user=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)
             message_div = $("#" + layer.id + "-analysis-message");
             message_div.toggleClass('hidden', false);
-            message_div.html('The WCS URL has been added to this layer.');
+            message_div.html('The WCS URL has been added to this server.');
             message_div.toggleClass('alert-danger', false);
             message_div.toggleClass('alert-success', true);
          },

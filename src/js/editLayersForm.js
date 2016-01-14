@@ -144,7 +144,7 @@ gisportal.editLayersForm.addListeners = function(){
       var user = $(this).data("user");
       var user_info = gisportal.userPermissions.this_user_info;
       $.ajax({
-         url:  '/service/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  'http://localhost:1310/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          success: function(){
             var to_be_deleted = [];
             for(index in gisportal.selectedLayers){
@@ -318,7 +318,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: '/service/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+            url: 'http://localhost:1310/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('green-spin', false);
