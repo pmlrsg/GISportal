@@ -1,0 +1,6 @@
+<input type="radio" id="tab-{{id}}-dimensions" name="tabs" data-tab-name="dimensions" {{checked visibleTab "dimensions"}} class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab dimensions-tab">
+   <h3>vector styles</h3>
+   <div class="vector-style-container">
+   </div>
+</div>

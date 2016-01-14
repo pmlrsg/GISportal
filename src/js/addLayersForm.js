@@ -298,7 +298,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             var user_info = gisportal.userPermissions.this_user_info;
             //Sends the layers to the middleware to be added to the json file
             $.ajax({
-               url:  '/service/add_user_layer',
+               url: gisportal.middlewarePath + '/add_user_layer',
                method:'POST',
                data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"), 'domain':gisportal.userPermissions.domainName},
                // If there is success

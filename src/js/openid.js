@@ -33,7 +33,7 @@ gisportal.openid.setup = function(containerID) {
          gisportal.openid.hideLogin();
       }
       else  {
-         console.log('User did not log in');
+         //console.log('User did not log in');
       }
    };
    

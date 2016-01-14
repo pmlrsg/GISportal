@@ -53,7 +53,15 @@ We also need to install all the required libraries. This can be done in a few wa
 Finally we need autoprefixer from NPM, this will allow the portal to be run in IE9 and other older browsers
 ``npm install -g autoprefixer``
 
+
 3. **Build JavaScript/CSS**  
+
+**Install SASS**
+To compile the CSS for the project we use SASS. This relies on a ruby gem called sass.
+
+``sudo gem install sass``
+
+
 For production, JavaScript and CSS should be minifed; the application is configured to offer compressed files unless you tell it to use `dev` mode. The build mechanism uses Grunt, which first needs to be installed. 
 
     Make sure you have Grunt CLI tools

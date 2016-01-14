@@ -22,6 +22,7 @@ def metadata(metadata_type, metadata_id):
          type_name = types[temp_type]
          with open('%s/%s' % (type_dir, type_name)) as tfile:
             text = tfile.read()
+            text = text.decode('utf-8')
             current_app.logger.debug(text)
             html = markdown.markdown(text).replace('\n','') 
          return html

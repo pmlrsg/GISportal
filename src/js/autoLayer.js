@@ -68,12 +68,15 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 
    _.forIn(gisportal.layers, function( layer ){
-      if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
-         only_matching_layer = {};
-         only_matching_layer[layer.id] = layer;
-      }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
-         matching_layers[layer.id] = layer;
+      if(layer.serviceType!=="WFS"){   
+         if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
+            only_matching_layer = {};
+            only_matching_layer[layer.id] = layer;
+         }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
+            matching_layers[layer.id] = layer;
+         }
       }
+      
    });
    return only_matching_layer || matching_layers; // If there is a 'chosen one' it returns it, if not it returns the list of other matching ones.
 };
@@ -85,7 +88,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&username=' + gisportal.userPermissions.user + '&domain=' + gisportal.userPermissions.domainName + '&permission=' + gisportal.userPermissions.this_user_info.permission
+      clean_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&username=' + gisportal.userPermissions.user + '&domain=' + gisportal.userPermissions.domainName + '&permission=' + gisportal.userPermissions.this_user_info.permission
       if(given_cache_refresh == "false"){
          request_url = "cache/" + gisportal.userPermissions.domainName + "/temporary_cache/"+clean_file+".json"
       }else{
@@ -99,6 +102,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
             gisportal.autoLayer.addGivenLayer(layer);
          },
          error: function(e){
+            console.log("AAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRGT");
             if(given_cache_refresh == "false" && e.status == 404){
                $.ajax({
                   url:  clean_url,

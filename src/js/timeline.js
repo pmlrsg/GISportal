@@ -60,7 +60,7 @@ gisportal.TimeLine = function(id, options) {
    
    // Check to see if the element with id exists, if not throw an error and return a null object
    if (!$('div#' + id).length) {
-      console.error('No DIV with ID, "' + id + '" exists. Cannot render TimeLine.');
+      //console.error('No DIV with ID, "' + id + '" exists. Cannot render TimeLine.');
       return;
    }
 
@@ -129,7 +129,7 @@ gisportal.TimeLine = function(id, options) {
    
    // Set initial y scale
    this.xScale = d3.time.scale().domain([this.minDate, this.maxDate]).range([0, this.width]);
-   console.log("xscale width:" + this.width);
+   //console.log("xscale width:" + this.width);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
    //--------------------------------------------------------------------------
@@ -437,8 +437,8 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    var padding = (maxDate - minDate) * 0.05; 
    this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime() - padding) : this.minDate);
    this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime() + padding) : this.maxDate);
-   console.log(minDate, maxDate);
-   console.log(this.xScale.domain());
+   //console.log(minDate, maxDate);
+   //console.log(this.xScale.domain());
    this.xScale.domain([this.minDate * 0.9, this.maxDate * 1.1]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();

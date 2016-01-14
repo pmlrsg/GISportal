@@ -242,6 +242,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       }
 
    } else {
+
       console.log('addToPanel');
       var matching_tags = gisportal.groupNames(refinedIndicatorLayers)[name];
       var placeholder = $('<div class="js-refine-section-external' + '"><div id="refine-external"></div></div>')
@@ -271,6 +272,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
             })
          }
       }
+
 
 
 

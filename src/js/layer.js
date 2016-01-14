@@ -43,6 +43,7 @@ gisportal.layer = function( options ) {
 
       provider: {},
       offsetVectors: null,
+      serviceType: null,
 
       autoScale: gisportal.config.autoScale
    };
@@ -177,14 +178,17 @@ gisportal.layer = function( options ) {
          // A list of styles available for the layer
          this.styles = layerData.Styles; // Can be 'Null'.
          var default_style = null;
+         //console.log("before style add");
          $.each(this.styles, function(index, value){
             if(value.Name == gisportal.config.defaultStyle){
                default_style = value.Name;
             }
          });
+         //console.log("adding style");
          this.style = default_style || this.styles[0].Name;
          
       } else if(this.type == "refLayers") {
+        //console.log("gett wfs metadat if block")
          // intended for WFS type layers that are not time related
       }
       
@@ -381,7 +385,7 @@ gisportal.layer = function( options ) {
          return filtArray;
       } 
       else  if (nearestDate != null) {
-         console.log("Using nearest date: " + nearestDate);
+         //console.log("Using nearest date: " + nearestDate);
          return [nearestDate];
       }
       else {
@@ -422,13 +426,13 @@ gisportal.layer = function( options ) {
             //-----------------------------------------------------------------       
             
             layer.setVisibility(layer.isVisible);
-            console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
+            //console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
          }
          else {
             layer.currentDateTimes = [];
             layer.selectedDateTime = '';
             layer.setVisibility(false);
-            console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
+            //console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
          }
       }
    };
@@ -620,6 +624,7 @@ gisportal.addLayer = function(layer, options) {
  * @param {object} layer - A gisportal.layer object
  */
 gisportal.removeLayer = function(layer) {
+  //console.log("removing Layer");
    var index = _.indexOf(gisportal.selectedLayers, layer.id);
    
    // Using splice to remove the index from selectedLayers 
@@ -680,7 +685,13 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options) {  
   var options = options || {};
   var id = layer.id; 
+  //console.log("getting layer data 222");
+  if (layer.serviceType=="WFS"){
 
+    gisportal.layers[id].init(options,layer)
+  }
+  else {
+    //console.log("inside ajax getting");
    $.ajax({
       type: 'GET',
       url: "./cache/layers/" + fileName,
@@ -695,5 +706,6 @@ gisportal.getLayerData = function(fileName, layer, options) {
          $.notify("Sorry\nThere was a problem loading this layer, please try again", "error")
       }
    });
+ }
 };
 

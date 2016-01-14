@@ -22,7 +22,7 @@ trim_sizes = {
 Gets wcs data from a specified server, then performs a requested function
 on the received data, before jsonifying the output and returning it.
 """
-@portal_wcs.route('/wcs', methods = ['GET'])
+@portal_wcs.route('/wcs', methods = ['GET','POST'])
 def getWcsData():
    import random
    
@@ -43,6 +43,8 @@ def getWcsData():
                   data = getIrregularData(params)
                elif 'line' in params:
                   data = getIrregularData(params, poly_type='line') 
+               elif 'multipolygon' in params:
+                  data = getIrregularData(params, poly_type='multipoly')
                else:
                   data = getBboxData(params, basic)
                output = toCSV(data)
@@ -153,36 +155,38 @@ Gets any parameters.
 def getParams():
    # Required for url
    nameToParam = {}
-   nameToParam["baseURL"] = Param("baseURL", False, False, request.args.get('baseurl'))
+   nameToParam["baseURL"] = Param("baseURL", False, False, request.values.get('baseurl'))
    nameToParam["service"] = Param("service", False, True, 'WCS')
    nameToParam["request"] = Param("request", False, True, 'GetCoverage')
-   nameToParam["version"] = Param("version", False, True, request.args.get('version', '1.0.0'))
-   nameToParam["format"] = Param("format", False, True, request.args.get('format', 'NetCDF3'))
-   nameToParam["output_format"] = Param("output_format", True, True, request.args.get('output_format', None))
-   nameToParam["coverage"] = Param("coverage", False, True, request.args.get('coverage'))
+   nameToParam["version"] = Param("version", False, True, request.values.get('version', '1.0.0'))
+   nameToParam["format"] = Param("format", False, True, request.values.get('format', 'NetCDF3'))
+   nameToParam["output_format"] = Param("output_format", True, True, request.values.get('output_format', None))
+   nameToParam["coverage"] = Param("coverage", False, True, request.values.get('coverage'))
    nameToParam["crs"] = Param("crs", False, True, 'OGC:CRS84')
    
    # Optional extras
-   nameToParam["time"] = Param("time", True, True, request.args.get('time', None))
-   nameToParam["vertical"] = Param("vertical", True, True, request.args.get('depth', None))
-   nameToParam["polygon"] = Param("polygon", True, True, request.args.get('isPolygon', None))
-   nameToParam["line"] = Param("polygon", True, True, request.args.get('isLine', None))
+   nameToParam["time"] = Param("time", True, True, request.values.get('time', None))
+   nameToParam["vertical"] = Param("vertical", True, True, request.values.get('depth', None))
+   nameToParam["polygon"] = Param("polygon", True, True, request.values.get('isPolygon', None))
+   nameToParam["line"] = Param("polygon", True, True, request.values.get('isLine', None))
+   nameToParam["multipoly"] = Param("multipoly", True, True, request.values.get('isMultiPolygon', None))
+
    
    # One Required
-   nameToParam["bbox"] = Param("bbox", True, True, request.args.get('bbox', None))
-   nameToParam["circle"] = Param("circle", True, True, request.args.get('circle', None))
+   nameToParam["bbox"] = Param("bbox", True, True, request.values.get('bbox', None))
+   nameToParam["circle"] = Param("circle", True, True, request.values.get('circle', None))
    #nameToParam["polygon"] = Param("polygon", True, True, request.args.get('polygon', None))
-   nameToParam["point"] = Param("point", True, True, request.args.get('point', None))
+   nameToParam["point"] = Param("point", True, True, request.values.get('point', None))
    
    # Custom
-   nameToParam["type"] = Param("type", False, False, request.args.get('type'))
-   nameToParam["graphXAxis"] = Param("graphXAxis", True, False, request.args.get('graphXAxis'))
-   nameToParam["graphYAxis"] = Param("graphYAxis", True, False, request.args.get('graphYAxis'))
-   nameToParam["graphZAxis"] = Param("graphZAxis", True, False, request.args.get('graphZAxis'))
+   nameToParam["type"] = Param("type", False, False, request.values.get('type'))
+   nameToParam["graphXAxis"] = Param("graphXAxis", True, False, request.values.get('graphXAxis'))
+   nameToParam["graphYAxis"] = Param("graphYAxis", True, False, request.values.get('graphYAxis'))
+   nameToParam["graphZAxis"] = Param("graphZAxis", True, False, request.values.get('graphZAxis'))
    
-   nameToParam["graphXFunc"] = Param("graphXFunc", True, False, request.args.get('graphXFunc'))
-   nameToParam["graphYFunc"] = Param("graphYFunc", True, False, request.args.get('graphYFunc'))
-   nameToParam["graphZFunc"] = Param("graphZFunc", True, False, request.args.get('graphZFunc'))
+   nameToParam["graphXFunc"] = Param("graphXFunc", True, False, request.values.get('graphXFunc'))
+   nameToParam["graphYFunc"] = Param("graphYFunc", True, False, request.values.get('graphYFunc'))
+   nameToParam["graphZFunc"] = Param("graphZFunc", True, False, request.values.get('graphZFunc'))
    
    return nameToParam
 
@@ -272,6 +276,7 @@ def create_mask(poly, params, poly_type="polygon"):
    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
    #print '#'*50
    #print lonlat_poly
+   lonlat_poly = lonlat_poly.buffer(0)
    overlap_poly = loaded_poly.intersection(lonlat_poly)
    poly = poly[trim_sizes[poly_type]]
 
@@ -326,7 +331,6 @@ def create_mask(poly, params, poly_type="polygon"):
          ImageDraw.Draw(img).line(found,   fill=2)
 
    masker = np.array(img)
-
    #fig = plt.figure()
    masked_variable = []
    for i in range(chl.shape[0]):
@@ -337,6 +341,7 @@ def create_mask(poly, params, poly_type="polygon"):
    #    imgplot = plt.imshow(masked_variable)
 
    # plt.show()
+
    return masked_variable, to_be_masked, masker, tfile, variable
 
 
@@ -367,14 +372,24 @@ def contactWCSServer(url):
    current_app.logger.debug('Request successful')
    return resp
       
-def saveOutTempFile(resp):
-   current_app.logger.debug('Saving out temporary file...')
-   temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
-   temp.write(resp.read())
-   temp.close()
-   resp.close()
-   current_app.logger.debug('Temporary file saved successfully')
-   return temp.name
+def saveOutTempFile(resp, notemp=False):
+   import time
+   if notemp:
+      pass
+      mytfilename = '/users/rsg/olcl/irregular_test/' + str(time.time()).split('.')[0]
+      outfile = open(mytfilename, 'w')
+      outfile.write(resp.read())
+      outfile.close()
+      resp.close()
+      return mytfilename
+   else:
+      current_app.logger.debug('Saving out temporary file...')
+      temp = tempfile.NamedTemporaryFile('w+b', delete=False, dir='/tmp')
+      temp.write(resp.read())
+      temp.close()
+      resp.close()
+      current_app.logger.debug('Temporary file saved successfully')
+      return temp.name
     
 def openNetCDFFile(fileName, params):
    current_app.logger.debug('Opening netCDF file...')
@@ -531,20 +546,38 @@ def getBboxData(params, method):
 Performs a basic set of statistical functions on the provided data.
 """
 def basic(dataset, params, irregular=False, original=None):
+   import matplotlib
+   matplotlib.use('Agg')
+   import matplotlib.pyplot as plt   
    if irregular:
-      arr = np.ma.concatenate(dataset)
+      # current_app.logger.debug('irregular shape')
+      # current_app.logger.debug([x.shape for x in dataset])
+
+      #arr = np.ma.concatenate(dataset)
+      arr = np.ma.array(dataset)
+
+      #_img = Image.fromarray(arr[0], 'RGB')
+      #_img.save('/users/rsg/olcl/irregular_test/my.png')
+      # plt.imshow(arr[0])
+      # plt.savefig('/users/rsg/olcl/irregular_test/my.png')
+      # current_app.logger.debug('irregular shape after concatonate')
+      # current_app.logger.debug(arr)
    else:
       arr = np.array(dataset.variables[params['coverage'].value])
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
    if original is not None:
       dataset = original
-   
-   maskedArray = np.ma.masked_invalid(arr)
+   if not irregular:
+      maskedArray = np.ma.masked_invalid(arr)
+   else:
+      maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
-   
+   plt.imshow(maskedArray[0])
+   plt.savefig('/users/rsg/olcl/irregular_test/my_masked.png')
    time = getCoordinateVariable(dataset, 'Time')
-      
+   # current_app.logger.debug('time channel test')
+   # current_app.logger.debug(time)
    if time == None:
       g.graphError = "could not find time dimension"
       return
@@ -583,7 +616,7 @@ def basic(dataset, params, irregular=False, original=None):
    output['data'] = {}
    
    for i, row in enumerate(maskedArray):
-
+      current_app.logger.debug(row)
       if timeUnits:
          date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
       else:     

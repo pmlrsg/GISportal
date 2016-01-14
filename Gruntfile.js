@@ -17,7 +17,9 @@ var coreFiles = [
     "src/js/selectiontools.js",
     "src/js/notify.js",
     "src/js/notify_settings.js",
+    "src/js/vector_styles.js",
     "src/js/layer.js",
+    "src/js/vector_layer.js",
     "src/js/openid.js",
     "src/js/timeline.js",
     "src/js/Plot.js",
@@ -81,15 +83,17 @@ module.exports = function(grunt) {
    // Project configuration.
    grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
+      sass: {
+        dist: {
+          options : {
+            style: 'expanded'
+          },
+          files: {
+            'html/css/GISportal.css' : 'src/css/scss/gisportal.scss'
+          }
+        }
+      },
       concat: {      
-         styles: {
-            options: {
-               stripBanners: true
-            },
-            src: cssFiles,
-            dest: 'html/css/<%= pkg.name %>.css',
-            nonull: true
-         },
          javascript: {
             options: {
                stripBanners: true
@@ -124,17 +128,17 @@ module.exports = function(grunt) {
             }
          }
       },
-      postcss: {
-         options: {
-            processors: [
-               require('pixrem')(),
-               require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
-            ]
-         },
-         dist: {
-            src: 'html/css/<%= pkg.name %>.css',
-         }
-      },
+      // postcss: {
+      //    options: {
+      //       processors: [
+      //          require('pixrem')(),
+      //          require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+      //       ]
+      //    },
+      //    dist: {
+      //       src: 'html/css/<%= pkg.name %>.css',
+      //    }
+      // },
       cssmin: {
          options: {
             shorthandCompacting: false,
@@ -187,10 +191,11 @@ module.exports = function(grunt) {
    grunt.loadNpmTasks('grunt-contrib-cssmin');  // this is here because cssnano that's a plugin for postcss is too slow
    grunt.loadNpmTasks('grunt-contrib-jshint');
    grunt.loadNpmTasks('grunt-replace');
+   grunt.loadNpmTasks('grunt-contrib-sass');
    
 
    // Tasks
    grunt.registerTask('default', ['concat', 'uglify', 'postcss', 'cssmin', 'replace:build']);
-   grunt.registerTask('dev', ['concat', 'postcss', 'replace:dev', 'jshint']);
+   grunt.registerTask('dev', ['sass','concat','replace:dev', 'jshint']);
 
 };

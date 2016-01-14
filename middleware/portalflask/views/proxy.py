@@ -627,10 +627,12 @@ def digForLayers(parent_layer, name, service_title, title, abstract, bounding_bo
          if len(styles_list) > 0:
             style = styles_list
         
+
       # If all of the required elements have been found then the layer is added to the layers list.
       if name and service_title and title and bounding_boxes and style:
          layers.append({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace("_", " ")],"niceName": title.title(), "data_provider" : provider}, "boundingBox": bounding_boxes['boundingBox'], "Abstract": abstract, "FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "boundingBox": bounding_boxes['boundingBox'], "MoreIndicatorInfo" : False})
          layer_data = {"FirstDate": dimensions['firstDate'], "LastDate": dimensions['lastDate'], "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions['dimensions'], "Styles": style}
+
          clean_server_name = clean_url
          
          path = os.path.join(CURRENT_PATH, LAYERCACHEPATH, clean_server_name + "_" + name + FILEEXTENSIONJSON)

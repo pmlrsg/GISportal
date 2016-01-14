@@ -23,7 +23,8 @@ if( ! window.location.origin )
    window.location.origin = window.location.protocol + "//" + window.location.host
 
 // Path to the python flask middleware
-gisportal.middlewarePath = window.location.origin + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = window.location.href + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+
 
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
@@ -103,10 +104,11 @@ var map;
  */
 gisportal.loadLayers = function() { 
    // The old layers will be removed from the portal
+   gisportal.loadVectorLayers();
    gisportal.original_layers = {};
    gisportal.layers = {};
    loadWmsLayers();
-
+   
    function loadWmsLayers(){
       // Get WMS cache
       var user_info = gisportal.userPermissions.this_user_info
@@ -122,7 +124,85 @@ gisportal.loadLayers = function() {
 
 };
 
+/**
+ * Map function to load the vector layers from cache
+ */
+gisportal.loadVectorLayers = function() {
+  var errorHandling = function(request, errorType, exception) {
+      var data = {
+         type: 'vector cache',
+         request: request,
+         errorType: errorType,
+         exception: exception,
+         url: this.url
+      };
+      gritterErrorHandler(data);
+   };
 
+   $.ajax({
+      url: './cache/vectorLayers.json',
+      dataType: 'json',
+      success: gisportal.initVectorLayers,
+      error: errorHandling
+
+   });
+
+};
+
+
+gisportal.createVectorLayers = function() {
+   gisportal.vlayers = [];
+   gisportal.vectors = [];
+   gisportal.cache.vectorLayers.forEach(function( vector ){
+      //console.log(vector);
+      vector.services.wfs.vectors.forEach(function( v ){
+      processVectorLayer(vector.services.wfs.url, v);
+
+      });
+   });
+
+   function processVectorLayer(serverUrl, vector) {
+      var vectorOptions = {
+         "name": vector.name,
+         "description": vector.desc,
+         "endpoint" : serverUrl,
+         "serviceType" : "WFS",
+         "variableName" : vector.variableName,
+         "maxFeatures" : vector.maxFeatures,
+         "tags" : vector.tags,
+         "id" : vector.id,
+         "boundingBox" : vector.boundingBox,
+         "exBoundingBox" : vector.exBoundingBox,
+         "metadataQueue" : [],
+         "abstract" : vector.abstract,
+         "provider" : vector.provider,
+         "contactInfo" : {
+            "organization" : vector.provider
+         },
+         "ignoredParams" : vector.ignoredParams,
+         "vectorType" : vector.vectorType,
+         "styles" : vector.styles,
+         "defaultProperty" : vector.defaultProperty,
+         "defaultProperties" : vector.defaultProperties,
+         "descriptiveName" : vector.tags.niceName,
+         "unit" : vector.unit,
+         "moreIndicatorInfo" : vector.moreIndicatorInfo
+      };
+      //console.log("  CREATING WITH VECTOR FUNCTION   ");
+      var vectorLayer = new gisportal.Vector(vectorOptions);
+      gisportal.vectors.push(vectorLayer);
+
+gisportal.layers[vectorOptions.id] = vectorLayer;
+
+      //console.log(vectorLayer);
+      vectorLayerOL = vectorLayer.createOLLayer();
+      //vectorLayer.openlayers['anID'] = vectorLayerOL;
+      //console.log(vectorLayerOL);
+      gisportal.vlayers.push(vectorLayerOL);
+   }
+   gisportal.configurePanel.refreshData();
+
+};
 
 /** 
  * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
@@ -181,7 +261,8 @@ gisportal.createOpLayers = function() {
       };
 
       var layer = new gisportal.layer( layerOptions );
-
+//console.log("adding info for Indicator : ");
+            //console.log(layer);
       // If theres a duplicate id, increase a counter
       var postfix = "";
       while( gisportal.layers[layer.id + postfix ] !== void(0) )
@@ -293,7 +374,7 @@ gisportal.refreshDateCache = function() {
    
    gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);  
    
-   console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
+   //console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
 };
 
 /**
@@ -316,6 +397,10 @@ gisportal.mapInit = function() {
    dataReadingPopupCloser.onclick = function() {
       dataReadingPopupOverlay.setPosition(undefined);
       dataReadingPopupCloser.blur();
+      _.each(gisportal.selectedFeatures, function(feature){
+         feature[0].setStyle(feature[1]);
+      })
+      gisportal.selectedFeatures = [];
       return false;
    };
 
@@ -344,39 +429,193 @@ gisportal.mapInit = function() {
          resolution: 0.175,
       }),
       logo: false
-   })
+   });
+
+   map.addInteraction(new ol.interaction.Select({
+      condition: function(e) {
+         return e.originalEvent.type=='mousemove';
+      },
+      hover : false
+   }));
+
+
+// var select = new ol.interaction.Select({
+//    multi : true,
+//    layers : function(layer){
+//       //console.log("-------------------------------");
+//       //console.log(layer);
+//       return true
+//    }
+// });
+// map.addInteraction(select);
+
+//    select.on('select', function(e){
+    
+    
+//   //console.log("e.target at select :");
+//       //console.log(e);
+
+//       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
+//       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+//       dataReadingPopupContent.innerHTML = response;
+//       dataReadingPopupOverlay.setPosition(e.coordinate);
+//           //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
+
+//    })
+
+//    // Pan by mouse seems to be broken in ol3.8
+   // This seems to be the new syntax for adding it
+   map.addInteraction(new ol.interaction.DragPan({}));
+
 
    //add a click event to get the clicked point's data reading
-   map.on('singleclick', function(e) {
-      if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
-         var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
-         var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
-         var lat = point[1].toFixed(3);
-         var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-         var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-         dataReadingPopupContent.innerHTML = response;
-         dataReadingPopupOverlay.setPosition(e.coordinate);
+    map.on('singleclick', function(e) {
+        var isFeature = false;
+        var response = ''
+        if(gisportal.selectionTools.isSelecting){
 
-         gisportal.getPointReading(e);
-      }
-   })
+         map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
+               console.log("adding WKT to form");
+               var t_wkt = gisportal.wkt.writeFeatures([feature]);
+               console.log(t_wkt);
+               $('.js-coordinates').val(t_wkt);
+
+               
+
+         });
+         gisportal.selectionTools.isSelecting = false;
+
+        }
+        else {
+           map.forEachFeatureAtPixel(e.pixel,
+               function(feature, layer) {
+                   if (feature) {
+                     //console.log("----------------------");
+                     //console.log(feature);
+                     var geom = feature.getGeometry();
+                     //console.log(gisportal.wkt.writeFeatures([feature])) ;
+                       // clear existing style if any layers currently slected
+                       _.each(gisportal.selectedFeatures, function(feature) {
+                           //feature[0].setStyle(feature[1]);
+                       })
+                       //console.log('====================');
+                       var tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
+                       isFeature = true;
+                       gisportal.selectedFeatures.push([feature, feature.getStyle()]);
+                       var fill = gisportal.vectorStyles.genColour(0.8);
+                       var geometry = feature.getGeometry();
+                       var coord = geometry.getCoordinates();
+                       feature.setStyle(new ol.style.Style({
+                           stroke: new ol.style.Stroke({
+                               color: gisportal.vectorStyles.genColour(1),
+                               width: 2
+                           }),
+                           fill: new ol.style.Fill({
+                               color: fill
+                           })
+                       }));
+                       //console.log('coord ' + coord); // coord 307225.8888888889,361595.6666666666
+
+                       ////console.log(feature.values_); // name undefined
+                       // var ft = myGeoJSONSource.getClosestFeatureToCoordinate(coord);
+                       // //console.log('name ' + ft.get('Tenant_Name')); // name Shefton
+                       response += '<p style="color:' + fill + '">vector details</p><ul>';
+                       var props = feature.getProperties();
+                       for (var key in props) {
+                           if (props.hasOwnProperty(key)) {
+                               ////console.log(key, props[key]);
+                               if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
+                                   response += "<li>" + key + " : " + props[key] + "</li>"
+                               }
+                           }
+                       }
+                       response += "</ul>"
+
+                   }
+           });
+           dataReadingPopupContent.innerHTML = response;
+           dataReadingPopupOverlay.setPosition(e.coordinate);
+           if (!isFeature) {
+               var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+               var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
+               var lat = point[1].toFixed(3);
+               var elementId = 'dataValue' + String(e.coordinate[0]).replace('.', '') + String(e.coordinate[1]).replace('.', '');
+               var response = '<p>Measurement at:<br /><em>Longtitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+               dataReadingPopupContent.innerHTML = response;
+               dataReadingPopupOverlay.setPosition(e.coordinate);
+
+               gisportal.getPointReading(e);
+           }
+     }
+    });
+
    map.on("moveend", function(data) {
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
       gisportal.events.trigger('map.move', centre, zoom);
    });
-   
-   // Get both master cache files from the server. These files tells the server
-   // what layers to load for Operation (wms) and Reference (wcs) layers.
-   gisportal.loadLayers();
 
-   // Create the base layers, country borders layers and graticules; set defaults
+
+
+
+
+
+
+
+
+   //    if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
+   //       var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+   //       var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
+   //       var lat = point[1].toFixed(3);
+   //       var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
+   //       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+   //       dataReadingPopupContent.innerHTML = response;
+   //       dataReadingPopupOverlay.setPosition(e.coordinate);
+
+   //       gisportal.getPointReading(e);
+   //    }
+   // })
+
+   
+
+ 
+   gisportal.loadLayers();
+//gisportal.loadVectorLayers();
+
+   // new load of vector layers
+  // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    
    // add vector layer for drawing area of interest polygons, and set up tools
    gisportal.selectionTools.init();
 
 };
+
+gisportal.selectedFeatures = [];
+
+
+gisportal.getWFSFeature = function(featureID) {
+   url = "https://vortices.npm.ac.uk/geoserver/rsg/ows?service=WFS&maxFeatures=10version=1.1.0&request=GetFeature&typename=rsg:MMO_Fish_Shellfish_Cages_A&srs=EPSG:4326&outputFormat=application/json&featureID="
+   url += featureID;
+   $.ajax({
+      url: url,
+      success : function(data){
+         //console.log(data);
+          var wfsFormat = new ol.format.GeoJSON({
+            featureNS: "http://rsg.pml.ac.uk",
+            featureType : [featureID.split('.')[1]]
+          });
+          //console.log("success getting feature info");
+          features = wfsFormat.readFeatures(data);
+         //console.log(features);
+      },
+      error : function(err) {
+         //console.log("wfs get feature error");
+      }
+      
+   })
+};
+
 
 /**
  * The initiation of WMS layers, such as adding to gisportal.cache.
@@ -393,6 +632,21 @@ gisportal.initWMSlayers = function(data, opts) {
       gisportal.createOpLayers();
    }
 };
+
+/**
+ * The initiation of Vector layers, such as adding to gisportal.cache.
+ * @param {object} data - The actual layer
+ * @param {object} opts - Options, not currently used
+ */ 
+gisportal.initVectorLayers = function(data, opts) {
+   if (data !== null)  {
+
+      gisportal.cache.vectorLayers = data;
+      // Create WMS layers from the data
+      gisportal.createVectorLayers();
+   }
+};
+
 
 
 /*===========================================================================*/
@@ -507,6 +761,7 @@ gisportal.saveState = function(state) {
  */
 gisportal.loadState = function(state) {
    
+   //console.log("Loading State!")
    gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    var state = state || {};
@@ -735,11 +990,11 @@ gisportal.main = function() {
       // for retrieving a state object.
       var stateID = gisportal.utils.getURLParameter('state');
       if(stateID !== null) {
-         console.log('Retrieving State...');
+         //console.log('Retrieving State...');
          gisportal.ajaxState(stateID);
       }
       else {
-         console.log('Loading Default State...');
+         //console.log('Loading Default State...');
       }
 
       // if collaboration features are enabled, switch 'em on...
@@ -767,10 +1022,10 @@ gisportal.ajaxState = function(id) {
       dataType: 'json',
       success: function( data ) {         
          gisportal.setState( data );
-         console.log('Success! State retrieved');
+         //console.log('Success! State retrieved');
       },
       error: function( request ){
-         console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
+         //console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
       }
    });
 } 
@@ -1020,7 +1275,7 @@ gisportal.getPointReading = function(e) {
 
 
          $.ajax({
-            url:  '/service/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            url:  gisportal.middlewarePath + '/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
                try{
                   $(elementId +' .loading').remove();
@@ -1120,6 +1375,11 @@ gisportal.loadBrowseCategories = function(data){
                   addCategory(category);
                }
             }
+         }
+      }
+      for(layer in gisportal.vectors){
+         for(category in gisportal.vectors[layer]['tags']){
+            addCategory(category);
          }
       }
    // Any other time

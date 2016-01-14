@@ -169,6 +169,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
 
    try{
       var l = gisportal.layers[id];
+      if(l.serviceType!="WFS"){
       var bbox = l.exBoundingBox.WestBoundLongitude + ","
          + l.exBoundingBox.SouthBoundLatitude + ","
          + l.exBoundingBox.EastBoundLongitude + ","
@@ -190,6 +191,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
             }
          }
       });
+   }
    }catch(e){};
 
    gisportal.events.trigger('scalebar.autoscale', id, force);

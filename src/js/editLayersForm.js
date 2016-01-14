@@ -177,7 +177,7 @@ gisportal.editLayersForm.addListeners = function(){
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+         refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -211,7 +211,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = '/service/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+                  refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
