@@ -128,22 +128,15 @@ gisportal.loadLayers = function() {
  * Map function to load the vector layers from cache
  */
 gisportal.loadVectorLayers = function() {
-  var errorHandling = function(request, errorType, exception) {
-      var data = {
-         type: 'vector cache',
-         request: request,
-         errorType: errorType,
-         exception: exception,
-         url: this.url
-      };
-      gritterErrorHandler(data);
-   };
+
 
    $.ajax({
       url: './cache/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
-      error: errorHandling
+      error: function(e){
+            $.notify("Sorry\nThere was an unexpected error getting the vector cache. Try refreshing the page, or coming back later.", {autoHide:false, className:"error"});
+         }
 
    });
 

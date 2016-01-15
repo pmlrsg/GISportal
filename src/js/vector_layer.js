@@ -533,30 +533,30 @@ gisportal.addVectorLayers = function(layers) {
 
 gisportal.vectorSelectionTest = function(id, tabname){
 
-var layers = map.getLayers();
-    var found = false;
+  var layers = map.getLayers();
+      var found = false;
 
-layers.forEach(function(f){
-    console.log("testing layer");
-    console.log(f);
-    if(f instanceof ol.layer.Vector){
-        if (f.getSource().getFeatures().length > 0) {
-        console.log("adding vector select button")
-        //gisportal.indicatorsPanel.vectorSelectSwitch(id, tabname)
-        found = true;
-    }
-    }
-    else {
-        console.log("skipping as not vector");
-    }
-    
-})
+  layers.forEach(function(f){
+      console.log("testing layer");
+      console.log(f);
+      if(f instanceof ol.layer.Vector){
+          if (f.getSource().getFeatures().length > 0) {
+          console.log("adding vector select button")
+          //gisportal.indicatorsPanel.vectorSelectSwitch(id, tabname)
+          found = true;
+      }
+      }
+      else {
+          console.log("skipping as not vector");
+      }
+      
+  })
 
-if(found){
-        $('.js-draw-select-polygon').removeClass('hidden');
-    }
-    else {
-        $('.js-draw-select-polygon').addClass('hidden');
-    }
+  if(found){
+          $('.js-draw-select-polygon').removeClass('hidden');
+      }
+      else {
+          $('.js-draw-select-polygon').addClass('hidden');
+      }
 
 };
