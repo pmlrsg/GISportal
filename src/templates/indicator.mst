@@ -14,10 +14,10 @@
             <span class="{{active visibleTab "analysis"}} js-icon-analyse  icon-btn js-closable icon-business-chart-2 indicator-header-icon js-indicator-tab-trigger" data-tab-name="analysis" for="tab-{{id}}-analysis" title="Layer Analysis"></span>
 
             {{#if ../user_allowed_to_add}}
-               <span class="js-add-layer-server icon-btn indicator-header-icon icon-add-3" data-server="{{../serverName}}" data-owner="{{../owner}}" title="Add Data"></span>
+               <span class="js-add-layer-server icon-btn indicator-header-icon icon-add-3" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Add Data"></span>
             {{/if}}
             {{#if ../user_allowed_to_edit}}
-               <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" title="Edit Data"></span>
+               <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Edit Data"></span>
             {{/if}}
             
             <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
