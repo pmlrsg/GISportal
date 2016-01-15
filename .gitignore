@@ -19,3 +19,4 @@ collaboration/config/config.json
 middleware/nodejs/
 middleware/nodejs/*
 middleware/python-flask.log
+.sass-cache/*
