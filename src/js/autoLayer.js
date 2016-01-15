@@ -102,7 +102,6 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
             gisportal.autoLayer.addGivenLayer(layer);
          },
          error: function(e){
-            console.log("AAAAAAAAAAAAAAAAARRRRRRRRRRRRRRRRRRRRRRGT");
             if(given_cache_refresh == "false" && e.status == 404){
                $.ajax({
                   url:  clean_url,

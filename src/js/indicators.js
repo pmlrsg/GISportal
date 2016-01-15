@@ -411,7 +411,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
 
    //Add the edit/add layers listener to add the server to the form
    $('span.js-add-layer-server').on('click', function(){
-      gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'));
+      gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
    })
 
    gisportal.events.trigger('layer.addtopanel', data)

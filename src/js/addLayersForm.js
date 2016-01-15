@@ -36,7 +36,7 @@ gisportal.addLayersForm.validation_functions = {
 * 
 * @param {Object} layer - Object containing data about the layer. 
 */
-gisportal.addLayersForm.addlayerToList = function(layer){
+gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    if(gisportal.selectedLayers.indexOf(layer.id) > -1){
       gisportal.addLayersForm.selectedLayers.push(layer.id); // Saves out all of the layers that are selected.
    }
@@ -92,7 +92,15 @@ gisportal.addLayersForm.addlayerToList = function(layer){
          return;
       }
    }
-   gisportal.addLayersForm.layers_list[list_id] = layer_info;
+   if(layer_id && list_id != 1 && layer_id == layer.id){ // If this is the layer that was clicked from then this makes sure it is added to the beggining of the list.
+      layer_info.list_id = 1;
+      gisportal.addLayersForm.layers_list[list_id] = gisportal.addLayersForm.layers_list[1];
+      gisportal.addLayersForm.layers_list[list_id].list_id = list_id;
+      gisportal.addLayersForm.layers_list[1] = layer_info;
+
+   }else{
+      gisportal.addLayersForm.layers_list[list_id] = layer_info;
+   }
 };
 
 /**
@@ -680,7 +688,7 @@ gisportal.addLayersForm.checkValidity = function(field, value){
 *
 * @param String server - the name of the server to be added to the form.
 */
-gisportal.addLayersForm.addServerToForm = function(server, owner){
+gisportal.addLayersForm.addServerToForm = function(server, owner, layer_id){
    gisportal.addLayersForm.layers_list = {}; // Resets the form information
    gisportal.addLayersForm.server_info = {};
    if(_.size(gisportal.original_layers) > 0){ //gets the list of layers.
@@ -692,7 +700,7 @@ gisportal.addLayersForm.addServerToForm = function(server, owner){
    for(layer in layers_list){
       if(layers_list[layer]['serverName'] == server){
          single_layer = layers_list[layer];
-         gisportal.addLayersForm.addlayerToList(layers_list[layer]);
+         gisportal.addLayersForm.addlayerToList(layers_list[layer], layer_id);
       }
    }
    gisportal.addLayersForm.validation_errors = {};
