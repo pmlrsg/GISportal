@@ -16,7 +16,7 @@ collaboration.init = function(io, app, config) {
       if (handshakeData.headers.cookie) {
          try {
             var cookies = cookieParser.signedCookies(cookie.parse(handshakeData.headers.cookie), config.session.secret);
-            var sid = cookies['collaboration'];
+            var sid = cookies['GISportal'];
          
             var sessionStore = app.get('sessionStore');
             sessionStore.load(sid, function(err, session) {

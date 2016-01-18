@@ -42,7 +42,7 @@ app.set('sessionStore', new redisStore({client: redisClient}));
 app.use(cookieParser(config.session.secret));
 // * Session manager
 app.use(session({
-   key: 'collaboration',
+   key: 'GISportal',
    secret: config.session.secret, 
    store: app.get('sessionStore'),
       cookie: {
@@ -69,7 +69,7 @@ app.use('/', routes);
 // Start listening...
 server = http.createServer(app)
 server.listen(config.app.port, function() {
-	console.log('collaboration-suite listening on port %d', config.app.port)
+	console.log('GISportal server listening on port %d', config.app.port)
 });
 io = io.listen(server);
 
