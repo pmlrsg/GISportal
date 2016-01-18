@@ -9,7 +9,7 @@ var jimp = require("jimp");
 var bodyParser = require('body-parser');
 
 var USER_CACHE_PREFIX = "user_";
-var CURRENT_PATH = path.dirname(process.argv[1]);
+var CURRENT_PATH = __dirname;
 var MASTER_CACHE_PATH = CURRENT_PATH + "/../../html/cache/";
 var LAYER_CACHE_PATH = MASTER_CACHE_PATH + "layers/";
 
@@ -141,7 +141,7 @@ app.all('/update_layer', function(req, res){
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json";
    var base_path = path.join(MASTER_CACHE_PATH, domain);
-   if(!username == domain){
+   if(username != domain){
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
    var this_path = path.join(base_path, filename);
@@ -152,20 +152,21 @@ app.all('/update_layer', function(req, res){
 });
 
 app.all('/add_wcs_url', function(req, res){
+   var url = req.query.url.split('?')[0] + "?"; // Gets the given url
    var username = req.query.username; // Gets the given username
    var permission = req.query.permission; // Gets the given permission
    var domain = req.query.domain; // Gets the given domain
-   var url = req.query.url; // Gets the url given
-   var filename = data.serverName + ".json";
+   var filename = req.query.filename + ".json"; // Gets the given filename
+
    var base_path = path.join(MASTER_CACHE_PATH, domain);
-   if(!username == domain){
+   if(username != domain){
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
    var this_path = path.join(base_path, filename);
-   fs.writeFile(this_path, JSON.stringify(data), function(err){
-      if(err) throw err;
-      res.send("");
-   });
+   json_data = JSON.parse(fs.readFileSync(this_path));
+   json_data.wcsURL = url;
+   fs.writeFileSync(this_path, JSON.stringify(json_data));
+   res.send(this_path);
 });
 
 

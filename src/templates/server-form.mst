@@ -12,6 +12,9 @@
 
          <label data-field="address">Address:</label></br>
          <textarea data-field="address" >{{address}}</textarea><br/>
+
+         <label data-field="wcsURL">WCS URL:</label></br>
+         <input type="text" value="{{wcsURL}}" data-field="wcsURL"/></br>
       </div>
       <div class="layers-form-right">
          <label data-field="person">Maintainer:</label></br>

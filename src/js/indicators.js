@@ -239,22 +239,24 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    if(!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))){
       error_div.toggleClass('hidden', false);
       error_div.html("The URL must start with 'http://'' or 'https://'");
-   }else if(user = "guest"){
+   }else if(layer.provider == "UserDefinedLayer"){
       for(index in gisportal.layers){
          this_layer = gisportal.layers[index];
          if(this_layer.serverName = filename){
-            gisportal.layers[index].wcsURL = wcs_url.split("?")[0];
+            gisportal.layers[index].wcsURL = wcs_url.split("?")[0] + "?";
          }
       }
+      console.log("May not have loaded") // Look at only doing it if the user is allowed with that layer
       gisportal.indicatorsPanel.analysisTab(layer.id)
       message_div = $("#" + layer.id + "-analysis-message");
       message_div.toggleClass('hidden', false);
       message_div.html('The WCS URL has been added to this server.');
       message_div.toggleClass('alert-danger', false);
       message_div.toggleClass('alert-success', true);
-   }else{
+   }else{ // Perhaps only if this user isnt a guest!
+      var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  '/service/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&user=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
+         url:  'http://localhost:1310/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)

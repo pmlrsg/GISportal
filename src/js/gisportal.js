@@ -23,7 +23,7 @@ if( ! window.location.origin )
    window.location.origin = window.location.protocol + "//" + window.location.host
 
 // Path to the python flask middleware
-gisportal.middlewarePath = window.location.href + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = window.location.origin + window.location.pathname + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 
 // Flask url paths, relates to /middleware/portalflask/views/

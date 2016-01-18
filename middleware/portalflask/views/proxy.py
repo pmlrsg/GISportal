@@ -291,6 +291,7 @@ def add_user_layer():
    server_info = json.loads(request.form['server_info'])
    domain = request.form['domain'] # Gets the given domain.
    username = server_info['owner'] # Gets the given username.
+   wcsURL = server_info['wcsURL'] # Gets the given wcsURL.
    
 
    if set(('unique_name', 'provider', 'server_name')).issubset(server_info): # Verifies that the necessary server information is provided
@@ -357,6 +358,10 @@ def add_user_layer():
       
       if len(server_info['position']) > 0:
          data['contactInfo']['position']= server_info['position']
+      
+      if wcsURL and len(wcsURL) > 0:
+         data['wcsURL']= wcsURL
+      
       
       saveFile(save_path, json.dumps(data)) # The data file is then added to the user_cache folder.
       return "" # Return of an empty string so that the portal knows the data transfer was successfull.

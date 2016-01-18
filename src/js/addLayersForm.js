@@ -24,8 +24,12 @@ gisportal.addLayersForm.validation_functions = {
                               }
    },
    'email':function(value){if(!/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$|^$/i.test(value)){
-                                 return "The email you provided is invalid, please try again.";
-                              }
+                              return "The email you provided is invalid, please try again.";
+                           }
+   },
+   'wcsURL':function(value){if(value.length > 0 &&!value.startsWith('http://') && !value.startsWith('https://')){
+                              return "The wcsURL must start with 'http://' or 'https://'";
+                           }
    },
 };
 
@@ -436,7 +440,8 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "phone":phone,
          "wms_url":wms_url,
          "owner":owner,
-         "server_name":layer.serverName
+         "server_name":layer.serverName,
+         "wcsURL":layer.wcsURL
       };
    }
    // The display form variable is set to true so that the portal knows if the form was displayed last time the user was viewing it.
