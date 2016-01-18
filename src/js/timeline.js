@@ -476,6 +476,12 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.reHeight();
    this.redraw(); 
    this.updatePickerBounds();
+
+   // ensure that the timeline is visible and adjust the panel height accordingly
+   $('.timeline-container').css('bottom','0px');
+   var h = $('.timeline-container').height();
+   $('.panel').css('bottom', h + 35 +'px');
+   
 };
 
 
