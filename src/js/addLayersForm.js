@@ -96,14 +96,12 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
          return;
       }
    }
-   if(layer_id && list_id != 1 && layer_id == layer.id){ // If this is the layer that was clicked from then this makes sure it is added to the beggining of the list.
-      layer_info.list_id = 1;
-      gisportal.addLayersForm.layers_list[list_id] = gisportal.addLayersForm.layers_list[1];
-      gisportal.addLayersForm.layers_list[list_id].list_id = list_id;
-      gisportal.addLayersForm.layers_list[1] = layer_info;
+   
+   gisportal.addLayersForm.layers_list[list_id] = layer_info;
 
-   }else{
-      gisportal.addLayersForm.layers_list[list_id] = layer_info;
+   if(layer_id&& layer_id == layer.id){ // If this is the layer that was clicked from then this makes sure it is loaded in the form first.
+      return list_id;
+
    }
 };
 
@@ -702,13 +700,17 @@ gisportal.addLayersForm.addServerToForm = function(server, owner, layer_id){
       var layers_list = gisportal.layers;
    }
    var single_layer;
+   var index_to_load = 1;
    for(layer in layers_list){
       if(layers_list[layer]['serverName'] == server){
          single_layer = layers_list[layer];
-         gisportal.addLayersForm.addlayerToList(layers_list[layer], layer_id);
+         index = gisportal.addLayersForm.addlayerToList(layers_list[layer], layer_id);
+         if(index){// If this layer is the one that was clicked
+            index_to_load = index;
+         }
       }
    }
    gisportal.addLayersForm.validation_errors = {};
    // The form is then loaded (loading the first layer)
-   gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', owner)
+   gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, index_to_load, 'div.js-layer-form-html', 'div.js-server-form-html', owner)
 }

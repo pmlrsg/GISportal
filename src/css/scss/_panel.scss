@@ -437,8 +437,8 @@ input.search:focus  {
 .show-tools  {
    font-family: "Open Sans";
    background-color: #fafafb;
-   box-shadow: 4px 0 10px rgba(0,0,0,0.25);
-   border: 1px solid #b1a7bc;
+   box-shadow: 0px 0px 11px -2px black;
+   border: 1px solid #fafafb;
    line-height: 32px;
    padding-right: 15px;
    left: 25px;
@@ -446,7 +446,6 @@ input.search:focus  {
    position: absolute;
    -webkit-appearance: none;
    -moz-appearance: none;
-   border-radius: 5px;
    height: 40px;
 }
 

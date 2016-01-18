@@ -36,7 +36,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
 <!-- OpenLayers Map Code -->
-<script src="js-libs/OpenLayers3/ol-debug.js" type="text/javascript"></script>
+<script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
 
 <!-- D3 -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
@@ -118,7 +118,9 @@
    </div>
 
    <!-- The Timeline -->
-   <div class="timeline-container">
+   <div class="timeline-container" style="bottom: -1000px;">
+      <h3>Timeline</h3>
+      <p> - Click and drag to move, use your mouse scroll wheel to zoom, click to select a date or enter your required date in the date field on the right</p>
       <div class="timeline-inner">
          <ul class="js-timeline-labels timeline-labels"></ul>
          <div id="timeline" class=""></div>

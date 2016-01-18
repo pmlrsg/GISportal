@@ -1,6 +1,6 @@
 .notifyjs-corner {
     z-index: 1100!important;
-    margin: 60px 18px 125px 30% !important;
+    margin: 115px 20px 125px 30% !important;
 }
 
 .notifyjs-bootstrap-on-panel{
@@ -36,4 +36,69 @@
   padding: 5px;
   margin: 2px;
   width: 60px;
+}
+
+.notifyjs-gisportal-base {
+  color: #111111;
+  padding: 8px 15px 8px 14px;
+  background-color: #ffffff;
+  padding-left: 30px;
+  background-repeat: no-repeat;
+  background-position: 3px 7px;
+  border-left: 10px;
+  border-style: solid;
+  width: 350px;
+  box-shadow: 0px 0px 11px -2px black;
+  margin-bottom: 10px;
+}
+
+.notifyjs-gisportal-base:before {
+  font-family: "streamline-24px" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 18px;
+  position: absolute;
+  left: 15px;
+}
+
+.notifyjs-gisportal-error {
+  border-color: #900;
+}
+
+.notifyjs-gisportal-error:before {
+  content: "\e307";
+  color: #900;
+}
+
+.notifyjs-gisportal-success {
+  border-color: #3c763d;
+}
+
+.notifyjs-gisportal-success:before {
+  content: "\e2ff";
+  color: #3c763d;
+}
+
+.notifyjs-gisportal-info {
+  border-color: #31708f;
+}
+
+.notifyjs-gisportal-info:before {
+  content: "\e0b8";
+  color: #31708f;
+}
+
+.notifyjs-gisportal-warn {
+  border-color: #D48702;
+}
+
+.notifyjs-gisportal-warn:before {
+  content: "\e4b9";
+  color: #D48702;
 }

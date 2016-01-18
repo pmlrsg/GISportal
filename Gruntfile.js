@@ -84,14 +84,22 @@ module.exports = function(grunt) {
    grunt.initConfig({
       pkg: grunt.file.readJSON('package.json'),
       sass: {
-        dist: {
-          options : {
-            style: 'expanded'
-          },
-          files: {
-            'html/css/GISportal.css' : 'src/css/scss/gisportal.scss'
-          }
-        }
+         dev: {
+            options : {
+               style: 'expanded'
+            },
+            files: {
+               'html/css/<%= pkg.name %>.css' : 'src/css/scss/gisportal.scss'
+            }
+         },
+         build: {
+            options : {
+               style: 'compressed'
+            },
+            files: {
+               'html/css/<%= pkg.name %>.min.css' : 'src/css/scss/gisportal.scss'
+            }
+         }
       },
       concat: {      
          javascript: {
@@ -128,17 +136,17 @@ module.exports = function(grunt) {
             }
          }
       },
-      // postcss: {
-      //    options: {
-      //       processors: [
-      //          require('pixrem')(),
-      //          require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
-      //       ]
-      //    },
-      //    dist: {
-      //       src: 'html/css/<%= pkg.name %>.css',
-      //    }
-      // },
+      postcss: {
+         options: {
+            processors: [
+               require('pixrem')(),
+               require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+            ]
+         },
+         dist: {
+            src: 'html/css/<%= pkg.name %>.css',
+         }
+      },
       cssmin: {
          options: {
             shorthandCompacting: false,
@@ -195,7 +203,7 @@ module.exports = function(grunt) {
    
 
    // Tasks
-   grunt.registerTask('default', ['concat', 'uglify', 'postcss', 'cssmin', 'replace:build']);
-   grunt.registerTask('dev', ['sass','concat','replace:dev', 'jshint']);
+   grunt.registerTask('default', ['sass:build', 'concat', 'uglify', 'postcss', 'cssmin', 'replace:build']);
+   grunt.registerTask('dev', ['sass:dev','concat','replace:dev', 'jshint']);
 
 };
