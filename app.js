@@ -24,7 +24,8 @@ try {
    console.log('');
    console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/config-server.js '+ __dirname +'/config/config-server.js');
    console.log('');
-   console.log('Exiting application, bye');
+   console.log('Exiting application, bye   o/');
+   console.log('');
    process.exit();
 }
 
