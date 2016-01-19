@@ -45,11 +45,12 @@ app.use(session({
    key: 'GISportal',
    secret: config.session.secret, 
    store: app.get('sessionStore'),
-      cookie: {
-         maxAge: config.session.age || null
-      }
-   })
-);
+   cookie: {
+      maxAge: config.session.age || null
+   },
+   saveUninitialized: false, // don't create session until something stored,
+   resave: false // don't save session if unmodified
+}));
 
 // template engine
 app.set('view engine', 'jade');
