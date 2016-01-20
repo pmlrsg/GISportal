@@ -70,3 +70,17 @@ user.getAccessLevel = function(req) {
    }
    return level;
 }
+
+/**
+ * getUsername checks the request user cookie against the session object stored in Redis
+ * and returns the users username as string
+ * @param  {Object} req    Express router request object
+ * @return {String}        [guest|email address of user]
+ */
+user.getUsername = function(req) {
+   var username = "";
+   if(typeof(req.session.passport.user) != 'undefined') {
+      username = req.session.passport.user.emails[0].value;
+   }
+   return username;
+}

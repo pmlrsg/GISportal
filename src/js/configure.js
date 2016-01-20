@@ -326,7 +326,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          break;
       }
    }
-   if(!gisportal.userPermissions.user_clearance){
+   if(!gisportal.user.info.permission == "guest"){
       addable_layers = false;
    }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
@@ -358,7 +358,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.userPermissions.this_user_info.username)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.username)
    });
 
    var categories = [];

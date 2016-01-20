@@ -11,6 +11,7 @@ var gm = require("gm");
 var jimp = require("jimp");
 var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
+var user = require('./user.js');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
@@ -65,9 +66,9 @@ router.use(function (req, res, next) {
 router.use(bodyParser.json({limit: '1mb'}));
 router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 
-router.get('/settings/get_cache', function(req, res) {
-   var usernames = [req.query.username];
-   var permission = req.query.permission;
+router.get('/app/settings/get_cache', function(req, res) {
+   var usernames = [user.getUsername(req)];
+   var permission = user.getAccessLevel(req);
    var domain = "pmpc1310.npm.ac.uk";//req.get('origin').replace("http://", "").replace("https://", "");;
 
    var cache = []; // The list of cache deatils to be returned to the browser
@@ -114,7 +115,7 @@ router.get('/settings/get_cache', function(req, res) {
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 });
 
-router.all('/settings/rotate', function(req, res){
+router.all('/app/settings/rotate', function(req, res){
    var angle = parseInt(req.query.angle); // Gets the given angle
    var url = req.query.url // Gets the given URL
    if(angle == "undefined" || angle == "" || typeof(angle) != "number"){
@@ -133,9 +134,9 @@ router.all('/settings/rotate', function(req, res){
    });   
 });
 
-router.get('/settings/remove_server_cache', function(req, res){
-   var username = req.query.username; // Gets the given username
-   var permission = req.query.permission; // Gets the given permission
+router.get('/app/settings/remove_server_cache', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req); // Gets the user permission
    var domain = req.query.domain; // Gets the given domain
    var filename = req.query.filename; // Gets the given filename
    filename += ".json"; // Adds the file extension to the filename
@@ -159,9 +160,9 @@ router.get('/settings/remove_server_cache', function(req, res){
    });
 });
 
-router.all('/settings/update_layer', function(req, res){
-   var username = req.query.username; // Gets the given username
-   var permission = req.query.permission; // Gets the given permission
+router.all('/app/settings/update_layer', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req); // Gets the user permission
    var domain = req.query.domain; // Gets the given domain
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json"; // Gets the given filename
@@ -176,10 +177,10 @@ router.all('/settings/update_layer', function(req, res){
    });
 });
 
-router.get('/settings/add_wcs_url', function(req, res){
+router.get('/app/settings/add_wcs_url', function(req, res){
    var url = req.query.url.split('?')[0] + "?"; // Gets the given url
-   var username = req.query.username; // Gets the given username
-   var permission = req.query.permission; // Gets the given permission
+   var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req); // Gets the user permission
    var domain = req.query.domain; // Gets the given domain
    var filename = req.query.filename + ".json"; // Gets the given filename
 
@@ -194,7 +195,7 @@ router.get('/settings/add_wcs_url', function(req, res){
    res.send(this_path);
 });
 
-router.all('/settings/add_user_layer', function(req, res){
+router.all('/app/settings/add_user_layer', function(req, res){
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = req.body.domain; // Gets the given domain
@@ -278,14 +279,14 @@ router.all('/settings/add_user_layer', function(req, res){
 });
 
 
-router.get('/settings/load_new_wms_layer', function(req, res){
+router.get('/app/settings/load_new_wms_layer', function(req, res){
    var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
    var refresh = req.query.refresh; // Gets the given refresh
    var domain = req.query.domain; // Gets the given domain
 
    var sub_master_cache = {};
    sub_master_cache.server = {};
-   var clean_url = url.replace("http://", "").replace("https://", "").replace(/\//g, "-");
+   var clean_url = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
    var contact_info = {};
    var address = "";
 
@@ -297,7 +298,6 @@ router.get('/settings/load_new_wms_layer', function(req, res){
    var file_path = path.join(directory, filename);
 
    if(refresh == "true" || !fileExists(file_path)){
-      console.log(url + "service=WMS&request=GetCapabilities");
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
          xml2js.parseString(body, function (err, result) {
             if(err) throw err;

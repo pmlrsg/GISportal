@@ -572,6 +572,7 @@ collaboration.userAuthorised = function() {
    $('.js-collaboration-holder').html('').html(rendered); 
 	
    collaboration.initSession();
+   gisportal.user.loggedIn()
  	return true;
 }
 

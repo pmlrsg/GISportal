@@ -43,7 +43,7 @@ gisportal.map_settings.init = function() {
       baseLayers: layers,
       countryBorders: borders,
       projections: projections,
-      user_clearance:gisportal.userPermissions.user_clearance
+      user_clearance:gisportal.user.info.permission
    }
    var rendered = gisportal.templates['map-settings'](data)
    $('.js-map-options').html(rendered);
@@ -108,7 +108,7 @@ gisportal.map_settings.init = function() {
       if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
          gisportal.wms_submitted = true;
          // Gets the URL and refresh_cache boolean
-         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value;
+         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value.split("?")[0];
          gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
 
          error_div = $("#wms-url-message");
@@ -144,7 +144,7 @@ gisportal.map_settings.init = function() {
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
          $.ajax({
-            url:  'cache/' + gisportal.userPermissions.domainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+            url:  'cache/' + gisportal.user.domainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
             dataType: 'json',
             success: function(layer){
                if(!gisportal.wms_submitted){

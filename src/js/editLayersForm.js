@@ -28,7 +28,7 @@ gisportal.editLayersForm.produceServerList = function(){
    //for each of the layers in the list.
    for(layer in layers_obj){
       var this_layer = layers_obj[layer];
-      if(!gisportal.userPermissions.admin_clearance && this_layer.owner != gisportal.userPermissions.this_user_info.username){
+      if(!gisportal.user.info.permission == "admin" && this_layer.owner != gisportal.user.info.username){
          continue;
       }
       var contactInfo;
@@ -67,9 +67,11 @@ gisportal.editLayersForm.produceServerList = function(){
          server_info.layers.push(layer_info);
          gisportal.editLayersForm.server_list.push(server_info);
       }
+      var admin = false;
+      if(gisportal.user.info.permissions == "admin") admin = true;
       data = {
          "server_list": gisportal.editLayersForm.server_list,
-         "admin": gisportal.userPermissions.admin_clearance
+         "admin": admin
       }
    }
    // The server list is shown using the list previously created.
@@ -142,9 +144,9 @@ gisportal.editLayersForm.addListeners = function(){
       var this_span = $(this);
       var server = $(this).data("server");
       var user = $(this).data("user");
-      var user_info = gisportal.userPermissions.this_user_info;
+      var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.user.domainName,
          success: function(){
             var to_be_deleted = [];
             for(index in gisportal.selectedLayers){
@@ -173,11 +175,11 @@ gisportal.editLayersForm.addListeners = function(){
       $(this).parent("td").parent("tr").toggleClass('alert-warning', true);
       var url = $(this).data("server");
       var user = $(this).data("user");
-      var domain = gisportal.userPermissions.domainName
+      var domain = gisportal.user.domainName
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain
+         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -194,7 +196,7 @@ gisportal.editLayersForm.addListeners = function(){
          });
          return;
       }
-      var cache_url = 'cache/' + gisportal.userPermissions.domainName + '/temporary_cache/';
+      var cache_url = 'cache/' + gisportal.user.domainName + '/temporary_cache/';
       cache_url += url+".json?_="+ new Date().getMilliseconds();
       $.ajax({
          url:  cache_url,
@@ -211,7 +213,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
+                  refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
@@ -259,7 +261,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
    var wms_url = wms_url || new_data.wmsURL;
    var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
 
-   var ajax_url = 'cache/' + gisportal.userPermissions.domainName + "/";
+   var ajax_url = 'cache/' + gisportal.user.domainName + "/";
    if(user != domain){
       ajax_url += "user_" + user + "/";
    }
@@ -314,11 +316,11 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          new_data['contactInfo'] = user_data['contactInfo'];
          new_data['wcsURL'] = user_data['wcsURL'] || undefined;
          new_data['provider']= provider || user_data['options']['providerShortTag'];
-         var user_info = gisportal.userPermissions.this_user_info;
+         var user_info = gisportal.user.info;
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: gisportal.middlewarePath + '/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.user.domainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('green-spin', false);

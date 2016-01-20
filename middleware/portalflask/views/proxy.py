@@ -392,8 +392,8 @@ def createCache(url, refresh, username, permission, domain):
    directory = os.path.join(CURRENT_PATH, MASTERCACHEPATH, domain, "temporary_cache")
    if not os.path.exists(directory):
       os.makedirs(directory) # If the global_cache folder does not already exist it is created.
-   path = os.path.join(directory, filename)
-   if not os.path.isfile(path) or refresh == "true": # As long as the file does not exist or is to be refreshed the cache will be created.
+   file_path = os.path.join(directory, filename)
+   if not os.path.isfile(file_path) or refresh == "true": # As long as the file does not exist or is to be refreshed the cache will be created.
       print url
       doc = urllib2.urlopen(url + "service=WMS&request=GetCapabilities")
       root = ET.parse(doc).getroot()# Gets the XML root from the url.
@@ -456,7 +456,6 @@ def createCache(url, refresh, username, permission, domain):
          style = None
 
          # Gets all of the required layer information available from the WMS
-         name_elem = parent_layer.find('./%sName' % (WMS_NAMESPACE))
          title_elem = parent_layer.find('./%sTitle' % (WMS_NAMESPACE))
          abstract_elem = parent_layer.find('./%sAbstract' % (WMS_NAMESPACE))
          ex_bounding_elem = parent_layer.find('./%sEX_GeographicBoundingBox' % (WMS_NAMESPACE))
@@ -495,12 +494,12 @@ def createCache(url, refresh, username, permission, domain):
          sub_master_cache['timeStamp'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
          
          data = json.dumps(sub_master_cache)
-         saveFile(path, data)
+         saveFile(file_path, data)
          return data         
       else:
          return json.dumps({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"})
 
-   json_file = open(path, 'r') # If the file does not need to be refreshed, it goes off and gets te information that is already there.
+   json_file = open(file_path, 'r') # If the file does not need to be refreshed, it goes off and gets te information that is already there.
    layer_return = json_file.read()
    return layer_return
 

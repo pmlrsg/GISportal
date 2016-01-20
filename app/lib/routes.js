@@ -7,13 +7,13 @@ var user = require('./user.js');
 module.exports = router;
 
 // default path; check for cookie and if it's not there send them to the login page
-router.get('/node', function(req, res) {
+router.get('/app', function(req, res) {
    res.render('index', {
       title: 'GISportal collaboration'
    });
 });
 
-router.get('/node/dashboard', user.isAdmin, function(req, res) {
+router.get('/app/dashboard', function(req, res) { //, user.requiresValidUser
    var userId = req._passport.session.user.id;
    var displayName = req._passport.session.user.displayName;
    var userEmail = req._passport.session.user.emails[0].value;
@@ -28,21 +28,31 @@ router.get('/node/dashboard', user.isAdmin, function(req, res) {
    })
 });
 
-router.get('/node/auth/google', passport.authenticate('google'));
+router.get('/app/auth/google', passport.authenticate('google'));
 
-router.get('/node/auth/google/callback', 
+router.get('/app/auth/google/callback', 
    passport.authenticate('google', {
-     successRedirect: '/node/authorised',
-     failureRedirect: '/node/auth-failed'
+     successRedirect: '/app/authorised',
+     failureRedirect: '/app/auth-failed'
    })
  );
 
-router.get('/node/authorised', function(req, res) {
+router.get('/app/authorised', function(req, res) {
    res.setHeader("Access-Control-Allow-Origin", "*");
    res.render('authorised', {});
 })
 
-router.get('/node/logout', function(req, res) {
+router.get('/app/logout', function(req, res) {
    req._passport = null;
-   res.redirect('/node');
+   res.redirect('/app');
+})
+
+router.get('/app/user/get', function(req, res) {
+   var email = user.getUsername(req);
+   var permission = user.getAccessLevel(req);
+   var info ={
+      "email":email,
+      "permission": permission
+   }
+   res.send(info);
 })

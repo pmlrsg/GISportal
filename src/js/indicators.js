@@ -254,9 +254,9 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
       message_div.toggleClass('alert-danger', false);
       message_div.toggleClass('alert-success', true);
    }else{ // Perhaps only if this user isnt a guest!
-      var user_info = gisportal.userPermissions.this_user_info
+      var user_info = gisportal.user.info
       $.ajax({
-         url:  gisportal.middlewarePath + '/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.user.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)
@@ -357,11 +357,11 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    user_allowed_to_add = false;
    user_allowed_to_edit = false;
 
-   if(gisportal.userPermissions.user_clearance && layer.providerTag == "UserDefinedLayer"){
+   if(!gisportal.user.info.permission == "guest" && layer.providerTag == "UserDefinedLayer"){
       user_allowed_to_add = true;
    }
-   if(gisportal.userPermissions.user_clearance && layer.providerTag != "UserDefinedLayer"){
-      if(layer.owner!="domain" || gisportal.userPermissions.admin_clearance)
+   if(!gisportal.user.info.permission == "guest" && layer.providerTag != "UserDefinedLayer"){
+      if(layer.owner!="domain" || gisportal.user.info.permission == "admin")
       user_allowed_to_edit = true;
    }
 

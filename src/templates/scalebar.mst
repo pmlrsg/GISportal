@@ -1,6 +1,6 @@
 {{#if units}}<p>Scale - {{units}}</p>{{/if}}
 <div class="scalebar-outer{{#unless legendSettings.scalePoints}}-loose{{/unless}} {{#if log}}scalebar-log{{else}}scalebar-linear{{/if}} ">
-	<div class="scalebar{{#unless legendSettings.scalePoints}}-loose{{/unless}}" ><img class="legend-img" onerror="gisportal.scalebars.scalebarImageError('{{id}}')" onload="gisportal.scalebars.scalebarImageSuccess('{{id}}')" src="settings/rotate?angle={{angle}}&url={{legendURL}}"></img></div>
+	<div class="scalebar{{#unless legendSettings.scalePoints}}-loose{{/unless}}" ><img class="legend-img" onerror="gisportal.scalebars.scalebarImageError('{{id}}')" onload="gisportal.scalebars.scalebarImageSuccess('{{id}}')" src="app/settings/rotate?angle={{angle}}&url={{legendURL}}"></img></div>
    {{#if legendSettings.scalePoints}}
    	{{#scalePoints}}
    		<span class="scalebar-overlay"><span title="{{original}}">{{nicePrint}}</span></span>

@@ -24,5 +24,11 @@ GLOBAL.config = {
       // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed
       age : 0
    },
+   admins:[
+      'bac@pml.ac.uk',
+      'olcl@pml.ac.uk',
+      'petwa@pml.ac.uk',
+      'ols@pml.ac.uk'
+   ]
  
 }

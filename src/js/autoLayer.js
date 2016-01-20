@@ -68,11 +68,12 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 
    _.forIn(gisportal.layers, function( layer ){
-      if(layer.serviceType!=="WFS"){   
-         if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
+      if(layer.serviceType!=="WFS"){
+         var username = gisportal.user.info.username;
+         if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == username){
             only_matching_layer = {};
             only_matching_layer[layer.id] = layer;
-         }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
+         }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == username){
             matching_layers[layer.id] = layer;
          }
       }
@@ -88,9 +89,9 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.userPermissions.domainName
+      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.user.domainName
       if(given_cache_refresh == "false"){
-         request_url = "cache/" + gisportal.userPermissions.domainName + "/temporary_cache/"+clean_file+".json"
+         request_url = "cache/" + gisportal.user.domainName + "/temporary_cache/"+clean_file+".json"
       }else{
          request_url = clean_url
       }
@@ -132,7 +133,7 @@ gisportal.autoLayer.addGivenLayer = function(layer){
    if (json_layer["Error"] != undefined){
       $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
    }else{
-      json_layer.owner = gisportal.userPermissions.this_user_info.username;
+      json_layer.owner = gisportal.user.info.username;
       gisportal.initWMSlayers([json_layer]);
    }
 };
