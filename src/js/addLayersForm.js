@@ -430,7 +430,6 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
       gisportal.addLayersForm.server_info={
          "provider":provider,
          "original_provider":original_provider,
-         "unique_name":layer.sensor,
          "address":address,
          "person":person,
          "position":position,
@@ -592,7 +591,7 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          success: function( data ){
             var style_index = 0;
             for(style in data.Styles){
-               if(data.Styles[style].Name == 'boxfill/rainbow'){
+               if(data.Styles[style].Name == gisportal.config.defaultStyle){
                   style_index = style;
                }
             }

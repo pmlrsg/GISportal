@@ -32,7 +32,7 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-gisportal.ProxyHost = gisportal.middlewarePath + '/proxy?url=';   // Flask (Python) service OpenLayers proxy
+gisportal.ProxyHost = window.location.origin + window.location.pathname + 'service/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -113,7 +113,7 @@ gisportal.loadLayers = function() {
       // Get WMS cache
       var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  'http://127.0.0.1:1310/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){

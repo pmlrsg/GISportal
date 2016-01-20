@@ -144,7 +144,7 @@ gisportal.editLayersForm.addListeners = function(){
       var user = $(this).data("user");
       var user_info = gisportal.userPermissions.this_user_info;
       $.ajax({
-         url:  'http://localhost:1310/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
          success: function(){
             var to_be_deleted = [];
             for(index in gisportal.selectedLayers){
@@ -177,7 +177,7 @@ gisportal.editLayersForm.addListeners = function(){
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+         refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -211,7 +211,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&username=' + user + '&domain=' + domain + '&permission=' + gisportal.userPermissions.this_user_info.permission;
+                  refresh_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
@@ -318,7 +318,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: 'http://localhost:1310/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
+            url: gisportal.middlewarePath + '/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.userPermissions.domainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('green-spin', false);

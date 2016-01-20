@@ -291,10 +291,9 @@ def add_user_layer():
    server_info = json.loads(request.form['server_info'])
    domain = request.form['domain'] # Gets the given domain.
    username = server_info['owner'] # Gets the given username.
-   wcsURL = server_info['wcsURL'] # Gets the given wcsURL.
    
 
-   if set(('unique_name', 'provider', 'server_name')).issubset(server_info): # Verifies that the necessary server information is provided
+   if set(('provider', 'server_name')).issubset(server_info): # Verifies that the necessary server information is provided
 
       filename = server_info['server_name'] + FILEEXTENSIONJSON
       if domain == username:
@@ -318,7 +317,7 @@ def add_user_layer():
          this_new_layer = layers_list[new_layer]
          # This checks that the layer data passed is valid
          if set(('abstract', 'id', 'list_id', 'nice_name', 'tags')).issubset(this_new_layer) and set(('indicator_type', 'region', 'interval', 'model_name')).issubset(this_new_layer['tags']):
-            for old_layer in data['server'][server_info['unique_name']]: # Loops through the old layers to find a match.
+            for old_layer in data['server']['Layers']: # Loops through the old layers to find a match.
                if old_layer['Name'] == this_new_layer['original_name']:
                   if this_new_layer['include']: # Only add the information if the user asked for the layer to be included.
                      # This block adds the information provided by the user to the new_data variable
@@ -336,7 +335,7 @@ def add_user_layer():
                      new_data.append(new_data_layer)
       # The new data is then put back into the data file to replace the previous information
 
-      data['server'][server_info['unique_name']] = new_data
+      data['server']['Layers'] = new_data
 
       # This adds all of the server information to the data file
       if len(server_info['address']) > 0:
@@ -359,8 +358,8 @@ def add_user_layer():
       if len(server_info['position']) > 0:
          data['contactInfo']['position']= server_info['position']
       
-      if wcsURL and len(wcsURL) > 0:
-         data['wcsURL']= wcsURL
+      if server_info['wcsURL'] and len(wcsURL) > 0:
+         data['wcsURL']= server_info['wcsURL'];
       
       
       saveFile(save_path, json.dumps(data)) # The data file is then added to the user_cache folder.

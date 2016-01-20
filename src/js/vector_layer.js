@@ -27,7 +27,7 @@ gisportal.Vector = function(options) {
         providerTag: null, //short provider name
         serviceVersion: null, // version of OGC service
         variableName: null, // the WFS variable name
-        srsName: 'EPSG:4326', // SRS for teh vector layer
+        srsName: 'EPSG:4326', // SRS for the vector layer
         defaultStyle: new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'rgba(0, 0, 255, 1.0)',

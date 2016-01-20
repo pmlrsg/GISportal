@@ -256,7 +256,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.userPermissions.this_user_info
       $.ajax({
-         url:  'http://localhost:1310/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
+         url:  gisportal.middlewarePath + '/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.userPermissions.domainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)

@@ -64,6 +64,8 @@ app.use(passport.initialize());
 // Configure routes
 var routes = require('./app/lib/routes.js');
 app.use('/', routes);
+var site_settings = require('./app/lib/site_settings.js');
+app.use('/', site_settings);
 
 
 // Start listening...
