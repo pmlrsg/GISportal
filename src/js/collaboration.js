@@ -37,7 +37,7 @@ collaboration.initDOM = function() {
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
-               url: 'app/user',
+               url: 'app/collaboration',
                success: function(data) {
                   $('#collab-content').html(data);         
                },
@@ -591,6 +591,7 @@ collaboration.userAuthorised = function() {
 	
    //collaboration.initSession();
    collaboration.initDOM();
+   gisportal.user.initDOM();
  	return true;
 };
 

@@ -1,33 +1,8 @@
 
+.collabHolder { padding-bottom: 20px; }
+.collabHolder p {margin: 7px 0px;}
 
-.collabIframe {
-  background: rgb(239, 237, 241);
-}
-.collabIframe p {margin: 7px 0px;}
-
-.collabIframe .userDetails {
-
-}
-.collabIframe .name {
-   font-weight: bold;
-}
-.collabIframe .email {
-   font-style: italic;
-}
-.collabIframe .logout {
-   text-align: right;
-   margin-top: 10px;
-}
-
-.collabIframe .avatar {
-   width: 75px;
-   height: auto;
-   border-radius: 50%;
-   float: left;
-   margin-right: 10px;
-}
-
-.collabIframe .join, .collabIframe .host {
+.collabHolder .join, .collabHolder .host {
    clear: both;
    margin-top: 20px;
 }

@@ -3,15 +3,9 @@ script(type='text/javascript')
    |   $('.js-google-auth-button').click(function() { var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1'); });
    |});
 body
-   div.userHolder
-      h3 User Dashboard
-      p You can login to this application using your Google ID.
+   div.collabHolder
+      h3 Collaboration
+      p To begin using the collaboration tools in this portal you will need to be logged in
       p &nbsp;
 
       a(href="javascript:void(0)" class="js-google-auth-button" ): img(src!="/img/sign-in-with-google.png" style!="width:200px;height:auto")
-
-      p Once you are logged in you will be able to:
-      ul
-         li Add and save your own data layers
-         li Share your view of the map with colleagues using the collaboration features
-         li Save and share plots that you create

@@ -13,7 +13,7 @@ GLOBAL.config = {
          scope : "https://www.googleapis.com/auth/userinfo.email",
          clientid : "741961836801-v58t7bv2t08jglenlj9vlvh6usr57l2d.apps.googleusercontent.com",
          clientsecret : "PndOco4Zzj4RZin_nHrPNsnH",
-         callback : "https://pmpc1465.npm.ac.uk/node/auth/google/callback",
+         callback : "https://pmpc1465.npm.ac.uk/app/user/auth/google/callback",
          prompt: "select_account"
       }
    },
