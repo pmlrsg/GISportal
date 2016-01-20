@@ -42,14 +42,15 @@ app.set('sessionStore', new redisStore({client: redisClient}));
 app.use(cookieParser(config.session.secret));
 // * Session manager
 app.use(session({
-   key: 'collaboration',
+   key: 'GISportal',
    secret: config.session.secret, 
    store: app.get('sessionStore'),
-      cookie: {
-         maxAge: config.session.age || null
-      }
-   })
-);
+   cookie: {
+      maxAge: config.session.age || null
+   },
+   saveUninitialized: false, // don't create session until something stored,
+   resave: false // don't save session if unmodified
+}));
 
 // template engine
 app.set('view engine', 'jade');
@@ -71,7 +72,7 @@ app.use('/', site_settings);
 // Start listening...
 server = http.createServer(app)
 server.listen(config.app.port, function() {
-	console.log('collaboration-suite listening on port %d', config.app.port)
+	console.log('GISportal server listening on port %d', config.app.port)
 });
 io = io.listen(server);
 

@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 var passport = require('passport');
+var user = require('./user.js');
 
 module.exports = router;
 
@@ -12,7 +13,7 @@ router.get('/node', function(req, res) {
    });
 });
 
-router.get('/node/dashboard', isLoggedIn, function(req, res) {
+router.get('/node/dashboard', user.isAdmin, function(req, res) {
    var userId = req._passport.session.user.id;
    var displayName = req._passport.session.user.displayName;
    var userEmail = req._passport.session.user.emails[0].value;
@@ -45,11 +46,3 @@ router.get('/node/logout', function(req, res) {
    req._passport = null;
    res.redirect('/node');
 })
-
-function isLoggedIn(req, res, next) {
-   if (typeof req._passport.session.user != 'undefined') {
-      return next();
-   } else {
-      res.redirect('/node');
-   }
-}
