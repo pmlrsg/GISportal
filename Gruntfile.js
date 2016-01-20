@@ -34,7 +34,7 @@ var coreFiles = [
     "src/js/autoLayer.js",
     "src/js/addLayersForm.js",
     "src/js/editLayersForm.js",
-    "src/js/userPermissions.js",
+    "src/js/user.js",
     "src/js/collaboration.js",
     "src/js/collaboration-event-bindings.js"
   ];
