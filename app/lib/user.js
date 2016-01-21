@@ -1,7 +1,4 @@
 
-var cookie = require('cookie');
-var cookieParser = require('cookie-parser');
-
 var user = {}
 module.exports = user;
 

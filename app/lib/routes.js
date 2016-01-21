@@ -41,7 +41,9 @@ router.get('/app/user/authorised', function(req, res) {
 })
 
 router.get('/app/user/logout', function(req, res) {
-   req.session.passport = {};
+   res.clearCookie('GISportal', { path: '/' });
+   req.session.destroy();
+   
    res.sendStatus(200);
 })
 

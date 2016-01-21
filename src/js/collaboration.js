@@ -532,7 +532,8 @@ collaboration.buildMembersList = function(data) {
 
       var rendered = gisportal.templates.collaboration();
       $('.js-collaboration-holder').html('').html(rendered);
-
+      collaboration.initDOM();
+      
       collaboration.setStatus('error', 'You have left the room');
       setTimeout(function() {
          $('.collaboration-status').remove();
