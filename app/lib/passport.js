@@ -5,6 +5,7 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 module.exports = passport;
 
 passport.init = function(config) {
+   console.log('passport.init');
    passport.use(new GoogleStrategy({
       clientID: config.auth.google.clientid,
       clientSecret: config.auth.google.clientsecret,
@@ -19,10 +20,12 @@ passport.init = function(config) {
 
 
    passport.serializeUser(function(user, done) {
+      console.log('serialize: '+JSON.stringify(user));
     done(null, user);
    });
 
    passport.deserializeUser(function(user, done) {
+      console.log('deserialize: '+JSON.stringify(user));
     done(null, user);
    });
    

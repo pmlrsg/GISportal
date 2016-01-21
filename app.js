@@ -46,7 +46,7 @@ app.use(session({
    secret: config.session.secret, 
    store: app.get('sessionStore'),
    cookie: {
-      maxAge: config.session.age || null
+      maxAge: 3600 
    },
    saveUninitialized: false, // don't create session until something stored,
    resave: false // don't save session if unmodified

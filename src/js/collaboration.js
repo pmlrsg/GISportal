@@ -33,11 +33,11 @@ collaboration.initDOM = function() {
    var roomId = gisportal.utils.getURLParameter('room');
    
    $.ajax({
-      url: 'app/collaboration/dashboard',
+      url: '/app/collaboration/dashboard',
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
-               url: 'app/collaboration',
+               url: '/app/collaboration',
                success: function(data) {
                   $('#collab-content').html(data);         
                },
