@@ -1,16 +1,7 @@
 <div class="start-container overlay-container">
    <div class="intro-text">
-   <p>The Marine Operation Ecology data portal provides model simulated ecosystem data for
-    European Regional Seas.</p>
-    <p>More information on OPEC is available on the project web site,
-    <a href="http://marineopec.eu" target="_blank">http://marineopec.eu</a></p>
-   </div>
-   <div class="homepageSlider">
-      <div class="homepageSlider-wrap">
-         {{#each homepageSlides}}
-            <div  style="background-image: url('{{.}}');" ></div>
-         {{/each}}
-      </div>
+      <p>The eartH2Observe portal provides model simulated, earth observation and in-situ data for global water resources.</p>
+      <p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>
    </div>
 
    <nav class="start-nav">
