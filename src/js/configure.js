@@ -326,7 +326,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          break;
       }
    }
-   if(!gisportal.user.info.permission == "guest"){
+   if(gisportal.user.info.permission != "guest"){
       addable_layers = false;
    }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)

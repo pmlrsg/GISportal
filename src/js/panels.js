@@ -58,4 +58,4 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 
    });
 
-}
+};

@@ -40,7 +40,7 @@ gisportal.map_settings.init = function() {
       projections.push(d)
    })
    var user = false;
-   if(!gisportal.user.info.permission == "guest") user = true;
+   if(gisportal.user.info.permission != "guest") user = true;
    var data = {
       baseLayers: layers,
       countryBorders: borders,

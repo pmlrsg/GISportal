@@ -13,7 +13,7 @@ GLOBAL.config = {
          scope : "https://www.googleapis.com/auth/userinfo.email",
          clientid : "741961836801-v58t7bv2t08jglenlj9vlvh6usr57l2d.apps.googleusercontent.com",
          clientsecret : "PndOco4Zzj4RZin_nHrPNsnH",
-         callback : "https://pmpc1465.npm.ac.uk/node/auth/google/callback",
+         callback : "https://localhost/app/user/auth/google/callback",
          prompt: "select_account"
       }
    },
@@ -25,10 +25,10 @@ GLOBAL.config = {
       age : 0
    },
    admins:[
-      'bac@pml.ac.uk',
-      'olcl@pml.ac.uk',
-      'petwa@pml.ac.uk',
-      'ols@pml.ac.uk'
+      'admin1@admin.co.uk',
+      'admin2@admin.co.uk',
+      'admin3@admin.co.uk',
+      'admin4@admin.co.uk'
    ]
  
 }

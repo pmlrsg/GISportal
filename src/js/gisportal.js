@@ -958,6 +958,7 @@ gisportal.main = function() {
       gisportal.graphs.initDOM();           // graphing.js
       gisportal.analytics.initGA();         // analytics.js
       gisportal.panelSlideout.initDOM();    //panel-slideout.js
+      gisportal.user.initDOM()      // panels.js
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon')

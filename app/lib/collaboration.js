@@ -46,7 +46,7 @@ collaboration.init = function(io, app, config) {
       socket.room = '';
       
       var cookies = cookieParser.signedCookies(cookie.parse(socket.request.headers.cookie), config.session.secret);
-      var sid = cookies['collaboration'];
+      var sid = cookies['GISportal'];
 
       var user = {};
       var sessionStore = app.get('sessionStore');
