@@ -134,10 +134,6 @@ gisportal.loadVectorLayers = function() {
       url: './cache/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
-      error: function(e){
-            $.notify("Sorry\nThere was an unexpected error getting the vector cache. Try refreshing the page, or coming back later.", {autoHide:false, className:"error"});
-         }
-
    });
 
 };
