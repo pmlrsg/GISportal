@@ -320,14 +320,13 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
    var addable_layers = false;
-   for(var layer in gisportal.layers){
-      if(layer.indexOf("UserDefinedLayer") > -1){
-         addable_layers = true;
-         break;
-      }
-   }
    if(gisportal.user.info.permission != "guest"){
-      addable_layers = false;
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            addable_layers = true;
+            break;
+         }
+      }
    }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
    var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
