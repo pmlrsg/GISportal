@@ -7,7 +7,6 @@ html/cache/*
 html/GISportal.js
 html/GISportal.min.js
 html/css/*
-html/css/
 html/all_templates.mst
 middleware/portalflask/settings.py
 config/*

@@ -27,7 +27,7 @@ gisportal.utils.replace = function(search, replace, subject, count) {
       this.window[count] = 0;
    }
 
-   for(i = 0, sl = s.length; i < sl; i++) {      
+   for(var i = 0, sl = s.length; i < sl; i++) {      
       if(s[i] === '') {
          continue;
       }

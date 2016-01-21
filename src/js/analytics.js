@@ -194,7 +194,7 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
    function getDefinitionIndexFromKey( customDefinitionKey ){
       var definitionIndex = null;
       // Find the key in the object/array
-      for( var i in gisportal.analytics.customDefinitions ){
+      for(var i in gisportal.analytics.customDefinitions ){
          if( gisportal.analytics.customDefinitions.hasOwnProperty( i ) )
             if( gisportal.analytics.customDefinitions[i] == customDefinitionKey )
                var definitionIndex = i;
@@ -247,7 +247,7 @@ gisportal.analytics.send = function( toSend ){
    if( toSend['eventLabel'] == void( 0 ) ){
       var buffer = [];
       
-      for( var i in toSend ){
+      for(var i in toSend ){
          if( toSend.hasOwnProperty( i ) == false )
             continue;
          

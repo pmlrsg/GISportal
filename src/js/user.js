@@ -1,6 +1,5 @@
 gisportal.user = {};
 gisportal.user.info = {"email":"", "permission":"guest"};
-gisportal.user.domainName = window.location.href.replace("http://", "").replace("https://", "").split("?")[0].replace(/\/$/, '').replace(/\//g, '_');
 
 gisportal.user.loggedIn = function(){
    $.ajax({
@@ -24,7 +23,7 @@ gisportal.user.loggedIn = function(){
             gisportal.user.initDOM();
             collaboration.initDOM();
          }
-      })
+      });
    });
 };
 

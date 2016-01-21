@@ -331,7 +331,7 @@ gisportal.graphs.Plot =(function(){
     */
    Plot.prototype.buildRequestDataGeneric = function( seriesArray ){
       var totalCount = 0;
-      for( var i = 0; i < this._components.length; i++ ){
+      for(var i = 0; i < this._components.length; i++ ){
          var component = this._components[ i ];
          var layer = gisportal.layers[ component.indicator ];
 

@@ -22,8 +22,14 @@ gisportal.VERSION = "0.4.0";
 if( ! window.location.origin )
    window.location.origin = window.location.protocol + "//" + window.location.host
 
+// The domain name of the portal
+gisportal.domainName = window.location.origin + window.location.pathname;
+
+// This edits the domain name a bit to be sent to the middleware (removes the end "/" and replaces all other "/"s with "_")
+gisportal.niceDomainName = gisportal.domainName.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_')
+
 // Path to the python flask middleware
-gisportal.middlewarePath = window.location.origin + window.location.pathname + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = gisportal.domainName + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 
 // Flask url paths, relates to /middleware/portalflask/views/
@@ -113,7 +119,7 @@ gisportal.loadLayers = function() {
       // Get WMS cache
       var user_info = gisportal.user.info
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.user.domainName,
+         url:  gisportal.middlewarePath + '/settings/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.niceDomainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -267,7 +273,7 @@ gisportal.createOpLayers = function() {
    };
 
    // This block restores the old selected layers using the new IDs that have just been set
-   for(i in gisportal.addLayersForm.selectedLayers){
+   for(var i in gisportal.addLayersForm.selectedLayers){
       var id = gisportal.addLayersForm.selectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
@@ -766,7 +772,7 @@ gisportal.loadState = function(state) {
    var keys = state.selectedIndicators;
    var available_keys = [];
 
-   for(key in keys){
+   for(var key in keys){
       if (gisportal.layers[keys[key]]){
          available_keys.push(keys[key]);
       }
@@ -1204,7 +1210,7 @@ gisportal.validateBrowser = function(){
    var requirements = [ 'svg', 'boxsizing', 'csscalc','inlinesvg' ];
 
    var valid = true;
-   for( var i =  0; i < requirements.length; i++ )
+   for(var i =  0; i < requirements.length; i++ )
       valid = (valid &&  Modernizr[requirements[i]] )
 
    if( valid )
@@ -1362,25 +1368,25 @@ gisportal.loadBrowseCategories = function(data){
    // If data is give (first loading of portal)
    // Loop through each of the tags and run it through the addCategory function
    if(data){
-      for(obj in data){
-         for(server in data[obj]['server']){
-            for(layers in data[obj]['server'][server]){
-               for(category in data[obj]['server'][server][layers]['tags']){
+      for(var obj in data){
+         for(var server in data[obj]['server']){
+            for(var layers in data[obj]['server'][server]){
+               for(var category in data[obj]['server'][server][layers].tags){
                   addCategory(category);
                }
             }
          }
       }
-      for(layer in gisportal.vectors){
-         for(category in gisportal.vectors[layer]['tags']){
+      for(var layer in gisportal.vectors){
+         for(var category in gisportal.vectors[layer].tags){
             addCategory(category);
          }
       }
    // Any other time
    // Loop through each of the tags in gisportal.layers and run it through the addCategory function
    }else{
-      for(layer in gisportal.layers){
-         for(category in gisportal.layers[layer]['tags']){
+      for(var layer in gisportal.layers){
+         for(var category in gisportal.layers[layer].tags){
             addCategory(category);
          }
       }

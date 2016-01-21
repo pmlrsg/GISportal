@@ -240,7 +240,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
       error_div.toggleClass('hidden', false);
       error_div.html("The URL must start with 'http://'' or 'https://'");
    }else if(layer.provider == "UserDefinedLayer"){
-      for(index in gisportal.layers){
+      for(var index in gisportal.layers){
          this_layer = gisportal.layers[index];
          if(this_layer.serverName = filename){
             gisportal.layers[index].wcsURL = wcs_url.split("?")[0] + "?";
@@ -256,7 +256,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.user.info
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.user.domainName,
+         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&permission=' + user_info.permission + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.niceDomainName,
          success: function(data){
             layer.wcsURL = data
             gisportal.indicatorsPanel.analysisTab(layer.id)
@@ -357,11 +357,11 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    user_allowed_to_add = false;
    user_allowed_to_edit = false;
 
-   if(!gisportal.user.info.permission == "guest" && layer.providerTag == "UserDefinedLayer"){
+   if(gisportal.user.info.permission != "guest" && layer.providerTag == "UserDefinedLayer"){
       user_allowed_to_add = true;
    }
-   if(!gisportal.user.info.permission == "guest" && layer.providerTag != "UserDefinedLayer"){
-      if(layer.owner!="domain" || gisportal.user.info.permission == "admin")
+   if(gisportal.user.info.permission != "guest" && layer.providerTag != "UserDefinedLayer"){
+      if(layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin")
       user_allowed_to_edit = true;
    }
 

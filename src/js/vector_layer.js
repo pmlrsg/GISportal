@@ -185,7 +185,7 @@ gisportal.Vector = function(options) {
       }
       
       else{
-          for(colour in gisportal.vectorStyles.startingColours) {
+          for(var colour in gisportal.vectorStyles.startingColours) {
             if(gisportal.vectorStyles.coloursInUse.indexOf(colour)==-1){
                 _colour = colour;
                 this.currentColour = colour;
@@ -222,7 +222,7 @@ gisportal.Vector = function(options) {
       var featureCount = features.length;
       var isNumberProperty = false
       ////console.log(featureCount);
-      for(x;x<=featureCount-1;x++) {
+      for(var x;x<=featureCount-1;x++) {
         var props = features[x].getProperties();
 
         if(!_.contains(possibleOptions, props[prop])){
@@ -257,7 +257,7 @@ gisportal.Vector = function(options) {
         var legend = [];
       var legend_obj = {};
       var y = 0;
-      for(y, x=bins.length -1; y<bins.length -1  , x> 0; y++, x--){
+      for(var y, x=bins.length -1; y<bins.length -1  , x> 0; y++, x--){
         var option = bins[y]+'-'+bins[y+1]
         legend.push({'option':option,'colour':colorPalette[x]});
         legend_obj[option] = colorPalette[x];
@@ -270,7 +270,7 @@ gisportal.Vector = function(options) {
           var legend = [];
           var legend_obj = {};
           //var y = 0;
-          for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
+          for(var y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
             legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
             legend_obj[possibleOptions[y]] = colorPalette[y];
           }

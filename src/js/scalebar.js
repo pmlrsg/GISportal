@@ -46,7 +46,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       if( indicator.log ){
          var range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
          var minScaleLog =  Math.log(indicator.minScaleVal);
-         for( var i = 0; i < scaleSteps; i++ ){
+         for(var i = 0; i < scaleSteps; i++ ){
             var step = (range / (scaleSteps-1)) * i;
             var value = minScaleLog + step;
             value = Math.exp( value );
@@ -54,7 +54,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
          }
       }else{
          var range = indicator.maxScaleVal - indicator.minScaleVal;
-         for( var i = 0; i < scaleSteps; i++ ){
+         for(var i = 0; i < scaleSteps; i++ ){
             var step = (range / (scaleSteps-1)) * i;
             var value = indicator.minScaleVal + step;
 	        scalePoints.push( value );

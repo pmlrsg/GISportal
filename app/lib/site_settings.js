@@ -69,6 +69,7 @@ router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 router.get('/app/settings/get_cache', function(req, res) {
    var usernames = [user.getUsername(req)];
    var permission = user.getAccessLevel(req);
+   console.log(permission);
    var domain = "pmpc1310.npm.ac.uk";//req.get('origin').replace("http://", "").replace("https://", "");;
 
    var cache = []; // The list of cache deatils to be returned to the browser

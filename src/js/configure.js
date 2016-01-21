@@ -320,7 +320,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
    var addable_layers = false;
-   for(layer in gisportal.layers){
+   for(var layer in gisportal.layers){
       if(layer.indexOf("UserDefinedLayer") > -1){
          addable_layers = true;
          break;
@@ -349,7 +349,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // Listener is added to the add layers button
    $('button#js-add-layers-form').on('click', function() {
       var single_layer;
-      for(layer in gisportal.layers){
+      for(var layer in gisportal.layers){
          if(layer.indexOf("UserDefinedLayer") > -1){
             single_layer = gisportal.layers[layer]
             // Each of the user defined layers are added to the layers_list variable
@@ -358,7 +358,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.username)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email)
    });
 
    var categories = [];
@@ -641,7 +641,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();
-      for(index in gisportal.selectedLayers){
+      for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
    }else{

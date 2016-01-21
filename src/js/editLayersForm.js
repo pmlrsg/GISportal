@@ -7,8 +7,8 @@ gisportal.editLayersForm.addSeverTable = function(){
    gisportal.refresh_server = true;
    gisportal.loadLayers();
    gisportal.editLayersForm.server_list = [];
-   gisportal.loading.increment()
-}
+   gisportal.loading.increment();
+};
 
 /**
 * This function populates server_list with a unique list of servers from the layers (not user defined)
@@ -18,22 +18,21 @@ gisportal.editLayersForm.addSeverTable = function(){
 */
 gisportal.editLayersForm.produceServerList = function(){
    gisportal.editLayersForm.server_list = [];
-   var layers_obj = {}
+   var layers_obj = {};
    if(_.size(gisportal.original_layers) > 0){
-      var layers_obj = gisportal.original_layers;
+      layers_obj = gisportal.original_layers;
    }else{
-      var layers_obj = gisportal.layers;
+      layers_obj = gisportal.layers;
    }
-   var data = undefined;
    //for each of the layers in the list.
-   for(layer in layers_obj){
+   for(var layer in layers_obj){
       var this_layer = layers_obj[layer];
-      if(!gisportal.user.info.permission == "admin" && this_layer.owner != gisportal.user.info.username){
+      if((gisportal.user.info.permission != "admin" && this_layer.owner != gisportal.user.info.email) || this_layer.serviceType =="WFS"){
          continue;
       }
       var contactInfo;
       var provider;
-      var serverName
+      var serverName;
       serverName = this_layer.serverName;
       provider = this_layer.tags.data_provider || this_layer.providerTag;
       timeStamp = this_layer.timeStamp;
@@ -46,7 +45,7 @@ gisportal.editLayersForm.produceServerList = function(){
          "provider":provider,
          "wms_url":wms_url,
          "owner":owner,
-         "layers":[]
+         "Layers":[]
       };
       // Gets the unique layer information.
       var layer_info = {
@@ -55,16 +54,16 @@ gisportal.editLayersForm.produceServerList = function(){
       };
       var unique = true;
       // If the server has already been added the layer is added to it
-      for(i in gisportal.editLayersForm.server_list){
+      for(var i in gisportal.editLayersForm.server_list){
          if(gisportal.editLayersForm.server_list[i].serverName == server_info.serverName && gisportal.editLayersForm.server_list[i].owner == server_info.owner){
-            gisportal.editLayersForm.server_list[i]['layers'].push(layer_info);
+            gisportal.editLayersForm.server_list[i].Layers.push(layer_info);
             unique = false;
             break;
          }
       }
       // If the server has not yet been added, the layer and server are both added to the list.
       if(unique){
-         server_info.layers.push(layer_info);
+         server_info.Layers.push(layer_info);
          gisportal.editLayersForm.server_list.push(server_info);
       }
       var admin = false;
@@ -72,7 +71,7 @@ gisportal.editLayersForm.produceServerList = function(){
       data = {
          "server_list": gisportal.editLayersForm.server_list,
          "admin": admin
-      }
+      };
    }
    // The server list is shown using the list previously created.
    $( '.js-edit-layers-popup' ).toggleClass('hidden', false);
@@ -97,19 +96,19 @@ gisportal.editLayersForm.addListeners = function(){
 
    // This shows or hides the list of laers relating to the server.
    $('span.show-server-layers').on('click', function() {
-      var server_layers_selector = 'tr.server-layers[data-server="' + $(this).data('server') + '"]'
+      var server_layers_selector = 'tr.server-layers[data-server="' + $(this).data('server') + '"]';
       if($(server_layers_selector).hasClass('hidden')){
          $(server_layers_selector).toggleClass('hidden', false);
          // The icon is changed to represent hiding the layers.
          $(this).toggleClass('icon-arrow-move-up', true);
          $(this).toggleClass('icon-arrow-move-down', false);
-         $(this).attr('title', "Hide Layers")
+         $(this).attr('title', "Hide Layers");
       }else{
          $(server_layers_selector).toggleClass('hidden', true);
          // The icon is changed to represent showing the layers.
          $(this).toggleClass('icon-arrow-move-up', false);
          $(this).toggleClass('icon-arrow-move-down', true);
-         $(this).attr('title', "Show Layers")
+         $(this).attr('title', "Show Layers");
       }
 
    });
@@ -120,21 +119,21 @@ gisportal.editLayersForm.addListeners = function(){
       gisportal.addLayersForm.layers_list = {};
       gisportal.addLayersForm.server_info = {};
       gisportal.addLayersForm.form_info = {};
-      for(i in gisportal.editLayersForm.server_list){
+      for(var i in gisportal.editLayersForm.server_list){
          if(gisportal.editLayersForm.server_list[i].serverName == $(this).data("server")){
-            for(layer in gisportal.editLayersForm.server_list[i]['layers']){
-               var id = gisportal.editLayersForm.server_list[i]['layers'][layer].id
+            for(var layer in gisportal.editLayersForm.server_list[i].Layers){
+               var id = gisportal.editLayersForm.server_list[i].Layers[layer].id;
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
-               single_layer = this_layer
+               single_layer = this_layer;
                // Each of the server layers are added to the layers_list variable
-               gisportal.addLayersForm.addlayerToList(this_layer)
+               gisportal.addLayersForm.addlayerToList(this_layer);
             }
          }
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
 
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'))
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'));
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
@@ -146,15 +145,15 @@ gisportal.editLayersForm.addListeners = function(){
       var user = $(this).data("user");
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.user.domainName,
+         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.niceDomainName,
          success: function(){
             var to_be_deleted = [];
-            for(index in gisportal.selectedLayers){
+            for(var index in gisportal.selectedLayers){
                            if(this_span.data('server') == gisportal.layers[gisportal.selectedLayers[index]].serverName){
                               to_be_deleted.push(gisportal.selectedLayers[index]);
                            }
                         }
-            for(id in to_be_deleted){
+            for(var id in to_be_deleted){
                gisportal.indicatorsPanel.removeFromPanel(to_be_deleted[id]);
             }
             gisportal.loadLayers();
@@ -166,7 +165,7 @@ gisportal.editLayersForm.addListeners = function(){
             this_span.notify("Deletion Fail", {position:"left", className:"error"});
          }
       });
-   })
+   });
 
    // Refreshes the server information.
    $('span.js-update-server').on('click', function(){
@@ -175,11 +174,11 @@ gisportal.editLayersForm.addListeners = function(){
       $(this).parent("td").parent("tr").toggleClass('alert-warning', true);
       var url = $(this).data("server");
       var user = $(this).data("user");
-      var domain = gisportal.user.domainName
+      var domain = gisportal.niceDomainName;
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain
+         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -190,13 +189,13 @@ gisportal.editLayersForm.addListeners = function(){
                this_span.toggleClass('green-spin', false);
                this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
                this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-               setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
+               setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
                this_span.notify("Refresh Failed", {position:"left", className:"error"});
             }
          });
          return;
       }
-      var cache_url = 'cache/' + gisportal.user.domainName + '/temporary_cache/';
+      var cache_url = 'cache/' + gisportal.niceDomainName + '/temporary_cache/';
       cache_url += url+".json?_="+ new Date().getMilliseconds();
       $.ajax({
          url:  cache_url,
@@ -224,7 +223,7 @@ gisportal.editLayersForm.addListeners = function(){
                         this_span.toggleClass('green-spin', false);
                         this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
                         this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-                        setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
+                        setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
                         this_span.notify("Refresh Failed", {position:"left", className:"error"});
                      }
                   });
@@ -240,12 +239,12 @@ gisportal.editLayersForm.addListeners = function(){
             this_span.toggleClass('green-spin', false);
             this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
             this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-            setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
+            setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
             this_span.notify("Could not find cache file", {position:"left", className:"error"});
          }
       });
-   })
-}
+   });
+};
 
 /**
 * This function takes the cached data and inputs the data from the current user cache file.
@@ -258,10 +257,10 @@ gisportal.editLayersForm.addListeners = function(){
 * @param jQuery String user - The owner of the cache.
 */
 gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain, wms_url){
-   var wms_url = wms_url || new_data.wmsURL;
+   wms_url = wms_url || new_data.wmsURL;
    var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
 
-   var ajax_url = 'cache/' + gisportal.user.domainName + "/";
+   var ajax_url = 'cache/' + gisportal.niceDomainName + "/";
    if(user != domain){
       ajax_url += "user_" + user + "/";
    }
@@ -273,41 +272,37 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // Lists for storing diffences.
          var missing_layers = [];
          var new_layers = [];
-         // The server name is retrieved from the list.
-         for(server_name in user_data['server']){
-            var server = server_name;
-         }
          // For each of the layers in the user data. 
-         for(user_layer in user_data['server'][server]){
+         for(var user_layer in user_data.server.Layers){
             var found = false;
             // Loop through the new data and update the information of the matching layer.
-            var new_server = _.keys(new_data['server'])[0]
-            for(new_layer in new_data['server'][new_server]){
-               if(user_data['server'][server][user_layer]['Name'] == new_data['server'][new_server][new_layer]['Name']){
-                  new_data['server'][new_server][new_layer]['Abstract'] = user_data['server'][server][user_layer]['Abstract'];
-                  new_data['server'][new_server][new_layer]['Title'] = user_data['server'][server][user_layer]['Title'];
-                  new_data['server'][new_server][new_layer]['tags'] = user_data['server'][server][user_layer]['tags'];
-                  new_data['server'][new_server][new_layer]['LegendSettings'] = user_data['server'][server][user_layer]['LegendSettings'];
-                  new_data['server'][new_server][new_layer]['ProviderDetails'] = user_data['server'][server][user_layer]['ProviderDetails'] || undefined;
+            var new_server = _.keys(new_data.server)[0];
+            for(var new_layer in new_data.server[new_server]){
+               if(user_data.server.Layers[user_layer]['Name'] == new_data.server[new_server][new_layer]['Name']){
+                  new_data.server[new_server][new_layer]['Abstract'] = user_data.server.Layers[user_layer]['Abstract'];
+                  new_data.server[new_server][new_layer]['Title'] = user_data.server.Layers[user_layer]['Title'];
+                  new_data.server[new_server][new_layer]['tags'] = user_data.server.Layers[user_layer]['tags'];
+                  new_data.server[new_server][new_layer]['LegendSettings'] = user_data.server.Layers[user_layer]['LegendSettings'];
+                  new_data.server[new_server][new_layer]['ProviderDetails'] = user_data.server.Layers[user_layer]['ProviderDetails'] || undefined;
                   // The provider is saved so that it can be out into the provider variable.
-                  var provider = user_data['server'][server][user_layer]['tags']['data_provider'];
+                  var provider = user_data.server.Layers[user_layer]['tags']['data_provider'];
                   found = true;
-               }else if(new_layers.indexOf(new_data['server'][new_server][new_layer]['Name']) == -1){
+               }else if(new_layers.indexOf(new_data.server[new_server][new_layer]['Name']) == -1){
                   // for layers that don't match, loop back through the user data to check that there are no layers that are new to the server.
                   var missing = true;
-                  for(second_user_layer in user_data['server'][server]){
-                     if(user_data['server'][server][second_user_layer]['Name'] == new_data['server'][new_server][new_layer]['Name']){
+                  for(var second_user_layer in user_data.server.Layers){
+                     if(user_data.server.Layers[second_user_layer]['Name'] == new_data.server[new_server][new_layer]['Name']){
                         missing = false;
                      }
                   }
                   if(missing){
-                     new_layers.push(new_data['server'][new_server][new_layer]['Name']);
+                     new_layers.push(new_data.server[new_server][new_layer]['Name']);
                   }
                }
             }
             // If the layer was not found in the new data it is added to the missing layers list.
             if(!found){
-               missing_layers.push(user_data['server'][server][user_layer]['Name']);
+               missing_layers.push(user_data.server.Layers[user_layer]['Name']);
             }
          }
          // The new data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info.
@@ -320,7 +315,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.user.domainName,
+            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.niceDomainName,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('green-spin', false);

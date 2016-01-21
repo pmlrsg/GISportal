@@ -70,7 +70,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
 
    // Makes a list of all the other wanted tags.
    var other_tags = {};
-   for(tag in layer.tags){
+   for(var tag in layer.tags){
       if(!(tag == "data_provider" || tag == "niceName" || tag == "providerTag")){
          other_tags[tag] = layer.tags[tag];
       }
@@ -91,7 +91,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
 
-   for(value in gisportal.addLayersForm.layers_list){ // Ensures that the layer can only be added once. 
+   for(var value in gisportal.addLayersForm.layers_list){ // Ensures that the layer can only be added once. 
       if(gisportal.addLayersForm.layers_list[value]['id'] == layer.id){
          return;
       }
@@ -154,7 +154,7 @@ gisportal.addLayersForm.displayPaginator = function(total_pages, current_page, a
 * @param String form_div - The JQuery selector of the element that the form should be applied to.
 */
 gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_div){
-   for(value in gisportal.addLayersForm.layers_list){
+   for(var value in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[value]['total_pages'] = total_pages; //This passes the total number of pages to each layer for later use.
    }
    // Takes the current page information and adds it to the element given
@@ -239,7 +239,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       }
       // The information is then added to every layer in the list
-      for(value in gisportal.addLayersForm.layers_list){
+      for(var value in gisportal.addLayersForm.layers_list){
          gisportal.addLayersForm.layers_list[value]["tags"][key] = key_val;
       }
       // The information is then updated to the browser cache so that it is there next time.
@@ -250,7 +250,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    $('div.scale-points-div span.scale-to-all-layers').on( 'click', function () {
 
       // The assumed values are is added to every layer in the list
-      for(value in gisportal.addLayersForm.layers_list){
+      for(var value in gisportal.addLayersForm.layers_list){
          gisportal.addLayersForm.layers_list[value]['legendSettings']['scalePoints'] = true;
          gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['colorbaronly'] = true;
          gisportal.addLayersForm.layers_list[value]['legendSettings']['Parameters']['height'] = 500;
@@ -285,12 +285,12 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          return;
       }
       // Checks each layer in the list for errors with tags.
-      for(layer in gisportal.addLayersForm.layers_list){
+      for(var layer in gisportal.addLayersForm.layers_list){
          var this_layer = gisportal.addLayersForm.layers_list[layer];
          // As long as it should be included.
          if(this_layer['include']){
             var invalid = gisportal.addLayersForm.checkValidity;
-            for(tag in this_layer.tags){
+            for(var tag in this_layer.tags){
                // If the tag is invalid
                if(invalid("all_tags", this_layer.tags[tag])['invalid']){
                   // Load up the layer in the form and return so nothing is actually submitted
@@ -302,18 +302,18 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       }
       // Adds each layer to the cache
-      for(layer in gisportal.addLayersForm.layers_list){
+      for(var layer in gisportal.addLayersForm.layers_list){
          // As long as it is to be included
          if(gisportal.addLayersForm.layers_list[layer]['include']){
             //Sends the layers to the middleware to be added to the json file
             $.ajax({
                url: gisportal.middlewarePath + '/settings/add_user_layer',
                method:'POST',
-               data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"), 'domain':gisportal.user.domainName},
+               data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"), 'domain':gisportal.niceDomainName},
                // If there is success
                success: function(layer){
                   // This block removes any old selected layers
-                  for(i in gisportal.addLayersForm.selectedLayers){
+                  for(var i in gisportal.addLayersForm.selectedLayers){
                      var id = gisportal.addLayersForm.selectedLayers[i];
                      var original_provider = gisportal.addLayersForm.server_info.original_provider
                      gisportal.indicatorsPanel.removeFromPanel(id);
@@ -381,7 +381,7 @@ gisportal.addLayersForm.addTagInput = function(tag){
    var total_pages = $('span.add-tag-input').data("total-pages");
    var current_page = $('span.add-tag-input').data("current-page");
    // The given tag is added as an empty field to each layer in the list
-   for(index in gisportal.addLayersForm.layers_list){
+   for(var index in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[index]["tags"][tag]="";
    }
    // The form is then refreshed (to include the new tag.)
@@ -589,7 +589,7 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          dataType: 'json',
          success: function( data ){
             var style_index = 0;
-            for(style in data.Styles){
+            for(var style in data.Styles){
                if(data.Styles[style].Name == gisportal.config.defaultStyle){
                   style_index = style;
                }
@@ -699,7 +699,7 @@ gisportal.addLayersForm.addServerToForm = function(server, owner, layer_id){
    }
    var single_layer;
    var index_to_load = 1;
-   for(layer in layers_list){
+   for(var layer in layers_list){
       if(layers_list[layer]['serverName'] == server){
          single_layer = layers_list[layer];
          index = gisportal.addLayersForm.addlayerToList(layers_list[layer], layer_id);

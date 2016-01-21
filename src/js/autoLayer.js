@@ -69,7 +69,7 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
 
    _.forIn(gisportal.layers, function( layer ){
       if(layer.serviceType!=="WFS"){
-         var username = gisportal.user.info.username;
+         var username = gisportal.user.info.email;
          if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == username){
             only_matching_layer = {};
             only_matching_layer[layer.id] = layer;
@@ -89,9 +89,9 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.user.domainName
+      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.niceDomainName
       if(given_cache_refresh == "false"){
-         request_url = "cache/" + gisportal.user.domainName + "/temporary_cache/"+clean_file+".json"
+         request_url = "cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json"
       }else{
          request_url = clean_url
       }
@@ -133,7 +133,7 @@ gisportal.autoLayer.addGivenLayer = function(layer){
    if (json_layer["Error"] != undefined){
       $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
    }else{
-      json_layer.owner = gisportal.user.info.username;
+      json_layer.owner = gisportal.user.info.email;
       gisportal.initWMSlayers([json_layer]);
    }
 };

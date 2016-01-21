@@ -45,7 +45,7 @@ gisportal.vectorStyles.createPalette = function(startingColour, steps){
 	var currentB = startColour['b'];
 	var palette = [];
 	var x = 1
-	for(x;x <= steps;x++){
+	for(var x;x <= steps;x++){
 
 		currentR = Math.floor(currentR + (255 - currentR) * (tintFactor * x));
 		currentG = Math.floor(currentG + (255 - currentG) * (tintFactor * x));

@@ -161,7 +161,7 @@ gisportal.graphs.PlotStatus = (function(){
       // Loop over all of sources and find the longest
       // estimation time. This will be the one thats 
       // said to be the Plots completion time
-      for( var sourceId = 0; sourceId < serverStatus.sources.length; sourceId++ ){
+      for(var sourceId = 0; sourceId < serverStatus.sources.length; sourceId++ ){
          var source = serverStatus.sources[ sourceId ];
 
          switch( source.estimation.state ){

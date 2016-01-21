@@ -181,7 +181,7 @@ Handlebars.registerHelper('round', function(number, decimals, options) {
 Handlebars.registerHelper('call', function() {
    var method = arguments[ 0 ];
    var methodArgs = new Array(arguments.length - 2);
-   for( var i = 1; i < arguments.length - 1; i++ )
+   for(var i = 1; i < arguments.length - 1; i++ )
       methodArgs[i - 1] = arguments[ i ];
    var options = arguments[ arguments.length - 1 ];
 
@@ -189,7 +189,7 @@ Handlebars.registerHelper('call', function() {
    var currentLocation = options.data.root;
    var path = method.split('.');
 
-   for( var i = 0; path.length > i; i++ ){
+   for(var i = 0; path.length > i; i++ ){
       lastLocation = currentLocation;
       currentLocation = currentLocation[ path[i] ];
    };
