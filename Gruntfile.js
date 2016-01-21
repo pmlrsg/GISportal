@@ -36,7 +36,8 @@ var coreFiles = [
     "src/js/editLayersForm.js",
     "src/js/userPermissions.js",
     "src/js/collaboration.js",
-    "src/js/collaboration-event-bindings.js"
+    "src/js/collaboration-event-bindings.js",
+    "src/js/user.js"
   ];
 
 var cssFiles = [

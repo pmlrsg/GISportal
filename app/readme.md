@@ -20,7 +20,7 @@ You will need to create a Project in the Google Developers Console to allow the 
 5. Under the OAuth heading click the **Create new Client ID** button
 6. Leave the Application Type as **Web Application**
 7. Set the **Authorised Javascript Origins** value to the URL that your application will run on
-8. Set the **Authorised Redirect URI** value to the URL on the callback function; the callback function is `/node/auth/google/callback` so the value you need to enter would be `https://www.example.com/node/auth/google/callback`
+8. Set the **Authorised Redirect URI** value to the URL on the callback function; the callback function is `/app/user/auth/google/callback` so the value you need to enter would be `https://www.example.com/app/user/auth/google/callback`
 9. Click the **Create Client ID** to save the details; the new client ID details will be shown on the screen and you will need to add these to the application's configuration file
 
 ### Edit the configuration file

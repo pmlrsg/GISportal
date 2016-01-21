@@ -1,0 +1,12 @@
+div.userHolder
+   h3 User Dashboard
+   p You are now logged in
+   
+   div.userDetails
+      img(src=userPicture class='avatar')
+      div.name= displayName
+      div.email= userEmail
+      p.logout 
+         a(href='javascript:void(0)').logout Logout
+
+   div.clearfix

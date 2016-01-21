@@ -15,11 +15,23 @@ var jade = require("jade");
 var app = express();
 
 // Set the settings
-require('./config/index.js')(app);
-var config = app.get('config');
+try {
+   require('./config/config-server.js');
+} catch(e) {
+   console.log('There doesn\'t appear to be a server config settings file in place');
+   console.log('');
+   console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
+   console.log('');
+   console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/config-server.js '+ __dirname +'/config/config-server.js');
+   console.log('');
+   console.log('Exiting application, bye   o/');
+   console.log('');
+   process.exit();
+}
+
 
 // set up Redis as the session store
-var redisSetup = require('./lib/redissetup.js');
+var redisSetup = require('./app/lib/redissetup.js');
 var redisClient = redisSetup.startRedis(app, config);
 var redisStore = require('connect-redis')(session);
 
@@ -30,39 +42,40 @@ app.set('sessionStore', new redisStore({client: redisClient}));
 app.use(cookieParser(config.session.secret));
 // * Session manager
 app.use(session({
-   key: 'collaboration',
+   key: 'GISportal',
    secret: config.session.secret, 
    store: app.get('sessionStore'),
-      cookie: {
-         maxAge: config.session.age || null
-      }
-   })
-);
+   cookie: {
+      maxAge: config.session.age || null
+   },
+   saveUninitialized: false, // don't create session until something stored,
+   resave: false // don't save session if unmodified
+}));
 
 // template engine
 app.set('view engine', 'jade');
 
 // Passport settings
-var passportConfig = require('./lib/passport.js');
+var passportConfig = require('./app/lib/passport.js');
 passportConfig.init(config);
 
 var passport = require('passport');
 app.use(passport.initialize());
 
 // Configure routes
-var routes = require('./lib/routes.js');
+var routes = require('./app/lib/routes.js');
 app.use('/', routes);
 
 
 // Start listening...
 server = http.createServer(app)
 server.listen(config.app.port, function() {
-	console.log('collaboration-suite listening on port %d', config.app.port)
+	console.log('GISportal server listening on port %d', config.app.port)
 });
 io = io.listen(server);
 
 // the collaboration websocket stuff
-var collaboration = require('./lib/collaboration.js');
+var collaboration = require('./app/lib/collaboration.js');
 collaboration.init(io, app, config);
 
 /*

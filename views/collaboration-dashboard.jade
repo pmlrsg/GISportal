@@ -1,0 +1,29 @@
+script(type='text/javascript')
+   |$( document ).ready(function() {
+   |   if (!collaboration.active) collaboration.initSession();
+   |   $('.js-start-new-room').on('click', function() { collaboration.startNewRoom()});
+   |   $('.js-join-room').on('click', function() { 
+   |      var roomId = $('#roomId').val();
+   |      if (roomId) {
+   |         collaboration.joinRoom(roomId);
+   |      } else {
+   |         alert('Please enter the reference number of the room that you would like to join');
+   |      }
+   |   });
+   |});
+
+div.collabHolder
+   h3 Collaboration Dashboard
+   div.join
+      h3 Join a session
+      p If you have a collaboration reference enter it here to join the session
+      input(type="text", id="roomId", placeholder="Collaboration reference")
+      div(class="js-room-id-message hidden")
+      button(class="js-join-room brand small pull-right analysis-add-to-plot-buttons") Join Session
+
+   div.host
+      h3 Host a session
+      p Select this option to host a new session and invite people to join you
+      button(class="js-start-new-room brand small pull-right") Start new
+
+   div.clearfix
