@@ -1,0 +1,1 @@
+{"wmsURL": "https://wci.earth2observe.eu/thredds/wms/cnr/cmorph-daily-rainfall-agg.nc?", "wcsURL": "https://wci.earth2observe.eu/thredds/wcs/cnr/cmorph-daily-rainfall-agg.nc?", "serverName": "cmorph_rainfall_daily", "options": {"providerShortTag": "CNR"}, "server": {"cmorph-daily-rainfall-agg.nc": []}}
