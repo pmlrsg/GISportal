@@ -60,6 +60,17 @@ var passportConfig = require('./app/lib/passport.js');
 passportConfig.init(config);
 
 var passport = require('passport');
+   passport.serializeUser(function(user, done) {
+    console.log('app serialize:\n' +JSON.stringify(user));
+    done(null, user);
+   });
+
+   passport.deserializeUser(function(user, done) {
+    console.log('app deserialize:\n'+JSON.stringify(user));
+    done(null, user);
+   });
+
+//var passport = require('passport');
 app.use(passport.initialize());
 
 // Configure routes
