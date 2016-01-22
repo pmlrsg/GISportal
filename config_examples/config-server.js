@@ -24,5 +24,6 @@ GLOBAL.config = {
       // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed
       age : 0
    },
- 
+   // an array of email address to grant admin privilges to when when they login
+   admins: [], 
 }
