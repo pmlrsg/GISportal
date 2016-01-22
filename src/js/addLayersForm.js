@@ -228,7 +228,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       if(key == "indicator_type"){
          key_val = key_val.split(",");
          for (value in key_val){
-            value = value.trim();
+            key_val[value] = key_val[value].trim()
          }
       }
       // The information is then added to every layer in the list
@@ -531,7 +531,7 @@ gisportal.addLayersForm.addInputListeners = function(){
             if(key == "indicator_type"){ // As the indacator type is a list, it must be split first.
                key_val = key_val.split(",");
                for (value in key_val){
-                  value = key.trim();
+                  key_val[value] = key_val[value].trim()
                }
             }
             gisportal.addLayersForm.layers_list[index]["tags"][key] = key_val;
