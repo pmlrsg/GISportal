@@ -65,16 +65,16 @@ gisportal.events.bind("templates-loaded", function() {
    }
  });
 
-// This returns the layer or layers that the user has selected in the url
+// This returns the layer or layers that match the URL
 gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    var matching_layers = {};
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 
-   _.forIn(gisportal.layers, function( layer ){
-      if(layer.serviceType!=="WFS"){
-         var username = gisportal.user.info.email;
-         var permission = gisportal.user.info.permission;
-         if(layer.owner == username || permission == 'guest' || gisportal.autoLayer.urlLoad){
+   _.forIn(gisportal.layers, function( layer ){ // Goes through each of the layers
+      if(layer.serviceType!=="WFS"){ // Not vector layers
+         var username = gisportal.user.info.email; // The logged in user
+         var permission = gisportal.user.info.permission; // The permission of the user
+         if(layer.owner == username || permission == 'guest' || gisportal.autoLayer.urlLoad){ // This makes sure that the layers currently in the portal are only loaded when they should be
             if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name)){
                only_matching_layer = {};
                only_matching_layer[layer.id] = layer;

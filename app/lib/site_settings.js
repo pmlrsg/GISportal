@@ -240,7 +240,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
                         data.options.providerShortTag = clean_provider;
                      }
                      new_data_layer.tags.niceName = this_new_layer.nice_name;
-                     new_data_layer.LegendSetings = this_new_layer.legendSettings;
+                     new_data_layer.LegendSettings = this_new_layer.legendSettings;
                      new_data.push(new_data_layer);
                      found = true;
                      break;
@@ -252,6 +252,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
             }
          }
       }
+      // Adds all of the broader information to the JSON object.
       data.server.Layers = new_data;
       data.contactInfo.address = server_info.address.replace("\n", "<br/>") || "";
       data.contactInfo.email = server_info.email || "";
