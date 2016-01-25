@@ -4,8 +4,11 @@ gisportal.autoLayer.TriedToAddLayer = false;
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
 
-
+   gisportal.autoLayer.urlLoad = false; // If the wms information is being loaded from the URL (first time) or the text box.
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
+   if(!gisportal.autoLayer.given_wms_url && gisportal.utils.getURLParameter('wms_url')){
+      gisportal.autoLayer.urlLoad = true;
+   }
    if(given_wms_url && given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
    }
@@ -70,11 +73,14 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    _.forIn(gisportal.layers, function( layer ){
       if(layer.serviceType!=="WFS"){
          var username = gisportal.user.info.email;
-         if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == username){
-            only_matching_layer = {};
-            only_matching_layer[layer.id] = layer;
-         }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == username){
-            matching_layers[layer.id] = layer;
+         var permission = gisportal.user.info.permission;
+         if(layer.owner == username || permission == 'guest' || gisportal.autoLayer.urlLoad){
+            if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name)){
+               only_matching_layer = {};
+               only_matching_layer[layer.id] = layer;
+            }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name)){
+               matching_layers[layer.id] = layer;
+            }
          }
       }
       
