@@ -49,7 +49,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    var indicator_type = layer.tags.indicator_type || "";
    var region = layer.tags.region || "";
    var interval = layer.tags.interval || "";
-   var model_name = layer.tags.model_name || "";
+   var model = layer.tags.model || "";
    var styles_file = './cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
    var legendSettings = layer.legendSettings || {
          "scalePoints":false,
@@ -82,7 +82,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "original_name":layer.urlName, //used to input the data into the correct files int the end.
       "abstract":layer.abstract,
       "id":layer.id,
-      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model_name":model_name}, //ensures that these tags are displayed on the form
+      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
       "include":true,
       "styles_file":styles_file,
       "legendSettings":legendSettings,

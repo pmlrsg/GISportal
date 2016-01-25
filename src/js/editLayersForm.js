@@ -24,6 +24,7 @@ gisportal.editLayersForm.produceServerList = function(){
    }else{
       layers_obj = gisportal.layers;
    }
+   var data;
    //for each of the layers in the list.
    for(var layer in layers_obj){
       var this_layer = layers_obj[layer];
@@ -67,7 +68,7 @@ gisportal.editLayersForm.produceServerList = function(){
          gisportal.editLayersForm.server_list.push(server_info);
       }
       var admin = false;
-      if(gisportal.user.info.permissions == "admin") admin = true;
+      if(gisportal.user.info.permission == "admin") admin = true;
       data = {
          "server_list": gisportal.editLayersForm.server_list,
          "admin": admin

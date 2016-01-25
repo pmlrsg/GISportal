@@ -69,7 +69,6 @@ router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 router.get('/app/settings/get_cache', function(req, res) {
    var usernames = [user.getUsername(req)];
    var permission = user.getAccessLevel(req);
-   console.log(permission);
    var domain = "pmpc1310.npm.ac.uk";//req.get('origin').replace("http://", "").replace("https://", "");;
 
    var cache = []; // The list of cache deatils to be returned to the browser
@@ -254,24 +253,12 @@ router.all('/app/settings/add_user_layer', function(req, res){
          }
       }
       data.server.Layers = new_data;
-      if(server_info.address && server_info.address.length>0){
-         data.contactInfo.address = server_info.address.replace("\n", "<br/>");
-      }
-      if(server_info.email && server_info.email.length>0){
-         data.contactInfo.email = server_info.email;
-      }
-      if(server_info.person && server_info.person.length>0){
-         data.contactInfo.person = server_info.person;
-      }
-      if(server_info.phone && server_info.phone.length>0){
-         data.contactInfo.phone = server_info.phone;
-      }
-      if(server_info.position && server_info.position.length>0){
-         data.contactInfo.position = server_info.position;
-      }
-      if(server_info.wcsURL && server_info.wcsURL.length>0){
-         data.wcsURL = server_info.wcsURL;
-      }
+      data.contactInfo.address = server_info.address.replace("\n", "<br/>") || "";
+      data.contactInfo.email = server_info.email || "";
+      data.contactInfo.person = server_info.person || "";
+      data.contactInfo.phone = server_info.phone || "";
+      data.contactInfo.position = server_info.position || "";
+      data.wcsURL = server_info.wcsURL || "";
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");
    }else{
