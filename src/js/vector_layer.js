@@ -218,7 +218,7 @@ gisportal.Vector = function(options) {
   this.createStyleFromProp = function(source,prop,colour){
       var features = source.getFeatures();
       var possibleOptions = [];
-      var x, y = 0;
+      var x = 0, y = 0;
       var bins;
       var featureCount = features.length;
       var isNumberProperty = false;
