@@ -95,8 +95,8 @@ gisportal.openid.getLink = function()  {
       },
       dataType: 'json',
       success: function( data ) { 
-         if (data['output']['url']) {
-            $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+         if (data.output.url) {
+            $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data.output.url);
          }
       },
       error: function( request, errorType, exception ) {

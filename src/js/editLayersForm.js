@@ -273,45 +273,46 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // Lists for storing diffences.
          var missing_layers = [];
          var new_layers = [];
+         var provider;
          // For each of the layers in the user data. 
          for(var user_layer in user_data.server.Layers){
             var found = false;
             // Loop through the new data and update the information of the matching layer.
             var new_server = _.keys(new_data.server)[0];
             for(var new_layer in new_data.server[new_server]){
-               if(user_data.server.Layers[user_layer]['Name'] == new_data.server[new_server][new_layer]['Name']){
-                  new_data.server[new_server][new_layer]['Abstract'] = user_data.server.Layers[user_layer]['Abstract'];
-                  new_data.server[new_server][new_layer]['Title'] = user_data.server.Layers[user_layer]['Title'];
-                  new_data.server[new_server][new_layer]['tags'] = user_data.server.Layers[user_layer]['tags'];
-                  new_data.server[new_server][new_layer]['LegendSettings'] = user_data.server.Layers[user_layer]['LegendSettings'];
-                  new_data.server[new_server][new_layer]['ProviderDetails'] = user_data.server.Layers[user_layer]['ProviderDetails'] || undefined;
+               if(user_data.server.Layers[user_layer].Name == new_data.server[new_server][new_layer].Name){
+                  new_data.server[new_server][new_layer].Abstract = user_data.server.Layers[user_layer].Abstract;
+                  new_data.server[new_server][new_layer].Title = user_data.server.Layers[user_layer].Title;
+                  new_data.server[new_server][new_layer].tags = user_data.server.Layers[user_layer].tags;
+                  new_data.server[new_server][new_layer].LegendSettings = user_data.server.Layers[user_layer].LegendSettings;
+                  new_data.server[new_server][new_layer].ProviderDetails = user_data.server.Layers[user_layer].ProviderDetails || undefined;
                   // The provider is saved so that it can be out into the provider variable.
-                  var provider = user_data.server.Layers[user_layer]['tags']['data_provider'];
+                  provider = user_data.server.Layers[user_layer].tags.data_provider;
                   found = true;
-               }else if(new_layers.indexOf(new_data.server[new_server][new_layer]['Name']) == -1){
+               }else if(new_layers.indexOf(new_data.server[new_server][new_layer].Name) == -1){
                   // for layers that don't match, loop back through the user data to check that there are no layers that are new to the server.
                   var missing = true;
                   for(var second_user_layer in user_data.server.Layers){
-                     if(user_data.server.Layers[second_user_layer]['Name'] == new_data.server[new_server][new_layer]['Name']){
+                     if(user_data.server.Layers[second_user_layer].Name == new_data.server[new_server][new_layer].Name){
                         missing = false;
                      }
                   }
                   if(missing){
-                     new_layers.push(new_data.server[new_server][new_layer]['Name']);
+                     new_layers.push(new_data.server[new_server][new_layer].Name);
                   }
                }
             }
             // If the layer was not found in the new data it is added to the missing layers list.
             if(!found){
-               missing_layers.push(user_data.server.Layers[user_layer]['Name']);
+               missing_layers.push(user_data.server.Layers[user_layer].Name);
             }
          }
          // The new data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info.
          // If present the wcsURL is also added.
-         new_data['options'] = user_data['options'];
-         new_data['contactInfo'] = user_data['contactInfo'];
-         new_data['wcsURL'] = user_data['wcsURL'] || undefined;
-         new_data['provider']= provider || user_data['options']['providerShortTag'];
+         new_data.options = user_data.options;
+         new_data.contactInfo = user_data.contactInfo;
+         new_data.wcsURL = user_data.wcsURL || undefined;
+         new_data.provider= provider || user_data.options.providerShortTag;
          var user_info = gisportal.user.info;
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
@@ -322,7 +323,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
                span.toggleClass('green-spin', false);
                span.parent("td").parent("tr").toggleClass('alert-warning', false);
                span.parent("td").parent("tr").toggleClass('alert-success', true);
-               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-success', false)},2000);
+               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-success', false);},2000);
                // Refreshes the timestamp.
                span.parent("td").siblings(".time-stamp").html(new_data.timeStamp);
                // The layers are then refreshed
@@ -331,7 +332,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
                span.toggleClass('green-spin', false);
                span.parent("td").parent("tr").toggleClass('alert-warning', false);
                span.parent("td").parent("tr").toggleClass('alert-danger', true);
-               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
+               setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
                span.notify("ERROR!", {position:"left", className:"error"});
             }
          });
@@ -341,8 +342,8 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          span.toggleClass('green-spin', false);
          span.parent("td").parent("tr").toggleClass('alert-warning', false);
          span.parent("td").parent("tr").toggleClass('alert-danger', true);
-         setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false)},2000);
+         setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
          span.notify("Could not get internal info", {position:"left", className:"error"});
       }
    });
-}
+};

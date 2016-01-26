@@ -60,7 +60,7 @@ gisportal.layer = function( options ) {
    // {indicator name} - {indicator region} - { indicator provider }
    this.descriptiveName = this.name;
    if (this.tags.region) this.descriptiveName += ' - ' + this.tags.region;
-   if (this.providerTag) this.descriptiveName += ' - ' + this.providerTag
+   if (this.providerTag) this.descriptiveName += ' - ' + this.providerTag;
 
    // The original indicator name used by thedds/cache
    this.urlName = options.name;
@@ -91,7 +91,7 @@ gisportal.layer = function( options ) {
    }
    
 
-   this.tags['providerTag'] = this.providerTag;
+   this.tags.providerTag = this.providerTag;
 
    this.provider = this.providerTag;
 
@@ -194,7 +194,7 @@ gisportal.layer = function( options ) {
       
       var olLayer = this.createOLLayer(); // Create OL layer.
       
-      this.openlayers['anID'] = olLayer;
+      this.openlayers.anID = olLayer;
 
       if (options.show !== false)  { 
          gisportal.checkIfLayerFromState(layer);
@@ -248,12 +248,12 @@ gisportal.layer = function( options ) {
     * @param {object} object - The object to extend the WMS layer params
     */
    this.mergeNewParams = function(object) {
-      if (this.openlayers['anID']) {
-         var params = this.openlayers['anID'].getSource().getParams();
+      if (this.openlayers.anID) {
+         var params = this.openlayers.anID.getSource().getParams();
          for(var prop in object) {
             params[prop] = object[prop];
          }
-         this.openlayers['anID'].getSource().updateParams(params);
+         this.openlayers.anID.getSource().updateParams(params);
          gisportal.scalebars.autoScale( this.id );   
       }
    };
@@ -266,7 +266,7 @@ gisportal.layer = function( options ) {
     */
    this.isVisible = true;  
    this.setVisibility = function(visibility) {
-      if (this.openlayers['anID']) this.openlayers['anID'].setVisible(visibility);
+      if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility);
       this.isVisible = visibility;
    };
    
@@ -384,7 +384,7 @@ gisportal.layer = function( options ) {
       if (filtArray.length > 0) {
          return filtArray;
       } 
-      else  if (nearestDate != null) {
+      else  if (nearestDate !== null) {
          //console.log("Using nearest date: " + nearestDate);
          return [nearestDate];
       }
@@ -461,7 +461,7 @@ gisportal.layer = function( options ) {
               if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
               if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
               layer.units = json_data.units; 
-              layer.log = json_data.logScaling == true ? true : false;
+              layer.log = json_data.logScaling === true ? true : false;
 
             }catch(e){
               //var layer.scaling = 'raw';
@@ -469,7 +469,7 @@ gisportal.layer = function( options ) {
 
         gisportal.layers[layer.id].metadataComplete = true; 
         layer.metadataComplete = true;
-        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); delete d; });
+        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); d = null; });
 
          },
          error: function(request, errorType, exception) {
@@ -479,14 +479,14 @@ gisportal.layer = function( options ) {
             layer.maxScaleVal = layer.origMaxScaleVal;
             layer.log = false;
             
-            $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error")
+            $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");
          }
       });
    };
 
    this.cacheUrl = function(){
-     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json'
-   }
+     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json';
+   };
 
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
@@ -535,7 +535,7 @@ gisportal.layer = function( options ) {
                   tileElement.src = src;
                }
             })
-         })
+         });
 
       } else if(this.type == 'refLayers') {
          // intended for WFS type layers that are not time related
@@ -597,10 +597,10 @@ gisportal.layer = function( options ) {
  * @param {object} options - Extend the layer with options
  */
 gisportal.addLayer = function(layer, options) {
-   var options = options || {};   
+   options = options || {};   
   
    if (layer)  {
-      layer.addOLLayer(layer.openlayers['anID'], layer.id);
+      layer.addOLLayer(layer.openlayers.anID, layer.id);
    }
  
    if (options.minScaleVal || options.maxScaleVal)  {   
@@ -651,8 +651,8 @@ gisportal.removeLayer = function(layer) {
 gisportal.setLayerIndex = function(layer, index) {
    // var noLayers = gisportal.selectedLayers.length;
    // var startIndex = map.layers.length - noLayers;
-   // var name = layer.openlayers['anID'].name;
-   // map.setLayerIndex(layer.openlayers['anID'], index);
+   // var name = layer.openlayers.anID.name;
+   // map.setLayerIndex(layer.openlayers.anID, index);
 
    // var vector = map.getLayersByName('POI Layer')[0];
    // map.setLayerIndex(vector, map.layers.length - 1);
@@ -683,12 +683,12 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options) {  
-  var options = options || {};
+  options = options || {};
   var id = layer.id; 
   //console.log("getting layer data 222");
   if (layer.serviceType=="WFS"){
 
-    gisportal.layers[id].init(options,layer)
+    gisportal.layers[id].init(options,layer);
   }
   else {
     //console.log("inside ajax getting");
@@ -703,7 +703,7 @@ gisportal.getLayerData = function(fileName, layer, options) {
          gisportal.layers[id].init(data, options);
       },
       error: function() {
-         $.notify("Sorry\nThere was a problem loading this layer, please try again", "error")
+         $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
       }
    });
  }

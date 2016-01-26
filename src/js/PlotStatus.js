@@ -92,7 +92,7 @@ gisportal.graphs.PlotStatus = (function(){
             case "error":
                _this.stateError( serverStatus );
                break;
-         };
+         }
       });
    };
 
@@ -175,8 +175,8 @@ gisportal.graphs.PlotStatus = (function(){
                   worestCaseEstimation = estimatedEst;
                break;
 
-         };
-      };
+         }
+      }
 
       var message = serverStatus.message;
 
@@ -201,12 +201,12 @@ gisportal.graphs.PlotStatus = (function(){
     * @return String
     */
    PlotStatus.prototype.printSmallTimeDiffernce = function( endTime, allowNegative ){
-      var allowNegative = allowNegative || false;
+      allowNegative = allowNegative || false;
       var startTime = new Date();
 
       var differnceInSecs = ( endTime.getTime() - startTime.getTime() ) / 1000;
 
-      if( ! allowNegative && differnceInSecs == 0 )
+      if( ! allowNegative && differnceInSecs === 0 )
          return "0m0s";
 
       var flip = false;
@@ -224,7 +224,7 @@ gisportal.graphs.PlotStatus = (function(){
       output += seconds + "s";
 
       return output;
-   }
+   };
 
    // Getter themes
 

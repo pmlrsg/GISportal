@@ -353,7 +353,7 @@ gisportal.TimeLine.prototype.redraw = function() {
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
 
    // Add new required g elements
-   this.dateDetails.enter().append('svg:g')
+   this.dateDetails.enter().append('svg:g');
    
    // Remove unneeded g elements
    this.dateDetails.exit().remove(); 
@@ -443,7 +443,7 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
-   gisportal.events.trigger('date.zoom', startDate, endDate)
+   gisportal.events.trigger('date.zoom', startDate, endDate);
 };
 
 // Add a new time bar using detailed parameters
@@ -560,7 +560,7 @@ gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
    if( !current || new Date(date).getTime() != current.getTime() )
       $('.js-current-date').data('date', date).pikaday( 'setDate', date );
-}
+};
 
 // Get the currently selected date 
 gisportal.TimeLine.prototype.getDate = function() {
@@ -577,7 +577,7 @@ gisportal.TimeLine.prototype.updatePickerBounds = function() {
          bar.startDate,
          bar.endDate,
       ];
-   }).reduce(function(d1,d2){ return d1.concat(d2) },[]);
+   }).reduce(function(d1,d2){ return d1.concat(d2);},[]);
 
    var extent = d3.extent( dates );
 

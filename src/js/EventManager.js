@@ -68,6 +68,7 @@
       handlers = getHandlers(self, type),
       i = indexOf.call(handlers, listener)
     ;
+    //Not sure what this line does, JShint complains!
     -1 < i && handlers.splice(i, 1);
     if (!handlers.length) delete self._events[type];
     return self;

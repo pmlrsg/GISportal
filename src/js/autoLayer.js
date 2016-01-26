@@ -3,7 +3,6 @@ gisportal.autoLayer.TriedToAddLayer = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
-
    gisportal.autoLayer.urlLoad = false; // If the wms information is being loaded from the URL (first time) or the text box.
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(!gisportal.autoLayer.given_wms_url && gisportal.utils.getURLParameter('wms_url')){
@@ -54,7 +53,7 @@ gisportal.events.bind("layers-loaded", function() {
    if(gisportal.refresh_server){
       gisportal.refresh_server = false;
       gisportal.editLayersForm.produceServerList();
-      gisportal.loading.decrement()
+      gisportal.loading.decrement();
    }
  });
 
@@ -95,11 +94,11 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.niceDomainName
+      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&domain=' + gisportal.niceDomainName;
       if(given_cache_refresh == "false"){
-         request_url = "cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json"
+         request_url = "cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json";
       }else{
-         request_url = clean_url
+         request_url = clean_url;
       }
       // If the information is already available then it will be loaded from the file instead of the middleware doing so.
       $.ajax({
@@ -136,8 +135,8 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
 // This adds the layer(s) that has/have been retrieved by the middleware. It then runs the loadGivenLayer function once again to either load that layer or list the layers found
 gisportal.autoLayer.addGivenLayer = function(layer){
    json_layer = JSON.parse(layer);
-   if (json_layer["Error"] != undefined){
-      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
+   if (json_layer.Error !== undefined){
+      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer.Error, "error");
    }else{
       json_layer.owner = gisportal.user.info.email;
       gisportal.initWMSlayers([json_layer]);
@@ -149,12 +148,12 @@ gisportal.autoLayer.loadPreviousLayers = function(){
    gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list")) || {};
    gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info")) || {};
    gisportal.addLayersForm.form_info = JSON.parse(gisportal.storage.get("form_info")) || {};
-   if(gisportal.addLayersForm.form_info['wms_url']){
+   if(gisportal.addLayersForm.form_info.wms_url){
 
-      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info["wms_url"];
+      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info.wms_url;
       gisportal.autoLayer.loadGivenLayer();
    }
-   if(gisportal.addLayersForm.form_info["display_form"]){
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info['owner']);
+   if(gisportal.addLayersForm.form_info.display_form){
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info.current_page, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info.owner);
    }
 };

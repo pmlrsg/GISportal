@@ -4,7 +4,7 @@ gisportal.graphs.jobs = [];
 
 
 function getIndicatorDateRange( indicator ){
-   var indicator = gisportal.layers[indicator];
+   indicator = gisportal.layers[indicator];
    
    var firstDate = new Date(indicator.firstDate);
    var lastDate = new Date(indicator.lastDate);
@@ -28,7 +28,7 @@ gisportal.graphs.activePlotEditor = null;
  */
 gisportal.graphs.addComponentToGraph = function( component ){
    
-   if( gisportal.graphs.activePlotEditor == null ){
+   if( gisportal.graphs.activePlotEditor === null ){
       var Plot = gisportal.graphs.Plot;
 
       var plot = new Plot();
@@ -37,8 +37,8 @@ gisportal.graphs.addComponentToGraph = function( component ){
    }
    
    gisportal.panelSlideout.openSlideout( 'active-plot' );
-   gisportal.graphs.activePlotEditor.addComponent( component )
-}
+   gisportal.graphs.activePlotEditor.addComponent( component );
+};
 
 
 
@@ -60,7 +60,7 @@ gisportal.graphs.activeGraphSubmitted = function(){
 
    gisportal.panelSlideout.closeSlideout( 'active-plot' );
    gisportal.panels.showPanel( 'history' );
-}
+};
 
 /**
  * Removes the active graph. Deletes the data and closes the pane;
@@ -69,7 +69,7 @@ gisportal.graphs.deleteActiveGraph = function(){
    gisportal.panelSlideout.closeSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor = null;
    $('.panel').removeClass('has-active-plot');
-}
+};
 
 gisportal.graphs.initDOM = function() {
    
@@ -80,7 +80,7 @@ gisportal.graphs.initDOM = function() {
    gisportal.graphs.graphsHistoryList = $('.js-graphs-history-list');
    gisportal.graphs.graphsSavedList = $('.js-graphs-saved-list');
    
-}
+};
 
 /**
  * Open a plot in the editor.
@@ -89,8 +89,8 @@ gisportal.graphs.initDOM = function() {
 gisportal.graphs.editPlot = function( plot ){
    //If the user is editing a graph
    // Warn them first
-   if( gisportal.graphs.activePlotEditor != null )
-      if( confirm( "This will delete your current plot" ) == false )
+   if( gisportal.graphs.activePlotEditor !== null )
+      if( confirm( "This will delete your current plot" ) === false )
          return false;
 
    var PlotEditor = gisportal.graphs.PlotEditor;
@@ -98,5 +98,5 @@ gisportal.graphs.editPlot = function( plot ){
    $('.panel').addClass('has-active-plot');
    gisportal.graphs.activePlotEditor = plotEditor;
    gisportal.panelSlideout.openSlideout( 'active-plot' );
-}
+};
 

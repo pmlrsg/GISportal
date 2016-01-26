@@ -33,12 +33,12 @@ gisportal.map_settings.init = function() {
       border.id = d.getProperties().id;
       border.name = d.getProperties().title;
       borders.push(border);
-   })
+   });
 
    var projections = [];
    _.forEach(gisportal.availableProjections, function(d) {
-      projections.push(d)
-   })
+      projections.push(d);
+   });
    var user = false;
    if(gisportal.user.info.permission != "guest") user = true;
    var data = {
@@ -46,8 +46,8 @@ gisportal.map_settings.init = function() {
       countryBorders: borders,
       projections: projections,
       user_clearance:user
-   }
-   var rendered = gisportal.templates['map-settings'](data)
+   };
+   var rendered = gisportal.templates['map-settings'](data);
    $('.js-map-options').html(rendered);
 
    $('button.js-edit-layers').on('click', function(e){
@@ -88,17 +88,17 @@ gisportal.map_settings.init = function() {
    // set the default value for the base map
    if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
       map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
-      $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap })
+      $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
    } else {
       map.addLayer(gisportal.baseLayers.EOX);   
-      $('#select-basemap').ddslick('select', { value: "EOX" })
+      $('#select-basemap').ddslick('select', { value: "EOX" });
    }
 
    // set the default value if one exists in config.js
-   if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible == true) {
+   if (typeof gisportal.config.countryBorder != 'undefined' && typeof gisportal.config.countryBorder.defaultLayer != 'undefined' && gisportal.config.countryBorder.alwaysVisible === true) {
       $('#select-country-borders').ddslick('select', { value: gisportal.config.countryBorder.defaultLayer });
       gisportal.selectCountryBorderLayer(gisportal.config.countryBorder.defaultLayer);
-   };
+   }
 
    if (typeof gisportal.config.showGraticules != 'undefined' && gisportal.config.showGraticules) {
       $('#select-graticules').ddslick('select', { value: "On" });
@@ -141,7 +141,7 @@ gisportal.map_settings.init = function() {
    // WMS URL event handler for refresh cache checkbox
    $('input.js-wms-url').on('change', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var input_value = $('input.js-wms-url')[0].value
+      var input_value = $('input.js-wms-url')[0].value;
       if(input_value.length > 0){
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
@@ -187,7 +187,7 @@ gisportal.setGraticuleVisibility = function(setTo) {
       }
       
    }
-}
+};
 
 /** Create  the country borders overlay
  *
@@ -250,9 +250,7 @@ gisportal.createCountryBorderLayers = function() {
          }),
       })
    };
-
-
-}
+};
 
 gisportal.setCountryBordersToTopLayer = function() {
    try { // because it might not exist yet
@@ -260,13 +258,13 @@ gisportal.setCountryBordersToTopLayer = function() {
    } catch(e) {
 
    }
-}
+};
 
 gisportal.selectCountryBorderLayer = function(id) {
    // first remove all other country layers that might be on the map
    for (var prop in gisportal.countryBorderLayers) {
       try {
-         map.removeLayer(gisportal.countryBorderLayers[prop])   
+         map.removeLayer(gisportal.countryBorderLayers[prop]);
       } catch(e) {
          // nowt to do really, the layer may not be on the map
       }
@@ -275,7 +273,7 @@ gisportal.selectCountryBorderLayer = function(id) {
    if (id != '0') {
       map.addLayer(gisportal.countryBorderLayers[id]);
    }  
-}
+};
 
 
 /**
@@ -390,7 +388,7 @@ gisportal.createBaseLayers = function() {
             projection: gisportal.projection
          })
       }),
-   }
+   };
 
    if (gisportal.config.bingMapsAPIKey) {
       gisportal.baseLayers.BingMapsAerial = new ol.layer.Tile({
@@ -467,7 +465,7 @@ gisportal.selectBaseLayer = function(id) {
    // take off all the base maps
    for (var prop in gisportal.baseLayers) {
       try {
-         map.removeLayer(gisportal.baseLayers[prop])
+         map.removeLayer(gisportal.baseLayers[prop]);
       } catch(e) {
          // nowt to do really, the base layer may not be on the map
       }
@@ -482,8 +480,8 @@ gisportal.selectBaseLayer = function(id) {
       // if there's only one available projection for the selected base map set the projection to that value and then load the base map
       if (gisportal.baseLayers[id].getProperties().projections.length == 1) {
          msg = 'The projection has been changed to ' + gisportal.baseLayers[id].getProperties().projections[0] + ' in order to display the ' + gisportal.baseLayers[id].getProperties().title + ' base layer';
-         gisportal.setProjection(gisportal.baseLayers[id].getProperties().projections[0])
-         $('#select-projection').ddslick('select', { value: gisportal.baseLayers[id].getProperties().projections[0], doCallback: false })
+         gisportal.setProjection(gisportal.baseLayers[id].getProperties().projections[0]);
+         $('#select-projection').ddslick('select', { value: gisportal.baseLayers[id].getProperties().projections[0], doCallback: false });
          setViewRequired = false;
       } else {
          msg = 'The \'' + gisportal.baseLayers[id].getProperties().title + '\' base map is not available in the current projection. Try changing the projection first and then selecting the base map again';
@@ -512,7 +510,7 @@ gisportal.selectBaseLayer = function(id) {
       var projection = map.getView().getProjection().getCode();
       gisportal.setView(centre, extent, projection);
    }
-}
+};
 
 gisportal.createGraticules = function() {
 
@@ -527,8 +525,7 @@ gisportal.createGraticules = function() {
    if (gisportal.config.showGraticules) {
       graticule_control.setMap(map);
    }
-
-}
+};
   
 gisportal.setProjection = function(new_projection) {
    // first make sure that base layer can accept the projection
@@ -542,7 +539,7 @@ gisportal.setProjection = function(new_projection) {
          .toggleClass('alert-danger', true)
          .toggleClass('hidden', false);
       // set the projection ddslick value back to original value
-      $('#select-projection').ddslick('revertToPreviousValue')
+      $('#select-projection').ddslick('revertToPreviousValue');
       return;
    } else {
       $('.js-map-settings-message').html('').toggleClass('alert-danger', false).toggleClass('hidden', true);
@@ -559,7 +556,7 @@ gisportal.setProjection = function(new_projection) {
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
    gisportal.refreshLayers();
-}
+};
 
 gisportal.setView = function(centre, extent, projection) {
    var current_zoom = map.getView().getZoom();
@@ -578,33 +575,33 @@ gisportal.setView = function(centre, extent, projection) {
          center: centre,
          minZoom: min_zoom,
          maxZoom: max_zoom,
-      })
+      });
    map.setView(view);
    map.getView().fit(extent, map.getSize());
 
-}
+};
 
 gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
    var new_bounds = bounds;
 
    if (from_proj != to_proj) {
-      var new_max_extent = gisportal.availableProjections[to_proj].bounds
+      var new_max_extent = gisportal.availableProjections[to_proj].bounds;
 
       var sw_corner = gisportal.reprojectPoint([bounds[0], bounds[1]], from_proj, to_proj);
       var ne_corner = gisportal.reprojectPoint([bounds[2], bounds[3]], from_proj, to_proj);
       
-      var new_bounds = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
+      new_bounds = [sw_corner[0], sw_corner[1], ne_corner[0], ne_corner[1]];
 
       for (var i = 0; i < 4; i++) {
          if (isNaN(new_bounds[i])) new_bounds[i] = new_max_extent[i];
       }   
    }
    return new_bounds;
-}
+};
 
 gisportal.reprojectPoint = function(point, from_proj, to_proj) {
    return ol.proj.transform(point, from_proj, to_proj);
-}
+};
 
 gisportal.refreshLayers = function() {
    _.forEach(map.getLayers().a, function(layer) {
@@ -618,4 +615,4 @@ gisportal.refreshLayers = function() {
          layer.getSource().updateParams(params);
       }
    });
-}
+};

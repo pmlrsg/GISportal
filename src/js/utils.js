@@ -16,7 +16,7 @@ gisportal.utils = {};
  * @return {string} The resulting string
  */  
 gisportal.utils.replace = function(search, replace, subject, count) {
-   var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
+   var j = 0, temp = '', repl = '', fl = 0,
       f = [].concat(search),
       r = [].concat(replace),
       s = subject,
@@ -113,8 +113,8 @@ gisportal.utils.ISODateString = function(d) {
  * @param {string} secondDate - The second date
  */ 
 gisportal.utils.compareDates = function(firstDate, secondDate) { 
-   var firstDate = gisportal.utils.ISODateString(firstDate);
-   var secondDate = gisportal.utils.ISODateString(secondDate);
+   firstDate = gisportal.utils.ISODateString(firstDate);
+   secondDate = gisportal.utils.ISODateString(secondDate);
    if (firstDate < secondDate) return true;
    return false;
 };
@@ -160,7 +160,7 @@ gisportal.utils.mustacheFormat = function(o)  {
       }
    }
    return data;
-}
+};
 
 /**
  * Clamps the number between the min and max.
@@ -181,7 +181,7 @@ gisportal.utils.clamp = function (num, min, max) {
  * @returns The decoded URI component matching the name
  */
 gisportal.utils.getURLParameter = function(name) {
-   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||["",""])[1].replace(/\+/g, '%20'))||null;
 };
 
 /**
@@ -228,8 +228,8 @@ gisportal.utils.getWindowInnerSize = function() {
     height = window.innerHeight;
   } else {
     // For IE,
-    if (('BackCompat' === window.document.compatMode)
-        && ('body' in window.document)) {
+    if (('BackCompat' === window.document.compatMode) &&
+        ('body' in window.document)) {
         elem = window.document.body;
     } else if ('documentElement' in window.document) {
       elem = window.document.documentElement;
@@ -325,7 +325,7 @@ gisportal.utils.nameToId = function(name)  {
    name = name.replace(/\;/g, '_');
    name = name.replace(/\//g, '_');
    return name.toLowerCase();
-}
+};
 
 /**
  * Takes an object a returns a flattened object
@@ -446,4 +446,4 @@ HashMap.prototype.any = function any(value) {
 
 gisportal.utils.titleCase = function(str){
    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
+};

@@ -16,7 +16,7 @@ gisportal.graphs.PlotEditor = (function(){
       this._allowMultipleSeries = 1;
 
       this.buildEditor();
-   }
+   };
 
 
    PlotEditor.prototype.buildEditor = function(){
@@ -41,7 +41,7 @@ gisportal.graphs.PlotEditor = (function(){
       //Setup the active "create graph" button
       this._editorParent.find('.js-create-graph').click(function(){
          _this.submitRequest();
-      })
+      });
 
       this._editorParent.find('.js-close-active-plot').click(function(){
          if( confirm('Warning this will delete this plot. Try "Hide" to keep this plot.') )
@@ -50,7 +50,7 @@ gisportal.graphs.PlotEditor = (function(){
             return false;
       });
 
-   }
+   };
 
    /**
     * Setup the plot title element.
@@ -66,12 +66,12 @@ gisportal.graphs.PlotEditor = (function(){
       this.plot().on('title-change', function(value){
          var currentValue = _this._plotTitleInput.val();
          if( currentValue != value['new'] )
-            _this._plotTitleInput.val(value['new'])
+            _this._plotTitleInput.val(value['new']);
       });
       this._plotTitleInput.change(function(){
          _this.plot().title( $(this).val() );
       });
-   }
+   };
 
    /**
     * Setup the plot type SELECT element.
@@ -87,13 +87,12 @@ gisportal.graphs.PlotEditor = (function(){
       this.plot().on('plotType-change', function(value){
          var currentValue = _this._plotTypeSelect.val();
          if( currentValue != value['new'] )
-            _this._plotTypeSelect.val(value['new'])
+            _this._plotTypeSelect.val(value['new']);
       });
       this._plotTypeSelect.change(function(){
          _this.plot().plotType( $(this).val() );
       });
-
-   }
+   };
 
    /**
     * Adds a component to the Editors plot.
@@ -112,10 +111,8 @@ gisportal.graphs.PlotEditor = (function(){
 
          setTimeout(function(){ alert.remove(); }, 5000);
          this._editorParent.find( '.js-components-area' ).prepend( alert );
-
       }
-
-   }
+   };
 
    
 
@@ -134,8 +131,7 @@ gisportal.graphs.PlotEditor = (function(){
          $(this).next('.js-dropdown-menu').html( rendered );
          _this._editorParent.find('.js-slideout-content').scrollTop(10000);
       });
-      
-   }
+   };
 
 
    /**
@@ -159,7 +155,7 @@ gisportal.graphs.PlotEditor = (function(){
       }else{
          alert("A series on the left Y axis is required.");
       }
-   }
+   };
 
    /**
     * Updates the UI time bounds slider's currently selection
@@ -167,7 +163,7 @@ gisportal.graphs.PlotEditor = (function(){
    PlotEditor.prototype.updateDateRangeSliderTBounds = function(){
 
       var tBounds = this.plot().tBounds();
-      var tBoundMillisec = tBounds.map(function( date ){ return date.getTime() });
+      var tBoundMillisec = tBounds.map(function( date ){ return date.getTime();});
       var sliderValInInts = this._rangeSlider.val().map(function(val){ return parseInt(val); });
 
       if( _.isEqual( tBoundMillisec, sliderValInInts) )
@@ -179,8 +175,7 @@ gisportal.graphs.PlotEditor = (function(){
             tBounds[1].getTime()
          ]
       }, true);
-
-   }
+   };
 
    /**
     * Updates the UI time bounds slider's out bounds
@@ -195,8 +190,7 @@ gisportal.graphs.PlotEditor = (function(){
             max: dateRangeBounds.max.getTime()
          }
       }, true);
-
-   }
+   };
 
    /**
     * Setups the the date slider on graph pane.
@@ -244,9 +238,9 @@ gisportal.graphs.PlotEditor = (function(){
       })
       // Listen for when the user moves the slider and update the tBounds
       .on('slide', function(event, val){
-         var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp) });
+         var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp);});
          _this.plot().tBounds( tBounds );
-      })
+      });
       
       // The start date input element is manually typed update  tBounds
       this._startDateInput.change(function(){
@@ -257,7 +251,7 @@ gisportal.graphs.PlotEditor = (function(){
             setDate.call(this, currentTBounds[0] );
          else
             _this.plot().tBounds( [ newDate, currentTBounds[1] ] );
-      })
+      });
       
       // The end date input element is manually typed update  tBounds
       this._endDateInput.change(function(){
@@ -268,7 +262,7 @@ gisportal.graphs.PlotEditor = (function(){
             setDate.call(this, currentTBounds[1] );
          else
             _this.plot().tBounds( [ currentTBounds[0] , newDate ] );
-      })
+      });
 
       this.plot().on('dateRangeBounds-change', function(){
          _this.updateDateRangeSliderBounds();
@@ -276,8 +270,7 @@ gisportal.graphs.PlotEditor = (function(){
       this.plot().on('tBounds-change', function(){
          _this.updateDateRangeSliderTBounds();
       });
-
-   }
+   };
 
    /**
     * Setups up the functions required to handle the graph components.
@@ -297,7 +290,7 @@ gisportal.graphs.PlotEditor = (function(){
       function addComponent( component ){
 
          if( _this.plot().components().length > 1 )
-            _this._editorParent.find('.js-slideout-content').addClass('multiple-components')
+            _this._editorParent.find('.js-slideout-content').addClass('multiple-components');
 
          var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];
@@ -333,17 +326,17 @@ gisportal.graphs.PlotEditor = (function(){
                   case "yes":
                      return "This indicator has data in the selected time range";
                   case "partial":
-                     return "This indicator only has partial data in this date range.\nValid range: " + validRange
+                     return "This indicator only has partial data in this date range.\nValid range: " + validRange;
                   case "no":
-                     return "This indicator only has no data in this date range.\nValid range: " + validRange
-               };
+                     return "This indicator only has no data in this date range.\nValid range: " + validRange;
+               }
             }
          });
       }
 
       // When a component is added to Plot add it to the UI
       this.plot().on('component-added', function( data ){
-         addComponent( data.component )
+         addComponent( data.component );
       });
       
       // When a component is removed from the Plot remove it from the UI
@@ -373,7 +366,7 @@ gisportal.graphs.PlotEditor = (function(){
 
       // Reload any exisitng components
       this.plot().components().forEach( addComponent );
-   }
+   };
 
    /**
     * Find out if the component passed in has data in range.
@@ -406,8 +399,7 @@ gisportal.graphs.PlotEditor = (function(){
 
        // Set the attribute of the result
       $(componentElement).attr('has-data-in-range', result);
-
-   }
+   };
 
    /**
     * Returns the Plot that this editor is editing
@@ -415,7 +407,7 @@ gisportal.graphs.PlotEditor = (function(){
     */
    PlotEditor.prototype.plot = function(){
       return this._plot;
-   }
+   };
 
    return PlotEditor;
 })();

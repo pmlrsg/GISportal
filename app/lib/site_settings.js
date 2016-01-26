@@ -254,11 +254,13 @@ router.all('/app/settings/add_user_layer', function(req, res){
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = new_data;
-      data.contactInfo.address = server_info.address.replace("\n", "<br/>") || "";
-      data.contactInfo.email = server_info.email || "";
-      data.contactInfo.person = server_info.person || "";
-      data.contactInfo.phone = server_info.phone || "";
-      data.contactInfo.position = server_info.position || "";
+      if(data.contactInfo){
+         data.contactInfo.address = server_info.address.replace("\n", "<br/>") || "";
+         data.contactInfo.email = server_info.email || "";
+         data.contactInfo.person = server_info.person || "";
+         data.contactInfo.phone = server_info.phone || "";
+         data.contactInfo.position = server_info.position || "";
+      }
       data.wcsURL = server_info.wcsURL || "";
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");

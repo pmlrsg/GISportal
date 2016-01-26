@@ -83,6 +83,4 @@ gisportal.panelSlideout.hideAllPanels = function(){
 		if( newState == 'peak' )
 			$(this).addClass( 'show-peak' );
 	});
-
-	
-}
+};

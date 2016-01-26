@@ -24,7 +24,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       {
          // If the style names match grab its info
          if(value.Name == indicator.style && url === null) {
-            url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL)
+            url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL);
             width = parseInt(value.Width, 10);
             height = parseInt(value.Height, 10);
             return false; // Break loop
@@ -42,48 +42,48 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       
       var scalePoints = [];
       
-      
+      var i, range, step, value, makePointReadable;
       if( indicator.log ){
-         var range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
+         range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
          var minScaleLog =  Math.log(indicator.minScaleVal);
-         for(var i = 0; i < scaleSteps; i++ ){
-            var step = (range / (scaleSteps-1)) * i;
-            var value = minScaleLog + step;
+         for(i = 0; i < scaleSteps; i++ ){
+            step = (range / (scaleSteps-1)) * i;
+            value = minScaleLog + step;
             value = Math.exp( value );
 	        scalePoints.push( value );
          }
       }else{
-         var range = indicator.maxScaleVal - indicator.minScaleVal;
-         for(var i = 0; i < scaleSteps; i++ ){
-            var step = (range / (scaleSteps-1)) * i;
-            var value = indicator.minScaleVal + step;
+         range = indicator.maxScaleVal - indicator.minScaleVal;
+         for(i = 0; i < scaleSteps; i++ ){
+            step = (range / (scaleSteps-1)) * i;
+            value = indicator.minScaleVal + step;
 	        scalePoints.push( value );
          }
       }
       
       var isExponentOver3 = scalePoints.some(function( point ){
          //return point.toExponential().match(/\.(.+)e/)[1].length > 4
-         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 3 )
-      })
+         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 3 );
+      });
       
       if( isExponentOver3 ){
-	      var makePointReadable = function( point ){
+	      makePointReadable = function( point ){
 	         point = point.toExponential();
 	         if( point.indexOf('.') == -1 )
 	            return point;
 	         var original = point.match(/\.(.+)e/)[1];
 	         return point.replace( original, original.substr(0,2) );
-	      }
+	      };
       }else{
-	      var makePointReadable = function( point ){ return Math.round(point * 10) / 10; }
+	      makePointReadable = function( point ){ return Math.round(point * 10) / 10; };
       }
       
       scalePoints = scalePoints.map(function( point ){
 	      return {
 	         original: isExponentOver3 ? point.toExponential() : point,
 	         nicePrint: makePointReadable(point)
-	      }
-      })
+	      };
+      });
 
       return {
          url: url,
@@ -100,28 +100,28 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
  * @parama {boolean} hasBase - True if you have the base URL (wmsURL)
  */
 gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
-   var given_parameters = undefined;
-   var parameters = ""
+   var given_parameters;
+   var parameters = "";
 
    try{
       given_parameters = layer.legendSettings.Parameters;
    }catch(e){}
    
    try{
-      if(given_parameters["height"]){
-         parameters += "&HEIGHT=" + given_parameters["height"];
+      if(given_parameters.height){
+         parameters += "&HEIGHT=" + given_parameters.height;
       }
    }catch(e){}
 
    try{
-      if(given_parameters["width"]){
-         parameters += "&WIDTH=" + given_parameters["width"];
+      if(given_parameters.width){
+         parameters += "&WIDTH=" + given_parameters.width;
       }
    }catch(e){}
 
    try{
-      if(given_parameters["colorbaronly"]){
-         parameters += "&colorbaronly=" + given_parameters["colorbaronly"];
+      if(given_parameters.colorbaronly){
+         parameters += "&colorbaronly=" + given_parameters.colorbaronly;
       }
    }catch(e){}
 
@@ -138,7 +138,7 @@ gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
    }catch(e){}
 
    if(parameters.length > 0 && base.indexOf("?") ==-1){
-      parameters = "?" + parameters
+      parameters = "?" + parameters;
    }
 
    if (base.length > 0)
@@ -157,29 +157,29 @@ gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
  */
 gisportal.scalebars.autoScale = function(id, force)  {
    var autoScaleCheck = $('#tab-' + id + '-autoScale');
-   if( force != true){
+   if( force !== true){
       if( autoScaleCheck.length == 1 ){
          if( ! autoScaleCheck.prop('checked') ){
             return;
-         };
+         }
       }else if( ! gisportal.config.autoScale ){
          return;
-      };
-   };
+      }
+   }
 
    try{
       var l = gisportal.layers[id];
       if(l.serviceType!="WFS"){
-      var bbox = l.exBoundingBox.WestBoundLongitude + ","
-         + l.exBoundingBox.SouthBoundLatitude + ","
-         + l.exBoundingBox.EastBoundLongitude + ","
-         + l.exBoundingBox.NorthBoundLatitude;
-
+      var bbox = l.exBoundingBox.WestBoundLongitude + "," +
+         l.exBoundingBox.SouthBoundLatitude + "," +
+         l.exBoundingBox.EastBoundLongitude + "," +
+         l.exBoundingBox.NorthBoundLatitude;
+      var time;
       try{
-         var time = '&time=' + new Date(l.selectedDateTime).toISOString();
+         time = '&time=' + new Date(l.selectedDateTime).toISOString();
       }
       catch(e){
-         var time = "";
+         time = "";
       }
 
       $.ajax({
@@ -192,7 +192,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
          }
       });
    }
-   }catch(e){};
+   }catch(e){}
 
    gisportal.events.trigger('scalebar.autoscale', id, force);
 };

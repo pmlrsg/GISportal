@@ -42,9 +42,9 @@ gisportal.graphs.Plot =(function(){
       this._dateRangeBounds = {
          min: new Date(0),
          max: new Date( Math.pow(2,31) * 1000 )
-      }
+      };
       
-   }
+   };
 
    //Make the object able to fire events
    Plot.prototype = _.create( EventEmitter.prototype, { constructor: Plot } );
@@ -65,7 +65,7 @@ gisportal.graphs.Plot =(function(){
    */
    Plot.prototype.addComponent= function( component ){
       // Check the plot type id allowed more then 1 series
-      if( this._allowMultipleSeries == false && this.components().length >= 1 )
+      if( this._allowMultipleSeries === false && this.components().length >= 1 )
          return new Error( "This graph type can only have 1 series" );
 
       var plot = this;
@@ -76,12 +76,12 @@ gisportal.graphs.Plot =(function(){
       // 
       // If it doesn't match that means the user manually edited
       // it so we shouldn't touch it
-      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() === "" );
 
       // Was the yAxis set manually?
       // If not auto set it
       if( !component.yAxis ){
-         if( this._components.length == 0 )
+         if( this._components.length === 0 )
             component.yAxis = 1;
          else
             component.yAxis = 2;
@@ -101,7 +101,7 @@ gisportal.graphs.Plot =(function(){
       // edited it
       if( updateGraphTitle )
          this.title( this.getGraphTitle( this._components ) );
-   }
+   };
    
    /**
    * Removes a components from the array and the active plot window
@@ -120,7 +120,7 @@ gisportal.graphs.Plot =(function(){
       // 
       // If it doesn't match that means the user manually edited
       // it so we shouldn't touch it
-      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() == "" );
+      var updateGraphTitle = ( this.getGraphTitle(this._components) == this.title() || this.title() === "" );
 
       this._components.splice( index, 1);
 
@@ -146,7 +146,7 @@ gisportal.graphs.Plot =(function(){
          var indicator = gisportal.layers[ component.indicator ];
          return indicator.displayName();
       })).join(" / ");
-   }
+   };
    
    /**
    * Builds a request to send to the graphing server
@@ -165,7 +165,7 @@ gisportal.graphs.Plot =(function(){
       
       var request = { plot: plotRequest, style: plotStyle };
       return request;
-   }
+   };
    
    /**
     * Adds basic information, the plot type,
@@ -184,7 +184,7 @@ gisportal.graphs.Plot =(function(){
          { key: 'logos', label: 'Logos' },
          { key: 'svg', label: 'SVG' }
       ];
-   }
+   };
    
 
    /**
@@ -206,7 +206,7 @@ gisportal.graphs.Plot =(function(){
 
       plotStyle.logos = providers;
 
-   }
+   };
 
 
 
@@ -216,7 +216,7 @@ gisportal.graphs.Plot =(function(){
     */
    Plot.prototype.allowMultipleSeries = function(){
       this._allowMultipleSeries = true;
-   }
+   };
 
    /**
     * Tells the editor to not allow multiple series.
@@ -233,7 +233,7 @@ gisportal.graphs.Plot =(function(){
             _this.removeComponent( component );
          });
 
-   }
+   };
 
    /**
     * Adds the Axis options to a plot request.
@@ -261,7 +261,7 @@ gisportal.graphs.Plot =(function(){
             var indicator = gisportal.layers[ component.indicator ];
             var output = indicator.name;
             if( 'elevation' in component )
-               output += ' Elv:' + component.elevation + 'M'
+               output += ' Elv:' + component.elevation + 'M';
             if( indicator.units )
                output += " (" + indicator.units + ")";
 
@@ -276,7 +276,7 @@ gisportal.graphs.Plot =(function(){
             "tickFormat" : "auto"
          };
          plotRequest.y1Axis = y1Axis;
-      };
+      }
 
 
       // Get components that will go on the left Y axis
@@ -291,7 +291,7 @@ gisportal.graphs.Plot =(function(){
             var indicator = gisportal.layers[ component.indicator ];
             var output = indicator.name;
             if( 'elevation' in component )
-               output += ' Elv:' + component.elevation + 'M'
+               output += ' Elv:' + component.elevation + 'M';
             if( indicator.units )
                output += " (" + indicator.units + ")";
 
@@ -306,8 +306,8 @@ gisportal.graphs.Plot =(function(){
             "tickFormat" : "auto"
          };
          plotRequest.y2Axis = y2Axis;
-      };
-   }
+      }
+   };
 
    /**
     * Added for the possibly to change the function
@@ -321,7 +321,7 @@ gisportal.graphs.Plot =(function(){
       };
 
       this.buildRequestDataGeneric( plotRequest.data.series );
-   }
+   };
 
    /**
     * Adds all the request series to the array
@@ -360,7 +360,7 @@ gisportal.graphs.Plot =(function(){
             logo = layer.provider.logo;
          }
          else{
-            logo = "undefined"
+            logo = "undefined";
          }
 
          // Gumph needed for the plotting serving to its thing
@@ -407,7 +407,7 @@ gisportal.graphs.Plot =(function(){
 
          seriesArray.push( newSeries );
       }
-   }
+   };
 
    /**
    * Submits the request the user has been building to server.
@@ -439,8 +439,8 @@ gisportal.graphs.Plot =(function(){
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
             $.notify(error, "error");
          }
-      })
-   }
+      });
+   };
 
    /**
    * Starts firing requests to the server monitoring the jobs status.
@@ -469,7 +469,7 @@ gisportal.graphs.Plot =(function(){
                else
                   _this.error( "Invalid reply from server. It possibly crashed." );
             }
-         })
+         });
       }
       
       this._monitorJobStatusInterval = setInterval(updateStatus, 1000);
@@ -491,7 +491,7 @@ gisportal.graphs.Plot =(function(){
       if( !arguments.length ) return this._state;
       this._state = _new;
       return this;
-   }
+   };
 
    /**
     * Get the server status if no parameter provided
@@ -510,11 +510,11 @@ gisportal.graphs.Plot =(function(){
          'new': _new
       });
       
-      if( _new.completed == true )
+      if( _new.completed === true )
          this.stopMonitoringJobStatus();
 
       return this;
-   }
+   };
   
    /**
     * Get the server status if no parameter provided
@@ -537,7 +537,7 @@ gisportal.graphs.Plot =(function(){
         this.allowSingleSeries();
 
       return this;
-   }
+   };
    
    
    /**
@@ -554,7 +554,7 @@ gisportal.graphs.Plot =(function(){
          this.emit('title-change', { 'new': _new, 'old': old });
 
       return this;
-   }
+   };
    
    /**
     * Get the server status if no parameter provided
@@ -562,14 +562,14 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.components = function( _new ){
       if( !arguments.length ) return this._components;
       return this;
-   }
+   };
    
    /**
    * Finds the widest time range that covers all the indicators data sets.
    */
    Plot.prototype.calculateDateRangeBounds = function(){
       //If theres no components return the current bounds
-      if( this._components.length == 0 )
+      if( this._components.length === 0 )
          return this.dateRangeBounds();
       
       var min = null;
@@ -581,18 +581,18 @@ gisportal.graphs.Plot =(function(){
          var firstDate = new Date(indicator.firstDate);
          var lastDate = new Date(indicator.lastDate);
          
-         if( firstDate < min || min == null )
+         if( firstDate < min || min === null )
             min = firstDate;
             
-         if( lastDate > max || max == null )
+         if( lastDate > max || max === null )
             max = lastDate;
-      })
+      });
       
       return {
          min: min,
          max: max
       };
-   }
+   };
    
    /**
    * The data range is the maximum range that covers all the components
@@ -628,7 +628,7 @@ gisportal.graphs.Plot =(function(){
 
 
       return this;
-   }
+   };
 
    /**
    * Checks that the new tBounds is with the allowed date range
@@ -648,10 +648,10 @@ gisportal.graphs.Plot =(function(){
       var dateRangeBounds = this.dateRangeBounds();
       
       //Make sure the tBounds fit in the allowed dateRangeBounds
-      if( dateRangeBounds.min != null && this._tBounds[0] < dateRangeBounds.min )
+      if( dateRangeBounds.min !== null && this._tBounds[0] < dateRangeBounds.min )
          this._tBounds[0] = dateRangeBounds.min;
       
-      if( dateRangeBounds.max != null && dateRangeBounds.max < this._tBounds[1] )
+      if( dateRangeBounds.max !== null && dateRangeBounds.max < this._tBounds[1] )
          this._tBounds[1] = dateRangeBounds.max;
       
 
@@ -660,7 +660,7 @@ gisportal.graphs.Plot =(function(){
          this.emit('tBounds-change', { 'new': this._tBounds, 'old': old });
       
       return this;
-   }
+   };
    
    /**
     * This returns the URL to the graph
@@ -668,7 +668,7 @@ gisportal.graphs.Plot =(function(){
     * @return String   URL to the popup
     */
    Plot.prototype.interactiveUrl = function(){
-      return graphServerUrl + '/job/' + this.id + '/interactive'
+      return graphServerUrl + '/job/' + this.id + '/interactive';
    };
 
 

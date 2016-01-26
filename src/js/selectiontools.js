@@ -63,7 +63,7 @@ gisportal.selectionTools.init = function()  {
 };
 
 function cancelDraw() {
-   if(draw == null)return;
+   if(draw === null)return;
    
    map.removeInteraction(draw);
    setTimeout(function() {
@@ -123,7 +123,7 @@ gisportal.selectionTools.getActiveControl = function() {
 };
 
 gisportal.selectionTools.toggleTool = function(type)  {
-   if (draw != null) {
+   if (draw !== null) {
       cancelDraw();
    }
    
@@ -203,8 +203,9 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    geom = feature.getGeometry();
 
    //var bounds;
+   var wkt_feature;
    if (feature_type === "Polygon") {
-      var wkt_feature = gisportal.wkt.writeGeometry(geom);
+      wkt_feature = gisportal.wkt.writeGeometry(geom);
       
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
@@ -216,7 +217,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       $('.js-edit-polygon').attr('disabled', false);
    }
    else if(feature_type === 'Line') {
-      var wkt_feature = gisportal.wkt.writeGeometry(geom);
+      wkt_feature = gisportal.wkt.writeGeometry(geom);
       
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
