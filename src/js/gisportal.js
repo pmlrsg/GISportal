@@ -1280,7 +1280,7 @@ gisportal.getPointReading = function(e) {
 
 
          $.ajax({
-            url:  gisportal.middlewarePath + '/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
                try{
                   $(elementId +' .loading').remove();

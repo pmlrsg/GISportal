@@ -269,6 +269,52 @@ router.all('/app/settings/add_user_layer', function(req, res){
    }
 });
 
+router.get('/app/settings/load_data_values', function(req, res){
+   var url = req.query.url; // Gets the given URL
+   var name = req.query.name; // Gets the given name
+   var units = req.query.units; // getst the given units
+
+   request(url + '&INFO_FORMAT=text/xml', function(err, response, body){
+      if(err) throw err;
+      var content_type = response.headers['content-type'];
+      var response_text = "Sorry, could not calculate a value for: " + name;
+
+      if(content_type == 'application/xml;charset=UTF-8'){
+         xml2js.parseString(body, function (err, result) {
+            if(err) throw err;
+            try{
+               response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
+            }catch(e){
+               response_text = "Sorry, could not calculate a value for: " + name
+            }
+            res.send(response_text);
+         });
+      }else{
+         request(url, function(err2, response2, body2){
+            if(err2) throw err2;
+            content_type = response2.headers['content-type'].replace(';charset=UTF-8', '');
+            if(content_type == "text/xml"){
+               xml2js.parseString(body2, function (err, result) {
+                  if(err) throw err;
+                  var output = name + ":"
+                  try{
+                     for(key in result.FeatureInfoResponse.FIELDS[0].$){
+                        output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                     }
+                  }catch(e){
+                     output += "<br/>no data found at this point";
+                  }
+                  response_text = output;
+               });
+            }else if(content_type == "text/plain" || content_type == "text/html"){
+               response_text = name + ":<br/>" + body2.replace(/(?:\r\n|\r|\n)/g, '<br />');
+            }
+            res.send(response_text);
+         });
+      }
+   });
+});
+
 
 router.get('/app/settings/load_new_wms_layer', function(req, res){
    var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
@@ -440,7 +486,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
       }
       if(name && service_title && title && bounding_boxes && style){
          layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes.exGeographicBoundingBox, "MoreIndicatorInfo" : false})
-         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions.dimensions, "Styles": style};
+         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions.dimensions || [], "Styles": style};
          var save_path = path.join(LAYER_CACHE_PATH, clean_url + "_" + name + ".json");
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;
