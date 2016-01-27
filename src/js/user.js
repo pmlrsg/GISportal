@@ -3,7 +3,7 @@ gisportal.user.info = {"email":"", "permission":"guest"};
 
 gisportal.user.loggedIn = function(){
    gisportal.user.updateProfile(); // The user info is updated update the login change
-   $('.logout').click(function() {
+   $('.logoutButton').click(function() {
       $.ajax({
          url: 'app/user/logout',
          success: function() {
@@ -39,17 +39,21 @@ gisportal.user.initDOM = function() {
 
 // This gets the logged in users information or the default guest values
 gisportal.user.updateProfile = function(){
+   function refreshUserPortal(){
+      gisportal.addLayersForm.form_info = {};
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.loadLayers();
+      gisportal.map_settings.init();
+   }
    $.ajax({
       url: gisportal.middlewarePath + '/user/get',
       success: function(user_info){
          gisportal.user.info = user_info;
-         gisportal.addLayersForm.form_info = {};
-         gisportal.addLayersForm.refreshStorageInfo();
-         gisportal.loadLayers();
-         gisportal.map_settings.init();
+         refreshUserPortal();
       },
       error: function(e){
          gisportal.user.info = {"email":"", "permission":"guest"};
+         refreshUserPortal();
       }
    });
 };

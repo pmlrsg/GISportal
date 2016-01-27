@@ -220,19 +220,21 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
          id = refinedIndicators[indicator];
          holder = $('input[value="' + id + '"]').parent();
          
+         var layer = gisportal.layers[id];
          var tags = [];
          for(var cat in gisportal.browseCategories) {
             var tmp = {
                name: gisportal.browseCategories[cat],
-               value: gisportal.layers[id].tags[cat]
+               value: layer.tags[cat]
             };
             tags.push(tmp);
          }
 
          data = {
-            provider: gisportal.layers[id].providerTag,
-            dateStart: gisportal.layers[id].firstDate,
-            dateEnd: gisportal.layers[id].lastDate,
+            provider: layer.providerTag,
+            dateStart: layer.firstDate,
+            dateEnd: layer.lastDate,
+            owner: layer.owner,
             tags: tags 
          };
 
