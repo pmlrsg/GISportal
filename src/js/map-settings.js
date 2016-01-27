@@ -39,13 +39,10 @@ gisportal.map_settings.init = function() {
    _.forEach(gisportal.availableProjections, function(d) {
       projections.push(d);
    });
-   var user = false;
-   if(gisportal.user.info.permission != "guest") user = true;
    var data = {
       baseLayers: layers,
       countryBorders: borders,
       projections: projections,
-      user_clearance:user
    };
    var rendered = gisportal.templates['map-settings'](data);
    $('.js-map-options').html(rendered);

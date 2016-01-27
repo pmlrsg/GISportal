@@ -43,7 +43,6 @@ gisportal.user.updateProfile = function(){
       gisportal.addLayersForm.form_info = {};
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.loadLayers();
-      gisportal.map_settings.init();
    }
    $.ajax({
       url: gisportal.middlewarePath + '/user/get',
@@ -56,4 +55,42 @@ gisportal.user.updateProfile = function(){
          refreshUserPortal();
       }
    });
+};
+
+gisportal.loadLayerEditButtons = function(){
+   var removedLayers = [];
+   for(var index in gisportal.selectedLayers){
+      var id = gisportal.selectedLayers[index];
+      var layer = gisportal.layers[id];
+      var indicator = $('ul.indicator-list').children('li[data-id=' + id + ']')
+      var indicator_actions = indicator.find('div.indicator-actions');
+      var span_info = null;
+      if(gisportal.user.info.permission == "guest"){
+         if(!layer){
+            removedLayers.push(id);
+            indicator.remove();
+         }
+         var button = indicator_actions.find('span.js-add-layer-server')[0];
+         if(button){
+            button.remove();
+            continue;
+         }
+      }else if(layer.providerTag == "UserDefinedLayer"){
+         span_info = ["icon-add-3", "Add Data"];
+      }else if(layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin"){
+         span_info = ["icon-pencil-2", "Edit Data"];
+      }
+      if(span_info && span_info.length == 2 && layer){
+         indicator_actions.append('<span class="js-add-layer-server icon-btn indicator-header-icon ' + span_info[0] + '" data-server="' + layer.serverName + '" data-owner="' + layer.owner + '" data-layer="' + id + '" title="' + span_info[1] + '"></span>');
+      }
+   }
+   for(index in removedLayers){
+      gisportal.selectedLayers = _.without(gisportal.selectedLayers, removedLayers[index]);
+   }
+   //Loads the server form button or hides it
+   if(gisportal.user.info.permission == "guest"){
+      $('div.server-list-div').toggleClass("hidden", true);
+   }else{
+      $('div.server-list-div').toggleClass("hidden", false);
+   }
 };

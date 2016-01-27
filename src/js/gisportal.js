@@ -288,6 +288,9 @@ gisportal.createOpLayers = function() {
    gisportal.layersLoaded = true;
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
+
+   // Makes sure that the correct buttons are shown for editing
+   gisportal.loadLayerEditButtons();
    // Batch add here in future.
 
    gisportal.events.trigger('layers-loaded');
