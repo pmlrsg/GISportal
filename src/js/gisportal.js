@@ -445,7 +445,7 @@ gisportal.mapInit = function() {
 //       //console.log(e);
 
 //       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
-//       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+//       var response = '<p>Measurement at:<br /><em>Longitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
 //       dataReadingPopupContent.innerHTML = response;
 //       dataReadingPopupOverlay.setPosition(e.coordinate);
 //           //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
@@ -529,7 +529,7 @@ gisportal.mapInit = function() {
                var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
                var lat = point[1].toFixed(3);
                var elementId = 'dataValue' + String(e.coordinate[0]).replace('.', '') + String(e.coordinate[1]).replace('.', '');
-               var response = '<p>Measurement at:<br /><em>Longtitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+               var response = '<p>Measurement at:<br /><em>Longitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
                dataReadingPopupContent.innerHTML = response;
                dataReadingPopupOverlay.setPosition(e.coordinate);
 
@@ -557,7 +557,7 @@ gisportal.mapInit = function() {
    //       var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
    //       var lat = point[1].toFixed(3);
    //       var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-   //       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
+   //       var response = '<p>Measurement at:<br /><em>Longitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
    //       dataReadingPopupContent.innerHTML = response;
    //       dataReadingPopupOverlay.setPosition(e.coordinate);
 
