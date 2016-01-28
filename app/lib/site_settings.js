@@ -339,6 +339,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
 
    if(refresh == "true" || !fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
+         if(error) throw error;
          xml2js.parseString(body, function (err, result) {
             if(err) throw err;
             var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];

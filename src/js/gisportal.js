@@ -111,7 +111,6 @@ var map;
 gisportal.loadLayers = function() { 
    // The old layers will be removed from the portal keeping any layers that are already loaded to one side.
    gisportal.tempRemoveLayers();
-   console.log(gisportal.selectedLayers);
    gisportal.loadVectorLayers();
    gisportal.original_layers = {};
    gisportal.layers = {};
@@ -133,8 +132,9 @@ gisportal.loadLayers = function() {
 };
 
 gisportal.tempRemoveLayers = function(){
-   for(var id in gisportal.selectedLayers){
-      var layer = gisportal.selectedLayers[id];
+   var id, layer;
+   for(id in gisportal.selectedLayers){
+      layer = gisportal.selectedLayers[id];
       gisportal.tempSelectedLayers.push(layer);
    }
    for(id in gisportal.tempSelectedLayers){
@@ -289,8 +289,9 @@ gisportal.createOpLayers = function() {
    }
 
    // This block restores the old selected layers so that the layers.openlayers object exists
-   for(var i in gisportal.tempSelectedLayers){
-      var id = gisportal.tempSelectedLayers[i];
+   var id, i;
+   for(i in gisportal.tempSelectedLayers){
+      id = gisportal.tempSelectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
       }catch(e){
@@ -300,8 +301,8 @@ gisportal.createOpLayers = function() {
    gisportal.tempSelectedLayers = [];
 
    // This block restores the old selected layers using the new IDs that have just been set
-   for(var i in gisportal.addLayersForm.selectedLayers){
-      var id = gisportal.addLayersForm.selectedLayers[i];
+   for(i in gisportal.addLayersForm.selectedLayers){
+      id = gisportal.addLayersForm.selectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
       }catch(e){
