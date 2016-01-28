@@ -110,6 +110,8 @@ var map;
  */
 gisportal.loadLayers = function() { 
    // The old layers will be removed from the portal keeping any layers that are already loaded to one side.
+   gisportal.tempRemoveLayers();
+   console.log(gisportal.selectedLayers);
    gisportal.loadVectorLayers();
    gisportal.original_layers = {};
    gisportal.layers = {};
@@ -128,6 +130,17 @@ gisportal.loadLayers = function() {
       });
    }
 
+};
+
+gisportal.tempRemoveLayers = function(){
+   for(var id in gisportal.selectedLayers){
+      var layer = gisportal.selectedLayers[id];
+      gisportal.tempSelectedLayers.push(layer);
+   }
+   for(id in gisportal.tempSelectedLayers){
+      layer = gisportal.tempSelectedLayers[id];
+      gisportal.indicatorsPanel.removeIndicators(layer);
+   }
 };
 
 /**
@@ -274,6 +287,17 @@ gisportal.createOpLayers = function() {
       gisportal.layers[layer.id] = layer;
 
    }
+
+   // This block restores the old selected layers so that the layers.openlayers object exists
+   for(var i in gisportal.tempSelectedLayers){
+      var id = gisportal.tempSelectedLayers[i];
+      try{
+         gisportal.refinePanel.layerFound(id);
+      }catch(e){
+         console.log("Cannot add that layer!");
+      }
+   }
+   gisportal.tempSelectedLayers = [];
 
    // This block restores the old selected layers using the new IDs that have just been set
    for(var i in gisportal.addLayersForm.selectedLayers){

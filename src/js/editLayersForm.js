@@ -5,21 +5,9 @@ gisportal.editLayersForm.server_list = [];
 gisportal.editLayersForm.addSeverTable = function(){
    // loadLayers() is run so that gisportal.layers is refreshed and will include any changed layers.
    gisportal.refresh_server = true;
-   gisportal.editLayersForm.tempRemoveLayers();
    gisportal.loadLayers();
    gisportal.editLayersForm.server_list = [];
    gisportal.loading.increment();
-};
-
-gisportal.editLayersForm.tempRemoveLayers = function(){
-   for(var id in gisportal.selectedLayers){
-      var layer = gisportal.selectedLayers[id];
-      gisportal.addLayersForm.selectedLayers.push(layer);
-   }
-   for(id in gisportal.addLayersForm.selectedLayers){
-      layer = gisportal.addLayersForm.selectedLayers[id];
-      gisportal.indicatorsPanel.removeIndicators(layer);
-   }
 };
 
 /**

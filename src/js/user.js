@@ -67,7 +67,7 @@ gisportal.loadLayerEditButtons = function(){
       var span_info = null;
       if(gisportal.user.info.permission == "guest"){
          if(layer && gisportal.niceDomainName != layer.owner){
-            gisportal.indicatorsPanel.removeFromPanel(id)
+            gisportal.indicatorsPanel.removeFromPanel(id);
          }
          var button = indicator_actions.find('span.js-add-layer-server')[0];
          if(button){
