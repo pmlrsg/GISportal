@@ -150,7 +150,8 @@ gisportal.editLayersForm.addListeners = function(){
          success: function(){
             var to_be_deleted = [];
             for(var index in gisportal.selectedLayers){
-               if(this_span.data('server') == gisportal.layers[gisportal.selectedLayers[index]].serverName){
+               var layer = gisportal.layers[gisportal.selectedLayers[index]]
+               if(this_span.data('server') == layer.serverName && this_span.data('user') == layer.owner){
                   to_be_deleted.push(gisportal.selectedLayers[index]);
                }
             }
