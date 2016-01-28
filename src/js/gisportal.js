@@ -109,7 +109,7 @@ var map;
  * start layer dependent code asynchronously
  */
 gisportal.loadLayers = function() { 
-   // The old layers will be removed from the portal
+   // The old layers will be removed from the portal keeping any layers that are already loaded to one side.
    gisportal.loadVectorLayers();
    gisportal.original_layers = {};
    gisportal.layers = {};
@@ -280,7 +280,9 @@ gisportal.createOpLayers = function() {
       var id = gisportal.addLayersForm.selectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
-      }catch(e){}
+      }catch(e){
+         console.log("Cannot add that layer!");
+      }
    }
    gisportal.addLayersForm.selectedLayers = [];
 
@@ -289,8 +291,7 @@ gisportal.createOpLayers = function() {
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
    gisportal.configurePanel.refreshData();
 
-   // Makes sure that the correct buttons are shown for editing
-   gisportal.loadLayerEditButtons();
+   
    // Batch add here in future.
 
    gisportal.events.trigger('layers-loaded');

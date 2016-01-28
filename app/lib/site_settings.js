@@ -139,8 +139,9 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var permission = user.getAccessLevel(req); // Gets the user permission
    var domain = req.query.domain; // Gets the given domain
    var filename = req.query.filename; // Gets the given filename
+   var owner = req.query.owner; // Gets the given owner
    filename += ".json"; // Adds the file extension to the filename
-   var base_path = path.join(MASTER_CACHE_PATH, domain, USER_CACHE_PREFIX + username); // The path if the owner is not a domain
+   var base_path = path.join(MASTER_CACHE_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
    var master_list = fs.readdirSync(MASTER_CACHE_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value){
       if(value == username){
@@ -151,13 +152,15 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var file_path = path.join(base_path, filename); // The current file path
    var delete_path = path.join(base_path, "deleted_cache"); // The directory to be moved to (so it can be created if needs be)
    var delete_file_path = path.join(delete_path, filename); // The full path to be moved to
-   if(!directoryExists(delete_path)){
-      fs.mkdirSync(delete_path); // Creates the directory if it doesn't already exist
+   if(owner == username || permission == "admin"){
+      if(!directoryExists(delete_path)){
+         fs.mkdirSync(delete_path); // Creates the directory if it doesn't already exist
+      }
+      fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
+         if(err) throw err;
+         res.send(delete_file_path); // Returns the file path so it can be replaced if the user undoes the delete
+      });
    }
-   fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
-      if(err) throw err;
-      res.send(delete_file_path); // Returns the file path so it can be replaced if the user undoes the delete
-   });
 });
 
 router.all('/app/settings/update_layer', function(req, res){

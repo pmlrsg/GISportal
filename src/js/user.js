@@ -42,6 +42,8 @@ gisportal.user.updateProfile = function(){
    function refreshUserPortal(){
       gisportal.addLayersForm.form_info = {};
       gisportal.addLayersForm.refreshStorageInfo();
+      // Makes sure that the correct buttons are shown for editing
+      gisportal.loadLayerEditButtons();
       gisportal.loadLayers();
    }
    $.ajax({
@@ -58,17 +60,14 @@ gisportal.user.updateProfile = function(){
 };
 
 gisportal.loadLayerEditButtons = function(){
-   var removedLayers = [];
    for(var index in gisportal.selectedLayers){
       var id = gisportal.selectedLayers[index];
       var layer = gisportal.layers[id];
-      var indicator = $('ul.indicator-list').children('li[data-id=' + id + ']')
-      var indicator_actions = indicator.find('div.indicator-actions');
+      var indicator_actions = $('ul.indicator-list').children('li[data-id=' + id + ']').find('div.indicator-actions');
       var span_info = null;
       if(gisportal.user.info.permission == "guest"){
-         if(!layer){
-            removedLayers.push(id);
-            indicator.remove();
+         if(layer && gisportal.niceDomainName != layer.owner){
+            gisportal.indicatorsPanel.removeFromPanel(id)
          }
          var button = indicator_actions.find('span.js-add-layer-server')[0];
          if(button){
@@ -83,9 +82,6 @@ gisportal.loadLayerEditButtons = function(){
       if(span_info && span_info.length == 2 && layer){
          indicator_actions.append('<span class="js-add-layer-server icon-btn indicator-header-icon ' + span_info[0] + '" data-server="' + layer.serverName + '" data-owner="' + layer.owner + '" data-layer="' + id + '" title="' + span_info[1] + '"></span>');
       }
-   }
-   for(index in removedLayers){
-      gisportal.selectedLayers = _.without(gisportal.selectedLayers, removedLayers[index]);
    }
    //Loads the server form button or hides it
    if(gisportal.user.info.permission == "guest"){

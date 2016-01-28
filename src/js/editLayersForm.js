@@ -5,9 +5,21 @@ gisportal.editLayersForm.server_list = [];
 gisportal.editLayersForm.addSeverTable = function(){
    // loadLayers() is run so that gisportal.layers is refreshed and will include any changed layers.
    gisportal.refresh_server = true;
+   gisportal.editLayersForm.tempRemoveLayers();
    gisportal.loadLayers();
    gisportal.editLayersForm.server_list = [];
    gisportal.loading.increment();
+};
+
+gisportal.editLayersForm.tempRemoveLayers = function(){
+   for(var id in gisportal.selectedLayers){
+      var layer = gisportal.selectedLayers[id];
+      gisportal.addLayersForm.selectedLayers.push(layer);
+   }
+   for(id in gisportal.addLayersForm.selectedLayers){
+      layer = gisportal.addLayersForm.selectedLayers[id];
+      gisportal.indicatorsPanel.removeIndicators(layer);
+   }
 };
 
 /**
@@ -146,14 +158,14 @@ gisportal.editLayersForm.addListeners = function(){
       var user = $(this).data("user");
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&username=' + user + '&permission=' + user_info.permission + '&domain=' + gisportal.niceDomainName,
+         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user + '&domain=' + gisportal.niceDomainName,
          success: function(){
             var to_be_deleted = [];
             for(var index in gisportal.selectedLayers){
-                           if(this_span.data('server') == gisportal.layers[gisportal.selectedLayers[index]].serverName){
-                              to_be_deleted.push(gisportal.selectedLayers[index]);
-                           }
-                        }
+               if(this_span.data('server') == gisportal.layers[gisportal.selectedLayers[index]].serverName){
+                  to_be_deleted.push(gisportal.selectedLayers[index]);
+               }
+            }
             for(var id in to_be_deleted){
                gisportal.indicatorsPanel.removeFromPanel(to_be_deleted[id]);
             }
