@@ -906,27 +906,6 @@ gisportal.checkIfLayerFromState = function(layer) {
 /*===========================================================================*/
 
 /**
- * This will run when a user logs in using openID
- */
-gisportal.login = function() {
-   $('.js-logged-out').toggleClass('hidden', true);
-   $('.js-logged-in').toggleClass('hidden', false);
-   gisportal.openid.login();
-   // Load history
-};
-
-/**
- * This will run when a user logs out
- */
-gisportal.logout = function() {
-   $('.js-logged-out').toggleClass('hidden', false);
-   $('.js-logged-in').toggleClass('hidden', true);
-};
-
-
-/*===========================================================================*/
-
-/**
  * Gets the current state of the portal from any and all components who have 
  * a state and wish to be stored. 
  */

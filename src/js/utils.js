@@ -284,32 +284,6 @@ gisportal.utils.getCenteredCoords = function(width, height) {
 };
 
 /**
- * This function opens a popup for openid
- * @param {string} width - The width, including "px"
- * @param {string} height - The height, including "px"
- * @param {string} url - The url to show in the popup
- * @param {function} onOpenHandler - A callback for when the popup opens
- * @param {function} checkforCloseHandler - A callback to check if it has closed
- * @returns Object with details about the popup 
- */
-gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
-   if(onOpenHandler !== null) {
-      onOpenHandler();
-   }
-   
-   var coordinates = gisportal.utils.getCenteredCoords(width, height);
-   var popupWindow = window.open(url, "", 
-      "width=" + width + 
-      ", height=" + height + 
-      ", status = 1, location = 1, resizable = yes" + 
-      ", left=" + coordinates[0] + 
-      ", top=" + coordinates[1]
-   );
-   var interval = window.setInterval(checkforCloseHandler, 80);
-   return {'popupWindow':popupWindow, 'interval': interval};
-};
-
-/**
  * Changes a name so that it can
  * be used as an HTML id.
  * Use as a HASH. Compare don't decipher.

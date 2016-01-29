@@ -20,7 +20,6 @@ var coreFiles = [
     "src/js/vector_styles.js",
     "src/js/layer.js",
     "src/js/vector_layer.js",
-    "src/js/openid.js",
     "src/js/timeline.js",
     "src/js/Plot.js",
     "src/js/PlotEditor.js",
