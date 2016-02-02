@@ -13,7 +13,7 @@ var bunyan = require('bunyan'); // Added
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
-var MASTER_CACHE_PATH = CURRENT_PATH + "/../../html/cache/";
+var MASTER_CACHE_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CACHE_PATH = MASTER_CACHE_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
@@ -74,6 +74,28 @@ router.use(function (req, res, next) {
 
 router.use(bodyParser.json({limit: '1mb'}));
 router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
+
+
+//PYTHON TEST
+//REMOVE EVENTUALLY BUT NEED THE CONCEPT FOR EXTRACTION AND PLOTTING BITS!
+router.get('/app/settings/python', function(req, res){
+   var pythonShell = require("python-shell");
+   var pyshell = new pythonShell('python.py', {scriptPath:__dirname, args:["-t", "basic", "-v", "-url", req.query.url]});
+
+
+   var string = "";
+   pyshell.on("message", function(message){
+      string += message + "<br/>";
+   });
+
+   pyshell.end(function(err){
+      if(err){
+         handleError(err, res);
+      }else{
+         res.send(string);
+      }
+   });
+});
 
 router.get('/app/settings/proxy', function(req, res) {
    var url = decodeURI(req.query.url) // Gets the given URL

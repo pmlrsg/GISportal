@@ -30,7 +30,8 @@
     "connect-redis": "~2.0.0",
     "jade": "~1.10.0",
     "xml2js": "~0.4.16",
-    "bunyan": "~1.5.1"
+    "bunyan": "~1.5.1",
+    "python-shell": "~0.3.0"
   },
   "engines": {
     "node": ">= 0.8.0",
