@@ -35,7 +35,7 @@
 	</li>
    <div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
 	<li>
-      <form>
+      <form class="add-wms-form">
          <label>You can add an external Web Map Service (WMS) URL here:</label>
          <input type="text" class="js-wms-url" placeholder="WMS URL">
          <div class="wms-url-message alert-info hidden" id="refresh-cache-message"/>

@@ -67,7 +67,8 @@ button.js-user-feedback-submit{
   background-color:white;
 }
 
-.green-spin {
+.warn-spin {
+  display:-webkit-inline-box;
   color: #8a6d3b !important;
   opacity: 1;
   -webkit-animation-name: rotate; 

@@ -38,7 +38,7 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-gisportal.ProxyHost = window.location.origin + window.location.pathname + 'service/proxy?url=';   // Flask (Python) service OpenLayers proxy
+gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -120,7 +120,7 @@ gisportal.loadLayers = function() {
       // Get WMS cache
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/get_cache?username=' + user_info.username + '&permission=' + user_info.permission + '&domain=' + gisportal.niceDomainName,
+         url:  gisportal.middlewarePath + '/settings/get_cache?domain=' + gisportal.niceDomainName,
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -154,7 +154,7 @@ gisportal.loadVectorLayers = function() {
       dataType: 'json',
       success: gisportal.initVectorLayers,
       error: function(e){
-            $.notify("Sorry\nThere was an unexpected error getting the vector cache. Try refreshing the page, or coming back later.", {autoHide:false, className:"error"});
+            console.log("No Vector Layers Found");
          }
 
    });
@@ -314,10 +314,14 @@ gisportal.createOpLayers = function() {
    var state = gisportal.cache.state;
    gisportal.layersLoaded = true;
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
-   gisportal.configurePanel.refreshData();
 
-   
-   // Batch add here in future.
+   if(_.size(gisportal.layers) <= 0){
+      $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
+      $('form.add-wms-form').toggleClass("alert-info", true);
+      setTimeout(function(){$('form.add-wms-form').toggleClass("alert-info", false);},7500);
+   }else{
+      gisportal.configurePanel.refreshData();
+   }
 
    gisportal.events.trigger('layers-loaded');
 };

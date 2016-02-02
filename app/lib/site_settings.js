@@ -1,17 +1,15 @@
-var xml2js = require('xml2js')
-var et = require('elementtree');
+var xml2js = require('xml2js'); // Added
 var request = require('request');
-var express = require('express');
+var express = require('express'); // Added
 var router = express.Router();
 var path = require('path');
 var fs = require("fs");
 var _ = require("underscore");
-var S = require("underscore.string.fp");
-var gm = require("gm");
 var jimp = require("jimp");
 var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
+var bunyan = require('bunyan'); // Added
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
@@ -22,6 +20,7 @@ var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
 module.exports = router;
 
+var log = bunyan.createLogger({name: "Portal Middleware"});
 /**
  * Returns true or false depending if a string stars with another string.
  * @param  {String} string The string to be evaluated
@@ -56,6 +55,16 @@ function directoryExists(filePath)
     }
 }
 
+function handleError(err, res){
+   try{
+      log.error(err);
+      res.status(err.status || 500);
+      res.send({message: err.message});
+   }catch(e){
+      log.error("The error has already been sent");
+   }
+}
+
 router.use(function (req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -66,13 +75,30 @@ router.use(function (req, res, next) {
 router.use(bodyParser.json({limit: '1mb'}));
 router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 
+router.get('/app/settings/proxy', function(req, res) {
+   var url = decodeURI(req.query.url) // Gets the given URL
+   request(url, function(err, response, body){
+      if(err){
+         handleError(err, res);
+      }else{
+         res.status(response.statusCode);
+         res.setHeader("content-type", response.headers['content-type'].split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
+         res.send(body);
+      }
+   });
+});
+
 router.get('/app/settings/get_cache', function(req, res) {
    var usernames = [user.getUsername(req)];
    var permission = user.getAccessLevel(req);
-   var domain = "pmpc1310.npm.ac.uk";//req.get('origin').replace("http://", "").replace("https://", "");;
+   var domain = req.query.domain; // Gets the given domain
 
    var cache = []; // The list of cache deatils to be returned to the browser
    var master_path = path.join(MASTER_CACHE_PATH, domain); // The path for the domain cache
+
+   if(!directoryExists(master_path)){
+      fs.mkdirSync(master_path); // Creates the directory if it doesn't exist
+   }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
    master_list.forEach(function(filename){
@@ -123,14 +149,21 @@ router.all('/app/settings/rotate', function(req, res){
    }
    angle = Math.round(angle/90)*90; // Rounds the angle to the neerest 90 degrees
    jimp.read(url, function(err, image){ // Gets the image file from the URL
-      if (err) throw err;
-      image.rotate(angle); // Rotates the image *clockwise!*
-      //image.resize( width, jimp.AUTO);
-      image.getBuffer(jimp.MIME_PNG, function(err, image){ // Buffers the image so it sends correctly
-         if(err) throw err;
-         res.setHeader('Content-type', 'image/png'); // Makes sure its a png
-         res.send(image); // Sends the image to the browser.
-      });
+      if (err){
+         handleError(err, res);
+      }else{
+         image.rotate(angle); // Rotates the image *clockwise!*
+         //image.resize( width, jimp.AUTO);
+         image.getBuffer(jimp.MIME_PNG, function(err2, image2){ // Buffers the image so it sends correctly
+            if(err2){
+               handleError(err2, res);
+            }else{
+               res.setHeader('Content-type', 'image/png'); // Makes sure its a png
+               res.send(image2); // Sends the image to the browser.
+            }
+            
+         });
+      }
    });   
 });
 
@@ -144,7 +177,7 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var base_path = path.join(MASTER_CACHE_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
    var master_list = fs.readdirSync(MASTER_CACHE_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value){
-      if(value == username){
+      if(value == domain){
          base_path = path.join(MASTER_CACHE_PATH,domain);
          return;
       }
@@ -157,14 +190,17 @@ router.get('/app/settings/remove_server_cache', function(req, res){
          fs.mkdirSync(delete_path); // Creates the directory if it doesn't already exist
       }
       fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
-         if(err) throw err;
-         res.send(delete_file_path); // Returns the file path so it can be replaced if the user undoes the delete
+         if(err){
+            handleError(err, res);
+         }else{
+            res.send(delete_file_path); // Returns the file path so it can be replaced if the user undoes the delete
+         }
       });
    }
 });
 
 router.all('/app/settings/update_layer', function(req, res){
-   var username = user.getUsername(req); // Gets the given username
+   var username = req.query.username; // Gets the given username
    var permission = user.getAccessLevel(req); // Gets the user permission
    var domain = req.query.domain; // Gets the given domain
    var data = JSON.parse(req.body.data); // Gets the data given
@@ -175,8 +211,11 @@ router.all('/app/settings/update_layer', function(req, res){
    }
    var this_path = path.join(base_path, filename);
    fs.writeFile(this_path, JSON.stringify(data), function(err){
-      if(err) throw err;
-      res.send("");
+      if(err){
+            handleError(err, res);
+         }else{
+            res.send("");
+         }
    });
 });
 
@@ -230,11 +269,13 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   if(this_new_layer.include){ // As long as it should be included
                      var new_data_layer = data.server.Layers[old_layer]; // 
                      new_data_layer.Title = titleCase(this_new_layer.nice_name);
-                     new_data_layer.Abstact = this_new_layer.abstract;
+                     new_data_layer.Abstract = this_new_layer.abstract;
                      for(key in this_new_layer.tags){
                         var val = this_new_layer.tags[key];
                         if(val && val.length > 0){
                            new_data_layer.tags[key] = val;
+                        }else{
+                           new_data_layer.tags[key] = undefined;
                         }
                      }
                      if(server_info.provider.length > 0){
@@ -257,7 +298,10 @@ router.all('/app/settings/add_user_layer', function(req, res){
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = new_data;
-      if(data.contactInfo){
+      if(server_info){
+         if(!data.contactInfo){
+            data.contactInfo = {};
+         }
          data.contactInfo.address = server_info.address.replace("\n", "<br/>") || "";
          data.contactInfo.email = server_info.email || "";
          data.contactInfo.person = server_info.person || "";
@@ -278,42 +322,54 @@ router.get('/app/settings/load_data_values', function(req, res){
    var units = req.query.units; // getst the given units
 
    request(url + '&INFO_FORMAT=text/xml', function(err, response, body){
-      if(err) throw err;
-      var content_type = response.headers['content-type'];
-      var response_text = "Sorry, could not calculate a value for: " + name;
-
-      if(content_type == 'application/xml;charset=UTF-8'){
-         xml2js.parseString(body, function (err, result) {
-            if(err) throw err;
-            try{
-               response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
-            }catch(e){
-               response_text = "Sorry, could not calculate a value for: " + name
-            }
-            res.send(response_text);
-         });
+      if(err){
+         handleError(err, res);
       }else{
-         request(url, function(err2, response2, body2){
-            if(err2) throw err2;
-            content_type = response2.headers['content-type'].replace(';charset=UTF-8', '');
-            if(content_type == "text/xml"){
-               xml2js.parseString(body2, function (err, result) {
-                  if(err) throw err;
-                  var output = name + ":"
+         var content_type = response.headers['content-type'];
+         var response_text = "Sorry, could not calculate a value for: " + name;
+
+         if(content_type == 'application/xml;charset=UTF-8'){
+            xml2js.parseString(body, function (err, result) {
+               if(err){
+                  handleError(err, res);
+               }else{
                   try{
-                     for(key in result.FeatureInfoResponse.FIELDS[0].$){
-                        output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
-                     }
+                     response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
                   }catch(e){
-                     output += "<br/>no data found at this point";
+                     response_text = "Sorry, could not calculate a value for: " + name
                   }
-                  response_text = output;
-               });
-            }else if(content_type == "text/plain" || content_type == "text/html"){
-               response_text = name + ":<br/>" + body2.replace(/(?:\r\n|\r|\n)/g, '<br />');
-            }
-            res.send(response_text);
-         });
+                  res.send(response_text);
+               }
+            });
+         }else{
+            request(url, function(err, response, body){
+               if(err){
+                  handleError(err, res);
+               }else{
+                  content_type = response2.headers['content-type'].replace(';charset=UTF-8', '');
+                  if(content_type == "text/xml"){
+                     xml2js.parseString(body, function (err, result) {
+                        if(err){
+                           handleError(err, res);
+                        }else{
+                           var output = name + ":"
+                           try{
+                              for(key in result.FeatureInfoResponse.FIELDS[0].$){
+                                 output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                              }
+                           }catch(e){
+                              output += "<br/>no data found at this point";
+                           }
+                           response_text = output;
+                        }
+                     });
+                  }else if(content_type == "text/plain" || content_type == "text/html"){
+                     response_text = name + ":<br/>" + body.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                  }
+                  res.send(response_text); 
+               }
+            });
+         }
       }
    });
 });
@@ -339,114 +395,120 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
 
    if(refresh == "true" || !fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
-         if(error) throw error;
-         xml2js.parseString(body, function (err, result) {
-            if(err) throw err;
-            var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
-            var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
-            var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
-            var contact_position = contact_data.ContactPosition;
-            var contact_address;
-            var contact_city;
-            var contact_state;
-            var contact_post_code;
-            var contact_country;
-            var address_block = contact_data.ContactAddress;
-            if(address_block){
-               contact_address = address_block[0].Address;
-               contact_city = address_block[0].City;
-               contact_state = address_block[0].StateOrProvince;
-               contact_post_code = address_block[0].PostCode;
-               contact_country = address_block[0].Country;
-            }
-            var contact_phone = contact_data.ContactVoiceTelephone;
-            var contact_email = contact_data.ContactElectronicMailAddress;
+         if(error){
+            handleError(err, res);
+         }else{
+            xml2js.parseString(body, function (err, result) {
+               if(err){
+                  handleError(err, res);
+               }else{
+                  var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
+                  var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
+                  var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
+                  var contact_position = contact_data.ContactPosition;
+                  var contact_address;
+                  var contact_city;
+                  var contact_state;
+                  var contact_post_code;
+                  var contact_country;
+                  var address_block = contact_data.ContactAddress;
+                  if(address_block){
+                     contact_address = address_block[0].Address;
+                     contact_city = address_block[0].City;
+                     contact_state = address_block[0].StateOrProvince;
+                     contact_post_code = address_block[0].PostCode;
+                     contact_country = address_block[0].Country;
+                  }
+                  var contact_phone = contact_data.ContactVoiceTelephone;
+                  var contact_email = contact_data.ContactElectronicMailAddress;
 
-            if(contact_person[0].length > 0){
-               contact_info.person = contact_person[0];
-            }
-            if(typeof(contact_organization[0]) == 'string'){
-               var provider = contact_organization[0];
-            }
-            if(contact_position && contact_position[0].length > 0){
-               contact_info.position = contact_position[0];
-            }
-            if(contact_address && contact_address[0].length > 0){
-               address += contact_address[0] + "<br/>";
-            }
-            if(contact_city && contact_city[0].length > 0){
-               address += contact_city[0] + "<br/>";
-            }
-            if(contact_state && contact_state[0].length > 0){
-               address += contact_state[0] + "<br/>";
-            }
-            if(contact_post_code && contact_post_code[0].length > 0){
-               address += contact_post_code[0] + "<br/>";
-            }
-            if(contact_country && contact_country[0].length > 0){
-               address += contact_country[0] + "<br/>";
-            }
-            if(contact_phone && contact_phone[0].length > 0){
-               contact_info.phone = contact_phone[0];
-            }
-            if(contact_email && contact_email[0].length > 0){
-               contact_info.email = contact_email[0];
-            }
-            if(address.length > 0){
-               contact_info.address = address;
-            }
+                  if(contact_person[0].length > 0){
+                     contact_info.person = contact_person[0];
+                  }
+                  if(typeof(contact_organization[0]) == 'string'){
+                     var provider = contact_organization[0];
+                  }
+                  if(contact_position && contact_position[0].length > 0){
+                     contact_info.position = contact_position[0];
+                  }
+                  if(contact_address && contact_address[0].length > 0){
+                     address += contact_address[0] + "<br/>";
+                  }
+                  if(contact_city && contact_city[0].length > 0){
+                     address += contact_city[0] + "<br/>";
+                  }
+                  if(contact_state && contact_state[0].length > 0){
+                     address += contact_state[0] + "<br/>";
+                  }
+                  if(contact_post_code && contact_post_code[0].length > 0){
+                     address += contact_post_code[0] + "<br/>";
+                  }
+                  if(contact_country && contact_country[0].length > 0){
+                     address += contact_country[0] + "<br/>";
+                  }
+                  if(contact_phone && contact_phone[0].length > 0){
+                     contact_info.phone = contact_phone[0];
+                  }
+                  if(contact_email && contact_email[0].length > 0){
+                     contact_info.email = contact_email[0];
+                  }
+                  if(address.length > 0){
+                     contact_info.address = address;
+                  }
 
-            for(index in result.WMS_Capabilities.Capability[0].Layer){
-               var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
-               var layers = [];
-               var name;
-               var service_title;
-               var title;
-               var abstract;
-               var bounding_boxes;
-               var dimensions = {};
-               var style;
+                  for(index in result.WMS_Capabilities.Capability[0].Layer){
+                     var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
+                     var layers = [];
+                     var name;
+                     var service_title;
+                     var title;
+                     var abstract;
+                     var bounding_boxes;
+                     var dimensions = {};
+                     var style;
 
-               var title_elem = parent_layer.Title;
-               var abstract_elem = parent_layer.Abstract;
-               var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
-               var bounding_elem = parent_layer.BoundingBox;
-               var style_elem = parent_layer.Style;
+                     var title_elem = parent_layer.Title;
+                     var abstract_elem = parent_layer.Abstract;
+                     var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
+                     var bounding_elem = parent_layer.BoundingBox;
+                     var style_elem = parent_layer.Style;
 
-               if(title_elem && typeof(title_elem[0]) == "string"){
-                  service_title = title_elem[0].replace(/ /g,"_").replace(/\(/g,"_").replace(/\)/g,"_").replace(/\//g,"_");
-               }
-               if(abstract_elem && typeof(abstract_elem[0]) == "string"){
-                  abstract = abstract_elem[0];
-               }
-               if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
-                  bounding_boxes = createBoundingBoxes(parent_layer);
-               }
-               if(style_elem){
-                  style = createStylesArray(parent_layer);
-                  if(style.length == 0){
-                     style = undefined;
+                     if(title_elem && typeof(title_elem[0]) == "string"){
+                        service_title = title_elem[0].replace(/ /g,"_").replace(/\(/g,"_").replace(/\)/g,"_").replace(/\//g,"_");
+                     }
+                     if(abstract_elem && typeof(abstract_elem[0]) == "string"){
+                        abstract = abstract_elem[0];
+                     }
+                     if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
+                        bounding_boxes = createBoundingBoxes(parent_layer);
+                     }
+                     if(style_elem){
+                        style = createStylesArray(parent_layer);
+                        if(style.length == 0){
+                           style = undefined;
+                        }
+                     }
+
+                     digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
+                  }
+                  if(layers.length > 0){
+                     sub_master_cache.server.Layers = layers;
+                     sub_master_cache.options = {"providerShortTag": "UserDefinedLayer"};
+                     sub_master_cache.wmsURL = url;
+                     sub_master_cache.serverName = clean_url;
+                     sub_master_cache.contactInfo = contact_info;
+                     sub_master_cache.provider = provider.replace(/&amp;/g, '&');
+                     sub_master_cache.timeStamp = new Date();
+
+                     var data = JSON.stringify(sub_master_cache)
+                     fs.writeFileSync(file_path, data);
+                     res.send(data);
+                  }else{
+                     res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
                   }
                }
-
-               digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
-            }
-            if(layers.length > 0){
-               sub_master_cache.server.Layers = layers;
-               sub_master_cache.options = {"providerShortTag": "UserDefinedLayer"};
-               sub_master_cache.wmsURL = url;
-               sub_master_cache.serverName = clean_url;
-               sub_master_cache.contactInfo = contact_info;
-               sub_master_cache.provider = provider.replace(/&amp;/g, '&');
-               sub_master_cache.timeStamp = new Date();
-
-               var data = JSON.stringify(sub_master_cache)
-               fs.writeFileSync(file_path, data);
-               res.send(data);
-            }else{
-               res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
-            }
-         });
+            });
+         }
       });
    }else{
       res.send(fs.readFileSync(file_path));

@@ -20,17 +20,13 @@ gisportal.autoLayer.loadGivenLayer = function(){
       gisportal.given_layers = gisportal.autoLayer.getLayers(given_wms_url, given_url_name);
 
       // If there is a single layer, then it is loaded.
-      if(_.size(gisportal.given_layers) == 1){
+      if(_.size(gisportal.given_layers) >= 1){
          try{
             gisportal.configurePanel.resetPanel(gisportal.given_layers);
          }
          catch(e){
             $.notify("Sorry:\nThere was an error loading " + given_layers[0].id + " : " + e, "error");
          }
-         return;
-      }else if(_.size(gisportal.given_layers) > 1){
-         // If there are more than one layers then it adds them to the panel.
-         gisportal.configurePanel.resetPanel(gisportal.given_layers);
          return;
       }else{
          if(given_wms_url && given_wms_url.length > 0){

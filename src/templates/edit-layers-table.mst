@@ -27,7 +27,7 @@
          <tr class="server-layers hidden" data-server="{{serverName}}">
          <td/>
          <td>
-         {{#each layers}}
+         {{#each Layers}}
             {{title}}<br/>
          {{/each}}
          </td>
