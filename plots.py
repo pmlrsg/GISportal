@@ -16,8 +16,8 @@ import numpy as np
 import pandas as pd
 import json
 
-from bokeh.plotting import figure, show, output_notebook, output_file, ColumnDataSource, hplot
-from bokeh.models import LinearColorMapper, NumeralTickFormatter
+from bokeh.plotting import figure, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
+from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
 
 import palettes
 
@@ -33,12 +33,16 @@ def get_palette(palette="rsg_colour"):
 #END get_palette
 
 def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
-   # Here we calculate the slope and intercept from the min and max
-   # and use that to build an array of colours for the legend.
-   # We also have to set the height of each block individually to match the scale 
-   # (particularly for log scales) otherwise we get ugly gaps.
-   # NOTE - We work in the display scale (log or otherwise) but the values for the axis 
-   # are calculated in real space regardless.
+   '''
+   Returns a bokeh plot with a kegend based on the colurs provided.
+
+   Here we calculate the slope and intercept from the min and max
+   and use that to build an array of colours for the legend.
+   We also have to set the height of each block individually to match the scale 
+   (particularly for log scales) otherwise we get ugly gaps.
+   NOTE - We work in the display scale (log or otherwise) but the values for the axis 
+   are calculated in real space regardless.
+   '''
    slope = (max_val - min_val) / len(colours)
    intercept = max_val - (slope * 255)
    intercept = min_val 
@@ -100,7 +104,7 @@ def hovmoller_plot(values, colours, plot_width, min_x, max_x, min_y, max_y, x_ax
    return(p)
 #END hovmoller_plot
 
-def hovmoller(infile):
+def hovmoller(infile, outfile="image.html"):
    with open(infile) as json_file:
       df = json.load(json_file)
    
@@ -195,13 +199,138 @@ def hovmoller(infile):
            color_mapper=LinearColorMapper(palette=colours, low=min_val, high=max_val))
    
 
-   output_file("image.html", title="Hovmoller example")
+   output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
    show(layout)
    
 #END hovmoller
 
-# If this is run at the command line then just list the available palettes
+def timeseries(infile, outfile="time.html"):
+   with open(infile) as json_file:
+       df = json.load(json_file)
+   json_file.close()
+       
+   plot_type = df['type']
+   var_name = df['coverage']
+   plot_units = df['units']
+   plot_scale = df['scale']
+   
+   date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
+   
+   datasource = dict(date=date,
+                     sdate=df['Date'],
+                     mean=df['Mean'])
+
+   if 'Standard Deviation' in df:
+      # Set the errorbars
+      err_xs = []
+      err_ys = []
+      for x, y, std in zip(date, df['Mean'], df['Standard Deviation']):
+         err_xs.append((x, x))
+         err_ys.append((y - std, y + std))
+
+      datasource['err_xs'] = err_xs
+      datasource['err_ys'] = err_ys
+      datasource['stderr'] = df['Standard Deviation']
+   
+   if 'Max' in df and 'Min' in df:
+      # Set the min/max envelope. 
+      # We create a list of coords starting with the max for the first date then join up all
+      # the maxes in date order before moving down to the min for the last date and coming
+      # back to the first date.
+      band_y = np.append(df['Max'],df['Min'][::-1])
+      band_x = np.append(date,date[::-1])
+      datasource['min'] = df['Min']
+      datasource['max'] = df['Max']
+
+   source = ColumnDataSource(data=datasource)
+   
+   p = figure(title="Time Series - %s" % (var_name), x_axis_type="datetime", width=1200, 
+              height=400
+   )
+   
+   # Use some custom HTML to draw our tooltip. Just put the @var placeholders where you want them.
+   p.add_tools(HoverTool(tooltips="""
+           <div>
+               <div>
+                   <span style="font-size: 12px; font-weight: bold;">Date:</span>
+                   <span style="font-size: 12px; color: #966;">@sdate</span>
+               </div>
+               <div>
+                   <span style="font-size: 12px; font-weight: bold;">Mean:</span>
+                   <span style="font-size: 12px; color: #966;">@mean</span>
+               </div>
+               <div>
+                   <span style="font-size: 12px; font-weight: bold;">Max:</span>
+                   <span style="font-size: 12px; color: #966;">@max</span>
+               </div>
+               <div>
+                   <span style="font-size: 12px; font-weight: bold;">Min:</span>
+                   <span style="font-size: 12px; color: #966;">@min</span>
+               </div>
+               <div>
+                   <span style="font-size: 12px; font-weight: bold;">Stderr:</span>
+                   <span style="font-size: 12px; color: #966;">@stderr</span>
+               </div>
+           </div>
+           """
+           ))
+
+   p.add_tools(CrosshairTool())
+
+   p.xaxis.axis_label = 'Date'
+   
+   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+   # if we run it later.
+   p.yaxis.axis_label = "%s %s" % (var_name, plot_units)
+   
+   # If we want 2 Y axes then the lines below do this
+   
+   # Setting the second y axis range name and range
+   #p.extra_y_ranges = {"foo": Range1d(start=-100, end=200)}
+   # Adding the second axis to the plot.  
+   #p.add_layout(LinearAxis(y_range_name="foo", axis_label='Temp.'), 'right')
+   
+   if 'min' in datasource:
+      # Plot the max and min as a shaded band.
+      # Cannot use this dataframe because we have twice as many band variables as the rest of the 
+      # dataframe.
+      #p.patch('band_x', 'band_y', color='#7570B3', fill_alpha=0.05, line_alpha=0, source=source)
+      # So use this.
+      p.patch(band_x, band_y, color='#7570B3', fill_alpha=0.05, line_alpha=0)
+   
+   
+   # Plot the mean as line
+   p.line('date', 'mean', color='blue', legend='Mean %s' % (var_name), source=source)
+
+   # as a point
+   p.circle('date', 'mean', color='red', size=3, line_alpha=0, source=source)
+   
+   if 'err_xs' in datasource:
+      # Plot error bars
+      p.multi_line('err_xs', 'err_ys', color='red', line_alpha=0.5, source=source)
+   
+   # Legend placement needs to be after the first glyph set up.
+   # Cannot place legend outside plot.
+   p.legend.location = "top_left"
+   layout = vplot(p)
+   
+   # Example code to display the data in a table
+   #columns = [
+   #        TableColumn(field="date", title="Date", formatter=DateFormatter()),
+   #        TableColumn(field="mean", title="Mean"),
+   #    ]
+   #data_table = DataTable(source=source, columns=columns, width=400, height=280)
+
+   #layout = vplot(p, data_table)
+   
+   # plot the points
+   output_file(outfile, 'Time Series')
+   
+   show(layout)
+#END timeseries   
+
 if __name__ == "__main__":
-   hovmoller("hovmoller.json")
+   hovmoller("testing/data/hovmoller.json")
+   timeseries("testing/data/temperature.json")
 
