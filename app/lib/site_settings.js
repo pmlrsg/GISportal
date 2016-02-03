@@ -13,8 +13,9 @@ var bunyan = require('bunyan'); // Added
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
-var MASTER_CACHE_PATH = CURRENT_PATH + "/../../config/site_settings/";
-var LAYER_CACHE_PATH = MASTER_CACHE_PATH + "layers/";
+var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
+var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
@@ -33,26 +34,26 @@ function stringStartsWith(string, prefix) {
 
 function fileExists(filePath)
 {
-    try
-    {
-        return fs.statSync(filePath).isFile();
-    }
-    catch (err)
-    {
-        return false;
-    }
+   try
+   {
+      return fs.statSync(filePath).isFile();
+   }
+   catch (err)
+   {
+      return false;
+   }
 }
 
 function directoryExists(filePath)
 {
-    try
-    {
-        return fs.statSync(filePath).isDirectory();
-    }
-    catch (err)
-    {
-        return false;
-    }
+   try
+   {
+      return fs.statSync(filePath).isDirectory();
+   }
+   catch (err)
+   {
+      return false;
+   }
 }
 
 function handleError(err, res){
@@ -110,13 +111,35 @@ router.get('/app/settings/proxy', function(req, res) {
    });
 });
 
+router.get('/app/settings/config', function(req, res) {
+   var domain = req.query.domain; // Gets the given domain
+   var config_path = path.join(MASTER_CONFIG_PATH, domain, "config.js");
+   var js_file;
+   try{
+      js_file = fs.readFileSync(config_path);
+   }catch(e){
+      js_file = fs.readFileSync(EXAMPLE_CONFIG_PATH);
+   }
+   res.send(js_file);
+});
+
+
+router.get('/app/cache/*?', function(req, res) {
+   var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
+   try{
+      res.sendFile(config_path);
+   }catch(e){
+      handleError(e);
+   }
+});
+
 router.get('/app/settings/get_cache', function(req, res) {
    var usernames = [user.getUsername(req)];
    var permission = user.getAccessLevel(req);
    var domain = req.query.domain; // Gets the given domain
 
    var cache = []; // The list of cache deatils to be returned to the browser
-   var master_path = path.join(MASTER_CACHE_PATH, domain); // The path for the domain cache
+   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
    if(!directoryExists(master_path)){
       fs.mkdirSync(master_path); // Creates the directory if it doesn't exist
@@ -196,11 +219,11 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var filename = req.query.filename; // Gets the given filename
    var owner = req.query.owner; // Gets the given owner
    filename += ".json"; // Adds the file extension to the filename
-   var base_path = path.join(MASTER_CACHE_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
-   var master_list = fs.readdirSync(MASTER_CACHE_PATH); // The list of files and folders in the master_cache folder
+   var base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
+   var master_list = fs.readdirSync(MASTER_CONFIG_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value){
       if(value == domain){
-         base_path = path.join(MASTER_CACHE_PATH,domain);
+         base_path = path.join(MASTER_CONFIG_PATH,domain);
          return;
       }
    });
@@ -227,7 +250,7 @@ router.all('/app/settings/update_layer', function(req, res){
    var domain = req.query.domain; // Gets the given domain
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json"; // Gets the given filename
-   var base_path = path.join(MASTER_CACHE_PATH, domain); // The base path of 
+   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
    if(username != domain){
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
@@ -248,7 +271,7 @@ router.get('/app/settings/add_wcs_url', function(req, res){
    var domain = req.query.domain; // Gets the given domain
    var filename = req.query.filename + ".json"; // Gets the given filename
 
-   var base_path = path.join(MASTER_CACHE_PATH, domain);
+   var base_path = path.join(MASTER_CONFIG_PATH, domain);
    if(username != domain){
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
@@ -269,12 +292,12 @@ router.all('/app/settings/add_user_layer', function(req, res){
       var filename = server_info.server_name + '.json';
       if(domain == username){
          // If is is a global file it is refreshed from the URL
-         var cache_path = path.join(MASTER_CACHE_PATH, domain);
-         var save_path = path.join(MASTER_CACHE_PATH, domain, filename);
+         var cache_path = path.join(MASTER_CONFIG_PATH, domain);
+         var save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
       }else{
          // If it is to be a user file the data is retrieved from the temorary cache
-         var cache_path = path.join(MASTER_CACHE_PATH, domain, "temporary_cache");
-         var save_path = path.join(MASTER_CACHE_PATH, domain, USER_CACHE_PREFIX + username, filename);
+         var cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
+         var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
       }
       if(!directoryExists(cache_path)){
          fs.mkdirSync(cache_path); // Creates the directory if it doesn't already exist
@@ -409,7 +432,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    var address = "";
 
    var filename = clean_url + ".json";
-   var directory = path.join(MASTER_CACHE_PATH, domain, "temporary_cache");
+   var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
    if(!directoryExists(directory)){
       fs.mkdirSync(directory); // Creates the directory if it doesn't already exist
    }
@@ -575,7 +598,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
       if(name && service_title && title && bounding_boxes && style){
          layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes.exGeographicBoundingBox, "MoreIndicatorInfo" : false})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions.dimensions || [], "Styles": style};
-         var save_path = path.join(LAYER_CACHE_PATH, clean_url + "_" + name + ".json");
+         var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;
       }else{

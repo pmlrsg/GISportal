@@ -50,7 +50,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    var region = layer.tags.region || "";
    var interval = layer.tags.interval || "";
    var model = layer.tags.model || "";
-   var styles_file = './cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
+   var styles_file = 'app/cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
    var legendSettings = layer.legendSettings || {
          "scalePoints":false,
          "Rotation":0,

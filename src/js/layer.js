@@ -694,7 +694,7 @@ gisportal.getLayerData = function(fileName, layer, options) {
     //console.log("inside ajax getting");
    $.ajax({
       type: 'GET',
-      url: "./cache/layers/" + fileName,
+      url: "app/cache/layers/" + fileName,
       dataType: 'json',
       async: true,
       cache: false,

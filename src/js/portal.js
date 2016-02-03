@@ -11,6 +11,14 @@ $(document).ready(function() {
    if (!window.console) window.console = {};
    if (!window.console.log) window.console.log = function () { };
    if (!window.console.info) window.console.info = function () { };
-   
-   gisportal.main();
+   $.ajax({
+	  url: gisportal.middlewarePath + '/settings/config?domain=' + gisportal.niceDomainName,
+	  dataType: 'script',
+	  success: function(script){
+	  	// CHECK THIS IS SAFE!!!!!!!!!11
+	  	// NOT HAPPY ABOUT HAVING TO DO THIS BUT THERE SEEMS NO OTHER WAY TO GET THE SCRIPT TO RUN BEFORE gisportal.main() D-: !
+	  		eval(script);
+	  		gisportal.main();
+	  }
+	});
 });
