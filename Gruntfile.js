@@ -1,7 +1,7 @@
 
 var coreFiles = [
     "src/js/EventManager.js",
-    "config/config.js",
+    "config/base_config.js",
     "src/js/gisportal.js",
     "src/js/loading.js",
     "src/js/templates.js",

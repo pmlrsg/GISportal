@@ -149,7 +149,7 @@ gisportal.autoLayer.loadPreviousLayers = function(){
       gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info.wms_url;
       gisportal.autoLayer.loadGivenLayer();
    }
-   if(gisportal.addLayersForm.form_info.display_form){
+   if(gisportal.addLayersForm.form_info.display_form && gisportal.user.info.permission != "guest"){
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info.current_page, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info.owner);
    }
 };

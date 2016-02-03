@@ -1,13 +1,6 @@
 
 collaboration = {};
 
-collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false;	// indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
-
-// socket.io location settings
-collaboration.protocol = gisportal.config.collaborationFeatures.protocol || 'http'; 	// 'http' or 'https'; the connection is automagically upgraded to a websocket connection
-collaboration.host = gisportal.config.collaborationFeatures.host || 'localhost';
-collaboration.port = gisportal.config.collaborationFeatures.port || '';
-collaboration.path = gisportal.config.collaborationFeatures.path || '';				// optional path; must start with a /
 
 // jquery selectors for various control elements
 collaboration.startButton = '.js-start-collaboration';							// the button to initiate a collaboration session
@@ -21,6 +14,14 @@ collaboration.active = false;
 collaboration.role = '';
 
 collaboration.initDOM = function() {
+      
+   collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
+
+   // socket.io location settings
+   collaboration.protocol = gisportal.config.collaborationFeatures.protocol || 'http';    // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
+   collaboration.host = gisportal.config.collaborationFeatures.host || 'localhost';
+   collaboration.port = gisportal.config.collaborationFeatures.port || '';
+   collaboration.path = gisportal.config.collaborationFeatures.path || '';          // optional path; must start with a /
 	// line up the URL 
 	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
 

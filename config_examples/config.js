@@ -11,7 +11,7 @@
 
 
 
-gisportal.config = {
+$.extend(gisportal.config, {
    siteMode: "development", //(development|production)
 
     // Skip start screen only is the user has a saved state, requires T&C
@@ -25,10 +25,6 @@ gisportal.config = {
 
    browseMode : 'tabs',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
-   paths: {
-    graphServer: 'http://localhost:3000/',
-    middlewarePath: '/service'
-   },
    countryBorder : {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
