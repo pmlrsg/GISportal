@@ -159,36 +159,68 @@ gisportal.editLayersForm.addListeners = function(){
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
    // Deletes the server from the portal.
-   $('span.js-delete-server').one('click', function(){
+   $('span.js-delete-server').on('click', function(){
       var this_span = $(this);
-      var server = $(this).data("server");
-      var user = $(this).data("user");
-      $.ajax({
-         url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user + '&domain=' + gisportal.niceDomainName,
-         success: function(){
-            var to_be_deleted = [];
-            for(var index in gisportal.selectedLayers){
-               var layer = gisportal.layers[gisportal.selectedLayers[index]];
-               if(this_span.data('server') == layer.serverName && this_span.data('user') == layer.owner){
-                  to_be_deleted.push(gisportal.selectedLayers[index]);
+      if(!this_span.is(".working")){
+         this_span.toggleClass("working", true);
+         var server = $(this).data("server");
+         var user = $(this).data("user");
+         $.ajax({
+            url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user + '&domain=' + gisportal.niceDomainName,
+            success: function(removed_data){
+               this_span.toggleClass("working", false);
+               var to_be_deleted = [];
+               for(var index in gisportal.selectedLayers){
+                  var layer = gisportal.layers[gisportal.selectedLayers[index]];
+                  if(this_span.data('server') == layer.serverName && this_span.data('user') == layer.owner){
+                     to_be_deleted.push(gisportal.selectedLayers[index]);
+                  }
                }
+               for(var id in to_be_deleted){
+                  gisportal.indicatorsPanel.removeFromPanel(to_be_deleted[id]);
+               }
+               // Think it is safe to take this out but it is there just in case.
+               // If layers misbehave after being deleted then this might be a place to look first:
+               // gisportal.loadLayers();
+               this_span.closest("tr").next().toggleClass("hidden", true);
+               this_span.closest("tr").toggleClass("hidden", true);
+               $(document).off('click', '.notifyjs-gisportal-restore-option-base .no');
+               $(document).off('click', '.notifyjs-gisportal-restore-option-base .yes');
+               $('.notifyjs-gisportal-restore-option-base').closest("div.notifyjs-wrapper").remove();
+               $.notify({'title':"Would you like to undo this delete ?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-restore-option",  autoHide:false, clickToHide: false});
+               $(document).one('click', '.notifyjs-gisportal-restore-option-base .no', function() {
+                  $(this).trigger('notify-hide');
+               });
+               $(document).one('click', '.notifyjs-gisportal-restore-option-base .yes', function() {
+                  $.ajax({
+                     method: 'post',
+                     url:  gisportal.middlewarePath + '/settings/restore_server_cache',
+                     data: JSON.parse(removed_data),
+                     success: function(){
+                        this_span.closest("tr").toggleClass("hidden", false);
+                     }
+                  });
+                  //hide notification
+                  $(this).trigger('notify-hide');
+               });
+               $.notify("Success\nThe server was successfuly removed", "success");
+            },
+            error: function(){
+               this_span.toggleClass("working", false);
+               this_span.notify("Deletion Fail", {position:"left", className:"error"});
             }
-            for(var id in to_be_deleted){
-               gisportal.indicatorsPanel.removeFromPanel(to_be_deleted[id]);
-            }
-            gisportal.loadLayers();
-            this_span.closest("tr").next().remove();
-            this_span.closest("tr").remove();
-            $.notify("Success\nThe server was successfuly removed", "success");
-         },
-         error: function(){
-            this_span.notify("Deletion Fail", {position:"left", className:"error"});
-         }
-      });
+         });
+      }
    });
 
    // Refreshes the server information.
    $('span.js-update-server').on('click', function(){
+      // This removes any other notify.js notifications and triggers so that there is no overlap.
+      $('.notifyjs-gisportal-refresh-option-base').closest("td").find("span").toggleClass("warn-spin", false);
+      $('.notifyjs-gisportal-refresh-option-base').closest("tr").toggleClass("alert-warning", false);
+      $(document).off('click', '.notifyjs-gisportal-refresh-option-base .no');
+      $(document).off('click', '.notifyjs-gisportal-refresh-option-base .yes');
+      $('.notifyjs-gisportal-refresh-option-base').closest("div.notifyjs-wrapper").remove();
       var this_span = $(this);
       $(this).toggleClass('warn-spin', true);
       $(this).parent("td").parent("tr").toggleClass('alert-warning', true);
@@ -223,14 +255,14 @@ gisportal.editLayersForm.addListeners = function(){
          success: function(global_data){
             if(!global_data.timeStamp || (+new Date() - +new Date(global_data.timeStamp))/60000 > gisportal.config.cacheTimeout){
                // Add a notify so the user can choose to refresh the cache.
-               this_span.notify({'title':"Would you like to refresh the cache?", "yes-text":"Yes", "no-text":"No"},{style:"option", autoHide:false, clickToHide: false});
+               this_span.notify({'title':"Would you like to refresh the cache to refresh from?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-refresh-option", autoHide:false, clickToHide: false});
                 //listen for click events from this style
-               $(document).one('click', '.notifyjs-option-base .no', function() {
+               $(document).one('click', '.notifyjs-gisportal-refresh-option-base .no', function() {
                   gisportal.editLayersForm.refreshOldData(global_data, this_span, user, domain);
                   //programmatically trigger propogating hide event
                   $(this).trigger('notify-hide');
                });
-               $(document).one('click', '.notifyjs-option-base .yes', function() {
+               $(document).one('click', '.notifyjs-gisportal-refresh-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
                   refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
                   $.ajax({

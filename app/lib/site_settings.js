@@ -120,7 +120,10 @@ router.get('/app/settings/proxy', function(req, res) {
          handleError(err, res);
       }else{
          res.status(response.statusCode);
-         res.setHeader("content-type", response.headers['content-type'].split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
+         var content_type = response.headers['content-type']
+         if(content_type){
+            res.setHeader("content-type", content_type.split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
+         }
          res.send(body);
       }
    });
@@ -253,7 +256,26 @@ router.get('/app/settings/remove_server_cache', function(req, res){
          if(err){
             handleError(err, res);
          }else{
-            res.send(delete_file_path); // Returns the file path so it can be replaced if the user undoes the delete
+            res.send(JSON.stringify({'path':delete_file_path, 'owner':owner})); // Returns the file path so it can be replaced if the user undoes the delete
+         }
+      });
+   }
+});
+
+router.all('/app/settings/restore_server_cache', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req); // Gets the user permission
+   var domain = req.query.domain; // Gets the given domain
+   var data = req.body; // Gets the data back to restore previously deleted file
+   var owner = data.owner;
+   var deleted_path = data.path;
+   var restored_path = deleted_path.replace("deleted_cache/", "");
+   if(owner == username || permission == "admin"){
+      fs.rename(deleted_path, restored_path, function(err){ // Moves the file to the deleted cache
+         if(err){
+            handleError(err, res);
+         }else{
+            res.send("");
          }
       });
    }

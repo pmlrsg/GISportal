@@ -8,7 +8,9 @@
   margin-top: 20px;
 }
 
-.notifyjs-option-base {
+.notifyjs-gisportal-refresh-option-base,
+.notifyjs-gisportal-delete-option-base,
+.notifyjs-gisportal-restore-option-base {
   opacity: 0.85;
   width: 200px;
   background: #F5F5F5;
@@ -16,14 +18,18 @@
   border-radius: 10px;
 }
 
-.notifyjs-option-base .title {
+.notifyjs-gisportal-refresh-option-base .title,
+.notifyjs-gisportal-delete-option-base .title,
+.notifyjs-gisportal-restore-option-base .title {
   width: 100px;
   float: left;
   margin: 10px 0 0 10px;
   text-align: right;
 }
 
-.notifyjs-option-base .buttons {
+.notifyjs-gisportal-refresh-option-base .buttons,
+.notifyjs-gisportal-delete-option-base .buttons,
+.notifyjs-gisportal-restore-option-base .buttons {
   width: 70px;
   float: right;
   font-size: 9px;
@@ -31,7 +37,9 @@
   margin: 2px;
 }
 
-.notifyjs-option-base button {
+.notifyjs-gisportal-refresh-option-base button,
+.notifyjs-gisportal-delete-option-base button,
+.notifyjs-gisportal-restore-option-base button {
   font-size: 9px;
   padding: 5px;
   margin: 2px;
