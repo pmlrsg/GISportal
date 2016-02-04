@@ -47,7 +47,8 @@ gisportal.editLayersForm.produceServerList = function(){
          "provider":provider,
          "wms_url":wms_url,
          "owner":owner,
-         "Layers":[]
+         "includedLayers":[],
+         "excludedLayers":[]
       };
       // Gets the unique layer information.
       var layer_info = {
@@ -59,14 +60,22 @@ gisportal.editLayersForm.produceServerList = function(){
       // If the server has already been added the layer is added to it
       for(var i in gisportal.editLayersForm.server_list){
          if(gisportal.editLayersForm.server_list[i].serverName == server_info.serverName && gisportal.editLayersForm.server_list[i].owner == server_info.owner){
-            gisportal.editLayersForm.server_list[i].Layers.push(layer_info);
+            if(layer_info.include){
+               gisportal.editLayersForm.server_list[i].includedLayers.push(layer_info);
+            }else{
+               gisportal.editLayersForm.server_list[i].excludedLayers.push(layer_info);
+            }
             unique = false;
             break;
          }
       }
       // If the server has not yet been added, the layer and server are both added to the list.
       if(unique){
-         server_info.Layers.push(layer_info);
+         if(layer_info.include){
+            server_info.includedLayers.push(layer_info);
+         }else{
+            server_info.excludedLayers.push(layer_info);
+         }
          gisportal.editLayersForm.server_list.push(server_info);
       }
       var admin = false;
@@ -124,11 +133,20 @@ gisportal.editLayersForm.addListeners = function(){
       gisportal.addLayersForm.form_info = {};
       for(var i in gisportal.editLayersForm.server_list){
          if(gisportal.editLayersForm.server_list[i].serverName == $(this).data("server")){
-            for(var layer in gisportal.editLayersForm.server_list[i].Layers){
-               var id = gisportal.editLayersForm.server_list[i].Layers[layer].id;
+            for(var layer in gisportal.editLayersForm.server_list[i].includedLayers){
+               var id = gisportal.editLayersForm.server_list[i].includedLayers[layer].id;
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
                single_layer = this_layer;
                // Each of the server layers are added to the layers_list variable
+               gisportal.addLayersForm.addlayerToList(this_layer);
+            }
+            for(var layer in gisportal.editLayersForm.server_list[i].excludedLayers){
+               var id = gisportal.editLayersForm.server_list[i].excludedLayers[layer].id;
+               this_layer = gisportal.not_included_layers[id];
+               if(!single_layer){
+                  single_layer = this_layer;
+               }
+               // Each of the excluded server layers are added to the layers_list variable
                gisportal.addLayersForm.addlayerToList(this_layer);
             }
          }
@@ -140,7 +158,6 @@ gisportal.editLayersForm.addListeners = function(){
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
-
    // Deletes the server from the portal.
    $('span.js-delete-server').one('click', function(){
       var this_span = $(this);

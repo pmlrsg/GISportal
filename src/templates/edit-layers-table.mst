@@ -27,8 +27,13 @@
          <tr class="server-layers hidden" data-server="{{serverName}}">
          <td/>
          <td>
-         {{#each Layers}}
-            <p {{#unless include}}class="alert-danger"{{/unless}}>{{title}}</p>
+         {{#each includedLayers}}
+            {{#if @first}}<h3>Included Layers</h3>{{/if}}
+            <p>{{title}}</p>
+         {{/each}}
+         {{#each excludedLayers}}
+            {{#if @first}}<h3>Excluded Layers</h3>{{/if}}
+            <p>{{title}}</p>
          {{/each}}
          </td>
          <td/>
