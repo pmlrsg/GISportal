@@ -285,6 +285,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
                if(user_data.server.Layers[user_layer].Name == new_data.server[new_server][new_layer].Name){
                   new_data.server[new_server][new_layer].Abstract = user_data.server.Layers[user_layer].Abstract;
                   new_data.server[new_server][new_layer].Title = user_data.server.Layers[user_layer].Title;
+                  new_data.server[new_server][new_layer].include = user_data.server.Layers[user_layer].include || false;
                   new_data.server[new_server][new_layer].tags = user_data.server.Layers[user_layer].tags;
                   new_data.server[new_server][new_layer].LegendSettings = user_data.server.Layers[user_layer].LegendSettings;
                   new_data.server[new_server][new_layer].ProviderDetails = user_data.server.Layers[user_layer].ProviderDetails || undefined;

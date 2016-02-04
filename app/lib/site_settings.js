@@ -44,6 +44,21 @@ function fileExists(filePath)
    }
 }
 
+function sortLayersList(data, param){
+   var byParam = data.slice(0);
+   for(layer in byParam){
+      if(!byParam[layer][param]){
+         return byParam;
+      }
+   }
+   byParam.sort(function(a,b) {
+       var x = a[param].toLowerCase();
+       var y = b[param].toLowerCase();
+       return x < y ? -1 : x > y ? 1 : 0;
+   });
+   return byParam;
+}
+
 function directoryExists(filePath)
 {
    try
@@ -341,7 +356,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
          }
       }
       // Adds all of the broader information to the JSON object.
-      data.server.Layers = new_data;
+      data.server.Layers = sortLayersList(new_data, "Title");
       if(server_info){
          if(!data.contactInfo){
             data.contactInfo = {};
@@ -536,7 +551,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                      digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
                   }
                   if(layers.length > 0){
-                     sub_master_cache.server.Layers = layers;
+                     sub_master_cache.server.Layers = sortLayersList(layers, "Title");
                      sub_master_cache.options = {"providerShortTag": "UserDefinedLayer"};
                      sub_master_cache.wmsURL = url;
                      sub_master_cache.serverName = clean_url;
