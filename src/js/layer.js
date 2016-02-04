@@ -485,7 +485,7 @@ gisportal.layer = function( options ) {
    };
 
    this.cacheUrl = function(){
-     return portalLocation() + 'cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json';
+     return portalLocation() + 'app/cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json';
    };
 
    /**

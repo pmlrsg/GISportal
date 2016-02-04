@@ -24,6 +24,7 @@ gisportal.editLayersForm.produceServerList = function(){
    }else{
       layers_obj = gisportal.layers;
    }
+   $.extend(layers_obj, gisportal.not_included_layers);
    var data;
    //for each of the layers in the list.
    for(var layer in layers_obj){
@@ -51,6 +52,7 @@ gisportal.editLayersForm.produceServerList = function(){
       // Gets the unique layer information.
       var layer_info = {
          "id":layer,
+         "include":this_layer.include,
          "title":this_layer.name
       };
       var unique = true;
@@ -196,7 +198,7 @@ gisportal.editLayersForm.addListeners = function(){
          });
          return;
       }
-      var cache_url = 'cache/' + gisportal.niceDomainName + '/temporary_cache/';
+      var cache_url = 'app/cache/' + gisportal.niceDomainName + '/temporary_cache/';
       cache_url += url+".json?_="+ new Date().getMilliseconds();
       $.ajax({
          url:  cache_url,
@@ -261,7 +263,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
    wms_url = wms_url || new_data.wmsURL;
    var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
 
-   var ajax_url = 'cache/' + gisportal.niceDomainName + "/";
+   var ajax_url = 'app/cache/' + gisportal.niceDomainName + "/";
    if(user != domain){
       ajax_url += "user_" + user + "/";
    }

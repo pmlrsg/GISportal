@@ -28,7 +28,7 @@
          <td/>
          <td>
          {{#each Layers}}
-            {{title}}<br/>
+            <p {{#unless include}}class="alert-danger"{{/unless}}>{{title}}</p>
          {{/each}}
          </td>
          <td/>

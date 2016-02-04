@@ -143,7 +143,7 @@ gisportal.map_settings.init = function() {
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
          $.ajax({
-            url:  'cache/' + gisportal.niceDomainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+            url:  'app/cache/' + gisportal.niceDomainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
             dataType: 'json',
             success: function(layer){
                if(!gisportal.wms_submitted){

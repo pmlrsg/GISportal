@@ -83,7 +83,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "abstract":layer.abstract,
       "id":layer.id,
       "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
-      "include":true,
+      "include":layer.include,
       "styles_file":styles_file,
       "legendSettings":legendSettings,
       "title":layer.serverName
@@ -286,21 +286,17 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       // Checks each layer in the list for errors with tags.
       for(var layer in gisportal.addLayersForm.layers_list){
          var this_layer = gisportal.addLayersForm.layers_list[layer];
-         // As long as it should be included.
-         if(this_layer.include){
-            var invalid = gisportal.addLayersForm.checkValidity;
-            for(var tag in this_layer.tags){
-               // If the tag is invalid
-               if(invalid("all_tags", this_layer.tags[tag]).invalid){
-                  // Load up the layer in the form and return so nothing is actually submitted
-                  $.notify("Please correct the information on page " + layer, "error");
-                  gisportal.addLayersForm.displayForm(_.size(gisportal.addLayersForm.layers_list), parseInt(layer), "div.js-layer-form-html");
-                  return;
-               }
+         var invalid = gisportal.addLayersForm.checkValidity;
+         for(var tag in this_layer.tags){
+            // If the tag is invalid
+            if(invalid("all_tags", this_layer.tags[tag]).invalid){
+               // Load up the layer in the form and return so nothing is actually submitted
+               $.notify("Please correct the information on page " + layer, "error");
+               gisportal.addLayersForm.displayForm(_.size(gisportal.addLayersForm.layers_list), parseInt(layer), "div.js-layer-form-html");
+               return;
             }
          }
       }
-      // Adds each layer to the cache
       for(layer in gisportal.addLayersForm.layers_list){
          // As long as it is to be included
          if(gisportal.addLayersForm.layers_list[layer].include){
@@ -516,7 +512,7 @@ gisportal.addLayersForm.addInputListeners = function(){
          key_val = $(this).val(); // key_val set to value of field
       }
       if(key == 'include'){
-         key_val ^=1;
+         key_val = !key_val;
       }
       //The data is then added in a certain way.
       if(index){ // Only layer data fields have indexes.

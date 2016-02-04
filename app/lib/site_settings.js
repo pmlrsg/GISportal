@@ -222,7 +222,7 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
    var master_list = fs.readdirSync(MASTER_CONFIG_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value){
-      if(value == domain){
+      if(value == owner){
          base_path = path.join(MASTER_CONFIG_PATH,domain);
          return;
       }
@@ -311,29 +311,28 @@ router.all('/app/settings/add_user_layer', function(req, res){
             var found = false;
             for(old_layer in data.server.Layers){ // Loops through each old layer to be compared.
                if(data.server.Layers[old_layer].Name == this_new_layer.original_name){ // When the layers match
-                  if(this_new_layer.include){ // As long as it should be included
-                     var new_data_layer = data.server.Layers[old_layer]; // 
-                     new_data_layer.Title = titleCase(this_new_layer.nice_name);
-                     new_data_layer.Abstract = this_new_layer.abstract;
-                     for(key in this_new_layer.tags){
-                        var val = this_new_layer.tags[key];
-                        if(val && val.length > 0){
-                           new_data_layer.tags[key] = val;
-                        }else{
-                           new_data_layer.tags[key] = undefined;
-                        }
+                  var new_data_layer = data.server.Layers[old_layer]; // 
+                  new_data_layer.Title = titleCase(this_new_layer.nice_name);
+                  new_data_layer.Abstract = this_new_layer.abstract;
+                  new_data_layer.include = this_new_layer.include;
+                  for(key in this_new_layer.tags){
+                     var val = this_new_layer.tags[key];
+                     if(val && val.length > 0){
+                        new_data_layer.tags[key] = val;
+                     }else{
+                        new_data_layer.tags[key] = undefined;
                      }
-                     if(server_info.provider.length > 0){
-                        new_data_layer.tags.data_provider = server_info.provider;
-                        var clean_provider = server_info.provider.replace(/&amp/g,"and").replace(/ /g, "_").replace(/\\/g, "_").replace(/\//g, "_").replace(/\./g, "_").replace(/\,/g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\:/g, "_").replace(/\;/g, "_");
-                        data.options.providerShortTag = clean_provider;
-                     }
-                     new_data_layer.tags.niceName = this_new_layer.nice_name;
-                     new_data_layer.LegendSettings = this_new_layer.legendSettings;
-                     new_data.push(new_data_layer);
-                     found = true;
-                     break;
                   }
+                  if(server_info.provider.length > 0){
+                     new_data_layer.tags.data_provider = server_info.provider;
+                     var clean_provider = server_info.provider.replace(/&amp/g,"and").replace(/ /g, "_").replace(/\\/g, "_").replace(/\//g, "_").replace(/\./g, "_").replace(/\,/g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\:/g, "_").replace(/\;/g, "_");
+                     data.options.providerShortTag = clean_provider;
+                  }
+                  new_data_layer.tags.niceName = this_new_layer.nice_name;
+                  new_data_layer.LegendSettings = this_new_layer.legendSettings;
+                  new_data.push(new_data_layer);
+                  found = true;
+                  break;
                }
             }
             if(!found){

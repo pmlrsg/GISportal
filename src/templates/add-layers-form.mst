@@ -6,7 +6,7 @@
    <div class="layers-form-left">
 
       {{#unless_equals total_pages "1"}}
-      <label>Do Not Include This Layer:</label>
+      <label data-field="include">Do Not Include This Layer:</label>
       <input type="checkbox" data-field="include" {{#unless ../include}}checked{{/unless}} data-id="{{../list_id}}"/></br>
       {{/unless_equals}}
 

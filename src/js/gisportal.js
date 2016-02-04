@@ -113,6 +113,7 @@ gisportal.loadLayers = function() {
    gisportal.tempRemoveLayers();
    gisportal.loadVectorLayers();
    gisportal.original_layers = {};
+   gisportal.not_included_layers = {};
    gisportal.layers = {};
    loadWmsLayers();
    
@@ -246,9 +247,16 @@ gisportal.createOpLayers = function() {
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
 
+      var include_bool = true;
+
+      if(indicator.include === false){
+         include_bool = false;
+      }
+
       var layerOptions = { 
          //new
          "abstract": indicator.Abstract,
+         "include": include_bool,
          "contactInfo": server.contactInfo,
          "timeStamp":server.timeStamp,
          "owner":server.owner,
@@ -284,7 +292,11 @@ gisportal.createOpLayers = function() {
          postfix++; // will convert the "" into a number
 
       layer.id = layer.id + postfix;
-      gisportal.layers[layer.id] = layer;
+      if(layer.include){
+         gisportal.layers[layer.id] = layer;
+      }else{
+         gisportal.not_included_layers[layer.id] = layer;
+      }
 
    }
 
