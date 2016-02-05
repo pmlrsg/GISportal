@@ -73,11 +73,10 @@ function directoryExists(filePath)
 
 function handleError(err, res){
    try{
-      log.error(err);
       res.status(err.status || 500);
       res.send({message: err.message});
+      log.error(err);
    }catch(e){
-      log.error("The error has already been sent");
    }
 }
 
