@@ -18,11 +18,4 @@ class Extractor(object):
 
 
 	def getData(self):
-		print "="*20
-		print self.extract_area
-		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area)
-		data = wcs_extractor.getData()
-		fname = self.outdir+str(uuid.uuid4())+".nc"
-		with open(fname, 'w') as outfile:
-			outfile.write(data.read())
-		return fname
+		pass

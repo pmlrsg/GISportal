@@ -5,124 +5,125 @@ import numpy as np
 import netCDF4 as netCDF
 from shapely import wkt
 from PIL import Image, ImageDraw
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt   
 
-def create_mask(poly, params, poly_type="polygon"):
-   '''
-   takes a Well Known Text polygon or line 
-   and produces a masking array for use with numpy
-   @param poly - WKT polygon or line
-   @param variable - WCS variable to mask off
-   @param type - one from [polygon, line]
-   '''
-   loaded_poly = wkt.loads(poly)
-   wcs_envelope = loaded_poly.envelope
-   bounds =  wcs_envelope.bounds
-   bb = ','.join(map(str,bounds))
-   params['bbox']._value = bb
-   params['url'] = createURL(params)
-   variable = params['coverage'].value
-   #wcs_url = wcs_base_url % (bounds[0],bounds[1],bounds[2],bounds[3])
-   wcs_url = params['url'].value
-   #testfile=urllib.URLopener()
-   #testfile.retrieve(wcs_url,"%s.nc" % variable)
-   try:
-      resp = contactWCSServer(wcs_url)
-   except urllib2.HTTPError:
-      params["vertical"]._value = params["vertical"].value[1:]
-      params['url'] = createURL(params)
-      wcs_url = params['url'].value
-      resp = contactWCSServer(wcs_url)
-   tfile = saveOutTempFile(resp)
-   to_be_masked = netCDF.Dataset(tfile, 'r+')
+# def create_mask(poly, params, poly_type="polygon"):
+#    '''
+#    takes a Well Known Text polygon or line 
+#    and produces a masking array for use with numpy
+#    @param poly - WKT polygon or line
+#    @param variable - WCS variable to mask off
+#    @param type - one from [polygon, line]
+#    '''
+#    loaded_poly = wkt.loads(poly)
+#    wcs_envelope = loaded_poly.envelope
+#    bounds =  wcs_envelope.bounds
+#    bb = ','.join(map(str,bounds))
+#    params['bbox']._value = bb
+#    params['url'] = createURL(params)
+#    variable = params['coverage'].value
+#    #wcs_url = wcs_base_url % (bounds[0],bounds[1],bounds[2],bounds[3])
+#    wcs_url = params['url'].value
+#    #testfile=urllib.URLopener()
+#    #testfile.retrieve(wcs_url,"%s.nc" % variable)
+#    try:
+#       resp = contactWCSServer(wcs_url)
+#    except urllib2.HTTPError:
+#       params["vertical"]._value = params["vertical"].value[1:]
+#       params['url'] = createURL(params)
+#       wcs_url = params['url'].value
+#       resp = contactWCSServer(wcs_url)
+#    tfile = saveOutTempFile(resp)
+#    to_be_masked = netCDF.Dataset(tfile, 'r+')
 
-   chl = to_be_masked.variables[variable][:]
+#    chl = to_be_masked.variables[variable][:]
 
-   latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
-   lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
+#    latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
+#    lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
 
-   from shapely.geometry import Polygon
-   minlat = min(latvals)
-   maxlat = max(latvals)
-   minlon = min(lonvals)
-   maxlon = max(lonvals)
+#    from shapely.geometry import Polygon
+#    minlat = min(latvals)
+#    maxlat = max(latvals)
+#    minlon = min(lonvals)
+#    maxlon = max(lonvals)
 
-   lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
-   #print '#'*50
-   #print lonlat_poly
-   lonlat_poly = lonlat_poly.buffer(0)
-   overlap_poly = loaded_poly.intersection(lonlat_poly)
-   poly = poly[trim_sizes[poly_type]]
+#    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
+#    #print '#'*50
+#    #print lonlat_poly
+#    lonlat_poly = lonlat_poly.buffer(0)
+#    overlap_poly = loaded_poly.intersection(lonlat_poly)
+#    poly = poly[trim_sizes[poly_type]]
 
-   poly = poly.split(',')
-   poly = [x.split() for x in poly]
-
-
-
-   #found_lats = [find_closest(latvals, float(x[1])) for x in poly]
-   #found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
-   if overlap_poly.type == "MultiPolygon":
-      found = []
-      for poly in overlap_poly:
-         found_lats = [find_closest(latvals, float(x)) for x in poly.exterior.xy[1]]
-         found_lons = [find_closest(lonvals, float(x)) for x in poly.exterior.xy[0]]
-         found.append(zip(found_lons,found_lats))
+#    poly = poly.split(',')
+#    poly = [x.split() for x in poly]
 
 
-   elif overlap_poly.type == "MultiLineString":
-      found = []
-      for poly in overlap_poly:
-         found_lats = [find_closest(latvals, float(x)) for x in poly.xy[1]]
-         found_lons = [find_closest(lonvals, float(x)) for x in poly.xy[0]]
-         found.append(zip(found_lons,found_lats))
 
-   else:
-      if poly_type is 'line':
-         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
-         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
-      else:
-         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
-         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
+#    #found_lats = [find_closest(latvals, float(x[1])) for x in poly]
+#    #found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
+#    if overlap_poly.type == "MultiPolygon":
+#       found = []
+#       for poly in overlap_poly:
+#          found_lats = [find_closest(latvals, float(x)) for x in poly.exterior.xy[1]]
+#          found_lons = [find_closest(lonvals, float(x)) for x in poly.exterior.xy[0]]
+#          found.append(zip(found_lons,found_lats))
 
-      #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
-      found = zip(found_lons,found_lats)
 
-   # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
-   img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
+#    elif overlap_poly.type == "MultiLineString":
+#       found = []
+#       for poly in overlap_poly:
+#          found_lats = [find_closest(latvals, float(x)) for x in poly.xy[1]]
+#          found_lons = [find_closest(lonvals, float(x)) for x in poly.xy[0]]
+#          found.append(zip(found_lons,found_lats))
 
-   if overlap_poly.type == "MultiPolygon":
-      for f in found:
-         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
-   elif overlap_poly.type == "MultiLineString":
-      for f in found:
-         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
-   else:
-      if poly_type == 'polygon':
-         ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
-      if poly_type == 'line':
-         ImageDraw.Draw(img).line(found,   fill=2)
+#    else:
+#       if poly_type is 'line':
+#          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
+#          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
+#       else:
+#          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
+#          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
 
-   masker = np.array(img)
-   #fig = plt.figure()
-   masked_variable = []
-   for i in range(chl.shape[0]):
-      #print i
-      masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
-      masked_variable[i].filled(-999)
-   #    a = fig.add_subplot(1,5,i+1)
-   #    imgplot = plt.imshow(masked_variable)
+#       #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
+#       found = zip(found_lons,found_lats)
 
-   # plt.show()
+#    # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
+#    img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
 
-   return masked_variable, to_be_masked, masker, tfile, variable
+#    if overlap_poly.type == "MultiPolygon":
+#       for f in found:
+#          ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+#    elif overlap_poly.type == "MultiLineString":
+#       for f in found:
+#          ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+#    else:
+#       if poly_type == 'polygon':
+#          ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
+#       if poly_type == 'line':
+#          ImageDraw.Draw(img).line(found,   fill=2)
+
+#    masker = np.array(img)
+#    #fig = plt.figure()
+#    masked_variable = []
+#    for i in range(chl.shape[0]):
+#       #print i
+#       masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
+#       masked_variable[i].filled(-999)
+#    #    a = fig.add_subplot(1,5,i+1)
+#    #    imgplot = plt.imshow(masked_variable)
+
+#    # plt.show()
+
+#    return masked_variable, to_be_masked, masker, tfile, variable
 
 
 """
 Performs a basic set of statistical functions on the provided data.
 """
-def basic(dataset, variable, irregular=False, original=None):
-   import matplotlib
-   matplotlib.use('Agg')
-   import matplotlib.pyplot as plt   
+def basic(dataset, variable, irregular=False, original=None, filename="debugging_image"):
+  
    if irregular:
       # current_app.logger.debug('irregular shape')
       # current_app.logger.debug([x.shape for x in dataset])
@@ -130,10 +131,9 @@ def basic(dataset, variable, irregular=False, original=None):
       #arr = np.ma.concatenate(dataset)
       arr = np.ma.array(dataset)
 
-      #_img = Image.fromarray(arr[0], 'RGB')
-      #_img.save('/users/rsg/olcl/irregular_test/my.png')
-      # plt.imshow(arr[0])
-      # plt.savefig('/users/rsg/olcl/irregular_test/my.png')
+      print original
+      plt.imshow(arr[0])
+      plt.savefig(filename+'.png')
       # current_app.logger.debug('irregular shape after concatonate')
       # current_app.logger.debug(arr)
    else:
@@ -147,8 +147,8 @@ def basic(dataset, variable, irregular=False, original=None):
    else:
       maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
-   plt.imshow(maskedArray[0])
-   plt.savefig('/users/rsg/olcl/irregular_test/my_masked.png')
+   #plt.imshow(maskedArray[0])
+   #plt.savefig(filename+'.2.png')
    time = getCoordinateVariable(dataset, 'Time')
    # current_app.logger.debug('time channel test')
    # current_app.logger.debug(time)
@@ -318,23 +318,19 @@ def getHistogram(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
    bins = request.args.get('bins', None) # TODO move to get params
    numbers = []
-   current_app.logger.debug('before bins') # DEBUG
    
    if bins == None or not bins:
       max = getMax(maskedarr)
       min = getMin(maskedarr)
       bins = np.linspace(min, max, 11) # Create ten evenly spaced bins 
-      current_app.logger.debug('bins generated') # DEBUG
       N,bins = np.histogram(maskedarr, bins) # Create the histogram
    else:
       values = bins.split(',')
       for i,v in enumerate(values):
          values[i] = float(values[i]) # Cast string to float
       bins = np.array(values)
-      current_app.logger.debug('bins converted') # DEBUG
       N,bins = np.histogram(maskedarr, bins) # Create the histogram
    
-   current_app.logger.debug('histogram created') # DEBUG
    for i in range(len(bins)-1): # Iter over the bins       
       if np.isnan(bins[i]) or np.isnan(bins[i+1] or np.isnan(N[i])):
          g.graphError = 'no valid data available to use'
@@ -370,7 +366,6 @@ def getDepth(dataset):
 
 def getDimension(dataset, dimName):
    for i, key in enumerate(dataset.dimensions):
-      current_app.logger.debug(key)
       dimension = dataset.dimensions[key]
       if key == dimName:
          return len(dimension)
@@ -414,3 +409,146 @@ Returns the maximum value from the provided array.
 """
 def getMax(arr):
    return float(np.max(arr)) # Get the max ignoring nan's, then cast to float
+
+
+
+def getIrregularData(params, poly_type=None):
+   polygon = params['bbox'].value
+   if poly_type:
+      mask, data,_,_,_ = create_mask(polygon, params, poly_type)
+   else: 
+      mask, data,_,_,_ = create_mask(polygon, params)
+
+   return basic(mask, params, irregular=True, original=data)
+
+trim_sizes = {
+   "polygon" : slice(9,-2),
+   "line" : slice(11,-2)
+}
+
+def find_closest(arr, val):
+   """
+  Finds the position in the array where the array value matches
+  the value specified by the user
+   - poached from JAD
+  """
+   current_closest = 120310231023
+   current_idx = None
+   for i in range(len(arr)):
+      if abs(arr[i]-val)<current_closest:
+         current_closest = abs(arr[i]-val)
+         current_idx=i
+   return current_idx
+
+
+def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
+   '''
+   takes a Well Known Text polygon or line 
+   and produces a masking array for use with numpy
+   @param poly - WKT polygon or line
+   @param variable - WCS variable to mask off
+   @param type - one from [polygon, line]
+   '''
+
+   loaded_poly = wkt.loads(poly)
+   # wcs_envelope = loaded_poly.envelope
+   # bounds =  wcs_envelope.bounds
+   # bb = ','.join(map(str,bounds))
+
+   # params['bbox']._value = bb
+   # params['url'] = createURL(params)
+   # variable = params['coverage'].value
+   # #wcs_url = wcs_base_url % (bounds[0],bounds[1],bounds[2],bounds[3])
+   # wcs_url = params['url'].value
+   # #testfile=urllib.URLopener()
+   # #testfile.retrieve(wcs_url,"%s.nc" % variable)
+   # try:
+   #    resp = contactWCSServer(wcs_url)
+   # except urllib2.HTTPError:
+   #    params["vertical"]._value = params["vertical"].value[1:]
+   #    params['url'] = createURL(params)
+   #    wcs_url = params['url'].value
+   #    resp = contactWCSServer(wcs_url)
+   #tfile = saveOutTempFile(resp)
+   to_be_masked = netCDF.Dataset(netcdf_base, 'r+')
+
+   chl = to_be_masked.variables[variable][:]
+
+   latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
+   lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
+
+   from shapely.geometry import Polygon
+   minlat = min(latvals)
+   maxlat = max(latvals)
+   minlon = min(lonvals)
+   maxlon = max(lonvals)
+
+   lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
+   #print '#'*50
+   #print lonlat_poly
+   lonlat_poly = lonlat_poly.buffer(0)
+   overlap_poly = loaded_poly.intersection(lonlat_poly)
+   poly = poly[trim_sizes[poly_type]]
+
+   poly = poly.split(',')
+   poly = [x.split() for x in poly]
+
+
+
+   #found_lats = [find_closest(latvals, float(x[1])) for x in poly]
+   #found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
+   if overlap_poly.type == "MultiPolygon":
+      found = []
+      for poly in overlap_poly:
+         found_lats = [find_closest(latvals, float(x)) for x in poly.exterior.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in poly.exterior.xy[0]]
+         found.append(zip(found_lons,found_lats))
+
+
+   elif overlap_poly.type == "MultiLineString":
+      found = []
+      for poly in overlap_poly:
+         found_lats = [find_closest(latvals, float(x)) for x in poly.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in poly.xy[0]]
+         found.append(zip(found_lons,found_lats))
+
+   else:
+      if poly_type is 'line':
+         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.xy[0]]
+      else:
+         found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
+         found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
+
+      #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
+      found = zip(found_lons,found_lats)
+
+   # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
+   img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
+
+   if overlap_poly.type == "MultiPolygon":
+      for f in found:
+         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+   elif overlap_poly.type == "MultiLineString":
+      for f in found:
+         ImageDraw.Draw(img).polygon(f,  outline=2, fill=2)
+   else:
+      if poly_type == 'polygon':
+         ImageDraw.Draw(img).polygon(found,  outline=2, fill=2)
+      if poly_type == 'line':
+         ImageDraw.Draw(img).line(found,   fill=2)
+
+   masker = np.array(img)
+   #fig = plt.figure()
+   masked_variable = []
+   for i in range(chl.shape[0]):
+      #print i
+      masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
+      masked_variable[i].filled(-999)
+      #a = fig.add_subplot(1,5,i+1)
+      #imgplot = plt.imshow(masked_variable)
+
+   #plt.show()
+
+   return masked_variable, to_be_masked, masker,  variable
+

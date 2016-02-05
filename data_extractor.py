@@ -36,6 +36,7 @@ def main():
 	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=0)
 	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
 	parser.add_argument("-time", action="store", dest="time", help="A time string for in the format startdate/enddate or a single date", required=True)
+	parser.add_argument("-mask", action="store", dest="mask", help="a polygon representing teh irregular area", required=False)
 	args = parser.parse_args()
 
 	print args.debug
@@ -54,11 +55,13 @@ def main():
 		stats = BasicStats(filename, args.wcs_variable)
 		output_data = stats.process()
 	elif (args.extract_type == "irregular"):
-		extractor = IrregularExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
 		filename = extractor.getData()
+		output_data = filename
 	elif (args.extract_type == "trans-lat"):
-		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "latitude", extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
+		print filename
 	elif (args.extract_type == "trans-long"):
 		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "longitude", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()

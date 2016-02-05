@@ -1,4 +1,4 @@
 from wcs_extraction import WCSHelper
-from analysis_utils import basic
+from analysis_utils import *
 from debug import Debug
 
