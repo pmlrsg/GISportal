@@ -269,9 +269,17 @@ gisportal.groupNames = function(layers)  {
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
    var grouped = gisportal.groupTags();
-
+   var addable_layers = false;
+   if(gisportal.user.info.permission != "guest"){
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            addable_layers = true;
+            break;
+         }
+      }
+   }
    // load the template
-   var catFilter = gisportal.templates['category-filter-tabs']();
+   var catFilter = gisportal.templates['category-filter-tabs']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
    $('.more-info').on('click', function() {
       var message_block = $(this).prev();
@@ -287,6 +295,21 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       gisportal.configurePanel.resetPanel();
    });
 
+   // Listener is added to the add layers button
+   $('button#js-add-layers-form').on('click', function() {
+      var single_layer;
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            single_layer = gisportal.layers[layer];
+            // Each of the user defined layers are added to the layers_list variable
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer]);
+         }
+      }
+      gisportal.addLayersForm.validation_errors = {};
+      // The form is then loaded (loading the first layer)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
+   });
+
    // iterate over each category
    for (var cat in gisportal.browseCategories)  {
 
@@ -296,6 +319,14 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 
       gisportal.configurePanel.renderIndicatorsByTag(cat, targetDiv, tabNumber);
 
+   }
+   for(var x=1; x<=3; x++){
+      var label = $('label[for="tab-browse-' + x +'"]');
+      if(label.html() == String(x)){
+         label.toggleClass('hidden', true);
+      }else{
+         label.toggleClass('hidden', false);
+      }
    }
 };
 

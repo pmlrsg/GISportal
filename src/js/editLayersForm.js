@@ -133,15 +133,16 @@ gisportal.editLayersForm.addListeners = function(){
       gisportal.addLayersForm.form_info = {};
       for(var i in gisportal.editLayersForm.server_list){
          if(gisportal.editLayersForm.server_list[i].serverName == $(this).data("server")){
-            for(var layer in gisportal.editLayersForm.server_list[i].includedLayers){
-               var id = gisportal.editLayersForm.server_list[i].includedLayers[layer].id;
+            var layer, id;
+            for(layer in gisportal.editLayersForm.server_list[i].includedLayers){
+               id = gisportal.editLayersForm.server_list[i].includedLayers[layer].id;
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
                single_layer = this_layer;
                // Each of the server layers are added to the layers_list variable
                gisportal.addLayersForm.addlayerToList(this_layer);
             }
-            for(var layer in gisportal.editLayersForm.server_list[i].excludedLayers){
-               var id = gisportal.editLayersForm.server_list[i].excludedLayers[layer].id;
+            for(layer in gisportal.editLayersForm.server_list[i].excludedLayers){
+               id = gisportal.editLayersForm.server_list[i].excludedLayers[layer].id;
                this_layer = gisportal.not_included_layers[id];
                if(!single_layer){
                   single_layer = this_layer;

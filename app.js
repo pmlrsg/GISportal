@@ -9,15 +9,59 @@ var cookieParser = require('cookie-parser');
 var connect = require('connect');
 var session = require('express-session');
 var jade = require("jade");
+var path = require('path');
+var fs = require("fs");
+
+
+function fileExists(filePath)
+{
+   try
+   {
+      return fs.statSync(filePath).isFile();
+   }
+   catch (err)
+   {
+      return false;
+   }
+}
+
+function directoryExists(filePath)
+{
+   try
+   {
+      return fs.statSync(filePath).isDirectory();
+   }
+   catch (err)
+   {
+      return false;
+   }
+}
 
 
 // Express setup
 var app = express();
 
 // Set the settings
-try {
+found = false;
+try{
    require('./config/config-server.js');
-} catch(e) {
+   found = true;
+}catch(e){};
+var site_setings_path = path.join(__dirname, "config/site_settings");
+var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
+site_setings_list.forEach(function(foldername){
+   var folder_path = path.join(site_setings_path, foldername);
+   if(directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak"){
+      var config_path = path.join(folder_path, "config-server.js")
+      if(fileExists(config_path)){
+         try{
+            require(config_path);
+            found = true;
+         }catch(e){}
+      }
+   }
+});
+if(!found) {
    console.log('There doesn\'t appear to be a server config settings file in place');
    console.log('');
    console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');

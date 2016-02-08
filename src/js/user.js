@@ -18,7 +18,7 @@ gisportal.user.loggedIn = function(){
 
 gisportal.user.initDOM = function() {
    $.ajax({
-      url: 'app/user/dashboard',
+      url: 'app/user/dashboard/?domain=' + gisportal.niceDomainName,
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
@@ -47,7 +47,7 @@ gisportal.user.updateProfile = function(){
       gisportal.loadLayers();
    }
    $.ajax({
-      url: gisportal.middlewarePath + '/user/get',
+      url: gisportal.middlewarePath + '/user/get/?domain=' + gisportal.niceDomainName,
       success: function(user_info){
          gisportal.user.info = user_info;
          refreshUserPortal();

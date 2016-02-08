@@ -58,10 +58,11 @@ router.get('/app/collaboration/dashboard', user.requiresValidUser, function(req,
 });
 router.get('/app/user/get', function(req, res) {
    var email = user.getUsername(req);
-   var permission = user.getAccessLevel(req);
+   var permission = user.getAccessLevel(req, req.query.domain);
    var info ={
       "email":email,
-      "permission": permission
+      "permission": permission,
+      "domain":GLOBAL.config[req.query.domain]
    }
    res.send(info);
 })

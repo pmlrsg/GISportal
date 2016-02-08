@@ -44,6 +44,18 @@ function fileExists(filePath)
    }
 }
 
+function directoryExists(filePath)
+{
+   try
+   {
+      return fs.statSync(filePath).isDirectory();
+   }
+   catch (err)
+   {
+      return false;
+   }
+}
+
 function sortLayersList(data, param){
    var byParam = data.slice(0);
    for(layer in byParam){
@@ -57,18 +69,6 @@ function sortLayersList(data, param){
        return x < y ? -1 : x > y ? 1 : 0;
    });
    return byParam;
-}
-
-function directoryExists(filePath)
-{
-   try
-   {
-      return fs.statSync(filePath).isDirectory();
-   }
-   catch (err)
-   {
-      return false;
-   }
 }
 
 function handleError(err, res){
@@ -476,7 +476,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    if(refresh == "true" || !fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
          if(error){
-            handleError(err, res);
+            handleError(error, res);
          }else{
             xml2js.parseString(body, function (err, result) {
                if(err){

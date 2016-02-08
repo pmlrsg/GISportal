@@ -37,7 +37,7 @@ $.extend(gisportal.config, {
    cacheTimeout: 60,                               // Used to specify what time must elapse before the cache can be refreshed by the user
    
    collaborationFeatures : {
-      enabled : true,                               // (true|false) > If false the collaboration tab will be hidden
+      enabled : false,                               // (true|false) > If false the collaboration tab will be hidden
       protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
       host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
       port : '',                                    // must match the port specified in collaboration/config/config.js

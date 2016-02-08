@@ -254,11 +254,14 @@
    padding-top: 10px;
 }
 
-.category-select-list {
+.category-select-list,
+.category-tabs {
   background: #efedf1;
 }
 
-.category-select-list .selectlist, .category-select-list .selectoptions {
+.category-select-list .selectlist,
+.category-select-list .selectoptions,
+.category-tabs .selectoptions {
   padding: 10px;
 }
 

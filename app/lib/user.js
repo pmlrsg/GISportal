@@ -16,7 +16,7 @@ module.exports = user;
  * @return {Function}      `next()` or a 401 Not authorised response  
  */
 user.requiresValidUser = function(req, res, next) {
-   var level = user.getAccessLevel(req);
+   var level = user.getAccessLevel(req, req.query.domain);
 
    if (level != "guest") {
       return next();
@@ -52,15 +52,16 @@ user.requiresAdminUser = function(req, res, next) {
  * @param  {Object} req    Express router request object
  * @return {String}        [guest|user|admin]
  */
-user.getAccessLevel = function(req) {
+user.getAccessLevel = function(req, domain) {
    var level = "guest";
 
    if(typeof(req.session.passport.user) != 'undefined') {
       // there is a valid session so they are a logged in user
       level = "user";
-
+      domain = domain || req.query.domain
+      var config = GLOBAL.config[domain] || GLOBAL.config
       // check to see if they are an admin
-      var admins = GLOBAL.config.admins;
+      var admins = config.admins;
       for (var i = 0; i < admins.length; i++) {
          if (admins[i] == req.session.passport.user.emails[0].value) {
             level = "admin";
