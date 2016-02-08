@@ -65,5 +65,5 @@ $.extend(gisportal.config, {
    // none=Allow, advisory=Tell them only, strict=Stop them
    browserRestristion: "strict" //(none|advisory|strict)
 
-};
+});
 
