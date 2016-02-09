@@ -74,6 +74,7 @@ app.use(session({
 
 // template engine
 app.set('view engine', 'jade');
+app.use(express.static(path.join(__dirname, 'html')));
 
 // Passport settings
 var passportConfig = require('./app/lib/passport.js');

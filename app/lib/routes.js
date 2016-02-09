@@ -7,6 +7,11 @@ var utils = require('./utils.js');
 
 module.exports = router;
 
+
+router.get('/', function(req, res){
+   res.sendFile(html_dir + '/index.html');
+})
+
 // default path; check for cookie and if it's not there send them to the login page
 router.get('/app/user', function(req, res) {
    res.render('index', {});

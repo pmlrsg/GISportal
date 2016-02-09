@@ -17,14 +17,6 @@ collaboration.initDOM = function() {
       
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
 
-   // socket.io location settings
-   collaboration.protocol = gisportal.config.collaborationFeatures.protocol || 'http';    // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
-   collaboration.host = gisportal.config.collaborationFeatures.host || 'localhost';
-   collaboration.port = gisportal.config.collaborationFeatures.port || '';
-   collaboration.path = gisportal.config.collaborationFeatures.path || '';          // optional path; must start with a /
-	// line up the URL 
-	collaboration.socket_url = collaboration.protocol+'://'+collaboration.host+':'+collaboration.port + collaboration.path;
-
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
    var rendered = gisportal.templates.collaboration();
@@ -65,9 +57,9 @@ collaboration.initDOM = function() {
 collaboration.initSession = function() {
 
 	// get the socket.io script and open a connection
-	$.getScript(collaboration.socket_url+"/node/socket.io/socket.io.js")
+	$.getScript("/socket.io/socket.io.js")
 		.done(function( script, textStatus ) {
-         socket = io.connect(collaboration.socket_url+'/', {
+         socket = io.connect('/', {
 		   	"connect timeout": 1000
 		  	});
 
@@ -108,7 +100,7 @@ collaboration.initSession = function() {
 		   	if (reason == 'handshake error') { // user not logged into Google
 		   		$(collaboration.consoleWrapper).toggleClass('hidden', true);
 		   		$(collaboration.authenticationWrapper).toggleClass('hidden', false);
-					window.open(collaboration.socket_url +'/auth/google');
+					window.open('/auth/google');
 		   	} else {
 		   		collaboration.setStatus('error', 'The connection failed; '+reason);	
                // reset the iframe
