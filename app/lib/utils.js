@@ -1,5 +1,9 @@
 var utils = {}
 var fs = require("fs");
+var path = require("path");
+
+module.exports = utils;
+
 utils.fileExists = function(filePath)
 {
    try
@@ -28,4 +32,14 @@ utils.getDomainName = function(req){
    return req.headers.host;
 }
 
-module.exports = utils
+utils.mkdirpSync = function (dirpath) {
+   var parts = dirpath.split(path.sep);
+   for( var i = 1; i <= parts.length; i++ ) {
+      var part_path = path.join.apply(null, parts.slice(0, i))
+      part_path = "/" + part_path;
+      if(!utils.directoryExists(part_path)){
+         console.log(part_path);
+         fs.mkdirSync( part_path );
+      }
+   }
+}

@@ -24,6 +24,10 @@ try{
    found = true;
 }catch(e){};
 var site_setings_path = path.join(__dirname, "config/site_settings");
+if(!utils.directoryExists(site_setings_path)){
+   utils.mkdirpSync(site_setings_path);
+   fs.writeFileSync('./config/base_config.js', fs.readFileSync('./config_examples/base_config.js'));
+}
 var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
 site_setings_list.forEach(function(foldername){
    var folder_path = path.join(site_setings_path, foldername);
@@ -38,17 +42,21 @@ site_setings_list.forEach(function(foldername){
    }
 });
 if(!found) {
-   console.log('There doesn\'t appear to be a server config settings file in place');
-   console.log('');
-   console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
-   console.log('');
-   console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/config-server.js '+ __dirname +'/config/config-server.js');
-   console.log('');
-   console.log('Exiting application, bye   o/');
-   console.log('');
-   process.exit();
+   try{
+      fs.writeFileSync('./config/config-server.js', fs.readFileSync('./config_examples/config-server.js'));
+      require('./config/config-server.js');
+   }catch(e){
+      console.log('There doesn\'t appear to be a server config settings file in place');
+      console.log('');
+      console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
+      console.log('');
+      console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/config-server.js '+ __dirname +'/config/config-server.js');
+      console.log('');
+      console.log('Exiting application, bye   o/');
+      console.log('');
+      process.exit();
+   }
 }
-
 
 // set up Redis as the session store
 var redisSetup = require('./app/lib/redissetup.js');

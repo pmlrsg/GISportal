@@ -138,7 +138,7 @@ router.get('/app/settings/get_cache', function(req, res) {
    var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
    if(!utils.directoryExists(master_path)){
-      fs.mkdirSync(master_path); // Creates the directory if it doesn't exist
+      utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
    }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
@@ -170,7 +170,7 @@ router.get('/app/settings/get_cache', function(req, res) {
       for(username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
          var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
          if(!utils.directoryExists(user_cache_path)){
-            fs.mkdirSync(user_cache_path); // Creates the directory if it doesn't already exist
+            utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
          }
          var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
          user_list.forEach(function(filename){
@@ -238,7 +238,7 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var delete_file_path = path.join(delete_path, filename); // The full path to be moved to
    if(owner == username || permission == "admin"){
       if(!utils.directoryExists(delete_path)){
-         fs.mkdirSync(delete_path); // Creates the directory if it doesn't already exist
+         utils.mkdirpSync(delete_path); // Creates the directory if it doesn't already exist
       }
       fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
          if(err){
@@ -325,7 +325,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
          var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
       }
       if(!utils.directoryExists(cache_path)){
-         fs.mkdirSync(cache_path); // Creates the directory if it doesn't already exist
+         utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
       var data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
@@ -458,7 +458,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    var filename = clean_url + ".json";
    var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
    if(!utils.directoryExists(directory)){
-      fs.mkdirSync(directory); // Creates the directory if it doesn't already exist
+      utils.mkdirpSync(directory); // Creates the directory if it doesn't already exist
    }
    var file_path = path.join(directory, filename);
 
