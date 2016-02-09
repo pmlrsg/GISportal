@@ -129,7 +129,8 @@ router.get('/app/cache/*?', function(req, res) {
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
-   var usernames = [user.getUsername(req)];
+   var this_username = user.getUsername(req)
+   var usernames = [this_username];
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
 
@@ -145,6 +146,11 @@ router.get('/app/settings/get_cache', function(req, res) {
       var file_path = path.join(master_path, filename);
       if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+         if(permission != "admin"){ // The Layers list is filtered .
+            json_data.server.Layers = json_data.server.Layers.filter(function(val){
+               return val.include === true || typeof(val.include) === "undefined";
+            });
+         }
          json_data.owner = domain; // Adds the owner to the file (for the server list)
          cache.push(json_data); // Adds each file to the cache to be returned
       }
@@ -171,6 +177,11 @@ router.get('/app/settings/get_cache', function(req, res) {
             var file_path = path.join(user_cache_path, filename);
             if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+               if(permission != "admin" && this_username != owner){ // The Layers list is filtered.
+                  json_data.server.Layers = json_data.server.Layers.filter(function(val){
+                     return val.include === true || typeof(val.include) === "undefined";
+                  });
+               }
                json_data.owner = usernames[username]; // Adds the owner to the file (for the server list)
                cache.push(json_data); // Adds each file to the cache to be returned
             }

@@ -27,14 +27,43 @@ router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
    })
 });
 
-router.get('/app/user/auth/google', passport.authenticate('google'));
+router.get('/app/user/auth/google', function(req, res, next) {
 
-router.get('/app/user/auth/google/callback', 
-   passport.authenticate('google', {
-     successRedirect: '/app/user/authorised',
-     failureRedirect: '/app/user/auth-failed'
-   })
- );
+   var domain = utils.getDomainName(req);
+
+   // generate the authenticate method and pass the req/res
+   passport.authenticate(domain, function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('/'); }
+
+      // req / res held in closure
+      req.logIn(user, function(err) {
+         if (err) { return next(err); }
+         return res.send(user);
+      });
+
+   })(req, res, next);
+
+});
+
+router.get('/app/user/auth/google/callback', function(req, res, next){
+   //passport.authenticate('pmpc1310.npm.ac.uk', {successRedirect: '/app/user/authorised', failureRedirect: '/app/user/auth-failed'});
+
+   var domain = utils.getDomainName(req);
+
+   // generate the authenticate method and pass the req/res
+   passport.authenticate(domain, function(err, user, info) {
+      if (err) { return next(err); }
+      if (!user) { return res.redirect('/app/user/auth-failed'); }
+
+      // req / res held in closure
+      req.logIn(user, function(err) {
+         if (err) { return next(err); }
+         return res.redirect('/app/user/authorised');
+      });
+
+   })(req, res, next);
+});
 
 router.get('/app/user/authorised', function(req, res) {
    res.setHeader("Access-Control-Allow-Origin", "*");
