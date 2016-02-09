@@ -250,7 +250,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename + '&domain=' + gisportal.niceDomainName,
+         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
          success: function(data){
             layer.wcsURL = data;
             gisportal.indicatorsPanel.analysisTab(layer.id);

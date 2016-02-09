@@ -1,6 +1,7 @@
 
 
 // Imports
+var utils = require('./app/lib/utils.js');
 var express = require('express');
 var http = require('http');
 var io = require('socket.io')(http);
@@ -11,31 +12,6 @@ var session = require('express-session');
 var jade = require("jade");
 var path = require('path');
 var fs = require("fs");
-
-
-function fileExists(filePath)
-{
-   try
-   {
-      return fs.statSync(filePath).isFile();
-   }
-   catch (err)
-   {
-      return false;
-   }
-}
-
-function directoryExists(filePath)
-{
-   try
-   {
-      return fs.statSync(filePath).isDirectory();
-   }
-   catch (err)
-   {
-      return false;
-   }
-}
 
 
 // Express setup
@@ -51,9 +27,9 @@ var site_setings_path = path.join(__dirname, "config/site_settings");
 var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
 site_setings_list.forEach(function(foldername){
    var folder_path = path.join(site_setings_path, foldername);
-   if(directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak"){
+   if(utils.directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak"){
       var config_path = path.join(folder_path, "config-server.js")
-      if(fileExists(config_path)){
+      if(utils.fileExists(config_path)){
          try{
             require(config_path);
             found = true;

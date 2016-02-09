@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var user = require('./user.js');
+var utils = require('./utils.js');
 
 module.exports = router;
 
@@ -58,11 +59,11 @@ router.get('/app/collaboration/dashboard', user.requiresValidUser, function(req,
 });
 router.get('/app/user/get', function(req, res) {
    var email = user.getUsername(req);
-   var permission = user.getAccessLevel(req, req.query.domain);
+   var domain = utils.getDomainName(req);
+   var permission = user.getAccessLevel(req, domain);
    var info ={
       "email":email,
-      "permission": permission,
-      "domain":GLOBAL.config[req.query.domain]
+      "permission": permission   
    }
    res.send(info);
 })

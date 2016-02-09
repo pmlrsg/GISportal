@@ -320,6 +320,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       gisportal.configurePanel.renderIndicatorsByTag(cat, targetDiv, tabNumber);
 
    }
+   // This block makes sure that the correct number of tabs is shown. If there are only 2 available then the '3' tab will be hidden
    for(var x=1; x<=3; x++){
       var label = $('label[for="tab-browse-' + x +'"]');
       if(label.html() == String(x)){

@@ -343,7 +343,7 @@ gisportal.addLayersForm.sendLayers = function(layer){
    $.ajax({
       url: gisportal.middlewarePath + '/settings/add_user_layer',
       method:'POST',
-      data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"), 'domain':gisportal.niceDomainName},
+      data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"),},
       // If there is success
       success: function(layer){
          gisportal.form_working = false; // Will allow the submit button to be clicked again

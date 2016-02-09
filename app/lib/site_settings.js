@@ -10,6 +10,8 @@ var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
 var bunyan = require('bunyan'); // Added
+var utils = require('./utils.js');
+
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
@@ -30,30 +32,6 @@ var log = bunyan.createLogger({name: "Portal Middleware"});
  */
 function stringStartsWith(string, prefix) {
     return string.slice(0, prefix.length) == prefix;
-}
-
-function fileExists(filePath)
-{
-   try
-   {
-      return fs.statSync(filePath).isFile();
-   }
-   catch (err)
-   {
-      return false;
-   }
-}
-
-function directoryExists(filePath)
-{
-   try
-   {
-      return fs.statSync(filePath).isDirectory();
-   }
-   catch (err)
-   {
-      return false;
-   }
 }
 
 function sortLayersList(data, param){
@@ -129,7 +107,7 @@ router.get('/app/settings/proxy', function(req, res) {
 });
 
 router.get('/app/settings/config', function(req, res) {
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
    var config_path = path.join(MASTER_CONFIG_PATH, domain, "config.js");
    var js_file;
    try{
@@ -152,20 +130,20 @@ router.get('/app/cache/*?', function(req, res) {
 
 router.get('/app/settings/get_cache', function(req, res) {
    var usernames = [user.getUsername(req)];
-   var permission = user.getAccessLevel(req);
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
 
    var cache = []; // The list of cache deatils to be returned to the browser
    var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
-   if(!directoryExists(master_path)){
+   if(!utils.directoryExists(master_path)){
       fs.mkdirSync(master_path); // Creates the directory if it doesn't exist
    }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
    master_list.forEach(function(filename){
       var file_path = path.join(master_path, filename);
-      if(fileExists(file_path) && path.extname(filename) == ".json"){
+      if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
          json_data.owner = domain; // Adds the owner to the file (for the server list)
          cache.push(json_data); // Adds each file to the cache to be returned
@@ -174,7 +152,7 @@ router.get('/app/settings/get_cache', function(req, res) {
    if(permission != "guest"){
       if(permission == "admin"){
          master_list.forEach(function(filename){
-            if(directoryExists(path.join(master_path, filename))){
+            if(utils.directoryExists(path.join(master_path, filename))){
                if(stringStartsWith(filename, USER_CACHE_PREFIX)){
                   usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
                }
@@ -185,13 +163,13 @@ router.get('/app/settings/get_cache', function(req, res) {
       // Eventually should just remove all admins here!
       for(username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
          var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
-         if(!directoryExists(user_cache_path)){
+         if(!utils.directoryExists(user_cache_path)){
             fs.mkdirSync(user_cache_path); // Creates the directory if it doesn't already exist
          }
          var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
          user_list.forEach(function(filename){
             var file_path = path.join(user_cache_path, filename);
-            if(fileExists(file_path) && path.extname(filename) == ".json"){
+            if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
                json_data.owner = usernames[username]; // Adds the owner to the file (for the server list)
                cache.push(json_data); // Adds each file to the cache to be returned
@@ -231,8 +209,8 @@ router.all('/app/settings/rotate', function(req, res){
 
 router.get('/app/settings/remove_server_cache', function(req, res){
    var username = user.getUsername(req); // Gets the given username
-   var permission = user.getAccessLevel(req); // Gets the user permission
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
    var filename = req.query.filename; // Gets the given filename
    var owner = req.query.owner; // Gets the given owner
    filename += ".json"; // Adds the file extension to the filename
@@ -248,7 +226,7 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    var delete_path = path.join(base_path, "deleted_cache"); // The directory to be moved to (so it can be created if needs be)
    var delete_file_path = path.join(delete_path, filename); // The full path to be moved to
    if(owner == username || permission == "admin"){
-      if(!directoryExists(delete_path)){
+      if(!utils.directoryExists(delete_path)){
          fs.mkdirSync(delete_path); // Creates the directory if it doesn't already exist
       }
       fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
@@ -263,8 +241,8 @@ router.get('/app/settings/remove_server_cache', function(req, res){
 
 router.all('/app/settings/restore_server_cache', function(req, res){
    var username = user.getUsername(req); // Gets the given username
-   var permission = user.getAccessLevel(req); // Gets the user permission
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
    var data = req.body; // Gets the data back to restore previously deleted file
    var owner = data.owner;
    var deleted_path = data.path;
@@ -282,8 +260,8 @@ router.all('/app/settings/restore_server_cache', function(req, res){
 
 router.all('/app/settings/update_layer', function(req, res){
    var username = req.query.username; // Gets the given username
-   var permission = user.getAccessLevel(req); // Gets the user permission
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json"; // Gets the given filename
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
@@ -303,8 +281,8 @@ router.all('/app/settings/update_layer', function(req, res){
 router.get('/app/settings/add_wcs_url', function(req, res){
    var url = req.query.url.split('?')[0] + "?"; // Gets the given url
    var username = user.getUsername(req); // Gets the given username
-   var permission = user.getAccessLevel(req); // Gets the user permission
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
    var filename = req.query.filename + ".json"; // Gets the given filename
 
    var base_path = path.join(MASTER_CONFIG_PATH, domain);
@@ -321,7 +299,7 @@ router.get('/app/settings/add_wcs_url', function(req, res){
 router.all('/app/settings/add_user_layer', function(req, res){
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
-   var domain = req.body.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
    var username = server_info.owner; // Gets the given username
 
    if('provider' in server_info && 'server_name' in server_info){ // Checks that all the required fields are in the object
@@ -335,7 +313,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
          var cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
       }
-      if(!directoryExists(cache_path)){
+      if(!utils.directoryExists(cache_path)){
          fs.mkdirSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
@@ -458,7 +436,7 @@ router.get('/app/settings/load_data_values', function(req, res){
 router.get('/app/settings/load_new_wms_layer', function(req, res){
    var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
    var refresh = req.query.refresh; // Gets the given refresh
-   var domain = req.query.domain; // Gets the given domain
+   var domain = utils.getDomainName(req); // Gets the given domain
 
    var sub_master_cache = {};
    sub_master_cache.server = {};
@@ -468,12 +446,12 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
 
    var filename = clean_url + ".json";
    var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
-   if(!directoryExists(directory)){
+   if(!utils.directoryExists(directory)){
       fs.mkdirSync(directory); // Creates the directory if it doesn't already exist
    }
    var file_path = path.join(directory, filename);
 
-   if(refresh == "true" || !fileExists(file_path)){
+   if(refresh == "true" || !utils.fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
          if(error){
             handleError(error, res);

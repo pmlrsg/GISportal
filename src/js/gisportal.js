@@ -1023,7 +1023,7 @@ gisportal.main = function() {
       }
 
       // if collaboration features are enabled, switch 'em on...
-      if (collaboration.enabled) {
+      if (gisportal.config.collaborationFeatures.enabled) {
          collaboration.initDOM();
       }
       // Replaces all .icon-svg with actual SVG elements,

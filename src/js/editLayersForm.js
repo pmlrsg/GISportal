@@ -175,7 +175,7 @@ gisportal.editLayersForm.addListeners = function(){
             var server = this_span.data("server");
             var user = this_span.data("user");
             $.ajax({
-               url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user + '&domain=' + gisportal.niceDomainName,
+               url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user,
                success: function(removed_data){
                   this_span.toggleClass("working", false);
                   var to_be_deleted = [];
@@ -242,7 +242,7 @@ gisportal.editLayersForm.addListeners = function(){
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
+         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -276,7 +276,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-gisportal-refresh-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true&domain=' + domain;
+                  refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
@@ -380,7 +380,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user + '&domain=' + gisportal.niceDomainName,
+            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('warn-spin', false);

@@ -47,7 +47,7 @@ gisportal.user.updateProfile = function(){
       gisportal.loadLayers();
    }
    $.ajax({
-      url: gisportal.middlewarePath + '/user/get/?domain=' + gisportal.niceDomainName,
+      url: gisportal.middlewarePath + '/user/get/',
       success: function(user_info){
          gisportal.user.info = user_info;
          refreshUserPortal();
