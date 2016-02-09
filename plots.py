@@ -32,6 +32,11 @@ def get_palette(palette="rsg_colour"):
 
 #END get_palette
 
+def datetime(x):
+    return np.array(x, dtype=np.datetime64)
+
+#END datetime
+
 def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
    '''
    Returns a bokeh plot with a kegend based on the colurs provided.
@@ -215,7 +220,8 @@ def timeseries(infile, outfile="time.html"):
    plot_units = df['units']
    plot_scale = df['scale']
    
-   date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
+   #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
+   date = datetime(df['Date'])
    
    datasource = dict(date=date,
                      sdate=df['Date'],
