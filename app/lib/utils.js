@@ -38,7 +38,6 @@ utils.mkdirpSync = function (dirpath) {
       var part_path = path.join.apply(null, parts.slice(0, i))
       part_path = "/" + part_path;
       if(!utils.directoryExists(part_path)){
-         console.log(part_path);
          fs.mkdirSync( part_path );
       }
    }

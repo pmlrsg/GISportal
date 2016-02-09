@@ -119,7 +119,6 @@ gisportal.loadLayers = function() {
    
    function loadWmsLayers(){
       // Get WMS cache
-      var user_info = gisportal.user.info;
       $.ajax({
          url:  gisportal.middlewarePath + '/settings/get_cache?domain=' + gisportal.niceDomainName,
          dataType: 'json',
