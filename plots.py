@@ -100,18 +100,19 @@ def hovmoller(df, outfile="image.html"):
    plot_units = df['units']
    plot_scale = df['scale']
 
+   varindex = {j: i for i, j in enumerate(df['vars'])}
+
    assert plot_type in ("hovmollerLat", "hovmollerLon")
-   print plot_type
    
    data = np.transpose(df['data'])
 
    # Format date to integer values
    #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
-   date = datetime(data[0])
+   date = datetime(data[varindex['date']])
    
    # Format latlon to float. Otherwise we can not do the mins etc.
    #latlon = np.array(df["LatLon"]).astype(np.float)
-   latlon = np.array(data[1]).astype(np.float)
+   latlon = np.array(data[varindex['latlon']]).astype(np.float)
    
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
@@ -119,10 +120,10 @@ def hovmoller(df, outfile="image.html"):
 
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
-   assert x_size * y_size == len(data[2])
+   assert x_size * y_size == len(data[varindex['value']])
    
    # We want a 2d array with latlon as x axis and date as y.
-   values = np.reshape(np.array(data[2]),(-1,y_size))
+   values = np.reshape(np.array(data[varindex['value']]),(-1,y_size))
 
    # Easiest if we force float here but is that always true?
    # We also have problems with how the data gets stored as JSON (very big!).
@@ -204,6 +205,8 @@ def hovmoller(df, outfile="image.html"):
    # Create an RGBA image anchored at (min_x, min_y).
    p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
    
+   p.add_tools(CrosshairTool())
+
    #TODO This should be in the wrapper
    output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
@@ -211,53 +214,58 @@ def hovmoller(df, outfile="image.html"):
    
 #END hovmoller
 
-def timeseries(infile, outfile="time.html"):
-   with open(infile) as json_file:
-       df = json.load(json_file)
-   json_file.close()
-       
-   plot_type = df['type']
-   var_name = df['coverage']
-   plot_units = df['units']
-   plot_scale = df['scale']
-   
-   #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
-   date = datetime(df['Date'])
-   
-   datasource = dict(date=date,
-                     sdate=df['Date'],
-                     mean=df['Mean'])
+def timeseries(plot_data, outfile="time.html"):
 
-   if 'Standard Deviation' in df:
-      # Set the errorbars
-      err_xs = []
-      err_ys = []
-      for x, y, std in zip(date, df['Mean'], df['Standard Deviation']):
-         err_xs.append((x, x))
-         err_ys.append((y - std, y + std))
+   sources = []
 
-      datasource['err_xs'] = err_xs
-      datasource['err_ys'] = err_ys
-      datasource['stderr'] = df['Standard Deviation']
-   
-   if 'Max' in df and 'Min' in df:
-      # Set the min/max envelope. 
-      # We create a list of coords starting with the max for the first date then join up all
-      # the maxes in date order before moving down to the min for the last date and coming
-      # back to the first date.
-      band_y = np.append(df['Max'],df['Min'][::-1])
-      band_x = np.append(date,date[::-1])
-      datasource['min'] = df['Min']
-      datasource['max'] = df['Max']
+   for df in plot_data:
+          
+      plot_type = df['type']
+      var_name = df['coverage']
+      plot_units = df['units']
+      plot_scale = df['scale']
+      plot_title = df['title']
 
-   source = ColumnDataSource(data=datasource)
-   
-   p = figure(title="Time Series - %s" % (var_name), x_axis_type="datetime", width=1200, 
+      varindex = {j: i for i, j in enumerate(df['vars'])}
+      dfarray = np.array(df['data'])
+      data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
+      
+      date = datetime(data[varindex['date']])
+      
+      datasource = dict(date=date,
+                        sdate=data[varindex['date']],
+                        mean=data[varindex['mean']])
+
+      if 'std' in df['vars']:
+         # Set the errorbars
+         err_xs = []
+         err_ys = []
+         for x, y, std in zip(date, data[varindex['mean']].astype(np.float), data[varindex['std']].astype(np.float)):
+            err_xs.append((x, x))
+            err_ys.append((y - std, y + std))
+
+         datasource['err_xs'] = err_xs
+         datasource['err_ys'] = err_ys
+         datasource['stderr'] = data[varindex['std']]
+      
+      if 'max' in df['vars'] and 'min' in df['vars']:
+         # Set the min/max envelope. 
+         # We create a list of coords starting with the max for the first date then join up all
+         # the maxes in date order before moving down to the min for the last date and coming
+         # back to the first date.
+         band_y = np.append(data[varindex['max']],data[varindex['min']][::-1])
+         band_x = np.append(date,date[::-1])
+         datasource['min'] = data[varindex['min']]
+         datasource['max'] = data[varindex['max']]
+
+      sources.append(ColumnDataSource(data=datasource))
+      
+   plot = figure(title="%s" % (plot_title), x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
               height=400
    )
    
    # Use some custom HTML to draw our tooltip. Just put the @var placeholders where you want them.
-   p.add_tools(HoverTool(tooltips="""
+   plot.add_tools(HoverTool(tooltips="""
            <div>
                <div>
                    <span style="font-size: 12px; font-weight: bold;">Date:</span>
@@ -283,44 +291,46 @@ def timeseries(infile, outfile="time.html"):
            """
            ))
 
-   p.add_tools(CrosshairTool())
+   plot.add_tools(CrosshairTool())
 
-   p.xaxis.axis_label = 'Date'
+   plot.xaxis.axis_label = 'Date'
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   p.yaxis.axis_label = "%s %s" % (var_name, plot_units)
+   plot.yaxis.axis_label = "%s %s" % (var_name, plot_units)
    
    # If we want 2 Y axes then the lines below do this
    
    # Setting the second y axis range name and range
-   #p.extra_y_ranges = {"foo": Range1d(start=-100, end=200)}
+   #plot.extra_y_ranges = {"foo": Range1d(start=-100, end=200)}
    # Adding the second axis to the plot.  
-   #p.add_layout(LinearAxis(y_range_name="foo", axis_label='Temp.'), 'right')
+   #plot.add_layout(LinearAxis(y_range_name="foo", axis_label='Temp.'), 'right')
    
-   if 'min' in datasource:
-      # Plot the max and min as a shaded band.
-      # Cannot use this dataframe because we have twice as many band variables as the rest of the 
-      # dataframe.
-      #p.patch('band_x', 'band_y', color='#7570B3', fill_alpha=0.05, line_alpha=0, source=source)
-      # So use this.
-      p.patch(band_x, band_y, color='#7570B3', fill_alpha=0.05, line_alpha=0)
-   
-   
-   # Plot the mean as line
-   p.line('date', 'mean', color='blue', legend='Mean %s' % (var_name), source=source)
+   plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
+   for i, source in enumerate(sources):
+      if 'min' in datasource:
+         # Plot the max and min as a shaded band.
+         # Cannot use this dataframe because we have twice as many band variables as the rest of the 
+         # dataframe.
+         #plot.patch('band_x', 'band_y', color='#7570B3', fill_alpha=0.05, line_alpha=0, source=source)
+         # So use this.
+         plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
+      
+      
+      # Plot the mean as line
+      plot.line('date', 'mean', color=plot_palette[i][1], legend='Mean %s' % (var_name), source=source)
 
-   # as a point
-   p.circle('date', 'mean', color='red', size=3, line_alpha=0, source=source)
-   
-   if 'err_xs' in datasource:
-      # Plot error bars
-      p.multi_line('err_xs', 'err_ys', color='red', line_alpha=0.5, source=source)
-   
+      # as a point
+      plot.circle('date', 'mean', color=plot_palette[i][2], size=3, line_alpha=0, source=source)
+      
+      if 'err_xs' in datasource:
+         # Plot error bars
+         plot.multi_line('err_xs', 'err_ys', color=plot_palette[i][3], line_alpha=0.5, source=source)
+      
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
-   p.legend.location = "top_left"
-   layout = vplot(p)
+   plot.legend.location = "top_left"
+   layout = vplot(plot)
    
    # Example code to display the data in a table
    #columns = [
@@ -340,20 +350,25 @@ def timeseries(infile, outfile="time.html"):
 def legacy_reformat(data):
    return(data)
 
+def scatter(plot_data, outfile='/tmp/scatter.html'):
+   return True
 
-def plot(json_data):
+
+def get_plot_data(json_data):
    series = json_data['plot']['data']['series']
-   plot_type = json_data['plot']['type'] 
+   plot_type = json_data['plot']['type']
+   plot_title = json_data['plot']['title']
+   scale = json_data['plot']['y1Axis']['scale']
+   units = json_data['plot']['y1Axis']['label']
+
+   plot_data = []
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
-      series = json_data['plot']['data']['series']
+      # Extract the description of the data required from the request.
       ds = series[0]['data_source']
-
-      plot_type = json_data['plot']['type']
-      scale = json_data['plot']['y1Axis']['scale']
       coverage = ds['coverage']
-      units = json_data['plot']['y1Axis']['label']
 
+      # Build the request - based on the old style calls so shoud be compatible.
       request = "%s?baseurl=%s&coverage=%s&type=%s&graphXAxis=%s&graphYAxis=%s&graphZAxis=%s&time=%s%s%s&bbox=%s&depth=%s" % \
                   (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
                    urllib.quote_plus(ds['coverage']), 
@@ -364,44 +379,52 @@ def plot(json_data):
                    urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
                    urllib.quote_plus(ds['bbox']),
                    urllib.quote_plus(ds['depth']))
+
       response = json.load(urllib.urlopen(request))
 
+      # TODO - Old style extractor response. So pull the data out.
       data = response['output']['data']
 
-      plot_request = dict(scale=scale, coverage=coverage, type=plot_type, units=units,
-                      vars=['date', 'min', 'max', 'mean', 'std'], data=data)
+      # And convert it to a nice simple dict the plotter understands.
+      plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
+                      vars=['date', 'latlon', 'value'], data=data))
 
-      hovmoller(plot_request)
-
-   elif plot_type == "timeseries":
+   elif plot_type in ("timeseries", "scatter"):
       #TODO Can have more than 1 series so need a loop.
-      ds = series[0]['data_source']
-      baseurl = "%s&coverage=%s&type=%s&time=%s,%s&bbox=%s" % \
-                (ds['threddsUrl'], ds['coverage'], "timeseries", ds['t_bounds'][0], ds['t_bounds'][1], ds['bbox'])
-      request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s&depth=%s" % \
-                (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
-                urllib.quote_plus(ds['coverage']), 
-                "timeseries", 
-                urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
-                urllib.quote_plus(ds['bbox']),
-                urllib.quote_plus(ds['depth']))
-      response = json.load(urllib.urlopen(request))
-      # LEGACY - this reformats the response to the new format.
-      df = []
-      for date, details in data.items():
-          line = [date]
-          [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
-          df.append(line)
+      for s in series:
+         ds = s['data_source']
+         coverage = ds['coverage']
+         request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s&depth=%s" % \
+                   (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
+                   urllib.quote_plus(ds['coverage']), 
+                   "timeseries", 
+                   urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
+                   urllib.quote_plus(ds['bbox']),
+                   urllib.quote_plus(ds['depth']))
+         response = json.load(urllib.urlopen(request))
+
+         # LEGACY - this reformats the response to the new format.
+         data = response['output']['data']
+         df = []
+         for date, details in data.items():
+             line = [date]
+             [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
+             df.append(line)
     
-         
-   return True
+         plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
+                                 vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+
+
+   return plot_data
 
 
 if __name__ == "__main__":
-   with open("testing/data/hovmoller_request1.json") as json_file:
-       request = json.load(json_file)
-   json_file.close()
-
-   plot(request)
-   #timeseries("testing/data/temperature.json")
+   request = json.load(sys.stdin)
+   plot_data = get_plot_data(request)
+   if plot_data[0]['type'] == 'timeseries':
+      timeseries(plot_data)
+   elif plot_data[0]['type'] == 'scatter':
+      scatter(plot_data)
+   else:
+      hovmoller(plot_data[0])
 
