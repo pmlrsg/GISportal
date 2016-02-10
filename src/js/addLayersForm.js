@@ -7,8 +7,8 @@ gisportal.addLayersForm.validation_errors = {};
 
 // This is a variable that takes the names of fields and has validation functions to be applied to them. the return is the error message that shoudl be applied, if any.
 gisportal.addLayersForm.validation_functions = {
-   'all_tags':function(value){if(!/^[a-zA-Z0-9:\-\& \:\;\_\,\/\\]+$|^$/.test(value)){
-                                 var invalid_chars = _.uniq(value.match(/[^a-zA-Z0-9:\-\& \:\;\_\,\/\\]+|^$/g));
+   'all_tags':function(value){if(!/^[a-zA-Z0-9:\-\& \.\:\;\_\,\/\\]+$|^$/.test(value)){
+                                 var invalid_chars = _.uniq(value.match(/[^a-zA-Z0-9:\-\& \.\:\;\_\,\/\\]+|^$/g));
                                  return "The following characters are invalid: '" + invalid_chars.join("") + "' . Please try agian.";
                               }
    },

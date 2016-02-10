@@ -177,7 +177,7 @@ router.get('/app/settings/get_cache', function(req, res) {
             var file_path = path.join(user_cache_path, filename);
             if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-               if(permission != "admin" && this_username != owner){ // The Layers list is filtered.
+               if(permission != "admin" && this_username != filename.replace(USER_CACHE_PREFIX, "")){ // The Layers list is filtered.
                   json_data.server.Layers = json_data.server.Layers.filter(function(val){
                      return val.include === true || typeof(val.include) === "undefined";
                   });
