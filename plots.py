@@ -15,6 +15,7 @@ import sys
 import numpy as np
 import pandas as pd
 import json
+import urllib
 
 from bokeh.plotting import figure, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
@@ -33,13 +34,14 @@ def get_palette(palette="rsg_colour"):
 #END get_palette
 
 def datetime(x):
-    return np.array(x, dtype=np.datetime64)
+   return np.array(pd.to_datetime(x).astype(np.int64) // 10**6)
+   #return np.array(x, dtype=np.datetime64)
 
 #END datetime
 
 def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
    '''
-   Returns a bokeh plot with a kegend based on the colurs provided.
+   Returns a bokeh plot with a legend based on the colours provided.
 
    Here we calculate the slope and intercept from the min and max
    and use that to build an array of colours for the legend.
@@ -48,9 +50,9 @@ def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    NOTE - We work in the display scale (log or otherwise) but the values for the axis 
    are calculated in real space regardless.
    '''
-   slope = (max_val - min_val) / len(colours)
-   intercept = max_val - (slope * 255)
+   slope = (max_val - min_val) / (len(colours) - 1)
    intercept = min_val 
+
    legend_values = []
    legend_heights = []
    if log_plot:
@@ -91,29 +93,7 @@ def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    return(legend)
 #END hovmoller_legend   
    
-def hovmoller_plot(values, colours, plot_width, min_x, max_x, min_y, max_y, x_axis_type, y_axis_type, var_name):
-   # Create a figure with the dates on the x axis and latitudes on the y.
-   plot_width = 1200
-   p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
-              x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
-              title="Hovmoller - %s" % (var_name))
-
-   p.xaxis.axis_label = x_axis_label
-   p.yaxis.axis_label = y_axis_label
-   
-   # Create an image anchored at (min_x, min_y) and set the color_mapper to map 
-   # it with our palette.
-   p.image(image=[values],  x=min_x, y=min_y, dw=max_x-min_x, dh=max_y-min_y, 
-           color_mapper=LinearColorMapper(palette=colours, low=min_val, high=max_val))
-   
-   return(p)
-#END hovmoller_plot
-
-def hovmoller(infile, outfile="image.html"):
-   with open(infile) as json_file:
-      df = json.load(json_file)
-   
-   json_file.close()
+def hovmoller(df, outfile="image.html"):
        
    plot_type = df['type']
    var_name = df['coverage']
@@ -121,12 +101,17 @@ def hovmoller(infile, outfile="image.html"):
    plot_scale = df['scale']
 
    assert plot_type in ("hovmollerLat", "hovmollerLon")
+   print plot_type
    
+   data = np.transpose(df['data'])
+
    # Format date to integer values
-   date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
+   #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
+   date = datetime(data[0])
    
    # Format latlon to float. Otherwise we can not do the mins etc.
-   latlon = np.array(df["LatLon"]).astype(np.float)
+   #latlon = np.array(df["LatLon"]).astype(np.float)
+   latlon = np.array(data[1]).astype(np.float)
    
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
@@ -134,10 +119,10 @@ def hovmoller(infile, outfile="image.html"):
 
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
-   assert x_size * y_size == len(df["Value"])
+   assert x_size * y_size == len(data[2])
    
    # We want a 2d array with latlon as x axis and date as y.
-   values = np.reshape(np.array(df["Value"]),(-1,y_size))
+   values = np.reshape(np.array(data[2]),(-1,y_size))
 
    # Easiest if we force float here but is that always true?
    # We also have problems with how the data gets stored as JSON (very big!).
@@ -149,9 +134,6 @@ def hovmoller(infile, outfile="image.html"):
    else:
        log_plot = False
        
-   # Round to try and make the JSON smaller. Seems to have no effect.
-   values=np.round(values,1)
-   
    # If it has got this far without breaking the array must be regular (all rows same length) so
    # the next date value will be y_size elements along the array.
    date_step = date[y_size] - date[0]
@@ -160,6 +142,7 @@ def hovmoller(infile, outfile="image.html"):
    if plot_type == 'hovmollerLat':
        # Swap the values around so that the date is on the x axis
        values = np.transpose(values)
+       x_size, y_size = y_size, x_size
 
        # I think the coords refer to pixel centres so scale by half a pixel.
        min_x = date[0] - date_step / 2
@@ -188,8 +171,28 @@ def hovmoller(infile, outfile="image.html"):
 
    colours = get_palette()
    legend = hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
+
+   # Create an RGBA array to show the Hovmoller. We do this rather than using the Bokeh image glyph
+   # as that passes the actual data into bokeh.js as float resulting in huge files.   
    
-   #plot = hovmoller_plot(values, colours, 1200, min_x, max_x, min_y, max_y, x_axis_type, y_axis_type, var_name)
+   # First create an empty array of 32 bit ints.
+   img = np.empty((x_size, y_size), dtype=np.uint32)
+
+   # Create a view of the same array as an array of RGBA values.
+   view = img.view(dtype=np.uint8).reshape((x_size, y_size, 4))
+
+   # We are going to set the RGBA based on our chosen palette. The RSG library returns a flat list of values.
+   my_palette = palettes.getPalette('rsg_colour')
+   slope = (max_val - min_val) / (len(colours) - 1)
+   intercept = min_val
+   for i in range(x_size):
+      for j in range(y_size):
+        p_index = int((values[i,j] - intercept) / slope) * 4
+        view[i, j, 0] = my_palette[p_index]
+        view[i, j, 1] = my_palette[p_index+1]
+        view[i, j, 2] = my_palette[p_index+2]
+        view[i, j, 3] = 255
+
    plot_width = 1200
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
@@ -198,12 +201,10 @@ def hovmoller(infile, outfile="image.html"):
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
    
-   # Create an image anchored at (min_x, min_y) and set the color_mapper to map 
-   # it with our palette.
-   p.image(image=[values],  x=min_x, y=min_y, dw=max_x-min_x, dh=max_y-min_y, 
-           color_mapper=LinearColorMapper(palette=colours, low=min_val, high=max_val))
+   # Create an RGBA image anchored at (min_x, min_y).
+   p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
    
-
+   #TODO This should be in the wrapper
    output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
    show(layout)
@@ -336,7 +337,71 @@ def timeseries(infile, outfile="time.html"):
    show(layout)
 #END timeseries   
 
+def legacy_reformat(data):
+   return(data)
+
+
+def plot(json_data):
+   series = json_data['plot']['data']['series']
+   plot_type = json_data['plot']['type'] 
+
+   if plot_type in ("hovmollerLat", "hovmollerLon"):
+      series = json_data['plot']['data']['series']
+      ds = series[0]['data_source']
+
+      plot_type = json_data['plot']['type']
+      scale = json_data['plot']['y1Axis']['scale']
+      coverage = ds['coverage']
+      units = json_data['plot']['y1Axis']['label']
+
+      request = "%s?baseurl=%s&coverage=%s&type=%s&graphXAxis=%s&graphYAxis=%s&graphZAxis=%s&time=%s%s%s&bbox=%s&depth=%s" % \
+                  (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
+                   urllib.quote_plus(ds['coverage']), 
+                   plot_type, 
+                   urllib.quote_plus(ds['graphXAxis']), 
+                   urllib.quote_plus(ds['graphYAxis']), 
+                   urllib.quote_plus(ds['graphZAxis']),
+                   urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
+                   urllib.quote_plus(ds['bbox']),
+                   urllib.quote_plus(ds['depth']))
+      response = json.load(urllib.urlopen(request))
+
+      data = response['output']['data']
+
+      plot_request = dict(scale=scale, coverage=coverage, type=plot_type, units=units,
+                      vars=['date', 'min', 'max', 'mean', 'std'], data=data)
+
+      hovmoller(plot_request)
+
+   elif plot_type == "timeseries":
+      #TODO Can have more than 1 series so need a loop.
+      ds = series[0]['data_source']
+      baseurl = "%s&coverage=%s&type=%s&time=%s,%s&bbox=%s" % \
+                (ds['threddsUrl'], ds['coverage'], "timeseries", ds['t_bounds'][0], ds['t_bounds'][1], ds['bbox'])
+      request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s&depth=%s" % \
+                (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
+                urllib.quote_plus(ds['coverage']), 
+                "timeseries", 
+                urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
+                urllib.quote_plus(ds['bbox']),
+                urllib.quote_plus(ds['depth']))
+      response = json.load(urllib.urlopen(request))
+      # LEGACY - this reformats the response to the new format.
+      df = []
+      for date, details in data.items():
+          line = [date]
+          [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
+          df.append(line)
+    
+         
+   return True
+
+
 if __name__ == "__main__":
-   hovmoller("testing/data/hovmoller.json")
-   timeseries("testing/data/temperature.json")
+   with open("testing/data/hovmoller_request1.json") as json_file:
+       request = json.load(json_file)
+   json_file.close()
+
+   plot(request)
+   #timeseries("testing/data/temperature.json")
 
