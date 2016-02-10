@@ -25,7 +25,9 @@ try{
 }catch(e){};
 var site_setings_path = path.join(__dirname, "config/site_settings");
 if(!utils.directoryExists(site_setings_path)){
+   var layers_path = path.join(site_setings_path, "layers");
    utils.mkdirpSync(site_setings_path);
+   utils.mkdirpSync(layers_path);
    fs.writeFileSync('./config/base_config.js', fs.readFileSync('./config_examples/base_config.js'));
    fs.writeFileSync('./config/analytics_config.js', fs.readFileSync('./config_examples/analytics_config.js'));
 }

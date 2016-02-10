@@ -188,7 +188,6 @@ router.get('/app/settings/get_cache', function(req, res) {
          });
       }
    }
-
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 });
 

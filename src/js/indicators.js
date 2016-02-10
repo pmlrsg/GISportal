@@ -340,7 +340,6 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 };
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
-      //console.log("here");
    if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
 
    var id = data.id;
