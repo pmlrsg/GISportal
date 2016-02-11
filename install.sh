@@ -7,10 +7,11 @@ function getDomainInfo {
 	esac
 	echo
    echo -n "Enter the domain name and press [ENTER]: "; read domain;
-   echo -n "Enter an admin email address and press [ENTER]: "; read admin_email;
-   echo "Do this cool thing and give us the clientid and clientsecret :: http$ssl://$domain/app/user/auth/google/callback"
-   echo -n "Enter the clientid and press [ENTER]: "; read clientid;
-   echo -n "Enter the clientsecret and press [ENTER]: "; read clientsecret;
+   echo -n "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read admin_email;
+   echo "Follow this guide (Web Application [step 2]) : https://github.com/googleads/googleads-dotnet-lib/wiki/How-to-create-OAuth2-client-id-and-secret"
+   echo "Give the origin as:  http$ssl://$domain/ and the callback as: http$ssl://$domain/app/user/auth/google/callback"
+   echo -n "Enter the retrieved clientid and press [ENTER]: "; read clientid;
+   echo -n "Enter the retrieved clientsecret and press [ENTER]: "; read clientsecret;
 }
 echo "Configuring your new portal..."
 
