@@ -6,21 +6,11 @@ GLOBAL.config = {
       port: 6789,             
    },
    // redis connection settings
-   redisURL: "http://localhost:6379/",
-   // OAuth2 settings from Google, plus others if applicable
-   auth: {
-      google: {
-         scope : "https://www.googleapis.com/auth/userinfo.email",
-         clientid : "741961836801-v58t7bv2t08jglenlj9vlvh6usr57l2d.apps.googleusercontent.com",
-         clientsecret : "PndOco4Zzj4RZin_nHrPNsnH",
-         callback : "https://localhost/app/user/auth/google/callback",
-         prompt: "select_account"
-      }
-   },
+   redisURL: 'http://localhost:6379/',
    // session settings
    session : {
       // ssssh! it's secret (any randon string to keep prying eyes from seeing the content of the cookie)
-      secret : "9qD228jYbxh6MvmTM1kNdDbqjdEHfX20zRGCbDcGDAzPa9h9deiqIl851rSxz32gRLhd64wohTX0w3lkFN6zFVwhn3GZ6ML1chEN2oaCg5RiWL3CeJkFSyKjl4RU9N9o",
+      secret : '9qD228jYbxh6MvmTM1kNdDbqjdEHfX20zRGCbDcGDAzPa9h9deiqIl851rSxz32gRLhd64wohTX0w3lkFN6zFVwhn3GZ6ML1chEN2oaCg5RiWL3CeJkFSyKjl4RU9N9o',
       // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed
       age : 0
    },

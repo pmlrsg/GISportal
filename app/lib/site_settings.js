@@ -99,6 +99,9 @@ router.get('/app/settings/proxy', function(req, res) {
          res.status(response.statusCode);
          var content_type = response.headers['content-type']
          if(content_type){
+            if(content_type == "WMS_XML"){ // TODO: see if there is a smaller brick to crack this walnut
+               content_type = "text/xml"
+            }
             res.setHeader("content-type", content_type.split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
          }
          res.send(body);

@@ -190,7 +190,7 @@ gisportal.editLayersForm.addListeners = function(){
                   }
                   // Think it is safe to take this out but it is there just in case.
                   // If layers misbehave after being deleted then this might be a place to look first:
-                  // gisportal.loadLayers();
+                  gisportal.loadLayers();
                   this_span.closest("tr").next().toggleClass("hidden", true);
                   this_span.closest("tr").toggleClass("hidden", true);
                   $(document).off('click', '.notifyjs-gisportal-restore-option-base .no');

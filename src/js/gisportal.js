@@ -111,10 +111,10 @@ var map;
 gisportal.loadLayers = function() { 
    // The old layers will be removed from the portal keeping any layers that are already loaded to one side.
    gisportal.tempRemoveLayers();
-   gisportal.loadVectorLayers();
    gisportal.original_layers = {};
    gisportal.not_included_layers = {};
    gisportal.layers = {};
+   gisportal.loadVectorLayers();
    loadWmsLayers();
    
    function loadWmsLayers(){
@@ -241,7 +241,7 @@ gisportal.createOpLayers = function() {
       }
    }
 
-   // Turn an indicator into a later and adding to gisporta.layers
+   // Turn an indicator into a later and adding to gisportal.layers
    function processIndicator( server, sensorName, indicator ){
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
