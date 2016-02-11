@@ -6,12 +6,21 @@ function getDomainInfo {
 	  * ) ssl="" ;;
 	esac
 	echo
-   echo -n "Enter the domain name and press [ENTER]: "; read domain;
-   echo -n "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read admin_email;
+	echo "Enter the domain name and press [ENTER]: "; read -e domain;
+   while [ -e config/site_settings/"$domain" ]
+   do
+   	echo "That domain already exists, please try something else or type cancel and press [ENTER]: "; read -e domain;
+   	if [ $domain == "cancel" ]
+   		then
+   			domain="/";
+   			return
+   	fi
+	done
+   echo "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read -e admin_email;
    echo "Follow this guide (Web Application [step 2]) : https://github.com/googleads/googleads-dotnet-lib/wiki/How-to-create-OAuth2-client-id-and-secret"
    echo "Give the origin as:  http$ssl://$domain/ and the callback as: http$ssl://$domain/app/user/auth/google/callback"
-   echo -n "Enter the retrieved clientid and press [ENTER]: "; read clientid;
-   echo -n "Enter the retrieved clientsecret and press [ENTER]: "; read clientsecret;
+   echo "Enter the retrieved clientid and press [ENTER]: "; read -e clientid;
+   echo "Enter the retrieved clientsecret and press [ENTER]: "; read -e clientsecret;
 }
 echo "Configuring your new portal..."
 
@@ -19,12 +28,12 @@ npm install
 
 while [ -z $domain ]
 do
-read -p "Do you wish to setup a domain now? (y/n)?" -n 1 choice #-
-case "$choice" in 
-  y|Y ) echo; getDomainInfo;;
-  n|N ) domain="/" ;;
-  * ) echo; echo "Please choose y or n";;
-esac
+	read -p "Do you wish to setup a domain now? (y/n)?" -n 1 choice 
+	case "$choice" in 
+	  y|Y ) echo; getDomainInfo;;
+	  n|N ) domain="/" ;;
+	  * ) echo; echo "Please choose y or n";;
+	esac
 done
 
 if [ ! -e config/site_settings/"$domain" ]
