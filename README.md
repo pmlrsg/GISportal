@@ -231,8 +231,11 @@ Go over each custom definition key in the config file and change it the one in y
 
 # Multi-Portal Easy Install #
 
+
+You will first need to make sure that you have redis, ruby, sass, npm and grunt installed.
+Nginx must also be configured and a hosts configuration would be great too.
+
 - Clone this repo
-- Make sure that your nginx config is set up like the one in the config_examples folder and run nginx
 - Run install.sh
 - Follow the instructions
 - If providing domain information then make sure the domain ends with a public top-level domain (such as .com or .org)

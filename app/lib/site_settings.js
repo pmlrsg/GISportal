@@ -417,7 +417,7 @@ router.get('/app/settings/load_data_values', function(req, res){
                if(err){
                   handleError(err, res);
                }else{
-                  content_type = response2.headers['content-type'].replace(';charset=UTF-8', '');
+                  content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
                   if(content_type == "text/xml"){
                      xml2js.parseString(body, function (err, result) {
                         if(err){
@@ -473,109 +473,113 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                if(err){
                   handleError(err, res);
                }else{
-                  var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
-                  var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
-                  var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
-                  var contact_position = contact_data.ContactPosition;
-                  var contact_address;
-                  var contact_city;
-                  var contact_state;
-                  var contact_post_code;
-                  var contact_country;
-                  var address_block = contact_data.ContactAddress;
-                  if(address_block){
-                     contact_address = address_block[0].Address;
-                     contact_city = address_block[0].City;
-                     contact_state = address_block[0].StateOrProvince;
-                     contact_post_code = address_block[0].PostCode;
-                     contact_country = address_block[0].Country;
-                  }
-                  var contact_phone = contact_data.ContactVoiceTelephone;
-                  var contact_email = contact_data.ContactElectronicMailAddress;
-
-                  if(contact_person[0].length > 0){
-                     contact_info.person = contact_person[0];
-                  }
-                  if(typeof(contact_organization[0]) == 'string'){
-                     var provider = contact_organization[0];
-                  }
-                  if(contact_position && contact_position[0].length > 0){
-                     contact_info.position = contact_position[0];
-                  }
-                  if(contact_address && contact_address[0].length > 0){
-                     address += contact_address[0] + "<br/>";
-                  }
-                  if(contact_city && contact_city[0].length > 0){
-                     address += contact_city[0] + "<br/>";
-                  }
-                  if(contact_state && contact_state[0].length > 0){
-                     address += contact_state[0] + "<br/>";
-                  }
-                  if(contact_post_code && contact_post_code[0].length > 0){
-                     address += contact_post_code[0] + "<br/>";
-                  }
-                  if(contact_country && contact_country[0].length > 0){
-                     address += contact_country[0] + "<br/>";
-                  }
-                  if(contact_phone && contact_phone[0].length > 0){
-                     contact_info.phone = contact_phone[0];
-                  }
-                  if(contact_email && contact_email[0].length > 0){
-                     contact_info.email = contact_email[0];
-                  }
-                  if(address.length > 0){
-                     contact_info.address = address;
-                  }
-
-                  for(index in result.WMS_Capabilities.Capability[0].Layer){
-                     var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
-                     var layers = [];
-                     var name;
-                     var service_title;
-                     var title;
-                     var abstract;
-                     var bounding_boxes;
-                     var dimensions = {};
-                     var style;
-
-                     var title_elem = parent_layer.Title;
-                     var abstract_elem = parent_layer.Abstract;
-                     var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
-                     var bounding_elem = parent_layer.BoundingBox;
-                     var style_elem = parent_layer.Style;
-
-                     if(title_elem && typeof(title_elem[0]) == "string"){
-                        service_title = title_elem[0].replace(/ /g,"_").replace(/\(/g,"_").replace(/\)/g,"_").replace(/\//g,"_");
+                  try{
+                     var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
+                     var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
+                     var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
+                     var contact_position = contact_data.ContactPosition;
+                     var contact_address;
+                     var contact_city;
+                     var contact_state;
+                     var contact_post_code;
+                     var contact_country;
+                     var address_block = contact_data.ContactAddress;
+                     if(address_block){
+                        contact_address = address_block[0].Address;
+                        contact_city = address_block[0].City;
+                        contact_state = address_block[0].StateOrProvince;
+                        contact_post_code = address_block[0].PostCode;
+                        contact_country = address_block[0].Country;
                      }
-                     if(abstract_elem && typeof(abstract_elem[0]) == "string"){
-                        abstract = abstract_elem[0];
+                     var contact_phone = contact_data.ContactVoiceTelephone;
+                     var contact_email = contact_data.ContactElectronicMailAddress;
+
+                     if(contact_person[0].length > 0){
+                        contact_info.person = contact_person[0];
                      }
-                     if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
-                        bounding_boxes = createBoundingBoxes(parent_layer);
+                     if(typeof(contact_organization[0]) == 'string'){
+                        var provider = contact_organization[0];
                      }
-                     if(style_elem){
-                        style = createStylesArray(parent_layer);
-                        if(style.length == 0){
-                           style = undefined;
+                     if(contact_position && contact_position[0].length > 0){
+                        contact_info.position = contact_position[0];
+                     }
+                     if(contact_address && contact_address[0].length > 0){
+                        address += contact_address[0] + "<br/>";
+                     }
+                     if(contact_city && contact_city[0].length > 0){
+                        address += contact_city[0] + "<br/>";
+                     }
+                     if(contact_state && contact_state[0].length > 0){
+                        address += contact_state[0] + "<br/>";
+                     }
+                     if(contact_post_code && contact_post_code[0].length > 0){
+                        address += contact_post_code[0] + "<br/>";
+                     }
+                     if(contact_country && contact_country[0].length > 0){
+                        address += contact_country[0] + "<br/>";
+                     }
+                     if(contact_phone && contact_phone[0].length > 0){
+                        contact_info.phone = contact_phone[0];
+                     }
+                     if(contact_email && contact_email[0].length > 0){
+                        contact_info.email = contact_email[0];
+                     }
+                     if(address.length > 0){
+                        contact_info.address = address;
+                     }
+
+                     for(index in result.WMS_Capabilities.Capability[0].Layer){
+                        var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
+                        var layers = [];
+                        var name;
+                        var service_title;
+                        var title;
+                        var abstract;
+                        var bounding_boxes;
+                        var dimensions = {};
+                        var style;
+
+                        var title_elem = parent_layer.Title;
+                        var abstract_elem = parent_layer.Abstract;
+                        var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
+                        var bounding_elem = parent_layer.BoundingBox;
+                        var style_elem = parent_layer.Style;
+
+                        if(title_elem && typeof(title_elem[0]) == "string"){
+                           service_title = title_elem[0].replace(/ /g,"_").replace(/\(/g,"_").replace(/\)/g,"_").replace(/\//g,"_");
                         }
+                        if(abstract_elem && typeof(abstract_elem[0]) == "string"){
+                           abstract = abstract_elem[0];
+                        }
+                        if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
+                           bounding_boxes = createBoundingBoxes(parent_layer);
+                        }
+                        if(style_elem){
+                           style = createStylesArray(parent_layer);
+                           if(style.length == 0){
+                              style = undefined;
+                           }
+                        }
+
+                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
                      }
+                     if(layers.length > 0){
+                        sub_master_cache.server.Layers = sortLayersList(layers, "Title");
+                        sub_master_cache.options = {"providerShortTag": "UserDefinedLayer"};
+                        sub_master_cache.wmsURL = url;
+                        sub_master_cache.serverName = clean_url;
+                        sub_master_cache.contactInfo = contact_info;
+                        sub_master_cache.provider = provider.replace(/&amp;/g, '&');
+                        sub_master_cache.timeStamp = new Date();
 
-                     digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
-                  }
-                  if(layers.length > 0){
-                     sub_master_cache.server.Layers = sortLayersList(layers, "Title");
-                     sub_master_cache.options = {"providerShortTag": "UserDefinedLayer"};
-                     sub_master_cache.wmsURL = url;
-                     sub_master_cache.serverName = clean_url;
-                     sub_master_cache.contactInfo = contact_info;
-                     sub_master_cache.provider = provider.replace(/&amp;/g, '&');
-                     sub_master_cache.timeStamp = new Date();
-
-                     var data = JSON.stringify(sub_master_cache)
-                     fs.writeFileSync(file_path, data);
-                     res.send(data);
-                  }else{
-                     res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
+                        var data = JSON.stringify(sub_master_cache)
+                        fs.writeFileSync(file_path, data);
+                        res.send(data);
+                     }else{
+                        res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
+                     }
+                  }catch(e){
+                     handleError(e, res);
                   }
                }
             });
