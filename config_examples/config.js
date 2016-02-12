@@ -23,7 +23,7 @@ $.extend(gisportal.config, {
    // Do we require terms and conditions agreement to use the portal
    requiresTermsAndCondictions: true,
 
-   browseMode : 'tabs',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
+   browseMode : 'selectlist',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
    countryBorder : {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
@@ -51,19 +51,12 @@ $.extend(gisportal.config, {
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',
 
-   homepageSlides: [
-      "img/homepage-slides/opec1.jpg",
-      "img/homepage-slides/opec2.jpg",
-      "img/homepage-slides/opec3.jpg",
-      "img/homepage-slides/opec4.jpg",
-      "img/homepage-slides/opec5.jpg",
-      "img/homepage-slides/opec6.jpg",
-      "img/homepage-slides/opec7.jpg"
-   ],
 
    // Deny access to older browsers
    // none=Allow, advisory=Tell them only, strict=Stop them
-   browserRestristion: "strict" //(none|advisory|strict)
+   browserRestristion: "strict", //(none|advisory|strict)
+
+   startPageHTML: '<p>Please specify some text to go here</p>'
 
 });
 

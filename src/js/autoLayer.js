@@ -101,6 +101,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
          url:  request_url,
          dataType: 'text',
          success: function(layer){
+            $('.notifyjs-gisportal-info span:contains("Finding Layers")').closest('.notifyjs-wrapper').remove();
             gisportal.autoLayer.addGivenLayer(layer);
          },
          error: function(e){

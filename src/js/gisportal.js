@@ -1105,7 +1105,8 @@ gisportal.initStart = function()  {
    // Splash page parameters
    var data = {
       homepageSlides  : gisportal.config.homepageSlides,
-      hasAutoSaveState: gisportal.hasAutoSaveState()
+      hasAutoSaveState: gisportal.hasAutoSaveState(),
+      startHTML: gisportal.config.startPageHTML
    };
 
    // Render the spasl page HTML
