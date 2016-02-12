@@ -29,7 +29,7 @@ utils.directoryExists = function(filePath)
 }
 
 utils.getDomainName = function(req){
-   return req.headers.host;
+   return req.headers.host + req.url.match('^[^?]*')[0].split("/app")[0];
 }
 
 utils.mkdirpSync = function (dirpath) {

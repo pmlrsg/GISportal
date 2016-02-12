@@ -104,6 +104,7 @@ gisportal.map_settings.init = function() {
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
       e.preventDefault();
+      $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", false);
       if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
          gisportal.wms_submitted = true;
          // Gets the URL and refresh_cache boolean

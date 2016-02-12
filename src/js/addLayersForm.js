@@ -657,16 +657,16 @@ gisportal.addLayersForm.validateForm = function(form_div){
          if(check_valid.invalid){
             gisportal.addLayersForm.validation_errors[form][String(label.html())] = check_valid.message;
             // The inut and label are set to invalid so they can be highlighted
-            $(this).toggleClass('invalid', true);
-            label.toggleClass('invalid', true);
+            $(this).toggleClass('alert-error', true);
+            label.toggleClass('alert-error', true);
          }else{
             // If there is an error there is is removed.
             if(gisportal.addLayersForm.validation_errors[form][String(label.html())]){
                delete gisportal.addLayersForm.validation_errors[form][String(label.html())];
             }
             // The classes are then also reset
-            $(this).toggleClass('invalid', false);
-            label.toggleClass('invalid', false);
+            $(this).toggleClass('alert-error', false);
+            label.toggleClass('alert-error', false);
          }
          // If there are any errors they will be shown
          if(_.size(gisportal.addLayersForm.validation_errors[form]) > 0){

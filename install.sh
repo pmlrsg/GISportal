@@ -7,9 +7,9 @@ function getDomainInfo {
 	esac
 	echo
 	echo "Enter the domain name and press [ENTER]: "; read -e domain;
-   while [ -e config/site_settings/"$domain" ]
+   while [ -e config/site_settings/"$domain"/config-server.js ]
    do
-   	echo "That domain already exists, please try something else or type cancel and press [ENTER]: "; read -e domain;
+   	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain;
    	if [ $domain == "cancel" ]
    		then
    			domain="/";
@@ -34,7 +34,7 @@ npm install
 
 while [ -z $domain ]
 do
-	read -p "Do you wish to setup a domain now? (y/n)?" -n 1 choice 
+	read -p "Do you wish to setup a domain with authentication now? (y/n)?" -n 1 choice 
 	case "$choice" in 
 	  y|Y ) echo; getDomainInfo;;
 	  n|N ) domain="/"; echo ;;
@@ -75,7 +75,7 @@ if [ $domain != "/" ]
 		echo "   // session settings">>config/site_settings/"$domain"/config-server.js
 		echo "   session : {">>config/site_settings/"$domain"/config-server.js
 		echo "      // ssssh! it's secret (any randon string to keep prying eyes from seeing the content of the cookie)">>config/site_settings/"$domain"/config-server.js
-		echo "      secret : '$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)',">>config/site_settings/"$domain"/config-server.js
+		echo "      secret : '$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)',">>config/site_settings/"$domain"/config-server.js
 		echo "      // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed">>config/site_settings/"$domain"/config-server.js
 		echo "      age : 0">>config/site_settings/"$domain"/config-server.js
 		echo "   },">>config/site_settings/"$domain"/config-server.js

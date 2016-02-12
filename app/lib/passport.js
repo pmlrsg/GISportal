@@ -6,7 +6,7 @@ module.exports = passport;
 
 passport.init = function(config) {
    console.log()
-   console.log("List of domains:")
+   console.log("List of domains with Google authentication settings:")
    for(domain in config){
       if(config[domain].auth){
          console.log(domain);

@@ -328,8 +328,8 @@ gisportal.createOpLayers = function() {
 
    if(_.size(gisportal.layers) <= 0){
       $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
-      $('form.add-wms-form').toggleClass("alert-info", true);
-      setTimeout(function(){$('form.add-wms-form').toggleClass("alert-info", false);},7500);
+      gisportal.panels.showPanel('map-settings');
+      $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", true);
    }else{
       gisportal.configurePanel.refreshData();
    }
