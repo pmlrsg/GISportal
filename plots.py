@@ -17,7 +17,7 @@ import pandas as pd
 import json
 import urllib
 
-from bokeh.plotting import figure, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
+from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
 
 import palettes
@@ -210,7 +210,7 @@ def hovmoller(df, outfile="image.html"):
    #TODO This should be in the wrapper
    output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
-   show(layout)
+   save(layout)
    
 #END hovmoller
 
@@ -345,7 +345,7 @@ def timeseries(plot_data, outfile="time.html"):
    # plot the points
    output_file(outfile, 'Time Series')
    
-   show(layout)
+   save(layout)
 #END timeseries   
 
 def legacy_reformat(data):
@@ -432,7 +432,7 @@ def scatter(plot_data, outfile='/tmp/scatter.html'):
    # plot the points
    output_file(outfile, 'Time Series')
    
-   show(layout)
+   save(layout)
 
 
 def get_plot_data(json_data):
@@ -498,18 +498,18 @@ def get_plot_data(json_data):
 
    return plot_data
 
-def plot(request):
+def plot(request, outfile):
    plot_data = get_plot_data(request)
    if plot_data[0]['type'] == 'timeseries':
-      plot_file = timeseries(plot_data)
+      plot_file = timeseries(plot_data, outfile)
    elif plot_data[0]['type'] == 'scatter':
-      plot_file = scatter(plot_data)
+      plot_file = scatter(plot_data, outfile)
    else:
-      plot_file = hovmoller(plot_data[0])
+      plot_file = hovmoller(plot_data[0], outfile)
 
-   return plot_file 
+   return True
    
 
 if __name__ == "__main__":
    request = json.load(sys.stdin)
-   plot(request)
+   plot(request, "/local/petwa/Dropbox/Jupyter/plot.html")
