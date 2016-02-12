@@ -453,10 +453,11 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "wcsURL":layer.wcsURL
       };
    }
+   var possible_owners = ["olcl@pml.ac.uk", "ols@pml.ac.uk", "bac@pml.ac.uk", gisportal.niceDomainName]
    // The display form variable is set to true so that the portal knows if the form was displayed last time the user was viewing it.
    gisportal.addLayersForm.form_info.display_form = true;
    // The server form template is then loaded and displayed in the element given.
-   var server_form = gisportal.templates['server-form'](gisportal.addLayersForm.server_info);
+   var server_form = gisportal.templates['server-form']({server: gisportal.addLayersForm.server_info, owners: possible_owners});
    $(form_div).html(server_form);
    // The form is then validated.
    gisportal.addLayersForm.validateForm('div.overlay-container-form');

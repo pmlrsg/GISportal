@@ -21,7 +21,7 @@ $.extend(gisportal.config, {
    skipWelcomePage: false,
 
    // Do we require terms and conditions agreement to use the portal
-   requiresTermsAndCondictions: true,
+   requiresTermsAndCondictions: false,
 
    browseMode : 'selectlist',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
@@ -39,14 +39,12 @@ $.extend(gisportal.config, {
    collaborationFeatures : {
       enabled : false,                               // (true|false) > If false the collaboration tab will be hidden
       protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
-      host : 'pmpc1465.npm.ac.uk',                  // the hostname of the node server running collaboration/index.js
+      host : 'localhost',                  // the hostname of the node server running collaboration/index.js
       port : '',                                    // must match the port specified in collaboration/config/config.js
       path : '',                                    // optional path; must start with a /
    },
    // Should layers auto scale by default
    autoScale: true,
-
-   requiresTermsAndCondictions: true,
 
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',
@@ -56,6 +54,7 @@ $.extend(gisportal.config, {
    // none=Allow, advisory=Tell them only, strict=Stop them
    browserRestristion: "strict", //(none|advisory|strict)
 
+   // The HTML that you would like to be displayed on the splash welcome page.
    startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>'
 
 });
