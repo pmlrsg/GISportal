@@ -18,9 +18,15 @@ function getDomainInfo {
 	done
    echo "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read -e admin_email;
    echo "Follow this guide (Web Application [step 2]) : https://github.com/googleads/googleads-dotnet-lib/wiki/How-to-create-OAuth2-client-id-and-secret"
-   echo "Give the origin as:  http$ssl://$domain/ and the callback as: http$ssl://$domain/app/user/auth/google/callback"
-   echo "Enter the retrieved clientid and press [ENTER]: "; read -e clientid;
-   echo "Enter the retrieved clientsecret and press [ENTER]: "; read -e clientsecret;
+   echo "Give the origin as:  http$ssl://$domain and the callback as: http$ssl://$domain/app/user/auth/google/callback"
+   while [ -z $clientid ]
+   do
+   	echo "Enter the retrieved clientid and press [ENTER]: "; read -e clientid;
+   done
+   while [ -z $clientsecret ]
+   do
+   	echo "Enter the retrieved clientsecret and press [ENTER]: "; read -e clientsecret;
+	done
 }
 echo "Configuring your new portal..."
 
@@ -31,7 +37,7 @@ do
 	read -p "Do you wish to setup a domain now? (y/n)?" -n 1 choice 
 	case "$choice" in 
 	  y|Y ) echo; getDomainInfo;;
-	  n|N ) domain="/" ;;
+	  n|N ) domain="/"; echo ;;
 	  * ) echo; echo "Please choose y or n";;
 	esac
 done

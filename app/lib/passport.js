@@ -5,8 +5,11 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 module.exports = passport;
 
 passport.init = function(config) {
+   console.log()
+   console.log("List of domains:")
    for(domain in config){
       if(config[domain].auth){
+         console.log(domain);
          passport.use(domain,new GoogleStrategy({
             clientID: config[domain].auth.google.clientid,
             clientSecret: config[domain].auth.google.clientsecret,
@@ -20,6 +23,7 @@ passport.init = function(config) {
          ));
       }
    }
+   console.log();
 
    passport.serializeUser(function(user, done) {
     done(null, user);

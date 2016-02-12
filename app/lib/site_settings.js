@@ -21,6 +21,13 @@ var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
+
+// This is for the xml2js parsing, it removes any silly namespaces.
+var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
+var stripPrefix = function(str) {
+   return str.replace(prefixMatch, '');
+};
+
 module.exports = router;
 
 var log = bunyan.createLogger({name: "Portal Middleware"});
@@ -400,7 +407,7 @@ router.get('/app/settings/load_data_values', function(req, res){
          var response_text = "Sorry, could not calculate a value for: " + name;
 
          if(content_type == 'application/xml;charset=UTF-8'){
-            xml2js.parseString(body, function (err, result) {
+            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
                if(err){
                   handleError(err, res);
                }else{
@@ -419,7 +426,7 @@ router.get('/app/settings/load_data_values', function(req, res){
                }else{
                   content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
                   if(content_type == "text/xml"){
-                     xml2js.parseString(body, function (err, result) {
+                     xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
                         if(err){
                            handleError(err, res);
                         }else{
@@ -469,7 +476,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
          if(error){
             handleError(error, res);
          }else{
-            xml2js.parseString(body, function (err, result) {
+            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
                if(err){
                   handleError(err, res);
                }else{
