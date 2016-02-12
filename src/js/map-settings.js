@@ -119,6 +119,7 @@ gisportal.map_settings.init = function() {
             $('#refresh-cache-div').toggleClass('hidden', true);
             gisportal.wms_submitted = false;
          }else{
+            $('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")').closest('.notifyjs-wrapper').remove();
             // If it passes the error div is hidden and the autoLayer functions are run using the given parameters
             $('input.js-wms-url').val("");
             $('#refresh-cache-message').toggleClass('hidden', true);

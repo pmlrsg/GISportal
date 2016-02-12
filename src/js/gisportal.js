@@ -327,9 +327,11 @@ gisportal.createOpLayers = function() {
    if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
 
    if(_.size(gisportal.layers) <= 0){
-      $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
-      gisportal.panels.showPanel('map-settings');
-      $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", true);
+      if(_.size($('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")')) <= 0){
+         $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
+         gisportal.panels.showPanel('map-settings');
+         $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", true);
+      }
    }else{
       gisportal.configurePanel.refreshData();
    }
