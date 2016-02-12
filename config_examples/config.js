@@ -56,7 +56,7 @@ $.extend(gisportal.config, {
    // none=Allow, advisory=Tell them only, strict=Stop them
    browserRestristion: "strict", //(none|advisory|strict)
 
-   startPageHTML: '<p>Please specify some text to go here</p>'
+   startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>'
 
 });
 

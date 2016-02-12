@@ -2,6 +2,7 @@
    <div class="intro-text">
    {{{startHTML}}}
    </div>
+   {{#if homepageSlides}}
    <div class="homepageSlider">
       <div class="homepageSlider-wrap">
          {{#each homepageSlides}}
@@ -9,6 +10,7 @@
          {{/each}}
       </div>
    </div>
+   {{/if}}
 
    <nav class="start-nav">
       {{#if hasAutoSaveState}}
