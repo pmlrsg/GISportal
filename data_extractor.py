@@ -15,6 +15,8 @@ transect time extraction (trans-time) - extracts data from a POLYLINE, then retu
 
 example wcs url : http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY?service=WCS&version=1.0.0&request=GetCapabilities
 
+example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -time 2010-01-01/2011-01-01
+
 """
 
 import argparse
@@ -34,18 +36,20 @@ def main():
 	parser.add_argument("-var", "--variable", action="store", dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
 	parser.add_argument("-v", "--debug", action="store_true", dest="debug", help="a debug flag - if passed there will be a tonne of log output and all interim files will be saved", required=False)
 	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=0)
-	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
+	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False)#, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
 	parser.add_argument("-time", action="store", dest="time", help="A time string for in the format startdate/enddate or a single date", required=True)
 	parser.add_argument("-mask", action="store", dest="mask", help="a polygon representing teh irregular area", required=False)
+	parser.add_argument("-csv", action="store", dest="csv", help="a csv file with lat,lon,date for use in transect extraction", required=False)
 	args = parser.parse_args()
 
 	print args.debug
 	debug = Debug(args.debug)
 	debug.log("a message to test debugging")
 
-	bbox = wkt.loads(args.geom).bounds
-
-	print bbox
+	if(args.geom):
+		print "geom found - generating bbox"
+		bbox = wkt.loads(args.geom).bounds
+		print bbox
 
 
 
@@ -57,7 +61,7 @@ def main():
 	elif (args.extract_type == "irregular"):
 		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
 		filename = extractor.getData()
-		output_data = filename
+		stats = filename
 	elif (args.extract_type == "trans-lat"):
 		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
@@ -66,6 +70,8 @@ def main():
 		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "longitude", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
 	elif (args.extract_type == "trans-time"):
+		# we will accept csv here so we need to grab teh lat lons and dates for use within teh extractor below
+
 		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "time", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
 	else :
