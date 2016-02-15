@@ -1067,11 +1067,15 @@ gisportal.zoomOverall = function()  {
       var largestBounds = [ 180, 90, -180, -90 ];
 
       for (var i = 0; i < gisportal.selectedLayers.length; i++)  {
-         var layer = gisportal.layers[gisportal.selectedLayers[i]].boundingBox;
-         if (+layer.MinX < +largestBounds[0]) largestBounds[0] = parseFloat(layer.MinX); // left 
-         if (+layer.MinY < +largestBounds[1]) largestBounds[1] = parseFloat(layer.MinY); // bottom
-         if (+layer.MaxX > +largestBounds[2]) largestBounds[2] = parseFloat(layer.MaxX); // right 
-         if (+layer.MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(layer.MaxY); // top
+         var bbox = gisportal.layers[gisportal.selectedLayers[i]].exBoundingBox;
+         var MinX = bbox.WestBoundLongitude;
+         var MinY = bbox.SouthBoundLatitude;
+         var MaxX = bbox.EastBoundLongitude;
+         var MaxY = bbox.NorthBoundLatitude;
+         if (+MinX < +largestBounds[0]) largestBounds[0] = parseFloat(MinX); // left 
+         if (+MinY < +largestBounds[1]) largestBounds[1] = parseFloat(MinY); // bottom
+         if (+MaxX > +largestBounds[2]) largestBounds[2] = parseFloat(MaxX); // right 
+         if (+MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(MaxY); // top
       }
 
       var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', map.getView().getProjection().getCode());
