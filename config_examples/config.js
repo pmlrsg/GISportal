@@ -12,6 +12,23 @@
 
 
 $.extend(gisportal.config, {
+   analytics:{
+      active:false,
+      customDefinitions: {
+         "cd1": 'indicator_name',
+         "cd2": 'indicator_id',
+         "cd3": 'indicator_region',
+         "cd4": 'indicator_interval',
+         "cd5": 'indicator_elevation',
+         "cd6": 'indicator_layer_style',
+         "cd7": 'graph_type',
+         "cd8": 'indicator_confidence',
+         "cd9": 'indicator_year',
+         "cd10" : 'click_location',
+         'cm1' : "used_in_layer",
+         'cm2': "used_in_graph" // Used in layer
+      }
+   },
    siteMode: "development", //(development|production)
 
     // Skip start screen only is the user has a saved state, requires T&C

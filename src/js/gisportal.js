@@ -150,7 +150,7 @@ gisportal.loadVectorLayers = function() {
 
 
    $.ajax({
-      url: 'app/cache/vectorLayers.json',
+      url: 'app/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
       error: function(e){

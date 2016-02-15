@@ -108,9 +108,6 @@ gisportal.analytics.initDomEvents = function(){
    });
 };
 
-//Settings for the custom dimensions ids and what the values should be
-gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
-
 gisportal.analytics.customDefinitionsUsedInEvents = {
      
      
@@ -191,9 +188,9 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
    function getDefinitionIndexFromKey( customDefinitionKey ){
       var definitionIndex = null;
       // Find the key in the object/array
-      for(var i in gisportal.analytics.customDefinitions ){
-         if( gisportal.analytics.customDefinitions.hasOwnProperty( i ) )
-            if( gisportal.analytics.customDefinitions[i] == customDefinitionKey )
+      for(var i in gisportal.config.analytics.customDefinitions ){
+         if( gisportal.config.analytics.customDefinitions.hasOwnProperty( i ) )
+            if( gisportal.config.analytics.customDefinitions[i] == customDefinitionKey )
                definitionIndex = i;
       }
       // If not key was found then error

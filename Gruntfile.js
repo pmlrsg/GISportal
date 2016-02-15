@@ -9,7 +9,6 @@ var coreFiles = [
     "src/js/panels.js",
     "src/js/panel-slideout.js",
     "src/js/ui.js",
-    "config/analytics_config.js",
     "src/js/configure.js",
     "src/js/scalebar.js",
     "src/js/refine.js",
