@@ -476,7 +476,11 @@ gisportal.addLayersForm.showOwnerOptions = function(){
          var output = [];
          for(var index in owners){
             var owner = owners[index];
-            output.push('<option value="'+ owner +'">'+ owner +'</option>');
+            if(owner == gisportal.niceDomainName){
+               output.push('<option value="'+ owner +'">global</option>');
+            }else{
+               output.push('<option value="'+ owner +'">'+ owner +'</option>');
+            }
          }
          select_elem.html(output.join(""));
          select_elem.val(owners[0]);
