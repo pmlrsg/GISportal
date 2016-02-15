@@ -94,10 +94,6 @@ if [ ! -e config/base_config.js ]
 	then
 		cp ./config_examples/base_config.js ./config/base_config.js;
 fi
-if [ ! -e config/analytics_config.js ]
-	then
-		cp ./config_examples/analytics_config.js ./config/analytics_config.js;
-fi
 
 grunt dev
 node app.js
