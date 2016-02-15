@@ -458,7 +458,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    // The server form template is then loaded and displayed in the element given.
    var server_form = gisportal.templates['server-form'](gisportal.addLayersForm.server_info);
    $(form_div).html(server_form);
-   gisportal.addLayersForm.showOwnerOptions();
+   gisportal.addLayersForm.showOwnerOptions(owner);
    // The form is then validated.
    gisportal.addLayersForm.validateForm('div.overlay-container-form');
    // Input listeners are then added
@@ -467,7 +467,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    gisportal.addLayersForm.refreshStorageInfo();
 };
 
-gisportal.addLayersForm.showOwnerOptions = function(){
+gisportal.addLayersForm.showOwnerOptions = function(given_owner){
    var select_elem = $("form.server-form select[data-field='owner']");
    $.ajax({
       url:  gisportal.middlewarePath + '/settings/get_owners',
@@ -483,7 +483,7 @@ gisportal.addLayersForm.showOwnerOptions = function(){
             }
          }
          select_elem.html(output.join(""));
-         select_elem.val(owners[0]);
+         select_elem.val(given_owner);
          if(owners.length > 1){
             select_elem.removeAttr('disabled');
          }
