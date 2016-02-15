@@ -453,12 +453,12 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "wcsURL":layer.wcsURL
       };
    }
-   var possible_owners = ["olcl@pml.ac.uk", "ols@pml.ac.uk", "bac@pml.ac.uk", gisportal.niceDomainName]
    // The display form variable is set to true so that the portal knows if the form was displayed last time the user was viewing it.
    gisportal.addLayersForm.form_info.display_form = true;
    // The server form template is then loaded and displayed in the element given.
-   var server_form = gisportal.templates['server-form']({server: gisportal.addLayersForm.server_info, owners: possible_owners});
+   var server_form = gisportal.templates['server-form'](gisportal.addLayersForm.server_info);
    $(form_div).html(server_form);
+   gisportal.addLayersForm.showOwnerOptions();
    // The form is then validated.
    gisportal.addLayersForm.validateForm('div.overlay-container-form');
    // Input listeners are then added
@@ -466,6 +466,31 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    // The browser cache is updaed with the changes.
    gisportal.addLayersForm.refreshStorageInfo();
 };
+
+gisportal.addLayersForm.showOwnerOptions = function(){
+   var select_elem = $("form.server-form select[data-field='owner']");
+   $.ajax({
+      url:  gisportal.middlewarePath + '/settings/get_owners',
+      success: function( data ){
+         var owners = data.owners
+         var output = [];
+         for(var index in owners){
+            var owner = owners[index];
+            output.push('<option value="'+ owner +'">'+ owner +'</option>');
+         }
+         select_elem.html(output.join(""));
+         select_elem.val(owners[0]);
+         if(owners.length > 1){
+            select_elem.removeAttr('disabled');
+         }
+
+      }
+   });
+   $(select_elem).on('change', function() {
+      gisportal.addLayersForm.server_info.owner = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+   });
+}
 
 /**
 * This function displays both parts of the form
@@ -614,7 +639,9 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
                }
             }
             gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
-            gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
+            if(gisportal.addLayersForm.layers_list[current_page].styles_url){
+               gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
+            }
          }
       });
    }

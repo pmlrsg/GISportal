@@ -1,42 +1,39 @@
-{{#with server}}
-   <div class="form-header">
-      {{server_name}}
-      <span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
-   </div>
-   <div class="js-server-form-validation form-validation-div alert-danger hidden"></div>
-   <form class="server-form">
-      <div class="clearfix">
-         <div class="layers-form-left">
 
-            <label data-field="provider">Provider:</label></br>
-            <input type="text" value="{{provider}}" data-field="provider"/></br>
+<div class="form-header">
+   {{server_name}}
+   <span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
+</div>
+<div class="js-server-form-validation form-validation-div alert-danger hidden"></div>
+<form class="server-form">
+   <div class="clearfix">
+      <div class="layers-form-left">
 
-            <label data-field="address">Address:</label></br>
-            <textarea data-field="address" >{{address}}</textarea><br/>
+         <label data-field="provider">Provider:</label></br>
+         <input type="text" value="{{provider}}" data-field="provider"/></br>
 
-            <label data-field="wcsURL">WCS URL:</label></br>
-            <input type="text" value="{{wcsURL}}" data-field="wcsURL"/></br>
-         </div>
-         <div class="layers-form-right">
-            <label data-field="person">Maintainer:</label></br>
-            <input type="text" value="{{person}}" data-field="person"/></br>
+         <label data-field="address">Address:</label></br>
+         <textarea data-field="address" >{{address}}</textarea><br/>
 
-            <label data-field="position">Position:</label></br>
-            <input type="text" value="{{position}}" data-field="position"/></br>
-
-            <label data-field="email">Email:</label></br>
-            <input type="text" value="{{email}}" data-field="email"/></br>
-
-            <label data-field="phone">Phone:</label></br>
-            <input type="text" value="{{phone}}" data-field="phone"/></br>
-            
-            <label data-field="owner">Owner:</label></br>
-            <select data-field="owner">
-            {{#each ../owners}}
-               <option {{#if_equals}}selected{{/if_equals}} value="{{this}}">{{this}}</option>
-            {{/each}}
-            </select></br>
-         </div>
+         <label data-field="wcsURL">WCS URL:</label></br>
+         <input type="text" value="{{wcsURL}}" data-field="wcsURL"/></br>
       </div>
-   </form>
-{{/with}}
+      <div class="layers-form-right">
+         <label data-field="person">Maintainer:</label></br>
+         <input type="text" value="{{person}}" data-field="person"/></br>
+
+         <label data-field="position">Position:</label></br>
+         <input type="text" value="{{position}}" data-field="position"/></br>
+
+         <label data-field="email">Email:</label></br>
+         <input type="text" value="{{email}}" data-field="email"/></br>
+
+         <label data-field="phone">Phone:</label></br>
+         <input type="text" value="{{phone}}" data-field="phone"/></br>
+         
+         <label data-field="owner">Owner:</label></br>
+         <select disabled data-field="owner">
+            <option selected value="none">Loading...</option>
+         </select></br>
+      </div>
+   </div>
+</form>

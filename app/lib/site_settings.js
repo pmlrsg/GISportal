@@ -128,6 +128,30 @@ router.get('/app/settings/config', function(req, res) {
    res.send(js_file);
 });
 
+router.get('/app/settings/get_owners', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var username = user.getUsername(req);
+   var permission = user.getAccessLevel(req, domain);
+   var owners = [];
+   owners.push(username);
+
+   if(permission == "admin"){
+      var domain_path = path.join(MASTER_CONFIG_PATH, domain);
+      var domain_folder = fs.readdirSync(domain_path); // The list of files and folders in the domain folder
+      domain_folder.forEach(function(folder){
+         var folder_name = path.join(domain_path, folder);
+         if(utils.directoryExists(folder_name) && stringStartsWith(folder, USER_CACHE_PREFIX)){
+            var folder_owner = folder.replace(USER_CACHE_PREFIX, "");
+            if(folder_owner != username){
+               owners.push(folder_owner);
+            }
+         }
+      });
+      owners.push(domain);
+   }
+   res.send({owners:owners});
+});
+
 
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
@@ -139,7 +163,7 @@ router.get('/app/cache/*?', function(req, res) {
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
-   var this_username = user.getUsername(req)
+   var this_username = user.getUsername(req);
    var usernames = [this_username];
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
@@ -337,7 +361,16 @@ router.all('/app/settings/add_user_layer', function(req, res){
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
-      var data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+      var data = {};
+      try{
+         data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+      }catch(e){
+         // Tries again with the temporary cache (Perhaps an admin is adding a server to this domain)
+         if(domain == username){
+            cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
+            data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+         }
+      }
       var new_data = []; // The list for the new data to go into
       for(new_layer in layers_list){ // Loops through each new layer.
          var this_new_layer = layers_list[new_layer];
@@ -407,7 +440,7 @@ router.get('/app/settings/load_data_values', function(req, res){
          var response_text = "Sorry, could not calculate a value for: " + name;
 
          if(content_type == 'application/xml;charset=UTF-8'){
-            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
+            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
                   handleError(err, res);
                }else{
@@ -426,7 +459,7 @@ router.get('/app/settings/load_data_values', function(req, res){
                }else{
                   content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
                   if(content_type == "text/xml"){
-                     xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
+                     xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                         if(err){
                            handleError(err, res);
                         }else{
@@ -476,7 +509,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
          if(error){
             handleError(error, res);
          }else{
-            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix], valueProcessors: [stripPrefix], attrValueProcessors: [stripPrefix] }, function (err, result) {
+            xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
                   handleError(err, res);
                }else{
@@ -695,7 +728,7 @@ function createStylesArray(layer){
          legend = legend[0];
          styles.push({
             "Name": name,
-            "LegendURL": legend.OnlineResource[0].$['xlink:href'],
+            "LegendURL": legend.OnlineResource[0].$['href'],
             "Width": legend.$.width,
             "Height": legend.$.height
          });
