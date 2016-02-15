@@ -183,7 +183,6 @@ gisportal.createVectorLayers = function() {
          "maxFeatures" : vector.maxFeatures,
          "tags" : vector.tags,
          "id" : vector.id,
-         "boundingBox" : vector.boundingBox,
          "exBoundingBox" : vector.exBoundingBox,
          "metadataQueue" : [],
          "abstract" : vector.abstract,

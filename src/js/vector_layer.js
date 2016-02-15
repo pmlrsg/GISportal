@@ -23,7 +23,6 @@ gisportal.Vector = function(options) {
         endpoint: null, // service enpoint URL
         dataType: null, // one of (point|polygon|line)
         exBoundingBox: null,
-        boundingBox: null, // bounding box of layer
         providerTag: null, //short provider name
         serviceVersion: null, // version of OGC service
         variableName: null, // the WFS variable name

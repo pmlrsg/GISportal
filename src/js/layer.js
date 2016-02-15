@@ -167,9 +167,6 @@ gisportal.layer = function( options ) {
       
       // A list of styles available for the layer
       this.styles = null;
-      
-      // The BoundingBox for the layer
-      this.boundingBox = layerData.BoundingBox; // Can be 'Null'.
 
       if(this.type == "opLayers") {
          this.getMetadata();

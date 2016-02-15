@@ -575,14 +575,13 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         var service_title;
                         var title;
                         var abstract;
-                        var bounding_boxes;
+                        var bounding_box;
                         var dimensions = {};
                         var style;
 
                         var title_elem = parent_layer.Title;
                         var abstract_elem = parent_layer.Abstract;
                         var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
-                        var bounding_elem = parent_layer.BoundingBox;
                         var style_elem = parent_layer.Style;
 
                         if(title_elem && typeof(title_elem[0]) == "string"){
@@ -591,8 +590,8 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         if(abstract_elem && typeof(abstract_elem[0]) == "string"){
                            abstract = abstract_elem[0];
                         }
-                        if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
-                           bounding_boxes = createBoundingBoxes(parent_layer);
+                        if(typeof(ex_bounding_elem) != "undefined"){
+                           bounding_box = createBoundingBox(parent_layer);
                         }
                         if(style_elem){
                            style = createStylesArray(parent_layer);
@@ -601,7 +600,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                            }
                         }
 
-                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
+                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
                      }
                      if(layers.length > 0){
                         sub_master_cache.server.Layers = sortLayersList(layers, "Title");
@@ -630,7 +629,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    }
 });
 
-function digForLayers(parent_layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider){
+function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){
    for(index in parent_layer.Layer){
       var layer = parent_layer.Layer[index]
 
@@ -638,7 +637,6 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
       var title_elem = layer.Title;
       var abstract_elem = layer.Abstract;
       var ex_bounding_elem = layer.EX_GeographicBoundingBox;
-      var bounding_elem = layer.BoundingBox;
       var dimension_elem = layer.Dimension;
       var style_elem = layer.Style;
 
@@ -656,8 +654,8 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          dimensions = createDimensionsArray(layer)
       }
 
-      if(typeof(bounding_elem) != "undefined" && typeof(ex_bounding_elem) != "undefined"){
-         bounding_boxes = createBoundingBoxes(layer);
+      if(typeof(ex_bounding_elem) != "undefined"){
+         bounding_box = createBoundingBox(layer);
       }
       if(style_elem){
          style = createStylesArray(layer);
@@ -665,55 +663,29 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
             style = undefined;
          }
       }
-      if(name && service_title && title && bounding_boxes && style){
-         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes.exGeographicBoundingBox, "MoreIndicatorInfo" : false})
-         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_boxes['exGeographicBoundingBox'], "BoundingBox": bounding_boxes['boundingBox'], "Dimensions": dimensions.dimensions || [], "Styles": style};
+      if(name && service_title && title && bounding_box && style){
+         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "MoreIndicatorInfo" : false})
+         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
          var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;
       }else{
-         digForLayers(layer, name, service_title, title, abstract, bounding_boxes, style, dimensions, clean_url, layers, provider);
+         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
       }
 
    }
 
 }
 
-function createBoundingBoxes(layer){
-   var bounding_boxes = {};
-   function bBox(bounding){
-      return {
-            "CRS":bounding.CRS,
-            "MinX":bounding.minx,
-            "MaxX":bounding.maxx,
-            "MinY":bounding.miny,
-            "MaxY":bounding.maxy
-         };
-   }
-
-   var boundingBox;
-   for(index in layer.BoundingBox){
-      bounding_elem = layer.BoundingBox[index].$
-      if(bounding_elem.CRS == "EPSG:4326"){
-         boundingBox = bBox(bounding_elem);
-         break;
-      }else if(bounding_elem.CRS == "EPSG:3857"){
-         boundingBox = bBox(bounding_elem);
-      }else if(bounding_elem.CRS == "CRS:84" && _.size(boundingBox) == 0){
-         boundingBox = bBox(bounding_elem);
-      }
-   }
-   
+function createBoundingBox(layer){   
    bounding_elem = layer.EX_GeographicBoundingBox[0]
    var exGeographicBoundingBox = {
       "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
       "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
       "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
       "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
-   };
-   bounding_boxes.exGeographicBoundingBox = exGeographicBoundingBox;
-   bounding_boxes.boundingBox = boundingBox;
-   return bounding_boxes;
+   }
+   return exGeographicBoundingBox;
 }
 
 function createStylesArray(layer){
