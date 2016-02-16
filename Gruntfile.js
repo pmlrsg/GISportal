@@ -37,41 +37,6 @@ var coreFiles = [
     "src/js/collaboration-event-bindings.js"
   ];
 
-var cssFiles = [
-    "src/css/reset.css",
-    "src/css/fonts.css",
-    "src/css/streamline.css",
-    "src/css/streamline-filled-in.css",
-    "src/css/type.css",
-    "src/css/overlay.css",      
-    "src/css/start.css",
-    "src/css/export.css",
-    "src/css/share.css",
-    "src/css/animation.css",
-    "src/css/jquery.nouislider.css",
-    "src/css/notify.css",
-    "src/css/timeline.css",
-    "src/css/main.css",
-    "src/css/grid.css",
-    "src/css/icons.css",
-    "src/css/panel.css",
-    "src/css/panel-slideout.css",
-    "src/css/add-layers-form.css",
-    "src/css/metadata-panel.css",
-    "src/css/scalebar.css",
-    "src/css/indicators.css",
-    "src/css/tables.css",
-    "src/css/graph.css",
-    "src/css/nv.d3.css",
-    "src/css/history.css",
-    "src/css/mapcontrols.css",
-    "html/js-libs/tooltipster/css/tooltipster.css",
-    "html/js-libs/tooltipster/css/themes/tooltipster-shadow.css",
-    "src/css/alerts.css",
-    "src/css/popup.css",
-    "src/css/collaboration.css"
-  ]
-
 function stripDirectory( file ) {
    return file.replace( /.+\/(.+?)>?$/, "$1" );
 }

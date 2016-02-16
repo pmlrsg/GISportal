@@ -472,7 +472,7 @@ gisportal.addLayersForm.showOwnerOptions = function(given_owner){
    $.ajax({
       url:  gisportal.middlewarePath + '/settings/get_owners',
       success: function( data ){
-         var owners = data.owners
+         var owners = data.owners;
          var output = [];
          for(var index in owners){
             var owner = owners[index];
@@ -494,7 +494,7 @@ gisportal.addLayersForm.showOwnerOptions = function(given_owner){
       gisportal.addLayersForm.server_info.owner = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
    });
-}
+};
 
 /**
 * This function displays both parts of the form

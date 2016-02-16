@@ -79,6 +79,7 @@ gisportal.graphs.initDOM = function() {
 
    gisportal.graphs.graphsHistoryList = $('.js-graphs-history-list');
    gisportal.graphs.graphsSavedList = $('.js-graphs-saved-list');
+   gisportal.graphs.popup.addActionListeners();
    
 };
 
@@ -100,3 +101,9 @@ gisportal.graphs.editPlot = function( plot ){
    gisportal.panelSlideout.openSlideout( 'active-plot' );
 };
 
+gisportal.graphs.popup = {};
+gisportal.graphs.popup.addActionListeners = function(){
+   $('span.js-plot-popup-close').on('click', function(){
+      $('div.js-plot-popup').toggleClass('hidden', true);
+   });
+};
