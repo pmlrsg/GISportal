@@ -29,7 +29,7 @@ gisportal.domainName = window.location.origin + window.location.pathname;
 gisportal.niceDomainName = gisportal.domainName.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 
 // Path to the python flask middleware
-gisportal.middlewarePath = gisportal.domainName + gisportal.config.paths.middlewarePath; // <-- Change Path to match left hand side of WSGIScriptAlias
+gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app"; // <-- Change Path to match left hand side of WSGIScriptAlias
 
 
 // Flask url paths, relates to /middleware/portalflask/views/
@@ -150,7 +150,7 @@ gisportal.loadVectorLayers = function() {
 
 
    $.ajax({
-      url: 'app/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
       error: function(e){

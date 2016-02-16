@@ -26,13 +26,16 @@ collaboration.initDOM = function() {
    var roomId = gisportal.utils.getURLParameter('room');
    
    $.ajax({
-      url: 'app/collaboration/dashboard/?domain=' + gisportal.niceDomainName,
+      url: gisportal.middlewarePath + '/collaboration/dashboard/?domain=' + gisportal.niceDomainName,
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
-               url: 'app/collaboration',
+               url: gisportal.middlewarePath + '/collaboration',
                success: function(data) {
-                  $('#collab-content').html(data);         
+                  $('#collab-content').html(data);
+                  $('.js-google-auth-button').click(function() {
+                     var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                  }); 
                },
             });
          },

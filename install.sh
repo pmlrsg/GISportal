@@ -6,10 +6,10 @@ function getDomainInfo {
 	  * ) ssl="" ;;
 	esac
 	echo
-	echo "Enter the domain name and press [ENTER]: "; read -e domain;
-   while [ -e config/site_settings/"$domain"/config-server.js ]
+	echo "Enter the domain name and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
+   while [ -e config/site_settings/"$nicedomain"/config-server.js ]
    do
-   	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain;
+   	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
    	if [ $domain == "cancel" ]
    		then
    			domain="/";
@@ -42,9 +42,9 @@ do
 	esac
 done
 
-if [ ! -e config/site_settings/"$domain" ]
+if [ ! -e config/site_settings/"$nicedomain" ]
 	then
-		mkdir -p config/site_settings/"$domain";
+		mkdir -p config/site_settings/"$nicedomain";
 fi
 
 if [ ! -e config/site_settings/layers ]
@@ -54,35 +54,35 @@ fi
 
 if [ $domain != "/" ]
 	then
-		echo "GLOBAL.config['$domain'] = {">>config/site_settings/"$domain"/config-server.js
-		echo "   // Application settings">>config/site_settings/"$domain"/config-server.js
-		echo "   app: {">>config/site_settings/"$domain"/config-server.js
-		echo "      // the port that the application will run on">>config/site_settings/"$domain"/config-server.js
-		echo "      port: 6789,">>config/site_settings/"$domain"/config-server.js
-		echo "   },">>config/site_settings/"$domain"/config-server.js
-		echo "   // redis connection settings">>config/site_settings/"$domain"/config-server.js
-		echo "   redisURL: 'http$ssl://localhost:6379/',">>config/site_settings/"$domain"/config-server.js
-		echo "   // OAuth2 settings from Google, plus others if applicable">>config/site_settings/"$domain"/config-server.js
-		echo "   auth: {">>config/site_settings/"$domain"/config-server.js
-		echo "      google: {">>config/site_settings/"$domain"/config-server.js
-		echo "         scope : 'https://www.googleapis.com/auth/userinfo.email',">>config/site_settings/"$domain"/config-server.js
-		echo "         clientid : '$clientid',">>config/site_settings/"$domain"/config-server.js
-		echo "         clientsecret : '$clientsecret',">>config/site_settings/"$domain"/config-server.js
-		echo "         callback : 'http$ssl://$domain/app/user/auth/google/callback',">>config/site_settings/"$domain"/config-server.js
-		echo "         prompt: 'select_account'">>config/site_settings/"$domain"/config-server.js
-		echo "      }">>config/site_settings/"$domain"/config-server.js
-		echo "   },">>config/site_settings/"$domain"/config-server.js
-		echo "   // session settings">>config/site_settings/"$domain"/config-server.js
-		echo "   session : {">>config/site_settings/"$domain"/config-server.js
-		echo "      // ssssh! it's secret (any randon string to keep prying eyes from seeing the content of the cookie)">>config/site_settings/"$domain"/config-server.js
-		echo "      secret : '$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)',">>config/site_settings/"$domain"/config-server.js
-		echo "      // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed">>config/site_settings/"$domain"/config-server.js
-		echo "      age : 0">>config/site_settings/"$domain"/config-server.js
-		echo "   },">>config/site_settings/"$domain"/config-server.js
-		echo "   admins:[">>config/site_settings/"$domain"/config-server.js
-		echo "      '$admin_email'">>config/site_settings/"$domain"/config-server.js
-		echo "   ]">>config/site_settings/"$domain"/config-server.js
-		echo "}">>config/site_settings/"$domain"/config-server.js
+		echo "GLOBAL.config['$nicedomain'] = {">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   // Application settings">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   app: {">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      // the port that the application will run on">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      port: 6789,">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   },">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   // redis connection settings">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   redisURL: 'http$ssl://localhost:6379/',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   // OAuth2 settings from Google, plus others if applicable">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   auth: {">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      google: {">>config/site_settings/"$nicedomain"/config-server.js
+		echo "         scope : 'https://www.googleapis.com/auth/userinfo.email',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "         clientid : '$clientid',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "         clientsecret : '$clientsecret',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "         callback : 'http$ssl://$domain/app/user/auth/google/callback',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "         prompt: 'select_account'">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      }">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   },">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   // session settings">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   session : {">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      // ssssh! it's secret (any randon string to keep prying eyes from seeing the content of the cookie)">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      secret : '$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)',">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      // the age in seconds that the cookie should persist; 0 == session cookie that expires when the browser is closed">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      age : 0">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   },">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   admins:[">>config/site_settings/"$nicedomain"/config-server.js
+		echo "      '$admin_email'">>config/site_settings/"$nicedomain"/config-server.js
+		echo "   ]">>config/site_settings/"$nicedomain"/config-server.js
+		echo "}">>config/site_settings/"$nicedomain"/config-server.js
 fi
 
 

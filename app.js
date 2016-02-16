@@ -96,9 +96,19 @@ app.use(passport.initialize());
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
-app.use('/', routes);
 var site_settings = require('./app/lib/site_settings.js');
+app.use('/', routes);
 app.use('/', site_settings);
+app.param('subfolder', function(req, res, next, subfolder){
+   if(subfolder != "app"){
+      req.SUBFOLDER = subfolder;
+      next();
+   }else{
+      res.send();
+   }
+})
+app.use('/:subfolder', routes);
+app.use('/:subfolder', site_settings);
 
 
 // Start listening...
