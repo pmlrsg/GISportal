@@ -6,7 +6,7 @@ function getDomainInfo {
 	  * ) ssl="" ;;
 	esac
 	echo
-	echo "Enter the domain name and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
+	echo "Enter the domain name (and path) and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
    while [ -e config/site_settings/"$nicedomain"/config-server.js ]
    do
    	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
@@ -16,9 +16,10 @@ function getDomainInfo {
    			return
    	fi
 	done
+	domainonly=$(echo $domain | cut -d/ -f1);
    echo "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read -e admin_email;
    echo "Follow this guide (Web Application [step 2]) : https://github.com/googleads/googleads-dotnet-lib/wiki/How-to-create-OAuth2-client-id-and-secret"
-   echo "Give the origin as:  http$ssl://$domain and the callback as: http$ssl://$domain/app/user/auth/google/callback"
+   echo "Give the origin as:  http$ssl://$domainonly and the callback as: http$ssl://$domain/app/user/auth/google/callback"
    while [ -z $clientid ]
    do
    	echo "Enter the retrieved clientid and press [ENTER]: "; read -e clientid;

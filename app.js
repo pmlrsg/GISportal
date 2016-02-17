@@ -14,6 +14,10 @@ var path = require('path');
 var fs = require("fs");
 
 
+var CURRENT_PATH = __dirname;
+var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
+
+
 // Express setup
 var app = express();
 
@@ -102,7 +106,13 @@ app.use('/', site_settings);
 app.param('subfolder', function(req, res, next, subfolder){
    if(subfolder != "app"){
       req.SUBFOLDER = subfolder;
-      next();
+      var domain = utils.getDomainName(req)
+      console.log(domain);
+      if(utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))){
+         next();
+      }else{
+         res.status(404).send('Sorry, This portal doesn\'t exist');
+      }
    }else{
       res.send();
    }

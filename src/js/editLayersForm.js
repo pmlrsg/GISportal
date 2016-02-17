@@ -207,6 +207,7 @@ gisportal.editLayersForm.addListeners = function(){
                         data: JSON.parse(removed_data),
                         success: function(){
                            this_span.closest("tr").toggleClass("hidden", false);
+                           gisportal.loadLayers();
                         }
                      });
                      //hide notification
