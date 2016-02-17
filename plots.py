@@ -9,6 +9,7 @@ Available functions
 listPlots: Return a list of available plot types.
 """
 
+from __future__ import print_function
 import __builtin__
 import sys
 
@@ -16,6 +17,7 @@ import numpy as np
 import pandas as pd
 import json
 import urllib
+import os, hashlib
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
@@ -412,7 +414,7 @@ def scatter(plot_data, outfile='/tmp/scatter.html'):
    
    plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
 
-   plot.circle('x', 'y', color=plot_palette[0][2], size=3, line_alpha=0, source=source)
+   plot.circle('x', 'y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
       
       
    # Legend placement needs to be after the first glyph set up.
@@ -420,22 +422,13 @@ def scatter(plot_data, outfile='/tmp/scatter.html'):
    plot.legend.location = "top_left"
    layout = vplot(plot)
    
-   # Example code to display the data in a table
-   #columns = [
-   #        TableColumn(field="date", title="Date", formatter=DateFormatter()),
-   #        TableColumn(field="mean", title="Mean"),
-   #    ]
-   #data_table = DataTable(source=source, columns=columns, width=400, height=280)
-
-   #layout = vplot(p, data_table)
-   
    # plot the points
-   output_file(outfile, 'Time Series')
+   output_file(outfile, 'Scatter Plot')
    
    save(layout)
 
 
-def get_plot_data(json_data):
+def get_plot_data(json_data, request_type='data'):
    series = json_data['plot']['data']['series']
    plot_type = json_data['plot']['type']
    plot_title = json_data['plot']['title']
@@ -498,8 +491,21 @@ def get_plot_data(json_data):
 
    return plot_data
 
-def plot(request, outfile):
-   plot_data = get_plot_data(request)
+def prepare_plot(request, outdir):
+   '''
+   Prepare_plot takes a plot request and hashes it to produce a key for future use.
+   It then parese the request to build the calls to the extract service and submits them
+   as single result tests to get the timing information.
+   If all looks OK it returns the hash to the caller, otherwise it returns an error.
+   '''
+
+   #plot_data = get_plot_data(request, 'time')
+   hasher = hashlib.sha1()
+   hasher.update(sys.stdin.read())
+   return hasher.hexdigest()
+
+def execute_plot(request, outfile):
+   plot_data = get_plot_data(request, 'data')
    if plot_data[0]['type'] == 'timeseries':
       plot_file = timeseries(plot_data, outfile)
    elif plot_data[0]['type'] == 'scatter':
@@ -511,5 +517,54 @@ def plot(request, outfile):
    
 
 if __name__ == "__main__":
-   request = json.load(sys.stdin)
-   plot(request, "/local/petwa/Dropbox/Jupyter/plot.html")
+   from argparse import ArgumentParser, RawTextHelpFormatter
+   import os
+
+   usage_text = """Usage: %prog [options]
+"""
+   description_text = """Plotting functions
+
+Examples:
+
+To prepare a plot for submission
+./plots.py -c prepare -d /tmp < testing/data/testscatter1.json
+
+To submit a prepared plot
+./plots.py -H da39a3ee5e6b4b0d3255bfef95601890afd80709 -d /tmp -c execute
+"""
+
+   valid_commands = ('prepare', 'execute', 'status')
+   cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
+   cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
+   cmdParser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="Enable verbose output")
+   cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory")
+   cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Hash of prepared command")
+
+   opts = cmdParser.parse_args()
+
+   if not os.path.isdir(opts.dirname):
+      print("'{}' is not a directory".format(opts.dirname))
+      sys.exit(1)
+   
+   if opts.command not in ('prepare', 'execute', 'status'):
+      print("Command must be one of {}".format(valid_commands))
+      sys.exit(1)
+
+   if opts.command == "prepare":
+      request = json.load(sys.stdin)
+      my_hash = prepare_plot(request, opts.dirname)
+      file_path = opts.dirname + "/" + my_hash + "-request.json"
+      with open(file_path, 'w') as outfile:
+         json.dump(request, outfile)
+      print(my_hash)
+   elif opts.command == "execute":
+      file_path = opts.dirname + "/" + opts.hash + "-request.json"
+      with open(file_path, 'r') as infile:
+         request = json.load(infile)
+      execute_plot(request, opts.dirname + "/" + opts.hash + "-plot.html")
+      print(opts.dirname + "/" + opts.hash + "-plot.html")
+   elif opts.command == "status":
+      pass
+   else:
+      # We should not be here
+      sys.exit(2)
