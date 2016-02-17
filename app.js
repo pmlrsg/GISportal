@@ -107,7 +107,6 @@ app.param('subfolder', function(req, res, next, subfolder){
    if(subfolder != "app"){
       req.SUBFOLDER = subfolder;
       var domain = utils.getDomainName(req)
-      console.log(domain);
       if(utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))){
          next();
       }else{

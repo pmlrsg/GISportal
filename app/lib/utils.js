@@ -33,7 +33,6 @@ utils.getDomainName = function(req){
    if(req.SUBFOLDER){
       domain += "_" + req.SUBFOLDER
    }
-   console.log(domain);
    return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');;
 }
 

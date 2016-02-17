@@ -9,7 +9,7 @@ passport.init = function(config) {
    console.log("List of domains with Google authentication settings:")
    for(domain in config){
       if(config[domain].auth){
-         console.log(domain);
+         console.log(domain.replace(/_/g, "/"));
          passport.use(domain,new GoogleStrategy({
             clientID: config[domain].auth.google.clientid,
             clientSecret: config[domain].auth.google.clientsecret,

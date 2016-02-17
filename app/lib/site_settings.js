@@ -155,7 +155,6 @@ router.get('/app/settings/get_owners', function(req, res) {
 
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
-   console.log(config_path);
    res.sendFile(config_path, function (err) {
       if (err) {
          handleError(err, res);
