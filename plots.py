@@ -443,7 +443,7 @@ def get_plot_data(json_data, request_type='data'):
       coverage = ds['coverage']
 
       # Build the request - based on the old style calls so shoud be compatible.
-      request = "%s?baseurl=%s&coverage=%s&type=%s&graphXAxis=%s&graphYAxis=%s&graphZAxis=%s&time=%s%s%s&bbox=%s&depth=%s" % \
+      request = "%s?baseurl=%s&coverage=%s&type=%s&graphXAxis=%s&graphYAxis=%s&graphZAxis=%s&time=%s%s%s&bbox=%s" % \
                   (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
                    urllib.quote_plus(ds['coverage']), 
                    plot_type, 
@@ -451,8 +451,9 @@ def get_plot_data(json_data, request_type='data'):
                    urllib.quote_plus(ds['graphYAxis']), 
                    urllib.quote_plus(ds['graphZAxis']),
                    urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
-                   urllib.quote_plus(ds['bbox']),
-                   urllib.quote_plus(ds['depth']))
+                   urllib.quote_plus(ds['bbox']))
+      if 'depth' in ds.keys():
+         request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
 
       response = json.load(urllib.urlopen(request))
 
@@ -468,13 +469,15 @@ def get_plot_data(json_data, request_type='data'):
       for s in series:
          ds = s['data_source']
          coverage = ds['coverage']
-         request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s&depth=%s" % \
+         request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s" % \
                    (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
                    urllib.quote_plus(ds['coverage']), 
                    "timeseries", 
                    urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
-                   urllib.quote_plus(ds['bbox']),
-                   urllib.quote_plus(ds['depth']))
+                   urllib.quote_plus(ds['bbox']))
+         if 'depth' in ds.keys():
+            request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
+
          response = json.load(urllib.urlopen(request))
 
          # LEGACY - this reformats the response to the new format.
@@ -569,8 +572,10 @@ To submit a prepared plot
       print(my_hash)
    elif opts.command == "execute":
       file_path = opts.dirname + "/" + opts.hash + "-request.json"
+      debug(2, "File: {}".format(file_path))
       with open(file_path, 'r') as infile:
          request = json.load(infile)
+      debug(3, "Request: {}".format(request['plot']))
       execute_plot(request, opts.dirname + "/" + opts.hash + "-plot.html")
       print(opts.dirname + "/" + opts.hash + "-plot.html")
    elif opts.command == "status":
