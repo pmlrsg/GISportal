@@ -515,6 +515,10 @@ def execute_plot(request, outfile):
 
    return True
    
+verbosity = 0
+def debug(level, msg):
+   if verbosity >= level: print(msg, file=sys.stderr)
+
 
 if __name__ == "__main__":
    from argparse import ArgumentParser, RawTextHelpFormatter
@@ -536,24 +540,30 @@ To submit a prepared plot
    valid_commands = ('prepare', 'execute', 'status')
    cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
    cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
-   cmdParser.add_argument("-v", "--verbose", action="store_true", dest="verbose", help="Enable verbose output")
+   cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output")
    cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory")
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Hash of prepared command")
 
    opts = cmdParser.parse_args()
 
+   verbosity = opts.verbose 
+
+   debug(1, "Verbosity is {}".format(opts.verbose))
+
    if not os.path.isdir(opts.dirname):
-      print("'{}' is not a directory".format(opts.dirname))
+      print("'{}' is not a directory".format(opts.dirname), file=sys.stderr)
       sys.exit(1)
    
    if opts.command not in ('prepare', 'execute', 'status'):
-      print("Command must be one of {}".format(valid_commands))
+      print("Command must be one of {}".format(valid_commands), file=sys.stderr)
       sys.exit(1)
 
    if opts.command == "prepare":
       request = json.load(sys.stdin)
+      debug(3, "Request: {}".format(request))
       my_hash = prepare_plot(request, opts.dirname)
       file_path = opts.dirname + "/" + my_hash + "-request.json"
+      debug(2, "File: {}".format(file_path))
       with open(file_path, 'w') as outfile:
          json.dump(request, outfile)
       print(my_hash)
