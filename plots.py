@@ -501,7 +501,7 @@ def prepare_plot(request, outdir):
 
    #plot_data = get_plot_data(request, 'time')
    hasher = hashlib.sha1()
-   hasher.update(sys.stdin.read())
+   hasher.update(json.dumps(request))
    return hasher.hexdigest()
 
 def execute_plot(request, outfile):
