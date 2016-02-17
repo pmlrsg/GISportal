@@ -1,0 +1,106 @@
+    {
+        "plot": {
+            "data": {
+                "series": [
+                    {
+                        "data_source": {
+                            "bbox": "-20.094,39.998,13.7,65.222",
+                            "coverage": "Chl",
+                            "depth": "-1.0",
+                            "metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_Chl.json",
+                            "middlewareUrl": "http://portal.marineopec.eu/service/wcs",
+                            "t_bounds": [
+                                "2002-12-22T15:37:58.651Z",
+                                "2013-12-16T00:00:00.000Z"
+                            ],
+                            "threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?"
+                        },
+                        "handler": "OPEC_SERVICE_WCS",
+                        "label": "1) Chlorophyll - North East Atlantic - PML",
+                        "logo": "http://portal.marineopec.eu/img/providers/pml.png",
+                        "markdown": [
+                            "http://portal.marineopec.eu/service/metadata/indicator/Chlorophyll",
+                            "http://portal.marineopec.eu/service/metadata/provider/PML"
+                        ],
+                        "meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+                        "type": "line",
+                        "yAxis": 1
+                    },
+                    {
+                        "data_source": {
+                            "bbox": "-20.094,39.998,13.7,65.222",
+                            "coverage": "DIN",
+                            "depth": "-1.0",
+                            "metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_DIN.json",
+                            "middlewareUrl": "http://portal.marineopec.eu/service/wcs",
+                            "t_bounds": [
+                                "2006-12-22T15:37:58.651Z",
+                                "2013-12-16T00:00:00.000Z"
+                            ],
+                            "threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?"
+                        },
+                        "handler": "OPEC_SERVICE_WCS",
+                        "label": "2) Nitrate - North East Atlantic - PML",
+                        "logo": "http://portal.marineopec.eu/img/providers/pml.png",
+                        "markdown": [
+                            "http://portal.marineopec.eu/service/metadata/indicator/Nitrate",
+                            "http://portal.marineopec.eu/service/metadata/provider/PML"
+                        ],
+                        "meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+                        "type": "line",
+                        "yAxis": 2
+                    }
+                ]
+            },
+            "downloadTypes": [
+                {
+                    "key": "csv",
+                    "label": "CSV"
+                },
+                {
+                    "key": "png",
+                    "label": "PNG"
+                },
+                {
+                    "key": "meta-data",
+                    "label": "Meta Data"
+                },
+                {
+                    "key": "logos",
+                    "label": "Logos"
+                },
+                {
+                    "key": "svg",
+                    "label": "SVG"
+                }
+            ],
+            "style": "basic",
+            "title": "PML: Chlorophyll / PML: Nitrate",
+            "type": "timeseries",
+            "xAxis": {
+                "label": "Date/Time",
+                "tickFormat": "%d/%m/%Y",
+                "ticks": "auto",
+                "weight": "auto"
+            },
+            "y1Axis": {
+                "label": "Chlorophyll Elv:-1.0M (mg C m-3)",
+                "scale": "linear",
+                "tickFormat": "auto",
+                "ticks": "auto",
+                "weight": "auto"
+            },
+            "y2Axis": {
+                "label": "Nitrate Elv:-1.0M (mmol m-3)",
+                "scale": "linear",
+                "tickFormat": "auto",
+                "ticks": "auto",
+                "weight": "auto"
+            }
+        },
+        "style": {
+            "logos": [
+                "http://portal.marineopec.eu/img/providers/pml.png"
+            ]
+        }
+    }

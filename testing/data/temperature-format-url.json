@@ -1,0 +1,27 @@
+{
+    "coverages": ["SST"],
+    "type": "timeseries",
+    "SST": {"url": 
+"values":{"Date":[
+                               "2013-11-16T00:00:00"
+                             ],
+                      "Max": [
+                               19.27879524230957
+                             ],
+                      "Mean": [
+                               12.045310460974147
+                             ],
+                      "Median": [
+                               11.87871265411377
+                             ],
+                      "Min": [
+                               4.485976696014403
+                             ],
+                      "Standard Deviation": [
+                               3.3710469141333177
+                             ]
+                     }
+            "scale": "linear",
+            "units": "(degrees C)"
+           }
+}

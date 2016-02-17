@@ -1,0 +1,71 @@
+[{
+"request": {
+"handler": "OPEC_SERVICE_WCS",
+"data_source": {
+"coverage": "Chl",
+"t_bounds": [
+"2012-12-22T15:37:58.651Z",
+"2013-12-16T00:00:00.000Z"
+],
+"bbox": "-20.094,39.998,13.7,65.222",
+"depth": "-1.0",
+"threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?",
+"metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_Chl.json",
+"middlewareUrl": "http://portal.marineopec.eu/service/wcs"
+},
+"label": "1) Chlorophyll - North East Atlantic - PML",
+"yAxis": 1,
+"type": "line",
+"meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+"markdown": [
+"http://portal.marineopec.eu/service/metadata/indicator/Chlorophyll",
+"http://portal.marineopec.eu/service/metadata/provider/PML"
+],
+"logo": "http://portal.marineopec.eu/img/providers/pml.png"
+},
+"level": "info",
+"message": "Getting data source OPEC_SERVICE_WCS",
+"timestamp": "2016-02-04T10:20:21.593Z"
+},
+{
+"job_id": 548,
+"level": "info",
+"message": "Getting URL http://portal.marineopec.eu/service/wcs?baseurl=https%3A%2F%2Frsg.pml.ac.uk%2Fthredds%2Fwcs%2FPML_GEN_M%3F&coverage=Chl&type=timeseries&time=2012-12-22T15%3A37%3A58.651Z%2F2013-12-16T00%3A00%3A00.000Z&bbox=-20.094%2C39.998%2C13.7%2C65.222&depth=-1.0",
+"timestamp": "2016-02-04T10:20:21.594Z"
+},
+{
+"request": {
+"handler": "OPEC_SERVICE_WCS",
+"data_source": {
+"coverage": "DIN",
+"t_bounds": [
+"2012-12-22T15:37:58.651Z",
+"2013-12-16T00:00:00.000Z"
+],
+"bbox": "-20.094,39.998,13.7,65.222",
+"depth": "-1.0",
+"threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?",
+"metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_DIN.json",
+"middlewareUrl": "http://portal.marineopec.eu/service/wcs"
+},
+"label": "2) Nitrate - North East Atlantic - PML",
+"yAxis": 2,
+"type": "line",
+"meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+"markdown": [
+"http://portal.marineopec.eu/service/metadata/indicator/Nitrate",
+"http://portal.marineopec.eu/service/metadata/provider/PML"
+],
+"logo": "http://portal.marineopec.eu/img/providers/pml.png"
+},
+"level": "info",
+"message": "Getting data source OPEC_SERVICE_WCS",
+"timestamp": "2016-02-04T10:20:21.595Z"
+},
+{
+"job_id": 548,
+"level": "info",
+"message": "Getting URL http://portal.marineopec.eu/service/wcs?baseurl=https%3A%2F%2Frsg.pml.ac.uk%2Fthredds%2Fwcs%2FPML_GEN_M%3F&coverage=DIN&type=timeseries&time=2012-12-22T15%3A37%3A58.651Z%2F2013-12-16T00%3A00%3A00.000Z&bbox=-20.094%2C39.998%2C13.7%2C65.222&depth=-1.0",
+"timestamp": "2016-02-04T10:20:21.596Z"
+}
+]
