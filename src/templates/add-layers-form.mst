@@ -25,7 +25,7 @@
          </div>
 
          <label data-field="URL">Scalebar Custom URL:</label>
-         <input type="text" data-field="URL" value="{{URL}}" data-id="{{list_id}}"/></br>
+         <input type="text" data-field="URL" value="{{legendSettings.URL}}" data-id="{{list_id}}"/></br>
 
          <div class="clearfix legend-parameters">
             {{#with legendSettings.Parameters}}
