@@ -1,4 +1,7 @@
 from . import Extractor
+from extraction_utils import WCSHelper
+import tempfile
+import uuid
 
 class TransectExtractor(Extractor):
 	"""docstring for TransectExtractor"""
@@ -7,4 +10,12 @@ class TransectExtractor(Extractor):
 		
 	def getData(self):
 		print " I AM AN OVERLOADED FUNCTION"
-		return "I WAS RETURNED FROM AN OVERLOADED FUNCTION"
+		print self.extract_area
+		print "="*20
+		print self.extract_area
+		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area)
+		data = wcs_extractor.getData()
+		fname = self.outdir+str(uuid.uuid4())+".nc"
+		with open(fname, 'w') as outfile:
+			outfile.write(data.read())
+		return fname
