@@ -22,7 +22,7 @@ example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,
 import argparse
 from extractors import BasicExtractor, IrregularExtractor, TransectExtractor
 from extraction_utils import Debug, get_transect_bounds, get_transect_times
-from analysis_types import BasicStats
+from analysis_types import BasicStats, TransectStats
 from shapely import wkt
 
 def main():
@@ -76,7 +76,7 @@ def main():
 		time = get_transect_times(args.csv)
 		extractor = TransectExtractor(args.wcs_url, [time], "time", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
-		stats = BasicStats(filename, args.wcs_variable)
+		stats = TransectStats(filename, args.wcs_variable, args.csv)
 		output_data = stats.process()
 	else :
 		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
