@@ -429,6 +429,7 @@ def scatter(plot_data, outfile='/tmp/scatter.html'):
 
 
 def get_plot_data(json_data, request_type='data'):
+   debug(2, "get_plot_data: Started")
    series = json_data['plot']['data']['series']
    plot_type = json_data['plot']['type']
    plot_title = json_data['plot']['title']
@@ -462,7 +463,11 @@ def get_plot_data(json_data, request_type='data'):
          data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
       debug(4, "Requesting data: {}".format(data_request))
 
-      response = json.load(urllib.urlopen(data_request))
+      try:
+         response = json.load(urllib.urlopen(data_request))
+      except ValueError:
+         return []   
+         
 
       # TODO - Old style extractor response. So pull the data out.
       data = response['output']['data']
@@ -495,7 +500,12 @@ def get_plot_data(json_data, request_type='data'):
             data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
          debug(4, "Requesting data: {}".format(data_request))
 
-         response = json.load(urllib.urlopen(data_request))
+         try:
+            response = json.load(urllib.urlopen(data_request))
+         except ValueError:
+            debug(3, "Data request, {}, failed".format(data_request))
+            return []   
+         
 
          # LEGACY - this reformats the response to the new format.
          data = response['output']['data']
@@ -526,6 +536,11 @@ def prepare_plot(request, outdir):
 
 def execute_plot(request, outfile):
    plot_data = get_plot_data(request, 'data')
+
+   if len(plot_data) == 0:
+      debug(0, "Data request failed")
+      return False
+
    if plot_data[0]['type'] == 'timeseries':
       plot_file = timeseries(plot_data, outfile)
    elif plot_data[0]['type'] == 'scatter':
@@ -566,21 +581,20 @@ To submit a prepared plot
 
    opts = cmdParser.parse_args()
 
-   verbosity = opts.verbose 
+   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose 
 
    debug(1, "Verbosity is {}".format(opts.verbose))
-
    if not os.path.isdir(opts.dirname):
-      print("'{}' is not a directory".format(opts.dirname), file=sys.stderr)
+      debug(0,"'{}' is not a directory".format(opts.dirname))
       sys.exit(1)
    
    if opts.command not in ('prepare', 'execute', 'status'):
-      print("Command must be one of {}".format(valid_commands), file=sys.stderr)
+      debug(0,"Command must be one of {}".format(valid_commands))
       sys.exit(1)
 
    if opts.command == "prepare":
       request = json.load(sys.stdin)
-      debug(3, "Recieved request: {}".format(request))
+      debug(3, "Received request: {}".format(request))
       my_hash = prepare_plot(request, opts.dirname)
       file_path = opts.dirname + "/" + my_hash + "-request.json"
       debug(2, "File: {}".format(file_path))
@@ -593,8 +607,11 @@ To submit a prepared plot
       with open(file_path, 'r') as infile:
          request = json.load(infile)
       debug(3, "Request: {}".format(request['plot']))
-      execute_plot(request, opts.dirname + "/" + opts.hash + "-plot.html")
-      print(opts.dirname + "/" + opts.hash + "-plot.html")
+      if execute_plot(request, opts.dirname + "/" + opts.hash + "-plot.html"):
+         print(opts.dirname + "/" + opts.hash + "-plot.html")
+      else:
+         debug(0, "Failed to comlete plot")
+         sys.exit(2)
    elif opts.command == "status":
       pass
    else:
