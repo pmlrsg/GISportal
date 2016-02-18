@@ -11,7 +11,9 @@ var titleCase = require('to-title-case');
 var user = require('./user.js');
 var bunyan = require('bunyan'); // Added
 var utils = require('./utils.js');
+var pythonShell = require('python-shell');
 
+var child_process = require('child_process');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
@@ -300,6 +302,26 @@ router.all('/app/settings/restore_server_cache', function(req, res){
          }
       });
    }
+});
+
+router.all('/app/settings/plot', function(req, res){
+   var data = req.body;
+
+   //var child = child_process.spawn('python',[path.join(__dirname, "../../../plotting/plots.py")]);
+   var child = child_process.spawn('python', ["-u", path.join(__dirname, "../../../plotting/plots.py")]);
+
+   child.stdout.on('data', function(data){
+      console.log(data.toString());
+   });
+
+   child.stdin.write(JSON.stringify(data.request));
+   child.stdin.end();
+
+   //child.on('close', function(code){
+   //   console.log("Closed with code: " + code);
+   //})
+
+   res.send("");
 });
 
 router.all('/app/settings/update_layer', function(req, res){

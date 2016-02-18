@@ -7,10 +7,7 @@
  */
 
 // Encapsulation it for neatness
-gisportal.graphs.Plot =(function(){
-   // Location of the graphing server
-   var graphServerUrl = gisportal.config.paths.graphServer;
-   
+gisportal.graphs.Plot =(function(){    
    //
    var Plot = function(){
       
@@ -423,7 +420,7 @@ gisportal.graphs.Plot =(function(){
       // Post it to the server
       $.ajax({
          method: 'post',
-         url: graphServerUrl + '/plot',
+         url: gisportal.middlewarePath + '/settings/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',
