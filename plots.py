@@ -440,6 +440,7 @@ def get_plot_data(json_data, request_type='data'):
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
       ds = series[0]['data_source']
+      coverage = ds['coverage']
       time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
       debug(3,"Time bounds: {}".format(time_bounds))
 
@@ -477,12 +478,6 @@ def get_plot_data(json_data, request_type='data'):
          coverage = ds['coverage']
          time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
          debug(3,"Time bounds: {}".format(time_bounds))
-         request = "%s?baseurl=%s&coverage=%s&type=%s&time=%s%s%s&bbox=%s" % \
-                   (ds['middlewareUrl'], urllib.quote_plus(ds['threddsUrl']), 
-                   urllib.quote_plus(ds['coverage']), 
-                   "timeseries", 
-                   urllib.quote_plus(ds['t_bounds'][0]), urllib.quote_plus("/"), urllib.quote_plus(ds['t_bounds'][1]), 
-                   urllib.quote_plus(ds['bbox']))
          request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
                       ds['middlewareUrl'], 
                       urllib.quote_plus(ds['threddsUrl']), 
@@ -498,9 +493,9 @@ def get_plot_data(json_data, request_type='data'):
             request = request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
          if 'depth' in ds.keys():
             request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-         debug(3, request)
          if 'depth' in ds.keys():
             request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
+         debug(3, "Request: ".format(request))
 
          response = json.load(urllib.urlopen(request))
 
