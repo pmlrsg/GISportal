@@ -445,7 +445,7 @@ def get_plot_data(json_data, request_type='data'):
       debug(3,"Time bounds: {}".format(time_bounds))
 
       # Build the request - based on the old style calls so shoud be compatible.
-      request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
+      data_request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
                    ds['middlewareUrl'], 
                    urllib.quote_plus(ds['threddsUrl']), 
                    urllib.quote_plus(ds['coverage']), 
@@ -453,16 +453,16 @@ def get_plot_data(json_data, request_type='data'):
                    time_bounds,
                    urllib.quote_plus(ds['bbox']))
       if 'graphXAxis' in ds.keys():
-         request = request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
+         data_request = data_request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
       if 'graphYAxis' in ds.keys():
-         request = request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
+         data_request = data_request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
       if 'graphZAxis' in ds.keys():
-         request = request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
+         data_request = data_request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
       if 'depth' in ds.keys():
-         request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-      debug(3, request)
+         data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
+      debug(4, "Requesting data: {}".format(data_request))
 
-      response = json.load(urllib.urlopen(request))
+      response = json.load(urllib.urlopen(data_request))
 
       # TODO - Old style extractor response. So pull the data out.
       data = response['output']['data']
@@ -478,7 +478,7 @@ def get_plot_data(json_data, request_type='data'):
          coverage = ds['coverage']
          time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
          debug(3,"Time bounds: {}".format(time_bounds))
-         request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
+         data_request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
                       ds['middlewareUrl'], 
                       urllib.quote_plus(ds['threddsUrl']), 
                       urllib.quote_plus(ds['coverage']), 
@@ -486,18 +486,16 @@ def get_plot_data(json_data, request_type='data'):
                       time_bounds,
                       urllib.quote_plus(ds['bbox']))
          if 'graphXAxis' in ds.keys():
-            request = request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
+            data_request = data_request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
          if 'graphYAxis' in ds.keys():
-            request = request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
+            data_request = data_request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
          if 'graphZAxis' in ds.keys():
-            request = request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
+            data_request = data_request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
          if 'depth' in ds.keys():
-            request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-         if 'depth' in ds.keys():
-            request = request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-         debug(3, "Request: ".format(request))
+            data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
+         debug(4, "Requesting data: {}".format(data_request))
 
-         response = json.load(urllib.urlopen(request))
+         response = json.load(urllib.urlopen(data_request))
 
          # LEGACY - this reformats the response to the new format.
          data = response['output']['data']
@@ -582,7 +580,7 @@ To submit a prepared plot
 
    if opts.command == "prepare":
       request = json.load(sys.stdin)
-      debug(3, "Request: {}".format(request))
+      debug(3, "Recieved request: {}".format(request))
       my_hash = prepare_plot(request, opts.dirname)
       file_path = opts.dirname + "/" + my_hash + "-request.json"
       debug(2, "File: {}".format(file_path))
