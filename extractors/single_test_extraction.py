@@ -27,5 +27,5 @@ class SingleExtractor(Extractor):
 		stop_time = time.time()
 		ret = {}
 		ret['time_diff'] = stop_time - start_time
-		ret['file_size'] = sizeof_fmt(os.stat(fname).st_size)
+		ret['file_size'] = os.stat(fname).st_size
 		return json.dumps(ret)
