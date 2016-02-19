@@ -37,7 +37,7 @@ def main():
 	parser.add_argument("-v", "--debug", action="store_true", dest="debug", help="a debug flag - if passed there will be a tonne of log output and all interim files will be saved", required=False)
 	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=0)
 	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False)#, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
-	parser.add_argument("-bbox", "--bbox", action="store", dest="bbox", help="A string representation of teh polygon to extract", required=False)
+	parser.add_argument("-b", "--bbox", action="store", dest="bbox", help="A string representation of teh polygon to extract", required=False)
 	parser.add_argument("-time", action="store", dest="time", help="A time string for in the format startdate/enddate or a single date", required=True)
 	parser.add_argument("-mask", action="store", dest="mask", help="a polygon representing teh irregular area", required=False)
 	parser.add_argument("-csv", action="store", dest="csv", help="a csv file with lat,lon,date for use in transect extraction", required=False)
