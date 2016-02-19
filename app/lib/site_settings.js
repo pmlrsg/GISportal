@@ -11,7 +11,9 @@ var titleCase = require('to-title-case');
 var user = require('./user.js');
 var bunyan = require('bunyan'); // Added
 var utils = require('./utils.js');
+var pythonShell = require('python-shell');
 
+var child_process = require('child_process');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
@@ -155,11 +157,11 @@ router.get('/app/settings/get_owners', function(req, res) {
 
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
-   try{
-      res.sendFile(config_path);
-   }catch(e){
-      handleError(e);
-   }
+   res.sendFile(config_path, function (err) {
+      if (err) {
+         handleError(err, res);
+      }
+    });
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
@@ -300,6 +302,26 @@ router.all('/app/settings/restore_server_cache', function(req, res){
          }
       });
    }
+});
+
+router.all('/app/settings/plot', function(req, res){
+   var data = req.body;
+
+   //var child = child_process.spawn('python',[path.join(__dirname, "../../../plotting/plots.py")]);
+   var child = child_process.spawn('python', ["-u", path.join(__dirname, "../../../plotting/plots.py")]);
+
+   child.stdout.on('data', function(data){
+      console.log(data.toString());
+   });
+
+   child.stdin.write(JSON.stringify(data.request));
+   child.stdin.end();
+
+   //child.on('close', function(code){
+   //   console.log("Closed with code: " + code);
+   //})
+
+   res.send("");
 });
 
 router.all('/app/settings/update_layer', function(req, res){
@@ -666,6 +688,9 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
       if(name && service_title && title && bounding_box && style){
          layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "MoreIndicatorInfo" : false})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
+         if(!utils.directoryExists(LAYER_CONFIG_PATH)){
+            utils.mkdirpSync(LAYER_CONFIG_PATH);
+         }
          var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;

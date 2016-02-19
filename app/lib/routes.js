@@ -4,12 +4,13 @@ var router = express.Router();
 var passport = require('passport');
 var user = require('./user.js');
 var utils = require('./utils.js');
+var path = require('path');
 
+var html_dir = __dirname + "/../../html"
 module.exports = router;
 
-
 router.get('/', function(req, res){
-   res.sendFile(html_dir + '/index.html');
+   res.sendFile(path.join(html_dir, '/index.html'));
 })
 
 // default path; check for cookie and if it's not there send them to the login page

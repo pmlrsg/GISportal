@@ -14,6 +14,10 @@ var path = require('path');
 var fs = require("fs");
 
 
+var CURRENT_PATH = __dirname;
+var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
+
+
 // Express setup
 var app = express();
 
@@ -96,9 +100,24 @@ app.use(passport.initialize());
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
-app.use('/', routes);
 var site_settings = require('./app/lib/site_settings.js');
+app.use('/', routes);
 app.use('/', site_settings);
+app.param('subfolder', function(req, res, next, subfolder){
+   if(subfolder != "app"){
+      req.SUBFOLDER = subfolder;
+      var domain = utils.getDomainName(req)
+      if(utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))){
+         next();
+      }else{
+         res.status(404).send('Sorry, This portal doesn\'t exist');
+      }
+   }else{
+      res.send();
+   }
+})
+app.use('/:subfolder', routes);
+app.use('/:subfolder', site_settings);
 
 
 // Start listening...

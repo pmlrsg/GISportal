@@ -140,7 +140,7 @@ gisportal.map_settings.init = function() {
    // WMS URL event handler for refresh cache checkbox
    $('input.js-wms-url').on('change', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var input_value = $('input.js-wms-url')[0].value;
+      var input_value = $('input.js-wms-url')[0].value.split("?")[0];
       if(input_value.length > 0){
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.

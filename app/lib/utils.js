@@ -1,8 +1,11 @@
 var utils = {}
 var fs = require("fs");
 var path = require("path");
+var bunyan = require('bunyan');
 
 module.exports = utils;
+
+var log = bunyan.createLogger({name: "Portal Middleware"});
 
 utils.fileExists = function(filePath)
 {
@@ -29,7 +32,11 @@ utils.directoryExists = function(filePath)
 }
 
 utils.getDomainName = function(req){
-   return (req.headers.host + req.url).split("/app")[0].replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');;
+   var domain = req.headers.host
+   if(req.SUBFOLDER){
+      domain += "_" + req.SUBFOLDER
+   }
+   return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');;
 }
 
 utils.mkdirpSync = function (dirpath) {
@@ -40,5 +47,15 @@ utils.mkdirpSync = function (dirpath) {
       if(!utils.directoryExists(part_path)){
          fs.mkdirSync( part_path );
       }
+   }
+}
+
+
+utils.handleError = function(err, res){
+   try{
+      res.status(err.status || 500);
+      res.send({message: err.message});
+      log.error(err);
+   }catch(e){
    }
 }
