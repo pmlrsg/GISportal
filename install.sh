@@ -5,8 +5,8 @@ function getDomainInfo {
 	  y|Y ) ssl="s";;
 	  * ) ssl="" ;;
 	esac
-	echo
-	echo "Enter the domain name (and path) and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
+	echo ""
+	echo "Enter the domain name (and path, without the http:// part), e.g. 'www.example.com/portal', and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
    while [ -e config/site_settings/"$nicedomain"/config-server.js ]
    do
    	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
@@ -17,16 +17,27 @@ function getDomainInfo {
    	fi
 	done
 	domainonly=$(echo $domain | cut -d/ -f1);
+   echo ""
    echo "Enter an admin email address (must be linked to a gmail account) and press [ENTER]: "; read -e admin_email;
-   echo "Follow this guide (Web Application [step 2]) : https://github.com/googleads/googleads-dotnet-lib/wiki/How-to-create-OAuth2-client-id-and-secret"
-   echo "Give the origin as:  http$ssl://$domainonly and the callback as: http$ssl://$domain/app/user/auth/google/callback"
+   echo ""
+   echo "OAuth Settings using Google"
+   echo "---------------------------"
+   echo "If you are unfamiliar with how to setup OAuth authentication then this guide will "
+   echo "help:  https://support.google.com/cloud/answer/6158849/?hl=en&authuser=0"
+   echo ""
+   echo "Go to https://console.developers.google.com/apis/credentials and create a new OAuth 2.0 client"
+   echo "ID for a Web Application; you will be asked for the following pieces of information: "
+   echo ""
+   echo " - Authorised JavaScript origin:   http$ssl://$domainonly"
+   echo " - Authorised redirect URIs:       http$ssl://$domain/app/user/auth/google/callback"
+   echo ""
    while [ -z $clientid ]
    do
-   	echo "Enter the retrieved clientid and press [ENTER]: "; read -e clientid;
+   	echo "Enter the Client ID and press [ENTER]: "; read -e clientid;
    done
    while [ -z $clientsecret ]
    do
-   	echo "Enter the retrieved clientsecret and press [ENTER]: "; read -e clientsecret;
+   	echo "Enter the Client Secret and press [ENTER]: "; read -e clientsecret;
 	done
 }
 echo "Configuring your new portal..."
@@ -96,5 +107,10 @@ if [ ! -e config/base_config.js ]
 		cp ./config_examples/base_config.js ./config/base_config.js;
 fi
 
-grunt dev
-node app.js
+grunt
+
+echo ""
+echo "The configuration is complete; run the following command to start the application:"
+echo ""
+echo "node app.js"
+echo ""
