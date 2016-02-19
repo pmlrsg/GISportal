@@ -31,7 +31,7 @@ function getDomainInfo {
 }
 echo "Configuring your new portal..."
 
-npm install
+npm install --silent
 
 while [ -z $domain ]
 do
