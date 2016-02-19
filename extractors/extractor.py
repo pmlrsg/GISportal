@@ -11,7 +11,7 @@ class Extractor(object):
 		self.extract_dates = extract_dates
 		self.extract_area = extract_area
 		self.extract_variable = extract_variable
-		self.outdir = "/users/rsg/olcl/scratch/extractor_testing/"
+		self.outdir = "/tmp/"
 
 	def __repr__(self):
 		return "< "+str(self.__class__)+"  "+self.wcs_url+" , ["+",".join(self.extract_dates)+"] >"
