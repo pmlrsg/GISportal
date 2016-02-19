@@ -43,14 +43,14 @@ def main():
 	parser.add_argument("-csv", action="store", dest="csv", help="a csv file with lat,lon,date for use in transect extraction", required=False)
 	args = parser.parse_args()
 
-	print args.debug
+	#print args.debug
 	debug = Debug(args.debug)
 	debug.log("a message to test debugging")
 
 	if(args.geom):
-		print "geom found - generating bbox"
+		#print "geom found - generating bbox"
 		bbox = wkt.loads(args.geom).bounds
-		print bbox
+		#print bbox
 	if(args.bbox):
 		bbox = [args.bbox]
 
@@ -68,7 +68,7 @@ def main():
 	elif (args.extract_type == "trans-lat"):
 		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
-		print filename
+		#print filename
 	elif (args.extract_type == "trans-long"):
 		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "longitude", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()

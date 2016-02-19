@@ -16,8 +16,8 @@ class SingleExtractor(Extractor):
 
 
 	def getData(self):
-		print "="*20
-		print self.extract_dates
+		#print "="*20
+		#print self.extract_dates
 		start_time = time.time()
 		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, single=True)
 		data = wcs_extractor.getData()
