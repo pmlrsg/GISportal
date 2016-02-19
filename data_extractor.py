@@ -52,7 +52,7 @@ def main():
 		bbox = wkt.loads(args.geom).bounds
 		print bbox
 	if(args.bbox):
-		bbox = bbox
+		bbox = [args.bbox]
 
 
 
