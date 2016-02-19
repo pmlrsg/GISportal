@@ -20,7 +20,7 @@ example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,
 """
 
 import argparse
-from extractors import BasicExtractor, IrregularExtractor, TransectExtractor
+from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
 from extraction_utils import Debug, get_transect_bounds, get_transect_times
 from analysis_types import BasicStats, TransectStats
 from shapely import wkt
@@ -30,7 +30,7 @@ def main():
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["basic","irregular","trans-lat","trans-long","trans-time"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["single","basic","irregular","trans-lat","trans-long","trans-time"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
 	parser.add_argument("-url", "--wcs_url", action="store", dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
@@ -78,6 +78,9 @@ def main():
 		filename = extractor.getData()
 		stats = TransectStats(filename, args.wcs_variable, args.csv)
 		output_data = stats.process()
+	elif (args.extract_type == "single"):
+		extractor = SingleExtractor(args.wcs_url, args.time, extract_area=bbox, extract_variable=args.wcs_variable)
+		output_data = extractor.getData()
 	else :
 		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
 

@@ -18,11 +18,20 @@ def get_transect_times(_csv):
 		data = csv.DictReader(csvfile, delimiter=',')
 		dates = []
 		for row in data:
-			date = row['Dates'].split(' ')[0]
+			date = row['Date'].split(' ')[0]
 			dates.append(datetime.datetime.strptime(date, '%d/%m/%Y'))
 	return "%s/%s" % (min(dates), max(dates))
 
 def getCsvDict(_csv):
+	ret = {}
+	ret['Lat'] = []
+	ret['Lon'] = []
+	ret['Date'] = []
 	with open(_csv, "rb") as csvfile:
 		data = csv.DictReader(csvfile, delimiter=',')
-	return data
+		for row in data:
+			for key in row:
+				
+				ret[key].append(row[key])
+	print ret
+	return ret

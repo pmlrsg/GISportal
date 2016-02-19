@@ -552,3 +552,11 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
 
    return masked_variable, to_be_masked, masker,  variable
 
+
+
+def sizeof_fmt(num, suffix='B'):
+    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)

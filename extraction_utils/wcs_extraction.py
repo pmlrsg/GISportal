@@ -3,9 +3,10 @@ import logging
 
 class WCSHelper(object):
 	"""docstring for WCSHelper"""
-	def __init__(self, url, dates, variable, bbox):
+	def __init__(self, url, dates, variable, bbox, single=False):
 		super(WCSHelper, self).__init__()
 		self.url = url
+		self.single = single
 		self.dates = dates
 		self.variable = variable
 		self.bbox = bbox
@@ -19,9 +20,12 @@ class WCSHelper(object):
 	def getData(self):
 		print '-'*20
 		print self.bbox
-		print "/".join(self.dates)
+		print self.dates
 		time = ["2009-11-01T00:00:00Z"]
-		output = self.wcs.getCoverage(identifier=self.variable, time=self.dates, bbox=self.bbox, format="NetCDF3")
+		if self.single :
+			output = self.wcs.getCoverage(identifier=self.variable, time=[self.dates], bbox=self.bbox, format="NetCDF3")
+		else:	
+			output = self.wcs.getCoverage(identifier=self.variable, time=self.dates, bbox=self.bbox, format="NetCDF3")
 		return output
 
 

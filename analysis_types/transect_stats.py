@@ -1,6 +1,7 @@
 import netCDF4 as netCDF
 from extraction_utils import basic, getCsvDict
 import json
+import csv
 
 class TransectStats(object):
 	"""docstring for TransectStats"""
@@ -13,9 +14,10 @@ class TransectStats(object):
 
 	def process(self):
 		print "running basic processing on %s" % self.filename
-		data = getCsvDict(self._csv)
-		for row in data:
-			print "getting data from %f %f for %s" % (row['Lat'], row['Lon'], row['Date'])
+		with open(self._csv, "rb") as csvfile:
+			data = csv.DictReader(csvfile, delimiter=',')
+			for row in data:
+				print "getting data from %f %f for %s" % (float(row['Lat']), float(row['Lon']), row['Date'])
 		netcdf_file = netCDF.Dataset(self.filename, "r")
 		return data
 
