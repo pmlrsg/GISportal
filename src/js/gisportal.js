@@ -33,9 +33,7 @@ gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app"; // 
 
 
 // Flask url paths, relates to /middleware/portalflask/views/
-gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
-gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
 gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';   // Flask (Python) service OpenLayers proxy

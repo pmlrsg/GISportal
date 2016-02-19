@@ -1003,7 +1003,7 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
    //console.log(layerId);
    // Select tab
    // temp solution
-   console.log(tabName);
+   //console.log(tabName);
    if(tabName=="analysis"){
       gisportal.vectorSelectionTest( layerId, tabName );
    }

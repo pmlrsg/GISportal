@@ -379,7 +379,7 @@ gisportal.graphs.Plot =(function(){
                // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
                // Location of the middle ware to do the analytics 
-               "middlewareUrl" : gisportal.middlewarePath + '/wcs'
+               "middlewareUrl" : "http://portal.marineopec.eu/service/wcs" // Eventually will not be needed!!
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
@@ -417,20 +417,20 @@ gisportal.graphs.Plot =(function(){
       // Generate the request object
       var request = this.buildRequest();
       
-      // Post it to the server
+      // Get the time estimate
+
+      // Make the plot
       $.ajax({
          method: 'post',
-         url: gisportal.middlewarePath + '/settings/plot',
+         url: gisportal.middlewarePath + '/plotting/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',
          success: function( data ){
-            // Start monitoring the job, this will
-            // also add a status box into the stored
-            // graphs panel
-            _this.id = data.job_id;
+            console.log(data);
+            // Do the polling!
+            _this.id = data.hash;
             _this.monitorJobStatus();
-            
          }, error: function(e){
             var error = 'Sorry, we failed to create a graph: \n'+
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
@@ -452,19 +452,14 @@ gisportal.graphs.Plot =(function(){
       function updateStatus(){
          $.ajax({
             dataType: 'json',
-            url: graphServerUrl + '/job/' + _this.id + '/status',
-            cache: false,
+            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getMilliseconds(),
+            dataType:'json',
             success: function( serverStatus ){
-               _this.serverStatus( serverStatus );
+               _this.serverStatus( serverStatus );               
             },
             error: function( response ){
-
                clearInterval( _this._monitorJobStatusInterval );
-
-               if( response.status == 404 )
-                  _this.error( "Job not found on server" );
-               else
-                  _this.error( "Invalid reply from server. It possibly crashed." );
+               $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
             }
          });
       }

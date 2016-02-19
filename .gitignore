@@ -18,3 +18,4 @@ collaboration/config/config.json
 middleware/python-flask.log
 .sass-cache/*
 html/css/*
+html/plots/*

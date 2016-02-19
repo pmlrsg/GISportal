@@ -9,7 +9,6 @@ var jimp = require("jimp");
 var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
-var bunyan = require('bunyan'); // Added
 var utils = require('./utils.js');
 var pythonShell = require('python-shell');
 
@@ -31,8 +30,6 @@ var stripPrefix = function(str) {
 };
 
 module.exports = router;
-
-var log = bunyan.createLogger({name: "Portal Middleware"});
 /**
  * Returns true or false depending if a string stars with another string.
  * @param  {String} string The string to be evaluated
@@ -58,15 +55,6 @@ function sortLayersList(data, param){
    return byParam;
 }
 
-function handleError(err, res){
-   try{
-      res.status(err.status || 500);
-      res.send({message: err.message});
-      log.error(err);
-   }catch(e){
-   }
-}
-
 router.use(function (req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -77,33 +65,11 @@ router.use(function (req, res, next) {
 router.use(bodyParser.json({limit: '1mb'}));
 router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 
-
-//PYTHON TEST
-//REMOVE EVENTUALLY BUT NEED THE CONCEPT FOR EXTRACTION AND PLOTTING BITS!
-router.get('/app/settings/python', function(req, res){
-   var pythonShell = require("python-shell");
-   var pyshell = new pythonShell('python.py', {scriptPath:__dirname, args:["-t", "basic", "-v", "-url", req.query.url]});
-
-
-   var string = "";
-   pyshell.on("message", function(message){
-      string += message + "<br/>";
-   });
-
-   pyshell.end(function(err){
-      if(err){
-         handleError(err, res);
-      }else{
-         res.send(string);
-      }
-   });
-});
-
 router.get('/app/settings/proxy', function(req, res) {
    var url = decodeURI(req.query.url) // Gets the given URL
    request(url, function(err, response, body){
       if(err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          res.status(response.statusCode);
          var content_type = response.headers['content-type']
@@ -159,7 +125,7 @@ router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
    res.sendFile(config_path, function (err) {
       if (err) {
-         handleError(err, res);
+         utils.handleError(err, res);
       }
     });
 });
@@ -236,13 +202,13 @@ router.all('/app/settings/rotate', function(req, res){
    angle = Math.round(angle/90)*90; // Rounds the angle to the neerest 90 degrees
    jimp.read(url, function(err, image){ // Gets the image file from the URL
       if (err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          image.rotate(angle); // Rotates the image *clockwise!*
          //image.resize( width, jimp.AUTO);
          image.getBuffer(jimp.MIME_PNG, function(err2, image2){ // Buffers the image so it sends correctly
             if(err2){
-               handleError(err2, res);
+               utils.handleError(err2, res);
             }else{
                res.setHeader('Content-type', 'image/png'); // Makes sure its a png
                res.send(image2); // Sends the image to the browser.
@@ -277,7 +243,7 @@ router.get('/app/settings/remove_server_cache', function(req, res){
       }
       fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
          if(err){
-            handleError(err, res);
+            utils.handleError(err, res);
          }else{
             res.send(JSON.stringify({'path':delete_file_path, 'owner':owner})); // Returns the file path so it can be replaced if the user undoes the delete
          }
@@ -296,32 +262,12 @@ router.all('/app/settings/restore_server_cache', function(req, res){
    if(owner == username || permission == "admin"){
       fs.rename(deleted_path, restored_path, function(err){ // Moves the file to the deleted cache
          if(err){
-            handleError(err, res);
+            utils.handleError(err, res);
          }else{
             res.send("");
          }
       });
    }
-});
-
-router.all('/app/settings/plot', function(req, res){
-   var data = req.body;
-
-   //var child = child_process.spawn('python',[path.join(__dirname, "../../../plotting/plots.py")]);
-   var child = child_process.spawn('python', ["-u", path.join(__dirname, "../../../plotting/plots.py")]);
-
-   child.stdout.on('data', function(data){
-      console.log(data.toString());
-   });
-
-   child.stdin.write(JSON.stringify(data.request));
-   child.stdin.end();
-
-   //child.on('close', function(code){
-   //   console.log("Closed with code: " + code);
-   //})
-
-   res.send("");
 });
 
 router.all('/app/settings/update_layer', function(req, res){
@@ -337,7 +283,7 @@ router.all('/app/settings/update_layer', function(req, res){
    var this_path = path.join(base_path, filename);
    fs.writeFile(this_path, JSON.stringify(data), function(err){
       if(err){
-            handleError(err, res);
+            utils.handleError(err, res);
          }else{
             res.send("");
          }
@@ -456,7 +402,7 @@ router.get('/app/settings/load_data_values', function(req, res){
 
    request(url + '&INFO_FORMAT=text/xml', function(err, response, body){
       if(err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          var content_type = response.headers['content-type'];
          var response_text = "Sorry, could not calculate a value for: " + name;
@@ -464,7 +410,7 @@ router.get('/app/settings/load_data_values', function(req, res){
          if(content_type == 'application/xml;charset=UTF-8'){
             xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   try{
                      response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
@@ -477,13 +423,13 @@ router.get('/app/settings/load_data_values', function(req, res){
          }else{
             request(url, function(err, response, body){
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
                   if(content_type == "text/xml"){
                      xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                         if(err){
-                           handleError(err, res);
+                           utils.handleError(err, res);
                         }else{
                            var output = name + ":"
                            try{
@@ -529,11 +475,11 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    if(refresh == "true" || !utils.fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
          if(error){
-            handleError(error, res);
+            utils.handleError(error, res);
          }else{
             xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   try{
                      var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
@@ -640,7 +586,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
                      }
                   }catch(e){
-                     handleError(e, res);
+                     utils.handleError(e, res);
                   }
                }
             });
@@ -685,7 +631,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
             style = undefined;
          }
       }
-      if(name && service_title && title && bounding_box && style){
+      if(name && service_title && title && bounding_box){
          layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "MoreIndicatorInfo" : false})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
          if(!utils.directoryExists(LAYER_CONFIG_PATH)){

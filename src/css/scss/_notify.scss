@@ -109,3 +109,8 @@
   content: "\e4b9";
   color: #D48702;
 }
+
+[data-notify-text],
+[data-notify-html]{
+  word-wrap:break-word;
+}

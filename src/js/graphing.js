@@ -107,3 +107,10 @@ gisportal.graphs.popup.addActionListeners = function(){
       $('div.js-plot-popup').toggleClass('hidden', true);
    });
 };
+
+gisportal.graphs.popup.loadPlot = function(html){
+   var popup_content = gisportal.templates['plot-popup']({html:html});
+   $('.js-plot-popup').html(popup_content);
+   $('.js-plot-popup').toggleClass("hidden", false);
+   gisportal.graphs.popup.addActionListeners();
+}
