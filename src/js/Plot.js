@@ -428,8 +428,8 @@ gisportal.graphs.Plot =(function(){
                numbered_layer_times.push(Date.parse(layer_times[time]).valueOf());
             }
             // Works out the number of time slices so that the time and size can be made per indicator rather than indicator time slice
-            var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf())
-            var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf())
+            var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf());
+            var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf());
             var total_slices = Math.abs(min_index-max_index);
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
@@ -438,7 +438,11 @@ gisportal.graphs.Plot =(function(){
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if(_this.series_total === 0){
-            $.notify("This is the data:\n time: " + _this.timeEstimate + "s size: " + _this.sizeEstimate);
+            if(_this.sizeEstimate < 4294967296){
+               $.notify("This is the data:\n time: " + _this.timeEstimate + "s size: " + _this.sizeEstimate);
+            }else{
+               $.notify("There is too much data\n Try plotting a graph with a smaller bounding box or smaller time bounds", "error");
+            }
          }
       }
       

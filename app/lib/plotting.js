@@ -48,7 +48,7 @@ router.all('/app/plotting/check_plot', function(req, res){
       process_info.push("-g");
       process_info.push(series_data.bbox);
    }else{
-      process_info.push('-b="' + series_data.bbox + '"');
+      process_info.push('-b=' + series_data.bbox);
    }
    var child = child_process.spawn('python', process_info)
 
@@ -58,6 +58,6 @@ router.all('/app/plotting/check_plot', function(req, res){
    });
 
    child.stderr.on('data', function (data) {
-      handleError(data, res);
+      utils.handleError(data, res);
    });
 });
