@@ -367,6 +367,8 @@ gisportal.graphs.Plot =(function(){
             "data_source" : {
                // Variable name
                "coverage"  : layer.urlName,
+               // Layer ID
+               "layer_id"  : layer.id,
                // Time range of the data
                "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
                // Bounds box of the data, also supports WKT
@@ -416,8 +418,49 @@ gisportal.graphs.Plot =(function(){
       
       // Generate the request object
       var request = this.buildRequest();
+
+      function accumulateEstimates(data){
+         if(data.time && data.size && data.layer_id){
+            _this.series_total --;
+            var layer_times = gisportal.layers[data.layer_id].DTCache;
+            var numbered_layer_times = [];
+            for(var time in layer_times){
+               numbered_layer_times.push(Date.parse(layer_times[time]).valueOf());
+            }
+            // Works out the number of time slices so that the time and size can be made per indicator rather than indicator time slice
+            var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf())
+            var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf())
+            var total_slices = Math.abs(min_index-max_index);
+            _this.timeEstimate += (data.time * total_slices);
+            _this.sizeEstimate += (data.size * total_slices);
+         }else{
+            $.notify("This error was returned: " + data.responseText, "error");
+         }
+         // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
+         if(_this.series_total === 0){
+            $.notify("This is the data:\n time: " + _this.timeEstimate + "s size: " + _this.sizeEstimate);
+         }
+      }
       
-      // Get the time estimate
+      // Checks the time and size
+      var series_list = request.plot.data.series;
+
+      // Sets the number of series so we know when they are complete
+      _this.series_total = _.size(series_list);
+      _this.timeEstimate = 0;
+      _this.sizeEstimate = 0;
+      for(var series in series_list){
+         $.ajax({
+            method: 'post',
+            url: gisportal.middlewarePath + '/plotting/check_plot',
+            contentType : 'application/json',
+            data: JSON.stringify(series_list[series]),
+            dataType: 'json',
+            success: accumulateEstimates,
+            error: accumulateEstimates
+         });
+      }
+      
 
       // Make the plot
       $.ajax({
@@ -451,7 +494,6 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       function updateStatus(){
          $.ajax({
-            dataType: 'json',
             url: "/plots/" + _this.id + "-status.json?_="+ new Date().getMilliseconds(),
             dataType:'json',
             success: function( serverStatus ){
@@ -652,15 +694,6 @@ gisportal.graphs.Plot =(function(){
          this.emit('tBounds-change', { 'new': this._tBounds, 'old': old });
       
       return this;
-   };
-   
-   /**
-    * This returns the URL to the graph
-    * which can be used in the popup or iframe
-    * @return String   URL to the popup
-    */
-   Plot.prototype.interactiveUrl = function(){
-      return graphServerUrl + '/job/' + this.id + '/interactive';
    };
 
 

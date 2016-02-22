@@ -64,10 +64,18 @@ gisportal.graphs.PlotStatus = (function(){
          })
          // Open a plot
         .on('click', '.js-graph-status-open', function(){
-            // Get the URL for that plot
-            var interactiveUrl = plot.interactiveUrl();
-            // Open it in a pop up
-            window.open( interactiveUrl, '', 'width=' + window.innerWidth * 0.90 + ',height=' + window.innerHeight * 0.70  + ',toolbar=no' );
+            $.ajax({
+               url: '/plots/' + "test.html",
+               dataType: 'html',
+               success: function( html ){
+                  gisportal.graphs.popup.loadPlot(html);
+               }, error: function(e){
+                  var error = 'Sorry, we failed to load the graph: \n'+
+                                 'The server failed with this message: "' + e.statusText + '"';
+                  $.notify(error, "error");
+               }
+            });
+            console.log(plot.id);
          });
    };
 

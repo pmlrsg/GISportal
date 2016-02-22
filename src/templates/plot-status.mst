@@ -21,10 +21,10 @@
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'success' }}
 			<div></div>
-			<div >
-				<button class="js-graph-status-delete">Delete</button>
-				<button class="js-graph-status-copy">Copy/Edit</button>
-				<button class="js-graph-status-open">Open</button>
+			<div class="graph-buttons">
+				<button class="js-graph-status-delete brand secondary">Delete</button>
+				<button class="js-graph-status-copy brand secondary">Copy/Edit</button>
+				<button class="js-graph-status-open brand secondary">Open</button>
 			</div>
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'error' }}

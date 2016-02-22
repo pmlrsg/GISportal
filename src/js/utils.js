@@ -47,6 +47,20 @@ gisportal.utils.replace = function(search, replace, subject, count) {
    return sa ? s : s[0];  
 };
 
+gisportal.utils.closestIndex = function closest(array,num){
+   var i=0;
+   var minDiff=100000000000;
+   var ans = -1;
+   for(i in array){
+      var m=Math.abs(num-array[i]);
+      if(m<minDiff){ 
+         minDiff=m; 
+         ans=i; 
+      }
+   }
+   return ans;
+};
+
 /**
  * Extension to JavaScript Arrays to de-duplicate them
  * @param {array} array - The array to remove duplications from
