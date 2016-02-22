@@ -11,12 +11,13 @@ git submodule update
 ```
 docker build -t pmlrsg/gisportal .
 ```
-1. The first time you run the container you will need to run it interactively (the -it arguments) so that the setup script can create the config files specific to your needs
+1. The first time you run the container you will need to run it interactively (the `-it` arguments) so that the setup script can create the config files specific to your needs. The config files will be created in a volume that is stored on the host machine (so they can be backed up); the `-v` argument specifies where the folder is on the host machine. In this example the foler on the host machine, which must exist prior to running this command, is `/usr/share/GISportal`
 ```
-docker run -it pmlrsg/gisportal /app/GISportal/docker-run.sh
+mkdir -p /usr/share/GISportal
+docker run -v /usr/share/GISportal:/app/GISportal/config -it pmlrsg/gisportal /app/GISportal/docker-install.sh
 ```
 This will lead you through the interactive setp of the application including the option to specify a domain name (if you want to use one), the setup of Google as OAuth provider for authentication, and specifying administrator details
 1. On subsequent runs there's no need to run interactively
 ```
-
+docker run -v /usr/share/GISportal:/app/GISportal/config pmlrsg/gisportal
 ```

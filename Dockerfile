@@ -17,7 +17,7 @@ RUN cd /app/GISportal && \
 
 # Use node-forever to keep it going when things go pete tong
 
-VOLUME ["/app/GISportal/config" ]
+VOLUME /app/GISportal/config
 
 EXPOSE 6789
 CMD ["/app/GISportal/docker-run.sh"]

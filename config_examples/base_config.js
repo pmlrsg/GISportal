@@ -13,7 +13,7 @@
 
 gisportal.config = {
    paths: {
-    graphServer: 'http://localhost:3000',
+    graphServer: 'plotting',
     middlewarePath: 'app'
    }
 };
