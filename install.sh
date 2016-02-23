@@ -72,7 +72,6 @@ if [ $domain != "/" ]
       sed s/CLIENT_ID/$clientid/ | \
       sed s/CLIENT_SECRET/$clientsecret/ | \
       sed s_CALLBACK_http$ssl://$domain/app/user/auth/google/callback_ | \
-      sed s/SECRET/$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)/ | \
       sed s/ADMINISTRATOR/$admin_email/ > config/site_settings/$nicedomain/config-server.js;
 fi
 
@@ -80,6 +79,7 @@ fi
 if [ ! -e config/config-server.js ]
 	then
 		cp ./config_examples/config-server.js ./config/config-server.js;
+      cat config_examples/config-server.js | sed s/SECRET/$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)/ > config/config-server.js;
 fi
 if [ ! -e config/base_config.js ]
 	then

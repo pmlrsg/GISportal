@@ -8,9 +8,5 @@ GLOBAL.config['DOMAIN_NAME'] = {
          prompt: 'select_account'
       }
    },
-   session : {
-      secret : 'SECRET',
-      age : 0
-   },
-   admins:[ADMINISTRATOR]
+   admins:['ADMINISTRATOR']
 }

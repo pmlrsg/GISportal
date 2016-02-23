@@ -6,5 +6,9 @@ GLOBAL.config = {
       port: 6789,             
    },
    // redis connection settings
-   redisURL: 'http://localhost:6379/' 
+   redisURL: 'http://localhost:6379/' ,
+   session : {
+      secret : 'SECRET',
+      age : 0
+   },
 }
