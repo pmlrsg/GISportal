@@ -32,6 +32,7 @@ class TransectStats(object):
 		lats = []
 		lons = []
 		dates = []
+		ret = []
 		for row in data:
 			print "getting data from %f %f for %s" % (float(row['Lat']), float(row['Lon']), row['Date'])
 			#lats.append(row['Lat'])
@@ -46,7 +47,15 @@ class TransectStats(object):
 			print "indexs for lat,lon,time : %d %d %d" % (lat_index, lon_index, time_index)
 			data = data_var[time_index][lat_index][lon_index]
 			print data
-		return data
+			_ret = {}
+			_ret['track_date'] = track_date.isoformat()
+			_ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
+			_ret['track_lat'] = row['Lat']
+			_ret['track_lon'] = row['Lon']
+			_ret['data_value'] = data
+			ret.append(_ret)
+
+		return ret
 
 
 		#netcdf_variable = netcdf_file[variable]
