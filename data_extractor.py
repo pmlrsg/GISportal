@@ -24,6 +24,7 @@ from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, Si
 from extraction_utils import Debug, get_transect_bounds, get_transect_times
 from analysis_types import BasicStats, TransectStats
 from shapely import wkt
+import json
 
 def main():
 
@@ -80,7 +81,7 @@ def main():
 		extractor = TransectExtractor(args.wcs_url, [time], "time", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
 		stats = TransectStats(filename, args.wcs_variable, args.csv)
-		output_data = stats.process()
+		output_data = json.dumps(stats.process())
 	elif (args.extract_type == "single"):
 		extractor = SingleExtractor(args.wcs_url, args.time, extract_area=bbox, extract_variable=args.wcs_variable)
 		output_data = extractor.getData()

@@ -52,7 +52,7 @@ class TransectStats(object):
 			_ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
 			_ret['track_lat'] = row['Lat']
 			_ret['track_lon'] = row['Lon']
-			_ret['data_value'] = data
+			_ret['data_value'] = float(data) if not np.isnan(data)  else "null"
 			ret.append(_ret)
 
 		return ret
