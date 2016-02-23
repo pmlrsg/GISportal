@@ -314,16 +314,18 @@ def timeseries(plot, outfile="time.html"):
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    
    # If we want 2 Y axes then the lines below do this
-   
-   # Setting the second y axis range name and range
-   ts_plot.extra_y_ranges = {"y2": Range1d(start=ymin[1], end=ymax[1])}
+   if len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+      debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+      # Setting the second y axis range name and range
+      ts_plot.extra_y_ranges = {"y2": Range1d(start=ymin[1], end=ymax[1])}
 
-   # Adding the second axis to the plot.  
-   ts_plot.add_layout(LinearAxis(y_range_name="y2", axis_label=plot['y2Axis']['label']), 'right')
+      # Adding the second axis to the plot.  
+      ts_plot.add_layout(LinearAxis(y_range_name="y2", axis_label=plot['y2Axis']['label']), 'right')
    
    plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
    for i, source in enumerate(sources):
       if 'min' in datasource and len(sources) == 1:
+         debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
          # Plot the max and min as a shaded band.
          # Cannot use this dataframe because we have twice as many band variables as the rest of the 
          # dataframe.
@@ -333,13 +335,16 @@ def timeseries(plot, outfile="time.html"):
       
       
       # Plot the mean as line
-      ts_plot.line('date', 'mean', color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
+      debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
+      ts_plot.line('date', 'mean', y_range_name="y2", color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
+      debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
       ts_plot.circle('date', 'mean', color=plot_palette[i][2], size=3, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars
+         debug(2, "Plotting error bars for {}".format(plot_data[i]['coverage']))
          ts_plot.multi_line('err_xs', 'err_ys', color=plot_palette[i][3], line_alpha=0.5, source=source)
       
    # Legend placement needs to be after the first glyph set up.
@@ -554,8 +559,8 @@ def get_plot_data(json_data, request_type='data'):
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
     
-         plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
-                                 vars=['date', 'min', 'max', 'mean', 'std'], data=df, xAxis=xAxis, y1Axis=y1Axis, y2Axis=y2Axis))
+         plot_data.append(dict(scale=scale, coverage=coverage, units=units,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+
    plot['data'] = plot_data
    return plot
 
@@ -580,9 +585,9 @@ def execute_plot(request, outfile):
       debug(0, "Data request failed")
       return False
 
-   if plot_data[0]['type'] == 'timeseries':
+   if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, outfile)
-   elif plot_data[0]['type'] == 'scatter':
+   elif plot['type'] == 'scatter':
       plot_file = scatter(plot, outfile)
    else:
       plot_file = hovmoller(plot, outfile)
