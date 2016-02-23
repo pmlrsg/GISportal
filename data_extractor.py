@@ -63,7 +63,7 @@ def main():
 		output_data = stats.process()
 	elif (args.extract_type == "irregular"):
 		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
-		filename = extractor.getData()
+		filename = output_data = extractor.getData()
 		stats = filename
 	elif (args.extract_type == "trans-lat"):
 		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=args.wcs_variable)
