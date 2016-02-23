@@ -461,6 +461,7 @@ gisportal.graphs.Plot =(function(){
             contentType : 'application/json',
             data: JSON.stringify(series_list[series]),
             dataType: 'json',
+            timeout:3000,
             success: accumulateEstimates,
             error: accumulateEstimates
          });

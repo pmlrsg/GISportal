@@ -30,6 +30,8 @@ gisportal.graphs.PlotStatus = (function(){
      * says the status of the plot has changed
      */
    PlotStatus.prototype.rebuildElement = function(){
+      var _this = this;
+
       // Get the plot
       var plot = this.plot();
 
@@ -57,6 +59,7 @@ gisportal.graphs.PlotStatus = (function(){
          // Delete a plot
          .on('click', '.js-graph-status-delete', function(){
             $(this).closest('.graph-job').remove();
+            _this._plot.stopMonitoringJobStatus();
          })
          // Copy a plot
          .on('click', '.js-graph-status-copy', function(){
