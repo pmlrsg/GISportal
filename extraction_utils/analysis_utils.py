@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt   
-
+from datetime import timedelta
 """
 Performs a basic set of statistical functions on the provided data.
 """
@@ -316,13 +316,15 @@ trim_sizes = {
    "line" : slice(11,-2)
 }
 
-def find_closest(arr, val):
+def find_closest(arr, val, time=False):
    """
   Finds the position in the array where the array value matches
   the value specified by the user
    - poached from JAD
   """
    current_closest = 120310231023
+   if time:
+      current_closest = timedelta.max
    current_idx = None
    for i in range(len(arr)):
       if abs(arr[i]-val)<current_closest:

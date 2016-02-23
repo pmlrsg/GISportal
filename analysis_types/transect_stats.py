@@ -1,7 +1,9 @@
 import netCDF4 as netCDF
-from extraction_utils import basic, getCsvDict
+from extraction_utils import basic, getCsvDict, find_closest, getCoordinateVariable
 import json
 import csv
+import datetime
+import numpy as np
 
 class TransectStats(object):
 	"""docstring for TransectStats"""
@@ -14,11 +16,36 @@ class TransectStats(object):
 
 	def process(self):
 		print "running basic processing on %s" % self.filename
-		with open(self._csv, "rb") as csvfile:
-			data = csv.DictReader(csvfile, delimiter=',')
-			for row in data:
-				print "getting data from %f %f for %s" % (float(row['Lat']), float(row['Lon']), row['Date'])
 		netcdf_file = netCDF.Dataset(self.filename, "r")
+		time_var = netcdf_file.variables['time']
+		data_var = np.array(netcdf_file.variables[self.variable])
+		print data_var.shape
+		times = time_var[:]
+		#print "times from netcdf file"
+		times = [datetime.datetime.strptime(netCDF.num2date(x, time_var.units, calendar='standard').isoformat(), "%Y-%m-%dT%H:%M:%S") for x in times]
+		#2010-10-01T00:00:00
+		#print times
+
+		with open(self._csv, "rb") as csvfile:
+			csv_file = csvfile.read()
+		data = csv.DictReader(csv_file.splitlines(), delimiter=',')
+		lats = []
+		lons = []
+		dates = []
+		for row in data:
+			print "getting data from %f %f for %s" % (float(row['Lat']), float(row['Lon']), row['Date'])
+			#lats.append(row['Lat'])
+			#lons.append(row['Lon'])
+			#dates.append(datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M"))
+			lat_index = find_closest(getCoordinateVariable(netcdf_file, "Lat")[:],float(row['Lat']) )
+			lon_index = find_closest(getCoordinateVariable(netcdf_file, "Lon")[:],float(row['Lon']) )
+			#print row['Date']
+			track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
+			#print track_date
+			time_index = find_closest(times, track_date, time=True)
+			print "indexs for lat,lon,time : %d %d %d" % (lat_index, lon_index, time_index)
+			data = data_var[time_index][lat_index][lon_index]
+			print data
 		return data
 
 

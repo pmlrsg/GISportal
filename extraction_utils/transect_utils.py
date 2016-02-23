@@ -1,6 +1,7 @@
 import csv
 import datetime
 
+
 def get_transect_bounds(_csv):
 	print _csv
 	with open(_csv, "rb") as csvfile:
@@ -10,6 +11,7 @@ def get_transect_bounds(_csv):
 		for row in data:
 			lats.append(float(row['Lat']))
 			lons.append(float(row['Lon']))
+	print (min(lons), min(lats), max(lons), max(lats))
 	return (min(lons), min(lats), max(lons), max(lats))
 
 
