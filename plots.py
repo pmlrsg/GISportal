@@ -667,7 +667,7 @@ To submit a prepared plot
 
       file_path = opts.dirname + "/" + my_hash + "-plot.html"
       if execute_plot(request, file_path):
-         print(file_path)
+         debug(1,file_path))
       else:
          debug(0, "Failed to complete plot")
          sys.exit(2)
