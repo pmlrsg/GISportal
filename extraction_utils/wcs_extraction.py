@@ -21,7 +21,6 @@ class WCSHelper(object):
 		#print '-'*20
 		#print self.bbox
 		#print self.dates
-		time = ["2009-11-01T00:00:00Z"]
 		if self.single :
 			output = self.wcs.getCoverage(identifier=self.variable, time=[self.dates], bbox=self.bbox, format="NetCDF3")
 		else:	
