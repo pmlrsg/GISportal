@@ -81,7 +81,12 @@ def main():
 		extractor = TransectExtractor(args.wcs_url, [time], "time", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
 		stats = TransectStats(filename, args.wcs_variable, args.csv)
-		output_data = json.dumps(stats.process())
+		output_data = stats.process()
+		output_metadata = extractor.metadataBlock()
+		output = {}
+		output['metadata'] = output_metadata
+		output['data'] = output_data
+		output_data = json.dumps(output)
 	elif (args.extract_type == "single"):
 		extractor = SingleExtractor(args.wcs_url, args.time, extract_area=bbox, extract_variable=args.wcs_variable)
 		output_data = extractor.getData()

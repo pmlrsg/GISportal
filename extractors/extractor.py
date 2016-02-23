@@ -19,3 +19,12 @@ class Extractor(object):
 
 	def getData(self):
 		pass
+
+	def metadataBlock(self):
+		ret = {}
+		ret['variable'] = self.extract_variable
+		ret['extract_dates'] = self.extract_dates
+		ret['extract_area'] = self.extract_area
+		ret['wcs_url'] = self.wcs_url
+
+		return ret
