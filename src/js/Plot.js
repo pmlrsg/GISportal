@@ -431,10 +431,11 @@ gisportal.graphs.Plot =(function(){
             var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf());
             var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf());
             var total_slices = Math.abs(max_index - min_index);
+            console.log(data.time);
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          }else{
-            $.notify("This error was returned: " + data.responseText, "error");
+            $.notify("This error was returned: " + data.statusText, "error");
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if(_this.series_total === 0){

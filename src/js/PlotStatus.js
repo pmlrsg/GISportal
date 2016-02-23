@@ -124,7 +124,7 @@ gisportal.graphs.PlotStatus = (function(){
          this.rebuildElement();
 
       var message = serverStatus.message;
-      var error_element = this._element.find('.js-graph-status-show-full-error')
+      var error_element = this._element.find('.js-graph-status-show-full-error');
       error_element.on('click',function(){
          $.notify( message , {className:"error", autoHide: false});
       });

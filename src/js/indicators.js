@@ -1071,6 +1071,10 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       [
          Number(bounds.WestBoundLongitude),
          Number(bounds.SouthBoundLatitude)
+      ],
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
       ]
    ];
 
