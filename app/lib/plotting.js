@@ -27,6 +27,15 @@ router.all('/app/plotting/plot', function(req, res){
    var hash;
    child.stdout.on('data', function(data){
       hash = data.toString().replace(/\n|\r\n|\r/g, '');
+
+
+
+      var temp_status_file = path.join(PLOT_DESTINATION, hash + "-status.json")
+      fs.writeFileSync(temp_status_file, JSON.stringify({"message": "Any Message you Like!", "state": "processing", "completed":false}));
+
+
+
+
       res.send({hash:hash});
    });
 

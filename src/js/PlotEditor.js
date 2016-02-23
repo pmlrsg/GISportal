@@ -153,7 +153,7 @@ gisportal.graphs.PlotEditor = (function(){
          this.plot().submitRequest();
          gisportal.graphs.activeGraphSubmitted();
       }else{
-         alert("A series on the left Y axis is required.");
+         $.notify("A series on the left Y axis is required.", "error");
       }
    };
 

@@ -65,7 +65,7 @@ gisportal.graphs.PlotStatus = (function(){
          // Open a plot
         .on('click', '.js-graph-status-open', function(){
             $.ajax({
-               url: '/plots/' + "test.html",
+               url: '/plots/' + $(this).data("hash") + "-plot.html",
                dataType: 'html',
                success: function( html ){
                   gisportal.graphs.popup.loadPlot(html);
@@ -121,11 +121,10 @@ gisportal.graphs.PlotStatus = (function(){
          this.rebuildElement();
 
       var message = serverStatus.message;
-      this._element
-         .find('.js-graph-status-show-full-error')
-         .click(function(){
-            alert( message );
-         });
+      var error_element = this._element.find('.js-graph-status-show-full-error')
+      error_element.on('click',function(){
+         $.notify( message , {className:"error", autoHide: false});
+      });
    };
 
    /**
@@ -158,42 +157,20 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
       var isCalculating = false;
-      var hasEstimation = false;
-      var worestCaseEstimation = new Date();
 
       // Rebuild the element if we arent already showing
       // the processing template
       if( this.renderedState != "processing" )
          this.rebuildElement();
 
-      // Loop over all of sources and find the longest
-      // estimation time. This will be the one thats 
-      // said to be the Plots completion time
-      for(var sourceId = 0; sourceId < serverStatus.sources.length; sourceId++ ){
-         var source = serverStatus.sources[ sourceId ];
-
-         switch( source.estimation.state ){
-            case "calculating":
-               isCalculating = true;
-               break;
-            case "success":
-               hasEstimation = true;
-               var estimatedEst = new Date( source.estimation.endTime );
-               if( estimatedEst.getTime() > worestCaseEstimation.getTime() )
-                  worestCaseEstimation = estimatedEst;
-               break;
-
-         }
-      }
-
       var message = serverStatus.message;
 
       // Decide what the estimated completion 
       // time message should be
-      if( isCalculating && ! hasEstimation )
+      if( isCalculating && ! this._plot.estimatedFinishTime )
          message += "<br>Estimated time remaining: calculating";
-      if( hasEstimation )
-         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
+      if( this._plot.estimatedFinishTime )
+         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( this._plot.estimatedFinishTime ) ;
 
       // Add the message to the status element
       this._element
@@ -214,7 +191,7 @@ gisportal.graphs.PlotStatus = (function(){
 
       var differnceInSecs = ( endTime.getTime() - startTime.getTime() ) / 1000;
 
-      if( ! allowNegative && differnceInSecs === 0 )
+      if( ! allowNegative && differnceInSecs <= 0 )
          return "0m0s";
 
       var flip = false;

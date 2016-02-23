@@ -430,7 +430,7 @@ gisportal.graphs.Plot =(function(){
             // Works out the number of time slices so that the time and size can be made per indicator rather than indicator time slice
             var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf());
             var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf());
-            var total_slices = Math.abs(min_index-max_index);
+            var total_slices = Math.abs(max_index - min_index);
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          }else{
@@ -439,7 +439,8 @@ gisportal.graphs.Plot =(function(){
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if(_this.series_total === 0){
             if(_this.sizeEstimate < 4294967296){
-               $.notify("This is the data:\n time: " + _this.timeEstimate + "s size: " + _this.sizeEstimate);
+               var t = new Date();
+               _this.estimatedFinishTime = new Date(t.getTime() + 1000*_this.timeEstimate);
             }else{
                $.notify("There is too much data\n Try plotting a graph with a smaller bounding box or smaller time bounds", "error");
             }
@@ -498,12 +499,13 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       function updateStatus(){
          $.ajax({
-            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getMilliseconds(),
+            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
             dataType:'json',
             success: function( serverStatus ){
                _this.serverStatus( serverStatus );               
             },
             error: function( response ){
+               $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
                clearInterval( _this._monitorJobStatusInterval );
                $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
             }

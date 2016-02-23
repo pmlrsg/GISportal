@@ -178,6 +178,7 @@ div.js-plot-popup-html{
   margin-top: 25px;
 }
 
-.graph-buttons button{
+.graph-buttons button,
+.js-graph-status-delete{
   background-color: $analysis-button;
 }

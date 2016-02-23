@@ -113,4 +113,4 @@ gisportal.graphs.popup.loadPlot = function(html){
    $('.js-plot-popup').html(popup_content);
    $('.js-plot-popup').toggleClass("hidden", false);
    gisportal.graphs.popup.addActionListeners();
-}
+};
