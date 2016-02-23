@@ -24,6 +24,14 @@ from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Ran
 
 import palettes
 
+class Enum(set):
+    def __getattr__(self, name):
+        if name in self:
+            return name
+        raise AttributeError
+
+Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
+
 def get_palette(palette="rsg_colour"):
    colours = []
    my_palette = palettes.getPalette('rsg_colour')
@@ -239,6 +247,7 @@ def timeseries(plot, outfile="time.html"):
    for df in plot_data:
           
       varindex = {j: i for i, j in enumerate(df['vars'])}
+      debug(4, "timeseries: varindex = {}".format(varindex))
       dfarray = np.array(df['data'])
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
       debug(4, data[varindex['mean']]) 
@@ -255,8 +264,13 @@ def timeseries(plot, outfile="time.html"):
          err_xs = []
          err_ys = []
          for x, y, std in zip(date, data[varindex['mean']].astype(np.float), data[varindex['std']].astype(np.float)):
-            err_xs.append((x, x))
-            err_ys.append((y - std, y + std))
+            if plot_scale == "linear":
+               err_xs.append((x, x))
+               err_ys.append((y - std, y + std))
+            else:
+               # Calculate the errors in log space. Not sure if this is what is wanted but the other looks silly.
+               err_xs.append((x, x))
+               err_ys.append((np.power(10, np.log10(y) - np.log10(std)), np.power(10, np.log10(y) + np.log10(std)))) 
 
          datasource['err_xs'] = err_xs
          datasource['err_ys'] = err_ys
@@ -278,32 +292,38 @@ def timeseries(plot, outfile="time.html"):
               height=400
    )
    
+   tooltips = [("Date", "@sdate")]
+   tooltips.append(("Mean", "@mean"))
+   tooltips.append(("Max ", "@max"))
+   tooltips.append(("Min ", "@min"))
+   tooltips.append(("Std ", "@stderr"))
+
    # Use some custom HTML to draw our tooltip. Just put the @var placeholders where you want them.
-   ts_plot.add_tools(HoverTool(tooltips="""
-           <div>
-               <div>
-                   <span style="font-size: 12px; font-weight: bold;">Date:</span>
-                   <span style="font-size: 12px; color: #966;">@sdate</span>
-               </div>
-               <div>
-                   <span style="font-size: 12px; font-weight: bold;">Mean:</span>
-                   <span style="font-size: 12px; color: #966;">@mean</span>
-               </div>
-               <div>
-                   <span style="font-size: 12px; font-weight: bold;">Max:</span>
-                   <span style="font-size: 12px; color: #966;">@max</span>
-               </div>
-               <div>
-                   <span style="font-size: 12px; font-weight: bold;">Min:</span>
-                   <span style="font-size: 12px; color: #966;">@min</span>
-               </div>
-               <div>
-                   <span style="font-size: 12px; font-weight: bold;">Stderr:</span>
-                   <span style="font-size: 12px; color: #966;">@stderr</span>
-               </div>
-           </div>
-           """
-           ))
+   #ts_plot.add_tools(HoverTool(tooltips="""
+   #        <div>
+   #            <div>
+   #                <span style="font-size: 12px; font-weight: bold;">Date:</span>
+   #                <span style="font-size: 12px; color: #966;">@sdate</span>
+   #            </div>
+   #            <div>
+   #                <span style="font-size: 12px; font-weight: bold;">Mean:</span>
+   #                <span style="font-size: 12px; color: #966;">@mean</span>
+   #            </div>
+   #            <div>
+   #                <span style="font-size: 12px; font-weight: bold;">Max:</span>
+   #                <span style="font-size: 12px; color: #966;">@max</span>
+   #            </div>
+   #            <div>
+   #                <span style="font-size: 12px; font-weight: bold;">Min:</span>
+   #                <span style="font-size: 12px; color: #966;">@min</span>
+   #            </div>
+   #            <div>
+   #                <span style="font-size: 12px; font-weight: bold;">Stderr:</span>
+   #                <span style="font-size: 12px; color: #966;">@stderr</span>
+   #            </div>
+   #        </div>
+   #        """
+   #        ))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -311,46 +331,57 @@ def timeseries(plot, outfile="time.html"):
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
+   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-   
-   # If we want 2 Y axes then the lines below do this
-   if len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-      debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
-      # Setting the second y axis range name and range
-      ts_plot.extra_y_ranges = {"y2": Range1d(start=ymin[1], end=ymax[1])}
+   #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
+   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   yrange = [None, None]
 
-      # Adding the second axis to the plot.  
-      ts_plot.add_layout(LinearAxis(y_range_name="y2", axis_label=plot['y2Axis']['label']), 'right')
+   # Adding the second axis to the plot.  
+   #ts_plot.add_layout(LinearAxis(y_range_name="y1", axis_label=plot['y1Axis']['label']), 'left')
    
-   plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
+   plot_palette = [['#7570B3', 'blue', 'blue', 'blue'], ['#A0A0A0', 'green', 'green', 'green']]
+
    for i, source in enumerate(sources):
+      # If we want 2 Y axes then the lines below do this
+      if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+         debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # Setting the second y axis range name and range
+         yrange[1] = "y2"
+         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+   
+         # Adding the second axis to the plot.  
+         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+   
       if 'min' in datasource and len(sources) == 1:
          debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
          # Plot the max and min as a shaded band.
          # Cannot use this dataframe because we have twice as many band variables as the rest of the 
          # dataframe.
-         #plot.patch('band_x', 'band_y', color='#7570B3', fill_alpha=0.05, line_alpha=0, source=source)
          # So use this.
          ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
       
       
+      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'mean', y_range_name="y2", color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', color=plot_palette[i][2], size=3, line_alpha=0, source=source)
+      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=3, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars
          debug(2, "Plotting error bars for {}".format(plot_data[i]['coverage']))
-         ts_plot.multi_line('err_xs', 'err_ys', color=plot_palette[i][3], line_alpha=0.5, source=source)
+         ts_plot.multi_line('err_xs', 'err_ys', y_range_name=y_range_name, color=plot_palette[i][3], line_alpha=0.5, source=source)
       
+   hover = HoverTool(tooltips=tooltips)
+   ts_plot.add_tools(hover)
+
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
    ts_plot.legend.location = "top_left"
-   layout = vplot(ts_plot)
    
    # Example code to display the data in a table
    #columns = [
@@ -364,7 +395,7 @@ def timeseries(plot, outfile="time.html"):
    # plot the points
    output_file(outfile, 'Time Series')
    
-   save(layout)
+   save(ts_plot)
 #END timeseries   
 
 def legacy_reformat(data):
@@ -527,6 +558,8 @@ def get_plot_data(json_data, request_type='data'):
          coverage = ds['coverage']
          time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
          debug(3,"Time bounds: {}".format(time_bounds))
+         yaxis = s['yAxis']
+
          data_request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
                       ds['middlewareUrl'], 
                       urllib.quote_plus(ds['threddsUrl']), 
@@ -548,7 +581,7 @@ def get_plot_data(json_data, request_type='data'):
             response = json.load(urllib.urlopen(data_request))
          except ValueError:
             debug(3, "Data request, {}, failed".format(data_request))
-            return []   
+            return dict(data=[])
          
 
          # LEGACY - this reformats the response to the new format.
@@ -559,7 +592,7 @@ def get_plot_data(json_data, request_type='data'):
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
     
-         plot_data.append(dict(scale=scale, coverage=coverage, units=units,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+         plot_data.append(dict(scale=scale, coverage=coverage, units=units, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
 
    plot['data'] = plot_data
    return plot
@@ -567,33 +600,74 @@ def get_plot_data(json_data, request_type='data'):
 def prepare_plot(request, outdir):
    '''
    Prepare_plot takes a plot request and hashes it to produce a key for future use.
-   It then parese the request to build the calls to the extract service and submits them
+   It then parses the request to build the calls to the extract service and submits them
    as single result tests to get the timing information.
    If all looks OK it returns the hash to the caller, otherwise it returns an error.
    '''
 
+   # Currently get issues as the JSON is not always in the same order so hash is different.
+   # TODO How to handle multiple versions of the same request simultaneously.
+
    #plot_data = get_plot_data(request, 'time')
    hasher = hashlib.sha1()
    hasher.update(json.dumps(request))
-   return hasher.hexdigest()
+   my_hash = hasher.hexdigest()
+   update_status(opts.dirname, my_hash, request, Plot_status.initialising, "Preparing")
+   return my_hash
 
 def execute_plot(request, outfile):
+   update_status(opts.dirname, my_hash, request, Plot_status.extracting, "Extracting")
    plot = get_plot_data(request, 'data')
    plot_data = plot['data']
 
    if len(plot_data) == 0:
       debug(0, "Data request failed")
+      update_status(opts.dirname, my_hash, request, Plot_status.failed, "Extract failed")
       return False
 
    if plot['type'] == 'timeseries':
+      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
       plot_file = timeseries(plot, outfile)
    elif plot['type'] == 'scatter':
+      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
       plot_file = scatter(plot, outfile)
    else:
+      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
       plot_file = hovmoller(plot, outfile)
 
    return True
    
+def update_status(dirname, my_hash, request, plot_status, message):
+   # Read status file, create if not there.
+   file_path = opts.dirname + "/" + my_hash + "-status.json"
+   try:
+      with open(file_path, 'r') as status_file:
+         status = json.load(status_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Status file {} not found".format(file_path))
+         # It does not exist yet so create the initial JSON
+         status = dict(
+            percentage = 0,
+            state = plot_status,
+            message = message,
+            completed = False,
+            job_id = my_hash
+         )
+      else:
+         raise
+   status["message"] = message
+   status["state"] = plot_status
+   if plot_status == Plot_status.complete:
+      status["completed"] = True
+      status['filename'] = opts.dirname + "/" + my_hash + "-plot.html"
+
+   debug(3, "Status: {}".format(status))
+   with open(file_path, 'w') as status_file:
+      json.dump(status, status_file)
+
+   return True
+
 verbosity = 0
 def debug(level, msg):
    if verbosity >= level: print(msg, file=sys.stderr)
@@ -666,8 +740,10 @@ To submit a prepared plot
       debug(3, "Request: {}".format(request['plot']))
 
       file_path = opts.dirname + "/" + my_hash + "-plot.html"
+      
       if execute_plot(request, file_path):
          debug(1,file_path)
+         update_status(opts.dirname, my_hash, request, Plot_status.complete, "Complete")
       else:
          debug(0, "Failed to complete plot")
          sys.exit(2)
