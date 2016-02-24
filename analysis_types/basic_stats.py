@@ -11,7 +11,7 @@ class BasicStats(object):
 		
 
 	def process(self):
-		print "running basic processing on %s" % self.filename
+		#print "running basic processing on %s" % self.filename
 
 		netcdf_file = netCDF.Dataset(self.filename, "r")
 		return json.dumps(basic(netcdf_file, self.variable))

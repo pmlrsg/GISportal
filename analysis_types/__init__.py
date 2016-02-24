@@ -1,2 +1,3 @@
 from basic_stats import BasicStats
 from transect_stats import TransectStats
+from hovmoller_stats import HovmollerStats

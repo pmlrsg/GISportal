@@ -102,106 +102,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
 
 
 
-def hovmoller(dataset, params):
-   xAxisVar = params['graphXAxis'].value
-   yAxisVar = params['graphYAxis'].value
-   zAxisVar = params['graphZAxis'].value
 
-   xVar = getCoordinateVariable(dataset, xAxisVar)
-   xArr = np.array(xVar)
-   yVar = getCoordinateVariable(dataset, yAxisVar)
-   yArr = np.array(yVar)
-   zArr = np.array(dataset.variables[zAxisVar])
-   
-   if xVar == None:
-      g.graphError = "could not find %s dimension" % xAxisVar
-      return
-   if yVar == None:
-      g.graphError = "could not find %s dimension" % yAxisVar
-      return
-   
-   # Create a masked array ignoring nan's
-   zMaskedArray = np.ma.masked_invalid(zArr)
-      
-   time = None
-   lat = None
-   lon = None
-   
-   if xAxisVar == 'Time':
-      times = xArr
-      time = xVar
-      lat = yArr
-   else:        
-      lon = xArr
-      times = yArr
-      time = yVar
-
-   output = {}
-   
-   timeUnits = getUnits(time)
-   start = None
-   if timeUnits:
-      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
-   else: 
-      start = ''.join(times[0])
-   
-   output['global'] = {'time': start}
-   
-   output['data'] = []
- 
-   numDimensions = len(zMaskedArray.shape)
-   
-   direction = None 
-   if lat != None:
-      direction = 'lat'
-   elif lon != None:
-      direction = 'lon'
-      if numDimensions == 4:
-         zMaskedArray = zMaskedArray.swapaxes(2,3)
-      else:
-         zMaskedArray = zMaskedArray.swapaxes(1,2) # Make it use Lon instead of Lat
-   
-
-   # If 4 dimensions, assume depth and switch with time
-   if numDimensions == 4:
-      depth = np.array(getDepth(dataset))
-      if len(depth.shape) > 1:
-         print 'WARNING: There are multiple depths.'
-      else:
-         # Presume 1 depth, set to contents of depth
-         # This way, it will enumerate over correct array
-         # whether depth or not
-         zMaskedArray = zMaskedArray.swapaxes(0,1)[0]
-         
-         output['depth'] = float(depth[0])
- 
-
-   for i, timelatlon in enumerate(zMaskedArray):
-      date = None    
-      if timeUnits:
-         date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
-      else:     
-         date = ''.join(times[i])
-      
-      for j, row in enumerate(timelatlon):
-         
-         if direction == "lat":
-            pos = lat[j]
-         elif direction == "lon":
-            pos = lon[j]
-         
-         mean = getMean(row)
-         
-         if not np.isnan(mean):
-            output['data'].append([date, float(pos), mean])
-            
-   if len(output['data']) < 1:
-      g.graphError = "no valid data available to use"
-      error_handler.setError('2-07', None, g.user.id, "views/wcs.py:hovmoller - No valid data available to use.")
-      return output
-      
-   
-   return output
 
 
 def getHistogram(arr):
@@ -452,3 +353,106 @@ def sizeof_fmt(num, suffix='B'):
             return "%3.1f%s%s" % (num, unit, suffix)
         num /= 1024.0
     return "%.1f%s%s" % (num, 'Yi', suffix)
+
+
+
+def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
+   
+   xVar = getCoordinateVariable(dataset, xAxisVar)
+   xArr = np.array(xVar)
+   yVar = getCoordinateVariable(dataset, yAxisVar)
+   yArr = np.array(yVar)
+   zArr = np.array(dataset.variables[dataVar])
+   
+   if xVar == None:
+      print "could not find %s dimension" % xAxisVar
+      return
+   if yVar == None:
+      print "could not find %s dimension" % yAxisVar
+      return
+   
+   # Create a masked array ignoring nan's
+   zMaskedArray = np.ma.masked_invalid(zArr)
+      
+   time = None
+   lat = None
+   lon = None
+   
+   if xAxisVar == 'Time':
+      times = xArr
+      time = xVar
+      lat = yArr
+   else:        
+      lon = xArr
+      times = yArr
+      time = yVar
+
+   output = {}
+   
+   timeUnits = getUnits(time)
+   start = None
+   if timeUnits:
+      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+   else: 
+      start = ''.join(times[0])
+   
+   output['global'] = {'time': start}
+   
+   output['data'] = []
+ 
+   numDimensions = len(zMaskedArray.shape)
+   print numDimensions
+   direction = None 
+   if lat != None:
+      direction = 'lat'
+   elif lon != None:
+      direction = 'lon'
+      if numDimensions == 4:
+         zMaskedArray = zMaskedArray.swapaxes(2,3)
+      else:
+         zMaskedArray = zMaskedArray.swapaxes(1,2) # Make it use Lon instead of Lat
+   
+
+   # If 4 dimensions, assume depth and switch with time
+   if numDimensions == 4:
+      depth = np.array(getDepth(dataset))
+      if len(depth.shape) > 1:
+         current_app.logger.debug('WARNING: There are multiple depths.')
+      else:
+         # Presume 1 depth, set to contents of depth
+         # This way, it will enumerate over correct array
+         # whether depth or not
+         zMaskedArray = zMaskedArray.swapaxes(0,1)[0]
+         
+         output['depth'] = float(depth[0])
+ 
+   print len(lon)
+   for i, timelatlon in enumerate(zMaskedArray):
+      date = None   
+      if timeUnits:
+         date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+      else:     
+         date = ''.join(times[i])
+      
+      for j, row in enumerate(timelatlon):
+         print len(row)
+         if direction == "lat":
+            if (j < len(lat)):
+               pos = lat[j]
+         elif direction == "lon":
+            if (j < len(lon)):
+               pos = lon[j]
+            
+         
+         mean = getMean(row)
+         
+         if not np.isnan(mean):
+            output['data'].append([date, float(pos), mean])
+            
+   if len(output['data']) < 1:
+      g.graphError = "no valid data available to use"
+      error_handler.setError('2-07', None, g.user.id, "views/wcs.py:hovmoller - No valid data available to use.")
+      return output
+      
+   
+   return output

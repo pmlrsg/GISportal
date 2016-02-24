@@ -22,7 +22,7 @@ example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,
 import argparse
 from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
 from extraction_utils import Debug, get_transect_bounds, get_transect_times
-from analysis_types import BasicStats, TransectStats
+from analysis_types import BasicStats, TransectStats, HovmollerStats
 from shapely import wkt
 import json
 
@@ -31,7 +31,7 @@ def main():
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["single","basic","irregular","trans-lat","trans-long","trans-time"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
 	parser.add_argument("-url", "--wcs_url", action="store", dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
@@ -42,6 +42,8 @@ def main():
 	parser.add_argument("-time", action="store", dest="time", help="A time string for in the format startdate/enddate or a single date", required=False)
 	parser.add_argument("-mask", action="store", dest="mask", help="a polygon representing teh irregular area", required=False)
 	parser.add_argument("-csv", action="store", dest="csv", help="a csv file with lat,lon,date for use in transect extraction", required=False)
+	parser.add_argument("-xvar", action="store", dest="xvar", help="x axis variable for hovmoller plot")
+	parser.add_argument("-yvar", action="store", dest="yvar", help="y axis vairable for hovmoller plot")
 	args = parser.parse_args()
 
 	#print args.debug
@@ -90,9 +92,15 @@ def main():
 	elif (args.extract_type == "single"):
 		extractor = SingleExtractor(args.wcs_url, args.time, extract_area=bbox, extract_variable=args.wcs_variable)
 		output_data = extractor.getData()
+	elif (args.extract_type == "hovmoller"):
+		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
+		filename = extractor.getData()
+		stats = HovmollerStats(filename, args.xvar, args.yvar, args.wcs_variable)
+		output_data = stats.process()
 	else :
 		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
 
+	#print "finished"
 	print output_data
 
 
