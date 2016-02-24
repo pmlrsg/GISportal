@@ -16,11 +16,14 @@ import sys
 import numpy as np
 import pandas as pd
 import json
+import jinja2
 import urllib
 import os, hashlib
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
+from bokeh.resources import CSSResources
+from bokeh.embed import components
 
 import palettes
 
@@ -29,6 +32,36 @@ from data_extractor.analysis_types import BasicStats, HovmollerStats
 
 # Set the default logging verbosity to lowest.
 verbosity = 0
+
+
+
+template = jinja2.Template("""
+<!DOCTYPE html>
+<html lang="en-US">
+
+<link
+    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
+    rel="stylesheet" type="text/css"
+>
+<script 
+    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
+></script>
+
+<body>
+
+    {{ script }}
+    
+    {{ div }}
+
+</body>
+
+</html>
+""")
+
+
+
+# Just pick some random colours. Probably need to make this configurable.
+plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
 
 # Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
@@ -111,10 +144,13 @@ def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    
 def hovmoller(plot, outfile="image.html"):
        
+   plot_type = plot['type']
+   plot_title = plot['title']
+   plot_units = plot['y1Axis']['label']
+
    df = plot['data'][0]
    plot_type = df['type']
    var_name = df['coverage']
-   plot_units = df['units']
    plot_scale = df['scale']
 
    varindex = {j: i for i, j in enumerate(df['vars'])}
@@ -214,7 +250,7 @@ def hovmoller(plot, outfile="image.html"):
    plot_width = 1200
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
-              title="Hovmoller - {}".format(var_name))
+              title="Hovmoller - {}".format(plot_title), responsive=True)
 
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
@@ -243,8 +279,6 @@ def timeseries(plot, outfile="time.html"):
    sources = []
    var_meta = dict()
    var_name = plot_data[0]['coverage']
-   plot_units = plot_data[0]['units']
-   plot_scale = plot_data[0]['scale']
    plot_scale = plot['scale']
 
    ymin = []
@@ -252,10 +286,17 @@ def timeseries(plot, outfile="time.html"):
 
    for df in plot_data:
           
+      # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
+
       debug(4, "timeseries: varindex = {}".format(varindex))
+
+      # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
+
+      # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
+
       debug(4, data[varindex['mean']]) 
       ymin.append(np.amin(data[varindex['mean']].astype(np.float64)))
       ymax.append(np.amax(data[varindex['mean']].astype(np.float64)))
@@ -295,7 +336,7 @@ def timeseries(plot, outfile="time.html"):
       sources.append(ColumnDataSource(data=datasource))
       
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
-              height=400
+              height=400, responsive=True
    )
    
    tooltips = [("Date", "@sdate")]
@@ -303,33 +344,6 @@ def timeseries(plot, outfile="time.html"):
    tooltips.append(("Max ", "@max"))
    tooltips.append(("Min ", "@min"))
    tooltips.append(("Std ", "@stderr"))
-
-   # Use some custom HTML to draw our tooltip. Just put the @var placeholders where you want them.
-   #ts_plot.add_tools(HoverTool(tooltips="""
-   #        <div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Date:</span>
-   #                <span style="font-size: 12px; color: #966;">@sdate</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Mean:</span>
-   #                <span style="font-size: 12px; color: #966;">@mean</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Max:</span>
-   #                <span style="font-size: 12px; color: #966;">@max</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Min:</span>
-   #                <span style="font-size: 12px; color: #966;">@min</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Stderr:</span>
-   #                <span style="font-size: 12px; color: #966;">@stderr</span>
-   #            </div>
-   #        </div>
-   #        """
-   #        ))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -346,8 +360,6 @@ def timeseries(plot, outfile="time.html"):
    # Adding the second axis to the plot.  
    #ts_plot.add_layout(LinearAxis(y_range_name="y1", axis_label=plot['y1Axis']['label']), 'left')
    
-   plot_palette = [['#7570B3', 'blue', 'blue', 'blue'], ['#A0A0A0', 'green', 'green', 'green']]
-
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
@@ -375,7 +387,7 @@ def timeseries(plot, outfile="time.html"):
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=3, line_alpha=0, source=source)
+      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars
@@ -389,30 +401,18 @@ def timeseries(plot, outfile="time.html"):
    # Cannot place legend outside plot.
    ts_plot.legend.location = "top_left"
    
-   # Example code to display the data in a table
-   #columns = [
-   #        TableColumn(field="date", title="Date", formatter=DateFormatter()),
-   #        TableColumn(field="mean", title="Mean"),
-   #    ]
-   #data_table = DataTable(source=source, columns=columns, width=400, height=280)
+   script, div = components(ts_plot)
 
-   #layout = vplot(p, data_table)
-   
    # plot the points
-   output_file(outfile, 'Time Series')
+   #output_file(outfile, 'Time Series')
+   with open(outfile, 'w') as output_file:
+      print(template.render(script=script, div=div), file=output_file)
    
-   save(ts_plot)
+   #save(ts_plot)
    return(ts_plot)
 #END timeseries   
 
-def legacy_reformat(data):
-   return(data)
-#END legacy_reformat
-
 def scatter(plot, outfile='/tmp/scatter.html'):
-
-   # Just pick some random colours. Probably need to make this configurable.
-   plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
 
    plot_data = plot['data']
    plot_type = plot['type']
@@ -459,25 +459,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 
    scatter_plot.add_tools(hover)
 
-   # Use some custom HTML to draw our tooltip. Just put the @var placeholders where you want them.
-   #scatter_plot.add_tools(HoverTool(tooltips="""
-   #        <div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">Date:</span>
-   #                <span style="font-size: 12px; color: #966;">@sdate</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">x:</span>
-   #                <span style="font-size: 12px; color: #966;">@x</span>
-   #            </div>
-   #            <div>
-   #                <span style="font-size: 12px; font-weight: bold;">y:</span>
-   #                <span style="font-size: 12px; color: #966;">@y</span>
-   #            </div>
-   #        </div>
-   #        """
-   #        ))
-
    scatter_plot.xaxis.axis_label = plot['xAxis']['label']
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
@@ -485,7 +466,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    scatter_plot.yaxis.axis_label = plot['y1Axis']['label']
    
    scatter_plot.circle('x', 'y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
-      
       
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
@@ -499,63 +479,62 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #END scatter
 
 
-def get_plot_data(json_data, request_type='data'):
+def get_plot_data(json_request, request_type='data'):
    debug(2, "get_plot_data: Started")
-   series = json_data['plot']['data']['series']
-   plot_type = json_data['plot']['type']
-   plot_title = json_data['plot']['title']
-   scale = json_data['plot']['y1Axis']['scale']
-   units = json_data['plot']['y1Axis']['label']
-   y1Axis = json_data['plot']['y1Axis']
-   xAxis = json_data['plot']['xAxis']
 
+   # Common data for all plots. 
+   series = json_request['plot']['data']['series']
+   plot_type = json_request['plot']['type']
+   plot_title = json_request['plot']['title']
+   scale = json_request['plot']['y1Axis']['scale']
+   units = json_request['plot']['y1Axis']['label']
+   y1Axis = json_request['plot']['y1Axis']
+   xAxis = json_request['plot']['xAxis']
+
+   # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
+   # as a list.
    plot_data = []
-   if 'y2Axis' in json_data['plot'].keys(): 
-      y2Axis = json_data['plot']['y2Axis']
-      plot = dict(
-         scale=scale, type=plot_type, units=units, title=plot_title,
-         vars=['date', 'min', 'max', 'mean', 'std'], xAxis=xAxis, y1Axis=y1Axis, y2Axis=y2Axis,
-         data=[])
-   else:
-      plot = dict(
-         scale=scale, type=plot_type, units=units, title=plot_title,
-         vars=['date', 'min', 'max', 'mean', 'std'], xAxis=xAxis, y1Axis=y1Axis,
-         data=[])
+
+   plot = dict(
+      scale=scale, type=plot_type, units=units, title=plot_title,
+      vars=['date', 'min', 'max', 'mean', 'std'], xAxis=xAxis, y1Axis=y1Axis,
+      data=[])
+   if 'y2Axis' in json_request['plot'].keys(): 
+      y2Axis = json_request['plot']['y2Axis']
+      plot['y2Axis']=y2Axis
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
+      # Hovmoller should only have one data series to plot.
+      if len(series) > 1:
+         debug(0, "Error: Attempting to plot {} data series".format(len(series)))
+
       ds = series[0]['data_source']
       coverage = ds['coverage']
       time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
       debug(3,"Time bounds: {}".format(time_bounds))
 
-      # Build the request - based on the old style calls so shoud be compatible.
-      data_request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
-                   ds['middlewareUrl'], 
-                   urllib.quote_plus(ds['threddsUrl']), 
-                   urllib.quote_plus(ds['coverage']), 
-                   plot_type, 
-                   time_bounds,
-                   urllib.quote_plus(ds['bbox']))
-      if 'graphXAxis' in ds.keys():
-         data_request = data_request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
-      if 'graphYAxis' in ds.keys():
-         data_request = data_request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
-      if 'graphZAxis' in ds.keys():
-         data_request = data_request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
-      if 'depth' in ds.keys():
-         data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-      debug(3, "Requesting data: {}".format(data_request))
+      coverage = ds['coverage']
+      wcs_url = ds['threddsUrl']
+      bbox = ["{}".format(ds['bbox'])]
+      time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
+      debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
       try:
-         response = json.load(urllib.urlopen(data_request))
+         extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+         extract = extractor.getData()
+         if plot_type == "hovmollerLat":
+            hov_stats = HovmollerStats(extract, "Time", "Lat", coverage)
+         else:
+            hov_stats = HovmollerStats(extract, "Lon",  "Time", coverage)
+         
+         response = json.loads(hov_stats.process())
       except ValueError:
          debug(2, "Data request, {}, failed".format(data_request))
-         return []   
+         return dict(data=[])
          
-
       # TODO - Old style extractor response. So pull the data out.
-      data = response['output']['data']
+      data = response['data']
 
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
@@ -576,7 +555,7 @@ def get_plot_data(json_data, request_type='data'):
          try:
             extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
             extract = extractor.getData()
-            ts_stats = BasicStats(extract, ds['coverage'])
+            ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
          except ValueError:
             debug(2, "Data request, {}, failed".format(data_request))
@@ -584,7 +563,7 @@ def get_plot_data(json_data, request_type='data'):
          
          debug(4, "Response: {}".format(response))
 
-         # LEGACY - this reformats the response to the new format.
+         #TODO LEGACY - this reformats the response to the new format.
          data = response['data']
          df = []
          for date, details in data.items():
@@ -592,7 +571,7 @@ def get_plot_data(json_data, request_type='data'):
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
     
-         plot_data.append(dict(scale=scale, coverage=coverage, units=units, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+         plot_data.append(dict(coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
 
    plot['data'] = plot_data
    return plot
