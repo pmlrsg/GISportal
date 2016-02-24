@@ -24,12 +24,17 @@ from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Ran
 
 import palettes
 
+# Set the default logging verbosity to lowest.
+verbosity = 0
+
+# Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
     def __getattr__(self, name):
         if name in self:
             return name
         raise AttributeError
 
+# Valid plot status values.
 Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
 def get_palette(palette="rsg_colour"):
@@ -40,13 +45,11 @@ def get_palette(palette="rsg_colour"):
        colours.append("#{:02x}{:02x}{:02x}".format(my_palette[i], my_palette[i+1], my_palette[i+2]))
 
    return(colours)
-
 #END get_palette
 
 def datetime(x):
    return np.array(pd.to_datetime(x).astype(np.int64) // 10**6)
    #return np.array(x, dtype=np.datetime64)
-
 #END datetime
 
 def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
@@ -222,7 +225,7 @@ def hovmoller(plot, outfile="image.html"):
    output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
    save(layout)
-   
+   return(layout)
 #END hovmoller
 
 def timeseries(plot, outfile="time.html"):
@@ -396,10 +399,12 @@ def timeseries(plot, outfile="time.html"):
    output_file(outfile, 'Time Series')
    
    save(ts_plot)
+   return(ts_plot)
 #END timeseries   
 
 def legacy_reformat(data):
    return(data)
+#END legacy_reformat
 
 def scatter(plot, outfile='/tmp/scatter.html'):
 
@@ -487,6 +492,8 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    output_file(outfile, 'Scatter Plot')
    
    save(scatter_plot)
+   return(scatter_plot)
+#END scatter
 
 
 def get_plot_data(json_data, request_type='data'):
@@ -596,6 +603,7 @@ def get_plot_data(json_data, request_type='data'):
 
    plot['data'] = plot_data
    return plot
+#END get_plot_data
 
 def prepare_plot(request, outdir):
    '''
@@ -605,15 +613,15 @@ def prepare_plot(request, outdir):
    If all looks OK it returns the hash to the caller, otherwise it returns an error.
    '''
 
-   # Currently get issues as the JSON is not always in the same order so hash is different.
+   # TODO Currently get issues as the JSON is not always in the same order so hash is different.
    # TODO How to handle multiple versions of the same request simultaneously.
 
-   #plot_data = get_plot_data(request, 'time')
    hasher = hashlib.sha1()
    hasher.update(json.dumps(request))
    my_hash = hasher.hexdigest()
    update_status(opts.dirname, my_hash, request, Plot_status.initialising, "Preparing")
    return my_hash
+#END prepare_plot
 
 def execute_plot(request, outfile):
    update_status(opts.dirname, my_hash, request, Plot_status.extracting, "Extracting")
@@ -636,8 +644,13 @@ def execute_plot(request, outfile):
       plot_file = hovmoller(plot, outfile)
 
    return True
+#END execute_plot
    
 def update_status(dirname, my_hash, request, plot_status, message):
+   '''
+      Updates a JSON status file whose name is defined by dirname and my_hash.
+   '''
+
    # Read status file, create if not there.
    file_path = opts.dirname + "/" + my_hash + "-status.json"
    try:
@@ -656,21 +669,29 @@ def update_status(dirname, my_hash, request, plot_status, message):
          )
       else:
          raise
+
+   # Update the status information.
    status["message"] = message
    status["state"] = plot_status
    if plot_status == Plot_status.complete:
       status["completed"] = True
       status['filename'] = opts.dirname + "/" + my_hash + "-plot.html"
+   else:
+      status["completed"] = False
+      status['filename'] = None
 
    debug(3, "Status: {}".format(status))
+
+   # Write it back to the file.
    with open(file_path, 'w') as status_file:
       json.dump(status, status_file)
 
    return True
+#END update_status
 
-verbosity = 0
 def debug(level, msg):
    if verbosity >= level: print(msg, file=sys.stderr)
+#END debug
 
 
 if __name__ == "__main__":
@@ -683,14 +704,12 @@ if __name__ == "__main__":
 
 Examples:
 
-To prepare a plot for submission
-./plots.py -c prepare -d /tmp < testing/data/testscatter1.json
+To execute a plot
+./plots.py -c execute -d /tmp < testing/data/testscatter1.json
 
-To submit a prepared plot
-./plots.py -H da39a3ee5e6b4b0d3255bfef95601890afd80709 -d /tmp -c execute
 """
 
-   valid_commands = ('prepare', 'execute', 'status')
+   valid_commands = ('execute')
    cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
    cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
    cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output")
@@ -706,11 +725,11 @@ To submit a prepared plot
       debug(0,"'{}' is not a directory".format(opts.dirname))
       sys.exit(1)
    
-   if opts.command not in ('prepare', 'execute', 'status'):
+   if opts.command not in valid_commands:
       debug(0,"Command must be one of {}".format(valid_commands))
       sys.exit(1)
 
-   if opts.command == "prepare":
+   if opts.command == "execute":
       request = json.load(sys.stdin)
       debug(3, "Received request: {}".format(request))
 
@@ -719,22 +738,13 @@ To submit a prepared plot
       file_path = opts.dirname + "/" + my_hash + "-request.json"
       debug(2, "File: {}".format(file_path))
 
+      # Store the request for possible caching in the future.
       with open(file_path, 'w') as outfile:
          json.dump(request, outfile)
 
-      print(my_hash)
-   elif opts.command == "execute":
-      request = json.load(sys.stdin)
-      debug(3, "Received request: {}".format(request))
-
-      my_hash = prepare_plot(request, opts.dirname)
-
-      file_path = opts.dirname + "/" + my_hash + "-request.json"
-      debug(2, "File: {}".format(file_path))
-
-      with open(file_path, 'w') as outfile:
-         json.dump(request, outfile)
-
+      # Output the identifier for the plot on stdout. This is used by the frontend
+      # to monitor the status of the plot. We must not do this before we have written the 
+      # status file.
       print(my_hash)
 
       debug(3, "Request: {}".format(request['plot']))
@@ -748,8 +758,6 @@ To submit a prepared plot
          debug(0, "Failed to complete plot")
          sys.exit(2)
 
-   elif opts.command == "status":
-      pass
    else:
       # We should not be here
       sys.exit(2)
