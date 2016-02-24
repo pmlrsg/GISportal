@@ -24,6 +24,9 @@ from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Ran
 
 import palettes
 
+from data_extractor.extractors import BasicExtractor
+from data_extractor.analysis_types import BasicStats, HovmollerStats
+
 # Set the default logging verbosity to lowest.
 verbosity = 0
 
@@ -542,12 +545,12 @@ def get_plot_data(json_data, request_type='data'):
          data_request = data_request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
       if 'depth' in ds.keys():
          data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-      debug(4, "Requesting data: {}".format(data_request))
+      debug(3, "Requesting data: {}".format(data_request))
 
       try:
          response = json.load(urllib.urlopen(data_request))
       except ValueError:
-         debug(3, "Data request, {}, failed".format(data_request))
+         debug(2, "Data request, {}, failed".format(data_request))
          return []   
          
 
@@ -562,37 +565,27 @@ def get_plot_data(json_data, request_type='data'):
       #TODO Can have more than 1 series so need a loop.
       for s in series:
          ds = s['data_source']
-         coverage = ds['coverage']
-         time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
-         debug(3,"Time bounds: {}".format(time_bounds))
          yaxis = s['yAxis']
 
-         data_request = "{}?baseurl={}&coverage={}&type={}&time={}&bbox={}".format(
-                      ds['middlewareUrl'], 
-                      urllib.quote_plus(ds['threddsUrl']), 
-                      urllib.quote_plus(ds['coverage']), 
-                      "timeseries", 
-                      time_bounds,
-                      urllib.quote_plus(ds['bbox']))
-         if 'graphXAxis' in ds.keys():
-            data_request = data_request + "&graphXAxis={}".format(urllib.quote_plus(ds['graphXAxis']))
-         if 'graphYAxis' in ds.keys():
-            data_request = data_request + "&graphYAxis={}".format(urllib.quote_plus(ds['graphYAxis']))
-         if 'graphZAxis' in ds.keys():
-            data_request = data_request + "&graphZAxis={}".format(urllib.quote_plus(ds['graphZAxis']))
-         if 'depth' in ds.keys():
-            data_request = data_request + "&depth={}".format(urllib.quote_plus(ds['depth']))
-         debug(4, "Requesting data: {}".format(data_request))
+         coverage = ds['coverage']
+         wcs_url = ds['threddsUrl']
+         bbox = ["{}".format(ds['bbox'])]
+         time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
+         debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
          try:
-            response = json.load(urllib.urlopen(data_request))
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+            extract = extractor.getData()
+            ts_stats = BasicStats(extract, ds['coverage'])
+            response = json.loads(ts_stats.process())
          except ValueError:
-            debug(3, "Data request, {}, failed".format(data_request))
+            debug(2, "Data request, {}, failed".format(data_request))
             return dict(data=[])
          
+         debug(4, "Response: {}".format(response))
 
          # LEGACY - this reformats the response to the new format.
-         data = response['output']['data']
+         data = response['data']
          df = []
          for date, details in data.items():
              line = [date]
