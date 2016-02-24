@@ -401,7 +401,6 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    output['data'] = []
  
    numDimensions = len(zMaskedArray.shape)
-   print numDimensions
    direction = None 
    if lat != None:
       direction = 'lat'
@@ -426,7 +425,7 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
          
          output['depth'] = float(depth[0])
  
-   print len(lon)
+   #print len(lon)
    for i, timelatlon in enumerate(zMaskedArray):
       date = None   
       if timeUnits:
@@ -435,7 +434,7 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
          date = ''.join(times[i])
       
       for j, row in enumerate(timelatlon):
-         print len(row)
+         #print len(row)
          if direction == "lat":
             if (j < len(lat)):
                pos = lat[j]

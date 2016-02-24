@@ -13,7 +13,7 @@ class HovmollerStats(object):
 		
 
 	def process(self):
-		print "running basic processing on %s" % self.filename
+		#print "running basic processing on %s" % self.filename
 
 		netcdf_file = netCDF.Dataset(self.filename, "r")
 		return json.dumps(hovmoller(netcdf_file, self.xVariable, self.yVariable, self.dataVariable))
