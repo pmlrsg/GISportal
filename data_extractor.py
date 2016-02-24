@@ -17,6 +17,8 @@ example wcs url : http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY?service=
 
 example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -time 2010-01-01/2011-01-01
 
+example hovmoller : python data_extractor.py -t hovmoller -b="-29.883,27.334,-23.027,33.486" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -xvar Lon -yvar Time -time 2010-01-01/2010-03-01 | python -m json.tool
+
 """
 
 import argparse
