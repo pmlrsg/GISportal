@@ -188,7 +188,29 @@ gisportal.selectionTools.toggleTool = function(type)  {
 };
 
 gisportal.selectionTools.updateROI = function()  {
-   // this will all change with the pre-saved area selection options that are coming   
+   var new_bounds = $(this).val();
+   var this_feature;
+   if(new_bounds.startsWith("POLYGON")){
+      try{
+         this_feature = gisportal.wkt.readFeature(new_bounds);
+      }catch(e){}
+   }else{
+      try{
+         var newer_bounds = new_bounds.split(",");
+         var polygon = new Terraformer.Polygon( {
+            "type": "Polygon",
+            "coordinates": [[[newer_bounds[0], newer_bounds[1]], [newer_bounds[2], newer_bounds[1]], [newer_bounds[2], newer_bounds[3]], [newer_bounds[0], newer_bounds[3]], [newer_bounds[0], newer_bounds[1]]]]
+         });
+         this_feature = gisportal.wkt.readFeature(gisportal.coordinatesToPolygon(polygon.coordinates));
+      }catch(e){}
+   }
+   try{
+      gisportal.currentSelectedRegion = new_bounds;
+      gisportal.vectorLayer.getSource().clear();
+      gisportal.vectorLayer.getSource().addFeature(this_feature);
+      return;
+   }catch(e){}
+   $(this).val("Error, revert to old value");
 };
 
 gisportal.currentSelectedRegion = "";

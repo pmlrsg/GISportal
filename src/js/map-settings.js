@@ -615,7 +615,11 @@ gisportal.reprojectPolygon = function(polygon, to_proj) {
    }
    var coord = bbox.coordinates;
 
-   // The rebuilding of the POLYGON.
+   return gisportal.coordinatesToPolygon(coord);
+};
+
+gisportal.coordinatesToPolygon = function(coord){
+   // The building of the POLYGON.
    var projectedWKT = 'POLYGON(';
 
    var ringCount = coord.length;

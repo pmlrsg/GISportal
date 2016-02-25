@@ -965,8 +965,8 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
 
    // Gets any error with the bounding box and puts it into the div
-   var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id )
-   if( bound_error ){
+   var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
+   if( bound_error !== true ){
       errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
       var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
       setTimeout( function(){
@@ -1053,20 +1053,20 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
    }
-   // This checks if any point is on the earth
-   var found_point_on_earth = false;
    var current_proj = map.getView().getProjection().getCode();
    for(var point in bb1.coordinates[0]){
       if(current_proj !== "EPSG:4326"){
          bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");
       }
-      if(Math.abs(bb1.coordinates[0][point][0]) <= 180){
-         found_point_on_earth = true;
-      }
    }
+   var proj_bounds = gisportal.availableProjections[current_proj].bounds;
    // A different message is displayed if the user clicks off the earth
-   if(!found_point_on_earth){
-      return "The bounding box you drew is completely off the earth, please recenter your map.";
+   var bb2 = new Terraformer.Polygon( {
+      "type": "Polygon",
+      "coordinates": [[[proj_bounds[0], proj_bounds[4]], [proj_bounds[3], proj_bounds[4]], [proj_bounds[3], proj_bounds[2]], [proj_bounds[0], proj_bounds[2]], [proj_bounds[0], proj_bounds[4]]]]
+   });
+   if(!bb1.intersects( bb2 )){
+      return "The bounding box you drew is completely off the projection, please recenter your map.";
    }
 
    var layer = gisportal.layers[ layerId ];
@@ -1095,13 +1095,13 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       ]
    ];
 
-   var bb2 = new Terraformer.Polygon( {
+   bb2 = new Terraformer.Polygon( {
       "type": "Polygon",
       "coordinates": [arr] 
    });
 
-   if(bb1.intersects( bb2 ) || bb1.contains( bb2 ) || bb1.within( bb2 )){
-      return false
+   if(bb1.intersects( bb2 )){
+      return true;
    }
    else{
       return "The bounding box selected contains no data for this indicator.";

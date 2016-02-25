@@ -34,8 +34,8 @@ gisportal.graphs.addComponentToGraph = function( component ){
       gisportal.graphs.editPlot( plot );
       plot.plotType( 'timeseries' );
       // These variables are set so that the correct drop downs are loaded in the first place.
-      component.xText = "Left Axis"
-      component.yText = "Right Axis"
+      component.xText = "Left Axis";
+      component.yText = "Right Axis";
    }else{
       component = gisportal.graphs.setComponentXYText(component, $('.js-active-plot-type').val() || "timeseries");
    }
@@ -51,14 +51,13 @@ gisportal.graphs.setComponentXYText = function(component, plotType){
          component.xText = "Left Axis";
          component.yText = "Right Axis";
          break;
-      case "scater":
       default:
          component.xText = "X Axis";
          component.yText = "Y Axis";
          break;
    }
    return component;
-}
+};
 
 
 

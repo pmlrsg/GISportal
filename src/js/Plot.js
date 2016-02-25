@@ -584,7 +584,7 @@ gisportal.graphs.Plot =(function(){
       // Changes the text of any already selected options
       $('select.js-y-axis option[value="1"]').text(xText);
       $('select.js-y-axis option[value="2"]').text(yText);
-   }
+   };
   
    /**
     * Sets the minimum and maximum amount of components
