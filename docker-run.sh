@@ -4,6 +4,8 @@
 #  fires up node.
 #
 printf "starting... \n\n"
+cd /app/GISportal
+grunt
 
 /usr/bin/redis-server --daemonize yes; 
 
@@ -15,4 +17,4 @@ printf "To use the application with the domain name you specified at installatio
 refer to the nginx section of the docker-readme.md file; this explains how to configure nginx to
 act a proxy for external requests\n\n"
 
-/usr/bin/node /app/GISportal/app.js > /app/GISportal/config/app.log 
+/usr/bin/node /app/GISportal/app.js > /app/GISportal/config/app.log

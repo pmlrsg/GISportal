@@ -3,4 +3,4 @@
 	url = https://github.com/pmlrsg/nvd3
 [submodule "plotting"]
 	path = plotting
-	url = rsggit@rsg-gitlab.npm.ac.uk:web-development/plotting.git
+	url = https://gitlab.rsg.pml.ac.uk/web-development/plotting.git 
