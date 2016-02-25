@@ -19,6 +19,7 @@ import json
 import jinja2
 import urllib
 import os, hashlib
+import time
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
@@ -496,9 +497,12 @@ def get_plot_data(json_request, request_type='data'):
    plot_data = []
 
    plot = dict(
+      status="fail",
       scale=scale, type=plot_type, units=units, title=plot_title,
       vars=['date', 'min', 'max', 'mean', 'std'], xAxis=xAxis, y1Axis=y1Axis,
-      data=[])
+      data=[]
+   )
+
    if 'y2Axis' in json_request['plot'].keys(): 
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
@@ -531,7 +535,7 @@ def get_plot_data(json_request, request_type='data'):
          response = json.loads(hov_stats.process())
       except ValueError:
          debug(2, "Data request, {}, failed".format(data_request))
-         return dict(data=[])
+         return plot
          
       # TODO - Old style extractor response. So pull the data out.
       data = response['data']
@@ -573,6 +577,7 @@ def get_plot_data(json_request, request_type='data'):
     
          plot_data.append(dict(coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
 
+   plot['status'] = "success"
    plot['data'] = plot_data
    return plot
 #END get_plot_data
@@ -590,41 +595,113 @@ def prepare_plot(request, outdir):
 
    hasher = hashlib.sha1()
    hasher.update(json.dumps(request))
-   my_hash = hasher.hexdigest()
-   update_status(opts.dirname, my_hash, request, Plot_status.initialising, "Preparing")
+   my_hash = "{}_{}".format(hasher.hexdigest(), int(time.time()))
    return my_hash
 #END prepare_plot
 
-def execute_plot(request, outfile):
-   update_status(opts.dirname, my_hash, request, Plot_status.extracting, "Extracting")
-   plot = get_plot_data(request, 'data')
+def read_cached_request(dirname, my_hash):
+   request = None
+   request_path = dirname + "/" + my_hash + "-request.json"
+   try:
+      with open(request_path, 'r') as request_file:
+         request = json.load(request_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Request file {} not found".format(request_path))
+      else:
+         raise
+
+   return request
+#END read_cached_request
+
+def read_cached_data(dirname, my_hash):
+   plot = None
+   data_path = dirname + "/" + my_hash + "-data.json"
+   try:
+      with open(data_path, 'r') as outfile:
+         plot = json.load(outfile)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Cache file {} not found".format(data_path))
+      else:
+         raise
+
+   return plot 
+#END read_cached_request
+
+def execute_plot(dirname, my_hash):
+   if my_hash == "":
+      request = json.load(sys.stdin)
+      debug(3, "Received request: {}".format(request))
+
+      my_hash = prepare_plot(request, dirname)
+
+      update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
+
+      # Store the request for possible caching in the future.
+      request_path = dirname + "/" + my_hash + "-request.json"
+      debug(2, "File: {}".format(request_path))
+      with open(request_path, 'w') as outfile:
+         json.dump(request, outfile)
+      
+      # Call the extractor.
+      update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
+      plot = get_plot_data(request, 'data')
+
+      # Only cache the data if we think it is OK.
+      if plot['status'] == "success":
+         data_path = dirname + "/" + my_hash + "-data.json"
+         debug(2, "File: {}".format(data_path))
+         with open(data_path, 'w') as outfile:
+            json.dump(plot, outfile)
+      
+   else:
+      # We have been supplied a hash for this request so check if we have got the data already cached.
+      plot = read_cached_data(dirname, my_hash)
+      if plot == None:
+         request = read_cached_request(dirname, my_hash)
+         if request == None:
+            debug(0, "Option -H {} was supplied but no cached files found".format(my_hash))
+            update_status(dirname, my_hash, Plot_status.failed, "Cache read failed")
+            sys.exit(2)
+         else:
+            plot = get_plot_data(request, 'data')
+
+   # Output the identifier for the plot on stdout. This is used by the frontend
+   # to monitor the status of the plot. We must not do this before we have written the 
+   # status file.
+   print(my_hash)
+
+   file_path = dirname + "/" + my_hash + "-plot.html"
+
    plot_data = plot['data']
 
    if len(plot_data) == 0:
       debug(0, "Data request failed")
-      update_status(opts.dirname, my_hash, request, Plot_status.failed, "Extract failed")
+      update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
       return False
 
    if plot['type'] == 'timeseries':
-      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
-      plot_file = timeseries(plot, outfile)
+      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+      plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
-      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
-      plot_file = scatter(plot, outfile)
+      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+      plot_file = scatter(plot, file_path)
    else:
-      update_status(opts.dirname, my_hash, request, Plot_status.plotting, "Plotting")
-      plot_file = hovmoller(plot, outfile)
+      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+      plot_file = hovmoller(plot, file_path)
 
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete")
    return True
 #END execute_plot
    
-def update_status(dirname, my_hash, request, plot_status, message):
+def update_status(dirname, my_hash, plot_status, message):
    '''
       Updates a JSON status file whose name is defined by dirname and my_hash.
    '''
 
    # Read status file, create if not there.
-   file_path = opts.dirname + "/" + my_hash + "-status.json"
+   file_path = dirname + "/" + my_hash + "-status.json"
    try:
       with open(file_path, 'r') as status_file:
          status = json.load(status_file)
@@ -647,7 +724,7 @@ def update_status(dirname, my_hash, request, plot_status, message):
    status["state"] = plot_status
    if plot_status == Plot_status.complete:
       status["completed"] = True
-      status['filename'] = opts.dirname + "/" + my_hash + "-plot.html"
+      status['filename'] = dirname + "/" + my_hash + "-plot.html"
    else:
       status["completed"] = False
       status['filename'] = None
@@ -681,7 +758,7 @@ To execute a plot
 
 """
 
-   valid_commands = ('execute')
+   valid_commands = ('execute', 'csv')
    cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
    cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
    cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output")
@@ -702,30 +779,10 @@ To execute a plot
       sys.exit(1)
 
    if opts.command == "execute":
-      request = json.load(sys.stdin)
-      debug(3, "Received request: {}".format(request))
 
-      my_hash = prepare_plot(request, opts.dirname)
-
-      file_path = opts.dirname + "/" + my_hash + "-request.json"
-      debug(2, "File: {}".format(file_path))
-
-      # Store the request for possible caching in the future.
-      with open(file_path, 'w') as outfile:
-         json.dump(request, outfile)
-
-      # Output the identifier for the plot on stdout. This is used by the frontend
-      # to monitor the status of the plot. We must not do this before we have written the 
-      # status file.
-      print(my_hash)
-
-      debug(3, "Request: {}".format(request['plot']))
-
-      file_path = opts.dirname + "/" + my_hash + "-plot.html"
-      
-      if execute_plot(request, file_path):
-         debug(1,file_path)
-         update_status(opts.dirname, my_hash, request, Plot_status.complete, "Complete")
+      # Now try and make the plot.
+      if execute_plot(opts.dirname, opts.hash):
+         debug(1, "Plot complete")
       else:
          debug(0, "Failed to complete plot")
          sys.exit(2)
