@@ -166,7 +166,7 @@ def hovmoller(plot, outfile="image.html"):
    
    # Format latlon to float. Otherwise we can not do the mins etc.
    #latlon = np.array(df["LatLon"]).astype(np.float)
-   latlon = np.array(data[varindex['latlon']]).astype(np.float)
+   latlon = np.array(data[varindex['latlon']]).astype(np.float64)
    
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
@@ -181,7 +181,7 @@ def hovmoller(plot, outfile="image.html"):
 
    # Easiest if we force float here but is that always true?
    # We also have problems with how the data gets stored as JSON (very big!).
-   values = values.astype(np.float)
+   values = values.astype(np.float64)
    
    if plot_scale == "log":
        log_plot = True
@@ -280,7 +280,7 @@ def timeseries(plot, outfile="time.html"):
    sources = []
    var_meta = dict()
    var_name = plot_data[0]['coverage']
-   plot_scale = plot['scale']
+   plot_scale = plot['y1Axis']['scale']
 
    ymin = []
    ymax = []
@@ -297,6 +297,8 @@ def timeseries(plot, outfile="time.html"):
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
+ 
+      np.savetxt("/tmp/foo.csv", np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
 
       debug(4, data[varindex['mean']]) 
       ymin.append(np.amin(data[varindex['mean']].astype(np.float64)))
@@ -311,7 +313,7 @@ def timeseries(plot, outfile="time.html"):
          # Set the errorbars
          err_xs = []
          err_ys = []
-         for x, y, std in zip(date, data[varindex['mean']].astype(np.float), data[varindex['std']].astype(np.float)):
+         for x, y, std in zip(date, data[varindex['mean']].astype(np.float64), data[varindex['std']].astype(np.float64)):
             if plot_scale == "linear":
                err_xs.append((x, x))
                err_ys.append((y - std, y + std))
@@ -329,7 +331,7 @@ def timeseries(plot, outfile="time.html"):
          # We create a list of coords starting with the max for the first date then join up all
          # the maxes in date order before moving down to the min for the last date and coming
          # back to the first date.
-         band_y = np.append(data[varindex['max']],data[varindex['min']][::-1])
+         band_y = np.append(data[varindex['max']].astype(np.float64),data[varindex['min']].astype(np.float64)[::-1])
          band_x = np.append(date,date[::-1])
          datasource['min'] = data[varindex['min']]
          datasource['max'] = data[varindex['max']]
@@ -353,6 +355,7 @@ def timeseries(plot, outfile="time.html"):
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
@@ -498,8 +501,8 @@ def get_plot_data(json_request, request_type='data'):
 
    plot = dict(
       status="fail",
-      scale=scale, type=plot_type, units=units, title=plot_title,
-      vars=['date', 'min', 'max', 'mean', 'std'], xAxis=xAxis, y1Axis=y1Axis,
+      type=plot_type, title=plot_title,
+      xAxis=xAxis, y1Axis=y1Axis,
       data=[]
    )
 
@@ -591,7 +594,6 @@ def prepare_plot(request, outdir):
    '''
 
    # TODO Currently get issues as the JSON is not always in the same order so hash is different.
-   # TODO How to handle multiple versions of the same request simultaneously.
 
    hasher = hashlib.sha1()
    hasher.update(json.dumps(request))
@@ -638,6 +640,11 @@ def execute_plot(dirname, my_hash):
 
       update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
 
+      # Output the identifier for the plot on stdout. This is used by the frontend
+      # to monitor the status of the plot. We must not do this before we have written the 
+      # status file.
+      print(my_hash)
+
       # Store the request for possible caching in the future.
       request_path = dirname + "/" + my_hash + "-request.json"
       debug(2, "File: {}".format(request_path))
@@ -657,6 +664,7 @@ def execute_plot(dirname, my_hash):
       
    else:
       # We have been supplied a hash for this request so check if we have got the data already cached.
+      update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
       plot = read_cached_data(dirname, my_hash)
       if plot == None:
          request = read_cached_request(dirname, my_hash)
@@ -665,12 +673,8 @@ def execute_plot(dirname, my_hash):
             update_status(dirname, my_hash, Plot_status.failed, "Cache read failed")
             sys.exit(2)
          else:
+            update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
             plot = get_plot_data(request, 'data')
-
-   # Output the identifier for the plot on stdout. This is used by the frontend
-   # to monitor the status of the plot. We must not do this before we have written the 
-   # status file.
-   print(my_hash)
 
    file_path = dirname + "/" + my_hash + "-plot.html"
 
@@ -761,9 +765,9 @@ To execute a plot
    valid_commands = ('execute', 'csv')
    cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
    cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
-   cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output")
-   cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory")
-   cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Hash of prepared command")
+   cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output, more v's, more verbose.")
+   cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory.")
+   cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
 
    opts = cmdParser.parse_args()
 
