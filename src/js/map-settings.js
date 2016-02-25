@@ -597,6 +597,51 @@ gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
    }
    return new_bounds;
 };
+/*
+ * This function reprojects a polygon to a given prjection
+ * The polygon cannot be parsed back so the values have to be put back in 'by hand'
+ */
+gisportal.reprojectPolygon = function(polygon, to_proj) {
+   var polygonBox = new Terraformer.WKT.parse(polygon);
+   var bbox;
+
+   // If it can be projected it will be, if not the original is returned.
+   if(to_proj == "EPSG:4326"){
+      bbox = polygonBox.toGeographic();
+   }else if(to_proj == "EPSG:3857"){
+      bbox = polygonBox.toMercator();
+   }else{
+      return polygon;
+   }
+   var coord = bbox.coordinates;
+
+   // The rebuilding of the POLYGON.
+   var projectedWKT = 'POLYGON(';
+
+   var ringCount = coord.length;
+   for (var i = 0; i < ringCount; i++) {
+      var ring = coord[i];
+      //ring starts; add opening bracket
+      projectedWKT = projectedWKT + "(";
+      var ptCount = ring.length;
+      var coordList = "";
+      for (var j = 0; j < ptCount; j++) {
+         var pt = ring[j];
+         //write the coordinates
+         coordList = coordList + String(pt[0]) + " " + String(pt[1]) + ", ";
+      }
+      //remove the last comma (indicating end of coordinate)
+      coordList = coordList.substring(0, coordList.lastIndexOf(','));
+      //add to the WKT String
+      projectedWKT = projectedWKT + coordList + "), ";
+   }
+   //remove the last comma (indicating end of ring)
+   projectedWKT = projectedWKT.substring(0, projectedWKT.lastIndexOf(','));
+
+   //closing bracket
+   projectedWKT = projectedWKT + ")";
+   return projectedWKT;
+};
 
 gisportal.reprojectPoint = function(point, from_proj, to_proj) {
    return ol.proj.transform(point, from_proj, to_proj);

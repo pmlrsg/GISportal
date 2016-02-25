@@ -61,9 +61,9 @@ gisportal.graphs.Plot =(function(){
    * 
    */
    Plot.prototype.addComponent= function( component ){
-      // Check the plot type id allowed more then 1 series
-      if( this._allowMultipleSeries === false && this.components().length >= 1 )
-         return new Error( "This graph type can only have 1 series" );
+      // Check the amount of series
+      if(this.components().length >= this.maxComponents )
+         return new Error( "You already have the maximum number of series for this graph type" );
 
       var plot = this;
       
@@ -205,33 +205,6 @@ gisportal.graphs.Plot =(function(){
 
    };
 
-
-
-   /**
-    * Tells the editor to allow multiple series
-    * for the current graph type
-    */
-   Plot.prototype.allowMultipleSeries = function(){
-      this._allowMultipleSeries = true;
-   };
-
-   /**
-    * Tells the editor to not allow multiple series.
-    * Will also check the current state and remove any
-    * extra if needed
-    */
-   Plot.prototype.allowSingleSeries = function(){
-      var _this = this;
-      this._allowMultipleSeries = false;
-
-      // Remove all but the first series
-      if( this.components().length > 1 )
-         this.components().slice( 1 ).forEach(  function( component ){
-            _this.removeComponent( component );
-         });
-
-   };
-
    /**
     * Adds the Axis options to a plot request.
     * @param  Object  plotRequest The request object to add the values to
@@ -359,6 +332,18 @@ gisportal.graphs.Plot =(function(){
          else{
             logo = "undefined";
          }
+         // This is the bounding box put into the correct format for the plotting service
+         var nice_bbox = component.bbox;
+         var current_projection = map.getView().getProjection().getCode();
+         if(current_projection != "EPSG:4326"){
+            if(nice_bbox.indexOf('POLYGON') == -1){
+               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
+            }else if(nice_bbox.startsWith('POLYGON')){
+               nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
+            }else{
+               console.log("This is a multipolygon!");
+            }
+         }
 
          // Gumph needed for the plotting serving to its thing
          var newSeries = {
@@ -372,7 +357,7 @@ gisportal.graphs.Plot =(function(){
                // Time range of the data
                "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
                // Bounds box of the data, also supports WKT
-               "bbox": component.bbox,
+               "bbox": nice_bbox,
                // Depth, optional
                "depth": component.elevation,
                
@@ -431,11 +416,13 @@ gisportal.graphs.Plot =(function(){
             var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf());
             var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf());
             var total_slices = Math.abs(max_index - min_index);
-            console.log(data.time);
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          }else{
             $.notify("This error was returned: " + data.statusText, "error");
+            // Removes the plot from the list and stops tracking it
+            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
+            _this.stopMonitoringJobStatus();
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if(_this.series_total === 0){
@@ -477,7 +464,6 @@ gisportal.graphs.Plot =(function(){
          data: JSON.stringify({ request: request }),
          dataType: 'json',
          success: function( data ){
-            console.log(data);
             // Do the polling!
             _this.id = data.hash;
             _this.monitorJobStatus();
@@ -571,14 +557,48 @@ gisportal.graphs.Plot =(function(){
       
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
-      
 
-      if( _new == 'timeseries' )
-        this.allowMultipleSeries();
-      else
-        this.allowSingleSeries();
+      // This section makes sure that the 
+      if( _new == 'timeseries'){
+         this.setMinMaxComponents(1,10);
+         this.setComponentXYText("Left Axis", "Right Axis");
+      }
+      else if( _new == 'scatter'){
+         this.setMinMaxComponents(2,2);
+         this.setComponentXYText("X Axis", "Y Axis");
+      }else{
+         this.setMinMaxComponents(1,1);
+      }
 
       return this;
+   };
+   /**
+    * This makes sure that the correct text is shown in the X & Y selection options
+    */
+   Plot.prototype.setComponentXYText = function(xText, yText){
+      //Makes sure any new options have the correct text
+      for(var component in this._components){
+         this._components[component].xText = xText;
+         this._components[component].yText = yText;
+      }
+      // Changes the text of any already selected options
+      $('select.js-y-axis option[value="1"]').text(xText);
+      $('select.js-y-axis option[value="2"]').text(yText);
+   }
+  
+   /**
+    * Sets the minimum and maximum amount of components
+    * If there are more than the maximum then the excess are removed.
+    */
+   Plot.prototype.setMinMaxComponents = function(min, max){
+      var _this = this;
+      this.minComponents = min;
+      this.maxComponents = max;
+      if( this.components().length > max ){
+         this.components().slice( max ).forEach(  function( component ){
+            _this.removeComponent( component );
+         });
+      }
    };
    
    

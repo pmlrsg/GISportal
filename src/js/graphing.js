@@ -30,15 +30,35 @@ gisportal.graphs.addComponentToGraph = function( component ){
    
    if( gisportal.graphs.activePlotEditor === null ){
       var Plot = gisportal.graphs.Plot;
-
       var plot = new Plot();
       gisportal.graphs.editPlot( plot );
       plot.plotType( 'timeseries' );
+      // These variables are set so that the correct drop downs are loaded in the first place.
+      component.xText = "Left Axis"
+      component.yText = "Right Axis"
+   }else{
+      component = gisportal.graphs.setComponentXYText(component, $('.js-active-plot-type').val() || "timeseries");
    }
    
    gisportal.panelSlideout.openSlideout( 'active-plot' );
    gisportal.graphs.activePlotEditor.addComponent( component );
 };
+
+// This sets the correct text for the dropdown depending on the selected graph
+gisportal.graphs.setComponentXYText = function(component, plotType){
+   switch(plotType){
+      case "timeseries":
+         component.xText = "Left Axis";
+         component.yText = "Right Axis";
+         break;
+      case "scater":
+      default:
+         component.xText = "X Axis";
+         component.yText = "Y Axis";
+         break;
+   }
+   return component;
+}
 
 
 

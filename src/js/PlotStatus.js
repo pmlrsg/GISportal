@@ -78,7 +78,6 @@ gisportal.graphs.PlotStatus = (function(){
                   $.notify(error, "error");
                }
             });
-            console.log(plot.id);
          });
    };
 
@@ -93,15 +92,16 @@ gisportal.graphs.PlotStatus = (function(){
       this.plot().on('serverStatus-change', function( data ){
          var serverStatus = data['new'];
          switch( serverStatus.state ){
-            case "success":
+            case "complete":
                _this.stateSuccess( serverStatus );
                break;
-            case "processing":
+            case "extracting":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;
-            case "error":
+            case "failed":
                _this.stateError( serverStatus );
+               _this._plot.stopMonitoringJobStatus();
                break;
          }
       });
@@ -120,7 +120,7 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateError = function( serverStatus ){
 
-      if( this.renderedState != "error" )
+      if( this.renderedState != "failed" )
          this.rebuildElement();
 
       var message = serverStatus.message;
@@ -141,7 +141,7 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateSuccess = function( serverStatus ){
 
-      if( this.renderedState != "success" )
+      if( this.renderedState != "complete" )
          this.rebuildElement();
 
    };
@@ -163,7 +163,7 @@ gisportal.graphs.PlotStatus = (function(){
 
       // Rebuild the element if we arent already showing
       // the processing template
-      if( this.renderedState != "processing" )
+      if( this.renderedState != "extracting" )
          this.rebuildElement();
 
       var message = serverStatus.message;

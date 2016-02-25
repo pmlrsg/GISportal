@@ -525,7 +525,7 @@ gisportal.mapInit = function() {
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
                console.log("adding WKT to form");
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
-               console.log(t_wkt);
+               //console.log(t_wkt);
                $('.js-coordinates').val(t_wkt);
 
                

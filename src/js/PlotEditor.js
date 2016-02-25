@@ -13,8 +13,6 @@ gisportal.graphs.PlotEditor = (function(){
 
       this._editorParent = $(editorParent);
 
-      this._allowMultipleSeries = 1;
-
       this.buildEditor();
    };
 
@@ -289,8 +287,9 @@ gisportal.graphs.PlotEditor = (function(){
 
       function addComponent( component ){
 
-         if( _this.plot().components().length > 1 )
+         if( _this.plot().components().length > 1 ){
             _this._editorParent.find('.js-slideout-content').addClass('multiple-components');
+         }
 
          var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];

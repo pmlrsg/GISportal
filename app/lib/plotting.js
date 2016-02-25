@@ -27,15 +27,6 @@ router.all('/app/plotting/plot', function(req, res){
    var hash;
    child.stdout.on('data', function(data){
       hash = data.toString().replace(/\n|\r\n|\r/g, '');
-
-
-
-      var temp_status_file = path.join(PLOT_DESTINATION, hash + "-status.json")
-      fs.writeFileSync(temp_status_file, JSON.stringify({"message": "Any Message you Like!", "state": "processing", "completed":false}));
-
-
-
-
       res.send({hash:hash});
    });
 
@@ -43,7 +34,7 @@ router.all('/app/plotting/plot', function(req, res){
    child.stdin.end();
 
    child.stderr.on('data', function (data) {
-      utils.handleError(data, res);
+      utils.handleError(data.toString(), res);
    });
 });
 
@@ -67,6 +58,6 @@ router.all('/app/plotting/check_plot', function(req, res){
    });
 
    child.stderr.on('data', function (data) {
-      utils.handleError(data, res);
+      utils.handleError(data.toString(), res);
    });
 });

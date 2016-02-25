@@ -192,11 +192,13 @@ gisportal.selectionTools.updateROI = function()  {
 };
 
 gisportal.currentSelectedRegion = "";
+gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    setTimeout(function() {
                gisportal.selectionTools.isDrawing = false;
             }, 500);
    var feature_type = map.ROI_Type;
+   gisportal.feature_type = feature_type;
 
    // Get the geometry of the drawn feature
    var geom = new ol.Feature();
@@ -229,7 +231,6 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       $('.js-edit-polygon').attr('disabled', false);
    } else {
       bounds = feature.getGeometry().getExtent();
-      bounds = gisportal.reprojectBoundingBox(bounds, map.getView().getProjection().getCode(), 'EPSG:4326');
 
       var coords = "";
       if (bounds) {

@@ -19,7 +19,7 @@
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
 				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
-				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}} disabled>Scatter</option>
+				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
 				<option value="profile"  {{selected "profile" (call 'plot.plotType')}} disabled>Profile</option>
 				<option value="geographic"  {{selected "geographic" (call 'plot.plotType')}} disabled>Geographic</option>
 			 </select>
