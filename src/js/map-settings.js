@@ -527,6 +527,7 @@ gisportal.createGraticules = function() {
 };
   
 gisportal.setProjection = function(new_projection) {
+   var old_projection = map.getView().getProjection().getCode();
    // first make sure that base layer can accept the projection
    var current_basemap = $('#select-basemap').data('ddslick').selectedData.value;
 
@@ -555,6 +556,7 @@ gisportal.setProjection = function(new_projection) {
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
    gisportal.refreshLayers();
+   gisportal.selectedRegionProjectionChange(old_projection, new_projection);
 };
 
 gisportal.setView = function(centre, extent, projection) {
@@ -580,6 +582,19 @@ gisportal.setView = function(centre, extent, projection) {
 
 };
 
+gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
+   if(gisportal.currentSelectedRegion !== ""){
+      if(gisportal.currentSelectedRegion.startsWith("POLYGON")){
+         $('.js-coordinates').val(gisportal.reprojectPolygon(gisportal.currentSelectedRegion, new_proj));
+      }else{
+         $('.js-coordinates').val(gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj));
+      }
+      $('.js-coordinates').trigger('change');
+   }
+};
+
+// A bounding box may need to be split on the ","
+// It needs to be in the format: [int, int, int, int] not "int, int, int, int"
 gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
    var new_bounds = bounds;
 
