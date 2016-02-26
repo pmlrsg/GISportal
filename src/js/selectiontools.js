@@ -74,6 +74,10 @@ function cancelDraw() {
 gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI);
 
+   $('.js-indicators').on('focus', '.js-coordinates', function(){
+      $(this).data('oldVal', $(this).val());
+   });
+
    $('.js-indicators').on('click', '.js-draw-box', function()  {
       gisportal.selectionTools.toggleTool('Box');
    });
@@ -210,7 +214,17 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       return;
    }catch(e){}
-   $(this).val("Error, revert to old value");
+   var _this = $(this);
+   _this.closest('.analysis-coordinates').prepend('<div class="alert alert-danger">Sorry that didn\'t work<br/>Edit the data and try again or click <a class="js-revert-text">here</a></div>');
+   var my_timeout = setTimeout( function(){
+      _this.siblings('div .alert-danger').remove();
+   }, 6000 );
+   _this.siblings('div .alert-danger').find('a.js-revert-text').on('click', function(){
+      _this.siblings('div .alert-danger').remove();
+      _this.val(_this.data('oldVal'));
+      _this.trigger('change');
+      clearTimeout(my_timeout);
+   });
 };
 
 gisportal.currentSelectedRegion = "";

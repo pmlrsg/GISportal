@@ -61,7 +61,7 @@ gisportal.graphs.Plot =(function(){
    * 
    */
    Plot.prototype.addComponent= function( component ){
-      // Check the amount of series
+      // Check the plot type id allowed more then 1 series
       if(this.components().length >= this.maxComponents )
          return new Error( "You already have the maximum number of series for this graph type" );
 
@@ -332,7 +332,6 @@ gisportal.graphs.Plot =(function(){
          else{
             logo = "undefined";
          }
-         // This is the bounding box put into the correct format for the plotting service
          var nice_bbox = component.bbox;
          var current_projection = map.getView().getProjection().getCode();
          if(current_projection != "EPSG:4326"){
@@ -420,7 +419,6 @@ gisportal.graphs.Plot =(function(){
             _this.sizeEstimate += (data.size * total_slices);
          }else{
             $.notify("This error was returned: " + data.statusText, "error");
-            // Removes the plot from the list and stops tracking it
             $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
             _this.stopMonitoringJobStatus();
          }
@@ -558,14 +556,11 @@ gisportal.graphs.Plot =(function(){
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
 
-      // This section makes sure that the 
       if( _new == 'timeseries'){
          this.setMinMaxComponents(1,10);
-         this.setComponentXYText("Left Axis", "Right Axis");
       }
       else if( _new == 'scatter'){
          this.setMinMaxComponents(2,2);
-         this.setComponentXYText("X Axis", "Y Axis");
       }else{
          this.setMinMaxComponents(1,1);
       }
@@ -573,7 +568,7 @@ gisportal.graphs.Plot =(function(){
       return this;
    };
    /**
-    * This makes sure that the correct text is shown in the X & Y selection options
+    * This makes sure that the correct tesxt is shown in the X & Y selection options
     */
    Plot.prototype.setComponentXYText = function(xText, yText){
       //Makes sure any new options have the correct text

@@ -616,6 +616,7 @@ gisportal.reprojectPolygon = function(polygon, to_proj) {
    var coord = bbox.coordinates;
 
    return gisportal.coordinatesToPolygon(coord);
+   // Maybe try bboxToWKT at some point
 };
 
 gisportal.coordinatesToPolygon = function(coord){

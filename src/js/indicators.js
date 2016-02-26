@@ -1063,7 +1063,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    // A different message is displayed if the user clicks off the earth
    var bb2 = new Terraformer.Polygon( {
       "type": "Polygon",
-      "coordinates": [[[proj_bounds[0], proj_bounds[4]], [proj_bounds[3], proj_bounds[4]], [proj_bounds[3], proj_bounds[2]], [proj_bounds[0], proj_bounds[2]], [proj_bounds[0], proj_bounds[4]]]]
+      "coordinates": [[[proj_bounds[0], proj_bounds[3]], [proj_bounds[2], proj_bounds[3]], [proj_bounds[2], proj_bounds[1]], [proj_bounds[0], proj_bounds[1]], [proj_bounds[0], proj_bounds[3]]]]
    });
    if(!bb1.intersects( bb2 )){
       return "The bounding box you drew is completely off the projection, please recenter your map.";

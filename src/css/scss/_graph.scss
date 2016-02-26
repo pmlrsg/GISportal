@@ -183,3 +183,9 @@ div.js-plot-popup-html{
   height: 31px;
   background-color: $analysis-button;
 }
+
+a.js-revert-text{
+  text-decoration: underline;
+  font-weight:bold;
+  cursor: pointer;
+}
