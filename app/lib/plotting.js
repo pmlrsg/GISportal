@@ -27,7 +27,9 @@ router.all('/app/plotting/plot', function(req, res){
    var hash;
    child.stdout.on('data', function(data){
       hash = data.toString().replace(/\n|\r\n|\r/g, '');
-      res.send({hash:hash});
+      try{
+         res.send({hash:hash});
+      }catch(e){}
    });
 
    child.stdin.write(JSON.stringify(data.request));

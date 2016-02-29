@@ -151,6 +151,7 @@ gisportal.graphs.PlotEditor = (function(){
 
       if(minComponents <= totComponents){
          if( this.plot().components().length == 1 || hasLeftHandSeries ){
+            this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
             this.plot().submitRequest();
             gisportal.graphs.activeGraphSubmitted();
          }else{

@@ -212,6 +212,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.buildRequestAxis = function( plotRequest ){
 
       var xAxis =  {
+         "scale" : "linear",
          "label" : "Date/Time",
          "ticks" : "auto",
          "weight" : "auto",
@@ -418,8 +419,8 @@ gisportal.graphs.Plot =(function(){
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          }else{
-            $.notify("This error was returned: " + data.statusText, "error");
-            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
+            $.notify("This error was returned when trying to estimae time: " + data.statusText, "error");
+//            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
             _this.stopMonitoringJobStatus();
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
@@ -447,7 +448,7 @@ gisportal.graphs.Plot =(function(){
             contentType : 'application/json',
             data: JSON.stringify(series_list[series]),
             dataType: 'json',
-            timeout:3000,
+            //timeout:3000,
             success: accumulateEstimates,
             error: accumulateEstimates
          });

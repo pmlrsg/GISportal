@@ -96,6 +96,7 @@ gisportal.graphs.PlotStatus = (function(){
                _this.stateSuccess( serverStatus );
                break;
             case "extracting":
+            case "plotting":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;

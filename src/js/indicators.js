@@ -1072,7 +1072,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    }
    // INFO: This could eventually be replaced if a bounding box that intersects the current world can be split into multi-polygons.
    if(!bb1.within( bb2 )){
-      return "The bounding box you drew is not within the current projection, please recenter your map.";
+      return "The bounding box cannot wrap around the dateline, please redraw it.";
    }
 
    var layer = gisportal.layers[ layerId ];
