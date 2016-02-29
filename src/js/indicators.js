@@ -1045,7 +1045,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    // Skip if empty
    if( gisportal.currentSelectedRegion === "" ) return true;
 
-   var bb1;
+   var bb1, point;
    // Try to see if its WKT string
    try{
       bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
@@ -1054,8 +1054,8 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
    }
    var current_proj = map.getView().getProjection().getCode();
-   for(var point in bb1.coordinates[0]){
-      if(current_proj !== "EPSG:4326"){
+   if(current_proj !== "EPSG:4326"){
+      for(point in bb1.coordinates[0]){
          bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");
       }
    }
@@ -1065,8 +1065,14 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       "type": "Polygon",
       "coordinates": [[[proj_bounds[0], proj_bounds[3]], [proj_bounds[2], proj_bounds[3]], [proj_bounds[2], proj_bounds[1]], [proj_bounds[0], proj_bounds[1]], [proj_bounds[0], proj_bounds[3]]]]
    });
-   if(!bb1.intersects( bb2 )){
-      return "The bounding box you drew is completely off the projection, please recenter your map.";
+   if(current_proj !== "EPSG:4326"){
+      for(point in bb2.coordinates[0]){
+         bb2.coordinates[0][point] = gisportal.reprojectPoint(bb2.coordinates[0][point], current_proj, "EPSG:4326");
+      }
+   }
+   // INFO: This could eventually be replaced if a bounding box that intersects the current world can be split into multi-polygons.
+   if(!bb1.within( bb2 )){
+      return "The bounding box you drew is not within the current projection, please recenter your map.";
    }
 
    var layer = gisportal.layers[ layerId ];
