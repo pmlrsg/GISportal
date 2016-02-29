@@ -664,6 +664,9 @@ gisportal.coordinatesToPolygon = function(coord){
 };
 
 gisportal.reprojectPoint = function(point, from_proj, to_proj) {
+   // Makes sure that each of the points are floats and not strings.
+   point[0] = parseFloat(point[0]);
+   point[1] = parseFloat(point[1]);
    return ol.proj.transform(point, from_proj, to_proj);
 };
 

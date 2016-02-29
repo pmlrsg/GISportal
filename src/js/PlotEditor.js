@@ -139,6 +139,8 @@ gisportal.graphs.PlotEditor = (function(){
     *
     */
    PlotEditor.prototype.submitRequest = function(){
+      var minComponents = this.plot().minComponents;
+      var totComponents = this.plot().components().length;
 
      var hasLeftHandSeries = this.plot().components().some(function( component ){
          return component.yAxis == 1;
@@ -147,11 +149,15 @@ gisportal.graphs.PlotEditor = (function(){
      if( this.plot().components().length == 1 )
       this.plot().components()[0].yAxis = 1;
 
-      if( this.plot().components().length == 1 || hasLeftHandSeries ){
-         this.plot().submitRequest();
-         gisportal.graphs.activeGraphSubmitted();
+      if(minComponents <= totComponents){
+         if( this.plot().components().length == 1 || hasLeftHandSeries ){
+            this.plot().submitRequest();
+            gisportal.graphs.activeGraphSubmitted();
+         }else{
+            $.notify("A series on the left Y axis is required.", "error");
+         }
       }else{
-         $.notify("A series on the left Y axis is required.", "error");
+         $.notify("You must have at least " + minComponents + " compenents for this type of graph.", "error");
       }
    };
 

@@ -558,9 +558,11 @@ gisportal.graphs.Plot =(function(){
 
       if( _new == 'timeseries'){
          this.setMinMaxComponents(1,10);
+         this.setComponentXYText("Left Axis", "Right Axis");
       }
       else if( _new == 'scatter'){
          this.setMinMaxComponents(2,2);
+         this.setComponentXYText("X Axis", "Y Axis");
       }else{
          this.setMinMaxComponents(1,1);
       }
