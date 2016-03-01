@@ -43,6 +43,8 @@ class WCSRawHelper(object):
 		ret = ''
 		for key in params:
 			ret += key+'='+params[key]+'&'
+		if ret.endswith('&'):
+			ret = ret[:-1]
 		return ret
 
 		
