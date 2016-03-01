@@ -17,7 +17,17 @@ example wcs url : http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY?service=
 
 example calling : python data_extractor.py -t basic -g "POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -time 2010-01-01/2011-01-01
 
-example hovmoller : python data_extractor.py -t hovmoller -b="-29.883,27.334,-23.027,33.486" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -xvar Lon -yvar Time -time 2010-01-01/2010-03-01 | python -m json.tool
+example hovmoller : python data_extractor.py -t hovmoller  -29.883,27.334,-23.027,33.486" -url http://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY -var chlor_a -xvar Lon -yvar Time -time 2010-01-01/2010-03-01 | python -m json.tool
+
+
+test extraction where polygon is wholy larger than coverage
+
+https://vortices.npm.ac.uk/thredds/wcs/deltares/aet-pet/MOD16_AET_corr_monthly_2000_2013.nc
+
+AET
+
+166.41782422566678</westBoundLongitude><eastBoundLongitude>178.58449089233343</eastBoundLongitude><southBoundLatitude>-47.296123669666635</southBoundLatitude><northBoundLatitude>-34.12112366966664
+
 
 """
 
@@ -27,6 +37,8 @@ from extraction_utils import Debug, get_transect_bounds, get_transect_times
 from analysis_types import BasicStats, TransectStats, HovmollerStats
 from shapely import wkt
 import json
+import time as _time
+
 
 def main():
 
@@ -62,8 +74,11 @@ def main():
 
 
 	if (args.extract_type == "basic"):
+		start_time = _time.time()
+
 		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
+		middle_time = _time.time()
 		stats = BasicStats(filename, args.wcs_variable)
 		output_data = stats.process()
 	elif (args.extract_type == "irregular"):
@@ -80,10 +95,14 @@ def main():
 	elif (args.extract_type == "trans-time"):
 		# we will accept csv here so we need to grab teh lat lons and dates for use within teh extractor below
 		#csv = open(args.csv, "r").read()
+		start_time = _time.time()
+
 		bbox = get_transect_bounds(args.csv)
 		time = get_transect_times(args.csv)
 		extractor = TransectExtractor(args.wcs_url, [time], "time", extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
+		middle_time = _time.time()
+
 		stats = TransectStats(filename, args.wcs_variable, args.csv)
 		output_data = stats.process()
 		output_metadata = extractor.metadataBlock()
@@ -91,6 +110,8 @@ def main():
 		output['metadata'] = output_metadata
 		output['data'] = output_data
 		output_data = json.dumps(output)
+
+		after_stats = _time.time()
 	elif (args.extract_type == "single"):
 		extractor = SingleExtractor(args.wcs_url, args.time, extract_area=bbox, extract_variable=args.wcs_variable)
 		output_data = extractor.getData()
@@ -103,7 +124,9 @@ def main():
 		raise ValueError('extract type not recognised! must be one of ["basic","irregular","trans-lat","trans-long","trans-time"]')
 
 	#print "finished"
-	print output_data
+	#print output_data
+	print middle_time - start_time
+	print after_stats - middle_time
 
 
 

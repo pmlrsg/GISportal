@@ -34,12 +34,12 @@ class TransectStats(object):
 		dates = []
 		ret = []
 		for row in data:
-			print "getting data from %f %f for %s" % (float(row['Lat']), float(row['Lon']), row['Date'])
+			print "getting data from %f %f for %s" % (float(row['Latitude']), float(row['Longitude']), row['Date'])
 			#lats.append(row['Lat'])
 			#lons.append(row['Lon'])
 			#dates.append(datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M"))
-			lat_index = find_closest(getCoordinateVariable(netcdf_file, "Lat")[:],float(row['Lat']) )
-			lon_index = find_closest(getCoordinateVariable(netcdf_file, "Lon")[:],float(row['Lon']) )
+			lat_index = find_closest(getCoordinateVariable(netcdf_file, "Lat")[:],float(row['Latitude']) )
+			lon_index = find_closest(getCoordinateVariable(netcdf_file, "Lon")[:],float(row['Longitude']) )
 			#print row['Date']
 			track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 			#print track_date
@@ -50,8 +50,8 @@ class TransectStats(object):
 			_ret = {}
 			_ret['track_date'] = track_date.isoformat()
 			_ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
-			_ret['track_lat'] = row['Lat']
-			_ret['track_lon'] = row['Lon']
+			_ret['track_lat'] = row['Latitude']
+			_ret['track_lon'] = row['Longitude']
 			_ret['data_value'] = float(data) if not np.isnan(data)  else "null"
 			ret.append(_ret)
 

@@ -76,10 +76,12 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    output['global'] = {'time': start}
    
    output['data'] = {}
-   
+   #print len(time)
    for i, row in enumerate(maskedArray):
+      #print i
       if timeUnits:
-         date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+         if (i < len(time)):
+            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
       else:     
          date = ''.join(times[i])
       mean = getMean(row)

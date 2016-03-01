@@ -9,8 +9,8 @@ def get_transect_bounds(_csv):
 		lats = []
 		lons = []
 		for row in data:
-			lats.append(float(row['Lat']))
-			lons.append(float(row['Lon']))
+			lats.append(float(row['Latitude']))
+			lons.append(float(row['Longitude']))
 	print (min(lons), min(lats), max(lons), max(lats))
 	return (min(lons), min(lats), max(lons), max(lats))
 
