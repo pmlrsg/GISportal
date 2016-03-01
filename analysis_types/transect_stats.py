@@ -44,15 +44,30 @@ class TransectStats(object):
 			lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
 			lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
 			#print len(lat_var)
-			lat_offset = lat_var[1] - lat_var[0]
-			lon_offset = lon_var[1] - lon_var[0]
-			current_lat = float(row['Latitude'])
-			current_lon = float(row['Longitude'])
-			t_lat = current_lat - lat_var[0]
-			t_lon = current_lon - lon_var[0]
-			lat_index = int(round(abs(t_lat / lat_offset)))
-			lon_index = int(round(abs(t_lon / lon_offset)))
-			#lat_index = find_closest(getCoordinateVariable(netcdf_file, "Lat")[:],float(row['Latitude']), last_lat )
+			if (len(lat_var) <= 1):
+				lat_index = 0
+			else:
+				lat_offset = lat_var[1] - lat_var[0]
+				current_lat = float(row['Latitude'])
+				t_lat = current_lat - lat_var[0]
+				lat_index = int(round(abs(t_lat / lat_offset)))
+
+			if (len(lon_var) <= 1):
+				lon_index = 0
+			else:
+				lon_offset = lon_var[1] - lon_var[0]
+				current_lon = float(row['Longitude'])
+				t_lon = current_lon - lon_var[0]
+				lon_index = int(round(abs(t_lon / lon_offset)))
+
+
+			# current_lat = float(row['Latitude'])
+			# current_lon = float(row['Longitude'])
+			# t_lat = current_lat - lat_var[0]
+			# t_lon = current_lon - lon_var[0]
+			# lat_index = int(round(abs(t_lat / lat_offset)))
+			# lon_index = int(round(abs(t_lon / lon_offset)))
+			# #lat_index = find_closest(getCoordinateVariable(netcdf_file, "Lat")[:],float(row['Latitude']), last_lat )
 			#lon_index = find_closest(getCoordinateVariable(netcdf_file, "Lon")[:],float(row['Longitude']), last_lon )
 			# print "index test"
 			# print "found using find_closest"

@@ -45,6 +45,6 @@ class WCSRawHelper(object):
 		
 	def getCoverage(self):
 		full_url = self.url +'?'+ self.generateGetCoverageUrl()
-		#print full_url
+		print full_url
 		resp = urllib2.urlopen(full_url)
 		return resp
