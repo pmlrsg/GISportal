@@ -34,7 +34,7 @@ class WCSRawHelper(object):
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
 		params['Time'] = ','.join(self.dates)
-		if(len(self.bbox) > 1):
+		if(not isinstance(self.bbox, basestring)):
 			params['BBOX'] = ','.join([str(x) for x in self.bbox])
 		else:
 			params['BBOX'] = self.bbox
