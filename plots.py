@@ -12,6 +12,8 @@ listPlots: Return a list of available plot types.
 from __future__ import print_function
 import __builtin__
 import sys
+import requests
+import urllib2
 
 import numpy as np
 import pandas as pd
@@ -20,6 +22,8 @@ import jinja2
 import urllib
 import os, hashlib
 import time
+import zipfile
+import shutil
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
@@ -149,6 +153,10 @@ def hovmoller(plot, outfile="image.html"):
    plot_title = plot['title']
    plot_units = plot['y1Axis']['label']
 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
    df = plot['data'][0]
    plot_type = df['type']
    var_name = df['coverage']
@@ -159,6 +167,25 @@ def hovmoller(plot, outfile="image.html"):
    assert plot_type in ("hovmollerLat", "hovmollerLon")
    
    data = np.transpose(df['data'])
+
+   # Save the CSV files
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+   np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+
+   with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
+      zf.write(csv_file)
+
+   shutil.rmtree(csv_dir)
 
    # Format date to integer values
    #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
@@ -276,19 +303,34 @@ def timeseries(plot, outfile="time.html"):
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
+ 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
 
    sources = []
-   var_meta = dict()
-   var_name = plot_data[0]['coverage']
-   plot_scale = plot['y1Axis']['scale']
 
    ymin = []
    ymax = []
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
 
    for df in plot_data:
           
       # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
+
+      plot_scale= df['scale']
 
       debug(4, "timeseries: varindex = {}".format(varindex))
 
@@ -297,8 +339,13 @@ def timeseries(plot, outfile="time.html"):
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
+
+      # Write out the CSV of the data.
+      # TODO Should we put this in a function
  
-      np.savetxt("/tmp/foo.csv", np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      zf.write(csv_file)
 
       debug(4, data[varindex['mean']]) 
       ymin.append(np.amin(data[varindex['mean']].astype(np.float64)))
@@ -338,6 +385,9 @@ def timeseries(plot, outfile="time.html"):
 
       sources.append(ColumnDataSource(data=datasource))
       
+   zf.close()
+   shutil.rmtree(csv_dir)
+
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
               height=400, responsive=True
    )
@@ -422,6 +472,10 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    plot_type = plot['type']
    plot_title = plot['title']
 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
 
    # We have 2 sets of values we want to plot as a scatter. I think the extracter will bring these back together 
    # in the future.
@@ -438,6 +492,27 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    dfarray2 = np.array(df2['data'])
    data2 = np.transpose(dfarray2[np.argsort(dfarray2[:,0])])
       
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   csv_file1 = csv_dir + "/" + df1['coverage'] + ".csv"
+   np.savetxt(csv_file1, np.transpose(data1), comments='', header=','.join(df1['vars']), fmt="%s",delimiter=",")
+   csv_file2 = csv_dir + "/" + df2['coverage'] + ".csv"
+   np.savetxt(csv_file2, np.transpose(data2), comments='', header=','.join(df2['vars']), fmt="%s",delimiter=",")
+   with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
+      zf.write(csv_file1, arcname=df1['coverage'] + ".csv")
+      zf.write(csv_file2, arcname=df2['coverage'] + ".csv")
+      debug(3, "ZIP: {}".format(zf.namelist()))
+
+   shutil.rmtree(csv_dir)
+
    datasource = dict(date=date,
                      sdate=data1[varindex['date']],
                      x=data1[varindex['mean']],
@@ -552,19 +627,31 @@ def get_plot_data(json_request, request_type='data'):
       for s in series:
          ds = s['data_source']
          yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
 
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
          bbox = ["{}".format(ds['bbox'])]
+         bbox = ds['bbox']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
-         debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
+         data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
          try:
             extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
          except ValueError:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return dict(data=[])
+         #except urllib2.HTTPError:
+            #debug(2, "Data request, {}, failed".format(data_request))
+            #return dict(data=[])
+         except requests.exceptions.ReadTimeout:
             debug(2, "Data request, {}, failed".format(data_request))
             return dict(data=[])
          
@@ -578,7 +665,7 @@ def get_plot_data(json_request, request_type='data'):
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
     
-         plot_data.append(dict(coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
 
    plot['status'] = "success"
    plot['data'] = plot_data
@@ -597,11 +684,133 @@ def prepare_plot(request, outdir):
 
    hasher = hashlib.sha1()
    hasher.update(json.dumps(request))
-   my_hash = "{}_{}".format(hasher.hexdigest(), int(time.time()))
-   return my_hash
+   my_hash = "{}".format(hasher.hexdigest())
+   my_id = "{}{}".format(int(time.time()), os.getpid())
+   return my_hash, my_id
 #END prepare_plot
 
+def execute_plot(dirname, my_fullid):
+   if my_fullid == "":
+      request = json.load(sys.stdin)
+      debug(3, "Received request: {}".format(request))
+
+      my_hash, my_id = prepare_plot(request, dirname)
+      my_fullid = my_hash + "_" + my_id
+
+      update_status(dirname, my_fullid, Plot_status.initialising, "Preparing")
+
+      # Output the identifier for the plot on stdout. This is used by the frontend
+      # to monitor the status of the plot. We must not do this before we have written the 
+      # status file.
+      print(my_fullid)
+
+      # Store the request for possible caching in the future.
+      request_path = dirname + "/" + my_hash + "-request.json"
+      debug(2, "File: {}".format(request_path))
+      with open(request_path, 'w') as outfile:
+         json.dump(request, outfile)
+      
+      # Call the extractor.
+      update_status(dirname, my_fullid, Plot_status.extracting, "Extracting")
+      plot = get_plot_data(request, 'data')
+
+      # Only cache the data if we think it is OK.
+      if plot['status'] == "success":
+         data_path = dirname + "/" + my_hash + "-data.json"
+         debug(2, "File: {}".format(data_path))
+         with open(data_path, 'w') as outfile:
+            json.dump(plot, outfile)
+      
+   else:
+      # We have been supplied a hash for this request so check if we have got the data already cached.
+      update_status(dirname, my_fullid, Plot_status.initialising, "Preparing")
+      my_hash, my_id = my_fullid.split("_")
+      plot = read_cached_data(dirname, my_hash, my_id)
+      if plot == None:
+         request = read_cached_request(dirname, my_hash)
+         if request == None:
+            debug(0, "Option -H {} was supplied but no cached files found".format(my_fullid))
+            update_status(dirname, my_fullid, Plot_status.failed, "Cache read failed")
+            sys.exit(2)
+         else:
+            update_status(dirname, my_fullid, Plot_status.extracting, "Extracting")
+            plot = get_plot_data(request, 'data')
+
+   file_path = dirname + "/" + my_fullid + "-plot.html"
+
+   plot_data = plot['data']
+
+   if len(plot_data) == 0:
+      debug(0, "Data request failed")
+      update_status(dirname, my_fullid, Plot_status.failed, "Extract failed")
+      return False
+
+   plot['req_hash'] = my_hash
+   plot['req_id'] = my_id
+   plot['dir_name'] = dirname
+
+   if plot['type'] == 'timeseries':
+      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
+      plot_file = timeseries(plot, file_path)
+   elif plot['type'] == 'scatter':
+      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
+      plot_file = scatter(plot, file_path)
+   else:
+      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
+      plot_file = hovmoller(plot, file_path)
+
+   update_status(opts.dirname, my_fullid, Plot_status.complete, "Complete")
+   return True
+#END execute_plot
+   
+def update_status(dirname, my_fullid, plot_status, message):
+   '''
+      Updates a JSON status file whose name is defined by dirname and my_fullid.
+   '''
+
+   # Read status file, create if not there.
+   file_path = dirname + "/" + my_fullid + "-status.json"
+   try:
+      with open(file_path, 'r') as status_file:
+         status = json.load(status_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Status file {} not found".format(file_path))
+         # It does not exist yet so create the initial JSON
+         status = dict(
+            percentage = 0,
+            state = plot_status,
+            message = message,
+            completed = False,
+            job_id = my_fullid
+         )
+      else:
+         raise
+
+   # Update the status information.
+   status["message"] = message
+   status["state"] = plot_status
+   if plot_status == Plot_status.complete:
+      status["completed"] = True
+      status['filename'] = dirname + "/" + my_fullid + "-plot.html"
+   else:
+      status["completed"] = False
+      status['filename'] = None
+
+   debug(3, "Status: {}".format(status))
+
+   # Write it back to the file.
+   with open(file_path, 'w') as status_file:
+      json.dump(status, status_file)
+
+   return True
+#END update_status
+
 def read_cached_request(dirname, my_hash):
+   '''
+   Looks for a file named <dirname>/<my_hash>-request.json.
+   If the file exists the contents are returned otherwise None.
+   '''
    request = None
    request_path = dirname + "/" + my_hash + "-request.json"
    try:
@@ -616,7 +825,7 @@ def read_cached_request(dirname, my_hash):
    return request
 #END read_cached_request
 
-def read_cached_data(dirname, my_hash):
+def read_cached_data(dirname, my_hash, my_id):
    plot = None
    data_path = dirname + "/" + my_hash + "-data.json"
    try:
@@ -630,117 +839,6 @@ def read_cached_data(dirname, my_hash):
 
    return plot 
 #END read_cached_request
-
-def execute_plot(dirname, my_hash):
-   if my_hash == "":
-      request = json.load(sys.stdin)
-      debug(3, "Received request: {}".format(request))
-
-      my_hash = prepare_plot(request, dirname)
-
-      update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
-
-      # Output the identifier for the plot on stdout. This is used by the frontend
-      # to monitor the status of the plot. We must not do this before we have written the 
-      # status file.
-      print(my_hash)
-
-      # Store the request for possible caching in the future.
-      request_path = dirname + "/" + my_hash + "-request.json"
-      debug(2, "File: {}".format(request_path))
-      with open(request_path, 'w') as outfile:
-         json.dump(request, outfile)
-      
-      # Call the extractor.
-      update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
-      plot = get_plot_data(request, 'data')
-
-      # Only cache the data if we think it is OK.
-      if plot['status'] == "success":
-         data_path = dirname + "/" + my_hash + "-data.json"
-         debug(2, "File: {}".format(data_path))
-         with open(data_path, 'w') as outfile:
-            json.dump(plot, outfile)
-      
-   else:
-      # We have been supplied a hash for this request so check if we have got the data already cached.
-      update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
-      plot = read_cached_data(dirname, my_hash)
-      if plot == None:
-         request = read_cached_request(dirname, my_hash)
-         if request == None:
-            debug(0, "Option -H {} was supplied but no cached files found".format(my_hash))
-            update_status(dirname, my_hash, Plot_status.failed, "Cache read failed")
-            sys.exit(2)
-         else:
-            update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
-            plot = get_plot_data(request, 'data')
-
-   file_path = dirname + "/" + my_hash + "-plot.html"
-
-   plot_data = plot['data']
-
-   if len(plot_data) == 0:
-      debug(0, "Data request failed")
-      update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
-      return False
-
-   if plot['type'] == 'timeseries':
-      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
-      plot_file = timeseries(plot, file_path)
-   elif plot['type'] == 'scatter':
-      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
-      plot_file = scatter(plot, file_path)
-   else:
-      update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
-      plot_file = hovmoller(plot, file_path)
-
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete")
-   return True
-#END execute_plot
-   
-def update_status(dirname, my_hash, plot_status, message):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, "Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = dict(
-            percentage = 0,
-            state = plot_status,
-            message = message,
-            completed = False,
-            job_id = my_hash
-         )
-      else:
-         raise
-
-   # Update the status information.
-   status["message"] = message
-   status["state"] = plot_status
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-   else:
-      status["completed"] = False
-      status['filename'] = None
-
-   debug(3, "Status: {}".format(status))
-
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
-
-   return True
-#END update_status
 
 def debug(level, msg):
    if verbosity >= level: print(msg, file=sys.stderr)
