@@ -40,7 +40,10 @@ class WCSRawHelper(object):
 			params['BBOX'] = self.bbox
 		params['Format'] = 'NetCDF3'
 		#print params
-		return urllib.urlencode(params)
+		ret = ''
+		for key in params:
+			ret += key+'='+params[key]+'&'
+		return ret
 
 		
 	def getCoverage(self):
