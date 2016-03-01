@@ -3,7 +3,7 @@ import datetime
 
 
 def get_transect_bounds(_csv):
-	print _csv
+	#print _csv
 	with open(_csv, "rb") as csvfile:
 		data = csv.DictReader(csvfile, delimiter=',')
 		lats = []
@@ -11,8 +11,8 @@ def get_transect_bounds(_csv):
 		for row in data:
 			lats.append(float(row['Latitude']))
 			lons.append(float(row['Longitude']))
-	print (min(lons), min(lats), max(lons), max(lats))
-	return (min(lons), min(lats), max(lons), max(lats))
+	#print (min(lons),min(lats),max(lons),max(lats))
+	return (min(lons),min(lats),max(lons),max(lats))
 
 
 def get_transect_times(_csv):
@@ -35,5 +35,5 @@ def getCsvDict(_csv):
 			for key in row:
 				
 				ret[key].append(row[key])
-	print ret
+	#print ret
 	return ret

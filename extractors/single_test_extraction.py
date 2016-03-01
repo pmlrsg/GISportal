@@ -1,5 +1,5 @@
 from . import Extractor
-from extraction_utils import WCSHelper
+from extraction_utils import WCSHelper, WCSRawHelper
 import tempfile
 import uuid
 import time
@@ -19,7 +19,7 @@ class SingleExtractor(Extractor):
 		#print "="*20
 		#print self.extract_dates
 		start_time = time.time()
-		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, single=True)
+		wcs_extractor = WCSRawHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, single=True)
 		data = wcs_extractor.getData()
 		fname = self.outdir+str(uuid.uuid4())+".nc"
 		with open(fname, 'w') as outfile:

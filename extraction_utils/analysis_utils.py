@@ -21,7 +21,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       #arr = np.ma.concatenate(dataset)
       arr = np.ma.array(dataset)
 
-      print original
+      #print original
       plt.imshow(arr[0])
       plt.savefig(filename+'.png')
       # current_app.logger.debug('irregular shape after concatonate')
@@ -219,7 +219,7 @@ trim_sizes = {
    "line" : slice(11,-2)
 }
 
-def find_closest(arr, val, time=False):
+def find_closest(arr, val, starting, time=False):
    """
   Finds the position in the array where the array value matches
   the value specified by the user
@@ -229,8 +229,12 @@ def find_closest(arr, val, time=False):
    if time:
       current_closest = timedelta.max
    current_idx = None
-   for i in range(len(arr)):
+   #last_diff = 0 if time else timedelta.min
+   for i in range(starting,len(arr)):
+      # if (abs(arr[i]-val) > last_diff):
+      #    break
       if abs(arr[i]-val)<current_closest:
+         last_diff = abs(arr[i]-val)
          current_closest = abs(arr[i]-val)
          current_idx=i
    return current_idx
