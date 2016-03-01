@@ -34,7 +34,10 @@ class WCSRawHelper(object):
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
 		params['Time'] = ','.join(self.dates)
-		params['BBOX'] = ','.join([str(x) for x in self.bbox])
+		if(len(self.bbox) > 1):
+			params['BBOX'] = ','.join([str(x) for x in self.bbox])
+		else:
+			params['BBOX'] = self.bbox
 		params['Format'] = 'NetCDF3'
 		#print params
 		return urllib.urlencode(params)
