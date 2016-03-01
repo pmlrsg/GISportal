@@ -79,6 +79,7 @@
             "type": "scatter",
             "xAxis": {
                 "label": "Nitrate Elv:-1.0M (mmol m-3)",
+                "scale": "linear",
                 "tickFormat": "%d/%m/%Y",
                 "ticks": "auto",
                 "weight": "auto"
