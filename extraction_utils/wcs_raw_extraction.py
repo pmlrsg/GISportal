@@ -33,7 +33,7 @@ class WCSRawHelper(object):
 		params['Request'] = 'GetCoverage'
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
-		params['Time'] = ','.join(self.dates)
+		params['Time'] = urllib.quote_plus(','.join(self.dates))
 		if(not isinstance(self.bbox, basestring)):
 			params['BBOX'] = ','.join([str(x) for x in self.bbox])
 		else:

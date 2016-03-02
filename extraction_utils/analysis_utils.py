@@ -145,7 +145,6 @@ def getCoordinateVariable(dataset, axis):
          #current_app.logger.debug(name) # DEBUG
          if name == "_CoordinateAxisType" and var._CoordinateAxisType == axis:
             return var
-   
    return None
 
 def getDepth(dataset):
@@ -461,3 +460,17 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
       
    
    return output
+
+
+
+def test_time_axis(filenames):
+   print "inside get times func"
+   print filenames
+   times = {}
+   for key in filenames:
+      print filenames[key]
+      times[key] = getCoordinateVariable(netCDF.Dataset(filenames[key], 'r+'), 'Time')[:]
+   
+   dif = [x - x for times[x] in times ]
+   print dif
+   return times

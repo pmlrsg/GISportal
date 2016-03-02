@@ -32,8 +32,8 @@ AET
 """
 
 import argparse
-from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
-from extraction_utils import Debug, get_transect_bounds, get_transect_times
+from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
+from extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
 from analysis_types import BasicStats, TransectStats, HovmollerStats
 from shapely import wkt
 import json
@@ -45,10 +45,10 @@ def main():
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
-	parser.add_argument("-url", "--wcs_url", action="store", dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
-	parser.add_argument("-var", "--variable", action="store", dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
+	parser.add_argument("-url", "--wcs_url", action="store", nargs="+",dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
+	parser.add_argument("-var", "--variable", action="store", nargs="+",dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
 	parser.add_argument("-v", "--debug", action="store_true", dest="debug", help="a debug flag - if passed there will be a tonne of log output and all interim files will be saved", required=False)
 	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=0)
 	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False)#, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
@@ -61,6 +61,7 @@ def main():
 	args = parser.parse_args()
 
 	#print args.debug
+	print args.wcs_variable
 	debug = Debug(args.debug)
 	debug.log("a message to test debugging")
 
@@ -81,6 +82,11 @@ def main():
 		middle_time = _time.time()
 		stats = BasicStats(filename, args.wcs_variable)
 		output_data = stats.process()
+	elif (args.extract_type == 'scatter'):
+		# scatter extractor returns a dict {var : netcdf, var2: netcdf2}
+		extractor = ScatterExtractor(args.wcs_url[0],args.wcs_url[1], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0], extract_variable_2=args.wcs_variable[1] )
+		filenames = extractor.getData()
+		are_times_same = test_time_axis(filenames)
 	elif (args.extract_type == "irregular"):
 		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
 		filename = output_data = extractor.getData()
@@ -99,7 +105,7 @@ def main():
 
 		bbox = get_transect_bounds(args.csv)
 		time = get_transect_times(args.csv)
-		extractor = TransectExtractor(args.wcs_url, [time], "time", extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = TransectExtractor(args.wcs_url[0], [time], "time", extract_area=bbox, extract_variable=args.wcs_variable[0])
 		filename = extractor.getData()
 		middle_time = _time.time()
 
