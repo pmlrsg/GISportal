@@ -32,8 +32,10 @@ from bokeh.embed import components
 
 import palettes
 
-from data_extractor.extractors import BasicExtractor
-from data_extractor.analysis_types import BasicStats, HovmollerStats
+from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
+from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
+from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats
+
 
 # Set the default logging verbosity to lowest.
 verbosity = 0
@@ -53,9 +55,32 @@ template = jinja2.Template("""
 ></script>
 
 <body>
-
+<h1>TEST</h1>
+<div id="plot">
     {{ script }}
     
+    {{ div }}
+</div>
+</body>
+
+</html>
+""")
+
+hovmoller_template = jinja2.Template("""
+<!DOCTYPE html>
+<html lang="en-US">
+
+<link
+    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
+    rel="stylesheet" type="text/css"
+>
+<script 
+    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
+></script>
+
+<body>
+<h1>TEST</h1>
+{{ script }}
     {{ div }}
 
 </body>
@@ -275,7 +300,7 @@ def hovmoller(plot, outfile="image.html"):
         view[i, j, 2] = my_palette[p_index+2]
         view[i, j, 3] = 255
 
-   plot_width = 1200
+   plot_width = 800
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
               title="Hovmoller - {}".format(plot_title), responsive=True)
@@ -289,16 +314,17 @@ def hovmoller(plot, outfile="image.html"):
    p.add_tools(CrosshairTool())
 
    #TODO This should be in the wrapper
+   script, div = components({'hovmoller':p, 'legend': legend})
+   #with open(outfile, 'w') as output_file:
+      #print(hovmoller_template.render(script=script, div=div), file=output_file)
+   
    output_file(outfile, title="Hovmoller example")
    layout = hplot(legend, p)
    save(layout)
-   return(layout)
+   return(p)
 #END hovmoller
 
-def timeseries(plot, outfile="time.html"):
-
-   # Just pick some random colours. Probably need to make this configurable.
-   plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
+def transect(plot, outfile="transect.html"):
 
    plot_data = plot['data']
    plot_type = plot['type']
@@ -336,6 +362,133 @@ def timeseries(plot, outfile="time.html"):
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
+      dfarray[dfarray == 'null'] = "NaN"
+
+      debug(4, dfarray)
+
+      # Flip it so we have columns for each variable ordered by time.
+      data = np.transpose(dfarray[np.argsort(dfarray[:,2])])
+
+      debug(4,data)
+      # Write out the CSV of the data.
+      # TODO Should we put this in a function
+ 
+      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      zf.write(csv_file)
+
+      min_value = np.amin(data[varindex['data_value']].astype(np.float64))
+      max_value = np.amax(data[varindex['data_value']].astype(np.float64))
+      buffer_value = (max_value - min_value) /10
+      ymin.append(min_value-buffer_value)
+      ymax.append(max_value+buffer_value)
+      date = datetime(data[varindex['track_date']])
+      
+      datasource = dict(date=date,
+                        sdate=data[varindex['track_date']],
+                        value=data[varindex['data_value']])
+
+      sources.append(ColumnDataSource(data=datasource))
+      
+   zf.close()
+   shutil.rmtree(csv_dir)
+
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
+              height=400, responsive=True
+   )
+   
+   tooltips = [("Date", "@sdate")]
+   tooltips.append(("Value", "@value"))
+
+   ts_plot.add_tools(CrosshairTool())
+
+   ts_plot.xaxis.axis_label = 'Date'
+   
+   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+   # if we run it later.
+   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
+   ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   yrange = [None, None]
+
+   for i, source in enumerate(sources):
+      # If we want 2 Y axes then the lines below do this
+      if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+         debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # Setting the second y axis range name and range
+         yrange[1] = "y2"
+         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+   
+         # Adding the second axis to the plot.  
+         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+   
+      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      # Plot the mean as line
+      debug(2, "Plotting line for {}".format(plot_data[i]['coverage']))
+      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+
+      # as a point
+      debug(2, "Plotting points for {}".format(plot_data[i]['coverage']))
+      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      
+   hover = HoverTool(tooltips=tooltips)
+   ts_plot.add_tools(hover)
+
+   # Legend placement needs to be after the first glyph set up.
+   # Cannot place legend outside plot.
+   ts_plot.legend.location = "top_left"
+   
+   script, div = components(ts_plot)
+
+   # plot the points
+   #output_file(outfile, 'Time Series')
+   with open(outfile, 'w') as output_file:
+      print(template.render(script=script, div=div), file=output_file)
+   
+   #save(ts_plot)
+   return(ts_plot)
+#END transect
+   
+def timeseries(plot, outfile="time.html"):
+
+   plot_data = plot['data']
+   plot_type = plot['type']
+   plot_title = plot['title']
+ 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
+   sources = []
+
+   ymin = []
+   ymax = []
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
+
+   for df in plot_data:
+          
+      # Build the numerical indices into our data based on the variable list supplied.
+      varindex = {j: i for i, j in enumerate(df['vars'])}
+
+      plot_scale= df['scale']
+
+      debug(4, "timeseries: varindex = {}".format(varindex))
+
+      # Grab the data as a numpy array.
+      dfarray = np.array(df['data'])
+      debug(4, dfarray)
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
@@ -558,7 +711,7 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #END scatter
 
 
-def get_plot_data(json_request, request_type='data'):
+def get_plot_data(json_request, plot=dict()):
    debug(2, "get_plot_data: Started")
 
    # Common data for all plots. 
@@ -581,6 +734,7 @@ def get_plot_data(json_request, request_type='data'):
       data=[]
    )
 
+   # Only try and set the 2nd Y axis if we have info. in the request.
    if 'y2Axis' in json_request['plot'].keys(): 
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
@@ -599,6 +753,7 @@ def get_plot_data(json_request, request_type='data'):
       coverage = ds['coverage']
       wcs_url = ds['threddsUrl']
       bbox = ["{}".format(ds['bbox'])]
+      bbox = ds['bbox']
       time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
       debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
@@ -634,7 +789,6 @@ def get_plot_data(json_request, request_type='data'):
 
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
-         bbox = ["{}".format(ds['bbox'])]
          bbox = ds['bbox']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
@@ -667,6 +821,51 @@ def get_plot_data(json_request, request_type='data'):
     
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
 
+   elif plot_type == "transect":
+      for s in series:
+         ds = s['data_source']
+         yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
+
+         coverage = ds['coverage']
+         csv_file = json_request['plot']['transectFile']
+         wcs_url = ds['threddsUrl']
+         bbox = get_transect_bounds(csv_file)
+         time = get_transect_times(csv_file)
+         data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
+         filename = extractor.getData()
+         debug(4, "Extracted to {}".format(filename))
+         stats = TransectStats(filename, coverage, csv_file)
+         output_data = stats.process()
+         debug(4, "Transect extract: {}".format(output_data))
+
+         #TODO LEGACY - this reformats the response to the new format.
+         df = []
+         for details in output_data:
+            line = []
+            [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
+            #TODO This strips out nulls as the break the plotting at the moment.
+            if line[1] != 'null': df.append(line)
+    
+         #TODO This was in the extractor command line butnot sure we need it at the moment.
+         #output_metadata = extractor.metadataBlock()
+         #output = {}
+         #output['metadata'] = output_metadata
+         #output['data'] = output_data
+
+         # And convert it to a nice simple dict the plotter understands.
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
+
+   else:
+      # We should not be here!
+      debug(0, "Unrecognised data request, {}.".format(data_request))
+      return dict(data=[])
+
    plot['status'] = "success"
    plot['data'] = plot_data
    return plot
@@ -686,7 +885,12 @@ def prepare_plot(request, outdir):
    hasher.update(json.dumps(request))
    my_hash = "{}".format(hasher.hexdigest())
    my_id = "{}{}".format(int(time.time()), os.getpid())
-   return my_hash, my_id
+   plot = dict(
+      req_hash= my_hash, 
+      req_id= my_id,
+      status= dict(status= Plot_status.initialising), 
+      dir_name=outdir)
+   return plot
 #END prepare_plot
 
 def execute_plot(dirname, my_fullid):
@@ -694,7 +898,10 @@ def execute_plot(dirname, my_fullid):
       request = json.load(sys.stdin)
       debug(3, "Received request: {}".format(request))
 
-      my_hash, my_id = prepare_plot(request, dirname)
+      plot = prepare_plot(request, dirname)
+      my_hash = plot['req_hash']
+      dirname = plot['dir_name']
+      my_id = plot['req_id']
       my_fullid = my_hash + "_" + my_id
 
       update_status(dirname, my_fullid, Plot_status.initialising, "Preparing")
@@ -749,15 +956,19 @@ def execute_plot(dirname, my_fullid):
    plot['req_id'] = my_id
    plot['dir_name'] = dirname
 
+   update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
    if plot['type'] == 'timeseries':
-      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
-      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
       plot_file = scatter(plot, file_path)
-   else:
-      update_status(dirname, my_fullid, Plot_status.plotting, "Plotting")
+   elif plot['type'] in ("hovmollerLat", "hovmollerLon"):
       plot_file = hovmoller(plot, file_path)
+   elif plot['type'] == 'transect':
+      plot_file = transect(plot, file_path)
+   else:
+      # We should not be here.
+      debug(0, "Unknown plot type, {}.".format(plot['type']))
+      return False
 
    update_status(opts.dirname, my_fullid, Plot_status.complete, "Complete")
    return True
@@ -803,7 +1014,7 @@ def update_status(dirname, my_fullid, plot_status, message):
    with open(file_path, 'w') as status_file:
       json.dump(status, status_file)
 
-   return True
+   return status
 #END update_status
 
 def read_cached_request(dirname, my_hash):
