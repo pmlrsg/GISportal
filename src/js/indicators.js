@@ -546,11 +546,9 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;
+      indicator.loggedIn = gisportal.user.info.permission != "guest";
       var rendered = gisportal.templates['tab-analysis'](indicator);
-      $('[data-id="' + id + '"] .js-tab-analysis')
-         .html(rendered)
-         .find('.js-coordinates')
-         .val( gisportal.currentSelectedRegion );
+      $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
       gisportal.indicatorsPanel.checkTabFromState(id);
@@ -935,7 +933,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    };
 
    urlParams.coverage = indicator.urlName;
-   urlParams.bbox = $('[data-id="' + indicator.id + '"] .js-coordinates').val();
+   urlParams.bbox = gisportal.currentSelectedRegion;
    urlParams.time = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
    if( $('[data-id="' + indicator.id + '"] .js-analysis-elevation').length > 0 ){

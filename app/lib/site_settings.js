@@ -11,6 +11,7 @@ var titleCase = require('to-title-case');
 var user = require('./user.js');
 var utils = require('./utils.js');
 var pythonShell = require('python-shell');
+var ogr2ogr = require('ogr2ogr')
 
 var child_process = require('child_process');
 
@@ -18,10 +19,13 @@ var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var TEMP_UPLOADS_PATH = CURRENT_PATH + "/../../uploads/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
+var multer  = require('multer')
+var upload = multer({ dest: TEMP_UPLOADS_PATH })
 
 // This is for the xml2js parsing, it removes any silly namespaces.
 var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
@@ -58,7 +62,7 @@ function sortLayersList(data, param){
 router.use(function (req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-Modified-Since');
    next();
 });
 
@@ -127,7 +131,7 @@ router.get('/app/cache/*?', function(req, res) {
       if (err) {
          utils.handleError(err, res);
       }
-    });
+   });
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
@@ -268,6 +272,45 @@ router.all('/app/settings/restore_server_cache', function(req, res){
          }
       });
    }
+});
+
+router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var file_list = req.files; // Gets the data given
+
+   var shape_file;
+   for(var file in file_list){
+      var this_file = file_list[file];
+      if(this_file.mimetype == "application/x-esri-shape"){
+         shape_file = this_file;
+      }
+      fs.renameSync(this_file.path, path.join(this_file.destination, this_file.originalname));
+   }
+
+   var geoJSON_path =   path.join(shape_file.destination, shape_file.originalname + ".json");
+   var stream = fs.createWriteStream(geoJSON_path);
+
+   var shape_path = path.join(shape_file.destination, shape_file.originalname);
+   var geoJSON = ogr2ogr(shape_path);
+   try{
+      geoJSON.stream().pipe(stream);
+   }catch(e){
+      utils.handleError(e, res);
+   }
+
+   // Once the Geojsonhas been created the temp files are deleted
+   stream.on('finish', function() {
+      for(var file in file_list){
+         this_file = file_list[file];
+         fs.unlinkSync(path.join(this_file.destination, this_file.originalname));
+      }
+      res.sendFile(geoJSON_path, function (err) {
+         if (err) {
+            utils.handleError(err, res);
+         }
+      });
+   });
 });
 
 router.all('/app/settings/update_layer', function(req, res){

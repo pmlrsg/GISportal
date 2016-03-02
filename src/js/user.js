@@ -48,6 +48,7 @@ gisportal.user.updateProfile = function(){
       // Makes sure that the correct buttons are shown for editing
       gisportal.loadLayerEditButtons();
       gisportal.loadLayers();
+      gisportal.updateHideClasses();
    }
    $.ajax({
       url: gisportal.middlewarePath + '/user/get/',
@@ -91,5 +92,15 @@ gisportal.loadLayerEditButtons = function(){
       $('div.server-list-div').toggleClass("hidden", true);
    }else{
       $('div.server-list-div').toggleClass("hidden", false);
+   }
+};
+
+gisportal.updateHideClasses = function(){
+   if(gisportal.user.info.permission == "guest"){
+      $('.hide-when-logged-in').toggleClass('hidden', false);
+      $('.show-when-logged-in').toggleClass('hidden', true);
+   }else{
+      $('.hide-when-logged-in').toggleClass('hidden', true);
+      $('.show-when-logged-in').toggleClass('hidden', false);
    }
 };

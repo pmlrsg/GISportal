@@ -86,8 +86,10 @@
   display: none;
 }
 
-.analysis-draw-bbox-buttons button{
+.analysis-draw-bbox-buttons button,
+.analysis-draw-bbox-buttons label{
   background-color: $analysis-button;
+  cursor: pointer;
 }
 .analysis-draw-bbox-buttons .icon-cursor-select-area{
     position: relative;

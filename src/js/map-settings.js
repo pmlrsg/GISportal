@@ -557,6 +557,7 @@ gisportal.setProjection = function(new_projection) {
    gisportal.setView(new_centre, new_extent, new_projection);
    gisportal.refreshLayers();
    gisportal.selectedRegionProjectionChange(old_projection, new_projection);
+   gisportal.projection = map.getView().getProjection().getCode();
 };
 
 gisportal.setView = function(centre, extent, projection) {
@@ -585,11 +586,11 @@ gisportal.setView = function(centre, extent, projection) {
 gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
    if(gisportal.currentSelectedRegion !== ""){
       if(gisportal.currentSelectedRegion.startsWith("POLYGON")){
-         $('.js-coordinates').val(gisportal.reprojectPolygon(gisportal.currentSelectedRegion, new_proj));
+         gisportal.currentSelectedRegion = gisportal.reprojectPolygon(gisportal.currentSelectedRegion, new_proj);
       }else{
-         $('.js-coordinates').val(gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj));
+         gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
       }
-      $('.js-coordinates').trigger('change');
+      gisportal.selectionTools.updateROI();
    }
 };
 

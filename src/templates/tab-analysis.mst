@@ -4,30 +4,59 @@
       <div class="js-analysis-message hidden alert-danger" id="{{id}}-analysis-message"/>
       {{#if wcsURL}}
          <li class="full-size">
-         <div >
-            <p>Draw a selection box on the map to refine the data before analysis</p>
+         <div class="full-width">
+            <b>ANALYSIS</b>
+            <p>To refine the data before analysis you can:</p>
+            <br/>
             
             <div class="analysis-draw-bbox-buttons">
+               <p>Draw a selection box on the map</p>
                <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
-                  <span class=" icon-cursor-select-area" data-id="Ph" title="Draw Polygon"></span>
+                  <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
                   Draw Polygon
                </button>
                <button class="brand secondary extra-small js-draw-polygon" data-id="{{id}}" title="Draw Irregular Polygon">
-                  <span class=" icon-network-1-1" data-id="Ph" title="Draw Box" ></span>
+                  <span class=" icon-network-1-1" data-id="Ph" title="Draw Irregular Polygon" ></span>
                   Draw Irregular Polygon
                </button>
-               <button class="brand secondary extra-small js-draw-select-polygon hidden" data-id="{{id}}" title="Select Existing Polygon">
-                  <span class=" icon-network-1-1" data-id="Ph" title="Draw Box" ></span>
-                  Select Polygon
-               </button>
-               <!--
-               <button class="icon_line js-draw-line" data-id="{{id}}" title="Draw Polygon">Draw Box</button>
-               -->
+               <br/>
+               <br/>
+               <b>OR</b>
+               <br/>
+               <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
+                  <p>Upload a shape file</p>
+                  <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
+                     <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
+                     Upload Files
+                  </label>
+                  <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
+                     <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx" name="files"></input>
+                  </form>
+               </div>
+               <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">Login and upload a shape file</p>
+               <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
+                  <br/>
+                  <b>OR</b>
+                  <br/>
+                  <p>Use this dropdown to select a previous polygon</p>
+               </div>
+               <div class="draw-select-polygon-div">
+                  <br/>
+                  <b>OR</b>
+                  <br/>
+                  <button class="brand secondary extra-small js-draw-select-polygon" data-id="{{id}}" title="Select Existing Polygon">
+                     <span class=" icon-hand-touch-1" data-id="Ph" title="Select Existing Polygon" ></span>
+                     Select Existing Polygon
+                  </button>
+               </div>
             </div>
             <div class="coordinates clearfix">
-               <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+               <b>OR</b>
+               <br/>
+               <p><label for="tab-{{id}}-coordinates">Enter coordinates</label></p>
                <div class="analysis-coordinates">
                   <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates " type="text">
+                  <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
                </div>
             </div>
             <div class="bbox-info hidden clearfix">
@@ -48,13 +77,11 @@
             {{/elevation}}
 
             <div class="analysis-add-to-plot-buttons clearfix">
-               <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to existing graph</button>
+               <button id="export-{{id}}" class="brand small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
+               <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to graph</button>
                <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new graph</button>
             </div>
          </div>
-         </li>
-         <li class="export-button">
-            <button id="export-{{id}}" class="brand secondary extra-small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
          </li>
       {{else}}
          <li class="full-size">

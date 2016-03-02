@@ -74,6 +74,8 @@ function cancelDraw() {
 gisportal.selectionTools.initDOM = function()  {
    $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI);
 
+   $('.js-indicators').on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded);
+
    $('.js-indicators').on('focus', '.js-coordinates', function(){
       $(this).data('oldVal', $(this).val());
    });
@@ -106,6 +108,58 @@ gisportal.selectionTools.initDOM = function()  {
    //    map.renderSync();
    // })
 
+};
+
+gisportal.selectionTools.shapesUploaded = function(){
+   var files_list = this.files;
+   var dbf_found, shp_found, shx_found;
+
+
+   for(var i = 0; i < files_list.length; i++){
+      this_file = files_list[i];
+      if(this_file.type == "application/x-dbf"){
+         dbf_found = true;
+      }
+      if(this_file.type == "application/x-esri-shape"){
+         shp_found = true;
+      }
+      if(this_file.type == "application/x-esri-shape-index"){
+         shx_found = true;
+      }
+   }
+   if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
+      $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
+      this.value = "";
+   }else{
+      var formData = new FormData($(this).parent()[0]);
+      $.ajax({
+         url: '/app/settings/upload_shape',  //Server script to process data
+         type: 'POST',
+         xhr: function() {  // Custom XMLHttpRequest
+            var myXhr = $.ajaxSettings.xhr();
+            return myXhr;
+         },
+         success: function(d){
+            //var geoJSON_feature = new ol.format.GeoJSON().readFeature(d);
+            //console.log("Add Feature: " + geoJSON_feature);
+            var geoJsonFormat = new ol.format.GeoJSON();
+            var featureOptions = {
+               'dataProjection': gisportal.projection,
+               'featureProjection': "ESPG:4326"
+            };
+            var features = geoJsonFormat.readFeatures(JSON.stringify(d), featureOptions);
+            gisportal.vectorLayer.getSource().clear();
+            gisportal.vectorLayer.getSource().addFeatures(features);
+            gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+
+         },
+         error: function(e) {console.log(e);},
+         data: formData,
+         cache: false,
+         contentType: false,
+         processData: false
+      });
+   }
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {
@@ -192,7 +246,12 @@ gisportal.selectionTools.toggleTool = function(type)  {
 };
 
 gisportal.selectionTools.updateROI = function()  {
-   var new_bounds = $(this).val();
+   var this_bounds;
+   try{
+      this_bounds = $(this).val();
+   }catch(e){}
+
+   var new_bounds = this_bounds || gisportal.currentSelectedRegion;
    var this_feature;
    if(new_bounds.startsWith("POLYGON")){
       try{
@@ -213,18 +272,21 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       return;
-   }catch(e){}
-   var _this = $(this);
-   _this.closest('.analysis-coordinates').prepend('<div class="alert alert-danger">Sorry that didn\'t work<br/>Edit the data and try again or click <a class="js-revert-text">here</a></div>');
-   var my_timeout = setTimeout( function(){
-      _this.siblings('div .alert-danger').remove();
-   }, 6000 );
-   _this.siblings('div .alert-danger').find('a.js-revert-text').on('click', function(){
-      _this.siblings('div .alert-danger').remove();
-      _this.val(_this.data('oldVal'));
-      _this.trigger('change');
-      clearTimeout(my_timeout);
-   });
+   }catch(e){
+      if(this_bounds){
+         var _this = $(this);
+         _this.closest('.analysis-coordinates').prepend('<div class="alert alert-danger">Sorry that didn\'t work<br/>Edit the data and try again or click <a class="js-revert-text">here</a> to revert to the previous value</div>');
+         var my_timeout = setTimeout( function(){
+            _this.siblings('div .alert-danger').remove();
+         }, 6000 );
+         _this.siblings('div .alert-danger').find('a.js-revert-text').on('click', function(){
+            _this.siblings('div .alert-danger').remove();
+            _this.val(_this.data('oldVal'));
+            _this.trigger('change');
+            clearTimeout(my_timeout);
+         });
+      }
+   }
 };
 
 gisportal.currentSelectedRegion = "";
@@ -250,7 +312,6 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       });
 
       gisportal.currentSelectedRegion = wkt_feature;
-      $('.js-coordinates').val(wkt_feature);
       //$('.bbox-info').toggleClass('hidden', false);
       $('.js-edit-polygon').attr('disabled', false);
    }
@@ -262,7 +323,6 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       });
 
       gisportal.currentSelectedRegion = wkt_feature;
-      $('.js-coordinates').val(wkt_feature);
       //$('.bbox-info').toggleClass('hidden', false);
       $('.js-edit-polygon').attr('disabled', false);
    } else {
@@ -280,7 +340,6 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          });
       
          gisportal.currentSelectedRegion = coords;
-         $('.js-coordinates').val(coords);
          //$('.bbox-info').toggleClass('hidden', false);
          $('.js-edit-polygon').attr('disabled', false);
       }

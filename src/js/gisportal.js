@@ -478,6 +478,15 @@ gisportal.mapInit = function() {
       }),
       logo: false
    });
+   gisportal.dragAndDropInteraction = new ol.interaction.DragAndDrop({
+      formatConstructors: [
+         ol.format.GPX,
+         ol.format.GeoJSON,
+         ol.format.IGC,
+         ol.format.KML,
+         ol.format.TopoJSON
+      ]
+   });
 
    map.addInteraction(new ol.interaction.Select({
       condition: function(e) {
@@ -485,6 +494,15 @@ gisportal.mapInit = function() {
       },
       hover : false
    }));
+
+   map.addInteraction(gisportal.dragAndDropInteraction);
+
+   gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
+      // Make sure only one feature is loaded at a time
+      gisportal.vectorLayer.getSource().clear();
+      gisportal.vectorLayer.getSource().addFeatures(event.features);
+      gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
+   });
 
 
 // var select = new ol.interaction.Select({
@@ -526,7 +544,7 @@ gisportal.mapInit = function() {
                console.log("adding WKT to form");
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
                //console.log(t_wkt);
-               $('.js-coordinates').val(t_wkt);
+               gisporttal.currentSelectedRegion = t_wkt;
 
                
 
@@ -547,7 +565,10 @@ gisportal.mapInit = function() {
                            //feature[0].setStyle(feature[1]);
                        });
                        //console.log('====================');
-                       var tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
+                       var tlayer;
+                       if(feature.getId()){
+                         tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
+                       }
                        isFeature = true;
                        gisportal.selectedFeatures.push([feature, feature.getStyle()]);
                        var fill = gisportal.vectorStyles.genColour(0.8);
@@ -572,8 +593,12 @@ gisportal.mapInit = function() {
                        for (var key in props) {
                            if (props.hasOwnProperty(key)) {
                                ////console.log(key, props[key]);
-                               if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
-                                   response += "<li>" + key + " : " + props[key] + "</li>";
+                               if(tlayer){
+                                  if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
+                                      response += "<li>" + key + " : " + props[key] + "</li>";
+                                  }
+                               }else if(props[key]!==undefined){
+                                 response += "<li>" + key + " : " + props[key] + "</li>";
                                }
                            }
                        }

@@ -58,6 +58,10 @@
 
 }
 
+.analysis-coordinates input[type="text"]{
+  width: calc(100% - 65px);
+}
+
 .panel-header .tab.active{
     background-color: #f0eef3;
     color: black;
@@ -503,4 +507,13 @@ input.search:focus  {
 
 .tooltipster-base{
   word-break : break-word;
+}
+
+.panel-tab b{
+  font-weight: bold;
+  display: block;
+}
+
+div.full-width{
+  width:100%;
 }
