@@ -619,8 +619,11 @@ def timeseries(plot, outfile="time.html"):
       zf.write(csv_file)
 
       debug(4, data[varindex['mean']]) 
-      ymin.append(np.amin(data[varindex['mean']].astype(np.float64)))
-      ymax.append(np.amax(data[varindex['mean']].astype(np.float64)))
+      min_value = np.amin(data[varindex['mean']].astype(np.float64))
+      max_value = np.amax(data[varindex['mean']].astype(np.float64))
+      buffer_value = (max_value - min_value) /20
+      ymin.append(min_value - buffer_value)
+      ymax.append(max_value + buffer_value)
       debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
 
       date = datetime(data[varindex['date']])
@@ -642,8 +645,11 @@ def timeseries(plot, outfile="time.html"):
                err_xs.append((x, x))
                err_ys.append((np.power(10, np.log10(y) - np.log10(std)), np.power(10, np.log10(y) + np.log10(std)))) 
 
-         ymin[-1] = np.amin(np.array(err_ys).astype(np.float64))
-         ymax[-1] = np.amax(np.array(err_ys).astype(np.float64))
+         min_value = np.amin(np.array(err_ys).astype(np.float64))
+         max_value = np.amax(np.array(err_ys).astype(np.float64))
+         buffer_value = (max_value - min_value) /20
+         ymin[-1] = min_value - buffer_value
+         ymax[-1] = max_value + buffer_value
          debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
          datasource['err_xs'] = err_xs
          datasource['err_ys'] = err_ys
