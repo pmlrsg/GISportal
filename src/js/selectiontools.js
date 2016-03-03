@@ -129,7 +129,6 @@ gisportal.selectionTools.shapesUploaded = function(){
    }
    if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
       $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
-      this.value = "";
    }else{
       var formData = new FormData($(this).parent()[0]);
       $.ajax({
@@ -147,10 +146,11 @@ gisportal.selectionTools.shapesUploaded = function(){
                'dataProjection': gisportal.projection,
                'featureProjection': "ESPG:4326"
             };
-            var features = geoJsonFormat.readFeatures(JSON.stringify(d), featureOptions);
+            var features = geoJsonFormat.readFeatures(d, featureOptions);
             gisportal.vectorLayer.getSource().clear();
             gisportal.vectorLayer.getSource().addFeatures(features);
             gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+            gisportal.indicatorsPanel.populateShapeSelect();
 
          },
          error: function(e) {console.log(e);},

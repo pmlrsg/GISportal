@@ -551,6 +551,8 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
+      gisportal.indicatorsPanel.populateShapeSelect();
+
       gisportal.indicatorsPanel.checkTabFromState(id);
 
    };
@@ -559,6 +561,33 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
    else indicator.metadataQueue.push(onMetadata);
 
 };
+
+gisportal.indicatorsPanel.populateShapeSelect = function(){
+   // A request to populate the dropdown with the users polygons
+   $.ajax({
+      url:  gisportal.middlewarePath + '/settings/get_shapes',
+      dataType: 'json',
+      success: function(data){
+         // Empties the dropdown
+         $('.users-geojson-files').html("");
+         selectValues = data.list;
+         if(selectValues.length > 0){
+            $('.users-geojson-files').html("<option selected disabled>Please select a file...</option>");
+            $.each(selectValues, function(key, value) {   
+               $('.users-geojson-files')
+                  .append($("<option></option>")
+                  .attr("value",key)
+                  .text(value));
+            });
+         }else{
+            $('.users-geojson-files').html("<option selected disabled>You have no files yet, please add some</option>");
+         }
+      },
+      error: function(e){
+         $('.users-geojson-files').html("<option selected disabled>You must be logged in to use this feature</option>");
+      }
+   });
+}
 
 /**
  * Redraws the legend bar which will reflect changes to the legend colour and range

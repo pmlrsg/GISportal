@@ -49,6 +49,7 @@ gisportal.user.updateProfile = function(){
       gisportal.loadLayerEditButtons();
       gisportal.loadLayers();
       gisportal.updateHideClasses();
+      gisportal.indicatorsPanel.populateShapeSelect();
    }
    $.ajax({
       url: gisportal.middlewarePath + '/user/get/',

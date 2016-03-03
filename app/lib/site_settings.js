@@ -197,6 +197,22 @@ router.get('/app/settings/get_cache', function(req, res) {
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 });
 
+router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res) {
+   var username = user.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var shape_list = [];
+   var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
+   var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+   user_list.forEach(function(filename){
+      var file_path = path.join(user_cache_path, filename);
+      if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){
+         shape_list.push(filename.replace(".shp.geojson", ""));
+      }
+   });
+   res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
+});
+
 router.all('/app/settings/rotate', function(req, res){
    var angle = parseInt(req.query.angle); // Gets the given angle
    var url = req.query.url // Gets the given URL
@@ -288,7 +304,7 @@ router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('f
       fs.renameSync(this_file.path, path.join(this_file.destination, this_file.originalname));
    }
 
-   var geoJSON_path =   path.join(shape_file.destination, shape_file.originalname + ".json");
+   var geoJSON_path =   path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, shape_file.originalname + ".geojson");
    var stream = fs.createWriteStream(geoJSON_path);
 
    var shape_path = path.join(shape_file.destination, shape_file.originalname);
