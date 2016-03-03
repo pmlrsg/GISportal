@@ -408,7 +408,7 @@ def extract(plot, outfile="image.html"):
             view[i, j, 3] = 255
 
    plot_width = 800
-   plot_height = 400
+   plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
               title="Image extract - {}".format(plot_title))
