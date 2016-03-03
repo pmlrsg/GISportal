@@ -471,6 +471,6 @@ def test_time_axis(filenames):
       print filenames[key]
       times[key] = getCoordinateVariable(netCDF.Dataset(filenames[key], 'r+'), 'Time')[:]
    
-   dif = [x - x for times[x] in times ]
+   dif = [times[x] - times[x] for times[x] in times ]
    print dif
    return times

@@ -32,9 +32,9 @@ AET
 """
 
 import argparse
-from extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
-from extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
-from analysis_types import BasicStats, TransectStats, HovmollerStats
+from python_extraction.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
+from python_extraction.extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
+from python_extraction.analysis_types import BasicStats, TransectStats, HovmollerStats
 from shapely import wkt
 import json
 import time as _time
@@ -77,11 +77,17 @@ def main():
 	if (args.extract_type == "basic"):
 		start_time = _time.time()
 
-		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = BasicExtractor(args.wcs_url[0], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
 		filename = extractor.getData()
 		middle_time = _time.time()
-		stats = BasicStats(filename, args.wcs_variable)
+		stats = BasicStats(filename, args.wcs_variable[0])
 		output_data = stats.process()
+	elif (args.extract_type == "image"):
+		#extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
+		#filename = extractor.getData()
+		#image_data = ImageStats(filename, args.wcs_variable[0])
+		#output_data = image_data.convert()
+		pass
 	elif (args.extract_type == 'scatter'):
 		# scatter extractor returns a dict {var : netcdf, var2: netcdf2}
 		extractor = ScatterExtractor(args.wcs_url[0],args.wcs_url[1], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0], extract_variable_2=args.wcs_variable[1] )

@@ -1,11 +1,11 @@
 from . import Extractor
-from extraction_utils import WCSHelper, WCSRawHelper
+from ..extraction_utils import WCSHelper, WCSRawHelper
 import tempfile
 import uuid
 import time
 import os
 import json
-from extraction_utils import sizeof_fmt
+from ..extraction_utils import sizeof_fmt
 
 
 class SingleExtractor(Extractor):

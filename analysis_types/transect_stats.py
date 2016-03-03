@@ -1,5 +1,5 @@
 import netCDF4 as netCDF
-from extraction_utils import basic, getCsvDict, find_closest, getCoordinateVariable
+from ..extraction_utils import basic, getCsvDict, find_closest, getCoordinateVariable
 import json
 import csv
 import datetime

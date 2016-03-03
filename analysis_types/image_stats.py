@@ -1,11 +1,12 @@
 import netCDF4 as netCDF
 from ..extraction_utils import basic
 import json
+import matplotlib.pyplot as plt
 
-class BasicStats(object):
-	"""docstring for BasicStats"""
+class ImageStats(object):
+	"""docstring for ImageStats"""
 	def __init__(self, filename, variable):
-		super(BasicStats, self).__init__()
+		super(ImageStats, self).__init__()
 		self.filename = filename
 		self.variable = variable
 		
@@ -14,6 +15,10 @@ class BasicStats(object):
 		#print "running basic processing on %s" % self.filename
 
 		netcdf_file = netCDF.Dataset(self.filename, "r")
+		variable = netcdf_file.variables[self.variable]
+		plt.figure()
+		plt.imshow(variable[:])
+		
 		return json.dumps(basic(netcdf_file, self.variable))
 
 
