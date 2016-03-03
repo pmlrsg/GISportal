@@ -118,6 +118,120 @@ def datetime(x):
    #return np.array(x, dtype=np.datetime64)
 #END datetime
 
+def read_status(dirname, my_hash):
+   '''
+      Reads a JSON status file whose name is defined by dirname and my_hash.
+   '''
+
+   status = None
+   file_path = dirname + "/" + my_hash + "-status.json"
+   try:
+      with open(file_path, 'r') as status_file:
+         status = json.load(status_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Status file {} not found".format(file_path))
+      else:
+         raise
+
+   return status
+#END read_status
+
+def update_status(dirname, my_hash, plot_status, message="", percentage=0):
+   '''
+      Updates a JSON status file whose name is defined by dirname and my_hash.
+   '''
+
+   initial_status = dict(
+      percentage = 0,
+      state = plot_status,
+      message = message,
+      completed = False,
+      job_id = my_hash
+   )
+
+   # Read status file, create if not there.
+   file_path = dirname + "/" + my_hash + "-status.json"
+   try:
+      with open(file_path, 'r') as status_file:
+         if plot_status == Plot_status.initialising:
+            status = initial_status
+         else:
+            status = json.load(status_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Status file {} not found".format(file_path))
+         # It does not exist yet so create the initial JSON
+         status = initial_status
+      else:
+         raise
+
+   # Update the status information.
+   status["message"] = message
+   status["state"] = plot_status
+   status['percentage'] = percentage
+   if plot_status == Plot_status.complete:
+      status["completed"] = True
+      status['filename'] = dirname + "/" + my_hash + "-plot.html"
+      status['csv'] = dirname + "/" + my_hash + ".zip"
+   elif plot_status == Plot_status.failed:
+      status["completed"] = True
+      status['filename'] = None
+      status['csv'] = None
+   else:
+      status["completed"] = False
+      status['filename'] = None
+      status['csv'] = None
+
+   debug(3, "Status: {}".format(status))
+
+   # Write it back to the file.
+   with open(file_path, 'w') as status_file:
+      json.dump(status, status_file)
+
+   return status
+#END update_status
+
+def read_cached_request(dirname, my_hash):
+   '''
+   Looks for a file named <dirname>/<my_hash>-request.json.
+   If the file exists the contents are returned otherwise None.
+   '''
+   request = None
+   request_path = dirname + "/" + my_hash + "-request.json"
+   try:
+      with open(request_path, 'r') as request_file:
+         request = json.load(request_file)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Request file {} not found".format(request_path))
+      else:
+         raise
+
+   return request
+#END read_cached_request
+
+def read_cached_data(dirname, my_hash, my_id):
+   plot = None
+   data_path = dirname + "/" + my_hash + "-data.json"
+   try:
+      with open(data_path, 'r') as outfile:
+         plot = json.load(outfile)
+   except IOError as err:
+      if err.errno == 2:
+         debug(2, "Cache file {} not found".format(data_path))
+      else:
+         raise
+
+   return plot 
+#END read_cached_data
+
+def debug(level, msg):
+   if verbosity >= level: print(msg, file=sys.stderr)
+#END debug
+
+#############################################################################################################
+   
 def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
    '''
    Returns a bokeh plot with a legend based on the colours provided.
@@ -715,6 +829,9 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #END scatter
 
 
+#############################################################################################################
+   
+
 def get_plot_data(json_request, plot=dict()):
    debug(2, "get_plot_data: Started")
 
@@ -978,119 +1095,8 @@ def execute_plot(dirname, plot, request):
    update_status(opts.dirname, my_hash, Plot_status.complete, "Complete")
    return True
 #END execute_plot
-   
-def read_status(dirname, my_hash):
-   '''
-      Reads a JSON status file whose name is defined by dirname and my_hash.
-   '''
 
-   status = None
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, "Status file {} not found".format(file_path))
-      else:
-         raise
-
-   return status
-#END read_status
-
-def update_status(dirname, my_hash, plot_status, message="", percentage=0):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   initial_status = dict(
-      percentage = 0,
-      state = plot_status,
-      message = message,
-      completed = False,
-      job_id = my_hash
-   )
-
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         if plot_status == Plot_status.initialising:
-            status = initial_status
-         else:
-            status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, "Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = initial_status
-      else:
-         raise
-
-   # Update the status information.
-   status["message"] = message
-   status["state"] = plot_status
-   status['percentage'] = percentage
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-      status['csv'] = dirname + "/" + my_hash + ".zip"
-   elif plot_status == Plot_status.failed:
-      status["completed"] = True
-      status['filename'] = None
-      status['csv'] = None
-   else:
-      status["completed"] = False
-      status['filename'] = None
-      status['csv'] = None
-
-   debug(3, "Status: {}".format(status))
-
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
-
-   return status
-#END update_status
-
-def read_cached_request(dirname, my_hash):
-   '''
-   Looks for a file named <dirname>/<my_hash>-request.json.
-   If the file exists the contents are returned otherwise None.
-   '''
-   request = None
-   request_path = dirname + "/" + my_hash + "-request.json"
-   try:
-      with open(request_path, 'r') as request_file:
-         request = json.load(request_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, "Request file {} not found".format(request_path))
-      else:
-         raise
-
-   return request
-#END read_cached_request
-
-def read_cached_data(dirname, my_hash, my_id):
-   plot = None
-   data_path = dirname + "/" + my_hash + "-data.json"
-   try:
-      with open(data_path, 'r') as outfile:
-         plot = json.load(outfile)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, "Cache file {} not found".format(data_path))
-      else:
-         raise
-
-   return plot 
-#END read_cached_data
-
-def debug(level, msg):
-   if verbosity >= level: print(msg, file=sys.stderr)
-#END debug
-
+#############################################################################################################
 
 if __name__ == "__main__":
    from argparse import ArgumentParser, RawTextHelpFormatter
@@ -1137,9 +1143,10 @@ To execute a plot
          if execute_plot(opts.dirname, plot, request):
             debug(1, "Plot complete")
          else:
-            debug(0, "Failed to complete plot")
+            debug(0, "Error executing. Failed to complete plot")
             sys.exit(2)
       except:
+         debug(0, "Uncaught Exception. Failed to complete plot")
          update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed")
          raise
 
