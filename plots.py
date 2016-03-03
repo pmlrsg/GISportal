@@ -284,7 +284,7 @@ def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
                source=legend_source)
 
    return(legend)
-#END hovmoller_legend   
+#END plot_legend   
    
 def extract(plot, outfile="image.html"):
        
@@ -1311,7 +1311,7 @@ To execute a plot
 
 """
 
-   valid_commands = ('execute', 'csv')
+   valid_commands = ('execute')
    cmdParser = ArgumentParser(formatter_class=RawTextHelpFormatter, epilog=description_text)
    cmdParser.add_argument("-c", "--command", action="store", dest="command", default="status", help="Plot command to execute {}.".format(valid_commands))
    cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output, more v's, more verbose.")
