@@ -621,6 +621,8 @@ def timeseries(plot, outfile="time.html"):
       debug(4, data[varindex['mean']]) 
       ymin.append(np.amin(data[varindex['mean']].astype(np.float64)))
       ymax.append(np.amax(data[varindex['mean']].astype(np.float64)))
+      debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
+
       date = datetime(data[varindex['date']])
       
       datasource = dict(date=date,
@@ -640,6 +642,9 @@ def timeseries(plot, outfile="time.html"):
                err_xs.append((x, x))
                err_ys.append((np.power(10, np.log10(y) - np.log10(std)), np.power(10, np.log10(y) + np.log10(std)))) 
 
+         ymin[-1] = np.amin(np.array(err_ys).astype(np.float64))
+         ymax[-1] = np.amax(np.array(err_ys).astype(np.float64))
+         debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
          datasource['err_xs'] = err_xs
          datasource['err_ys'] = err_ys
          datasource['stderr'] = data[varindex['std']]
