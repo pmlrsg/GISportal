@@ -232,7 +232,7 @@ def debug(level, msg):
 
 #############################################################################################################
    
-def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
+def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):   
    '''
    Returns a bokeh plot with a legend based on the colours provided.
 
@@ -286,6 +286,149 @@ def hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    return(legend)
 #END hovmoller_legend   
    
+def extract(plot, outfile="image.html"):
+       
+   plot_type = plot['type']
+   plot_title = plot['title']
+   plot_units = plot['y1Axis']['label']
+
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
+   df = plot['data'][0]
+   plot_type = df['type']
+   var_name = df['coverage']
+   plot_scale = df['scale']
+
+   debug(4, "extract: plot={}".format(df['data'][2]))
+
+   varindex = {j: i for i, j in enumerate(df['vars'])}
+
+   data = np.transpose(df['data'])
+
+   # Save the CSV files
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+   #np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+
+   #with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
+      #zf.write(csv_file)
+
+   #shutil.rmtree(csv_dir)
+
+   # Format latlon to float. Otherwise we can not do the mins etc.
+   #latlon = np.array(df["LatLon"]).astype(np.float)
+   lat = np.array(data[varindex['latitudes']]).astype(np.float64)
+   lon = np.array(data[varindex['longitudes']]).astype(np.float64)
+   
+   # Guess the size of each axis from the number of unique values in it.
+   x_size = len(lon)
+   y_size = len(lat)
+
+   debug(3, "x_size {}, y_size {}, {} {}".format(x_size, y_size, len(data[varindex['data']][0]), len(data[varindex['data']])))
+   # Make our array of values the right shape.
+   # If the data list does not match the x and y sizes then bomb out.
+   #assert x_size * y_size == len(data[varindex['value']])
+   
+   # We want a 2d array with latlon as x axis and date as y.
+   #values = np.reshape(np.array(data[varindex['value']]),(-1,y_size))
+
+   # Assume we have a nested list of values ordered in lat, lon order.
+   values = np.flipud(np.array(data[varindex['data']]))
+
+   # Easiest if we force float here but is that always true?
+   # We also have problems with how the data gets stored as JSON (very big!).
+   values = values.astype(np.float64)
+   debug(3, "values shape: {}".format(values.shape))
+   debug(3, "\nrow:{} \ncol:{}\n".format(values[0], values[:,0])) 
+   debug(3, "Bounds: {} {}".format(values[0,0], values[y_size-1,x_size-1]))
+   debug(4, values)
+   if plot_scale == "log":
+       log_plot = True
+       values = np.log10(values)
+   else:
+       log_plot = False
+       
+   min_x = lon[0]
+   max_x = lon[-1]
+   min_y = lat[-1]
+   max_y = lat[0]
+   x_axis_type = "linear"
+   y_axis_type = "linear"
+   x_axis_label = "Longitude"
+   y_axis_label = "Latitude"
+ 
+   debug(3, "min_x {}, max_x {}, min_y {}, max_y {}".format(min_x,max_x,min_y,max_y))
+ 
+   # We are working in the plotting space here, log or linear. Use this to set our
+   # default scales.
+   min_val = np.nanmin(values)
+   max_val = np.nanmax(values)
+   debug(3, "min_val {}, max_val {}".format(min_val,max_val))
+
+   colours = get_palette()
+   legend = plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
+
+   # Create an RGBA array to show the Hovmoller. We do this rather than using the Bokeh image glyph
+   # as that passes the actual data into bokeh.js as float resulting in huge files.   
+   
+   # First create an empty array of 32 bit ints.
+   img = np.empty((y_size, x_size), dtype=np.uint32)
+
+   # Create a view of the same array as an array of RGBA values.
+   view = img.view(dtype=np.uint8).reshape((y_size, x_size, 4))
+   debug(3, "RGBA shape: {}".format(view.shape))
+   # We are going to set the RGBA based on our chosen palette. The RSG library returns a flat list of values.
+   my_palette = palettes.getPalette('rsg_colour')
+   slope = (max_val - min_val) / (len(colours) - 1)
+   intercept = min_val
+   debug(3, "Slope: {}, intercept: {}".format(slope, intercept))
+   for j in range(x_size):
+      for i in range(y_size):
+         if np.isnan(values[i,j]):
+            view[i, j, 0] = 0
+            view[i, j, 1] = 0
+            view[i, j, 2] = 0
+            view[i, j, 3] = 0
+         else:
+            p_index = int((values[i,j] - intercept) / slope) * 4
+            view[i, j, 0] = my_palette[p_index]
+            view[i, j, 1] = my_palette[p_index+1]
+            view[i, j, 2] = my_palette[p_index+2]
+            view[i, j, 3] = 255
+
+   plot_width = 800
+   plot_height = 400
+   p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
+              x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
+              title="Image extract - {}".format(plot_title))
+
+   p.xaxis.axis_label = x_axis_label
+   p.yaxis.axis_label = y_axis_label
+   
+   # Create an RGBA image anchored at (min_x, min_y).
+   p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
+   
+   p.add_tools(CrosshairTool())
+
+   #TODO This should be in the wrapper
+   
+   output_file(outfile, title="Image Extract")
+   layout = hplot(legend, p)
+   save(layout)
+   return(p)
+#END extract
+
 def hovmoller(plot, outfile="image.html"):
        
    plot_type = plot['type']
@@ -391,7 +534,7 @@ def hovmoller(plot, outfile="image.html"):
    max_val = np.amax(values)
 
    colours = get_palette()
-   legend = hovmoller_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
+   legend = plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
 
    # Create an RGBA array to show the Hovmoller. We do this rather than using the Bokeh image glyph
    # as that passes the actual data into bokeh.js as float resulting in huge files.   
@@ -906,16 +1049,58 @@ def get_plot_data(json_request, plot=dict()):
          debug(2, "Data request, {}, failed".format(data_request))
          return plot
          
-      # TODO - Old style extractor response. So pull the data out.
+      # TODO - Old style extractor response. If we change it we need to match the change here.
       data = response['data']
+      debug(4, "Data: {}".format(data))
 
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
                       vars=['date', 'latlon', 'value'], data=data))
       update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
 
+   elif plot_type in ("extract"):
+      if len(series) > 1:
+         debug(0, "Error: Attempting to plot {} data series".format(len(series)))
+
+      ds = series[0]['data_source']
+      coverage = ds['coverage']
+      time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
+      debug(3,"Time bounds: {}".format(time_bounds))
+
+      coverage = ds['coverage']
+      wcs_url = ds['threddsUrl']
+      bbox = ["{}".format(ds['bbox'])]
+      bbox = ds['bbox']
+      time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
+
+      debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
+      #try:
+         #extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+         #extract = extractor.getData()
+         #map_stats = HovmollerStats(extract, "Lon",  "Time", coverage)
+         #response = json.loads(hov_stats.process())
+      #except ValueError:
+         #debug(2, "Data request, {}, failed".format(data_request))
+         #return plot
+         
+      # TODO - For testing we use the file specified. Need to build a call to the extractor.
+      testdata = ds['filename']
+      debug(3, "Loading test from {}".format(testdata))
+      with open(testdata, 'r') as datafile:
+         json_data = json.load(datafile)
+      debug(4, "Data: {}".format(json_data.keys()))
+
+      data = []
+      my_vars = ['data', 'latitudes', 'longitudes']
+      [data.append(json_data[i]) for i in my_vars]
+      
+      # And convert it to a nice simple dict the plotter understands.
+      plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
+                      vars=my_vars, data=data))
+      update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
+
    elif plot_type in ("timeseries", "scatter"):
-      #TODO Can have more than 1 series so need a loop.
+      #Can have more than 1 series so need a loop.
       for s in series:
          ds = s['data_source']
          yaxis = s['yAxis']
@@ -948,7 +1133,7 @@ def get_plot_data(json_request, plot=dict()):
          
          debug(4, "Response: {}".format(response))
 
-         #TODO LEGACY - this reformats the response to the new format.
+         #TODO LEGACY - Change if the format is altered.
          data = response['data']
          df = []
          for date, details in data.items():
@@ -982,12 +1167,12 @@ def get_plot_data(json_request, plot=dict()):
          output_data = stats.process()
          debug(4, "Transect extract: {}".format(output_data))
 
-         #TODO LEGACY - this reformats the response to the new format.
+         #TODO LEGACY - Change if the format is altered.
          df = []
          for details in output_data:
             line = []
             [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
-            #TODO This strips out nulls as the break the plotting at the moment.
+            #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': df.append(line)
     
          #TODO This was in the extractor command line butnot sure we need it at the moment.
@@ -1098,6 +1283,8 @@ def execute_plot(dirname, plot, request):
       plot_file = hovmoller(plot, file_path)
    elif plot['type'] == 'transect':
       plot_file = transect(plot, file_path)
+   elif plot['type'] == 'extract':
+      plot_file = extract(plot, file_path)
    else:
       # We should not be here.
       debug(0, "Unknown plot type, {}.".format(plot['type']))
