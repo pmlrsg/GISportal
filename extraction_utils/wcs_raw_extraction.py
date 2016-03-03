@@ -22,7 +22,7 @@ class WCSRawHelper(object):
 		#print self.bbox
 		#print self.dates
 		if self.single :
-			output = self.getCoverage(identifier=self.variable, time=[self.dates], bbox=self.bbox, format="NetCDF3")
+			output = self.getCoverage()
 		else:	
 			output = self.getCoverage()
 		return output
@@ -33,7 +33,10 @@ class WCSRawHelper(object):
 		params['Request'] = 'GetCoverage'
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
-		params['Time'] = urllib.quote_plus(','.join(self.dates))
+		if(not isinstance(self.dates, basestring)):
+			params['Time'] = urllib.quote_plus(','.join(self.dates))
+		else:
+			params['Time'] = urllib.quote_plus(self.dates)
 		if(not isinstance(self.bbox, basestring)):
 			params['BBOX'] = ','.join([str(x) for x in self.bbox])
 		else:
@@ -53,6 +56,6 @@ class WCSRawHelper(object):
 			full_url = self.url + self.generateGetCoverageUrl()
 		else:
 			full_url = self.url +'?'+ self.generateGetCoverageUrl()
-		print full_url
+		#print full_url
 		resp = urllib2.urlopen(full_url)
 		return resp
