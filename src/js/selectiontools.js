@@ -112,62 +112,71 @@ gisportal.selectionTools.initDOM = function()  {
 
 gisportal.selectionTools.shapesUploaded = function(){
    var files_list = this.files;
-   var dbf_found, shp_found, shx_found;
+   if(files_list.length > 0){
+      var dbf_found, shp_found, shx_found;
 
 
-   for(var i = 0; i < files_list.length; i++){
-      this_file = files_list[i];
-      if(this_file.type == "application/x-dbf"){
-         dbf_found = true;
+      for(var i = 0; i < files_list.length; i++){
+         this_file = files_list[i];
+         if(this_file.type == "application/x-dbf"){
+            dbf_found = true;
+         }
+         if(this_file.type == "application/x-esri-shape"){
+            shp_found = true;
+         }
+         if(this_file.type == "application/x-esri-shape-index"){
+            shx_found = true;
+         }
       }
-      if(this_file.type == "application/x-esri-shape"){
-         shp_found = true;
+      if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
+         $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
+      }else{
+         var formData = new FormData($(this).parent()[0]);
+         $.ajax({
+            url: '/app/settings/upload_shape',  //Server script to process data
+            type: 'POST',
+            xhr: function() {  // Custom XMLHttpRequest
+               var myXhr = $.ajaxSettings.xhr();
+               return myXhr;
+            },
+            success: function(d){
+               gisportal.selectionTools.loadGeoJSON(d.geojson, d.shapeName);
+            },
+            error: function(e) {console.log(e);},
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+         });
       }
-      if(this_file.type == "application/x-esri-shape-index"){
-         shx_found = true;
-      }
-   }
-   if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
-      $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
-   }else{
-      var formData = new FormData($(this).parent()[0]);
-      $.ajax({
-         url: '/app/settings/upload_shape',  //Server script to process data
-         type: 'POST',
-         xhr: function() {  // Custom XMLHttpRequest
-            var myXhr = $.ajaxSettings.xhr();
-            return myXhr;
-         },
-         success: function(d){
-            //var geoJSON_feature = new ol.format.GeoJSON().readFeature(d);
-            //console.log("Add Feature: " + geoJSON_feature);
-            var geoJsonFormat = new ol.format.GeoJSON();
-            var featureOptions = {
-               'dataProjection': gisportal.projection,
-               'featureProjection': "ESPG:4326"
-            };
-            var features = geoJsonFormat.readFeatures(d, featureOptions);
-            gisportal.vectorLayer.getSource().clear();
-            gisportal.vectorLayer.getSource().addFeatures(features);
-            gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
-            gisportal.indicatorsPanel.populateShapeSelect();
-
-         },
-         error: function(e) {console.log(e);},
-         data: formData,
-         cache: false,
-         contentType: false,
-         processData: false
-      });
    }
 };
 
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
+   var geoJsonFormat = new ol.format.GeoJSON();
+   var featureOptions = {
+      'featureProjection': map.getView().getProjection().getCode()
+   };
+   var features = geoJsonFormat.readFeatures(geojson, featureOptions);
+   gisportal.vectorLayer.getSource().clear();
+   gisportal.vectorLayer.getSource().addFeatures(features);
+   gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+   $('.js-coordinates').val("");
+   // If this is a newly created geojson
+   if(shapeName){
+      shapeName += ".shp";
+      // Makes sure it adds the value or just selects the existing value
+      if($(".users-geojson-files option[value='" + shapeName + "']").length === 0){
+         $('.users-geojson-files').append("<option selected value='" +  shapeName + "'>" + shapeName + "</option>");
+      }else{
+         $('.users-geojson-files').val(shapeName);
+      }
+   }
+   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val()};
+};
+
 gisportal.selectionTools.toggleBboxDisplay = function() {
-
    $('.coordinates').disabled();
-
-
-
 };
 
 gisportal.selectionTools.getActiveControl = function() {
@@ -269,6 +278,13 @@ gisportal.selectionTools.updateROI = function()  {
    }
    try{
       gisportal.currentSelectedRegion = new_bounds;
+      $('input.js-upload-shape')[0].value = "";
+      var value = "default";
+      if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+         value = gisportal.methodThatSelectedCurrentRegion.value;
+      }
+      $('.users-geojson-files').val(value);
+      gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
       gisportal.vectorLayer.getSource().clear();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       return;
@@ -290,6 +306,7 @@ gisportal.selectionTools.updateROI = function()  {
 };
 
 gisportal.currentSelectedRegion = "";
+gisportal.methodThatSelectedCurrentRegion = {};
 gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    setTimeout(function() {
@@ -344,6 +361,10 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          $('.js-edit-polygon').attr('disabled', false);
       }
    }
+   $('.js-coordinates').val(gisportal.currentSelectedRegion);
+   $('input.js-upload-shape')[0].value = "";
+   $('.users-geojson-files').val("default");
+   gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
    this.toggleTool('None'); // So that people don't misclick
 
   

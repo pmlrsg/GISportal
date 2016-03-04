@@ -10,6 +10,7 @@
             <br/>
             
             <div class="analysis-draw-bbox-buttons">
+               <b>DRAW</b>
                <p>Draw a selection box on the map</p>
                <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
                   <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
@@ -19,10 +20,15 @@
                   <span class=" icon-network-1-1" data-id="Ph" title="Draw Irregular Polygon" ></span>
                   Draw Irregular Polygon
                </button>
+               <div class="coordinates clearfix">
+                  <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+                  <div class="analysis-coordinates">
+                     <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
+                     <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
+                  </div>
+               </div>
                <br/>
-               <br/>
-               <b>OR</b>
-               <br/>
+               <b>UPLOAD</b>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)</p>
                   <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
@@ -32,40 +38,26 @@
                   <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
                      <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx" name="files"></input>
                   </form>
+                  <p>Or you can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
                </div>
                <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">Login and upload a shape file</p>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
-                  <b>OR</b>
-                  <br/>
-                  <p>Use this dropdown to select a previous polygon:</p>
+                  <b>SELECT</b>
+                  <p>Use this dropdown or select an existing polygon:</p>
                   <select class="users-geojson-files">
-                     <option selected>Loading...</option>
+                     <option selected value="default">Loading...</option>
                   </select>
                </div>
                <div class="draw-select-polygon-div">
-                  <br/>
-                  <b>OR</b>
                   <br/>
                   <button class="brand secondary extra-small js-draw-select-polygon" data-id="{{id}}" title="Select Existing Polygon">
                      <span class=" icon-hand-touch-1" data-id="Ph" title="Select Existing Polygon" ></span>
                      Select Existing Polygon
                   </button>
                </div>
-               <br/>
-               <b>OR</b>
-               <br/>
-               <p>You can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
             </div>
-            <div class="coordinates clearfix">
-               <b>OR</b>
-               <br/>
-               <p><label for="tab-{{id}}-coordinates">Enter coordinates</label></p>
-               <div class="analysis-coordinates">
-                  <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates " type="text">
-                  <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
-               </div>
-            </div>
+            <br/>
             <div class="bbox-info hidden clearfix">
                <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>
                <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>

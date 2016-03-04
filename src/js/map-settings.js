@@ -590,6 +590,9 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
       }else{
          gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
       }
+      if($('.js-coordinates').val() !== ""){
+         $('.js-coordinates').val(gisportal.currentSelectedRegion);
+      }
       gisportal.selectionTools.updateROI();
    }
 };

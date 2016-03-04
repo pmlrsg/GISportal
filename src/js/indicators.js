@@ -551,6 +551,11 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
+      if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
+         $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
+      }
+
+      gisportal.indicatorsPanel.addAnalysisListeners();
       gisportal.indicatorsPanel.populateShapeSelect();
 
       gisportal.indicatorsPanel.checkTabFromState(id);
@@ -562,32 +567,85 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
 };
 
+gisportal.indicatorsPanel.addAnalysisListeners = function(){
+   $('.users-geojson-files').on('change', function(){
+      $.ajax({
+         url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + this.value + ".geojson" ,
+         dataType: 'json',
+         success: function(data){
+            gisportal.selectionTools.loadGeoJSON(data);
+         },
+         error: function(e){
+            console.log(e);
+         }
+      });
+   });
+   var addCoordinatesToProfile = function(name){
+      var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
+      var geojson = gisportal.featureToGeoJSON(feature);
+      $.ajax({
+         method: 'post',
+         url:  'app/settings/save_geoJSON?filename=' + name +".bbox",
+         data:{'data': JSON.stringify(geojson)},
+         success: function(data){
+            if($(".users-geojson-files option[value='" + data + "']").length === 0){
+               $('.users-geojson-files').append("<option selected value='" + data + "'>" + data + "</option>");
+            }else{
+               $('.users-geojson-files').val(data);
+            }
+         },
+         error: function(e){
+            console.log(e);
+         }
+      });
+   };
+
+   $('.js-add-coordinates-to-profile').on('click', function(){
+      gisportal.panels.userFeedback("Please enter a name to use for your file", addCoordinatesToProfile);
+   });
+};
+
 gisportal.indicatorsPanel.populateShapeSelect = function(){
    // A request to populate the dropdown with the users polygons
    $.ajax({
       url:  gisportal.middlewarePath + '/settings/get_shapes',
       dataType: 'json',
       success: function(data){
+         var selected_value;
+         if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+            selected_value = gisportal.methodThatSelectedCurrentRegion.value;
+         }
+         if($('.users-geojson-files')[0]){
+            var current_val = $('.users-geojson-files')[0].value;
+            if(current_val != "default"){
+               selected_value = $('.users-geojson-files')[0].value;
+            }
+         }
          // Empties the dropdown
          $('.users-geojson-files').html("");
          selectValues = data.list;
          if(selectValues.length > 0){
-            $('.users-geojson-files').html("<option selected disabled>Please select a file...</option>");
+            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
             $.each(selectValues, function(key, value) {   
                $('.users-geojson-files')
                   .append($("<option></option>")
-                  .attr("value",key)
+                  .attr("value",value)
                   .text(value));
             });
+            if(selected_value){
+               $('.users-geojson-files').val(selected_value);
+            }else{
+               $('.users-geojson-files').val("default");
+            }            
          }else{
-            $('.users-geojson-files').html("<option selected disabled>You have no files yet, please add some</option>");
+            $('.users-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
          }
       },
       error: function(e){
-         $('.users-geojson-files').html("<option selected disabled>You must be logged in to use this feature</option>");
+         $('.users-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
       }
    });
-}
+};
 
 /**
  * Redraws the legend bar which will reflect changes to the legend colour and range
@@ -858,7 +916,7 @@ gisportal.indicatorsPanel.getParams = function(id) {
       bins: '',
       time: dateRange,
       //bbox: $('#graphcreator-bbox').val(),
-      bbox: $('#tab-' + id + '-coordinates').val(),
+      bbox: gisportal.currentSelectedRegion,
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,

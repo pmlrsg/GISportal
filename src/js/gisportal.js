@@ -502,6 +502,10 @@ gisportal.mapInit = function() {
       gisportal.vectorLayer.getSource().clear();
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
+      gisportal.methodThatSelectedCurrentRegion = {method:"dragAndDrop"};
+      $('.js-coordinates').val("");
+      $('input.js-upload-shape')[0].value = "";
+      $('.users-geojson-files').val("default");
    });
 
 
@@ -544,7 +548,8 @@ gisportal.mapInit = function() {
                console.log("adding WKT to form");
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
                //console.log(t_wkt);
-               gisporttal.currentSelectedRegion = t_wkt;
+               gisportal.currentSelectedRegion = t_wkt;
+               gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon"};
 
                
 
@@ -769,6 +774,7 @@ gisportal.saveState = function(state) {
    state = state || {}; 
    // Save layers
    state.map = {};
+   state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
    state.map.layers = {}; 
    state.timeline = {}; 
@@ -862,9 +868,10 @@ gisportal.loadState = function(state) {
          gisportal.configurePanel.close();
          // this stops the map from auto zooming to the max extent of all loaded layers
          indicator.preventAutoZoom = true;
-
+         if(state.selectedRegionInfo){
+            gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
+         }
          gisportal.refinePanel.layerFound(indicator.id);
-        
       }
    }
    
@@ -911,7 +918,11 @@ gisportal.loadState = function(state) {
  */
 gisportal.featureToGeoJSON = function(feature) {
    var geoJSON = new ol.format.GeoJSON();
-   return geoJSON.writeFeature(feature);
+   var featureOptions = {
+      dataProjection: 'EPSG:4326',
+      featureProjection: map.getView().getProjection().getCode()
+   };
+   return geoJSON.writeFeature(feature, featureOptions);
 };
 
 /**

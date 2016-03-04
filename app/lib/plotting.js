@@ -8,7 +8,7 @@ var child_process = require('child_process');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
-var EXTRACTOR_PATH = path.join(__dirname, "../../../data_extractor/data_extractor.py");
+var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
 
 module.exports = router;
 

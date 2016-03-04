@@ -10,7 +10,6 @@ var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
 var utils = require('./utils.js');
-var pythonShell = require('python-shell');
 var ogr2ogr = require('ogr2ogr')
 
 var child_process = require('child_process');
@@ -197,22 +196,6 @@ router.get('/app/settings/get_cache', function(req, res) {
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 });
 
-router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res) {
-   var username = user.getUsername(req);
-   var domain = utils.getDomainName(req); // Gets the given domain
-
-   var shape_list = [];
-   var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
-   var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
-   user_list.forEach(function(filename){
-      var file_path = path.join(user_cache_path, filename);
-      if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){
-         shape_list.push(filename.replace(".shp.geojson", ""));
-      }
-   });
-   res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
-});
-
 router.all('/app/settings/rotate', function(req, res){
    var angle = parseInt(req.query.angle); // Gets the given angle
    var url = req.query.url // Gets the given URL
@@ -271,6 +254,24 @@ router.get('/app/settings/remove_server_cache', function(req, res){
    }
 });
 
+router.get('/app/settings/add_wcs_url', function(req, res){
+   var url = req.query.url.split('?')[0] + "?"; // Gets the given url
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   var filename = req.query.filename + ".json"; // Gets the given filename
+
+   var base_path = path.join(MASTER_CONFIG_PATH, domain);
+   if(username != domain){
+      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
+   }
+   var this_path = path.join(base_path, filename);
+   json_data = JSON.parse(fs.readFileSync(this_path));
+   json_data.wcsURL = url;
+   fs.writeFileSync(this_path, JSON.stringify(json_data));
+   res.send(this_path);
+});
+
 router.all('/app/settings/restore_server_cache', function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -321,11 +322,47 @@ router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('f
          this_file = file_list[file];
          fs.unlinkSync(path.join(this_file.destination, this_file.originalname));
       }
-      res.sendFile(geoJSON_path, function (err) {
-         if (err) {
+      var geoJSONData = fs.readFileSync(geoJSON_path);
+      geoJSONData = JSON.parse(geoJSONData);
+      try{
+         res.send({shapeName: shape_file.originalname.replace(".shp", ""), geojson:geoJSONData})
+      }catch(err){
+         utils.handleError(err, res);
+      }
+   });
+});
+
+router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res) {
+   var username = user.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var shape_list = [];
+   var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
+   var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+   user_list.forEach(function(filename){
+      var file_path = path.join(user_cache_path, filename);
+      if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){
+         shape_list.push(filename.replace(".geojson", ""));
+      }
+   });
+   res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
+});
+
+router.all('/app/settings/save_geoJSON', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var filename = req.query.filename;
+   var data = JSON.parse(req.body.data); // Gets the data given
+
+
+   var geoJSON_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename + ".geojson");
+
+   fs.writeFile(geoJSON_path, JSON.stringify(data), function(err){
+      if(err){
             utils.handleError(err, res);
+         }else{
+            res.send(filename);
          }
-      });
    });
 });
 
@@ -347,24 +384,6 @@ router.all('/app/settings/update_layer', function(req, res){
             res.send("");
          }
    });
-});
-
-router.get('/app/settings/add_wcs_url', function(req, res){
-   var url = req.query.url.split('?')[0] + "?"; // Gets the given url
-   var username = user.getUsername(req); // Gets the given username
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = user.getAccessLevel(req, domain); // Gets the user permission
-   var filename = req.query.filename + ".json"; // Gets the given filename
-
-   var base_path = path.join(MASTER_CONFIG_PATH, domain);
-   if(username != domain){
-      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
-   }
-   var this_path = path.join(base_path, filename);
-   json_data = JSON.parse(fs.readFileSync(this_path));
-   json_data.wcsURL = url;
-   fs.writeFileSync(this_path, JSON.stringify(json_data));
-   res.send(this_path);
 });
 
 router.all('/app/settings/add_user_layer', function(req, res){

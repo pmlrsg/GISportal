@@ -86,8 +86,8 @@
   display: none;
 }
 
-.analysis-draw-bbox-buttons button,
-.analysis-draw-bbox-buttons label{
+.analysis-draw-bbox-buttons button.extra-small,
+.analysis-draw-bbox-buttons label.js-upload-shape{
   background-color: $analysis-button;
   cursor: pointer;
 }

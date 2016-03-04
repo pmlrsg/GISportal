@@ -353,6 +353,10 @@ select,
   height: 35px;
 }
 
+select.users-geojson-files{
+  text-transform: none;
+}
+
 /* Firefox has a weird padding problem */
 @-moz-document url-prefix() {
    #indicatorsPanel select  {
