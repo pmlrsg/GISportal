@@ -582,7 +582,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
    });
    var addCoordinatesToProfile = function(name){
       var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
-      var geojson = gisportal.featureToGeoJSON(feature);
+      var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
       $.ajax({
          method: 'post',
          url:  'app/settings/save_geoJSON?filename=' + name +".bbox",

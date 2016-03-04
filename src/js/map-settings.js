@@ -556,7 +556,9 @@ gisportal.setProjection = function(new_projection) {
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
    gisportal.refreshLayers();
-   gisportal.selectedRegionProjectionChange(old_projection, new_projection);
+   if(gisportal.vectorLayer){
+      gisportal.selectedRegionProjectionChange(old_projection, new_projection);
+   }
    gisportal.projection = map.getView().getProjection().getCode();
 };
 
@@ -584,16 +586,22 @@ gisportal.setView = function(centre, extent, projection) {
 };
 
 gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
-   if(gisportal.currentSelectedRegion !== ""){
-      if(gisportal.currentSelectedRegion.startsWith("POLYGON")){
-         gisportal.currentSelectedRegion = gisportal.reprojectPolygon(gisportal.currentSelectedRegion, new_proj);
-      }else{
-         gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
-      }
-      if($('.js-coordinates').val() !== ""){
-         $('.js-coordinates').val(gisportal.currentSelectedRegion);
-      }
-      gisportal.selectionTools.updateROI();
+   var feature, this_feature;
+   var features = gisportal.vectorLayer.getSource().getFeatures();
+   for(feature in features){
+      this_feature = features[feature];
+      features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, old_proj, new_proj));
+   }
+   gisportal.vectorLayer.getSource().clear();
+   gisportal.vectorLayer.getSource().addFeatures(features);
+   if(gisportal.methodThatSelectedCurrentRegion.justCoords){
+      gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
+   }else{
+      gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+   }
+   if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
+      gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
+      $('.js-coordinates').val(gisportal.currentSelectedRegion);
    }
 };
 

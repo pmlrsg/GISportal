@@ -502,7 +502,7 @@ gisportal.mapInit = function() {
       gisportal.vectorLayer.getSource().clear();
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
-      gisportal.methodThatSelectedCurrentRegion = {method:"dragAndDrop"};
+      gisportal.methodThatSelectedCurrentRegion = {method:"dragAndDrop", justCoords:false};
       $('.js-coordinates').val("");
       $('input.js-upload-shape')[0].value = "";
       $('.users-geojson-files').val("default");
@@ -549,7 +549,7 @@ gisportal.mapInit = function() {
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
                //console.log(t_wkt);
                gisportal.currentSelectedRegion = t_wkt;
-               gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon"};
+               gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", justCoords: false};
 
                
 
@@ -916,11 +916,11 @@ gisportal.loadState = function(state) {
  * This converts from Feature to GeoJSON
  * @param {object} feature - The feature
  */
-gisportal.featureToGeoJSON = function(feature) {
+gisportal.featureToGeoJSON = function(feature, from_proj, to_proj) {
    var geoJSON = new ol.format.GeoJSON();
    var featureOptions = {
-      dataProjection: 'EPSG:4326',
-      featureProjection: map.getView().getProjection().getCode()
+      dataProjection: to_proj,
+      featureProjection: from_proj
    };
    return geoJSON.writeFeature(feature, featureOptions);
 };

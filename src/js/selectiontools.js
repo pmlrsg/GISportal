@@ -172,7 +172,7 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
          $('.users-geojson-files').val(shapeName);
       }
    }
-   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val()};
+   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {
@@ -309,6 +309,7 @@ gisportal.currentSelectedRegion = "";
 gisportal.methodThatSelectedCurrentRegion = {};
 gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
+   gisportal.methodThatSelectedCurrentRegion.justCoords = false;
    setTimeout(function() {
                gisportal.selectionTools.isDrawing = false;
             }, 500);
@@ -344,6 +345,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       $('.js-edit-polygon').attr('disabled', false);
    } else {
       bounds = feature.getGeometry().getExtent();
+      gisportal.methodThatSelectedCurrentRegion.justCoords = true;
 
       var coords = "";
       if (bounds) {
@@ -364,7 +366,8 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    $('.js-coordinates').val(gisportal.currentSelectedRegion);
    $('input.js-upload-shape')[0].value = "";
    $('.users-geojson-files').val("default");
-   gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
+   gisportal.methodThatSelectedCurrentRegion.method = "drawBBox";
+   gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
    this.toggleTool('None'); // So that people don't misclick
 
   
