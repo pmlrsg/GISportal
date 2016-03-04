@@ -28,13 +28,13 @@ AET
 
 166.41782422566678</westBoundLongitude><eastBoundLongitude>178.58449089233343</eastBoundLongitude><southBoundLatitude>-47.296123669666635</southBoundLatitude><northBoundLatitude>-34.12112366966664
 
-irregular : POLYGON((17.84 37.934,15.818 34.023,19.949 33.979,20.125 34.55,17.84 37.934))
+
 """
 
 import argparse
-from python_extraction.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
-from python_extraction.extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
-from python_extraction.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats
+from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
+from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
+from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats
 from shapely import wkt
 import json
 import time as _time
@@ -45,7 +45,7 @@ def main():
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["test","image","scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
 	parser.add_argument("-url", "--wcs_url", action="store", nargs="+",dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", nargs="+",dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
@@ -82,23 +82,19 @@ def main():
 		middle_time = _time.time()
 		stats = BasicStats(filename, args.wcs_variable[0])
 		output_data = stats.process()
-	elif (args.extract_type== "test"):
-		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
-		filename = extractor.getData()
-		stats = HovmollerStats(filename, args.xvar, args.yvar, args.wcs_variable)
-		output_data = stats.process()
 	elif (args.extract_type == "image"):
-		extractor = BasicExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=args.wcs_variable[0])
-		filename = extractor.getData()
-		image_data = ImageStats(filename, args.wcs_variable[0])
-		output_data = image_data.process()
+		#extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
+		#filename = extractor.getData()
+		#image_data = ImageStats(filename, args.wcs_variable[0])
+		#output_data = image_data.convert()
+		pass
 	elif (args.extract_type == 'scatter'):
 		# scatter extractor returns a dict {var : netcdf, var2: netcdf2}
 		extractor = ScatterExtractor(args.wcs_url[0],args.wcs_url[1], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0], extract_variable_2=args.wcs_variable[1] )
 		filenames = extractor.getData()
 		are_times_same = test_time_axis(filenames)
 	elif (args.extract_type == "irregular"):
-		extractor = IrregularExtractor(args.wcs_url[0], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0], masking_polygon=args.geom)
+		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
 		filename = output_data = extractor.getData()
 		stats = filename
 	elif (args.extract_type == "trans-lat"):
@@ -115,11 +111,11 @@ def main():
 
 		bbox = get_transect_bounds(args.csv)
 		time = get_transect_times(args.csv)
-		extractor = BasicExtractor(args.wcs_url[0], [time],  extract_area=bbox, extract_variable=args.wcs_variable[0])
+		extractor = TransectExtractor(args.wcs_url[0], [time], "time", extract_area=bbox, extract_variable=args.wcs_variable[0])
 		filename = extractor.getData()
 		middle_time = _time.time()
 
-		stats = TransectStats(filename, args.wcs_variable[0], args.csv)
+		stats = TransectStats(filename, args.wcs_variable, args.csv)
 		output_data = stats.process()
 		output_metadata = extractor.metadataBlock()
 		output = {}
@@ -132,7 +128,7 @@ def main():
 		extractor = SingleExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=args.wcs_variable[0])
 		output_data = extractor.getData()
 	elif (args.extract_type == "hovmoller"):
-		extractor = BasicExtractor(args.wcs_url[0], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
+		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
 		filename = extractor.getData()
 		stats = HovmollerStats(filename, args.xvar, args.yvar, args.wcs_variable)
 		output_data = stats.process()
