@@ -6,7 +6,7 @@ RUN yum -y update; \
     yum clean all; \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7; \
     yum install -y epel-release; \
-    yum install -y nodejs npm git python wget tar redis ruby python-devel; \
+    yum install -y nodejs npm git python wget tar redis ruby python-devel gdal; \
     wget -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py; \
     python /tmp/get-pip.py; \
     pip install requests numpy pandas jinja2 bokeh; \
