@@ -1,4 +1,4 @@
-<div class="graph-job" state="{{call 'state'}}" >
+<div class="graph-job" state="{{call 'state'}}" data-created="{{_createdOn}}">
 	<div>
 		{{#if id}}
 			{{#if saved}}
@@ -14,24 +14,24 @@
 		</div>
 	</div>
 	<div>
-		{{#if_equals (call 'state') 'processing' }}
+		{{#if_equals (call 'state') 'extracting' }}
 			<div class="loading-image"></div>
-			<button class="js-graph-status-delete">Delete</button>
+			<button class="js-graph-status-delete brand secondary">Delete</button>
 			<div class="js-message"></div>
 		{{/if_equals}}
-		{{#if_equals (call 'state') 'success' }}
+		{{#if_equals (call 'state') 'complete' }}
 			<div></div>
-			<div >
-				<button class="js-graph-status-delete">Delete</button>
-				<button class="js-graph-status-copy">Copy/Edit</button>
-				<button class="js-graph-status-open">Open</button>
+			<div class="graph-buttons">
+				<button class="js-graph-status-delete brand secondary">Delete</button>
+				<button class="js-graph-status-copy brand secondary">Copy/Edit</button>
+				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}">Open</button>
 			</div>
 		{{/if_equals}}
-		{{#if_equals (call 'state') 'error' }}
+		{{#if_equals (call 'state') 'failed' }}
 			<div></div>
 			<div>
 				The graph could not be built. Downstream error.<br>
-				<button class="js-graph-status-delete">Delete</button>
+				<button class="js-graph-status-delete brand secondary">Delete</button>
 				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
 			</div>
 		{{/if_equals}}

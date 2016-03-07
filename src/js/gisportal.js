@@ -33,9 +33,7 @@ gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app"; // 
 
 
 // Flask url paths, relates to /middleware/portalflask/views/
-gisportal.wcsLocation = gisportal.middlewarePath + '/wcs?';
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
-gisportal.graphLocation = gisportal.middlewarePath + '/graph';
 
 // Define a proxy for the map to allow async javascript http protocol requests
 gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';   // Flask (Python) service OpenLayers proxy
@@ -120,7 +118,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/get_cache?domain=' + gisportal.niceDomainName,
+         url:  gisportal.middlewarePath + '/settings/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -480,6 +478,15 @@ gisportal.mapInit = function() {
       }),
       logo: false
    });
+   gisportal.dragAndDropInteraction = new ol.interaction.DragAndDrop({
+      formatConstructors: [
+         ol.format.GPX,
+         ol.format.GeoJSON,
+         ol.format.IGC,
+         ol.format.KML,
+         ol.format.TopoJSON
+      ]
+   });
 
    map.addInteraction(new ol.interaction.Select({
       condition: function(e) {
@@ -487,6 +494,19 @@ gisportal.mapInit = function() {
       },
       hover : false
    }));
+
+   map.addInteraction(gisportal.dragAndDropInteraction);
+
+   gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
+      // Make sure only one feature is loaded at a time
+      gisportal.vectorLayer.getSource().clear();
+      gisportal.vectorLayer.getSource().addFeatures(event.features);
+      gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
+      gisportal.methodThatSelectedCurrentRegion = {method:"dragAndDrop", justCoords:false};
+      $('.js-coordinates').val("");
+      $('input.js-upload-shape')[0].value = "";
+      $('.users-geojson-files').val("default");
+   });
 
 
 // var select = new ol.interaction.Select({
@@ -527,8 +547,9 @@ gisportal.mapInit = function() {
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
                console.log("adding WKT to form");
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
-               console.log(t_wkt);
-               $('.js-coordinates').val(t_wkt);
+               //console.log(t_wkt);
+               gisportal.currentSelectedRegion = t_wkt;
+               gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", justCoords: false};
 
                
 
@@ -549,7 +570,10 @@ gisportal.mapInit = function() {
                            //feature[0].setStyle(feature[1]);
                        });
                        //console.log('====================');
-                       var tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
+                       var tlayer;
+                       if(feature.getId()){
+                         tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
+                       }
                        isFeature = true;
                        gisportal.selectedFeatures.push([feature, feature.getStyle()]);
                        var fill = gisportal.vectorStyles.genColour(0.8);
@@ -574,8 +598,12 @@ gisportal.mapInit = function() {
                        for (var key in props) {
                            if (props.hasOwnProperty(key)) {
                                ////console.log(key, props[key]);
-                               if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
-                                   response += "<li>" + key + " : " + props[key] + "</li>";
+                               if(tlayer){
+                                  if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
+                                      response += "<li>" + key + " : " + props[key] + "</li>";
+                                  }
+                               }else if(props[key]!==undefined){
+                                 response += "<li>" + key + " : " + props[key] + "</li>";
                                }
                            }
                        }
@@ -746,6 +774,7 @@ gisportal.saveState = function(state) {
    state = state || {}; 
    // Save layers
    state.map = {};
+   state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
    state.map.layers = {}; 
    state.timeline = {}; 
@@ -839,9 +868,10 @@ gisportal.loadState = function(state) {
          gisportal.configurePanel.close();
          // this stops the map from auto zooming to the max extent of all loaded layers
          indicator.preventAutoZoom = true;
-
+         if(state.selectedRegionInfo){
+            gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
+         }
          gisportal.refinePanel.layerFound(indicator.id);
-        
       }
    }
    
@@ -886,9 +916,13 @@ gisportal.loadState = function(state) {
  * This converts from Feature to GeoJSON
  * @param {object} feature - The feature
  */
-gisportal.featureToGeoJSON = function(feature) {
+gisportal.featureToGeoJSON = function(feature, from_proj, to_proj) {
    var geoJSON = new ol.format.GeoJSON();
-   return geoJSON.writeFeature(feature);
+   var featureOptions = {
+      dataProjection: to_proj,
+      featureProjection: from_proj
+   };
+   return geoJSON.writeFeature(feature, featureOptions);
 };
 
 /**

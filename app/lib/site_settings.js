@@ -9,9 +9,8 @@ var jimp = require("jimp");
 var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
-var bunyan = require('bunyan'); // Added
 var utils = require('./utils.js');
-var pythonShell = require('python-shell');
+var ogr2ogr = require('ogr2ogr')
 
 var child_process = require('child_process');
 
@@ -19,10 +18,13 @@ var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var TEMP_UPLOADS_PATH = CURRENT_PATH + "/../../uploads/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
+var multer  = require('multer')
+var upload = multer({ dest: TEMP_UPLOADS_PATH })
 
 // This is for the xml2js parsing, it removes any silly namespaces.
 var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
@@ -31,8 +33,6 @@ var stripPrefix = function(str) {
 };
 
 module.exports = router;
-
-var log = bunyan.createLogger({name: "Portal Middleware"});
 /**
  * Returns true or false depending if a string stars with another string.
  * @param  {String} string The string to be evaluated
@@ -58,52 +58,21 @@ function sortLayersList(data, param){
    return byParam;
 }
 
-function handleError(err, res){
-   try{
-      res.status(err.status || 500);
-      res.send({message: err.message});
-      log.error(err);
-   }catch(e){
-   }
-}
-
 router.use(function (req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-Modified-Since');
    next();
 });
 
 router.use(bodyParser.json({limit: '1mb'}));
 router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
 
-
-//PYTHON TEST
-//REMOVE EVENTUALLY BUT NEED THE CONCEPT FOR EXTRACTION AND PLOTTING BITS!
-router.get('/app/settings/python', function(req, res){
-   var pythonShell = require("python-shell");
-   var pyshell = new pythonShell('python.py', {scriptPath:__dirname, args:["-t", "basic", "-v", "-url", req.query.url]});
-
-
-   var string = "";
-   pyshell.on("message", function(message){
-      string += message + "<br/>";
-   });
-
-   pyshell.end(function(err){
-      if(err){
-         handleError(err, res);
-      }else{
-         res.send(string);
-      }
-   });
-});
-
 router.get('/app/settings/proxy', function(req, res) {
    var url = decodeURI(req.query.url) // Gets the given URL
    request(url, function(err, response, body){
       if(err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          res.status(response.statusCode);
          var content_type = response.headers['content-type']
@@ -159,9 +128,9 @@ router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
    res.sendFile(config_path, function (err) {
       if (err) {
-         handleError(err, res);
+         utils.handleError(err, res);
       }
-    });
+   });
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
@@ -180,7 +149,7 @@ router.get('/app/settings/get_cache', function(req, res) {
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
    master_list.forEach(function(filename){
       var file_path = path.join(master_path, filename);
-      if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
+      if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json"){
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
          if(permission != "admin"){ // The Layers list is filtered .
             json_data.server.Layers = json_data.server.Layers.filter(function(val){
@@ -236,13 +205,13 @@ router.all('/app/settings/rotate', function(req, res){
    angle = Math.round(angle/90)*90; // Rounds the angle to the neerest 90 degrees
    jimp.read(url, function(err, image){ // Gets the image file from the URL
       if (err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          image.rotate(angle); // Rotates the image *clockwise!*
          //image.resize( width, jimp.AUTO);
          image.getBuffer(jimp.MIME_PNG, function(err2, image2){ // Buffers the image so it sends correctly
             if(err2){
-               handleError(err2, res);
+               utils.handleError(err2, res);
             }else{
                res.setHeader('Content-type', 'image/png'); // Makes sure its a png
                res.send(image2); // Sends the image to the browser.
@@ -277,71 +246,12 @@ router.get('/app/settings/remove_server_cache', function(req, res){
       }
       fs.rename(file_path, delete_file_path, function(err){ // Moves the file to the deleted cache
          if(err){
-            handleError(err, res);
+            utils.handleError(err, res);
          }else{
             res.send(JSON.stringify({'path':delete_file_path, 'owner':owner})); // Returns the file path so it can be replaced if the user undoes the delete
          }
       });
    }
-});
-
-router.all('/app/settings/restore_server_cache', function(req, res){
-   var username = user.getUsername(req); // Gets the given username
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = user.getAccessLevel(req, domain); // Gets the user permission
-   var data = req.body; // Gets the data back to restore previously deleted file
-   var owner = data.owner;
-   var deleted_path = data.path;
-   var restored_path = deleted_path.replace("deleted_cache/", "");
-   if(owner == username || permission == "admin"){
-      fs.rename(deleted_path, restored_path, function(err){ // Moves the file to the deleted cache
-         if(err){
-            handleError(err, res);
-         }else{
-            res.send("");
-         }
-      });
-   }
-});
-
-router.all('/app/settings/plot', function(req, res){
-   var data = req.body;
-
-   //var child = child_process.spawn('python',[path.join(__dirname, "../../../plotting/plots.py")]);
-   var child = child_process.spawn('python', ["-u", path.join(__dirname, "../../../plotting/plots.py")]);
-
-   child.stdout.on('data', function(data){
-      console.log(data.toString());
-   });
-
-   child.stdin.write(JSON.stringify(data.request));
-   child.stdin.end();
-
-   //child.on('close', function(code){
-   //   console.log("Closed with code: " + code);
-   //})
-
-   res.send("");
-});
-
-router.all('/app/settings/update_layer', function(req, res){
-   var username = req.query.username; // Gets the given username
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = user.getAccessLevel(req, domain); // Gets the user permission
-   var data = JSON.parse(req.body.data); // Gets the data given
-   var filename = data.serverName + ".json"; // Gets the given filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
-   if(username != domain){
-      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
-   }
-   var this_path = path.join(base_path, filename);
-   fs.writeFile(this_path, JSON.stringify(data), function(err){
-      if(err){
-            handleError(err, res);
-         }else{
-            res.send("");
-         }
-   });
 });
 
 router.get('/app/settings/add_wcs_url', function(req, res){
@@ -360,6 +270,120 @@ router.get('/app/settings/add_wcs_url', function(req, res){
    json_data.wcsURL = url;
    fs.writeFileSync(this_path, JSON.stringify(json_data));
    res.send(this_path);
+});
+
+router.all('/app/settings/restore_server_cache', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   var data = req.body; // Gets the data back to restore previously deleted file
+   var owner = data.owner;
+   var deleted_path = data.path;
+   var restored_path = deleted_path.replace("deleted_cache/", "");
+   if(owner == username || permission == "admin"){
+      fs.rename(deleted_path, restored_path, function(err){ // Moves the file to the deleted cache
+         if(err){
+            utils.handleError(err, res);
+         }else{
+            res.send("");
+         }
+      });
+   }
+});
+
+router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var file_list = req.files; // Gets the data given
+
+   var shape_file;
+   for(var file in file_list){
+      var this_file = file_list[file];
+      if(this_file.mimetype == "application/x-esri-shape"){
+         shape_file = this_file;
+      }
+      fs.renameSync(this_file.path, path.join(this_file.destination, this_file.originalname));
+   }
+
+   var geoJSON_path =   path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, shape_file.originalname + ".geojson");
+   var stream = fs.createWriteStream(geoJSON_path);
+
+   var shape_path = path.join(shape_file.destination, shape_file.originalname);
+   var geoJSON = ogr2ogr(shape_path);
+   try{
+      geoJSON.stream().pipe(stream);
+   }catch(e){
+      utils.handleError(e, res);
+   }
+
+   // Once the Geojsonhas been created the temp files are deleted
+   stream.on('finish', function() {
+      for(var file in file_list){
+         this_file = file_list[file];
+         fs.unlinkSync(path.join(this_file.destination, this_file.originalname));
+      }
+      var geoJSONData = fs.readFileSync(geoJSON_path);
+      geoJSONData = JSON.parse(geoJSONData);
+      try{
+         res.send({shapeName: shape_file.originalname.replace(".shp", ""), geojson:geoJSONData})
+      }catch(err){
+         utils.handleError(err, res);
+      }
+   });
+});
+
+router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res) {
+   var username = user.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var shape_list = [];
+   var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
+   var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+   user_list.forEach(function(filename){
+      var file_path = path.join(user_cache_path, filename);
+      if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){
+         shape_list.push(filename.replace(".geojson", ""));
+      }
+   });
+   res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
+});
+
+router.all('/app/settings/save_geoJSON', function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var filename = req.query.filename;
+   var data = JSON.parse(req.body.data); // Gets the data given
+
+
+   var geoJSON_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename + ".geojson");
+
+   fs.writeFile(geoJSON_path, JSON.stringify(data), function(err){
+      if(err){
+            utils.handleError(err, res);
+         }else{
+            res.send(filename);
+         }
+   });
+});
+
+router.all('/app/settings/update_layer', function(req, res){
+   var username = req.query.username; // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   var data = JSON.parse(req.body.data); // Gets the data given
+   var filename = data.serverName + ".json"; // Gets the given filename
+   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
+   if(username != domain){
+      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
+   }
+   var this_path = path.join(base_path, filename);
+   fs.writeFile(this_path, JSON.stringify(data), function(err){
+      if(err){
+            utils.handleError(err, res);
+         }else{
+            res.send("");
+         }
+   });
 });
 
 router.all('/app/settings/add_user_layer', function(req, res){
@@ -456,7 +480,7 @@ router.get('/app/settings/load_data_values', function(req, res){
 
    request(url + '&INFO_FORMAT=text/xml', function(err, response, body){
       if(err){
-         handleError(err, res);
+         utils.handleError(err, res);
       }else{
          var content_type = response.headers['content-type'];
          var response_text = "Sorry, could not calculate a value for: " + name;
@@ -464,7 +488,7 @@ router.get('/app/settings/load_data_values', function(req, res){
          if(content_type == 'application/xml;charset=UTF-8'){
             xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   try{
                      response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
@@ -477,13 +501,13 @@ router.get('/app/settings/load_data_values', function(req, res){
          }else{
             request(url, function(err, response, body){
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
                   if(content_type == "text/xml"){
                      xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                         if(err){
-                           handleError(err, res);
+                           utils.handleError(err, res);
                         }else{
                            var output = name + ":"
                            try{
@@ -529,11 +553,11 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    if(refresh == "true" || !utils.fileExists(file_path)){
       request(url + "service=WMS&request=GetCapabilities", function(error, response, body){
          if(error){
-            handleError(error, res);
+            utils.handleError(error, res);
          }else{
             xml2js.parseString(body,{tagNameProcessors:[stripPrefix], attrNameProcessors: [stripPrefix]}, function (err, result) {
                if(err){
-                  handleError(err, res);
+                  utils.handleError(err, res);
                }else{
                   try{
                      var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
@@ -640,7 +664,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         res.send({"Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"});
                      }
                   }catch(e){
-                     handleError(e, res);
+                     utils.handleError(e, res);
                   }
                }
             });
@@ -685,7 +709,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
             style = undefined;
          }
       }
-      if(name && service_title && title && bounding_box && style){
+      if(name && service_title && title && bounding_box){
          layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "MoreIndicatorInfo" : false})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
          if(!utils.directoryExists(LAYER_CONFIG_PATH)){

@@ -261,7 +261,7 @@ gisportal.editLayersForm.addListeners = function(){
          return;
       }
       var cache_url = 'app/cache/' + gisportal.niceDomainName + '/temporary_cache/';
-      cache_url += url+".json?_="+ new Date().getMilliseconds();
+      cache_url += url+".json?_="+ new Date().getTime();
       $.ajax({
          url:  cache_url,
          dataType: 'json',
@@ -329,7 +329,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
    if(user != domain){
       ajax_url += "user_" + user + "/";
    }
-   ajax_url += clean_wms_url+".json?_="+ new Date().getMilliseconds();
+   ajax_url += clean_wms_url+".json?_="+ new Date().getTime();
    $.ajax({
       url:  ajax_url, // The user cache is the retrieved to be compared with the new data.
       dataType: 'json',

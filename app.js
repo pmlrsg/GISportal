@@ -101,8 +101,10 @@ app.use(passport.initialize());
 // Configure routes
 var routes = require('./app/lib/routes.js');
 var site_settings = require('./app/lib/site_settings.js');
+var plotting = require('./app/lib/plotting.js');
 app.use('/', routes);
 app.use('/', site_settings);
+app.use('/', plotting);
 app.param('subfolder', function(req, res, next, subfolder){
    if(subfolder != "app"){
       req.SUBFOLDER = subfolder;
@@ -118,6 +120,7 @@ app.param('subfolder', function(req, res, next, subfolder){
 })
 app.use('/:subfolder', routes);
 app.use('/:subfolder', site_settings);
+app.use('/:subfolder', plotting);
 
 
 // Start listening...

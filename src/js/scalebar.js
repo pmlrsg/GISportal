@@ -18,19 +18,19 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       var width = 1;
       var height = 500;
       var scaleSteps = 5;
-
-      // Iter over styles
-      $.each(indicator.styles, function(index, value)
-      {
-         // If the style names match grab its info
-         if(value.Name == indicator.style && url === null) {
-            url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL);
-            width = parseInt(value.Width, 10);
-            height = parseInt(value.Height, 10);
-            return false; // Break loop
-         }
-      });
-   
+      if(indicator.styles){
+         // Iter over styles
+         $.each(indicator.styles, function(index, value)
+         {
+            // If the style names match grab its info
+            if(value.Name == indicator.style && url === null) {
+               url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL);
+               width = parseInt(value.Width, 10);
+               height = parseInt(value.Height, 10);
+               return false; // Break loop
+            }
+         });
+      }   
       // If the url is still null then there were no matches, so use a generic url
       if(url === null)
          url = gisportal.scalebars.createGetLegendURL(indicator, "");
@@ -251,7 +251,7 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
 
    if ((max !== undefined && max !== null) && (min !== undefined && min !== null))  {
       if (isLog && min <= 0)  {
-         alert('Cannot use a logarithmic scale with negative or zero values');
+         $('.js-indicator-is-log[data-id="' + indicator.id + '"]').notify("Cannot use a logarithmic scale with negative or zero values", {position:"right middle"});
          logEl.attr('checked', false);
          isLog = false;
       }

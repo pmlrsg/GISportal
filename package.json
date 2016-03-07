@@ -36,7 +36,9 @@
     "underscore": "~1.8.3",
     "jimp": "~0.2.21",
     "body-parser": "~1.14.2",
-    "to-title-case": "~1.0.0"
+    "to-title-case": "~1.0.0",
+    "multer": "~1.1.0",
+    "ogr2ogr": "~0.5.1"
   },
   "engines": {
     "node": ">= 0.8.0",

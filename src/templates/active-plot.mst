@@ -16,10 +16,12 @@
 		<div class="">
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
-				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries (default)</option>
-				<option value="histogram" {{selected "histogram" (call 'plot.plotType')}} disabled>Histogram - Coming Soon....</option>
+				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
 				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
+				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
+				<option value="profile"  {{selected "profile" (call 'plot.plotType')}} disabled>Profile</option>
+				<option value="geographic"  {{selected "geographic" (call 'plot.plotType')}} disabled>Geographic</option>
 			 </select>
 		</div>
 	</li>

@@ -145,7 +145,7 @@ gisportal.map_settings.init = function() {
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
          $.ajax({
-            url:  'app/cache/' + gisportal.niceDomainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getMilliseconds(),
+            url:  'app/cache/' + gisportal.niceDomainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getTime(),
             dataType: 'json',
             success: function(layer){
                if(!gisportal.wms_submitted){
@@ -527,6 +527,7 @@ gisportal.createGraticules = function() {
 };
   
 gisportal.setProjection = function(new_projection) {
+   var old_projection = map.getView().getProjection().getCode();
    // first make sure that base layer can accept the projection
    var current_basemap = $('#select-basemap').data('ddslick').selectedData.value;
 
@@ -555,6 +556,10 @@ gisportal.setProjection = function(new_projection) {
    var new_centre = ol.proj.transform(current_centre, current_projection, new_projection);
    gisportal.setView(new_centre, new_extent, new_projection);
    gisportal.refreshLayers();
+   if(gisportal.vectorLayer){
+      gisportal.selectedRegionProjectionChange(old_projection, new_projection);
+   }
+   gisportal.projection = map.getView().getProjection().getCode();
 };
 
 gisportal.setView = function(centre, extent, projection) {
@@ -580,6 +585,28 @@ gisportal.setView = function(centre, extent, projection) {
 
 };
 
+gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
+   var feature, this_feature;
+   var features = gisportal.vectorLayer.getSource().getFeatures();
+   for(feature in features){
+      this_feature = features[feature];
+      features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, old_proj, new_proj));
+   }
+   gisportal.vectorLayer.getSource().clear();
+   gisportal.vectorLayer.getSource().addFeatures(features);
+   if(gisportal.methodThatSelectedCurrentRegion.justCoords){
+      gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
+   }else{
+      gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+   }
+   if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
+      gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
+      $('.js-coordinates').val(gisportal.currentSelectedRegion);
+   }
+};
+
+// A bounding box may need to be split on the ","
+// It needs to be in the format: [int, int, int, int] not "int, int, int, int"
 gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
    var new_bounds = bounds;
 
@@ -597,8 +624,61 @@ gisportal.reprojectBoundingBox = function(bounds, from_proj, to_proj) {
    }
    return new_bounds;
 };
+/*
+ * This function reprojects a polygon to a given prjection
+ * The polygon cannot be parsed back so the values have to be put back in 'by hand'
+ */
+gisportal.reprojectPolygon = function(polygon, to_proj) {
+   var polygonBox = new Terraformer.WKT.parse(polygon);
+   var bbox;
+
+   // If it can be projected it will be, if not the original is returned.
+   if(to_proj == "EPSG:4326"){
+      bbox = polygonBox.toGeographic();
+   }else if(to_proj == "EPSG:3857"){
+      bbox = polygonBox.toMercator();
+   }else{
+      return polygon;
+   }
+   var coord = bbox.coordinates;
+
+   return gisportal.coordinatesToPolygon(coord);
+   // Maybe try bboxToWKT at some point
+};
+
+gisportal.coordinatesToPolygon = function(coord){
+   // The building of the POLYGON.
+   var projectedWKT = 'POLYGON(';
+
+   var ringCount = coord.length;
+   for (var i = 0; i < ringCount; i++) {
+      var ring = coord[i];
+      //ring starts; add opening bracket
+      projectedWKT = projectedWKT + "(";
+      var ptCount = ring.length;
+      var coordList = "";
+      for (var j = 0; j < ptCount; j++) {
+         var pt = ring[j];
+         //write the coordinates
+         coordList = coordList + String(pt[0]) + " " + String(pt[1]) + ", ";
+      }
+      //remove the last comma (indicating end of coordinate)
+      coordList = coordList.substring(0, coordList.lastIndexOf(','));
+      //add to the WKT String
+      projectedWKT = projectedWKT + coordList + "), ";
+   }
+   //remove the last comma (indicating end of ring)
+   projectedWKT = projectedWKT.substring(0, projectedWKT.lastIndexOf(','));
+
+   //closing bracket
+   projectedWKT = projectedWKT + ")";
+   return projectedWKT;
+};
 
 gisportal.reprojectPoint = function(point, from_proj, to_proj) {
+   // Makes sure that each of the points are floats and not strings.
+   point[0] = parseFloat(point[0]);
+   point[1] = parseFloat(point[1]);
    return ol.proj.transform(point, from_proj, to_proj);
 };
 

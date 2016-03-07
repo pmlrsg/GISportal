@@ -534,10 +534,10 @@ gisportal.vectorSelectionTest = function(id, tabname){
   });
 
   if(found){
-          $('.js-draw-select-polygon').removeClass('hidden');
+          $('.draw-select-polygon-div').removeClass('hidden');
       }
       else {
-          $('.js-draw-select-polygon').addClass('hidden');
+          $('.draw-select-polygon-div').addClass('hidden');
       }
 
 };

@@ -13,8 +13,6 @@ gisportal.graphs.PlotEditor = (function(){
 
       this._editorParent = $(editorParent);
 
-      this._allowMultipleSeries = 1;
-
       this.buildEditor();
    };
 
@@ -141,6 +139,8 @@ gisportal.graphs.PlotEditor = (function(){
     *
     */
    PlotEditor.prototype.submitRequest = function(){
+      var minComponents = this.plot().minComponents;
+      var totComponents = this.plot().components().length;
 
      var hasLeftHandSeries = this.plot().components().some(function( component ){
          return component.yAxis == 1;
@@ -149,11 +149,16 @@ gisportal.graphs.PlotEditor = (function(){
      if( this.plot().components().length == 1 )
       this.plot().components()[0].yAxis = 1;
 
-      if( this.plot().components().length == 1 || hasLeftHandSeries ){
-         this.plot().submitRequest();
-         gisportal.graphs.activeGraphSubmitted();
+      if(minComponents <= totComponents){
+         if( this.plot().components().length == 1 || hasLeftHandSeries ){
+            this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
+            this.plot().submitRequest();
+            gisportal.graphs.activeGraphSubmitted();
+         }else{
+            $.notify("A series on the left Y axis is required.", "error");
+         }
       }else{
-         alert("A series on the left Y axis is required.");
+         $.notify("You must have at least " + minComponents + " compenents for this type of graph.", "error");
       }
    };
 
@@ -289,8 +294,9 @@ gisportal.graphs.PlotEditor = (function(){
 
       function addComponent( component ){
 
-         if( _this.plot().components().length > 1 )
+         if( _this.plot().components().length > 1 ){
             _this._editorParent.find('.js-slideout-content').addClass('multiple-components');
+         }
 
          var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];

@@ -546,12 +546,17 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;
+      indicator.loggedIn = gisportal.user.info.permission != "guest";
       var rendered = gisportal.templates['tab-analysis'](indicator);
-      $('[data-id="' + id + '"] .js-tab-analysis')
-         .html(rendered)
-         .find('.js-coordinates')
-         .val( gisportal.currentSelectedRegion );
+      $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
+
+      if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
+         $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
+      }
+
+      gisportal.indicatorsPanel.addAnalysisListeners();
+      gisportal.indicatorsPanel.populateShapeSelect();
 
       gisportal.indicatorsPanel.checkTabFromState(id);
 
@@ -560,6 +565,86 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
    if (indicator.metadataComplete) onMetadata();
    else indicator.metadataQueue.push(onMetadata);
 
+};
+
+gisportal.indicatorsPanel.addAnalysisListeners = function(){
+   $('.users-geojson-files').on('change', function(){
+      $.ajax({
+         url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + this.value + ".geojson" ,
+         dataType: 'json',
+         success: function(data){
+            gisportal.selectionTools.loadGeoJSON(data);
+         },
+         error: function(e){
+            console.log(e);
+         }
+      });
+   });
+   var addCoordinatesToProfile = function(name){
+      var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
+      var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
+      $.ajax({
+         method: 'post',
+         url:  'app/settings/save_geoJSON?filename=' + name +".bbox",
+         data:{'data': JSON.stringify(geojson)},
+         success: function(data){
+            if($(".users-geojson-files option[value='" + data + "']").length === 0){
+               $('.users-geojson-files').append("<option selected value='" + data + "'>" + data + "</option>");
+            }else{
+               $('.users-geojson-files').val(data);
+            }
+         },
+         error: function(e){
+            console.log(e);
+         }
+      });
+   };
+
+   $('.js-add-coordinates-to-profile').on('click', function(){
+      gisportal.panels.userFeedback("Please enter a name to use for your file", addCoordinatesToProfile);
+   });
+};
+
+gisportal.indicatorsPanel.populateShapeSelect = function(){
+   // A request to populate the dropdown with the users polygons
+   $.ajax({
+      url:  gisportal.middlewarePath + '/settings/get_shapes',
+      dataType: 'json',
+      success: function(data){
+         var selected_value;
+         if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+            selected_value = gisportal.methodThatSelectedCurrentRegion.value;
+         }
+         if($('.users-geojson-files')[0]){
+            var current_val = $('.users-geojson-files')[0].value;
+            if(current_val != "default"){
+               selected_value = $('.users-geojson-files')[0].value;
+            }
+         }
+         // Empties the dropdown
+         $('.users-geojson-files').html("");
+         selectValues = data.list;
+         if(selectValues.length > 0){
+            $('.users-geojson-files').html("<option value='default' disabled>Please select a file...</option>");
+            $.each(selectValues, function(key, value) {   
+               $('.users-geojson-files')
+                  .append($("<option></option>")
+                  .attr("value",value)
+                  .text(value));
+            });
+            if(selected_value){
+               $('.users-geojson-files').val(selected_value);
+            }else{
+               $('.users-geojson-files').val("default");
+            }            
+         }else{
+            $('.users-geojson-files').html("<option value='default' selected disabled>You have no files yet, please add some</option>");
+         }
+      },
+      error: function(e){
+         $('.users-geojson-files').html("<option selected value='default' disabled>You must be logged in to use this feature</option>");
+      }
+   });
 };
 
 /**
@@ -831,7 +916,7 @@ gisportal.indicatorsPanel.getParams = function(id) {
       bins: '',
       time: dateRange,
       //bbox: $('#graphcreator-bbox').val(),
-      bbox: $('#tab-' + id + '-coordinates').val(),
+      bbox: gisportal.currentSelectedRegion,
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,
@@ -935,7 +1020,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    };
 
    urlParams.coverage = indicator.urlName;
-   urlParams.bbox = $('[data-id="' + indicator.id + '"] .js-coordinates').val();
+   urlParams.bbox = gisportal.currentSelectedRegion;
    urlParams.time = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
    if( $('[data-id="' + indicator.id + '"] .js-analysis-elevation').length > 0 ){
@@ -964,8 +1049,10 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
 
-   if( ! doesCurrentlySelectedRegionFallInLayerBounds( id ) ){
-      errorHtml = '<div class="alert alert-danger">The bounding box selected contains no data for this indicator.</div>';
+   // Gets any error with the bounding box and puts it into the div
+   var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
+   if( bound_error !== true ){
+      errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
       var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
       setTimeout( function(){
          errorElement.remove();
@@ -1003,7 +1090,7 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
    //console.log(layerId);
    // Select tab
    // temp solution
-   console.log(tabName);
+   //console.log(tabName);
    if(tabName=="analysis"){
       gisportal.vectorSelectionTest( layerId, tabName );
    }
@@ -1043,13 +1130,34 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    // Skip if empty
    if( gisportal.currentSelectedRegion === "" ) return true;
 
-   var bb1;
+   var bb1, point;
    // Try to see if its WKT string
    try{
       bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    }catch( e ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
+   }
+   var current_proj = map.getView().getProjection().getCode();
+   if(current_proj !== "EPSG:4326"){
+      for(point in bb1.coordinates[0]){
+         bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");
+      }
+   }
+   var proj_bounds = gisportal.availableProjections[current_proj].bounds;
+   // A different message is displayed if the user clicks off the earth
+   var bb2 = new Terraformer.Polygon( {
+      "type": "Polygon",
+      "coordinates": [[[proj_bounds[0], proj_bounds[3]], [proj_bounds[2], proj_bounds[3]], [proj_bounds[2], proj_bounds[1]], [proj_bounds[0], proj_bounds[1]], [proj_bounds[0], proj_bounds[3]]]]
+   });
+   if(current_proj !== "EPSG:4326"){
+      for(point in bb2.coordinates[0]){
+         bb2.coordinates[0][point] = gisportal.reprojectPoint(bb2.coordinates[0][point], current_proj, "EPSG:4326");
+      }
+   }
+   // INFO: This could eventually be replaced if a bounding box that intersects the current world can be split into multi-polygons.
+   if(!bb1.within( bb2 )){
+      return "The bounding box cannot wrap around the dateline, please redraw it.";
    }
 
    var layer = gisportal.layers[ layerId ];
@@ -1071,14 +1179,23 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       [
          Number(bounds.WestBoundLongitude),
          Number(bounds.SouthBoundLatitude)
+      ],
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
       ]
    ];
 
-   var bb2 = new Terraformer.Polygon( {
+   bb2 = new Terraformer.Polygon( {
       "type": "Polygon",
       "coordinates": [arr] 
    });
 
-   return bb1.intersects( bb2 ) || bb1.contains( bb2 ) || bb1.within( bb2 );
+   if(bb1.intersects( bb2 )){
+      return true;
+   }
+   else{
+      return "The bounding box selected contains no data for this indicator.";
+   }
 
 }

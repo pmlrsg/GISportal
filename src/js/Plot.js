@@ -62,8 +62,8 @@ gisportal.graphs.Plot =(function(){
    */
    Plot.prototype.addComponent= function( component ){
       // Check the plot type id allowed more then 1 series
-      if( this._allowMultipleSeries === false && this.components().length >= 1 )
-         return new Error( "This graph type can only have 1 series" );
+      if(this.components().length >= this.maxComponents )
+         return new Error( "You already have the maximum number of series for this graph type" );
 
       var plot = this;
       
@@ -205,33 +205,6 @@ gisportal.graphs.Plot =(function(){
 
    };
 
-
-
-   /**
-    * Tells the editor to allow multiple series
-    * for the current graph type
-    */
-   Plot.prototype.allowMultipleSeries = function(){
-      this._allowMultipleSeries = true;
-   };
-
-   /**
-    * Tells the editor to not allow multiple series.
-    * Will also check the current state and remove any
-    * extra if needed
-    */
-   Plot.prototype.allowSingleSeries = function(){
-      var _this = this;
-      this._allowMultipleSeries = false;
-
-      // Remove all but the first series
-      if( this.components().length > 1 )
-         this.components().slice( 1 ).forEach(  function( component ){
-            _this.removeComponent( component );
-         });
-
-   };
-
    /**
     * Adds the Axis options to a plot request.
     * @param  Object  plotRequest The request object to add the values to
@@ -239,6 +212,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.buildRequestAxis = function( plotRequest ){
 
       var xAxis =  {
+         "scale" : "linear",
          "label" : "Date/Time",
          "ticks" : "auto",
          "weight" : "auto",
@@ -359,6 +333,17 @@ gisportal.graphs.Plot =(function(){
          else{
             logo = "undefined";
          }
+         var nice_bbox = component.bbox;
+         var current_projection = map.getView().getProjection().getCode();
+         if(current_projection != "EPSG:4326"){
+            if(nice_bbox.indexOf('POLYGON') == -1){
+               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
+            }else if(nice_bbox.startsWith('POLYGON')){
+               nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
+            }else{
+               console.log("This is a multipolygon!");
+            }
+         }
 
          // Gumph needed for the plotting serving to its thing
          var newSeries = {
@@ -367,10 +352,12 @@ gisportal.graphs.Plot =(function(){
             "data_source" : {
                // Variable name
                "coverage"  : layer.urlName,
+               // Layer ID
+               "layer_id"  : layer.id,
                // Time range of the data
                "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
                // Bounds box of the data, also supports WKT
-               "bbox": component.bbox,
+               "bbox": nice_bbox,
                // Depth, optional
                "depth": component.elevation,
                
@@ -379,7 +366,7 @@ gisportal.graphs.Plot =(function(){
                // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
                // Location of the middle ware to do the analytics 
-               "middlewareUrl" : gisportal.middlewarePath + '/wcs'
+               "middlewareUrl" : "http://portal.marineopec.eu/service/wcs" // Eventually will not be needed!!
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
@@ -416,21 +403,69 @@ gisportal.graphs.Plot =(function(){
       
       // Generate the request object
       var request = this.buildRequest();
+
+      function accumulateEstimates(data){
+         if(data.time && data.size && data.layer_id){
+            _this.series_total --;
+            var layer_times = gisportal.layers[data.layer_id].DTCache;
+            var numbered_layer_times = [];
+            for(var time in layer_times){
+               numbered_layer_times.push(Date.parse(layer_times[time]).valueOf());
+            }
+            // Works out the number of time slices so that the time and size can be made per indicator rather than indicator time slice
+            var min_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[0].valueOf());
+            var max_index = gisportal.utils.closestIndex(numbered_layer_times, _this._tBounds[1].valueOf());
+            var total_slices = Math.abs(max_index - min_index);
+            _this.timeEstimate += (data.time * total_slices);
+            _this.sizeEstimate += (data.size * total_slices);
+         }else{
+            $.notify("This error was returned when trying to estimae time: " + data.statusText, "error");
+//            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
+            _this.stopMonitoringJobStatus();
+         }
+         // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
+         if(_this.series_total === 0){
+            if(_this.sizeEstimate < 4294967296){
+               var t = new Date();
+               _this.estimatedFinishTime = new Date(t.getTime() + 1000*_this.timeEstimate);
+            }else{
+               $.notify("There is too much data\n Try plotting a graph with a smaller bounding box or smaller time bounds", "error");
+            }
+         }
+      }
       
-      // Post it to the server
+      // Checks the time and size
+      var series_list = request.plot.data.series;
+
+      // Sets the number of series so we know when they are complete
+      _this.series_total = _.size(series_list);
+      _this.timeEstimate = 0;
+      _this.sizeEstimate = 0;
+      for(var series in series_list){
+         $.ajax({
+            method: 'post',
+            url: gisportal.middlewarePath + '/plotting/check_plot',
+            contentType : 'application/json',
+            data: JSON.stringify(series_list[series]),
+            dataType: 'json',
+            //timeout:3000,
+            success: accumulateEstimates,
+            error: accumulateEstimates
+         });
+      }
+      
+
+      // Make the plot
       $.ajax({
          method: 'post',
-         url: gisportal.middlewarePath + '/settings/plot',
+         url: gisportal.middlewarePath + '/plotting/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',
          success: function( data ){
-            // Start monitoring the job, this will
-            // also add a status box into the stored
-            // graphs panel
-            _this.id = data.job_id;
+            // Do the polling!
+            _this.id = data.hash;
             _this.monitorJobStatus();
-            
          }, error: function(e){
             var error = 'Sorry, we failed to create a graph: \n'+
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
@@ -451,20 +486,15 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       function updateStatus(){
          $.ajax({
-            dataType: 'json',
-            url: graphServerUrl + '/job/' + _this.id + '/status',
-            cache: false,
+            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
+            dataType:'json',
             success: function( serverStatus ){
-               _this.serverStatus( serverStatus );
+               _this.serverStatus( serverStatus );               
             },
             error: function( response ){
-
+               $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
                clearInterval( _this._monitorJobStatusInterval );
-
-               if( response.status == 404 )
-                  _this.error( "Job not found on server" );
-               else
-                  _this.error( "Invalid reply from server. It possibly crashed." );
+               $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
             }
          });
       }
@@ -526,14 +556,47 @@ gisportal.graphs.Plot =(function(){
       
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
-      
 
-      if( _new == 'timeseries' )
-        this.allowMultipleSeries();
-      else
-        this.allowSingleSeries();
+      if( _new == 'timeseries'){
+         this.setMinMaxComponents(1,10);
+         this.setComponentXYText("Left Axis", "Right Axis");
+      }
+      else if( _new == 'scatter'){
+         this.setMinMaxComponents(2,2);
+         this.setComponentXYText("X Axis", "Y Axis");
+      }else{
+         this.setMinMaxComponents(1,1);
+      }
 
       return this;
+   };
+   /**
+    * This makes sure that the correct tesxt is shown in the X & Y selection options
+    */
+   Plot.prototype.setComponentXYText = function(xText, yText){
+      //Makes sure any new options have the correct text
+      for(var component in this._components){
+         this._components[component].xText = xText;
+         this._components[component].yText = yText;
+      }
+      // Changes the text of any already selected options
+      $('select.js-y-axis option[value="1"]').text(xText);
+      $('select.js-y-axis option[value="2"]').text(yText);
+   };
+  
+   /**
+    * Sets the minimum and maximum amount of components
+    * If there are more than the maximum then the excess are removed.
+    */
+   Plot.prototype.setMinMaxComponents = function(min, max){
+      var _this = this;
+      this.minComponents = min;
+      this.maxComponents = max;
+      if( this.components().length > max ){
+         this.components().slice( max ).forEach(  function( component ){
+            _this.removeComponent( component );
+         });
+      }
    };
    
    
@@ -657,15 +720,6 @@ gisportal.graphs.Plot =(function(){
          this.emit('tBounds-change', { 'new': this._tBounds, 'old': old });
       
       return this;
-   };
-   
-   /**
-    * This returns the URL to the graph
-    * which can be used in the popup or iframe
-    * @return String   URL to the popup
-    */
-   Plot.prototype.interactiveUrl = function(){
-      return graphServerUrl + '/job/' + this.id + '/interactive';
    };
 
 

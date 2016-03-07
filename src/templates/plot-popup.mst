@@ -1,0 +1,8 @@
+<div class="overlay-container js-plot-popup-html">
+	<div class="plot-header">
+		Plot
+		<span class="icon-delete-3 js-plot-popup-close btn right-icon icon-btn">
+		</span>
+	</div>
+	{{{html}}}
+</div>

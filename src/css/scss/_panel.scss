@@ -53,9 +53,12 @@
     margin: 7px 4px 0px 4px;
     padding: 8px 8px 9px 8px;
     
-    background-color: $primary-purple;
     cursor: pointer;
 
+}
+
+.analysis-coordinates input[type="text"]{
+  width: calc(100% - 65px);
 }
 
 .panel-header .tab.active{
@@ -349,6 +352,10 @@ select,
   height: 35px;
 }
 
+select.users-geojson-files{
+  text-transform: none;
+}
+
 /* Firefox has a weird padding problem */
 @-moz-document url-prefix() {
    #indicatorsPanel select  {
@@ -503,4 +510,13 @@ input.search:focus  {
 
 .tooltipster-base{
   word-break : break-word;
+}
+
+.panel-tab b{
+  font-weight: bold;
+  display: block;
+}
+
+div.full-width{
+  width:100%;
 }

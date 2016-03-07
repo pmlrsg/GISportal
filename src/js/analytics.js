@@ -1,7 +1,7 @@
 gisportal.analytics = {};
 
 gisportal.analytics.initGA = function(){
-   if( gisportal.config.analytics.active === false ) return;
+   if( !gisportal.config.analytics || gisportal.config.analytics.active === false ) return;
    
    /* jshint ignore:start */
    //Load UA
@@ -236,7 +236,7 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
 };
 
 gisportal.analytics.send = function( toSend ){
-   if( gisportal.config.analytics.active === false ) return;
+   if( !gisportal.config.analytics || gisportal.config.analytics.active === false ) return;
    
    if( toSend.eventLabel == void( 0 ) ){
       var buffer = [];

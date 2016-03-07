@@ -172,3 +172,20 @@ div.js-plot-popup-html{
   overflow: auto;
   margin: 10px auto;
 }
+
+.js-plot-popup-html table{
+  margin: auto;
+  margin-top: 25px;
+}
+
+.graph-buttons button,
+.js-graph-status-delete{
+  height: 31px;
+  background-color: $analysis-button;
+}
+
+a.js-revert-text{
+  text-decoration: underline;
+  font-weight:bold;
+  cursor: pointer;
+}
