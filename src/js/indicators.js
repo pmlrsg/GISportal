@@ -549,6 +549,9 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       indicator.loggedIn = gisportal.user.info.permission != "guest";
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
+      $('.js-google-auth-button').click(function() {
+         var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+      });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
       if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
@@ -576,7 +579,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             gisportal.selectionTools.loadGeoJSON(data);
          },
          error: function(e){
-            console.log(e);
+            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
          }
       });
    });
@@ -595,7 +598,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             }
          },
          error: function(e){
-            console.log(e);
+            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
          }
       });
    };

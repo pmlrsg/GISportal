@@ -38,7 +38,8 @@
     "body-parser": "~1.14.2",
     "to-title-case": "~1.0.0",
     "multer": "~1.1.0",
-    "ogr2ogr": "~0.5.1"
+    "ogr2ogr": "~0.5.1",
+    "csv-parser": "~1.9.3"
   },
   "engines": {
     "node": ">= 0.8.0",
