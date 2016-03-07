@@ -17,7 +17,16 @@ mkdir -p /usr/share/GISportal
 docker run -v /usr/share/GISportal:/app/GISportal/config -it pmlrsg/gisportal /app/GISportal/docker-install.sh
 ```
 This will lead you through the interactive setp of the application including the option to specify a domain name (if you want to use one), the setup of Google as OAuth provider for authentication, and specifying administrator details
-1. On subsequent runs there's no need to run interactively
+1. On subsequent runs there's no need to run interactively; the portal will be accessible at http://localhost:6789/
 ```
-docker run -v /usr/share/GISportal:/app/GISportal/config pmlrsg/gisportal
+docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config pmlrsg/gisportal
 ```
+
+== Running GISportal with nginx
+You can run a standard installation of nginx and use the `proxy_pass` command to proxy requests to your GISportal container running on port 6789. Alternatively, you can use a nginx docker container using the following commands:
+```
+docker pull jwilder/nginx-proxy
+docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
+docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config -e VIRTUAL_HOST=<your-required-hostname> -e VIRTUAL_PORT=6789 -t pmlrsg/gisportal
+```
+
