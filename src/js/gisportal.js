@@ -502,6 +502,7 @@ gisportal.mapInit = function() {
       gisportal.vectorLayer.getSource().clear();
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
+      cancelDraw();
       gisportal.methodThatSelectedCurrentRegion = {method:"dragAndDrop", justCoords:false};
       $('.js-coordinates').val("");
       $('input.js-upload-shape')[0].value = "";
@@ -550,6 +551,7 @@ gisportal.mapInit = function() {
                //console.log(t_wkt);
                gisportal.currentSelectedRegion = t_wkt;
                gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", justCoords: false};
+               cancelDraw();
 
                
 

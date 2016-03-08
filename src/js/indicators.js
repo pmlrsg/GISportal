@@ -36,6 +36,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-clear-selection', function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.currentSelectedRegion = "";
+      cancelDraw();
       $('.js-coordinates').val("");
       $('.js-upload-shape').val("");
       $('.users-geojson-files').val("default");
