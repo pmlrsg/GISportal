@@ -218,7 +218,7 @@ trim_sizes = {
    "line" : slice(11,-2)
 }
 
-def find_closest(arr, val, starting, time=False):
+def find_closest(arr, val, starting=0, time=False):
    """
   Finds the position in the array where the array value matches
   the value specified by the user

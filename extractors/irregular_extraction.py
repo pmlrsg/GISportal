@@ -1,6 +1,6 @@
 from ..extraction_utils import create_mask
 from . import Extractor
-from ..extraction_utils import WCSHelper, basic
+from ..extraction_utils import WCSRawHelper, basic
 import tempfile
 import uuid
 from ..analysis_types import BasicStats
@@ -14,7 +14,8 @@ class IrregularExtractor(Extractor):
 		self.masking_polygon = masking_polygon
 
 	def getData(self):
-		wcs_extractor = WCSHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area)
+		print self.wcs_url
+		wcs_extractor = WCSRawHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area)
 		data = wcs_extractor.getData()
 		fname = self.outdir+str(uuid.uuid4())+".nc"
 		with open(fname, 'w') as outfile:

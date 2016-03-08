@@ -94,7 +94,7 @@ def main():
 		filenames = extractor.getData()
 		are_times_same = test_time_axis(filenames)
 	elif (args.extract_type == "irregular"):
-		extractor = IrregularExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable, masking_polygon=args.geom)
+		extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), masking_polygon=args.geom)
 		filename = output_data = extractor.getData()
 		stats = filename
 	elif (args.extract_type == "trans-lat"):
@@ -115,7 +115,7 @@ def main():
 		filename = extractor.getData()
 		middle_time = _time.time()
 
-		stats = TransectStats(filename, args.wcs_variable, args.csv)
+		stats = TransectStats(filename, args.wcs_variable[0], args.csv)
 		output_data = stats.process()
 		output_metadata = extractor.metadataBlock()
 		output = {}
