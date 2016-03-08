@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 
 var user = {}
 module.exports = user;
+var utils = require('./utils.js');
 
 /**
  * requiresValidUser is to be used as a chained router function; if the current user has an
@@ -16,7 +17,7 @@ module.exports = user;
  * @return {Function}      `next()` or a 401 Not authorised response  
  */
 user.requiresValidUser = function(req, res, next) {
-   var level = user.getAccessLevel(req, req.query.domain);
+   var level = user.getAccessLevel(req, utils.getDomainName(req));
 
    if (level != "guest") {
       return next();

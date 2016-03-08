@@ -239,3 +239,9 @@ Nginx must also be configured and a hosts configuration would be great too.
 - Run install.sh
 - Follow the instructions
 - If providing domain information then make sure the domain ends with a public top-level domain (such as .com or .org)
+
+
+# Handy Tips #
+
+If you do not want to store the CSVs for long periods of time then add this to your crontab:
+find /path/to/portal/uploads/ -mtime +7 -exec rm -f {} \;

@@ -33,6 +33,14 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.indicatorsPanel.addToPlot(id);
    });
 
+   $('.js-indicators').on('click', '.js-clear-selection', function()  {
+      gisportal.vectorLayer.getSource().clear();
+      gisportal.currentSelectedRegion = "";
+      $('.js-coordinates').val("");
+      $('.js-upload-shape').val("");
+      $('.users-geojson-files').val("default");
+   });
+
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
          gisportal.panels.showPanel('choose-indicator');
@@ -549,6 +557,9 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       indicator.loggedIn = gisportal.user.info.permission != "guest";
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
+      $('.js-google-auth-button').click(function() {
+         var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+      });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
       if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
@@ -576,7 +587,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             gisportal.selectionTools.loadGeoJSON(data);
          },
          error: function(e){
-            console.log(e);
+            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
          }
       });
    });
@@ -595,7 +606,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             }
          },
          error: function(e){
-            console.log(e);
+            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
          }
       });
    };
@@ -1050,14 +1061,16 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
 
    // Gets any error with the bounding box and puts it into the div
-   var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
-   if( bound_error !== true ){
-      errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
-      var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
-      setTimeout( function(){
-         errorElement.remove();
-      }, 6000 );
-      return;
+   if(gisportal.methodThatSelectedCurrentRegion.method != "csvUpload"){
+      var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
+      if( bound_error !== true ){
+         errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
+         var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
+         setTimeout( function(){
+            errorElement.remove();
+         }, 6000 );
+         return;
+      }
    }
 
    var indicator = gisportal.layers[id];

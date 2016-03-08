@@ -16,19 +16,21 @@
 		<div class="">
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
+			{{#if profile_plot}}
+				<option value="profile" {{selected "profile" (call 'plot.plotType')}} selected="selected">Profile</option>
+			{{else}}
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
 				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
 				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
-				<option value="profile"  {{selected "profile" (call 'plot.plotType')}} disabled>Profile</option>
 				<option value="geographic"  {{selected "geographic" (call 'plot.plotType')}} disabled>Geographic</option>
+			{{/if}}
 			 </select>
 		</div>
 	</li>
-	
 	<li>
 		<!-- <p class="number">3</p> -->
-		<div class="">
+		<div class="{{#if profile_plot}} hidden{{/if}}">
 			<p>Set a date range using the timeline below</p>
 			<div class="clearfix">
 				<input placeholder="Start" class="js-min graph-min js-active-plot-start-date" type="text">

@@ -113,11 +113,16 @@ gisportal.selectionTools.initDOM = function()  {
 gisportal.selectionTools.shapesUploaded = function(){
    var files_list = this.files;
    if(files_list.length > 0){
-      var dbf_found, shp_found, shx_found;
-
+      var dbf_found, shp_found, shx_found, files_total_size = 0;
+      var formData = new FormData($(this).parent()[0]);
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
+         files_total_size += this_file.size;
+         if(files_total_size > 5242880){
+            $.notify("There is a  5MB limit on file uploads", "error");
+            return;
+         }
          if(this_file.type == "application/x-dbf"){
             dbf_found = true;
          }
@@ -127,11 +132,14 @@ gisportal.selectionTools.shapesUploaded = function(){
          if(this_file.type == "application/x-esri-shape-index"){
             shx_found = true;
          }
+         if(this_file.type == "text/csv"){
+            gisportal.selectionTools.csvFound(formData);
+            return true;
+         }
       }
       if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
          $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
       }else{
-         var formData = new FormData($(this).parent()[0]);
          $.ajax({
             url: '/app/settings/upload_shape',  //Server script to process data
             type: 'POST',
@@ -142,7 +150,14 @@ gisportal.selectionTools.shapesUploaded = function(){
             success: function(d){
                gisportal.selectionTools.loadGeoJSON(d.geojson, d.shapeName);
             },
-            error: function(e) {console.log(e);},
+            error: function(e) {
+               if(e.status == 401){
+                  $.notify("Sorry, You nust be logged in to use this feature.", "error");
+               }else{
+                  $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+                  $('.js-upload-shape').val("");
+               }
+            },
             data: formData,
             cache: false,
             contentType: false,
@@ -150,6 +165,32 @@ gisportal.selectionTools.shapesUploaded = function(){
          });
       }
    }
+};
+
+gisportal.selectionTools.csvFound = function(formData){
+   $.ajax({
+      url: '/app/settings/upload_csv',  //Server script to process data
+      type: 'POST',
+      xhr: function() {  // Custom XMLHttpRequest
+         var myXhr = $.ajaxSettings.xhr();
+         return myXhr;
+      },
+      success: function(d){
+         gisportal.selectionTools.loadGeoJSON(d.geoJSON);
+         gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+      },
+      error: function(e) {
+         if(e.status == 401){
+            $.notify("Sorry, You nust be logged in to use this feature.", "error");
+         }else{
+            $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
+         }
+      },
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false
+   });
 };
 
 gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){

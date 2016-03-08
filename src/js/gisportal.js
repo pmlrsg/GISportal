@@ -596,7 +596,7 @@ gisportal.mapInit = function() {
                        response += '<p style="color:' + fill + '">vector details</p><ul>';
                        var props = feature.getProperties();
                        for (var key in props) {
-                           if (props.hasOwnProperty(key)) {
+                           if (props.hasOwnProperty(key) && key != "geometry") {
                                ////console.log(key, props[key]);
                                if(tlayer){
                                   if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {

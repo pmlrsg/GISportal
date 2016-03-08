@@ -2,6 +2,7 @@ var xml2js = require('xml2js'); // Added
 var request = require('request');
 var express = require('express'); // Added
 var router = express.Router();
+var util = require('util');
 var path = require('path');
 var fs = require("fs");
 var _ = require("underscore");
@@ -10,7 +11,8 @@ var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
 var utils = require('./utils.js');
-var ogr2ogr = require('ogr2ogr')
+var ogr2ogr = require('ogr2ogr');
+var csv = require('csv-parser');
 
 var child_process = require('child_process');
 
@@ -19,6 +21,7 @@ var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var TEMP_UPLOADS_PATH = CURRENT_PATH + "/../../uploads/";
+var METADATA_PATH = CURRENT_PATH + "/../../markdown/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
@@ -131,6 +134,17 @@ router.get('/app/cache/*?', function(req, res) {
          utils.handleError(err, res);
       }
    });
+});
+
+router.get('/app/metadata/*?', function(req, res) {
+   var html_path = path.join(METADATA_PATH, req.params[0] + ".md");// Gets the given path
+
+   var markdown_data = fs.readFileSync(html_path).toString();
+
+
+   var markdown = require( "markdown" ).markdown;
+
+   res.send( markdown.toHTML(markdown_data) );
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
@@ -346,6 +360,52 @@ router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res
       }
    });
    res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
+});
+
+router.all('/app/settings/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res){
+   var username = user.getUsername(req); // Gets the given username
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var csv_file = req.file; // Gets the data given
+
+   if(csv_file.mimetype != "text/csv"){
+      res.status(415).send('Please upload a CSV file');
+   }
+
+   var csv_path = path.join(csv_file.destination, csv_file.originalname);
+
+   fs.renameSync(csv_file.path, csv_path);
+   var features_list = [];
+   var line_number = 1;
+   var error_lines = [];
+
+   fs.createReadStream(csv_path)
+      .pipe(csv())
+      .on('data', function(data) {
+         line_number ++;
+         if(data.Date && data.Longitude && data.Latitude){
+            if(new Date(data.Date) == "Invalid Date"){
+               error_lines.push(line_number);
+            }else{
+               var longitude = parseFloat(data.Longitude);
+               var latitude = parseFloat(data.Latitude);
+               var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}}
+               features_list.push(geoJSON_data);
+            }
+         }else{
+            return res.status(400).send('The CSV headers are invalid \n Please correct the errors and upload again')
+         }
+      })
+      .on('error', function(err){
+         utils.handleError(err, res);
+      })
+      .on('finish', function(){
+         if(error_lines.length > 0){
+            res.status(400).send('The data on CSV line(s) ' + error_lines.join(", ") + ' is invalid \n Please correct the errors and upload again');
+         }else{
+            res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_file.originalname});
+         }   
+      });
+   
 });
 
 router.all('/app/settings/save_geoJSON', function(req, res){

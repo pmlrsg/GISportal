@@ -32,7 +32,11 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var Plot = gisportal.graphs.Plot;
       var plot = new Plot();
       gisportal.graphs.editPlot( plot );
-      plot.plotType( 'timeseries' );
+      var plotType = "timeseries";
+      if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
+         plotType = "profile";
+      }
+      plot.plotType( plotType );
       // These variables are set so that the correct drop downs are loaded in the first place.
       component.xText = "Left Axis";
       component.yText = "Right Axis";
