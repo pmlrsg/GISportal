@@ -33,6 +33,14 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.indicatorsPanel.addToPlot(id);
    });
 
+   $('.js-indicators').on('click', '.js-clear-selection', function()  {
+      gisportal.vectorLayer.getSource().clear();
+      gisportal.currentSelectedRegion = "";
+      $('.js-coordinates').val("");
+      $('.js-upload-shape').val("");
+      $('.users-geojson-files').val("default");
+   });
+
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
          gisportal.panels.showPanel('choose-indicator');
@@ -1053,14 +1061,16 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
 
    // Gets any error with the bounding box and puts it into the div
-   var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
-   if( bound_error !== true ){
-      errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
-      var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
-      setTimeout( function(){
-         errorElement.remove();
-      }, 6000 );
-      return;
+   if(gisportal.methodThatSelectedCurrentRegion.method != "csvUpload"){
+      var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
+      if( bound_error !== true ){
+         errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
+         var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
+         setTimeout( function(){
+            errorElement.remove();
+         }, 6000 );
+         return;
+      }
    }
 
    var indicator = gisportal.layers[id];

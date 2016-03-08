@@ -113,11 +113,16 @@ gisportal.selectionTools.initDOM = function()  {
 gisportal.selectionTools.shapesUploaded = function(){
    var files_list = this.files;
    if(files_list.length > 0){
-      var dbf_found, shp_found, shx_found;
+      var dbf_found, shp_found, shx_found, files_total_size = 0;
       var formData = new FormData($(this).parent()[0]);
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
+         files_total_size += this_file.size;
+         if(files_total_size > 5242880){
+            $.notify("There is a  5MB limit on file uploads", "error");
+            return;
+         }
          if(this_file.type == "application/x-dbf"){
             dbf_found = true;
          }
@@ -150,6 +155,7 @@ gisportal.selectionTools.shapesUploaded = function(){
                   $.notify("Sorry, You nust be logged in to use this feature.", "error");
                }else{
                   $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+                  $('.js-upload-shape').val("");
                }
             },
             data: formData,
@@ -171,12 +177,13 @@ gisportal.selectionTools.csvFound = function(formData){
       },
       success: function(d){
          gisportal.selectionTools.loadGeoJSON(d.geoJSON);
+         gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
       },
       error: function(e) {
          if(e.status == 401){
             $.notify("Sorry, You nust be logged in to use this feature.", "error");
          }else{
-            $.notify("Sorry, There was an error with that: " + e.responseText, "error");
+            $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
          }
       },
       data: formData,
