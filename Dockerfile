@@ -23,4 +23,6 @@ RUN cd /app/GISportal && \
 VOLUME /app/GISportal/config
 
 EXPOSE 6789
+WORKDIR /app/GISportal
+
 CMD ["/app/GISportal/docker-run.sh"]
