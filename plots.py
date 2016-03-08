@@ -55,7 +55,6 @@ template = jinja2.Template("""
 ></script>
 
 <body>
-<h1>TEST</h1>
 <div id="plot">
     {{ script }}
     
@@ -79,7 +78,6 @@ hovmoller_template = jinja2.Template("""
 ></script>
 
 <body>
-<h1>TEST</h1>
 {{ script }}
     {{ div }}
 
