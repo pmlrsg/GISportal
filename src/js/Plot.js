@@ -247,6 +247,9 @@ gisportal.graphs.Plot =(function(){
             "tickFormat" : "auto"
          };
          plotRequest.y1Axis = y1Axis;
+         if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
+            plotRequest.transectFile = gisportal.methodThatSelectedCurrentRegion.value;
+         }
       }
 
 

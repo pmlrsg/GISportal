@@ -13,6 +13,7 @@ var user = require('./user.js');
 var utils = require('./utils.js');
 var ogr2ogr = require('ogr2ogr');
 var csv = require('csv-parser');
+var moment = require('moment');
 
 var child_process = require('child_process');
 
@@ -383,7 +384,7 @@ router.all('/app/settings/upload_csv', user.requiresValidUser, upload.single('fi
       .on('data', function(data) {
          line_number ++;
          if(data.Date && data.Longitude && data.Latitude){
-            if(new Date(data.Date) == "Invalid Date"){
+            if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
                error_lines.push(line_number);
             }else{
                var longitude = parseFloat(data.Longitude);
@@ -402,7 +403,7 @@ router.all('/app/settings/upload_csv', user.requiresValidUser, upload.single('fi
          if(error_lines.length > 0){
             res.status(400).send('The data on CSV line(s) ' + error_lines.join(", ") + ' is invalid \n Please correct the errors and upload again');
          }else{
-            res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_file.originalname});
+            res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path});
          }   
       });
    
