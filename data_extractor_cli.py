@@ -33,8 +33,8 @@ AET
 
 import argparse
 from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, ScatterExtractor
-from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times, test_time_axis
-from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats
+from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times, are_time_axis_the_same
+from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ScatterStats
 from shapely import wkt
 import json
 import time as _time
@@ -64,10 +64,11 @@ def main():
 	#print args.wcs_variable
 	debug = Debug(args.debug)
 	debug.log("a message to test debugging")
-
+	irregular = False
 	if(args.geom):
-		#print "geom found - generating bbox"
+		print "geom found - generating bbox"
 		bbox = wkt.loads(args.geom).bounds
+		irregular = True
 		#print bbox
 	if(args.bbox):
 		bbox = [args.bbox]
@@ -75,24 +76,29 @@ def main():
 
 
 	if (args.extract_type == "basic"):
-		start_time = _time.time()
-
-		extractor = BasicExtractor(args.wcs_url[0], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
-		filename = extractor.getData()
-		middle_time = _time.time()
+		if irregular:
+			extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), masking_polygon=args.geom)
+			filename = extractor.getData() 
+		else:
+			extractor = BasicExtractor(args.wcs_url[0], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
+			filename = extractor.getData()
 		stats = BasicStats(filename, args.wcs_variable[0])
 		output_data = stats.process()
 	elif (args.extract_type == "image"):
-		#extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
-		#filename = extractor.getData()
-		#image_data = ImageStats(filename, args.wcs_variable[0])
-		#output_data = image_data.convert()
+		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
+		filename = extractor.getData()
+		image_data = ImageStats(filename, args.wcs_variable[0])
+		output_data = image_data.process()
 		pass
 	elif (args.extract_type == 'scatter'):
 		# scatter extractor returns a dict {var : netcdf, var2: netcdf2}
 		extractor = ScatterExtractor(args.wcs_url[0],args.wcs_url[1], [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0], extract_variable_2=args.wcs_variable[1] )
 		filenames = extractor.getData()
-		are_times_same = test_time_axis(filenames)
+		stats = ScatterStats(filenames)
+		output_data =  json.dumps(stats.process())
+		#are_times_same = are_time_axis_the_same(filenames)
+		#print are_times_same
+		#print filenames
 	elif (args.extract_type == "irregular"):
 		extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), masking_polygon=args.geom)
 		filename = output_data = extractor.getData()

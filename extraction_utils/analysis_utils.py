@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt   
 from datetime import timedelta
+import datetime
 """
 Performs a basic set of statistical functions on the provided data.
 """
@@ -27,7 +28,8 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       # current_app.logger.debug('irregular shape after concatonate')
       # current_app.logger.debug(arr)
    else:
-      arr = np.array(dataset.variables[variable])
+      arr = np.ma.array(dataset.variables[variable][:])
+      #print arr
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
    if original is not None:
@@ -37,6 +39,8 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    else:
       maskedArray = np.ma.masked_invalid(arr)
    #maskedArray = arr
+   #print '-'*40
+   #print maskedArray
    #plt.imshow(maskedArray[0])
    #plt.savefig(filename+'.2.png')
    time = getCoordinateVariable(dataset, 'Time')
@@ -99,13 +103,102 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       g.graphError = "no valid data available to use"
       return output
       
-   
+   #original.close()
    return output
 
 
+def basic_scatter(dataset1, variable1, dataset2, variable2,):
+   
+   arr1 = np.ma.array(dataset1.variables[variable1][:])
+   arr2 = np.ma.array(dataset2.variables[variable2][:])
+      #print arr
+   #current_app.logger.debug(arr)
+   # Create a masked array ignoring nan's
 
+   maskedArray1 = np.ma.masked_invalid(arr1)
+   maskedArray2 = np.ma.masked_invalid(arr2)
+   #maskedArray = arr
+   #print '-'*40
+   #print maskedArray
+   #plt.imshow(maskedArray[0])
+   #plt.savefig(filename+'.2.png')
+   time1 = getCoordinateVariable(dataset1, 'Time')
+   time2 = getCoordinateVariable(dataset2, 'Time')
+   # current_app.logger.debug('time channel test')
+   # current_app.logger.debug(time)
+   if time1 == None:
+      g.graphError = "could not find time dimension"
+      return
+   if time2 == None:
+      g.graphError = "could not find time dimension"
+      return
+   
+   times1 = np.array(time1)
+   isotimes1 = [(netCDF.num2date(x, time1.units, calendar='standard')).isoformat() for x in times1[:]]
 
+   times2 = np.array(time2)
+   isotimes2 = [(netCDF.num2date(x, time2.units, calendar='standard')).isoformat() for x in times2[:]]
+   output = {}
+   
+   units1 = getUnits(dataset1.variables[variable1])
+   units2 = getUnits(dataset2.variables[variable2])
+   output['units1'] = units1
+   output['units2'] = units2
+   
+   
+   #mean = getMean(maskedArray)
+   #median = getMedian(maskedArray)
+   #std = getStd(maskedArray)
+   #min = getMin(maskedArray)
+   #max = getMax(maskedArray)
+   data1 = gen_data(time1, times1, maskedArray1)
+   data2 = gen_data(time2, times2, maskedArray2)
+   time_data = gen_time_array()
+   #print data1, data2, time_data
+   zipped_data = zip(data1, data2, isotimes1)
+      
+   #original.close()
+   return {'order' : [variable1, variable2, 'Time'], 'data' : zipped_data}
 
+def gen_time_array():
+   pass
+
+def gen_data(time, times, maskedArray):
+   timeUnits = getUnits(time)
+   start = None
+   if timeUnits:
+      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+   else: 
+      start = ''.join(times[0])
+   
+   #=========================================================================
+   # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+   #   output = {}
+   #   g.graphError = "no valid data available to use"
+   # else:
+   #   output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
+   #=========================================================================
+   
+   output = {}
+   output['data'] = {}
+   data = []
+   #print len(time)
+   for i, row in enumerate(maskedArray):
+      #print i
+      if timeUnits:
+         if (i < len(time)):
+            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+      else:     
+         date = ''.join(times[i])
+      mean = getMean(row)
+      
+      
+      
+      if  np.isnan(mean) :
+         pass
+      else:
+         data.append(mean)
+   return data
 
 def getHistogram(arr):
    maskedarr = np.ma.masked_array(arr, [np.isnan(x) for x in arr])
@@ -268,7 +361,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    #    wcs_url = params['url'].value
    #    resp = contactWCSServer(wcs_url)
    #tfile = saveOutTempFile(resp)
-   to_be_masked = netCDF.Dataset(netcdf_base, 'r+')
+   to_be_masked = netCDF.Dataset(netcdf_base, 'a')
 
    chl = to_be_masked.variables[variable][:]
 
@@ -347,7 +440,14 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
       #imgplot = plt.imshow(masked_variable)
 
    #plt.show()
+   print np.array(masked_variable).shape
+   to_be_masked.variables[variable][:] = np.ma.array(masked_variable)[:]
+   to_be_masked.close()
 
+   to_be_masked = netCDF.Dataset(netcdf_base, 'r+')
+
+   #print to_be_masked.variables[variable][:]
+   #to_be_masked.close()
    return masked_variable, to_be_masked, masker,  variable
 
 
@@ -463,14 +563,32 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
 
 
 
-def test_time_axis(filenames):
+def are_time_axis_the_same(filenames):
    print "inside get times func"
    print filenames
    times = {}
    for key in filenames:
       print filenames[key]
-      times[key] = getCoordinateVariable(netCDF.Dataset(filenames[key], 'r+'), 'Time')[:]
+      times[key] = getCoordinateVariable(netCDF.Dataset(filenames[key], 'r+'), 'Time')
    
-   dif = [times[x] - times[x] for times[x] in times ]
-   print dif
-   return times
+   keys = times.keys()
+
+   #if (len(times[keys[0]]) != len(times[keys[1]]) ):
+   #   pass
+      #return False
+
+   #else:
+   time_range = len(times[keys[0]]) if len(times[keys[0]]) > len(times[keys[1]]) else len(times[keys[1]])
+   #print "using range %d" % time_range
+   print len(times[keys[0]])
+   print len(times[keys[1]])
+   for x in range(time_range):
+      time1 = datetime.datetime.strptime(netCDF.num2date(times[keys[0]][x], times[keys[0]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
+      time2 = datetime.datetime.strptime(netCDF.num2date(times[keys[1]][x], times[keys[1]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
+      print time1, time2
+      #print times[keys[0]][x] , times[keys[1]][x]
+      dif = time1 - time2
+      print dif
+      if dif > timedelta.min:
+         return False
+   return True

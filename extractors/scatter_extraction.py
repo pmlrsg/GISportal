@@ -28,6 +28,6 @@ class ScatterExtractor(Extractor):
 		with open(fname_two, 'w') as outfile:
 			outfile.write(data.read())
 		#print "getting data for %s and %s" % (self.extract_variable, self.second_var)
-
+		#print {self.extract_variable :fname_one, self.second_var : fname_two }
 		return {self.extract_variable :fname_one, self.second_var : fname_two }
 		# 

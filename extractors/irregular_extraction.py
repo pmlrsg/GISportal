@@ -21,6 +21,7 @@ class IrregularExtractor(Extractor):
 		with open(fname, 'w') as outfile:
 			outfile.write(data.read())
 		mask, data,_,_ = create_mask(self.masking_polygon,fname,self.extract_variable)
-		return basic(mask, self.extract_variable, irregular=True, original=data, filename=fname)
+		#return basic(data, self.extract_variable,  filename=fname)
+		return fname
 
 
