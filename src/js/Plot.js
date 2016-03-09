@@ -279,6 +279,10 @@ gisportal.graphs.Plot =(function(){
             "weight" : "auto",
             "tickFormat" : "auto"
          };
+         if(this.plotType() == "scatter"){
+            //Overwrites the xAxis if its a scatter
+            plotRequest.xAxis = y2Axis;
+         }
          plotRequest.y2Axis = y2Axis;
       }
    };
