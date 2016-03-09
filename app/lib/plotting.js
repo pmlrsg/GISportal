@@ -5,16 +5,18 @@ var fs = require("fs");
 var utils = require('./utils.js');
 var ogr2ogr = require('ogr2ogr');
 var csv = require('csv-parser');
+var user = require('./user.js');
 var moment = require('moment');
-
-var multer  = require('multer')
-var upload = multer({ dest: TEMP_UPLOADS_PATH })
 
 var child_process = require('child_process');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
 var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
+var TEMP_UPLOADS_PATH = __dirname + "/../../uploads/";
+
+var multer  = require('multer')
+var upload = multer({ dest: TEMP_UPLOADS_PATH })
 
 module.exports = router;
 

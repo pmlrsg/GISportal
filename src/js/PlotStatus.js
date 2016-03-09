@@ -59,6 +59,9 @@ gisportal.graphs.PlotStatus = (function(){
          // Delete a plot
          .on('click', '.js-graph-status-delete', function(){
             $(this).closest('.graph-job').remove();
+            if($('.graph-job').length <= 0){
+               $('.no-graphs-text').toggleClass("hidden", false);
+            }
             _this._plot.stopMonitoringJobStatus();
          })
          // Copy a plot
@@ -79,6 +82,9 @@ gisportal.graphs.PlotStatus = (function(){
                }
             });
          });
+      if($('.graph-job').length > 0){
+         $('.no-graphs-text').toggleClass("hidden", true);
+      }
    };
 
    /**

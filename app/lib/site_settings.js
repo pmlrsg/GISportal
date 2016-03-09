@@ -18,7 +18,6 @@ var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
-var TEMP_UPLOADS_PATH = CURRENT_PATH + "/../../uploads/";
 var METADATA_PATH = CURRENT_PATH + "/../../markdown/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 

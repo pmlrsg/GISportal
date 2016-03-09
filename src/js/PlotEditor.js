@@ -159,6 +159,9 @@ gisportal.graphs.PlotEditor = (function(){
             this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
             this.plot().submitRequest();
             gisportal.graphs.activeGraphSubmitted();
+            if($('.graph-job').length > 0){
+               $('.no-graphs-text').toggleClass("hidden", true);
+            }
          }else{
             $.notify("A series on the left Y axis is required.", "error");
          }
