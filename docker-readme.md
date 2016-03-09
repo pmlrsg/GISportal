@@ -19,7 +19,7 @@ docker run -v /usr/share/GISportal:/app/GISportal/config -it pmlrsg/gisportal /a
 This will lead you through the interactive setp of the application including the option to specify a domain name (if you want to use one), the setup of Google as OAuth provider for authentication, and specifying administrator details
 1. On subsequent runs there's no need to run interactively; the portal will be accessible at http://localhost:6789/
 ```
-docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config pmlrsg/gisportal
+docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config -t pmlrsg/gisportal
 ```
 
 == Running GISportal with nginx
