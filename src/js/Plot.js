@@ -560,6 +560,7 @@ gisportal.graphs.Plot =(function(){
     * is allowed multiple series
     */
    Plot.prototype.plotType = function( _new ){
+      var _this = this;
       if( !arguments.length ) return this._plotType;
       var old = this._plotType;
       this._plotType = _new;
@@ -574,12 +575,16 @@ gisportal.graphs.Plot =(function(){
       else if( _new == 'scatter'){
          this.setMinMaxComponents(2,2);
          this.setComponentXYText("X Axis", "Y Axis");
+         this._components.forEach(function(comElem){
+            _this.forceComponentDateRange( comElem );
+         });
       }else{
          this.setMinMaxComponents(1,1);
       }
 
       return this;
    };
+
    /**
     * This makes sure that the correct tesxt is shown in the X & Y selection options
     */
@@ -671,6 +676,8 @@ gisportal.graphs.Plot =(function(){
    *  - Calls set tBounds to check that all the indicators are in range 
    */
    Plot.prototype.dateRangeBounds = function( _new ){
+      var _this = this;
+
       if( !arguments.length ) return this._dateRangeBounds;
 
       var oldDateRange = this._dateRangeBounds;
@@ -696,8 +703,35 @@ gisportal.graphs.Plot =(function(){
       
       this.tBounds( newtBounds );
 
+      if(this.plotType() == "scatter"){
+         this._components.forEach(function(comElem){
+            _this.forceComponentDateRange( comElem );
+         });
+      }
+
 
       return this;
+   };
+
+   // This function makes sure that the date ranges or the component fits within the input box values
+   Plot.prototype.forceComponentDateRange = function(componentElement){
+      // The the layer of the current component
+      var indicator = gisportal.layers[ componentElement.indicator ];
+
+      // Date range of the components layer
+      var firstDate = new Date(indicator.firstDate);
+      var lastDate = new Date(indicator.lastDate);
+
+      var tBounds = this.tBounds();
+
+      if(firstDate > tBounds[0]){
+         $('.js-active-plot-start-date').val(firstDate.toISOString().split("T")[0]);
+         $('.js-active-plot-start-date').trigger("change");
+      }
+      if(tBounds[1] > lastDate){
+         $('.js-active-plot-end-date').val(lastDate.toISOString().split("T")[0]);
+         $('.js-active-plot-end-date').trigger("change");
+      }
    };
 
    /**
