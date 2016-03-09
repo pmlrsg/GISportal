@@ -934,9 +934,6 @@ gisportal.indicatorsPanel.getParams = function(id) {
       graphYAxis: graphYAxis,
       graphZAxis: indicator.urlName
    };
-   if (gisportal.currentSelectedRegion.indexOf('(') !== -1) {
-      graphParams.isIrregular = 'true';
-   }
    return graphParams;
 };
 

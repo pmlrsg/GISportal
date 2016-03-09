@@ -410,6 +410,9 @@ gisportal.graphs.Plot =(function(){
       
       // Generate the request object
       var request = this.buildRequest();
+      if (gisportal.currentSelectedRegion.indexOf('(') !== -1) {
+         request.plot.isIrregular = 'true';
+      }
 
       function accumulateEstimates(data){
          if(data.time && data.size && data.layer_id){
