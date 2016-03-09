@@ -1146,11 +1146,18 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
 
    var bb1, point;
    // Try to see if its WKT string
+   var temp_bbox = gisportal.currentSelectedRegion;
+   // This bit just makes sure that the Terraformer can interprate the values as it doesn't work with scientific notation
+   temp_bbox = temp_bbox.split(",");
+   for(var val in temp_bbox){
+      temp_bbox[val] = Number(temp_bbox[val]);
+   }
+   temp_bbox = temp_bbox.join(",");
    try{
-      bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
+      bb1 = Terraformer.WKT.parse( temp_bbox );
    }catch( e ){
       // Assume the old bbox style
-      bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
+      bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
    }
    var current_proj = map.getView().getProjection().getCode();
    if(current_proj !== "EPSG:4326"){
