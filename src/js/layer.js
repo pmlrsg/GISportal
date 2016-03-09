@@ -173,7 +173,7 @@ gisportal.layer = function( options ) {
          this.getDimensions(layerData); // Get dimensions.
          if(!this.temporal) $('li[data-id="' + this.id + '"] .date-range-detail').hide();
          // A list of styles available for the layer
-         this.styles = layerData.Styles; // Can be 'Null'.
+         this.styles = _.sortBy(layerData.Styles, function(style){return style.Name}); // Can be 'Null'.
          var default_style = null;
          //console.log("before style add");
          if(this.styles){
