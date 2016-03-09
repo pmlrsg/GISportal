@@ -6,10 +6,29 @@ RUN yum -y update; \
     yum clean all; \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7; \
     yum install -y epel-release; \
-    yum install -y nodejs npm git python wget tar redis ruby python-devel gdal libjpeg-turbo freetype-devel libpng-devel hdf5-devel netcdf-devel python-pillow; \
-    wget -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py; \
-    python /tmp/get-pip.py; \
-    pip install requests numpy pandas jinja2 bokeh owslib Pillow shapely netCDF4; \
+    yum install -y nodejs \
+        npm \
+        git \
+        wget \
+        tar \
+        redis \
+        ruby \
+        gdal \
+        numpy \
+        libjpeg-turbo \
+        freetype-devel \
+        libpng-devel \
+        hdf5-devel \
+        netcdf-devel \
+        python \
+        python-devel \
+        python-pip \
+        python-pillow-devel \
+        python-requests \
+        python-pandas \
+        python-jinja2 \
+        python-matplotlib; \
+    pip install bokeh owslib shapely netCDF4; \
     npm install -g grunt-cli --silent && \
     gem install sass && \
     mkdir -p /app/GISportal/config /app/GISportal/html/plots

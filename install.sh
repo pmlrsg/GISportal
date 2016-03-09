@@ -104,7 +104,9 @@ grunt
 if [ "$SOURCE" = "docker" ]
    then
    echo ""
-   echo "The installation step is complete; now run the docker container in normal node to begin using the application"
+   echo "The installation step is complete; now run the docker container in normal node to begin using the application, e.g. run:"
+   echo ""
+   echo "  docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config -t pmlrsg/gisportal"
    echo ""
 fi
 
