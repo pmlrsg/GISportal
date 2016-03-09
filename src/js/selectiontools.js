@@ -166,7 +166,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
       }else{
          $.ajax({
-            url: '/app/settings/upload_shape',  //Server script to process data
+            url: '/app/plotting/upload_shape',  //Server script to process data
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
                var myXhr = $.ajaxSettings.xhr();
@@ -194,7 +194,7 @@ gisportal.selectionTools.shapesUploaded = function(){
 
 gisportal.selectionTools.csvFound = function(formData){
    $.ajax({
-      url: '/app/settings/upload_csv',  //Server script to process data
+      url: '/app/plotting/upload_csv',  //Server script to process data
       type: 'POST',
       xhr: function() {  // Custom XMLHttpRequest
          var myXhr = $.ajaxSettings.xhr();
@@ -417,12 +417,11 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
       gisportal.methodThatSelectedCurrentRegion.justCoords = true;
 
       var coords = "";
-      // Number() is used to convert any scientific notation to parse any scientific notation as the Terraformer module does not work with it
       if (bounds) {
-         coords += Number(bounds[0]) + ",";
-         coords += Number(bounds[1]) + ",";
-         coords += Number(bounds[2]) + ",";
-         coords += Number(bounds[3]);
+         coords += bounds[0] + ",";
+         coords += bounds[1] + ",";
+         coords += bounds[2] + ",";
+         coords += bounds[3];
          
          coords = coords.replace(/[\d\.]+/g, function(num){
             return Math.round(num * 1000 ) / 1000;

@@ -597,7 +597,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
       var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
       $.ajax({
          method: 'post',
-         url:  'app/settings/save_geoJSON?filename=' + name,
+         url:  'app/plotting/save_geoJSON?filename=' + name,
          data:{'data': JSON.stringify(geojson)},
          success: function(data){
             if($(".users-geojson-files option[value='" + data + "']").length === 0){
@@ -620,7 +620,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
 gisportal.indicatorsPanel.populateShapeSelect = function(){
    // A request to populate the dropdown with the users polygons
    $.ajax({
-      url:  gisportal.middlewarePath + '/settings/get_shapes',
+      url:  'app/plotting/get_shapes',
       dataType: 'json',
       success: function(data){
          var selected_value;
@@ -1146,11 +1146,18 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
 
    var bb1, point;
    // Try to see if its WKT string
+   var temp_bbox = gisportal.currentSelectedRegion;
+   // This bit just makes sure that the Terraformer can interprate the values as it doesn't work with scientific notation
+   temp_bbox = temp_bbox.split(",");
+   for(var val in temp_bbox){
+      temp_bbox[val] = Number(temp_bbox[val]);
+   }
+   temp_bbox = temp_bbox.join(",");
    try{
-      bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
+      bb1 = Terraformer.WKT.parse( temp_bbox );
    }catch( e ){
       // Assume the old bbox style
-      bb1 = Terraformer.WKT.parse( bboxToWKT(gisportal.currentSelectedRegion) );
+      bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
    }
    var current_proj = map.getView().getProjection().getCode();
    if(current_proj !== "EPSG:4326"){
