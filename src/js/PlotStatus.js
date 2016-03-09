@@ -82,9 +82,6 @@ gisportal.graphs.PlotStatus = (function(){
                }
             });
          });
-      if($('.graph-job').length > 0){
-         $('.no-graphs-text').toggleClass("hidden", true);
-      }
    };
 
    /**
