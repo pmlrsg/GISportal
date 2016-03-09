@@ -448,17 +448,19 @@ gisportal.graphs.Plot =(function(){
       _this.series_total = _.size(series_list);
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
-      for(var series in series_list){
-         $.ajax({
-            method: 'post',
-            url: gisportal.middlewarePath + '/plotting/check_plot',
-            contentType : 'application/json',
-            data: JSON.stringify(series_list[series]),
-            dataType: 'json',
-            //timeout:3000,
-            success: accumulateEstimates,
-            error: accumulateEstimates
-         });
+      if(_this._plotType != "transect"){
+         for(var series in series_list){
+            $.ajax({
+               method: 'post',
+               url: gisportal.middlewarePath + '/plotting/check_plot',
+               contentType : 'application/json',
+               data: JSON.stringify(series_list[series]),
+               dataType: 'json',
+               //timeout:3000,
+               success: accumulateEstimates,
+               error: accumulateEstimates
+            });
+         }
       }
       
 
@@ -713,7 +715,7 @@ gisportal.graphs.Plot =(function(){
       return this;
    };
 
-   // This function makes sure that the date ranges or the component fits within the input box values
+   // This function makes sure that the daterange ranges or the component fits within the input box values
    Plot.prototype.forceComponentDateRange = function(componentElement){
       // The the layer of the current component
       var indicator = gisportal.layers[ componentElement.indicator ];
