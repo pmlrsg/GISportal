@@ -496,6 +496,9 @@ gisportal.graphs.Plot =(function(){
             },
             error: function( response ){
                $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
+               if($('.graph-job').length <= 0){
+                  $('.no-graphs-text').toggleClass("hidden", false);
+               }
                clearInterval( _this._monitorJobStatusInterval );
                $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
             }
