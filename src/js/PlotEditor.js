@@ -19,13 +19,13 @@ gisportal.graphs.PlotEditor = (function(){
 
    PlotEditor.prototype.buildEditor = function(){
 
-      var profile_plot = false;
+      var transect_plot = false;
       if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
-         profile_plot = true;
+         transect_plot = true;
       }
       var rendered = gisportal.templates['active-plot']({
          plot: this._plot,
-         profile_plot: profile_plot
+         transect_plot: transect_plot
       });
 
       this._editorParent.find('.js-slideout-content').html( rendered );

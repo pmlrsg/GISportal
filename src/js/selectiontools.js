@@ -63,6 +63,7 @@ gisportal.selectionTools.init = function()  {
 };
 
 function cancelDraw() {
+   $('.drawInProgress').toggleClass('drawInProgress', false);
    if(draw === null)return;
    
    map.removeInteraction(draw);
@@ -81,16 +82,40 @@ gisportal.selectionTools.initDOM = function()  {
    });
 
    $('.js-indicators').on('click', '.js-draw-box', function()  {
-      gisportal.selectionTools.toggleTool('Box');
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Box');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
    });
    $('.js-indicators').on('click', '.js-draw-polygon', function() {
-      gisportal.selectionTools.toggleTool('Polygon');
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Polygon');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
    });
    $('.js-indicators').on('click', '.js-draw-line', function() {
-      gisportal.selectionTools.toggleTool('Line');
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Line');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
    });
    $('.js-indicators').on('click', '.js-draw-select-polygon', function() {
-      gisportal.selectionTools.toggleTool('SelectFromMap');
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('SelectFromMap');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
 
    });
 
@@ -200,6 +225,8 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
    gisportal.vectorLayer.getSource().clear();
+   cancelDraw();
+   //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
@@ -327,6 +354,7 @@ gisportal.selectionTools.updateROI = function()  {
       $('.users-geojson-files').val(value);
       gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
       gisportal.vectorLayer.getSource().clear();
+      cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       return;
    }catch(e){
@@ -407,6 +435,7 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    $('.js-coordinates').val(gisportal.currentSelectedRegion);
    $('input.js-upload-shape')[0].value = "";
    $('.users-geojson-files').val("default");
+   cancelDraw();
    gisportal.methodThatSelectedCurrentRegion.method = "drawBBox";
    gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
    this.toggleTool('None'); // So that people don't misclick

@@ -36,6 +36,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-clear-selection', function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.currentSelectedRegion = "";
+      cancelDraw();
       $('.js-coordinates').val("");
       $('.js-upload-shape').val("");
       $('.users-geojson-files').val("default");
@@ -596,7 +597,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
       var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
       $.ajax({
          method: 'post',
-         url:  'app/settings/save_geoJSON?filename=' + name +".bbox",
+         url:  'app/settings/save_geoJSON?filename=' + name,
          data:{'data': JSON.stringify(geojson)},
          success: function(data){
             if($(".users-geojson-files option[value='" + data + "']").length === 0){

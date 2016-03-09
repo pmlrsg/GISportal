@@ -34,7 +34,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
       gisportal.graphs.editPlot( plot );
       var plotType = "timeseries";
       if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
-         plotType = "profile";
+         plotType = "transect";
       }
       plot.plotType( plotType );
       // These variables are set so that the correct drop downs are loaded in the first place.
