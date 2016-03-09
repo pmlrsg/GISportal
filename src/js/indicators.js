@@ -597,7 +597,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
       var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
       $.ajax({
          method: 'post',
-         url:  'app/settings/save_geoJSON?filename=' + name,
+         url:  'app/plotting/save_geoJSON?filename=' + name,
          data:{'data': JSON.stringify(geojson)},
          success: function(data){
             if($(".users-geojson-files option[value='" + data + "']").length === 0){
@@ -620,7 +620,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
 gisportal.indicatorsPanel.populateShapeSelect = function(){
    // A request to populate the dropdown with the users polygons
    $.ajax({
-      url:  gisportal.middlewarePath + '/settings/get_shapes',
+      url:  'app/plotting/get_shapes',
       dataType: 'json',
       success: function(data){
          var selected_value;

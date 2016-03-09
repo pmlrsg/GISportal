@@ -10,6 +10,12 @@ var moment = require('moment');
 
 var child_process = require('child_process');
 
+var USER_CACHE_PREFIX = "user_";
+var CURRENT_PATH = __dirname;
+var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
+var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var METADATA_PATH = CURRENT_PATH + "/../../markdown/";
+var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
 var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
@@ -72,7 +78,7 @@ router.all('/app/plotting/check_plot', function(req, res){
    });
 });
 
-router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res){
+router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var file_list = req.files; // Gets the data given
@@ -113,13 +119,14 @@ router.all('/app/settings/upload_shape', user.requiresValidUser, upload.array('f
    });
 });
 
-router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res) {
+router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res) {
    var username = user.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
 
    var shape_list = [];
    var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
    var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+   console.log(user_list);
    user_list.forEach(function(filename){
       var file_path = path.join(user_cache_path, filename);
       if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){
@@ -129,7 +136,7 @@ router.get('/app/settings/get_shapes', user.requiresValidUser, function(req, res
    res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
 });
 
-router.all('/app/settings/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res){
+router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var csv_file = req.file; // Gets the data given
@@ -175,7 +182,7 @@ router.all('/app/settings/upload_csv', user.requiresValidUser, upload.single('fi
    
 });
 
-router.all('/app/settings/save_geoJSON', function(req, res){
+router.all('/app/plotting/save_geoJSON', function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var filename = req.query.filename;

@@ -166,7 +166,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
       }else{
          $.ajax({
-            url: '/app/settings/upload_shape',  //Server script to process data
+            url: '/app/plotting/upload_shape',  //Server script to process data
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
                var myXhr = $.ajaxSettings.xhr();
@@ -194,7 +194,7 @@ gisportal.selectionTools.shapesUploaded = function(){
 
 gisportal.selectionTools.csvFound = function(formData){
    $.ajax({
-      url: '/app/settings/upload_csv',  //Server script to process data
+      url: '/app/plotting/upload_csv',  //Server script to process data
       type: 'POST',
       xhr: function() {  // Custom XMLHttpRequest
          var myXhr = $.ajaxSettings.xhr();
