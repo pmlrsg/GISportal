@@ -934,14 +934,8 @@ gisportal.indicatorsPanel.getParams = function(id) {
       graphYAxis: graphYAxis,
       graphZAxis: indicator.urlName
    };
-   var bbox = $('#tab-' + id + '-coordinates').val();
-   if (bbox.indexOf('POLYGON') !== -1) {
-      graphParams.isPolygon = 'true';
-
-   }
-   if (bbox.indexOf('LINESTRING') !== -1) {
-      graphParams.isLine = 'true';
-
+   if (gisportal.currentSelectedRegion.indexOf('(') !== -1) {
+      graphParams.isIrregular = 'true';
    }
    return graphParams;
 };
