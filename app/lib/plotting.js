@@ -126,7 +126,6 @@ router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res
    var shape_list = [];
    var user_cache_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username);
    var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
-   console.log(user_list);
    user_list.forEach(function(filename){
       var file_path = path.join(user_cache_path, filename);
       if(utils.fileExists(file_path) && path.extname(filename) == ".geojson"){

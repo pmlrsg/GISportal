@@ -1154,7 +1154,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    }
    temp_bbox = temp_bbox.join(",");
    try{
-      bb1 = Terraformer.WKT.parse( temp_bbox );
+      bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    }catch( e ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );

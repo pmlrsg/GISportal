@@ -10,7 +10,7 @@
 			<div></div>
 		{{/if}}
 		<div class="plot-status-title">
-			<h2 class="title ellipsisOverflow" title="{{call 'title'}}">{{call 'title'}}</h2>
+			<h2 class="title" title="{{call 'title'}}">{{call 'title'}}</h2>
 		</div>
 	</div>
 	<div>
