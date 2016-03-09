@@ -46,14 +46,6 @@ template = jinja2.Template("""
 <!DOCTYPE html>
 <html lang="en-US">
 
-<link
-    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
-    rel="stylesheet" type="text/css"
->
-<script 
-    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
-></script>
-
 <body>
 <div id="plot">
     {{ script }}
@@ -68,14 +60,6 @@ template = jinja2.Template("""
 hovmoller_template = jinja2.Template("""
 <!DOCTYPE html>
 <html lang="en-US">
-
-<link
-    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
-    rel="stylesheet" type="text/css"
->
-<script 
-    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
-></script>
 
 <body>
 {{ script }}
