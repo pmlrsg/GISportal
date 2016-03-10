@@ -578,11 +578,11 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
 
 
 def are_time_axis_the_same(filenames):
-   print "inside get times func"
-   print filenames
+   #print "inside get times func"
+   #print filenames
    times = {}
    for key in filenames:
-      print filenames[key]
+      #print filenames[key]
       times[key] = getCoordinateVariable(netCDF.Dataset(filenames[key], 'r+'), 'Time')
    
    keys = times.keys()
@@ -594,15 +594,15 @@ def are_time_axis_the_same(filenames):
    #else:
    time_range = len(times[keys[0]]) if len(times[keys[0]]) > len(times[keys[1]]) else len(times[keys[1]])
    #print "using range %d" % time_range
-   print len(times[keys[0]])
-   print len(times[keys[1]])
+   #print len(times[keys[0]])
+   #print len(times[keys[1]])
    for x in range(time_range):
       time1 = datetime.datetime.strptime(netCDF.num2date(times[keys[0]][x], times[keys[0]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
       time2 = datetime.datetime.strptime(netCDF.num2date(times[keys[1]][x], times[keys[1]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
-      print time1, time2
+      #print time1, time2
       #print times[keys[0]][x] , times[keys[1]][x]
       dif = time1 - time2
-      print dif
+      #print dif
       if dif > timedelta.min:
          return False
    return True

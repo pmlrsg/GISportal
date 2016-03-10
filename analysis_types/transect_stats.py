@@ -15,8 +15,8 @@ class TransectStats(object):
 		
 
 	def process(self):
-		print "running basic processing on %s" % self.filename
-		print self.variable
+		#print "running basic processing on %s" % self.filename
+		#print self.variable
 		netcdf_file = netCDF.Dataset(self.filename, "r")
 		time_var = netcdf_file.variables['time']
 		data_var = np.array(netcdf_file.variables[self.variable])
