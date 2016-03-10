@@ -198,3 +198,35 @@ router.all('/app/plotting/save_geoJSON', function(req, res){
          }
    });
 });
+
+router.all('/app/download', function(req, res){
+   var baseURL = req.query.baseurl;
+   var coverage = req.query.coverage;
+   var time = req.query.time;
+   var bbox = req.query.bbox;
+   var depth = req.query.depth;
+
+   var process_info = [EXTRACTOR_PATH, "-t", "file", "-url", baseURL, "-var", coverage, "-time", time, "-g", bbox, "-dest", TEMP_UPLOADS_PATH];
+   if(depth){
+      process_info.push("-d");
+      process_info.push(depth);
+   }
+
+   var child = child_process.spawn('python', process_info)
+
+   child.stdout.on('data', function(data){
+      var options = {
+         dotfiles: 'deny',
+         headers: {
+            'Content-Disposition': "attachment; filename=extracted_" + coverage + ".nc",
+            'x-timestamp': Date.now(),
+            'x-sent': true
+         }
+      };
+      res.sendFile(path.normalize(data.toString().replace("\n", "")), options);
+   });
+
+   child.stderr.on('data', function (data) {
+      utils.handleError(data.toString(), res);
+   });
+});

@@ -68,6 +68,7 @@ function cancelDraw() {
    
    map.removeInteraction(draw);
    setTimeout(function() {
+      gisportal.selectionTools.isSelecting = false;
       gisportal.selectionTools.isDrawing = false;
    }, 500);
 }

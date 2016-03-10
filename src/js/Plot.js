@@ -343,11 +343,12 @@ gisportal.graphs.Plot =(function(){
          var nice_bbox = component.bbox;
          var current_projection = gisportal.projection;
          if(current_projection != "EPSG:4326"){
-            if(nice_bbox.indexOf('POLYGON') == -1){
+            if(gisportal.methodThatSelectedCurrentRegion.justCoords){
                nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
             }else if(nice_bbox.startsWith('POLYGON')){
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
             }else{
+               //TOD: Fix this!!!!!!!
                console.log("This is a multipolygon!");
             }
          }

@@ -1038,14 +1038,14 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
          urlParams.vertical = '-' + Math.abs( vert );
    }
 
-   graphParams.type = 'timeseries';
+   graphParams.type = 'file';
    graphParams.time = urlParams.time;
    graphParams.bbox = urlParams.bbox;
    graphParams.depth = urlParams.vertical;
 
 
    var request = $.param(urlParams);
-   if (urlParams.bbox.indexOf("POLYGON") !== -1 || urlParams.bbox.indexOf("LINESTRING") !== -1) {
+   if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true) {
       url = gisportal.middlewarePath + "/download?" + $.param(graphParams);
    } else {
       url = indicator.wcsURL + request;
