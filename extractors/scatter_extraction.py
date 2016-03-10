@@ -6,8 +6,8 @@ import uuid
 
 class ScatterExtractor(Extractor):
 	"""docstring for BasicExtractor"""
-	def __init__(self, wcs_url, wcs_url_2,extract_dates, extract_area=None, extract_variable=None, extract_variable_2=None):
-		super(ScatterExtractor, self).__init__(wcs_url, extract_dates,  extract_area=extract_area, extract_variable=extract_variable)
+	def __init__(self, wcs_url, wcs_url_2,extract_dates, extract_area=None, extract_variable=None, extract_variable_2=None,  extract_depth=None):
+		super(ScatterExtractor, self).__init__(wcs_url, extract_dates,  extract_area=extract_area, extract_variable=extract_variable,  extract_depth=extract_depth)
 		self.second_var = extract_variable_2
 		self.wcs_url_2 = wcs_url_2
 

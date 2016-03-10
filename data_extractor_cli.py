@@ -45,7 +45,7 @@ def main():
 	usage = "a usage string" 
 
 	parser = argparse.ArgumentParser(description=usage)
-	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
+	parser.add_argument("-t", "--type", action="store", dest="extract_type", help="Extraction type to perform", required=True, choices=["file","scatter","single","basic","irregular","trans-lat","trans-long","trans-time", "hovmoller"])
 	parser.add_argument("-o", "--output", action="store", dest="output", help="Choose the output type (only json is currently available)", required=False, choices=["json"], default="json")
 	parser.add_argument("-url", "--wcs_url", action="store", nargs="+",dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", nargs="+",dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
@@ -58,6 +58,8 @@ def main():
 	parser.add_argument("-csv", action="store", dest="csv", help="a csv file with lat,lon,date for use in transect extraction", required=False)
 	parser.add_argument("-xvar", action="store", dest="xvar", help="x axis variable for hovmoller plot")
 	parser.add_argument("-yvar", action="store", dest="yvar", help="y axis vairable for hovmoller plot")
+	parser.add_argument("-dest" , action="store", dest="dest", help="location to save an extracted file in")
+
 	args = parser.parse_args()
 
 	#print args.debug
@@ -84,6 +86,10 @@ def main():
 			filename = extractor.getData()
 		stats = BasicStats(filename, args.wcs_variable[0])
 		output_data = stats.process()
+	elif (args.extract_type=="file"):
+		extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), masking_polygon=args.geom)
+		filename = getData(dest=args.dest)
+		output_data = filename
 	elif (args.extract_type == "image"):
 		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
 		filename = extractor.getData()

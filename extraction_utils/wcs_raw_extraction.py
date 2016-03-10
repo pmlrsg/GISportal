@@ -6,13 +6,14 @@ class WCSRawHelper(object):
 	"""docstring for WCSHelper
 	https://rsg.pml.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY?Service=WCS&Format=NetCDF3&Request=GetCoverage&version=1.0.0&BBOX=47.92008333,1.0731783,125.83,30.4258&Coverage=chlor_a&Time=2009-01-07%2000:00:00/2016-02-24%2000:00:00
 	"""
-	def __init__(self, url, dates, variable, bbox, single=False):
+	def __init__(self, url, dates, variable, bbox, depth,single=False):
 		super(WCSRawHelper, self).__init__()
 		self.url = url
 		self.single = single
 		self.dates = dates
 		self.variable = variable
 		self.bbox = bbox
+		self.depth = depth
 
 	def __repr__(self):
 		return str(self.wcs)
@@ -33,6 +34,8 @@ class WCSRawHelper(object):
 		params['Request'] = 'GetCoverage'
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
+		if(self.depth):
+			params['Vertical'] = self.depth
 		if(not isinstance(self.dates, basestring)):
 			params['Time'] = urllib.quote_plus(','.join(self.dates))
 		else:
@@ -56,6 +59,6 @@ class WCSRawHelper(object):
 			full_url = self.url + self.generateGetCoverageUrl()
 		else:
 			full_url = self.url +'?'+ self.generateGetCoverageUrl()
-		#print full_url
+		print full_url
 		resp = urllib2.urlopen(full_url)
 		return resp

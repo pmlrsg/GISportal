@@ -23,7 +23,11 @@ class ImageStats(object):
 		lat_list = []
 		lon_list = []
 		#print variable.shape
-		if(len(variable.shape) > 2 ):
+		if(len(variable.shape) > 3 ):
+			var_list = [[float(x) for x in y] for y in variable[0][0]]
+			lat_list = [float(x) for x in lats]
+			lon_list = [float(x) for x in lons]
+		elif(len(variable.shape) > 2 ):
 			var_list = [[float(x) for x in y] for y in variable[0]]
 			lat_list = [float(x) for x in lats]
 			lon_list = [float(x) for x in lons]
@@ -38,9 +42,12 @@ class ImageStats(object):
 		#print len(var_list[0])
 
 		_ret = {}
-		_ret['data'] = var_list
-		_ret['latitudes'] = lat_list
-		_ret['longitudes'] = lon_list
+		_ret['vars'] = ['Data','Latitudes','Longitudes']
+		_ret['data'] = []
+		_ret['data'].append(var_list)
+		_ret['data'].append(lat_list)
+		_ret['data'].append(lon_list)
+		#print json.dumps(_ret )
 		return json.dumps(_ret )
 
 
