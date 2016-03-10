@@ -66,7 +66,7 @@ def main():
 	debug.log("a message to test debugging")
 	irregular = False
 	if(args.geom):
-		print "geom found - generating bbox"
+		#print "geom found - generating bbox"
 		bbox = wkt.loads(args.geom).bounds
 		irregular = True
 		#print bbox
