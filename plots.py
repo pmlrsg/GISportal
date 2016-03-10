@@ -36,7 +36,7 @@ import palettes
 
 from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
-from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats
+from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats
 
 
 # Set the default logging verbosity to lowest.
@@ -279,18 +279,20 @@ def extract(plot, outfile="image.html"):
    my_hash = plot['req_hash']
    my_id = plot['req_id']
    dir_name = plot['dir_name']
-
+   #print(plot)
    df = plot['data'][0]
+   #print(df)
    plot_type = df['type']
    var_name = df['coverage']
    plot_scale = df['scale']
 
-   debug(4, "extract: plot={}".format(df['data'][2]))
+   debug(4, "extract: plot={}".format(df['data']))
 
    varindex = {j: i for i, j in enumerate(df['vars'])}
-
-   data = np.transpose(df['data'])
-
+   #print(varindex)
+   #data = np.transpose(df['data'])
+   data = df['data']['data']
+   #print(data)
    # Save the CSV files
    csv_dir = dir_name + "/" + my_hash
 
@@ -517,8 +519,9 @@ def hovmoller(plot, outfile="image.html"):
  
    # We are working in the plotting space here, log or linear. Use this to set our
    # default scales.
-   min_val = min(np.nanmin(values)[:])
-   max_val = max(np.nanmax(values)[:])
+
+   min_val = np.nanmin(values)
+   max_val = np.nanmax(values)
    #print(min_val, max_val)
    #print(values[:])
    colours = get_palette()
@@ -1073,34 +1076,42 @@ def get_plot_data(json_request, plot=dict()):
 
       coverage = ds['coverage']
       wcs_url = ds['threddsUrl']
+      if 'depth' in ds:
+        depth = ds['depth']
+      else:
+        depth=None
       bbox = ["{}".format(ds['bbox'])]
       bbox = ds['bbox']
       time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
       debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
-      #try:
-         #extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
-         #extract = extractor.getData()
-         #map_stats = HovmollerStats(extract, "Lon",  "Time", coverage)
-         #response = json.loads(hov_stats.process())
-      #except ValueError:
-         #debug(2, "Data request, {}, failed".format(data_request))
-         #return plot
+      try:
+         if irregular:
+            bounds = wkt.loads(bbox).bounds
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+         else:
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+         extract = extractor.getData()
+         map_stats = ImageStats(extract,  coverage)
+         response = json.loads(map_stats.process())
+      except ValueError:
+         debug(2, "Data request, {}, failed".format(data_request))
+         return plot
          
       # TODO - For testing we use the file specified. Need to build a call to the extractor.
-      testdata = ds['filename']
-      debug(3, "Loading test from {}".format(testdata))
-      with open(testdata, 'r') as datafile:
-         json_data = json.load(datafile)
-      debug(4, "Data: {}".format(json_data.keys()))
+      #testdata = ds['filename']
+      #debug(3, "Loading test from {}".format(testdata))
+      #with open(testdata, 'r') as datafile:
+      #   json_data = json.load(datafile)
+      #debug(4, "Data: {}".format(json_data.keys()))
 
-      data = []
+      #data = []
       my_vars = ['data', 'latitudes', 'longitudes']
-      [data.append(json_data[i]) for i in my_vars]
+      #[data.append(json_data[i]) for i in my_vars]
       
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
-                      vars=my_vars, data=data))
+                      vars=my_vars, data=response))
       update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
 
    elif plot_type in ("timeseries", "scatter"):
