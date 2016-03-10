@@ -431,7 +431,7 @@ def hovmoller(plot, outfile="image.html"):
    varindex = {j: i for i, j in enumerate(df['vars'])}
 
    assert plot_type in ("hovmollerLat", "hovmollerLon")
-   
+   #print(df['data'])
    data = np.transpose(df['data'])
 
    # Save the CSV files
@@ -464,18 +464,21 @@ def hovmoller(plot, outfile="image.html"):
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
    y_size = len(set(latlon))
-
+   #print(x_size,y_size)
+   #print(data[varindex['value']])
+   #print(len(data[varindex['value']]))
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
    assert x_size * y_size == len(data[varindex['value']])
-   
+   #print(np.array(data[varindex['value']]))
    # We want a 2d array with latlon as x axis and date as y.
-   values = np.reshape(np.array(data[varindex['value']]),(-1,y_size))
+   
+   values = np.reshape(np.ma.masked_array(data[varindex['value']]),(-1,y_size))
 
    # Easiest if we force float here but is that always true?
    # We also have problems with how the data gets stored as JSON (very big!).
    values = values.astype(np.float64)
-   
+   #print(values.shape)
    if plot_scale == "log":
        log_plot = True
        values = np.log10(values)
@@ -514,9 +517,10 @@ def hovmoller(plot, outfile="image.html"):
  
    # We are working in the plotting space here, log or linear. Use this to set our
    # default scales.
-   min_val = np.amin(values)
-   max_val = np.amax(values)
-
+   min_val = min(np.nanmin(values)[:])
+   max_val = max(np.nanmax(values)[:])
+   #print(min_val, max_val)
+   #print(values[:])
    colours = get_palette()
    legend = plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
 
@@ -535,11 +539,18 @@ def hovmoller(plot, outfile="image.html"):
    intercept = min_val
    for i in range(x_size):
       for j in range(y_size):
-        p_index = int((values[i,j] - intercept) / slope) * 4
-        view[i, j, 0] = my_palette[p_index]
-        view[i, j, 1] = my_palette[p_index+1]
-        view[i, j, 2] = my_palette[p_index+2]
-        view[i, j, 3] = 255
+         #print(i,j,intercept,slope,values[i,j] )
+         if(np.isnan(values[i,j])):
+            view[i, j, 0] = 0
+            view[i, j, 1] = 0
+            view[i, j, 2] = 0
+            view[i, j, 3] = 0
+         else:
+            p_index = int((values[i,j] - intercept) / slope) * 4
+            view[i, j, 0] = my_palette[p_index]
+            view[i, j, 1] = my_palette[p_index+1]
+            view[i, j, 2] = my_palette[p_index+2]
+            view[i, j, 3] = 255
 
    plot_width = 800
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
@@ -1031,6 +1042,7 @@ def get_plot_data(json_request, plot=dict()):
          else:
            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
          extract = extractor.getData()
+
          if plot_type == "hovmollerLat":
             hov_stats = HovmollerStats(extract, "Time", "Lat", coverage)
          else:
