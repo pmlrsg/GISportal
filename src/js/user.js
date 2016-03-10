@@ -8,7 +8,9 @@ gisportal.user.loggedIn = function(){
          url: gisportal.middlewarePath + '/user/logout',
          success: function() {
             gisportal.user.initDOM();
-            collaboration.initDOM();
+            if(gisportal.config.collaborationFeatures.enabled){
+               collaboration.initDOM();
+            }
             gisportal.user.updateProfile(); // The user information is then reset back to defualts
          }
       });
