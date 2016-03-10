@@ -207,8 +207,14 @@ gisportal.selectionTools.csvFound = function(formData){
       error: function(e) {
          if(e.status == 401){
             $.notify("Sorry, You nust be logged in to use this feature.", "error");
-         }else{
+         }else if(e.status == 413){
+            $.notify("The server cannot take requests of that size \nPlease select a smaller file", {className:"error", autoHide: false});
+         }else if(e.status == 400){
+            $.notify("Sorry, There was an error with your File: " + e.responseText, {className:"error", autoHide: false});
+         }else if(e.status == 415){
             $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
+         }else{
+            $.notify("Sorry, There was an error with that: " + e.statusText, {className:"error", autoHide: false});
          }
       },
       data: formData,

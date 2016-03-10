@@ -509,7 +509,7 @@ gisportal.graphs.Plot =(function(){
                   $('.no-graphs-text').toggleClass("hidden", false);
                }
                clearInterval( _this._monitorJobStatusInterval );
-               $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
+               $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
             }
          });
       }
