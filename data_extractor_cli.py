@@ -87,8 +87,8 @@ def main():
 		stats = BasicStats(filename, args.wcs_variable[0])
 		output_data = stats.process()
 	elif (args.extract_type=="file"):
-		extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), masking_polygon=args.geom)
-		filename = getData(dest=args.dest)
+		extractor = IrregularExtractor(str(args.wcs_url[0]), [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]), extract_depth=args.depth,masking_polygon=args.geom)
+		filename = extractor.getData(dest=args.dest)
 		output_data = filename
 	elif (args.extract_type == "image"):
 		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable[0])
