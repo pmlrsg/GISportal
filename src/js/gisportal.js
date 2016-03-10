@@ -555,11 +555,8 @@ gisportal.mapInit = function() {
                $('.users-geojson-files').val("default");
                gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", justCoords: false};
                cancelDraw();
-
-               
-
+               gisportal.selectionTools.isSelecting = false;
          });
-         gisportal.selectionTools.isSelecting = false;
 
         }
         else {
