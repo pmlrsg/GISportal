@@ -341,7 +341,7 @@ gisportal.graphs.Plot =(function(){
             logo = "undefined";
          }
          var nice_bbox = component.bbox;
-         var current_projection = map.getView().getProjection().getCode();
+         var current_projection = gisportal.projection;
          if(current_projection != "EPSG:4326"){
             if(nice_bbox.indexOf('POLYGON') == -1){
                nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");

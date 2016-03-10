@@ -221,7 +221,7 @@ gisportal.selectionTools.csvFound = function(formData){
 gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
-      'featureProjection': map.getView().getProjection().getCode()
+      'featureProjection': gisportal.projection
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
    gisportal.vectorLayer.getSource().clear();

@@ -143,7 +143,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          parseFloat(indicator.exBoundingBox.EastBoundLongitude),
          parseFloat(indicator.exBoundingBox.NorthBoundLatitude)
       ];
-      var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', map.getView().getProjection().getCode());
+      var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', gisportal.projection);
       
       map.getView().fit(extent, map.getSize());
    });
@@ -579,22 +579,26 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
 };
 
+gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
+   $.ajax({
+      url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
+      dataType: 'json',
+      success: function(data){
+         gisportal.selectionTools.loadGeoJSON(data);
+      },
+      error: function(e){
+         $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+      }
+   });
+};
+
 gisportal.indicatorsPanel.addAnalysisListeners = function(){
    $('.users-geojson-files').on('change', function(){
-      $.ajax({
-         url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + this.value + ".geojson" ,
-         dataType: 'json',
-         success: function(data){
-            gisportal.selectionTools.loadGeoJSON(data);
-         },
-         error: function(e){
-            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
-         }
-      });
+      gisportal.indicatorsPanel.geoJSONSelected(this.value);
    });
    var addCoordinatesToProfile = function(name){
       var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
-      var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
+      var geojson = gisportal.featureToGeoJSON(feature, gisportal.projection, "EPSG:4326");
       $.ajax({
          method: 'post',
          url:  'app/plotting/save_geoJSON?filename=' + name,
@@ -1150,7 +1154,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
    }
-   var current_proj = map.getView().getProjection().getCode();
+   var current_proj = gisportal.projection;
    if(current_proj !== "EPSG:4326"){
       for(point in bb1.coordinates[0]){
          bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");

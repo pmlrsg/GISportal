@@ -470,7 +470,7 @@ gisportal.selectBaseLayer = function(id) {
       }
    }
    // check to see if we need to change projection
-   var current_projection = map.getView().getProjection().getCode();
+   var current_projection = gisportal.projection;
    var msg = '';
    var setViewRequired = true;
 
@@ -506,7 +506,7 @@ gisportal.selectBaseLayer = function(id) {
    if (setViewRequired) {
       var centre = map.getView().getCenter();
       var extent = map.getView().calculateExtent(map.getSize());
-      var projection = map.getView().getProjection().getCode();
+      var projection = gisportal.projection;
       gisportal.setView(centre, extent, projection);
    }
 };
