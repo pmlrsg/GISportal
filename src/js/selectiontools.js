@@ -203,6 +203,7 @@ gisportal.selectionTools.csvFound = function(formData){
       success: function(d){
          gisportal.selectionTools.loadGeoJSON(d.geoJSON);
          gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+         gisportal.graphs.deleteActiveGraph();
       },
       error: function(e) {
          if(e.status == 401){

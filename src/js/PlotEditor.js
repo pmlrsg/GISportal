@@ -368,8 +368,10 @@ gisportal.graphs.PlotEditor = (function(){
       
       // When a component is removed from the Plot remove it from the UI
       this.plot().on('component-removed', function( data ){
-         if( _this.plot().components().length <= 1 )
+         if( _this.plot().components().length === 1 )
             _this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
+         if( _this.plot().components().length === 0 )
+            gisportal.graphs.deleteActiveGraph();
 
 
          _this._componentsTable.children().each(function(){
