@@ -14,7 +14,7 @@ class IrregularExtractor(Extractor):
 		self.masking_polygon = masking_polygon
 
 	def getData(self):
-		print self.wcs_url
+		#print self.wcs_url
 		wcs_extractor = WCSRawHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area)
 		data = wcs_extractor.getData()
 		fname = self.outdir+str(uuid.uuid4())+".nc"

@@ -435,17 +435,23 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    for i in range(chl.shape[0]):
       #print i
       masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
-      masked_variable[i].filled(-999)
+      #print "adding null values"
+      masked_variable[i].filled(fill_value=np.nan)
+      where_is_nan = np.isnan(masked_variable[i])
+      masked_variable[i][masked_variable[i] == 9.96921e+36] = np.nan
+      #print masked_variable[i]
       #a = fig.add_subplot(1,5,i+1)
       #imgplot = plt.imshow(masked_variable)
 
    #plt.show()
-   print np.array(masked_variable).shape
+   #print np.array(masked_variable).shape
+   #where_is_nan = np.isnan(masked_variable)
+   #masked_variable[where_is_nan] = 9.96921e+36
    to_be_masked.variables[variable][:] = np.ma.array(masked_variable)[:]
    to_be_masked.close()
 
    to_be_masked = netCDF.Dataset(netcdf_base, 'r+')
-
+   #print to_be_masked.variables[variable][:]
    #print to_be_masked.variables[variable][:]
    #to_be_masked.close()
    return masked_variable, to_be_masked, masker,  variable
@@ -467,8 +473,13 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    xArr = np.array(xVar)
    yVar = getCoordinateVariable(dataset, yAxisVar)
    yArr = np.array(yVar)
-   zArr = np.array(dataset.variables[dataVar])
-   
+   zArr = dataset.variables[dataVar][:]
+   #print '+'*20
+   #print zArr
+   zArr = np.ma.masked_array(zArr)
+   #print '-'*20
+   #print zArr
+   #print zArr.shape
    if xVar == None:
       print "could not find %s dimension" % xAxisVar
       return
@@ -547,11 +558,14 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
             if (j < len(lon)):
                pos = lon[j]
             
-         
+         #print row
          mean = getMean(row)
-         
+         #print mean
          if not np.isnan(mean):
             output['data'].append([date, float(pos), mean])
+         else:
+            #print "adding nan"
+            output['data'].append([date, float(pos), None])
             
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
