@@ -30,6 +30,8 @@ from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Ran
 from bokeh.resources import CSSResources
 from bokeh.embed import components
 
+from shapely import wkt
+
 import palettes
 
 from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
@@ -969,8 +971,9 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    
 
 def get_plot_data(json_request, plot=dict()):
-   debug(2, "get_plot_data: Started")
 
+   debug(2, "get_plot_data: Started")
+   irregular = False
    # Common data for all plots. 
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
@@ -981,6 +984,8 @@ def get_plot_data(json_request, plot=dict()):
    xAxis = json_request['plot']['xAxis']
    dirname = plot['dir_name']
    my_hash = plot['req_hash']
+   if 'isIrregular' in json_request['plot']:
+      irregular = True
 
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
    # as a list.
@@ -991,6 +996,7 @@ def get_plot_data(json_request, plot=dict()):
    plot['xAxis'] = xAxis
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
+
    debug(3, plot)
 
    # Only try and set the 2nd Y axis if we have info. in the request.
@@ -1019,7 +1025,11 @@ def get_plot_data(json_request, plot=dict()):
 
       debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
       try:
-         extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+         if irregular:
+            bounds = wkt.loads(bbox).bounds
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+         else:
+           extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
          extract = extractor.getData()
          if plot_type == "hovmollerLat":
             hov_stats = HovmollerStats(extract, "Time", "Lat", coverage)
@@ -1099,7 +1109,11 @@ def get_plot_data(json_request, plot=dict()):
          data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
          debug(3, "Requesting data: {}".format(data_request))
          try:
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+            if irregular:
+               bounds = wkt.loads(bbox).bounds
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+            else:
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
