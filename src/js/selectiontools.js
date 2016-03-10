@@ -228,6 +228,8 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    cancelDraw();
    //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
+   // Zooms to the extent of the features just added
+   map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize())
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
    // If this is a newly created geojson

@@ -569,6 +569,8 @@ gisportal.graphs.Plot =(function(){
       if( !arguments.length ) return this._plotType;
       var old = this._plotType;
       this._plotType = _new;
+
+      $('.graph-date-range-info-li').toggleClass("hidden", true);
       
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
@@ -709,9 +711,15 @@ gisportal.graphs.Plot =(function(){
       this.tBounds( newtBounds );
 
       if(this.plotType() == "scatter"){
+         var errFound = false;
          this._components.forEach(function(comElem){
-            _this.forceComponentDateRange( comElem );
+            if(_this.forceComponentDateRange( comElem )){
+               errFound = true;
+            }
          });
+         if(!errFound){
+            $('.graph-date-range-info-li').toggleClass("hidden", true);
+         }
       }
 
 
@@ -729,13 +737,18 @@ gisportal.graphs.Plot =(function(){
 
       var tBounds = this.tBounds();
 
-      if(firstDate > tBounds[0]){
-         $('.js-active-plot-start-date').val(firstDate.toISOString().split("T")[0]);
-         $('.js-active-plot-start-date').trigger("change");
-      }
-      if(tBounds[1] > lastDate){
-         $('.js-active-plot-end-date').val(lastDate.toISOString().split("T")[0]);
-         $('.js-active-plot-end-date').trigger("change");
+      if(firstDate > tBounds[0] || tBounds[1] > lastDate){
+         if(firstDate > tBounds[0]){
+            $('.js-active-plot-start-date').val(firstDate.toISOString().split("T")[0]);
+            $('.js-active-plot-start-date').trigger("change");
+         }
+         if(tBounds[1] > lastDate){
+            $('.js-active-plot-end-date').val(lastDate.toISOString().split("T")[0]);
+            $('.js-active-plot-end-date').trigger("change");
+         }
+         $('.graph-date-range-info-li').toggleClass("hidden", false);
+         $('.graph-date-range-info-div').html("<p>The time bounds have been moved so that they are contained in all of the compenents you have added. Scatter plots must have time bounds contained within the components</p>");
+         return true;
       }
    };
 
