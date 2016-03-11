@@ -398,7 +398,9 @@ def extract(plot, outfile="image.html"):
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
               title="Image extract - {}".format(plot_title))
-
+   p.title_text_font_size = "14pt"
+   p.xaxis.axis_label_text_font_size = "10pt"
+   p.yaxis.axis_label_text_font_size = "10pt"
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
    
@@ -416,7 +418,6 @@ def extract(plot, outfile="image.html"):
 #END extract
 
 def hovmoller(plot, outfile="image.html"):
-       
    plot_type = plot['type']
    plot_title = plot['title']
    plot_units = plot['y1Axis']['label']
@@ -462,13 +463,10 @@ def hovmoller(plot, outfile="image.html"):
    # Format latlon to float. Otherwise we can not do the mins etc.
    #latlon = np.array(df["LatLon"]).astype(np.float)
    latlon = np.array(data[varindex['latlon']]).astype(np.float64)
-   
+
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
    y_size = len(set(latlon))
-   #print(x_size,y_size)
-   #print(data[varindex['value']])
-   #print(len(data[varindex['value']]))
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
    assert x_size * y_size == len(data[varindex['value']])
@@ -559,7 +557,9 @@ def hovmoller(plot, outfile="image.html"):
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
               title="Hovmoller - {}".format(plot_title), responsive=True)
-
+   p.title_text_font_size = "14pt"
+   p.xaxis.axis_label_text_font_size = "10pt"
+   p.yaxis.axis_label_text_font_size = "10pt"
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
    
@@ -662,7 +662,9 @@ def transect(plot, outfile="transect.html"):
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
-   
+   ts_plot.title_text_font_size = "14pt"
+   ts_plot.xaxis.axis_label_text_font_size = "10pt"
+   ts_plot.yaxis.axis_label_text_font_size = "10pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
@@ -814,6 +816,9 @@ def timeseries(plot, outfile="time.html"):
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
               height=400, responsive=True
    )
+   ts_plot.title_text_font_size = "14pt"
+   ts_plot.xaxis.axis_label_text_font_size = "10pt"
+   ts_plot.yaxis.axis_label_text_font_size = "10pt"
    
    tooltips = [("Date", "@sdate")]
    tooltips.append(("Mean", "@mean"))
@@ -958,8 +963,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       x_axis_type=plot['y1Axis']['scale'], 
       y_axis_type=plot['y2Axis']['scale'], 
       width=800,
-      height=300,
+      height=400,
       responsive=True)
+   scatter_plot.title_text_font_size = "14pt"
+   scatter_plot.xaxis.axis_label_text_font_size = "10pt"
+   scatter_plot.yaxis.axis_label_text_font_size = "10pt"
 
    hover = HoverTool(
       tooltips=[
