@@ -319,10 +319,7 @@ gisportal.graphs.Plot =(function(){
          meta += "Confidence: " + layer.tags.Confidence + "<br>";
          meta += "Provider: " + layer.providerTag + "<br>";
          meta += "Interval: " + layer.tags.interval + "<br>";
-         if( component.bbox )
-            meta += "Bounding Box: " + component.bbox + "<br>";
-         else
-            meta += "BBox: All coverage<br>";
+         meta += "Bounding Box: " + component.bbox + "<br>";
 
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
@@ -343,13 +340,13 @@ gisportal.graphs.Plot =(function(){
          var nice_bbox = component.bbox;
          var current_projection = gisportal.projection;
          if(current_projection != "EPSG:4326"){
-            if(gisportal.methodThatSelectedCurrentRegion.justCoords){
-               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
-            }else if(nice_bbox.startsWith('POLYGON')){
+            if(nice_bbox.startsWith('POLYGON')){
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
+            }else if(nice_bbox.indexOf("(") > -1){
+               //TODO: Fix this!!!!!!!
+               console.log("This is a different kind of polygon!!!");
             }else{
-               //TOD: Fix this!!!!!!!
-               console.log("This is a multipolygon!");
+               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
             }
          }
 
@@ -510,7 +507,11 @@ gisportal.graphs.Plot =(function(){
                   $('.no-graphs-text').toggleClass("hidden", false);
                }
                clearInterval( _this._monitorJobStatusInterval );
-               $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
+               if(response.status == 200){
+                  $.notify( "There was an error creating the graph" , "error");
+               }else{
+                  $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
+               }
             }
          });
       }

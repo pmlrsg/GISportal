@@ -363,6 +363,9 @@ gisportal.selectionTools.updateROI = function()  {
       }
       $('.users-geojson-files').val(value);
       gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
+      if(gisportal.currentSelectedRegion.indexOf("(") === -1){
+         gisportal.methodThatSelectedCurrentRegion.justCoords = true;
+      }
       gisportal.vectorLayer.getSource().clear();
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);

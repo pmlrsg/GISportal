@@ -923,7 +923,13 @@ gisportal.indicatorsPanel.getParams = function(id) {
 
    var indicator = gisportal.layers[id];
 
+   var exBoundingBox = indicator.exBoundingBox;
 
+   var bbox = gisportal.currentSelectedRegion;
+   if(bbox == ""){
+      bbox = exBoundingBox.WestBoundLongitude + "," + exBoundingBox.SouthBoundLatitude + "," + exBoundingBox.EastBoundLongitude + "," + exBoundingBox.NorthBoundLatitude;
+      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",")
+   }
    // TODO: add bins for histogram!
    var graphParams = {
       baseurl: indicator.wcsURL,
@@ -932,7 +938,7 @@ gisportal.indicatorsPanel.getParams = function(id) {
       bins: '',
       time: dateRange,
       //bbox: $('#graphcreator-bbox').val(),
-      bbox: gisportal.currentSelectedRegion,
+      bbox: bbox,
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,
