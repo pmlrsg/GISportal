@@ -17,14 +17,17 @@ class IrregularExtractor(Extractor):
 		#print self.wcs_url
 		wcs_extractor = WCSRawHelper(self.wcs_url, self.extract_dates, self.extract_variable, self.extract_area, self.extract_depth)
 		data = wcs_extractor.getData()
+		uuid_filename = str(uuid.uuid4())+".nc"
 		if dest:
-			fname = dest+str(uuid.uuid4())+".nc"
+			fname = dest+uuid_filename
 		else:
-			fname = self.outdir+str(uuid.uuid4())+".nc"
+			fname = self.outdir+uuid_filename
 		with open(fname, 'w') as outfile:
 			outfile.write(data.read())
 		mask, data,_,_ = create_mask(self.masking_polygon,fname,self.extract_variable)
 		#return basic(data, self.extract_variable,  filename=fname)
+		if dest:
+			return uuid_filename
 		return fname
 
 
