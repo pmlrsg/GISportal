@@ -1007,7 +1007,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
    content.find('.js-download').click(function(){
       var range = slider.val();
-      var download_data = gisportal.indicatorsPanel.exportRawUrl( id )
+      var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
       if(download_data.irregular){
          $.ajax({
             url:  download_data.url,
