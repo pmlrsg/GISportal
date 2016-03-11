@@ -473,6 +473,8 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    xArr = np.array(xVar)
    yVar = getCoordinateVariable(dataset, yAxisVar)
    yArr = np.array(yVar)
+   #print '+'*40
+   #print yArr.shape
    zArr = dataset.variables[dataVar][:]
    #print '+'*20
    #print zArr
@@ -543,12 +545,14 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
  
    #print len(lon)
    for i, timelatlon in enumerate(zMaskedArray):
+      #print i
+      #print times[i]
       date = None   
       if timeUnits:
-         date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+         date = netCDF.num2date(times[i], time.units, calendar='standard').isoformat()
       else:     
          date = ''.join(times[i])
-      
+      #print date
       for j, row in enumerate(timelatlon):
          #print len(row)
          if direction == "lat":
@@ -560,6 +564,7 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
             
          #print row
          mean = getMean(row)
+         #print mean
          #print mean
          if not np.isnan(mean):
             output['data'].append([date, float(pos), mean])
