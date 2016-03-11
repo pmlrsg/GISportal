@@ -563,44 +563,18 @@ gisportal.mapInit = function() {
            map.forEachFeatureAtPixel(e.pixel,
                function(feature, layer) {
                    if (feature && _.keys(feature.getProperties()).length >1 ) {
-                     //console.log("----------------------");
-                     //console.log(feature);
                      var geom = feature.getGeometry();
-                     //console.log(gisportal.wkt.writeFeatures([feature])) ;
-                       // clear existing style if any layers currently slected
                        _.each(gisportal.selectedFeatures, function(feature) {
-                           //feature[0].setStyle(feature[1]);
                        });
-                       //console.log('====================');
                        var tlayer;
                        if(feature.getId()){
                          tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
                        }
                        isFeature = true;
                        gisportal.selectedFeatures.push([feature, feature.getStyle()]);
-                       // var fill = gisportal.vectorStyles.genColour(0.8);
-                       // var geometry = feature.getGeometry();
-                       // var coord = geometry.getCoordinates();
-                       // feature.setStyle(new ol.style.Style({
-                       //     stroke: new ol.style.Stroke({
-                       //         color: gisportal.vectorStyles.genColour(1),
-                       //         width: 2
-                       //     }),
-                       //     fill: new ol.style.Fill({
-                       //         color: fill
-                       //     })
-                       // }));
-                       //console.log('coord ' + coord); // coord 307225.8888888889,361595.6666666666
-
-                       ////console.log(feature.values_); // name undefined
-                       // var ft = myGeoJSONSource.getClosestFeatureToCoordinate(coord);
-                       // //console.log('name ' + ft.get('Tenant_Name')); // name Shefton
-
-                       //response += '<p style="color:' + fill + '">vector details</p><ul>';
                        var props = feature.getProperties();
                        for (var key in props) {
                            if (props.hasOwnProperty(key) && key != "geometry") {
-                               ////console.log(key, props[key]);
                                if(tlayer){
                                   if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
                                       response += "<li>" + key + " : " + props[key] + "</li>";
@@ -634,30 +608,6 @@ gisportal.mapInit = function() {
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
       gisportal.events.trigger('map.move', centre, zoom);
    });
-
-
-
-
-
-
-
-
-
-   //    if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
-   //       var point = gisportal.reprojectPoint(e.coordinate, gisportal.projection, 'EPSG:4326');
-   //       var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
-   //       var lat = point[1].toFixed(3);
-   //       var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-   //       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-   //       dataReadingPopupContent.innerHTML = response;
-   //       dataReadingPopupOverlay.setPosition(e.coordinate);
-
-   //       gisportal.getPointReading(e);
-   //    }
-   // })
-
-   
-
  
    gisportal.loadLayers();
 //gisportal.loadVectorLayers();

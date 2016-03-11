@@ -64,13 +64,11 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   if(draw === null)return;
+   if(!draw)return;
    
    map.removeInteraction(draw);
-   setTimeout(function() {
-      gisportal.selectionTools.isSelecting = false;
-      gisportal.selectionTools.isDrawing = false;
-   }, 500);
+   gisportal.selectionTools.isSelecting = false;
+   gisportal.selectionTools.isDrawing = false;
 }
 
 gisportal.selectionTools.initDOM = function()  {
@@ -312,21 +310,22 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
 
-      
-      draw.on('drawstart',
-         function(evt) {
-            gisportal.vectorLayer.getSource().clear();
-            // set sketch
-            sketch = evt.feature;
-         }, this);
+      if(draw){
+         draw.on('drawstart',
+            function(evt) {
+               gisportal.vectorLayer.getSource().clear();
+               // set sketch
+               sketch = evt.feature;
+            }, this);
 
-      draw.on('drawend',
-         function(evt) {
-            gisportal.selectionTools.ROIAdded(sketch);
-            // unset sketch
-            sketch = null;
+         draw.on('drawend',
+            function(evt) {
+               gisportal.selectionTools.ROIAdded(sketch);
+               // unset sketch
+               sketch = null;
 
-         }, this);      
+            }, this);
+      }
    }
    map.ROI_Type = type;
 
