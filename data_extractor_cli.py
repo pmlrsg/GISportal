@@ -50,7 +50,7 @@ def main():
 	parser.add_argument("-url", "--wcs_url", action="store", nargs="+",dest="wcs_url", help="The URL of the Web Coverage Service to get data from", required=True)
 	parser.add_argument("-var", "--variable", action="store", nargs="+",dest="wcs_variable", help="The variable/coverage to request from WCS", required=True)
 	parser.add_argument("-v", "--debug", action="store_true", dest="debug", help="a debug flag - if passed there will be a tonne of log output and all interim files will be saved", required=False)
-	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=0)
+	parser.add_argument("-d", "--depth", action="store", dest="depth", help="an optional depth parameter for sending to WCS", required=False, default=None)
 	parser.add_argument("-g", "--geom", action="store", dest="geom", help="A string representation of teh polygon to extract", required=False)#, default="POLYGON((-28.125 43.418,-19.512 43.77,-18.809 34.453,-27.07 34.629,-28.125 43.418))")
 	parser.add_argument("-b", "--bbox", action="store", dest="bbox", help="A string representation of teh polygon to extract", required=False)
 	parser.add_argument("-time", action="store", dest="time", help="A time string for in the format startdate/enddate or a single date", required=False)
@@ -137,7 +137,7 @@ def main():
 
 		after_stats = _time.time()
 	elif (args.extract_type == "single"):
-		extractor = SingleExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=args.wcs_variable[0])
+		extractor = SingleExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=args.wcs_variable[0], extract_depth=args.depth)
 		output_data = extractor.getData()
 	elif (args.extract_type == "hovmoller"):
 		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
