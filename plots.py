@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-
+  
 """
 $Id$
 Library to make a variety of plots.
@@ -36,7 +36,7 @@ import palettes
 
 from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
-from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats
+from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
 
 # Set the default logging verbosity to lowest.
@@ -898,22 +898,32 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    my_hash = plot['req_hash']
    my_id = plot['req_id']
    dir_name = plot['dir_name']
+   varindex = {j: i for i, j in enumerate(plot_data[0]['order'])}
 
 
    # We have 2 sets of values we want to plot as a scatter. I think the extracter will bring these back together 
    # in the future.
-   df1 = plot_data[0]
-   df2 = plot_data[1]
+   df = plot_data[0]['data']
+   cov_meta = plot_data[0]['cov_meta']
+   xVar = cov_meta['x']['coverage']
+   yVar = cov_meta['y']['coverage']
+
+   xData = [x[varindex[xVar]] for x in df]
+   yData = [x[varindex[yVar]] for x in df]
+   dateData = [x[varindex['Time']] for x in df]
+
+   #df1 = plot_data[0]
+   #df2 = plot_data[1]
           
    # Create a dict to hold index into the array for each item
-   varindex = {j: i for i, j in enumerate(df1['vars'])}
-   dfarray1 = np.array(df1['data'])
-   data1 = np.transpose(dfarray1[np.argsort(dfarray1[:,0])])
+   # df1 = x df2 = y
+   data1 = np.array(xData)
+   #data1 = np.transpose(dfarray1[np.argsort(dfarray1[:,0])])
       
-   date = datetime(data1[varindex['date']])
+   date = datetime(dateData)
 
-   dfarray2 = np.array(df2['data'])
-   data2 = np.transpose(dfarray2[np.argsort(dfarray2[:,0])])
+   data2 = np.array(yData)
+   #data2 = np.transpose(dfarray2[np.argsort(dfarray2[:,0])])
       
    csv_dir = dir_name + "/" + my_hash
 
@@ -925,28 +935,28 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       else:
          raise
 
-   csv_file1 = csv_dir + "/" + df1['coverage'] + ".csv"
-   np.savetxt(csv_file1, np.transpose(data1), comments='', header=','.join(df1['vars']), fmt="%s",delimiter=",")
-   csv_file2 = csv_dir + "/" + df2['coverage'] + ".csv"
-   np.savetxt(csv_file2, np.transpose(data2), comments='', header=','.join(df2['vars']), fmt="%s",delimiter=",")
+   csv_file1 = csv_dir + "/" + cov_meta['x']['coverage'] + ".csv"
+   np.savetxt(csv_file1, np.transpose(data1), comments='', header="data", fmt="%s",delimiter=",")
+   csv_file2 = csv_dir + "/" + cov_meta['y']['coverage'] + ".csv"
+   np.savetxt(csv_file2, np.transpose(data2), comments='', header="data", fmt="%s",delimiter=",")
    with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
-      zf.write(csv_file1, arcname=df1['coverage'] + ".csv")
-      zf.write(csv_file2, arcname=df2['coverage'] + ".csv")
+      zf.write(csv_file1, arcname=cov_meta['x']['coverage'] + ".csv")
+      zf.write(csv_file2, arcname=cov_meta['x']['coverage'] + ".csv")
       debug(3, "ZIP: {}".format(zf.namelist()))
 
    shutil.rmtree(csv_dir)
 
    datasource = dict(date=date,
-                     sdate=data1[varindex['date']],
-                     x=data1[varindex['mean']],
-                     y=data2[varindex['mean']])
+                     sdate=dateData,
+                     x=data1,
+                     y=data2)
 
    source = ColumnDataSource(data=datasource)
-      
+   #print(source)
    scatter_plot = figure(
       title=plot_title, 
-      x_axis_type=plot['xAxis']['scale'], 
-      y_axis_type=plot['y1Axis']['scale'], 
+      x_axis_type=plot['y1Axis']['scale'], 
+      y_axis_type=plot['y2Axis']['scale'], 
       width=800,
       height=300,
       responsive=True)
@@ -954,20 +964,20 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    hover = HoverTool(
       tooltips=[
          ("Date", "@sdate"),
-         (df1['coverage'], "@x"),
-         (df2['coverage'], "@y")
+         (cov_meta['x']['coverage'], "@x"),
+         (cov_meta['y']['coverage'], "@y")
       ]
    )
 
    scatter_plot.add_tools(hover)
 
-   scatter_plot.xaxis.axis_label = plot['xAxis']['label']
+   scatter_plot.xaxis.axis_label = plot['y1Axis']['label']
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   scatter_plot.yaxis.axis_label = plot['y1Axis']['label']
+   scatter_plot.yaxis.axis_label = plot['y2Axis']['label']
    
-   scatter_plot.circle('x', 'y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
       
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
@@ -1114,7 +1124,7 @@ def get_plot_data(json_request, plot=dict()):
                       vars=my_vars, data=response))
       update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
 
-   elif plot_type in ("timeseries", "scatter"):
+   elif plot_type in ("timeseries"):
       #Can have more than 1 series so need a loop.
       for s in series:
          ds = s['data_source']
@@ -1162,6 +1172,52 @@ def get_plot_data(json_request, plot=dict()):
     
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+   elif plot_type == "scatter":
+      t_holder = {}
+      scatter_stats_holder = {}
+      series_count = 0
+      for s in series:
+         ds = s['data_source']
+         if s['yAxis'] == 1:
+            scale = json_request['plot']['y2Axis']['scale']
+            actual_axis = "x"
+         else:
+            scale = json_request['plot']['y1Axis']['scale']
+            actual_axis = "y"
+         coverage = ds['coverage']
+         wcs_url = ds['threddsUrl']
+         bbox = ds['bbox']
+         time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
+         t_holder[actual_axis] = {}
+         t_holder[actual_axis]['coverage'] = coverage
+         t_holder[actual_axis]['wcs_url'] = wcs_url
+         t_holder[actual_axis]['bbox'] = bbox
+         t_holder[actual_axis]['time_bounds'] = time_bounds
+         print(t_holder)
+         try:
+            if irregular:
+               bounds = wkt.loads(bbox).bounds
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+            else:
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+            extract = extractor.getData()
+            scatter_stats_holder[coverage] = extract
+         except ValueError:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return dict(data=[])
+         #except urllib2.HTTPError:
+            #debug(2, "Data request, {}, failed".format(data_request))
+            #return dict(data=[])
+         except requests.exceptions.ReadTimeout:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return dict(data=[])
+      stats = ScatterStats(scatter_stats_holder)
+      response = json.loads(stats.process())
+      data = response['data']
+      data_order = response['order']
+      plot_data.append(dict(cov_meta=t_holder, order=data_order, data=data))
+      update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
+
 
    elif plot_type == "transect":
       for s in series:
