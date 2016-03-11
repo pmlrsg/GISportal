@@ -110,11 +110,11 @@ def main():
 		filename = output_data = extractor.getData()
 		stats = filename
 	elif (args.extract_type == "trans-lat"):
-		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = TransectExtractor(args.wcs_url, [args.time], "latitude",  extract_area=bbox, extract_variable=str(args.wcs_variable[0]))
 		filename = extractor.getData()
 		#print filename
 	elif (args.extract_type == "trans-long"):
-		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "longitude", extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = TransectExtractor(args.wcs_url, ["2011-01-01", "2012-01-01"], "longitude", extract_area=bbox, extract_variable=str(args.wcs_variable[0]))
 		filename = extractor.getData()
 	elif (args.extract_type == "trans-time"):
 		# we will accept csv here so we need to grab teh lat lons and dates for use within teh extractor below
@@ -123,7 +123,7 @@ def main():
 
 		bbox = get_transect_bounds(args.csv)
 		time = get_transect_times(args.csv)
-		extractor = TransectExtractor(args.wcs_url[0], [time], "time", extract_area=bbox, extract_variable=args.wcs_variable[0])
+		extractor = TransectExtractor(args.wcs_url[0], [time], "time", extract_area=bbox, extract_variable=str(args.wcs_variable[0]))
 		filename = extractor.getData()
 		middle_time = _time.time()
 
@@ -137,10 +137,10 @@ def main():
 
 		after_stats = _time.time()
 	elif (args.extract_type == "single"):
-		extractor = SingleExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=args.wcs_variable[0], extract_depth=args.depth)
+		extractor = SingleExtractor(args.wcs_url[0], args.time, extract_area=bbox, extract_variable=str(args.wcs_variable[0]), extract_depth=args.depth)
 		output_data = extractor.getData()
 	elif (args.extract_type == "hovmoller"):
-		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=args.wcs_variable)
+		extractor = BasicExtractor(args.wcs_url, [args.time], extract_area=bbox, extract_variable=str(args.wcs_variable[0]))
 		filename = extractor.getData()
 		stats = HovmollerStats(filename, args.xvar, args.yvar, args.wcs_variable)
 		output_data = stats.process()
