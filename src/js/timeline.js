@@ -216,7 +216,7 @@ gisportal.TimeLine = function(id, options) {
       
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
-      self.showDate(self.draggedDate);   
+      $('.js-current-date').val(moment(self.draggedDate).format('YYYY-MM-DD'));
    };
    
    this.dragDateEnd = function() {
