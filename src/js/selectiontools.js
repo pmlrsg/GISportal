@@ -64,12 +64,11 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   if(draw === null)return;
+   if(!draw)return;
    
    map.removeInteraction(draw);
-   setTimeout(function() {
-      gisportal.selectionTools.isDrawing = false;
-   }, 500);
+   gisportal.selectionTools.isSelecting = false;
+   gisportal.selectionTools.isDrawing = false;
 }
 
 gisportal.selectionTools.initDOM = function()  {
@@ -203,12 +202,19 @@ gisportal.selectionTools.csvFound = function(formData){
       success: function(d){
          gisportal.selectionTools.loadGeoJSON(d.geoJSON);
          gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+         gisportal.graphs.deleteActiveGraph();
       },
       error: function(e) {
          if(e.status == 401){
             $.notify("Sorry, You nust be logged in to use this feature.", "error");
-         }else{
+         }else if(e.status == 413){
+            $.notify("The server cannot take requests of that size \nPlease select a smaller file", {className:"error", autoHide: false});
+         }else if(e.status == 400){
+            $.notify("Sorry, There was an error with your File: " + e.responseText, {className:"error", autoHide: false});
+         }else if(e.status == 415){
             $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
+         }else{
+            $.notify("Sorry, There was an error with that: " + e.statusText, {className:"error", autoHide: false});
          }
       },
       data: formData,
@@ -221,13 +227,15 @@ gisportal.selectionTools.csvFound = function(formData){
 gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
-      'featureProjection': map.getView().getProjection().getCode()
+      'featureProjection': gisportal.projection
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
    gisportal.vectorLayer.getSource().clear();
    cancelDraw();
    //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
+   // Zooms to the extent of the features just added
+   map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
    // If this is a newly created geojson
@@ -302,21 +310,22 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
 
-      
-      draw.on('drawstart',
-         function(evt) {
-            gisportal.vectorLayer.getSource().clear();
-            // set sketch
-            sketch = evt.feature;
-         }, this);
+      if(draw){
+         draw.on('drawstart',
+            function(evt) {
+               gisportal.vectorLayer.getSource().clear();
+               // set sketch
+               sketch = evt.feature;
+            }, this);
 
-      draw.on('drawend',
-         function(evt) {
-            gisportal.selectionTools.ROIAdded(sketch);
-            // unset sketch
-            sketch = null;
+         draw.on('drawend',
+            function(evt) {
+               gisportal.selectionTools.ROIAdded(sketch);
+               // unset sketch
+               sketch = null;
 
-         }, this);      
+            }, this);
+      }
    }
    map.ROI_Type = type;
 
@@ -353,6 +362,9 @@ gisportal.selectionTools.updateROI = function()  {
       }
       $('.users-geojson-files').val(value);
       gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
+      if(gisportal.currentSelectedRegion.indexOf("(") === -1){
+         gisportal.methodThatSelectedCurrentRegion.justCoords = true;
+      }
       gisportal.vectorLayer.getSource().clear();
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);

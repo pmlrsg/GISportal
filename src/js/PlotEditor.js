@@ -147,14 +147,27 @@ gisportal.graphs.PlotEditor = (function(){
       var minComponents = this.plot().minComponents;
       var totComponents = this.plot().components().length;
 
-     var hasLeftHandSeries = this.plot().components().some(function( component ){
+      var hasLeftHandSeries = this.plot().components().some(function( component ){
          return component.yAxis == 1;
       });
 
-     if( this.plot().components().length == 1 )
-      this.plot().components()[0].yAxis = 1;
+      if( this.plot().components().length == 1 )
+         this.plot().components()[0].yAxis = 1;
 
       if(minComponents <= totComponents){
+         if(this.plot().plotType() == "scatter"){
+            var _this = this;
+            var errFound = false;
+            this.plot()._components.forEach(function(comElem){
+               if(_this.plot().forceComponentDateRange( comElem )){
+                  errFound = true;
+               }
+            });
+            if(errFound){
+               $.notify("Scatter plots must have time bounds contained within the components. \nPlease try submitting again.", "error");
+               return;
+            }
+         }
          if( this.plot().components().length == 1 || hasLeftHandSeries ){
             this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
             this.plot().submitRequest();
@@ -355,8 +368,10 @@ gisportal.graphs.PlotEditor = (function(){
       
       // When a component is removed from the Plot remove it from the UI
       this.plot().on('component-removed', function( data ){
-         if( _this.plot().components().length <= 1 )
+         if( _this.plot().components().length === 1 )
             _this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
+         if( _this.plot().components().length === 0 )
+            gisportal.graphs.deleteActiveGraph();
 
 
          _this._componentsTable.children().each(function(){

@@ -586,7 +586,9 @@ collaboration.userAuthorised = function() {
    $('.js-collaboration-holder').html('').html(rendered); 
 	
    //collaboration.initSession();
-   collaboration.initDOM();
+   if(gisportal.config.collaborationFeatures.enabled){
+      collaboration.initDOM();
+   }
    gisportal.user.initDOM();
  	return true;
 };

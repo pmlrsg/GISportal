@@ -409,7 +409,14 @@ gisportal.Vector = function(options) {
 
         var loadFeatures = function(response) {
             var wfsFormat = new ol.format.WFS();
-            sourceVector.addFeatures(wfsFormat.readFeatures(response));
+            // This converts the features to the correct projection
+            var feature, this_feature;
+            var features = wfsFormat.readFeatures(response);
+            for(feature in features){
+               this_feature = features[feature];
+               features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, "EPSG:4326", gisportal.projection));
+            }
+            sourceVector.addFeatures(features);
             if(!this.styleUIBuilt){
                 setup_style_ui(sourceVector,vec);
             }
@@ -435,7 +442,7 @@ gisportal.Vector = function(options) {
                     '%26request%3DGetFeature' +
                     '%26typename%3D' + $vector.variableName +
                     '%26srs%3D' + $vector.srsName +
-                    '%26bbox%3D' + extent + ',EPSG:4326';
+                    '%26bbox%3D' + extent + ',' + gisportal.projection;
 
                 $.ajax({
                     url: url

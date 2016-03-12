@@ -49,8 +49,13 @@ router.all('/app/plotting/plot', function(req, res){
    child.stdin.write(JSON.stringify(data.request));
    child.stdin.end();
 
+   var error;
    child.stderr.on('data', function (data) {
-      utils.handleError(data.toString(), res);
+      error += data.toString();
+   });
+   child.on('exit', function () {
+      if(error)
+      utils.handleError(error, res);
    });
 });
 
@@ -72,9 +77,13 @@ router.all('/app/plotting/check_plot', function(req, res){
       data = JSON.parse(data);
       res.send({time:data.time_diff, size:data.file_size, layer_id:series_data.layer_id});
    });
-
+   var error;
    child.stderr.on('data', function (data) {
-      utils.handleError(data.toString(), res);
+      error += data.toString();
+   });
+   child.on('exit', function () {
+      if(error)
+      utils.handleError(error, res);
    });
 });
 
@@ -196,5 +205,60 @@ router.all('/app/plotting/save_geoJSON', function(req, res){
          }else{
             res.send(filename);
          }
+   });
+});
+
+router.all('/app/prep_download', function(req, res){
+   var data = JSON.parse(req.body.data); // Gets the data given
+   var baseURL = data.baseurl;
+   var coverage = data.coverage;
+   var time = data.time;
+   var bbox = data.bbox;
+   var depth = data.depth;
+
+   var process_info = [EXTRACTOR_PATH, "-t", "file", "-url", baseURL, "-var", coverage, "-time", time, "-g", bbox, "-dest", TEMP_UPLOADS_PATH];
+   if(depth){
+      process_info.push("-d");
+      process_info.push(depth);
+   }
+
+   var child = child_process.spawn('python', process_info)
+
+   child.stdout.on('data', function(data){
+      var temp_file = path.normalize(data.toString().replace("\n", ""));
+
+      res.send({filename:temp_file, coverage: coverage});
+   });
+
+   var error;
+   child.stderr.on('data', function (data) {
+      error += data.toString();
+   });
+   child.on('exit', function () {
+      if(error)
+      utils.handleError(error, res);
+   });
+});
+
+router.all('/app/download', function(req, res){
+   var filename = req.query.filename
+   var coverage = req.query.coverage
+
+   var temp_file = path.join(TEMP_UPLOADS_PATH, filename);
+
+   var options = {
+      dotfiles: 'deny',
+      headers: {
+         'Content-Disposition': "attachment; filename=extracted_" + coverage + ".nc",
+         'x-timestamp': Date.now(),
+         'x-sent': true
+      }
+   };
+   res.sendFile(temp_file, options, function(err){
+      if (err) {
+         utils.handleError(err, res);
+      }else{
+         fs.unlink(temp_file);
+      }
    });
 });

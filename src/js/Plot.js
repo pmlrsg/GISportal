@@ -319,10 +319,7 @@ gisportal.graphs.Plot =(function(){
          meta += "Confidence: " + layer.tags.Confidence + "<br>";
          meta += "Provider: " + layer.providerTag + "<br>";
          meta += "Interval: " + layer.tags.interval + "<br>";
-         if( component.bbox )
-            meta += "Bounding Box: " + component.bbox + "<br>";
-         else
-            meta += "BBox: All coverage<br>";
+         meta += "Bounding Box: " + component.bbox + "<br>";
 
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
@@ -341,14 +338,15 @@ gisportal.graphs.Plot =(function(){
             logo = "undefined";
          }
          var nice_bbox = component.bbox;
-         var current_projection = map.getView().getProjection().getCode();
+         var current_projection = gisportal.projection;
          if(current_projection != "EPSG:4326"){
-            if(nice_bbox.indexOf('POLYGON') == -1){
-               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
-            }else if(nice_bbox.startsWith('POLYGON')){
+            if(nice_bbox.startsWith('POLYGON')){
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
+            }else if(nice_bbox.indexOf("(") > -1){
+               //TODO: Fix this!!!!!!!
+               console.log("This is a different kind of polygon!!!");
             }else{
-               console.log("This is a multipolygon!");
+               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
             }
          }
 
@@ -509,7 +507,11 @@ gisportal.graphs.Plot =(function(){
                   $('.no-graphs-text').toggleClass("hidden", false);
                }
                clearInterval( _this._monitorJobStatusInterval );
-               $.notify( "There was an error creating the graph:\n" + response.responseText , "error");
+               if(response.status == 200){
+                  $.notify( "There was an error creating the graph" , "error");
+               }else{
+                  $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
+               }
             }
          });
       }
@@ -569,6 +571,8 @@ gisportal.graphs.Plot =(function(){
       if( !arguments.length ) return this._plotType;
       var old = this._plotType;
       this._plotType = _new;
+
+      $('.graph-date-range-info-li').toggleClass("hidden", true);
       
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
@@ -709,9 +713,15 @@ gisportal.graphs.Plot =(function(){
       this.tBounds( newtBounds );
 
       if(this.plotType() == "scatter"){
+         var errFound = false;
          this._components.forEach(function(comElem){
-            _this.forceComponentDateRange( comElem );
+            if(_this.forceComponentDateRange( comElem )){
+               errFound = true;
+            }
          });
+         if(!errFound){
+            $('.graph-date-range-info-li').toggleClass("hidden", true);
+         }
       }
 
 
@@ -729,13 +739,18 @@ gisportal.graphs.Plot =(function(){
 
       var tBounds = this.tBounds();
 
-      if(firstDate > tBounds[0]){
-         $('.js-active-plot-start-date').val(firstDate.toISOString().split("T")[0]);
-         $('.js-active-plot-start-date').trigger("change");
-      }
-      if(tBounds[1] > lastDate){
-         $('.js-active-plot-end-date').val(lastDate.toISOString().split("T")[0]);
-         $('.js-active-plot-end-date').trigger("change");
+      if(firstDate > tBounds[0] || tBounds[1] > lastDate){
+         if(firstDate > tBounds[0]){
+            $('.js-active-plot-start-date').val(firstDate.toISOString().split("T")[0]);
+            $('.js-active-plot-start-date').trigger("change");
+         }
+         if(tBounds[1] > lastDate){
+            $('.js-active-plot-end-date').val(lastDate.toISOString().split("T")[0]);
+            $('.js-active-plot-end-date').trigger("change");
+         }
+         $('.graph-date-range-info-li').toggleClass("hidden", false);
+         $('.graph-date-range-info-div').html("<p>The time bounds have been moved so that they are contained in all of the compenents you have added. Scatter plots must have time bounds contained within the components</p>");
+         return true;
       }
    };
 

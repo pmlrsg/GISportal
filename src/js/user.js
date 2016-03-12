@@ -8,7 +8,9 @@ gisportal.user.loggedIn = function(){
          url: gisportal.middlewarePath + '/user/logout',
          success: function() {
             gisportal.user.initDOM();
-            collaboration.initDOM();
+            if(gisportal.config.collaborationFeatures.enabled){
+               collaboration.initDOM();
+            }
             gisportal.user.updateProfile(); // The user information is then reset back to defualts
          }
       });
@@ -65,6 +67,11 @@ gisportal.user.updateProfile = function(){
 };
 
 gisportal.loadLayerEditButtons = function(){
+   var addListenerForEditButton = function(){
+      $('span.js-add-layer-server').on('click', function(){
+         gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
+      });
+   };
    for(var index in gisportal.selectedLayers){
       var id = gisportal.selectedLayers[index];
       var layer = gisportal.layers[id];
@@ -86,6 +93,7 @@ gisportal.loadLayerEditButtons = function(){
       }
       if(span_info && span_info.length == 2 && layer){
          indicator_actions.append('<span class="js-add-layer-server icon-btn indicator-header-icon ' + span_info[0] + '" data-server="' + layer.serverName + '" data-owner="' + layer.owner + '" data-layer="' + id + '" title="' + span_info[1] + '"></span>');
+         addListenerForEditButton();
       }
    }
    //Loads the server form button or hides it

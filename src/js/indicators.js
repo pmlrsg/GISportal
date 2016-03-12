@@ -143,7 +143,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          parseFloat(indicator.exBoundingBox.EastBoundLongitude),
          parseFloat(indicator.exBoundingBox.NorthBoundLatitude)
       ];
-      var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', map.getView().getProjection().getCode());
+      var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', gisportal.projection);
       
       map.getView().fit(extent, map.getSize());
    });
@@ -579,22 +579,26 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
 };
 
+gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
+   $.ajax({
+      url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
+      dataType: 'json',
+      success: function(data){
+         gisportal.selectionTools.loadGeoJSON(data);
+      },
+      error: function(e){
+         $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+      }
+   });
+};
+
 gisportal.indicatorsPanel.addAnalysisListeners = function(){
    $('.users-geojson-files').on('change', function(){
-      $.ajax({
-         url: 'app/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + this.value + ".geojson" ,
-         dataType: 'json',
-         success: function(data){
-            gisportal.selectionTools.loadGeoJSON(data);
-         },
-         error: function(e){
-            $.notify("Sorry, There was an error with that: " + e.statusText, "error");
-         }
-      });
+      gisportal.indicatorsPanel.geoJSONSelected(this.value);
    });
    var addCoordinatesToProfile = function(name){
       var feature = gisportal.vectorLayer.getSource().getFeatures()[0];
-      var geojson = gisportal.featureToGeoJSON(feature, map.getView().getProjection().getCode(), "EPSG:4326");
+      var geojson = gisportal.featureToGeoJSON(feature, gisportal.projection, "EPSG:4326");
       $.ajax({
          method: 'post',
          url:  'app/plotting/save_geoJSON?filename=' + name,
@@ -919,7 +923,13 @@ gisportal.indicatorsPanel.getParams = function(id) {
 
    var indicator = gisportal.layers[id];
 
+   var exBoundingBox = indicator.exBoundingBox;
 
+   var bbox = gisportal.currentSelectedRegion;
+   if(bbox == ""){
+      bbox = exBoundingBox.WestBoundLongitude + "," + exBoundingBox.SouthBoundLatitude + "," + exBoundingBox.EastBoundLongitude + "," + exBoundingBox.NorthBoundLatitude;
+      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",")
+   }
    // TODO: add bins for histogram!
    var graphParams = {
       baseurl: indicator.wcsURL,
@@ -928,7 +938,7 @@ gisportal.indicatorsPanel.getParams = function(id) {
       bins: '',
       time: dateRange,
       //bbox: $('#graphcreator-bbox').val(),
-      bbox: gisportal.currentSelectedRegion,
+      bbox: bbox,
       depth: depthDirection(id),
       graphXAxis: graphXAxis,
       graphYAxis: graphYAxis,
@@ -1003,7 +1013,22 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
    content.find('.js-download').click(function(){
       var range = slider.val();
-      window.open(gisportal.indicatorsPanel.exportRawUrl( id ), "_blank");
+      var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
+      if(download_data.irregular){
+         $.ajax({
+            url:  download_data.url,
+            method:"POST",
+            data: {'data': JSON.stringify(download_data.data)},
+            success: function(data){
+               window.open('/app/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
+            },
+            error: function(e){
+               $.notify('There was an error downloading the netCDF: ' + e.statusText, "error");
+            }
+         });
+      }else{
+         window.open(download_data.url, "_blank");
+      }
 
    });
 
@@ -1013,7 +1038,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    var indicator = gisportal.layers[id];
    var graphParams = (this.getParams(id));
 
-   var url = null;
+   var download_data = null;
    var urlParams = {
       service: 'WCS',
       version: '1.0.0',
@@ -1023,7 +1048,23 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    };
 
    urlParams.coverage = indicator.urlName;
-   urlParams.bbox = gisportal.currentSelectedRegion;
+
+   //This block converts the bbox for the download ... TODO: This might be simplifiyable (similar to selectedRegionProjectionChange function)
+   if(gisportal.projection != "EPSG:4326"){
+      if(gisportal.methodThatSelectedCurrentRegion.justCoords){
+         urlParams.bbox = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), gisportal.projection, "EPSG:4326").toString();
+      }else{
+         var feature, this_feature;
+         var features = gisportal.vectorLayer.getSource().getFeatures();
+         for(feature in features){
+            this_feature = features[feature];
+            features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, gisportal.projection, "EPSG:4326"));
+         }
+         urlParams.bbox = gisportal.wkt.writeFeatures(features);
+      }
+   }else{
+      urlParams.bbox = gisportal.currentSelectedRegion;
+   }
    urlParams.time = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
    if( $('[data-id="' + indicator.id + '"] .js-analysis-elevation').length > 0 ){
@@ -1034,19 +1075,19 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
          urlParams.vertical = '-' + Math.abs( vert );
    }
 
-   graphParams.type = 'timeseries';
+   graphParams.type = 'file';
    graphParams.time = urlParams.time;
    graphParams.bbox = urlParams.bbox;
    graphParams.depth = urlParams.vertical;
 
 
    var request = $.param(urlParams);
-   if (urlParams.bbox.indexOf("POLYGON") !== -1 || urlParams.bbox.indexOf("LINESTRING") !== -1) {
-      url = gisportal.middlewarePath + "/download?" + $.param(graphParams);
+   if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true) {
+      download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
    } else {
-      url = indicator.wcsURL + request;
+      download_data = {url:indicator.wcsURL + request, irregular:false};
    }
-   return url;
+   return download_data;
 };
 
 gisportal.indicatorsPanel.addToPlot = function( id )  {
@@ -1150,7 +1191,7 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
    }
-   var current_proj = map.getView().getProjection().getCode();
+   var current_proj = gisportal.projection;
    if(current_proj !== "EPSG:4326"){
       for(point in bb1.coordinates[0]){
          bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");

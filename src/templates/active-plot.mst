@@ -23,7 +23,7 @@
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
 				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
 				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
-				<option value="geographic"  {{selected "geographic" (call 'plot.plotType')}} disabled>Geographic</option>
+				<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
 			{{/if}}
 			 </select>
 		</div>
@@ -38,6 +38,9 @@
 			</div>
 			<div class="js-range-slider "></div>
 		</div>
+	</li>
+	<li class="graph-date-range-info-li alert-info hidden">
+		<div class="graph-date-range-info-div alert-info"></div>
 	</li>
 	
 	

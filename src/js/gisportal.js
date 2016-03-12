@@ -546,60 +546,35 @@ gisportal.mapInit = function() {
         if(gisportal.selectionTools.isSelecting){
 
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
-               console.log("adding WKT to form");
                var t_wkt = gisportal.wkt.writeFeatures([feature]);
-               //console.log(t_wkt);
+               //TODO: Make the feature highlighted!!!
+               gisportal.vectorLayer.getSource().clear();
                gisportal.currentSelectedRegion = t_wkt;
+               $('.js-coordinates').val("");
+               $('.js-upload-shape').val("");
+               $('.users-geojson-files').val("default");
                gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", justCoords: false};
                cancelDraw();
-
-               
-
+               gisportal.selectionTools.isSelecting = false;
          });
-         gisportal.selectionTools.isSelecting = false;
 
         }
         else {
            map.forEachFeatureAtPixel(e.pixel,
                function(feature, layer) {
-                   if (feature) {
-                     //console.log("----------------------");
-                     //console.log(feature);
+                   if (feature && _.keys(feature.getProperties()).length >1 ) {
                      var geom = feature.getGeometry();
-                     //console.log(gisportal.wkt.writeFeatures([feature])) ;
-                       // clear existing style if any layers currently slected
                        _.each(gisportal.selectedFeatures, function(feature) {
-                           //feature[0].setStyle(feature[1]);
                        });
-                       //console.log('====================');
                        var tlayer;
                        if(feature.getId()){
                          tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
                        }
                        isFeature = true;
                        gisportal.selectedFeatures.push([feature, feature.getStyle()]);
-                       var fill = gisportal.vectorStyles.genColour(0.8);
-                       var geometry = feature.getGeometry();
-                       var coord = geometry.getCoordinates();
-                       feature.setStyle(new ol.style.Style({
-                           stroke: new ol.style.Stroke({
-                               color: gisportal.vectorStyles.genColour(1),
-                               width: 2
-                           }),
-                           fill: new ol.style.Fill({
-                               color: fill
-                           })
-                       }));
-                       //console.log('coord ' + coord); // coord 307225.8888888889,361595.6666666666
-
-                       ////console.log(feature.values_); // name undefined
-                       // var ft = myGeoJSONSource.getClosestFeatureToCoordinate(coord);
-                       // //console.log('name ' + ft.get('Tenant_Name')); // name Shefton
-                       response += '<p style="color:' + fill + '">vector details</p><ul>';
                        var props = feature.getProperties();
                        for (var key in props) {
                            if (props.hasOwnProperty(key) && key != "geometry") {
-                               ////console.log(key, props[key]);
                                if(tlayer){
                                   if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
                                       response += "<li>" + key + " : " + props[key] + "</li>";
@@ -610,13 +585,12 @@ gisportal.mapInit = function() {
                            }
                        }
                        response += "</ul>";
-
+                       dataReadingPopupContent.innerHTML = response;
+                       dataReadingPopupOverlay.setPosition(e.coordinate);
                    }
            });
-           dataReadingPopupContent.innerHTML = response;
-           dataReadingPopupOverlay.setPosition(e.coordinate);
-           if (!isFeature) {
-               var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+           if (!isFeature && $('.drawInProgress').length <= 0) {
+               var point = gisportal.reprojectPoint(e.coordinate, gisportal.projection, 'EPSG:4326');
                var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
                var lat = point[1].toFixed(3);
                var elementId = 'dataValue' + String(e.coordinate[0]).replace('.', '') + String(e.coordinate[1]).replace('.', '');
@@ -634,30 +608,6 @@ gisportal.mapInit = function() {
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
       gisportal.events.trigger('map.move', centre, zoom);
    });
-
-
-
-
-
-
-
-
-
-   //    if (gisportal.selectionTools.isDrawing === false && gisportal.selectedLayers.length > 0) {
-   //       var point = gisportal.reprojectPoint(e.coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
-   //       var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
-   //       var lat = point[1].toFixed(3);
-   //       var elementId = 'dataValue'+ String(e.coordinate[0]).replace('.','') + String(e.coordinate[1]).replace('.','');
-   //       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-   //       dataReadingPopupContent.innerHTML = response;
-   //       dataReadingPopupOverlay.setPosition(e.coordinate);
-
-   //       gisportal.getPointReading(e);
-   //    }
-   // })
-
-   
-
  
    gisportal.loadLayers();
 //gisportal.loadVectorLayers();
@@ -872,6 +822,23 @@ gisportal.loadState = function(state) {
          indicator.preventAutoZoom = true;
          if(state.selectedRegionInfo){
             gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
+            switch( state.selectedRegionInfo.method ){
+               case "drawBBox":
+                  gisportal.currentSelectedRegion = state.selectedRegionInfo.value;
+                  break;
+               case "csvUpload":
+                  gisportal.methodThatSelectedCurrentRegion = {};
+                  break;
+               case "geoJSONSelect":
+                  gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value);
+                  break;
+               case "dragAndDrop":
+                  stateMap.feature = undefined;
+                  break;
+               case "selectExistingPolygon":
+                  gisportal.methodThatSelectedCurrentRegion = {};
+                  break;
+            }
          }
          gisportal.refinePanel.layerFound(indicator.id);
       }
@@ -1116,7 +1083,7 @@ gisportal.zoomOverall = function()  {
          if (+MaxY > +largestBounds[3]) largestBounds[3] = parseFloat(MaxY); // top
       }
 
-      var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', map.getView().getProjection().getCode());
+      var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', gisportal.projection);
       map.getView().fit(extent, map.getSize());
    }
 };
@@ -1325,7 +1292,7 @@ gisportal.getPointReading = function(e) {
          }
          request += '&TIME=' + layer.selectedDateTime;
          request += '&TRANSPARENT=true';
-         request += '&CRS='+ map.getView().getProjection().getCode();
+         request += '&CRS='+ gisportal.projection;
          request += '&COLORSCALERANGE='+ layer.minScaleVal +','+ layer.maxScaleVal;
          request += '&NUMCOLORBANDS=253';
          request += '&LOGSCALE=false';
@@ -1333,7 +1300,7 @@ gisportal.getPointReading = function(e) {
          request += '&REQUEST=GetFeatureInfo';
          request += '&EXCEPTIONS=application/vnd.ogc.se_inimage';
          request += '&FORMAT=image/png';
-         request += '&SRS='+ map.getView().getProjection().getCode();
+         request += '&SRS='+ gisportal.projection;
          request += '&BBOX='+ bbox;
          request += '&X='+ pixel[0];
          request += '&Y='+ pixel[1];
@@ -1375,7 +1342,7 @@ gisportal.getPointReading = function(e) {
  */
 gisportal.pointInsideBox = function(coordinate, exBoundingBox){
    // as the exBoundingBox is defined as EPSG:4326 first reproject the coordinate
-   var point = gisportal.reprojectPoint(coordinate, map.getView().getProjection().getCode(), 'EPSG:4326');
+   var point = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
    point[0] = gisportal.normaliseLongitude(point[0], 'EPSG:4326');
 
    return point[0] >= exBoundingBox.WestBoundLongitude && point[0] <= exBoundingBox.EastBoundLongitude && point[1] >= exBoundingBox.SouthBoundLatitude && point[1] <= exBoundingBox.NorthBoundLatitude;
