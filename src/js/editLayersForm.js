@@ -196,23 +196,6 @@ gisportal.editLayersForm.addListeners = function(){
                   $(document).off('click', '.notifyjs-gisportal-restore-option-base .no');
                   $(document).off('click', '.notifyjs-gisportal-restore-option-base .yes');
                   $('.notifyjs-gisportal-restore-option-base').closest("div.notifyjs-wrapper").remove();
-                  $.notify({'title':"Would you like to undo this delete ?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-restore-option",  autoHide:false, clickToHide: false});
-                  $(document).one('click', '.notifyjs-gisportal-restore-option-base .no', function() {
-                     $(this).trigger('notify-hide');
-                  });
-                  $(document).one('click', '.notifyjs-gisportal-restore-option-base .yes', function() {
-                     $.ajax({
-                        method: 'post',
-                        url:  gisportal.middlewarePath + '/settings/restore_server_cache',
-                        data: JSON.parse(removed_data),
-                        success: function(){
-                           this_span.closest("tr").toggleClass("hidden", false);
-                           gisportal.loadLayers();
-                        }
-                     });
-                     //hide notification
-                     $(this).trigger('notify-hide');
-                  });
                   $.notify("Success\nThe server was successfuly removed", "success");
                },
                error: function(){
