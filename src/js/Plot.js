@@ -429,7 +429,6 @@ gisportal.graphs.Plot =(function(){
             _this.sizeEstimate += (data.size * total_slices);
          }else{
             $.notify("This error was returned when trying to estimate time: " + data.statusText, "error");
-//            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
             _this.stopMonitoringJobStatus();
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
