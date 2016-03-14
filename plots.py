@@ -345,10 +345,15 @@ def extract(plot, outfile="image.html"):
    else:
        log_plot = False
        
-   min_x = lon[0]
-   max_x = lon[-1]
-   min_y = lat[-1]
-   max_y = lat[0]
+   #min_x = lon[0]
+   #max_x = lon[-1]
+   #min_y = lat[-1]
+   #max_y = lat[0]
+   min_x = np.nanmin(lon)
+   max_x = np.nanmax(lon)
+   min_y = np.nanmin(lat)
+   max_y = np.nanmax(lat)
+   print(min_x,max_x,min_y,max_y)
    x_axis_type = "linear"
    y_axis_type = "linear"
    x_axis_label = "Longitude"
@@ -379,20 +384,31 @@ def extract(plot, outfile="image.html"):
    slope = (max_val - min_val) / (len(colours) - 1)
    intercept = min_val
    debug(3, "Slope: {}, intercept: {}".format(slope, intercept))
+   # test here the order of lat lon maybe
+   lat_order_reversed = lat[1] > lat[0]
    for j in range(x_size):
-      for i in range(y_size):
+
+      #print(j)
+      for i in reversed(range(y_size)):
+         if lat_order_reversed:
+            _i = (y_size - 1) - i
+         else:
+            _i = i
          if np.isnan(values[i,j]):
-            view[i, j, 0] = 0
-            view[i, j, 1] = 0
-            view[i, j, 2] = 0
-            view[i, j, 3] = 0
+            view[_i, j, 0] = 0
+            view[_i, j, 1] = 0
+            view[_i, j, 2] = 0
+            view[_i, j, 3] = 0
          else:
             p_index = int((values[i,j] - intercept) / slope) * 4
-            view[i, j, 0] = my_palette[p_index]
-            view[i, j, 1] = my_palette[p_index+1]
-            view[i, j, 2] = my_palette[p_index+2]
-            view[i, j, 3] = 255
+            view[_i, j, 0] = my_palette[p_index]
+            view[_i, j, 1] = my_palette[p_index+1]
+            view[_i, j, 2] = my_palette[p_index+2]
+            view[_i, j, 3] = 255
 
+
+
+    
    plot_width = 800
    plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
@@ -496,18 +512,24 @@ def hovmoller(plot, outfile="image.html"):
        x_size, y_size = y_size, x_size
 
        # I think the coords refer to pixel centres so scale by half a pixel.
+       min_latlon = np.nanmin(latlon)
+       max_latlon = np.nanmax(latlon)
+       min_ll_index = latlon.tolist().index(min_latlon)
+       max_ll_index = latlon.tolist().index(max_latlon)
        min_x = date[0] - date_step / 2
        max_x = date[-1] + date_step / 2
-       min_y = latlon[0] - (latlon[1] - latlon[0]) / 2
-       max_y = latlon[-1] + (latlon[1] - latlon[0]) / 2
+       #min_y = latlon[0] - (latlon[1] - latlon[0]) / 2
+       #max_y = latlon[-1] + (latlon[1] - latlon[0]) / 2
+       min_y = min_latlon - (latlon[1] - latlon[0]) / 2
+       max_y = max_latlon + (latlon[1] - latlon[0]) / 2
        x_axis_type = "datetime"
        y_axis_type = plot_scale
        x_axis_label = "Date"
        y_axis_label = "Latitude"
    else:
        # I think the coords refer to pixel centres so scale by half a pixel.
-       min_x = latlon[0] - (latlon[1] - latlon[0]) / 2
-       max_x = latlon[-1] + (latlon[1] - latlon[0]) / 2
+       min_x = min_latlon - (latlon[1] - latlon[0]) / 2
+       max_x = max_latlon + (latlon[1] - latlon[0]) / 2
        min_y = date[0] - date_step / 2
        max_y = date[-1] + date_step / 2
        x_axis_type = plot_scale
@@ -538,20 +560,28 @@ def hovmoller(plot, outfile="image.html"):
    my_palette = palettes.getPalette('rsg_colour')
    slope = (max_val - min_val) / (len(colours) - 1)
    intercept = min_val
-   for i in range(x_size):
+   lat_order_reversed = latlon[0] > latlon[1]
+   #print(latlon)
+   #print(lat_order_reversed)
+   for i in reversed(range(x_size)):
+      if lat_order_reversed:
+         _i = (x_size - 1) - i
+      else:
+         _i = i
       for j in range(y_size):
          #print(i,j,intercept,slope,values[i,j] )
+        
          if(np.isnan(values[i,j])):
-            view[i, j, 0] = 0
-            view[i, j, 1] = 0
-            view[i, j, 2] = 0
-            view[i, j, 3] = 0
+            view[_i, j, 0] = 0
+            view[_i, j, 1] = 0
+            view[_i, j, 2] = 0
+            view[_i, j, 3] = 0
          else:
             p_index = int((values[i,j] - intercept) / slope) * 4
-            view[i, j, 0] = my_palette[p_index]
-            view[i, j, 1] = my_palette[p_index+1]
-            view[i, j, 2] = my_palette[p_index+2]
-            view[i, j, 3] = 255
+            view[_i, j, 0] = my_palette[p_index]
+            view[_i, j, 1] = my_palette[p_index+1]
+            view[_i, j, 2] = my_palette[p_index+2]
+            view[_i, j, 3] = 255
 
    plot_width = 800
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
