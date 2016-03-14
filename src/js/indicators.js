@@ -364,7 +364,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    if(gisportal.user.info.permission != "guest" && layer.providerTag == "UserDefinedLayer"){
       user_allowed_to_add = true;
    }
-   if(gisportal.user.info.permission != "guest" && layer.providerTag != "UserDefinedLayer"){
+   if(gisportal.user.info.permission != "guest" && layer.providerTag != "UserDefinedLayer" && layer.serviceType != "WFS"){
       if(layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin")
       user_allowed_to_edit = true;
    }
