@@ -23,8 +23,6 @@ collaboration.init = function(io, app, config) {
                if(err || !session) {
                   return accept('Error retrieving session!', false);
                }
-
-               //console.log(session);
             });
 
          } catch(e) {
@@ -52,8 +50,6 @@ collaboration.init = function(io, app, config) {
       var sessionStore = app.get('sessionStore');
       sessionStore.load(sid, function(err, session) {
          if (!session || !session.passport.user || err) {
-            //console.log("session: ");
-            //console.log(session);
             return 'no passport';
          }
          
