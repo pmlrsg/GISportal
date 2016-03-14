@@ -797,7 +797,7 @@ gisportal.graphs.Plot =(function(){
             $('.js-create-graph').toggleClass("hidden", true);
             return
          }else{
-            $('.js-create-graph').toggleClass("hidden", true);
+            $('.js-create-graph').toggleClass("hidden", false);
          }
       }
       $('.graph-date-range-error-li').toggleClass("hidden", true);
