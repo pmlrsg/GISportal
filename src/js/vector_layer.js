@@ -14,8 +14,6 @@ gisportal.vectorLayerCount = 0;
  **/
 
 gisportal.Vector = function(options) {
-    ////console.log("creating vector layer");
-    ////console.log(options);
     var vector = this;
 
     var defaults = {
