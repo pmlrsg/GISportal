@@ -135,6 +135,7 @@ gisportal.selectionTools.initDOM = function()  {
 };
 
 gisportal.selectionTools.shapesUploaded = function(){
+   gisportal.loading.increment();
    var files_list = this.files;
    if(files_list.length > 0){
       var dbf_found, shp_found, shx_found, files_total_size = 0;
@@ -145,6 +146,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          files_total_size += this_file.size;
          if(files_total_size > 5242880){
             $.notify("There is a  5MB limit on file uploads", "error");
+            gisportal.loading.decrement();
             return;
          }
          if(this_file.type == "application/x-dbf"){
@@ -158,6 +160,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          }
          if(this_file.type == "text/csv"){
             gisportal.selectionTools.csvFound(formData);
+            gisportal.loading.decrement();
             return true;
          }
       }
@@ -173,6 +176,7 @@ gisportal.selectionTools.shapesUploaded = function(){
             },
             success: function(d){
                gisportal.selectionTools.loadGeoJSON(d.geojson, d.shapeName);
+               gisportal.loading.decrement();
             },
             error: function(e) {
                if(e.status == 401){
@@ -181,6 +185,7 @@ gisportal.selectionTools.shapesUploaded = function(){
                   $.notify("Sorry, There was an error with that: " + e.statusText, "error");
                   $('.js-upload-shape').val("");
                }
+               gisportal.loading.decrement();
             },
             data: formData,
             cache: false,

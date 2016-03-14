@@ -364,7 +364,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    if(gisportal.user.info.permission != "guest" && layer.providerTag == "UserDefinedLayer"){
       user_allowed_to_add = true;
    }
-   if(gisportal.user.info.permission != "guest" && layer.providerTag != "UserDefinedLayer"){
+   if(gisportal.user.info.permission != "guest" && layer.providerTag != "UserDefinedLayer" && layer.serviceType != "WFS"){
       if(layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin")
       user_allowed_to_edit = true;
    }
@@ -1012,6 +1012,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
 
    content.find('.js-download').click(function(){
+      gisportal.loading.increment();
       var range = slider.val();
       var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
       if(download_data.irregular){
@@ -1021,13 +1022,16 @@ gisportal.indicatorsPanel.exportData = function(id) {
             data: {'data': JSON.stringify(download_data.data)},
             success: function(data){
                window.open('/app/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
+               gisportal.loading.decrement();
             },
             error: function(e){
                $.notify('There was an error downloading the netCDF: ' + e.statusText, "error");
+               gisportal.loading.decrement();
             }
          });
       }else{
          window.open(download_data.url, "_blank");
+         gisportal.loading.decrement();
       }
 
    });
@@ -1172,6 +1176,16 @@ function bboxToWKT( bboxString ){
 
 }
 
+function convertBboxCoords(coordsArray, from_proj, to_proj){
+      for(var point in coordsArray){
+         if(typeof(coordsArray[point][0]) == "object"){
+            convertBboxCoords(coordsArray[point], from_proj, to_proj);
+         }else{
+            coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
+         }
+      }
+   }
+
 function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    // Skip if empty
    if( gisportal.currentSelectedRegion === "" ) return true;
@@ -1191,12 +1205,11 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       // Assume the old bbox style
       bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
    }
+
    var current_proj = gisportal.projection;
-   if(current_proj !== "EPSG:4326"){
-      for(point in bb1.coordinates[0]){
-         bb1.coordinates[0][point] = gisportal.reprojectPoint(bb1.coordinates[0][point], current_proj, "EPSG:4326");
-      }
-   }
+
+   convertBboxCoords(bb1.coordinates, current_proj, "EPSG:4326");
+
    var proj_bounds = gisportal.availableProjections[current_proj].bounds;
    // A different message is displayed if the user clicks off the earth
    var bb2 = new Terraformer.Polygon( {

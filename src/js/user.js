@@ -77,7 +77,7 @@ gisportal.loadLayerEditButtons = function(){
       var layer = gisportal.layers[id];
       var indicator_actions = $('ul.indicator-list').children('li[data-id=' + id + ']').find('div.indicator-actions');
       var span_info = null;
-      if(gisportal.user.info.permission == "guest"){
+      if(gisportal.user.info.permission == "guest" && layer.serviceType != "WFS"){
          if(layer && gisportal.niceDomainName != layer.owner){
             gisportal.indicatorsPanel.removeFromPanel(id);
          }
@@ -86,9 +86,9 @@ gisportal.loadLayerEditButtons = function(){
             button.remove();
             continue;
          }
-      }else if(layer.providerTag == "UserDefinedLayer"){
+      }else if(layer.providerTag == "UserDefinedLayer" && layer.serviceType != "WFS"){
          span_info = ["icon-add-3", "Add Data"];
-      }else if(layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin"){
+      }else if((layer.owner != gisportal.niceDomainName || gisportal.user.info.permission == "admin") && layer.serviceType != "WFS"){
          span_info = ["icon-pencil-2", "Edit Data"];
       }
       if(span_info && span_info.length == 2 && layer){

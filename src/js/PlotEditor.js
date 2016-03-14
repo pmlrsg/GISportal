@@ -163,6 +163,7 @@ gisportal.graphs.PlotEditor = (function(){
                   errFound = true;
                }
             });
+            this.plot().checkComponentOverlap();
             if(errFound){
                $.notify("Scatter plots must have time bounds contained within the components. \nPlease try submitting again.", "error");
                return;

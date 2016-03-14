@@ -42,6 +42,9 @@
 	<li class="graph-date-range-info-li alert-info hidden">
 		<div class="graph-date-range-info-div alert-info"></div>
 	</li>
+	<li class="graph-date-range-error-li alert-danger hidden">
+		<div class="graph-date-range-error-div alert-danger"></div>
+	</li>
 	
 	
 	<li class="js-components-area" >
