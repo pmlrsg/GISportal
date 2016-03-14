@@ -368,7 +368,7 @@ gisportal.graphs.Plot =(function(){
                "depth": component.elevation,
                
                // Threads URL, passed to the middleware URL
-               "threddsUrl"  : layer.wcsURL,
+               "threddsUrl"  : layer.wcsURL.split("?")[0],
                // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
                // Location of the middle ware to do the analytics 
