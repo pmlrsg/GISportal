@@ -1,0 +1,7 @@
+<div class="js-plot-data">
+<h2>Metadata:</h2>
+{{#each data}}
+	<h3>{{label}}</h3>
+	{{{meta}}}
+{{/each}}
+</div>
