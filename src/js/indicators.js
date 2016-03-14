@@ -1012,6 +1012,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
 
    content.find('.js-download').click(function(){
+      gisportal.loading.increment();
       var range = slider.val();
       var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
       if(download_data.irregular){
@@ -1021,13 +1022,16 @@ gisportal.indicatorsPanel.exportData = function(id) {
             data: {'data': JSON.stringify(download_data.data)},
             success: function(data){
                window.open('/app/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
+               gisportal.loading.decrement();
             },
             error: function(e){
                $.notify('There was an error downloading the netCDF: ' + e.statusText, "error");
+               gisportal.loading.decrement();
             }
          });
       }else{
          window.open(download_data.url, "_blank");
+         gisportal.loading.decrement();
       }
 
    });
