@@ -1138,11 +1138,7 @@ gisportal.indicatorsPanel.vectorSelectSwitch = function( layerID , tabName) {
 };
 
 gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
-   //console.log("layer id on select tab = ");
-   //console.log(layerId);
    // Select tab
-   // temp solution
-   //console.log(tabName);
    if(tabName=="analysis"){
       gisportal.vectorSelectionTest( layerId, tabName );
    }
