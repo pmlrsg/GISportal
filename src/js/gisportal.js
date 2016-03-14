@@ -513,35 +513,7 @@ gisportal.mapInit = function() {
       $('.users-geojson-files').val("default");
    });
 
-
-// var select = new ol.interaction.Select({
-//    multi : true,
-//    layers : function(layer){
-//       //console.log("-------------------------------");
-//       //console.log(layer);
-//       return true
-//    }
-// });
-// map.addInteraction(select);
-
-//    select.on('select', function(e){
-    
-    
-//   //console.log("e.target at select :");
-//       //console.log(e);
-
-//       var elementId = 'dataValue'+ String(gisportal.normaliseCoordinate(e.coordinate[0])).replace('.','') + String(e.coordinate[1]).replace('.','');
-//       var response = '<p>Measurement at:<br /><em>Longtitude</em>: '+ lon +', <em>Latitude</em>: '+ lat +'</p><ul id="'+ elementId +'"><li class="loading">Loading...</li></ul>';
-//       dataReadingPopupContent.innerHTML = response;
-//       dataReadingPopupOverlay.setPosition(e.coordinate);
-//           //gisportal.getWFSFeature(e.target.getFeatures().getArray()[0].id_);
-
-//    })
-
-//    // Pan by mouse seems to be broken in ol3.8
-   // This seems to be the new syntax for adding it
    map.addInteraction(new ol.interaction.DragPan({}));
-
 
    //add a click event to get the clicked point's data reading
     map.on('singleclick', function(e) {
@@ -598,7 +570,7 @@ gisportal.mapInit = function() {
                var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
                var lat = point[1].toFixed(3);
                var elementId = 'dataValue' + String(e.coordinate[0]).replace('.', '') + String(e.coordinate[1]).replace('.', '');
-               response = '<p>Measurement at:<br /><em>Longtitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
+               response = '<p>Measurement at:<br /><em>Longitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
                dataReadingPopupContent.innerHTML = response;
                dataReadingPopupOverlay.setPosition(e.coordinate);
 
@@ -614,10 +586,8 @@ gisportal.mapInit = function() {
    });
  
    gisportal.loadLayers();
-//gisportal.loadVectorLayers();
 
-   // new load of vector layers
-  // Create the base layers, country borders layers and graticules; set defaults
+   // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    
    // add vector layer for drawing area of interest polygons, and set up tools
