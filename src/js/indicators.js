@@ -613,6 +613,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             }else{
                $('.users-geojson-files').val(data);
             }
+            $('.js-coordinates').val("");
          },
          error: function(e){
             $.notify("Sorry, There was an error with that: " + e.statusText, "error");
@@ -930,9 +931,9 @@ gisportal.indicatorsPanel.getParams = function(id) {
    var exBoundingBox = indicator.exBoundingBox;
 
    var bbox = gisportal.currentSelectedRegion;
-   if(bbox == ""){
+   if(bbox === ""){
       bbox = exBoundingBox.WestBoundLongitude + "," + exBoundingBox.SouthBoundLatitude + "," + exBoundingBox.EastBoundLongitude + "," + exBoundingBox.NorthBoundLatitude;
-      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",")
+      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",");
    }
    // TODO: add bins for histogram!
    var graphParams = {

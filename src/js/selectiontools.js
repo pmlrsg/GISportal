@@ -72,15 +72,12 @@ function cancelDraw() {
 }
 
 gisportal.selectionTools.initDOM = function()  {
-   $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI);
-
-   $('.js-indicators').on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded);
-
-   $('.js-indicators').on('focus', '.js-coordinates', function(){
+   $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI)
+   .on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded)
+   .on('focus', '.js-coordinates', function(){
       $(this).data('oldVal', $(this).val());
-   });
-
-   $('.js-indicators').on('click', '.js-draw-box', function()  {
+   })
+   .on('click', '.js-draw-box', function()  {
       var hasntClass = !$(this).hasClass("drawInProgress");
       if(hasntClass){
          gisportal.selectionTools.toggleTool('Box');
@@ -88,8 +85,8 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-   });
-   $('.js-indicators').on('click', '.js-draw-polygon', function() {
+   })
+   .on('click', '.js-draw-polygon', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
       if(hasntClass){
          gisportal.selectionTools.toggleTool('Polygon');
@@ -97,8 +94,8 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-   });
-   $('.js-indicators').on('click', '.js-draw-line', function() {
+   })
+   .on('click', '.js-draw-line', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
       if(hasntClass){
          gisportal.selectionTools.toggleTool('Line');
@@ -106,8 +103,8 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-   });
-   $('.js-indicators').on('click', '.js-draw-select-polygon', function() {
+   })
+   .on('click', '.js-draw-select-polygon', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
       if(hasntClass){
          gisportal.selectionTools.toggleTool('SelectFromMap');
@@ -116,6 +113,18 @@ gisportal.selectionTools.initDOM = function()  {
       }
       $(this).toggleClass("drawInProgress", hasntClass);
 
+   })
+   .on('click', '.js-remove-geojson', function() {
+      $.ajax({
+            url: '/app/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
+            success: function(filename){
+               gisportal.vectorLayer.getSource().clear();
+               $('.users-geojson-files option[value="' + filename + '"]').remove();
+            },
+            error: function(err){
+               $.notify("Sorry, that didn't delete properly, please try again", "error");
+            }
+         });
    });
 
 
@@ -333,7 +342,7 @@ gisportal.selectionTools.toggleTool = function(type)  {
                gisportal.selectionTools.ROIAdded(sketch);
                // unset sketch
                sketch = null;
-               $(document).off( 'keydown' )
+               $(document).off( 'keydown' );
 
             }, this);
       }

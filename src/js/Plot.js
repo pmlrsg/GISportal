@@ -779,27 +779,27 @@ gisportal.graphs.Plot =(function(){
             $('.graph-date-range-error-div').html("<p>When creating a scatter plot the sample times of each indicator must be matching; the indicators you have selected do not overlap in time</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else if(!interval1 || !interval2){
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; The interval of one of your indicators is undefined</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else if(interval1 != interval2){
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; at the moment you have '" + indicator1.id + "' which is " + interval1 + " and '" + indicator2.id + "' which is " + interval2 + "</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else{
             $('.js-create-graph').toggleClass("hidden", false);
          }
       }
       $('.graph-date-range-error-li').toggleClass("hidden", true);
-   }
+   };
 
    /**
    * Checks that the new tBounds is with the allowed date range

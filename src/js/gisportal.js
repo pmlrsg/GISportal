@@ -133,7 +133,7 @@ gisportal.tempRemoveLayers = function(){
    var id, layer, style;
    for(id in gisportal.selectedLayers){
       layer = gisportal.selectedLayers[id];
-      style = gisportal.layers[layer].style
+      style = gisportal.layers[layer].style;
       gisportal.tempSelectedLayers.push({id:layer, style:style});
    }
    for(id in gisportal.tempSelectedLayers){
