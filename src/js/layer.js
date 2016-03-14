@@ -161,7 +161,7 @@ gisportal.layer = function( options ) {
     * @param {object} layerData - The data
     * @param {object} options - The options
     */
-   this.init = function(layerData, options) {
+   this.init = function(layerData, options, prev_style) {
       var self = this;
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       
@@ -179,7 +179,7 @@ gisportal.layer = function( options ) {
          if(this.styles){
             $.each(this.styles, function(index, value){
                if(value.Name == gisportal.config.defaultStyle){
-                  default_style = value.Name;
+                  default_style = prev_style || value.Name;
                }
             });
             //console.log("adding style");
@@ -200,6 +200,10 @@ gisportal.layer = function( options ) {
       }
 
       this.select();
+
+      if(prev_style){
+        this.mergeNewParams({STYLES:prev_style});
+      }
 
    };
    
@@ -680,7 +684,7 @@ gisportal.filterLayersByDate = function(date) {
  * @param {string} microLayer - The microLayer for the layer to be downloaded
  * @param {object} options - Any extra options for the layer
  */
-gisportal.getLayerData = function(fileName, layer, options) {  
+gisportal.getLayerData = function(fileName, layer, options, style) {  
   options = options || {};
   var id = layer.id; 
   //console.log("getting layer data 222");
@@ -698,7 +702,7 @@ gisportal.getLayerData = function(fileName, layer, options) {
       cache: false,
       success: function(data) {
          // Initialises the layer with the data from the AJAX call
-         gisportal.layers[id].init(data, options);
+         gisportal.layers[id].init(data, options, style);
       },
       error: function() {
          $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
