@@ -297,8 +297,9 @@ gisportal.createOpLayers = function() {
    }
 
    // This block restores the old selected layers so that the layers.openlayers object exists
+   // It is done in revers order so that they stay in the same order as when they were taken off
    var id, i;
-   for(i in gisportal.tempSelectedLayers){
+   for(i = _.size(gisportal.tempSelectedLayers)-1; i >= 0; i--){
       id = gisportal.tempSelectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
