@@ -428,7 +428,7 @@ gisportal.graphs.Plot =(function(){
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          }else{
-            $.notify("This error was returned when trying to estimae time: " + data.statusText, "error");
+            $.notify("This error was returned when trying to estimate time: " + data.statusText, "error");
 //            $('[data-graph-id="' + _this.id + '"]').closest('.graph-job').remove();
             _this.stopMonitoringJobStatus();
          }
