@@ -26,7 +26,7 @@ collaboration.initDOM = function() {
    var roomId = gisportal.utils.getURLParameter('room');
    
    $.ajax({
-      url: gisportal.middlewarePath + '/collaboration/dashboard/?domain=' + gisportal.niceDomainName,
+      url: gisportal.middlewarePath + '/collaboration/dashboard',
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
@@ -529,10 +529,27 @@ collaboration.buildMembersList = function(data) {
       var rendered = gisportal.templates.collaboration();
       $('.js-collaboration-holder').html('').html(rendered);
 
-      collaboration.setStatus('error', 'You have left the room');
-      setTimeout(function() {
-         $('.collaboration-status').remove();
-      }, 3000);
+      $.ajax({
+         url: gisportal.middlewarePath + '/collaboration/dashboard',
+         statusCode: {
+            401: function() {    // the user isn't currently login so direct them at the login page instead
+               $.ajax({
+                  url: gisportal.middlewarePath + '/collaboration',
+                  success: function(data) {
+                     $('#collab-content').html(data);
+                     $('.js-google-auth-button').click(function() {
+                        var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                     }); 
+                  },
+               });
+            },
+         },
+         success: function(data) {
+            $('#collab-content').html(data);
+            
+         },
+
+      });
    });
 
    $('.js-invite-people').click(function() {
