@@ -558,6 +558,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;
       indicator.loggedIn = gisportal.user.info.permission != "guest";
+      indicator.noOAuth = gisportal.noOAuth;
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('.js-google-auth-button').click(function() {
@@ -589,6 +590,7 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
          gisportal.selectionTools.loadGeoJSON(data);
       },
       error: function(e){
+         gisportal.vectorLayer.getSource().clear();
          $.notify("Sorry, There was an error with that: " + e.statusText, "error");
       }
    });

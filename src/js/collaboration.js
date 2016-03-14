@@ -17,6 +17,10 @@ collaboration.initDOM = function() {
       
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
 
+   if(!collaboration.enabled){
+      return;
+   }
+
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
    var rendered = gisportal.templates.collaboration();

@@ -1032,10 +1032,7 @@ gisportal.main = function() {
          //console.log('Loading Default State...');
       }
 
-      // if collaboration features are enabled, switch 'em on...
-      if (gisportal.config.collaborationFeatures.enabled) {
-         collaboration.initDOM();
-      }
+      collaboration.initDOM();
       // Replaces all .icon-svg with actual SVG elements,
       // so that they can be styled with CSS
       // which cannot be done with SVG in background-image

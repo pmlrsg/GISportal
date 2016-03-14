@@ -17,7 +17,12 @@ var utils = require('./utils.js');
  * @return {Function}      `next()` or a 401 Not authorised response  
  */
 user.requiresValidUser = function(req, res, next) {
-   var level = user.getAccessLevel(req, utils.getDomainName(req));
+   var domain = utils.getDomainName(req);
+   var level = user.getAccessLevel(req, domain);
+   if(!GLOBAL.config[domain].auth){
+      res.sendStatus(403);
+      return;
+   }
 
    if (level != "guest") {
       return next();

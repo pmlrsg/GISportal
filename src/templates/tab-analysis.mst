@@ -27,23 +27,25 @@
                      <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
                   </div>
                </div>
-               <br/>
-               <b>UPLOAD</b>
-               <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
-                  <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
-                  or<br/>
-                  Upload a CSV file containing point data</p>
-                  <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
-                     <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
-                     Upload Files
-                  </label>
-                  <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
-                     <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx, .csv" name="files"></input>
-                  </form>
-                  <p>Alternatively, you can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
-               </div>
-               <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
-               <a href="javascript:void(0)" class="js-google-auth-button">Login</a> and upload a file</p>
+               {{#unless noOAuth}}
+                  <br/>
+                  <b>UPLOAD</b>
+                  <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
+                     <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
+                     or<br/>
+                     Upload a CSV file containing point data</p>
+                     <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
+                        <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
+                        Upload Files
+                     </label>
+                     <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
+                        <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx, .csv" name="files"></input>
+                     </form>
+                     <p>Alternatively, you can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
+                  </div>
+                  <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
+                  <a href="javascript:void(0)" class="js-google-auth-button">Login</a> and upload a file</p>
+               {{/unless}}
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
                   <b>SELECT</b>

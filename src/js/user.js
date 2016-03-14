@@ -33,6 +33,12 @@ gisportal.user.initDOM = function() {
                },
             });
          },
+         403: function() {    // the user isn't currently login so direct them at the login page instead
+            $('[data-panel-name="user"]').toggleClass('hidden', true);
+            gisportal.config.collaborationFeatures.enabled = false;
+            $('[data-panel-name="collaboration"]').toggleClass('hidden', true);
+            gisportal.noOAuth = true;
+         }
       },
       success: function(data) {
          $('.js-user-dashboard').html(data);

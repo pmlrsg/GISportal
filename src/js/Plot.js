@@ -371,8 +371,6 @@ gisportal.graphs.Plot =(function(){
                "threddsUrl"  : layer.wcsURL.split("?")[0],
                // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
-               // Location of the middle ware to do the analytics 
-               "middlewareUrl" : "http://portal.marineopec.eu/service/wcs" // Eventually will not be needed!!
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
@@ -497,7 +495,7 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       function updateStatus(){
          $.ajax({
-            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
+            url: "plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
             dataType:'json',
             success: function( serverStatus ){
                _this.serverStatus( serverStatus );               
