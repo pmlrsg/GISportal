@@ -45,6 +45,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
          gisportal.panels.showPanel('choose-indicator');
+         // Clears the vector layer to avoid confusion
+         gisportal.vectorLayer.getSource().clear();
       }
       var id = $(this).closest('[data-id]').data('id');
       console.log("deleting based on id");
@@ -479,7 +481,7 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 
 /* There is overlap here with configurePanel,
  * should refactor at some point */
-gisportal.indicatorsPanel.selectLayer = function(id) {
+gisportal.indicatorsPanel.selectLayer = function(id, style) {
    if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
    var layer = gisportal.layers[id];
    var options = {};
@@ -492,7 +494,7 @@ gisportal.indicatorsPanel.selectLayer = function(id) {
          gisportal.getVectorLayerData(layer);
       }
       else {
-         gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options);
+         gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
       gisportal.events.trigger('layer.select', id, gisportal.layers[id].name);
    }

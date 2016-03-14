@@ -130,13 +130,14 @@ gisportal.loadLayers = function() {
 };
 
 gisportal.tempRemoveLayers = function(){
-   var id, layer;
+   var id, layer, style;
    for(id in gisportal.selectedLayers){
       layer = gisportal.selectedLayers[id];
-      gisportal.tempSelectedLayers.push(layer);
+      style = gisportal.layers[layer].style
+      gisportal.tempSelectedLayers.push({id:layer, style:style});
    }
    for(id in gisportal.tempSelectedLayers){
-      layer = gisportal.tempSelectedLayers[id];
+      layer = gisportal.tempSelectedLayers[id].id;
       gisportal.indicatorsPanel.removeIndicators(layer);
    }
 };
@@ -297,11 +298,14 @@ gisportal.createOpLayers = function() {
    }
 
    // This block restores the old selected layers so that the layers.openlayers object exists
+   // It is done in revers order so that they stay in the same order as when they were taken off
    var id, i;
-   for(i in gisportal.tempSelectedLayers){
-      id = gisportal.tempSelectedLayers[i];
+   for(i = _.size(gisportal.tempSelectedLayers)-1; i >= 0; i--){
+      id = gisportal.tempSelectedLayers[i].id;
+      style = gisportal.tempSelectedLayers[i].style;
       try{
-         gisportal.refinePanel.layerFound(id);
+         gisportal.layers[id].mergeNewParams({STYLES:style});
+         gisportal.refinePanel.layerFound(id, style);
       }catch(e){
          console.log("Cannot add that layer!");
       }
