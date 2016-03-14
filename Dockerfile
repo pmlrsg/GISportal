@@ -4,7 +4,7 @@
 #  the image is build. See docker-readme.md for full details
 #
 #  To obtain the latest image direct from the Docker Hub you can 
-#  run `docker pull pmlrsg/gisporta` on the command line
+#  run `docker pull pmlrsg/gisportal` on the command line
 #
 
 FROM centos:latest
