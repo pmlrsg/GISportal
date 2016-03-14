@@ -15,8 +15,6 @@ $(document).ready(function() {
 	  url: gisportal.middlewarePath + '/settings/config',
 	  dataType: 'script',
 	  success: function(script){
-	  	// CHECK THIS IS SAFE!!!!!!!!!11
-	  	// NOT HAPPY ABOUT HAVING TO DO THIS BUT THERE SEEMS NO OTHER WAY TO GET THE SCRIPT TO RUN BEFORE gisportal.main() D-: !
 	  		eval(script);
 	  		gisportal.main();
 	  }
