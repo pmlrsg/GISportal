@@ -53,8 +53,6 @@ router.get('/app/user/auth/google', function(req, res, next) {
 });
 
 router.get('/app/user/auth/google/callback', function(req, res, next){
-   //passport.authenticate('pmpc1310.npm.ac.uk', {successRedirect: '/app/user/authorised', failureRedirect: '/app/user/auth-failed'});
-
    var domain = utils.getDomainName(req);
 
    // generate the authenticate method and pass the req/res
