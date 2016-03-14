@@ -30,7 +30,7 @@ $.extend(gisportal.config, {
          'cm2': "used_in_graph" // Used in layer
       }
    },
-   siteMode: "development", //(development|production)
+   siteMode: "production", //(development|production)
 
     // Skip start screen only is the user has a saved state, requires T&C
    autoResumeSavedState: false,
