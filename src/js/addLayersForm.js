@@ -154,6 +154,8 @@ gisportal.addLayersForm.displayPaginator = function(total_pages, current_page, a
 * @param String form_div - The JQuery selector of the element that the form should be applied to.
 */
 gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_div){
+   // Makes sure that the user is not still drawing a polygon;
+   cancelDraw();
    for(var value in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[value].total_pages = total_pages; //This passes the total number of pages to each layer for later use.
    }

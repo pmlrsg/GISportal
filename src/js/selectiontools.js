@@ -321,6 +321,11 @@ gisportal.selectionTools.toggleTool = function(type)  {
                gisportal.vectorLayer.getSource().clear();
                // set sketch
                sketch = evt.feature;
+               $(document).on( 'keydown', function ( e ) {
+                  if(e.keyCode == 27){
+                     cancelDraw();
+                  }
+               });
             }, this);
 
          draw.on('drawend',
@@ -328,6 +333,7 @@ gisportal.selectionTools.toggleTool = function(type)  {
                gisportal.selectionTools.ROIAdded(sketch);
                // unset sketch
                sketch = null;
+               $(document).off( 'keydown' )
 
             }, this);
       }
