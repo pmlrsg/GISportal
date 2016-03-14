@@ -574,6 +574,7 @@ gisportal.graphs.Plot =(function(){
       this._plotType = _new;
 
       $('.graph-date-range-info-li').toggleClass("hidden", true);
+      $('.graph-date-range-error-li').toggleClass("hidden", true);
       
       if( _new != old )
          this.emit('plotType-change', { 'new': _new, 'old': old });
@@ -588,6 +589,7 @@ gisportal.graphs.Plot =(function(){
          this._components.forEach(function(comElem){
             _this.forceComponentDateRange( comElem );
          });
+         _this.checkComponentOverlap();
       }else{
          this.setMinMaxComponents(1,1);
       }
@@ -720,6 +722,7 @@ gisportal.graphs.Plot =(function(){
                errFound = true;
             }
          });
+         this.checkComponentOverlap();
          if(!errFound){
             $('.graph-date-range-info-li').toggleClass("hidden", true);
          }
@@ -750,10 +753,32 @@ gisportal.graphs.Plot =(function(){
             $('.js-active-plot-end-date').trigger("change");
          }
          $('.graph-date-range-info-li').toggleClass("hidden", false);
-         $('.graph-date-range-info-div').html("<p>The time bounds have been moved so that they are contained in all of the compenents you have added. Scatter plots must have time bounds contained within the components</p>");
+         $('.graph-date-range-info-div').html("<p>When creating a scatter plot the sample times of each indicator must be matching, so the start and end times have been set to maximum extent possible for these two indicators</p>");
          return true;
       }
    };
+
+   Plot.prototype.checkComponentOverlap = function(){
+      $('.graph-date-range-error-li').toggleClass("hidden", true);
+      var components = this._components;
+      if(components.length >= 2){
+         // Could eventually be in a loop checking more than 2 components, currently only ever 2
+         var indicator1 = gisportal.layers[components[0].indicator];
+         var indicator2 = gisportal.layers[components[1].indicator];
+         var start1 = indicator1.firstDate;
+         var end1 = indicator1.lastDate;
+         var start2 = indicator2.firstDate;
+         var end2 = indicator2.lastDate;
+         if(start1 > end2 || start2 > end1){
+            $('.graph-date-range-info-li').toggleClass("hidden", true);
+            $('.graph-date-range-error-li').toggleClass("hidden", false);
+            $('.graph-date-range-error-div').html("<p>When creating a scatter plot the sample times of each indicator must be matching; the indicators you have selected do not overlap in time</p>");
+            $('.js-components tr').attr("has-data-in-range", "no")
+            return
+         }
+      }
+      $('.graph-date-range-error-li').toggleClass("hidden", true);
+   }
 
    /**
    * Checks that the new tBounds is with the allowed date range

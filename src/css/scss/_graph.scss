@@ -190,11 +190,13 @@ a.js-revert-text{
   cursor: pointer;
 }
 
-.graph-date-range-info-div.alert-info p {
+.graph-date-range-info-div.alert-info p,
+.graph-date-range-error-div.alert-danger p {
     padding: 10px;
 }
 
-.graph-date-range-info-li{
+.graph-date-range-info-li,
+.graph-date-range-error-li{
   padding-bottom: initial!important;
   padding-top: initial!important;
 }
