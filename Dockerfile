@@ -1,3 +1,12 @@
+#
+#  This Dockerfile creates an image based on the contents of the current
+#  folder; therefore the submodules have to be initalised and updated before 
+#  the image is build. See docker-readme.md for full details
+#
+#  To obtain the latest image direct from the Docker Hub you can 
+#  run `docker pull pmlrsg/gisporta` on the command line
+#
+
 FROM centos:latest
 
 MAINTAINER "Ben Calton" <bac@pml.ac.uk>
