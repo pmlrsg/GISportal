@@ -412,7 +412,7 @@ def extract(plot, outfile="image.html"):
    plot_width = 800
    plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
-              x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
+              x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
               title="Image extract - {}".format(plot_title))
    p.title_text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "10pt"
@@ -585,7 +585,7 @@ def hovmoller(plot, outfile="image.html"):
 
    plot_width = 800
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
-              x_axis_type=x_axis_type, y_axis_type=y_axis_type, 
+              x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
               title="Hovmoller - {}".format(plot_title), responsive=True)
    p.title_text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "10pt"
@@ -680,7 +680,7 @@ def transect(plot, outfile="transect.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=400, responsive=True
    )
    
@@ -843,7 +843,7 @@ def timeseries(plot, outfile="time.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, 
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=400, responsive=True
    )
    ts_plot.title_text_font_size = "14pt"
@@ -989,7 +989,7 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    source = ColumnDataSource(data=datasource)
    #print(source)
    scatter_plot = figure(
-      title=plot_title, 
+      title=plot_title, logo=None,
       x_axis_type=plot['y1Axis']['scale'], 
       y_axis_type=plot['y2Axis']['scale'], 
       width=800,
