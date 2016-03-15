@@ -15,8 +15,6 @@ RUN yum -y update && \
     yum clean all && \
     rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7 && \
     yum install -y epel-release gcc && \
-    yum install -y python-devel python-pip && \
-    pip install numpy && \
     yum install -y nodejs \
         npm \
         git \
@@ -30,12 +28,15 @@ RUN yum -y update && \
         libpng-devel \
         hdf5-devel \
         netcdf-devel \
+        python-devel \
+        python-pip \
         python-pillow-devel \
         python-requests \
         python-pandas \
         python-jinja2 \
         python-matplotlib && \
-    pip install bokeh owslib shapely netCDF4 && \
+    rm -rf /usr/lib64/python2.7/site-packages/numpy* && \
+    pip install numpy bokeh owslib shapely netCDF4 && \
     npm install -g grunt-cli --silent && \
     gem install sass && \
     mkdir -p /app/GISportal/config /app/GISportal/html/plots
@@ -52,3 +53,4 @@ EXPOSE 6789
 WORKDIR /app/GISportal
 
 CMD ["/app/GISportal/docker-run.sh"]
+
