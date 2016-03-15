@@ -275,7 +275,7 @@ def getMedian(arr):
 Returns the mean value from the provided array.
 """
 def getMean(arr):
-   return float(np.mean(arr))
+   return float(np.nanmean(arr))
 
 """
 Returns the std value from the provided array.
@@ -491,7 +491,8 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    
    # Create a masked array ignoring nan's
    zMaskedArray = np.ma.masked_invalid(zArr)
-      
+   # print zMaskedArray
+   # print zMaskedArray.shape
    time = None
    lat = None
    lon = None
@@ -539,11 +540,13 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
          # Presume 1 depth, set to contents of depth
          # This way, it will enumerate over correct array
          # whether depth or not
+         #print "adding dim shinanigans"
          zMaskedArray = zMaskedArray.swapaxes(0,1)[0]
          
          output['depth'] = float(depth[0])
  
    #print len(lon)
+   t_store_dates = []
    for i, timelatlon in enumerate(zMaskedArray):
       #print i
       #print times[i]
@@ -553,6 +556,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
       else:     
          date = ''.join(times[i])
       #print date
+      if(date in t_store_dates):
+         pass
+         #print "FOUND DUPLICATE DATE %s" % date
+      t_store_dates.append(date)
       for j, row in enumerate(timelatlon):
          #print len(row)
          if direction == "lat":
