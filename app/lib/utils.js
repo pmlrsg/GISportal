@@ -36,7 +36,7 @@ utils.getDomainName = function(req){
    if(req.SUBFOLDER){
       domain += "_" + req.SUBFOLDER
    }
-   return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');;
+   return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 }
 
 utils.mkdirpSync = function (dirpath) {

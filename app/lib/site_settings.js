@@ -156,6 +156,7 @@ router.get('/app/settings/get_cache', function(req, res) {
    }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
+   console.log(master_list);
    master_list.forEach(function(filename){
       var file_path = path.join(master_path, filename);
       if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json"){

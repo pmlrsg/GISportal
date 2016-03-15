@@ -72,7 +72,7 @@ gisportal.graphs.PlotStatus = (function(){
         .on('click', '.js-graph-status-open', function(){
             var hash = $(this).data("hash");
             $.ajax({
-               url: '/plots/' + hash + "-plot.html",
+               url: 'plots/' + hash + "-plot.html",
                dataType: 'html',
                success: function( html ){
                   gisportal.graphs.popup.loadPlot(html, hash);

@@ -262,7 +262,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  '/app/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
+         url:  'app/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
          success: function(data){
             layer.wcsURL = data;
             gisportal.indicatorsPanel.analysisTab(layer.id);
@@ -307,7 +307,7 @@ gisportal.indicatorsPanel.getMetadata = function(layer, indicator, provider) {
        return d.promise(); // return a promise
    };
 
-   var urls = [gisportal.middlewarePath+'/metadata/provider/' + provider, gisportal.middlewarePath+'/metadata/indicator/' + indicator].map($.get);
+   var urls = ['app/metadata/provider/' + provider, 'app/metadata/indicator/' + indicator].map($.get);
 
    some(urls).then(function(results){
       for(var i = 0; i < results.length; i++) {
@@ -563,7 +563,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('.js-google-auth-button').click(function() {
-         var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+         var authWin = window.top.open('app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
       });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
@@ -1027,7 +1027,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
             method:"POST",
             data: {'data': JSON.stringify(download_data.data)},
             success: function(data){
-               window.open('/app/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
+               window.open('app/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
                gisportal.loading.decrement();
             },
             error: function(e){
@@ -1093,7 +1093,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 
    var request = $.param(urlParams);
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true) {
-      download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
+      download_data = {url:"app/prep_download?", data: graphParams, irregular:true};
    } else {
       download_data = {url:indicator.wcsURL + request, irregular:false};
    }

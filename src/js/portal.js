@@ -12,7 +12,7 @@ $(document).ready(function() {
    if (!window.console.log) window.console.log = function () { };
    if (!window.console.info) window.console.info = function () { };
    $.ajax({
-	  url: '/app/settings/config',
+	  url: 'app/settings/config',
 	  dataType: 'script',
 	  success: function(script){
 	  		eval(script);

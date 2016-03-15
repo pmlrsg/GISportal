@@ -53,7 +53,6 @@
                   <select class="users-geojson-files">
                      <option selected value="default">Loading...</option>
                   </select>
-                  <br/>
                   <button class="brand secondary extra-small js-remove-geojson hidden" data-id="{{id}}" title="Delete Selected Polygon">
                      <span class=" icon-bin-2 " data-id="Ph" title="Delete Selected Polygon" ></span>
                      Delete Selected Polygon

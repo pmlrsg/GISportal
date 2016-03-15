@@ -327,9 +327,9 @@ gisportal.graphs.Plot =(function(){
          // Add the external meta data URLS
          var markdowns = [];
          if( layer.moreIndicatorInfo )
-            markdowns.push( '/app/metadata/indicator/' + layer.name );
+            markdowns.push( 'app/metadata/indicator/' + layer.name );
          if( layer.moreProviderInfo )
-            markdowns.push( '/app/metadata/provider/' + layer.providerTag );
+            markdowns.push( 'app/metadata/provider/' + layer.providerTag );
 
          if(layer.provider){
             logo = layer.provider.logo;
@@ -451,7 +451,7 @@ gisportal.graphs.Plot =(function(){
          for(var series in series_list){
             $.ajax({
                method: 'post',
-               url: '/app/plotting/check_plot',
+               url: 'app/plotting/check_plot',
                contentType : 'application/json',
                data: JSON.stringify(series_list[series]),
                dataType: 'json',
@@ -466,7 +466,7 @@ gisportal.graphs.Plot =(function(){
       // Make the plot
       $.ajax({
          method: 'post',
-         url: '/app/plotting/plot',
+         url: 'app/plotting/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',

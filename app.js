@@ -107,7 +107,7 @@ app.use('/', plotting);
 app.param('subfolder', function(req, res, next, subfolder){
    if(subfolder != "app"){
       req.SUBFOLDER = subfolder;
-      var domain = utils.getDomainName(req)
+      var domain = utils.getDomainName(req);
       if(utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))){
          next();
       }else{
