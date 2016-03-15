@@ -70,11 +70,12 @@ gisportal.graphs.PlotStatus = (function(){
          })
          // Open a plot
         .on('click', '.js-graph-status-open', function(){
+            var hash = $(this).data("hash");
             $.ajax({
-               url: '/plots/' + $(this).data("hash") + "-plot.html",
+               url: '/plots/' + hash + "-plot.html",
                dataType: 'html',
                success: function( html ){
-                  gisportal.graphs.popup.loadPlot(html);
+                  gisportal.graphs.popup.loadPlot(html, hash);
                }, error: function(e){
                   var error = 'Sorry, we failed to load the graph: \n'+
                                  'The server failed with this message: "' + e.statusText + '"';

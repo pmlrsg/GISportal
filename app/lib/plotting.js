@@ -144,6 +144,21 @@ router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res
    res.send(JSON.stringify({list:shape_list})); // Returns the list to the browser.
 });
 
+router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req, res) {
+   var username = user.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var filename = req.query.filename;
+
+   var geojson_file = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename + ".geojson");
+   fs.unlink(geojson_file, function(err){
+      if(err){
+         utils.handleError(err,res);
+      }else{
+         res.send(filename); 
+      }
+   });
+});
+
 router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain

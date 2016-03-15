@@ -175,7 +175,7 @@ gisportal.editLayersForm.addListeners = function(){
             var server = this_span.data("server");
             var user = this_span.data("user");
             $.ajax({
-               url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user,
+               url:  '/app/settings/remove_server_cache?filename=' + server + '&owner=' + user,
                success: function(removed_data){
                   this_span.toggleClass("working", false);
                   var to_be_deleted = [];
@@ -196,23 +196,6 @@ gisportal.editLayersForm.addListeners = function(){
                   $(document).off('click', '.notifyjs-gisportal-restore-option-base .no');
                   $(document).off('click', '.notifyjs-gisportal-restore-option-base .yes');
                   $('.notifyjs-gisportal-restore-option-base').closest("div.notifyjs-wrapper").remove();
-                  $.notify({'title':"Would you like to undo this delete ?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-restore-option",  autoHide:false, clickToHide: false});
-                  $(document).one('click', '.notifyjs-gisportal-restore-option-base .no', function() {
-                     $(this).trigger('notify-hide');
-                  });
-                  $(document).one('click', '.notifyjs-gisportal-restore-option-base .yes', function() {
-                     $.ajax({
-                        method: 'post',
-                        url:  gisportal.middlewarePath + '/settings/restore_server_cache',
-                        data: JSON.parse(removed_data),
-                        success: function(){
-                           this_span.closest("tr").toggleClass("hidden", false);
-                           gisportal.loadLayers();
-                        }
-                     });
-                     //hide notification
-                     $(this).trigger('notify-hide');
-                  });
                   $.notify("Success\nThe server was successfuly removed", "success");
                },
                error: function(){
@@ -243,7 +226,7 @@ gisportal.editLayersForm.addListeners = function(){
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
          var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
+         refresh_url = '/app/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
          $.ajax({
             url:  refresh_url,
             dataType: 'json',
@@ -277,7 +260,7 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-gisportal-refresh-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
+                  refresh_url = '/app/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
                   $.ajax({
                      url:  refresh_url,
                      dataType: 'json',
@@ -381,7 +364,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
          // The data is sent off to the middleware to relace the old user cahce file.
          $.ajax({
             method: 'post',
-            url: gisportal.middlewarePath + '/settings/update_layer?username=' + user,
+            url: '/app/settings/update_layer?username=' + user,
             data:{'data': JSON.stringify(new_data)},
             success: function(){
                span.toggleClass('warn-spin', false);

@@ -17,6 +17,10 @@ collaboration.initDOM = function() {
       
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
 
+   if(!collaboration.enabled){
+      return;
+   }
+
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
    var rendered = gisportal.templates.collaboration();
@@ -26,15 +30,15 @@ collaboration.initDOM = function() {
    var roomId = gisportal.utils.getURLParameter('room');
    
    $.ajax({
-      url: gisportal.middlewarePath + '/collaboration/dashboard',
+      url: '/app/collaboration/dashboard',
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
-               url: gisportal.middlewarePath + '/collaboration',
+               url: '/app/collaboration',
                success: function(data) {
                   $('#collab-content').html(data);
                   $('.js-google-auth-button').click(function() {
-                     var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                     var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                   }); 
                },
             });
@@ -530,15 +534,15 @@ collaboration.buildMembersList = function(data) {
       $('.js-collaboration-holder').html('').html(rendered);
 
       $.ajax({
-         url: gisportal.middlewarePath + '/collaboration/dashboard',
+         url: '/app/collaboration/dashboard',
          statusCode: {
             401: function() {    // the user isn't currently login so direct them at the login page instead
                $.ajax({
-                  url: gisportal.middlewarePath + '/collaboration',
+                  url: '/app/collaboration',
                   success: function(data) {
                      $('#collab-content').html(data);
                      $('.js-google-auth-button').click(function() {
-                        var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                        var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                      }); 
                   },
                });

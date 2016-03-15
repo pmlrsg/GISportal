@@ -327,9 +327,9 @@ gisportal.graphs.Plot =(function(){
          // Add the external meta data URLS
          var markdowns = [];
          if( layer.moreIndicatorInfo )
-            markdowns.push( gisportal.middlewarePath + '/metadata/indicator/' + layer.name );
+            markdowns.push( '/app/metadata/indicator/' + layer.name );
          if( layer.moreProviderInfo )
-            markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
+            markdowns.push( '/app/metadata/provider/' + layer.providerTag );
 
          if(layer.provider){
             logo = layer.provider.logo;
@@ -371,8 +371,6 @@ gisportal.graphs.Plot =(function(){
                "threddsUrl"  : layer.wcsURL.split("?")[0],
                // Meta cache is needed for the time estimation
                "metaCacheUrl" : layer.cacheUrl(),
-               // Location of the middle ware to do the analytics 
-               "middlewareUrl" : "http://portal.marineopec.eu/service/wcs" // Eventually will not be needed!!
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
@@ -453,7 +451,7 @@ gisportal.graphs.Plot =(function(){
          for(var series in series_list){
             $.ajax({
                method: 'post',
-               url: gisportal.middlewarePath + '/plotting/check_plot',
+               url: '/app/plotting/check_plot',
                contentType : 'application/json',
                data: JSON.stringify(series_list[series]),
                dataType: 'json',
@@ -468,7 +466,7 @@ gisportal.graphs.Plot =(function(){
       // Make the plot
       $.ajax({
          method: 'post',
-         url: gisportal.middlewarePath + '/plotting/plot',
+         url: '/app/plotting/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',
@@ -496,7 +494,7 @@ gisportal.graphs.Plot =(function(){
       var _this = this;
       function updateStatus(){
          $.ajax({
-            url: "/plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
+            url: "plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
             dataType:'json',
             success: function( serverStatus ){
                _this.serverStatus( serverStatus );               
@@ -780,27 +778,27 @@ gisportal.graphs.Plot =(function(){
             $('.graph-date-range-error-div').html("<p>When creating a scatter plot the sample times of each indicator must be matching; the indicators you have selected do not overlap in time</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else if(!interval1 || !interval2){
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; The interval of one of your indicators is undefined</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else if(interval1 != interval2){
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; at the moment you have '" + indicator1.id + "' which is " + interval1 + " and '" + indicator2.id + "' which is " + interval2 + "</p>");
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
-            return
+            return;
          }else{
-            $('.js-create-graph').toggleClass("hidden", true);
+            $('.js-create-graph').toggleClass("hidden", false);
          }
       }
       $('.graph-date-range-error-li').toggleClass("hidden", true);
-   }
+   };
 
    /**
    * Checks that the new tBounds is with the allowed date range

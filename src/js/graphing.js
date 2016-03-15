@@ -131,9 +131,21 @@ gisportal.graphs.popup.addActionListeners = function(){
    });
 };
 
-gisportal.graphs.popup.loadPlot = function(html){
-   var popup_content = gisportal.templates['plot-popup']({html:html});
+gisportal.graphs.popup.loadPlot = function(html, hash){
+   var popup_content = gisportal.templates['plot-popup']({html:html, hash:hash});
    $('.js-plot-popup').html(popup_content);
+   $.ajax({
+      url: '/plots/' + hash + "-request.json",
+      dataType: 'json',
+      success: function( data ){
+         var plotting_data = gisportal.templates['plot-data']({data:data.plot.data.series});
+         $('.extra-plot-info[data-hash="' + hash + '"]').prepend(plotting_data);
+      }, error: function(e){
+         var error = 'Sorry, we failed to load the metadata: \n'+
+                        'The server failed with this message: "' + e.statusText + '"';
+         $.notify(error, "error");
+      }
+   });
    $('.js-plot-popup').toggleClass("hidden", false);
    gisportal.graphs.popup.addActionListeners();
 };

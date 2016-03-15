@@ -261,7 +261,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
+         url:  '/app/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
          success: function(data){
             layer.wcsURL = data;
             gisportal.indicatorsPanel.analysisTab(layer.id);
@@ -558,10 +558,11 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       indicator.modified = gisportal.utils.nameToId(indicator.name);
       indicator.modifiedName = modifiedName;
       indicator.loggedIn = gisportal.user.info.permission != "guest";
+      indicator.noOAuth = gisportal.noOAuth;
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('.js-google-auth-button').click(function() {
-         var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+         var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
       });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
@@ -589,6 +590,7 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
          gisportal.selectionTools.loadGeoJSON(data);
       },
       error: function(e){
+         gisportal.vectorLayer.getSource().clear();
          $.notify("Sorry, There was an error with that: " + e.statusText, "error");
       }
    });
@@ -611,6 +613,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             }else{
                $('.users-geojson-files').val(data);
             }
+            $('.js-coordinates').val("");
          },
          error: function(e){
             $.notify("Sorry, There was an error with that: " + e.statusText, "error");
@@ -928,9 +931,9 @@ gisportal.indicatorsPanel.getParams = function(id) {
    var exBoundingBox = indicator.exBoundingBox;
 
    var bbox = gisportal.currentSelectedRegion;
-   if(bbox == ""){
+   if(bbox === ""){
       bbox = exBoundingBox.WestBoundLongitude + "," + exBoundingBox.SouthBoundLatitude + "," + exBoundingBox.EastBoundLongitude + "," + exBoundingBox.NorthBoundLatitude;
-      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",")
+      bbox = gisportal.reprojectBoundingBox(bbox.split(","), "EPSG:4326", gisportal.projection).join(",");
    }
    // TODO: add bins for histogram!
    var graphParams = {

@@ -154,6 +154,8 @@ gisportal.addLayersForm.displayPaginator = function(total_pages, current_page, a
 * @param String form_div - The JQuery selector of the element that the form should be applied to.
 */
 gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_div){
+   // Makes sure that the user is not still drawing a polygon;
+   cancelDraw();
    for(var value in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[value].total_pages = total_pages; //This passes the total number of pages to each layer for later use.
    }
@@ -341,7 +343,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
 gisportal.addLayersForm.sendLayers = function(layer){
    $.ajax({
-      url: gisportal.middlewarePath + '/settings/add_user_layer',
+      url: '/app/settings/add_user_layer',
       method:'POST',
       data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"),},
       // If there is success
@@ -470,7 +472,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
 gisportal.addLayersForm.showOwnerOptions = function(given_owner){
    var select_elem = $("form.server-form select[data-field='owner']");
    $.ajax({
-      url:  gisportal.middlewarePath + '/settings/get_owners',
+      url:  '/app/settings/get_owners',
       success: function( data ){
          var owners = data.owners;
          var output = [];
