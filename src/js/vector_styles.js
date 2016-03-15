@@ -33,18 +33,18 @@ gisportal.vectorStyles.createOLStyle = function(options){
 };
 
 gisportal.vectorStyles.createPalette = function(startingColour, steps){
-
+   var startColour;
 	if (startingColour in gisportal.vectorStyles.startingColours)
-		var startColour = gisportal.vectorStyles.startingColours[startingColour];
+		startColour = gisportal.vectorStyles.startingColours[startingColour];
 	else
-		return false
+		return false;
 
 	var tintFactor = 0.5 / steps;
-	var currentR = startColour['r'];
-	var currentG = startColour['g'];
-	var currentB = startColour['b'];
+	var currentR = startColour.r;
+	var currentG = startColour.g;
+	var currentB = startColour.b;
 	var palette = [];
-	var x = 1
+	var x = 1;
 	for(x;x <= steps;x++){
 
 		currentR = Math.floor(currentR + (255 - currentR) * (tintFactor * x));
@@ -53,11 +53,11 @@ gisportal.vectorStyles.createPalette = function(startingColour, steps){
 		newFull = "rgba("+currentR+","+currentG+","+currentB+",1)";
 		palette.push(newFull);
 
-	};
+	}
 
 	return palette;
 
-}
+};
 
 gisportal.vectorStyles.startingColours = {
 	"basic_purple" : {
@@ -102,7 +102,7 @@ gisportal.vectorStyles.startingColours = {
             	"b" : 0,
                 "a" : 1
         }
-}
+};
 
 
 gisportal.vectorStyles.defaultLine = new ol.style.Style({
@@ -120,15 +120,15 @@ gisportal.vectorStyles.defaultPoly =   new ol.style.Style({
     fill: new ol.style.Fill({
       color: 'rgba(0, 0, 255, 0.1)'
     })
-})
+});
 
 gisportal.vectorStyles.genColour = function(opacity) {
       var r = Math.floor(Math.random() * (255 - 0) + 0);
       var g = Math.floor(Math.random() * (255 - 0) + 0);
       var b = Math.floor(Math.random() * (255 - 0) + 0);
-    var colour = 'rgba('+ r.toString() +',' + g.toString() +',' + b.toString() + ',' +opacity.toString() + ')'
+    var colour = 'rgba('+ r.toString() +',' + g.toString() +',' + b.toString() + ',' +opacity.toString() + ')';
     //console.log(colour);
-    return colour
+    return colour;
 };
 
 

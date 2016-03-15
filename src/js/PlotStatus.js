@@ -30,6 +30,8 @@ gisportal.graphs.PlotStatus = (function(){
      * says the status of the plot has changed
      */
    PlotStatus.prototype.rebuildElement = function(){
+      var _this = this;
+
       // Get the plot
       var plot = this.plot();
 
@@ -57,6 +59,10 @@ gisportal.graphs.PlotStatus = (function(){
          // Delete a plot
          .on('click', '.js-graph-status-delete', function(){
             $(this).closest('.graph-job').remove();
+            if($('.graph-job').length <= 0){
+               $('.no-graphs-text').toggleClass("hidden", false);
+            }
+            _this._plot.stopMonitoringJobStatus();
          })
          // Copy a plot
          .on('click', '.js-graph-status-copy', function(){
@@ -64,10 +70,18 @@ gisportal.graphs.PlotStatus = (function(){
          })
          // Open a plot
         .on('click', '.js-graph-status-open', function(){
-            // Get the URL for that plot
-            var interactiveUrl = plot.interactiveUrl();
-            // Open it in a pop up
-            window.open( interactiveUrl, '', 'width=' + window.innerWidth * 0.90 + ',height=' + window.innerHeight * 0.70  + ',toolbar=no' );
+            var hash = $(this).data("hash");
+            $.ajax({
+               url: 'plots/' + hash + "-plot.html",
+               dataType: 'html',
+               success: function( html ){
+                  gisportal.graphs.popup.loadPlot(html, hash);
+               }, error: function(e){
+                  var error = 'Sorry, we failed to load the graph: \n'+
+                                 'The server failed with this message: "' + e.statusText + '"';
+                  $.notify(error, "error");
+               }
+            });
          });
    };
 
@@ -82,17 +96,19 @@ gisportal.graphs.PlotStatus = (function(){
       this.plot().on('serverStatus-change', function( data ){
          var serverStatus = data['new'];
          switch( serverStatus.state ){
-            case "success":
+            case "complete":
                _this.stateSuccess( serverStatus );
                break;
-            case "processing":
+            case "extracting":
+            case "plotting":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;
-            case "error":
+            case "failed":
                _this.stateError( serverStatus );
+               _this._plot.stopMonitoringJobStatus();
                break;
-         };
+         }
       });
    };
 
@@ -109,15 +125,14 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateError = function( serverStatus ){
 
-      if( this.renderedState != "error" )
+      if( this.renderedState != "failed" )
          this.rebuildElement();
 
       var message = serverStatus.message;
-      this._element
-         .find('.js-graph-status-show-full-error')
-         .click(function(){
-            alert( message );
-         });
+      var error_element = this._element.find('.js-graph-status-show-full-error');
+      error_element.on('click',function(){
+         $.notify( message , {className:"error", autoHide: false});
+      });
    };
 
    /**
@@ -131,7 +146,7 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateSuccess = function( serverStatus ){
 
-      if( this.renderedState != "success" )
+      if( this.renderedState != "complete" )
          this.rebuildElement();
 
    };
@@ -150,42 +165,20 @@ gisportal.graphs.PlotStatus = (function(){
     */
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
       var isCalculating = false;
-      var hasEstimation = false;
-      var worestCaseEstimation = new Date();
 
       // Rebuild the element if we arent already showing
       // the processing template
-      if( this.renderedState != "processing" )
+      if( this.renderedState != "extracting" )
          this.rebuildElement();
-
-      // Loop over all of sources and find the longest
-      // estimation time. This will be the one thats 
-      // said to be the Plots completion time
-      for( var sourceId = 0; sourceId < serverStatus.sources.length; sourceId++ ){
-         var source = serverStatus.sources[ sourceId ];
-
-         switch( source.estimation.state ){
-            case "calculating":
-               isCalculating = true;
-               break;
-            case "success":
-               hasEstimation = true;
-               var estimatedEst = new Date( source.estimation.endTime );
-               if( estimatedEst.getTime() > worestCaseEstimation.getTime() )
-                  worestCaseEstimation = estimatedEst;
-               break;
-
-         };
-      };
 
       var message = serverStatus.message;
 
       // Decide what the estimated completion 
       // time message should be
-      if( isCalculating && ! hasEstimation )
+      if( isCalculating && ! this._plot.estimatedFinishTime )
          message += "<br>Estimated time remaining: calculating";
-      if( hasEstimation )
-         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( worestCaseEstimation ) ;
+      if( this._plot.estimatedFinishTime )
+         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( this._plot.estimatedFinishTime ) ;
 
       // Add the message to the status element
       this._element
@@ -201,12 +194,12 @@ gisportal.graphs.PlotStatus = (function(){
     * @return String
     */
    PlotStatus.prototype.printSmallTimeDiffernce = function( endTime, allowNegative ){
-      var allowNegative = allowNegative || false;
+      allowNegative = allowNegative || false;
       var startTime = new Date();
 
       var differnceInSecs = ( endTime.getTime() - startTime.getTime() ) / 1000;
 
-      if( ! allowNegative && differnceInSecs == 0 )
+      if( ! allowNegative && differnceInSecs <= 0 )
          return "0m0s";
 
       var flip = false;
@@ -224,7 +217,7 @@ gisportal.graphs.PlotStatus = (function(){
       output += seconds + "s";
 
       return output;
-   }
+   };
 
    // Getter themes
 

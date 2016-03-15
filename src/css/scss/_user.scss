@@ -1,0 +1,27 @@
+
+.userHolder {padding-bottom: 20px;}
+.userHolder p {margin: 7px 0px;}
+
+.userHolder .name {
+   font-weight: bold;
+}
+.userHolder .email {
+   font-style: italic;
+}
+.userHolder .logout {
+   text-align: right;
+   margin-top: 10px;
+}
+
+.userHolder .avatar {
+   width: 75px;
+   height: auto;
+   border-radius: 50%;
+   float: left;
+   margin-right: 10px;
+}
+
+.userHolder ul li { 
+   list-style: square inside;
+   margin-left: 8px;
+}

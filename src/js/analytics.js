@@ -1,22 +1,21 @@
-
-gisportal.analytics = {}
-
+gisportal.analytics = {};
 
 gisportal.analytics.initGA = function(){
-   if( gisportal.config.analytics.active == false ) return;
+   if( !gisportal.config.analytics || gisportal.config.analytics.active === false ) return;
    
-   
+   /* jshint ignore:start */
    //Load UA
    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+   /* jshint ignore:end */
 
    ga('create', gisportal.config.analytics.UATrackingId , 'auto');
    ga('send', 'pageview');
    
    gisportal.analytics.initDomEvents();
-}
+};
 
 
 gisportal.analytics.getGetParam = function(val) {
@@ -30,14 +29,14 @@ gisportal.analytics.getGetParam = function(val) {
         if (tmp[0] === val) result = decodeURIComponent(tmp[1]);
     });
     return result;
-}
+};
 
 /**
 * Adds events to the DOM. (requires the <body> to exist)
 */
 gisportal.analytics.initDomEvents = function(){
    var state = gisportal.analytics.getGetParam('state');
-   if(  typeof state == 'string' && state != "" ){
+   if(  typeof state == 'string' && state !== "" ){
       ga('send', {
          'hitType': 'event',
          'eventCategory': 'Start',
@@ -80,22 +79,22 @@ gisportal.analytics.initDomEvents = function(){
    // Someone drew a bounding box
    $('body').on( 'click', '.js-draw-box', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.selectionBoxDrawn( layer )
+      if( layer !== null )
+         gisportal.analytics.events.selectionBoxDrawn( layer );
    });
 
    // Someone drew a bounding box
    $('body').on( 'click', '.js-draw-polygon', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.selectionPolygonDrawn( layer )
+      if( layer !== null )
+         gisportal.analytics.events.selectionPolygonDrawn( layer );
    });
    
    // Someone typed a bounding box
    $('body').on( 'change', '.js-coordinates', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer != null )
-         gisportal.analytics.events.selectionBoxTyped( layer )
+      if( layer !== null )
+         gisportal.analytics.events.selectionBoxTyped( layer );
    });
    
    gisportal.events.bind( 'layer.select', function( event, id ){
@@ -107,12 +106,7 @@ gisportal.analytics.initDomEvents = function(){
       var layer = gisportal.layers[ id ];
       gisportal.analytics.events.removeLayer( layer );
    });
-   
-   
-}
-
-//Settings for the custom dimensions ids and what the values should be
-gisportal.analytics.customDefinitions  = gisportal.config.analytics.customDefinitions;
+};
 
 gisportal.analytics.customDefinitionsUsedInEvents = {
      
@@ -141,7 +135,7 @@ gisportal.analytics.customDefinitionsUsedInEvents = {
         'indicator_provider',
         'indicator_confidence'
      ]
-}
+};
 
 
 //A list of common functions used when tracking analytics
@@ -194,13 +188,13 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
    function getDefinitionIndexFromKey( customDefinitionKey ){
       var definitionIndex = null;
       // Find the key in the object/array
-      for( var i in gisportal.analytics.customDefinitions ){
-         if( gisportal.analytics.customDefinitions.hasOwnProperty( i ) )
-            if( gisportal.analytics.customDefinitions[i] == customDefinitionKey )
-               var definitionIndex = i;
+      for(var i in gisportal.config.analytics.customDefinitions ){
+         if( gisportal.config.analytics.customDefinitions.hasOwnProperty( i ) )
+            if( gisportal.config.analytics.customDefinitions[i] == customDefinitionKey )
+               definitionIndex = i;
       }
       // If not key was found then error
-      if( definitionIndex == null )
+      if( definitionIndex === null )
          throw "No custom definition defined.";
 
       // Expand the definition index from short to long
@@ -235,29 +229,29 @@ gisportal.analytics.getCustomDefinitionsValues = function( nameSet ){
    }
 
    
-   gisportal.analytics.customDefinitionsUsedInEvents[ nameSet ].forEach( getValueForDefinition )
+   gisportal.analytics.customDefinitionsUsedInEvents[ nameSet ].forEach( getValueForDefinition );
    
    return toSend;
    
-}
+};
 
 gisportal.analytics.send = function( toSend ){
-   if( gisportal.config.analytics.active == false ) return;
+   if( !gisportal.config.analytics || gisportal.config.analytics.active === false ) return;
    
-   if( toSend['eventLabel'] == void( 0 ) ){
+   if( toSend.eventLabel == void( 0 ) ){
       var buffer = [];
       
-      for( var i in toSend ){
-         if( toSend.hasOwnProperty( i ) == false )
+      for(var i in toSend ){
+         if( toSend.hasOwnProperty( i ) === false )
             continue;
          
          buffer.push( toSend[ i ] );
       }
       
-      toSend['eventLabel'] = buffer.join( '*' )
+      toSend.eventLabel = buffer.join( '*' );
    }
    ga('send', toSend );
-}
+};
 
 gisportal.analytics.events = {};
 gisportal.analytics.pendingChanges = [];
@@ -276,7 +270,7 @@ gisportal.analytics.events.selectLayer = function( indicator ){
    
    toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
-}
+};
 
 //Called when a layer is removed
 gisportal.analytics.events.removeLayer = function( indicator ){
@@ -290,7 +284,7 @@ gisportal.analytics.events.removeLayer = function( indicator ){
    
    toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
-}
+};
 
 
 // Called when a used uses the the draw a bounding box tool
@@ -302,7 +296,7 @@ gisportal.analytics.events.selectionBoxDrawn = function( indicator ){
       'eventLabel': 'Selection box drawn'
    };
    gisportal.analytics.send( toSend );
-}
+};
 
 
 // Called when a used uses the the draw a bounding box tool
@@ -314,7 +308,7 @@ gisportal.analytics.events.selectionPolygonDrawn = function( indicator ){
       'eventLabel': 'Selection polygon drawn'
    };
    gisportal.analytics.send( toSend );
-}
+};
 
 
 
@@ -327,7 +321,7 @@ gisportal.analytics.events.selectionBoxTyped = function( indicator ){
       'eventLabel': 'Selection box typed'
    };
    gisportal.analytics.send( toSend );
-}
+};
 
 /*
 * Called when a graph is actaully crated.
@@ -344,4 +338,4 @@ gisportal.analytics.events.createGraph = function( plot ){
    
    toSend = $.extend( toSend, CDs );
    gisportal.analytics.send( toSend );
-}
+};

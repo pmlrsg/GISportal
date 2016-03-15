@@ -8,37 +8,17 @@
   margin-top: 20px;
 }
 
-.notifyjs-option-base {
-  opacity: 0.85;
-  width: 200px;
-  background: #F5F5F5;
-  padding: 5px;
-  border-radius: 10px;
-}
-
-.notifyjs-option-base .title {
-  width: 100px;
-  float: left;
-  margin: 10px 0 0 10px;
-  text-align: right;
-}
-
-.notifyjs-option-base .buttons {
-  width: 70px;
-  float: right;
-  font-size: 9px;
-  padding: 5px;
-  margin: 2px;
-}
-
-.notifyjs-option-base button {
-  font-size: 9px;
-  padding: 5px;
-  margin: 2px;
+.notifyjs-gisportal-refresh-option-base button,
+.notifyjs-gisportal-delete-option-base button,
+.notifyjs-gisportal-restore-option-base button {
   width: 60px;
+  margin:5px;
 }
 
-.notifyjs-gisportal-base {
+.notifyjs-gisportal-base,
+.notifyjs-gisportal-refresh-option-base,
+.notifyjs-gisportal-delete-option-base,
+.notifyjs-gisportal-restore-option-base {
   color: #111111;
   padding: 8px 15px 8px 14px;
   background-color: #ffffff;
@@ -52,7 +32,10 @@
   margin-bottom: 10px;
 }
 
-.notifyjs-gisportal-base:before {
+.notifyjs-gisportal-base:before,
+.notifyjs-gisportal-refresh-option-base:before,
+.notifyjs-gisportal-delete-option-base:before,
+.notifyjs-gisportal-restore-option-base:before {
   font-family: "streamline-24px" !important;
   font-style: normal !important;
   font-weight: normal !important;
@@ -67,38 +50,71 @@
   left: 15px;
 }
 
-.notifyjs-gisportal-error {
+.notifyjs-gisportal-error,
+.notifyjs-gisportal-refresh-option-error,
+.notifyjs-gisportal-delete-option-error,
+.notifyjs-gisportal-restore-option-error {
   border-color: #900;
 }
 
-.notifyjs-gisportal-error:before {
+.notifyjs-gisportal-error:before,
+.notifyjs-gisportal-refresh-option-error:before,
+.notifyjs-gisportal-delete-option-info:before,
+.notifyjs-gisportal-restore-option-info:before {
   content: "\e307";
   color: #900;
 }
 
-.notifyjs-gisportal-success {
+.notifyjs-gisportal-success,
+.notifyjs-gisportal-refresh-option-success,
+.notifyjs-gisportal-delete-option-success,
+.notifyjs-gisportal-restore-option-success {
   border-color: #3c763d;
 }
 
-.notifyjs-gisportal-success:before {
+.notifyjs-gisportal-success:before,
+.notifyjs-gisportal-refresh-option-success:before,
+.notifyjs-gisportal-delete-option-success:before,
+.notifyjs-gisportal-restore-option-success:before {
   content: "\e2ff";
   color: #3c763d;
 }
 
-.notifyjs-gisportal-info {
+.notifyjs-gisportal-info,
+.notifyjs-gisportal-refresh-option-info,
+.notifyjs-gisportal-delete-option-info,
+.notifyjs-gisportal-restore-option-info {
   border-color: #31708f;
 }
 
-.notifyjs-gisportal-info:before {
+.notifyjs-gisportal-info:before,
+.notifyjs-gisportal-refresh-option-info:before,
+.notifyjs-gisportal-delete-option-info:before,
+.notifyjs-gisportal-restore-option-info:before {
   content: "\e0b8";
   color: #31708f;
 }
 
-.notifyjs-gisportal-warn {
+.notifyjs-gisportal-warn,
+.notifyjs-gisportal-refresh-option-warn,
+.notifyjs-gisportal-delete-option-warn,
+.notifyjs-gisportal-restore-option-warn {
   border-color: #D48702;
 }
 
-.notifyjs-gisportal-warn:before {
+.notifyjs-gisportal-warn:before,
+.notifyjs-gisportal-refresh-option-warn:before,
+.notifyjs-gisportal-delete-option-warn:before,
+.notifyjs-gisportal-restore-option-warn:before {
   content: "\e4b9";
   color: #D48702;
+}
+
+[data-notify-text],
+[data-notify-html]{
+  word-wrap:break-word;
+}
+
+.scalevalues .notifyjs-gisportal-base{
+  width: 300px;
 }

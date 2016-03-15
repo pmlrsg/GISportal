@@ -47,8 +47,8 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
    });
 	$('.js-user-feedback-submit').on('click', function(e) {
 		e.preventDefault();
-		var str = $('.user-feedback-input').val()
-		if(/^[a-zA-Z _][a-zA-Z0-9 _]+$/.test(str)){
+		var str = $('.user-feedback-input').val();
+		if(/^[a-zA-Z _][a-zA-Z0-9 _]+$/.test(str) && str.length < 50){
 			given_function(str);
 	      $('div.js-user-feedback-popup').toggleClass('hidden', true);
 	   }else{
@@ -58,4 +58,4 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 
    });
 
-}
+};

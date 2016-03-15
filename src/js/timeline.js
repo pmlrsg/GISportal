@@ -216,7 +216,7 @@ gisportal.TimeLine = function(id, options) {
       
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
-      self.showDate(self.draggedDate);   
+      $('.js-current-date').val(moment(self.draggedDate).format('YYYY-MM-DD'));
    };
    
    this.dragDateEnd = function() {
@@ -353,7 +353,7 @@ gisportal.TimeLine.prototype.redraw = function() {
    this.dateDetails = this.dateDetailArea.selectAll('g').data(this.timebars);
 
    // Add new required g elements
-   this.dateDetails.enter().append('svg:g')
+   this.dateDetails.enter().append('svg:g');
    
    // Remove unneeded g elements
    this.dateDetails.exit().remove(); 
@@ -443,7 +443,7 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
-   gisportal.events.trigger('date.zoom', startDate, endDate)
+   gisportal.events.trigger('date.zoom', startDate, endDate);
 };
 
 // Add a new time bar using detailed parameters
@@ -476,6 +476,12 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.reHeight();
    this.redraw(); 
    this.updatePickerBounds();
+
+   // ensure that the timeline is visible and adjust the panel height accordingly
+   $('.timeline-container').css('bottom','0px');
+   var h = $('.timeline-container').height();
+   $('.panel').css('bottom', h + 35 +'px');
+   
 };
 
 
@@ -554,7 +560,7 @@ gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
    if( !current || new Date(date).getTime() != current.getTime() )
       $('.js-current-date').data('date', date).pikaday( 'setDate', date );
-}
+};
 
 // Get the currently selected date 
 gisportal.TimeLine.prototype.getDate = function() {
@@ -571,7 +577,7 @@ gisportal.TimeLine.prototype.updatePickerBounds = function() {
          bar.startDate,
          bar.endDate,
       ];
-   }).reduce(function(d1,d2){ return d1.concat(d2) },[]);
+   }).reduce(function(d1,d2){ return d1.concat(d2);},[]);
 
    var extent = d3.extent( dates );
 

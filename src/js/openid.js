@@ -95,8 +95,8 @@ gisportal.openid.getLink = function()  {
       },
       dataType: 'json',
       success: function( data ) { 
-         if (data['output']['url']) {
-            $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data['output']['url']);
+         if (data.output.url) {
+            $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data.output.url);
          }
       },
       error: function( request, errorType, exception ) {
@@ -194,7 +194,3 @@ gisportal.openid.isPopupClosed = function() {
 
 //======== ENDOF POPUP MANAGEMENT ========//
 
-gisportal.openid.providers = [
-   {name: 'google', title:'login with Google', url:'/service/login/google', imagePath:'img/Red-signin_Long_base_20dp.png', x:'0', y:'0', width:'147px', height:'30px'},
-   {name: 'yahoo', title:'login with Yahoo', url:'/service/login/yahoo', imagePath:'img/yahoo_signin_btn.png', x:'0', y:'0', width:'161px', height:'22px'}
-];

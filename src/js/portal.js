@@ -11,6 +11,12 @@ $(document).ready(function() {
    if (!window.console) window.console = {};
    if (!window.console.log) window.console.log = function () { };
    if (!window.console.info) window.console.info = function () { };
-   
-   gisportal.main();
+   $.ajax({
+	  url: gisportal.middlewarePath + '/settings/config',
+	  dataType: 'script',
+	  success: function(script){
+	  		eval(script);
+	  		gisportal.main();
+	  }
+	});
 });

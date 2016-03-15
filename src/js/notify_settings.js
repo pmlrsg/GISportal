@@ -36,14 +36,40 @@ $.notify.addStyle("gisportal", {
     html: "<div>\n<span data-notify-text></span>\n</div>",
   });
 
-$.notify.addStyle('option', {
+$.notify.addStyle('gisportal-refresh-option', {
   html: 
-    "<div>" +
+    "<div data-option='refresh'>" +
       "<div class='clearfix'>" +
         "<div class='title' data-notify-html='title'/>" +
         "<div class='buttons'>" +
-          "<button class='no' data-notify-text='no-text'></button>" +
-          "<button class='yes' data-notify-text='yes-text'></button>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+});
+
+$.notify.addStyle('gisportal-delete-option', {
+  html: 
+    "<div data-option='delete'>" +
+      "<div class='clearfix'>" +
+        "<div class='title' data-notify-html='title'/>" +
+        "<div class='buttons'>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+});
+
+$.notify.addStyle('gisportal-restore-option', {
+  html: 
+    "<div data-option='restore'>" +
+      "<div class='clearfix'>" +
+        "<div class='title' data-notify-html='title'/>" +
+        "<div class='buttons'>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
         "</div>" +
       "</div>" +
     "</div>"

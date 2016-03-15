@@ -29,8 +29,8 @@ gisportal.configurePanel.refreshData = function()  {
 
 
    $('#configurePanel').bind('scroll', function() {
-     gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop())
-   })
+     gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop());
+   });
 };
 
 /**
@@ -47,13 +47,6 @@ gisportal.configurePanel.close = function()  {
    //$('#configurePanel').toggleClass('hidden', true).toggleClass('active', false);
 };
 
-/**
- * This function initiates the DOM event handlers
- */
-gisportal.configurePanel.initDOM = function()  {
-   // nothing to see here any more
-}
-
 gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
    var options = [];
    
@@ -64,7 +57,7 @@ gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
 
    gisportal.refinePanel.reset();
    gisportal.configurePanel.selectLayer(name, options);
-}
+};
 
 /**
  * Resets the tabs and search box on the portal
@@ -81,7 +74,7 @@ gisportal.configurePanel.reset = function(){
    // and when browseMode = tabs
    $('.js-indicator-select .dd-container').ddslick('reset');
    
-}
+};
 
 /**
  * This used to be triggered by a button, that still exists
@@ -117,12 +110,8 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * @returns {object} Data structure with tags as keys
  */
 gisportal.groupTags = function(layers, vectorLayers)  {
-   if (layers == undefined) {
-      layers = gisportal.layers;
-   }
-   if (vectorLayers == undefined) {
-      vectorLayers = gisportal.vectors;
-   }
+   layers = layers || gisportal.layers;
+   vectorLayers = vectorLayers || gisportal.vectors;
    var grouped = {};
    
    // Iterate over the ids in gisportal.layers
@@ -209,9 +198,7 @@ gisportal.groupTags = function(layers, vectorLayers)  {
  * @returns {object} Data structure with names as keys
  */
 gisportal.groupNames = function(layers)  {
-   if (layers == undefined) {
-      layers = gisportal.layers;
-   }
+   layers = layers || gisportal.layers;
    var group = {};
 
    // Iterate over layers so that
@@ -282,9 +269,17 @@ gisportal.groupNames = function(layers)  {
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
    var grouped = gisportal.groupTags();
-
+   var addable_layers = false;
+   if(gisportal.user.info.permission != "guest"){
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            addable_layers = true;
+            break;
+         }
+      }
+   }
    // load the template
-   var catFilter = gisportal.templates['category-filter-tabs']();
+   var catFilter = gisportal.templates['category-filter-tabs']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
    $('.more-info').on('click', function() {
       var message_block = $(this).prev();
@@ -300,6 +295,21 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       gisportal.configurePanel.resetPanel();
    });
 
+   // Listener is added to the add layers button
+   $('button#js-add-layers-form').on('click', function() {
+      var single_layer;
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            single_layer = gisportal.layers[layer];
+            // Each of the user defined layers are added to the layers_list variable
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer]);
+         }
+      }
+      gisportal.addLayersForm.validation_errors = {};
+      // The form is then loaded (loading the first layer)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
+   });
+
    // iterate over each category
    for (var cat in gisportal.browseCategories)  {
 
@@ -309,6 +319,15 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 
       gisportal.configurePanel.renderIndicatorsByTag(cat, targetDiv, tabNumber);
 
+   }
+   // This block makes sure that the correct number of tabs is shown. If there are only 2 available then the '3' tab will be hidden
+   for(var x=1; x<=3; x++){
+      var label = $('label[for="tab-browse-' + x +'"]');
+      if(label.html() == String(x)){
+         label.toggleClass('hidden', true);
+      }else{
+         label.toggleClass('hidden', false);
+      }
    }
 };
 
@@ -320,14 +339,13 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // load the template
    var addable_layers = false;
-   for(layer in gisportal.layers){
-      if(layer.indexOf("UserDefinedLayer") > -1){
-         addable_layers = true;
-         break;
+   if(gisportal.user.info.permission != "guest"){
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            addable_layers = true;
+            break;
+         }
       }
-   }
-   if(!gisportal.userPermissions.user_clearance){
-      addable_layers = false;
    }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
    var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
@@ -349,16 +367,16 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // Listener is added to the add layers button
    $('button#js-add-layers-form').on('click', function() {
       var single_layer;
-      for(layer in gisportal.layers){
+      for(var layer in gisportal.layers){
          if(layer.indexOf("UserDefinedLayer") > -1){
-            single_layer = gisportal.layers[layer]
+            single_layer = gisportal.layers[layer];
             // Each of the user defined layers are added to the layers_list variable
-            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer])
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer]);
          }
       }
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.userPermissions.this_user_info.username)
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
    });
 
    var categories = [];
@@ -366,7 +384,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       var c = {
          value: category,
          text: gisportal.browseCategories[category],
-      }
+      };
       categories.push(c);
    }
 
@@ -389,12 +407,12 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    // set the index to 0, or if a defaultCategory is set use that instead; setting the value triggers the rendering of the drop down lists to filter by
    var defaultValue = { index: 0 };
-   var defaultCategory = gisportal.config.defaultCategory
+   var defaultCategory = gisportal.config.defaultCategory;
    if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.browseCategories) {
       defaultValue = { value: defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
-}
+};
 
 /**
  * [renderIndicatorsByTag description]
@@ -411,10 +429,27 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
    if (grouped[cat]) {
       tagNames = Object.keys(grouped[cat]);
       // sort it before it's rendered
-      tagNames.sort() 
+      tagNames.sort(); 
    } 
    var catName = gisportal.browseCategories[cat];
    var catNameKeys = Object.keys(gisportal.browseCategories);
+
+   var addIndicators = function(d)  {
+      var tmp = {};
+      tmp.name = d;
+      // Modified is used when a unique id is required
+      // in the actual html, for radio buttons for example.
+      tmp.modified = gisportal.utils.nameToId(d);
+      tmp.tagname = cat;
+      tmp.tagvalue = tagNames[i];
+      indicators.push(tmp);
+   };
+
+   var configureSelectedData = function(data) {
+      if (data.selectedData) {
+         gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
+      }
+   };
    
    for (var i = 0; i < tagNames.length; i++)  {
       var vals = tagVals[tagNames[i]];
@@ -422,7 +457,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
          // The tag name is made safe as it is use to make an HTML ID (restricted chars)
          var tagNameSafe = gisportal.utils.replace(['&amp;', '&','\ ','/',';','.',',','(',')'], ['and','and','_','_','_','_','_','_','_'], tagNames[i]);
          if(tagNameSafe.endsWith(':')){
-            tagNameSafe += "-"
+            tagNameSafe += "-";
          }
          // sort them
          vals.sort();
@@ -433,18 +468,9 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
             return d;
          });
          
-         _.forEach(vals, function(d)  {
-            var tmp = {};
-            tmp.name = d;
-            // Modified is used when a unique id is required
-            // in the actual html, for radio buttons for example.
-            tmp.modified = gisportal.utils.nameToId(d);
-            tmp.tagname = cat;
-            tmp.tagvalue = tagNames[i];
-            indicators.push(tmp);
-         });
+         _.forEach(vals, addIndicators);
 
-         var rendered = gisportal.templates['categories'] ({
+         var rendered = gisportal.templates.categories ({
             tag : tagNames[i],
             tagnamesafe: tagNameSafe,
             tagModified : gisportal.utils.nameToId(tagNames[i]),
@@ -457,15 +483,11 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
          
          $('#select-'+ tagNameSafe).ddslick({
             selectText: tagNames[i],
-            onSelected: function(data) {
-               if (data.selectedData) {
-                  gisportal.configurePanel.toggleIndicator(data.selectedData.name, data.selectedData.tag, data.selectedData.tagname);
-               }
-            }
+            onSelected: configureSelectedData
          });
       }
    }
-}
+};
 
 
 /**
@@ -544,11 +566,11 @@ gisportal.configurePanel.search = function(val)  {
       tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
       indicators.push(tmp);
    });
-   var rendered = gisportal.templates['browseIndicators']({
+   var rendered = gisportal.templates.browseIndicators({
       location: 'search',
       indicators : indicators,
       search_term: val,
-      empty_search: (val == "")
+      empty_search: (val === "")
    });
    
    $('.js-search-results').html(rendered);
@@ -556,7 +578,7 @@ gisportal.configurePanel.search = function(val)  {
       //console.log("clicked/..................");
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
       $('.js-search-results').css('display', 'none');   
-      gisportal.events.trigger('search.resultselected', $(this).text())
+      gisportal.events.trigger('search.resultselected', $(this).text());
    });
    $('.js-search-results').css('display', 'block');
    if (val == 'sombrero') {
@@ -579,8 +601,8 @@ gisportal.configurePanel.search = function(val)  {
  */
 gisportal.configurePanel.selectLayer = function(name, options)  {
 
-   var options = options || {};
-   var name = name;
+   options = options || {};
+   name = name;
    var id = this.hasIndicator(name);  
    
    if (options.id) {
@@ -641,7 +663,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
          $('.filtered-list-message').show();
-      for(index in gisportal.selectedLayers){
+      for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
    }else{
@@ -658,7 +680,7 @@ gisportal.configurePanel.resetPanel = function(given_layers){
          $('.filtered-list-message').hide();
          $('.unfiltered-list-message').show();
          setTimeout(function(){
-            $('.unfiltered-list-message').slideUp('slow')
+            $('.unfiltered-list-message').slideUp('slow');
          }, 5000);
       }
    }

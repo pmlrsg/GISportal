@@ -45,9 +45,9 @@ $(document).ready(function()  {
 
 function changeTab( tabElement )  {
   if( tabElement && tabElement instanceof HTMLElement )
-    var tabElement = tabElement;
+    tabElement = tabElement;
   else
-    var tabElement = this;
+    tabElement = this;
 
   var e = $(tabElement)[0];
 

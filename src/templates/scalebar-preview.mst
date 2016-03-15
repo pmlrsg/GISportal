@@ -1,5 +1,5 @@
 <label>Scalebar Preview:</label><br/>
-<img src="/service/rotate?angle={{angle}}&url={{legendURL}}"></img>
+<img src="{{middleware}}/settings/rotate?angle={{angle}}&url={{legendURL}}"></img>
 {{#if scalePoints}}
    <span class="scalebar-overlay"><span title="0">0</span></span>
    <span class="scalebar-overlay"><span title="0">0</span></span>

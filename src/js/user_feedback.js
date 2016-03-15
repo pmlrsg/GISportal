@@ -1,7 +1,7 @@
 // Unique session ID which is posted to UserVioice
 // When a request is made you can go into the
 // state's database and retrieve the information
-window.session_id = (new Date).getTime() + "-" + Math.floor( Math.random() * 1000000 );
+window.session_id = (new Date()).getTime() + "-" + Math.floor( Math.random() * 1000000 );
 
 $(function(){
   // When a user clients the user voice icon store the state

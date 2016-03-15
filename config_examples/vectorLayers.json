@@ -6,7 +6,7 @@
       },
       "services": { 
          "wfs" : {
-            "url" : "/service/proxy?url=https%3A%2F%2Fvortices.npm.ac.uk%2Fgeoserver%2Frsg%2Fows",
+            "url" : "/app/settings/proxy?url=https%3A%2F%2Fvortices.npm.ac.uk%2Fgeoserver%2Frsg%2Fows",
             "params" : "",
             "vectors" : [
                {
