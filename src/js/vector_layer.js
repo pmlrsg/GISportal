@@ -485,6 +485,11 @@ gisportal.Vector = function(options) {
 
     this.addOLLayer = function(layer, id) {
         map.addLayer(layer);
+
+        var hoverInteraction = new ol.interaction.Select({
+            condition: ol.events.condition.pointerMove,
+        });
+        map.addInteraction(hoverInteraction);
         //console.log('adding and redoing ui');
         if(!this.styleUIBuilt){
             this.setStyleUI(layer.getSource(),layer.defaultProperty);

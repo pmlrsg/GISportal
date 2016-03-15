@@ -488,12 +488,57 @@ gisportal.mapInit = function() {
       ]
    });
 
-   map.addInteraction(new ol.interaction.Select({
-      condition: function(e) {
-         return e.originalEvent.type=='mousemove';
-      },
-      hover : false
-   }));
+   // map.addInteraction(new ol.interaction.Select({
+   //    condition: function(e) {
+   //       return e.originalEvent.type=='mousemove';
+   //    },
+   //    hover : false
+   // }));
+   // cahnging fature overlay for ol3
+   
+   var collection = new ol.Collection();
+
+
+   gisportal.featureOverlay = new ol.layer.Vector({
+      map : map,
+      source: new ol.source.Vector({
+         features: collection,
+         useSpatialIndex : false
+      }),
+      style : new ol.style.Style({
+        stroke: new ol.style.Stroke({
+          color: [255,0,0,0.6],
+          width: 2
+        }),
+        fill: new ol.style.Fill({
+          color: [255,0,0,0.2]
+        }),
+        zIndex: 100000000
+      }),
+      updateWhileAnimating : true,
+      updateWhileIneracting: true
+   })
+
+   // map.addInteraction(new ol.interaction.Select({
+   //    condition : ol.events.condition.pointerMove
+   // }))
+   
+   map.on('pointermove', function(evt) {
+      
+       var pixel = evt.pixel;
+                gisportal.featureOverlay.getSource().clear()
+
+      map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+         if(!layer){
+            return;
+         }
+         //layer.getSource().removeFeature(feature);
+         console.log(gisportal.featureOverlay);
+         gisportal.featureOverlay.getSource().addFeature(feature);
+         console.log(gisportal.featureOverlay.getSource().getFeatures());
+      });
+
+   });
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
