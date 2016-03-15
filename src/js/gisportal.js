@@ -536,7 +536,7 @@ gisportal.mapInit = function() {
             return;
          }
          //layer.getSource().removeFeature(feature);
-         console.log(gisportal.featureOverlay);
+         //console.log(gisportal.featureOverlay);
          gisportal.featureOverlay.getSource().addFeature(feature);
          console.log(gisportal.featureOverlay.getSource().getFeatures());
       });

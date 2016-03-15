@@ -595,6 +595,9 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.layers_list[index][key] = key_val;
          }
       }else{
+         if(key == "wcsURL"){
+            key_val = key_val.split("?")[0];
+         }
          gisportal.addLayersForm.server_info[key] = key_val;
       }
       // The storage data is then updated.
