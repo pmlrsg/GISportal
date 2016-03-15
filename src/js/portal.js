@@ -12,7 +12,7 @@ $(document).ready(function() {
    if (!window.console.log) window.console.log = function () { };
    if (!window.console.info) window.console.info = function () { };
    $.ajax({
-	  url: gisportal.middlewarePath + '/settings/config',
+	  url: '/app/settings/config',
 	  dataType: 'script',
 	  success: function(script){
 	  	// CHECK THIS IS SAFE!!!!!!!!!11

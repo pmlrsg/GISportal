@@ -33,10 +33,10 @@ gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app"; // 
 
 
 // Flask url paths, relates to /middleware/portalflask/views/
-gisportal.stateLocation = gisportal.middlewarePath + '/state';
+gisportal.stateLocation = '/app/state';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';   // Flask (Python) service OpenLayers proxy
+gisportal.ProxyHost = '/app/settings/proxy?url=';   // Flask (Python) service OpenLayers proxy
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -118,7 +118,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/get_cache',
+         url:  '/app/settings/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -149,7 +149,7 @@ gisportal.loadVectorLayers = function() {
 
 
    $.ajax({
-      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
+      url: '/app/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
       error: function(e){
@@ -1313,7 +1313,7 @@ gisportal.getPointReading = function(e) {
 
 
          $.ajax({
-            url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            url:  '/app/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
                try{
                   $(elementId +' .loading').remove();

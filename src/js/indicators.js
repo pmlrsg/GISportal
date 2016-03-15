@@ -261,7 +261,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
    }else{ // Perhaps only if this user isnt a guest!
       var user_info = gisportal.user.info;
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
+         url:  '/app/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
          success: function(data){
             layer.wcsURL = data;
             gisportal.indicatorsPanel.analysisTab(layer.id);
@@ -562,7 +562,7 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('.js-google-auth-button').click(function() {
-         var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+         var authWin = window.top.open('/app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
       });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
