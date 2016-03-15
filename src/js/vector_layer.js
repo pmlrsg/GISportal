@@ -65,12 +65,26 @@ gisportal.Vector = function(options) {
 
     this.init = function(options, layer) {
         ////console.log('initialiseing"');
-
+        console.log("adding hover style interaction");
+       
         map.addLayer(layer.OLLayer);
-
+         var hoverInteraction = new ol.interaction.Select({
+            condition: ol.events.condition.pointerMove,
+            layers : [layer.OLLayer],
+            style :  new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color: 'rgba(255, 0, 0, 0.5)',
+                width: 2
+              }),
+              fill: new ol.style.Fill({
+                color: 'rgba(0, 0, 255, 0.1)'
+              })
+            })
+        });
+        map.addInteraction(hoverInteraction);
         this.select();
         this.getMetadata();
-                this.openlayers.anID = layer.OLLayer;
+        this.openlayers.anID = layer.OLLayer;
 
         //gisportal.indicatorsPanel.selectTab( this.id, 'details' );
         ////console.log('+=+++++++++++++++++++++++++');
@@ -486,10 +500,6 @@ gisportal.Vector = function(options) {
     this.addOLLayer = function(layer, id) {
         map.addLayer(layer);
 
-        var hoverInteraction = new ol.interaction.Select({
-            condition: ol.events.condition.pointerMove,
-        });
-        map.addInteraction(hoverInteraction);
         //console.log('adding and redoing ui');
         if(!this.styleUIBuilt){
             this.setStyleUI(layer.getSource(),layer.defaultProperty);
