@@ -536,9 +536,7 @@ gisportal.mapInit = function() {
             return;
          }
          //layer.getSource().removeFeature(feature);
-         //console.log(gisportal.featureOverlay);
          gisportal.featureOverlay.getSource().addFeature(feature);
-         console.log(gisportal.featureOverlay.getSource().getFeatures());
       });
 
    });
@@ -812,30 +810,34 @@ gisportal.loadState = function(state) {
       if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
       else indicator = gisportal.layers[available_keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
-         gisportal.configurePanel.close();
-         // this stops the map from auto zooming to the max extent of all loaded layers
-         indicator.preventAutoZoom = true;
-         if(state.selectedRegionInfo){
-            gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
-            switch( state.selectedRegionInfo.method ){
-               case "drawBBox":
-                  gisportal.currentSelectedRegion = state.selectedRegionInfo.value;
-                  break;
-               case "csvUpload":
-                  gisportal.methodThatSelectedCurrentRegion = {};
-                  break;
-               case "geoJSONSelect":
-                  gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value);
-                  break;
-               case "dragAndDrop":
-                  stateMap.feature = undefined;
-                  break;
-               case "selectExistingPolygon":
-                  gisportal.methodThatSelectedCurrentRegion = {};
-                  break;
+         if(indicator.serviceType == "WFS"){
+            console.log("Please load the vector properly")
+         }else{
+            gisportal.configurePanel.close();
+            // this stops the map from auto zooming to the max extent of all loaded layers
+            indicator.preventAutoZoom = true;
+            gisportal.refinePanel.layerFound(indicator.id);
+            if(state.selectedRegionInfo){
+               gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
+               switch( state.selectedRegionInfo.method ){
+                  case "drawBBox":
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.value;
+                     break;
+                  case "csvUpload":
+                     gisportal.methodThatSelectedCurrentRegion = {};
+                     break;
+                  case "geoJSONSelect":
+                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value);
+                     break;
+                  case "dragAndDrop":
+                     stateMap.feature = undefined;
+                     break;
+                  case "selectExistingPolygon":
+                     gisportal.methodThatSelectedCurrentRegion = {};
+                     break;
+               }
             }
          }
-         gisportal.refinePanel.layerFound(indicator.id);
       }
    }
    

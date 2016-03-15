@@ -498,16 +498,15 @@ gisportal.graphs.Plot =(function(){
                _this.serverStatus( serverStatus );               
             },
             error: function( response ){
+               if(response.status == 200){
+                  return;
+               }
                $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
                if($('.graph-job').length <= 0){
                   $('.no-graphs-text').toggleClass("hidden", false);
                }
                clearInterval( _this._monitorJobStatusInterval );
-               if(response.status == 200){
-                  $.notify( "There was an error creating the graph" , "error");
-               }else{
-                  $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
-               }
+               $.notify( "There was an error creating the graph:\n" + response.statusText , "error");
             }
          });
       }
