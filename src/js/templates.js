@@ -41,7 +41,7 @@ gisportal.loadTemplates = function( callback ){
  * @return {[string]} The new image URL
  */
 Handlebars.registerHelper('rotate_image', function(imgUrl, angle) {
-  return "app/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
+  return gisportal.middlewarePath + "/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
 });
 
 Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {

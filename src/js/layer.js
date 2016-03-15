@@ -486,10 +486,6 @@ gisportal.layer = function( options ) {
       });
    };
 
-   this.cacheUrl = function(){
-     return portalLocation() + 'app/cache/layers/' + layer.serverName + '_' + layer.urlName.replace("/","-") + '.json';
-   };
-
    /**
     * This function creates an Open Layers layer, such as a WMS Layer.
     * These are stored in layer.openlayers. Currently the implementation
@@ -696,7 +692,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
     //console.log("inside ajax getting");
    $.ajax({
       type: 'GET',
-      url: "app/cache/layers/" + fileName,
+      url: gisportal.middlewarePath + "/cache/layers/" + fileName,
       dataType: 'json',
       async: true,
       cache: false,

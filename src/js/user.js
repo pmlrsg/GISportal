@@ -5,7 +5,7 @@ gisportal.user.loggedIn = function(){
    gisportal.user.updateProfile(); // The user info is updated update the login change
    $('.logoutButton').click(function() {
       $.ajax({
-         url: 'app/user/logout',
+         url: gisportal.middlewarePath + '/user/logout',
          success: function() {
             gisportal.user.initDOM();
             if(gisportal.config.collaborationFeatures.enabled){
@@ -20,15 +20,15 @@ gisportal.user.loggedIn = function(){
 
 gisportal.user.initDOM = function() {
    $.ajax({
-      url: 'app/user/dashboard/?domain=' + gisportal.niceDomainName,
+      url: gisportal.middlewarePath + '/user/dashboard/?domain=' + gisportal.niceDomainName,
       statusCode: {
          401: function() {    // the user isn't currently login so direct them at the login page instead
             $.ajax({
-               url: 'app/user',
+               url: gisportal.middlewarePath + '/user',
                success: function(data) {
                   $('.js-user-dashboard').html(data); 
                   $('.js-google-auth-button').click(function() {
-                     var authWin = window.top.open('app/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                     var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                   });        
                },
             });
@@ -60,7 +60,7 @@ gisportal.user.updateProfile = function(){
       gisportal.indicatorsPanel.populateShapeSelect();
    }
    $.ajax({
-      url: 'app/user/get/',
+      url: gisportal.middlewarePath + '/user/get/',
       success: function(user_info){
          gisportal.user.info = user_info;
          refreshUserPortal();

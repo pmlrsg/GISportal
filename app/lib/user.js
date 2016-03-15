@@ -19,7 +19,7 @@ var utils = require('./utils.js');
 user.requiresValidUser = function(req, res, next) {
    var domain = utils.getDomainName(req);
    var level = user.getAccessLevel(req, domain);
-   if(!GLOBAL.config[domain].auth){
+   if(!GLOBAL.config[domain] || !GLOBAL.config[domain].auth){
       res.sendStatus(403);
       return;
    }

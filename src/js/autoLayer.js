@@ -90,9 +90,9 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = 'app/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh;
+      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh;
       if(given_cache_refresh == "false"){
-         request_url = "app/cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json";
+         request_url = gisportal.middlewarePath + "/cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json";
       }else{
          request_url = clean_url;
       }

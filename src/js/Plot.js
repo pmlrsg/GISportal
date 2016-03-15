@@ -196,7 +196,7 @@ gisportal.graphs.Plot =(function(){
          if( ! layer.provider || ! layer.provider.logo )
             return;
 
-         var providerLogo = portalLocation() + layer.provider.logo;
+         var providerLogo = gisportal.middlewarePath + layer.provider.logo;
          if( providers.indexOf( providerLogo ) == -1 )
             providers.push( providerLogo );
       });
@@ -327,9 +327,9 @@ gisportal.graphs.Plot =(function(){
          // Add the external meta data URLS
          var markdowns = [];
          if( layer.moreIndicatorInfo )
-            markdowns.push( 'app/metadata/indicator/' + layer.name );
+            markdowns.push( gisportal.middlewarePath + '/metadata/indicator/' + layer.name );
          if( layer.moreProviderInfo )
-            markdowns.push( 'app/metadata/provider/' + layer.providerTag );
+            markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
 
          if(layer.provider){
             logo = layer.provider.logo;
@@ -369,15 +369,13 @@ gisportal.graphs.Plot =(function(){
                
                // Threads URL, passed to the middleware URL
                "threddsUrl"  : layer.wcsURL.split("?")[0],
-               // Meta cache is needed for the time estimation
-               "metaCacheUrl" : layer.cacheUrl(),
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": component.yAxis,
             "type": "line",
             "meta": meta,
             "markdown": markdowns,
-            "logo": portalLocation() + logo
+            "logo": gisportal.middlewarePath + logo
          };
 
          // If its a hovmoller then 
@@ -451,7 +449,7 @@ gisportal.graphs.Plot =(function(){
          for(var series in series_list){
             $.ajax({
                method: 'post',
-               url: 'app/plotting/check_plot',
+               url: gisportal.middlewarePath + '/plotting/check_plot',
                contentType : 'application/json',
                data: JSON.stringify(series_list[series]),
                dataType: 'json',
@@ -466,7 +464,7 @@ gisportal.graphs.Plot =(function(){
       // Make the plot
       $.ajax({
          method: 'post',
-         url: 'app/plotting/plot',
+         url: gisportal.middlewarePath + '/plotting/plot',
          contentType : 'application/json',
          data: JSON.stringify({ request: request }),
          dataType: 'json',

@@ -58,12 +58,12 @@ router.get('/app/user/auth/google/callback', function(req, res, next){
    // generate the authenticate method and pass the req/res
    passport.authenticate(domain, function(err, user, info) {
       if (err) { return next(err); }
-      if (!user) { return res.redirect('/app/user/auth-failed'); }
+      if (!user) { return res.redirect('../../auth-failed'); }
 
       // req / res held in closure
       req.logIn(user, function(err) {
          if (err) { return next(err); }
-         return res.redirect('/app/user/authorised');
+         return res.redirect('../../authorised');
       });
 
    })(req, res, next);
