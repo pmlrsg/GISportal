@@ -249,7 +249,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
       for(var index in gisportal.layers){
          this_layer = gisportal.layers[index];
          if(this_layer.serverName == filename){
-            gisportal.layers[index].wcsURL = wcs_url.split("?")[0] + "?";
+            gisportal.layers[index].wcsURL = wcs_url.split("?")[0];
          }
       }
       console.log("May not have loaded"); // Look at only doing it if the user is allowed with that layer
