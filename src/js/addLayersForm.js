@@ -50,7 +50,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    var region = layer.tags.region || "";
    var interval = layer.tags.interval || "";
    var model = layer.tags.model || "";
-   var styles_file = 'app/cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
+   var styles_file = gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
    var legendSettings = layer.legendSettings || {
          "scalePoints":false,
          "Rotation":0,
@@ -343,7 +343,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
 gisportal.addLayersForm.sendLayers = function(layer){
    $.ajax({
-      url: 'app/settings/add_user_layer',
+      url: gisportal.middlewarePath + '/settings/add_user_layer',
       method:'POST',
       data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"),},
       // If there is success
@@ -472,7 +472,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
 gisportal.addLayersForm.showOwnerOptions = function(given_owner){
    var select_elem = $("form.server-form select[data-field='owner']");
    $.ajax({
-      url:  'app/settings/get_owners',
+      url:  gisportal.middlewarePath + '/settings/get_owners',
       success: function( data ){
          var owners = data.owners;
          var output = [];
@@ -629,7 +629,8 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
       var data = {
          'scalePoints':layer.legendSettings.scalePoints,
          'angle':layer.legendSettings.Rotation,
-         'legendURL':legendURL
+         'legendURL':legendURL,
+         'middleware':gisportal.middlewarePath
       };
       var preview = gisportal.templates['scalebar-preview'](data);
       $(scalebar_div).html(preview);

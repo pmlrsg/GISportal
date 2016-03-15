@@ -28,11 +28,14 @@ gisportal.domainName = window.location.origin + window.location.pathname;
 // This edits the domain name a bit to be sent to the middleware (removes the end "/" and replaces all other "/"s with "_")
 gisportal.niceDomainName = gisportal.domainName.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 
+// Path to the middleware
+gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app";
+
 // Flask url paths, relates to /middleware/portalflask/views/
-gisportal.stateLocation = 'app/state';
+gisportal.stateLocation = gisportal.middlewarePath + '/state';
 
 // Define a proxy for the map to allow async javascript http protocol requests
-gisportal.ProxyHost = 'app/settings/proxy?url=';
+gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';
 
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
@@ -114,7 +117,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  'app/settings/get_cache',
+         url:  gisportal.middlewarePath + '/settings/get_cache',
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -145,7 +148,7 @@ gisportal.loadVectorLayers = function() {
 
 
    $.ajax({
-      url: 'app/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
       success: gisportal.initVectorLayers,
       error: function(e){
@@ -637,29 +640,6 @@ gisportal.mapInit = function() {
 };
 
 gisportal.selectedFeatures = [];
-
-
-gisportal.getWFSFeature = function(featureID) {
-   url = "https://vortices.npm.ac.uk/geoserver/rsg/ows?service=WFS&maxFeatures=10version=1.1.0&request=GetFeature&typename=rsg:MMO_Fish_Shellfish_Cages_A&srs=EPSG:4326&outputFormat=application/json&featureID=";
-   url += featureID;
-   $.ajax({
-      url: url,
-      success : function(data){
-         //console.log(data);
-          var wfsFormat = new ol.format.GeoJSON({
-            featureNS: "http://rsg.pml.ac.uk",
-            featureType : [featureID.split('.')[1]]
-          });
-          //console.log("success getting feature info");
-          features = wfsFormat.readFeatures(data);
-         //console.log(features);
-      },
-      error : function(err) {
-         //console.log("wfs get feature error");
-      }
-      
-   });
-};
 
 
 /**
@@ -1229,18 +1209,6 @@ gisportal.startRemoteErrorLogging = function(){
    });
 };
 
-/**
- * Returns the currently location of portal including origin and path
- * @return {[type]} [description]
- */
-function portalLocation(){
-   var origin = location.origin;
-   var path = location.pathname;
-   var endSlash = path.lastIndexOf( '/' );
-   path = path.substring( 0, endSlash + 1 );
-   return origin + path;
-}
-
 
 /**
  * Check the users version of the portal is valid.
@@ -1324,7 +1292,7 @@ gisportal.getPointReading = function(e) {
 
 
          $.ajax({
-            url:  'app/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
+            url:  gisportal.middlewarePath + '/settings/load_data_values?url=' + encodeURIComponent(request) + '&name=' + layer.descriptiveName + '&units=' + layer.units,
             success: function(data){
                try{
                   $(elementId +' .loading').remove();

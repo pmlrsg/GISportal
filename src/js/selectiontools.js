@@ -128,7 +128,7 @@ gisportal.selectionTools.initDOM = function()  {
    })
    .on('click', '.js-remove-geojson', function() {
       $.ajax({
-            url: 'app/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
+            url: gisportal.middlewarePath + '/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
             success: function(filename){
                // Triggers a click so that all the selection information is cleared
                $('.js-clear-selection').trigger('click');
@@ -190,7 +190,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
       }else{
          $.ajax({
-            url: 'app/plotting/upload_shape',  //Server script to process data
+            url: gisportal.middlewarePath + '/plotting/upload_shape',  //Server script to process data
             type: 'POST',
             xhr: function() {  // Custom XMLHttpRequest
                var myXhr = $.ajaxSettings.xhr();
@@ -220,7 +220,7 @@ gisportal.selectionTools.shapesUploaded = function(){
 
 gisportal.selectionTools.csvFound = function(formData){
    $.ajax({
-      url: 'app/plotting/upload_csv',  //Server script to process data
+      url: gisportal.middlewarePath + '/plotting/upload_csv',  //Server script to process data
       type: 'POST',
       xhr: function() {  // Custom XMLHttpRequest
          var myXhr = $.ajaxSettings.xhr();

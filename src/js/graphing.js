@@ -135,7 +135,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
    var popup_content = gisportal.templates['plot-popup']({html:html, hash:hash});
    $('.js-plot-popup').html(popup_content);
    $.ajax({
-      url: '/plots/' + hash + "-request.json",
+      url: 'plots/' + hash + "-request.json",
       dataType: 'json',
       success: function( data ){
          var plotting_data = gisportal.templates['plot-data']({data:data.plot.data.series});
