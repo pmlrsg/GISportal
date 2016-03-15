@@ -68,6 +68,7 @@
       handlers = getHandlers(self, type),
       i = indexOf.call(handlers, listener)
     ;
+    //Not sure what this line does, JShint complains!
     -1 < i && handlers.splice(i, 1);
     if (!handlers.length) delete self._events[type];
     return self;
@@ -133,7 +134,7 @@ EventManager.prototype.bind = function( eventType, callback ){
 EventManager.prototype.trigger = function(eventType, data){
    args = [ eventType, {} ];
 
-   for( var i = 1; i < arguments.length; i++ )
+   for(var i = 1; i < arguments.length; i++ )
     args.push( arguments[i] );
    this._events.emit.apply( this._events, args );
    return ;

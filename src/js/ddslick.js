@@ -16,7 +16,7 @@
         }
     };
 
-    var methods = {}
+    var methods = {};
 
     //Set defauls for the control
     var defaults = {
@@ -32,7 +32,7 @@
         showSelectedHTML: true,
         clickOffToClose: false,
         onSelected: function () { }
-    }
+    };
 
     var ddSelectHtml = '<div class="dd-select"><input class="dd-selected-value" type="hidden" /><a class="dd-selected"></a><span class="dd-pointer dd-pointer-down"></span></div>';
     var ddOptionsHtml = '<ul class="dd-options"></ul>';
@@ -40,7 +40,7 @@
     //Public methods 
     methods.init = function (options) {
         //Preserve the original defaults by passing an empty object as the target
-        var options = $.extend({}, defaults, options);
+        options = $.extend({}, defaults, options);
 
         //Apply on all selected elements
         return this.each(function () {
@@ -83,8 +83,8 @@
                 obj.addClass('dd-container').append(ddSelectHtml).append(ddOptionsHtml);
 
                 //Get newly created ddOptions and ddSelect to manipulate
-                var ddSelect = obj.find('.dd-select'),
-                    ddOptions = obj.find('.dd-options');
+                ddSelect = obj.find('.dd-select');
+                var ddOptions = obj.find('.dd-options');
 
                 //Set widths
                 ddOptions.css({ width: options.width });
@@ -92,7 +92,7 @@
                 obj.css({ width: options.width });
 
                 //Set height
-                if (options.height != null)
+                if (options.height !== null)
                     ddOptions.css({ height: options.height, overflow: 'auto' });
 
                 //Add ddOptions to the container. Replace with template engine later.
@@ -122,16 +122,16 @@
                     selectedIndex: -1,
                     selectedItem: null,
                     selectedData: null
-                }
+                };
                 obj.data('ddslick', pluginData);
 
                 //Check if needs to show the select text, otherwise show selected or default selection
-                if (options.selectText.length > 0 && options.defaultSelectedIndex == null) {
+                if (options.selectText.length > 0 && options.defaultSelectedIndex === null) {
                     obj.find('.dd-selected').html(options.selectText);
                 }
                 else {
-                    var index = (options.defaultSelectedIndex != null && options.defaultSelectedIndex >= 0 && options.defaultSelectedIndex < options.data.length)
-                                ? options.defaultSelectedIndex
+                    var index = (options.defaultSelectedIndex !== null && options.defaultSelectedIndex >= 0 && options.defaultSelectedIndex < options.data.length) ?
+                                options.defaultSelectedIndex
                                 : 0;
                     selectIndex(obj, index, false);
                 }
@@ -164,7 +164,7 @@
 
     //Public method to select an option by its index
     methods.select = function (options) {
-        var doCallback = undefined;
+        var doCallback;
         if (typeof options.doCallback !== 'undefined') doCallback = options.doCallback;
 
         return this.each(function () {
@@ -175,7 +175,7 @@
                 selectValue($(this), options.value, doCallback);
             }
         });
-    }
+    };
 
     methods.revertToPreviousValue = function() {
         //return this.each(function() {
@@ -184,7 +184,7 @@
                 selectValue($(this), previousValue, false);
             }
         //});
-    }
+    };
 
     //Public method to open drop down
     methods.open = function () {
@@ -219,7 +219,7 @@
             //Check if plugin is initialized
             if (pluginData)
                 reset($this); 
-        })
+        });
     };
 
     //Public method to destroy. Unbind all events and restore the original Html select/options
@@ -234,7 +234,7 @@
                 $this.removeData('ddslick').unbind('.ddslick').replaceWith(originalElement);
             }
         });
-    }
+    };
 
     function selectValue(obj, value, doCallback) {
 
@@ -265,7 +265,7 @@
             selectedLiItem = selectedOption.closest('li'),
             settings = pluginData.settings,
             selectedData = pluginData.settings.data[index],
-            previouslySelectedValue = obj.find('.dd-option-selected input').val()
+            previouslySelectedValue = obj.find('.dd-option-selected input').val();
 
         //Highlight selected option
         obj.find('.dd-option').removeClass('dd-option-selected');

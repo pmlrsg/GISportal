@@ -8,7 +8,7 @@
   bottom: 125px;
   left: 25px;
 
-  min-width: 310px;
+  min-width: 350px;
   width: 25%;
   max-width: 500px;
   user-select: none;
@@ -53,9 +53,12 @@
     margin: 7px 4px 0px 4px;
     padding: 8px 8px 9px 8px;
     
-    background-color: $primary-purple;
     cursor: pointer;
 
+}
+
+.analysis-coordinates input[type="text"]{
+  width: calc(100% - 65px);
 }
 
 .panel-header .tab.active{
@@ -254,11 +257,14 @@
    padding-top: 10px;
 }
 
-.category-select-list {
+.category-select-list,
+.category-tabs {
   background: #efedf1;
 }
 
-.category-select-list .selectlist, .category-select-list .selectoptions {
+.category-select-list .selectlist,
+.category-select-list .selectoptions,
+.category-tabs .selectoptions {
   padding: 10px;
 }
 
@@ -344,6 +350,10 @@ select,
   margin-top: 9px;
   width: 100%;
   height: 35px;
+}
+
+select.users-geojson-files{
+  text-transform: none;
 }
 
 /* Firefox has a weird padding problem */
@@ -500,4 +510,13 @@ input.search:focus  {
 
 .tooltipster-base{
   word-break : break-word;
+}
+
+.panel-tab b{
+  font-weight: bold;
+  display: block;
+}
+
+div.full-width{
+  width:100%;
 }

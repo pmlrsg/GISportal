@@ -7,6 +7,8 @@
 <title>GIS Portal Prototype</title>
 
 <!-- ============================ Now for the styling ============================ -->
+<!-- ================= Bokeh first so they don't ruin everything ================= -->
+<link href="//cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" rel="stylesheet" type="text/css">
 
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/@@GISportal.min.css" />
@@ -23,6 +25,8 @@
 <!-- Modernizer -->
 <script src="js-libs/modernizr.js"></script>
 
+<!-- Plotting JS -->
+<script type="text/javascript" src="//cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
 
 <!-- jQuery no UI slider -->
 <script src="js-libs/jquery-nouislider/jquery.nouislider.min.js"></script>
@@ -118,7 +122,9 @@
    </div>
 
    <!-- The Timeline -->
-   <div class="timeline-container">
+   <div class="timeline-container" style="bottom: -1000px;">
+      <h3>Timeline</h3>
+      <p> - Click and drag to move, use your mouse scroll wheel to zoom, click to select a date or enter your required date in the date field on the right</p>
       <div class="timeline-inner">
          <ul class="js-timeline-labels timeline-labels"></ul>
          <div id="timeline" class=""></div>
@@ -143,6 +149,9 @@
             </div>
             <div data-panel-name="history" class="js-show-panel tab ">
                <span  class="icon-briefcase" title="Stored graphs"></span>
+            </div>
+            <div data-panel-name="user" class="js-show-panel tab">
+               <span  class="icon-profile-1" title="User Dashboard"></span>
             </div>
             <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab"></span>
          </div>
@@ -192,13 +201,6 @@
       
       <div id="collaborationPanel" data-panel-name="collaboration" class="panel-container">
          <div class="panel-container-solid-backdrop">
-            
-            <!-- <div id="gSignInWrapper">
-               <div id="gSignInButtonHolder">
-                  <a href="javascript:void(0)" class="js-google-auth-button"><img src="img/sign-in-with-google.png" width="200" /></a>
-               </div>
-            </div> -->
-
             <div class="js-collaboration-holder"></div>
          </div>
       </div>
@@ -216,8 +218,14 @@
             <h3>Stored Graphs</h3>
             <div>
                <div class="js-graphs-saved-list" ></div>
-               <div class="js-graphs-history-list" ></div>
+               <div class="js-graphs-history-list" ><div class="no-graphs-text"><em>No graphs to display</em></div></div>
             </div>
+         </div>
+      </div>
+      
+      <div id="userPanel" data-panel-name="user" class="panel-container" >
+         <div class="panel-container-solid-backdrop" >
+            <div class="js-user-dashboard"></div>
          </div>
       </div>
       
@@ -316,6 +324,8 @@
    <div class="overlay js-user-feedback-popup hidden">
       <div class="overlay-container js-user-feedback-html"></div>
    </div>
+
+   <div class="overlay js-plot-popup hidden"></div>
 
    <div class="global-loading-icon">
    </div>

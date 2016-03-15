@@ -3,9 +3,11 @@ gisportal.autoLayer.TriedToAddLayer = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
-
-
+   gisportal.autoLayer.urlLoad = false; // If the wms information is being loaded from the URL (first time) or the text box.
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
+   if(!gisportal.autoLayer.given_wms_url && gisportal.utils.getURLParameter('wms_url')){
+      gisportal.autoLayer.urlLoad = true;
+   }
    if(given_wms_url && given_wms_url.length > 0){
       given_wms_url = given_wms_url.split("?")[0];
    }
@@ -18,17 +20,13 @@ gisportal.autoLayer.loadGivenLayer = function(){
       gisportal.given_layers = gisportal.autoLayer.getLayers(given_wms_url, given_url_name);
 
       // If there is a single layer, then it is loaded.
-      if(_.size(gisportal.given_layers) == 1){
+      if(_.size(gisportal.given_layers) >= 1){
          try{
             gisportal.configurePanel.resetPanel(gisportal.given_layers);
          }
          catch(e){
             $.notify("Sorry:\nThere was an error loading " + given_layers[0].id + " : " + e, "error");
          }
-         return;
-      }else if(_.size(gisportal.given_layers) > 1){
-         // If there are more than one layers then it adds them to the panel.
-         gisportal.configurePanel.resetPanel(gisportal.given_layers);
          return;
       }else{
          if(given_wms_url && given_wms_url.length > 0){
@@ -51,7 +49,7 @@ gisportal.events.bind("layers-loaded", function() {
    if(gisportal.refresh_server){
       gisportal.refresh_server = false;
       gisportal.editLayersForm.produceServerList();
-      gisportal.loading.decrement()
+      gisportal.loading.decrement();
    }
  });
 
@@ -62,18 +60,22 @@ gisportal.events.bind("templates-loaded", function() {
    }
  });
 
-// This returns the layer or layers that the user has selected in the url
+// This returns the layer or layers that match the URL
 gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
    var matching_layers = {};
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 
-   _.forIn(gisportal.layers, function( layer ){
-      if(layer.serviceType!=="WFS"){   
-         if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
-            only_matching_layer = {};
-            only_matching_layer[layer.id] = layer;
-         }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name) && layer.owner == gisportal.userPermissions.this_user_info.username){
-            matching_layers[layer.id] = layer;
+   _.forIn(gisportal.layers, function( layer ){ // Goes through each of the layers
+      if(layer.serviceType!=="WFS"){ // Not vector layers
+         var username = gisportal.user.info.email; // The logged in user
+         var permission = gisportal.user.info.permission; // The permission of the user
+         if(layer.owner == username || permission == 'guest' || gisportal.autoLayer.urlLoad){ // This makes sure that the layers currently in the portal are only loaded when they should be
+            if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name)){
+               only_matching_layer = {};
+               only_matching_layer[layer.id] = layer;
+            }else if((layer.wmsURL.split("?")[0] == given_wms_url || layer.urlName == given_url_name)){
+               matching_layers[layer.id] = layer;
+            }
          }
       }
       
@@ -88,17 +90,18 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
       gisportal.autoLayer.TriedToAddLayer = true;
 
       clean_file = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
-      clean_url = gisportal.middlewarePath + '/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh + '&username=' + gisportal.userPermissions.user + '&domain=' + gisportal.userPermissions.domainName + '&permission=' + gisportal.userPermissions.this_user_info.permission
+      clean_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh='+given_cache_refresh;
       if(given_cache_refresh == "false"){
-         request_url = "cache/" + gisportal.userPermissions.domainName + "/temporary_cache/"+clean_file+".json"
+         request_url = gisportal.middlewarePath + "/cache/" + gisportal.niceDomainName + "/temporary_cache/"+clean_file+".json";
       }else{
-         request_url = clean_url
+         request_url = clean_url;
       }
       // If the information is already available then it will be loaded from the file instead of the middleware doing so.
       $.ajax({
          url:  request_url,
          dataType: 'text',
          success: function(layer){
+            $('.notifyjs-gisportal-info span:contains("Finding Layers")').closest('.notifyjs-wrapper').remove();
             gisportal.autoLayer.addGivenLayer(layer);
          },
          error: function(e){
@@ -129,10 +132,10 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
 // This adds the layer(s) that has/have been retrieved by the middleware. It then runs the loadGivenLayer function once again to either load that layer or list the layers found
 gisportal.autoLayer.addGivenLayer = function(layer){
    json_layer = JSON.parse(layer);
-   if (json_layer["Error"] != undefined){
-      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer["Error"], "error");
+   if (json_layer.Error !== undefined){
+      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + json_layer.Error, "error");
    }else{
-      json_layer.owner = gisportal.userPermissions.this_user_info.username;
+      json_layer.owner = gisportal.user.info.email;
       gisportal.initWMSlayers([json_layer]);
    }
 };
@@ -142,12 +145,12 @@ gisportal.autoLayer.loadPreviousLayers = function(){
    gisportal.addLayersForm.layers_list = JSON.parse(gisportal.storage.get("layers_list")) || {};
    gisportal.addLayersForm.server_info = JSON.parse(gisportal.storage.get("server_info")) || {};
    gisportal.addLayersForm.form_info = JSON.parse(gisportal.storage.get("form_info")) || {};
-   if(gisportal.addLayersForm.form_info['wms_url']){
+   if(gisportal.addLayersForm.form_info.wms_url){
 
-      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info["wms_url"];
+      gisportal.autoLayer.given_wms_url = gisportal.addLayersForm.form_info.wms_url;
       gisportal.autoLayer.loadGivenLayer();
    }
-   if(gisportal.addLayersForm.form_info["display_form"]){
-      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info['current_page'], 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info['owner']);
+   if(gisportal.addLayersForm.form_info.display_form && gisportal.user.info.permission != "guest"){
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), gisportal.addLayersForm.layers_list["1"] , gisportal.addLayersForm.form_info.current_page, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.addLayersForm.server_info.owner);
    }
 };

@@ -1,10 +1,8 @@
 <div class="start-container overlay-container">
    <div class="intro-text">
-   <p>The Marine Operation Ecology data portal provides model simulated ecosystem data for
-    European Regional Seas.</p>
-    <p>More information on OPEC is available on the project web site,
-    <a href="http://marineopec.eu" target="_blank">http://marineopec.eu</a></p>
+   {{{startHTML}}}
    </div>
+   {{#if homepageSlides}}
    <div class="homepageSlider">
       <div class="homepageSlider-wrap">
          {{#each homepageSlides}}
@@ -12,6 +10,7 @@
          {{/each}}
       </div>
    </div>
+   {{/if}}
 
    <nav class="start-nav">
       {{#if hasAutoSaveState}}

@@ -50,9 +50,21 @@ gisportal.selectionTools.init = function()  {
    //    var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
    //    if (features.length) {
    //       feature = features[0];
-
    //    }
    // });
+      // map.on('pointermove', function(evt) {
+      //  var pixel = evt.pixel;
+      // map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+      //    console.log(feature);
+      //    console.log(layer);
+       
+         
+      // //gisportal.featureOverlay.getSource().clear()
+
+      //   // gisportal.featureOverlay.getSource().addFeature(feature)
+      // });
+
+  // });
    map.on('postrender', function(renderEvent) {
       if (feature) {
          //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
@@ -63,29 +75,69 @@ gisportal.selectionTools.init = function()  {
 };
 
 function cancelDraw() {
-   if(draw == null)return;
+   $('.drawInProgress').toggleClass('drawInProgress', false);
+   if(!draw)return;
    
    map.removeInteraction(draw);
-   setTimeout(function() {
-      gisportal.selectionTools.isDrawing = false;
-   }, 500);
+   gisportal.selectionTools.isSelecting = false;
+   gisportal.selectionTools.isDrawing = false;
 }
 
 gisportal.selectionTools.initDOM = function()  {
-   $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI);
+   $('.js-indicators').on('change', '.js-coordinates', gisportal.selectionTools.updateROI)
+   .on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded)
+   .on('focus', '.js-coordinates', function(){
+      $(this).data('oldVal', $(this).val());
+   })
+   .on('click', '.js-draw-box', function()  {
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Box');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
+   })
+   .on('click', '.js-draw-polygon', function() {
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Polygon');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
+   })
+   .on('click', '.js-draw-line', function() {
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('Line');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
+   })
+   .on('click', '.js-draw-select-polygon', function() {
+      var hasntClass = !$(this).hasClass("drawInProgress");
+      if(hasntClass){
+         gisportal.selectionTools.toggleTool('SelectFromMap');
+      }else{
+         cancelDraw();
+      }
+      $(this).toggleClass("drawInProgress", hasntClass);
 
-   $('.js-indicators').on('click', '.js-draw-box', function()  {
-      gisportal.selectionTools.toggleTool('Box');
-   });
-   $('.js-indicators').on('click', '.js-draw-polygon', function() {
-      gisportal.selectionTools.toggleTool('Polygon');
-   });
-   $('.js-indicators').on('click', '.js-draw-line', function() {
-      gisportal.selectionTools.toggleTool('Line');
-   });
-   $('.js-indicators').on('click', '.js-draw-select-polygon', function() {
-      gisportal.selectionTools.toggleTool('SelectFromMap');
-
+   })
+   .on('click', '.js-remove-geojson', function() {
+      $.ajax({
+            url: gisportal.middlewarePath + '/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
+            success: function(filename){
+               // Triggers a click so that all the selection information is cleared
+               $('.js-clear-selection').trigger('click');
+               $('.users-geojson-files option[value="' + filename + '"]').remove();
+            },
+            error: function(err){
+               $.notify("Sorry, that didn't delete properly, please try again", "error");
+            }
+         });
    });
 
 
@@ -104,12 +156,130 @@ gisportal.selectionTools.initDOM = function()  {
 
 };
 
+gisportal.selectionTools.shapesUploaded = function(){
+   gisportal.loading.increment();
+   var files_list = this.files;
+   if(files_list.length > 0){
+      var dbf_found, shp_found, shx_found, files_total_size = 0;
+      var formData = new FormData($(this).parent()[0]);
+
+      for(var i = 0; i < files_list.length; i++){
+         this_file = files_list[i];
+         files_total_size += this_file.size;
+         if(files_total_size > 5242880){
+            $.notify("There is a  5MB limit on file uploads", "error");
+            gisportal.loading.decrement();
+            return;
+         }
+         if(this_file.type == "application/x-dbf"){
+            dbf_found = true;
+         }
+         if(this_file.type == "application/x-esri-shape"){
+            shp_found = true;
+         }
+         if(this_file.type == "application/x-esri-shape-index"){
+            shx_found = true;
+         }
+         if(this_file.type == "text/csv"){
+            gisportal.selectionTools.csvFound(formData);
+            gisportal.loading.decrement();
+            return true;
+         }
+      }
+      if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
+         $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
+      }else{
+         $.ajax({
+            url: gisportal.middlewarePath + '/plotting/upload_shape',  //Server script to process data
+            type: 'POST',
+            xhr: function() {  // Custom XMLHttpRequest
+               var myXhr = $.ajaxSettings.xhr();
+               return myXhr;
+            },
+            success: function(d){
+               gisportal.selectionTools.loadGeoJSON(d.geojson, d.shapeName);
+               gisportal.loading.decrement();
+            },
+            error: function(e) {
+               if(e.status == 401){
+                  $.notify("Sorry, You nust be logged in to use this feature.", "error");
+               }else{
+                  $.notify("Sorry, There was an error with that: " + e.statusText, "error");
+                  $('.js-upload-shape').val("");
+               }
+               gisportal.loading.decrement();
+            },
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false
+         });
+      }
+   }
+};
+
+gisportal.selectionTools.csvFound = function(formData){
+   $.ajax({
+      url: gisportal.middlewarePath + '/plotting/upload_csv',  //Server script to process data
+      type: 'POST',
+      xhr: function() {  // Custom XMLHttpRequest
+         var myXhr = $.ajaxSettings.xhr();
+         return myXhr;
+      },
+      success: function(d){
+         gisportal.selectionTools.loadGeoJSON(d.geoJSON);
+         gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+         gisportal.graphs.deleteActiveGraph();
+      },
+      error: function(e) {
+         if(e.status == 401){
+            $.notify("Sorry, You nust be logged in to use this feature.", "error");
+         }else if(e.status == 413){
+            $.notify("The server cannot take requests of that size \nPlease select a smaller file", {className:"error", autoHide: false});
+         }else if(e.status == 400){
+            $.notify("Sorry, There was an error with your File: " + e.responseText, {className:"error", autoHide: false});
+         }else if(e.status == 415){
+            $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
+         }else{
+            $.notify("Sorry, There was an error with that: " + e.statusText, {className:"error", autoHide: false});
+         }
+      },
+      data: formData,
+      cache: false,
+      contentType: false,
+      processData: false
+   });
+};
+
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
+   var geoJsonFormat = new ol.format.GeoJSON();
+   var featureOptions = {
+      'featureProjection': gisportal.projection
+   };
+   var features = geoJsonFormat.readFeatures(geojson, featureOptions);
+   gisportal.vectorLayer.getSource().clear();
+   cancelDraw();
+   //MORETODO: remove the selected class from draw buttons
+   gisportal.vectorLayer.getSource().addFeatures(features);
+   // Zooms to the extent of the features just added
+   map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
+   gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
+   $('.js-coordinates').val("");
+   // If this is a newly created geojson
+   if(shapeName){
+      shapeName += ".shp";
+      // Makes sure it adds the value or just selects the existing value
+      if($(".users-geojson-files option[value='" + shapeName + "']").length === 0){
+         $('.users-geojson-files').append("<option selected value='" +  shapeName + "'>" + shapeName + "</option>");
+      }else{
+         $('.users-geojson-files').val(shapeName);
+      }
+   }
+   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+};
+
 gisportal.selectionTools.toggleBboxDisplay = function() {
-
    $('.coordinates').disabled();
-
-
-
 };
 
 gisportal.selectionTools.getActiveControl = function() {
@@ -123,7 +293,7 @@ gisportal.selectionTools.getActiveControl = function() {
 };
 
 gisportal.selectionTools.toggleTool = function(type)  {
-   if (draw != null) {
+   if (draw !== null) {
       cancelDraw();
    }
    
@@ -167,68 +337,129 @@ gisportal.selectionTools.toggleTool = function(type)  {
       }
 
 
-      
-      draw.on('drawstart',
-         function(evt) {
-            gisportal.vectorLayer.getSource().clear();
-            // set sketch
-            sketch = evt.feature;
-         }, this);
+      if(draw){
+         draw.on('drawstart',
+            function(evt) {
+               gisportal.vectorLayer.getSource().clear();
+               // set sketch
+               sketch = evt.feature;
+               $(document).on( 'keydown', function ( e ) {
+                  if(e.keyCode == 27){
+                     cancelDraw();
+                  }
+               });
+            }, this);
 
-      draw.on('drawend',
-         function(evt) {
-            gisportal.selectionTools.ROIAdded(sketch);
-            // unset sketch
-            sketch = null;
+         draw.on('drawend',
+            function(evt) {
+               gisportal.selectionTools.ROIAdded(sketch);
+               // unset sketch
+               sketch = null;
+               $(document).off( 'keydown' );
 
-         }, this);      
+            }, this);
+      }
    }
    map.ROI_Type = type;
 
 };
 
 gisportal.selectionTools.updateROI = function()  {
-   // this will all change with the pre-saved area selection options that are coming   
+   var this_bounds;
+   try{
+      this_bounds = $(this).val();
+   }catch(e){}
+
+   var new_bounds = this_bounds || gisportal.currentSelectedRegion;
+   var this_feature;
+   if(new_bounds.startsWith("POLYGON")){
+      try{
+         this_feature = gisportal.wkt.readFeature(new_bounds);
+      }catch(e){}
+   }else{
+      try{
+         var newer_bounds = new_bounds.split(",");
+         var polygon = new Terraformer.Polygon( {
+            "type": "Polygon",
+            "coordinates": [[[newer_bounds[0], newer_bounds[1]], [newer_bounds[2], newer_bounds[1]], [newer_bounds[2], newer_bounds[3]], [newer_bounds[0], newer_bounds[3]], [newer_bounds[0], newer_bounds[1]]]]
+         });
+         this_feature = gisportal.wkt.readFeature(gisportal.coordinatesToPolygon(polygon.coordinates));
+      }catch(e){}
+   }
+   try{
+      gisportal.currentSelectedRegion = new_bounds;
+      $('input.js-upload-shape')[0].value = "";
+      var value = "default";
+      if(gisportal.methodThatSelectedCurrentRegion.method == "geoJSONSelect"){
+         value = gisportal.methodThatSelectedCurrentRegion.value;
+      }
+      $('.users-geojson-files').val(value);
+      gisportal.methodThatSelectedCurrentRegion = {method:"drawBBox", value: gisportal.currentSelectedRegion};
+      if(gisportal.currentSelectedRegion.indexOf("(") === -1){
+         gisportal.methodThatSelectedCurrentRegion.justCoords = true;
+      }
+      gisportal.vectorLayer.getSource().clear();
+      cancelDraw();
+      gisportal.vectorLayer.getSource().addFeature(this_feature);
+      return;
+   }catch(e){
+      if(this_bounds){
+         var _this = $(this);
+         _this.closest('.analysis-coordinates').prepend('<div class="alert alert-danger">Sorry that didn\'t work<br/>Edit the data and try again or click <a class="js-revert-text">here</a> to revert to the previous value</div>');
+         var my_timeout = setTimeout( function(){
+            _this.siblings('div .alert-danger').remove();
+         }, 6000 );
+         _this.siblings('div .alert-danger').find('a.js-revert-text').on('click', function(){
+            _this.siblings('div .alert-danger').remove();
+            _this.val(_this.data('oldVal'));
+            _this.trigger('change');
+            clearTimeout(my_timeout);
+         });
+      }
+   }
 };
 
 gisportal.currentSelectedRegion = "";
+gisportal.methodThatSelectedCurrentRegion = {};
+gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
+   gisportal.methodThatSelectedCurrentRegion.justCoords = false;
    setTimeout(function() {
                gisportal.selectionTools.isDrawing = false;
             }, 500);
    var feature_type = map.ROI_Type;
+   gisportal.feature_type = feature_type;
 
    // Get the geometry of the drawn feature
    var geom = new ol.Feature();
    geom = feature.getGeometry();
 
    //var bounds;
+   var wkt_feature;
    if (feature_type === "Polygon") {
-      var wkt_feature = gisportal.wkt.writeGeometry(geom);
+      wkt_feature = gisportal.wkt.writeGeometry(geom);
       
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });
 
       gisportal.currentSelectedRegion = wkt_feature;
-      $('.js-coordinates').val(wkt_feature);
       //$('.bbox-info').toggleClass('hidden', false);
       $('.js-edit-polygon').attr('disabled', false);
    }
    else if(feature_type === 'Line') {
-      var wkt_feature = gisportal.wkt.writeGeometry(geom);
+      wkt_feature = gisportal.wkt.writeGeometry(geom);
       
       wkt_feature = wkt_feature.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });
 
       gisportal.currentSelectedRegion = wkt_feature;
-      $('.js-coordinates').val(wkt_feature);
       //$('.bbox-info').toggleClass('hidden', false);
       $('.js-edit-polygon').attr('disabled', false);
    } else {
       bounds = feature.getGeometry().getExtent();
-      bounds = gisportal.reprojectBoundingBox(bounds, map.getView().getProjection().getCode(), 'EPSG:4326');
+      gisportal.methodThatSelectedCurrentRegion.justCoords = true;
 
       var coords = "";
       if (bounds) {
@@ -242,11 +473,16 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
          });
       
          gisportal.currentSelectedRegion = coords;
-         $('.js-coordinates').val(coords);
          //$('.bbox-info').toggleClass('hidden', false);
          $('.js-edit-polygon').attr('disabled', false);
       }
    }
+   $('.js-coordinates').val(gisportal.currentSelectedRegion);
+   $('input.js-upload-shape')[0].value = "";
+   $('.users-geojson-files').val("default");
+   cancelDraw();
+   gisportal.methodThatSelectedCurrentRegion.method = "drawBBox";
+   gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
    this.toggleTool('None'); // So that people don't misclick
 
   

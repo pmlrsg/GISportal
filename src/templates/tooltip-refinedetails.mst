@@ -12,3 +12,9 @@
       <dd>{{value}}</dd>
    </dl>
 {{/tags}}
+{{#if owner}}
+   <dl>
+      <dt>Owner<dt>
+      <dd>{{{owner}}}</dd>
+   </dl>
+{{/if}}

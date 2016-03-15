@@ -107,6 +107,11 @@
    height:100px;
 }
 
+.server-form select{
+   text-transform: none;
+   margin-top: 0px;
+}
+
 .overlay-container-form label{
    padding-top:10px;
    display:inline-block;
@@ -173,11 +178,30 @@
 .wms-url-div{
    padding-top:10px;
 }
-textarea.invalid,
-input.invalid{
+
+.server-list-div{
+   padding-top:10px;
+}
+
+textarea.alert-error,
+input.alert-error{
    background-color:#f2dede;
    border-color:#b55457;
    color:#b55457;
+}
+
+textarea.alert-info,
+input.alert-info{
+   background-color:#d9edf7;
+   border-color:#bce8f1;
+   color:#31708f;
+}
+
+textarea.alert-warning,
+input.alert-warning{
+   background-color:#fcf8e3;
+   border-color:#faebcc;
+   color:#8a6d3b;
 }
 
 label.invalid{

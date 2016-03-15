@@ -14,8 +14,6 @@ gisportal.vectorLayerCount = 0;
  **/
 
 gisportal.Vector = function(options) {
-    ////console.log("creating vector layer");
-    ////console.log(options);
     var vector = this;
 
     var defaults = {
@@ -23,11 +21,10 @@ gisportal.Vector = function(options) {
         endpoint: null, // service enpoint URL
         dataType: null, // one of (point|polygon|line)
         exBoundingBox: null,
-        boundingBox: null, // bounding box of layer
         providerTag: null, //short provider name
         serviceVersion: null, // version of OGC service
         variableName: null, // the WFS variable name
-        srsName: 'EPSG:4326', // SRS for teh vector layer
+        srsName: 'EPSG:4326', // SRS for the vector layer
         defaultStyle: new ol.style.Style({
             stroke: new ol.style.Stroke({
                 color: 'rgba(0, 0, 255, 1.0)',
@@ -62,18 +59,32 @@ gisportal.Vector = function(options) {
      */
     this.isVisible = true;
     this.setVisibility = function(visibility) {
-        if (this.openlayers['anID']) this.openlayers['anID'].setVisible(visibility);
+        if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility);
         this.isVisible = visibility;
     };
 
     this.init = function(options, layer) {
         ////console.log('initialiseing"');
-
-        map.addLayer(layer.OLLayer)
-
+        console.log("adding hover style interaction");
+       
+        map.addLayer(layer.OLLayer);
+         var hoverInteraction = new ol.interaction.Select({
+            condition: ol.events.condition.pointerMove,
+            layers : [layer.OLLayer],
+            style :  new ol.style.Style({
+              stroke: new ol.style.Stroke({
+                color: 'rgba(255, 0, 0, 0.5)',
+                width: 2
+              }),
+              fill: new ol.style.Fill({
+                color: 'rgba(0, 0, 255, 0.1)'
+              })
+            })
+        });
+        map.addInteraction(hoverInteraction);
         this.select();
         this.getMetadata();
-                this.openlayers['anID'] = layer.OLLayer;
+        this.openlayers.anID = layer.OLLayer;
 
         //gisportal.indicatorsPanel.selectTab( this.id, 'details' );
         ////console.log('+=+++++++++++++++++++++++++');
@@ -156,7 +167,7 @@ gisportal.Vector = function(options) {
         //        ////console.table(gisportal.layers[layer.id]);
         _.each(gisportal.layers[layer.id].metadataQueue, function(d) {
             d();
-            delete d;
+            d = null;
         });
         //gisportal.indicatorsPanel.selectTab( layer.id, "details" );
 
@@ -185,7 +196,7 @@ gisportal.Vector = function(options) {
       }
       
       else{
-          for(colour in gisportal.vectorStyles.startingColours) {
+          for(var colour in gisportal.vectorStyles.startingColours) {
             if(gisportal.vectorStyles.coloursInUse.indexOf(colour)==-1){
                 _colour = colour;
                 this.currentColour = colour;
@@ -194,13 +205,13 @@ gisportal.Vector = function(options) {
             }
           }
       } 
-      var opts = this.createStyleFromProp(source,prop,_colour)
+      var opts = this.createStyleFromProp(source,prop,_colour);
       if ("unit" in this) {
         opts.unit = this.unit;
       }
       if(this.defaultProperties.length > 0){
-        opts['defaultProps'] = true;
-        opts['defaultProperties'] = this.defaultProperties;
+        opts.defaultProps = true;
+        opts.defaultProperties = this.defaultProperties;
       }
       gisportal.vectorStyles.cache[this.id+"__"+prop] = opts;
       var renderedStyleUI = gisportal.templates['vector-style-ui'](opts);
@@ -218,9 +229,10 @@ gisportal.Vector = function(options) {
   this.createStyleFromProp = function(source,prop,colour){
       var features = source.getFeatures();
       var possibleOptions = [];
-      var x = 0;
+      var x = 0, y = 0;
+      var bins;
       var featureCount = features.length;
-      var isNumberProperty = false
+      var isNumberProperty = false;
       ////console.log(featureCount);
       for(x;x<=featureCount-1;x++) {
         var props = features[x].getProperties();
@@ -231,52 +243,50 @@ gisportal.Vector = function(options) {
             possibleOptions.push( props[prop]);
         }
       }
-      console.log(possibleOptions);
       var isAllNumeric = function(x) {
-        return !isNaN(x)
-      }
+        return !isNaN(x);
+      };
       isNumberProperty = possibleOptions.every(isAllNumeric);
 
+      var colorPalette, legend, legend_obj;
       if(isNumberProperty) {
 
         var options_number = possibleOptions.map(function(x) {
-            return (Number(x))//.toFixed(4);
-        })
-        console.log(options_number);
+            return (Number(x));//.toFixed(4);
+        });
+        //console.log(options_number);
         var min = Math.min.apply(Math, options_number);
         var max = Math.max.apply(Math, options_number);
         var diff = max - min;
         var bin = Number((diff / (gisportal.vectorStyles.binSize )).toFixed(4));
-        var bins = []
+        bins = [];
         for (b = 0; b <= gisportal.vectorStyles.binSize; b++) {
-            bins.push((min + (bin*b)).toFixed(4))
+            bins.push((min + (bin*b)).toFixed(4));
         }
-        var colorPalette = gisportal.vectorStyles.createPalette(colour, bins.length);
+        colorPalette = gisportal.vectorStyles.createPalette(colour, bins.length);
         isNumberProperty = true;
 
-        var legend = [];
-      var legend_obj = {};
-      var y = 0;
+        legend = [];
+      legend_obj = {};
       for(y, x=bins.length -1; y<bins.length -1  , x> 0; y++, x--){
-        var option = bins[y]+'-'+bins[y+1]
+        var option = bins[y]+'-'+bins[y+1];
         legend.push({'option':option,'colour':colorPalette[x]});
         legend_obj[option] = colorPalette[x];
       }
       }
       else{
-           var colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
+           colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
           
           ////console.log(colorPalette);
-          var legend = [];
-          var legend_obj = {};
-          //var y = 0;
+          legend = [];
+          legend_obj = {};
           for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
             legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
             legend_obj[possibleOptions[y]] = colorPalette[y];
           }
      }
       ////console.log(legend);
-      var x = 0;
+      x = 0;
         for (x; x < featureCount; x++) {
             ////console.log("setting style for feature");
             if (isNumberProperty) {
@@ -287,7 +297,7 @@ gisportal.Vector = function(options) {
 
                     if (bins[p] <= curVal && bins[p + 1] >= curVal) {
                         if (this.vectorType == "POINT") {
-                            console.log("adding point style")
+                            console.log("adding point style");
                             features[x].setStyle(
                             new ol.style.Style({
                                 image: new ol.style.Circle({
@@ -313,9 +323,9 @@ gisportal.Vector = function(options) {
                     }
                 }
             } else {
-                console.log(this.vectorType);
+                //console.log(this.vectorType);
                 if (this.vectorType == "POINT") {
-                    console.log("adding point style")
+                    //console.log("adding point style")
                     features[x].setStyle(
                             new ol.style.Style({
                                 image: new ol.style.Circle({
@@ -345,13 +355,13 @@ gisportal.Vector = function(options) {
 
       this.currentProperty = prop;
       opts = {};
-      opts['currentProperty'] = prop ;
-      opts['possibleOptions'] = possibleOptions;
-      opts['legend'] = legend;
-      opts['id'] = this.id;
+      opts.currentProperty = prop ;
+      opts.possibleOptions = possibleOptions;
+      opts.legend = legend;
+      opts.id = this.id;
 
       return opts;
-  }
+  };
 
     /**
      * This function creates an Open Layers layer, such as a WMS Layer.
@@ -411,7 +421,14 @@ gisportal.Vector = function(options) {
 
         var loadFeatures = function(response) {
             var wfsFormat = new ol.format.WFS();
-            sourceVector.addFeatures(wfsFormat.readFeatures(response));
+            // This converts the features to the correct projection
+            var feature, this_feature;
+            var features = wfsFormat.readFeatures(response);
+            for(feature in features){
+               this_feature = features[feature];
+               features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, "EPSG:4326", gisportal.projection));
+            }
+            sourceVector.addFeatures(features);
             if(!this.styleUIBuilt){
                 setup_style_ui(sourceVector,vec);
             }
@@ -423,7 +440,7 @@ gisportal.Vector = function(options) {
           vec.setStyleUI(source,prop);
           //////console.table(source.getFeatures()[0].getProperties());
           //////console.log('[data-id="' + id + '"] .js-tab-dimensions');
-        }
+        };
         var buildLoader = function($vector, $source) {
             return function(extent, resolution, projection) {
                 ////console.log('inside loader');
@@ -437,7 +454,7 @@ gisportal.Vector = function(options) {
                     '%26request%3DGetFeature' +
                     '%26typename%3D' + $vector.variableName +
                     '%26srs%3D' + $vector.srsName +
-                    '%26bbox%3D' + extent + ',EPSG:4326';
+                    '%26bbox%3D' + extent + ',' + gisportal.projection;
 
                 $.ajax({
                     url: url
@@ -482,7 +499,8 @@ gisportal.Vector = function(options) {
 
     this.addOLLayer = function(layer, id) {
         map.addLayer(layer);
-        console.log('adding and redoing ui');
+
+        //console.log('adding and redoing ui');
         if(!this.styleUIBuilt){
             this.setStyleUI(layer.getSource(),layer.defaultProperty);
 
@@ -492,29 +510,12 @@ gisportal.Vector = function(options) {
 
     this.removeOLLayer = function(layer, id) {
         map.removeLayer(layer);
-        console.log("removing ui flag");
+        //console.log("removing ui flag");
         this.styleUIBuilt = false;
 
         gisportal.vectorLayerCount--;
-        gisportal.vectorStyles.coloursInUse = _.without(gisportal.vectorStyles.coloursInUse,this.currentColour)
+        gisportal.vectorStyles.coloursInUse = _.without(gisportal.vectorStyles.coloursInUse,this.currentColour);
 
-    };
-
-    this.loadFeatures = function(reponse) {
-        ////console.log("attempting to load features into");
-        formatWFS = ol.format.WFS();
-        var features = formatWFS.readFeatures(response);
-        for (var i = 0; i < features.length; i++) {
-            features[i].getGeometry().applyTransform(function(coords, coords2, stride) {
-                for (var j = 0; j < coords.length; j += stride) {
-                    var y = coords[j];
-                    var x = coords[j + 1];
-                    coords[j] = x;
-                    coords[j + 1] = y;
-                }
-            });
-        }
-        this.sourcevector.addFeatures(features);
     };
 
     return this;
@@ -522,7 +523,7 @@ gisportal.Vector = function(options) {
 };
 
 gisportal.getVectorLayerData = function(layer) {
-    gisportal.layers[id].init(options, layer)
+    gisportal.layers[id].init(options, layer);
 
 };
 
@@ -537,26 +538,26 @@ gisportal.vectorSelectionTest = function(id, tabname){
       var found = false;
 
   layers.forEach(function(f){
-      console.log("testing layer");
-      console.log(f);
+      //console.log("testing layer");
+      //console.log(f);
       if(f instanceof ol.layer.Vector){
           if (f.getSource().getFeatures().length > 0) {
-          console.log("adding vector select button")
+          //console.log("adding vector select button")
           //gisportal.indicatorsPanel.vectorSelectSwitch(id, tabname)
           found = true;
       }
       }
       else {
-          console.log("skipping as not vector");
+          //console.log("skipping as not vector");
       }
       
-  })
+  });
 
   if(found){
-          $('.js-draw-select-polygon').removeClass('hidden');
+          $('.draw-select-polygon-div').removeClass('hidden');
       }
       else {
-          $('.js-draw-select-polygon').addClass('hidden');
+          $('.draw-select-polygon-div').addClass('hidden');
       }
 
 };

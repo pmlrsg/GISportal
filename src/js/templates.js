@@ -10,13 +10,13 @@ gisportal.templates = {};
  * @param  {Function} callback Callback on completion 
  */
 gisportal.loadTemplates = function( callback ){
-	var callback = callback || function(){};
+	callback = callback || function(){};
    
    function compileTemplates(all_templates, status, request) {
-      var templates = all_templates.split('#####')
+      var templates = all_templates.split('#####');
       for (var i = 0; i< templates.length; i++) {
          if (templates[i].length > 1) {
-            var t = templates[i].split('###')
+            var t = templates[i].split('###');
             var templateName = t[0].substring( 0, t[0].length - 4 );
             gisportal.templates[ templateName ] = Handlebars.compile( t[1] );   
          }
@@ -27,7 +27,7 @@ gisportal.loadTemplates = function( callback ){
    $.ajax({
       url: 'all_templates.mst',
       success: compileTemplates
-   })
+   });
    
    gisportal.templatesLoaded = true;
    gisportal.events.trigger("templates-loaded");
@@ -56,18 +56,19 @@ Handlebars.registerHelper('unless_equals', function(attr1, attr2, options) {
 
 
 Handlebars.registerHelper('equals', function(attr1, attr2, options) {
-   return ( attr1 == attr2 )
+   return ( attr1 == attr2 );
 });
 
 Handlebars.registerHelper('dotdotdot', function(str) {
-   lenVal = 200
-   if (str.length > lenVal)
+   lenVal = 200;
+   if (str.length > lenVal){
       for(var index=lenVal; index<str.length; index++){
          if([" ", "_"].indexOf(str[index])>=0){
             return str.substring(0,index) + '...';
          }
       }
       return str.substring(0,lenVal) + '...';
+   }
    return str;
 });
 
@@ -137,7 +138,7 @@ Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
  */
 Handlebars.registerHelper('selected', function(attr1, attr2, options) {
    if( attr1 == attr2 )
-      return 'selected'
+      return 'selected';
 });
 
 /**
@@ -146,7 +147,7 @@ Handlebars.registerHelper('selected', function(attr1, attr2, options) {
  */
 Handlebars.registerHelper('checked', function(attr1, attr2, options) {
    if( attr1 == attr2 )
-      return 'checked'
+      return 'checked';
 });
 
 
@@ -156,7 +157,7 @@ Handlebars.registerHelper('checked', function(attr1, attr2, options) {
  */
 Handlebars.registerHelper('active', function(attr1, attr2, options) {
    if( attr1 == attr2 )
-      return 'active'
+      return 'active';
 });
 
 /**
@@ -166,7 +167,7 @@ Handlebars.registerHelper('active', function(attr1, attr2, options) {
  * @return {float} The rounded number
  */
 Handlebars.registerHelper('round', function(number, decimals, options) {
-   var decimals = decimals || 0;
+   decimals = decimals || 0;
    var offset = Math.pow( 10 ,decimals  );
    return Math.round( number * offset ) / offset;
 });
@@ -181,7 +182,7 @@ Handlebars.registerHelper('round', function(number, decimals, options) {
 Handlebars.registerHelper('call', function() {
    var method = arguments[ 0 ];
    var methodArgs = new Array(arguments.length - 2);
-   for( var i = 1; i < arguments.length - 1; i++ )
+   for(var i = 1; i < arguments.length - 1; i++ )
       methodArgs[i - 1] = arguments[ i ];
    var options = arguments[ arguments.length - 1 ];
 
@@ -189,10 +190,10 @@ Handlebars.registerHelper('call', function() {
    var currentLocation = options.data.root;
    var path = method.split('.');
 
-   for( var i = 0; path.length > i; i++ ){
+   for(i = 0; path.length > i; i++ ){
       lastLocation = currentLocation;
       currentLocation = currentLocation[ path[i] ];
-   };
+   }
 
    return currentLocation.apply( lastLocation, methodArgs );
 

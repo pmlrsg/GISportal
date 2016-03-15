@@ -140,3 +140,63 @@ input.graph-min, input.graph-max{
 .active-plot-slideout .panel-list{
    min-height: calc(100% - 40px);
 }
+
+.plot-header{
+  background-color: #59476d;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px; 
+  min-height: 38px;
+}
+
+.plot-header .right-icon{
+  float: right;
+  font-size: 22px;
+  line-height: 1px;
+}
+
+div.js-plot-popup{
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: auto;
+}
+
+div.js-plot-popup-html{
+  height: 95%;
+  width: 95%;
+  background-color: white;
+  color: #111111;
+  padding: 15px;
+  max-width: 90%;
+  overflow: auto;
+  margin: 10px auto;
+}
+
+.js-plot-popup-html table{
+  margin: auto;
+  margin-top: 25px;
+}
+
+.graph-buttons button,
+.js-graph-status-delete{
+  height: 31px;
+  background-color: $analysis-button;
+}
+
+a.js-revert-text{
+  text-decoration: underline;
+  font-weight:bold;
+  cursor: pointer;
+}
+
+.graph-date-range-info-div.alert-info p,
+.graph-date-range-error-div.alert-danger p {
+    padding: 10px;
+}
+
+.graph-date-range-info-li,
+.graph-date-range-error-li{
+  padding-bottom: initial!important;
+  padding-top: initial!important;
+}

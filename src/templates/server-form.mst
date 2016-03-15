@@ -1,3 +1,4 @@
+
 <div class="form-header">
    {{server_name}}
    <span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
@@ -12,6 +13,9 @@
 
          <label data-field="address">Address:</label></br>
          <textarea data-field="address" >{{address}}</textarea><br/>
+
+         <label data-field="wcsURL">WCS URL:</label></br>
+         <input type="text" value="{{wcsURL}}" data-field="wcsURL"/></br>
       </div>
       <div class="layers-form-right">
          <label data-field="person">Maintainer:</label></br>
@@ -25,6 +29,11 @@
 
          <label data-field="phone">Phone:</label></br>
          <input type="text" value="{{phone}}" data-field="phone"/></br>
+         
+         <label data-field="owner">Owner:</label></br>
+         <select disabled data-field="owner">
+            <option selected value="none">Loading...</option>
+         </select></br>
       </div>
    </div>
 </form>

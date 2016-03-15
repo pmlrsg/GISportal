@@ -16,7 +16,7 @@ gisportal.utils = {};
  * @return {string} The resulting string
  */  
 gisportal.utils.replace = function(search, replace, subject, count) {
-   var i = 0, j = 0, temp = '', repl = '', sl = 0, fl = 0,
+   var j = 0, temp = '', repl = '', fl = 0,
       f = [].concat(search),
       r = [].concat(replace),
       s = subject,
@@ -27,7 +27,7 @@ gisportal.utils.replace = function(search, replace, subject, count) {
       this.window[count] = 0;
    }
 
-   for(i = 0, sl = s.length; i < sl; i++) {      
+   for(var i = 0, sl = s.length; i < sl; i++) {      
       if(s[i] === '') {
          continue;
       }
@@ -45,6 +45,20 @@ gisportal.utils.replace = function(search, replace, subject, count) {
    }
    
    return sa ? s : s[0];  
+};
+
+gisportal.utils.closestIndex = function closest(array,num){
+   var i=0;
+   var minDiff=100000000000;
+   var ans = -1;
+   for(i in array){
+      var m=Math.abs(num-array[i]);
+      if(m<minDiff){ 
+         minDiff=m; 
+         ans=i; 
+      }
+   }
+   return ans;
 };
 
 /**
@@ -113,8 +127,8 @@ gisportal.utils.ISODateString = function(d) {
  * @param {string} secondDate - The second date
  */ 
 gisportal.utils.compareDates = function(firstDate, secondDate) { 
-   var firstDate = gisportal.utils.ISODateString(firstDate);
-   var secondDate = gisportal.utils.ISODateString(secondDate);
+   firstDate = gisportal.utils.ISODateString(firstDate);
+   secondDate = gisportal.utils.ISODateString(secondDate);
    if (firstDate < secondDate) return true;
    return false;
 };
@@ -160,7 +174,7 @@ gisportal.utils.mustacheFormat = function(o)  {
       }
    }
    return data;
-}
+};
 
 /**
  * Clamps the number between the min and max.
@@ -181,7 +195,7 @@ gisportal.utils.clamp = function (num, min, max) {
  * @returns The decoded URI component matching the name
  */
 gisportal.utils.getURLParameter = function(name) {
-   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+   return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||["",""])[1].replace(/\+/g, '%20'))||null;
 };
 
 /**
@@ -228,8 +242,8 @@ gisportal.utils.getWindowInnerSize = function() {
     height = window.innerHeight;
   } else {
     // For IE,
-    if (('BackCompat' === window.document.compatMode)
-        && ('body' in window.document)) {
+    if (('BackCompat' === window.document.compatMode) &&
+        ('body' in window.document)) {
         elem = window.document.body;
     } else if ('documentElement' in window.document) {
       elem = window.document.documentElement;
@@ -284,32 +298,6 @@ gisportal.utils.getCenteredCoords = function(width, height) {
 };
 
 /**
- * This function opens a popup for openid
- * @param {string} width - The width, including "px"
- * @param {string} height - The height, including "px"
- * @param {string} url - The url to show in the popup
- * @param {function} onOpenHandler - A callback for when the popup opens
- * @param {function} checkforCloseHandler - A callback to check if it has closed
- * @returns Object with details about the popup 
- */
-gisportal.utils.openPopup = function(width, height, url, onOpenHandler, checkforCloseHandler) {
-   if(onOpenHandler !== null) {
-      onOpenHandler();
-   }
-   
-   var coordinates = gisportal.utils.getCenteredCoords(width, height);
-   var popupWindow = window.open(url, "", 
-      "width=" + width + 
-      ", height=" + height + 
-      ", status = 1, location = 1, resizable = yes" + 
-      ", left=" + coordinates[0] + 
-      ", top=" + coordinates[1]
-   );
-   var interval = window.setInterval(checkforCloseHandler, 80);
-   return {'popupWindow':popupWindow, 'interval': interval};
-};
-
-/**
  * Changes a name so that it can
  * be used as an HTML id.
  * Use as a HASH. Compare don't decipher.
@@ -325,7 +313,7 @@ gisportal.utils.nameToId = function(name)  {
    name = name.replace(/\;/g, '_');
    name = name.replace(/\//g, '_');
    return name.toLowerCase();
-}
+};
 
 /**
  * Takes an object a returns a flattened object
@@ -446,4 +434,4 @@ HashMap.prototype.any = function any(value) {
 
 gisportal.utils.titleCase = function(str){
    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
+};

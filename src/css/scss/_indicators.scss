@@ -86,17 +86,26 @@
   display: none;
 }
 
-.analysis-draw-bbox-buttons button{
+.analysis-draw-bbox-buttons button.extra-small,
+.analysis-draw-bbox-buttons label.js-upload-shape{
   background-color: $analysis-button;
+  border: 1px solid $analysis-button;
+  cursor: pointer;
 }
 .analysis-draw-bbox-buttons .icon-cursor-select-area{
     position: relative;
     top: 3px;
 }
+
+.analysis-draw-bbox-buttons button.drawInProgress{
+  background-color: #EFEFEF;
+  border: 1px solid $analysis-button;
+  color: $analysis-button
+}
+
 .analysis-add-to-plot-buttons{
   margin-top: 10px;
 }
-
 
 .number  {
    color: #b1a7bc;
