@@ -28,10 +28,6 @@ gisportal.domainName = window.location.origin + window.location.pathname;
 // This edits the domain name a bit to be sent to the middleware (removes the end "/" and replaces all other "/"s with "_")
 gisportal.niceDomainName = gisportal.domainName.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 
-// Path to the python flask middleware
-gisportal.middlewarePath = gisportal.domainName.replace(/\/$/, '') + "/app";
-
-
 // Flask url paths, relates to /middleware/portalflask/views/
 gisportal.stateLocation = gisportal.middlewarePath + '/state';
 

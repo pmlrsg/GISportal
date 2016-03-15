@@ -36,6 +36,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-clear-selection', function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.currentSelectedRegion = "";
+      gisportal.methodThatSelectedCurrentRegion = {};
       cancelDraw();
       $('.js-coordinates').val("");
       $('.js-upload-shape').val("");
@@ -613,7 +614,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
             }else{
                $('.users-geojson-files').val(data);
             }
-            $('.js-coordinates').val("");
+            $('.users-geojson-files').trigger('change');
          },
          error: function(e){
             $.notify("Sorry, There was an error with that: " + e.statusText, "error");
