@@ -54,9 +54,9 @@
                      <option selected value="default">Loading...</option>
                   </select>
                   <br/>
-                  <button class="brand secondary extra-small js-remove-geojson" data-id="{{id}}" title="Remove Selected Polygon">
-                     <span class=" icon-bin-2 " data-id="Ph" title="Remove Selected Polygon" ></span>
-                     Remove Selected Polygon
+                  <button class="brand secondary extra-small js-remove-geojson hidden" data-id="{{id}}" title="Delete Selected Polygon">
+                     <span class=" icon-bin-2 " data-id="Ph" title="Delete Selected Polygon" ></span>
+                     Delete Selected Polygon
                   </button>
                </div>
                <div class="draw-select-polygon-div">

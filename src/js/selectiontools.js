@@ -118,7 +118,8 @@ gisportal.selectionTools.initDOM = function()  {
       $.ajax({
             url: '/app/plotting/delete_geojson?filename=' + $('.users-geojson-files').val(),
             success: function(filename){
-               gisportal.vectorLayer.getSource().clear();
+               // Triggers a click so that all the selection information is cleared
+               $('.js-clear-selection').trigger('click');
                $('.users-geojson-files option[value="' + filename + '"]').remove();
             },
             error: function(err){
