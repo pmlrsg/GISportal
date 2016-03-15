@@ -468,9 +468,9 @@ def hovmoller(plot, outfile="image.html"):
    np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
 
    with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
-      zf.write(csv_file)
+      zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-   shutil.rmtree(csv_dir)
+   shutil.rmtree(csv_dir, df['coverage'] + ".csv")
 
    # Format date to integer values
    #date = np.array(pd.to_datetime(df['Date']).astype(np.int64) // 10**6)
@@ -660,7 +660,7 @@ def transect(plot, outfile="transect.html"):
  
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
       np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
-      zf.write(csv_file)
+      zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
       min_value = np.amin(data[varindex['data_value']].astype(np.float64))
       max_value = np.amax(data[varindex['data_value']].astype(np.float64))
@@ -789,7 +789,7 @@ def timeseries(plot, outfile="time.html"):
  
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
       np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
-      zf.write(csv_file)
+      zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
       debug(4, data[varindex['mean']]) 
       min_value = np.amin(data[varindex['mean']].astype(np.float64))
