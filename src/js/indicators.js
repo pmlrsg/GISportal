@@ -1106,7 +1106,7 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
 
    // Gets any error with the bounding box and puts it into the div
    if(gisportal.methodThatSelectedCurrentRegion.method != "csvUpload"){
-      var bound_error = doesCurrentlySelectedRegionFallInLayerBounds( id );
+      var bound_error = gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds( id );
       if( bound_error !== true ){
          errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
          var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
@@ -1162,7 +1162,7 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
    });
 };
 
-function bboxToWKT( bboxString ){
+gisportal.indicatorsPanel.bboxToWKT = function( bboxString ){
    var elements = bboxString.split( "," );
    if( elements.length === false ) return false;
    var newPoints = [
@@ -1176,20 +1176,19 @@ function bboxToWKT( bboxString ){
    ];
 
    return 'POLYGON((' + newPoints.join(",") + '))';
+};
 
-}
-
-function convertBboxCoords(coordsArray, from_proj, to_proj){
-      for(var point in coordsArray){
-         if(typeof(coordsArray[point][0]) == "object"){
-            convertBboxCoords(coordsArray[point], from_proj, to_proj);
-         }else{
-            coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
-         }
+gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, to_proj){
+   for(var point in coordsArray){
+      if(typeof(coordsArray[point][0]) == "object"){
+         gisportal.indicatorsPanel.convertBboxCoords(coordsArray[point], from_proj, to_proj);
+      }else{
+         coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
       }
    }
+};
 
-function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
+gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = function( layerId ){
    // Skip if empty
    if( gisportal.currentSelectedRegion === "" ) return true;
 
@@ -1206,12 +1205,12 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
       bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    }catch( e ){
       // Assume the old bbox style
-      bb1 = Terraformer.WKT.parse( bboxToWKT(temp_bbox) );
+      bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
    }
 
    var current_proj = gisportal.projection;
 
-   convertBboxCoords(bb1.coordinates, current_proj, "EPSG:4326");
+   gisportal.indicatorsPanel.convertBboxCoords(bb1.coordinates, current_proj, "EPSG:4326");
 
    var proj_bounds = gisportal.availableProjections[current_proj].bounds;
    // A different message is displayed if the user clicks off the earth
@@ -1266,5 +1265,4 @@ function doesCurrentlySelectedRegionFallInLayerBounds( layerId ){
    else{
       return "The bounding box selected contains no data for this indicator.";
    }
-
-}
+};

@@ -344,7 +344,7 @@ gisportal.graphs.Plot =(function(){
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
             }else if(nice_bbox.indexOf("(") > -1){
                bb1 = Terraformer.WKT.parse(nice_bbox);
-               convertBboxCoords(bb1.coordinates, current_projection, "EPSG:4326");
+               gisportal.indicatorsPanel.convertBboxCoords(bb1.coordinates, current_projection, "EPSG:4326");
                nice_bbox = Terraformer.WKT.convert(bb1);
             }else{
                nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");

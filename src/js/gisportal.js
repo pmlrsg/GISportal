@@ -520,7 +520,7 @@ gisportal.mapInit = function() {
       }),
       updateWhileAnimating : true,
       updateWhileIneracting: true
-   })
+   });
 
    // map.addInteraction(new ol.interaction.Select({
    //    condition : ol.events.condition.pointerMove
@@ -529,7 +529,7 @@ gisportal.mapInit = function() {
    map.on('pointermove', function(evt) {
       
        var pixel = evt.pixel;
-                gisportal.featureOverlay.getSource().clear()
+                gisportal.featureOverlay.getSource().clear();
 
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
          if(!layer){
