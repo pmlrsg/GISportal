@@ -12,6 +12,7 @@ listPlots: Return a list of available plot types.
 from __future__ import print_function
 import __builtin__
 import sys
+import traceback
 import requests
 import urllib2
 
@@ -43,6 +44,14 @@ from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerSt
 verbosity = 0
 
 
+
+#<link
+#    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
+#    rel="stylesheet" type="text/css"
+#>
+#<script 
+#    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
+#></script>
 
 template = jinja2.Template("""
 <!DOCTYPE html>
@@ -121,7 +130,7 @@ def read_status(dirname, my_hash):
    return status
 #END read_status
 
-def update_status(dirname, my_hash, plot_status, message="", percentage=0):
+def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback=""):
    '''
       Updates a JSON status file whose name is defined by dirname and my_hash.
    '''
@@ -131,6 +140,7 @@ def update_status(dirname, my_hash, plot_status, message="", percentage=0):
       state = plot_status,
       message = message,
       completed = False,
+      traceback= traceback,
       job_id = my_hash
    )
 
@@ -152,6 +162,7 @@ def update_status(dirname, my_hash, plot_status, message="", percentage=0):
 
    # Update the status information.
    status["message"] = message
+   status["traceback"] = traceback
    status["state"] = plot_status
    status['percentage'] = percentage
    if plot_status == Plot_status.complete:
@@ -483,6 +494,9 @@ def hovmoller(plot, outfile="image.html"):
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(set(date))
    y_size = len(set(latlon))
+
+   debug(2, "x_size {}, y_size {}, data {}".format(x_size, y_size, len(data[varindex['value']])))
+
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
    assert x_size * y_size == len(data[varindex['value']])
@@ -685,9 +699,9 @@ def transect(plot, outfile="transect.html"):
    )
    
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("Value", "@value"))
-   tooltips.append(("Latitude", "@lat"))
-   tooltips.append(("Longitude", "@lon"))
+   tooltips.append(("Value", "@value{1.11}"))
+   tooltips.append(("Latitude", "@lat{1.1}"))
+   tooltips.append(("Longitude", "@lon{1.1}"))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -851,10 +865,10 @@ def timeseries(plot, outfile="time.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("Mean", "@mean"))
-   tooltips.append(("Max ", "@max"))
-   tooltips.append(("Min ", "@min"))
-   tooltips.append(("Std ", "@stderr"))
+   tooltips.append(("Mean", "@mean{1.11}"))
+   tooltips.append(("Max ", "@max{1.11}"))
+   tooltips.append(("Min ", "@min{1.11}"))
+   tooltips.append(("Std ", "@stderr{1.11}"))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -990,8 +1004,8 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    #print(source)
    scatter_plot = figure(
       title=plot_title, logo=None,
-      x_axis_type=plot['y1Axis']['scale'], 
-      y_axis_type=plot['y2Axis']['scale'], 
+      x_axis_type=plot['xAxis']['scale'], 
+      y_axis_type=plot['y1Axis']['scale'], 
       width=800,
       height=400,
       responsive=True)
@@ -1002,18 +1016,18 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    hover = HoverTool(
       tooltips=[
          ("Date", "@sdate"),
-         (cov_meta['x']['coverage'], "@x"),
-         (cov_meta['y']['coverage'], "@y")
+         (cov_meta['x']['coverage'], "@x{0.000}"),
+         (cov_meta['y']['coverage'], "@y{0.000}")
       ]
    )
 
    scatter_plot.add_tools(hover)
 
-   scatter_plot.xaxis.axis_label = plot['y1Axis']['label']
+   scatter_plot.xaxis.axis_label = plot['xAxis']['label']
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   scatter_plot.yaxis.axis_label = plot['y2Axis']['label']
+   scatter_plot.yaxis.axis_label = plot['y1Axis']['label']
    
    scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
       
@@ -1217,11 +1231,11 @@ def get_plot_data(json_request, plot=dict()):
       for s in series:
          ds = s['data_source']
          if s['yAxis'] == 1:
-            scale = json_request['plot']['y2Axis']['scale']
-            actual_axis = "x"
-         else:
             scale = json_request['plot']['y1Axis']['scale']
             actual_axis = "y"
+         else:
+            scale = json_request['plot']['xAxis']['scale']
+            actual_axis = "x"
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
          bbox = ds['bbox']
@@ -1457,8 +1471,9 @@ To execute a plot
             debug(0, "Error executing. Failed to complete plot")
             sys.exit(2)
       except:
-         debug(0, "Uncaught Exception. Failed to complete plot")
-         update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed")
+         trace_message = traceback.format_exc()
+         debug(0, "Uncaught Exception. Failed to complete plot - {}".format(trace_message))
+         update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
          raise
 
    else:
