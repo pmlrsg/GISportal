@@ -267,7 +267,7 @@ def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    legend = figure(width=150, y_axis_type=legend_y_axis_type, y_range=legend_y_range)
                    
    # Set the y axis format so it does not default to scientific notation.
-   legend.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
+   legend.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    legend.yaxis.axis_label = "{} {}".format(var_name, plot_units)
 
    legend.xaxis.visible = False
@@ -699,7 +699,7 @@ def transect(plot, outfile="transect.html"):
    )
    
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("Value", "@value{1.11}"))
+   tooltips.append(("Value", "@value{0.000}"))
    tooltips.append(("Latitude", "@lat{1.1}"))
    tooltips.append(("Longitude", "@lon{1.1}"))
 
@@ -712,7 +712,7 @@ def transect(plot, outfile="transect.html"):
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
-   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
@@ -865,10 +865,10 @@ def timeseries(plot, outfile="time.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("Mean", "@mean{1.11}"))
-   tooltips.append(("Max ", "@max{1.11}"))
-   tooltips.append(("Min ", "@min{1.11}"))
-   tooltips.append(("Std ", "@stderr{1.11}"))
+   tooltips.append(("Mean", "@mean{0.000}"))
+   tooltips.append(("Max ", "@max{0.000}"))
+   tooltips.append(("Min ", "@min{0.000}"))
+   tooltips.append(("Std ", "@stderr{0.000}"))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -877,7 +877,7 @@ def timeseries(plot, outfile="time.html"):
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
-   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
