@@ -811,7 +811,7 @@ gisportal.loadState = function(state) {
       else indicator = gisportal.layers[available_keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
          if(indicator.serviceType == "WFS"){
-            console.log("Please load the vector properly")
+            console.log("Please load the vector properly");
          }else{
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
