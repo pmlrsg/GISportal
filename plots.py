@@ -504,7 +504,8 @@ def hovmoller(plot, outfile="image.html"):
    # If it has got this far without breaking the array must be regular (all rows same length) so
    # the next date value will be y_size elements along the array.
    date_step = date[y_size] - date[0]
-   
+   min_latlon = np.nanmin(latlon)
+   max_latlon = np.nanmax(latlon)
    # Arrange the x and y's to suit the plot.
    if plot_type == 'hovmollerLat':
        # Swap the values around so that the date is on the x axis
@@ -512,8 +513,7 @@ def hovmoller(plot, outfile="image.html"):
        x_size, y_size = y_size, x_size
 
        # I think the coords refer to pixel centres so scale by half a pixel.
-       min_latlon = np.nanmin(latlon)
-       max_latlon = np.nanmax(latlon)
+       
        min_ll_index = latlon.tolist().index(min_latlon)
        max_ll_index = latlon.tolist().index(max_latlon)
        min_x = date[0] - date_step / 2
@@ -1089,7 +1089,7 @@ def get_plot_data(json_request, plot=dict()):
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage,  masking_polygon=bbox)
          else:
            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
          extract = extractor.getData()
