@@ -556,28 +556,33 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
       else:     
          date = ''.join(times[i])
       #print date
-      if(date in t_store_dates):
-         pass
+      if(date  in [ x[0] for x in t_store_dates]):
+         #idx = [ x[0] for x in t_store_dates].index(date)
          #print "FOUND DUPLICATE DATE %s" % date
-      t_store_dates.append(date)
-      for j, row in enumerate(timelatlon):
-         #print len(row)
-         if direction == "lat":
-            if (j < len(lat)):
-               pos = lat[j]
-         elif direction == "lon":
-            if (j < len(lon)):
-               pos = lon[j]
-            
-         #print row
-         mean = getMean(row)
-         #print mean
-         #print mean
-         if not np.isnan(mean):
-            output['data'].append([date, float(pos), mean])
-         else:
-            #print "adding nan"
-            output['data'].append([date, float(pos), None])
+         pass
+         #t_store_dates.append((date, i))
+
+         #print "testing row vs row = %b" % (timelatlon == zMaskedArray[t_store_dates[idx][1]])
+      else:
+         t_store_dates.append((date, i))
+         for j, row in enumerate(timelatlon):
+            #print len(row)
+            if direction == "lat":
+               if (j < len(lat)):
+                  pos = lat[j]
+            elif direction == "lon":
+               if (j < len(lon)):
+                  pos = lon[j]
+               
+            #print row
+            mean = getMean(row)
+            #print mean
+            #print mean
+            if not np.isnan(mean):
+               output['data'].append([date, float(pos), mean])
+            else:
+               #print "adding nan"
+               output['data'].append([date, float(pos), None])
             
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
@@ -588,7 +593,8 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    return output
 
 
-
+def are_dupes_the_same():
+   pass
 def are_time_axis_the_same(filenames):
    #print "inside get times func"
    #print filenames
