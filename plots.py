@@ -302,7 +302,7 @@ def extract(plot, outfile="image.html"):
    varindex = {j: i for i, j in enumerate(df['vars'])}
    #print(varindex)
    #data = np.transpose(df['data'])
-   data = df['data']['data']
+   data = df['data']
    #print(data)
    # Save the CSV files
    csv_dir = dir_name + "/" + my_hash
@@ -325,14 +325,14 @@ def extract(plot, outfile="image.html"):
 
    # Format latlon to float. Otherwise we can not do the mins etc.
    #latlon = np.array(df["LatLon"]).astype(np.float)
-   lat = np.array(data[varindex['latitudes']]).astype(np.float64)
-   lon = np.array(data[varindex['longitudes']]).astype(np.float64)
+   lat = np.array(data[varindex['Latitudes']]).astype(np.float64)
+   lon = np.array(data[varindex['Longitudes']]).astype(np.float64)
    
    # Guess the size of each axis from the number of unique values in it.
    x_size = len(lon)
    y_size = len(lat)
 
-   debug(3, "x_size {}, y_size {}, {} {}".format(x_size, y_size, len(data[varindex['data']][0]), len(data[varindex['data']])))
+   debug(3, "x_size {}, y_size {}, {} {}".format(x_size, y_size, len(data[varindex['Data']][0]), len(data[varindex['Data']])))
    # Make our array of values the right shape.
    # If the data list does not match the x and y sizes then bomb out.
    #assert x_size * y_size == len(data[varindex['value']])
@@ -341,7 +341,7 @@ def extract(plot, outfile="image.html"):
    #values = np.reshape(np.array(data[varindex['value']]),(-1,y_size))
 
    # Assume we have a nested list of values ordered in lat, lon order.
-   values = np.flipud(np.array(data[varindex['data']]))
+   values = np.flipud(np.array(data[varindex['Data']]))
 
    # Easiest if we force float here but is that always true?
    # We also have problems with how the data gets stored as JSON (very big!).
@@ -1087,6 +1087,7 @@ def get_plot_data(json_request, plot=dict()):
       # Hovmoller should only have one data series to plot.
       if len(series) > 1:
          debug(0, "Error: Attempting to plot {} data series".format(len(series)))
+         return plot
 
       ds = series[0]['data_source']
       coverage = ds['coverage']
@@ -1133,6 +1134,7 @@ def get_plot_data(json_request, plot=dict()):
    elif plot_type in ("extract"):
       if len(series) > 1:
          debug(0, "Error: Attempting to plot {} data series".format(len(series)))
+         return plot
 
       ds = series[0]['data_source']
       coverage = ds['coverage']
@@ -1140,47 +1142,53 @@ def get_plot_data(json_request, plot=dict()):
       debug(3,"Time bounds: {}".format(time_bounds))
 
       coverage = ds['coverage']
-      wcs_url = ds['threddsUrl']
-      if 'depth' in ds:
-        depth = ds['depth']
+      #my_vars = ['data', 'latitudes', 'longitudes']
+      if "filename" in ds.keys():
+         # TODO - For testing we use the file specified. Need to build a call to the extractor.
+         testdata = ds['filename']
+         debug(3, "Loading test from {}".format(testdata))
+         with open(testdata, 'r') as datafile:
+            json_data = json.load(datafile)
+         debug(4, "Data: {}".format(json_data.keys()))
+
+         data = []
+         my_vars = json_data['vars']
+         [data.append(json_data[i]) for i in my_vars]
       else:
-        depth=None
-      bbox = ["{}".format(ds['bbox'])]
-      bbox = ds['bbox']
-      time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
-
-      debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
-      try:
-         if irregular:
-            bounds = wkt.loads(bbox).bounds
-            data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
-            debug(3, "Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+         wcs_url = ds['threddsUrl']
+         if 'depth' in ds:
+           depth = ds['depth']
          else:
-            data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
-            debug(3, "Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
-         extract = extractor.getData()
-         map_stats = ImageStats(extract,  coverage)
-         response = json.loads(map_stats.process())
-      except ValueError:
-         debug(2, "Data request, {}, failed".format(data_request))
-         return plot
-         
-      # TODO - For testing we use the file specified. Need to build a call to the extractor.
-      #testdata = ds['filename']
-      #debug(3, "Loading test from {}".format(testdata))
-      #with open(testdata, 'r') as datafile:
-      #   json_data = json.load(datafile)
-      #debug(4, "Data: {}".format(json_data.keys()))
+           depth=None
+         bbox = ["{}".format(ds['bbox'])]
+         bbox = ds['bbox']
+         time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
-      #data = []
-      my_vars = ['data', 'latitudes', 'longitudes']
-      #[data.append(json_data[i]) for i in my_vars]
-      
+         debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
+         try:
+            if irregular:
+               bounds = wkt.loads(bbox).bounds
+               data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+               debug(3, "Requesting data: {}".format(data_request))
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+            else:
+               data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+               debug(3, "Requesting data: {}".format(data_request))
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extract = extractor.getData()
+            map_stats = ImageStats(extract,  coverage)
+            response = json.loads(map_stats.process())
+            #with open('/tmp/dfile.json', 'w') as outfile:
+               #json.dump(response, outfile)
+            data = response['data']
+            my_vars = response['vars']
+         except ValueError:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return plot
+            
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
-                      vars=my_vars, data=response))
+                      vars=my_vars, data=data))
       update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
 
    elif plot_type in ("timeseries"):
