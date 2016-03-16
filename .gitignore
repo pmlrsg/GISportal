@@ -12,4 +12,4 @@ html/plots/*
 !html/plots/.gitkeep
 node_modules
 uploads/*
-!upload/.gitkeep
+!uploads/.gitkeep
