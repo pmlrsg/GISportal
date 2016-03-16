@@ -1099,13 +1099,16 @@ def get_plot_data(json_request, plot=dict()):
       bbox = ds['bbox']
       time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
-      debug(3, "Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
+            data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            debug(3, "Requesting data: {}".format(data_request))
             extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage,  masking_polygon=bbox)
          else:
-           extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+            data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            debug(3, "Requesting data: {}".format(data_request))
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1150,8 +1153,12 @@ def get_plot_data(json_request, plot=dict()):
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
+            data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            debug(3, "Requesting data: {}".format(data_request))
             extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
          else:
+            data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            debug(3, "Requesting data: {}".format(data_request))
             extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
          extract = extractor.getData()
          map_stats = ImageStats(extract,  coverage)
