@@ -757,7 +757,7 @@ gisportal.addLayersForm.addServerToForm = function(server, owner, layer_id){
    var single_layer;
    var index_to_load = 1;
    for(var layer in layers_list){
-      if(layers_list[layer].serverName == server){
+      if(layers_list[layer].serverName == server && layers_list[layer].owner == owner){
          single_layer = layers_list[layer];
          index = gisportal.addLayersForm.addlayerToList(layers_list[layer], layer_id);
          if(index){// If this layer is the one that was clicked

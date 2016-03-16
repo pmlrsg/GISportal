@@ -218,6 +218,7 @@ gisportal.graphs.Plot =(function(){
          "weight" : "auto",
          "tickFormat" : this.plotType() == "timeseries" ? "%d/%m/%Y" : ",.2f"
       };
+      var y1Axis;
       plotRequest.xAxis = xAxis;
 
       // Get components that will go on the left Y axis
@@ -239,7 +240,7 @@ gisportal.graphs.Plot =(function(){
             return output;
          }).join(' / ');
 
-         var y1Axis = {
+         y1Axis = {
             "scale" : "linear", //( linear | log_scale | ordinal | time)
             "label" : yAxis1Label,
             "ticks" : "auto",
@@ -281,7 +282,9 @@ gisportal.graphs.Plot =(function(){
          };
          if(this.plotType() == "scatter"){
             //Overwrites the xAxis if its a scatter
-            plotRequest.xAxis = y2Axis;
+            plotRequest.xAxis = y1Axis;
+            plotRequest.y1Axis = y2Axis;
+            plotRequest.y2Axis = null;
          }
          plotRequest.y2Axis = y2Axis;
       }
@@ -351,6 +354,16 @@ gisportal.graphs.Plot =(function(){
             }
          }
 
+         var yAxis = component.yAxis;
+         if(this._plotType == "scatter"){
+            // Inverts the yAxis number for scatters to get the right data
+            if(yAxis === 2){
+               yAxis = 1;
+            }else{
+               yAxis = 0;
+            }
+         }
+
          // Gumph needed for the plotting serving to its thing
          var newSeries = {
             // Source handler file to use
@@ -371,7 +384,7 @@ gisportal.graphs.Plot =(function(){
                "threddsUrl"  : layer.wcsURL.split("?")[0],
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
-            "yAxis": component.yAxis,
+            "yAxis": yAxis,
             "type": "line",
             "meta": meta,
             "markdown": markdowns,

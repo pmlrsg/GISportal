@@ -166,7 +166,9 @@ router.get('/app/settings/get_cache', function(req, res) {
             });
          }
          json_data.owner = domain; // Adds the owner to the file (for the server list)
-         cache.push(json_data); // Adds each file to the cache to be returned
+         if(json_data.wmsURL){
+            cache.push(json_data); // Adds each file to the cache to be returned
+         }
       }
    });
    if(permission != "guest"){
@@ -197,7 +199,9 @@ router.get('/app/settings/get_cache', function(req, res) {
                   });
                }
                json_data.owner = usernames[username]; // Adds the owner to the file (for the server list)
-               cache.push(json_data); // Adds each file to the cache to be returned
+               if(json_data.wmsURL){
+                  cache.push(json_data); // Adds each file to the cache to be returned
+               }
             }
          });
       }
@@ -325,6 +329,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = server_info.owner; // Gets the given username
+
 
    if('provider' in server_info && 'server_name' in server_info){ // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
