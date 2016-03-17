@@ -364,6 +364,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    to_be_masked = netCDF.Dataset(netcdf_base, 'a')
 
    chl = to_be_masked.variables[variable][:]
+   fillValue = to_be_masked.variables[variable].getncattr('_FillValue')
 
    latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
    lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
@@ -432,13 +433,15 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    masker = np.array(img)
    #fig = plt.figure()
    masked_variable = []
+   #print chl.shape
+   #print fillValue
    for i in range(chl.shape[0]):
       #print i
       masked_variable.append(np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker]))
       #print "adding null values"
-      masked_variable[i].filled(fill_value=np.nan)
+      masked_variable[i].filled(fill_value=fillValue)
       where_is_nan = np.isnan(masked_variable[i])
-      masked_variable[i][masked_variable[i] == 9.96921e+36] = np.nan
+      masked_variable[i][masked_variable[i] == fillValue] = np.nan
       #print masked_variable[i]
       #a = fig.add_subplot(1,5,i+1)
       #imgplot = plt.imshow(masked_variable)
@@ -448,6 +451,9 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    #where_is_nan = np.isnan(masked_variable)
    #masked_variable[where_is_nan] = 9.96921e+36
    to_be_masked.variables[variable][:] = np.ma.array(masked_variable)[:]
+   #print  to_be_masked.variables[variable][:]
+   #print np.min(to_be_masked.variables[variable][:])
+   #print np.max(to_be_masked.variables[variable][:])
    to_be_masked.close()
 
    to_be_masked = netCDF.Dataset(netcdf_base, 'r+')

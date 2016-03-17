@@ -4,6 +4,7 @@ import json
 import matplotlib.pyplot as plt
 import decimal
 import numpy as np
+import traceback
 
 class ImageStats(object):
 	"""docstring for ImageStats"""
@@ -16,8 +17,11 @@ class ImageStats(object):
 	def process(self):
 		#print "running basic processing on %s" % self.filename
 		# create three arrays, 1D lat 1D lon 2D data
+		#print "processing image"
 		netcdf_file = netCDF.Dataset(self.filename, "r")
-		variable = np.ma.masked_array(netcdf_file.variables[self.variable])
+		#variable = np.ma.masked_array(netcdf_file.variables[self.variable])
+		variable = np.ma.array(netcdf_file.variables[self.variable][:])
+
 		lats = getCoordinateVariable(netcdf_file, "Lat")
 		lons = getCoordinateVariable(netcdf_file, "Lon")
 		time_dim_index = netcdf_file.variables[self.variable].dimensions.index('time')
@@ -26,14 +30,24 @@ class ImageStats(object):
 		var_list = []
 		lat_list = []
 		lon_list = []
-		print variable.shape
+		#print variable.shape
 		if(len(variable.shape) > 3 ):
-			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.nanmean(variable, axis=time_dim_index)]
+			#print "hmmmm"
+			#print variable.shape
+			#print variable
+			#print np.nanmean(variable, axis=time_dim_index).shape
+
+			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.nanmean(variable, axis=time_dim_index)[0]]
+			#print var_list
 			lat_list = [float(x) for x in lats]
 			lon_list = [float(x) for x in lons]
 		elif(len(variable.shape) > 2 ):
+			#print variable.shape
+			#print variable
+			#print np.nanmean(variable, axis=time_dim_index)
 			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.nanmean(variable, axis=time_dim_index)]
 			#var_list = [[float(x) for x in y] for y in variable[0]]
+			#print var_list
 			lat_list = [float(x) for x in lats]
 			lon_list = [float(x) for x in lons]
 		else:
@@ -45,7 +59,7 @@ class ImageStats(object):
 		#print len(lon_list)
 		#print len(var_list)
 		#print len(var_list[0])
-		print lat_list
+		#print lat_list
 		_ret = {}
 		_ret['vars'] = ['Data','Latitudes','Longitudes']
 		_ret['data'] = []
