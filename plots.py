@@ -364,7 +364,7 @@ def extract(plot, outfile="image.html"):
    max_x = np.nanmax(lon)
    min_y = np.nanmin(lat)
    max_y = np.nanmax(lat)
-   print(min_x,max_x,min_y,max_y)
+   #print(min_x,max_x,min_y,max_y)
    x_axis_type = "linear"
    y_axis_type = "linear"
    x_axis_label = "Longitude"
@@ -1093,7 +1093,9 @@ def get_plot_data(json_request, plot=dict()):
       coverage = ds['coverage']
       time_bounds = urllib.quote_plus(ds['t_bounds'][0] + "/" + ds['t_bounds'][1])
       debug(3,"Time bounds: {}".format(time_bounds))
-
+      depth = None
+      if 'depth' in ds:
+         depth = ds['depth']
       coverage = ds['coverage']
       wcs_url = ds['threddsUrl']
       bbox = ["{}".format(ds['bbox'])]
@@ -1105,11 +1107,11 @@ def get_plot_data(json_request, plot=dict()):
             bounds = wkt.loads(bbox).bounds
             data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, "Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage,  masking_polygon=bbox)
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_deoth=depth, masking_polygon=bbox)
          else:
             data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, "Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1200,7 +1202,9 @@ def get_plot_data(json_request, plot=dict()):
             scale = json_request['plot']['y1Axis']['scale']
          else:
             scale = json_request['plot']['y2Axis']['scale']
-
+         depth = None
+         if 'depth' in ds:
+            depth = ds['depth']
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
          bbox = ds['bbox']
@@ -1211,9 +1215,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
@@ -1254,19 +1258,22 @@ def get_plot_data(json_request, plot=dict()):
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
          bbox = ds['bbox']
+         depth = None
+         if 'depth' in ds:
+            depth = ds['depth']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
          t_holder[actual_axis] = {}
          t_holder[actual_axis]['coverage'] = coverage
          t_holder[actual_axis]['wcs_url'] = wcs_url
          t_holder[actual_axis]['bbox'] = bbox
          t_holder[actual_axis]['time_bounds'] = time_bounds
-         print(t_holder)
+         #print(t_holder)
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
