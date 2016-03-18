@@ -331,6 +331,11 @@ def find_closest(arr, val, starting=0, time=False):
          current_idx=i
    return current_idx
 
+def getFillValue(variable):
+   if '_FillValue' in variable.ncattrs():
+      return variable.getncattr('_FillValue')
+   else:
+      return np.nan
 
 def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    '''
@@ -364,7 +369,7 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    to_be_masked = netCDF.Dataset(netcdf_base, 'a')
 
    chl = to_be_masked.variables[variable][:]
-   fillValue = to_be_masked.variables[variable].getncattr('_FillValue')
+   fillValue = getFillValue(to_be_masked.variables[variable])
 
    latvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0])][:]
    lonvals = to_be_masked.variables[str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0])][:]
