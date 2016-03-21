@@ -53,7 +53,7 @@ module.exports = function(grunt) {
             },
             files: {
                'html/css/<%= pkg.name %>.css' : 'src/css/scss/gisportal.scss',
-               'html/css/<%= pkg.name %>_green.css' : 'src/css/scss/gisportal_green.scss'
+               'html/css/<%= pkg.name %>_blue.css' : 'src/css/scss/gisportal_blue.scss'
             }
          }
       },
