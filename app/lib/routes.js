@@ -13,14 +13,21 @@ router.get('/', function(req, res){
    res.sendFile(path.join(html_dir, '/index.html'));
 });
 
-router.get('/app/css', function(req, res) {
+router.get('/css/:mode', function(req, res) {
+   var mode = req.params.mode;
    var domain = utils.getDomainName(req);
    var config = GLOBAL.config[domain] || GLOBAL.config;
 
+   var min = "";
+
+   if(mode != "dev"){
+      min = ".min";
+   }
+
    if(config.cssFile){
-      res.sendFile(path.join(html_dir, "css", config.cssFile));
+      res.sendFile(path.join(html_dir, "css", config.cssFile.replace(".css", "") + min + ".css"));
    }else{
-      res.sendFile(path.join(html_dir, "css/GISportal.css"));
+      res.sendFile(path.join(html_dir, "css/GISportal" + min + ".css"));
    }
 });
 

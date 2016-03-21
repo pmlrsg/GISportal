@@ -110,7 +110,8 @@ module.exports = function(grunt) {
          },
          target: {
             files: {
-              'html/css/<%= pkg.name %>.min.css': 'html/css/<%= pkg.name %>.css'
+              'html/css/<%= pkg.name %>.min.css': 'html/css/<%= pkg.name %>.css',
+              'html/css/<%= pkg.name %>_blue.min.css': 'html/css/<%= pkg.name %>_blue.css'
             }
          }
       },
@@ -121,6 +122,10 @@ module.exports = function(grunt) {
                   {
                      match: 'GISportal.min.',
                      replacement: 'GISportal.'
+                  },
+                  {
+                     match: 'MODE',
+                     replacement: 'dev'
                   }
                ]
             },
@@ -134,6 +139,10 @@ module.exports = function(grunt) {
                   {
                      match: 'GISportal.min.',
                      replacement: 'GISportal.min.'
+                  },
+                  {
+                     match: 'MODE',
+                     replacement: 'production'
                   }
                ]
             },

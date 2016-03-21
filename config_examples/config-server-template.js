@@ -8,6 +8,5 @@ GLOBAL.config['DOMAIN_NAME'] = {
          prompt: 'select_account'
       }
    },
-   admins:['ADMINISTRATOR'],
-   cssFile:"CSS_FILE.CSS"
+   admins:['ADMINISTRATOR']
 }
