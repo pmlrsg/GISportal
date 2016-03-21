@@ -1,1 +1,1 @@
-# data extractor - now on gitlab
+See https://github.com/pmlrsg/GISportal for details
