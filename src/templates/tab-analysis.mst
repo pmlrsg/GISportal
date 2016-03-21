@@ -27,7 +27,7 @@
                      <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
                   </div>
                </div>
-               {{#unless noOAuth}}
+               <div {{#if noOAuth}}class="hidden"{{/if}}>
                   <br/>
                   <b>UPLOAD</b>
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
@@ -45,7 +45,7 @@
                   </div>
                   <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
                   <a href="javascript:void(0)" class="js-google-auth-button">Login</a> and upload a file</p>
-               {{/unless}}
+               </div>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
                   <b>SELECT</b>
