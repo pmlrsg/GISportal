@@ -224,8 +224,3 @@ Go over each custom definition key in the config file and change it the one in y
  #cm2 - Used in layer 
 
 
-
-# Handy Tips #
-
-If you do not want to store the CSVs for long periods of time then add this to your crontab:
-find /path/to/portal/uploads/ -mtime +7 -exec rm -f {} \;
