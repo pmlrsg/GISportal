@@ -1,0 +1,67 @@
+/*------------------------------------*\
+    Grid
+\*------------------------------------*/
+
+.grid-list.panel-list li,
+.grid
+  {
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  min-height: 40px;
+}
+
+.js-tab-analysis .grid-list.panel-list li  {
+   align-items: flex-start;
+   border-bottom: 1px solid #e0dce4;
+}
+
+.grid-list.panel-list li {
+   flex-flow: row;
+}
+
+
+.grid-cell  {
+  margin-right: 1%;
+  line-height: 1.5;
+  align-items: center;
+  word-wrap: break-word;
+}
+
+.icon-column  {
+  width: 40px;
+}
+
+/*
+.grid-cell:first-child  {
+  margin-left: 15px;
+}
+.grid-cell:last-child  {
+  margin-right: 15px;
+}
+*/
+
+.grid-cell.fill  {
+  flex: 1;
+  flex-basis: 100%;
+  -ms-flex-preferred-size: 0px;
+  margin-bottom: 10px;
+}
+
+@media only screen and (min-width : 1270px)  {
+  .grid-list.panel-list li,
+  .grid  {
+    flex-flow: initial;
+  }
+
+  .reorder-before  {
+    margin-right: 15px;
+    order: -1;
+  }
+
+  .fill  {
+    flex-basis: initial;
+    marign: 0;
+  }
+}
+

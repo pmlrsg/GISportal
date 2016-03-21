@@ -5,7 +5,7 @@ JSON_SORT_KEYS = False
 
 SECRET_KEY = 'p7i0-22@0eheas^kzw3=1qfug_x+5)5)8u4v=2iyiwwx1eh)37'
 
-OPENID_FOLDER = '/home/rsgadmin/cache/projects/portal.marineopec.eu/openID'
+OPENID_FOLDER = '/users/rsg/olcl/scratch/portal_rsg/GISportal/html/cache/openID'
 DATABASE_URI = 'sqlite:///' + OPENID_FOLDER + '/user_storage.db'
 
 
@@ -19,6 +19,6 @@ LOG_PATH = ''
 ERROR_LEVEL = "W"
 
 # section to define root folder for markdown metadata files
-MARKDOWN_ROOT = "/change/to/markdown/directory"
+MARKDOWN_ROOT = "/users/rsg/olcl/scratch/portal_rsg/GISportal/html/markdown"
 
 MARKDOWN_DIRS = ['provider', 'indicator']

@@ -1,0 +1,42 @@
+<span class="icon-delete-3 js-layer-form-close btn right-icon icon-btn"></span>
+<table class="layers-form-table">
+   <thead>
+      <tr>
+         <th>Layer</th>
+         <th>Display Title</th>
+         <th>Indicator Type(s)</th>
+         <th>Abstract</th>
+      </tr>
+   </thead>
+   <tbody>
+      {{#each this}}
+         {{#if userDefined}}
+            <tr>
+               <td>{{displayTitle}}</td>
+               <td><input type="text" value='{{displayTitle}}'></input></td>
+               <td><input type="text" value='{{tags.indicator_type}}'></input></td>
+               <td><input type="text" value='{{abstract}}'></input></td>
+            </tr>
+         {{/if}}
+      {{/each}}
+   </tbody>
+   {{!<tfoot>
+      <tr>
+         <td colspan="4">
+            <div id="paging">
+               <ul>
+                  <li><a href="#"><span>Previous</span></a></li>
+                  <li><a href="#" class="active"><span>1</span></a></li>
+                  <li><a href="#"><span>2</span></a></li>
+                  <li><a href="#"><span>3</span></a></li>
+                  <li><a href="#"><span>4</span></a></li>
+                  <li><a href="#"><span>5</span></a></li>
+                  <li><a href="#"><span>Next</span></a></li>
+               </ul>
+            </div>
+      </tr>
+   </tfoot>}}
+</table>
+<div class="clearfix">
+   <button class="brand small js-layers-form-submit pull-right">Submit Layers</button>
+</div>

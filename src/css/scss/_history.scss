@@ -1,0 +1,40 @@
+/*------------------------------------*\
+    History Panel
+\*------------------------------------*/
+
+
+#historyPanel .graphJob {
+	
+	background: white;
+	border-style: none;
+	border: 1px solid #d8d3dd;
+	border-radius: 0;
+	color: #8a7b9b;
+	display: block;
+	text-align: left;
+	text-indent: 1px;
+	text-overflow: '';
+	line-height: 33px;
+	padding-left: 10px;
+	text-transform: capitalize;
+	margin-top: 9px;
+	width: 100%;
+}
+
+.saved, .not-saved, .loading-image{
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+}
+
+.saved:before, .not-saved:before{
+	content: "\e09d";
+	cursor: pointer;
+}
+
+.not-saved{
+	font-family: "streamline-24px" !important;
+}
+.saved, not-saved:hover{
+	font-family: "streamline-24px-filled-in" !important;
+}

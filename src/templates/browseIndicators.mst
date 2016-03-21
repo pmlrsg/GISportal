@@ -1,0 +1,15 @@
+{{! List of used variables for this template:
+   id - The indicator id
+   name - The name to be shown for the indicator
+}}
+{{#unless empty_search}}
+	{{#each indicators}}
+	   <li data-name="{{name}}">
+	   	<a class="dd-option" data-optionid="{{@root.location}}-toggleVisibility-{{modified}}" data-name="{{name}}">{{name}}</a>
+	   </li>
+	{{else}}
+	  <li class="no-result">
+	    No results for "{{search_term}}"
+	  </li>
+	{{/each}}
+{{/unless}}

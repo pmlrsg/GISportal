@@ -1,0 +1,22 @@
+<div class="start-container overlay-container">
+   <div class="intro-text">
+   {{{startHTML}}}
+   </div>
+   {{#if homepageSlides}}
+   <div class="homepageSlider">
+      <div class="homepageSlider-wrap">
+         {{#each homepageSlides}}
+            <div  style="background-image: url('{{.}}');" ></div>
+         {{/each}}
+      </div>
+   </div>
+   {{/if}}
+
+   <nav class="start-nav">
+      {{#if hasAutoSaveState}}
+
+         <a class="btn brand with-border js-load-last-state">Load your previous map</a>
+      {{/if}}
+      <button class="brand with-border js-start">Start building a map</button>
+   </nav>
+</div>

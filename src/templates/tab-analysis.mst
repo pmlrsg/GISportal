@@ -1,0 +1,108 @@
+<input type="radio" id="tab-{{id}}-analysis" name="tabs" data-tab-name="analysis" {{checked visibleTab "analysis"}} class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab">
+   <ol class="steps grid-list panel-list">
+      <div class="js-analysis-message hidden alert-danger" id="{{id}}-analysis-message"/>
+      {{#if wcsURL}}
+         <li class="full-size">
+         <div class="full-width">
+            <b>ANALYSIS</b>
+            <p>To refine the data before analysis you can:</p>
+            <br/>
+            
+            <div class="analysis-draw-bbox-buttons">
+               <b>DRAW</b>
+               <p>Draw a selection box on the map</p>
+               <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
+                  <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
+                  Draw Polygon
+               </button>
+               <button class="brand secondary extra-small js-draw-polygon" data-id="{{id}}" title="Draw Irregular Polygon">
+                  <span class=" icon-network-1-1" data-id="Ph" title="Draw Irregular Polygon" ></span>
+                  Draw Irregular Polygon
+               </button>
+               <div class="coordinates clearfix">
+                  <p><label for="tab-{{id}}-coordinates">Or enter coordinates</label></p>
+                  <div class="analysis-coordinates">
+                     <input id="tab-{{id}}-coordinates" placeholder="Left, Bottom, Right, Top" class="js-coordinates" type="text">
+                     <button data-id="{{id}}" class="brand small js-add-coordinates-to-profile show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">Save</button>
+                  </div>
+               </div>
+               <div {{#if noOAuth}}class="hidden"{{/if}}>
+                  <br/>
+                  <b>UPLOAD</b>
+                  <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
+                     <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
+                     or<br/>
+                     Upload a CSV file containing point data</p>
+                     <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
+                        <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
+                        Upload Files
+                     </label>
+                     <form class="js-upload-shape-form hidden" enctype="multipart/form-data">
+                        <input class="js-upload-shape" multiple id="js-upload-shape-file-input" data-id="{{id}}" type="file" accept=".shp,.dbf, .shx, .csv" name="files"></input>
+                     </form>
+                     <p>Alternatively, you can drag and drop files straight onto the map! (GPX, GeoJSON, IGC, KML, TopoJSON)</p>
+                  </div>
+                  <p class="hide-when-logged-in {{#if loggedIn}}hidden{{/if}}">
+                  <a href="javascript:void(0)" class="js-google-auth-button">Login</a> and upload a file</p>
+               </div>
+               <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
+                  <br/>
+                  <b>SELECT</b>
+                  <p>Use this dropdown or select an existing polygon:</p>
+                  <select class="users-geojson-files">
+                     <option selected value="default">Loading...</option>
+                  </select>
+                  <button class="brand secondary extra-small js-remove-geojson hidden" data-id="{{id}}" title="Delete Selected Polygon">
+                     <span class=" icon-bin-2 " data-id="Ph" title="Delete Selected Polygon" ></span>
+                     Delete Selected Polygon
+                  </button>
+               </div>
+               <div class="draw-select-polygon-div">
+                  <br/>
+                  <button class="brand secondary extra-small js-draw-select-polygon" data-id="{{id}}" title="Select Existing Polygon">
+                     <span class=" icon-hand-touch-1" data-id="Ph" title="Select Existing Polygon" ></span>
+                     Select Existing Polygon
+                  </button>
+               </div>
+            </div>
+            <br/>
+            <div class="bbox-info hidden clearfix">
+               <div class="bbox-info-width"><dd>Width:</dd><dt><span class="js-bbox-width"></span></dt></div>
+               <div class="bbox-info-height"><dd>Height:</dd><dt><span class="js-bbox-height"></span></dt></div>
+               <div class="bbox-info-area"><dd>Area:</dd><dt><span class="js-bbox-area"></span></dt></div>
+            </div>
+
+            {{#elevation}}
+               <div class="elevation clearfix">
+                  <p>Choose a layer depth:</p>
+                  <select class="js-analysis-elevation">
+                     {{#elevationCache}}
+                        <option {{selected this @root.selectedElevation}} value="{{.}}">{{round . 2}} {{@root.elevationUnits}}</option>
+                     {{/elevationCache}}
+                  </select>
+               </div>
+            {{/elevation}}
+
+            <div class="analysis-add-to-plot-buttons clearfix">
+               <button id="export-{{id}}" class="brand small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
+               <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to graph</button>
+               <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new graph</button><br/>
+               <button data-id="{{id}}" class="brand secondary js-clear-selection clearfix"><span class="icon-eraser icon-btn"> </span>Clear Selection</button>
+            </div>
+         </div>
+         </li>
+      {{else}}
+         <li class="full-size">
+            <div>
+               <p>There is currently no record of the WCS (Web Coverage Service) URL for this layer, please specify this below as we need this to create a graph:</p>
+               <input type='text' class="js-wcs-url" placeholder="WCS URL" value="{{wcsURL}}" data-id="{{id}}">
+               <div class=" analysis-add-to-plot-buttons clearfix">
+                  <button data-id="{{id}}" class="brand small analysis-make-new-series js-wcs-url pull-right">Submit WCS URL</button>
+               </div>
+            </div>
+         </li>
+      {{/if}}
+   </ol>
+</div>
+

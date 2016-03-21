@@ -1,0 +1,75 @@
+/*------------------------------------*\
+   Type
+   This is where the type styles are
+   defined. You may be looking for
+   fonts.css
+\*------------------------------------*/
+
+body  {
+   font-family: 'Open Sans', sans-serif;
+   font-size: 13px;
+   font-size: 0.8125rem; /* 13/16 = 0.8125 */
+   line-height: 1.5;
+}
+
+h3  {
+   font-size: 15px;
+   font-size: 0.9375rem; /* 15/16=0.9275 */
+   font-weight: 600;
+}
+
+h4  {
+   font-size: 14px;
+   font-size: 0.875rem; /* 14/16=0.875 */
+   font-weight: 600;
+}
+
+.bold { font-weight: 600; }
+
+/* Start Screen */
+
+.intro-text,
+.share-container h2,
+.overlay-container h2,
+.export-container h2  {
+   color: #f7f6f8;
+   font-size: 20px;
+   font-size: 1.25rem; /* 24/16 = 1.5 */
+   font-weight: 300;
+}
+
+.examples a   {
+   color: #f7f6f8;
+}
+
+/* Buttons */
+
+.brand  {
+   /* Font was falling back to Arial, not sure why
+      so for now explicitly making Open Sans */
+   font-family: 'Open Sans', sans-serif;
+   font-size: 14px;
+   font-size: 0.875rem; /* 18/16 = 1.125 */
+   font-weight: 600;
+   text-decoration: none;
+}
+
+/* Panel */
+
+.panel-tab-name {
+   color: #8a7b9b;
+   font-size: 13px;
+   font-size: 0.8125rem; /* 13/16=0.8125 */
+   font-weight: 600;
+   text-align: center;
+}
+
+.number  {
+   font-size: 24px;
+   font-size: 1.5rem;
+   text-align: center;
+}
+
+.bbox-info dt  {
+   color: #545454;
+}

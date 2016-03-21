@@ -1,0 +1,76 @@
+<input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
+<table class="stripe panel-tab">
+   <tbody>
+      
+      {{#displayTags}}
+         <tr><td>{{&displayName}}</td><td>{{str_join displayValues ", "}}</td></tr>
+      {{/displayTags}}
+
+      <tr><td>Bounding box</td><td>
+         <label>{{round exBoundingBox.NorthBoundLatitude 2}}</label> N, 
+         <label>{{round exBoundingBox.EastBoundLongitude 2}}</label>   E, 
+         <label>{{round exBoundingBox.SouthBoundLatitude 2}}</label> S,
+         <label>{{round exBoundingBox.WestBoundLongitude 2}}</label>   W 
+      </td></tr>
+      <tr class="date-range-detail"><td>Date range</td><td>{{firstDate}} to {{lastDate}}</td></tr>
+      {{#if provider.email}}
+         <tr>
+            <td>Email</td>
+            <td><a href="mailto:{{provider.email}}">{{provider.email}}</a></td>
+         </tr>
+      {{/if}}
+      {{#if moreIndicatorInfo}}
+      <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
+      {{else}}
+        {{#if moreProviderInfo}}
+        <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
+        {{/if}}
+
+      {{/if}}
+      {{#if abstract}}
+         <tr>
+            <td>Abstract</td>
+            <td>{{{abstract}}}</td>
+         </tr>
+      {{/if}}
+
+      {{#if contactInfo}}
+         {{#with contactInfo}}
+            {{#if person}}
+               <tr>
+                  <td>Contact Person</td>
+                  <td>{{person}}</td>
+               </tr>
+               {{#if position}}
+                  <tr>
+                     <td>Contact Position</td>
+                     <td>{{position}}</td>
+                  </tr>
+               {{/if}}
+            {{/if}}
+            {{#if address}}
+               <tr>
+                  <td>Address</td>
+                  <td>
+                     {{{address}}}
+                  </td>
+               </tr>
+            {{/if}}
+            {{#if phone}}
+               <tr>
+                  <td>Telephone</td>
+                  <td>{{phone}}</td>
+               </tr>
+            {{/if}}
+            {{#if email}}
+               <tr>
+                  <td>Email</td>
+                  <td><a href="mailto:{{email}}">{{email}}</a></td>
+               </tr>
+            {{/if}}
+         {{/with}}
+      {{/if}}
+
+
+   </tbody>
+</table>

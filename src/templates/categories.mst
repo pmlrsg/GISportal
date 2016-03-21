@@ -1,0 +1,20 @@
+{{! List of used variables for this template:
+   category - The category
+   name - The name to be shown for the category
+}}
+
+<div>
+   <select multiple id="select-{{tagnamesafe}}" class="hide-select" data-id="{{tag}}">
+      {{#indicators}}
+         <option value="{{name}}" 
+            data-optionid="cat-{{@root.tagModified}}-toggleVisibility-{{modified}}" 
+            data-tag="{{@root.tag}}" 
+            data-tagname="{{tagname}}" 
+            data-tagvalue="{{tagvalue}}" 
+            data-name="{{name}}"
+         >{{name}}</option>
+         
+      {{/indicators}}
+   </select>
+</div>
+
