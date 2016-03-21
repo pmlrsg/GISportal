@@ -3,12 +3,12 @@
 @import "_animation.scss";
 @import "_export.scss";
 @import "_fonts.scss";
+@import "_main.scss";
 @import "_graph.scss";
 @import "_grid.scss";
 @import "_history.scss";
 @import "_icons.scss";
 @import "_jquery.nouislider.scss";
-@import "_main.scss";
 @import "_indicators.scss";
 
 @import "_mapcontrols.scss";
@@ -17,6 +17,7 @@
 @import "_overlay.scss";
 @import "_panel.scss";
 @import "_panel-slideout.scss";
+@import "_add-layers-form.scss";
 @import "_popup.scss";
 @import "_reset.scss";
 @import "_scalebar.scss";
@@ -28,3 +29,12 @@
 @import "_timeline.scss";
 @import "_type.scss";
 @import "_walkthrough.scss";
+@import "_vector.scss";
+
+@import "_collaboration.scss";
+@import "_notify.scss";
+@import "_user.scss";
+
+
+@import "../../../html/js-libs/tooltipster/css/tooltipster.scss";
+@import "../../../html/js-libs/tooltipster/css/themes/tooltipster-shadow.scss";

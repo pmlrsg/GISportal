@@ -11,7 +11,18 @@ module.exports = router;
 
 router.get('/', function(req, res){
    res.sendFile(path.join(html_dir, '/index.html'));
-})
+});
+
+router.get('/app/css', function(req, res) {
+   var domain = utils.getDomainName(req);
+   var config = GLOBAL.config[domain] || GLOBAL.config;
+
+   if(config.cssFile){
+      res.sendFile(path.join(html_dir, "css", config.cssFile));
+   }else{
+      res.sendFile(path.join(html_dir, "css/GISportal.css"));
+   }
+});
 
 // default path; check for cookie and if it's not there send them to the login page
 router.get('/app/user', function(req, res) {
