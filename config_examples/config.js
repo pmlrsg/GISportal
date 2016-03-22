@@ -41,8 +41,9 @@ $.extend(gisportal.config, {
    // Do we require terms and conditions agreement to use the portal
    requiresTermsAndCondictions: false,
 
-   browseMode : 'selectlist',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
+   browseMode : 'selectlist',                       // (tabs|selectlist|simplelist) selectlist (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list; simplelist = a simple list of all the ids in the portal
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
+   hiddenCategories: ['testing'],                     // a list of categories to not be shown.
    countryBorder : {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load

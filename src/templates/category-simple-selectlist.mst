@@ -1,0 +1,6 @@
+<ul class="category-select-list">
+   <li class="selectoptions">
+      Available indicators:
+      <div class="js-category-filter-options"></div>
+   </li>
+</ul>
