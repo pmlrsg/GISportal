@@ -22,6 +22,11 @@ gisportal.panels.showPanel = function(panelName) {
 			"panel-name": gisportal.panels.activePanel
 		});
 	}
+	if(gisportal.panels.activePanel == "choose-indicator" && $('#refine-layers')[0]){
+		// Makes sure the ddslick is always open;
+		$('#refine-layers').ddslick('close');
+		$('#refine-layers').ddslick('open');
+	}
 	gisportal.panels.activePanel = panelName;
 
 };

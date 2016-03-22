@@ -21,10 +21,14 @@ gisportal.configurePanel.refreshData = function()  {
    var groupedTags = gisportal.groupTags();
    var categories = this.browseCategories;
 
-   if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'tabs') {
-      this.renderTagsAsTabs();
-   } else if (gisportal.config.browseMode == 'selectlist') {
-      this.renderTagsAsSelectlist();
+   if(_.size(gisportal.browseCategories) > 0 && gisportal.config.browseMode != 'simplelist'){
+      if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'selectlist') {
+         this.renderTagsAsSelectlist();
+      } else if (gisportal.config.browseMode == 'tabs') {
+         this.renderTagsAsTabs();
+      }
+   }else{
+      this.renderIndicatorsAsSimpleList();
    }
 
 
@@ -412,6 +416,43 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       defaultValue = { value: defaultCategory };
    } 
    $('#js-category-filter-select').ddslick('select', defaultValue);
+};
+
+/**
+ * An alternative method of grouping/filtering categories. This 
+ * method is for when there are no tags to be sorted by.
+ */
+gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
+   // load the template
+   var selectList = gisportal.templates['category-simple-selectlist']();
+   $('.js-category-filter').html(selectList);
+
+   placeholder = $('<div id="refine-layers"></div>');
+   $('.js-category-filter-options').append(placeholder);
+   data = {};
+   for (var layer in gisportal.layers){
+      data[layer] = [layer];
+   }
+
+   $('#refine-layers').ddslick({
+      data: gisportal.utils.mustacheFormat(data),
+      initialState: 'open',
+      selectText: 'Select a Layer',
+      onSelected: function(data) {
+         gisportal.refinePanel.layerFound(data.selectedData.text);
+      }
+   });
+
+   for (layer in gisportal.layers){
+      info = gisportal.templates['tooltip-refine-external-details'](gisportal.layers[layer]);
+      holder = $('input[value="' + layer + '"]').parent();
+      if (holder.length > 0) {
+         holder.tooltipster({
+            content: $(info),
+            position: 'right',
+         });
+      }
+   }
 };
 
 /**
