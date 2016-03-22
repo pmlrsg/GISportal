@@ -536,7 +536,9 @@ gisportal.mapInit = function() {
             return;
          }
          //layer.getSource().removeFeature(feature);
-         gisportal.featureOverlay.getSource().addFeature(feature);
+         if(layer != gisportal.vectorLayer){
+            gisportal.featureOverlay.getSource().addFeature(feature);
+         }
       });
 
    });
@@ -1171,7 +1173,7 @@ gisportal.launchMap = function(){
    window.onbeforeunload = function(){
       gisportal.autoSaveState();
       if( gisportal.config.siteMode == "production")
-         return "Warning. Your about to leave the page";
+         return "Warning. You're about to leave the page";
       else
          return;
    };
