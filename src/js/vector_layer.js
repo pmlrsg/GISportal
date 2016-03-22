@@ -230,7 +230,7 @@ gisportal.Vector = function(options) {
       var features = source.getFeatures();
       var possibleOptions = [];
       var x = 0, y = 0;
-      var bins;
+      var bins, style_colour;
       var featureCount = features.length;
       var isNumberProperty = false;
       ////console.log(featureCount);
@@ -287,69 +287,82 @@ gisportal.Vector = function(options) {
      }
       ////console.log(legend);
       x = 0;
-        for (x; x < featureCount; x++) {
+         for (x; x < featureCount; x++) {
             ////console.log("setting style for feature");
             if (isNumberProperty) {
-                var p = 0;
-                var binsLength = bins.length;
-                for (p; p < binsLength - 1; p++) {
-                    var curVal = (Number(features[x].getProperties()[prop]));
+               var p = 0;
+               var binsLength = bins.length;
+               for (p; p < binsLength - 1; p++) {
+                  var curVal = (Number(features[x].getProperties()[prop]));
 
-                    if (bins[p] <= curVal && bins[p + 1] >= curVal) {
-                        if (this.vectorType == "POINT") {
-                            console.log("adding point style");
-                            features[x].setStyle(
-                            new ol.style.Style({
-                                image: new ol.style.Circle({
-                                    radius: 5,
-                                    fill: new ol.style.Fill({
-                                        color: legend_obj[bins[p] + '-' + bins[p + 1]]
-                                    }),
-                                    stroke: new ol.style.Stroke({
-                                        width: 0.5,
-                                        color: 'rgba(255,0,0,1)'
-                                    })
-                                })
-                            }));
-                        }
-                        if (this.vectorType == "POLYGON") {
-                            features[x].setStyle(
-                                new ol.style.Style({
-                                    fill: new ol.style.Fill({
-                                        color: legend_obj[bins[p] + '-' + bins[p + 1]]
-                                    })
-                                }));
-                        }
-                    }
-                }
-            } else {
-                //console.log(this.vectorType);
-                if (this.vectorType == "POINT") {
-                    //console.log("adding point style")
-                    features[x].setStyle(
-                            new ol.style.Style({
-                                image: new ol.style.Circle({
-                                    radius: 5,
-                                    fill: new ol.style.Fill({
-                                        color:legend_obj[features[x].getProperties()[prop]]
-                                    }),
-                                    stroke: new ol.style.Stroke({
-                                        width: 0.5,
-                                        color: legend_obj[features[x].getProperties()[prop]]
-                                    })
-                                })
-                            })
-                            );
+                  if (bins[p] <= curVal && bins[p + 1] >= curVal) {
+                     style_colour = legend_obj[bins[p] + '-' + bins[p + 1]];
+                     style_colour = ol.color.asArray(style_colour);
+                     if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
+                        style_colour[3] = 0.8;
+                     }else{
+                        style_colour[3] = 1;
+                     }
+                     if (this.vectorType == "POINT") {
+                        console.log("adding point style");
+                        features[x].setStyle(
+                        new ol.style.Style({
+                           image: new ol.style.Circle({
+                              radius: 5,
+                              fill: new ol.style.Fill({
+                                 color: style_colour
+                              }),
+                              stroke: new ol.style.Stroke({
+                                 width: 0.5,
+                                 color: 'rgba(255,0,0,1)'
+                              })
+                           })
+                        }));
+                     }
+                     if (this.vectorType == "POLYGON") {
+                        features[x].setStyle(
+                           new ol.style.Style({
+                              fill: new ol.style.Fill({
+                                 color: style_colour
+                              })
+                           }));
+                     }
+                  }
+               }
+            }else {
+               style_colour = legend_obj[features[x].getProperties()[prop]];
+               style_colour = ol.color.asArray(style_colour);
+               if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
+                  style_colour[3] = 0.8;
+               }else{
+                  style_colour[3] = 1;
+               }
+               if (this.vectorType == "POINT") {
+                  features[x].setStyle(
+                     new ol.style.Style({
+                        image: new ol.style.Circle({
+                           radius: 5,
+                           fill: new ol.style.Fill({
+                              color:style_colour
+                           }),
+                           stroke: new ol.style.Stroke({
+                              width: 0.5,
+                              color: style_colour
+                           })
+                        })
+                     })
+                  );
 
-                        }
-                        if (this.vectorType == "POLYGON") {
-                            features[x].setStyle(
-                                new ol.style.Style({
-                                    fill: new ol.style.Fill({
-                                        color: legend_obj[features[x].getProperties()[prop]]
-                                    })
-                                }));
-                        }
+               }
+               if (this.vectorType == "POLYGON") {
+                  features[x].setStyle(
+                     new ol.style.Style({
+                        fill: new ol.style.Fill({
+                           color: style_colour
+                        })
+                     })
+                  );
+               }
             }
         }
 
