@@ -1,13 +1,19 @@
 #!/bin/bash
 
 function getDomainInfo {
-	read -p "Do you wish to use ssl? (y/n)?" -n 1 choice2 #-
-	case "$choice2" in 
-	  y|Y ) ssl="s";;
-	  * ) ssl="" ;;
-	esac
 	echo ""
 	echo "Enter the domain name (and path, without the http:// part), e.g. 'www.example.com/portal', and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
+   read -p "Do you wish to use ssl? (y/n)?" -n 1 choice2 #-
+   case "$choice2" in 
+     y|Y ) ssl="s";;
+     * ) ssl="" ;;
+   esac
+   echo ""
+   read -p "Do you wish to setup authentication for this domain? (y/n)?" -n 1 choice2 #-
+   case "$choice2" in 
+     y|Y ) auth="y";;
+     * ) return ;;
+   esac
    while [ -e config/site_settings/"$nicedomain"/config-server.js ]
    do
    	echo "That domain already has authentication, please try something else or type cancel and press [ENTER]: "; read -e domain; domain=${domain%/}; nicedomain=${domain//\//_};
@@ -47,12 +53,7 @@ npm install --silent
 
 while [ -z $domain ]
 do
-	read -p "Do you wish to setup a domain with authentication now? (y/n)?" -n 1 choice 
-	case "$choice" in 
-	  y|Y ) echo; getDomainInfo;;
-	  n|N ) domain="/"; echo ;;
-	  * ) echo; echo "Please choose y or n";;
-	esac
+	getDomainInfo;
 done
 
 if [ ! -e config/site_settings/"$nicedomain" ]
@@ -65,7 +66,7 @@ if [ ! -e config/site_settings/layers ]
 		mkdir -p config/site_settings/layers;
 fi
 
-if [ $domain != "/" ]
+if [ $domain != "/" ] && [ $auth == "y" ]
    then
    TEMPLATE=$(cat config_examples/config-server-template.js);
    echo ${TEMPLATE} | sed s/DOMAIN_NAME/$nicedomain/ | \
