@@ -43,6 +43,7 @@ $.extend(gisportal.config, {
 
    browseMode : 'selectlist',                       // (tabs|selectlist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
+   hiddenCategories: ['testing'],                     // a list of categories to not be shown.
    countryBorder : {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
