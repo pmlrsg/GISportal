@@ -22,10 +22,10 @@ gisportal.configurePanel.refreshData = function()  {
    var categories = this.browseCategories;
 
    if(_.size(gisportal.browseCategories) > 0 && gisportal.config.browseMode != 'simplelist'){
-      if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'tabs') {
-         this.renderTagsAsTabs();
-      } else if (gisportal.config.browseMode == 'selectlist') {
+      if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'selectlist') {
          this.renderTagsAsSelectlist();
+      } else if (gisportal.config.browseMode == 'tabs') {
+         this.renderTagsAsTabs();
       }
    }else{
       this.renderIndicatorsAsSimpleList();

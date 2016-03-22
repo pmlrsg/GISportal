@@ -41,7 +41,7 @@ $.extend(gisportal.config, {
    // Do we require terms and conditions agreement to use the portal
    requiresTermsAndCondictions: false,
 
-   browseMode : 'selectlist',                       // (tabs|selectlist|simplelist) tabs (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list; simplelist = a simple list of all the ids in the portal
+   browseMode : 'selectlist',                       // (tabs|selectlist|simplelist) selectlist (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list; simplelist = a simple list of all the ids in the portal
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
    hiddenCategories: ['testing'],                     // a list of categories to not be shown.
    countryBorder : {
