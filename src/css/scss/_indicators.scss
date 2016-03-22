@@ -16,10 +16,10 @@
 .indicator-header-moving { 
   background: repeating-linear-gradient(
   -45deg,
-  #59476d,
-  #59476d 10px,
-  #32253f 10px,
-  #32253f 20px
+  $panel-content-header,
+  $panel-content-header 10px,
+  $panel-headfoot 10px,
+  $panel-headfoot 20px
 );
 }
 
