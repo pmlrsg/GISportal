@@ -425,9 +425,8 @@ gisportal.feature_type = "";
 gisportal.selectionTools.ROIAdded = function(feature)  {
    gisportal.methodThatSelectedCurrentRegion.justCoords = false;
    setTimeout(function() {
-               cancelDraw();
-               gisportal.selectionTools.toggleTool('None'); // So that people don't misclick
-            }, 300);
+               gisportal.selectionTools.isDrawing = false;
+            }, 500);
    var feature_type = map.ROI_Type;
    gisportal.feature_type = feature_type;
 
@@ -481,8 +480,10 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    $('.js-coordinates').val(gisportal.currentSelectedRegion);
    $('input.js-upload-shape')[0].value = "";
    $('.users-geojson-files').val("default");
+   cancelDraw();
    gisportal.methodThatSelectedCurrentRegion.method = "drawBBox";
    gisportal.methodThatSelectedCurrentRegion.value = gisportal.currentSelectedRegion;
+   this.toggleTool('None'); // So that people don't misclick
 
   
    
