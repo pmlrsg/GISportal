@@ -369,7 +369,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   new_data_layer.include = this_new_layer.include;
                   for(key in this_new_layer.tags){
                      var val = this_new_layer.tags[key];
-                     if(val && val.length > 0){
+                     if(val && val.length > 0 && val[0] != ""){
                         new_data_layer.tags[key] = val;
                      }else{
                         new_data_layer.tags[key] = undefined;

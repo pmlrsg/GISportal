@@ -32,7 +32,7 @@ utils.directoryExists = function(filePath)
 }
 
 utils.getDomainName = function(req){
-   var domain = req.headers.host
+   var domain = req.headers.host;
    if(req.SUBFOLDER){
       domain += "_" + req.SUBFOLDER
    }
