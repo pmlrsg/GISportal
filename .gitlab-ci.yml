@@ -1,0 +1,10 @@
+image: pmlrsg/gisportal-host
+
+stages:
+    - build
+
+job1: 
+    stage: build
+    script: 
+        - npm install
+        - node app.js 
