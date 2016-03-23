@@ -209,6 +209,7 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
       //console.log(vectorLayerOL);
       gisportal.vlayers.push(vectorLayerOL);
    }
+   gisportal.configurePanel.refreshData();
 
 };
 
@@ -1410,9 +1411,5 @@ gisportal.loadBrowseCategories = function(data){
          }
       }
    }
-   for(category in gisportal.config.hiddenCategories){
-      var deleteCat = gisportal.config.hiddenCategories[category];
-      delete gisportal.browseCategories[deleteCat];
-      console.log("Removing '" + deleteCat + "' category");
-   }
+
 };
