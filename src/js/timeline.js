@@ -341,7 +341,7 @@ gisportal.TimeLine.prototype.redraw = function() {
 
             var g = d3.select(this).selectAll('line').data(dateTimes, function(d) { return(d); });  // <-- second level data-join
              g.enter().append('svg:line')
-               .attr('stroke', '#59476D')
+               .attr('stroke', '#59476D') // This needs to be changable for different coloured portals
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
                .attr('class', 'detailLine');
