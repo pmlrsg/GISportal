@@ -817,10 +817,6 @@ gisportal.loadState = function(state) {
             // this stops the map from auto zooming to the max extent of all loaded layers
             indicator.preventAutoZoom = true;
             gisportal.refinePanel.layerFound(indicator.id);
-            if(state.selectedLayers[indicator.id]){
-               var layer_state = state.selectedLayers[indicator.id];
-               gisportal.loadLayerState(layer_state);
-            }
             if(state.selectedRegionInfo){
                gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
                switch( state.selectedRegionInfo.method ){
@@ -840,6 +836,10 @@ gisportal.loadState = function(state) {
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                }
+            }
+            if(state.selectedLayers[indicator.id]){
+               var layer_state = state.selectedLayers[indicator.id];
+               gisportal.loadLayerState(layer_state);
             }
          }
       }
@@ -887,9 +887,10 @@ gisportal.loadLayerState = function(layer_state){
       var openTab = layer_state.openTab;
       var id = layer_state.id;
       var tabName = openTab.split(id + "-")[1];
-      $('.indicator-header[data-id="' + id + '"] + ul .js-tab-trigger:checked[id]').attr('id', openTab);
-      $('#' + openTab).prop('checked', true).change();
-      gisportal.indicatorsPanel.selectTab(id, tabName);
+      // This is done because the "$('#tab-' + layerId + '-' + tabName)" element does not exist in select tab at the moment so it doesn't work
+      setTimeout(function(){
+         gisportal.indicatorsPanel.selectTab(id, tabName);
+      }, 1000);
    }
 };
 
