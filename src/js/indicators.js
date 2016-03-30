@@ -583,12 +583,12 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
 };
 
-gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
+gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedState){
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
       dataType: 'json',
       success: function(data){
-         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue);
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
       },
       error: function(e){
          gisportal.vectorLayer.getSource().clear();

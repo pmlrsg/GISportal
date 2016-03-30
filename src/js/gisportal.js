@@ -829,7 +829,7 @@ gisportal.loadState = function(state) {
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
-                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value);
+                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value, fromSavedState = true);
                      break;
                   case "dragAndDrop":
                      stateMap.feature = undefined;
