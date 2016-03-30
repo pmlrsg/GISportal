@@ -738,6 +738,7 @@ gisportal.saveState = function(state) {
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
             'maxScaleVal': indicator.maxScaleVal,
+            'log': indicator.log,
             'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked[id]').attr('id')
          };    
       }
@@ -838,13 +839,14 @@ gisportal.loadState = function(state) {
                      break;
                }
             }
-            if(state.selectedLayers[indicator.id]){
-               var layer_state = state.selectedLayers[indicator.id];
-               gisportal.loadLayerState(layer_state);
-            }
          }
       }
    }
+   if(state.selectedLayers){
+      gisportal.loadLayersState = state.selectedLayers;
+   }
+   // TODO: Find a place for this where the layers have been loaded properly from the state and then take the timout off
+   setTimeout(gisportal.loadLayerState, 1000);
    
    // Create the feature if there is one
    if (stateMap.feature) {    // Array.<ol.Feature>
@@ -883,24 +885,50 @@ gisportal.loadState = function(state) {
 
 };
 
-gisportal.loadLayerState = function(layer_state){
-   var id = layer_state.id;
-   // This opens the tab that the user had open
-   if(layer_state.openTab){
-      var openTab = layer_state.openTab;
-      var tabName = openTab.split(id + "-")[1];
-      // This is done because the "$('#tab-' + layerId + '-' + tabName)" element does not exist in select tab at the moment so it doesn't work
-      setTimeout(function(){
-         gisportal.indicatorsPanel.selectTab(id, tabName);
-      }, 1000);
-   }
+gisportal.loadLayerState = function(){
+   if(gisportal.loadLayersState){
+      function setScaleValues(id, min, max, log){
+         // There is a further race condition because of the scalebar loading changing the min max.
+         setTimeout(function(){
+            $('.js-scale-min[data-id="' + id + '"]').val(min).trigger('change');
+            $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
+            $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log).trigger('change');
+         }, 500);
+      }
+      for(var layer in gisportal.loadLayersState){
+         var layer_state = gisportal.loadLayersState[layer];
+         var id = layer_state.id;
+         var style = layer_state.style || gisportal.config.defaultStyle;
+         var min = layer_state.minScaleVal;
+         var max = layer_state.maxScaleVal;
+         var log = layer_state.log || false;
+         var opacity = layer_state.opacity || 1;
 
-   //This sets the visibility of the layer to the same as what the user had before
-   if(layer_state.isVisible === false){
-      setTimeout(function(){
-         gisportal.indicatorsPanel.hideLayer(id);
-      }, 1000);
+         // This opens the tab that the user had open
+         if(layer_state.openTab){
+            var openTab = layer_state.openTab;
+            var tabName = openTab.split(id + "-")[1];
+            gisportal.indicatorsPanel.selectTab(id, tabName);
+         }
+
+         //This sets the visibility of the layer to the same as what the user had before
+         if(layer_state.isVisible === false){
+            gisportal.indicatorsPanel.hideLayer(id);
+         }
+
+         // This sets the layer style to the same as what the user had before
+         $('#tab-' + id + '-layer-style').ddslick('select', {value: style});
+
+         // Sets the min & max and log of the scalebar to the value that the user had previously set
+         setScaleValues(id, min, max, log);
+
+         // Sets the layers opacity to the value that the user had previously
+         $('#tab-' + id + '-opacity').val(opacity*100);
+         gisportal.layers[id].setOpacity(opacity);
+
+      }
    }
+   gisportal.loadLayersState = null;
 };
 
 /**
