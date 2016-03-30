@@ -720,26 +720,27 @@ gisportal.saveState = function(state) {
    state.map = {};
    state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
-   state.map.layers = {}; 
+   state.selectedLayers = {}; 
    state.timeline = {}; 
 
-   // // Get the current layers and any settings/options for them.
-   // var keys = gisportal.selectedLayers;
-   // for(var i = 0, len = keys.length; i < len; i++) {
-   //    var selectedIndicator = gisportal.selectedLayers[i];
+   // Get the current layers and any settings/options for them.
+   var keys = gisportal.selectedLayers;
+   for(var i = 0, len = keys.length; i < len; i++) {
+      var selectedIndicator = gisportal.selectedLayers[i];
 
-   //    if (selectedIndicator)  {
-   //       var indicator = gisportal.layers[selectedIndicator];
-   //       state.map.layers[indicator.id] = {
-   //          'selected': indicator.selected,
-   //          'opacity': indicator.opacity !== null ? indicator.opacity : 1,
-   //          'style': indicator.style !== null ? indicator.style : '',
-   //          'minScaleVal': indicator.minScaleVal,
-   //          'maxScaleVal': indicator.maxScaleVal,
-   //          'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
-   //       };    
-   //    }
-   // }
+      if (selectedIndicator)  {
+         var indicator = gisportal.layers[selectedIndicator];
+         state.selectedLayers[indicator.id] = {
+            'id': indicator.id,
+            'selected': indicator.selected,
+            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+            'style': indicator.style !== null ? indicator.style : '',
+            'minScaleVal': indicator.minScaleVal,
+            'maxScaleVal': indicator.maxScaleVal,
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked[id]').attr('id')
+         };    
+      }
+   }
    // outside of loop so it can be easily ordered 
    var layers = [];
    $('.sortable-list .indicator-header').each(function() {
@@ -816,6 +817,10 @@ gisportal.loadState = function(state) {
             // this stops the map from auto zooming to the max extent of all loaded layers
             indicator.preventAutoZoom = true;
             gisportal.refinePanel.layerFound(indicator.id);
+            if(state.selectedLayers[indicator.id]){
+               var layer_state = state.selectedLayers[indicator.id];
+               gisportal.loadLayerState(layer_state);
+            }
             if(state.selectedRegionInfo){
                gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
                switch( state.selectedRegionInfo.method ){
@@ -875,6 +880,17 @@ gisportal.loadState = function(state) {
    view.setZoom(stateMap.zoom);
    view.setCenter(stateMap.centre);
 
+};
+
+gisportal.loadLayerState = function(layer_state){
+   if(layer_state.openTab){
+      var openTab = layer_state.openTab;
+      var id = layer_state.id;
+      var tabName = openTab.split(id + "-")[1];
+      $('.indicator-header[data-id="' + id + '"] + ul .js-tab-trigger:checked[id]').attr('id', openTab);
+      $('#' + openTab).prop('checked', true).change();
+      gisportal.indicatorsPanel.selectTab(id, tabName);
+   }
 };
 
 /**
