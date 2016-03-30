@@ -888,14 +888,14 @@ gisportal.loadState = function(state) {
 
 gisportal.loadLayerState = function(){
    if(gisportal.loadLayersState){
-      function setScaleValues(id, min, max, log){
+      var setScaleValues = function(id, min, max, log){
          // There is a further race condition because of the scalebar loading changing the min max.
          setTimeout(function(){
             $('.js-scale-min[data-id="' + id + '"]').val(min).trigger('change');
             $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
             $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log).trigger('change');
          }, 500);
-      }
+      };
       for(var layer in gisportal.loadLayersState){
          var layer_state = gisportal.loadLayersState[layer];
          var id = layer_state.id;
