@@ -861,6 +861,7 @@ gisportal.loadState = function(state) {
    
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
+      // This is always overwitten by 'gisportal.TimeLine.prototype.addTimeBar' so until the bit is removed that says 'Move asap. tidy up' this will not work correctly
       if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
    }
 

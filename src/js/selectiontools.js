@@ -251,7 +251,7 @@ gisportal.selectionTools.csvFound = function(formData){
    });
 };
 
-gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'featureProjection': gisportal.projection
@@ -276,6 +276,9 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
       }
    }
    gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+   if(selectedValue){
+      gisportal.methodThatSelectedCurrentRegion.value = selectedValue;
+   }
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {

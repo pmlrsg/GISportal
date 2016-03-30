@@ -588,7 +588,7 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
       dataType: 'json',
       success: function(data){
-         gisportal.selectionTools.loadGeoJSON(data);
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue);
       },
       error: function(e){
          gisportal.vectorLayer.getSource().clear();
