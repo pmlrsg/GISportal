@@ -733,6 +733,7 @@ gisportal.saveState = function(state) {
          state.selectedLayers[indicator.id] = {
             'id': indicator.id,
             'selected': indicator.selected,
+            'isVisible': indicator.isVisible,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
@@ -883,13 +884,21 @@ gisportal.loadState = function(state) {
 };
 
 gisportal.loadLayerState = function(layer_state){
+   var id = layer_state.id;
+   // This opens the tab that the user had open
    if(layer_state.openTab){
       var openTab = layer_state.openTab;
-      var id = layer_state.id;
       var tabName = openTab.split(id + "-")[1];
       // This is done because the "$('#tab-' + layerId + '-' + tabName)" element does not exist in select tab at the moment so it doesn't work
       setTimeout(function(){
          gisportal.indicatorsPanel.selectTab(id, tabName);
+      }, 1000);
+   }
+
+   //This sets the visibility of the layer to the same as what the user had before
+   if(layer_state.isVisible === false){
+      setTimeout(function(){
+         gisportal.indicatorsPanel.hideLayer(id);
       }, 1000);
    }
 };
