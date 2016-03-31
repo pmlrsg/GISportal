@@ -97,6 +97,15 @@ router.get('/app/settings/config', function(req, res) {
    res.send(js_file);
 });
 
+router.get('/app/settings/view', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var view_name = req.query.view;
+   var view_path = path.join(MASTER_CONFIG_PATH, domain, "views", view_name + ".json");
+   var view_file;
+   view_file = fs.readFileSync(view_path);
+   res.send(view_file);
+});
+
 router.get('/app/settings/get_owners', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);
