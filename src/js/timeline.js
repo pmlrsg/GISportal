@@ -486,7 +486,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
 
 gisportal.TimeLine.prototype.has = function(name)  {
-   var has = _.where(gisportal.timeline.timebars, function(d)  {
+   var has = _.filter(gisportal.timeline.timebars, function(d)  {
       return d.name.toLowerCase() === name.toLowerCase();
    });
 
