@@ -505,7 +505,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
          // For each tag name, if it has values then render the mustache
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
-         vals = _.unique(vals, function(d)  {
+         vals = _.uniq(vals, function(d)  {
             return d;
          });
          
