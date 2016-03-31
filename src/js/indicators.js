@@ -721,7 +721,7 @@ gisportal.indicatorsPanel.vectorStyleTab = function(id) {
             console.log(gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
             var indicator = gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty];
             indicator.zoomable = true;
-            if(gisportal.current_view){
+            if(gisportal.current_view && gisportal.current_view.noPan){
                indicator.zoomable = false;
             }
       var renderedStyleUI = gisportal.templates['vector-style-ui'](indicator);
@@ -750,7 +750,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       gisportal.indicatorsPanel.redrawScalebar(id);
 
       indicator.zoomable = true;
-      if(gisportal.current_view){
+      if(gisportal.current_view && gisportal.current_view.noPan){
          indicator.zoomable = false;
       }
       var rendered = gisportal.templates['tab-dimensions'](indicator);

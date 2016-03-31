@@ -215,7 +215,7 @@ gisportal.Vector = function(options) {
       }
       gisportal.vectorStyles.cache[this.id+"__"+prop] = opts;
       opts.zoomable = true;
-      if(gisportal.current_view){
+      if(gisportal.current_view && gisportal.current_view.noPan){
          opts.zoomable = false;
       }
       var renderedStyleUI = gisportal.templates['vector-style-ui'](opts);

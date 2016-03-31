@@ -738,8 +738,10 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
    }
    var filteredLayers = {};
    for(var layer in layers_obj){
-      if(_.isMatch(layers_obj[layer], layerFilter)){
-         filteredLayers[layer] = layers_obj[layer];
+      for(filter in layerFilter){
+         if(_.isMatch(layers_obj[layer], layerFilter[filter])){
+            filteredLayers[layer] = layers_obj[layer];
+         }
       }
    }
    gisportal.configurePanel.resetPanel(filteredLayers);
@@ -753,8 +755,10 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter){
       layers_obj = gisportal.layers;
    }
    for(var layer in layers_obj){
-      if(_.isMatch(layers_obj[layer], layerFilter)){
-         gisportal.refinePanel.layerFound(layer);
+      for(filter in layerFilter){
+         if(_.isMatch(layers_obj[layer], layerFilter[filter])){
+            gisportal.refinePanel.layerFound(layer);
+         }
       }
    }
 };
