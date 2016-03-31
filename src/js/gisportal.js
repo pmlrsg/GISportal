@@ -719,7 +719,8 @@ gisportal.saveState = function(state) {
    state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
    state.map.layers = {}; 
-   state.timeline = {}; 
+   state.timeline = {};
+   state.view = gisportal.current_view;
 
    // // Get the current layers and any settings/options for them.
    // var keys = gisportal.selectedLayers;
@@ -872,6 +873,9 @@ gisportal.loadState = function(state) {
    var view = map.getView();
    view.setZoom(stateMap.zoom);
    view.setCenter(stateMap.centre);
+   if(state.view){
+      gisportal.view.loadView(state.view.view_name);
+   }
 
 };
 

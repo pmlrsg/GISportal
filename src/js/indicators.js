@@ -1207,7 +1207,7 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       // Assume the old bbox style
       try{
          bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
-      }catch(e){
+      }catch(err){
          $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
       }
    }

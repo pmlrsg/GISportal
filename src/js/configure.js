@@ -297,6 +297,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
+      gisportal.view.removeView();
    });
 
    // Listener is added to the add layers button
@@ -366,6 +367,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
+      gisportal.view.removeView();
    });
 
    // Listener is added to the add layers button
@@ -725,6 +727,17 @@ gisportal.configurePanel.resetPanel = function(given_layers){
          }, 5000);
       }
    }
+};
+
+gisportal.configurePanel.filterLayers = function(layerFilter){
+   var filteredLayers = {};
+   gisportal.configurePanel.refreshData();
+   for(var layer in gisportal.layers){
+      if(_.isMatch(gisportal.layers[layer], layerFilter)){
+         filteredLayers[layer] = gisportal.layers[layer];
+      }
+   }
+   gisportal.configurePanel.resetPanel(filteredLayers);
 };
 
 

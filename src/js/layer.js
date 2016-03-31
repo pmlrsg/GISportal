@@ -336,7 +336,7 @@ gisportal.layer = function( options ) {
       } else {
          layer.setVisibility(true);
       }
-      if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
+      if (!gisportal.current_view && (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom)) {
          gisportal.zoomOverall();   
       }
       
