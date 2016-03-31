@@ -729,15 +729,34 @@ gisportal.configurePanel.resetPanel = function(given_layers){
    }
 };
 
-gisportal.configurePanel.filterLayers = function(layerFilter){
+gisportal.configurePanel.filterLayersList = function(layerFilter){
+   var layers_obj;
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
    var filteredLayers = {};
-   gisportal.configurePanel.refreshData();
-   for(var layer in gisportal.layers){
-      if(_.isMatch(gisportal.layers[layer], layerFilter)){
-         filteredLayers[layer] = gisportal.layers[layer];
+   for(var layer in layers_obj){
+      if(_.isMatch(layers_obj[layer], layerFilter)){
+         filteredLayers[layer] = layers_obj[layer];
       }
    }
    gisportal.configurePanel.resetPanel(filteredLayers);
+};
+
+gisportal.configurePanel.filterLayersLoad = function(layerFilter){
+   var layers_obj;
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
+   for(var layer in layers_obj){
+      if(_.isMatch(layers_obj[layer], layerFilter)){
+         gisportal.refinePanel.layerFound(layer);
+      }
+   }
 };
 
 

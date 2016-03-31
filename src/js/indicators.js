@@ -137,8 +137,9 @@ gisportal.indicatorsPanel.initDOM = function() {
    //  Zoom to data region
    $('.js-indicators').on('click', '.js-zoom-data', function() {
       var indicator = gisportal.layers[$(this).data('id')];
-      if (indicator === null)
+      if (indicator === null){
          return;
+      }
 
       var bbox = [
          parseFloat(indicator.exBoundingBox.WestBoundLongitude),
@@ -718,7 +719,12 @@ gisportal.indicatorsPanel.vectorStyleTab = function(id) {
          if(id+"__"+layer.defaultProperty in gisportal.vectorStyles.cache) {
             gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty].unit = layer.unit;
             console.log(gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
-      var renderedStyleUI = gisportal.templates['vector-style-ui'](gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
+            var indicator = gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty];
+            indicator.zoomable = true;
+            if(gisportal.current_view){
+               indicator.zoomable = false;
+            }
+      var renderedStyleUI = gisportal.templates['vector-style-ui'](indicator);
       $('[data-id="' + layer.id + '"] .dimensions-tab .vector-style-container').html(renderedStyleUI);
    }
 };
@@ -743,6 +749,10 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       gisportal.indicatorsPanel.redrawScalebar(id);
 
+      indicator.zoomable = true;
+      if(gisportal.current_view){
+         indicator.zoomable = false;
+      }
       var rendered = gisportal.templates['tab-dimensions'](indicator);
 
       $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);

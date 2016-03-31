@@ -7,6 +7,7 @@ gisportal.view.loadView = function(view_name){
          data = JSON.parse(data);
          data.view_name = view_name;
          gisportal.current_view = data;
+         $('.hide-when-view').toggleClass('hidden', true);
          if(data.bounds){
             var extent = gisportal.reprojectBoundingBox(data.bounds, 'EPSG:4326', gisportal.projection);
             map.getView().fit(extent, map.getSize());
@@ -40,8 +41,12 @@ gisportal.view.loadView = function(view_name){
             }
          }
 
-         if(data.layerFilter){
-            gisportal.configurePanel.filterLayers(data.layerFilter);
+         // Loads the list and displayed layers that are filtered
+         if(data.layerListFilter){
+            gisportal.configurePanel.filterLayersList(data.layerListFilter);
+         }
+         if(data.layerLoadFilter){
+            gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter);
          }
       }
    });
@@ -53,5 +58,7 @@ gisportal.view.removeView = function(view_name){
    map.getInteractions().forEach(function(interaction) {
       interaction.setActive(true);
    }, this);
+
+   $('.hide-when-view').toggleClass('hidden', false);
 
 };
