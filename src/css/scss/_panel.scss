@@ -352,6 +352,11 @@ select,
   height: 35px;
 }
 
+/* Disabled options cannot be the same colour as the rest it seems :S */
+option:disabled{
+  color: darken( $selector-text, 1% );
+}
+
 select.users-geojson-files{
   text-transform: none;
 }
