@@ -73,7 +73,7 @@ gisportal.view.loadView = function(view_name){
    });
 };
 
-gisportal.view.removeView = function(){
+gisportal.view.removeView = function(resetBool){
    gisportal.current_view = null;
    // Activates all of the interactions again
    map.getInteractions().forEach(function(interaction) {
@@ -82,5 +82,7 @@ gisportal.view.removeView = function(){
 
    $('.hide-when-view').toggleClass('hidden', false);
    $('.view-title p').html("").parent().toggleClass('hidden', true);
-   gisportal.configurePanel.resetPanel();
+   if(resetBool !== false){
+      gisportal.configurePanel.resetPanel(null, false);
+   }
 };

@@ -23,7 +23,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
       if(_.size(gisportal.given_layers) >= 1){
          try{
             gisportal.configurePanel.resetPanel(gisportal.given_layers);
-            gisportal.view.removeView();
+            gisportal.view.removeView(false);
          }
          catch(e){
             $.notify("Sorry:\nThere was an error loading " + given_layers[0].id + " : " + e, "error");

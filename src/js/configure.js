@@ -56,7 +56,7 @@ gisportal.configurePanel.loadViewList = function(){
          }else{
             $('li.views-list').toggleClass('hidden', true);
          }
-      }
+      },
       error: function(error) {
          $('li.views-list').toggleClass('hidden', true);
       }
@@ -721,7 +721,7 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
  * If no layers are given then it resets to the original layers.
  * @param {Object} given_layers - The layers you want to be loaded or NULL.
  */
-gisportal.configurePanel.resetPanel = function(given_layers){
+gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
    if(given_layers){
       // Either add layers to the original or stores the layers if it is undefined
       gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
@@ -739,16 +739,18 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.storage.set("server_info", undefined);
       gisportal.storage.set("form_info", undefined);
       // Ensures the panel is only reset when it really needs to be
-      if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
+      if(gisportal.original_layers && _.size(gisportal.original_layers) > 0 && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
          gisportal.original_layers = {};
          gisportal.loadBrowseCategories();
          gisportal.configurePanel.refreshData();
-         $('.filtered-list-message').hide();
-         $('.unfiltered-list-message').show();
-         setTimeout(function(){
-            $('.unfiltered-list-message').slideUp('slow');
-         }, 5000);
+         if(showMessageBool !== false){
+            $('.filtered-list-message').hide();
+            $('.unfiltered-list-message').show();
+            setTimeout(function(){
+               $('.unfiltered-list-message').slideUp('slow');
+            }, 5000);
+         }
       }
    }
 };
