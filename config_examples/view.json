@@ -5,6 +5,8 @@
 
 
 
+   "_comment":"The title of the view for the user to see",
+   "title": "Example View",
 
 	"_comment":"The bounds of the area you would like the view to zoom to",
    "bounds": [-10.723,49.219,2.637,62.402],

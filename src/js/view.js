@@ -3,8 +3,19 @@ gisportal.view = {};
 gisportal.view.loadView = function(view_name){
    $.ajax({
       url: gisportal.middlewarePath + '/settings/view?view=' + view_name,
+      dataType: 'json',
       success: function(data) {
-         data = JSON.parse(data);
+         var title = view_name;
+         if(data.title){
+            title = data.title;
+         }
+         $('.view-title p').html(title + " view").parent().toggleClass('hidden', false);
+
+         // This listener is added the the remove view span (button)
+         $('.view-title span.remove-view').off('click');
+         $('.view-title span.remove-view').on('click', function(){
+            gisportal.view.removeView();
+         });
          data.view_name = view_name;
          gisportal.current_view = data;
          $('.hide-when-view').toggleClass('hidden', true);
@@ -48,11 +59,20 @@ gisportal.view.loadView = function(view_name){
          if(data.layerLoadFilter){
             gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter);
          }
+      },
+      error: function(err, reason) {
+         if(err.status === 404){
+            $.notify(view_name + " could not be found in views", "error");
+         }else if(reason == 'parsererror'){
+            $.notify(view_name + " could not be parsed", "error");
+         }else{
+            $.notify("Unable to load that " + view_name + ", The server returned: " + err.statusText, "error");
+         }
       }
    });
 };
 
-gisportal.view.removeView = function(view_name){
+gisportal.view.removeView = function(){
    gisportal.current_view = null;
    // Activates all of the interactions again
    map.getInteractions().forEach(function(interaction) {
@@ -60,5 +80,5 @@ gisportal.view.removeView = function(view_name){
    }, this);
 
    $('.hide-when-view').toggleClass('hidden', false);
-
+   $('.view-title p').html("").parent().toggleClass('hidden', true);
 };

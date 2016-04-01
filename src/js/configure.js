@@ -738,7 +738,7 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
    }
    var filteredLayers = {};
    for(var layer in layers_obj){
-      for(filter in layerFilter){
+      for(var filter in layerFilter){
          if(_.isMatch(layers_obj[layer], layerFilter[filter])){
             filteredLayers[layer] = layers_obj[layer];
          }
@@ -755,7 +755,7 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter){
       layers_obj = gisportal.layers;
    }
    for(var layer in layers_obj){
-      for(filter in layerFilter){
+      for(var filter in layerFilter){
          if(_.isMatch(layers_obj[layer], layerFilter[filter])){
             gisportal.refinePanel.layerFound(layer);
          }
