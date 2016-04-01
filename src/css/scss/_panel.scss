@@ -313,7 +313,7 @@
 }
 
 a.refine-remove:hover {
-  background-color: #D8D3DD;
+  background-color: $general-border;
 }
 
 .refined-tag { 
@@ -335,9 +335,9 @@ select,
 .indicator-dropdown {
   background: white;
   border-style: none;
-  border: 1px solid #d8d3dd;
+  border: 1px solid $general-border;
   border-radius: 0;
-  color: #8a7b9b;
+  color: $selector-text;
   display: block;
   /*-webkit-appearance: none;
   -moz-appearance: none;*/
@@ -430,7 +430,7 @@ select.users-geojson-files{
 }
 
 input.search  {
-   border: 1px solid #d8d3dd;
+   border: 1px solid $general-border;
    display: inline-block;
    height: 45px;
    padding: 5px;
