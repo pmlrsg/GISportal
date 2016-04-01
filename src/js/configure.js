@@ -31,9 +31,35 @@ gisportal.configurePanel.refreshData = function()  {
       this.renderIndicatorsAsSimpleList();
    }
 
+   gisportal.configurePanel.loadViewList();
 
    $('#configurePanel').bind('scroll', function() {
      gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop());
+   });
+};
+
+gisportal.configurePanel.loadViewList = function(){
+   $.ajax({
+      url: gisportal.middlewarePath + '/settings/get_views',
+      dataType: 'json',
+      success: function(data) {
+         if(_.size(data) > 0){
+            $('li.views-list').toggleClass('hidden', false);
+            $('select.js-views-list').html("<option value='default' selected disabled>Please select a view...</option>");
+            for(var view in data){
+               $('select.js-views-list').append("<option value='" + view + "'>" + data[view] + "</option>");
+            }
+            $('select.js-views-list').off('change');
+            $('select.js-views-list').on('change', function(){
+               gisportal.view.loadView($(this).val());
+            });
+         }else{
+            $('li.views-list').toggleClass('hidden', true);
+         }
+      }
+      error: function(error) {
+         $('li.views-list').toggleClass('hidden', true);
+      }
    });
 };
 
@@ -297,7 +323,6 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.view.removeView();
    });
 
    // Listener is added to the add layers button
@@ -367,7 +392,6 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.view.removeView();
    });
 
    // Listener is added to the add layers button
@@ -748,7 +772,7 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
 };
 
 gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilter){
-   var layers_obj;
+   var layers_obj, layer, filter;
    // This is required if the user loads a view when they have loaded some external layers using the interface
    if(_.size(gisportal.original_layers) > 0){
       layers_obj = gisportal.original_layers;
@@ -758,8 +782,8 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilte
    // Makes sure that it only uses the filtered list of indicators
    var filteredLayers = {};
    if(layerListFilter){
-      for(var layer in layers_obj){
-         for(var filter in layerListFilter){
+      for(layer in layers_obj){
+         for(filter in layerListFilter){
             if(_.isMatch(layers_obj[layer], layerListFilter[filter])){
                filteredLayers[layer] = layers_obj[layer];
             }
@@ -768,8 +792,8 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilte
    }else{
       filteredLayers = layers_obj;
    }
-   for(var layer in filteredLayers){
-      for(var filter in layerFilter){
+   for(layer in filteredLayers){
+      for(filter in layerFilter){
          if(_.isMatch(filteredLayers[layer], layerFilter[filter])){
             gisportal.refinePanel.layerFound(layer);
          }

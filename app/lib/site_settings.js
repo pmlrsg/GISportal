@@ -110,6 +110,34 @@ router.get('/app/settings/view', function(req, res) {
    }
 });
 
+router.get('/app/settings/get_views', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var views_path = path.join(MASTER_CONFIG_PATH, domain, "views");
+
+   if(!utils.directoryExists(views_path)){
+      res.status(404).send();
+      return;
+   }
+
+   var views_obj = {};
+   var views_list = fs.readdirSync(views_path); // The list of files and folders in the master_cache folder
+   views_list.forEach(function(filename){
+      var view_path = path.join(views_path, filename);
+
+      if(utils.fileExists(view_path)){
+         view_file = fs.readFileSync(view_path);
+         try{
+            var niceName = filename.replace('.json', "")
+            views_obj[niceName] = JSON.parse(view_file).title || niceName;
+         }catch(e){};
+      }
+   });
+
+   res.send(views_obj);
+
+});
+
 router.get('/app/settings/get_owners', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);

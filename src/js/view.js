@@ -82,4 +82,5 @@ gisportal.view.removeView = function(){
 
    $('.hide-when-view').toggleClass('hidden', false);
    $('.view-title p').html("").parent().toggleClass('hidden', true);
+   gisportal.configurePanel.resetPanel();
 };
