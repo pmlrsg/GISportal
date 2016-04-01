@@ -55,9 +55,10 @@ gisportal.view.loadView = function(view_name){
          // Loads the list and displayed layers that are filtered
          if(data.layerListFilter){
             gisportal.configurePanel.filterLayersList(data.layerListFilter);
+            $('.filtered-list-message').toggleClass('hidden', true);
          }
          if(data.layerLoadFilter){
-            gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter);
+            gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter, data.layerListFilter);
          }
       },
       error: function(err, reason) {
