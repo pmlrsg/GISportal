@@ -554,8 +554,6 @@ gisportal.mapInit = function() {
       $('.users-geojson-files').val("default");
    });
 
-   map.addInteraction(new ol.interaction.DragPan({}));
-
    //add a click event to get the clicked point's data reading
     map.on('singleclick', function(e) {
         var isFeature = false;

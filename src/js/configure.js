@@ -707,6 +707,9 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
+      if(_.size(given_layers) == 1){
+         gisportal.refinePanel.layerFound(_.keys(given_layers)[0]);
+      }
    }else{
       // Removes all changes made to the info 
       gisportal.storage.set("layers_list", undefined);

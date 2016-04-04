@@ -1205,7 +1205,11 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    }catch( e ){
       // Assume the old bbox style
-      bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
+      try{
+         bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
+      }catch(e){
+         $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
+      }
    }
 
    var current_proj = gisportal.projection;
