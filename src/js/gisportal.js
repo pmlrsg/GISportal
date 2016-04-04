@@ -680,7 +680,7 @@ gisportal.nonLayerDependent = function() {
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
-      selectedDate: new Date("2015-06-05T00:00:00Z"),
+      selectedDate: new Date("1900-01-01T00:00:00Z"),
       chartMargins: {
          top: 7,
          right: 0,
@@ -859,8 +859,9 @@ gisportal.loadState = function(state) {
    
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
-      // This is always overwitten by 'gisportal.TimeLine.prototype.addTimeBar' so until the bit is removed that says 'Move asap. tidy up' this will not work correctly
-      if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
+      if (stateMap.date) {
+         gisportal.timeline.setDate(new Date(stateMap.date));
+      }
    }
 
    if (stateMap.baselayer) {
