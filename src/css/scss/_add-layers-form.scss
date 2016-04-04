@@ -13,7 +13,7 @@
 }
 
 .form-header{
-  background-color: #59476d;
+  background-color: $panel-content-header;
   color: #fff;
   line-height: 1.5;
   padding: 10px 15px; 
@@ -61,7 +61,7 @@
 }
 
 .pagination>li>a:hover, .pagination>li>span:hover {
-  background-color: #59476d;
+  background-color: $panel-content-header;
 }
 
 .pagination>li>a, .pagination>li>span {
@@ -72,7 +72,7 @@
    line-height: 1.42857143;
    color: #fff;
    text-decoration: none;
-   background-color: #b1a7bc;
+   background-color: $secondary-background;
    border: 1px solid #ddd;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .pagination>.disabled>a, .pagination>.disabled>a:focus, .pagination>.disabled>a:hover, .pagination>.disabled>span, .pagination>.disabled>span:focus, .pagination>.disabled>span:hover {
-   color: #b1a7bc;
+   color: $secondary-background;
    background-color: #fff;
    border-color: #ddd;
    cursor: default;
