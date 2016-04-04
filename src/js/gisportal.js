@@ -696,17 +696,16 @@ gisportal.nonLayerDependent = function() {
 /*===========================================================================*/
 
 gisportal.autoSaveState = function(){
-   var saved_state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ));
-   saved_state[gisportal.niceDomainName] = gisportal.saveState();
-   gisportal.storage.set( 'stateAutoSave', JSON.stringify(saved_state) );
+   var state = JSON.stringify(gisportal.saveState());
+   gisportal.storage.set( gisportal.niceDomainName + '_state', state );
 };
 
 gisportal.getAutoSaveState = function(){
-   var state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ))[gisportal.niceDomainName];
+   var state = JSON.parse(gisportal.storage.get( gisportal.niceDomainName + '_state' ));
    return state;
 };
 gisportal.hasAutoSaveState = function(){
-   return ( gisportal.storage.get( 'stateAutoSave' ) !== null && JSON.parse(gisportal.storage.get( 'stateAutoSave' ))[gisportal.niceDomainName] !== undefined );
+   return ( gisportal.storage.get( gisportal.niceDomainName + '_state' ) !== null );
 };
 
 /**
