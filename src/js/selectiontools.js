@@ -406,6 +406,9 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().clear();
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
+      if(!gisportal.current_view || !gisportal.current_view.noPan){
+         map.getView().fit(this_feature.getGeometry().getExtent(), map.getSize());
+      }
       return;
    }catch(e){
       if(this_bounds){
