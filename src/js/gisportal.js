@@ -775,9 +775,13 @@ gisportal.saveState = function(state) {
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
+
    if(gisportal.graphs.activePlotSlideout.hasClass('show-all') || gisportal.graphs.activePlotSlideout.hasClass('show-peak')){
       state.graphs.state_plot = gisportal.graphs.activePlotEditor.plot();
       state.graphs.state_plot.show_all = gisportal.graphs.activePlotSlideout.hasClass('show-all');
+   }
+   if(gisportal.graphs.storedGraphs.length > 0){
+      state.graphs.storedGraphs = gisportal.graphs.storedGraphs;
    }
 
    return state;
@@ -954,21 +958,35 @@ gisportal.loadLayerState = function(){
 };
 
 gisportal.loadGraphsState = function(graphState){
+   var plot;
+   if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
+      for(var graph in graphState.storedGraphs){
+         plot = graphState.storedGraphs[graph];
+         $.ajax({
+            url: "plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
+            dataType:'json',
+            success: function( data ){
+               if(data.state == "complete"){
+                  plot.noCopyEdit = true;
+                  plot.state = function(){
+                     return "complete";
+                  };
+                  plot.title = function(){
+                     return this._title;
+                  };
+                  var rendered = gisportal.templates['plot-status']( plot );
+                  gisportal.graphs.addButtonListeners(gisportal.graphs.graphsHistoryList.prepend(rendered), noCopyEdit = true);
+                  gisportal.graphs.storedGraphs.push(graphState.storedGraphs[graph]);
+               }
+            }
+         });
+      }
+   }
    if(graphState.state_plot){
-      
+      var time;
       var state_plot = graphState.state_plot;
-      var Plot = gisportal.graphs.Plot;
-      var plot = new Plot();
 
-      plot._components = state_plot._components;
-      plot._createdOn = state_plot._createdOn;
-      plot._dateRangeBounds = state_plot._dateRangeBounds;
-      plot._plotType = state_plot._plotType;
-      plot._state = state_plot._state;
-      plot._tBounds = state_plot._tBounds;
-      plot._title = state_plot._title;
-      plot.maxComponents = state_plot.maxComponents;
-      plot.minComponents = state_plot.minComponents;
+      plot = gisportal.graphs.createPlotFromState(state_plot);
       // Makes the lists dates instaead of date strings
       for(time in plot._dateRangeBounds){
          plot._dateRangeBounds[time] = new Date(plot._dateRangeBounds[time]);
@@ -976,7 +994,6 @@ gisportal.loadGraphsState = function(graphState){
       for(time in plot._tBounds){
          plot._tBounds[time] = new Date(plot._tBounds[time]);
       }
-
       gisportal.graphs.editPlot(plot);
       if(!state_plot.show_all){
          gisportal.panelSlideout.peakSlideout( 'active-plot' );

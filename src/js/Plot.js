@@ -486,6 +486,7 @@ gisportal.graphs.Plot =(function(){
             // Do the polling!
             _this.id = data.hash;
             _this.monitorJobStatus();
+            gisportal.graphs.storedGraphs.push({id: data.hash, _title: _this._title});
          }, error: function(e){
             var error = 'Sorry, we failed to create a graph: \n'+
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
@@ -865,5 +866,22 @@ gisportal.graphs.Plot =(function(){
    
    
    return Plot;
-})(); 
+})();
+
+gisportal.graphs.createPlotFromState = function(plotState){
+   var Plot = gisportal.graphs.Plot;
+   var plot = new Plot();
+
+   plot._components = plotState._components;
+   plot._createdOn = plotState._createdOn;
+   plot._dateRangeBounds = plotState._dateRangeBounds;
+   plot._plotType = plotState._plotType;
+   plot._state = plotState._state;
+   plot._tBounds = plotState._tBounds;
+   plot._title = plotState._title;
+   plot.maxComponents = plotState.maxComponents;
+   plot.minComponents = plotState.minComponents;
+
+   return plot;
+};
 
