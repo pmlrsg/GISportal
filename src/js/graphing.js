@@ -33,8 +33,12 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var plot = new Plot();
       gisportal.graphs.editPlot( plot );
       var plotType = "timeseries";
-      if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
+      var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;
+      if(bboxMethod == "csvUpload"){
          plotType = "transect";
+      }
+      if(bboxMethod == "geoJSONSelect"){
+         component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;
       }
       plot.plotType( plotType );
       // These variables are set so that the correct drop downs are loaded in the first place.

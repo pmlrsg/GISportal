@@ -779,7 +779,6 @@ gisportal.saveState = function(state) {
       state.graphs.state_plot = gisportal.graphs.activePlotEditor.plot();
       state.graphs.state_plot.show_all = gisportal.graphs.activePlotSlideout.hasClass('show-all');
    }
-   state.graphs.graphsHistoryList = gisportal.graphs.graphsHistoryList.html();
 
    return state;
 };
@@ -821,8 +820,10 @@ gisportal.loadState = function(state) {
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
             indicator.preventAutoZoom = true;
-            indicator.minScaleVal = state_indicator.minScaleVal;
-            indicator.maxScaleVal = state_indicator.maxScaleVal;
+            if(state_indicator){
+               indicator.minScaleVal = state_indicator.minScaleVal;
+               indicator.maxScaleVal = state_indicator.maxScaleVal;
+            }
             gisportal.indicatorsPanel.selectLayer(indicator.id);
             gisportal.indicatorsPanel.addToPanel({id:indicator.id});
             if(state.selectedRegionInfo){
@@ -903,7 +904,9 @@ gisportal.loadState = function(state) {
    view.setCenter(stateMap.centre);
 
    //Adding the graph state
-   gisportal.loadGraphsState(state.graphs);
+   if(state.graphs){
+      gisportal.loadGraphsState(state.graphs);
+   }
 
 };
 
@@ -951,9 +954,6 @@ gisportal.loadLayerState = function(){
 };
 
 gisportal.loadGraphsState = function(graphState){
-   if(graphState.graphsHistoryList){
-      gisportal.graphs.graphsHistoryList.html(graphState.graphsHistoryList);
-   }
    if(graphState.state_plot){
       
       var state_plot = graphState.state_plot;
@@ -967,8 +967,8 @@ gisportal.loadGraphsState = function(graphState){
       plot._state = state_plot._state;
       plot._tBounds = state_plot._tBounds;
       plot._title = state_plot._title;
-      plot._maxComponents = state_plot._maxComponents;
-      plot._minComponents = state_plot._minComponents;
+      plot.maxComponents = state_plot.maxComponents;
+      plot.minComponents = state_plot.minComponents;
       // Makes the lists dates instaead of date strings
       for(time in plot._dateRangeBounds){
          plot._dateRangeBounds[time] = new Date(plot._dateRangeBounds[time]);

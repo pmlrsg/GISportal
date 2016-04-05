@@ -60,7 +60,7 @@ gisportal.graphs.Plot =(function(){
    * }
    * 
    */
-   Plot.prototype.addComponent= function( component ){
+   Plot.prototype.addComponent = function( component ){
       // Check the plot type id allowed more then 1 series
       if(this.components().length >= this.maxComponents )
          return new Error( "You already have the maximum number of series for this graph type" );
@@ -317,12 +317,13 @@ gisportal.graphs.Plot =(function(){
          var layer = gisportal.layers[ component.indicator ];
 
          // Add the drop down meta data
+         var bbox_name = component.bboxName || component.bbox;
          var meta = "";
          meta += "Region: " + layer.tags.region + "<br>";
          meta += "Confidence: " + layer.tags.Confidence + "<br>";
          meta += "Provider: " + layer.providerTag + "<br>";
          meta += "Interval: " + layer.tags.interval + "<br>";
-         meta += "Bounding Box: " + component.bbox + "<br>";
+         meta += "Bounding Box: " + bbox_name + "<br>";
 
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
