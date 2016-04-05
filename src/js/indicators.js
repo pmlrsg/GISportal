@@ -83,6 +83,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scalevalues > input[type="checkbox"]', function() {
       var id = $(this).data('id');
+      // This removed the min val in the layer so that the data is refreshed on the map
+      gisportal.layers[id].minScaleVal = null;
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
@@ -103,7 +105,10 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Auto scale range
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
-      gisportal.layers[id].autoScale = $(this).prop('checked');
+      var layer = gisportal.layers[id];
+      layer.minScaleVal = null;
+      layer.maxScaleVal = null;
+      layer.autoScale = $(this).prop('checked');
       gisportal.scalebars.autoScale(id);
       gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'));
    });
@@ -554,8 +559,7 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
 gisportal.indicatorsPanel.analysisTab = function(id) {
    //console.log("adding analysis");
    var indicator = gisportal.layers[id];
-
-   var onMetadata = function() {
+   var onMetadata = function(){
       //console.log("in Onmetdata");
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
@@ -575,11 +579,9 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
       gisportal.indicatorsPanel.addAnalysisListeners();
       gisportal.indicatorsPanel.populateShapeSelect();
-
    };
-
-   if (indicator.metadataComplete) onMetadata();
-   else indicator.metadataQueue.push(onMetadata);
+   if(indicator.metadataComplete) onMetadata();
+   else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
 
 };
 
@@ -725,7 +727,8 @@ gisportal.indicatorsPanel.vectorStyleTab = function(id) {
 
 gisportal.indicatorsPanel.scalebarTab = function(id) {
    var layer = gisportal.layers[id];
-   var onMetadata = function() {
+   
+   var onMetadata = function(){
       //console.log("inside on metadata");
       var indicator = gisportal.layers[id];
       if (indicator.elevationCache && indicator.elevationCache.length > 0) {
@@ -799,20 +802,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
             }
          }
       });
-      
-      // $('#tab-' + indicator.id + '-layer-style').on('change', function() {
-      //    var value = $(this).val();
-      //    indicator.style = value;
-      //    indicator.mergeNewParams({
-      //       styles: value
-      //    });
-      //    gisportal.indicatorsPanel.scalebarTab(id);
-
-      // });
    };
-
-   if (layer.metadataComplete) onMetadata();
-   else layer.metadataQueue.push(onMetadata);
+   if(layer.metadataComplete) onMetadata();
+   else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
 };
 
 // Needs a refactor

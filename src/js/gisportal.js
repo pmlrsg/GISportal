@@ -182,7 +182,6 @@ gisportal.createVectorLayers = function() {
          "tags" : vector.tags,
          "id" : vector.id,
          "exBoundingBox" : vector.exBoundingBox,
-         "metadataQueue" : [],
          "abstract" : vector.abstract,
          "provider" : vector.provider,
          "contactInfo" : {
@@ -338,7 +337,7 @@ gisportal.createOpLayers = function() {
       gisportal.configurePanel.refreshData();
    }
 
-   gisportal.events.trigger('layers-loaded');
+   gisportal.events.trigger('available-layers-loaded');
 };
 
 /**
@@ -813,10 +812,14 @@ gisportal.loadState = function(state) {
          if(indicator.serviceType == "WFS"){
             console.log("Please load the vector properly");
          }else{
+            var state_indicator = state.selectedLayers[indicator.id];
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
             indicator.preventAutoZoom = true;
-            gisportal.refinePanel.layerFound(indicator.id);
+            indicator.minScaleVal = state_indicator.minScaleVal;
+            indicator.maxScaleVal = state_indicator.maxScaleVal;
+            gisportal.indicatorsPanel.selectLayer(indicator.id);
+            gisportal.indicatorsPanel.addToPanel({id:indicator.id});
             if(state.selectedRegionInfo){
                gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
                switch( state.selectedRegionInfo.method ){
@@ -843,8 +846,19 @@ gisportal.loadState = function(state) {
    if(state.selectedLayers){
       gisportal.loadLayersState = state.selectedLayers;
    }
-   // TODO: Find a place for this where the layers have been loaded properly from the state and then take the timout off
-   setTimeout(gisportal.loadLayerState, 1000);
+
+   gisportal.state_indicators_list = state.selectedIndicators;
+
+   // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
+   gisportal.events.bind('layer.metadataLoaded', function(event, id){
+      var index = gisportal.state_indicators_list.indexOf(id);
+      if(index > -1){
+         state.selectedIndicators.pop(index);
+      }
+      if(state.selectedIndicators.length == 0){
+         gisportal.loadLayerState();
+      }
+   });
    
    // Create the feature if there is one
    if (stateMap.feature) {    // Array.<ol.Feature>
@@ -888,12 +902,9 @@ gisportal.loadState = function(state) {
 gisportal.loadLayerState = function(){
    if(gisportal.loadLayersState){
       var setScaleValues = function(id, min, max, log){
-         // There is a further race condition because of the scalebar loading changing the min max.
-         setTimeout(function(){
-            $('.js-scale-min[data-id="' + id + '"]').val(min).trigger('change');
-            $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
-            $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log).trigger('change');
-         }, 500);
+         $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log);
+         $('.js-scale-min[data-id="' + id + '"]').val(min);
+         $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
       };
       for(var layer in gisportal.loadLayersState){
          var layer_state = gisportal.loadLayersState[layer];
