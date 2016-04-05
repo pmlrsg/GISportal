@@ -720,6 +720,7 @@ gisportal.saveState = function(state) {
    state.selectedLayers = {}; 
    state.timeline = {};
    state.graphs = {};
+   state.panel = {};
 
    // Get the current layers and any settings/options for them.
    var keys = gisportal.selectedLayers;
@@ -783,6 +784,8 @@ gisportal.saveState = function(state) {
    if(gisportal.graphs.storedGraphs.length > 0){
       state.graphs.storedGraphs = gisportal.graphs.storedGraphs;
    }
+
+   state.panel.activePanel = gisportal.panels.activePanel;
 
    return state;
 };
@@ -910,6 +913,10 @@ gisportal.loadState = function(state) {
    //Adding the graph state
    if(state.graphs){
       gisportal.loadGraphsState(state.graphs);
+   }
+
+   if(state.panel && state.panel.activePanel){
+      gisportal.panels.showPanel(state.panel.activePanel)
    }
 
 };
