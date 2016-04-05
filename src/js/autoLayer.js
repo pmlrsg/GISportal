@@ -1,8 +1,18 @@
 gisportal.autoLayer = {};
 gisportal.autoLayer.TriedToAddLayer = false;
+gisportal.autoLayer.viewLoaded = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
+   if(gisportal.utils.getURLParameter('view') && !gisportal.autoLayer.viewLoaded){
+      gisportal.autoLayer.viewLoaded = true;
+      gisportal.view.loadView(gisportal.utils.getURLParameter('view'));
+      return;
+   }
+   // If there is a view other layers will not be loaded
+   if(gisportal.current_view){
+      return;
+   }
    gisportal.autoLayer.urlLoad = false; // If the wms information is being loaded from the URL (first time) or the text box.
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(!gisportal.autoLayer.given_wms_url && gisportal.utils.getURLParameter('wms_url')){

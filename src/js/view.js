@@ -26,11 +26,14 @@ gisportal.view.loadView = function(view_name){
          // Gets interactions to be potentially removed
          var dragPan = null;
          var wheelZoom = null;
+         var doubleClickZoom = null;
          map.getInteractions().forEach(function(interaction) {
             if (interaction instanceof ol.interaction.DragPan) {
                dragPan = interaction;
             }else if (interaction instanceof ol.interaction.MouseWheelZoom) {
                wheelZoom = interaction;
+            }else if(interaction instanceof ol.interaction.DoubleClickZoom){
+               doubleClickZoom = interaction;
             }
          }, this);
 
@@ -47,9 +50,11 @@ gisportal.view.loadView = function(view_name){
          if(wheelZoom){
             if(data.noZoom){
                wheelZoom.setActive(false);
+               doubleClickZoom.setActive(false);
                $('.ol-zoom').toggleClass('hidden', true);
             }else{
                wheelZoom.setActive(true);
+               doubleClickZoom.setActive(true);
                $('.ol-zoom').toggleClass('hidden', false);
             }
          }
@@ -62,6 +67,7 @@ gisportal.view.loadView = function(view_name){
          if(data.layerLoadFilter){
             gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter, data.layerListFilter);
          }
+         $('.add-wms-form').toggleClass('hidden', true);
       },
       error: function(err, reason) {
          if(err.status === 404){
@@ -85,6 +91,7 @@ gisportal.view.removeView = function(resetBool){
 
    $('.hide-when-view').toggleClass('hidden', false);
    $('.view-title p').html("").parent().toggleClass('hidden', true);
+   $('.add-wms-form').toggleClass('hidden', false);
    if(resetBool !== false){
       gisportal.configurePanel.resetPanel(null, false);
    }
