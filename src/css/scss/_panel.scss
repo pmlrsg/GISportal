@@ -314,7 +314,7 @@ div.js-views-list {
 }
 
 a.refine-remove:hover {
-  background-color: #D8D3DD;
+  background-color: $general-border;
 }
 
 .refined-tag { 
@@ -336,7 +336,7 @@ select,
 .indicator-dropdown {
   background: white;
   border-style: none;
-  border: 1px solid #d8d3dd;
+  border: 1px solid $general-border;
   border-radius: 0;
   color: $selector-text;
   display: block;
@@ -351,6 +351,11 @@ select,
   margin-top: 9px;
   width: 100%;
   height: 35px;
+}
+
+/* Disabled options cannot be the same colour as the rest it seems :S */
+option:disabled{
+  color: darken( $selector-text, 1% );
 }
 
 select.users-geojson-files{
@@ -431,7 +436,7 @@ select.users-geojson-files{
 }
 
 input.search  {
-   border: 1px solid #d8d3dd;
+   border: 1px solid $general-border;
    display: inline-block;
    height: 45px;
    padding: 5px;

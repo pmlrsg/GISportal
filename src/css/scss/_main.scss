@@ -77,7 +77,7 @@ button, .btn{
 }
 
 .brand.secondary:active  {
-   background-color: #59476d;
+   background-color: $panel-content-header;
 }
 
 .secondary svg  {
@@ -98,7 +98,7 @@ button, .btn{
 
 .brand:active,
 .brand.loading {
-   background-color: #bab67c;
+   background-color: $button-border;
 }
 
 .brand.loading  {
@@ -127,7 +127,7 @@ button, .btn{
 
 .dropdown li  {
   background-color: #f7f6f8;
-  border-bottom: 1px solid #d8d3dd;
+  border-bottom: 1px solid $general-border;
   border-top: 1px solid #fff;
 }
 
@@ -145,8 +145,8 @@ button, .btn{
 input[type="text"] , textarea  {
   font-family: "Open Sans";
   background-color: #fff;
-  border: 1px solid #d8d3dd;
-  color: #8a7b9b;
+  border: 1px solid $general-border;
+  color: $selector-text;
   height: 35px;
   padding-left: 10px;
   width: 100%;
@@ -278,7 +278,7 @@ dd {
 .dd-desc { color:#aaa; display:block; overflow: hidden; font-weight:normal; line-height: 1.4em; }
 .dd-selected{ overflow:hidden; display:block; padding:10px; color: $selector-text;}
 .dd-pointer{ width:0; height:0; position:absolute; right:14px; top:50%; margin-top:-8px;}
-.dd-pointer-down{ border-right: 1px solid #8a7b9b; border-bottom:1px solid #8a7b9b; width:12px; height:12px; transform: rotate(45deg); -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg);}
+.dd-pointer-down{ border-right: 1px solid $general-border; border-bottom:1px solid $general-border; width:12px; height:12px; transform: rotate(45deg); -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg);}
 .dd-pointer-up{ border-right:1px solid #fff; border-bottom:1px solid #fff; width:12px; height:12px; transform: rotate(-135deg); -webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); margin-top: -2px; }
 .dd-options{ border:solid 1px #ccc; border-top:none; list-style:none; box-shadow:0px 1px 5px #ddd; display:none; z-index:2000; margin:0; padding:0;background:#fff; overflow:auto; }
 .dd-option{ padding:10px; display:block; border-bottom:solid 1px #ddd; overflow:hidden; text-decoration:none; color:#333; cursor:pointer;-webkit-transition: all 0.25s ease-in-out; -moz-transition: all 0.25s ease-in-out;-o-transition: all 0.25s ease-in-out;-ms-transition: all 0.25s ease-in-out; }
