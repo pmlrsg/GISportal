@@ -966,29 +966,6 @@ gisportal.loadLayerState = function(){
 
 gisportal.loadGraphsState = function(graphState){
    var plot;
-   if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
-      for(var graph in graphState.storedGraphs){
-         plot = graphState.storedGraphs[graph];
-         $.ajax({
-            url: "plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
-            dataType:'json',
-            success: function( data ){
-               if(data.state == "complete"){
-                  plot.noCopyEdit = true;
-                  plot.state = function(){
-                     return "complete";
-                  };
-                  plot.title = function(){
-                     return this._title;
-                  };
-                  var rendered = gisportal.templates['plot-status']( plot );
-                  gisportal.graphs.addButtonListeners(gisportal.graphs.graphsHistoryList.prepend(rendered), noCopyEdit = true);
-                  gisportal.graphs.storedGraphs.push(graphState.storedGraphs[graph]);
-               }
-            }
-         });
-      }
-   }
    if(graphState.state_plot){
       var time;
       var state_plot = graphState.state_plot;
@@ -1004,6 +981,32 @@ gisportal.loadGraphsState = function(graphState){
       gisportal.graphs.editPlot(plot);
       if(!state_plot.show_all){
          gisportal.panelSlideout.peakSlideout( 'active-plot' );
+      }
+   }
+   if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
+      var getStatus = function(plot, index){
+         $.ajax({
+            url: "plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
+            dataType:'json',
+            success: function( data ){
+               if(data.state == "complete"){
+                  plot.noCopyEdit = true;
+                  plot.state = function(){
+                     return "complete";
+                  };
+                  plot.title = function(){
+                     return this._title;
+                  };
+                  var rendered = gisportal.templates['plot-status']( plot );
+                  gisportal.graphs.addButtonListeners(gisportal.graphs.graphsHistoryList.prepend(rendered), noCopyEdit = true);
+                  gisportal.graphs.storedGraphs.push(graphState.storedGraphs[index]);
+               }
+            }
+         });
+      }
+      for(var graph in graphState.storedGraphs){
+         plot = graphState.storedGraphs[graph];
+         getStatus(plot, graph);
       }
    }
 };
