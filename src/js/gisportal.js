@@ -718,7 +718,8 @@ gisportal.saveState = function(state) {
    state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
    state.selectedLayers = {}; 
-   state.timeline = {}; 
+   state.timeline = {};
+   state.graphs = {};
 
    // Get the current layers and any settings/options for them.
    var keys = gisportal.selectedLayers;
@@ -774,6 +775,11 @@ gisportal.saveState = function(state) {
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
+   if(gisportal.graphs.activePlotSlideout.hasClass('show-all') || gisportal.graphs.activePlotSlideout.hasClass('show-peak')){
+      state.graphs.state_plot = gisportal.graphs.activePlotEditor.plot();
+      state.graphs.state_plot.show_all = gisportal.graphs.activePlotSlideout.hasClass('show-all');
+   }
+   state.graphs.graphsHistoryList = gisportal.graphs.graphsHistoryList.html();
 
    return state;
 };
@@ -784,7 +790,6 @@ gisportal.saveState = function(state) {
  */
 gisportal.loadState = function(state) {
    
-   //console.log("Loading State!")
    gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    state = state || {};
@@ -855,7 +860,7 @@ gisportal.loadState = function(state) {
       if(index > -1){
          state.selectedIndicators.pop(index);
       }
-      if(state.selectedIndicators.length == 0){
+      if(state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
       }
    });
@@ -896,6 +901,9 @@ gisportal.loadState = function(state) {
    var view = map.getView();
    view.setZoom(stateMap.zoom);
    view.setCenter(stateMap.centre);
+
+   //Adding the graph state
+   gisportal.loadGraphsState(state.graphs);
 
 };
 
@@ -940,6 +948,40 @@ gisportal.loadLayerState = function(){
       }
    }
    gisportal.loadLayersState = null;
+};
+
+gisportal.loadGraphsState = function(graphState){
+   if(graphState.graphsHistoryList){
+      gisportal.graphs.graphsHistoryList.html(graphState.graphsHistoryList);
+   }
+   if(graphState.state_plot){
+      
+      var state_plot = graphState.state_plot;
+      var Plot = gisportal.graphs.Plot;
+      var plot = new Plot();
+
+      plot._components = state_plot._components;
+      plot._createdOn = state_plot._createdOn;
+      plot._dateRangeBounds = state_plot._dateRangeBounds;
+      plot._plotType = state_plot._plotType;
+      plot._state = state_plot._state;
+      plot._tBounds = state_plot._tBounds;
+      plot._title = state_plot._title;
+      plot._maxComponents = state_plot._maxComponents;
+      plot._minComponents = state_plot._minComponents;
+      // Makes the lists dates instaead of date strings
+      for(time in plot._dateRangeBounds){
+         plot._dateRangeBounds[time] = new Date(plot._dateRangeBounds[time]);
+      }
+      for(time in plot._tBounds){
+         plot._tBounds[time] = new Date(plot._tBounds[time]);
+      }
+
+      gisportal.graphs.editPlot(plot);
+      if(!state_plot.show_all){
+         gisportal.panelSlideout.peakSlideout( 'active-plot' );
+      }
+   }
 };
 
 /**

@@ -684,12 +684,12 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       indicator.scalePoints = scalebarDetails.scalePoints;
       try{
          indicator.angle = indicator.legendSettings.Rotation;
-      }catch(e){
+      }catch(err){
          indicator.angle = 0;
       }
       try{
          indicator.legendURL = indicator.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
-      }catch(e){
+      }catch(err){
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }
       indicator.middleware = gisportal.middlewarePath;
@@ -1185,7 +1185,7 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       // Assume the old bbox style
       try{
          bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
-      }catch(e){
+      }catch(err){
          $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
       }
    }
