@@ -47,8 +47,10 @@ gisportal.view.loadView = function(view_name){
          if(wheelZoom){
             if(data.noZoom){
                wheelZoom.setActive(false);
+               $('.ol-zoom').toggleClass('hidden', true);
             }else{
                wheelZoom.setActive(true);
+               $('.ol-zoom').toggleClass('hidden', false);
             }
          }
 
@@ -79,6 +81,7 @@ gisportal.view.removeView = function(resetBool){
    map.getInteractions().forEach(function(interaction) {
       interaction.setActive(true);
    }, this);
+   $('.ol-zoom').toggleClass('hidden', false);
 
    $('.hide-when-view').toggleClass('hidden', false);
    $('.view-title p').html("").parent().toggleClass('hidden', true);
