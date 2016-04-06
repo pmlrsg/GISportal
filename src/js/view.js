@@ -9,6 +9,21 @@ gisportal.view.loadView = function(view_name){
          if(data.title){
             title = data.title;
          }
+
+         if(data.baseMap){
+            // Just in case the value is wrong;
+            try{
+               $('#select-basemap').ddslick('select', { value: data.baseMap });
+            }catch(err){}
+         }
+
+         if(data.projection){
+            // Just in case the value is wrong;
+            try{
+               $('#select-projection').ddslick('select', { value: data.projection });
+            }catch(err){}
+         }
+         
          $('.view-title p').html(title + " view").parent().toggleClass('hidden', false);
 
          // This listener is added the the remove view span (button)
@@ -21,7 +36,7 @@ gisportal.view.loadView = function(view_name){
          $('.hide-when-view').toggleClass('hidden', true);
          if(data.bounds){
             var extent = gisportal.reprojectBoundingBox(data.bounds, 'EPSG:4326', gisportal.projection);
-            map.getView().fit(extent, map.getSize());
+            gisportal.mapFit(extent, map.getSize());
          }
          // Gets interactions to be potentially removed
          var dragPan = null;
@@ -71,20 +86,6 @@ gisportal.view.loadView = function(view_name){
             // Just in case the value is wrong;
             try{
                $('#select-country-borders').ddslick('select', { value: data.borders });
-            }catch(err){}
-         }
-
-         if(data.baseMap){
-            // Just in case the value is wrong;
-            try{
-               $('#select-basemap').ddslick('select', { value: data.baseMap });
-            }catch(err){}
-         }
-
-         if(data.projection){
-            // Just in case the value is wrong;
-            try{
-               $('#select-projection').ddslick('select', { value: data.projection });
             }catch(err){}
          }
 

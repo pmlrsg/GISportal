@@ -581,7 +581,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
-   map.getView().fit(extent, map.getSize());
+   gisportal.mapFit(extent, map.getSize());
 
 };
 

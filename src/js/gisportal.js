@@ -1079,9 +1079,19 @@ gisportal.zoomOverall = function()  {
       }
 
       var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', gisportal.projection);
-      map.getView().fit(extent, map.getSize());
+      gisportal.mapFit(extent, map.getSize());
    }
 };
+gisportal.mapFit = function(extent, size){
+   // This takes an extent and fits the map to it with the correct padding
+   var polygon = ol.geom.Polygon.fromExtent(extent);
+   var padding = [50, 0, 0, 0];
+   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+      padding[2] = 95;
+   }
+   padding[3] = $('.panel').offset().left + $('.panel').width();
+   map.getView().fit(polygon, map.getSize(), {padding: padding})
+}
 
 /**
  * Replace links on start splash from config file

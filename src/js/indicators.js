@@ -149,7 +149,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       ];
       var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', gisportal.projection);
       
-      map.getView().fit(extent, map.getSize());
+      gisportal.mapFit(extent, map.getSize());
    });
 
    //Share this map

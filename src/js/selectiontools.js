@@ -263,7 +263,7 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    gisportal.vectorLayer.getSource().addFeatures(features);
    // Zooms to the extent of the features just added
    if(!gisportal.current_view || !gisportal.current_view.noPan){
-      map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
+      gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
    }
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
@@ -404,7 +404,7 @@ gisportal.selectionTools.updateROI = function()  {
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       if(!gisportal.current_view || !gisportal.current_view.noPan){
-         map.getView().fit(this_feature.getGeometry().getExtent(), map.getSize());
+         gisportal.mapFit(this_feature.getGeometry().getExtent(), map.getSize());
       }
       return;
    }catch(e){
