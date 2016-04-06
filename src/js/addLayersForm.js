@@ -274,6 +274,15 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.addLayersForm.refreshStorageInfo();
    });
 
+   // This adds the click listener to the 'exclude all layers' span
+   $('div.layers-form-left span.toggle-all-layers').on( 'click', function () {
+      var prop = $('input[data-field=include]').prop('checked');
+      for(var value in gisportal.addLayersForm.layers_list){
+         gisportal.addLayersForm.layers_list[value].include = !prop;
+      }
+      gisportal.addLayersForm.refreshStorageInfo();
+   });
+
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
@@ -558,6 +567,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       }
       if(key == 'include'){
          key_val = !key_val;
+         var toggle_elem = $('.toggle-all-layers');
       }
       //The data is then added in a certain way.
       if(index){ // Only layer data fields have indexes.
