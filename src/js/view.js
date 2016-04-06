@@ -36,7 +36,7 @@ gisportal.view.loadView = function(view_name){
          $('.hide-when-view').toggleClass('hidden', true);
          if(data.bounds){
             var extent = gisportal.reprojectBoundingBox(data.bounds, 'EPSG:4326', gisportal.projection);
-            gisportal.mapFit(extent, map.getSize());
+            gisportal.mapFit(extent);
          }
          // Gets interactions to be potentially removed
          var dragPan = null;
@@ -74,11 +74,11 @@ gisportal.view.loadView = function(view_name){
             }
          }
 
-         if(data.graticules == true){
+         if(data.graticules === true){
             $('#select-graticules').ddslick('select', { value: "On" });
          }
 
-         if(data.graticules == false){
+         if(data.graticules === false){
             $('#select-graticules').ddslick('select', { value: "Off" });
          }
 
