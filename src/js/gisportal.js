@@ -892,19 +892,19 @@ gisportal.loadState = function(state) {
       }
    }
 
-   if (stateMap.baselayer && (!gisportal.current_view !! !gisportal.current_view.baseMap)) {
+   if (stateMap.baselayer && (!gisportal.current_view || !gisportal.current_view.baseMap)) {
       $('#select-basemap').ddslick('select', { value: stateMap.baselayer });
    }
 
-   if (stateMap.countryborders && (!gisportal.current_view !! !gisportal.current_view.borders)) {
+   if (stateMap.countryborders && (!gisportal.current_view || !gisportal.current_view.borders)) {
       $('#select-country-borders').ddslick('select', { value: stateMap.countryborders});
    }
 
-   if (stateMap.graticules && (!gisportal.current_view !! !gisportal.current_view.graticules)) {
+   if (stateMap.graticules && (!gisportal.current_view || !gisportal.current_view.graticules)) {
       $('#select-graticules').ddslick('select', { value: stateMap.graticules });
    }
 
-   if(stateMap.projection && (!gisportal.current_view !! !gisportal.current_view.projection)){
+   if(stateMap.projection && (!gisportal.current_view || !gisportal.current_view.projection)){
       $('#select-projection').ddslick('select', { value: stateMap.projection });
    }
 
