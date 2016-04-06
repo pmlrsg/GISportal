@@ -59,6 +59,21 @@ gisportal.view.loadView = function(view_name){
             }
          }
 
+         if(data.graticules == true){
+            $('#select-graticules').ddslick('select', { value: "On" });
+         }
+
+         if(data.graticules == false){
+            $('#select-graticules').ddslick('select', { value: "Off" });
+         }
+
+         if(data.borders){
+            // Just in case the value is wrong;
+            try{
+               $('#select-country-borders').ddslick('select', { value: data.borders });
+            }catch(err){}
+         }
+
          // Loads the list and displayed layers that are filtered
          if(data.layerListFilter){
             gisportal.configurePanel.filterLayersList(data.layerListFilter);
