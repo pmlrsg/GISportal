@@ -74,6 +74,20 @@ gisportal.view.loadView = function(view_name){
             }catch(err){}
          }
 
+         if(data.baseMap){
+            // Just in case the value is wrong;
+            try{
+               $('#select-basemap').ddslick('select', { value: data.baseMap });
+            }catch(err){}
+         }
+
+         if(data.projection){
+            // Just in case the value is wrong;
+            try{
+               $('#select-projection').ddslick('select', { value: data.projection });
+            }catch(err){}
+         }
+
          // Loads the list and displayed layers that are filtered
          if(data.layerListFilter){
             gisportal.configurePanel.filterLayersList(data.layerListFilter);
