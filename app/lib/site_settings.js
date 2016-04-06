@@ -121,6 +121,44 @@ router.get('/app/settings/get_owners', function(req, res) {
    res.send({owners:owners});
 });
 
+router.get('/app/settings/get_dictionary', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var dict_path = path.join(MASTER_CONFIG_PATH, "dictionary.json");
+   if(utils.fileExists(dict_path)){
+      var dict_file = fs.readFileSync(dict_path);
+      res.send(dict_file);
+   }else{
+      res.status(404).send();
+   }
+});
+
+router.get('/app/settings/add_to_dictionary', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var standard_name = req.query.standard_name;
+   var display_name = req.query.display_name;
+
+   var dict_path = path.join(MASTER_CONFIG_PATH, "dictionary.json");
+   var dict;
+   if(!utils.fileExists(dict_path)){
+      if(standard_name && display_name){
+         dict = "{'" + standard_name + "':['" + display_name + "'']}";
+      }else{
+         dict = "{}";
+      }
+      fs.writeFileSync(dict_path, dict);
+   }else{
+      dict = JSON.parse(fs.readFileSync(dict_path));
+      if(!dict[standard_name]){
+         dict[standard_name] = [];
+      }
+      if(dict[standard_name].indexOf(display_name) < 0){
+         dict[standard_name].push(display_name);
+      }
+      fs.writeFileSync(dict_path, JSON.stringify(dict));
+   }
+   res.status(200).send();
+});
+
 
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path

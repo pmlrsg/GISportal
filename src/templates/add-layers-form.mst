@@ -1,5 +1,5 @@
 <div class="form-header">
-   <p>{{nice_name}} &nbsp; ({{list_id}}/{{total_pages}})</p>
+   <p>{{original_name}} &nbsp; ({{list_id}}/{{total_pages}})</p>
 </div>
 <div class="js-layers-form-validation form-validation-div alert-danger hidden"></div>
 <form class="layers-form">
@@ -13,6 +13,16 @@
 
       <label data-field="nice-name">Display Name:</label></br>
       <input type="text" value="{{nice_name}}" data-field="nice-name" data-id="{{list_id}}"/></br>
+      {{#if dict}}
+         <div class="dict-opts">
+            <label>Suggestions (Click to populate):</label>
+            {{#each dict}}
+               {{#if @first}}<ul>{{/if}}
+                  <li><button class="js-add-dict text-button">{{this}}</button></li>
+               {{#if @last}}</ul>{{/if}}
+            {{/each}}
+         </div>
+      {{/if}}
 
       <label data-field="abstract">Abstract:</label></br>
       <textarea data-field="abstract" data-id="{{list_id}}">{{{abstract}}}</textarea>
