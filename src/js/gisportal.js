@@ -776,6 +776,7 @@ gisportal.saveState = function(state) {
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
+   state.map.projection = $('#select-projection').data().ddslick.selectedData.value;
 
    if(gisportal.graphs.activePlotSlideout.hasClass('show-all') || gisportal.graphs.activePlotSlideout.hasClass('show-peak')){
       state.graphs.state_plot = gisportal.graphs.activePlotEditor.plot();
@@ -892,17 +893,19 @@ gisportal.loadState = function(state) {
    }
 
    if (stateMap.baselayer) {
-      gisportal.selectBaseLayer(stateMap.baselayer);
-      $('#select-basemap').val(stateMap.baselayer);
+      $('#select-basemap').ddslick('select', { value: stateMap.baselayer });
    }
 
    if (stateMap.countryborders) {
-      gisportal.selectCountryBorderLayer(stateMap.countryborders);
-      $('#select-country-borders').val(stateMap.countryborders);
+      $('#select-country-borders').ddslick('select', { value: stateMap.countryborders});
    }
 
    if (stateMap.graticules) {
-      $('#select-graticules').val(stateMap.graticules);
+      $('#select-graticules').ddslick('select', { value: stateMap.graticules });
+   }
+
+   if(stateMap.projection){
+      $('#select-projection').ddslick('select', { value: stateMap.projection });
    }
 
    // Load position & zoom
