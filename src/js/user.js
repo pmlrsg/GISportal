@@ -51,7 +51,9 @@ gisportal.user.initDOM = function() {
 // This gets the logged in users information or the default guest values
 gisportal.user.updateProfile = function(){
    function refreshUserPortal(){
-      gisportal.addLayersForm.form_info = {};
+      if(!gisportal.addLayersForm.form_info.display_form){
+         gisportal.addLayersForm.form_info = {};
+      }
       gisportal.addLayersForm.refreshStorageInfo();
       // Makes sure that the correct buttons are shown for editing
       gisportal.loadLayerEditButtons();

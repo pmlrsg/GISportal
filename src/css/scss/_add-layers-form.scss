@@ -26,14 +26,16 @@
   line-height: 1px;
 }
 
-.layers-form-left{
-   float:left;
-   width:47.5%;
-}
+@media screen and (min-width: 800px) {
+   .layers-form-left{
+      float:left;
+      width:47.5%;
+   }
 
-.layers-form-right{
-   float:right;
-   width:47.5%;
+   .layers-form-right{
+      float:right;
+      width:47.5%;
+   }
 }
 
 .js-layer-form-html .clearfix {
