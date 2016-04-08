@@ -40,7 +40,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
 
 
 
-gisportal.events.bind("layers-loaded", function() {
+gisportal.events.bind("available-layers-loaded", function() {
    if(gisportal.templatesLoaded){
       gisportal.autoLayer.loadGivenLayer();
       gisportal.autoLayer.loadPreviousLayers();

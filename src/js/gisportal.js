@@ -182,7 +182,6 @@ gisportal.createVectorLayers = function() {
          "tags" : vector.tags,
          "id" : vector.id,
          "exBoundingBox" : vector.exBoundingBox,
-         "metadataQueue" : [],
          "abstract" : vector.abstract,
          "provider" : vector.provider,
          "contactInfo" : {
@@ -338,7 +337,7 @@ gisportal.createOpLayers = function() {
       gisportal.configurePanel.refreshData();
    }
 
-   gisportal.events.trigger('layers-loaded');
+   gisportal.events.trigger('available-layers-loaded');
 };
 
 /**
@@ -680,7 +679,7 @@ gisportal.nonLayerDependent = function() {
    // Setup timeline, from timeline.js
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
-      selectedDate: new Date("2015-06-05T00:00:00Z"),
+      selectedDate: new Date("1900-01-01T00:00:00Z"),
       chartMargins: {
          top: 7,
          right: 0,
@@ -697,15 +696,15 @@ gisportal.nonLayerDependent = function() {
 
 gisportal.autoSaveState = function(){
    var state = JSON.stringify(gisportal.saveState());
-   gisportal.storage.set( 'stateAutoSave', state );
+   gisportal.storage.set( gisportal.niceDomainName + '_state', state );
 };
 
 gisportal.getAutoSaveState = function(){
-   var state = JSON.parse(gisportal.storage.get( 'stateAutoSave' ));
+   var state = JSON.parse(gisportal.storage.get( gisportal.niceDomainName + '_state' ));
    return state;
 };
 gisportal.hasAutoSaveState = function(){
-   return ( gisportal.storage.get( 'stateAutoSave' ) !== null );
+   return ( gisportal.storage.get( gisportal.niceDomainName + '_state' ) !== null );
 };
 
 /**
@@ -718,26 +717,31 @@ gisportal.saveState = function(state) {
    state.map = {};
    state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
-   state.map.layers = {}; 
-   state.timeline = {}; 
+   state.selectedLayers = {}; 
+   state.timeline = {};
+   state.graphs = {};
+   state.panel = {};
 
-   // // Get the current layers and any settings/options for them.
-   // var keys = gisportal.selectedLayers;
-   // for(var i = 0, len = keys.length; i < len; i++) {
-   //    var selectedIndicator = gisportal.selectedLayers[i];
+   // Get the current layers and any settings/options for them.
+   var keys = gisportal.selectedLayers;
+   for(var i = 0, len = keys.length; i < len; i++) {
+      var selectedIndicator = gisportal.selectedLayers[i];
 
-   //    if (selectedIndicator)  {
-   //       var indicator = gisportal.layers[selectedIndicator];
-   //       state.map.layers[indicator.id] = {
-   //          'selected': indicator.selected,
-   //          'opacity': indicator.opacity !== null ? indicator.opacity : 1,
-   //          'style': indicator.style !== null ? indicator.style : '',
-   //          'minScaleVal': indicator.minScaleVal,
-   //          'maxScaleVal': indicator.maxScaleVal,
-   //          'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked').attr('id')
-   //       };    
-   //    }
-   // }
+      if (selectedIndicator)  {
+         var indicator = gisportal.layers[selectedIndicator];
+         state.selectedLayers[indicator.id] = {
+            'id': indicator.id,
+            'selected': indicator.selected,
+            'isVisible': indicator.isVisible,
+            'opacity': indicator.opacity !== null ? indicator.opacity : 1,
+            'style': indicator.style !== null ? indicator.style : '',
+            'minScaleVal': indicator.minScaleVal,
+            'maxScaleVal': indicator.maxScaleVal,
+            'log': indicator.log,
+            'openTab' : $('.indicator-header[data-id="' + indicator.id + '"] + ul .js-tab-trigger:checked[id]').attr('id')
+         };    
+      }
+   }
    // outside of loop so it can be easily ordered 
    var layers = [];
    $('.sortable-list .indicator-header').each(function() {
@@ -772,6 +776,17 @@ gisportal.saveState = function(state) {
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;
    state.map.graticules = $('#select-graticules').data().ddslick.selectedData.value;
+   state.map.projection = $('#select-projection').data().ddslick.selectedData.value;
+
+   if(gisportal.graphs.activePlotSlideout.hasClass('show-all') || gisportal.graphs.activePlotSlideout.hasClass('show-peak')){
+      state.graphs.state_plot = gisportal.graphs.activePlotEditor.plot();
+      state.graphs.state_plot.show_all = gisportal.graphs.activePlotSlideout.hasClass('show-all');
+   }
+   if(gisportal.graphs.storedGraphs.length > 0){
+      state.graphs.storedGraphs = gisportal.graphs.storedGraphs;
+   }
+
+   state.panel.activePanel = gisportal.panels.activePanel;
 
    return state;
 };
@@ -782,7 +797,6 @@ gisportal.saveState = function(state) {
  */
 gisportal.loadState = function(state) {
    
-   //console.log("Loading State!")
    gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
    state = state || {};
@@ -810,10 +824,16 @@ gisportal.loadState = function(state) {
          if(indicator.serviceType == "WFS"){
             console.log("Please load the vector properly");
          }else{
+            var state_indicator = state.selectedLayers[indicator.id];
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
             indicator.preventAutoZoom = true;
-            gisportal.refinePanel.layerFound(indicator.id);
+            if(state_indicator){
+               indicator.minScaleVal = state_indicator.minScaleVal;
+               indicator.maxScaleVal = state_indicator.maxScaleVal;
+            }
+            gisportal.indicatorsPanel.selectLayer(indicator.id);
+            gisportal.indicatorsPanel.addToPanel({id:indicator.id});
             if(state.selectedRegionInfo){
                gisportal.methodThatSelectedCurrentRegion = state.selectedRegionInfo;
                switch( state.selectedRegionInfo.method ){
@@ -824,7 +844,7 @@ gisportal.loadState = function(state) {
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
-                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value);
+                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value, fromSavedState = true);
                      break;
                   case "dragAndDrop":
                      stateMap.feature = undefined;
@@ -837,6 +857,22 @@ gisportal.loadState = function(state) {
          }
       }
    }
+   if(state.selectedLayers){
+      gisportal.loadLayersState = state.selectedLayers;
+   }
+
+   gisportal.state_indicators_list = state.selectedIndicators;
+
+   // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
+   gisportal.events.bind('layer.metadataLoaded', function(event, id){
+      var index = gisportal.state_indicators_list.indexOf(id);
+      if(index > -1){
+         state.selectedIndicators.pop(index);
+      }
+      if(state.selectedIndicators.length === 0){
+         gisportal.loadLayerState();
+      }
+   });
    
    // Create the feature if there is one
    if (stateMap.feature) {    // Array.<ol.Feature>
@@ -851,21 +887,25 @@ gisportal.loadState = function(state) {
    
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
-      if (stateMap.date) gisportal.timeline.setDate(new Date(stateMap.date));
+      if (stateMap.date) {
+         gisportal.timeline.setDate(new Date(stateMap.date));
+      }
    }
 
-   if (stateMap.baselayer) {
-      gisportal.selectBaseLayer(stateMap.baselayer);
-      $('#select-basemap').val(stateMap.baselayer);
+   if (stateMap.baselayer && (!gisportal.current_view || !gisportal.current_view.baseMap)) {
+      $('#select-basemap').ddslick('select', { value: stateMap.baselayer });
    }
 
-   if (stateMap.countryborders) {
-      gisportal.selectCountryBorderLayer(stateMap.countryborders);
-      $('#select-country-borders').val(stateMap.countryborders);
+   if (stateMap.countryborders && (!gisportal.current_view || !gisportal.current_view.borders)) {
+      $('#select-country-borders').ddslick('select', { value: stateMap.countryborders});
    }
 
-   if (stateMap.graticules) {
-      $('#select-graticules').val(stateMap.graticules);
+   if (stateMap.graticules && (!gisportal.current_view || !gisportal.current_view.graticules)) {
+      $('#select-graticules').ddslick('select', { value: stateMap.graticules });
+   }
+
+   if(stateMap.projection && (!gisportal.current_view || !gisportal.current_view.projection)){
+      $('#select-projection').ddslick('select', { value: stateMap.projection });
    }
 
    // Load position & zoom
@@ -873,6 +913,105 @@ gisportal.loadState = function(state) {
    view.setZoom(stateMap.zoom);
    view.setCenter(stateMap.centre);
 
+   //Adding the graph state
+   if(state.graphs){
+      gisportal.loadGraphsState(state.graphs);
+   }
+
+   if(state.panel && state.panel.activePanel){
+      gisportal.panels.showPanel(state.panel.activePanel)
+   }
+
+};
+
+gisportal.loadLayerState = function(){
+   if(gisportal.loadLayersState){
+      var setScaleValues = function(id, min, max, log){
+         $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log);
+         $('.js-scale-min[data-id="' + id + '"]').val(min);
+         $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
+      };
+      for(var layer in gisportal.loadLayersState){
+         var layer_state = gisportal.loadLayersState[layer];
+         var id = layer_state.id;
+         var style = layer_state.style || gisportal.config.defaultStyle;
+         var min = layer_state.minScaleVal;
+         var max = layer_state.maxScaleVal;
+         var log = layer_state.log || false;
+         var opacity = layer_state.opacity || 1;
+
+         // This opens the tab that the user had open
+         if(layer_state.openTab){
+            var openTab = layer_state.openTab;
+            var tabName = openTab.split(id + "-")[1];
+            gisportal.indicatorsPanel.selectTab(id, tabName);
+         }
+
+         //This sets the visibility of the layer to the same as what the user had before
+         if(layer_state.isVisible === false){
+            gisportal.indicatorsPanel.hideLayer(id);
+         }
+
+         // This sets the layer style to the same as what the user had before
+         $('#tab-' + id + '-layer-style').ddslick('select', {value: style});
+
+         // Sets the min & max and log of the scalebar to the value that the user had previously set
+         setScaleValues(id, min, max, log);
+
+         // Sets the layers opacity to the value that the user had previously
+         $('#tab-' + id + '-opacity').val(opacity*100);
+         gisportal.layers[id].setOpacity(opacity);
+
+      }
+   }
+   gisportal.loadLayersState = null;
+};
+
+gisportal.loadGraphsState = function(graphState){
+   var plot;
+   if(graphState.state_plot){
+      var time;
+      var state_plot = graphState.state_plot;
+
+      plot = gisportal.graphs.createPlotFromState(state_plot);
+      // Makes the lists dates instaead of date strings
+      for(time in plot._dateRangeBounds){
+         plot._dateRangeBounds[time] = new Date(plot._dateRangeBounds[time]);
+      }
+      for(time in plot._tBounds){
+         plot._tBounds[time] = new Date(plot._tBounds[time]);
+      }
+      gisportal.graphs.editPlot(plot);
+      if(!state_plot.show_all){
+         gisportal.panelSlideout.peakSlideout( 'active-plot' );
+      }
+   }
+   if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
+      var getStatus = function(plot, index){
+         $.ajax({
+            url: "plots/" + plot.id + "-status.json?_="+ new Date().getTime(),
+            dataType:'json',
+            success: function( data ){
+               if(data.state == "complete"){
+                  plot.noCopyEdit = true;
+                  plot.state = function(){
+                     return "complete";
+                  };
+                  plot.title = function(){
+                     return this._title;
+                  };
+                  var rendered = gisportal.templates['plot-status']( plot );
+                  gisportal.graphs.addButtonListeners(gisportal.graphs.graphsHistoryList.prepend(rendered), noCopyEdit = true);
+                  gisportal.graphs.storedGraphs.push(graphState.storedGraphs[index]);
+               }
+            }
+         });
+      }
+      for(var graph in graphState.storedGraphs){
+         plot = graphState.storedGraphs[graph];
+         getStatus(plot, graph);
+      }
+   }
 };
 
 /**
