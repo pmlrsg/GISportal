@@ -162,6 +162,57 @@ router.get('/app/settings/get_owners', function(req, res) {
    res.send({owners:owners});
 });
 
+router.get('/app/settings/get_dictionary', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var username = user.getUsername(req);
+   var dict_path = path.join(MASTER_CONFIG_PATH, "dictionary.json");
+   var user_dict_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + username, "dictionary.json");
+
+   if(utils.fileExists(dict_path)){
+      var dict_file = JSON.parse(fs.readFileSync(dict_path));
+      if(utils.fileExists(user_dict_path)){
+         var user_dict_file = JSON.parse(fs.readFileSync(user_dict_path));
+         _.extend(dict_file, user_dict_file)
+      }
+      res.send(dict_file);
+   }else{
+      res.status(404).send();
+   }
+});
+
+router.get('/app/settings/add_to_dictionary', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var standard_name = req.query.standard_name;
+   var display_name = req.query.display_name;
+   var username = user.getUsername(req);
+   var permission = user.getAccessLevel(req, domain);
+
+   var path_gutts = "";
+   if(permission != "admin"){
+      path_gutts = path.join(domain, "user_" + username);
+   }
+   var dict_path = path.join(MASTER_CONFIG_PATH, path_gutts, "dictionary.json");
+   var dict;
+   if(!utils.fileExists(dict_path)){
+      if(standard_name && display_name){
+         dict = '{"' + standard_name + '":["' + display_name + '"]}';
+      }else{
+         dict = "{}";
+      }
+      fs.writeFileSync(dict_path, dict);
+   }else{
+      dict = JSON.parse(fs.readFileSync(dict_path));
+      if(!dict[standard_name]){
+         dict[standard_name] = [];
+      }
+      if(dict[standard_name].indexOf(display_name) < 0){
+         dict[standard_name].push(display_name);
+      }
+      fs.writeFileSync(dict_path, JSON.stringify(dict));
+   }
+   res.status(200).send();
+});
+
 
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
@@ -232,7 +283,7 @@ router.get('/app/settings/get_cache', function(req, res) {
          var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
          user_list.forEach(function(filename){
             var file_path = path.join(user_cache_path, filename);
-            if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
+            if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
                if(permission != "admin" && this_username != filename.replace(USER_CACHE_PREFIX, "")){ // The Layers list is filtered.
                   json_data.server.Layers = json_data.server.Layers.filter(function(val){
