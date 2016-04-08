@@ -18,6 +18,7 @@ gisportal.templates = {};
 
 
 gisportal.graphs.activePlotEditor = null;
+gisportal.graphs.storedGraphs = [];
 
 /**
  * Adds a component to the active plot.
@@ -33,8 +34,12 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var plot = new Plot();
       gisportal.graphs.editPlot( plot );
       var plotType = "timeseries";
-      if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
+      var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;
+      if(bboxMethod == "csvUpload"){
          plotType = "transect";
+      }
+      if(bboxMethod == "geoJSONSelect"){
+         component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;
       }
       plot.plotType( plotType );
       // These variables are set so that the correct drop downs are loaded in the first place.
@@ -148,4 +153,50 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
    });
    $('.js-plot-popup').toggleClass("hidden", false);
    gisportal.graphs.popup.addActionListeners();
+};
+
+gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
+   element
+   .on('click', '.js-graph-status-delete', function(){
+      var hash = $(this).data("hash");
+      $(this).closest('.graph-job').remove();
+      if($('.graph-job').length <= 0){
+         $('.no-graphs-text').toggleClass("hidden", false);
+      }
+      if(plot){
+         plot.stopMonitoringJobStatus();
+      }
+      // removes it from the stored list
+      var index;
+      for(graph in gisportal.graphs.storedGraphs){
+         if(gisportal.graphs.storedGraphs[graph].id == hash){
+            index = graph;
+         }
+      }
+      if(index){
+         gisportal.graphs.storedGraphs.pop(index);
+      }
+   })
+   // Copy a plot
+   .on('click', '.js-graph-status-copy', function(){
+      gisportal.graphs.editPlot( plot.copy() );
+   })
+   // Open a plot
+  .on('click', '.js-graph-status-open', function(){
+      var hash = $(this).data("hash");
+      $.ajax({
+         url: 'plots/' + hash + "-plot.html",
+         dataType: 'html',
+         success: function( html ){
+            gisportal.graphs.popup.loadPlot(html, hash);
+         }, error: function(e){
+            var error = 'Sorry, we failed to load the graph: \n'+
+                           'The server failed with this message: "' + e.statusText + '"';
+            $.notify(error, "error");
+         }
+      });
+   });
+   if(noCopyEdit || !plot){
+      element.off('click', '.js-graph-status-copy');
+   }
 };

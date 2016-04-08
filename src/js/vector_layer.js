@@ -46,7 +46,6 @@ gisportal.Vector = function(options) {
 
     this.openlayers = {};
     this.name = this.tags.niceName;
-    this.metadataQueue = [];
     this.visibleTab = "details";
     this.currentColour = '';
 
@@ -159,17 +158,10 @@ gisportal.Vector = function(options) {
 
     this.getMetadata = function() {
         var layer = this;
-        //gisportal.indicatorsPanel.vectorStyleTab(layer.id);
 
         gisportal.layers[layer.id].metadataComplete = true;
         layer.metadataComplete = true;
-        //      ////console.log("in metadat");
-        //        ////console.table(gisportal.layers[layer.id]);
-        _.each(gisportal.layers[layer.id].metadataQueue, function(d) {
-            d();
-            d = null;
-        });
-        //gisportal.indicatorsPanel.selectTab( layer.id, "details" );
+        gisportal.events.trigger('layer.metadataLoaded', layer.id);
 
     };
 

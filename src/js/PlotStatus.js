@@ -55,34 +55,7 @@ gisportal.graphs.PlotStatus = (function(){
 
       // Add listeners to the buttons that
       // maybe in the dom
-      this._element
-         // Delete a plot
-         .on('click', '.js-graph-status-delete', function(){
-            $(this).closest('.graph-job').remove();
-            if($('.graph-job').length <= 0){
-               $('.no-graphs-text').toggleClass("hidden", false);
-            }
-            _this._plot.stopMonitoringJobStatus();
-         })
-         // Copy a plot
-         .on('click', '.js-graph-status-copy', function(){
-            gisportal.graphs.editPlot( plot.copy() );
-         })
-         // Open a plot
-        .on('click', '.js-graph-status-open', function(){
-            var hash = $(this).data("hash");
-            $.ajax({
-               url: 'plots/' + hash + "-plot.html",
-               dataType: 'html',
-               success: function( html ){
-                  gisportal.graphs.popup.loadPlot(html, hash);
-               }, error: function(e){
-                  var error = 'Sorry, we failed to load the graph: \n'+
-                                 'The server failed with this message: "' + e.statusText + '"';
-                  $.notify(error, "error");
-               }
-            });
-         });
+      gisportal.graphs.addButtonListeners(this._element, noCopyEdit = false, plot);
    };
 
    /**
