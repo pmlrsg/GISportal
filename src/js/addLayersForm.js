@@ -595,6 +595,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    });
    $('.js-server-form-html input, .js-server-form-html textarea').off('focusout');
    // All of the inputs and textareas have listeners added.
+   // TODO: Decide if this should include keyup too. might be sensible
    $('.overlay-container-form input, .overlay-container-form textarea').on('change paste', function(){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
