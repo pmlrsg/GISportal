@@ -78,7 +78,6 @@ gisportal.layer = function( options ) {
    
    // These queues feel like a hack, refactor?
    this.metadataComplete = false;
-   this.metadataQueue = [];
 
    
    //this.moreInfo = opts.moreInfo;
@@ -102,7 +101,6 @@ gisportal.layer = function( options ) {
    // will use the data otherwise it will put a callback into
    // the queue.
    this.metadataComplete = false;
-   this.metadataQueue = []; 
 
    this.times = []; // The times for each of the layers stored
    this.openlayers = {}; // OpenLayers layers
@@ -457,21 +455,20 @@ gisportal.layer = function( options ) {
          async: true,
          success: function(data) {
             try{
-              json_data = JSON.parse(data);
-              if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
-              if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
-              if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
-              if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-              layer.units = json_data.units; 
-              layer.log = json_data.logScaling === true ? true : false;
-
+               json_data = JSON.parse(data);
+                 if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
+                 if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
+                 if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
+                 if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
+                 layer.units = json_data.units; 
+                 layer.log = json_data.logScaling === true ? true : false;
             }catch(e){
-              //var layer.scaling = 'raw';
+               //var layer.scaling = 'raw';
             }
-
-        gisportal.layers[layer.id].metadataComplete = true; 
-        layer.metadataComplete = true;
-        _.each(gisportal.layers[layer.id].metadataQueue, function(d) { d(); d = null; });
+            
+            gisportal.layers[layer.id].metadataComplete = true;
+            layer.metadataComplete = true;
+            gisportal.events.trigger('layer.metadataLoaded', layer.id);
 
          },
          error: function(request, errorType, exception) {

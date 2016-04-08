@@ -22,8 +22,10 @@
 		{{#if_equals (call 'state') 'complete' }}
 			<div></div>
 			<div class="graph-buttons">
-				<button class="js-graph-status-delete brand secondary">Delete</button>
-				<button class="js-graph-status-copy brand secondary">Copy/Edit</button>
+				<button class="js-graph-status-delete brand secondary" data-hash="{{../id}}">Delete</button>
+				{{#unless ../noCopyEdit}}
+					<button class="js-graph-status-copy brand secondary">Copy/Edit</button>
+				{{/unless}}
 				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}">Open</button>
 			</div>
 		{{/if_equals}}
