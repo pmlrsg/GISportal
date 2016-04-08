@@ -225,6 +225,8 @@ input[type="text"] , textarea  {
 
 .dev-warning { position: fixed; top: 0; width: 100%; background: $dev-warning; text-align: center; color: #fff; font-weight: bold; }
 
+.view-title { position: fixed; top: 0; width: 100%; background: $panel-content-header; text-align: center; color: #fff; font-weight: bold; }
+
 .dark-background{
   background-color: rgba(0,0,0,0.8);
   display: inline-flex;

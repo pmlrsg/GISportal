@@ -206,6 +206,10 @@ gisportal.Vector = function(options) {
         opts.defaultProperties = this.defaultProperties;
       }
       gisportal.vectorStyles.cache[this.id+"__"+prop] = opts;
+      opts.zoomable = true;
+      if(gisportal.current_view && gisportal.current_view.noPan){
+         opts.zoomable = false;
+      }
       var renderedStyleUI = gisportal.templates['vector-style-ui'](opts);
       $('[data-id="' + this.id + '"] .dimensions-tab .vector-style-container').html(renderedStyleUI);
       this.styleUIBuilt = true;

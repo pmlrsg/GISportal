@@ -168,7 +168,7 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
       }
       // removes it from the stored list
       var index;
-      for(graph in gisportal.graphs.storedGraphs){
+      for(var graph in gisportal.graphs.storedGraphs){
          if(gisportal.graphs.storedGraphs[graph].id == hash){
             index = graph;
          }

@@ -31,9 +31,35 @@ gisportal.configurePanel.refreshData = function()  {
       this.renderIndicatorsAsSimpleList();
    }
 
+   gisportal.configurePanel.loadViewList();
 
    $('#configurePanel').bind('scroll', function() {
      gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop());
+   });
+};
+
+gisportal.configurePanel.loadViewList = function(){
+   $.ajax({
+      url: gisportal.middlewarePath + '/settings/get_views',
+      dataType: 'json',
+      success: function(data) {
+         if(_.size(data) > 0){
+            $('li.views-list').toggleClass('hidden', false);
+            $('select.js-views-list').html("<option value='default' selected disabled>Please select a view...</option>");
+            for(var view in data){
+               $('select.js-views-list').append("<option value='" + view + "'>" + data[view] + "</option>");
+            }
+            $('select.js-views-list').off('change');
+            $('select.js-views-list').on('change', function(){
+               gisportal.view.loadView($(this).val());
+            });
+         }else{
+            $('li.views-list').toggleClass('hidden', true);
+         }
+      },
+      error: function(error) {
+         $('li.views-list').toggleClass('hidden', true);
+      }
    });
 };
 
@@ -505,7 +531,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
          // For each tag name, if it has values then render the mustache
          var indicators = [];
          // Do not allow duplicates, and all values should be lowercase
-         vals = _.unique(vals, function(d)  {
+         vals = _.uniq(vals, function(d)  {
             return d;
          });
          
@@ -695,7 +721,7 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
  * If no layers are given then it resets to the original layers.
  * @param {Object} given_layers - The layers you want to be loaded or NULL.
  */
-gisportal.configurePanel.resetPanel = function(given_layers){
+gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
    if(given_layers){
       // Either add layers to the original or stores the layers if it is undefined
       gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
@@ -716,16 +742,66 @@ gisportal.configurePanel.resetPanel = function(given_layers){
       gisportal.storage.set("server_info", undefined);
       gisportal.storage.set("form_info", undefined);
       // Ensures the panel is only reset when it really needs to be
-      if(gisportal.original_layers && gisportal.layers != gisportal.original_layers){
+      if(gisportal.original_layers && _.size(gisportal.original_layers) > 0 && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
          gisportal.original_layers = {};
          gisportal.loadBrowseCategories();
          gisportal.configurePanel.refreshData();
-         $('.filtered-list-message').hide();
-         $('.unfiltered-list-message').show();
-         setTimeout(function(){
-            $('.unfiltered-list-message').slideUp('slow');
-         }, 5000);
+         if(showMessageBool !== false){
+            $('.filtered-list-message').hide();
+            $('.unfiltered-list-message').show();
+            setTimeout(function(){
+               $('.unfiltered-list-message').slideUp('slow');
+            }, 5000);
+         }
+      }
+   }
+};
+
+gisportal.configurePanel.filterLayersList = function(layerFilter){
+   var layers_obj;
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
+   var filteredLayers = {};
+   for(var layer in layers_obj){
+      for(var filter in layerFilter){
+         if(_.isMatch(layers_obj[layer], layerFilter[filter])){
+            filteredLayers[layer] = layers_obj[layer];
+         }
+      }
+   }
+   gisportal.configurePanel.resetPanel(filteredLayers);
+};
+
+gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilter){
+   var layers_obj, layer, filter;
+   // This is required if the user loads a view when they have loaded some external layers using the interface
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
+   // Makes sure that it only uses the filtered list of indicators
+   var filteredLayers = {};
+   if(layerListFilter){
+      for(layer in layers_obj){
+         for(filter in layerListFilter){
+            if(_.isMatch(layers_obj[layer], layerListFilter[filter])){
+               filteredLayers[layer] = layers_obj[layer];
+            }
+         }
+      }
+   }else{
+      filteredLayers = layers_obj;
+   }
+   for(layer in filteredLayers){
+      for(filter in layerFilter){
+         if(_.isMatch(filteredLayers[layer], layerFilter[filter])){
+            gisportal.refinePanel.layerFound(layer);
+         }
       }
    }
 };

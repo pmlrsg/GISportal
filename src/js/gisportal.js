@@ -719,6 +719,7 @@ gisportal.saveState = function(state) {
    state.selectedIndicators = [];
    state.selectedLayers = {}; 
    state.timeline = {};
+   state.view = gisportal.current_view;
    state.graphs = {};
    state.panel = {};
 
@@ -795,7 +796,7 @@ gisportal.saveState = function(state) {
  * To load the state, provide a state object (created with saveState)
  * @param {object} state - The saved state object
  */
-gisportal.loadState = function(state) {
+gisportal.loadState = function(state){
    
    gisportal.stateLoadStarted = true;
    $('.start').toggleClass('hidden', true);
@@ -912,6 +913,9 @@ gisportal.loadState = function(state) {
    var view = map.getView();
    view.setZoom(stateMap.zoom);
    view.setCenter(stateMap.centre);
+   if(state.view){
+      gisportal.view.loadView(state.view.view_name);
+   }
 
    //Adding the graph state
    if(state.graphs){
@@ -919,7 +923,7 @@ gisportal.loadState = function(state) {
    }
 
    if(state.panel && state.panel.activePanel){
-      gisportal.panels.showPanel(state.panel.activePanel)
+      gisportal.panels.showPanel(state.panel.activePanel);
    }
 
 };
@@ -1006,7 +1010,7 @@ gisportal.loadGraphsState = function(graphState){
                }
             }
          });
-      }
+      };
       for(var graph in graphState.storedGraphs){
          plot = graphState.storedGraphs[graph];
          getStatus(plot, graph);
@@ -1214,8 +1218,18 @@ gisportal.zoomOverall = function()  {
       }
 
       var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', gisportal.projection);
-      map.getView().fit(extent, map.getSize());
+      gisportal.mapFit(extent);
    }
+};
+gisportal.mapFit = function(extent){
+   // This takes an extent and fits the map to it with the correct padding
+   var polygon = ol.geom.Polygon.fromExtent(extent);
+   var padding = [50, 0, 0, 0];
+   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+      padding[2] = 95;
+   }
+   padding[3] = $('.panel').offset().left + $('.panel').width();
+   map.getView().fit(polygon, map.getSize(), {padding: padding});
 };
 
 /**
