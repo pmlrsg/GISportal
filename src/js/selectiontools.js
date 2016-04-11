@@ -251,7 +251,7 @@ gisportal.selectionTools.csvFound = function(formData){
    });
 };
 
-gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue, fromSavedState){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'featureProjection': gisportal.projection
@@ -262,7 +262,9 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
    //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
    // Zooms to the extent of the features just added
-   map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
+   if((!gisportal.current_view || !gisportal.current_view.noPan) && !fromSavedState){
+      gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent());
+   }
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
    // If this is a newly created geojson
@@ -276,6 +278,9 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
       }
    }
    gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+   if(selectedValue){
+      gisportal.methodThatSelectedCurrentRegion.value = selectedValue;
+   }
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {
@@ -401,6 +406,9 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().clear();
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
+      if(!gisportal.current_view || !gisportal.current_view.noPan){
+         gisportal.mapFit(this_feature.getGeometry().getExtent());
+      }
       return;
    }catch(e){
       if(this_bounds){

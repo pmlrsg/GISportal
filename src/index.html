@@ -37,7 +37,7 @@
 <script src="js-libs/jquery.add-clear.js"></script>
 
 <!-- Lodash (_) -->
-<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.6.1/lodash.min.js"></script>
 
 <!-- OpenLayers Map Code -->
 <script src="js-libs/OpenLayers3/ol.js" type="text/javascript"></script>
@@ -96,6 +96,8 @@
 
 </head>
 <body role="application">
+
+   <div class="view-title hidden"><span class="icon-delete-3 right-icon remove-view icon-btn"></span><p></p></div>
    
    <!-- The start page,
          this should load before anything else. -->
@@ -177,6 +179,11 @@
             </li>
             <li>
                <div class="js-category-filter panel-tab no-gap active"></div>
+            </li>
+            <li class="views-list hidden">
+               <div class="js-views-list panel-tab no-gap active">Select a view:<br/>
+               <select class="js-views-list"></select>
+               </div>
             </li>
          </ul>
       </div>

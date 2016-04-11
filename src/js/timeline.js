@@ -55,7 +55,7 @@
  */
 gisportal.TimeLine = function(id, options) {
    
-   // Use "self" to refer to this instance of the OPEC.TimeLine object
+   // Use "self" to refer to this instance of the TimeLine object
    var self = this;
    
    // Check to see if the element with id exists, if not throw an error and return a null object
@@ -67,7 +67,7 @@ gisportal.TimeLine = function(id, options) {
     $('.js-current-date').pikaday({
       format: "YYYY-MM-DD",
       onSelect: function(){
-         self.setDate( this.getDate() );
+         self.setDate( self.getDate() );
       }
     });
    
@@ -341,10 +341,9 @@ gisportal.TimeLine.prototype.redraw = function() {
 
             var g = d3.select(this).selectAll('line').data(dateTimes, function(d) { return(d); });  // <-- second level data-join
              g.enter().append('svg:line')
-               .attr('stroke', '#59476D')
                .attr('y1', function() { return d3.round(self.yScale(i1) + self.barMargin + 1.5); })
                .attr('y2', function() { return d3.round(self.yScale(i1) + self.laneHeight - self.barMargin + 0.5); })
-               .attr('class', 'detailLine');
+               .attr('class', 'detailLine stroke');
             g.exit()
               .remove();
          }
@@ -469,7 +468,9 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       var data = gisportal.timeline.layerbars[0];
       gisportal.timeline.zoomDate(data.startDate, data.endDate);
       //Fix
-      gisportal.timeline.setDate(data.endDate);
+      if(gisportal.timeline.getDate().toISOString() == "1900-01-01T00:00:00.000Z"){
+         gisportal.timeline.setDate(data.endDate);
+      }
       
    }  
    
@@ -486,7 +487,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
 
 gisportal.TimeLine.prototype.has = function(name)  {
-   var has = _.where(gisportal.timeline.timebars, function(d)  {
+   var has = _.filter(gisportal.timeline.timebars, function(d)  {
       return d.name.toLowerCase() === name.toLowerCase();
    });
 
@@ -552,6 +553,7 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
    gisportal.filterLayersByDate(date);
    self.showDate(date);
+   gisportal.timeline.redraw();
 
    gisportal.events.trigger('date.selected', date);
 };

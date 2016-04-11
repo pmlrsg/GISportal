@@ -83,6 +83,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scalevalues > input[type="checkbox"]', function() {
       var id = $(this).data('id');
+      // This removed the min val in the layer so that the data is refreshed on the map
+      gisportal.layers[id].minScaleVal = null;
       var min = $('.js-scale-min[data-id="' + id + '"]').val();
       var max = $('.js-scale-max[data-id="' + id + '"]').val();
       gisportal.scalebars.validateScale(id, min, max);
@@ -103,7 +105,10 @@ gisportal.indicatorsPanel.initDOM = function() {
    //Auto scale range
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
-      gisportal.layers[id].autoScale = $(this).prop('checked');
+      var layer = gisportal.layers[id];
+      layer.minScaleVal = null;
+      layer.maxScaleVal = null;
+      layer.autoScale = $(this).prop('checked');
       gisportal.scalebars.autoScale(id);
       gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'));
    });
@@ -137,8 +142,9 @@ gisportal.indicatorsPanel.initDOM = function() {
    //  Zoom to data region
    $('.js-indicators').on('click', '.js-zoom-data', function() {
       var indicator = gisportal.layers[$(this).data('id')];
-      if (indicator === null)
+      if (indicator === null){
          return;
+      }
 
       var bbox = [
          parseFloat(indicator.exBoundingBox.WestBoundLongitude),
@@ -148,7 +154,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       ];
       var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', gisportal.projection);
       
-      map.getView().fit(extent, map.getSize());
+      gisportal.mapFit(extent);
    });
 
    //Share this map
@@ -352,6 +358,9 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 };
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
+   for(var l in gisportal.selectedLayers){
+      $('[data-id="' + gisportal.selectedLayers[l] + '"] span').toggleClass('active', false);
+   }
    if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
 
    var id = data.id;
@@ -546,14 +555,12 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
    ////console.log(rendered);
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
-   gisportal.indicatorsPanel.checkTabFromState(id);
 };
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
    //console.log("adding analysis");
    var indicator = gisportal.layers[id];
-
-   var onMetadata = function() {
+   var onMetadata = function(){
       //console.log("in Onmetdata");
       var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
       indicator.modified = gisportal.utils.nameToId(indicator.name);
@@ -573,22 +580,18 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
 
       gisportal.indicatorsPanel.addAnalysisListeners();
       gisportal.indicatorsPanel.populateShapeSelect();
-
-      gisportal.indicatorsPanel.checkTabFromState(id);
-
    };
-
-   if (indicator.metadataComplete) onMetadata();
-   else indicator.metadataQueue.push(onMetadata);
+   if(indicator.metadataComplete) onMetadata();
+   else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
 
 };
 
-gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue){
+gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedState){
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/user_' + gisportal.user.info.email + "/" + selectedValue + ".geojson" ,
       dataType: 'json',
       success: function(data){
-         gisportal.selectionTools.loadGeoJSON(data);
+         gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
       },
       error: function(e){
          gisportal.vectorLayer.getSource().clear();
@@ -682,12 +685,12 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       indicator.scalePoints = scalebarDetails.scalePoints;
       try{
          indicator.angle = indicator.legendSettings.Rotation;
-      }catch(e){
+      }catch(err){
          indicator.angle = 0;
       }
       try{
          indicator.legendURL = indicator.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
-      }catch(e){
+      }catch(err){
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }
       indicator.middleware = gisportal.middlewarePath;
@@ -718,14 +721,20 @@ gisportal.indicatorsPanel.vectorStyleTab = function(id) {
          if(id+"__"+layer.defaultProperty in gisportal.vectorStyles.cache) {
             gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty].unit = layer.unit;
             console.log(gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
-      var renderedStyleUI = gisportal.templates['vector-style-ui'](gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty]);
+            var indicator = gisportal.vectorStyles.cache[id+"__"+layer.defaultProperty];
+            indicator.zoomable = true;
+            if(gisportal.current_view && gisportal.current_view.noPan){
+               indicator.zoomable = false;
+            }
+      var renderedStyleUI = gisportal.templates['vector-style-ui'](indicator);
       $('[data-id="' + layer.id + '"] .dimensions-tab .vector-style-container').html(renderedStyleUI);
    }
 };
 
 gisportal.indicatorsPanel.scalebarTab = function(id) {
    var layer = gisportal.layers[id];
-   var onMetadata = function() {
+   
+   var onMetadata = function(){
       //console.log("inside on metadata");
       var indicator = gisportal.layers[id];
       if (indicator.elevationCache && indicator.elevationCache.length > 0) {
@@ -743,6 +752,10 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       gisportal.indicatorsPanel.redrawScalebar(id);
 
+      indicator.zoomable = true;
+      if(gisportal.current_view && gisportal.current_view.noPan){
+         indicator.zoomable = false;
+      }
       var rendered = gisportal.templates['tab-dimensions'](indicator);
 
       $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);
@@ -799,21 +812,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
             }
          }
       });
-      
-      // $('#tab-' + indicator.id + '-layer-style').on('change', function() {
-      //    var value = $(this).val();
-      //    indicator.style = value;
-      //    indicator.mergeNewParams({
-      //       styles: value
-      //    });
-      //    gisportal.indicatorsPanel.scalebarTab(id);
-
-      // });
-      gisportal.indicatorsPanel.checkTabFromState(id);
    };
-
-   if (layer.metadataComplete) onMetadata();
-   else layer.metadataQueue.push(onMetadata);
+   if(layer.metadataComplete) onMetadata();
+   else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
 };
 
 // Needs a refactor
@@ -892,19 +893,6 @@ function setDate(value) {
 gisportal.indicatorsPanel.removeIndicators = function(id) {
    gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
-};
-
-
-gisportal.indicatorsPanel.checkTabFromState = function(id) {
-   // Couldn't find a better place to put it 
-   if (gisportal.cache && gisportal.cache.state && gisportal.cache.state.map && gisportal.cache.state.map.layers && gisportal.cache.state.map.layers[id]) {
-      var openTab = gisportal.cache.state.map.layers[id].openTab;
-      if (openTab) {
-         $('[data-id="' + id + '"] label').toggleClass('active', false);
-         $('label[for="' + openTab + '"]').toggleClass('active', true);
-         $('#' + openTab).prop('checked', true).change();
-      }
-   }
 };
 
 
@@ -1205,7 +1193,11 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    }catch( e ){
       // Assume the old bbox style
-      bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
+      try{
+         bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
+      }catch(err){
+         $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
+      }
    }
 
    var current_proj = gisportal.projection;
