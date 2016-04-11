@@ -503,22 +503,21 @@ gisportal.mapInit = function() {
       $('.users-geojson-files').val("default");
    });
 
-   map.addInteraction(new ol.interaction.DragPan({}));
-
    gisportal.hoveredVectors = [];
    map.on('pointermove', function(e) {
       if(gisportal.selectionTools.isSelecting){
+         var setColour = function(feature,layer){
+            if(feature.getKeys().length !== 1){
+               console.log("remove: " + feature.getId());
+               var colorArr = ol.color.asArray(feature.getStyle().getFill().getColor());
+               colorArr[3] = 1;
+               feature.setStyle(new ol.style.Style({fill : new ol.style.Fill({color : colorArr})}));
+               gisportal.hoveredVectors.push(e.pixel);
+            }
+         };
          for(var id in gisportal.hoveredVectors){
             var pixel = gisportal.hoveredVectors[id];
-            map.forEachFeatureAtPixel(pixel, function(feature,layer){
-               if(feature.getKeys().length !== 1){
-                  console.log("remove: " + feature.getId());
-                  var colorArr = ol.color.asArray(feature.getStyle().getFill().getColor());
-                  colorArr[3] = 1;
-                  feature.setStyle(new ol.style.Style({fill : new ol.style.Fill({color : colorArr})}));
-                  gisportal.hoveredVectors.push(e.pixel);
-               }
-            });
+            map.forEachFeatureAtPixel(pixel, setColour(feature,layer));
          }
          gisportal.hoveredVectors = [];
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
