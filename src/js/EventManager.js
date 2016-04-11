@@ -124,6 +124,7 @@
 
 function EventManager() {
    this._events = new EventEmitter();
+   this._events.setMaxListeners(50);
 }
 
 EventManager.prototype.bind = function( eventType, callback ){
