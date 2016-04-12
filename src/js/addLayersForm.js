@@ -197,7 +197,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       });
    }catch(e){}
-   if(l.legendSettings && l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
+   if(l && l.legendSettings && l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
       $('.scale-points-div').toggleClass('hidden', false);
    }
    
@@ -318,7 +318,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                }
             }
             // It Updates the dictionary if the new display name is different fromt he statndard name
-            var dict = gisportal.addLayersForm.dictionary
+            var dict = gisportal.addLayersForm.dictionary;
             var this_dict = dict[this_layer.original_name];
             if(this_layer.original_name != this_layer.nice_name && (!this_dict || this_dict.indexOf(this_layer.nice_name) < 0)){
                gisportal.addLayersForm.addToDict(this_layer.original_name, this_layer.nice_name);
@@ -578,7 +578,7 @@ gisportal.addLayersForm.displaySuggestions = function(){
          $('.dict-opts').toggleClass('hidden', true);
       }
    }
-}
+};
 
 /**
 * This function adds all of the action listeners to the inputs of the form

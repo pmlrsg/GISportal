@@ -359,7 +359,7 @@ gisportal.indicatorsPanel.refreshData = function(indicators) {
 
 gisportal.indicatorsPanel.addToPanel = function(data) {
    for(var l in gisportal.selectedLayers){
-      $('[data-id="' + gisportal.selectedLayers[l] + '"] span').toggleClass('active', false);
+      $('[data-id="' + gisportal.selectedLayers[l] + '"] .indicator-actions span').not('.toggleVisibility').toggleClass('active', false);
    }
    if ($('.js-indicators [data-id="' + data.id + '"]').length > 0) return false;
 
