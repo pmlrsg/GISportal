@@ -76,9 +76,9 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   if(!draw)return;
-   
-   map.removeInteraction(draw);
+   if(draw){
+      map.removeInteraction(draw);
+   }
    gisportal.selectionTools.isSelecting = false;
    gisportal.selectionTools.isDrawing = false;
 }

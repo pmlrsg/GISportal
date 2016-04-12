@@ -517,7 +517,7 @@ gisportal.mapInit = function() {
          };
          for(var id in gisportal.hoveredVectors){
             var pixel = gisportal.hoveredVectors[id];
-            map.forEachFeatureAtPixel(pixel, setColour(feature,layer));
+            map.forEachFeatureAtPixel(pixel, setColour);
          }
          gisportal.hoveredVectors = [];
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
