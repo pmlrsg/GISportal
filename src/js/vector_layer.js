@@ -233,7 +233,7 @@ gisportal.Vector = function(options) {
       for(x;x<=featureCount-1;x++) {
         var props = features[x].getProperties();
 
-        if(!_.contains(possibleOptions, props[prop])){
+        if(!_.includes(possibleOptions, props[prop])){
             ////console.log("adding property value");
             ////console.log(props[this.defaultProperty]);
             possibleOptions.push( props[prop]);

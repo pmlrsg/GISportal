@@ -590,7 +590,7 @@ gisportal.mapInit = function() {
                        for (var key in props) {
                            if (props.hasOwnProperty(key) && key != "geometry") {
                                if(tlayer){
-                                  if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
+                                  if ((!_.includes(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
                                       response += "<li>" + key + " : " + props[key] + "</li>";
                                   }
                                }else if(props[key]!==undefined){
