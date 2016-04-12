@@ -599,49 +599,9 @@ gisportal.mapInit = function() {
             dataReadingPopupContent.innerHTML = response;
             dataReadingPopupOverlay.setPosition(e.coordinate);
 
-        }
-        else {
-           map.forEachFeatureAtPixel(e.pixel,
-               function(feature, layer) {
-                   if (feature && _.keys(feature.getProperties()).length >1 ) {
-                     var geom = feature.getGeometry();
-                       _.each(gisportal.selectedFeatures, function(feature) {
-                       });
-                       var tlayer;
-                       if(feature.getId()){
-                         tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
-                       }
-                       isFeature = true;
-                       gisportal.selectedFeatures.push([feature, feature.getStyle()]);
-                       var props = feature.getProperties();
-                       for (var key in props) {
-                           if (props.hasOwnProperty(key) && key != "geometry") {
-                               if(tlayer){
-                                  if ((!_.includes(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
-                                      response += "<li>" + key + " : " + props[key] + "</li>";
-                                  }
-                               }else if(props[key]!==undefined){
-                                 response += "<li>" + key + " : " + props[key] + "</li>";
-                               }
-                           }
-                       }
-                       response += "</ul>";
-                       dataReadingPopupContent.innerHTML = response;
-                       dataReadingPopupOverlay.setPosition(e.coordinate);
-                   }
-           });
-           if (!isFeature && $('.drawInProgress').length <= 0) {
-               var point = gisportal.reprojectPoint(e.coordinate, gisportal.projection, 'EPSG:4326');
-               var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
-               var lat = point[1].toFixed(3);
-               var elementId = 'dataValue' + String(e.coordinate[0]).replace('.', '') + String(e.coordinate[1]).replace('.', '');
-               response = '<p>Measurement at:<br /><em>Longitude</em>: ' + lon + ', <em>Latitude</em>: ' + lat + '</p><ul id="' + elementId + '"><li class="loading">Loading...</li></ul>';
-               dataReadingPopupContent.innerHTML = response;
-               dataReadingPopupOverlay.setPosition(e.coordinate);
-
-               gisportal.getPointReading(e);
-           }
-     }
+            gisportal.getPointReading(e);
+         }
+      }
     });
 
    map.on("moveend", function(data) {
