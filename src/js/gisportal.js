@@ -494,8 +494,8 @@ gisportal.mapInit = function() {
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
-      gisportal.featureHoverOverlay.getSource().clear();
-      gisportal.featureSelectOverlay.getSource().clear();
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
       cancelDraw();
@@ -505,51 +505,87 @@ gisportal.mapInit = function() {
       $('.users-geojson-files').val("default");
    });
 
-   gisportal.featureHoverOverlay = new ol.layer.Vector({
-      source: new ol.source.Vector(),
-      map: map,
-      style: new ol.style.Style({
+   // This function decides what colour and type of style to add to a feature
+   gisportal.featureOverlayStyle = function(feature, resolution){
+      var fillColour, strokeColour;
+      if(feature.getProperties().overlayType == "hover"){
+         fillColour = 'rgba(204,204,204,1)';
+         strokeColour = "white";
+      }else if(feature.getProperties().overlayType == "selected"){
+         fillColour = 'rgba(142,142,142,1)';
+         strokeColour = "white";
+      }else{
+         //If there is not a recognised overlay type it will set the colour to red
+         fillColour = 'red';
+         strokeColour = 'red';
+      }
+      if(feature.getGeometry().getType() == "Point"){
+         return [new ol.style.Style({
+            image: new ol.style.Circle({
+               stroke: new ol.style.Stroke({
+                  color: strokeColour,
+                  width: 0.5
+               }),
+               fill: new ol.style.Fill({
+                  color: fillColour
+               }),
+               radius: 5
+            })
+         })];
+      }
+      return [new ol.style.Style({
          stroke: new ol.style.Stroke({
-            color: 'white',
+            color: strokeColour,
             width: 1
          }),
          fill: new ol.style.Fill({
-            color: 'rgba(204,204,204,1)'
+            color: fillColour
          })
-      })
+      })];
+   };
+
+   // An overlay to add features to to draw their attention to the user
+   gisportal.featureOverlay = new ol.layer.Vector({
+      source: new ol.source.Vector(),
+      map: map,
+      style: gisportal.featureOverlayStyle
    });
 
-   gisportal.featureSelectOverlay = new ol.layer.Vector({
-      source: new ol.source.Vector(),
-      map: map,
-      style: new ol.style.Style({
-         stroke: new ol.style.Stroke({
-            color: 'white',
-            width: 1
-         }),
-         fill: new ol.style.Fill({
-            color: 'rgba(142,142,142,1)'
-         })
-      })
-   });
+   // A function to remove any features of a certail overlay type from any given overlay (vector layer)
+   gisportal.removeTypeFromOverlay = function(overlay, overlayType){
+      var features = overlay.getSource().getFeatures();
+      for(var feature in features){
+         this_feature = features[feature];
+         if(this_feature.getProperties().overlayType == overlayType){
+            overlay.getSource().removeFeature(this_feature);
+         }
+      }
+   };
 
    map.on('pointermove', function(e){
       if(e.dragging){
          return;
       }
-      gisportal.featureHoverOverlay.getSource().clear();
+      // Makes sure any hover features are removed ready to potentially add a single one
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       if(gisportal.selectionTools.isSelecting){
+         // If the selection mode is on
          var feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
-            if(feature.getKeys().length !== 1){
+            // Gets the first vector layer it finds
+            if(feature.getKeys().length !== 1 && feature.getId()){
                return feature;
             }
          });
          if(!feature){
+            // If there are no features then there are none to add
             return;
          }
+         // Stores the ID of the feature so that it knows which one it can select if the user clicks now.
          gisportal.hoveredFeature = feature.getId();
-         var new_feature = new ol.Feature(feature.getGeometry());
-         gisportal.featureHoverOverlay.getSource().addFeature(new_feature);
+         // Creates a new feature to lose the old style and add the type (so the style is correct)
+         var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"hover"});
+         // Adds the feature to the overlay
+         gisportal.featureOverlay.getSource().addFeature(new_feature);
       }
    });
 
@@ -557,16 +593,24 @@ gisportal.mapInit = function() {
    map.on('singleclick', function(e){
       var isFeature = false;
       var response = '';
-      gisportal.featureHoverOverlay.getSource().clear();
-      gisportal.featureSelectOverlay.getSource().clear();
+      // Removes all hover features from the overlay
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       if(gisportal.selectionTools.isSelecting){
+         // If the selection mode is on
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
             if(feature.getKeys().length === 1 || feature.getId() != gisportal.hoveredFeature || feature.getId() === undefined){
+               // If we are not on the correct feature then keep going until we are
                return;
             }
-            var new_feature = new ol.Feature(feature.getGeometry());
-            gisportal.featureSelectOverlay.getSource().addFeature(new_feature);
+            // If the correct feature is found from the hoveredFeature variable then you can select this one
+            // Makes sure any old selected features are removed ready to potentially add a new one
+            gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+            // Creates a new feature to lose the old style and add the type (so the style is correct)
+            var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"selected"});
+            // Adds the feature to the overlay
+            gisportal.featureOverlay.getSource().addFeature(new_feature);
 
+            // This part actually does the selecting bit for the graphing
             var t_wkt = gisportal.wkt.writeFeatures([feature]);
 
             gisportal.vectorLayer.getSource().clear();

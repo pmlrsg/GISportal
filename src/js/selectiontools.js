@@ -258,8 +258,8 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
    gisportal.vectorLayer.getSource().clear();
-   gisportal.featureHoverOverlay.getSource().clear();
-   gisportal.featureSelectOverlay.getSource().clear();
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
    cancelDraw();
    //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
@@ -347,8 +347,8 @@ gisportal.selectionTools.toggleTool = function(type)  {
          draw.on('drawstart',
             function(evt) {
                gisportal.vectorLayer.getSource().clear();
-               gisportal.featureHoverOverlay.getSource().clear();
-               gisportal.featureSelectOverlay.getSource().clear();
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
                // set sketch
                sketch = evt.feature;
                $(document).on( 'keydown', function ( e ) {
@@ -407,8 +407,8 @@ gisportal.selectionTools.updateROI = function()  {
          gisportal.methodThatSelectedCurrentRegion.justCoords = true;
       }
       gisportal.vectorLayer.getSource().clear();
-      gisportal.featureHoverOverlay.getSource().clear();
-      gisportal.featureSelectOverlay.getSource().clear();
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       if(!gisportal.current_view || !gisportal.current_view.noPan){

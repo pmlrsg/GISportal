@@ -35,8 +35,8 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '.js-clear-selection', function()  {
       gisportal.vectorLayer.getSource().clear();
-      gisportal.featureHoverOverlay.getSource().clear();
-      gisportal.featureSelectOverlay.getSource().clear();
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
       gisportal.currentSelectedRegion = "";
       gisportal.methodThatSelectedCurrentRegion = {};
       cancelDraw();
@@ -50,8 +50,8 @@ gisportal.indicatorsPanel.initDOM = function() {
          gisportal.panels.showPanel('choose-indicator');
          // Clears the vector layer to avoid confusion
          gisportal.vectorLayer.getSource().clear();
-         gisportal.featureHoverOverlay.getSource().clear();
-         gisportal.featureSelectOverlay.getSource().clear();
+         gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+         gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
       }
       var id = $(this).closest('[data-id]').data('id');
       console.log("deleting based on id");
