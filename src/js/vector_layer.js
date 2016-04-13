@@ -25,12 +25,6 @@ gisportal.Vector = function(options) {
         serviceVersion: null, // version of OGC service
         variableName: null, // the WFS variable name
         srsName: 'EPSG:4326', // SRS for the vector layer
-        defaultStyle: new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: 'rgba(0, 0, 255, 1.0)',
-                width: 2
-            })
-        }),
         defaultProperty: null,
         defaultProperties : [],
         unit : null,
@@ -67,20 +61,6 @@ gisportal.Vector = function(options) {
         console.log("adding hover style interaction");
        
         map.addLayer(layer.OLLayer);
-         var hoverInteraction = new ol.interaction.Select({
-            condition: ol.events.condition.pointerMove,
-            layers : [layer.OLLayer],
-            style :  new ol.style.Style({
-              stroke: new ol.style.Stroke({
-                color: 'rgba(255, 0, 0, 0.5)',
-                width: 2
-              }),
-              fill: new ol.style.Fill({
-                color: 'rgba(0, 0, 255, 0.1)'
-              })
-            })
-        });
-        map.addInteraction(hoverInteraction);
         this.select();
         this.getMetadata();
         this.openlayers.anID = layer.OLLayer;
@@ -295,9 +275,7 @@ gisportal.Vector = function(options) {
                      style_colour = legend_obj[bins[p] + '-' + bins[p + 1]];
                      style_colour = ol.color.asArray(style_colour);
                      if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
-                        style_colour[3] = 0.8;
-                     }else{
-                        style_colour[3] = 1;
+                        console.log("this is the feature that the user selected previously");
                      }
                      if (this.vectorType == "POINT") {
                         console.log("adding point style");
@@ -329,9 +307,7 @@ gisportal.Vector = function(options) {
                style_colour = legend_obj[features[x].getProperties()[prop]];
                style_colour = ol.color.asArray(style_colour);
                if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
-                  style_colour[3] = 0.8;
-               }else{
-                  style_colour[3] = 1;
+                  console.log("this is the feature that the user selected previously");
                }
                if (this.vectorType == "POINT") {
                   features[x].setStyle(
@@ -388,21 +364,6 @@ gisportal.Vector = function(options) {
      */
     this.createOLLayer = function() {
         var fillColour = "rgba(0,0,255,1)";
-        var styles = {
-            "POINT": new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 5,
-                    fill: new ol.style.Fill({
-                        color: 'rgba(0,0,255,0.5)'
-                    }),
-                    stroke: new ol.style.Stroke({
-                        width: 0.5,
-                        color: 'rgba(255,0,0,1)'
-                    })
-                })
-            }),
-            "POLYGON": gisportal.vectorStyles.defaultPoly
-        };
         createStyle = function(vec,source) {
             ////console.log("#############################");
 
@@ -485,8 +446,7 @@ gisportal.Vector = function(options) {
 
             var layerVector = new ol.layer.Vector({
 
-                source: sourceVector,
-                style: createStyle(vec,sourceVector)
+                source: sourceVector
 
 
             });

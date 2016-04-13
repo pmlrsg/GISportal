@@ -494,6 +494,8 @@ gisportal.mapInit = function() {
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
+      gisportal.featureHoverOverlay.getSource().clear();
+      gisportal.featureSelectOverlay.getSource().clear();
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
       cancelDraw();
@@ -503,49 +505,68 @@ gisportal.mapInit = function() {
       $('.users-geojson-files').val("default");
    });
 
-   gisportal.hoveredVectors = [];
-   map.on('pointermove', function(e) {
+   gisportal.featureHoverOverlay = new ol.layer.Vector({
+      source: new ol.source.Vector(),
+      map: map,
+      style: new ol.style.Style({
+         stroke: new ol.style.Stroke({
+            color: 'white',
+            width: 1
+         }),
+         fill: new ol.style.Fill({
+            color: 'rgba(204,204,204,1)'
+         })
+      })
+   });
+
+   gisportal.featureSelectOverlay = new ol.layer.Vector({
+      source: new ol.source.Vector(),
+      map: map,
+      style: new ol.style.Style({
+         stroke: new ol.style.Stroke({
+            color: 'white',
+            width: 1
+         }),
+         fill: new ol.style.Fill({
+            color: 'rgba(142,142,142,1)'
+         })
+      })
+   });
+
+   map.on('pointermove', function(e){
+      if(e.dragging){
+         return;
+      }
+      gisportal.featureHoverOverlay.getSource().clear();
       if(gisportal.selectionTools.isSelecting){
-         var setColour = function(feature,layer){
+         var feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
             if(feature.getKeys().length !== 1){
-               console.log("remove: " + feature.getId());
-               var colorArr = ol.color.asArray(feature.getStyle().getFill().getColor());
-               colorArr[3] = 1;
-               feature.setStyle(new ol.style.Style({fill : new ol.style.Fill({color : colorArr})}));
-               gisportal.hoveredVectors.push(e.pixel);
+               return feature;
             }
-         };
-         for(var id in gisportal.hoveredVectors){
-            var pixel = gisportal.hoveredVectors[id];
-            map.forEachFeatureAtPixel(pixel, setColour);
-         }
-         gisportal.hoveredVectors = [];
-         map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
-            if(feature.getKeys().length === 1){
-               return;
-            }
-            console.log("add: " + feature.getId());
-            var colorArr = ol.color.asArray(feature.getStyle().getFill().getColor());
-            colorArr[3] = 0.6;
-            feature.setStyle(new ol.style.Style({fill : new ol.style.Fill({color : colorArr})}));
-            gisportal.hoveredVectors.push(e.pixel);
          });
+         if(!feature){
+            return;
+         }
+         gisportal.hoveredFeature = feature.getId();
+         var new_feature = new ol.Feature(feature.getGeometry());
+         gisportal.featureHoverOverlay.getSource().addFeature(new_feature);
       }
    });
 
    //add a click event to get the clicked point's data reading
-   map.on('singleclick', function(e) {
+   map.on('singleclick', function(e){
       var isFeature = false;
       var response = '';
+      gisportal.featureHoverOverlay.getSource().clear();
+      gisportal.featureSelectOverlay.getSource().clear();
       if(gisportal.selectionTools.isSelecting){
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
-            if(feature.getKeys().length === 1){
+            if(feature.getKeys().length === 1 || feature.getId() != gisportal.hoveredFeature || feature.getId() === undefined){
                return;
             }
-            console.log("click: " + feature.getId());
-            var colorArr = ol.color.asArray(feature.getStyle().getFill().getColor());
-            colorArr[3] = 0.8;
-            feature.setStyle(new ol.style.Style({fill : new ol.style.Fill({color : colorArr})}));
+            var new_feature = new ol.Feature(feature.getGeometry());
+            gisportal.featureSelectOverlay.getSource().addFeature(new_feature);
+
             var t_wkt = gisportal.wkt.writeFeatures([feature]);
 
             gisportal.vectorLayer.getSource().clear();
@@ -555,7 +576,6 @@ gisportal.mapInit = function() {
             $('.users-geojson-files').val("default");
             gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", value: feature.getId(), justCoords: false};
             cancelDraw();
-            gisportal.selectionTools.isSelecting = false;
             // Only does it for one feature
             return;
          });
@@ -577,7 +597,7 @@ gisportal.mapInit = function() {
                   for (var key in props) {
                      if (props.hasOwnProperty(key) && key != "geometry") {
                         if(tlayer){
-                           if ((!_.contains(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
+                           if ((!_.includes(tlayer.ignoredParams, key))&&(props[key]!==undefined)) {
                               response += "<li>" + key + " : " + props[key] + "</li>";
                            }
                         }else if(props[key]!==undefined){
@@ -602,7 +622,7 @@ gisportal.mapInit = function() {
             gisportal.getPointReading(e);
          }
       }
-    });
+   });
 
    map.on("moveend", function(data) {
       var centre = data.map.getView().getCenter();

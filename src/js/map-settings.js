@@ -593,6 +593,8 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
       features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, old_proj, new_proj));
    }
    gisportal.vectorLayer.getSource().clear();
+   gisportal.featureHoverOverlay.getSource().clear();
+   gisportal.featureSelectOverlay.getSource().clear();
    gisportal.vectorLayer.getSource().addFeatures(features);
    if(gisportal.methodThatSelectedCurrentRegion.justCoords){
       gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
