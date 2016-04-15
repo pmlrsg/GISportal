@@ -73,6 +73,16 @@
             <label data-field="{{@key}}">{{title_case @key}}:</label></br>
             <input data-tag=true type="text" value="{{this}}" data-field="{{@key}}" data-id="{{../../list_id}}"/>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="{{@key}}"></span>{{/if_equals}}</br>
          {{/unless}}
+         {{#if ../tags_dict}}
+            <div class="tags-dict-opts" data-field="{{@key}}">
+               <label>Suggestions (Click to populate):</label>
+               {{#each ../../tags_dict}}
+                  {{#if @first}}<ul>{{/if}}
+                     <li><button class="js-add-tag-dict text-button" data-field="{{@../key}}">{{get_value this @../key}}</button></li>
+                  {{#if @last}}</ul>{{/if}}
+               {{/each}}
+            </div>
+         {{/if}}
       {{/each}}
       <span title="Add another Tag" data-total-pages="{{total_pages}}" data-current-page="{{list_id}}" class="add-tag-input icon-tag-add btn icon-btn left-icon"></span>
    </div>

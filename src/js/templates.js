@@ -76,6 +76,17 @@ Handlebars.registerHelper('title_case', function(str) {
    return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 });
 
+Handlebars.registerHelper('get_value', function(obj, key) {
+   if(obj){
+      if(typeof(obj[key]) == "object"){
+         return obj[key].join(", ");
+      }
+      return obj[key] || "";
+   }else{
+      return "";
+   }
+});
+
 String.prototype.endsWith = function(search) {
    var result = this.indexOf(search, this.length - search.length);
    return result !== -1;

@@ -76,6 +76,15 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       }
    }
 
+   var dict = [];
+   var tags_dict = [];
+   if(gisportal.addLayersForm.dictionary && gisportal.addLayersForm.dictionary[layer.urlName]){
+      dict = gisportal.addLayersForm.dictionary[layer.urlName].displayName;
+   }
+   if(gisportal.addLayersForm.dictionary && gisportal.addLayersForm.dictionary[layer.urlName]){
+      tags_dict = gisportal.addLayersForm.dictionary[layer.urlName].tags;
+   }
+
    var layer_info={
       "list_id":list_id,
       "nice_name":layer.tags.niceName,
@@ -87,7 +96,8 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "styles_file":styles_file,
       "legendSettings":legendSettings,
       "title":layer.serverName,
-      "dict":gisportal.addLayersForm.dictionary[layer.urlName]
+      "dict":dict,
+      "tags_dict":tags_dict
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -165,6 +175,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    $(form_div).html(layer_form);
    //Makes sure the suggestions are displayed/hidden
    gisportal.addLayersForm.displaySuggestions();
+   gisportal.addLayersForm.displayTagSuggestions(current_page);
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
    // The form then goes through validation to display corrections required to the user.
@@ -317,15 +328,19 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   return;
                }
             }
-            // It Updates the dictionary if the new display name is different fromt he statndard name
+            // It Updates the dictionary if the new display name is different from the statndard name
             var dict = gisportal.addLayersForm.dictionary;
-            var this_dict = dict[this_layer.original_name];
+            var this_dict = null;
+            if(dict[this_layer.original_name]){
+               this_dict = dict[this_layer.original_name].displayName;
+            }
             if(this_layer.original_name != this_layer.nice_name && (!this_dict || this_dict.indexOf(this_layer.nice_name) < 0)){
-               gisportal.addLayersForm.addToDict(this_layer.original_name, this_layer.nice_name);
+               gisportal.addLayersForm.addToDict(this_layer.original_name, this_layer.nice_name, this_layer.tags);
                if(!this_dict){
-                  dict[this_layer.original_name] = [];
+                  dict[this_layer.original_name] = {};
+                  dict[this_layer.original_name].displayName = [];
                }
-               dict[this_layer.original_name].push(this_layer.nice_name);
+               dict[this_layer.original_name].displayName.push(this_layer.nice_name);
             }
          }
          for(layer in gisportal.addLayersForm.layers_list){
@@ -363,8 +378,12 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    gisportal.addLayersForm.addInputListeners();
 };
 
-gisportal.addLayersForm.addToDict = function(standard_name, display_name){
-   $.ajax({url: gisportal.middlewarePath + '/settings/add_to_dictionary?standard_name=' + standard_name + '&display_name=' + display_name});
+gisportal.addLayersForm.addToDict = function(standard_name, display_name, tags){
+   $.ajax({
+      method:'post',
+      url: gisportal.middlewarePath + '/settings/add_to_dictionary?standard_name=' + standard_name + '&display_name=' + display_name,
+      data: tags
+   });
 };
 
 gisportal.addLayersForm.updateDict = function(){
@@ -372,7 +391,7 @@ gisportal.addLayersForm.updateDict = function(){
       url: gisportal.middlewarePath + '/settings/get_dictionary',
       dataType: 'json',
       success:function(data){
-         gisportal.addLayersForm.dictionary = data;
+         gisportal.addLayersForm.dictionary = data || {};
       }
    });
 };
@@ -580,6 +599,21 @@ gisportal.addLayersForm.displaySuggestions = function(){
    }
 };
 
+gisportal.addLayersForm.displayTagSuggestions = function(index){
+   $('.tags-dict-opts').toggleClass('hidden', false);
+   for(var tag in gisportal.addLayersForm.layers_list[index].tags){
+      var buttons = $('.tags-dict-opts ul li button[data-field=' + tag + ']');
+      for(var i = 0; i< buttons.length; i++){
+         var button_elem = buttons.eq(i);
+         var button_text = button_elem.text();
+         var box_text = $("input[data-field='" + tag + "']").val() || $("textarea[data-field='" + tag + "']").val();
+         if(!button_text || button_text == box_text){
+            $('.tags-dict-opts[data-field=' + tag + ']').toggleClass('hidden', true);
+         }
+      }
+   }
+};
+
 /**
 * This function adds all of the action listeners to the inputs of the form
 * 
@@ -587,7 +621,7 @@ gisportal.addLayersForm.displaySuggestions = function(){
 */
 gisportal.addLayersForm.addInputListeners = function(){
    // any existing listeners are turned off to avoid multiples being attached.
-   $('.overlay-container-form input, .overlay-container-form textarea').off('change paste');
+   $('.overlay-container-form input, .overlay-container-form textarea').off('change keyup paste');
    $('.js-layer-form-html input, .js-layer-form-html textarea').off('focusout');
    $('.js-layer-form-html span[data-field="Rotation"]').off('click');
    $('.js-layer-form-html span[data-field="Rotation"]').on('click', function(){
@@ -595,8 +629,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    });
    $('.js-server-form-html input, .js-server-form-html textarea').off('focusout');
    // All of the inputs and textareas have listeners added.
-   // TODO: Decide if this should include keyup too. might be sensible
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change paste', function(){
+   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
@@ -634,6 +667,7 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.layers_list[index].legendSettings[key] = key_val;
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }else if(tag){ // If it is a tag it needs to be added to the tags list.
+            gisportal.addLayersForm.displayTagSuggestions(index);
             if(key == "indicator_type"){ // As the indacator type is a list, it must be split first.
                if(key_val !== ""){
                   key_val = key_val.split(",");
@@ -674,6 +708,13 @@ gisportal.addLayersForm.addInputListeners = function(){
       e.preventDefault();
       var name = $(this).text();
       $("input[data-field='nice-name']").val(name).trigger('change');
+   });
+
+   $('.js-add-tag-dict').on('click', function(e){
+      e.preventDefault();
+      var name = $(this).text();
+      var field = $(this).data('field');
+      $("input[data-field='" + field + "']").val(name).trigger('change');
    });
 };
 
