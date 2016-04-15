@@ -4,6 +4,9 @@ The [GIS portal](https://github.com/pmlrsg/GISportal) is a web-based visualisati
 
 The GIS portal was developed as part of the [European Commission FP7](http://cordis.europa.eu/projects/rcn/100881_en.html) project OpEc, and its development continues with eartH2Observe as well as other sources of development investment or sponsorship of particular features.
 
+## Example Instances ##
+> You can find a full list of example instances of the GISportal software at http://pmlrsg.github.io/GISportal
+
 ## Overview ##
 
 The portal is composed of three parts. A web frontend written with **HTML**, **CSS** and **JavaScript**, a middleware written in **Node.js**, and a plotting and data extraction library written in **Python** that provides the analysis tools. 
