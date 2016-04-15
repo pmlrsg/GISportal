@@ -1,0 +1,15 @@
+*.orig
+*.pyc
+.DS_Store
+.sass-cache/*
+config/*
+html/GISportal.js
+html/GISportal.min.js
+html/all_templates.mst
+html/css/*
+html/index.html
+html/plots/*
+!html/plots/.gitkeep
+node_modules
+uploads/*
+!uploads/.gitkeep
