@@ -85,6 +85,18 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       tags_dict = gisportal.addLayersForm.dictionary[layer.urlName].tags;
    }
 
+   var reformatted_tags_dict = {};
+   for(var tag in tags_dict){
+      for(var key in tags_dict[tag]){
+         if(!reformatted_tags_dict[key]){
+            reformatted_tags_dict[key] = [];
+         }
+         if(reformatted_tags_dict[key].indexOf(tags_dict[tag][key]) == -1){
+            reformatted_tags_dict[key].push(tags_dict[tag][key])
+         }
+      }
+   }
+
    var layer_info={
       "list_id":list_id,
       "nice_name":layer.tags.niceName,
@@ -97,7 +109,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "legendSettings":legendSettings,
       "title":layer.serverName,
       "dict":dict,
-      "tags_dict":tags_dict
+      "tags_dict":reformatted_tags_dict
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form

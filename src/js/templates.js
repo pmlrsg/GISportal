@@ -76,12 +76,18 @@ Handlebars.registerHelper('title_case', function(str) {
    return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 });
 
-Handlebars.registerHelper('get_value', function(obj, key) {
+Handlebars.registerHelper('tags_list', function(obj, key) {
+   var html = "<ul>"
+
    if(obj){
-      if(typeof(obj[key]) == "object"){
-         return obj[key].join(", ");
+      for(var item in obj[key]){
+         var data = obj[key][item];
+         if(typeof(data) == "object"){
+            data = data.join(', ');
+         }
+         html += '<li><button class="js-add-tag-dict text-button" data-field="' + key + '">' + data + '</button></li>'
       }
-      return obj[key] || "";
+      return html + "</ul>";
    }else{
       return "";
    }
