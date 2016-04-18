@@ -331,16 +331,24 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             // It Updates the dictionary if the new display name is different from the statndard name
             var dict = gisportal.addLayersForm.dictionary;
             var this_dict = null;
+            var this_tags_dict = null;
             if(dict[this_layer.original_name]){
                this_dict = dict[this_layer.original_name].displayName;
+               this_tags_dict = dict[this_layer.original_name].tags;
             }
             if(this_layer.original_name != this_layer.nice_name && (!this_dict || this_dict.indexOf(this_layer.nice_name) < 0)){
                gisportal.addLayersForm.addToDict(this_layer.original_name, this_layer.nice_name, this_layer.tags);
-               if(!this_dict){
+               if(!dict[this_layer.original_name]){
                   dict[this_layer.original_name] = {};
+               }
+               if(!this_dict){
                   dict[this_layer.original_name].displayName = [];
                }
+               if(!this_tags_dict){
+                  dict[this_layer.original_name].tags = [];
+               }
                dict[this_layer.original_name].displayName.push(this_layer.nice_name);
+               dict[this_layer.original_name].tags.push(this_layer.tags);
             }
          }
          for(layer in gisportal.addLayersForm.layers_list){
