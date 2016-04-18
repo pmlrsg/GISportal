@@ -77,9 +77,8 @@ Handlebars.registerHelper('title_case', function(str) {
 });
 
 Handlebars.registerHelper('tags_list', function(obj, key) {
-   var html = "<ul>"
-
-   if(obj){
+   if(obj && obj[key]){
+      var html = "<ul>"
       for(var item in obj[key]){
          var data = obj[key][item];
          if(typeof(data) == "object"){

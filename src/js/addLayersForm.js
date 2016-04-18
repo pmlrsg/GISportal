@@ -623,6 +623,9 @@ gisportal.addLayersForm.displayTagSuggestions = function(index){
    $('.tags-dict-opts').toggleClass('hidden', false);
    for(var tag in gisportal.addLayersForm.layers_list[index].tags){
       var buttons = $('.tags-dict-opts ul li button[data-field=' + tag + ']');
+      if(buttons.length === 0){
+         $('.tags-dict-opts[data-field=' + tag + ']').toggleClass('hidden', true);
+      }
       for(var i = 0; i< buttons.length; i++){
          var button_elem = buttons.eq(i);
          var button_text = button_elem.text();
