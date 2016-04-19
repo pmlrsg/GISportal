@@ -70,7 +70,8 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
 
    // Makes a list of all the other wanted tags.
    var other_tags = {};
-   for(var tag in layer.tags){
+   var tag;
+   for(tag in layer.tags){
       if(!(tag == "data_provider" || tag == "niceName" || tag == "providerTag")){
          other_tags[tag] = layer.tags[tag];
       }
@@ -86,13 +87,13 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    }
 
    var reformatted_tags_dict = {};
-   for(var tag in tags_dict){
+   for(tag in tags_dict){
       for(var key in tags_dict[tag]){
          if(!reformatted_tags_dict[key]){
             reformatted_tags_dict[key] = [];
          }
          if(reformatted_tags_dict[key].indexOf(tags_dict[tag][key]) == -1){
-            reformatted_tags_dict[key].push(tags_dict[tag][key])
+            reformatted_tags_dict[key].push(tags_dict[tag][key]);
          }
       }
    }

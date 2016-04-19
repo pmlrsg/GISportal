@@ -78,13 +78,13 @@ Handlebars.registerHelper('title_case', function(str) {
 
 Handlebars.registerHelper('tags_list', function(obj, key) {
    if(obj && obj[key]){
-      var html = "<ul>"
+      var html = "<ul>";
       for(var item in obj[key]){
          var data = obj[key][item];
          if(typeof(data) == "object"){
             data = data.join(', ');
          }
-         html += '<li><button class="js-add-tag-dict text-button" data-field="' + key + '">' + data + '</button></li>'
+         html += '<li><button class="js-add-tag-dict text-button" data-field="' + key + '">' + data + '</button></li>';
       }
       return html + "</ul>";
    }else{

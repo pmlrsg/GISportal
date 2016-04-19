@@ -117,7 +117,7 @@ gisportal.loadLayers = function() {
    function loadWmsLayers(){
       // Get WMS cache
       $.ajax({
-         url:  gisportal.middlewarePath + '/settings/get_cache',
+         url:  gisportal.middlewarePath + '/settings/get_cache?_='+ new Date().getTime(),
          dataType: 'json',
          success: gisportal.initWMSlayers,
          error: function(e){
@@ -1530,7 +1530,7 @@ gisportal.loadBrowseCategories = function(data){
       // If the category is not in the list already
       if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
          // Add the category name as a key and convert it to a nice view for the value
-         gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+         gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
       }
    };
    gisportal.browseCategories = {};
