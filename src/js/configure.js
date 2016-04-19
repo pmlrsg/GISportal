@@ -509,6 +509,11 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
       tmp.modified = gisportal.utils.nameToId(d);
       tmp.tagname = cat;
       tmp.tagvalue = tagNames[i];
+      for(var indicator in indicators){
+         if(indicators[indicator].name == tmp.name){
+            return;
+         }
+      }
       indicators.push(tmp);
    };
 
@@ -631,6 +636,11 @@ gisportal.configurePanel.search = function(val)  {
       var tmp = {};
       tmp.name = d.name;
       tmp.modified = d.name.replace(/ /g, '__').toLowerCase();
+      for(var indicator in indicators){
+         if(indicators[indicator].name == tmp.name){
+            return;
+         }
+      }
       indicators.push(tmp);
    });
    var rendered = gisportal.templates.browseIndicators({

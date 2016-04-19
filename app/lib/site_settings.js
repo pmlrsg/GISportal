@@ -176,16 +176,17 @@ router.get('/app/settings/get_dictionary', function(req, res) {
       }
       res.send(dict_file);
    }else{
-      res.status(404).send();
+      res.send({});
    }
 });
 
-router.get('/app/settings/add_to_dictionary', function(req, res) {
+router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var standard_name = req.query.standard_name;
    var display_name = req.query.display_name;
    var username = user.getUsername(req);
    var permission = user.getAccessLevel(req, domain);
+   var tags = req.body; // Gets the data (tags)
 
    var path_gutts = "";
    if(permission != "admin"){
@@ -195,7 +196,7 @@ router.get('/app/settings/add_to_dictionary', function(req, res) {
    var dict;
    if(!utils.fileExists(dict_path)){
       if(standard_name && display_name){
-         dict = '{"' + standard_name + '":["' + display_name + '"]}';
+         dict = '{"' + standard_name + '":{"displayName":["' + display_name + '"], "tags":[' + JSON.stringify(tags) + ']}}';
       }else{
          dict = "{}";
       }
@@ -203,10 +204,19 @@ router.get('/app/settings/add_to_dictionary', function(req, res) {
    }else{
       dict = JSON.parse(fs.readFileSync(dict_path));
       if(!dict[standard_name]){
-         dict[standard_name] = [];
+         dict[standard_name] = {};
       }
-      if(dict[standard_name].indexOf(display_name) < 0){
-         dict[standard_name].push(display_name);
+      if(!dict[standard_name].displayName){
+         dict[standard_name].displayName = [];
+      }
+      if(!dict[standard_name].tags){
+         dict[standard_name].tags = [];
+      }
+      if(dict[standard_name].displayName.indexOf(display_name) < 0){
+         dict[standard_name].displayName.push(display_name);
+      }
+      if(dict[standard_name].tags.indexOf(tags) < 0){
+         dict[standard_name].tags.push(tags);
       }
       fs.writeFileSync(dict_path, JSON.stringify(dict));
    }
@@ -447,6 +457,9 @@ router.all('/app/settings/add_user_layer', function(req, res){
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
+      }
+      if(JSON.stringify(data) == "{}"){
+         return res.status(404).send();
       }
       var new_data = []; // The list for the new data to go into
       for(new_layer in layers_list){ // Loops through each new layer.
