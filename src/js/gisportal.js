@@ -1581,7 +1581,11 @@ gisportal.loadBrowseCategories = function(data){
       // If the category is not in the list already
       if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
          // Add the category name as a key and convert it to a nice view for the value
-         gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+         if(gisportal.config.catDisplayNames){
+            gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+         }else{
+            gisportal.browseCategories[cat] = gisportal.utils.titleCase(cat.replace(/_/g, ' '));
+         }
       }
    };
    gisportal.browseCategories = {};
