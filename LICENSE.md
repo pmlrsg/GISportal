@@ -6,7 +6,7 @@ Authors:
 > Robert Beecher-Brigden  
 > Shane Hudson  
 > Ben Calton  
-> Kieran Jones
+> Kieran Jones  
 > Oliver Standeven
 
 Copyright (c) 2016 PML Applications Ltd  
