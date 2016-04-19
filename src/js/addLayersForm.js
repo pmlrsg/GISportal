@@ -738,7 +738,11 @@ gisportal.addLayersForm.addInputListeners = function(){
       e.preventDefault();
       var name = $(this).text();
       var field = $(this).data('field');
-      $("input[data-field='" + field + "']").val(name).trigger('change');
+      var input = $("input[data-field='" + field + "']");
+      if(input.length == 0){
+         input = $("textarea[data-field='" + field + "']");
+      }
+      input.val(name).trigger('change');
    });
 };
 
