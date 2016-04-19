@@ -180,7 +180,7 @@ router.get('/app/settings/get_dictionary', function(req, res) {
    }
 });
 
-router.all('/app/settings/add_to_dictionary', function(req, res) {
+router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var standard_name = req.query.standard_name;
    var display_name = req.query.display_name;
