@@ -1294,12 +1294,12 @@ gisportal.initStart = function()  {
    // Do we have to show the T&C box first ?
    var autoLoad = null;
    if( gisportal.config.skipWelcomePage === true || gisportal.utils.getURLParameter('wms_url')){
-      if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
+      if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() && !_.isEmpty(gisportal.layers) ){
          autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
       }else{
          autoLoad = function(){ gisportal.launchMap(); };
       }
-   }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
+   }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() && !_.isEmpty(gisportal.layers) ){
       autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
    }
 
