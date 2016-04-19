@@ -50,7 +50,7 @@ gisportal.vectorStyles.createPalette = function(startingColour, steps){
 		currentR = Math.floor(currentR + (255 - currentR) * (tintFactor * x));
 		currentG = Math.floor(currentG + (255 - currentG) * (tintFactor * x));
 		currentB = Math.floor(currentB + (255 - currentB) * (tintFactor * x));
-		newFull = "rgba("+currentR+","+currentG+","+currentB+",1)";
+		newFull = "rgba("+currentR+","+currentG+","+currentB+","+startColour.a+")";
 		palette.push(newFull);
 
 	}
@@ -61,49 +61,48 @@ gisportal.vectorStyles.createPalette = function(startingColour, steps){
 
 gisportal.vectorStyles.startingColours = {
 	"basic_purple" : {
-		"rgba" : "rgba(38, 3, 57,1)",
+		"rgba" : "rgba(38, 3, 57,0.8)",
 		"r" : 38,
 		"g" : 3,
 		"b" : 57,
-		"a" : 1
+		"a" : 0.8
 	},
 	"basic_green" : {
-		"rgba" : "rgba(0,150,0,1)",
+		"rgba" : "rgba(0,150,0,0.8)",
 		"r" : 0,
 		"g" : 150,
 		"b" : 0,
-		"a" : 1
+		"a" : 0.8
 	},
 	"basic_red" : {
-		"rgba" : "rgba(188,0,0,1)",
+		"rgba" : "rgba(188,0,0,0.8)",
 		"r" : 188,
 		"g" : 0,
 		"b" : 0,
-		"a" : 1
+		"a" : 0.8
 	},
 	"basic_blue" : {
-		"rgba" : "rgba(5,2,175,1)",
+		"rgba" : "rgba(5,2,175,0.8)",
 		"r" : 5,
 		"g" : 2,
 		"b" : 175,
-                "a" : 1 
+      "a" : 0.8 
 	},
-        "basic_orange" : {
-		"rgba" : "rgba(255,116,0,1)",
-                "r" : 255,
-                "g" : 116,
-                "b" : 0,
-                "a" : 1
-        },
-        "bright_green" : {
-                "rgba" : "rgba(161,242,0,1)",
-                "r" : 161,
-               	"g" : 242,
-            	"b" : 0,
-                "a" : 1
-        }
+   "basic_orange" : {
+		"rgba" : "rgba(255,116,0,0.8)",
+      "r" : 255,
+      "g" : 116,
+      "b" : 0,
+      "a" : 0.8
+   },
+   "bright_green" : {
+      "rgba" : "rgba(161,242,0,0.8)",
+      "r" : 161,
+      "g" : 242,
+      "b" : 0,
+      "a" : 0.8
+   }
 };
-
 
 gisportal.vectorStyles.defaultLine = new ol.style.Style({
     stroke: new ol.style.Stroke({
