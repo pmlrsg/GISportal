@@ -940,7 +940,10 @@ gisportal.loadState = function(state){
    if (stateTimeline)  {
       gisportal.timeline.zoomDate(stateTimeline.minDate, stateTimeline.maxDate);
       if (stateMap.date) {
-         gisportal.timeline.setDate(new Date(stateMap.date));
+         var date = new Date(stateMap.date);
+         if(date.getTime() != gisportal.timeline.getDate().getTime()){
+            gisportal.timeline.setDate(date);
+         }
       }
    }
 
