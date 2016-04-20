@@ -322,7 +322,7 @@ gisportal.createOpLayers = function() {
 
    var state = gisportal.cache.state;
    gisportal.layersLoaded = true;
-   if (!gisportal.stateLoadStarted && state) gisportal.loadState(state);
+   if (!gisportal.stateLoadStarted && state && !gisportal.stateLoaded) gisportal.loadState(state);
 
    if(_.size(gisportal.layers) <= 0){
       if(_.size($('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")')) <= 0){
@@ -980,6 +980,8 @@ gisportal.loadState = function(state){
       gisportal.panels.showPanel(state.panel.activePanel);
    }
 
+   gisportal.stateLoaded = true;
+
 };
 
 gisportal.loadLayerState = function(){
@@ -1297,13 +1299,13 @@ gisportal.initStart = function()  {
    // Do we have to show the T&C box first ?
    var autoLoad = null;
    if( gisportal.config.skipWelcomePage === true || gisportal.utils.getURLParameter('wms_url')){
-      if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() && !_.isEmpty(gisportal.layers) ){
-         autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
+      if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
+         autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
       }else{
          autoLoad = function(){ gisportal.launchMap(); };
       }
-   }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() && !_.isEmpty(gisportal.layers) ){
-      autoLoad = function(){ gisportal.loadState( gisportal.getAutoSaveState() ); gisportal.launchMap();};
+   }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
+      autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
    }
 
    if( autoLoad !== null)

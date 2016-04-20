@@ -739,7 +739,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       var name = $(this).text();
       var field = $(this).data('field');
       var input = $("input[data-field='" + field + "']");
-      if(input.length == 0){
+      if(input.length === 0){
          input = $("textarea[data-field='" + field + "']");
       }
       input.val(name).trigger('change');
