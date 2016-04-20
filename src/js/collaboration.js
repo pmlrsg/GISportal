@@ -377,8 +377,8 @@ collaboration.initSession = function() {
 
             $(collaboration.historyConsole).prepend(data.presenter +': Auto Scale checkbox checked: '+ isChecked);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]').parent());
-               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked );
+               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
+               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked ).trigger('change');
             }
          });
 
@@ -389,8 +389,8 @@ collaboration.initSession = function() {
 
             $(collaboration.historyConsole).prepend(data.presenter +': Logarithmic checkbox checked: '+ isLog);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]').parent());
-               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog );
+               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
+               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog ).trigger('change');
             }
          });
 
@@ -442,7 +442,7 @@ collaboration.initSession = function() {
 		  		collaboration.log(data.presenter +': Scalebar was reset');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-reset[data-id="'+ data.params.id +'"]'));
-            	$('.js-reset[data-id="'+ data.params.id +'"] span').click();
+            	$('.js-reset[data-id="'+ data.params.id +'"]').click();
             }
 		  	});            
 

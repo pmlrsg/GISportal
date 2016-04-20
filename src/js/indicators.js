@@ -85,7 +85,7 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
-   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scalevalues > input[type="checkbox"]', function() {
+   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .js-indicator-is-log,  .scalevalues > input[type="checkbox"]', function() {
       var id = $(this).data('id');
       // This removed the min val in the layer so that the data is refreshed on the map
       gisportal.layers[id].minScaleVal = null;
