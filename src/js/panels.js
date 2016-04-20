@@ -28,6 +28,7 @@ gisportal.panels.showPanel = function(panelName) {
 		$('#refine-layers').ddslick('open');
 	}
 	gisportal.panels.activePanel = panelName;
+	gisportal.events.trigger('panels.showpanel', panelName);
 
 };
 
