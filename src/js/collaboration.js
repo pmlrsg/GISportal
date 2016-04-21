@@ -289,7 +289,9 @@ collaboration.initSession = function() {
          socket.on('layer.hide', function(data) {
             collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
-               gisportal.indicatorsPanel.hideLayer(data.params.id);
+               var id = data.params.id;
+               gisportal.indicatorsPanel.hideLayer(id);
+               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
             }
          });
 
@@ -335,7 +337,9 @@ collaboration.initSession = function() {
 		  	socket.on('layer.show', function(data) {
 		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
-            	gisportal.indicatorsPanel.showLayer(data.params.id);
+               var id = data.params.id;
+            	gisportal.indicatorsPanel.showLayer(id);
+               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
             }
 		  	});
                         
@@ -481,7 +485,7 @@ collaboration.initSession = function() {
             var tabName = data.params.tabName;
             collaboration.log(data.presenter +': ' + tabName + ' selected for ' + layerId);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('[data-tab-name="'+ tabName +'"]'));
+               collaboration.highlightElement($('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]'));
                gisportal.indicatorsPanel.selectTab( layerId, tabName );
             }
          });
