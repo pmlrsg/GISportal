@@ -202,6 +202,32 @@ gisportal.events.bind("search.typing", function(event, searchValue) {
    collaboration._emit('c_event', params);
 });
 
+// wms string changes
+gisportal.events.bind("wms.typing", function(event, typedValue) {
+   var params = {
+      "event" : "wms.typing",
+      "typedValue" : typedValue
+   };
+   collaboration._emit('c_event', params);
+});
+
+// refresh cache box changed
+gisportal.events.bind("refreshCacheBox.clicked", function(event, checked) {
+   var params = {
+      "event" : "refreshCacheBox.clicked",
+      "checked" : checked
+   };
+   collaboration._emit('c_event', params);
+});
+
+// wms submitted
+gisportal.events.bind("wms.submitted", function() {
+   var params = {
+      "event" : "wms.submitted"
+   };
+   collaboration._emit('c_event', params);
+});
+
 // search string changes
 gisportal.events.bind("search.cancel", function(event) {
    var params = {

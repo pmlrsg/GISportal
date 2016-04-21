@@ -461,6 +461,35 @@ collaboration.initSession = function() {
             }
          });
 
+         // wms value changed
+         socket.on('wms.typing', function(data) {
+            var typedValue = data.params.typedValue;
+            collaboration.log(data.presenter +': wms entry: ' + typedValue);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('input.js-wms-url'));
+               $('input.js-wms-url').val(typedValue).trigger('change');
+            }
+         });
+
+         // refresh cache value changed
+         socket.on('refreshCacheBox.clicked', function(data) {
+            var checked = data.params.checked;
+            collaboration.log(data.presenter +': refreshCacheBox: ' + checked);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('#refresh-cache-box'));
+               $('#refresh-cache-box')[0].checked = checked;
+            }
+         });
+
+         // wms submitted
+         socket.on('wms.submitted', function(data) {
+            collaboration.log(data.presenter +': wms submitted');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('button.js-wms-url'));
+               $('button.js-wms-url').trigger('click');
+            }
+         });
+
          // search cancelled
          socket.on('search.cancel', function(data) {
             collaboration.log(data.presenter +': search cancelled');

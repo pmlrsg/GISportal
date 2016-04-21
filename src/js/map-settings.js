@@ -52,6 +52,11 @@ gisportal.map_settings.init = function() {
       gisportal.editLayersForm.addSeverTable();
    });
 
+   $('#refresh-cache-box').on('change', function(){
+      var checked = $(this).is(':checked');
+      gisportal.events.trigger('refreshCacheBox.clicked', checked);
+   });
+
    // enable ddslick'ness
    $('#select-basemap').ddslick({
       onSelected: function(data) { 
@@ -135,12 +140,14 @@ gisportal.map_settings.init = function() {
             gisportal.addLayersForm.refreshStorageInfo();
          }
       }
+      gisportal.events.trigger('wms.submitted');
    });
 
    // WMS URL event handler for refresh cache checkbox
-   $('input.js-wms-url').on('change', function(e)  {
+   $('input.js-wms-url').on('change keyup', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var input_value = $('input.js-wms-url')[0].value.split("?")[0];
+      var typed = $('input.js-wms-url')[0].value;
+      var input_value = typed.split("?")[0];
       if(input_value.length > 0){
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
@@ -169,6 +176,7 @@ gisportal.map_settings.init = function() {
          $('#refresh-cache-message').toggleClass('hidden', true);
          $('#refresh-cache-div').toggleClass('hidden', true);
       }
+      gisportal.events.trigger('wms.typing', typed);
    });
 
 };
