@@ -217,7 +217,42 @@ collaboration.initSession = function() {
 
          socket.on('configurepanel.scroll', function(data) {
             if (collaboration.role == "member") {
-               $('#configurePanel').scrollTop(data.params.scrollTop);
+               var div = $('#configurePanel');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('mapsettingspanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('#mapSettingsPanel');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('addLayersForm.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.overlay-container-form');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('addLayersForm.input', function(data) {
+            if (collaboration.role == "member") {
+               var input = data.params.inputValue;
+               var field = data.params.field;
+               var input_elem = $('textarea[data-field="' + field + '"],input[data-field="' + field + '"]');
+               if(field == "Rotation"){
+                  input_elem = input_elem.filter('[value="' + input + '"]')
+               }else if(input_elem.is(':checkbox')){
+                  input_elem.prop('checked', input);
+               }else{
+                  input_elem.val(input);
+               }
+               input_elem.trigger('change');
+               collaboration.highlightElement(input_elem);
             }
          });
 
@@ -254,7 +289,7 @@ collaboration.initSession = function() {
          socket.on('ddslick.close', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj);
+               //collaboration.highlightElement(obj);
                obj.ddslick('close');   
             }
             collaboration.log(obj +' drop down closed');
@@ -264,7 +299,7 @@ collaboration.initSession = function() {
             var obj = $('#' + data.params.obj);
             var index = data.params.index;
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
+               //collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
                obj.ddslick('select', { "index": index });   
             }
             collaboration.log(obj +' selectedIndex: ' + index);
@@ -272,7 +307,9 @@ collaboration.initSession = function() {
 
    	  	socket.on('indicatorspanel.scroll', function(data) {
             if (collaboration.role == "member") {
-               $('#indicatorsPanel').scrollTop(data.params.scrollTop);
+               var div = $('#indicatorsPanel');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
          });
 
@@ -487,6 +524,33 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                collaboration.highlightElement($('button.js-wms-url'));
                $('button.js-wms-url').trigger('click');
+            }
+         });
+
+         // more info clicked
+         socket.on('moreInfo.clicked', function(data) {
+            collaboration.log(data.presenter +': more info clicked');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.more-info'));
+               $('.more-info').trigger('click');
+            }
+         });
+
+         // reset list clicked
+         socket.on('resetList.clicked', function(data) {
+            collaboration.log(data.presenter +': reset list clicked');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('button#reset-list'));
+               $('button#reset-list').trigger('click');
+            }
+         });
+
+         // add layers form clicked
+         socket.on('addLayersForm.clicked', function(data) {
+            collaboration.log(data.presenter +': add layers form clicked');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('button#js-add-layers-form'));
+               $('button#js-add-layers-form').trigger('click');
             }
          });
 

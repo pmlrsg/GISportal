@@ -106,6 +106,11 @@ gisportal.map_settings.init = function() {
       $('#select-graticules').ddslick('select', { value: "On" });
    }
 
+   $('#mapSettingsPanel').bind('scroll', function() {
+      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+      gisportal.events.trigger('mapsettingspanel.scroll', scrollPercent);
+   });
+
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
       e.preventDefault();

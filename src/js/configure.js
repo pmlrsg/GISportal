@@ -34,7 +34,8 @@ gisportal.configurePanel.refreshData = function()  {
    gisportal.configurePanel.loadViewList();
 
    $('#configurePanel').bind('scroll', function() {
-     gisportal.events.trigger('configurepanel.scroll', $(this).scrollTop());
+      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+      gisportal.events.trigger('configurepanel.scroll', scrollPercent);
    });
 };
 
@@ -320,9 +321,11 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
          $(this).html("less info...");
          message_block.slideDown('slow');
       }
+      gisportal.events.trigger('moreInfo.clicked');
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
+      //gisportal.events.trigger('resetList.clicked');
    });
 
    // Listener is added to the add layers button
@@ -338,6 +341,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
+      gisportal.events.trigger('addLayersForm.clicked');
    });
 
    // iterate over each category
@@ -389,9 +393,11 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          $(this).html("less info...");
          message_block.slideDown('slow');
       }
+      gisportal.events.trigger('moreInfo.clicked');
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
+      //gisportal.events.trigger('resetList.clicked');
    });
 
    // Listener is added to the add layers button
@@ -407,6 +413,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
+      gisportal.events.trigger('addLayersForm.clicked');
    });
 
    var categories = [];

@@ -613,7 +613,7 @@ gisportal.addLayersForm.displaySuggestions = function(){
    for(var i = 0; i< $('.dict-opts ul li').length; i++){
       var button_elem = $('.dict-opts ul li button').eq(i);
       var button_text = button_elem.text();
-      var box_text = $("input[data-field='nice-name']").val();
+      var box_text = $("input[data-field='nice_name']").val();
       if(button_text == box_text){
          $('.dict-opts').toggleClass('hidden', true);
       }
@@ -648,10 +648,15 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.overlay-container-form input, .overlay-container-form textarea').off('change keyup paste');
    $('.js-layer-form-html input, .js-layer-form-html textarea').off('focusout');
    $('.js-layer-form-html span[data-field="Rotation"]').off('click');
+
+   $('.overlay-container-form').bind('scroll', function() {
+      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+      gisportal.events.trigger('addLayersForm.scroll', scrollPercent);
+   });
+
    $('.js-layer-form-html span[data-field="Rotation"]').on('click', function(){
       $(this).children('input').trigger("change");
    });
-   $('.js-server-form-html input, .js-server-form-html textarea').off('focusout');
    // All of the inputs and textareas have listeners added.
    $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
       var tag = $(this).data("tag"); // Is this input for a tag?
@@ -663,6 +668,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       }else{
          key_val = $(this).val(); // key_val set to value of field
       }
+      var raw_key_val = key_val;
       if(key == 'include'){
          key_val = !key_val;
          var toggle_elem = $('.toggle-all-layers');
@@ -715,6 +721,8 @@ gisportal.addLayersForm.addInputListeners = function(){
       // The storage data is then updated.
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addInputListeners();
+      gisportal.addLayersForm.validateForm('div.overlay-container-form');
+      gisportal.events.trigger('addLayersForm.input', raw_key_val, key);
    });
    // When you focus out of a field, the form is then validated again.
    $('div.overlay-container-form input, div.overlay-container-form textarea').on('focusout', function(){
@@ -731,7 +739,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.js-add-dict').on('click', function(e){
       e.preventDefault();
       var name = $(this).text();
-      $("input[data-field='nice-name']").val(name).trigger('change');
+      $("input[data-field='nice_name']").val(name).trigger('change');
    });
 
    $('.js-add-tag-dict').on('click', function(e){

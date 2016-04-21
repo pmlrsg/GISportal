@@ -241,7 +241,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    $('#indicatorsPanel').bind('scroll', function() {
-     gisportal.events.trigger('indicatorspanel.scroll', $(this).scrollTop());
+      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+     gisportal.events.trigger('indicatorspanel.scroll', scrollPercent);
    });
 };
 

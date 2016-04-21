@@ -228,6 +228,30 @@ gisportal.events.bind("wms.submitted", function() {
    collaboration._emit('c_event', params);
 });
 
+// more info clicked
+gisportal.events.bind("moreInfo.clicked", function() {
+   var params = {
+      "event" : "moreInfo.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+// reset list clicked
+gisportal.events.bind("resetList.clicked", function() {
+   var params = {
+      "event" : "resetList.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+// add layers form clicked
+gisportal.events.bind("addLayersForm.clicked", function() {
+   var params = {
+      "event" : "addLayersForm.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
 // search string changes
 gisportal.events.bind("search.cancel", function(event) {
    var params = {
@@ -259,18 +283,43 @@ gisportal.events.bind("tab.select", function(event, layerId, tabName) {
 // jQuery events 
 
 
-gisportal.events.bind('configurepanel.scroll', function(event, scrollTop) {
+gisportal.events.bind('configurepanel.scroll', function(event, scrollPercent) {
    var params = {
       "event": "configurepanel.scroll",
-      "scrollTop": scrollTop
+      "scrollPercent": scrollPercent
    };
    collaboration._emit('c_event', params);
 });
 
-gisportal.events.bind('indicatorspanel.scroll', function(event, scrollTop) {
+gisportal.events.bind('mapsettingspanel.scroll', function(event, scrollPercent) {
+   var params = {
+      "event": "mapsettingspanel.scroll",
+      "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('indicatorspanel.scroll', function(event, scrollPercent) {
    var params = {
       "event": "indicatorspanel.scroll",
-      "scrollTop": scrollTop
+      "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.scroll', function(event, scrollPercent) {
+   var params = {
+      "event": "addLayersForm.scroll",
+      "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) {
+   var params = {
+      "event": "addLayersForm.input",
+      "field": field,
+      "inputValue": inputValue
    };
    collaboration._emit('c_event', params);
 });

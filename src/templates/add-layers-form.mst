@@ -11,8 +11,8 @@
       {{#if_equals ../list_id "1"}}<span title="Copy To All" class="toggle-all-layers icon-clipboard-edit btn icon-btn" data-field="include"></span>{{/if_equals}}</br>
       {{/unless_equals}}
 
-      <label data-field="nice-name">Display Name:</label></br>
-      <input type="text" value="{{nice_name}}" data-field="nice-name" data-id="{{list_id}}"/></br>
+      <label data-field="nice_name">Display Name:</label></br>
+      <input type="text" value="{{nice_name}}" data-field="nice_name" data-id="{{list_id}}"/></br>
       {{#if dict}}
          <div class="dict-opts">
             <label>Suggestions (Click to populate):</label>
