@@ -658,7 +658,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       $(this).children('input').trigger("change");
    });
    // All of the inputs and textareas have listeners added.
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(e){
+   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
