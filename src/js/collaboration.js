@@ -260,6 +260,7 @@ collaboration.initSession = function() {
          });
 
          socket.on('addLayersForm.close', function(data) {
+            collaboration.log(data.presenter +': Add Layers Form Closed');
             if (collaboration.role == "member") {
                $('span.js-layer-form-close').trigger('click');
             }
@@ -287,7 +288,7 @@ collaboration.initSession = function() {
                   keyName = "RIGHT Arrow";
                   break;
             }
-            collaboration.log('Keydown: '+ keyName);
+            collaboration.log(data.presenter +': Keydown: '+ keyName);
          });
 
          socket.on('date.selected', function(data) {
@@ -297,7 +298,7 @@ collaboration.initSession = function() {
                collaboration.highlightElement($('.js-current-date'));
                gisportal.timeline.setDate(date); 
             }
-            collaboration.log('Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
+            collaboration.log(data.presenter +': Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
          });
 
          socket.on('date.zoom', function(data) {
@@ -308,7 +309,7 @@ collaboration.initSession = function() {
                collaboration.highlightElement($('#timeline'));
                gisportal.timeline.zoom(startDate, endDate); 
             }
-            collaboration.log('Timeline zoom changed');
+            collaboration.log(data.presenter +': Timeline zoom changed');
          });
 
          socket.on('ddslick.open', function(data) {
@@ -452,8 +453,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.autoscale-checkbox', function(data) {
             var id = data.params.id;
             var isChecked = data.params.isChecked;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Auto Scale checkbox checked: '+ isChecked);
+            collaboration.log(data.presenter +': Autoscale set to ' + isChecked + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
                $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked ).trigger('change');
@@ -464,7 +464,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.log-set', function(data) {
             var id = data.params.id;
             var isLog = data.params.isLog;
-
+            collaboration.log(data.presenter +': Logarithmic set to ' + isLog + ' - '+ id);
             $(collaboration.historyConsole).prepend(data.presenter +': Logarithmic checkbox checked: '+ isLog);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
@@ -476,8 +476,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.max-set', function(data) {
             var id = data.params.id;
             var value = data.params.value;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Maximum set to '+ value);
+            collaboration.log(data.presenter +': Max set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
                $('.js-scale-max[data-id="' + id + '"]').val(value).change();
@@ -488,8 +487,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.min-set', function(data) {
             var id = data.params.id;
             var value = data.params.value;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Minimum set to '+ value);
+            collaboration.log(data.presenter +': Min set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
                $('.js-scale-min[data-id="' + id + '"]').val(value).change();
@@ -583,7 +581,7 @@ collaboration.initSession = function() {
 
          // add layers form clicked
          socket.on('addLayersForm.clicked', function(data) {
-            collaboration.log(data.presenter +': Add layers form clicked');
+            collaboration.log(data.presenter +': "Add layers" clicked');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('button#js-add-layers-form'));
                $('button#js-add-layers-form').trigger('click');
@@ -619,15 +617,21 @@ collaboration.initSession = function() {
             }
          });
 
-			// User saved state
-			socket.on('setSavedState', function(data) {
-		  		console.log(data);
-		  		
-		  		collaboration.log('State restored');
-		   	if (collaboration.role == "member") {
-		   		map.zoomToScale(data.params.zoomlevel);
-		   	}
-		  	});
+         socket.on('paginator.selected', function(data) {
+            collaboration.log(data.presenter +': Page ' + data.params.page + ' selected');
+            if (collaboration.role == "member") {
+               $('.js-go-to-form-page').find('a[data-page="' + data.params.page + '"]').trigger('click');
+            }
+         });
+
+         // User saved state
+         socket.on('setSavedState', function(data) {
+            
+            collaboration.log('State restored');
+            if (collaboration.role == "member") {
+               map.zoomToScale(data.params.zoomlevel);
+            }
+         });
 
 		  	// control whether the user is a presenter or a member
 			$('#btn-presenter').click(function() {

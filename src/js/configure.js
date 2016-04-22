@@ -34,7 +34,7 @@ gisportal.configurePanel.refreshData = function()  {
    gisportal.configurePanel.loadViewList();
 
    $('#configurePanel').bind('scroll', function() {
-      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+      var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
       gisportal.events.trigger('configurepanel.scroll', scrollPercent);
    });
 };

@@ -5,7 +5,7 @@
          <li class="disabled"><a  href="javascript:void(0)">...</a></li>
          {{/if}}
          {{#for from to 1}}
-         <li {{#if_equals ../current this }}class="disabled"{{/if_equals}}class="js-go-to-form-page" onclick="{{../function_name}}({{../max}}, {{this}}, '{{../form_div}}')" ><a href="javascript:void(0)">{{this}}</a></li>
+         <li {{#if_equals ../current this }}class="disabled"{{/if_equals}}class="js-go-to-form-page" onclick="{{../function_name}}({{../max}}, {{this}}, '{{../form_div}}')" ><a data-page="{{this}}" href="javascript:void(0)">{{this}}</a></li>
          {{/for}}
 
          {{#if end}}

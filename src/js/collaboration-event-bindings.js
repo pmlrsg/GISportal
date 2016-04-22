@@ -338,3 +338,11 @@ gisportal.events.bind('body.keydown', function(event, code) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('paginator.selected', function(event, page) {
+   var params = {
+      "event": "paginator.selected",
+      "page": page
+   };
+   collaboration._emit('c_event', params);
+});

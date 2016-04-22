@@ -653,7 +653,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.js-layer-form-html span[data-field="Rotation"]').off('click');
 
    $('.overlay-container-form').bind('scroll', function() {
-      var scrollPercent = 100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height()));
+      var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
       gisportal.events.trigger('addLayersForm.scroll', scrollPercent);
    });
 
@@ -756,6 +756,12 @@ gisportal.addLayersForm.addInputListeners = function(){
       }
       input.val(name).trigger('change');
    });
+
+   $('.js-go-to-form-page').find('a').off('click');
+   $('.js-go-to-form-page').find('a').on('click', function(){
+      var page = $(this).data('page');
+      gisportal.events.trigger('paginator.selected', page);
+   })
 };
 
 /**
