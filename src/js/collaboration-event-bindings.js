@@ -323,3 +323,18 @@ gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) 
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('addLayersForm.close', function(event) {
+   var params = {
+      "event": "addLayersForm.close"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('body.keydown', function(event, code) {
+   var params = {
+      "event": "body.keydown",
+      "code": code
+   };
+   collaboration._emit('c_event', params);
+});

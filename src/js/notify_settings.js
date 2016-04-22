@@ -74,3 +74,15 @@ $.notify.addStyle('gisportal-restore-option', {
       "</div>" +
     "</div>"
 });
+
+$.notify.addStyle('gisportal-collab-notification', {
+  html: 
+    "<div data-option='collab'>" +
+      "<div class='clearfix'>" +
+        "<div class='title' data-notify-html='title'/>" +
+        "<div class='buttons'>" +
+          "<a href='javascript:;'' class='hide-opt pull-right' data-notify-text='hide-text'></a>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+});

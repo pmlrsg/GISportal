@@ -242,16 +242,19 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                      gisportal.addLayersForm.refreshStorageInfo();
                   }
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
             case 37:
                if(current_page > 1){
                   gisportal.addLayersForm.displayForm(total_pages, current_page-1, form_div);
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
             case 39:
                if(current_page < total_pages){
                   gisportal.addLayersForm.displayForm(total_pages, current_page+1, form_div);
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
          }
       }
@@ -658,7 +661,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       $(this).children('input').trigger("change");
    });
    // All of the inputs and textareas have listeners added.
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
+   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(e){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
@@ -734,6 +737,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.form_info.display_form = false; // display_form set to false so that the portal knows that the form was not displayed last time the user was viewing it.
       // The browser cache is updaed witht the changes.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addLayersForm.close');
    });
 
    $('.js-add-dict').on('click', function(e){

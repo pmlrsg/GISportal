@@ -81,7 +81,7 @@ collaboration.init = function(io, app, config) {
                      reassignPresenter = true;
                   }
                   // get their name so others can be warned that `departed` has left the building
-                  departed = people[i].name;
+                  departed = people[i].name || people[i].email;
                   // take the user out of the people array
                   rooms[roomId].splice(i, 1);
                   break;

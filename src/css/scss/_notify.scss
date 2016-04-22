@@ -18,7 +18,8 @@
 .notifyjs-gisportal-base,
 .notifyjs-gisportal-refresh-option-base,
 .notifyjs-gisportal-delete-option-base,
-.notifyjs-gisportal-restore-option-base {
+.notifyjs-gisportal-restore-option-base,
+.notifyjs-gisportal-collab-notification-base {
   color: #111111;
   padding: 8px 15px 8px 14px;
   background-color: #ffffff;
@@ -35,7 +36,8 @@
 .notifyjs-gisportal-base:before,
 .notifyjs-gisportal-refresh-option-base:before,
 .notifyjs-gisportal-delete-option-base:before,
-.notifyjs-gisportal-restore-option-base:before {
+.notifyjs-gisportal-restore-option-base:before,
+.notifyjs-gisportal-collab-notification-base:before {
   font-family: "streamline-24px" !important;
   font-style: normal !important;
   font-weight: normal !important;
