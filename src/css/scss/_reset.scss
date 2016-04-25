@@ -29,6 +29,10 @@ footer, header, hgroup, menu, nav, section {
    display: block;
 }
 body {
+   height: 100%;
+   width: 100%;
+   overflow: hidden;
+   position: fixed;
    line-height: 1;
 }
 ol, ul {

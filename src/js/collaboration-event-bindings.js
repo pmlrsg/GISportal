@@ -45,16 +45,6 @@ gisportal.events.bind("ddslick.selectIndex", function(event, obj, index, doCallb
    collaboration._emit('c_event', params);
 });
 
-
-// new layer added
-gisportal.events.bind("layer.addtopanel", function(event, data) {
-   var params = {
-      "event" : "layer.addtopanel",
-      "layer" : data
-   };
-   collaboration._emit('c_event', params);
-});
-
 // hide a layer
 gisportal.events.bind("layer.hide", function(event, id, layerName) {
    var params = {

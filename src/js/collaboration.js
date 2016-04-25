@@ -5,7 +5,6 @@ collaboration = {};
 // jquery selectors for various control elements
 collaboration.startButton = '.js-start-collaboration';							// the button to initiate a collaboration session
 collaboration.consoleWrapper = '.js-collaboration-console';						// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
-collaboration.historyConsole = '.js-collaboration-history';						// a div that historical message log is appended to
 collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
 collaboration.statusIcon = '.js-collaboration-status-icon';                // element where the status icon is displayed
 collaboration.displayLog = true;                                           // if true the history is shown in `collaboration.historyConsole`
@@ -296,7 +295,9 @@ collaboration.initSession = function() {
 
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-current-date'));
-               gisportal.timeline.setDate(date); 
+               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+                  gisportal.timeline.setDate(date);
+               }
             }
             collaboration.log(data.presenter +': Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
          });
@@ -307,24 +308,25 @@ collaboration.initSession = function() {
 
             if (collaboration.role == "member") {
                collaboration.highlightElement($('#timeline'));
-               gisportal.timeline.zoom(startDate, endDate); 
+               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+                  gisportal.timeline.zoomDate(startDate, endDate);
+               }
             }
-            collaboration.log(data.presenter +': Timeline zoom changed');
          });
 
          socket.on('ddslick.open', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
                collaboration.highlightElement(obj);
-               obj.ddslick('open');   
+               obj.ddslick('open');
             }
          });
 
          socket.on('ddslick.close', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               //collaboration.highlightElement(obj);
-               obj.ddslick('close');   
+               collaboration.highlightElement(obj);
+               obj.ddslick('close');
             }
          });
 
@@ -332,8 +334,8 @@ collaboration.initSession = function() {
             var obj = $('#' + data.params.obj);
             var index = data.params.index;
             if (collaboration.role == "member") {
-               //collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
-               obj.ddslick('select', { "index": index });   
+               collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
+               obj.ddslick('select', { "index": index });
             }
          });
 
@@ -344,15 +346,6 @@ collaboration.initSession = function() {
                div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
          });
-
-         // layer added
-		  	socket.on('layer.addtopanel', function(data) {
-		  		//console.log('layer.addtopanel received');
-		  		//console.log(data);
-            if (collaboration.role == "member") {	
-		  			gisportal.indicatorsPanel.addToPanel(data.params.layer);
-            }
-		  	});
 
          // layer hidden
          socket.on('layer.hide', function(data) {
@@ -431,19 +424,19 @@ collaboration.initSession = function() {
             var panel_div = $('.js-show-panel[data-panel-name="'+ nicePanelName +'"]');
             if(panel_div.find('span').length > 0){
                nicePanelName = panel_div.find('span').attr('title');
-            }else if(panel_div.html().length > 0){
+            }else if(panel_div.html() && panel_div.html().length > 0){
                nicePanelName = panel_div.html();
             }
 		  		collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('[data-panel-name="' + p + '"].tab'));
-            	gisportal.panels.showPanel(p);
+               gisportal.panels.showPanel(p);
             }
 		  	});  
 
 		  	// autoscale
          socket.on('scalebar.autoscale', function(data) {
-		  		$(collaboration.historyConsole).prepend(data.presenter +': Auto Scale - '+ data.params.layerName);
+		  		collaboration.log(data.presenter +': Auto Scale - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.scalebars.autoScale(data.params.id, data.params.force);
             }
@@ -465,7 +458,6 @@ collaboration.initSession = function() {
             var id = data.params.id;
             var isLog = data.params.isLog;
             collaboration.log(data.presenter +': Logarithmic set to ' + isLog + ' - '+ id);
-            $(collaboration.historyConsole).prepend(data.presenter +': Logarithmic checkbox checked: '+ isLog);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
                $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog ).trigger('change');
@@ -501,8 +493,6 @@ collaboration.initSession = function() {
 
             if (typeof value != 'undefined') {
                var opacity = value * 100;
-
-               $(collaboration.historyConsole).prepend(data.presenter +': Opacity set to '+ value);
                if (collaboration.role == "member") {
                   collaboration.highlightElement($('#tab-' + id + '-opacity'));
                   
@@ -635,7 +625,7 @@ collaboration.initSession = function() {
          });
 
          socket.on('submitLayers.clicked', function(data) {
-            collaboration.log(data.presenter +': Submit Layers clicked');
+            collaboration.log(data.presenter +': "Submit Layers" clicked');
             if (collaboration.role == "member") {
                var submit_elem = $('.js-layers-form-submit');
                collaboration.highlightElement(submit_elem);

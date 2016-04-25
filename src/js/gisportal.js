@@ -769,7 +769,6 @@ gisportal.saveState = function(state) {
    state.selectedRegionInfo = gisportal.methodThatSelectedCurrentRegion;
    state.selectedIndicators = [];
    state.selectedLayers = {}; 
-   state.timeline = {};
    state.view = gisportal.current_view;
    state.graphs = {};
    state.panel = {};
@@ -822,8 +821,12 @@ gisportal.saveState = function(state) {
    state.map.centre = map.getView().getCenter();
 
    // Get timeline zoom
-   state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
-   state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
+   // This is here because it only needs to be regenerated if there are loaded layers
+   if(state.selectedIndicators.length > 0){
+      state.timeline = {};
+      state.timeline.minDate = gisportal.timeline.xScale.domain()[0];
+      state.timeline.maxDate = gisportal.timeline.xScale.domain()[1];
+   }
 
    state.map.baselayer = $('#select-basemap').data().ddslick.selectedData.value;
    state.map.countryborders = $('#select-country-borders').data().ddslick.selectedData.value;

@@ -537,6 +537,16 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.reHeight();
    this.redraw();
    this.updatePickerBounds();
+
+   var h = $('.timeline-container').height();
+   if(gisportal.timeline.timebars.length <= 0){
+      gisportal.timeline = null;
+      $('#timeline').html("");
+      gisportal.nonLayerDependent();
+      $('.timeline-container').css('bottom','-1000px');
+      h = 0;
+   }
+   $('.panel').css('bottom', h + 35 +'px');
 };
 
 // Set the currently selected date and animated the transition
