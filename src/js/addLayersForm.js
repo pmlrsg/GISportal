@@ -322,6 +322,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // Adds a listener to the submit button on the form.
    $('.layers-form-buttons-div button.js-layers-form-submit').on('click', function(e){
       e.preventDefault();
+      gisportal.events.trigger('submitLayers.clicked');
       if(!gisportal.form_working){
          gisportal.form_working = true;
          // If there are errors on the server information form then notify the user.
@@ -761,7 +762,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.js-go-to-form-page').find('a').on('click', function(){
       var page = $(this).data('page');
       gisportal.events.trigger('paginator.selected', page);
-   })
+   });
 };
 
 /**

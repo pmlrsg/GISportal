@@ -427,7 +427,7 @@ collaboration.initSession = function() {
          // panel selected/shown
          socket.on('panels.showpanel', function(data) {
             var p = data.params.panelName;
-            var nicePanelName = data.params.panelName
+            var nicePanelName = data.params.panelName;
             var panel_div = $('.js-show-panel[data-panel-name="'+ nicePanelName +'"]');
             if(panel_div.find('span').length > 0){
                nicePanelName = panel_div.find('span').attr('title');
@@ -621,6 +621,25 @@ collaboration.initSession = function() {
             collaboration.log(data.presenter +': Page ' + data.params.page + ' selected');
             if (collaboration.role == "member") {
                $('.js-go-to-form-page').find('a[data-page="' + data.params.page + '"]').trigger('click');
+            }
+         });
+
+         socket.on('zoomToData.clicked', function(data) {
+            var id = data.params.layer;
+            collaboration.log(data.presenter +': Zoom to data clicked: ' + id);
+            if (collaboration.role == "member") {
+               var zoom_elem = $('.js-zoom-data[data-id="' + id + '"]');
+               collaboration.highlightElement(zoom_elem);
+               zoom_elem.trigger('click');
+            }
+         });
+
+         socket.on('submitLayers.clicked', function(data) {
+            collaboration.log(data.presenter +': Submit Layers clicked');
+            if (collaboration.role == "member") {
+               var submit_elem = $('.js-layers-form-submit');
+               collaboration.highlightElement(submit_elem);
+               submit_elem.trigger('click');
             }
          });
 

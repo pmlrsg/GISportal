@@ -346,3 +346,18 @@ gisportal.events.bind('paginator.selected', function(event, page) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('zoomToData.clicked', function(event, id) {
+   var params = {
+      "event": "zoomToData.clicked",
+      "layer": id
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('submitLayers.clicked', function(event) {
+   var params = {
+      "event": "submitLayers.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
