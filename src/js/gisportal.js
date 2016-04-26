@@ -575,28 +575,40 @@ gisportal.mapInit = function() {
       if(e.dragging){
          return;
       }
-      // Makes sure any hover features are removed ready to potentially add a single one
-      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+      var feature;
       if(gisportal.selectionTools.isSelecting){
          // If the selection mode is on
-         var feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
+         feature = map.forEachFeatureAtPixel(e.pixel, function(feature, layer) {
             // Gets the first vector layer it finds
             if(feature.getKeys().length !== 1 && feature.getId()){
                return feature;
             }
          });
+      }
+      var hoverFeatures = gisportal.featureOverlay.getSource().getFeatures();
+      if(hoverFeatures.length > 0){
          if(!feature){
-            // If there are no features then there are none to add
+            // Makes sure any hover features are removed
+            gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
             return;
          }
-         // Stores the ID of the feature so that it knows which one it can select if the user clicks now.
-         gisportal.hoveredFeature = feature.getId();
-         // Creates a new feature to lose the old style and add the type (so the style is correct)
-         var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"hover"});
-         // Adds the feature to the overlay
-         gisportal.featureOverlay.getSource().addFeature(new_feature);
+         var hovered_feature = hoverFeatures[0];
+         if(!_.isEqual(hovered_feature.getGeometry().getCoordinates(), feature.getGeometry().getCoordinates())){
+            gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+            gisportal.hoverFeature(feature);
+         }
+      }else if(feature){
+         gisportal.hoverFeature(feature);
       }
    });
+   gisportal.hoverFeature = function(feature){
+      // Stores the ID of the feature so that it knows which one it can select if the user clicks now.
+      gisportal.hoveredFeature = feature.getId();
+      // Creates a new feature to lose the old style and add the type (so the style is correct)
+      var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"hover"});
+      // Adds the feature to the overlay
+      gisportal.featureOverlay.getSource().addFeature(new_feature);
+   };
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e){
