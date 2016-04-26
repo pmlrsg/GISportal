@@ -66,7 +66,13 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 
    });
    $('.user-feedback-input').on('change keyup paste', function(e){
-      gisportal.events.trigger('userFeedback.input', $(this).val());
+   	var value = $(this).val();
+   	if(e.type == "paste"){
+   		try{
+         	value = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
+      gisportal.events.trigger('userFeedback.input', value);
    });
 
 };

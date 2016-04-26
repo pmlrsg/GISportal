@@ -263,7 +263,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // This adds the click listener to the 'add to all layers' spans
    $('div.layers-form-right span.add-to-all-layers ').on( 'click', function () {
       // Gets the information from the related input
-      var field = $(this).data("field")
+      var field = $(this).data("field");
       var key = field.replace(/-/g,"_");
       var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"]").val();
       key = key.replace("-", "_");
@@ -732,6 +732,11 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addInputListeners();
       gisportal.addLayersForm.validateForm('div.overlay-container-form');
+      if(e.type == "paste"){
+         try{
+            raw_key_val = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
       gisportal.events.trigger('addLayersForm.input', raw_key_val, key);
    });
    // When you focus out of a field, the form is then validated again.

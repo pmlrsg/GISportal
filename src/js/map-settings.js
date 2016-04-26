@@ -149,7 +149,7 @@ gisportal.map_settings.init = function() {
    });
 
    // WMS URL event handler for refresh cache checkbox
-   $('input.js-wms-url').on('change keyup', function(e)  {
+   $('input.js-wms-url').on('change keyup paste', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
       var typed = $('input.js-wms-url')[0].value;
       var input_value = typed.split("?")[0];
@@ -181,7 +181,12 @@ gisportal.map_settings.init = function() {
          $('#refresh-cache-message').toggleClass('hidden', true);
          $('#refresh-cache-div').toggleClass('hidden', true);
       }
-      gisportal.events.trigger('wms.typing', typed);
+      if(e.type == "paste"){
+         try{
+            typed = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
+      gisportal.events.trigger('wms.typing', typed, e.type);
    });
 
 };

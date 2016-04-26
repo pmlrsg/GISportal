@@ -510,11 +510,12 @@ collaboration.initSession = function() {
 
          // wms value changed
          socket.on('wms.typing', function(data) {
+            var eType = data.params.eType;
             var typedValue = data.params.typedValue;
             collaboration.log(data.presenter +': WMS entry: ' + typedValue);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('input.js-wms-url'));
-               $('input.js-wms-url').val(typedValue).trigger('change');
+               $('input.js-wms-url').val(typedValue).trigger(eType);
             }
          });
 
@@ -637,7 +638,7 @@ collaboration.initSession = function() {
          socket.on('addToAll.clicked', function(data) {
             collaboration.log(data.presenter +': "Add to all" clicked');
             if (collaboration.role == "member") {
-               var field = data.params.field
+               var field = data.params.field;
                var add_to_all_elem = $('.add-to-all-layers[data-field="' + field + '"]');
                collaboration.highlightElement(add_to_all_elem);
                add_to_all_elem.trigger('click');
@@ -678,10 +679,109 @@ collaboration.initSession = function() {
 
          socket.on('userFeedback.input', function(data) {
             if (collaboration.role == "member") {
-               var input = data.params.inputValue
+               var input = data.params.inputValue;
                var input_elem = $('.user-feedback-input');
                input_elem.val(input);
                collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('drawBox.clicked', function(data) {
+            collaboration.log(data.presenter +': "Draw Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-box');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('drawPolygon.clicked', function(data) {
+            collaboration.log(data.presenter +': "Draw Irregular Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-polygon');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('selectPolygon.clicked', function(data) {
+            collaboration.log(data.presenter +': "Select Existing Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-select-polygon');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('removeGeoJSON.clicked', function(data) {
+            collaboration.log(data.presenter +': "Delete Selected Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-remove-geojson');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('jsCoordinate.edit', function(data) {
+            var eType = data.params.eventType;
+            var value = data.params.value;
+            collaboration.log(data.presenter +': Coordinates value set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               var input_elem = $('.js-coordinates');
+               input_elem.val(value);
+               input_elem.trigger(eType);
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('clearSelection.clicked', function(data) {
+            collaboration.log(data.presenter +': "Clear Selection" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-clear-selection');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('olDraw.click', function(data) {
+            var coordinate = data.params.coordinate;
+            if (collaboration.role == "member") {
+               gisportal.drawingPoints.push(coordinate);
+
+               gisportal.drawingOverlaySource.clear();
+               var geom;
+               if(gisportal.drawingPoints.length === 2){
+                  geom = new ol.geom.LineString(gisportal.drawingPoints);
+               }
+               if(gisportal.drawingPoints.length > 2){
+                  var polygon_array = _.clone(gisportal.drawingPoints);
+                  polygon_array.push(polygon_array[0]);
+                  geom = new ol.geom.Polygon([polygon_array]);
+               }
+               if(geom){
+                  gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:geom}));
+               }
+               for(var point in gisportal.drawingPoints){
+                  gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:new ol.geom.Point(gisportal.drawingPoints[point])}));
+               }
+            }
+         });
+
+         socket.on('olDraw.drawend', function(data) {
+            var coordinates = data.params.coordinates;
+            collaboration.log(data.presenter +': Polygon drawn');
+            if (collaboration.role == "member") {
+               var sketch = new ol.Feature({geometry:new ol.geom.Polygon(coordinates)});
+               gisportal.selectionTools.ROIAdded(sketch);
+               gisportal.vectorLayer.getSource().addFeature(sketch);
+            }
+         });
+
+         socket.on('olDraw.drawstart', function(data) {
+            if (collaboration.role == "member") {
+               gisportal.vectorLayer.getSource().clear();
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
             }
          });
 

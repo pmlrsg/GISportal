@@ -43,6 +43,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       $('.js-coordinates').val("");
       $('.js-upload-shape').val("");
       $('.users-geojson-files').val("default");
+      gisportal.events.trigger('clearSelection.clicked');
    });
 
    $('.js-indicators').on('click', '.js-remove', function() {

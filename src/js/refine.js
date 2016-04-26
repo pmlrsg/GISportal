@@ -143,8 +143,14 @@ gisportal.refinePanel.refreshData = function() {
 
       // add some magic to allow them to remove selected categories
       $('.refine-remove').click(function() {
-         var cat = $(this).data('cat');
-         gisportal.refinePanel.removeCategory(cat);
+         if($('.refine-remove').length == 1){
+            gisportal.configurePanel.reset();
+            gisportal.configurePanel.open();
+            gisportal.refinePanel.close();
+         }else{
+            var cat = $(this).data('cat');
+            gisportal.refinePanel.removeCategory(cat);
+         }
       });
 
       // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 

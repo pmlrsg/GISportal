@@ -545,6 +545,15 @@ gisportal.mapInit = function() {
    };
 
    // An overlay to add features to to draw their attention to the user
+   gisportal.drawingOverlay = new ol.layer.Vector({
+      source: new ol.source.Vector(),
+      map: map
+   });
+
+   gisportal.drawingOverlaySource =  gisportal.drawingOverlay.getSource();
+   gisportal.drawingPoints = [];
+
+   // An overlay to add points to to show where a presenter is drawing a polygon
    gisportal.featureOverlay = new ol.layer.Vector({
       source: new ol.source.Vector(),
       map: map,
@@ -654,7 +663,7 @@ gisportal.mapInit = function() {
                   dataReadingPopupOverlay.setPosition(e.coordinate);
                }
             });
-         if (!isFeature && $('.drawInProgress').length <= 0) {
+         if (!isFeature && !gisportal.selectionTools.isDrawing) {
             var point = gisportal.reprojectPoint(e.coordinate, gisportal.projection, 'EPSG:4326');
             var lon = gisportal.normaliseLongitude(point[0], 'EPSG:4326').toFixed(3);
             var lat = point[1].toFixed(3);
@@ -664,6 +673,9 @@ gisportal.mapInit = function() {
             dataReadingPopupOverlay.setPosition(e.coordinate);
 
             gisportal.getPointReading(e);
+         }
+         if(gisportal.selectionTools.isDrawing){
+            gisportal.events.trigger('olDraw.click', e.coordinate);
          }
       }
    });

@@ -183,10 +183,11 @@ gisportal.events.bind("search.typing", function(event, searchValue) {
 });
 
 // wms string changes
-gisportal.events.bind("wms.typing", function(event, typedValue) {
+gisportal.events.bind("wms.typing", function(event, typedValue, eType) {
    var params = {
       "event" : "wms.typing",
-      "typedValue" : typedValue
+      "typedValue" : typedValue,
+      "eType" : eType
    };
    collaboration._emit('c_event', params);
 });
@@ -396,6 +397,73 @@ gisportal.events.bind('userFeedback.input', function(event, inputValue) {
    var params = {
       "event": "userFeedback.input",
       "inputValue": inputValue
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('drawBox.clicked', function(event) {
+   var params = {
+      "event": "drawBox.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('drawPolygon.clicked', function(event) {
+   var params = {
+      "event": "drawPolygon.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('selectPolygon.clicked', function(event) {
+   var params = {
+      "event": "selectPolygon.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('removeGeoJSON.clicked', function(event) {
+   var params = {
+      "event": "removeGeoJSON.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('jsCoordinate.edit', function(event, eventType, value) {
+   var params = {
+      "event": "jsCoordinate.edit",
+      "eventType":eventType,
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('clearSelection.clicked', function(event) {
+   var params = {
+      "event": "clearSelection.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('olDraw.click', function(event, coordinate) {
+   var params = {
+      "event": "olDraw.click",
+      "coordinate": coordinate
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('olDraw.drawstart', function(event) {
+   var params = {
+      "event": "olDraw.drawstart"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('olDraw.drawend', function(event, coordinates) {
+   var params = {
+      "event": "olDraw.drawend",
+      "coordinates": coordinates
    };
    collaboration._emit('c_event', params);
 });
