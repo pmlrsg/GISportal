@@ -102,7 +102,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val());
    });
 
-   $('.js-indicators').on('change', '.js-indicator-is-log', function() { 
+   $('.js-indicators').on('click', '.js-indicator-is-log', function() { 
       gisportal.events.trigger('scalebar.log-set', $(this).data('id'), $(this).prop('checked'));
    });
 
@@ -509,7 +509,6 @@ gisportal.indicatorsPanel.selectLayer = function(id, style) {
       else {
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
-      gisportal.events.trigger('layer.select', id, gisportal.layers[id].name);
    }
 };
 

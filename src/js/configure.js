@@ -325,7 +325,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      //gisportal.events.trigger('resetList.clicked');
+      gisportal.events.trigger('resetList.clicked');
    });
 
    // Listener is added to the add layers button
@@ -397,7 +397,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      //gisportal.events.trigger('resetList.clicked');
+      gisportal.events.trigger('resetList.clicked');
    });
 
    // Listener is added to the add layers button

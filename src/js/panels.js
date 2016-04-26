@@ -50,6 +50,7 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	$('.js-user-feedback-close').on('click', function(e) {
 		e.preventDefault();
       $('div.js-user-feedback-popup').toggleClass('hidden', true);
+      gisportal.events.trigger('userFeedback.close');
    });
 	$('.js-user-feedback-submit').on('click', function(e) {
 		e.preventDefault();
@@ -61,7 +62,11 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	   	//error
 	   	gisportal.panels.userFeedback(message, given_function, true);
 	   }
+      gisportal.events.trigger('userFeedback.submit');
 
+   });
+   $('.user-feedback-input').on('change keyup paste', function(e){
+      gisportal.events.trigger('userFeedback.input', $(this).val());
    });
 
 };

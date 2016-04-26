@@ -8,7 +8,7 @@
       {{#unless_equals total_pages "1"}}
       <label data-field="include">Do Not Include This Layer:</label>
       <input type="checkbox" data-field="include" {{#unless ../include}}checked{{/unless}} data-id="{{../list_id}}"/>
-      {{#if_equals ../list_id "1"}}<span title="Copy To All" class="toggle-all-layers icon-clipboard-edit btn icon-btn" data-field="include"></span>{{/if_equals}}</br>
+      {{#if_equals ../list_id "1"}}<span title="Copy to all" class="toggle-all-layers icon-clipboard-edit btn icon-btn" data-field="include"></span>{{/if_equals}}</br>
       {{/unless_equals}}
 
       <label data-field="nice_name">Display Name:</label></br>
@@ -79,6 +79,6 @@
             {{{tags_list ../tags_dict @key}}}
          </div>
       {{/each}}
-      <span title="Add another Tag" data-total-pages="{{total_pages}}" data-current-page="{{list_id}}" class="add-tag-input icon-tag-add btn icon-btn left-icon"></span>
+      <span title="Add Another Tag" data-total-pages="{{total_pages}}" data-current-page="{{list_id}}" class="add-tag-input icon-tag-add btn icon-btn left-icon"></span>
    </div>
 </form>

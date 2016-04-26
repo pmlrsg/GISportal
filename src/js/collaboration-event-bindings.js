@@ -74,16 +74,6 @@ gisportal.events.bind("layer.reorder", function(event, newLayerOrder) {
    collaboration._emit('c_event', params);
 });
 
-// layer is selected
-gisportal.events.bind("layer.select", function(event, id, layerName) {
-   var params = {
-      "event" : "layer.select",
-      "id" : id,
-      "layerName" : layerName
-   };
-   collaboration._emit('c_event', params);
-});
-
 // show a layer
 gisportal.events.bind("layer.show", function(event, id, layerName) {
    var params = {
@@ -348,6 +338,64 @@ gisportal.events.bind('zoomToData.clicked', function(event, id) {
 gisportal.events.bind('submitLayers.clicked', function(event) {
    var params = {
       "event": "submitLayers.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('cancelChanges.clicked', function(event) {
+   var params = {
+      "event": "cancelChanges.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('toggleAllLayers.clicked', function(event) {
+   var params = {
+      "event": "toggleAllLayers.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addToAll.clicked', function(event, field) {
+   var params = {
+      "event": "addToAll.clicked",
+      "field": field
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addScalePointsToAll.clicked', function(event) {
+   var params = {
+      "event": "addScalePointsToAll.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addTagInput.clicked', function(event) {
+   var params = {
+      "event": "addTagInput.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('userFeedback.close', function(event) {
+   var params = {
+      "event": "userFeedback.close"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('userFeedback.submit', function(event) {
+   var params = {
+      "event": "userFeedback.submit"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('userFeedback.input', function(event, inputValue) {
+   var params = {
+      "event": "userFeedback.input",
+      "inputValue": inputValue
    };
    collaboration._emit('c_event', params);
 });

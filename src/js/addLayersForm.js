@@ -263,7 +263,8 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // This adds the click listener to the 'add to all layers' spans
    $('div.layers-form-right span.add-to-all-layers ').on( 'click', function () {
       // Gets the information from the related input
-      var key = $(this).data("field").replace(/-/g,"_");
+      var field = $(this).data("field")
+      var key = field.replace(/-/g,"_");
       var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"]").val();
       key = key.replace("-", "_");
       if(key == "indicator_type"){
@@ -278,6 +279,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addToAll.clicked', field);
    });
 
    // This adds the click listener to the 'add scale points to all layers' spans
@@ -302,6 +304,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addScalePointsToAll.clicked');
    });
 
    // This adds the click listener to the 'exclude all layers' span
@@ -311,12 +314,14 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.layers_list[value].include = !prop;
       }
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('toggleAllLayers.clicked');
    });
 
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
       gisportal.panels.userFeedback("Please enter a tag name to add it", gisportal.addLayersForm.addTagInput);
+      gisportal.events.trigger('addTagInput.clicked');
    });
 
    // Adds a listener to the submit button on the form.
@@ -395,6 +400,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.refreshStorageInfo();
          // The form is then hidden.
          $('div.js-layer-form-popup').toggleClass('hidden', true);
+         gisportal.events.trigger('cancelChanges.clicked');
       }
    });
    gisportal.addLayersForm.form_info.current_page = current_page;// Saves the current_page for loading next time.

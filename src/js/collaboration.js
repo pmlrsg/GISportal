@@ -325,7 +325,6 @@ collaboration.initSession = function() {
          socket.on('ddslick.close', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj);
                obj.ddslick('close');
             }
          });
@@ -383,17 +382,6 @@ collaboration.initSession = function() {
             }
          });
 
-         // layer selected
-         socket.on('layer.select', function(data) {
-            // console.log('layer.select received');
-            // console.log(data);
-            
-            collaboration.log(data.presenter +': New layer added - '+ data.params.layerName);
-            if (collaboration.role == "member") {
-               gisportal.indicatorsPanel.selectLayer(data.params.id);
-            }
-         });
-
          // layer shown
 		  	socket.on('layer.show', function(data) {
 		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
@@ -435,7 +423,6 @@ collaboration.initSession = function() {
 
 		  	// autoscale
          socket.on('scalebar.autoscale', function(data) {
-		  		collaboration.log(data.presenter +': Auto Scale - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.scalebars.autoScale(data.params.id, data.params.force);
             }
@@ -561,9 +548,8 @@ collaboration.initSession = function() {
 
          // reset list clicked
          socket.on('resetList.clicked', function(data) {
-            collaboration.log(data.presenter +': Reset list clicked');
+            collaboration.log(data.presenter +': "Reset" clicked');
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('button#reset-list'));
                $('button#reset-list').trigger('click');
             }
          });
@@ -629,6 +615,73 @@ collaboration.initSession = function() {
                var submit_elem = $('.js-layers-form-submit');
                collaboration.highlightElement(submit_elem);
                submit_elem.trigger('click');
+            }
+         });
+
+         socket.on('cancelChanges.clicked', function(data) {
+            collaboration.log(data.presenter +': "Cancel Changes" clicked');
+            if (collaboration.role == "member") {
+               $('.js-layers-form-cancel').trigger('click');
+            }
+         });
+
+         socket.on('toggleAllLayers.clicked', function(data) {
+            collaboration.log(data.presenter +': "Copy to all" clicked');
+            if (collaboration.role == "member") {
+               var toggle_all_elem = $('.toggle-all-layers');
+               collaboration.highlightElement(toggle_all_elem);
+               toggle_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addToAll.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add to all" clicked');
+            if (collaboration.role == "member") {
+               var field = data.params.field
+               var add_to_all_elem = $('.add-to-all-layers[data-field="' + field + '"]');
+               collaboration.highlightElement(add_to_all_elem);
+               add_to_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addScalePointsToAll.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add Scale Points to all" clicked');
+            if (collaboration.role == "member") {
+               var add_to_all_elem = $('.scale-to-all-layers');
+               collaboration.highlightElement(add_to_all_elem);
+               add_to_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addTagInput.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add Another Tag" clicked');
+            if (collaboration.role == "member") {
+               var add_tag_elem = $('.add-tag-input');
+               collaboration.highlightElement(add_tag_elem);
+               add_tag_elem.trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.close', function(data) {
+            collaboration.log(data.presenter +': User feedback closed');
+            if (collaboration.role == "member") {
+               $('.js-user-feedback-close').trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.submit', function(data) {
+            collaboration.log(data.presenter +': User feedback submitted');
+            if (collaboration.role == "member") {
+               $('.js-user-feedback-submit').trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.input', function(data) {
+            if (collaboration.role == "member") {
+               var input = data.params.inputValue
+               var input_elem = $('.user-feedback-input');
+               input_elem.val(input);
+               collaboration.highlightElement(input_elem);
             }
          });
 
