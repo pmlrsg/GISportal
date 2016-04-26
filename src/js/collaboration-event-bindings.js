@@ -35,11 +35,11 @@ gisportal.events.bind("ddslick.close", function(event, obj) {
    collaboration._emit('c_event', params);
 });
 
-gisportal.events.bind("ddslick.selectIndex", function(event, obj, index, doCallback) {
+gisportal.events.bind("ddslick.selectValue", function(event, obj, value, doCallback) {
    var params = {
-      "event" : "ddslick.selectIndex",
+      "event" : "ddslick.selectValue",
       "obj" : obj.attr('id'),
-      "index": index,
+      "value": value,
       "doCallback": doCallback
    };
    collaboration._emit('c_event', params);

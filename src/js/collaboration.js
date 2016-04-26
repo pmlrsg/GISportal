@@ -330,12 +330,11 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('ddslick.selectIndex', function(data) {
+         socket.on('ddslick.selectValue', function(data) {
             var obj = $('#' + data.params.obj);
-            var index = data.params.index;
+            var value = data.params.value;
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
-               obj.ddslick('select', { "index": index });
+               obj.ddslick('select', { "value": value });
             }
          });
 

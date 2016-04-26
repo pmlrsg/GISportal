@@ -147,7 +147,7 @@
 
                 //Selecting an option
                 obj.find('.dd-option').on('click.ddslick', function () {
-                    selectIndex(obj, $(this).closest('li').index());
+                    selectValue(obj, $(this).find('input').val());
                 });
 
                 //Click anywhere to close
@@ -243,6 +243,7 @@
         var index = ddOptions.index(selectedOption);
 
         selectIndex(obj, index, doCallback);
+        gisportal.events.trigger('ddslick.selectValue', obj, value, doCallback);
     }
 
     //Private: Select index
@@ -308,8 +309,6 @@
         if (doCallback && typeof settings.onSelected == 'function') {
             settings.onSelected.call(this, pluginData);
         }
-
-        gisportal.events.trigger('ddslick.selectIndex', obj, index, doCallback);
     }
 
     //Private: Close the drop down options
