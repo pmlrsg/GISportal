@@ -3,7 +3,7 @@
 gisportal.graphs.PlotEditor = (function(){
 
    var addPlottingTriggers = function(){
-      $('.js-active-plot-title').on('change keyup paste', function(){
+      $('.js-active-plot-title').on('change keyup paste', function(e){
          var value = $(this).val();
          if(e.type == "paste"){
             try{
@@ -61,6 +61,7 @@ gisportal.graphs.PlotEditor = (function(){
       //Setup the active "create graph" button
       this._editorParent.find('.js-create-graph').click(function(){
          _this.submitRequest();
+         gisportal.events.trigger('graph.submitted');
       });
 
       this._editorParent.find('.js-close-active-plot').click(function(){
@@ -292,13 +293,14 @@ gisportal.graphs.PlotEditor = (function(){
          _this.plot().tBounds( tBounds );
       })
       // Listen for when the user moves the slider and sends a trigger
-      .on('set change', function(event, val){
+      .on('change', function(event, val){
          gisportal.events.trigger('graphRange.change', val);
       });
       
       // The start date input element is manually typed update  tBounds
       this._startDateInput.change(function(){
          var newDate = new Date( $(this).val() );
+         gisportal.events.trigger('graphStartDate.change', newDate.getTime());
          var currentTBounds = _this.plot().tBounds();
          
          if( isNaN( newDate.getTime() ) )
@@ -310,6 +312,7 @@ gisportal.graphs.PlotEditor = (function(){
       // The end date input element is manually typed update  tBounds
       this._endDateInput.change(function(){
          var newDate = new Date( $(this).val() );
+         gisportal.events.trigger('graphEndDate.change', newDate.getTime());
          var currentTBounds = _this.plot().tBounds();
          
          if( isNaN( newDate.getTime() ) )

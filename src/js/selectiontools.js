@@ -179,11 +179,11 @@ gisportal.selectionTools.shapesUploaded = function(){
             if(ext == "csv"){
                this_file.type = "text/csv";
             }else if(ext == "dbf"){
-               this_file.type = "application/x-dbf"
+               this_file.type = "application/x-dbf";
             }else if(ext == "shp"){
-               this_file.type = "application/x-esri-shape"
+               this_file.type = "application/x-esri-shape";
             }else if(ext == "shx"){
-               this_file.type = "application/x-esri-shape-index"
+               this_file.type = "application/x-esri-shape-index";
             }
          }
          files_total_size += this_file.size;

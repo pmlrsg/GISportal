@@ -26,6 +26,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-add-to-plot', function()  {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.addToPlot(id);
+      gisportal.events.trigger('addToPlot.clicked', id);
    });
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');

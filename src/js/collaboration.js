@@ -847,9 +847,19 @@ collaboration.initSession = function() {
 
          socket.on('newPlot.clicked', function(data) {
             var id = data.params.id;
-            collaboration.log(data.presenter +': "Make New Graph" Clicked');
+            collaboration.log(data.presenter +': "Make new graph" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-make-new-plot[data-id="' + id + '"]');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('addToPlot.clicked', function(data) {
+            var id = data.params.id;
+            collaboration.log(data.presenter +': "Add to graph" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-add-to-plot[data-id="' + id + '"]');
                button_elem.trigger('click');
                collaboration.highlightElement(button_elem);
             }
@@ -896,13 +906,47 @@ collaboration.initSession = function() {
 
          socket.on('graphRange.change', function(data) {
             var value = data.params.value;
+            var start_date_elem = $('.js-active-plot-start-date');
+            var end_date_elem = $('.js-active-plot-end-date');
             var slider_elem = $('.js-range-slider');
             var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
             collaboration.log(data.presenter +': Graph date range set to: "' + dates.join(' - ') + '"');
             if (collaboration.role == "member") {
+               start_date_elem.val(dates[0]);
+               start_date_elem.trigger('change');
+               end_date_elem.val(dates[1]);
+               end_date_elem.trigger('change');
                slider_elem.val(value);
-               slider_elem.trigger('set');
                collaboration.highlightElement(slider_elem);
+            }
+         });
+
+         socket.on('graphStartDate.change', function(data) {
+            var value = new Date(data.params.value).toISOString().split("T")[0];
+            var date_elem = $('.js-active-plot-start-date');
+            collaboration.log(data.presenter +': Graph start date set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               date_elem.val(value);
+               date_elem.trigger('change');
+               collaboration.highlightElement(date_elem);
+            }
+         });
+
+         socket.on('graphEndDate.change', function(data) {
+            var value = new Date(data.params.value).toISOString().split("T")[0];
+            var date_elem = $('.js-active-plot-end-date');
+            collaboration.log(data.presenter +': Graph end date set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               date_elem.val(value);
+               date_elem.trigger('change');
+               collaboration.highlightElement(date_elem);
+            }
+         });
+
+         socket.on('graph.submitted', function(data) {
+            collaboration.log(data.presenter +': "Create Graph" clicked');
+            if (collaboration.role == "member") {
+               $('.js-create-graph').trigger('click');
             }
          });
 

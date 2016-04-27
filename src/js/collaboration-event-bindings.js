@@ -525,6 +525,14 @@ gisportal.events.bind('newPlot.clicked', function(event, id) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('addToPlot.clicked', function(event, id) {
+   var params = {
+      "event": "addToPlot.clicked",
+      "id": id
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('graphs.deleteActive', function(event) {
    var params = {
       "event": "graphs.deleteActive"
@@ -560,6 +568,29 @@ gisportal.events.bind('graphRange.change', function(event, value) {
    var params = {
       "event": "graphRange.change",
       "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphStartDate.change', function(event, value) {
+   var params = {
+      "event": "graphStartDate.change",
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphEndDate.change', function(event, value) {
+   var params = {
+      "event": "graphEndDate.change",
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graph.submitted', function(event) {
+   var params = {
+      "event": "graph.submitted"
    };
    collaboration._emit('c_event', params);
 });

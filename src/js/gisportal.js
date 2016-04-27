@@ -1109,6 +1109,7 @@ gisportal.loadGraphsState = function(graphState){
                   plot.title = function(){
                      return this._title;
                   };
+                  $('.no-graphs-text').toggleClass("hidden", true);
                   var rendered = gisportal.templates['plot-status']( plot );
                   gisportal.graphs.addButtonListeners(gisportal.graphs.graphsHistoryList.prepend(rendered), noCopyEdit = true);
                   gisportal.graphs.storedGraphs.push(graphState.storedGraphs[index]);
