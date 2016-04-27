@@ -124,10 +124,16 @@
 
 function EventManager() {
    this._events = new EventEmitter();
+   this._events.setMaxListeners(50);
 }
 
 EventManager.prototype.bind = function( eventType, callback ){
   this._events.on( eventType, callback );
+  return this;
+};
+
+EventManager.prototype.bind_once = function( eventType, callback ){
+  this._events.once( eventType, callback );
   return this;
 };
  

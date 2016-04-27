@@ -1,8 +1,18 @@
 gisportal.autoLayer = {};
 gisportal.autoLayer.TriedToAddLayer = false;
+gisportal.autoLayer.viewLoaded = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
+   if(gisportal.utils.getURLParameter('view') && !gisportal.autoLayer.viewLoaded){
+      gisportal.autoLayer.viewLoaded = true;
+      gisportal.view.loadView(gisportal.utils.getURLParameter('view'));
+      return;
+   }
+   // If there is a view other layers will not be loaded
+   if(gisportal.current_view){
+      return;
+   }
    gisportal.autoLayer.urlLoad = false; // If the wms information is being loaded from the URL (first time) or the text box.
    var given_wms_url = gisportal.autoLayer.given_wms_url || gisportal.utils.getURLParameter('wms_url');
    if(!gisportal.autoLayer.given_wms_url && gisportal.utils.getURLParameter('wms_url')){
@@ -23,6 +33,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
       if(_.size(gisportal.given_layers) >= 1){
          try{
             gisportal.configurePanel.resetPanel(gisportal.given_layers);
+            gisportal.view.removeView(false);
          }
          catch(e){
             $.notify("Sorry:\nThere was an error loading " + given_layers[0].id + " : " + e, "error");
@@ -40,7 +51,7 @@ gisportal.autoLayer.loadGivenLayer = function(){
 
 
 
-gisportal.events.bind("layers-loaded", function() {
+gisportal.events.bind("available-layers-loaded", function() {
    if(gisportal.templatesLoaded){
       gisportal.autoLayer.loadGivenLayer();
       gisportal.autoLayer.loadPreviousLayers();

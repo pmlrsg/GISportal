@@ -70,9 +70,31 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
 
    // Makes a list of all the other wanted tags.
    var other_tags = {};
-   for(var tag in layer.tags){
+   var tag;
+   for(tag in layer.tags){
       if(!(tag == "data_provider" || tag == "niceName" || tag == "providerTag")){
          other_tags[tag] = layer.tags[tag];
+      }
+   }
+
+   var dict = [];
+   var tags_dict = [];
+   if(gisportal.addLayersForm.dictionary && gisportal.addLayersForm.dictionary[layer.urlName]){
+      dict = gisportal.addLayersForm.dictionary[layer.urlName].displayName;
+   }
+   if(gisportal.addLayersForm.dictionary && gisportal.addLayersForm.dictionary[layer.urlName]){
+      tags_dict = gisportal.addLayersForm.dictionary[layer.urlName].tags;
+   }
+
+   var reformatted_tags_dict = {};
+   for(tag in tags_dict){
+      for(var key in tags_dict[tag]){
+         if(!reformatted_tags_dict[key]){
+            reformatted_tags_dict[key] = [];
+         }
+         if(reformatted_tags_dict[key].indexOf(tags_dict[tag][key]) == -1){
+            reformatted_tags_dict[key].push(tags_dict[tag][key]);
+         }
       }
    }
 
@@ -86,7 +108,9 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "include":layer.include,
       "styles_file":styles_file,
       "legendSettings":legendSettings,
-      "title":layer.serverName
+      "title":layer.serverName,
+      "dict":dict,
+      "tags_dict":reformatted_tags_dict
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -162,6 +186,9 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // Takes the current page information and adds it to the element given
    var layer_form = gisportal.templates['add-layers-form'](gisportal.addLayersForm.layers_list[current_page]);
    $(form_div).html(layer_form);
+   //Makes sure the suggestions are displayed/hidden
+   gisportal.addLayersForm.displaySuggestions();
+   gisportal.addLayersForm.displayTagSuggestions(current_page);
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
    // The form then goes through validation to display corrections required to the user.
@@ -194,7 +221,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          }
       });
    }catch(e){}
-   if(l.legendSettings && l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
+   if(l && l.legendSettings && l.legendSettings.scalePoints){ // If scalebar is already true the span is shown so it is possible to remove them.
       $('.scale-points-div').toggleClass('hidden', false);
    }
    
@@ -274,6 +301,15 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.addLayersForm.refreshStorageInfo();
    });
 
+   // This adds the click listener to the 'exclude all layers' span
+   $('div.layers-form-left span.toggle-all-layers').on( 'click', function () {
+      var prop = $('input[data-field=include]').prop('checked');
+      for(var value in gisportal.addLayersForm.layers_list){
+         gisportal.addLayersForm.layers_list[value].include = !prop;
+      }
+      gisportal.addLayersForm.refreshStorageInfo();
+   });
+
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
@@ -304,6 +340,28 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                   gisportal.form_working = false; // Will allow the submit button to be clicked again
                   return;
                }
+            }
+            // It Updates the dictionary if the new display name is different from the statndard name
+            var dict = gisportal.addLayersForm.dictionary;
+            var this_dict = null;
+            var this_tags_dict = null;
+            if(dict[this_layer.original_name]){
+               this_dict = dict[this_layer.original_name].displayName;
+               this_tags_dict = dict[this_layer.original_name].tags;
+            }
+            if(this_layer.original_name != this_layer.nice_name && (!this_dict || this_dict.indexOf(this_layer.nice_name) < 0)){
+               gisportal.addLayersForm.addToDict(this_layer.original_name, this_layer.nice_name, this_layer.tags);
+               if(!dict[this_layer.original_name]){
+                  dict[this_layer.original_name] = {};
+               }
+               if(!this_dict){
+                  dict[this_layer.original_name].displayName = [];
+               }
+               if(!this_tags_dict){
+                  dict[this_layer.original_name].tags = [];
+               }
+               dict[this_layer.original_name].displayName.push(this_layer.nice_name);
+               dict[this_layer.original_name].tags.push(this_layer.tags);
             }
          }
          for(layer in gisportal.addLayersForm.layers_list){
@@ -340,6 +398,25 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // Input listeners are then added to the paginator and the buttons.
    gisportal.addLayersForm.addInputListeners();
 };
+
+gisportal.addLayersForm.addToDict = function(standard_name, display_name, tags){
+   $.ajax({
+      method:'post',
+      url: gisportal.middlewarePath + '/settings/add_to_dictionary?standard_name=' + standard_name + '&display_name=' + display_name,
+      data: tags
+   });
+};
+
+gisportal.addLayersForm.updateDict = function(){
+   $.ajax({
+      url: gisportal.middlewarePath + '/settings/get_dictionary',
+      dataType: 'json',
+      success:function(data){
+         gisportal.addLayersForm.dictionary = data || {};
+      }
+   });
+};
+gisportal.addLayersForm.updateDict();
 
 gisportal.addLayersForm.sendLayers = function(layer){
    $.ajax({
@@ -531,6 +608,36 @@ gisportal.addLayersForm.refreshStorageInfo = function(){
    gisportal.storage.set( 'form_info', JSON.stringify(gisportal.addLayersForm.form_info ) );
 };
 
+gisportal.addLayersForm.displaySuggestions = function(){
+   $('.dict-opts').toggleClass('hidden', false);
+   for(var i = 0; i< $('.dict-opts ul li').length; i++){
+      var button_elem = $('.dict-opts ul li button').eq(i);
+      var button_text = button_elem.text();
+      var box_text = $("input[data-field='nice-name']").val();
+      if(button_text == box_text){
+         $('.dict-opts').toggleClass('hidden', true);
+      }
+   }
+};
+
+gisportal.addLayersForm.displayTagSuggestions = function(index){
+   $('.tags-dict-opts').toggleClass('hidden', false);
+   for(var tag in gisportal.addLayersForm.layers_list[index].tags){
+      var buttons = $('.tags-dict-opts ul li button[data-field=' + tag + ']');
+      if(buttons.length === 0){
+         $('.tags-dict-opts[data-field=' + tag + ']').toggleClass('hidden', true);
+      }
+      for(var i = 0; i< buttons.length; i++){
+         var button_elem = buttons.eq(i);
+         var button_text = button_elem.text();
+         var box_text = $("input[data-field='" + tag + "']").val() || $("textarea[data-field='" + tag + "']").val();
+         if(!button_text || button_text == box_text){
+            $('.tags-dict-opts[data-field=' + tag + ']').toggleClass('hidden', true);
+         }
+      }
+   }
+};
+
 /**
 * This function adds all of the action listeners to the inputs of the form
 * 
@@ -538,7 +645,7 @@ gisportal.addLayersForm.refreshStorageInfo = function(){
 */
 gisportal.addLayersForm.addInputListeners = function(){
    // any existing listeners are turned off to avoid multiples being attached.
-   $('.overlay-container-form input, .overlay-container-form textarea').off('change paste');
+   $('.overlay-container-form input, .overlay-container-form textarea').off('change keyup paste');
    $('.js-layer-form-html input, .js-layer-form-html textarea').off('focusout');
    $('.js-layer-form-html span[data-field="Rotation"]').off('click');
    $('.js-layer-form-html span[data-field="Rotation"]').on('click', function(){
@@ -546,7 +653,7 @@ gisportal.addLayersForm.addInputListeners = function(){
    });
    $('.js-server-form-html input, .js-server-form-html textarea').off('focusout');
    // All of the inputs and textareas have listeners added.
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change paste', function(){
+   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
@@ -558,6 +665,10 @@ gisportal.addLayersForm.addInputListeners = function(){
       }
       if(key == 'include'){
          key_val = !key_val;
+         var toggle_elem = $('.toggle-all-layers');
+      }
+      if(key == 'nice_name'){
+         gisportal.addLayersForm.displaySuggestions();
       }
       //The data is then added in a certain way.
       if(index){ // Only layer data fields have indexes.
@@ -580,6 +691,7 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.layers_list[index].legendSettings[key] = key_val;
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }else if(tag){ // If it is a tag it needs to be added to the tags list.
+            gisportal.addLayersForm.displayTagSuggestions(index);
             if(key == "indicator_type"){ // As the indacator type is a list, it must be split first.
                if(key_val !== ""){
                   key_val = key_val.split(",");
@@ -614,6 +726,23 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.form_info.display_form = false; // display_form set to false so that the portal knows that the form was not displayed last time the user was viewing it.
       // The browser cache is updaed witht the changes.
       gisportal.addLayersForm.refreshStorageInfo();
+   });
+
+   $('.js-add-dict').on('click', function(e){
+      e.preventDefault();
+      var name = $(this).text();
+      $("input[data-field='nice-name']").val(name).trigger('change');
+   });
+
+   $('.js-add-tag-dict').on('click', function(e){
+      e.preventDefault();
+      var name = $(this).text();
+      var field = $(this).data('field');
+      var input = $("input[data-field='" + field + "']");
+      if(input.length == 0){
+         input = $("textarea[data-field='" + field + "']");
+      }
+      input.val(name).trigger('change');
    });
 };
 

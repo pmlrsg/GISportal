@@ -97,6 +97,47 @@ router.get('/app/settings/config', function(req, res) {
    res.send(js_file);
 });
 
+router.get('/app/settings/view', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var view_name = req.query.view;
+   var view_path = path.join(MASTER_CONFIG_PATH, domain, "views", view_name + ".json");
+   var view_file;
+   if(utils.fileExists(view_path)){
+      view_file = fs.readFileSync(view_path);
+      res.send(view_file);
+   }else{
+      res.status(404).send();
+   }
+});
+
+router.get('/app/settings/get_views', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+
+   var views_path = path.join(MASTER_CONFIG_PATH, domain, "views");
+
+   if(!utils.directoryExists(views_path)){
+      res.status(404).send();
+      return;
+   }
+
+   var views_obj = {};
+   var views_list = fs.readdirSync(views_path); // The list of files and folders in the master_cache folder
+   views_list.forEach(function(filename){
+      var view_path = path.join(views_path, filename);
+
+      if(utils.fileExists(view_path)){
+         view_file = fs.readFileSync(view_path);
+         try{
+            var niceName = filename.replace('.json', "")
+            views_obj[niceName] = JSON.parse(view_file).title || niceName;
+         }catch(e){};
+      }
+   });
+
+   res.send(views_obj);
+
+});
+
 router.get('/app/settings/get_owners', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);
@@ -119,6 +160,67 @@ router.get('/app/settings/get_owners', function(req, res) {
       owners.push(domain);
    }
    res.send({owners:owners});
+});
+
+router.get('/app/settings/get_dictionary', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var username = user.getUsername(req);
+   var dict_path = path.join(MASTER_CONFIG_PATH, "dictionary.json");
+   var user_dict_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + username, "dictionary.json");
+
+   if(utils.fileExists(dict_path)){
+      var dict_file = JSON.parse(fs.readFileSync(dict_path));
+      if(utils.fileExists(user_dict_path)){
+         var user_dict_file = JSON.parse(fs.readFileSync(user_dict_path));
+         _.extend(dict_file, user_dict_file)
+      }
+      res.send(dict_file);
+   }else{
+      res.send({});
+   }
+});
+
+router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var standard_name = req.query.standard_name;
+   var display_name = req.query.display_name;
+   var username = user.getUsername(req);
+   var permission = user.getAccessLevel(req, domain);
+   var tags = req.body; // Gets the data (tags)
+
+   var path_gutts = "";
+   if(permission != "admin"){
+      path_gutts = path.join(domain, "user_" + username);
+   }
+   var dict_path = path.join(MASTER_CONFIG_PATH, path_gutts, "dictionary.json");
+   var dict;
+   if(!utils.fileExists(dict_path)){
+      if(standard_name && display_name){
+         dict = '{"' + standard_name + '":{"displayName":["' + display_name + '"], "tags":[' + JSON.stringify(tags) + ']}}';
+      }else{
+         dict = "{}";
+      }
+      fs.writeFileSync(dict_path, dict);
+   }else{
+      dict = JSON.parse(fs.readFileSync(dict_path));
+      if(!dict[standard_name]){
+         dict[standard_name] = {};
+      }
+      if(!dict[standard_name].displayName){
+         dict[standard_name].displayName = [];
+      }
+      if(!dict[standard_name].tags){
+         dict[standard_name].tags = [];
+      }
+      if(dict[standard_name].displayName.indexOf(display_name) < 0){
+         dict[standard_name].displayName.push(display_name);
+      }
+      if(dict[standard_name].tags.indexOf(tags) < 0){
+         dict[standard_name].tags.push(tags);
+      }
+      fs.writeFileSync(dict_path, JSON.stringify(dict));
+   }
+   res.status(200).send();
 });
 
 
@@ -191,7 +293,7 @@ router.get('/app/settings/get_cache', function(req, res) {
          var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
          user_list.forEach(function(filename){
             var file_path = path.join(user_cache_path, filename);
-            if(utils.fileExists(file_path) && path.extname(filename) == ".json"){
+            if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
                if(permission != "admin" && this_username != filename.replace(USER_CACHE_PREFIX, "")){ // The Layers list is filtered.
                   json_data.server.Layers = json_data.server.Layers.filter(function(val){
@@ -355,6 +457,9 @@ router.all('/app/settings/add_user_layer', function(req, res){
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
+      }
+      if(JSON.stringify(data) == "{}"){
+         return res.status(404).send();
       }
       var new_data = []; // The list for the new data to go into
       for(new_layer in layers_list){ // Loops through each new layer.

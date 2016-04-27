@@ -32,6 +32,7 @@ var coreFiles = [
     "src/js/autoLayer.js",
     "src/js/addLayersForm.js",
     "src/js/editLayersForm.js",
+    "src/js/view.js",
     "src/js/user.js",
     "src/js/collaboration.js",
     "src/js/collaboration-event-bindings.js"
@@ -53,7 +54,8 @@ module.exports = function(grunt) {
             },
             files: {
                'html/css/<%= pkg.name %>.css' : 'src/css/scss/gisportal.scss',
-               'html/css/<%= pkg.name %>_blue.css' : 'src/css/scss/gisportal_blue.scss'
+               'html/css/<%= pkg.name %>_blue.css' : 'src/css/scss/gisportal_blue.scss',
+               'html/css/<%= pkg.name %>_modellers.css' : 'src/css/scss/gisportal_modellers.scss'
             }
          }
       },
@@ -111,7 +113,8 @@ module.exports = function(grunt) {
          target: {
             files: {
               'html/css/<%= pkg.name %>.min.css': 'html/css/<%= pkg.name %>.css',
-              'html/css/<%= pkg.name %>_blue.min.css': 'html/css/<%= pkg.name %>_blue.css'
+              'html/css/<%= pkg.name %>_blue.min.css': 'html/css/<%= pkg.name %>_blue.css',
+              'html/css/<%= pkg.name %>_modellers.min.css': 'html/css/<%= pkg.name %>_modellers.css'
             }
          }
       },

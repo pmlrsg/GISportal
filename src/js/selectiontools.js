@@ -76,9 +76,9 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   if(!draw)return;
-   
-   map.removeInteraction(draw);
+   if(draw){
+      map.removeInteraction(draw);
+   }
    gisportal.selectionTools.isSelecting = false;
    gisportal.selectionTools.isDrawing = false;
 }
@@ -165,6 +165,20 @@ gisportal.selectionTools.shapesUploaded = function(){
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
+         // FOR STUPID WINDOWS (not reporting file types!!
+         if(this_file.type === ""){
+            var ext = this_file.name.split('.');
+            ext = ext[ext.length-1];
+            if(ext == "csv"){
+               this_file.type = "text/csv";
+            }else if(ext == "dbf"){
+               this_file.type = "application/x-dbf"
+            }else if(ext == "shp"){
+               this_file.type = "application/x-esri-shape"
+            }else if(ext == "shx"){
+               this_file.type = "application/x-esri-shape-index"
+            }
+         }
          files_total_size += this_file.size;
          if(files_total_size > 5242880){
             $.notify("There is a  5MB limit on file uploads", "error");
@@ -251,18 +265,22 @@ gisportal.selectionTools.csvFound = function(formData){
    });
 };
 
-gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
+gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValue, fromSavedState){
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'featureProjection': gisportal.projection
    };
    var features = geoJsonFormat.readFeatures(geojson, featureOptions);
    gisportal.vectorLayer.getSource().clear();
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+   gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
    cancelDraw();
    //MORETODO: remove the selected class from draw buttons
    gisportal.vectorLayer.getSource().addFeatures(features);
    // Zooms to the extent of the features just added
-   map.getView().fit(gisportal.vectorLayer.getSource().getExtent(), map.getSize());
+   if((!gisportal.current_view || !gisportal.current_view.noPan) && !fromSavedState){
+      gisportal.mapFit(gisportal.vectorLayer.getSource().getExtent());
+   }
    gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    $('.js-coordinates').val("");
    // If this is a newly created geojson
@@ -276,6 +294,9 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName){
       }
    }
    gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+   if(selectedValue){
+      gisportal.methodThatSelectedCurrentRegion.value = selectedValue;
+   }
 };
 
 gisportal.selectionTools.toggleBboxDisplay = function() {
@@ -333,7 +354,6 @@ gisportal.selectionTools.toggleTool = function(type)  {
 
       if (type == 'SelectFromMap') {
          gisportal.selectionTools.isSelecting = true;
-         console.log("starting polygon selection");
       }
 
 
@@ -341,6 +361,8 @@ gisportal.selectionTools.toggleTool = function(type)  {
          draw.on('drawstart',
             function(evt) {
                gisportal.vectorLayer.getSource().clear();
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
                // set sketch
                sketch = evt.feature;
                $(document).on( 'keydown', function ( e ) {
@@ -399,8 +421,13 @@ gisportal.selectionTools.updateROI = function()  {
          gisportal.methodThatSelectedCurrentRegion.justCoords = true;
       }
       gisportal.vectorLayer.getSource().clear();
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
+      if(!gisportal.current_view || !gisportal.current_view.noPan){
+         gisportal.mapFit(this_feature.getGeometry().getExtent());
+      }
       return;
    }catch(e){
       if(this_bounds){
