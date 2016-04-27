@@ -493,3 +493,11 @@ gisportal.events.bind('featureOverlay.removeType', function(event, overlayType) 
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('dataPopup.display', function(event, coordinate) {
+   var params = {
+      "event": "dataPopup.display",
+      "coordinate": coordinate
+   };
+   collaboration._emit('c_event', params);
+});

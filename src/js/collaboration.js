@@ -822,6 +822,13 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('dataPopup.display', function(data) {
+            var pixel = map.getPixelFromCoordinate(data.params.coordinate);
+            if (collaboration.role == "member") {
+               gisportal.displayDataPopup(pixel);
+            }
+         });
+
          // User saved state
          socket.on('setSavedState', function(data) {
             
