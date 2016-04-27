@@ -132,17 +132,18 @@ gisportal.editLayersForm.addListeners = function(){
       gisportal.addLayersForm.server_info = {};
       gisportal.addLayersForm.form_info = {};
       for(var i in gisportal.editLayersForm.server_list){
-         if(gisportal.editLayersForm.server_list[i].serverName == $(this).data("server")){
+         var this_form_layer = gisportal.editLayersForm.server_list[i];
+         if(this_form_layer.serverName == $(this).data("server") && this_form_layer.owner == $(this).data("user")){
             var layer, id;
-            for(layer in gisportal.editLayersForm.server_list[i].includedLayers){
-               id = gisportal.editLayersForm.server_list[i].includedLayers[layer].id;
+            for(layer in this_form_layer.includedLayers){
+               id = this_form_layer.includedLayers[layer].id;
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
                single_layer = this_layer;
                // Each of the server layers are added to the layers_list variable
                gisportal.addLayersForm.addlayerToList(this_layer);
             }
-            for(layer in gisportal.editLayersForm.server_list[i].excludedLayers){
-               id = gisportal.editLayersForm.server_list[i].excludedLayers[layer].id;
+            for(layer in this_form_layer.excludedLayers){
+               id = this_form_layer.excludedLayers[layer].id;
                this_layer = gisportal.not_included_layers[id];
                if(!single_layer){
                   single_layer = this_layer;

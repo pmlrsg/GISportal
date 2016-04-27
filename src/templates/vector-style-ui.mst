@@ -24,6 +24,6 @@
      
       
       <div class="indicator-option">
-         <button class="js-zoom-data text-button" data-id="{{id}}">Zoom to data</button>
+         <button class="js-zoom-data text-button hide-when-view {{#unless zoomable}}hidden{{/unless}}" data-id="{{id}}">Zoom to data</button>
       </div>
    </div>

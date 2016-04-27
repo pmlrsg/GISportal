@@ -30,6 +30,11 @@ $.extend(gisportal.config, {
          'cm2': "used_in_graph" // Used in layer
       }
    },
+
+   catDisplayNames : { // Used to give a nice format to a tag category. overwrites the default title casing
+      "msfd": "MSFD"
+   },
+
    siteMode: "production", //(development|production)
 
     // Skip start screen only is the user has a saved state, requires T&C

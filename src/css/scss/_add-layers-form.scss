@@ -13,7 +13,7 @@
 }
 
 .form-header{
-  background-color: #59476d;
+  background-color: $panel-content-header;
   color: #fff;
   line-height: 1.5;
   padding: 10px 15px; 
@@ -26,14 +26,16 @@
   line-height: 1px;
 }
 
-.layers-form-left{
-   float:left;
-   width:47.5%;
-}
+@media screen and (min-width: 800px) {
+   .layers-form-left{
+      float:left;
+      width:47.5%;
+   }
 
-.layers-form-right{
-   float:right;
-   width:47.5%;
+   .layers-form-right{
+      float:right;
+      width:47.5%;
+   }
 }
 
 .js-layer-form-html .clearfix {
@@ -61,7 +63,7 @@
 }
 
 .pagination>li>a:hover, .pagination>li>span:hover {
-  background-color: #59476d;
+  background-color: $panel-content-header;
 }
 
 .pagination>li>a, .pagination>li>span {
@@ -72,7 +74,7 @@
    line-height: 1.42857143;
    color: #fff;
    text-decoration: none;
-   background-color: #b1a7bc;
+   background-color: $secondary-background;
    border: 1px solid #ddd;
 }
 
@@ -88,7 +90,7 @@
 }
 
 .pagination>.disabled>a, .pagination>.disabled>a:focus, .pagination>.disabled>a:hover, .pagination>.disabled>span, .pagination>.disabled>span:focus, .pagination>.disabled>span:hover {
-   color: #b1a7bc;
+   color: $secondary-background;
    background-color: #fff;
    border-color: #ddd;
    cursor: default;
@@ -124,19 +126,15 @@
    margin-left:5px;
 }
 
-.layers-form-right .right-icon {
-   float:right;
+.layers-form .icon-btn{
    font-size: 22px;
    line-height: 1px;
    color:#111111;
    padding-top: 5px;
 }
 
-.scale-points-div .icon-btn {
-   font-size: 22px;
-   line-height: 1px;
-   color:#111111;
-   padding-top: 5px;
+.layers-form .text-button{
+  text-align: left;
 }
 
 .right-icon {
