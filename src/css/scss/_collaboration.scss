@@ -83,12 +83,12 @@
    background: radial-gradient(circle at 3px 3px, #FF916F, #7C1700);
 }
 .highlight-click {
-    -webkit-animation: glow 0.25s 0.25s 2;
+    animation: glow 0.25s 2;
 }
 
 .js-collaboration-popup .overlay-container { width:auto;}
 
-@-webkit-keyframes glow {
+@keyframes glow {
     to {
         -webkit-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
         -moz-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);

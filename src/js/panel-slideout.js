@@ -21,15 +21,12 @@ gisportal.panelSlideout.initDOM = function(  ){
 		})
 		.on( 'click', '.js-slideout-toggle-peak', function(){
 			var slideoutName = findRelatedSlideoutName( this );
+			gisportal.events.trigger('slideout.togglePeak', slideoutName);
 			gisportal.panelSlideout.togglePeak( slideoutName );
 		})
 		.on( 'click', '.js-slideout-close', function(){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.closeSlideout( slideoutName );
-		})
-		.on( 'click', '.js-slideout-peak', function(){
-			var slideoutName = findRelatedSlideoutName( this );
-			gisportal.panelSlideout.peakSlideout( slideoutName );
 		});
 };
 

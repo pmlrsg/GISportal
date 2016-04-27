@@ -31,6 +31,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       var id = $(this).data('id');
       gisportal.graphs.deleteActiveGraph();
       gisportal.indicatorsPanel.addToPlot(id);
+      gisportal.events.trigger('newPlot.clicked', id);
    });
 
    $('.js-indicators').on('click', '.js-clear-selection', function()  {

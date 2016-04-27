@@ -616,7 +616,7 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
    gisportal.vectorLayer.getSource().addFeatures(features);
    if(gisportal.methodThatSelectedCurrentRegion.justCoords){
       gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
-   }else{
+   }else if(features.length > 0){
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    }
    if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){

@@ -837,6 +837,33 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('newPlot.clicked', function(data) {
+            var id = data.params.id;
+            collaboration.log(data.presenter +': "Make New Graph" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-make-new-plot[data-id="' + id + '"]');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('graphs.deleteActive', function(data) {
+            collaboration.log(data.presenter +': Deleted Plot');
+            if (collaboration.role == "member") {
+               gisportal.graphs.deleteActiveGraph();
+            }
+         });
+
+         socket.on('slideout.togglePeak', function(data) {
+            var slideoutName = data.params.slideoutName;
+            collaboration.log(data.presenter +': Show panel: ' + slideoutName);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-toggle-peak');
+               gisportal.panelSlideout.togglePeak(slideoutName);
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
          // User saved state
          socket.on('setSavedState', function(data) {
             
@@ -975,7 +1002,7 @@ collaboration.log = function(msg) {
 
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');
-   setTimeout(function() { element.removeClass('highlight-click'); }, 500);
+   setTimeout(function() { element.removeClass('highlight-click'); }, 1000);
 };
 
 collaboration.setStatus = function(icon, message) {

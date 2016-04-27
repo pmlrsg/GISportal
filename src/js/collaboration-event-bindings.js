@@ -508,3 +508,26 @@ gisportal.events.bind('dataPopup.close', function(event) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('newPlot.clicked', function(event, id) {
+   var params = {
+      "event": "newPlot.clicked",
+      "id": id
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphs.deleteActive', function(event) {
+   var params = {
+      "event": "graphs.deleteActive"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('slideout.togglePeak', function(event, slideoutName) {
+   var params = {
+      "event": "slideout.togglePeak",
+      "slideoutName": slideoutName
+   };
+   collaboration._emit('c_event', params);
+});

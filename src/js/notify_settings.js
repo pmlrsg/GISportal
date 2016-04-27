@@ -75,6 +75,19 @@ $.notify.addStyle('gisportal-restore-option', {
     "</div>"
 });
 
+$.notify.addStyle('gisportal-close-plot-option', {
+  html: 
+    "<div data-option='close-plot'>" +
+      "<div class='clearfix'>" +
+        "<div class='title' data-notify-html='title'/>" +
+        "<div class='buttons'>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+});
+
 $.notify.addStyle('gisportal-collab-notification', {
   html: 
     "<div data-option='collab'>" +
