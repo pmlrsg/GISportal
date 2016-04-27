@@ -829,6 +829,12 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('dataPopup.close', function(data) {
+            if (collaboration.role == "member") {
+               gisportal.dataReadingPopupCloser.click();
+            }
+         });
+
          // User saved state
          socket.on('setSavedState', function(data) {
             

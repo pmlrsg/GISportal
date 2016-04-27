@@ -501,3 +501,10 @@ gisportal.events.bind('dataPopup.display', function(event, coordinate) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('dataPopup.close', function(event) {
+   var params = {
+      "event": "dataPopup.close"
+   };
+   collaboration._emit('c_event', params);
+});

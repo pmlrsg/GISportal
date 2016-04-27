@@ -450,6 +450,7 @@ gisportal.mapInit = function() {
          feature[0].setStyle(feature[1]);
       });
       gisportal.selectedFeatures = [];
+      gisportal.events.trigger('dataPopup.close');
       return false;
    };
 
