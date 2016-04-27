@@ -2,6 +2,21 @@
 
 gisportal.graphs.PlotEditor = (function(){
 
+   var addPlottingTriggers = function(){
+      $('.js-active-plot-title').on('change keyup paste', function(){
+         var value = $(this).val();
+         if(e.type == "paste"){
+            try{
+               value = e.originalEvent.clipboardData.getData('text/plain');
+            }catch(err){}
+         }
+         gisportal.events.trigger('graphTitle.edit', value);
+      });
+      $('.js-active-plot-type').on('change', function(){
+         gisportal.events.trigger('graphType.edit', $(this).val());
+      });
+   };
+
    /**
     * Creates a new PlotEditor object which will edit a plot object
     *
@@ -29,6 +44,8 @@ gisportal.graphs.PlotEditor = (function(){
       });
 
       this._editorParent.find('.js-slideout-content').html( rendered );
+
+      addPlottingTriggers();
 
 
       var _this = this;
@@ -273,6 +290,10 @@ gisportal.graphs.PlotEditor = (function(){
       .on('slide', function(event, val){
          var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp);});
          _this.plot().tBounds( tBounds );
+      })
+      // Listen for when the user moves the slider and sends a trigger
+      .on('set change', function(event, val){
+         gisportal.events.trigger('graphRange.change', val);
       });
       
       // The start date input element is manually typed update  tBounds

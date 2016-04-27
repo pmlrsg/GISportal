@@ -296,6 +296,14 @@ gisportal.events.bind('addLayersForm.scroll', function(event, scrollPercent) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('slideout.scroll', function(event, scrollPercent) {
+   var params = {
+      "event": "slideout.scroll",
+      "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) {
    var params = {
       "event": "addLayersForm.input",
@@ -528,6 +536,30 @@ gisportal.events.bind('slideout.togglePeak', function(event, slideoutName) {
    var params = {
       "event": "slideout.togglePeak",
       "slideoutName": slideoutName
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphTitle.edit', function(event, value) {
+   var params = {
+      "event": "graphTitle.edit",
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphType.edit', function(event, value) {
+   var params = {
+      "event": "graphType.edit",
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphRange.change', function(event, value) {
+   var params = {
+      "event": "graphRange.change",
+      "value":value
    };
    collaboration._emit('c_event', params);
 });

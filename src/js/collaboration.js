@@ -233,6 +233,14 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('slideout.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.js-slideout-content');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
          socket.on('addLayersForm.input', function(data) {
             if (collaboration.role == "member") {
                var input = data.params.inputValue;
@@ -415,7 +423,7 @@ collaboration.initSession = function() {
             }
 		  		collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('[data-panel-name="' + p + '"].tab'));
+               collaboration.highlightElementRubber($('[data-panel-name="' + p + '"].tab'));
                gisportal.panels.showPanel(p);
             }
 		  	});  
@@ -864,6 +872,40 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('graphTitle.edit', function(data) {
+            var value = data.params.value;
+            collaboration.log(data.presenter +': Title value set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               var input_elem = $('.js-active-plot-title');
+               input_elem.val(value);
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('graphType.edit', function(data) {
+            var value = data.params.value;
+            var input_elem = $('.js-active-plot-type');
+            var nice_val = input_elem.find(':selected').html() || value;
+            collaboration.log(data.presenter +': Graph type set to: "' + nice_val + '"');
+            if (collaboration.role == "member") {
+               input_elem.val(value);
+               input_elem.trigger('change');
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('graphRange.change', function(data) {
+            var value = data.params.value;
+            var slider_elem = $('.js-range-slider');
+            var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
+            collaboration.log(data.presenter +': Graph date range set to: "' + dates.join(' - ') + '"');
+            if (collaboration.role == "member") {
+               slider_elem.val(value);
+               slider_elem.trigger('set');
+               collaboration.highlightElement(slider_elem);
+            }
+         });
+
          // User saved state
          socket.on('setSavedState', function(data) {
             
@@ -1003,6 +1045,11 @@ collaboration.log = function(msg) {
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');
    setTimeout(function() { element.removeClass('highlight-click'); }, 1000);
+};
+
+collaboration.highlightElementRubber = function(element) {
+   element.addClass('highlight-rubber');
+   setTimeout(function() { element.removeClass('highlight-rubber'); }, 1000);
 };
 
 collaboration.setStatus = function(icon, message) {

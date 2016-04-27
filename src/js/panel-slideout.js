@@ -28,6 +28,10 @@ gisportal.panelSlideout.initDOM = function(  ){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.closeSlideout( slideoutName );
 		});
+	$('.js-slideout-content').bind('scroll', function() {
+	   var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+	   gisportal.events.trigger('slideout.scroll', scrollPercent);
+	});
 };
 
 function findRelatedSlideoutName( slideoutName ){
