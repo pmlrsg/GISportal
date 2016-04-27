@@ -1,0 +1,112 @@
+{
+"job_id": 548,
+"request": {
+"plot": {
+"type": "timeseries",
+"title": "PML: Chlorophyll / PML: Nitrate",
+"style": "basic",
+"downloadTypes": [
+{
+"key": "csv",
+"label": "CSV"
+},
+{
+"key": "png",
+"label": "PNG"
+},
+{
+"key": "meta-data",
+"label": "Meta Data"
+},
+{
+"key": "logos",
+"label": "Logos"
+},
+{
+"key": "svg",
+"label": "SVG"
+}
+],
+"xAxis": {
+"label": "Date/Time",
+"ticks": "auto",
+"weight": "auto",
+"tickFormat": "%d/%m/%Y"
+},
+"y1Axis": {
+"scale": "linear",
+"label": "Chlorophyll Elv:-1.0M (mg C m-3)",
+"ticks": "auto",
+"weight": "auto",
+"tickFormat": "auto"
+},
+"y2Axis": {
+"scale": "linear",
+"label": "Nitrate Elv:-1.0M (mmol m-3)",
+"ticks": "auto",
+"weight": "auto",
+"tickFormat": "auto"
+},
+"data": {
+"series": [
+{
+"handler": "OPEC_SERVICE_WCS",
+"data_source": {
+"coverage": "Chl",
+"t_bounds": [
+"2012-12-22T15:37:58.651Z",
+"2013-12-16T00:00:00.000Z"
+],
+"bbox": "-20.094,39.998,13.7,65.222",
+"depth": "-1.0",
+"threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?",
+"metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_Chl.json",
+"middlewareUrl": "http://portal.marineopec.eu/service/wcs"
+},
+"label": "1) Chlorophyll - North East Atlantic - PML",
+"yAxis": 1,
+"type": "line",
+"meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+"markdown": [
+"http://portal.marineopec.eu/service/metadata/indicator/Chlorophyll",
+"http://portal.marineopec.eu/service/metadata/provider/PML"
+],
+"logo": "http://portal.marineopec.eu/img/providers/pml.png"
+},
+{
+"handler": "OPEC_SERVICE_WCS",
+"data_source": {
+"coverage": "DIN",
+"t_bounds": [
+"2012-12-22T15:37:58.651Z",
+"2013-12-16T00:00:00.000Z"
+],
+"bbox": "-20.094,39.998,13.7,65.222",
+"depth": "-1.0",
+"threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?",
+"metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_DIN.json",
+"middlewareUrl": "http://portal.marineopec.eu/service/wcs"
+},
+"label": "2) Nitrate - North East Atlantic - PML",
+"yAxis": 2,
+"type": "line",
+"meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -20.094,39.998,13.7,65.222<br>Depth: -1.0m<br>",
+"markdown": [
+"http://portal.marineopec.eu/service/metadata/indicator/Nitrate",
+"http://portal.marineopec.eu/service/metadata/provider/PML"
+],
+"logo": "http://portal.marineopec.eu/img/providers/pml.png"
+}
+]
+}
+},
+"style": {
+"logos": [
+"http://portal.marineopec.eu/img/providers/pml.png"
+]
+}
+},
+"level": "info",
+"message": "New Job",
+"timestamp": "2016-02-04T10:20:21.587Z"
+}
