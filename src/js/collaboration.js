@@ -341,6 +341,8 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                var div = $('#indicatorsPanel');
                var scrollPercent = data.params.scrollPercent;
+               // This stops the animation that scrolls to a layer
+               div.trigger('mousewheel');
                div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
          });
