@@ -357,9 +357,6 @@ collaboration.initSession = function() {
 
          // layer selected
 		  	socket.on('layer.remove', function(data) {
-		  		console.log('layer.remove received');
-		  		console.log(data);
-
 		  		collaboration.log(data.presenter +': Layer removed - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
@@ -767,6 +764,14 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('olDraw.drawstart', function(data) {
+            if (collaboration.role == "member") {
+               gisportal.vectorLayer.getSource().clear();
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+            }
+         });
+
          socket.on('olDraw.drawend', function(data) {
             var coordinates = data.params.coordinates;
             collaboration.log(data.presenter +': Polygon drawn');
@@ -777,11 +782,43 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('olDraw.drawstart', function(data) {
+         socket.on('selectPolygon.hover', function(data) {
+            var coordinate = data.params.coordinate;
+            var id = data.params.id;
+            collaboration.log(data.presenter +': Polygon hover: ' + id);
             if (collaboration.role == "member") {
-               gisportal.vectorLayer.getSource().clear();
-               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
-               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+               var pixel = map.getPixelFromCoordinate(coordinate);
+               var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                  // Gets the first vector layer it finds
+                  if(feature.getKeys().length !== 1 && feature.getId() && feature.getId() == id){
+                     return feature;
+                  }
+               });
+               gisportal.hoverFeature(feature);
+            }
+         });
+
+         socket.on('selectPolygon.select', function(data) {
+            var coordinate = data.params.coordinate;
+            var id = data.params.id;
+            collaboration.log(data.presenter +': Polygon selected: ' + id);
+            if (collaboration.role == "member") {
+               var pixel = map.getPixelFromCoordinate(coordinate);
+               var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                  // Gets the first vector layer it finds
+                  if(feature.getKeys().length !== 1 && feature.getId() && feature.getId() == id){
+                     return feature;
+                  }
+               });
+               gisportal.selectFeature(feature);
+            }
+         });
+
+         socket.on('featureOverlay.removeType', function(data) {
+            var overlayType = data.params.overlayType;
+            collaboration.log(data.presenter +': Remove ' + overlayType);
+            if (collaboration.role == "member") {
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, overlayType);
             }
          });
 

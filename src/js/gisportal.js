@@ -563,11 +563,16 @@ gisportal.mapInit = function() {
    // A function to remove any features of a certail overlay type from any given overlay (vector layer)
    gisportal.removeTypeFromOverlay = function(overlay, overlayType){
       var features = overlay.getSource().getFeatures();
+      var found = false;
       for(var feature in features){
          this_feature = features[feature];
          if(this_feature.getProperties().overlayType == overlayType){
             overlay.getSource().removeFeature(this_feature);
+            found = true;
          }
+      }
+      if(overlay == gisportal.featureOverlay && found){
+         gisportal.events.trigger('featureOverlay.removeType', overlayType);
       }
    };
 
@@ -586,6 +591,7 @@ gisportal.mapInit = function() {
          });
       }
       var hoverFeatures = gisportal.featureOverlay.getSource().getFeatures();
+      // TODO: Filter this list to only "hover" layers
       if(hoverFeatures.length > 0){
          if(!feature){
             // Makes sure any hover features are removed
@@ -593,12 +599,15 @@ gisportal.mapInit = function() {
             return;
          }
          var hovered_feature = hoverFeatures[0];
+         // This is unlikely to happen but is is a safely precaution for when vectors overlap
          if(!_.isEqual(hovered_feature.getGeometry().getCoordinates(), feature.getGeometry().getCoordinates())){
             gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
             gisportal.hoverFeature(feature);
+            gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
          }
       }else if(feature){
          gisportal.hoverFeature(feature);
+         gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
       }
    });
    gisportal.hoverFeature = function(feature){
@@ -623,24 +632,8 @@ gisportal.mapInit = function() {
                // If we are not on the correct feature then keep going until we are
                return;
             }
-            // If the correct feature is found from the hoveredFeature variable then you can select this one
-            // Makes sure any old selected features are removed ready to potentially add a new one
-            gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
-            // Creates a new feature to lose the old style and add the type (so the style is correct)
-            var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"selected"});
-            // Adds the feature to the overlay
-            gisportal.featureOverlay.getSource().addFeature(new_feature);
-
-            // This part actually does the selecting bit for the graphing
-            var t_wkt = gisportal.wkt.writeFeatures([feature]);
-
-            gisportal.vectorLayer.getSource().clear();
-            gisportal.currentSelectedRegion = t_wkt;
-            $('.js-coordinates').val("");
-            $('.js-upload-shape').val("");
-            $('.users-geojson-files').val("default");
-            gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", value: feature.getId(), justCoords: false};
-            cancelDraw();
+            gisportal.selectFeature(feature);
+            gisportal.events.trigger("selectPolygon.select", map.getCoordinateFromPixel(e.pixel), feature.getId());
             // Only does it for one feature
             return;
          });
@@ -691,6 +684,26 @@ gisportal.mapInit = function() {
          }
       }
    });
+   gisportal.selectFeature = function(feature){
+         // If the correct feature is found from the hoveredFeature variable then you can select this one
+         // Makes sure any old selected features are removed ready to potentially add a new one
+         gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+         // Creates a new feature to lose the old style and add the type (so the style is correct)
+         var new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"selected"});
+         // Adds the feature to the overlay
+         gisportal.featureOverlay.getSource().addFeature(new_feature);
+
+         // This part actually does the selecting bit for the graphing
+         var t_wkt = gisportal.wkt.writeFeatures([feature]);
+
+         gisportal.vectorLayer.getSource().clear();
+         gisportal.currentSelectedRegion = t_wkt;
+         $('.js-coordinates').val("");
+         $('.js-upload-shape').val("");
+         $('.users-geojson-files').val("default");
+         gisportal.methodThatSelectedCurrentRegion = {method:"selectExistingPolygon", value: feature.getId(), justCoords: false};
+         cancelDraw();
+   };
 
    map.on("moveend", function(data) {
       var centre = data.map.getView().getCenter();

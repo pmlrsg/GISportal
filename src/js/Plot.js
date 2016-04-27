@@ -491,6 +491,7 @@ gisportal.graphs.Plot =(function(){
             var error = 'Sorry, we failed to create a graph: \n'+
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
             $.notify(error, "error");
+            // TODO: Remove the graph from the list
          }
       });
    };

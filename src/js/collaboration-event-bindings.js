@@ -467,3 +467,29 @@ gisportal.events.bind('olDraw.drawend', function(event, coordinates) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('selectPolygon.hover', function(event, coordinate, id) {
+   var params = {
+      "event": "selectPolygon.hover",
+      "coordinate": coordinate,
+      "id": id
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('selectPolygon.select', function(event, coordinate, id) {
+   var params = {
+      "event": "selectPolygon.select",
+      "coordinate": coordinate,
+      "id": id
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('featureOverlay.removeType', function(event, overlayType) {
+   var params = {
+      "event": "featureOverlay.removeType",
+      "overlayType": overlayType
+   };
+   collaboration._emit('c_event', params);
+});

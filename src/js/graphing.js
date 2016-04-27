@@ -149,6 +149,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
          var error = 'Sorry, we failed to load the metadata: \n'+
                         'The server failed with this message: "' + e.statusText + '"';
          $.notify(error, "error");
+         // TODO: Remove the graph from the list
       }
    });
    $('.js-plot-popup').toggleClass("hidden", false);
@@ -193,6 +194,7 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
             var error = 'Sorry, we failed to load the graph: \n'+
                            'The server failed with this message: "' + e.statusText + '"';
             $.notify(error, "error");
+            // TODO: Remove the graph from the list
          }
       });
    });
