@@ -165,6 +165,20 @@ gisportal.selectionTools.shapesUploaded = function(){
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
+         // FOR STUPID WINDOWS (not reporting file types!!
+         if(this_file.type === ""){
+            var ext = this_file.name.split('.');
+            ext = ext[ext.length-1];
+            if(ext == "csv"){
+               this_file.type = "text/csv";
+            }else if(ext == "dbf"){
+               this_file.type = "application/x-dbf"
+            }else if(ext == "shp"){
+               this_file.type = "application/x-esri-shape"
+            }else if(ext == "shx"){
+               this_file.type = "application/x-esri-shape-index"
+            }
+         }
          files_total_size += this_file.size;
          if(files_total_size > 5242880){
             $.notify("There is a  5MB limit on file uploads", "error");
