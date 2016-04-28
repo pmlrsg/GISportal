@@ -1,0 +1,64 @@
+{
+    "plot": {
+        "type": "hovmollerLat",
+        "title": "Plymouth_Marine_Laboratory: Mass Concentration of Chlorophyll a in Sea Water",
+        "style": "basic",
+        "downloadTypes": [{
+            "key": "csv",
+            "label": "CSV"
+        }, {
+            "key": "png",
+            "label": "PNG"
+        }, {
+            "key": "meta-data",
+            "label": "Meta Data"
+        }, {
+            "key": "logos",
+            "label": "Logos"
+        }, {
+            "key": "svg",
+            "label": "SVG"
+        }],
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": ",.2f"
+        },
+        "y1Axis": {
+            "scale": "linear",
+            "label": "Mass Concentration of Chlorophyll a in Sea Water (milligram m-3)",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "data": {
+            "series": [{
+                "handler": "OPEC_SERVICE_WCS",
+                "data_source": {
+                    "coverage": "chlor_a",
+                    "layer_id": "chlor_a__Plymouth_Marine_Laboratory",
+                    "t_bounds": ["2011-12-01T21:47:04.655Z", "2013-12-01T00:00:00.000Z"],
+                    "bbox": "POLYGON((-18.281 36.035,-29.004 25.664,-20.918 25.488,-18.281 36.035))",
+                    "threddsUrl": "https://vortices.npm.ac.uk/thredds/wcs/CCI_ALL-v2.0-MONTHLY",
+                    "metaCacheUrl": "http://my-cdssg-portal.com/app/cache/layers/vortices.npm.ac.uk-thredds-wms-CCI_ALL-v2.0-MONTHLY_chlor_a.json",
+                    "middlewareUrl": "http://portal.marineopec.eu/service/wcs",
+                    "graphXAxis": "Time",
+                    "graphYAxis": "Lat",
+                    "graphZAxis": "chlor_a"
+                },
+                "label": "1) Mass Concentration of Chlorophyll a in Sea Water - Plymouth Marine Laboratory",
+                "yAxis": 1,
+                "type": "line",
+                "meta": "Region: undefined<br>Confidence: undefined<br>Provider: Plymouth_Marine_Laboratory<br>Interval: undefined<br>Bounding Box: POLYGON((-18.281 36.035,-29.004 25.664,-20.918 25.488,-18.281 36.035))<br>",
+                "markdown": [],
+                "logo": "http://my-cdssg-portal.com/undefined"
+            }]
+        },
+        "isIrregular": "true"
+    },
+    "style": {
+        "logos": []
+    }
+}
