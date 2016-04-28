@@ -818,6 +818,7 @@ gisportal.saveState = function(state) {
    state.view = gisportal.current_view;
    state.graphs = {};
    state.panel = {};
+   state.refine = {};
 
    // Get the current layers and any settings/options for them.
    var keys = gisportal.selectedLayers;
@@ -888,6 +889,9 @@ gisportal.saveState = function(state) {
    }
 
    state.panel.activePanel = gisportal.panels.activePanel;
+
+   state.refine.category = gisportal.refinePanel.selectedCategory;
+   state.refine.refineData = gisportal.refinePanel.currentData;
 
    return state;
 };
@@ -1027,6 +1031,10 @@ gisportal.loadState = function(state){
 
    if(state.panel && state.panel.activePanel){
       gisportal.panels.showPanel(state.panel.activePanel);
+   }
+
+   if(state.refine && state.refine.category){
+      $('#js-category-filter-select').ddslick('select', { value: state.refine.category });
    }
 
    gisportal.stateLoaded = true;
