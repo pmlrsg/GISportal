@@ -103,6 +103,21 @@ gisportal.events.bind("panels.showpanel", function(event, panelName) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind("refinePanel.cancel", function(event) {
+   var params = {
+      "event" : "refinePanel.cancel"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind("refinePanel.removeCat", function(event, cat) {
+   var params = {
+      "event" : "refinePanel.removeCat",
+      "cat": cat
+   };
+   collaboration._emit('c_event', params);
+});
+
 // auto scale a layer
 gisportal.events.bind("scalebar.autoscale", function(event, id, force) {
    var params = {
@@ -559,6 +574,14 @@ gisportal.events.bind('graphTitle.edit', function(event, value) {
 gisportal.events.bind('graphType.edit', function(event, value) {
    var params = {
       "event": "graphType.edit",
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('layerDepth.change', function(event, value) {
+   var params = {
+      "event": "layerDepth.change",
       "value":value
    };
    collaboration._emit('c_event', params);

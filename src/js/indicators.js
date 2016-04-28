@@ -577,6 +577,10 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       $('.js-google-auth-button').click(function() {
          var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
       });
+      $('.js-analysis-elevation').on('change', function(){
+         var value = $(this).val();
+         gisportal.events.trigger('layerDepth.change', value);
+      });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
       if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){

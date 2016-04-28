@@ -14,6 +14,10 @@ gisportal.panels.initDOM = function() {
 
 gisportal.panels.showPanel = function(panelName) {
 	gisportal.hideAllPopups();
+	if(panelName != "refine-indicator"){
+		$('.dd-container').ddslick('close');
+		gisportal.configurePanel.reset();
+	}
 	
 	$('[data-panel-name="' + gisportal.panels.activePanel + '"]').removeClass('active');
 	$('[data-panel-name="' + panelName + '"]').addClass('active');

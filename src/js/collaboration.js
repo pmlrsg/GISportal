@@ -157,6 +157,7 @@ collaboration.initSession = function() {
 
             // if I am the presenter send my state so that the new member can catch up
             if (collaboration.role == 'presenter') {
+               $('.dd-container').ddslick('close');
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
@@ -421,12 +422,28 @@ collaboration.initSession = function() {
             }else if(panel_div.html() && panel_div.html().length > 0){
                nicePanelName = panel_div.html();
             }
-		  		collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
+            collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
             if (collaboration.role == "member") {
                collaboration.highlightElementRubber($('[data-panel-name="' + p + '"].tab'));
                gisportal.panels.showPanel(p);
             }
-		  	});  
+         });
+
+         socket.on('refinePanel.cancel', function(data) {
+            collaboration.log(data.presenter +': "Cancel" clicked');
+            if (collaboration.role == "member") {
+               $('.js-refine-configure').trigger('click');
+            }
+         });
+
+         socket.on('refinePanel.removeCat', function(data) {
+            var cat = data.params.cat;
+            var nice_cat = gisportal.browseCategories[cat] || cat;
+            collaboration.log(data.presenter +': Category removed: ' + nice_cat);
+            if (collaboration.role == "member") {
+               $('.refine-remove[data-cat="' + cat + '"]').trigger('click');
+            }
+         });
 
 		  	// autoscale
          socket.on('scalebar.autoscale', function(data) {
@@ -906,6 +923,18 @@ collaboration.initSession = function() {
             var input_elem = $('.js-active-plot-type');
             var nice_val = input_elem.find(':selected').html() || value;
             collaboration.log(data.presenter +': Graph type set to: "' + nice_val + '"');
+            if (collaboration.role == "member") {
+               input_elem.val(value);
+               input_elem.trigger('change');
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('layerDepth.change', function(data) {
+            var value = data.params.value;
+            var input_elem = $('.js-analysis-elevation');
+            var nice_val = input_elem.find(':selected').html() || value;
+            collaboration.log(data.presenter +': Layer Depth set to: "' + nice_val + '"');
             if (collaboration.role == "member") {
                input_elem.val(value);
                input_elem.trigger('change');
