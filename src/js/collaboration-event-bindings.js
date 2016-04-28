@@ -594,3 +594,51 @@ gisportal.events.bind('graph.submitted', function(event) {
    };
    collaboration._emit('c_event', params);
 });
+
+gisportal.events.bind('graphComponent.remove', function(event, index) {
+   var params = {
+      "event": "graphComponent.remove",
+      "index":index
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphComponent.axisChange', function(event, index, value) {
+   var params = {
+      "event": "graphComponent.axisChange",
+      "index":index,
+      "value":value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graph.open', function(event, hash) {
+   var params = {
+      "event": "graph.open",
+      "hash":hash
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graph.copy', function(event, hash) {
+   var params = {
+      "event": "graph.copy",
+      "hash":hash
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graph.delete', function(event, hash) {
+   var params = {
+      "event": "graph.delete",
+      "hash":hash
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('graphPopup.close', function(event) {
+   var params = {
+      "event": "graphPopup.close"
+   };
+   collaboration._emit('c_event', params);
+});

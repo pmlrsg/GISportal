@@ -289,7 +289,8 @@ gisportal.graphs.PlotEditor = (function(){
       })
       // Listen for when the user moves the slider and update the tBounds
       .on('slide', function(event, val){
-         var tBounds = val.map(Number).map(function(stamp){ return new Date(stamp);});
+        // Rounds the date to the day so that the plot requests are the same and return the same hash
+         var tBounds = val.map(Number).map(function(stamp){return new Date(stamp);});
          _this.plot().tBounds( tBounds );
       })
       // Listen for when the user moves the slider and sends a trigger
@@ -364,11 +365,18 @@ gisportal.graphs.PlotEditor = (function(){
          // On click X remove the component
          element.on('click', '.js-close-acitve-plot-component', function(){
             _this.plot().removeComponent( component );
+            //TODO: When this is no longer a table, give each component an id to be identified easier.
+            var tableIndex = $(this).closest('tr').index();
+            gisportal.events.trigger('graphComponent.remove', tableIndex);
          });
 
 
          element.on('click', '.js-y-axis', function(){
             component.yAxis = parseInt( $(this).val() );
+            //TODO: When this is no longer a table, give each component an id to be identified easier.
+            var tableIndex = $(this).closest('tr').index();
+            var value = $(this).val();
+            gisportal.events.trigger('graphComponent.axisChange', tableIndex, value);
          });
 
          // The tooltip which tells the user about the range of available data

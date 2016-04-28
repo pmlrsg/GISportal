@@ -133,6 +133,7 @@ gisportal.graphs.popup = {};
 gisportal.graphs.popup.addActionListeners = function(){
    $('span.js-plot-popup-close').on('click', function(){
       $('div.js-plot-popup').toggleClass('hidden', true);
+      gisportal.events.trigger('graphPopup.close');
    });
 };
 
@@ -177,10 +178,13 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
       if(index){
          gisportal.graphs.storedGraphs.pop(index);
       }
+      gisportal.events.trigger('graph.delete', hash);
    })
    // Copy a plot
    .on('click', '.js-graph-status-copy', function(){
+      var hash = $(this).data("hash");
       gisportal.graphs.editPlot( plot.copy() );
+      gisportal.events.trigger('graph.copy', hash);
    })
    // Open a plot
   .on('click', '.js-graph-status-open', function(){
@@ -197,6 +201,7 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
             // TODO: Remove the graph from the list
          }
       });
+      gisportal.events.trigger('graph.open', hash);
    });
    if(noCopyEdit || !plot){
       element.off('click', '.js-graph-status-copy');

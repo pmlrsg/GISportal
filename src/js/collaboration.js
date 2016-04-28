@@ -755,17 +755,26 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                gisportal.drawingPoints.push(coordinate);
 
+               // Makes sure that this is not the last (completion) click
+               var drawOverlay = true;
+               if(gisportal.vectorLayer.getSource().getFeatures().length > 0){
+                  drawOverlay = false;
+               }
+
                gisportal.drawingOverlaySource.clear();
                var geom;
                if(gisportal.drawingPoints.length === 2){
-                  geom = new ol.geom.LineString(gisportal.drawingPoints);
+                  // Only if drawing a polygon
+                  if($('.js-draw-polygon').hasClass('drawInProgress')){
+                     geom = new ol.geom.LineString(gisportal.drawingPoints);
+                  }
                }
                if(gisportal.drawingPoints.length > 2){
                   var polygon_array = _.clone(gisportal.drawingPoints);
                   polygon_array.push(polygon_array[0]);
                   geom = new ol.geom.Polygon([polygon_array]);
                }
-               if(geom){
+               if(geom && drawOverlay){
                   gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:geom}));
                }
                for(var point in gisportal.drawingPoints){
@@ -866,7 +875,7 @@ collaboration.initSession = function() {
          });
 
          socket.on('graphs.deleteActive', function(data) {
-            collaboration.log(data.presenter +': Deleted Plot');
+            collaboration.log(data.presenter +': Closed Plot');
             if (collaboration.role == "member") {
                gisportal.graphs.deleteActiveGraph();
             }
@@ -921,6 +930,32 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('graphComponent.remove', function(data) {
+            var index = data.params.index;
+            var tr_elem = $('.js-components tr:eq(' + index + ')');
+            var title = tr_elem.find('td span').html() || "Component";
+            collaboration.log(data.presenter +': ' + title + ' removed"');
+            if (collaboration.role == "member") {
+               var del_elem = tr_elem.find('.js-close-acitve-plot-component');
+               del_elem.trigger('click');
+            }
+         });
+
+         socket.on('graphComponent.axisChange', function(data) {
+            var index = data.params.index;
+            var value = data.params.value;
+            var tr_elem = $('.js-components tr:eq(' + index + ')');
+            var title = tr_elem.find('td span').html() || "Component";
+            var select_elem = tr_elem.find('.js-y-axis');
+            if (collaboration.role == "member") {
+               select_elem.val(value);
+               select_elem.trigger('click');
+               collaboration.highlightElement(select_elem);
+            }
+            var select_value = select_elem.find("option:selected").text();
+            collaboration.log(data.presenter +': ' + title + ': axis changed to "' + select_value);
+         });
+
          socket.on('graphStartDate.change', function(data) {
             var value = new Date(data.params.value).toISOString().split("T")[0];
             var date_elem = $('.js-active-plot-start-date');
@@ -947,6 +982,43 @@ collaboration.initSession = function() {
             collaboration.log(data.presenter +': "Create Graph" clicked');
             if (collaboration.role == "member") {
                $('.js-create-graph').trigger('click');
+            }
+         });
+
+         socket.on('graph.open', function(data) {
+            var hash = data.params.hash;
+            var open_elem = $('.js-graph-status-open[data-hash="' + hash + '"]');
+            var title = open_elem.data('title');
+            collaboration.log(data.presenter + ': "' + title + '": "Open" clicked');
+            if (collaboration.role == "member") {
+               open_elem.trigger('click');
+            }
+         });
+
+         socket.on('graph.copy', function(data) {
+            var hash = data.params.hash;
+            var copy_elem = $('.js-graph-status-copy[data-hash="' + hash + '"]');
+            var title = copy_elem.data('title');
+            collaboration.log(data.presenter + ': "' + title + '": "Copy/Edit" clicked');
+            if (collaboration.role == "member") {
+               copy_elem.trigger('click');
+            }
+         });
+
+         socket.on('graph.delete', function(data) {
+            var hash = data.params.hash;
+            var delete_elem = $('.js-graph-status-delete[data-hash="' + hash + '"]');
+            var title = delete_elem.data('title') || "Graph";
+            collaboration.log(data.presenter + ': "' + title + '": "Delete" clicked');
+            if (collaboration.role == "member") {
+               delete_elem.trigger('click');
+            }
+         });
+
+         socket.on('graphPopup.close', function(data) {
+            collaboration.log(data.presenter + ': Plot closed');
+            if (collaboration.role == "member") {
+               $('.js-plot-popup-close').trigger('click');
             }
          });
 

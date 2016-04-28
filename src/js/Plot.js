@@ -375,7 +375,8 @@ gisportal.graphs.Plot =(function(){
                // Layer ID
                "layer_id"  : layer.id,
                // Time range of the data
-               "t_bounds"  : [this.tBounds()[0].toISOString(), this.tBounds()[1].toISOString()],
+               // Rounded so that the requests stay the same over collaboration
+               "t_bounds"  : [this.tBounds()[0].toISOString().split("T")[0], this.tBounds()[1].toISOString().split("T")[0]],
                // Bounds box of the data, also supports WKT
                "bbox": nice_bbox,
                // Depth, optional
@@ -825,7 +826,7 @@ gisportal.graphs.Plot =(function(){
 
       if( _new.length == 1 )
          _new = [ _new, _new ];
-      
+
       this._tBounds = _new;
       
       var dateRangeBounds = this.dateRangeBounds();
