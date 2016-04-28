@@ -494,6 +494,7 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
  * @param  {[type]} targetDiv a jQuery object of the div where the drop down list should be created
   */
 gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNumber) {
+   gisportal.refinePanel.selectedCategory = cat;
    targetDiv.html('');
 
    var grouped = gisportal.groupTags();

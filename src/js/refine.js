@@ -35,6 +35,7 @@ gisportal.refinePanel.open = function(data) {
  * Closes the refine panel
  */
 gisportal.refinePanel.close = function() {
+   gisportal.refinePanel.currentData = null;
    $('#js-refine-section-interval').toggleClass('hidden', true);
    $('#js-refine-section-reliability').toggleClass('hidden', true);
    gisportal.panels.showPanel('choose-indicator');
