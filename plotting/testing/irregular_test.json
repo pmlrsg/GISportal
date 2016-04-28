@@ -1,0 +1,61 @@
+{
+    "plot": {
+        "type": "timeseries",
+        "title": "CEH: Latent Heat Flux",
+        "style": "basic",
+        "downloadTypes": [{
+            "key": "csv",
+            "label": "CSV"
+        }, {
+            "key": "png",
+            "label": "PNG"
+        }, {
+            "key": "meta-data",
+            "label": "MetaData"
+        }, {
+            "key": "logos",
+            "label": "Logos"
+        }, {
+            "key": "svg",
+            "label": "SVG"
+        }],
+        "xAxis": {
+            "scale": "linear",
+            "label": "Date/Time",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "%d/%m/%Y"
+        },
+        "y1Axis": {
+            "scale": "linear",
+            "label": "Latent Heat Flux (W m-2)",
+            "ticks": "auto",
+            "weight": "auto",
+            "tickFormat": "auto"
+        },
+        "data": {
+            "series": [{
+                "handler": "OPEC_SERVICE_WCS",
+                "data_source": {
+                    "coverage": "Qle",
+                    "layer_id": "Qle__CEH1",
+                    "t_bounds": ["1994-11-03T15:43:45.642Z", "1998-01-28T06:43:12.000Z"],
+                    "bbox": "POLYGON((-1.5820312484814332 19.31114335512759, 23.730468754170957 2.635788577620765,20.039062495736744 -8.059229626433183, -9.84374999554178 13.068776733698046, -1.5820312484814332 19.31114335512759))",
+                    "threddsUrl": "https://vortices.npm.ac.uk/thredds/wcs/ceh/wrr1-monthly-agg.nc?",
+                    "metaCacheUrl": "http://pmpc1310.npm.ac.uk/app/cache/layers/vortices.npm.ac.uk-thredds-wms-ceh-wrr1-monthly-agg.nc_Qle.json",
+                    "middlewareUrl": "http://portal.marineopec.eu/service/wcs"
+                },
+                "label": "1) Latent Heat Flux - Global - CEH",
+                "yAxis": 1,
+                "type": "line",
+                "meta": "Region: Global<br>Confidence: undefined<br>Provider: CEH<br>Interval: Monthly<br>Bounding Box: POLYGON((-176110.913 2191602.475,2641663.698 293518.189,2230738.233 -900122.445,-1095801.237 1467590.943,-176110.913 2191602.475))<br>",
+                "markdown": [],
+                "logo": "http://pmpc1310.npm.ac.uk/undefined"
+            }]
+        },
+        "isIrregular": "true"
+    },
+    "style": {
+        "logos": []
+    }
+}
