@@ -564,6 +564,7 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
    gisportal.filterLayersByDate(date);
    self.showDate(date);
+   $('.js-current-date').val(moment(date).format('YYYY-MM-DD')).trigger('change');
    gisportal.timeline.redraw();
 
    gisportal.events.trigger('date.selected', date);

@@ -320,10 +320,6 @@ gisportal.createOpLayers = function() {
    }
    gisportal.addLayersForm.selectedLayers = [];
 
-   var state = gisportal.cache.state;
-   gisportal.layersLoaded = true;
-   if (!gisportal.stateLoadStarted && state && !gisportal.stateLoaded) gisportal.loadState(state);
-
    if(_.size(gisportal.layers) <= 0){
       if(_.size($('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")')) <= 0){
          $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
@@ -336,6 +332,9 @@ gisportal.createOpLayers = function() {
       $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", false);
       gisportal.configurePanel.refreshData();
    }
+   var state = gisportal.cache.state;
+   gisportal.layersLoaded = true;
+   if (state && !gisportal.stateLoaded) gisportal.loadState(state);
 
    gisportal.events.trigger('available-layers-loaded');
 };
@@ -901,8 +900,10 @@ gisportal.saveState = function(state) {
  * @param {object} state - The saved state object
  */
 gisportal.loadState = function(state){
-   
-   gisportal.stateLoadStarted = true;
+   if(gisportal.stopLoadState){
+      return true;
+   }
+   gisportal.stopLoadState = true;
    $('.start').toggleClass('hidden', true);
    state = state || {};
 
@@ -1033,8 +1034,13 @@ gisportal.loadState = function(state){
       gisportal.panels.showPanel(state.panel.activePanel);
    }
 
-   if(state.refine && state.refine.category){
-      $('#js-category-filter-select').ddslick('select', { value: state.refine.category });
+   if(state.refine){
+      if(state.refine.category){
+         $('#js-category-filter-select').ddslick('select', { value: state.refine.category });
+      }
+      if(state.refine.refineData){
+         gisportal.refinePanel.refreshData(state.refine.refineData);
+      }
    }
 
    gisportal.stateLoaded = true;
@@ -1203,7 +1209,7 @@ gisportal.setState = function(state) {
    // Cache state for access by others
    gisportal.cache.state = state;
    // TODO: Merge with default state. 
-   if (!gisportal.stateLoadStarted && state && gisportal.layersLoaded) gisportal.loadState(state);
+   if (state && gisportal.layersLoaded) gisportal.loadState(state);
    
 };
 

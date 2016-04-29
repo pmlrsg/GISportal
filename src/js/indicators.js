@@ -636,6 +636,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
 
    $('.js-add-coordinates-to-profile').on('click', function(){
       gisportal.panels.userFeedback("Please enter a name to use for your file", addCoordinatesToProfile);
+      gisportal.events.trigger('coordinates.save');
    });
 };
 
