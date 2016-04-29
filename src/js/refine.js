@@ -35,6 +35,7 @@ gisportal.refinePanel.open = function(data) {
  * Closes the refine panel
  */
 gisportal.refinePanel.close = function() {
+   gisportal.refinePanel.currentData = null;
    $('#js-refine-section-interval').toggleClass('hidden', true);
    $('#js-refine-section-reliability').toggleClass('hidden', true);
    gisportal.panels.showPanel('choose-indicator');
@@ -50,14 +51,18 @@ gisportal.refinePanel.initDOM = function(data) {
       gisportal.configurePanel.reset();
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
+      gisportal.events.trigger('refinePanel.cancel');
    });
 };
 
 /**
  * Currently refreshData just renders the panel
  */
-gisportal.refinePanel.refreshData = function() {
-   var data = gisportal.refinePanel.currentData;
+gisportal.refinePanel.refreshData = function(data) {
+   if(data){
+      gisportal.refinePanel.currentData = data;
+   }
+   data = gisportal.refinePanel.currentData;
 
    var id = data.id;
    var name = data.name;
@@ -144,7 +149,18 @@ gisportal.refinePanel.refreshData = function() {
       // add some magic to allow them to remove selected categories
       $('.refine-remove').click(function() {
          var cat = $(this).data('cat');
-         gisportal.refinePanel.removeCategory(cat);
+         if($('.refine-remove').length == 1){
+            gisportal.configurePanel.reset();
+            gisportal.configurePanel.open();
+            gisportal.refinePanel.close();
+         }else{
+            gisportal.refinePanel.removeCategory(cat);
+         }
+         gisportal.events.trigger('refinePanel.removeCat', cat);
+      });
+      $('.indicator-select').bind('scroll', function() {
+         var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+         gisportal.events.trigger('refinePanel.scroll', scrollPercent);
       });
 
       // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 

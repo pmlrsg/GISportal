@@ -5,7 +5,6 @@ collaboration = {};
 // jquery selectors for various control elements
 collaboration.startButton = '.js-start-collaboration';							// the button to initiate a collaboration session
 collaboration.consoleWrapper = '.js-collaboration-console';						// the containing div that includes the status message, history console, and other collaboration elements only visible when connected
-collaboration.historyConsole = '.js-collaboration-history';						// a div that historical message log is appended to
 collaboration.statusMessage = '.js-collaboration-status-msg';					// element where the status message is displayed
 collaboration.statusIcon = '.js-collaboration-status-icon';                // element where the status icon is displayed
 collaboration.displayLog = true;                                           // if true the history is shown in `collaboration.historyConsole`
@@ -52,6 +51,7 @@ collaboration.initDOM = function() {
 
    if (roomId !== null && !collaboration.active) {
       gisportal.panels.showPanel('collaboration');
+      gisportal.stopLoadState = true;
       $('.js-collab-message')
          .toggleClass('hidden', false)
          .toggleClass('alert-warning', true)
@@ -149,8 +149,6 @@ collaboration.initSession = function() {
 		  	});
 
          socket.on('room.member-joined', function(data) {
-            console.log('member joined room');
-            
             // is this confirmation that I have joined?
             if (data.sessionId == socket.io.engine.id) { // yes, so set the role, status and show the room details
                collaboration.roomId = data.roomId;
@@ -160,6 +158,9 @@ collaboration.initSession = function() {
 
             // if I am the presenter send my state so that the new member can catch up
             if (collaboration.role == 'presenter') {
+               if(gisportal.panels.activePanel != "refine-indicator"){
+                  $('.dd-container').ddslick('close');
+               }
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
@@ -167,20 +168,24 @@ collaboration.initSession = function() {
                };
                collaboration._emit('c_event', params);
             }
+            var name = data.user.name || data.user.email;
+            if(data.user.email != gisportal.user.info.email){
+               collaboration.log(name + " has joined.");
+            }
             // load/update the member listings
             collaboration.buildMembersList(data);
          });
 
          socket.on('room.member-left', function(data) {
-            console.log(data.departed +' has left the room');
+            collaboration.log(data.departed +' has left the room');
             collaboration.buildMembersList(data);
          });
 
          socket.on('room.presenter-changed', function(data) {
-            console.log('change of presenter');
             // am I now the presenter?
             for (var p in data.people) {
-               if (data.people[p].presenter && data.people[p].id == socket.io.engine.id) {
+               var person = data.people[p];
+               if (person.presenter && person.id == socket.io.engine.id) {
                   collaboration.role = "presenter";
                   collaboration.setStatus('connected', 'Connected. You are the presenter');
                   gisportal.showModalMessage('You are now the presenter');
@@ -189,6 +194,10 @@ collaboration.initSession = function() {
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'Connected. .....');
                }
+               if(person.presenter){
+                  var pName = person.name || person.email;
+                  collaboration.log("Presenter changed to " + pName);
+               }
             }
             collaboration.buildMembersList(data);
          });
@@ -196,6 +205,7 @@ collaboration.initSession = function() {
          socket.on('room.presenter-state-update', function(data) {
             var state = data.params.state;
             if (collaboration.role == "member") {
+               gisportal.stopLoadState = false;
                gisportal.loadState(state);
             }
          });
@@ -203,22 +213,102 @@ collaboration.initSession = function() {
  		  	// -------------------------------------------------
     		// socket collaboration event functions
     		// -------------------------------------------------
-		  	
-		  	// sets the value of an element using the element's id
-		  	socket.on('setValueById', function(data) {
-		  		var params = data.params;
-		  		collaboration.log(data.presenter +': '+params.logmsg);
-		   	if (collaboration.role == "member") {
-		   		//console.log('setting value by id');
-		   		$('#'+params.id).val(params.value);
-		   		$('#'+params.id).trigger('change');
-		   	}
-		  	});
 
          socket.on('configurepanel.scroll', function(data) {
             if (collaboration.role == "member") {
-               $('#configurePanel').scrollTop(data.params.scrollTop);
+               var div = $('#configurePanel');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
+         });
+
+         socket.on('mapsettingspanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('#mapSettingsPanel');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('addLayersForm.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.overlay-container-form');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('slideout.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.js-slideout-content');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('refinePanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.indicator-select');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('addLayersForm.input', function(data) {
+            if (collaboration.role == "member") {
+               var input = data.params.inputValue;
+               var field = data.params.field;
+               var input_elem = $('textarea[data-field="' + field + '"],input[data-field="' + field + '"]');
+               var highlight_elem = input_elem;
+               if(field == "Rotation"){
+                  input_elem = input_elem.filter('[value="' + input + '"]');
+                  highlight_elem = input_elem.parent();
+               }else if(input_elem.is(':checkbox')){
+                  input_elem.prop('checked', input);
+               }else{
+                  // Makes sure the element is only highlighted if there has been a change
+                  if(input_elem.val() == input){
+                     highlight_elem = undefined;
+                  }
+                  input_elem.val(input);
+               }
+               input_elem.trigger('change');
+               if(highlight_elem){
+                  collaboration.highlightElement(highlight_elem);
+               }
+            }
+         });
+
+         socket.on('addLayersForm.close', function(data) {
+            collaboration.log(data.presenter +': Add Layers Form Closed');
+            if (collaboration.role == "member") {
+               $('span.js-layer-form-close').trigger('click');
+            }
+         });
+
+         socket.on('body.keydown', function(data) {
+            var keyCode = data.params.code;
+
+            if (collaboration.role == "member") {
+               var e = jQuery.Event("keydown");
+               e.which = keyCode; // # Some key code value
+               e.keyCode = keyCode;
+               document.activeElement.blur();
+               $('body').trigger(e);
+            }
+            var keyName;
+            switch(keyCode){
+               case 27:
+                  keyName = "Esc";
+                  break;
+               case 37:
+                  keyName = "LEFT Arrow";
+                  break;
+               case 39:
+                  keyName = "RIGHT Arrow";
+                  break;
+            }
+            collaboration.log(data.presenter +': Keydown: '+ keyName);
          });
 
          socket.on('date.selected', function(data) {
@@ -226,9 +316,11 @@ collaboration.initSession = function() {
 
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-current-date'));
-               gisportal.timeline.setDate(date); 
+               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+                  gisportal.timeline.setDate(date);
+               }
             }
-            collaboration.log('Date changed to '+ date);
+            collaboration.log(data.presenter +': Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
          });
 
          socket.on('date.zoom', function(data) {
@@ -237,67 +329,57 @@ collaboration.initSession = function() {
 
             if (collaboration.role == "member") {
                collaboration.highlightElement($('#timeline'));
-               gisportal.timeline.zoom(startDate, endDate); 
+               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
+                  gisportal.timeline.zoomDate(startDate, endDate);
+               }
             }
-            collaboration.log('Timeline zoom changed');
          });
 
          socket.on('ddslick.open', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
                collaboration.highlightElement(obj);
-               obj.ddslick('open');   
+               obj.ddslick('open');
             }
-            collaboration.log(obj +' drop down opened');
          });
 
          socket.on('ddslick.close', function(data) {
             var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj);
-               obj.ddslick('close');   
+               obj.ddslick('close');
             }
-            collaboration.log(obj +' drop down closed');
          });
 
-         socket.on('ddslick.selectIndex', function(data) {
+         socket.on('ddslick.selectValue', function(data) {
             var obj = $('#' + data.params.obj);
-            var index = data.params.index;
+            var value = data.params.value;
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj.find('li:nth-of-type('+ index +')'));
-               obj.ddslick('select', { "index": index });   
+               obj.ddslick('select', { "value": value });
             }
-            collaboration.log(obj +' selectedIndex: ' + index);
          });
 
    	  	socket.on('indicatorspanel.scroll', function(data) {
             if (collaboration.role == "member") {
-               $('#indicatorsPanel').scrollTop(data.params.scrollTop);
+               var div = $('#indicatorsPanel');
+               var scrollPercent = data.params.scrollPercent;
+               // This stops the animation that scrolls to a layer
+               div.trigger('mousewheel');
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
          });
-
-         // layer added
-		  	socket.on('layer.addtopanel', function(data) {
-		  		//console.log('layer.addtopanel received');
-		  		//console.log(data);
-            if (collaboration.role == "member") {	
-		  			gisportal.indicatorsPanel.addToPanel(data.params.layer);
-            }
-		  	});
 
          // layer hidden
          socket.on('layer.hide', function(data) {
             collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
-               gisportal.indicatorsPanel.hideLayer(data.params.id);
+               var id = data.params.id;
+               gisportal.indicatorsPanel.hideLayer(id);
+               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
             }
          });
 
          // layer selected
 		  	socket.on('layer.remove', function(data) {
-		  		console.log('layer.remove received');
-		  		console.log(data);
-
 		  		collaboration.log(data.presenter +': Layer removed - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
@@ -320,29 +402,19 @@ collaboration.initSession = function() {
             }
          });
 
-         // layer selected
-         socket.on('layer.select', function(data) {
-            // console.log('layer.select received');
-            // console.log(data);
-            
-            collaboration.log(data.presenter +': New layer added - '+ data.params.layerName);
-            if (collaboration.role == "member") {
-               gisportal.indicatorsPanel.selectLayer(data.params.id);
-            }
-         });
-
          // layer shown
 		  	socket.on('layer.show', function(data) {
 		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
-            	gisportal.indicatorsPanel.showLayer(data.params.id);
+               var id = data.params.id;
+            	gisportal.indicatorsPanel.showLayer(id);
+               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
             }
 		  	});
                         
          // map Move
          socket.on('map.move', function(data) {
             var params = data.params;
-            collaboration.log(data.presenter +': Map centred to '+params.centre+', with a zoom of '+params.zoom);
             if (collaboration.role == "member") {
                var view = map.getView();
                if (view) {
@@ -355,16 +427,38 @@ collaboration.initSession = function() {
          // panel selected/shown
          socket.on('panels.showpanel', function(data) {
             var p = data.params.panelName;
-		  		collaboration.log(data.presenter +': Panel selected - '+ data.params.layerName);
-            if (collaboration.role == "member") {
-               collaboration.highlightElement($('[data-panel-name="' + p + '"].tab'));
-            	gisportal.panels.showPanel(p);
+            var nicePanelName = data.params.panelName;
+            var panel_div = $('.js-show-panel[data-panel-name="'+ nicePanelName +'"]');
+            if(panel_div.find('span').length > 0){
+               nicePanelName = panel_div.find('span').attr('title');
+            }else if(panel_div.html() && panel_div.html().length > 0){
+               nicePanelName = panel_div.html();
             }
-		  	});  
+            collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
+            if (collaboration.role == "member") {
+               collaboration.highlightElementRubber($('[data-panel-name="' + p + '"].tab'));
+               gisportal.panels.showPanel(p);
+            }
+         });
+
+         socket.on('refinePanel.cancel', function(data) {
+            collaboration.log(data.presenter +': "Cancel" clicked');
+            if (collaboration.role == "member") {
+               $('.js-refine-configure').trigger('click');
+            }
+         });
+
+         socket.on('refinePanel.removeCat', function(data) {
+            var cat = data.params.cat;
+            var nice_cat = gisportal.browseCategories[cat] || cat;
+            collaboration.log(data.presenter +': Category removed: ' + nice_cat);
+            if (collaboration.role == "member") {
+               $('.refine-remove[data-cat="' + cat + '"]').trigger('click');
+            }
+         });
 
 		  	// autoscale
          socket.on('scalebar.autoscale', function(data) {
-		  		$(collaboration.historyConsole).prepend(data.presenter +': Auto Scale - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.scalebars.autoScale(data.params.id, data.params.force);
             }
@@ -374,11 +468,10 @@ collaboration.initSession = function() {
          socket.on('scalebar.autoscale-checkbox', function(data) {
             var id = data.params.id;
             var isChecked = data.params.isChecked;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Auto Scale checkbox checked: '+ isChecked);
+            collaboration.log(data.presenter +': Autoscale set to ' + isChecked + ' - '+ id);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]').parent());
-               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked );
+               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
+               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked ).trigger('change');
             }
          });
 
@@ -386,11 +479,10 @@ collaboration.initSession = function() {
          socket.on('scalebar.log-set', function(data) {
             var id = data.params.id;
             var isLog = data.params.isLog;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Logarithmic checkbox checked: '+ isLog);
+            collaboration.log(data.presenter +': Logarithmic set to ' + isLog + ' - '+ id);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]').parent());
-               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog );
+               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
+               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog ).trigger('change');
             }
          });
 
@@ -398,8 +490,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.max-set', function(data) {
             var id = data.params.id;
             var value = data.params.value;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Maximum set to '+ value);
+            collaboration.log(data.presenter +': Max set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
                $('.js-scale-max[data-id="' + id + '"]').val(value).change();
@@ -410,8 +501,7 @@ collaboration.initSession = function() {
          socket.on('scalebar.min-set', function(data) {
             var id = data.params.id;
             var value = data.params.value;
-
-            $(collaboration.historyConsole).prepend(data.presenter +': Minimum set to '+ value);
+            collaboration.log(data.presenter +': Min set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
                $('.js-scale-min[data-id="' + id + '"]').val(value).change();
@@ -425,8 +515,6 @@ collaboration.initSession = function() {
 
             if (typeof value != 'undefined') {
                var opacity = value * 100;
-
-               $(collaboration.historyConsole).prepend(data.presenter +': Opacity set to '+ value);
                if (collaboration.role == "member") {
                   collaboration.highlightElement($('#tab-' + id + '-opacity'));
                   
@@ -442,18 +530,73 @@ collaboration.initSession = function() {
 		  		collaboration.log(data.presenter +': Scalebar was reset');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-reset[data-id="'+ data.params.id +'"]'));
-            	$('.js-reset[data-id="'+ data.params.id +'"] span').click();
+            	$('.js-reset[data-id="'+ data.params.id +'"]').click();
             }
 		  	});            
 
          // search value changed
          socket.on('search.typing', function(data) {
             var searchValue = data.params.searchValue;
-            collaboration.log(data.presenter +': search term: ' + searchValue);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-search'));
                $('.js-search').val(searchValue);
                gisportal.configurePanel.search(searchValue);
+            }
+         });
+
+         // wms value changed
+         socket.on('wms.typing', function(data) {
+            var eType = data.params.eType;
+            var typedValue = data.params.typedValue;
+            collaboration.log(data.presenter +': WMS entry: ' + typedValue);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('input.js-wms-url'));
+               $('input.js-wms-url').val(typedValue).trigger(eType);
+            }
+         });
+
+         // refresh cache value changed
+         socket.on('refreshCacheBox.clicked', function(data) {
+            var checked = data.params.checked;
+            collaboration.log(data.presenter +': refreshCacheBox: ' + checked);
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('#refresh-cache-box'));
+               $('#refresh-cache-box')[0].checked = checked;
+            }
+         });
+
+         // wms submitted
+         socket.on('wms.submitted', function(data) {
+            collaboration.log(data.presenter +': WMS submitted');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('button.js-wms-url'));
+               $('button.js-wms-url').trigger('click');
+            }
+         });
+
+         // more info clicked
+         socket.on('moreInfo.clicked', function(data) {
+            collaboration.log(data.presenter +': more info clicked');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('.more-info'));
+               $('.more-info').trigger('click');
+            }
+         });
+
+         // reset list clicked
+         socket.on('resetList.clicked', function(data) {
+            collaboration.log(data.presenter +': "Reset" clicked');
+            if (collaboration.role == "member") {
+               $('button#reset-list').trigger('click');
+            }
+         });
+
+         // add layers form clicked
+         socket.on('addLayersForm.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add layers" clicked');
+            if (collaboration.role == "member") {
+               collaboration.highlightElement($('button#js-add-layers-form'));
+               $('button#js-add-layers-form').trigger('click');
             }
          });
 
@@ -479,22 +622,462 @@ collaboration.initSession = function() {
          socket.on('tab.select', function(data) {
             var layerId = data.params.layerId;
             var tabName = data.params.tabName;
-            collaboration.log(data.presenter +': ' + tabName + ' selected for ' + layerId);
+            collaboration.log(data.presenter +': ' + tabName + ' tab selected for ' + layerId);
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('[data-tab-name="'+ tabName +'"]'));
+               collaboration.highlightElement($('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]'));
                gisportal.indicatorsPanel.selectTab( layerId, tabName );
             }
          });
 
-			// User saved state
-			socket.on('setSavedState', function(data) {
-		  		console.log(data);
-		  		
-		  		collaboration.log('State restored');
-		   	if (collaboration.role == "member") {
-		   		map.zoomToScale(data.params.zoomlevel);
-		   	}
-		  	});
+         socket.on('paginator.selected', function(data) {
+            collaboration.log(data.presenter +': Page ' + data.params.page + ' selected');
+            if (collaboration.role == "member") {
+               $('.js-go-to-form-page').find('a[data-page="' + data.params.page + '"]').trigger('click');
+            }
+         });
+
+         socket.on('zoomToData.clicked', function(data) {
+            var id = data.params.layer;
+            collaboration.log(data.presenter +': Zoom to data clicked: ' + id);
+            if (collaboration.role == "member") {
+               var zoom_elem = $('.js-zoom-data[data-id="' + id + '"]');
+               collaboration.highlightElement(zoom_elem);
+               zoom_elem.trigger('click');
+            }
+         });
+
+         socket.on('submitLayers.clicked', function(data) {
+            collaboration.log(data.presenter +': "Submit Layers" clicked');
+            if (collaboration.role == "member") {
+               var submit_elem = $('.js-layers-form-submit');
+               collaboration.highlightElement(submit_elem);
+               submit_elem.trigger('click');
+            }
+         });
+
+         socket.on('cancelChanges.clicked', function(data) {
+            collaboration.log(data.presenter +': "Cancel Changes" clicked');
+            if (collaboration.role == "member") {
+               $('.js-layers-form-cancel').trigger('click');
+            }
+         });
+
+         socket.on('toggleAllLayers.clicked', function(data) {
+            collaboration.log(data.presenter +': "Copy to all" clicked');
+            if (collaboration.role == "member") {
+               var toggle_all_elem = $('.toggle-all-layers');
+               collaboration.highlightElement(toggle_all_elem);
+               toggle_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addToAll.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add to all" clicked');
+            if (collaboration.role == "member") {
+               var field = data.params.field;
+               var add_to_all_elem = $('.add-to-all-layers[data-field="' + field + '"]');
+               collaboration.highlightElement(add_to_all_elem);
+               add_to_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addScalePointsToAll.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add Scale Points to all" clicked');
+            if (collaboration.role == "member") {
+               var add_to_all_elem = $('.scale-to-all-layers');
+               collaboration.highlightElement(add_to_all_elem);
+               add_to_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('addTagInput.clicked', function(data) {
+            collaboration.log(data.presenter +': "Add Another Tag" clicked');
+            if (collaboration.role == "member") {
+               var add_tag_elem = $('.add-tag-input');
+               collaboration.highlightElement(add_tag_elem);
+               add_tag_elem.trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.close', function(data) {
+            collaboration.log(data.presenter +': User feedback closed');
+            if (collaboration.role == "member") {
+               $('.js-user-feedback-close').trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.submit', function(data) {
+            collaboration.log(data.presenter +': User feedback submitted');
+            if (collaboration.role == "member") {
+               $('.js-user-feedback-submit').trigger('click');
+            }
+         });
+
+         socket.on('userFeedback.input', function(data) {
+            if (collaboration.role == "member") {
+               var input = data.params.inputValue;
+               var input_elem = $('.user-feedback-input');
+               input_elem.val(input);
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('drawBox.clicked', function(data) {
+            collaboration.log(data.presenter +': "Draw Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-box');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('drawPolygon.clicked', function(data) {
+            collaboration.log(data.presenter +': "Draw Irregular Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-polygon');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('selectPolygon.clicked', function(data) {
+            collaboration.log(data.presenter +': "Select Existing Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-draw-select-polygon');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('removeGeoJSON.clicked', function(data) {
+            collaboration.log(data.presenter +': "Delete Selected Polygon" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-remove-geojson');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('jsCoordinate.edit', function(data) {
+            var eType = data.params.eventType;
+            var value = data.params.value;
+            collaboration.log(data.presenter +': Coordinates value set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               var input_elem = $('.js-coordinates');
+               input_elem.val(value);
+               input_elem.trigger(eType);
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('clearSelection.clicked', function(data) {
+            collaboration.log(data.presenter +': "Clear Selection" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-clear-selection');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('olDraw.click', function(data) {
+            var coordinate = data.params.coordinate;
+            if (collaboration.role == "member") {
+               gisportal.drawingPoints.push(coordinate);
+
+               // Makes sure that this is not the last (completion) click
+               var drawOverlay = true;
+               if(gisportal.vectorLayer.getSource().getFeatures().length > 0){
+                  drawOverlay = false;
+               }
+
+               gisportal.drawingOverlaySource.clear();
+               var geom;
+               if(gisportal.drawingPoints.length === 2){
+                  // Only if drawing a polygon
+                  if($('.js-draw-polygon').hasClass('drawInProgress')){
+                     geom = new ol.geom.LineString(gisportal.drawingPoints);
+                  }
+               }
+               if(gisportal.drawingPoints.length > 2){
+                  var polygon_array = _.clone(gisportal.drawingPoints);
+                  polygon_array.push(polygon_array[0]);
+                  geom = new ol.geom.Polygon([polygon_array]);
+               }
+               if(geom && drawOverlay){
+                  gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:geom}));
+               }
+               for(var point in gisportal.drawingPoints){
+                  gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:new ol.geom.Point(gisportal.drawingPoints[point])}));
+               }
+            }
+         });
+
+         socket.on('olDraw.drawstart', function(data) {
+            if (collaboration.role == "member") {
+               gisportal.vectorLayer.getSource().clear();
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+            }
+         });
+
+         socket.on('olDraw.drawend', function(data) {
+            var coordinates = data.params.coordinates;
+            collaboration.log(data.presenter +': Polygon drawn');
+            if (collaboration.role == "member") {
+               var sketch = new ol.Feature({geometry:new ol.geom.Polygon(coordinates)});
+               gisportal.selectionTools.ROIAdded(sketch);
+               gisportal.vectorLayer.getSource().addFeature(sketch);
+            }
+         });
+
+         socket.on('selectPolygon.hover', function(data) {
+            var coordinate = data.params.coordinate;
+            var id = data.params.id;
+            collaboration.log(data.presenter +': Polygon hover: ' + id);
+            if (collaboration.role == "member") {
+               var pixel = map.getPixelFromCoordinate(coordinate);
+               var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                  // Gets the first vector layer it finds
+                  if(feature.getKeys().length !== 1 && feature.getId() && feature.getId() == id){
+                     return feature;
+                  }
+               });
+               gisportal.hoverFeature(feature);
+            }
+         });
+
+         socket.on('selectPolygon.select', function(data) {
+            var coordinate = data.params.coordinate;
+            var id = data.params.id;
+            collaboration.log(data.presenter +': Polygon selected: ' + id);
+            if (collaboration.role == "member") {
+               var pixel = map.getPixelFromCoordinate(coordinate);
+               var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+                  // Gets the first vector layer it finds
+                  if(feature.getKeys().length !== 1 && feature.getId() && feature.getId() == id){
+                     return feature;
+                  }
+               });
+               gisportal.selectFeature(feature);
+            }
+         });
+
+         socket.on('coordinates.save', function(data) {
+            collaboration.log(data.presenter +': Save Coordinates clicked');
+            if (collaboration.role == "member") {
+               $('.js-add-coordinates-to-profile').trigger('click');
+            }
+         });
+
+         socket.on('featureOverlay.removeType', function(data) {
+            var overlayType = data.params.overlayType;
+            collaboration.log(data.presenter +': Remove ' + overlayType);
+            if (collaboration.role == "member") {
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, overlayType);
+            }
+         });
+
+         socket.on('dataPopup.display', function(data) {
+            var pixel = map.getPixelFromCoordinate(data.params.coordinate);
+            if (collaboration.role == "member") {
+               gisportal.displayDataPopup(pixel);
+            }
+         });
+
+         socket.on('dataPopup.close', function(data) {
+            if (collaboration.role == "member") {
+               gisportal.dataReadingPopupCloser.click();
+            }
+         });
+
+         socket.on('newPlot.clicked', function(data) {
+            var id = data.params.id;
+            collaboration.log(data.presenter +': "Make new graph" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-make-new-plot[data-id="' + id + '"]');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('addToPlot.clicked', function(data) {
+            var id = data.params.id;
+            collaboration.log(data.presenter +': "Add to graph" Clicked');
+            if (collaboration.role == "member") {
+               var button_elem = $('.js-add-to-plot[data-id="' + id + '"]');
+               button_elem.trigger('click');
+               collaboration.highlightElement(button_elem);
+            }
+         });
+
+         socket.on('graphs.deleteActive', function(data) {
+            collaboration.log(data.presenter +': Closed Plot');
+            if (collaboration.role == "member") {
+               gisportal.graphs.deleteActiveGraph();
+            }
+         });
+
+         socket.on('slideout.togglePeak', function(data) {
+            var slideoutName = data.params.slideoutName;
+            collaboration.log(data.presenter +': Show panel: ' + slideoutName);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-toggle-peak');
+               gisportal.panelSlideout.togglePeak(slideoutName);
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
+         socket.on('graphTitle.edit', function(data) {
+            var value = data.params.value;
+            collaboration.log(data.presenter +': Title value set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               var input_elem = $('.js-active-plot-title');
+               input_elem.val(value);
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('graphType.edit', function(data) {
+            var value = data.params.value;
+            var input_elem = $('.js-active-plot-type');
+            var nice_val = input_elem.find(':selected').html() || value;
+            collaboration.log(data.presenter +': Graph type set to: "' + nice_val + '"');
+            if (collaboration.role == "member") {
+               input_elem.val(value);
+               input_elem.trigger('change');
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('layerDepth.change', function(data) {
+            var value = data.params.value;
+            var input_elem = $('.js-analysis-elevation');
+            var nice_val = input_elem.find(':selected').html() || value;
+            collaboration.log(data.presenter +': Layer Depth set to: "' + nice_val + '"');
+            if (collaboration.role == "member") {
+               input_elem.val(value);
+               input_elem.trigger('change');
+               collaboration.highlightElement(input_elem);
+            }
+         });
+
+         socket.on('graphRange.change', function(data) {
+            var value = data.params.value;
+            var start_date_elem = $('.js-active-plot-start-date');
+            var end_date_elem = $('.js-active-plot-end-date');
+            var slider_elem = $('.js-range-slider');
+            var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
+            collaboration.log(data.presenter +': Graph date range set to: "' + dates.join(' - ') + '"');
+            if (collaboration.role == "member") {
+               start_date_elem.val(dates[0]);
+               start_date_elem.trigger('change');
+               end_date_elem.val(dates[1]);
+               end_date_elem.trigger('change');
+               slider_elem.val(value);
+               collaboration.highlightElement(slider_elem);
+            }
+         });
+
+         socket.on('graphComponent.remove', function(data) {
+            var index = data.params.index;
+            var tr_elem = $('.js-components tr:eq(' + index + ')');
+            var title = tr_elem.find('td span').html() || "Component";
+            collaboration.log(data.presenter +': ' + title + ' removed"');
+            if (collaboration.role == "member") {
+               var del_elem = tr_elem.find('.js-close-acitve-plot-component');
+               del_elem.trigger('click');
+            }
+         });
+
+         socket.on('graphComponent.axisChange', function(data) {
+            var index = data.params.index;
+            var value = data.params.value;
+            var tr_elem = $('.js-components tr:eq(' + index + ')');
+            var title = tr_elem.find('td span').html() || "Component";
+            var select_elem = tr_elem.find('.js-y-axis');
+            if (collaboration.role == "member") {
+               select_elem.val(value);
+               select_elem.trigger('click');
+               collaboration.highlightElement(select_elem);
+            }
+            var select_value = select_elem.find("option:selected").text();
+            collaboration.log(data.presenter +': ' + title + ': axis changed to "' + select_value);
+         });
+
+         socket.on('graphStartDate.change', function(data) {
+            var value = new Date(data.params.value).toISOString().split("T")[0];
+            var date_elem = $('.js-active-plot-start-date');
+            collaboration.log(data.presenter +': Graph start date set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               date_elem.val(value);
+               date_elem.trigger('change');
+               collaboration.highlightElement(date_elem);
+            }
+         });
+
+         socket.on('graphEndDate.change', function(data) {
+            var value = new Date(data.params.value).toISOString().split("T")[0];
+            var date_elem = $('.js-active-plot-end-date');
+            collaboration.log(data.presenter +': Graph end date set to: "' + value + '"');
+            if (collaboration.role == "member") {
+               date_elem.val(value);
+               date_elem.trigger('change');
+               collaboration.highlightElement(date_elem);
+            }
+         });
+
+         socket.on('graph.submitted', function(data) {
+            collaboration.log(data.presenter +': "Create Graph" clicked');
+            if (collaboration.role == "member") {
+               $('.js-create-graph').trigger('click');
+            }
+         });
+
+         socket.on('graph.open', function(data) {
+            var hash = data.params.hash;
+            var open_elem = $('.js-graph-status-open[data-hash="' + hash + '"]');
+            var title = open_elem.data('title');
+            collaboration.log(data.presenter + ': "' + title + '": "Open" clicked');
+            if (collaboration.role == "member") {
+               open_elem.trigger('click');
+            }
+         });
+
+         socket.on('graph.copy', function(data) {
+            var hash = data.params.hash;
+            var copy_elem = $('.js-graph-status-copy[data-hash="' + hash + '"]');
+            var title = copy_elem.data('title');
+            collaboration.log(data.presenter + ': "' + title + '": "Copy/Edit" clicked');
+            if (collaboration.role == "member") {
+               copy_elem.trigger('click');
+            }
+         });
+
+         socket.on('graph.delete', function(data) {
+            var hash = data.params.hash;
+            var delete_elem = $('.js-graph-status-delete[data-hash="' + hash + '"]');
+            var title = delete_elem.data('title') || "Graph";
+            collaboration.log(data.presenter + ': "' + title + '": "Delete" clicked');
+            if (collaboration.role == "member") {
+               delete_elem.trigger('click');
+            }
+         });
+
+         socket.on('graphPopup.close', function(data) {
+            collaboration.log(data.presenter + ': Plot closed');
+            if (collaboration.role == "member") {
+               $('.js-plot-popup-close').trigger('click');
+            }
+         });
+
+         // User saved state
+         socket.on('setSavedState', function(data) {
+            
+            collaboration.log('State restored');
+            if (collaboration.role == "member") {
+               map.zoomToScale(data.params.zoomlevel);
+            }
+         });
 
 		  	// control whether the user is a presenter or a member
 			$('#btn-presenter').click(function() {
@@ -524,6 +1107,8 @@ collaboration.joinRoom = function(roomId) {
 collaboration.buildMembersList = function(data) {
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
+
+   $('.js-auto').prop('checked', collaboration.displayLog);
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
@@ -562,6 +1147,14 @@ collaboration.buildMembersList = function(data) {
       $('.js-collab-room-url').focus(function() { $(this).select(); } ).mouseup(function (e) {e.preventDefault(); });
    });
 
+   $('.js-collab-notifications-toggle').click(function() {
+      var log = $(this).prop('checked');
+      collaboration.displayLog = log;
+      if(log === false){
+         $('.notifyjs-gisportal-collab-notification-base').parent().remove();
+      }
+   });
+
    if (collaboration.role == 'presenter') { 
       // add a link to other members to allow you to make them presenter
       $('.person').each(function() {
@@ -575,15 +1168,6 @@ collaboration.buildMembersList = function(data) {
          collaboration._emit('room.make-presenter', id);
       });
    }
-};
-
-collaboration.setValueById = function(id, value, logmsg) {
-	var params = {
-		"id" : id,
-		"value" : value,
-		"logmsg" : logmsg
-	};
-	collaboration._emit('setValueById', params);
 };
 
 collaboration.setUserSavedState = function() {
@@ -616,14 +1200,31 @@ collaboration.userAuthorised = function() {
 
 collaboration.log = function(msg) {
    if (collaboration.displayLog) {
-      $(collaboration.historyConsole).prepend('<p>' + msg + '</p>');
+      var notificationText = $(".notifyjs-gisportal-collab-notification-base div.title");
+
+      if(notificationText.length === 0){
+         $.notify({'title':msg, "hide-text":"Hide"},{style:"gisportal-collab-notification", autoHide:false});
+      }else{
+         notificationText.html(msg);
+      }
+      $(document).off('click', '.notifyjs-gisportal-collab-notification-base .hide-opt');
+      $(document).one('click', '.notifyjs-gisportal-collab-notification-base .hide-opt', function(e) {
+         e.preventDefault();
+         $('.js-collab-notifications-toggle').prop('checked', false);
+         collaboration.displayLog = false;
+      });
    }
 
 };
 
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');
-   setTimeout(function() { element.removeClass('highlight-click'); }, 500);
+   setTimeout(function() { element.removeClass('highlight-click'); }, 1000);
+};
+
+collaboration.highlightElementRubber = function(element) {
+   element.addClass('highlight-shake');
+   setTimeout(function() { element.removeClass('highlight-shake'); }, 1000);
 };
 
 collaboration.setStatus = function(icon, message) {

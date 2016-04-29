@@ -93,8 +93,9 @@ gisportal.analytics.initDomEvents = function(){
    // Someone typed a bounding box
    $('body').on( 'change', '.js-coordinates', function(){
       var layer = gisportal.layers[ $(this).closest('[data-id]').data('id') ];
-      if( layer !== null )
+      if( layer !== null ){
          gisportal.analytics.events.selectionBoxTyped( layer );
+      }
    });
    
    gisportal.events.bind( 'layer.select', function( event, id ){

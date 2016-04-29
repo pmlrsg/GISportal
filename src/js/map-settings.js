@@ -52,6 +52,11 @@ gisportal.map_settings.init = function() {
       gisportal.editLayersForm.addSeverTable();
    });
 
+   $('#refresh-cache-box').on('change', function(){
+      var checked = $(this).is(':checked');
+      gisportal.events.trigger('refreshCacheBox.clicked', checked);
+   });
+
    // enable ddslick'ness
    $('#select-basemap').ddslick({
       onSelected: function(data) { 
@@ -101,6 +106,11 @@ gisportal.map_settings.init = function() {
       $('#select-graticules').ddslick('select', { value: "On" });
    }
 
+   $('#mapSettingsPanel').bind('scroll', function() {
+      var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+      gisportal.events.trigger('mapsettingspanel.scroll', scrollPercent);
+   });
+
    // WMS URL event handler
    $('button.js-wms-url').on('click', function(e)  {
       e.preventDefault();
@@ -135,12 +145,14 @@ gisportal.map_settings.init = function() {
             gisportal.addLayersForm.refreshStorageInfo();
          }
       }
+      gisportal.events.trigger('wms.submitted');
    });
 
    // WMS URL event handler for refresh cache checkbox
-   $('input.js-wms-url').on('change', function(e)  {
+   $('input.js-wms-url').on('change keyup paste', function(e)  {
       gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var input_value = $('input.js-wms-url')[0].value.split("?")[0];
+      var typed = $('input.js-wms-url')[0].value;
+      var input_value = typed.split("?")[0];
       if(input_value.length > 0){
          var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
          // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
@@ -169,6 +181,12 @@ gisportal.map_settings.init = function() {
          $('#refresh-cache-message').toggleClass('hidden', true);
          $('#refresh-cache-div').toggleClass('hidden', true);
       }
+      if(e.type == "paste"){
+         try{
+            typed = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
+      gisportal.events.trigger('wms.typing', typed, e.type);
    });
 
 };
@@ -598,7 +616,7 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
    gisportal.vectorLayer.getSource().addFeatures(features);
    if(gisportal.methodThatSelectedCurrentRegion.justCoords){
       gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
-   }else{
+   }else if(features.length > 0){
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(features);
    }
    if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){

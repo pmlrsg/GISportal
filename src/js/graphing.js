@@ -116,12 +116,6 @@ gisportal.graphs.initDOM = function() {
  * Warn the user if they are going to delete an existing the graph
  */
 gisportal.graphs.editPlot = function( plot ){
-   //If the user is editing a graph
-   // Warn them first
-   if( gisportal.graphs.activePlotEditor !== null )
-      if( confirm( "This will delete your current plot" ) === false )
-         return false;
-
    var PlotEditor = gisportal.graphs.PlotEditor;
    var plotEditor = new PlotEditor( plot, $('.js-active-plot-slideout') );
    $('.panel').addClass('has-active-plot');
@@ -133,6 +127,7 @@ gisportal.graphs.popup = {};
 gisportal.graphs.popup.addActionListeners = function(){
    $('span.js-plot-popup-close').on('click', function(){
       $('div.js-plot-popup').toggleClass('hidden', true);
+      gisportal.events.trigger('graphPopup.close');
    });
 };
 
@@ -149,6 +144,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
          var error = 'Sorry, we failed to load the metadata: \n'+
                         'The server failed with this message: "' + e.statusText + '"';
          $.notify(error, "error");
+         // TODO: Remove the graph from the list
       }
    });
    $('.js-plot-popup').toggleClass("hidden", false);
@@ -176,10 +172,13 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
       if(index){
          gisportal.graphs.storedGraphs.pop(index);
       }
+      gisportal.events.trigger('graph.delete', hash);
    })
    // Copy a plot
    .on('click', '.js-graph-status-copy', function(){
+      var hash = $(this).data("hash");
       gisportal.graphs.editPlot( plot.copy() );
+      gisportal.events.trigger('graph.copy', hash);
    })
    // Open a plot
   .on('click', '.js-graph-status-open', function(){
@@ -193,8 +192,10 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
             var error = 'Sorry, we failed to load the graph: \n'+
                            'The server failed with this message: "' + e.statusText + '"';
             $.notify(error, "error");
+            // TODO: Remove the graph from the list
          }
       });
+      gisportal.events.trigger('graph.open', hash);
    });
    if(noCopyEdit || !plot){
       element.off('click', '.js-graph-status-copy');

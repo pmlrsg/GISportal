@@ -242,16 +242,19 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                      gisportal.addLayersForm.refreshStorageInfo();
                   }
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
             case 37:
                if(current_page > 1){
                   gisportal.addLayersForm.displayForm(total_pages, current_page-1, form_div);
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
             case 39:
                if(current_page < total_pages){
                   gisportal.addLayersForm.displayForm(total_pages, current_page+1, form_div);
                }
+               gisportal.events.trigger('body.keydown', e.keyCode);
                break;
          }
       }
@@ -260,7 +263,8 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // This adds the click listener to the 'add to all layers' spans
    $('div.layers-form-right span.add-to-all-layers ').on( 'click', function () {
       // Gets the information from the related input
-      var key = $(this).data("field").replace(/-/g,"_");
+      var field = $(this).data("field");
+      var key = field.replace(/-/g,"_");
       var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"]").val();
       key = key.replace("-", "_");
       if(key == "indicator_type"){
@@ -275,6 +279,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addToAll.clicked', field);
    });
 
    // This adds the click listener to the 'add scale points to all layers' spans
@@ -299,6 +304,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addScalePointsToAll.clicked');
    });
 
    // This adds the click listener to the 'exclude all layers' span
@@ -308,17 +314,20 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.layers_list[value].include = !prop;
       }
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('toggleAllLayers.clicked');
    });
 
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
       gisportal.panels.userFeedback("Please enter a tag name to add it", gisportal.addLayersForm.addTagInput);
+      gisportal.events.trigger('addTagInput.clicked');
    });
 
    // Adds a listener to the submit button on the form.
    $('.layers-form-buttons-div button.js-layers-form-submit').on('click', function(e){
       e.preventDefault();
+      gisportal.events.trigger('submitLayers.clicked');
       if(!gisportal.form_working){
          gisportal.form_working = true;
          // If there are errors on the server information form then notify the user.
@@ -391,6 +400,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.refreshStorageInfo();
          // The form is then hidden.
          $('div.js-layer-form-popup').toggleClass('hidden', true);
+         gisportal.events.trigger('cancelChanges.clicked');
       }
    });
    gisportal.addLayersForm.form_info.current_page = current_page;// Saves the current_page for loading next time.
@@ -613,7 +623,7 @@ gisportal.addLayersForm.displaySuggestions = function(){
    for(var i = 0; i< $('.dict-opts ul li').length; i++){
       var button_elem = $('.dict-opts ul li button').eq(i);
       var button_text = button_elem.text();
-      var box_text = $("input[data-field='nice-name']").val();
+      var box_text = $("input[data-field='nice_name']").val();
       if(button_text == box_text){
          $('.dict-opts').toggleClass('hidden', true);
       }
@@ -648,12 +658,17 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.overlay-container-form input, .overlay-container-form textarea').off('change keyup paste');
    $('.js-layer-form-html input, .js-layer-form-html textarea').off('focusout');
    $('.js-layer-form-html span[data-field="Rotation"]').off('click');
+
+   $('.overlay-container-form').bind('scroll', function() {
+      var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+      gisportal.events.trigger('addLayersForm.scroll', scrollPercent);
+   });
+
    $('.js-layer-form-html span[data-field="Rotation"]').on('click', function(){
       $(this).children('input').trigger("change");
    });
-   $('.js-server-form-html input, .js-server-form-html textarea').off('focusout');
    // All of the inputs and textareas have listeners added.
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(){
+   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(e){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
@@ -663,6 +678,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       }else{
          key_val = $(this).val(); // key_val set to value of field
       }
+      var raw_key_val = key_val;
       if(key == 'include'){
          key_val = !key_val;
          var toggle_elem = $('.toggle-all-layers');
@@ -715,6 +731,13 @@ gisportal.addLayersForm.addInputListeners = function(){
       // The storage data is then updated.
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addInputListeners();
+      gisportal.addLayersForm.validateForm('div.overlay-container-form');
+      if(e.type == "paste"){
+         try{
+            raw_key_val = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
+      gisportal.events.trigger('addLayersForm.input', raw_key_val, key);
    });
    // When you focus out of a field, the form is then validated again.
    $('div.overlay-container-form input, div.overlay-container-form textarea').on('focusout', function(){
@@ -726,12 +749,13 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.form_info.display_form = false; // display_form set to false so that the portal knows that the form was not displayed last time the user was viewing it.
       // The browser cache is updaed witht the changes.
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addLayersForm.close');
    });
 
    $('.js-add-dict').on('click', function(e){
       e.preventDefault();
       var name = $(this).text();
-      $("input[data-field='nice-name']").val(name).trigger('change');
+      $("input[data-field='nice_name']").val(name).trigger('change');
    });
 
    $('.js-add-tag-dict').on('click', function(e){
@@ -739,10 +763,16 @@ gisportal.addLayersForm.addInputListeners = function(){
       var name = $(this).text();
       var field = $(this).data('field');
       var input = $("input[data-field='" + field + "']");
-      if(input.length == 0){
+      if(input.length === 0){
          input = $("textarea[data-field='" + field + "']");
       }
       input.val(name).trigger('change');
+   });
+
+   $('.js-go-to-form-page').find('a').off('click');
+   $('.js-go-to-form-page').find('a').on('click', function(){
+      var page = $(this).data('page');
+      gisportal.events.trigger('paginator.selected', page);
    });
 };
 

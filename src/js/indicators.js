@@ -26,11 +26,13 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-add-to-plot', function()  {
       var id = $(this).data('id');
       gisportal.indicatorsPanel.addToPlot(id);
+      gisportal.events.trigger('addToPlot.clicked', id);
    });
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
       gisportal.graphs.deleteActiveGraph();
       gisportal.indicatorsPanel.addToPlot(id);
+      gisportal.events.trigger('newPlot.clicked', id);
    });
 
    $('.js-indicators').on('click', '.js-clear-selection', function()  {
@@ -43,6 +45,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       $('.js-coordinates').val("");
       $('.js-upload-shape').val("");
       $('.users-geojson-files').val("default");
+      gisportal.events.trigger('clearSelection.clicked');
    });
 
    $('.js-indicators').on('click', '.js-remove', function() {
@@ -85,7 +88,7 @@ gisportal.indicatorsPanel.initDOM = function() {
 
 
    // Scale range event handlers
-   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .scalevalues > input[type="checkbox"]', function() {
+   $('.js-indicators').on('change', '.js-scale-min, .js-scale-max, .js-indicator-is-log,  .scalevalues > input[type="checkbox"]', function() {
       var id = $(this).data('id');
       // This removed the min val in the layer so that the data is refreshed on the map
       gisportal.layers[id].minScaleVal = null;
@@ -102,7 +105,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.events.trigger('scalebar.max-set', $(this).data('id'), $(this).val());
    });
 
-   $('.js-indicators').on('change', '.js-indicator-is-log', function() { 
+   $('.js-indicators').on('click', '.js-indicator-is-log', function() { 
       gisportal.events.trigger('scalebar.log-set', $(this).data('id'), $(this).prop('checked'));
    });
 
@@ -159,6 +162,7 @@ gisportal.indicatorsPanel.initDOM = function() {
       var extent = gisportal.reprojectBoundingBox(bbox, 'EPSG:4326', gisportal.projection);
       
       gisportal.mapFit(extent);
+      gisportal.events.trigger('zoomToData.clicked', indicator.id);
    });
 
    //Share this map
@@ -241,7 +245,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 
    $('#indicatorsPanel').bind('scroll', function() {
-     gisportal.events.trigger('indicatorspanel.scroll', $(this).scrollTop());
+      var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+     gisportal.events.trigger('indicatorspanel.scroll', scrollPercent);
    });
 };
 
@@ -435,8 +440,6 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    $('span.js-add-layer-server').on('click', function(){
       gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
    });
-
-   gisportal.events.trigger('layer.addtopanel', data);
 };
 
 
@@ -509,7 +512,6 @@ gisportal.indicatorsPanel.selectLayer = function(id, style) {
       else {
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
-      gisportal.events.trigger('layer.select', id, gisportal.layers[id].name);
    }
 };
 
@@ -575,6 +577,10 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       $('.js-google-auth-button').click(function() {
          var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
       });
+      $('.js-analysis-elevation').on('change', function(){
+         var value = $(this).val();
+         gisportal.events.trigger('layerDepth.change', value);
+      });
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
       if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
@@ -630,6 +636,7 @@ gisportal.indicatorsPanel.addAnalysisListeners = function(){
 
    $('.js-add-coordinates-to-profile').on('click', function(){
       gisportal.panels.userFeedback("Please enter a name to use for your file", addCoordinatesToProfile);
+      gisportal.events.trigger('coordinates.save');
    });
 };
 

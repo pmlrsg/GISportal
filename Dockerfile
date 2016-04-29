@@ -41,11 +41,12 @@ RUN yum -y update && \
     gem install sass && \
     mkdir -p /app/GISportal/config /app/GISportal/html/plots
  
-ADD . /app/GISportal/
+ADD ./package.json /app/GISportal/package.json
 
 RUN cd /app/GISportal && \
-    npm install --silent && \
-    grunt  
+    npm install --silent
+
+ADD . /app/GISportal/
 
 VOLUME /app/GISportal/config
 

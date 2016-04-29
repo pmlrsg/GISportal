@@ -422,7 +422,8 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
       var id = this.timebars[i].id;
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
-      if (!label || label === "") label =  this.timebars[i].label + ' - ' + gisportal.layers[id].tags.region; 
+      if (!label || label === "") label =  this.timebars[i].label;
+      if(gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
       
       $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
    }
@@ -537,6 +538,16 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.reHeight();
    this.redraw();
    this.updatePickerBounds();
+
+   var h = $('.timeline-container').height();
+   if(gisportal.timeline.timebars.length <= 0){
+      gisportal.timeline = null;
+      $('#timeline').html("");
+      gisportal.nonLayerDependent();
+      $('.timeline-container').css('bottom','-1000px');
+      h = 0;
+   }
+   $('.panel').css('bottom', h + 35 +'px');
 };
 
 // Set the currently selected date and animated the transition
@@ -553,6 +564,7 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
    gisportal.filterLayersByDate(date);
    self.showDate(date);
+   $('.js-current-date').val(moment(date).format('YYYY-MM-DD')).trigger('change');
    gisportal.timeline.redraw();
 
    gisportal.events.trigger('date.selected', date);

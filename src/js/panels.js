@@ -14,6 +14,10 @@ gisportal.panels.initDOM = function() {
 
 gisportal.panels.showPanel = function(panelName) {
 	gisportal.hideAllPopups();
+	if(panelName != "refine-indicator"){
+		$('.dd-container').ddslick('close');
+		gisportal.configurePanel.reset();
+	}
 	
 	$('[data-panel-name="' + gisportal.panels.activePanel + '"]').removeClass('active');
 	$('[data-panel-name="' + panelName + '"]').addClass('active');
@@ -23,6 +27,7 @@ gisportal.panels.showPanel = function(panelName) {
 		});
 	}
 	gisportal.panels.activePanel = panelName;
+	gisportal.events.trigger('panels.showpanel', panelName);
 
 };
 
@@ -44,6 +49,7 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	$('.js-user-feedback-close').on('click', function(e) {
 		e.preventDefault();
       $('div.js-user-feedback-popup').toggleClass('hidden', true);
+      gisportal.events.trigger('userFeedback.close');
    });
 	$('.js-user-feedback-submit').on('click', function(e) {
 		e.preventDefault();
@@ -55,7 +61,17 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	   	//error
 	   	gisportal.panels.userFeedback(message, given_function, true);
 	   }
+      gisportal.events.trigger('userFeedback.submit');
 
+   });
+   $('.user-feedback-input').on('change keyup paste', function(e){
+   	var value = $(this).val();
+   	if(e.type == "paste"){
+   		try{
+         	value = e.originalEvent.clipboardData.getData('text/plain');
+         }catch(err){}
+      }
+      gisportal.events.trigger('userFeedback.input', value);
    });
 
 };

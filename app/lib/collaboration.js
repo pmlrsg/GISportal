@@ -81,7 +81,7 @@ collaboration.init = function(io, app, config) {
                      reassignPresenter = true;
                   }
                   // get their name so others can be warned that `departed` has left the building
-                  departed = people[i].name;
+                  departed = people[i].name || people[i].email;
                   // take the user out of the people array
                   rooms[roomId].splice(i, 1);
                   break;
@@ -186,7 +186,7 @@ collaboration.init = function(io, app, config) {
       socket.on('setValueById', function(data) {
          console.log(data.logmsg);
          io.sockets.in(socket.room).emit('setValueById', {
-            "presenter": user.email,
+            "presenter": user.name || user.email,
             "provider": user.provider,
             "params" : data
          });
@@ -196,7 +196,7 @@ collaboration.init = function(io, app, config) {
       socket.on('setValueByClass', function(data) {
          console.log(data.logmsg);
          io.sockets.in(socket.room).emit('setValueByClass', {
-            "presenter": user.email,
+            "presenter": user.name || user.email,
             "provider": user.provider,
             "params" : data
          });
@@ -205,7 +205,7 @@ collaboration.init = function(io, app, config) {
       socket.on('setSavedState', function(data) {
          console.log(data);
          io.sockets.in(socket.room).emit('setSavedState', {
-            "presenter": user.email,
+            "presenter": user.name || user.email,
             "provider": user.provider,
             "params" : data
          });
@@ -215,7 +215,7 @@ collaboration.init = function(io, app, config) {
       socket.on('c_event', function(data) {
          console.log(data);
          io.sockets.in(socket.room).emit(data.event, {
-            "presenter": user.email,
+            "presenter": user.name || user.email,
             "provider": user.provider,
             "params" : data
          })

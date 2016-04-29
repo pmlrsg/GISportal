@@ -1,6 +1,6 @@
 <div class="slideout-header">
    Graph
-   <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon js-close-active-plot"></span>
+   <span class="btn icon-arrow-delete-1 icon-btn right-icon js-close-active-plot"></span>
 </div>
 <ol class="steps panel-list">
 	<li>
@@ -57,16 +57,6 @@
 	</li>
 	
 	<li>
-		<!-- <p class="number">5</p> -->
-
-		<div class="pull-left dropdown-holder ">
-			<button class="brand dropdown-toggle js-add-indicator-dropdown small" data-toggle="dropdown" >
-				Add indicator
-				<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu js-dropdown-menu" role="menu">
-		   </ul>
-		</div>
 		<div class="pull-right">
 			<button class="brand create-graph js-create-graph small">Create graph</button>
 		</div>

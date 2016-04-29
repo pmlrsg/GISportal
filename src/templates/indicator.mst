@@ -5,7 +5,7 @@
          <div class="indicator-name">{{descriptiveName}}</div>
 
          <div class="indicator-actions">
-            <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" title="Toggle Visibility"></span>
+            <span class="js-toggleVisibility toggleVisibility hidden icon-btn indicator-header-icon " data-name="{{name}}" data-id="{{id}}" title="Toggle Visibility"></span>
             
             <span class="{{active visibleTab "dimensions"}} js-icon-scalebar js-closable icon-btn icon-setting-adjustment indicator-header-icon js-indicator-tab-trigger" data-tab-name="dimensions" for="tab-{{id}}-dimensions" title="Layer Settings"></span>
 

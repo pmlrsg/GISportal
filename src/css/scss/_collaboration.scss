@@ -83,18 +83,47 @@
    background: radial-gradient(circle at 3px 3px, #FF916F, #7C1700);
 }
 .highlight-click {
-    -webkit-animation: glow 0.25s 0.25s 2;
+    animation: glow 0.5s 2 alternate;
 }
 
 .js-collaboration-popup .overlay-container { width:auto;}
 
-@-webkit-keyframes glow {
-    to {
-        -webkit-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
-        -moz-box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
-        box-shadow: 0px 0px 50px 0px rgba(153,0,0,1);
-        border: 2px solid rgba(153,0,0,0.7);
+@keyframes glow {
+    80%, to {
+        -webkit-box-shadow: 0px 0px 35px 0px rgba(153,0,0,1);
+        -moz-box-shadow: 0px 0px 35px 0px rgba(153,0,0,1);
+        box-shadow: 0px 0px 35px 0px rgba(153,0,0,1);
     }
+}
+
+/*!
+ * Modified from:
+ * animate.css -http://daneden.me/animate
+ * Version - 3.5.1
+ * Licensed under the MIT license - http://opensource.org/licenses/MIT
+ *
+ * Copyright (c) 2016 Daniel Eden
+ */
+
+.highlight-shake {
+    animation: shake 0.75s;
+}
+
+@keyframes shake {
+  from, to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  20%, 60%{
+    -webkit-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  40%, 80% {
+    -webkit-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
+  }
 }
 
 .highlight-dot {

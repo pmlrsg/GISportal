@@ -10,7 +10,8 @@
 
 .notifyjs-gisportal-refresh-option-base button,
 .notifyjs-gisportal-delete-option-base button,
-.notifyjs-gisportal-restore-option-base button {
+.notifyjs-gisportal-restore-option-base button,
+.notifyjs-gisportal-close-plot-option-base button {
   width: 60px;
   margin:5px;
 }
@@ -18,7 +19,9 @@
 .notifyjs-gisportal-base,
 .notifyjs-gisportal-refresh-option-base,
 .notifyjs-gisportal-delete-option-base,
-.notifyjs-gisportal-restore-option-base {
+.notifyjs-gisportal-restore-option-base,
+.notifyjs-gisportal-close-plot-option-base,
+.notifyjs-gisportal-collab-notification-base {
   color: #111111;
   padding: 8px 15px 8px 14px;
   background-color: #ffffff;
@@ -32,10 +35,22 @@
   margin-bottom: 10px;
 }
 
+.notifyjs-gisportal-collab-notification-base {
+  background-color: rgba(255,255,255,0.6);
+  padding: 8px;
+  border-left: 0px;
+}
+
+.notifyjs-gisportal-collab-notification-base:hover {
+  background-color: #ffffff;
+}
+
 .notifyjs-gisportal-base:before,
 .notifyjs-gisportal-refresh-option-base:before,
 .notifyjs-gisportal-delete-option-base:before,
-.notifyjs-gisportal-restore-option-base:before {
+.notifyjs-gisportal-restore-option-base:before,
+.notifyjs-gisportal-close-plot-option-base:before,
+.notifyjs-gisportal-collab-notification-base:before {
   font-family: "streamline-24px" !important;
   font-style: normal !important;
   font-weight: normal !important;
@@ -53,14 +68,16 @@
 .notifyjs-gisportal-error,
 .notifyjs-gisportal-refresh-option-error,
 .notifyjs-gisportal-delete-option-error,
-.notifyjs-gisportal-restore-option-error {
+.notifyjs-gisportal-restore-option-error,
+.notifyjs-gisportal-close-plot-option-info {
   border-color: #900;
 }
 
 .notifyjs-gisportal-error:before,
 .notifyjs-gisportal-refresh-option-error:before,
 .notifyjs-gisportal-delete-option-info:before,
-.notifyjs-gisportal-restore-option-info:before {
+.notifyjs-gisportal-restore-option-info:before
+.notifyjs-gisportal-close-plot-option-info:before {
   content: "\e307";
   color: #900;
 }
