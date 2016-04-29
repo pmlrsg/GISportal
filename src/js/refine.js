@@ -58,8 +58,11 @@ gisportal.refinePanel.initDOM = function(data) {
 /**
  * Currently refreshData just renders the panel
  */
-gisportal.refinePanel.refreshData = function() {
-   var data = gisportal.refinePanel.currentData;
+gisportal.refinePanel.refreshData = function(data) {
+   if(data){
+      gisportal.refinePanel.currentData = data;
+   }
+   data = gisportal.refinePanel.currentData;
 
    var id = data.id;
    var name = data.name;
@@ -154,6 +157,10 @@ gisportal.refinePanel.refreshData = function() {
             gisportal.refinePanel.removeCategory(cat);
          }
          gisportal.events.trigger('refinePanel.removeCat', cat);
+      });
+      $('.indicator-select').bind('scroll', function() {
+         var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
+         gisportal.events.trigger('refinePanel.scroll', scrollPercent);
       });
 
       // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 

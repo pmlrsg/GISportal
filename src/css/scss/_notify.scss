@@ -35,6 +35,16 @@
   margin-bottom: 10px;
 }
 
+.notifyjs-gisportal-collab-notification-base {
+  background-color: rgba(255,255,255,0.6);
+  padding: 8px;
+  border-left: 0px;
+}
+
+.notifyjs-gisportal-collab-notification-base:hover {
+  background-color: #ffffff;
+}
+
 .notifyjs-gisportal-base:before,
 .notifyjs-gisportal-refresh-option-base:before,
 .notifyjs-gisportal-delete-option-base:before,

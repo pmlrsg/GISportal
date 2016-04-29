@@ -51,6 +51,7 @@ collaboration.initDOM = function() {
 
    if (roomId !== null && !collaboration.active) {
       gisportal.panels.showPanel('collaboration');
+      gisportal.stopLoadState = true;
       $('.js-collab-message')
          .toggleClass('hidden', false)
          .toggleClass('alert-warning', true)
@@ -157,7 +158,9 @@ collaboration.initSession = function() {
 
             // if I am the presenter send my state so that the new member can catch up
             if (collaboration.role == 'presenter') {
-               $('.dd-container').ddslick('close');
+               if(gisportal.panels.activePanel != "refine-indicator"){
+                  $('.dd-container').ddslick('close');
+               }
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
@@ -202,6 +205,7 @@ collaboration.initSession = function() {
          socket.on('room.presenter-state-update', function(data) {
             var state = data.params.state;
             if (collaboration.role == "member") {
+               gisportal.stopLoadState = false;
                gisportal.loadState(state);
             }
          });
@@ -237,6 +241,14 @@ collaboration.initSession = function() {
          socket.on('slideout.scroll', function(data) {
             if (collaboration.role == "member") {
                var div = $('.js-slideout-content');
+               var scrollPercent = data.params.scrollPercent;
+               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('refinePanel.scroll', function(data) {
+            if (collaboration.role == "member") {
+               var div = $('.indicator-select');
                var scrollPercent = data.params.scrollPercent;
                div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
             }
@@ -850,6 +862,13 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('coordinates.save', function(data) {
+            collaboration.log(data.presenter +': Save Coordinates clicked');
+            if (collaboration.role == "member") {
+               $('.js-add-coordinates-to-profile').trigger('click');
+            }
+         });
+
          socket.on('featureOverlay.removeType', function(data) {
             var overlayType = data.params.overlayType;
             collaboration.log(data.presenter +': Remove ' + overlayType);
@@ -1089,6 +1108,8 @@ collaboration.buildMembersList = function(data) {
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
 
+   $('.js-auto').prop('checked', collaboration.displayLog);
+
    // add events to the various action links
    $('.js-leave-room').click(function() {
       socket.disconnect();
@@ -1124,6 +1145,14 @@ collaboration.buildMembersList = function(data) {
       $('.js-collab-invite').toggleClass('hidden');
       $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
       $('.js-collab-room-url').focus(function() { $(this).select(); } ).mouseup(function (e) {e.preventDefault(); });
+   });
+
+   $('.js-collab-notifications-toggle').click(function() {
+      var log = $(this).prop('checked');
+      collaboration.displayLog = log;
+      if(log === false){
+         $('.notifyjs-gisportal-collab-notification-base').parent().remove();
+      }
    });
 
    if (collaboration.role == 'presenter') { 
@@ -1181,6 +1210,7 @@ collaboration.log = function(msg) {
       $(document).off('click', '.notifyjs-gisportal-collab-notification-base .hide-opt');
       $(document).one('click', '.notifyjs-gisportal-collab-notification-base .hide-opt', function(e) {
          e.preventDefault();
+         $('.js-collab-notifications-toggle').prop('checked', false);
          collaboration.displayLog = false;
       });
    }
@@ -1193,8 +1223,8 @@ collaboration.highlightElement = function(element) {
 };
 
 collaboration.highlightElementRubber = function(element) {
-   element.addClass('highlight-rubber');
-   setTimeout(function() { element.removeClass('highlight-rubber'); }, 1000);
+   element.addClass('highlight-shake');
+   setTimeout(function() { element.removeClass('highlight-shake'); }, 1000);
 };
 
 collaboration.setStatus = function(icon, message) {

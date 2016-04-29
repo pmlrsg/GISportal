@@ -93,9 +93,7 @@ $.notify.addStyle('gisportal-collab-notification', {
     "<div data-option='collab'>" +
       "<div class='clearfix'>" +
         "<div class='title' data-notify-html='title'/>" +
-        "<div class='buttons'>" +
-          "<a href='javascript:;'' class='hide-opt pull-right' data-notify-text='hide-text'></a>" +
-        "</div>" +
+        "<a href='javascript:;'' class='hide-opt pull-right' data-notify-text='hide-text'></a>" +
       "</div>" +
     "</div>"
 });

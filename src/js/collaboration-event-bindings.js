@@ -319,6 +319,14 @@ gisportal.events.bind('slideout.scroll', function(event, scrollPercent) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('refinePanel.scroll', function(event, scrollPercent) {
+   var params = {
+      "event": "refinePanel.scroll",
+      "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) {
    var params = {
       "event": "addLayersForm.input",
@@ -505,6 +513,13 @@ gisportal.events.bind('selectPolygon.select', function(event, coordinate, id) {
       "event": "selectPolygon.select",
       "coordinate": coordinate,
       "id": id
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('coordinates.save', function(event) {
+   var params = {
+      "event": "coordinates.save"
    };
    collaboration._emit('c_event', params);
 });
