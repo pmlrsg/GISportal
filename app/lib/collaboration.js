@@ -128,7 +128,9 @@ collaboration.init = function(io, app, config) {
          socket.join(socket.room, function() {
             io.sockets.in(socket.room).emit('room.created', {
                "roomId": roomId,
-               "people": rooms[roomId]
+               "people": rooms[roomId],
+               "presenter": socket.id,
+               "owner": socket.id
             });
          });
          console.log(user.email +' is now is room '+ roomId);

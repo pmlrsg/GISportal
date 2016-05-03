@@ -179,6 +179,16 @@ collaboration.initSession = function() {
          socket.on('room.member-left', function(data) {
             collaboration.log(data.departed +' has left the room');
             collaboration.buildMembersList(data);
+            var presenterFound = false;
+            for(person in data.people){
+               var user = data.people[person];
+               if(user.presenter === true){
+                  presenterFound = true;
+               }
+            }
+            if(!presenterFound && gisportal.user.info.email == data.people[0].email){
+               collaboration._emit('room.make-presenter', data.people[0].id, force=true);
+            }
          });
 
          socket.on('room.presenter-changed', function(data) {
