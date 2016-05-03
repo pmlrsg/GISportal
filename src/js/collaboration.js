@@ -12,13 +12,15 @@ collaboration.displayLog = true;                                           // if
 collaboration.active = false;
 collaboration.role = '';
 
-collaboration.initDOM = function() {
-      
+collaboration.initDOM = function() {     
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
 
    if(!collaboration.enabled){
       return;
    }
+
+   collaboration.owner = false;
+   $('.notifyjs-gisportal-collab-notification-base').parent().remove();
 
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
@@ -142,7 +144,9 @@ collaboration.initSession = function() {
             console.log('Room created: '+ data.roomId);
 		  		collaboration.roomId = data.roomId;
             
-            collaboration.setStatus('connected', 'Connected. You are the Presenter');
+            collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
+            collaboration.owner = true;
+            collaboration.log("Welcome to collaboration " + data.owner);
 
             // load the room template
             collaboration.buildMembersList(data);
@@ -164,9 +168,14 @@ collaboration.initSession = function() {
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
-                  "state": state
+                  "state": state,
+                  "joining-member": data.user.email
                };
                collaboration._emit('c_event', params);
+            }
+            // set the owner variable
+            if(data.owner && data.user.email == gisportal.user.info.email){
+               collaboration.owner = true;
             }
             var name = data.user.name || data.user.email;
             if(data.user.email != gisportal.user.info.email){
@@ -180,7 +189,7 @@ collaboration.initSession = function() {
             collaboration.log(data.departed +' has left the room');
             collaboration.buildMembersList(data);
             var presenterFound = false;
-            for(person in data.people){
+            for(var person in data.people){
                var user = data.people[person];
                if(user.presenter === true){
                   presenterFound = true;
@@ -197,24 +206,22 @@ collaboration.initSession = function() {
                var person = data.people[p];
                if (person.presenter && person.id == socket.io.engine.id) {
                   collaboration.role = "presenter";
-                  collaboration.setStatus('connected', 'Connected. You are the presenter');
+                  collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
                   break;
                } else {
                   collaboration.role = "member";
-                  collaboration.setStatus('connected', 'Connected. .....');
+                  collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
                }
-               if(person.presenter){
-                  var pName = person.name || person.email;
-                  collaboration.log("Presenter changed to " + pName);
-               }
+               var pName = person.name || person.email;
+               collaboration.log("Presenter changed to " + pName);
             }
             collaboration.buildMembersList(data);
          });
 
          socket.on('room.presenter-state-update', function(data) {
             var state = data.params.state;
-            if (collaboration.role == "member") {
+            if (collaboration.role == "member" && data.params['joining-member'] == gisportal.user.info.email) {
                gisportal.stopLoadState = false;
                gisportal.loadState(state);
             }
@@ -1124,6 +1131,8 @@ collaboration.buildMembersList = function(data) {
    $('.js-leave-room').click(function() {
       socket.disconnect();
       collaboration.roomId = null;
+      collaboration.owner = false;
+      $('.notifyjs-gisportal-collab-notification-base').parent().remove();
 
       var rendered = gisportal.templates.collaboration();
       $('.js-collaboration-holder').html('').html(rendered);
@@ -1165,17 +1174,36 @@ collaboration.buildMembersList = function(data) {
       }
    });
 
-   if (collaboration.role == 'presenter') { 
+   if (collaboration.role == 'presenter' || collaboration.owner) { 
       // add a link to other members to allow you to make them presenter
+      var presenter, me;
+      // Makes sure the presenter is not an option to be set as the presenter.
+      for(var persons in data.people){
+         var person = data.people[persons];
+         if(person.presenter){
+            presenter = person.id;
+         }
+         if(person.email == gisportal.user.info.email){
+            me = person.id;
+         }
+      }
       $('.person').each(function() {
          var id = $(this).data('id');
-         var link = $('<a href="javascript:void(0)" class="js-make-presenter" title="Make this person the presenter" data-id="' + id + '"></a>');
-         $(this).prepend(link);
+         if(presenter == id){
+            return true;
+         }
+         var title = "Make this person the presenter";
+         if(me == id){
+            // Different hover message for taking the presenter role yourself
+            title = "Take the presenter role";
+         }
+         var link = $('<span class="js-make-presenter btn icon-profile-4 pull-right" title="' + title + '" data-id="' + id + '"></span>');
+         $(this).append(link);
       });
 
       $('.js-make-presenter').click(function() {
          var id = $(this).data('id');
-         collaboration._emit('room.make-presenter', id);
+         collaboration._emit('room.make-presenter', id, force = true);
       });
    }
 };

@@ -11,6 +11,7 @@ gisportal.user.loggedIn = function(){
             if(gisportal.config.collaborationFeatures.enabled){
                collaboration.initDOM();
             }
+            $('.collaboration-status').remove();
             gisportal.user.updateProfile(); // The user information is then reset back to defualts
          }
       });

@@ -68,7 +68,10 @@ collaboration.init = function(io, app, config) {
 
          var leavingUserId = socket.id;
          var roomId = socket.room;
-         var people = rooms[roomId];
+         var people;
+         if(rooms[roomId]){
+            people = rooms[roomId].people;
+         }
          var departed = '';
          var reassignPresenter = false;
          var newPresenterId = null;
@@ -83,7 +86,7 @@ collaboration.init = function(io, app, config) {
                   // get their name so others can be warned that `departed` has left the building
                   departed = people[i].name || people[i].email;
                   // take the user out of the people array
-                  rooms[roomId].splice(i, 1);
+                  rooms[roomId].people.splice(i, 1);
                   break;
                }
             }
@@ -98,7 +101,7 @@ collaboration.init = function(io, app, config) {
             }
             io.sockets.in(socket.room).emit('room.member-left', {
                "roomId": roomId,
-               "people": rooms[roomId],
+               "people": rooms[roomId].people,
                "departed" : departed
             });
 
@@ -117,7 +120,8 @@ collaboration.init = function(io, app, config) {
          shasum.update(Date.now().toString());
          var roomId = shasum.digest('hex').substr(0,6);
 
-         rooms[roomId] = [{
+         rooms[roomId] = {};
+         rooms[roomId].people = [{
             "id": socket.id,
             "email": user.email,
             "name": user.name,
@@ -125,39 +129,49 @@ collaboration.init = function(io, app, config) {
             "owner": true
          }]
          socket.room = roomId;
+         rooms[roomId].owner = user.email;
          socket.join(socket.room, function() {
             io.sockets.in(socket.room).emit('room.created', {
                "roomId": roomId,
-               "people": rooms[roomId],
-               "presenter": socket.id,
-               "owner": socket.id
+               "people": rooms[roomId].people,
+               "owner": user.email
             });
          });
-         console.log(user.email +' is now is room '+ roomId);
+         console.log(user.email +' is now in room '+ roomId);
          
       })
 
       socket.on('room.join', function(roomId) {
+         if(!rooms[roomId]){
+            return
+         }
          console.log(user.email +' is joining room '+ roomId);
          // does the room actually exist
          if (rooms[roomId]) { // yes, add the user to it and let everyone in the room know
             socket.room = roomId;
             socket.join(socket.room, function() {
                // add the new user to the room's members array
+               var owner = false;
+               console.log(socket)
+               console.log(user.email)
+               if(rooms[roomId].owner == user.email){
+                  owner = true;
+               }
                var member = {
                   "id": socket.id,
                   "email": user.email,
                   "name": user.name,
                   "presenter": false,
-                  "owner": false
+                  "owner": owner
                }
-               rooms[roomId].push(member);
+               rooms[roomId].people.push(member);
 
                io.sockets.in(socket.room).emit('room.member-joined', {
                   "roomId": roomId,
                   "sessionId": socket.id,
                   "user": user,
-                  "people": rooms[roomId]
+                  "people": rooms[roomId].people,
+                  "owner": owner
                })
             })
          } else { // no, tell the user
@@ -169,7 +183,10 @@ collaboration.init = function(io, app, config) {
       socket.on('room.make-presenter', function(id) {
          console.log('changing presenter to '+ id)
          
-         var people = rooms[socket.room];
+         var people;
+         if(rooms[socket.room]){
+            people = rooms[socket.room].people;
+         }
          for (var p in people) {
             if (people[p].id == id) {
                people[p].presenter = true;
