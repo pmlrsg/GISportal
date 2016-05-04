@@ -287,7 +287,69 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          })
-      }) 
+      });
+
+      socket.on('room.diverge', function(id) {
+         var roomId = socket.room;
+         console.log(id + ' has diverged from room ' + roomId);
+         
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var name;
+            var room = JSON.parse(obj);
+            var people = room.people;
+            for (var p in people) {
+               if (people[p].id == id) {
+                  people[p].diverged = true;
+                  name = people[p].name || people[p].email;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(socket.room).emit('room.member-diverged', {
+                     "roomId": socket.room,
+                     "people": people,
+                     "divergent": name
+                  });
+               }
+            });
+         });
+      });
+
+      socket.on('room.merge', function(id) {
+         var roomId = socket.room;
+         console.log(id + ' has merged back into room ' + roomId);
+         
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var name, email;
+            var room = JSON.parse(obj);
+            var people = room.people;
+            for (var p in people) {
+               if (people[p].id == id) {
+                  people[p].diverged = false;
+                  name = people[p].name || people[p].email;
+                  email = people[p].email;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(socket.room).emit('room.member-merged', {
+                     "roomId": socket.room,
+                     "people": people,
+                     "merger": name,
+                     "email": email
+                  });
+               }
+            });
+         });
+      });
 
 
    });

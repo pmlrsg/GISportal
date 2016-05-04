@@ -74,19 +74,11 @@ collaboration.initSession = function() {
 		  	});
 
          $('.js-collab-diverge').on('click', function(){
-            gisportal.events.trigger('room.member-diverged', gisportal.user.info.email);
-            collaboration.diverged = true;
-            $('.collab-diverge').toggleClass('hidden', true);
-            $('.collab-merge').toggleClass('hidden', false);
-            $('.collab-overlay').toggleClass('hidden', true);
+            collaboration._emit('room.diverge', socket.io.engine.id, force=true);
          });
 
          $('.js-collab-merge').on('click', function(){
-            gisportal.events.trigger('room.member-merged', gisportal.user.info.email);
-            collaboration.diverged = false;
-            $('.collab-diverge').toggleClass('hidden', false);
-            $('.collab-merge').toggleClass('hidden', true);
-            $('.collab-overlay').toggleClass('hidden', false);
+            collaboration._emit('room.merge', socket.io.engine.id, force=true);
          });
 
     		// -------------------------------------------------
@@ -209,8 +201,25 @@ collaboration.initSession = function() {
             collaboration.buildMembersList(data);
          });
 
+         socket.on('room.member-diverged', function(data) {
+            for (var p in data.people) {
+               var person = data.people[p];
+               if (person.diverged && person.id == socket.io.engine.id) {
+                  collaboration.setStatus('connected', 'Diverged. You are diverged from room '+ data.roomId.toUpperCase());
+                  collaboration.diverged = true;
+                  $('.collab-diverge').toggleClass('hidden', true);
+                  $('.collab-merge').toggleClass('hidden', false);
+                  $('.collab-overlay').toggleClass('hidden', true);
+                  break;
+               }
+            }
+            if (collaboration.role == 'presenter') {
+               collaboration.log(data.divergent + " has diverged from your room");
+            }
+            collaboration.buildMembersList(data);
+         });
+
          socket.on('room.member-merged', function(data) {
-            // if I am the presenter send my state so that the newly merged member can catch up
             if (collaboration.role == 'presenter') {
                if(gisportal.panels.activePanel != "refine-indicator"){
                   $('.dd-container').ddslick('close');
@@ -219,18 +228,24 @@ collaboration.initSession = function() {
                var params = {
                   "event": "room.presenter-state-update",
                   "state": state,
-                  "joining-member": data.params.email
+                  "joining-member": data.email
                };
                collaboration._emit('c_event', params);
-               collaboration.log(data.params.email + " has merged back with your room");
+               collaboration.log(data.merger + " has merged back with your room");
+            }else{
+               for (var p in data.people) {
+                  var person = data.people[p];
+                  if (!person.diverged && person.id == socket.io.engine.id) {
+                     collaboration.setStatus('connected', 'Merged. You have been merged back into room '+ data.roomId.toUpperCase());
+                     collaboration.diverged = false;
+                     $('.collab-diverge').toggleClass('hidden', false);
+                     $('.collab-merge').toggleClass('hidden', true);
+                     $('.collab-overlay').toggleClass('hidden', false);
+                     break;
+                  }
+               }
             }
-         });
-
-         socket.on('room.member-diverged', function(data) {
-            // if I am the presenter send my state so that the newly merged member can catch up
-            if (collaboration.role == 'presenter') {
-               collaboration.log(data.params.email + " has diverged from your room");
-            }
+            collaboration.buildMembersList(data);
          });
 
          socket.on('room.member-left', function(data) {
@@ -1512,6 +1527,7 @@ collaboration.buildMembersList = function(data) {
    if (collaboration.role == 'presenter' || collaboration.owner) { 
       // add a link to other members to allow you to make them presenter
       var presenter, me;
+      var divergents = [];
       // Makes sure the presenter is not an option to be set as the presenter.
       for(var persons in data.people){
          var person = data.people[persons];
@@ -1521,10 +1537,13 @@ collaboration.buildMembersList = function(data) {
          if(person.email == gisportal.user.info.email){
             me = person.id;
          }
+         if(person.diverged){
+            divergents.push(person.id);
+         }
       }
       $('.person').each(function() {
          var id = $(this).data('id');
-         if(presenter == id){
+         if(presenter == id || divergents.indexOf(id) >= 0){
             return true;
          }
          var title = "Make this person the presenter";
