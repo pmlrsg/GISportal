@@ -145,6 +145,7 @@ collaboration.initSession = function() {
 		  		collaboration.roomId = data.roomId;
             
             collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
+            $('.collab-overlay').toggleClass('hidden', true);
             collaboration.owner = true;
             collaboration.log("Welcome to collaboration " + data.owner);
 
@@ -158,6 +159,7 @@ collaboration.initSession = function() {
                collaboration.roomId = data.roomId;
                collaboration.role = 'member';
                collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
+               $('.collab-overlay').toggleClass('hidden', false);
             }
 
             // if I am the presenter send my state so that the new member can catch up
@@ -212,10 +214,12 @@ collaboration.initSession = function() {
                   collaboration.role = "presenter";
                   collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
+                  $('.collab-overlay').toggleClass('hidden', true);
                   break;
                } else {
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
+                  $('.collab-overlay').toggleClass('hidden', false);
                }
                var pName = person.name || person.email;
                collaboration.log("Presenter changed to " + pName);
