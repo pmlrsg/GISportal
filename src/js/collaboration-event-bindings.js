@@ -275,6 +275,16 @@ gisportal.events.bind("tab.select", function(event, layerId, tabName) {
    collaboration._emit('c_event', params);
 });
 
+// Layer tab closed
+gisportal.events.bind("layerTab.close", function(event, layerId, tabName) {
+   var params = {
+      "event" : "layerTab.close",
+      "layerId": layerId,
+      "tabName": tabName
+   };
+   collaboration._emit('c_event', params);
+});
+
 
 // jQuery events 
 

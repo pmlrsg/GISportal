@@ -666,6 +666,18 @@ collaboration.initSession = function() {
             }
          });
 
+        // Layer tab closed
+         socket.on('layerTab.close', function(data) {
+            var layerId = data.params.layerId;
+            var tabName = data.params.tabName;
+            if (collaboration.role == "member") {
+               var tab_elem = $('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]');
+               var button_elem = $('#'+$(tab_elem).attr('for'));
+               button_elem.removeAttr('checked');
+               tab_elem.removeClass('active');
+            }
+         });
+
          socket.on('paginator.selected', function(data) {
             collaboration.log(data.presenter +': Page ' + data.params.page + ' selected');
             if (collaboration.role == "member") {
