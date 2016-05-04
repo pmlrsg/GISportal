@@ -177,6 +177,10 @@ collaboration.initSession = function() {
             if(data.owner && data.user.email == gisportal.user.info.email){
                collaboration.owner = true;
             }
+            // set the presenter
+            if(data.presenter && data.user.email == gisportal.user.info.email){
+               collaboration._emit('room.make-presenter', data.sessionId, force=true);
+            }
             var name = data.user.name || data.user.email;
             if(data.user.email != gisportal.user.info.email){
                collaboration.log(name + " has joined.");
@@ -268,6 +272,18 @@ collaboration.initSession = function() {
                var div = $('.indicator-select');
                var scrollPercent = data.params.scrollPercent;
                div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+            }
+         });
+
+         socket.on('addLayerServer.clicked', function(data) {
+            var layer = data.params.layer;
+            var server = data.params.server;
+            var add_elem = $('.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]');
+            if (collaboration.role == "member") {
+               if(add_elem.length > 0){
+                  collaboration.highlightElement(add_elem);
+                  add_elem.trigger('click');
+               }
             }
          });
 

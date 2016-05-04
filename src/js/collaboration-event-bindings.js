@@ -327,6 +327,15 @@ gisportal.events.bind('refinePanel.scroll', function(event, scrollPercent) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('addLayerServer.clicked', function(event, layer, server) {
+   var params = {
+      "event": "addLayerServer.clicked",
+      "layer": layer,
+      "server": server
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) {
    var params = {
       "event": "addLayersForm.input",
