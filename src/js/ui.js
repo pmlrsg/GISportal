@@ -69,7 +69,7 @@ function closeTab(){
       setTimeout(function(){
         button.removeAttr('checked');
         e.removeClass('active');
-        gisportal.events.trigger("layerTab.close", e.attr('for').split('-')[1], e.data('tab-name'))
+        gisportal.events.trigger("layerTab.close", e.attr('for').split('-')[1], e.data('tab-name'));
       },0);
     };
     var unbind = function(){

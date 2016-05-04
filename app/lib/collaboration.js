@@ -148,7 +148,8 @@ collaboration.init = function(io, app, config) {
                "email": user.email,
                "name": user.name,
                "presenter": true,
-               "owner": true
+               "owner": true,
+               "diverged": false
             }],
             "owner": user.email,
             "presenter": user.email,
@@ -195,7 +196,8 @@ collaboration.init = function(io, app, config) {
                   "email": user.email,
                   "name": user.name,
                   "presenter": presenter,
-                  "owner": owner
+                  "owner": owner,
+                  "diverged": false
                }
                room.people.push(member);
                client.set(roomId, JSON.stringify(room), function(err){
@@ -229,6 +231,7 @@ collaboration.init = function(io, app, config) {
             for (var p in people) {
                if (people[p].id == id) {
                   people[p].presenter = true;
+                  people[p].diverged = false;
                   presenterEmail = people[p].email;
                } else {
                   people[p].presenter = false;

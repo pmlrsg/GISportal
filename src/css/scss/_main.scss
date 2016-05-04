@@ -228,7 +228,9 @@ button.top-space {
 
 .dev-warning { position: fixed; top: 0; width: 100%; background: $dev-warning; text-align: center; color: #fff; font-weight: bold; }
 
-.view-title { position: fixed; top: 0; width: 100%; background: $panel-content-header; text-align: center; color: #fff; font-weight: bold; }
+.view-title, .collab-diverge, .collab-merge { position: fixed; top: 0; width: 100%; background: $panel-content-header; text-align: center; color: #fff; font-weight: bold; }
+
+.collab-diverge, .collab-merge{z-index:10100}
 
 .dark-background{
   background-color: rgba(0,0,0,0.8);

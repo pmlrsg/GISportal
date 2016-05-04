@@ -68,6 +68,15 @@
    border-radius: 50%;
    background: radial-gradient(circle at 3px 3px, #5cabff, #000);
 }
+.diverged {
+   position:absolute;
+   top: 12px;
+   left: 10px;
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background: radial-gradient(circle at 3px 3px, #ff5e5c, #000);
+}
 
 .highlight-click {
     animation: glow 0.5s 2 alternate;

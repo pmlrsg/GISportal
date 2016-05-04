@@ -20,7 +20,8 @@
 
 {{#people}}
 <div data-id="{{id}}" class="person">
-   {{#presenter}}<div class="presenter"></div>{{/presenter}}
+   {{#presenter}}<div class="presenter" title="Presenter"></div>{{/presenter}}
+   {{#diverged}}<div class="diverged" title="Diverged"></div>{{/diverged}}
    {{name}} ({{email}})
 </div>
 {{/people}}

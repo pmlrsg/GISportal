@@ -2,6 +2,22 @@
 //  Portal EventManager event bindings
 //--------------------------------------------------------------------------------------
 
+gisportal.events.bind("room.member-merged", function(event, email) {
+   var params = {
+      "event" : "room.member-merged",
+      "email" : email
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
+gisportal.events.bind("room.member-diverged", function(event, email) {
+   var params = {
+      "event" : "room.member-diverged",
+      "email" : email
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
 gisportal.events.bind("date.selected", function(event, date) {
    var params = {
       "event" : "date.selected",
