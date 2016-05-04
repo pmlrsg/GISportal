@@ -1286,10 +1286,9 @@ collaboration.highlightElementRubber = function(element) {
 };
 
 collaboration.setStatus = function(icon, message) {
-   if ($('.collaboration-status').length === 0) {
-      var statusMsg = gisportal.templates['collaboration-status'];
-      $('.ol-overlaycontainer').append(statusMsg);   
-   }
+
+   var statusMsg = gisportal.templates['collaboration-status'];
+   $('.collaboration-status').toggleClass('hidden', false).html(statusMsg);
    
    if (icon == 'connected') {
       $(collaboration.statusIcon).toggleClass('error', false);

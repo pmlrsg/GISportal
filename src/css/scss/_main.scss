@@ -212,6 +212,9 @@ input[type="text"] , textarea  {
 .align-center{
   text-align: center;
 }
+button.top-space {
+  margin-top: 5px;
+}
 .clearfix:after {
   visibility: hidden;
   display: block;
