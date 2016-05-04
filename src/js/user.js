@@ -11,6 +11,10 @@ gisportal.user.loggedIn = function(){
             if(gisportal.config.collaborationFeatures.enabled){
                collaboration.initDOM();
             }
+            if(collaboration && collaboration.roomId){
+               // Makes sure the collaboration room is left to avoid bugs
+               $('.js-leave-room').trigger('click');
+            }
             $('.collaboration-status').remove();
             gisportal.user.updateProfile(); // The user information is then reset back to defualts
          }
