@@ -529,6 +529,28 @@ collaboration.initSession = function() {
             }
          });
 
+         // panel hidden
+         socket.on('panel.hide', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            collaboration.log(data.presenter +': Panel hidden');
+            if (collaboration.role == "member") {
+               $('.js-hide-panel').trigger('click');
+            }
+         });
+
+         // panel shown
+         socket.on('panel.show', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            collaboration.log(data.presenter +': Panel shown');
+            if (collaboration.role == "member") {
+               $('.js-show-tools').trigger('click');
+            }
+         });
+
          // layer selected
 		  	socket.on('layer.remove', function(data) {
             if(collaboration.diverged){

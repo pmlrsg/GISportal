@@ -1262,6 +1262,7 @@ gisportal.main = function() {
       function showPanel()  {
          $('.js-show-tools').toggleClass('hidden', true);
          $('.panel.active').toggleClass('hidden', false);
+         gisportal.events.trigger('panel.show');
       }
 
       $('.js-hide-panel').on('click', hidePanel);
@@ -1269,6 +1270,7 @@ gisportal.main = function() {
       function hidePanel()  {
          $('.panel.active').toggleClass('hidden', true);
          $('.js-show-tools').toggleClass('hidden', false);
+         gisportal.events.trigger('panel.hide');
       }
 
       // Start setting up anything that is not layer dependent

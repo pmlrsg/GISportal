@@ -61,6 +61,22 @@ gisportal.events.bind("ddslick.selectValue", function(event, obj, value, doCallb
    collaboration._emit('c_event', params);
 });
 
+// hide the panel
+gisportal.events.bind("panel.hide", function(event) {
+   var params = {
+      "event" : "panel.hide"
+   };
+   collaboration._emit('c_event', params);
+});
+
+// show the panel
+gisportal.events.bind("panel.show", function(event) {
+   var params = {
+      "event" : "panel.show"
+   };
+   collaboration._emit('c_event', params);
+});
+
 // hide a layer
 gisportal.events.bind("layer.hide", function(event, id, layerName) {
    var params = {
