@@ -36,6 +36,10 @@
    background: radial-gradient(circle at 3px 3px,#FC3535, #420000);
 }
 
+.js-collaboration-status-icon.warning {
+   background: radial-gradient(circle at 3px 3px,#dd9205, #583a02);
+}
+
 #roomId, .roomId {
    text-transform: uppercase;
 }

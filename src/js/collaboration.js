@@ -81,6 +81,33 @@ collaboration.initSession = function() {
             collaboration._emit('room.merge', socket.io.engine.id, force=true);
          });
 
+         // Adds the ripple effect to the collab-div
+         $(".rippler").rippler({
+            effectClass: 'rippler-effect',
+            effectSize: 0,
+            addElement: 'div',
+            duration: 250
+         });
+
+         var idleMouseTimer;
+         var forceMouseHide = false;
+         $(".collab-overlay").on('mousemove click', function(ev) {
+            if(!forceMouseHide) {
+               $(".collab-overlay").css('cursor', '');
+
+               clearTimeout(idleMouseTimer);
+
+               idleMouseTimer = setTimeout(function() {
+                  $(".collab-overlay").css('cursor', 'none');
+
+                  forceMouseHide = true;
+                  setTimeout(function() {
+                     forceMouseHide = false;
+                  }, 200);
+               }, 1000);
+            }
+    });
+
     		// -------------------------------------------------
     		// socket core event functions
     		// -------------------------------------------------
@@ -105,7 +132,7 @@ collaboration.initSession = function() {
 
 		  	socket.on('disconnect', function (reason){
 		  		collaboration.active = false;
-		   	collaboration.setStatus('error', 'Unexpectedly disconnected, trying to reconnect...');
+		   	collaboration.setStatus('warning', 'Unexpectedly disconnected, trying to reconnect...');
 		  	});
 
 		  	// doesn't appear to work as the reconnect timeout is incrementally increased with each attempt; might have to monitor it outside of socket.io
@@ -205,7 +232,7 @@ collaboration.initSession = function() {
             for (var p in data.people) {
                var person = data.people[p];
                if (person.diverged && person.id == socket.io.engine.id) {
-                  collaboration.setStatus('connected', 'Diverged. You are diverged from room '+ data.roomId.toUpperCase());
+                  collaboration.setStatus('warning', 'Diverged. You are diverged from room '+ data.roomId.toUpperCase());
                   collaboration.diverged = true;
                   $('.collab-diverge').toggleClass('hidden', true);
                   $('.collab-merge').toggleClass('hidden', false);
@@ -1648,10 +1675,17 @@ collaboration.setStatus = function(icon, message) {
    
    if (icon == 'connected') {
       $(collaboration.statusIcon).toggleClass('error', false);
+      $(collaboration.statusIcon).toggleClass('warning', false);
       $(collaboration.statusIcon).toggleClass('connected', true);
    }
    if (icon == 'error') {
       $(collaboration.statusIcon).toggleClass('error', true);
+      $(collaboration.statusIcon).toggleClass('warning', false);
+      $(collaboration.statusIcon).toggleClass('connected', false);
+   }
+   if (icon == 'warning') {
+      $(collaboration.statusIcon).toggleClass('error', false);
+      $(collaboration.statusIcon).toggleClass('warning', true);
       $(collaboration.statusIcon).toggleClass('connected', false);
    }
    $(collaboration.statusMessage).html(message);
