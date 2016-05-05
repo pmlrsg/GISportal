@@ -160,8 +160,10 @@ gisportal.TimeLine = function(id, options) {
 
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom()
-                .x(this.xScale)
-              .on('zoom', function() { isDragging = true; self.redraw(); });
+               .x(this.xScale)
+               .on('zoom', function() {
+                  isDragging = true; self.redraw();
+               });
                  
 
    // Append the svg and add a class before attaching both events.
