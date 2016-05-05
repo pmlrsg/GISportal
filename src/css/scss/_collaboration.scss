@@ -7,6 +7,36 @@
    margin-top: 20px;
 }
 
+.collaboration-panel{
+    top: 182px;
+    right: 0px;
+    width: 300px;
+    position: absolute;
+    background-color: #fafafb;
+    box-shadow: 0px 0px 11px -2px black;
+    padding: 8px;
+    z-index:10150;
+}
+
+.collaboration-pulltab{
+    top: 190px;
+    position: absolute;
+    right: 0px;
+    padding: 8px;
+    transform-origin: top right;
+    background-color: #fafafb;
+    cursor: pointer;
+    text-align: center;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border: 1px solid;
+    border-right: none;
+    z-index:10160;
+}
+.collaboration-pulltab.open{
+    right: 300px;
+}
+
 .collaboration-status {
    top: 70px;
    right: 25px;

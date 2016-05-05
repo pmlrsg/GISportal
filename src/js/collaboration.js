@@ -26,7 +26,7 @@ collaboration.initDOM = function() {
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
    var rendered = gisportal.templates.collaboration();
-   $('.js-collaboration-holder').html(rendered);
+   $('#collaborationPanel .js-collaboration-holder').html(rendered);
 
    // if there's a room querystring parameter show the collaboration panel; they'll be put in the room if they are logged in already, otherwise prompt for login
    var roomId = gisportal.utils.getURLParameter('room');
@@ -79,6 +79,19 @@ collaboration.initSession = function() {
 
          $('.js-collab-merge').on('click', function(){
             collaboration._emit('room.merge', socket.io.engine.id, force=true);
+         });
+
+         $('.collaboration-pulltab').on('click', function(){
+            var pulltab = $(this);
+            var panel = $('.collaboration-panel');
+            if(pulltab.hasClass('open')){
+               pulltab.toggleClass('open', false);
+               panel.toggleClass('hidden', true);
+
+            }else{
+               pulltab.toggleClass('open', true);
+               panel.toggleClass('hidden', false);
+            }
          });
 
          // Adds the ripple effect to the collab-div
@@ -1521,13 +1534,22 @@ collaboration.joinRoom = function(roomId) {
 };
 
 collaboration.buildMembersList = function(data) {
+   for(var people in data.people){
+      person = data.people[people];
+      if(!person.name || person.name === ""){
+         person.name = person.email;
+      }
+   }
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
+   $('.collaboration-pulltab').toggleClass('hidden', false);
 
    $('.js-auto').prop('checked', collaboration.displayLog);
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
+      $('.collaboration-panel').toggleClass('hidden', true);
+      $('.collaboration-pulltab').toggleClass('hidden', true);
       socket.disconnect();
       collaboration.roomId = null;
       collaboration.owner = false;
@@ -1601,7 +1623,7 @@ collaboration.buildMembersList = function(data) {
             title = "Take the presenter role";
          }
          var link = $('<span class="js-make-presenter btn icon-profile-4 pull-right" title="' + title + '" data-id="' + id + '"></span>');
-         $(this).append(link);
+         $(this).prepend(link);
       });
 
       $('.js-make-presenter').click(function() {
