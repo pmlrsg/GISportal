@@ -27,8 +27,6 @@
     background-color: #fafafb;
     cursor: pointer;
     text-align: center;
-    border-bottom-left-radius: 5px;
-    border-top-left-radius: 5px;
     border: 1px solid;
     border-right: none;
     z-index:10160;
@@ -139,6 +137,10 @@
     animation: shake 0.75s;
 }
 
+.pulse-attention {
+    animation: pulse 0.5s 4;
+}
+
 @keyframes shake {
   from, to {
     -webkit-transform: translate3d(0, 0, 0);
@@ -153,6 +155,23 @@
   40%, 80% {
     -webkit-transform: translate3d(10px, 0, 0);
     transform: translate3d(10px, 0, 0);
+  }
+}
+
+@keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(2, 2, 2);
+    transform: scale3d(2, 2, 2);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
   }
 }
 
@@ -197,4 +216,8 @@ div.panel-container[data-panel-name="collaboration"] .alert-warning,
 div.panel-container[data-panel-name="collaboration"] .alert-success{
   margin: 10px -8px;
   padding: 10px;
+}
+
+.person-message{
+  color:#FB0401;
 }

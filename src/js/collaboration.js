@@ -73,14 +73,6 @@ collaboration.initSession = function() {
 		   	"connect timeout": 1000
 		  	});
 
-         $('.js-collab-diverge').on('click', function(){
-            collaboration._emit('room.diverge', socket.io.engine.id, force=true);
-         });
-
-         $('.js-collab-merge').on('click', function(){
-            collaboration._emit('room.merge', socket.io.engine.id, force=true);
-         });
-
          $('.collaboration-pulltab').on('click', function(){
             var pulltab = $(this);
             var panel = $('.collaboration-panel');
@@ -118,6 +110,16 @@ collaboration.initSession = function() {
                      forceMouseHide = false;
                   }, 200);
                }, 1000);
+            }
+            if(ev.type == "click"){
+               var pulltab = $('.collaboration-pulltab');
+               var panel = $('.collaboration-panel');
+               var person = panel.find('[data-id="' + socket.io.engine.id + '"]');
+               pulltab.toggleClass('open', true);
+               panel.toggleClass('hidden', false);
+               person.find('.person-message').remove();
+               person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+               collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
             }
     });
 
@@ -664,7 +666,7 @@ collaboration.initSession = function() {
             }
             collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
             if (collaboration.role == "member") {
-               collaboration.highlightElementRubber($('[data-panel-name="' + p + '"].tab'));
+               collaboration.highlightElementShake($('[data-panel-name="' + p + '"].tab'));
                gisportal.panels.showPanel(p);
             }
          });
@@ -1594,43 +1596,61 @@ collaboration.buildMembersList = function(data) {
          $('.notifyjs-gisportal-collab-notification-base').parent().remove();
       }
    });
+   var presenter, me, id;
+   var divergents = [];
+   // Makes sure the presenter is not an option to be set as the presenter.
+   for(var persons in data.people){
+      var person = data.people[persons];
+      if(person.presenter){
+         presenter = person.id;
+      }
+      if(person.email == gisportal.user.info.email){
+         me = person.id;
+      }
+      if(person.diverged){
+         divergents.push(person.id);
+      }
+   }
 
-   if (collaboration.role == 'presenter' || collaboration.owner) { 
-      // add a link to other members to allow you to make them presenter
-      var presenter, me;
-      var divergents = [];
-      // Makes sure the presenter is not an option to be set as the presenter.
-      for(var persons in data.people){
-         var person = data.people[persons];
-         if(person.presenter){
-            presenter = person.id;
-         }
-         if(person.email == gisportal.user.info.email){
-            me = person.id;
-         }
-         if(person.diverged){
-            divergents.push(person.id);
+   // Adds all of the tools to the peoples list
+   $('.person').each(function() {
+      id = $(this).data('id');
+      var link;
+      var title = "Make this person the presenter";
+      if(me == id){
+         // Different hover message for taking the presenter role yourself
+         title = "Take the presenter role";
+         if(collaboration.role != 'presenter'){
+            if(divergents.indexOf(id) >= 0){
+               link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
+               $(this).prepend(link);
+               $('.collaboration-panel').find(this).append('<p class="person-message">Click \'<span class="icon-link-1"></span>\' to merge back into the room</p>');
+            }else{
+               link = $('<span class="icon-link-broken-1 collab-btn js-collab-diverge pull-right" title="Diverge from collaboration"></span>');
+               $(this).prepend(link);
+            }
          }
       }
-      $('.person').each(function() {
-         var id = $(this).data('id');
-         if(presenter == id || divergents.indexOf(id) >= 0){
-            return true;
+      if(collaboration.role == 'presenter' || collaboration.owner){
+         if(presenter != id && divergents.indexOf(id) == -1){
+            link = $('<span class="js-make-presenter collab-btn icon-profile-4 pull-right" title="' + title + '" data-id="' + id + '"></span>');
+            $(this).prepend(link);
          }
-         var title = "Make this person the presenter";
-         if(me == id){
-            // Different hover message for taking the presenter role yourself
-            title = "Take the presenter role";
-         }
-         var link = $('<span class="js-make-presenter btn icon-profile-4 pull-right" title="' + title + '" data-id="' + id + '"></span>');
-         $(this).prepend(link);
+      }
+
+      $('.js-collab-diverge').on('click', function(){
+         collaboration._emit('room.diverge', socket.io.engine.id, force=true);
+      });
+
+      $('.js-collab-merge').on('click', function(){
+         collaboration._emit('room.merge', socket.io.engine.id, force=true);
       });
 
       $('.js-make-presenter').click(function() {
          var id = $(this).data('id');
          collaboration._emit('room.make-presenter', id, force = true);
       });
-   }
+   });
 };
 
 collaboration.setUserSavedState = function() {
@@ -1685,9 +1705,14 @@ collaboration.highlightElement = function(element) {
    setTimeout(function() { element.removeClass('highlight-click'); }, 1000);
 };
 
-collaboration.highlightElementRubber = function(element) {
+collaboration.highlightElementShake = function(element) {
    element.addClass('highlight-shake');
    setTimeout(function() { element.removeClass('highlight-shake'); }, 1000);
+};
+
+collaboration.highlightElementPulse = function(element) {
+   element.addClass('pulse-attention');
+   setTimeout(function() { element.removeClass('pulse-attention'); }, 2000);
 };
 
 collaboration.setStatus = function(icon, message) {
