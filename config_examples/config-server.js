@@ -11,5 +11,5 @@ GLOBAL.config = {
       secret : 'SECRET',
       age : 0
    },
-   cssFile:"GISportal_blue"
+   cssFile:"GISportal"
 }
