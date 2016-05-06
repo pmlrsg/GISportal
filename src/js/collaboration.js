@@ -26,6 +26,7 @@ collaboration.initDOM = function() {
 	$('[data-panel-name="collaboration"]').toggleClass('hidden', false);
 
    var rendered = gisportal.templates.collaboration();
+   $('.js-collaboration-holder').html('');
    $('#collaborationPanel .js-collaboration-holder').html(rendered);
 
    // if there's a room querystring parameter show the collaboration panel; they'll be put in the room if they are logged in already, otherwise prompt for login
@@ -73,6 +74,7 @@ collaboration.initSession = function() {
 		   	"connect timeout": 1000
 		  	});
 
+         $('.collaboration-pulltab').off('click').toggleClass('open', false);
          $('.collaboration-pulltab').on('click', function(){
             var pulltab = $(this);
             var panel = $('.collaboration-panel');
@@ -96,6 +98,7 @@ collaboration.initSession = function() {
 
          var idleMouseTimer;
          var forceMouseHide = false;
+         $(".collab-overlay").off('mousemove click');
          $(".collab-overlay").on('mousemove click', function(ev) {
             if(!forceMouseHide) {
                $(".collab-overlay").css('cursor', '');
@@ -114,7 +117,7 @@ collaboration.initSession = function() {
             if(ev.type == "click"){
                var pulltab = $('.collaboration-pulltab');
                var panel = $('.collaboration-panel');
-               var person = panel.find('[data-id="' + socket.io.engine.id + '"]');
+               var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
                pulltab.toggleClass('open', true);
                panel.toggleClass('hidden', false);
                person.find('.person-message').remove();
@@ -165,7 +168,8 @@ collaboration.initSession = function() {
 		   		collaboration.setStatus('error', 'The connection failed; '+reason);	
                // reset the iframe
                var rendered = gisportal.templates.collaboration();
-               $('.js-collaboration-holder').html('').html(rendered);
+               $('.js-collaboration-holder').html('');
+               $('#collaborationPanel .js-collaboration-holder').html(rendered);
 		   	}
 		   	
 		  	});
@@ -210,7 +214,6 @@ collaboration.initSession = function() {
                collaboration.roomId = data.roomId;
                collaboration.role = 'member';
                collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
-               $('.collab-diverge').toggleClass('hidden', false);
                $('.collab-overlay').toggleClass('hidden', false);
             }
 
@@ -249,8 +252,6 @@ collaboration.initSession = function() {
                if (person.diverged && person.id == socket.io.engine.id) {
                   collaboration.setStatus('warning', 'Diverged. You are diverged from room '+ data.roomId.toUpperCase());
                   collaboration.diverged = true;
-                  $('.collab-diverge').toggleClass('hidden', true);
-                  $('.collab-merge').toggleClass('hidden', false);
                   $('.collab-overlay').toggleClass('hidden', true);
                   break;
                }
@@ -280,8 +281,6 @@ collaboration.initSession = function() {
                   if (!person.diverged && person.id == socket.io.engine.id) {
                      collaboration.setStatus('connected', 'Merged. You have been merged back into room '+ data.roomId.toUpperCase());
                      collaboration.diverged = false;
-                     $('.collab-diverge').toggleClass('hidden', false);
-                     $('.collab-merge').toggleClass('hidden', true);
                      $('.collab-overlay').toggleClass('hidden', false);
                      break;
                   }
@@ -313,20 +312,13 @@ collaboration.initSession = function() {
                   collaboration.role = "presenter";
                   collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
-                  $('.collab-diverge').toggleClass('hidden', true);
-                  $('.collab-merge').toggleClass('hidden', true);
                   $('.collab-overlay').toggleClass('hidden', true);
                   break;
                } else {
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
                   if(!collaboration.diverged){
-                     $('.collab-diverge').toggleClass('hidden', false);
-                     $('.collab-merge').toggleClass('hidden', true);
                      $('.collab-overlay').toggleClass('hidden', false);
-                  }else{
-                     $('.collab-merge').toggleClass('hidden', false);
-                     $('.collab-diverge').toggleClass('hidden', true);
                   }
                }
                var pName = person.name || person.email;
@@ -1551,6 +1543,7 @@ collaboration.buildMembersList = function(data) {
    // add events to the various action links
    $('.js-leave-room').click(function() {
       $('.collaboration-panel').toggleClass('hidden', true);
+      $('.collab-overlay').toggleClass('hidden', true);
       $('.collaboration-pulltab').toggleClass('hidden', true);
       socket.disconnect();
       collaboration.roomId = null;
@@ -1558,7 +1551,8 @@ collaboration.buildMembersList = function(data) {
       $('.notifyjs-gisportal-collab-notification-base').parent().remove();
 
       var rendered = gisportal.templates.collaboration();
-      $('.js-collaboration-holder').html('').html(rendered);
+      $('.js-collaboration-holder').html('');
+      $('#collaborationPanel .js-collaboration-holder').html(rendered);
 
       $.ajax({
          url: gisportal.middlewarePath + '/collaboration/dashboard',
@@ -1624,7 +1618,6 @@ collaboration.buildMembersList = function(data) {
             if(divergents.indexOf(id) >= 0){
                link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
                $(this).prepend(link);
-               $('.collaboration-panel').find(this).append('<p class="person-message">Click \'<span class="icon-link-1"></span>\' to merge back into the room</p>');
             }else{
                link = $('<span class="icon-link-broken-1 collab-btn js-collab-diverge pull-right" title="Diverge from collaboration"></span>');
                $(this).prepend(link);
@@ -1671,7 +1664,8 @@ collaboration.userAuthorised = function() {
 	
 	// add the collaboration template into the mix...
 	var rendered = gisportal.templates.collaboration();
-   $('.js-collaboration-holder').html('').html(rendered); 
+   $('.js-collaboration-holder').html('');
+   $('#collaborationPanel .js-collaboration-holder').html(rendered); 
 	
    //collaboration.initSession();
    if(gisportal.config.collaborationFeatures.enabled){
@@ -1711,6 +1705,9 @@ collaboration.highlightElementShake = function(element) {
 };
 
 collaboration.highlightElementPulse = function(element) {
+   if(element.hasClass('pulse-attention')){
+      return;
+   }
    element.addClass('pulse-attention');
    setTimeout(function() { element.removeClass('pulse-attention'); }, 2000);
 };

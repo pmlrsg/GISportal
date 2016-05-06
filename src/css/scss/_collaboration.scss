@@ -10,12 +10,14 @@
 .collaboration-panel{
     top: 182px;
     right: 0px;
+    max-height: calc(100% - 217px);
     width: 300px;
     position: absolute;
     background-color: #fafafb;
     box-shadow: 0px 0px 11px -2px black;
     padding: 8px;
     z-index:10150;
+    overflow: auto;
 }
 
 .collaboration-pulltab{
