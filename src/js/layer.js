@@ -593,7 +593,7 @@ gisportal.removeLayersByProperty = function(property, value){
   var layer;
   for(layer in array){
     var this_layer = array[layer];
-    var properties = this_layer.getProperties()
+    var properties = this_layer.getProperties();
     if(properties && properties[property] && properties[property] == value){
       layers_list.push(this_layer);
     }
@@ -601,7 +601,7 @@ gisportal.removeLayersByProperty = function(property, value){
   for(layer in layers_list){
     map.removeLayer(layers_list[layer]);
   }
-}
+};
 
 /**
  * Setups up the layer, calls addOLLayer and updates scalebar
