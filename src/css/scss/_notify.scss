@@ -1,0 +1,137 @@
+.notifyjs-corner {
+    z-index: 10100!important;
+    margin: 115px 20px 125px 30% !important;
+}
+
+.notifyjs-bootstrap-on-panel{
+  margin-left: 315px;
+  margin-top: 20px;
+}
+
+.notifyjs-gisportal-refresh-option-base button,
+.notifyjs-gisportal-delete-option-base button,
+.notifyjs-gisportal-restore-option-base button,
+.notifyjs-gisportal-close-plot-option-base button {
+  width: 60px;
+  margin:5px;
+}
+
+.notifyjs-gisportal-base,
+.notifyjs-gisportal-refresh-option-base,
+.notifyjs-gisportal-delete-option-base,
+.notifyjs-gisportal-restore-option-base,
+.notifyjs-gisportal-close-plot-option-base,
+.notifyjs-gisportal-collab-notification-base {
+  color: #111111;
+  padding: 8px 15px 8px 14px;
+  background-color: #ffffff;
+  padding-left: 30px;
+  background-repeat: no-repeat;
+  background-position: 3px 7px;
+  border-left: 10px;
+  border-style: solid;
+  width: 350px;
+  box-shadow: 0px 0px 11px -2px black;
+  margin-bottom: 10px;
+}
+
+.notifyjs-gisportal-collab-notification-base {
+  background-color: rgba(255,255,255,0.6);
+  padding: 8px;
+  border-left: 0px;
+}
+
+.notifyjs-gisportal-collab-notification-base:hover {
+  background-color: #ffffff;
+}
+
+.notifyjs-gisportal-base:before,
+.notifyjs-gisportal-refresh-option-base:before,
+.notifyjs-gisportal-delete-option-base:before,
+.notifyjs-gisportal-restore-option-base:before,
+.notifyjs-gisportal-close-plot-option-base:before,
+.notifyjs-gisportal-collab-notification-base:before {
+  font-family: "streamline-24px" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 18px;
+  position: absolute;
+  left: 15px;
+}
+
+.notifyjs-gisportal-error,
+.notifyjs-gisportal-refresh-option-error,
+.notifyjs-gisportal-delete-option-error,
+.notifyjs-gisportal-restore-option-error,
+.notifyjs-gisportal-close-plot-option-info {
+  border-color: #900;
+}
+
+.notifyjs-gisportal-error:before,
+.notifyjs-gisportal-refresh-option-error:before,
+.notifyjs-gisportal-delete-option-info:before,
+.notifyjs-gisportal-restore-option-info:before
+.notifyjs-gisportal-close-plot-option-info:before {
+  content: "\e307";
+  color: #900;
+}
+
+.notifyjs-gisportal-success,
+.notifyjs-gisportal-refresh-option-success,
+.notifyjs-gisportal-delete-option-success,
+.notifyjs-gisportal-restore-option-success {
+  border-color: #3c763d;
+}
+
+.notifyjs-gisportal-success:before,
+.notifyjs-gisportal-refresh-option-success:before,
+.notifyjs-gisportal-delete-option-success:before,
+.notifyjs-gisportal-restore-option-success:before {
+  content: "\e2ff";
+  color: #3c763d;
+}
+
+.notifyjs-gisportal-info,
+.notifyjs-gisportal-refresh-option-info,
+.notifyjs-gisportal-delete-option-info,
+.notifyjs-gisportal-restore-option-info {
+  border-color: #31708f;
+}
+
+.notifyjs-gisportal-info:before,
+.notifyjs-gisportal-refresh-option-info:before,
+.notifyjs-gisportal-delete-option-info:before,
+.notifyjs-gisportal-restore-option-info:before {
+  content: "\e0b8";
+  color: #31708f;
+}
+
+.notifyjs-gisportal-warn,
+.notifyjs-gisportal-refresh-option-warn,
+.notifyjs-gisportal-delete-option-warn,
+.notifyjs-gisportal-restore-option-warn {
+  border-color: #D48702;
+}
+
+.notifyjs-gisportal-warn:before,
+.notifyjs-gisportal-refresh-option-warn:before,
+.notifyjs-gisportal-delete-option-warn:before,
+.notifyjs-gisportal-restore-option-warn:before {
+  content: "\e4b9";
+  color: #D48702;
+}
+
+[data-notify-text],
+[data-notify-html]{
+  word-wrap:break-word;
+}
+
+.scalevalues .notifyjs-gisportal-base{
+  width: 300px;
+}

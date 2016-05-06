@@ -1,0 +1,64 @@
+{
+   "_comment":"THESE FILES GOES INTO THE DOMAIN CONFIG FOLDER INSIDE ITS OWN 'VIEWS' FOLDER",
+
+
+
+
+
+   "_comment":"The title of the view for the user to see",
+   "title": "Example View",
+
+	"_comment":"The bounds of the area you would like the view to zoom to (Must be in degrees)",
+   "bounds": [-10.723,49.219,2.637,62.402],
+
+   "_comment":"Would you like to display lat/lon graticules?",
+   "graticules": false,
+
+   "_comment":"Would you like to display different border lines? (0 if none)",
+   "borders": "countries_all_black",
+
+   "_comment":"Would you like to display a different basemap?",
+   "baseMap": false,
+
+   "_comment":"Would you like to display a different projection? (Will only be displayed if compatible with the basemap",
+   "projection": "EPSG:4326",
+
+	"_comment":"Set to true if you would like to prevent the user from dragging the map",
+   "noPan": true,
+
+	"_comment":"Set to true if you would like to prevent the user from zooming in and out of the map",
+   "noZoom": true,
+
+   "_comment":"This refines the layers you want to list",
+   "layerListFilter": [
+   {
+      "tags":{
+         "data_provider":"CEH",
+         "interval":"Daily"
+      }
+   },
+   {
+      "tags":{
+         "data_provider":"CNRS"
+      }
+   }
+   ],
+
+   "_comment":"This refines the layers you want to load (Know that if you have a list filter the load filter will have to match layers in the filtered)",
+   "layerLoadFilter": [
+   {
+      "tags":{
+         "data_provider":"CEH",
+         "interval":"Daily"
+      },
+      "urlName":"SWnet"
+   },
+   {
+      "tags":{
+         "data_provider":"CNRS",
+         "interval":"Daily"
+      },
+      "urlName":"SWnet"
+   }
+   ]
+}

@@ -1,0 +1,4 @@
+<div class="js-collaboration-status-icon"></div>
+<span class="js-collaboration-status-presenter hidden"></span>
+<span class="js-collaboration-status-member hidden"></span>
+<span class="js-collaboration-status-msg">Initialising connection...</span>

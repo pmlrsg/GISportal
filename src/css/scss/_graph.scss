@@ -1,0 +1,207 @@
+/*------------------------------------*\
+    Graph Panel
+\*------------------------------------*/
+
+#graphPanel.panel-container { 
+   width: 150%;
+   max-width: 150%;
+   z-index: 20;
+}
+
+#graphPanel.panel {
+   overflow: visible;
+}
+
+.graph-holder,
+.graph-wait-message {
+   background: #fff;
+   text-align: center;
+   padding: 10px;
+}
+
+.active-plot-slideout{
+	padding: 0px;
+}
+
+
+.active-plot-slideout table{
+	width: 100%;
+}
+.active-plot-slideout .components td{
+	height: auto;
+	padding: 0px 5px;
+   vertical-align: middle;
+}
+
+.active-plot-slideout .components td:nth-child(2){
+	width: 100%;
+}
+.active-plot-slideout .components td:nth-child(1), .active-plot-slideout .components td:nth-child(3){
+	width: 19px;
+}
+
+.close-acitve-plot-component{
+	cursor: pointer;
+}
+
+.active-plot-component select{
+   height: 20px;
+   padding: 0px;
+   margin: 0px;
+}
+.active-plot-component[has-data-in-range]{
+ 	padding: 0px;
+	
+}
+.active-plot-component[has-data-in-range="yes"]{
+	background-color: #dff0d8 !important;
+}
+.active-plot-component[has-data-in-range="yes"] .icon-data:before{
+	color: green;
+	content: "\e303";
+}
+
+.active-plot-component[has-data-in-range="no"]{
+	background-color: #f2dede !important;
+}
+.active-plot-component[has-data-in-range="no"] .icon-data:before{
+	color: red;
+	content: "\e2c3";
+}
+.active-plot-component[has-data-in-range="partial"]{
+	background-color: #fcf8e3 !important;
+}
+.active-plot-component[has-data-in-range="partial"] .icon-data:before{
+	color: orange;
+	content: "\e333";
+}
+
+.graph-job{
+	padding: 6px 0px;
+	background-color: #F5F3F6;
+   margin: 6px;
+   border: 1px solid $general-border;
+}
+
+.graph-job .loading-image{
+	background-image: url('../img/ajax-loader.gif');
+	background-size: contain;
+	background-position: center center;
+	background-repeat: no-repeat;
+	align-self: center;
+}
+
+
+.graph-job > div{
+	width: 100%;
+	display: flex;
+}
+
+
+.graph-job > div div:nth-child(1){
+	flex-basis: 16px;
+	flex-shrink: 0;
+	margin-right: 5px;
+}
+
+input.graph-min, input.graph-max{
+	margin: 4px 0px 11px 0px;
+	width: 90px;
+}
+
+.graph-min{
+	float: left;
+}
+
+.graph-max{
+	float: right;
+}
+
+.elevation{
+	padding-top: 8px;
+}
+.elevation select{
+	margin-top: 0px;
+}
+
+
+.plot-status-title{
+   font-weight: bold;
+}
+
+.y-axis{
+   display: none;
+}
+
+.multiple-components .y-axis{
+   display: block;
+}
+
+.active-plot-slideout .panel-list{
+   min-height: calc(100% - 40px);
+}
+
+.plot-header{
+  background-color: $panel-content-header;
+  color: #fff;
+  line-height: 1.5;
+  padding: 10px 15px; 
+  min-height: 38px;
+}
+
+.plot-header .right-icon{
+  float: right;
+  font-size: 22px;
+  line-height: 1px;
+}
+
+div.js-plot-popup{
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: auto;
+}
+
+div.js-plot-popup-html{
+  height: 95%;
+  width: 95%;
+  background-color: white;
+  color: #111111;
+  padding: 15px;
+  max-width: 90%;
+  overflow: auto;
+  margin: 10px auto;
+  z-index: 10100;
+}
+
+div.js-plot-metadata{
+  margin-left: 15px;
+}
+
+.bk-plot-wrapper table{
+  margin: auto;
+  margin-top: 25px;
+}
+
+.graph-buttons button,
+.js-graph-status-delete{
+  height: 31px;
+  background-color: $analysis-button;
+}
+
+a.js-revert-text{
+  text-decoration: underline;
+  font-weight:bold;
+  cursor: pointer;
+}
+
+.graph-date-range-info-div.alert-info p,
+.graph-date-range-error-div.alert-danger p {
+    padding: 10px;
+}
+
+.graph-date-range-info-li,
+.graph-date-range-error-li{
+  padding-bottom: initial!important;
+  padding-top: initial!important;
+}

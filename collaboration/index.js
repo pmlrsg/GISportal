@@ -332,12 +332,7 @@ io.on('connection', function(socket){
          "socketId": socket.id,
          "params" : data
       })
-   }) 
-
-   // socket.on('RTCmessage', function(data) {
-   //    console.log(data);
-   //    io.sockets.in(socket.room).emit('RTCmessage', data)
-   // })
+   })
 
 
 });

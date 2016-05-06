@@ -1,0 +1,86 @@
+/*------------------------------------*\
+    Start Page
+\*------------------------------------*/
+
+.start  {
+   background-color: #635078;
+   background-image: url('../img/PML-MAP-2@2x.png');
+   background-repeat: no-repeat;
+   background-position:  center center;
+   background-size: cover;
+   z-index: 1000;
+   overflow-y: auto;
+}
+.start-dev { 
+   background: $splash-background ; 
+}
+
+.start-container  {
+   background: $primary-purple;
+   color: #f7f6f8;
+   padding: 0px;
+}
+
+.intro-text  {
+   padding: 25px;
+   padding-bottom: 10px;
+}
+
+.intro-text p  {
+   padding-bottom: 10px;
+}
+
+.intro-text a{
+   color: white;
+}
+
+.start-nav  {
+   background: $primary-purple;
+   padding: 20px 15px;
+   text-align: right;
+}
+
+.homepageSlider{
+   width: 100%;
+   height: 400px;
+   position: relative;
+   overflow: hidden;
+}
+
+.homepageSlider-wrap{
+  position: relative;
+   height: 100%;
+   width: 100%;
+}
+
+.homepageSlider-wrap div{
+   height: 100%;
+   width: 100%;
+   background-size: cover;
+   background-position: center center;
+  float:left;
+  position: relative;
+}
+
+.browse-not-compatible{
+  display: none;
+  z-index: 1000;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  margin-left: -200px;
+  margin-top: -84px;
+
+  height: 168px;
+  width: 400px;
+
+  color: white;
+  padding: 26px 15px;
+  background: #32273d;
+}
+.browse-not-compatible h3{
+  text-align: center;
+  font-size: 30px;
+}

@@ -1,0 +1,23 @@
+<tr has-data-in-range="yes" class="active-plot-component">
+	<td><div class="js-close-acitve-plot-component icon-cross btn"></div></td>
+	<td>
+		<b>Indicator:</b> <span>{{indicatorObj.descriptiveName}}</span>
+       {{#if bbox}}
+         <br>
+         <b>BBox:</b>
+         <span>{{truncate bbox 18}}</span>
+      {{/if}}
+      {{#if elevation}}
+         <br>
+         <b>Depth:</b>
+         <span> {{round elevation 2}} {{indicatorObj.elevationUnits}} </span>
+      {{/if}}
+      <select class="js-y-axis y-axis">
+         <option value="1" {{selected "1" yAxis}}>{{xText}}</option>
+         <option value="2" {{selected "2" yAxis}}>{{yText}}</option>
+      </select>
+	</td>
+	<td>
+		<div class=" icon-data"></div>
+	</td>
+</tr>

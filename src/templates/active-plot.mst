@@ -1,0 +1,65 @@
+<div class="slideout-header">
+   Graph
+   <span class="btn icon-arrow-delete-1 icon-btn right-icon js-close-active-plot"></span>
+</div>
+<ol class="steps panel-list">
+	<li>
+		<!-- <p class="number">1</p> -->
+		<div class="">
+			<p>Title:</p>
+			<input type="text" class="js-active-plot-title" value="{{plot._title}}" />
+		</div>
+	</li>
+	
+	<li>
+		<!-- <p class="number">2</p> -->
+		<div class="">
+			<p>Choose a graph type</p>
+			<select class="js-active-plot-type">
+			{{#if transect_plot}}
+				<option value="transect" {{selected "transect" (call 'plot.plotType')}} selected="selected">Transect</option>
+			{{else}}
+				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
+				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
+				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
+				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
+				<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
+			{{/if}}
+			 </select>
+		</div>
+	</li>
+	<li>
+		<!-- <p class="number">3</p> -->
+		<div class="{{#if transect_plot}} hidden{{/if}}">
+			<p>Set a date range using the timeline below</p>
+			<div class="clearfix">
+				<input placeholder="Start" class="js-min graph-min js-active-plot-start-date" type="text">
+				<input placeholder="End" class="js-max graph-max js-active-plot-end-date" type="text">
+			</div>
+			<div class="js-range-slider "></div>
+		</div>
+	</li>
+	<li class="graph-date-range-info-li alert-info hidden">
+		<div class="graph-date-range-info-div alert-info"></div>
+	</li>
+	<li class="graph-date-range-error-li alert-danger hidden">
+		<div class="graph-date-range-error-div alert-danger"></div>
+	</li>
+	
+	
+	<li class="js-components-area" >
+		<!-- <p class="number">4</p> -->
+		<div class="">
+			<table> 
+				<tbody class="js-components components"></tbody>
+			</table>
+		</div>
+	</li>
+	
+	<li>
+		<div class="pull-right">
+			<button class="brand create-graph js-create-graph small">Create graph</button>
+		</div>
+	</li>
+
+</ol>

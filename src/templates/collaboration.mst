@@ -1,0 +1,4 @@
+<div class="js-collaboration">
+   <div class="js-collab-message hidden alert-warning">{{message}}</div>
+   <div id="collab-content"></div>
+</div>

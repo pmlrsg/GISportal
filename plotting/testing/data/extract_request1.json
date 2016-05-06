@@ -1,0 +1,79 @@
+{
+    "plot": {
+        "data": {
+            "series": [
+                {
+                    "data_source": {
+                        "filename": "/local/petwa/source/plotting/testing/data/data-image-vert.json",
+                        "bbox": "-13.26,44.612,-4.823,50.72",
+                        "coverage": "Chl",
+                        "depth": "-1.0",
+                        "graphXAxis": "Lon",
+                        "graphYAxis": "Lat",
+                        "graphZAxis": "Chl",
+                        "metaCacheUrl": "http://portal.marineopec.eu/cache/layers/pml_monthly_Chl.json",
+                        "middlewareUrl": "http://portal.marineopec.eu/service/wcs",
+                        "t_bounds": [
+                            "1991-01-16T00:00:00.000Z",
+                            "2013-12-16T00:00:00.000Z"
+                        ],
+                        "threddsUrl": "https://rsg.pml.ac.uk/thredds/wcs/PML_GEN_M?"
+                    },
+                    "handler": "OPEC_SERVICE_WCS",
+                    "label": "1) Chlorophyll - North East Atlantic - PML",
+                    "logo": "http://portal.marineopec.eu/img/providers/pml.png",
+                    "markdown": [
+                        "http://portal.marineopec.eu/service/metadata/indicator/Chlorophyll",
+                        "http://portal.marineopec.eu/service/metadata/provider/PML"
+                    ],
+                    "meta": "Region: North East Atlantic<br>Confidence: Medium<br>Provider: PML<br>Interval: Monthly<br>Bounding Box: -13.26,44.612,-4.823,50.72<br>Depth: -1.0m<br>",
+                    "type": "line",
+                    "yAxis": 1
+                }
+            ]
+        },
+        "downloadTypes": [
+            {
+                "key": "csv",
+                "label": "CSV"
+            },
+            {
+                "key": "png",
+                "label": "PNG"
+            },
+            {
+                "key": "meta-data",
+                "label": "Meta Data"
+            },
+            {
+                "key": "logos",
+                "label": "Logos"
+            },
+            {
+                "key": "svg",
+                "label": "SVG"
+            }
+        ],
+        "style": "basic",
+        "title": "PML: Chlorophyll",
+        "type": "extract",
+        "xAxis": {
+            "label": "Longitude",
+            "tickFormat": ",.2f",
+            "ticks": "auto",
+            "weight": "auto"
+        },
+        "y1Axis": {
+            "label": "Chlorophyll Elv:-1.0M (mg C m-3)",
+            "scale": "linear",
+            "tickFormat": "auto",
+            "ticks": "auto",
+            "weight": "auto"
+        }
+    },
+    "style": {
+        "logos": [
+            "http://portal.marineopec.eu/img/providers/pml.png"
+        ]
+    }
+}

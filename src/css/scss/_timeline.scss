@@ -1,0 +1,125 @@
+/* Fix for IE SVG overflow issues */
+svg {
+   overflow: hidden;
+   shape-rendering: crispEdges;
+}
+
+.graph svg  {
+   shape-rendering: auto;
+}
+
+.timeline-container  {
+   left: 0;
+   bottom: 0px;
+   position: absolute;
+   width: 100%;
+   transform: translate3D(0,0,0); /* Performance improvement hack */
+   box-shadow: 0px 0px 11px -2px black;
+   padding: 5px;
+   background: #fff;
+}
+
+.timeline-container h3 {
+   display: inline;
+   padding-left: 15px;
+}
+
+.timeline-container p {
+   display: inline;
+}
+
+.timeline-inner  {
+   background-color: #fff;
+   margin: 0 auto;
+   position: relative;
+   width: 100%;
+   padding: 5px 70px 5px 5px;
+
+}
+
+.timeline  {
+   width: 100%;
+}
+
+.main {
+   pointer-events: bounding-box;
+}
+
+.main text {
+   text-anchor: start;
+   fill: $timeline-text;
+   /*stroke:black;
+   stroke-width:0.5px;*/
+}
+
+.main text:hover,
+.main text:focus  {
+   fill: #32253f;
+}
+
+.separatorLine {
+   stroke: gray;
+}
+
+.nowLine {
+   stroke: lightblue;
+   stroke-width: 1.5px;
+   stroke-dasharray: 2px,2px;
+}
+
+.selectedDateLine {
+   rx: 5;
+   ry: 5;
+   fill:$timeline-lozenge; /*#b1a7bc;*/
+}
+
+.laneText {
+}
+
+.detailLine {
+   stroke-width: 1;
+}
+
+.timeRange {
+   fill: $timeline-base;
+   stroke: none;
+}
+
+.data-bar-type--range  {
+   pointer-events: none;   
+}
+
+.axis line, .axis path {
+   stroke: $general-border;
+}
+
+#timeline{
+   width: calc(100% - 242px);
+   display: inline-block;
+}
+
+.timeline-labels  {
+   font-size: 10px;
+   width: 150px;
+   display: inline-block;
+}
+
+.timeline-labels li  {
+   position: absolute;
+   left: 15px;
+   top: 0;
+   text-transform: capitalize;
+}
+
+.current-date{
+   width: 85px;
+   padding: 5px;
+   display: inline-block;
+   position: relative;
+   top: -19px;
+   right: -5px;
+}
+
+line.stroke{
+   stroke:$timeline-stroke;
+}

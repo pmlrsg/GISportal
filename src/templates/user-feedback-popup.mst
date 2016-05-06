@@ -1,0 +1,12 @@
+{{message}}
+{{#if string_error}}
+<br/>
+<p class="alert-warning">Invalid string, you can only use 'a-z', 'A-Z', '0-9', ' ', '_' and the string cannot start with a digit or excede 100 characters.</p>
+{{/if}}
+<form>
+   <input class="user-feedback-input" type="text"/>
+   <div class="user-feedback-buttons-div">
+      <button class="brand small js-user-feedback-submit pull-right" href="javascript:void(0)">&#10004; Submit</button>
+      <button class="brand small js-user-feedback-close pull-right" href="javascript:void(0)">&#10006; Cancel</button>
+   </div>
+</form>

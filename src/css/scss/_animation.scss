@@ -1,0 +1,30 @@
+
+/*------------------------------------*\
+    Animation 
+\*------------------------------------*/
+
+@keyframes rotation  {
+   from { transform: rotate(0deg); }
+   to   { transform: rotate(359deg); }
+}
+
+.jiggly:before {
+    -webkit-animation: jiggle 0.5s infinite;
+}
+@-moz-keyframes jiggle {
+    0% {
+        -moz-transform: rotate(-10deg);
+    }
+    50% {
+        -moz-transform: rotate(10deg);
+    }
+}
+
+@-webkit-keyframes jiggle {
+    0% {
+        -webkit-transform: rotate(-10deg);
+    }
+    50% {
+        -webkit-transform: rotate(10deg);
+    }
+}
