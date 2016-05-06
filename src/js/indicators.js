@@ -453,11 +453,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
 
    // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
    var currentLayers = map.getLayers().getArray();
-   console.log(currentLayers);
-   console.log(layers);
-   console.log("map.layers before remove");
-   console.log(map.getLayers().getArray().length);
-   console.log(map.getLayers().getArray());
    var oddFactor = 1 + currentLayers.length;
    if (currentLayers) {
       for (var i = 0; i < map.getLayers().getArray().length + oddFactor; i++) {
@@ -465,9 +460,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
          map.removeLayer(map.getLayers().getArray()[0]);
       }
    }
-   console.log("map.layers after remove");
-   console.log(map.getLayers().getArray().length);
-   console.log(map.getLayers().getArray());
    // stick the base layer back on
    var selectedBaseMap = $('#select-basemap').data().ddslick.selectedData.value;
    if (selectedBaseMap !== 'none') {
