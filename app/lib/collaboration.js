@@ -289,6 +289,16 @@ collaboration.init = function(io, app, config) {
          })
       });
 
+      socket.on('webrtc_event', function(data) {
+         console.log(data);
+         io.sockets.in(socket.room).emit(data.event, {
+            "presenter": user.email,
+            "provider": user.provider,
+            "socketId": socket.id,
+            "params" : data
+         })
+      });
+
       socket.on('room.diverge', function(id) {
          var roomId = socket.room;
          console.log(id + ' has diverged from room ' + roomId);
