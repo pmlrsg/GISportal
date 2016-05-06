@@ -924,6 +924,7 @@ gisportal.loadState = function(state){
    }
    if(gisportal.selectedLayers && gisportal.selectedLayers.length > 0){
       // Remove any layers already on the map (if they are going to be reloaded it's okay because ol3 (sort-of) caches them)
+      gisportal.removeLayersByProperty('type', 'OLLayer');
       for(id = gisportal.selectedLayers.length-1; id >= 0; id--){
          gisportal.indicatorsPanel.removeFromPanel(gisportal.selectedLayers[id]);
       }

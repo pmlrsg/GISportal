@@ -506,6 +506,8 @@ gisportal.layer = function( options ) {
 
          layer = new ol.layer.Tile({
             title: this.displayName(),
+            id: this.id,
+            type: 'OLLayer',
             source: new ol.source.TileWMS({
                url:  this.wmsURL,
                crossOrigin: null,
@@ -549,6 +551,7 @@ gisportal.layer = function( options ) {
     * */
    this.addOLLayer = function(layer, id) {      
       
+      gisportal.removeLayersByProperty('id', id);
       // Add the layer to the map
       map.addLayer(layer);
  
@@ -583,6 +586,22 @@ gisportal.layer = function( options ) {
    // Store new layer.
    //gisportal.layers[this.id] = this;
 };
+
+gisportal.removeLayersByProperty = function(property, value){
+  var array = map.getLayers().getArray();
+  var layers_list = [];
+  var layer;
+  for(layer in array){
+    var this_layer = array[layer];
+    var properties = this_layer.getProperties()
+    if(properties && properties[property] && properties[property] == value){
+      layers_list.push(this_layer);
+    }
+  }
+  for(layer in layers_list){
+    map.removeLayer(layers_list[layer]);
+  }
+}
 
 /**
  * Setups up the layer, calls addOLLayer and updates scalebar

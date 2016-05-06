@@ -465,9 +465,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    if (selectedBaseMap !== 'none') {
       map.addLayer(gisportal.baseLayers[selectedBaseMap]);   
    }
-   
-   console.log("current after delete");
-   console.log(currentLayers);
    // then the indicator layers;
    for (var l = layers.length - 1; l > -1; l--) {
       map.addLayer(gisportal.layers[layers[l]].openlayers.anID);
