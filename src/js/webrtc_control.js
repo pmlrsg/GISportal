@@ -2,7 +2,7 @@
 //    WebRTC functions
 // *****************************************************************************
 
-var webRTC = {}
+var webRTC = {};
 
 webRTC.isChannelReady = false;
 webRTC.isInitiator = false;
@@ -33,7 +33,7 @@ webRTC.initMedia = function() {
    
    $('.js-toggle-webcam').on('click', function() {
       var localStreams = webRTC.peerConn.getLocalStreams()[0];
-      var video = localStreams.getVideoTracks()[0]
+      var video = localStreams.getVideoTracks()[0];
       video.enabled = !video.enabled;
 
       $(this).toggleClass('active', video.enabled);
@@ -47,7 +47,7 @@ webRTC.initMedia = function() {
 
    $('.js-toggle-microphone').on('click', function() {
       var localStreams = webRTC.peerConn.getLocalStreams()[0];
-      var mic = localStreams.getAudioTracks()[0]
+      var mic = localStreams.getAudioTracks()[0];
       mic.enabled = !mic.enabled;
 
       $(this).toggleClass('active', mic.enabled);
@@ -64,22 +64,22 @@ webRTC.initMedia = function() {
    });
 
    $('.js-end-webrtc-call').on('click', function() { 
-      hangup() 
+      hangup();
    });
 
-}
+};
 
 webRTC.deinitMedia = function() {
    sendMessage('media.disabled');
    webRTC.isChannelReady = false;
-   webRTC.stop()
+   webRTC.stop();
 
-}
+};
 
 if (webrtcDetectedBrowser === 'firefox') {
-   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:23.21.150.121' }] } // number IP
+   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:23.21.150.121' }] }; // number IP
 } else {
-   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] }
+   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] };
 };
 
 webRTC.pc_constraints = {
@@ -102,12 +102,13 @@ var sdpConstraints = {
 
 webRTC.messageCallback = function(data) {
    var message = data.params.message;
+   var memberId;
    console.log('Received message:', message);
    
    // USER ENABLES THEIR AUDIO/VIDEO
    if (message === 'media.enabled') {
       // update the user who's media was enabled with an 'available status'
-      var memberId = data.socketId;
+      memberId = data.socketId;
       $('[data-id="' + memberId + '"] .js-webrtc-online').toggleClass('hidden', false);
 
       // then start?
@@ -118,7 +119,7 @@ webRTC.messageCallback = function(data) {
    // USER DISABLES THEIR AUDIO/VIDEO
    if (message === 'media.disabled') {
       // update the user who's media was disabled 
-      var memberId = data.socketId;
+      memberId = data.socketId;
       $('[data-id="' + memberId + '"] .js-webrtc-online').toggleClass('hidden', true);
       
    } 
@@ -159,7 +160,7 @@ function sendMessage(message){
    var params = {
       'event': 'webrtc_event',
       'message': message
-   }
+   };
    console.log('Sending message: ', message);
    collaboration._emit('webrtc_event', params, true);
    
@@ -199,7 +200,7 @@ function maybeStart() {
 
 window.onbeforeunload = function(e) {
    sendMessage('bye');
-}
+};
 
 /////////////////////////////////////////////////////////
 
@@ -258,7 +259,7 @@ function doCall() {
 function acceptIncomingCall(caller) {
    var data = {
       caller: 'caller'
-   }
+   };
    var rendered = gisportal.templates['webrtc-inbound-call'](data)
    gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
 
@@ -360,7 +361,7 @@ webRTC.stop = function() {
    webRTC.isStarted = false;
    webRTC.peerConn.close();
    webRTC.peerConn = null;
-}
+};
 
 ///////////////////////////////////////////
 
