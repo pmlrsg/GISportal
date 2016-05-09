@@ -122,6 +122,9 @@ collaboration.initSession = function() {
                panel.toggleClass('hidden', false);
                person.find('.person-message').remove();
                person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+               person.find('p.person-message').on('click', function(){
+                  $(this).remove();
+               });
                collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
             }
     });
@@ -1629,6 +1632,9 @@ collaboration.buildMembersList = function(data) {
                $(this).prepend(link);
             }
          }
+      }else{
+         link = $('<span class="icon-webcam js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
+         $(this).prepend(link);
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
          if(presenter != id && divergents.indexOf(id) == -1){

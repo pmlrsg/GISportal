@@ -80,7 +80,7 @@ if (webrtcDetectedBrowser === 'firefox') {
    webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:23.21.150.121' }] }; // number IP
 } else {
    webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] };
-};
+}
 
 webRTC.pc_constraints = {
    'optional': [{
@@ -260,7 +260,7 @@ function acceptIncomingCall(caller) {
    var data = {
       caller: 'caller'
    };
-   var rendered = gisportal.templates['webrtc-inbound-call'](data)
+   var rendered = gisportal.templates['webrtc-inbound-call'](data);
    gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
 
    $('.js-answer-webrtc-call').click(function() { 

@@ -710,6 +710,14 @@ gisportal.mapInit = function() {
  
    gisportal.loadLayers();
 
+   // Adds and removes the correct grabbing css for the pointer.
+   $('#map canvas').on('mousedown', function(){
+      $(this).toggleClass('grabbing', true).toggleClass('grab', false);
+   });
+   $('#map canvas').on('mouseup', function(){
+      $(this).toggleClass('grab', true).toggleClass('grabbing', false);
+   });
+
    // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
    

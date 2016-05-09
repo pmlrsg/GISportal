@@ -49,6 +49,16 @@ button, .btn{
    padding: 0;
 }
 
+.grab{
+   cursor: -webkit-grab;
+   cursor:-moz-grab;
+}
+
+.grabbing{
+   cursor: -webkit-grabbing;
+   cursor:-moz-grabbing;
+}
+
 .brand  {
   background-color: $button-primary;
   border-style: none;
