@@ -120,6 +120,7 @@ app.param('subfolder', function(req, res, next, subfolder){
 app.use('/:subfolder', routes);
 app.use('/:subfolder', site_settings);
 app.use('/:subfolder', plotting);
+app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 
 
 // Start listening...
