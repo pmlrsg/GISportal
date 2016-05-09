@@ -341,15 +341,18 @@
    </div>
 
    <div class="collaboration-video hidden">
-      <video id="localVideo" autoplay muted width="150"></video>
-      <video id="remoteVideo" autoplay></video>
+      <div class="local-video-div video-div">
+         <video id="localVideo" autoplay muted></video>
+      </div>
+      <div class="remote-video-div video-div hidden">
+         <video id="remoteVideo" autoplay></video>
+      </div>
 
       <div class="video-controls-holder">
          <div class="video-controls">
-            <span class="icon-webcam js-toggle-webcam active" title="Video on; click to turn off"></span>
-            <span class="icon-volume-medium-1 js-toggle-microphone active" title="Microphone on; click to mute"></span>
-            <span class="icon-scale-reduce-2 js-toggle-video-size" title="Small screen"></span>
-            <span class="icon-delete-2-1 js-end-webrtc-call" title="End call"></span>
+            <span class="icon-webcam js-toggle-webcam active btn" title="Disable Webcam"></span>
+            <span class="icon-volume-medium-1 js-toggle-microphone active btn" title="mute"></span>
+            <span class="icon-delete-2-1 js-end-webrtc-call btn" title="End call"></span>
          </div>
       </div>
    </div>

@@ -61,6 +61,8 @@ collaboration.initDOM = function() {
          .toggleClass('alert-warning', true)
          .html('You have been invited to join room '+ roomId.toUpperCase() +'; please login to enter the room');
    }
+   $('.collaboration-video').draggable({containment: "document"});
+   $('.video-div').resizable({aspectRatio: true, minWidth: 100, maxWidth: 600, handles:"se"});
 };
 
 
@@ -1633,7 +1635,7 @@ collaboration.buildMembersList = function(data) {
             }
          }
       }else{
-         link = $('<span class="icon-webcam js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
+         link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
          $(this).prepend(link);
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
@@ -1655,6 +1657,24 @@ collaboration.buildMembersList = function(data) {
          var id = $(this).data('id');
          collaboration._emit('room.make-presenter', id, force = true);
       });
+   });
+
+   // Enable/Disable webRTC media
+   $('.js-toggle-rtc').click(function() {
+      var enabled = webRTC.isChannelReady || false;
+      if (!enabled) {
+         webRTC.initMedia();
+         $(this).find('.btn-value').text('Disable Video/Audio');
+      } else {
+         webRTC.deinitMedia();
+         $('.js-webrtc-online').toggleClass('hidden', true);
+         $(this).find('.btn-value').text('Enable Video/Audio');
+      }
+   });
+
+   $('.js-webrtc-online').on('click', function() {
+      webRTC.isInitiator = true;
+      maybeStart();
    });
 };
 

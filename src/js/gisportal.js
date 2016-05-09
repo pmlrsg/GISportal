@@ -1671,6 +1671,14 @@ gisportal.showModalMessage = function(html, timeout) {
    }, t);
 };
 
+gisportal.hideModalMessage = function() {
+   var holder = $('.js-modal-message-popup');
+   var target = $('.js-modal-message-html');
+
+   target.html("");
+   holder.toggleClass('hidden', true);
+};
+
 // This function gets a list of all the available tags
 gisportal.loadBrowseCategories = function(data){
    // This takes a category (cat) in a versatile format e.g. indicator_type
