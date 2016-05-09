@@ -289,6 +289,38 @@ collaboration.init = function(io, app, config) {
          })
       });
 
+      var mediaChange = function(change){
+         var roomId = socket.room;
+         console.log(user.email + ' has diverged from room ' + roomId);
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var name;
+            var room = JSON.parse(obj);
+            var people = room.people;
+            for (var p in people) {
+               if (people[p].id == socket.id) {
+                  if(change == "disabled"){
+                     people[p].dataEnabled = false;
+                  }else if(change == "enabled"){
+                     people[p].dataEnabled = true;
+                  }
+                  name = people[p].name || people[p].email;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(socket.room).emit('members.update', {
+                     "roomId": socket.room,
+                     "people": people
+                  });
+               }
+            });
+         });
+      }
+
       socket.on('webrtc_event', function(data) {
          console.log(data);
          io.sockets.in(socket.room).emit(data.event, {
@@ -296,12 +328,15 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "socketId": socket.id,
             "params" : data
-         })
+         });
+         if(data.message == "media.disabaled" || data.message == "media.enabled"){
+            mediaChange(data.message.split('.')[1]);
+         }
       });
 
       socket.on('room.diverge', function(id) {
          var roomId = socket.room;
-         console.log(id + ' has diverged from room ' + roomId);
+         console.log(user.email + ' has diverged from room ' + roomId);
          
          client.get(roomId, function(err, obj) {
             if(!obj){
@@ -331,7 +366,7 @@ collaboration.init = function(io, app, config) {
 
       socket.on('room.merge', function(id) {
          var roomId = socket.room;
-         console.log(id + ' has merged back into room ' + roomId);
+         console.log(user.email + ' has merged back into room ' + roomId);
          
          client.get(roomId, function(err, obj) {
             if(!obj){

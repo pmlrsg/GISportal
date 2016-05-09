@@ -3,7 +3,7 @@
    <button class="js-leave-room brand secondary extra-small gray"><span class="icon-log-out-1"></span>Leave the room</button> 
    <button class="js-invite-people brand secondary extra-small gray"><span class="icon-user-add-1"></span>Invite People</button> 
    <button class="js-record-session brand secondary extra-small gray hidden"><span class="icon-record-2"></span>Record session</button>
-   <button class="js-toggle-rtc brand secondary extra-small gray"><span class="icon-webcam"></span><span class="btn-value">Enable Video/Audio</span></button>
+   <button class="js-toggle-rtc brand secondary extra-small gray"><span class="icon-webcam"></span><span class="btn-value">{{#if AVEnabled}}Disable{{else}}Enable{{/if}} Video/Audio</span></button>
    <label>
    	Show Collaboration Notifications
       <input type="checkbox" checked class="js-collab-notifications-toggle">

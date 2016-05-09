@@ -294,6 +294,10 @@ collaboration.initSession = function() {
             collaboration.buildMembersList(data);
          });
 
+         socket.on('members.update', function(data) {
+            collaboration.buildMembersList(data);
+         });
+
          socket.on('room.member-left', function(data) {
             collaboration.log(data.departed +' has left the room');
             collaboration.buildMembersList(data);
@@ -1545,6 +1549,9 @@ collaboration.buildMembersList = function(data) {
          person.name = person.email;
       }
    }
+   if(webRTC){
+      data.AVEnabled = webRTC.isChannelReady;
+   }
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
@@ -1617,9 +1624,19 @@ collaboration.buildMembersList = function(data) {
       }
    }
 
+   var people_list = data.people;
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
+      var this_person;
+      for(var person_data in people_list){
+         if(people_list[person_data].id == id){
+            this_person = people_list[person_data];
+         }
+         if(people_list[person_data].id == me){
+            my_data = people_list[person_data];
+         }
+      }
       var link;
       var title = "Make this person the presenter";
       if(me == id){
@@ -1634,9 +1651,11 @@ collaboration.buildMembersList = function(data) {
                $(this).prepend(link);
             }
          }
-      }else{
-         link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
-         $(this).prepend(link);
+      }else if(my_data && my_data.dataEnabled){
+         if(this_person && this_person.dataEnabled){
+            link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
+            $(this).prepend(link);
+         }
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
          if(presenter != id && divergents.indexOf(id) == -1){
