@@ -61,8 +61,9 @@ collaboration.initDOM = function() {
          .toggleClass('alert-warning', true)
          .html('You have been invited to join room '+ roomId.toUpperCase() +'; please login to enter the room');
    }
+   var maxWidth = parseInt($(document).width()*0.48);
    $('.collaboration-video').draggable({containment: "document"});
-   $('.video-div').resizable({aspectRatio: true, minWidth: 100, maxWidth: 600, handles:"se"});
+   $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 100, "maxWidth": maxWidth, handles:"se"});
 };
 
 

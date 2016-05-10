@@ -445,3 +445,21 @@ HashMap.prototype.any = function any(value) {
 gisportal.utils.titleCase = function(str){
    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
+
+$.fn.keepOnScreen = function(){
+   var element = this.get(0);
+   var bounds = element.getBoundingClientRect();
+   var exceeds = [];
+   if(bounds.left < 0){
+      element.style.left = 0 + "px"
+   }
+   if(bounds.top < 0){
+      element.style.top = 0 + "px"
+   }
+   if(bounds.bottom > window.innerHeight){
+      element.style.top = parseInt(window.innerHeight - bounds.height) + "px"
+   }
+   if(bounds.right > window.innerWidth){
+      element.style.left = parseInt(window.innerWidth - bounds.width) + "px"
+   }
+}

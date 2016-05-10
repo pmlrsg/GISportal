@@ -15,6 +15,7 @@ webRTC.initMedia = function() {
    //webRTC.isChannelReady = true;
 
    var startTime;
+   // Gets the two vieo elements
    webRTC.localVideo = document.getElementById('localVideo');
    webRTC.remoteVideo = document.getElementById('remoteVideo');
 
@@ -24,6 +25,7 @@ webRTC.initMedia = function() {
       }]
    };
 
+   // Gets the audio and video
    var constraints = {
       video: true,
       audio: true
@@ -261,7 +263,7 @@ function doCall() {
 
 function acceptIncomingCall(caller) {
    var data = {
-      caller: 'caller'
+      caller: caller
    };
    var rendered = gisportal.templates['webrtc-inbound-call'](data);
    gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
@@ -351,16 +353,14 @@ function hangup() {
 
 function handleRemoteHangup() {
    console.log('Session terminated.');
-
-   $('.collaboration-video').toggleClass('hidden', true);
    gisportal.showModalMessage('Call ended');
-
    webRTC.stop();
    webRTC.isInitiator = false;
 }
 
 webRTC.stop = function() {
    $('.collaboration-video').toggleClass('hidden', true);
+   $('.remote-video-div').toggleClass('hidden', true);
    
    webRTC.isStarted = false;
    webRTC.peerConn.close();
