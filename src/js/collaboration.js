@@ -64,6 +64,42 @@ collaboration.initDOM = function() {
    var maxWidth = parseInt($(document).width()*0.48);
    $('.collaboration-video').draggable({containment: "document"});
    $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 100, "maxWidth": maxWidth, handles:"se"});
+   $('#remoteVideo, #localVideo').on('dblclick', function(){
+      $(this).fullScreen();
+   });
+
+   var idleMouseTimer = {};
+   var forceControlsDivHide = {'remoteVideo':false, 'localVideo': false};
+   $(".display-div").off('mousemove click');
+   $(".display-div").on('mousemove click', function(ev) {
+      var id = $(this).find('video').attr('id');
+      var controls = $(this).find('.video-controls');
+      if(!forceControlsDivHide[id]) {
+         clearTimeout(idleMouseTimer[id]);
+         if(!controls.hasClass('fadeIn')){
+            controls.toggleClass('fadeIn', true).toggleClass('hidden', false).toggleClass('fadeOut', false);
+         }
+         idleMouseTimer[id] = setTimeout(function() {
+            if(!controls.hasClass('fadeOut')){
+               controls.toggleClass('fadeOut', true).toggleClass('fadeIn', false);
+            }
+
+            forceControlsDivHide[id] = true;
+            setTimeout(function() {
+               forceControlsDivHide[id] = false;
+            }, 200);
+         }, 1000);
+      }
+   });
+   collaboration.addVideoActionListeners();
+};
+
+
+collaboration.addVideoActionListeners = function(){
+   $('.js-video-fullscreen').on('click', function(){
+      var video = $(this).closest('.display-div').find('video');
+      video.fullScreen();
+   });
 };
 
 
@@ -130,7 +166,7 @@ collaboration.initSession = function() {
                });
                collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
             }
-    });
+         });
 
     		// -------------------------------------------------
     		// socket core event functions

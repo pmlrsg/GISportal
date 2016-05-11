@@ -60,12 +60,16 @@
    transform: rotateY(180deg);
 }
 
-.video-div{
+.display-div{
   overflow: hidden;
   float: left;
-  min-width: 100px;
-  max-width: 48vw;
   position: relative;
+  margin-bottom: 6px;
+}
+
+.video-div{
+  min-width: 130px;
+  max-width: 48vw;
 }
 
 .collaboration-video{
@@ -84,10 +88,27 @@
   z-index: 10140 !important;
   display: block;
   position: absolute;
-  bottom: 0;
+  bottom: 5px;
   right: 0;
 }
 
 .ui-icon-gripsmall-diagonal-se:hover{
     cursor: se-resize;
+}
+
+.video-controls{
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  text-align: center;
+}
+
+.video-controls:hover{
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+span.video-control {
+  font-size: 30px;
+  text-shadow: white 0px 0px 5px;
 }
