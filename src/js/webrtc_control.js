@@ -263,7 +263,7 @@ function doCall() {
 
 function acceptIncomingCall(caller) {
    var data = {
-      caller: caller
+      "caller": caller
    };
    var rendered = gisportal.templates['webrtc-inbound-call'](data);
    gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer

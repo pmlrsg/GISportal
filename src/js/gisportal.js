@@ -457,7 +457,8 @@ gisportal.mapInit = function() {
       target: 'map',
       controls: [
          new ol.control.FullScreen({
-            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body'),
+            source: document.documentElement
          }),
          new ol.control.Zoom({
             zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
@@ -1275,7 +1276,7 @@ gisportal.main = function() {
       gisportal.graphs.initDOM();           // graphing.js
       gisportal.analytics.initGA();         // analytics.js
       gisportal.panelSlideout.initDOM();    //panel-slideout.js
-      gisportal.user.initDOM();      // panels.js
+      gisportal.user.initDOM();
       
       //Set the global loading icon
       gisportal.loading.loadingElement= jQuery('.global-loading-icon');

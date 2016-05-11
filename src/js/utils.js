@@ -463,3 +463,16 @@ $.fn.keepOnScreen = function(){
       element.style.left = parseInt(window.innerWidth - bounds.width) + "px"
    }
 }
+
+$.fn.fullScreen = function(){
+   var elem = this.get(0);
+   if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+   } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+   } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+   } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+   }
+}
