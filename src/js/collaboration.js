@@ -100,6 +100,18 @@ collaboration.addVideoActionListeners = function(){
       var video = $(this).closest('.display-div').find('video');
       video.fullScreen();
    });
+   $('.js-video-mute-toggle').on('click', function(){
+      var video = $(this).closest('.display-div').find('video');
+      var muted = video.is('[muted]');
+      if(muted){
+         // Make sure this actually mutes and unmuted the videos
+         video[0].removeAttribute('muted');
+         $(this).toggleClass("icon-volume-medium-1", true).toggleClass("icon-volume-mute-1", false).attr('title', "Mute");
+      }else{
+         video[0].setAttribute('muted', true);
+         $(this).toggleClass("icon-volume-mute-1", true).toggleClass("icon-volume-medium-1", false).attr('title', "Un-mute");
+      }
+   });
 };
 
 

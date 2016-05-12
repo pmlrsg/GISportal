@@ -93,7 +93,7 @@
 </head>
 <body role="application">
 
-   <div class="collab-overlay rippler rippler-default hidden"></div>
+   <div class="collab-overlay hidden"></div>
 
    <div class="collaboration-status hidden"></div>
 
@@ -346,6 +346,7 @@
             <video id="localVideo" autoplay muted></video>
          </div>
          <div class="local-video-controls video-controls hidden">
+            <span class="icon-call-delete js-end-webrtc-call video-control btn red-btn" title="End Call"></span>
             <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen"></span>
          </div>
       </div>
@@ -354,6 +355,7 @@
             <video id="remoteVideo" autoplay></video>
          </div>
          <div class="remote-video-controls video-controls hidden">
+            <span class="icon-volume-medium-1 js-video-mute-toggle video-control btn" title="Mute"></span>
             <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen"></span>
          </div>
       </div>
@@ -361,8 +363,6 @@
       <div class="video-controls-holder">
          <div class="video-controls">
             <span class="icon-webcam js-toggle-webcam active btn" title="Disable Webcam"></span>
-            <span class="icon-volume-medium-1 js-toggle-microphone active btn" title="mute"></span>
-            <span class="icon-delete-2-1 js-end-webrtc-call btn" title="End call"></span>
          </div>
       </div>
    </div>

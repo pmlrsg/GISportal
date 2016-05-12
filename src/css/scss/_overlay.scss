@@ -77,11 +77,6 @@
   display: inline-block;
 }
 
-.video-controls-holder{
-  background-color: white;
-  clear:both;
-}
-
 .ui-resizable-handle {
   height: 10px;
   width: 10px;
@@ -103,9 +98,18 @@
   text-align: center;
 }
 
+.red-btn{
+  color: #800000;
+}
+
+#localVideo::-webkit-media-controls-volume-slider,
+#localVideo::-webkit-media-controls-mute-button {
+  display: none
+}
+
 .video-controls:hover{
   opacity: 1 !important;
-  animation: none !important;
+  animation: fadeIn !important;
 }
 
 span.video-control {
