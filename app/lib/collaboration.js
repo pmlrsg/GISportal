@@ -324,8 +324,8 @@ collaboration.init = function(io, app, config) {
       socket.on('webrtc_event', function(data) {
          console.log(data);
          io.sockets.in(socket.room).emit(data.event, {
-            "presenter": user.email,
-            "provider": user.provider,
+            "sender": user.email,
+            "sender_name": user.name || user.email,
             "socketId": socket.id,
             "params" : data
          });

@@ -102,7 +102,7 @@ webRTC.messageCallback = function(data) {
       }
       webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
       if (!webRTC.isInitiator) {
-         acceptIncomingCall(message.caller);
+         acceptIncomingCall(data.sender_name);
       }
    } 
 
