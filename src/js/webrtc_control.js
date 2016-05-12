@@ -159,7 +159,6 @@ function maybeStart() {
    if (!webRTC.isStarted && webRTC.localStream && webRTC.isChannelReady) {
       createPeerConnection();
       webRTC.peerConn.addStream(webRTC.localStream);
-      // webRTC.isStarted = true;
       if (webRTC.isInitiator) {
          webRTC.isStarted = true;
          doCall();
@@ -250,6 +249,7 @@ function acceptIncomingCall(caller) {
 function doAnswer() {
    console.log('Sending answer to peer.');
    webRTC.peerConn.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+   webRTC.isStarted = true;
 }
 
 function mergeConstraints(cons1, cons2) {

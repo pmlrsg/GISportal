@@ -73,7 +73,7 @@
   max-width: 48vw;
 }
 
-.collaboration-video{
+.main-collaboration-video{
   z-index: 10125;
   display: inline-block;
   pointer-events: none;
@@ -100,8 +100,12 @@
   text-align: center;
 }
 
-.red-btn{
+.off-btn{
   color: #800000;
+}
+
+.on-btn{
+  color: #16970D;
 }
 
 #localVideo::-webkit-media-controls-volume-slider,

@@ -43,8 +43,8 @@ $(document).ready(function()  {
          });
          $('.video-div').resizable( "option", "maxWidth", maxWidth);
       }
-      if(!$('.collaboration-video').hasClass('hidden')){
-         $('.collaboration-video').keepOnScreen();
+      if(!$('.main-collaboration-video').hasClass('hidden')){
+         $('.main-collaboration-video').keepOnScreen();
       }
    });
    $('.panel').on('change', '.js-tab-trigger', changeTab);
