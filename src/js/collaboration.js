@@ -63,7 +63,7 @@ collaboration.initDOM = function() {
    }
    var maxWidth = parseInt($(document).width()*0.48);
    $('.collaboration-video').draggable({containment: "document"});
-   $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 100, "maxWidth": maxWidth, handles:"se"});
+   $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 130, "maxWidth": maxWidth, handles:"se"});
    $('#remoteVideo, #localVideo').on('dblclick', function(){
       $(this).fullScreen();
    });
@@ -1691,6 +1691,9 @@ collaboration.buildMembersList = function(data) {
       if(me == id){
          // Different hover message for taking the presenter role yourself
          title = "Take the presenter role";
+
+         link = $('<span class="icon-camera-symbol-3 js-toggle-webcam btn pull-right" title="Disable Webcam"></span>');
+         $(this).prepend(link);
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
                link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
@@ -1743,6 +1746,38 @@ collaboration.buildMembersList = function(data) {
    $('.js-webrtc-online').on('click', function() {
       webRTC.isInitiator = true;
       maybeStart();
+   });
+
+   $('.js-toggle-webcam').off('click');
+   $('.js-toggle-webcam').on('click', function() {
+      var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var video = localStreams.getVideoTracks()[0];
+      video.enabled = !video.enabled;
+      
+      if (video.enabled) {
+         $(this).attr('title', 'Disable Webcam');
+      } else {
+         $(this).attr('title', 'Enable Webcam');
+      }
+   });
+
+   $('.js-toggle-microphone').off('click');
+   $('.js-toggle-microphone').on('click', function() {
+      var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var mic = localStreams.getAudioTracks()[0];
+      mic.enabled = !mic.enabled;
+
+      $(this).toggleClass('active', mic.enabled);
+      $(this).toggleClass('disabled', !mic.enabled);
+      if (mic.enabled) {
+         $(this).attr('title', 'mute');
+         $(this).toggleClass('icon-volume-medium-1', true);
+         $(this).toggleClass('icon-volume-mute-1', false);
+      } else {
+         $(this).attr('title', 'un-mute');
+         $(this).toggleClass('icon-volume-medium-1', false);
+         $(this).toggleClass('icon-volume-mute-1', true);
+      }
    });
 };
 

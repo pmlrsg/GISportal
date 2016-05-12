@@ -65,6 +65,7 @@
   float: left;
   position: relative;
   margin-bottom: 6px;
+  pointer-events: all;
 }
 
 .video-div{
@@ -75,6 +76,7 @@
 .collaboration-video{
   z-index: 10125;
   display: inline-block;
+  pointer-events: none;
 }
 
 .ui-resizable-handle {
