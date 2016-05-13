@@ -91,6 +91,26 @@ collaboration.initDOM = function() {
          }, 1000);
       }
    });
+   $(".collab-videos-minimize").off('click');
+   $(".collab-videos-minimize").on('click', function(ev) {
+      $('.main-collaboration-video').toggleClass('overlay-minimized', true)
+         .toggleClass('overlay-maximized', false)
+         .attr('title', "Click to Maximize")
+         .draggable('destroy');
+
+      // Makes sure it is not activated straight away.
+      setTimeout(function(){
+         $('.main-collaboration-video.overlay-minimized').off('click');
+         // Makes sure that it is only called once
+         $('.main-collaboration-video.overlay-minimized').one('click', function(){
+            $('.main-collaboration-video').toggleClass('overlay-minimized', false)
+               .toggleClass('overlay-maximized', true)
+               .attr('title', "")
+               .draggable({containment: "document"});
+         });
+      },200);
+
+   });
    collaboration.addVideoActionListeners();
 };
 
@@ -1704,7 +1724,7 @@ collaboration.buildMembersList = function(data) {
             mic = {};
          }
          var on_class = "off";
-         var title = "Un-mute";
+         title = "Un-mute";
          if(mic.enabled){
             on_class = "on";
             title = "Mute";

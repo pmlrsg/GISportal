@@ -106,6 +106,13 @@
   text-align: center;
 }
 
+.collab-videos-minimize{
+  position: absolute;
+  right: 0;
+  text-shadow: white 0px 0px 5px;
+  pointer-events: all;
+}
+
 .off-btn{
   color: #800000;
 }
@@ -127,4 +134,37 @@
 span.video-control {
   font-size: 30px;
   text-shadow: white 0px 0px 5px;
+}
+
+.overlay-minimized{
+  animation: minimize 0.5s 1 forwards;
+  top: 0 !important;
+  left: 0 !important;
+  cursor: pointer;
+}
+
+@keyframes minimize {
+  to {
+    -webkit-transform: scale3d(.05, .05, .05);
+    transform: scale3d(.05, .05, .05);
+    -webkit-transform-origin: 5% top;
+    transform-origin: 5% top;
+  }
+}
+
+.overlay-maximized{
+  animation: maximize 0.5s 1 forwards;
+  -webkit-transform: scale3d(.05, .05, .05);
+  transform: scale3d(.05, .05, .05);
+  -webkit-transform-origin: 5% top;
+  transform-origin: 5% top;
+}
+
+@keyframes maximize {
+  to {
+    -webkit-transform: none;
+    transform: none;
+    -webkit-transform-origin: none;
+    transform-origin: none;
+  }
 }

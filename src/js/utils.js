@@ -451,18 +451,18 @@ $.fn.keepOnScreen = function(){
    var bounds = element.getBoundingClientRect();
    var exceeds = [];
    if(bounds.left < 0){
-      element.style.left = 0 + "px"
+      element.style.left = 0 + "px";
    }
    if(bounds.top < 0){
-      element.style.top = 0 + "px"
+      element.style.top = 0 + "px";
    }
    if(bounds.bottom > window.innerHeight){
-      element.style.top = parseInt(window.innerHeight - bounds.height) + "px"
+      element.style.top = parseInt(window.innerHeight - bounds.height) + "px";
    }
    if(bounds.right > window.innerWidth){
-      element.style.left = parseInt(window.innerWidth - bounds.width) + "px"
+      element.style.left = parseInt(window.innerWidth - bounds.width) + "px";
    }
-}
+};
 
 $.fn.fullScreen = function(){
    var elem = this.get(0);
@@ -475,4 +475,4 @@ $.fn.fullScreen = function(){
    } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
    }
-}
+};
