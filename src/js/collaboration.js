@@ -1797,32 +1797,32 @@ collaboration.buildMembersList = function(data) {
    $('.js-toggle-webcam').off('click');
    $('.js-toggle-webcam').on('click', function() {
       var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var button = $('.js-toggle-webcam');
       var video = localStreams.getVideoTracks()[0];
       video.enabled = !video.enabled;
       
       if (video.enabled) {
-         $(this).attr('title', 'Disable Webcam');
-         $(this).toggleClass('off-btn', false).toggleClass('on-btn', true);
+         button.attr('title', 'Disable Webcam');
+         button.toggleClass('off-btn', false).toggleClass('on-btn', true);
       } else {
-         $(this).attr('title', 'Enable Webcam');
-         $(this).toggleClass('off-btn', true).toggleClass('on-btn', false);
+         button.attr('title', 'Enable Webcam');
+         button.toggleClass('off-btn', true).toggleClass('on-btn', false);
       }
    });
 
    $('.js-toggle-microphone').off('click');
    $('.js-toggle-microphone').on('click', function() {
       var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var button = $('.js-toggle-microphone');
       var mic = localStreams.getAudioTracks()[0];
       mic.enabled = !mic.enabled;
 
-      $(this).toggleClass('active', mic.enabled);
-      $(this).toggleClass('disabled', !mic.enabled);
       if (mic.enabled) {
-         $(this).attr('title', 'Mute');
-         $(this).toggleClass('off-btn', false).toggleClass('on-btn', true);
+         button.attr('title', 'Mute');
+         button.toggleClass('off-btn', false).toggleClass('on-btn', true);
       } else {
-         $(this).attr('title', 'Un-mute');
-         $(this).toggleClass('off-btn', true).toggleClass('on-btn', false);
+         button.attr('title', 'Un-mute');
+         button.toggleClass('off-btn', true).toggleClass('on-btn', false);
       }
    });
 };
