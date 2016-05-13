@@ -65,7 +65,11 @@ collaboration.initDOM = function() {
    $('.main-collaboration-video').draggable({containment: "document"});
    $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 130, "maxWidth": maxWidth, handles:"se"});
    $('#remoteVideo, #localVideo').on('dblclick', function(){
-      $(this).fullScreen();
+      if($(this).attr('fullscreen') == "false"){
+         $(this).fullScreen();
+      }else{
+         $(this).exitFullScreen();
+      }
    });
 
    var idleMouseTimer = {};

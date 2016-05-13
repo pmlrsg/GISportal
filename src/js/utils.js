@@ -465,6 +465,7 @@ $.fn.keepOnScreen = function(){
 };
 
 $.fn.fullScreen = function(){
+   this.attr('fullscreen', true);
    var elem = this.get(0);
    if (elem.requestFullscreen) {
       elem.requestFullscreen();
@@ -474,5 +475,19 @@ $.fn.fullScreen = function(){
       elem.mozRequestFullScreen();
    } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
+   }
+};
+
+$.fn.exitFullScreen = function(){
+   this.attr('fullscreen', false);
+   var elem = this.get(0);
+   if (elem.exitFullscreen) {
+      elem.exitFullscreen();
+   } else if (elem.msExitFullscreen) {
+      elem.msExitFullscreen();
+   } else if (elem.mozCancelFullScreen) {
+      elem.mozCancelFullScreen();
+   } else if (elem.webkitExitFullscreen) {
+      elem.webkitExitFullscreen();
    }
 };
