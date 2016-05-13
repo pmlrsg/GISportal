@@ -83,6 +83,8 @@
   z-index: 10125;
   display: inline-block;
   pointer-events: none;
+  width: auto !important;
+  height: auto !important;
 }
 
 .ui-resizable-handle {

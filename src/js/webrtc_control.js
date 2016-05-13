@@ -223,7 +223,7 @@ function doCall() {
    constraints = mergeConstraints(constraints, sdpConstraints);
    console.log('Sending offer to peer, with constraints: \n' +
       '  \'' + JSON.stringify(constraints) + '\'.');
-   webRTC.peerConn.createOffer(setLocalAndSendMessage, null, constraints);
+   webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, constraints);
 }
 
 function acceptIncomingCall(caller) {
@@ -248,7 +248,7 @@ function acceptIncomingCall(caller) {
 }
 function doAnswer() {
    console.log('Sending answer to peer.');
-   webRTC.peerConn.createAnswer(setLocalAndSendMessage, null, sdpConstraints);
+   webRTC.peerConn.createAnswer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
    webRTC.isStarted = true;
 }
 
@@ -266,6 +266,12 @@ function setLocalAndSendMessage(sessionDescription) {
    sessionDescription.sdp = preferOpus(sessionDescription.sdp);
    webRTC.peerConn.setLocalDescription(sessionDescription);
    sendMessage(sessionDescription);
+}
+
+function handlePeerConnError(err) {
+   var msg = "Problem with the peer connection";
+
+   console.log(msg + " : " + err);
 }
 
 function requestTurn(turn_url) {
@@ -329,8 +335,10 @@ webRTC.stop = function() {
    $('.remote-video-div').toggleClass('hidden', true);
    
    webRTC.isStarted = false;
-   webRTC.peerConn.close();
-   webRTC.peerConn = null;
+   if(webRTC.peerConn){
+      webRTC.peerConn.close();
+      webRTC.peerConn = null;
+   }
 };
 
 ///////////////////////////////////////////
