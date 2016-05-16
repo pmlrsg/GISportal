@@ -1,5 +1,5 @@
 <p>Incoming call{{#if caller}} from {{caller}}{{/if}}</p>
 <div class="accpet-reject-buttons">
-<button class="button js-answer-webrtc-call brand secondary"><span class="icon-call-3"></span>Answer</button>
-<button class="button js-reject-webrtc-call brand secondary"><span class="icon-hang-up"></span>Reject</button>
+<button class="button js-answer-webrtc-call brand secondary answer-call"><span class="icon-call-3"></span>Answer</button>
+<button class="button js-reject-webrtc-call brand secondary reject-call"><span class="icon-hang-up"></span>Reject</button>
 </p>
