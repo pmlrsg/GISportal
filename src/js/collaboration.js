@@ -105,7 +105,6 @@ collaboration.initDOM = function() {
    $(".collab-videos-minimize").on('click', function(ev) {
       $('.main-collaboration-video').toggleClass('overlay-minimized', true)
          .toggleClass('overlay-maximized', false)
-         .toggleClass('display-inline', false)
          .attr('title', "Click to Maximize")
          .draggable('destroy');
 
@@ -119,7 +118,7 @@ collaboration.initDOM = function() {
                .attr('title', "")
                .draggable({containment: "document"});
             setTimeout(function(){
-               $('.main-collaboration-video').toggleClass('display-inline', true);
+               $('.main-collaboration-video').toggleClass('overlay-maximized', false);
             }, 500)
          });
       },200);
