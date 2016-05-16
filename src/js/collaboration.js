@@ -72,6 +72,12 @@ collaboration.initDOM = function() {
       }
    });
 
+   // Makes sure that the fullscreen attribute is changed when videos are changed to and from full screen
+   $("video").bind('webkitfullscreenchange mozfullscreenchange msfullscreenchange fullscreenchange', function(e) {
+      var state = document.fullScreen || document.mozFullScreen || document.msFullScreen || document.webkitIsFullScreen;
+      $(this).attr('fullscreen', state);
+   });
+
    var idleMouseTimer = {};
    var forceControlsDivHide = {'remoteVideo':false, 'localVideo': false};
    $(".display-div").off('mousemove click');
@@ -99,6 +105,7 @@ collaboration.initDOM = function() {
    $(".collab-videos-minimize").on('click', function(ev) {
       $('.main-collaboration-video').toggleClass('overlay-minimized', true)
          .toggleClass('overlay-maximized', false)
+         .toggleClass('display-inline', false)
          .attr('title', "Click to Maximize")
          .draggable('destroy');
 
@@ -111,13 +118,15 @@ collaboration.initDOM = function() {
                .toggleClass('overlay-maximized', true)
                .attr('title', "")
                .draggable({containment: "document"});
+            setTimeout(function(){
+               $('.main-collaboration-video').toggleClass('display-inline', true);
+            }, 500)
          });
       },200);
 
    });
    collaboration.addVideoActionListeners();
 };
-
 
 collaboration.addVideoActionListeners = function(){
    $('.js-video-fullscreen').on('click', function(){

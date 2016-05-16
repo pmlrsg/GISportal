@@ -480,14 +480,13 @@ $.fn.fullScreen = function(){
 
 $.fn.exitFullScreen = function(){
    this.attr('fullscreen', false);
-   var elem = this.get(0);
-   if (elem.exitFullscreen) {
-      elem.exitFullscreen();
-   } else if (elem.msExitFullscreen) {
-      elem.msExitFullscreen();
-   } else if (elem.mozCancelFullScreen) {
-      elem.mozCancelFullScreen();
-   } else if (elem.webkitExitFullscreen) {
-      elem.webkitExitFullscreen();
+   if (document.exitFullscreen) {
+      document.exitFullscreen();
+   } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+   } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+   } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
    }
 };

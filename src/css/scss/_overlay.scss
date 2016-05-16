@@ -81,7 +81,7 @@
 
 .main-collaboration-video{
   z-index: 10125;
-  display: inline-block;
+  display: inline;
   pointer-events: none;
   width: auto !important;
   height: auto !important;
@@ -143,6 +143,7 @@ span.video-control {
   top: 0 !important;
   left: 0 !important;
   cursor: pointer;
+  display: inline-block;
 }
 
 @keyframes minimize {
@@ -160,6 +161,7 @@ span.video-control {
   transform: scale3d(.05, .05, .05);
   -webkit-transform-origin: 5% top;
   transform-origin: 5% top;
+  display: inline-block;
 }
 
 @keyframes maximize {
@@ -168,5 +170,10 @@ span.video-control {
     transform: none;
     -webkit-transform-origin: none;
     transform-origin: none;
+    display: inline;
   }
+}
+
+.display-inline{
+  display: inline !important;
 }
