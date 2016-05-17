@@ -991,6 +991,8 @@ gisportal.loadState = function(state){
       }
    });
    
+   //Makes sure that the vectorLayer is cleared to avoid duplication
+   gisportal.vectorLayer.getSource().clear();
    // Create the feature if there is one
    if (stateMap.feature) {    // Array.<ol.Feature>
       var geoJsonFormat = new ol.format.GeoJSON();
