@@ -121,6 +121,7 @@ app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 app.use('/:subfolder', routes);
 app.use('/:subfolder', site_settings);
 app.use('/:subfolder', plotting);
+app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 
 
 // Start listening...
