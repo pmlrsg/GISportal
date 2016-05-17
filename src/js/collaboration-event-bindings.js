@@ -2,6 +2,22 @@
 //  Portal EventManager event bindings
 //--------------------------------------------------------------------------------------
 
+gisportal.events.bind("room.member-merged", function(event, email) {
+   var params = {
+      "event" : "room.member-merged",
+      "email" : email
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
+gisportal.events.bind("room.member-diverged", function(event, email) {
+   var params = {
+      "event" : "room.member-diverged",
+      "email" : email
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
 gisportal.events.bind("date.selected", function(event, date) {
    var params = {
       "event" : "date.selected",
@@ -41,6 +57,22 @@ gisportal.events.bind("ddslick.selectValue", function(event, obj, value, doCallb
       "obj" : obj.attr('id'),
       "value": value,
       "doCallback": doCallback
+   };
+   collaboration._emit('c_event', params);
+});
+
+// hide the panel
+gisportal.events.bind("panel.hide", function(event) {
+   var params = {
+      "event" : "panel.hide"
+   };
+   collaboration._emit('c_event', params);
+});
+
+// show the panel
+gisportal.events.bind("panel.show", function(event) {
+   var params = {
+      "event" : "panel.show"
    };
    collaboration._emit('c_event', params);
 });
@@ -275,6 +307,16 @@ gisportal.events.bind("tab.select", function(event, layerId, tabName) {
    collaboration._emit('c_event', params);
 });
 
+// Layer tab closed
+gisportal.events.bind("layerTab.close", function(event, layerId, tabName) {
+   var params = {
+      "event" : "layerTab.close",
+      "layerId": layerId,
+      "tabName": tabName
+   };
+   collaboration._emit('c_event', params);
+});
+
 
 // jQuery events 
 
@@ -323,6 +365,15 @@ gisportal.events.bind('refinePanel.scroll', function(event, scrollPercent) {
    var params = {
       "event": "refinePanel.scroll",
       "scrollPercent": scrollPercent
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayerServer.clicked', function(event, layer, server) {
+   var params = {
+      "event": "addLayerServer.clicked",
+      "layer": layer,
+      "server": server
    };
    collaboration._emit('c_event', params);
 });

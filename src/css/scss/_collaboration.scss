@@ -7,6 +7,36 @@
    margin-top: 20px;
 }
 
+.collaboration-panel{
+    top: 200px;
+    right: 0px;
+    max-height: calc(100% - 217px);
+    width: 300px;
+    position: absolute;
+    background-color: #fafafb;
+    box-shadow: 0px 0px 11px -2px black;
+    padding: 8px;
+    z-index:10150;
+    overflow: auto;
+}
+
+.collaboration-pulltab{
+    top: 210px;
+    position: absolute;
+    right: 0px;
+    padding: 8px;
+    transform-origin: top right;
+    background-color: #fafafb;
+    cursor: pointer;
+    text-align: center;
+    border: 1px solid;
+    border-right: none;
+    z-index:10160;
+}
+.collaboration-pulltab.open{
+    right: 300px;
+}
+
 .collaboration-status {
    top: 70px;
    right: 25px;
@@ -34,6 +64,10 @@
 
 .js-collaboration-status-icon.error {
    background: radial-gradient(circle at 3px 3px,#FC3535, #420000);
+}
+
+.js-collaboration-status-icon.warning {
+   background: radial-gradient(circle at 3px 3px,#dd9205, #583a02);
 }
 
 #roomId, .roomId {
@@ -68,20 +102,16 @@
    border-radius: 50%;
    background: radial-gradient(circle at 3px 3px, #5cabff, #000);
 }
-
-.js-make-presenter {
+.diverged {
    position:absolute;
    top: 12px;
    left: 10px;
    width: 10px;
    height: 10px;
    border-radius: 50%;
-   background: #bbb;
+   background: radial-gradient(circle at 3px 3px, #ff5e5c, #000);
 }
 
-.js-make-presenter:hover {
-   background: radial-gradient(circle at 3px 3px, #FF916F, #7C1700);
-}
 .highlight-click {
     animation: glow 0.5s 2 alternate;
 }
@@ -109,6 +139,10 @@
     animation: shake 0.75s;
 }
 
+.pulse-attention {
+    animation: pulse 0.5s 4;
+}
+
 @keyframes shake {
   from, to {
     -webkit-transform: translate3d(0, 0, 0);
@@ -123,6 +157,23 @@
   40%, 80% {
     -webkit-transform: translate3d(10px, 0, 0);
     transform: translate3d(10px, 0, 0);
+  }
+}
+
+@keyframes pulse {
+  from {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+
+  50% {
+    -webkit-transform: scale3d(2, 2, 2);
+    transform: scale3d(2, 2, 2);
+  }
+
+  to {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
   }
 }
 
@@ -167,4 +218,8 @@ div.panel-container[data-panel-name="collaboration"] .alert-warning,
 div.panel-container[data-panel-name="collaboration"] .alert-success{
   margin: 10px -8px;
   padding: 10px;
+}
+
+.person-message{
+  color:#FB0401;
 }

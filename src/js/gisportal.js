@@ -922,6 +922,13 @@ gisportal.loadState = function(state){
    if (available_keys.length > 0)  {
       gisportal.indicatorsPanel.open();
    }
+   if(gisportal.selectedLayers && gisportal.selectedLayers.length > 0){
+      // Remove any layers already on the map (if they are going to be reloaded it's okay because ol3 (sort-of) caches them)
+      gisportal.removeLayersByProperty('type', 'OLLayer');
+      for(id = gisportal.selectedLayers.length-1; id >= 0; id--){
+         gisportal.indicatorsPanel.removeFromPanel(gisportal.selectedLayers[id]);
+      }
+   }
    for (var i = 0, len = available_keys.length; i < len; i++) {
       var indicator = null;
       if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
@@ -973,7 +980,8 @@ gisportal.loadState = function(state){
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
       var index = gisportal.state_indicators_list.indexOf(id);
       if(index > -1){
-         state.selectedIndicators.pop(index);
+         // splice used because pop was not removing the correct value.
+         state.selectedIndicators.splice(index, 1);
       }
       if(state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
@@ -1068,11 +1076,18 @@ gisportal.loadLayerState = function(){
             var openTab = layer_state.openTab;
             var tabName = openTab.split(id + "-")[1];
             gisportal.indicatorsPanel.selectTab(id, tabName);
+         }else{
+            var tab_elem = $('[for="tab-'+ layer_state.id + '-details"]');
+            var button_elem = $('#'+$(tab_elem).attr('for'));
+            button_elem.removeAttr('checked');
+            tab_elem.removeClass('active');
          }
 
          //This sets the visibility of the layer to the same as what the user had before
          if(layer_state.isVisible === false){
             gisportal.indicatorsPanel.hideLayer(id);
+         }else{
+            gisportal.indicatorsPanel.showLayer(id);
          }
 
          // This sets the layer style to the same as what the user had before
@@ -1262,6 +1277,7 @@ gisportal.main = function() {
       function showPanel()  {
          $('.js-show-tools').toggleClass('hidden', true);
          $('.panel.active').toggleClass('hidden', false);
+         gisportal.events.trigger('panel.show');
       }
 
       $('.js-hide-panel').on('click', hidePanel);
@@ -1269,6 +1285,7 @@ gisportal.main = function() {
       function hidePanel()  {
          $('.panel.active').toggleClass('hidden', true);
          $('.js-show-tools').toggleClass('hidden', false);
+         gisportal.events.trigger('panel.hide');
       }
 
       // Start setting up anything that is not layer dependent

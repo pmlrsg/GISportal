@@ -124,6 +124,7 @@ gisportal.refinePanel.refreshData = function(data) {
    // and if there's only 1 then we have our winner - load it up baby
    if (refinedIndicators.length == 1) {
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
+      gisportal.refinePanel.currentData = null;
       return;
    } else {
       // more refinement is required. Show the user what they have selected so far
