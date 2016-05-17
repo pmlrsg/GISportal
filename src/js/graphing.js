@@ -126,10 +126,13 @@ gisportal.graphs.editPlot = function( plot ){
 gisportal.graphs.popup = {};
 gisportal.graphs.popup.addActionListeners = function(){
    $('span.js-plot-popup-close').on('click', function(){
-      if(collaboration.role == "presenter" || collaboration.diverged || collaboration.forcePopupClose){
+      if(collaboration.role != "member" || collaboration.diverged || collaboration.forcePopupClose){
          $('div.js-plot-popup').toggleClass('hidden', true);
          gisportal.events.trigger('graphPopup.close');
          collaboration.forcePopupClose = false;
+         gisportal.graphs.popup.openHash = null;
+      }else{
+         collaboration.divergeAlert();
       }
    });
 };
@@ -151,6 +154,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
       }
    });
    $('.js-plot-popup').toggleClass("hidden", false);
+   gisportal.graphs.popup.openHash = hash;
    gisportal.graphs.popup.addActionListeners();
 };
 

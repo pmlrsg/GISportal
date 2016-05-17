@@ -115,14 +115,7 @@ collaboration.initSession = function() {
                }, 1000);
             }
             if(ev.type == "click"){
-               var pulltab = $('.collaboration-pulltab');
-               var panel = $('.collaboration-panel');
-               var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
-               pulltab.toggleClass('open', true);
-               panel.toggleClass('hidden', false);
-               person.find('.person-message').remove();
-               person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
-               collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
+               collaboration.divergeAlert();
             }
     });
 
@@ -150,6 +143,8 @@ collaboration.initSession = function() {
 
 		  	socket.on('disconnect', function (reason){
 		  		collaboration.active = false;
+            collaboration.role = "";
+            collaboration.diverged = false;
 		   	collaboration.setStatus('warning', 'Unexpectedly disconnected, trying to reconnect...');
 		  	});
 
@@ -1648,6 +1643,17 @@ collaboration.buildMembersList = function(data) {
       collaboration._emit('room.make-presenter', id, force = true);
    });
 };
+
+collaboration.divergeAlert = function(){
+   var pulltab = $('.collaboration-pulltab');
+   var panel = $('.collaboration-panel');
+   var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
+   pulltab.toggleClass('open', true);
+   panel.toggleClass('hidden', false);
+   person.find('.person-message').remove();
+   person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+   collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
+}
 
 collaboration.setUserSavedState = function() {
 	var params = gisportal.saveState();
