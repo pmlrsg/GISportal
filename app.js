@@ -111,12 +111,13 @@ app.param('subfolder', function(req, res, next, subfolder){
       if(utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))){
          next();
       }else{
-         res.status(404).send('Sorry, This portal doesn\'t exist');
+         res.status(404).send('Sorry, This portal doesn\'t exist, try running the install script');
       }
    }else{
       res.send();
    }
 })
+app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 app.use('/:subfolder', routes);
 app.use('/:subfolder', site_settings);
 app.use('/:subfolder', plotting);
