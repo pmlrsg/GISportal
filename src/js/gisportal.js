@@ -1107,6 +1107,8 @@ gisportal.loadLayerState = function(){
 
 gisportal.loadGraphsState = function(graphState){
    var plot;
+   var graph;
+   var current_graphs = [];
    if(graphState.state_plot){
       var time;
       var state_plot = graphState.state_plot;
@@ -1122,6 +1124,12 @@ gisportal.loadGraphsState = function(graphState){
       gisportal.graphs.editPlot(plot);
       if(!state_plot.show_all){
          gisportal.panelSlideout.peakSlideout( 'active-plot' );
+      }
+   }
+   if(gisportal.graphs && gisportal.graphs.storedGraphs){
+      var store = gisportal.graphs.storedGraphs;
+      for(graph in store){
+         current_graphs.push(store[graph].id);
       }
    }
    if(graphState.storedGraphs && graphState.storedGraphs.length > 0){
@@ -1146,9 +1154,11 @@ gisportal.loadGraphsState = function(graphState){
             }
          });
       };
-      for(var graph in graphState.storedGraphs){
+      for(graph in graphState.storedGraphs){
          plot = graphState.storedGraphs[graph];
-         getStatus(plot, graph);
+         if(current_graphs.indexOf(plot.id) < 0){
+            getStatus(plot, graph);
+         }
       }
    }
 };

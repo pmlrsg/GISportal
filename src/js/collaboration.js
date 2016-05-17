@@ -1631,19 +1631,21 @@ collaboration.buildMembersList = function(data) {
             $(this).prepend(link);
          }
       }
+   });
+   $('.js-collab-diverge').off('click');
+   $('.js-collab-diverge').on('click', function(){
+      collaboration._emit('room.diverge', socket.io.engine.id, force=true);
+   });
 
-      $('.js-collab-diverge').on('click', function(){
-         collaboration._emit('room.diverge', socket.io.engine.id, force=true);
-      });
+   $('.js-collab-merge').off('click');
+   $('.js-collab-merge').on('click', function(){
+      collaboration._emit('room.merge', socket.io.engine.id, force=true);
+   });
 
-      $('.js-collab-merge').on('click', function(){
-         collaboration._emit('room.merge', socket.io.engine.id, force=true);
-      });
-
-      $('.js-make-presenter').click(function() {
-         var id = $(this).data('id');
-         collaboration._emit('room.make-presenter', id, force = true);
-      });
+   $('.js-make-presenter').off('click');
+   $('.js-make-presenter').click(function() {
+      var id = $(this).data('id');
+      collaboration._emit('room.make-presenter', id, force = true);
    });
 };
 
