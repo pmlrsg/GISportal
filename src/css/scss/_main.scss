@@ -31,6 +31,11 @@ button, .btn{
   cursor: pointer;
 }
 
+.collab-btn{
+  cursor: pointer;
+  padding-left: 5px;
+}
+
 #map  {
    background: #1a1a1a;
    z-index: -1;
@@ -212,6 +217,9 @@ input[type="text"] , textarea  {
 .align-center{
   text-align: center;
 }
+button.top-space {
+  margin-top: 5px;
+}
 .clearfix:after {
   visibility: hidden;
   display: block;
@@ -225,7 +233,7 @@ input[type="text"] , textarea  {
 
 .dev-warning { position: fixed; top: 0; width: 100%; background: $dev-warning; text-align: center; color: #fff; font-weight: bold; }
 
-.view-title { position: fixed; top: 0; width: 100%; background: $panel-content-header; text-align: center; color: #fff; font-weight: bold; }
+.view-title{ position: fixed; top: 0; width: 100%; background: $panel-content-header; text-align: center; color: #fff; font-weight: bold; }
 
 .dark-background{
   background-color: rgba(0,0,0,0.8);

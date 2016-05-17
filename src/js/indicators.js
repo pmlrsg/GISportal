@@ -438,6 +438,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
 
    //Add the edit/add layers listener to add the server to the form
    $('span.js-add-layer-server').on('click', function(){
+      gisportal.events.trigger('addLayerServer.clicked', $(this).data('layer'), $(this).data('server'));
       gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
    });
 };
@@ -452,11 +453,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
 
    // so, ol3 doesn't have a nice way to reorder layers; therefore, we take 'em all off and then add 'em back on
    var currentLayers = map.getLayers().getArray();
-   console.log(currentLayers);
-   console.log(layers);
-   console.log("map.layers before remove");
-   console.log(map.getLayers().getArray().length);
-   console.log(map.getLayers().getArray());
    var oddFactor = 1 + currentLayers.length;
    if (currentLayers) {
       for (var i = 0; i < map.getLayers().getArray().length + oddFactor; i++) {
@@ -464,17 +460,11 @@ gisportal.indicatorsPanel.reorderLayers = function() {
          map.removeLayer(map.getLayers().getArray()[0]);
       }
    }
-   console.log("map.layers after remove");
-   console.log(map.getLayers().getArray().length);
-   console.log(map.getLayers().getArray());
    // stick the base layer back on
    var selectedBaseMap = $('#select-basemap').data().ddslick.selectedData.value;
    if (selectedBaseMap !== 'none') {
       map.addLayer(gisportal.baseLayers[selectedBaseMap]);   
    }
-   
-   console.log("current after delete");
-   console.log(currentLayers);
    // then the indicator layers;
    for (var l = layers.length - 1; l > -1; l--) {
       map.addLayer(gisportal.layers[layers[l]].openlayers.anID);

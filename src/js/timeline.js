@@ -160,8 +160,10 @@ gisportal.TimeLine = function(id, options) {
 
    // Set up the SVG chart area within the specified div; handle mouse zooming with a callback.
    this.zoom = d3.behavior.zoom()
-                .x(this.xScale)
-              .on('zoom', function() { isDragging = true; self.redraw(); });
+               .x(this.xScale)
+               .on('zoom', function() {
+                  isDragging = true; self.redraw();
+               });
                  
 
    // Append the svg and add a class before attaching both events.
@@ -479,10 +481,15 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.redraw(); 
    this.updatePickerBounds();
 
-   // ensure that the timeline is visible and adjust the panel height accordingly
+   // ensure that the timeline is visible and adjust the panel heights accordingly
    $('.timeline-container').css('bottom','0px');
    var h = $('.timeline-container').height();
    $('.panel').css('bottom', h + 35 +'px');
+   var collab_panel = $('.collaboration-panel');
+   var collab_hidden = collab_panel.hasClass('hidden');
+   var top = collab_panel.toggleClass('hidden', false).position().top;
+   collab_panel.toggleClass('hidden', collab_hidden);
+   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
    
 };
 
@@ -548,6 +555,11 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
       h = 0;
    }
    $('.panel').css('bottom', h + 35 +'px');
+   var collab_panel = $('.collaboration-panel');
+   var collab_hidden = collab_panel.hasClass('hidden');
+   var top = collab_panel.toggleClass('hidden', false).position().top;
+   collab_panel.toggleClass('hidden', collab_hidden);
+   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
 };
 
 // Set the currently selected date and animated the transition

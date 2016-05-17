@@ -14,6 +14,7 @@ var coreFiles = [
     "src/js/refine.js",
     "src/js/indicators.js",
     "src/js/selectiontools.js",
+    "src/js/rippler.js",
     "src/js/notify.js",
     "src/js/notify_settings.js",
     "src/js/vector_styles.js",
