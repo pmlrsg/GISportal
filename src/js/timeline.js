@@ -67,7 +67,7 @@ gisportal.TimeLine = function(id, options) {
     $('.js-current-date').pikaday({
       format: "YYYY-MM-DD",
       onSelect: function(){
-         self.setDate( self.getDate() );
+         self.setDate( this.getDate() );
       }
     });
    
