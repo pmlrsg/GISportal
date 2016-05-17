@@ -1489,6 +1489,7 @@ collaboration.initSession = function() {
             }
             collaboration.log(data.presenter + ': Plot closed');
             if (collaboration.role == "member") {
+               collaboration.forcePopupClose = true;
                $('.js-plot-popup-close').trigger('click');
             }
          });

@@ -126,8 +126,11 @@ gisportal.graphs.editPlot = function( plot ){
 gisportal.graphs.popup = {};
 gisportal.graphs.popup.addActionListeners = function(){
    $('span.js-plot-popup-close').on('click', function(){
-      $('div.js-plot-popup').toggleClass('hidden', true);
-      gisportal.events.trigger('graphPopup.close');
+      if(collaboration.role == "presenter" || collaboration.diverged || collaboration.forcePopupClose){
+         $('div.js-plot-popup').toggleClass('hidden', true);
+         gisportal.events.trigger('graphPopup.close');
+         collaboration.forcePopupClose = false;
+      }
    });
 };
 
