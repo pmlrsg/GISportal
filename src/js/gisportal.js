@@ -830,6 +830,7 @@ gisportal.saveState = function(state) {
             'id': indicator.id,
             'selected': indicator.selected,
             'isVisible': indicator.isVisible,
+            'autoScale': indicator.autoScale,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
@@ -1062,8 +1063,15 @@ gisportal.loadState = function(state){
 
 gisportal.loadLayerState = function(){
    if(gisportal.loadLayersState){
-      var setScaleValues = function(id, min, max, log){
+      var setScaleValues = function(id, min, max, log, autoScale){
+         var auto = $('.js-auto[data-id="' + id + '"]')
          $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log);
+         auto.prop('checked', autoScale);
+         gisportal.layers[id].autoScale = autoScale;
+         if(autoScale){
+            auto.trigger('change');
+            return false;
+         }
          $('.js-scale-min[data-id="' + id + '"]').val(min);
          $('.js-scale-max[data-id="' + id + '"]').val(max).trigger('change');
       };
@@ -1074,6 +1082,7 @@ gisportal.loadLayerState = function(){
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
          var log = layer_state.log || false;
+         var autoScale = layer_state.autoScale || false;
          var opacity = layer_state.opacity || 1;
 
          // This opens the tab that the user had open
@@ -1099,7 +1108,7 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-layer-style').ddslick('select', {value: style});
 
          // Sets the min & max and log of the scalebar to the value that the user had previously set
-         setScaleValues(id, min, max, log);
+         setScaleValues(id, min, max, log, autoScale);
 
          // Sets the layers opacity to the value that the user had previously
          $('#tab-' + id + '-opacity').val(opacity*100);

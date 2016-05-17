@@ -1534,7 +1534,7 @@ collaboration.buildMembersList = function(data) {
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
 
-   $('.js-auto').prop('checked', collaboration.displayLog);
+   $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
