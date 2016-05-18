@@ -22,7 +22,7 @@ class TransectStats(object):
       times = time_var[:]
 
       if time_var.units:
-         times = [datetime.datetime.strptime(netCDF.num2date(x, time_var.units, calendar='standard').isoformat(), "%Y-%m-%dT%H:%M:%SZ") for x in times]
+         times = [datetime.datetime.strptime(netCDF.num2date(x, time_var.units, calendar='standard').isoformat(), "%Y-%m-%dT%H:%M:%S") for x in times]
       else:
          # the time variable doesn't have units; this can be caused by a thredds aggregation that uses dateFormatMark
          # to grab the date from the filename, in which case the date is an array of strings
