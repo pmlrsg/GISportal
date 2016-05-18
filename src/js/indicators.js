@@ -113,9 +113,11 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
       var layer = gisportal.layers[id];
-      layer.minScaleVal = null;
-      layer.maxScaleVal = null;
       layer.autoScale = $(this).prop('checked');
+      if(layer.autoScale){
+         layer.minScaleVal = null;
+         layer.maxScaleVal = null;
+      }
       gisportal.scalebars.autoScale(id);
       gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'));
    });
