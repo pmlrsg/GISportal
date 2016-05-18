@@ -88,14 +88,6 @@ collaboration.initSession = function() {
             }
          });
 
-         // Adds the ripple effect to the collab-div
-         $(".rippler").rippler({
-            effectClass: 'rippler-effect',
-            effectSize: 0,
-            addElement: 'div',
-            duration: 250
-         });
-
          var idleMouseTimer;
          var forceMouseHide = false;
          $(".collab-overlay").off('mousemove click');
@@ -115,14 +107,7 @@ collaboration.initSession = function() {
                }, 1000);
             }
             if(ev.type == "click"){
-               var pulltab = $('.collaboration-pulltab');
-               var panel = $('.collaboration-panel');
-               var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
-               pulltab.toggleClass('open', true);
-               panel.toggleClass('hidden', false);
-               person.find('.person-message').remove();
-               person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
-               collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
+               collaboration.divergeAlert();
             }
     });
 
@@ -150,6 +135,8 @@ collaboration.initSession = function() {
 
 		  	socket.on('disconnect', function (reason){
 		  		collaboration.active = false;
+            collaboration.role = "";
+            collaboration.diverged = false;
 		   	collaboration.setStatus('warning', 'Unexpectedly disconnected, trying to reconnect...');
 		  	});
 
@@ -1489,6 +1476,7 @@ collaboration.initSession = function() {
             }
             collaboration.log(data.presenter + ': Plot closed');
             if (collaboration.role == "member") {
+               collaboration.forcePopupClose = true;
                $('.js-plot-popup-close').trigger('click');
             }
          });
@@ -1538,7 +1526,7 @@ collaboration.buildMembersList = function(data) {
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
 
-   $('.js-auto').prop('checked', collaboration.displayLog);
+   $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
@@ -1606,6 +1594,9 @@ collaboration.buildMembersList = function(data) {
       }
    }
 
+   // Because there are two panels
+   var me_selectors = [];
+
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -1614,6 +1605,8 @@ collaboration.buildMembersList = function(data) {
       if(me == id){
          // Different hover message for taking the presenter role yourself
          title = "Take the presenter role";
+         me_selectors.push($(this));
+         $(this).find('p').html("You");
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
                link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
@@ -1630,20 +1623,42 @@ collaboration.buildMembersList = function(data) {
             $(this).prepend(link);
          }
       }
-
-      $('.js-collab-diverge').on('click', function(){
-         collaboration._emit('room.diverge', socket.io.engine.id, force=true);
-      });
-
-      $('.js-collab-merge').on('click', function(){
-         collaboration._emit('room.merge', socket.io.engine.id, force=true);
-      });
-
-      $('.js-make-presenter').click(function() {
-         var id = $(this).data('id');
-         collaboration._emit('room.make-presenter', id, force = true);
-      });
    });
+
+   if(me_selectors.length > 0){
+      // Makes sure that your person div(s) is at the top of the list
+      for(var i in me_selectors){
+         var parent_selector = me_selectors[i].parent();
+         me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+      }
+   }
+
+   $('.js-collab-diverge').off('click');
+   $('.js-collab-diverge').on('click', function(){
+      collaboration._emit('room.diverge', socket.io.engine.id, force=true);
+   });
+
+   $('.js-collab-merge').off('click');
+   $('.js-collab-merge').on('click', function(){
+      collaboration._emit('room.merge', socket.io.engine.id, force=true);
+   });
+
+   $('.js-make-presenter').off('click');
+   $('.js-make-presenter').click(function() {
+      var id = $(this).data('id');
+      collaboration._emit('room.make-presenter', id, force = true);
+   });
+};
+
+collaboration.divergeAlert = function(){
+   var pulltab = $('.collaboration-pulltab');
+   var panel = $('.collaboration-panel');
+   var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
+   pulltab.toggleClass('open', true);
+   panel.toggleClass('hidden', false);
+   person.find('.person-message').remove();
+   person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+   collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
 };
 
 collaboration.setUserSavedState = function() {
