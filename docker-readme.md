@@ -36,8 +36,20 @@
     docker run -d -p 6789:6789 -v /usr/share/GISportal:/app/GISportal/config -t pmlrsg/gisportal
     ```
 
+## Debugging GISportal
+
+To debug the node server inside the docker container run:
+
+```
+docker run -p 6789:6789 -p 8080:8080 -v /home/cpa/workspace/gisportal-docker-config-sub:/app/GISportal/config -it 30904 /app/GISportal/docker-debug.sh
+```
+
+Which starts the [node-inspector](https://github.com/node-inspector/node-inspector) for the
+GISportal. The debugging tools can be accessed under http://localhost:8080/?port=5858 .
+
+
 ## Running GISportal with nginx ##
-  
+
 You can run a standard installation of nginx and use the `proxy_pass` command to proxy requests to your GISportal container running on port 6789; see the main README.md for details. Alternatively, you can use an nginx docker container using the following commands:
 
 ```
