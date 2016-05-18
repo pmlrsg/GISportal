@@ -1594,6 +1594,9 @@ collaboration.buildMembersList = function(data) {
       }
    }
 
+   // Because there are two panels
+   var me_selectors = [];
+
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -1602,6 +1605,8 @@ collaboration.buildMembersList = function(data) {
       if(me == id){
          // Different hover message for taking the presenter role yourself
          title = "Take the presenter role";
+         me_selectors.push($(this));
+         $(this).find('p').html("You");
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
                link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
@@ -1619,6 +1624,15 @@ collaboration.buildMembersList = function(data) {
          }
       }
    });
+
+   if(me_selectors.length > 0){
+      // Makes sure that your person div(s) is at the top of the list
+      for(var i in me_selectors){
+         var parent_selector = me_selectors[i].parent();
+         me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+      }
+   }
+
    $('.js-collab-diverge').off('click');
    $('.js-collab-diverge').on('click', function(){
       collaboration._emit('room.diverge', socket.io.engine.id, force=true);
