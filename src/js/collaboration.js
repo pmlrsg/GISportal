@@ -88,14 +88,6 @@ collaboration.initSession = function() {
             }
          });
 
-         // Adds the ripple effect to the collab-div
-         $(".rippler").rippler({
-            effectClass: 'rippler-effect',
-            effectSize: 0,
-            addElement: 'div',
-            duration: 250
-         });
-
          var idleMouseTimer;
          var forceMouseHide = false;
          $(".collab-overlay").off('mousemove click');
@@ -1653,7 +1645,7 @@ collaboration.divergeAlert = function(){
    person.find('.person-message').remove();
    person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
    collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
-}
+};
 
 collaboration.setUserSavedState = function() {
 	var params = gisportal.saveState();

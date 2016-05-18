@@ -857,7 +857,8 @@ gisportal.saveState = function(state) {
    var geoJsonFormat = new ol.format.GeoJSON();
    var featureOptions = {
       'dataProjection': gisportal.projection,
-      'featureProjection': gisportal.projection
+      'featureProjection': gisportal.projection,
+      'decimals': 3
    };
    state.map.feature = geoJsonFormat.writeFeatures(features, featureOptions);   
    
@@ -1064,7 +1065,7 @@ gisportal.loadState = function(state){
 gisportal.loadLayerState = function(){
    if(gisportal.loadLayersState){
       var setScaleValues = function(id, min, max, log, autoScale){
-         var auto = $('.js-auto[data-id="' + id + '"]')
+         var auto = $('.js-auto[data-id="' + id + '"]');
          $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log);
          auto.prop('checked', autoScale);
          gisportal.layers[id].autoScale = autoScale;
