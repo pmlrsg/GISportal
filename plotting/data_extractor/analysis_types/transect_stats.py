@@ -20,7 +20,13 @@ class TransectStats(object):
 		data_var = np.array(netcdf_file.variables[self.variable])
 
 		times = time_var[:]
-		times = [datetime.datetime.strptime(netCDF.num2date(x, time_var.units, calendar='standard').isoformat(), "%Y-%m-%dT%H:%M:%S") for x in times]
+
+		if time_var.units:
+			times = [datetime.datetime.strptime(netCDF.num2date(x, time_var.units, calendar='standard').isoformat(), "%Y-%m-%dT%H:%M:%SZ") for x in times]
+      else:
+      	# the time variable doesn't have units; this can be caused by a thredds aggregation that uses dateFormatMark
+      	# to grab the date from the filename, in which case the date is an array of strings
+      	times = [datetime.datetime.strptime(x.tostring(), "%Y-%m-%dT%H:%M:%SZ") for x in times]
 
 		with open(self._csv, "rb") as csvfile:
 			csv_file = csvfile.read()
@@ -63,7 +69,11 @@ class TransectStats(object):
 
 			_ret = {}
 			_ret['track_date'] = track_date.isoformat()
-			_ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
+			if time_var.units:
+				_ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
+         else:
+         	_ret['data_date'] = time_var[time_index].tostring()
+			
 			_ret['track_lat'] = row['Latitude']
 			_ret['track_lon'] = row['Longitude']
 			_ret['data_value'] = float(data) if not np.isnan(data)  else "null"
