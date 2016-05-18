@@ -183,6 +183,10 @@ gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
    })
    // Copy a plot
    .on('click', '.js-graph-status-copy', function(){
+      if(collaboration.role == "presenter"){
+         $(this).notify("You cannot Copy/Edit when presenting because some members may not be able to follow.", {position: "right"});
+         return false;
+      }
       var hash = $(this).data("hash");
       gisportal.graphs.editPlot( plot.copy() );
       gisportal.events.trigger('graph.copy', hash);
