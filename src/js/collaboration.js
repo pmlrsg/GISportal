@@ -119,7 +119,7 @@ collaboration.initDOM = function() {
                .draggable({containment: "document"});
             setTimeout(function(){
                $('.main-collaboration-video').toggleClass('overlay-maximized', false);
-            }, 500)
+            }, 500);
          });
       },200);
 
@@ -171,14 +171,6 @@ collaboration.initSession = function() {
             }
          });
 
-         // Adds the ripple effect to the collab-div
-         $(".rippler").rippler({
-            effectClass: 'rippler-effect',
-            effectSize: 0,
-            addElement: 'div',
-            duration: 250
-         });
-
          var idleMouseTimer;
          var forceMouseHide = false;
          $(".collab-overlay").off('mousemove click');
@@ -198,17 +190,7 @@ collaboration.initSession = function() {
                }, 1000);
             }
             if(ev.type == "click"){
-               var pulltab = $('.collaboration-pulltab');
-               var panel = $('.collaboration-panel');
-               var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
-               pulltab.toggleClass('open', true);
-               panel.toggleClass('hidden', false);
-               person.find('.person-message').remove();
-               person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
-               person.find('p.person-message').on('click', function(){
-                  $(this).remove();
-               });
-               collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
+               collaboration.divergeAlert();
             }
          });
 
@@ -236,6 +218,8 @@ collaboration.initSession = function() {
 
 		  	socket.on('disconnect', function (reason){
 		  		collaboration.active = false;
+            collaboration.role = "";
+            collaboration.diverged = false;
 		   	collaboration.setStatus('warning', 'Unexpectedly disconnected, trying to reconnect...');
 		  	});
 
@@ -1579,6 +1563,7 @@ collaboration.initSession = function() {
             }
             collaboration.log(data.presenter + ': Plot closed');
             if (collaboration.role == "member") {
+               collaboration.forcePopupClose = true;
                $('.js-plot-popup-close').trigger('click');
             }
          });
@@ -1637,7 +1622,7 @@ collaboration.buildMembersList = function(data) {
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
 
-   $('.js-auto').prop('checked', collaboration.displayLog);
+   $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
@@ -1706,6 +1691,10 @@ collaboration.buildMembersList = function(data) {
    }
 
    var people_list = data.people;
+
+   // Because there are two panels
+   var me_selectors = [];
+
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -1723,6 +1712,8 @@ collaboration.buildMembersList = function(data) {
       if(me == id){
          // Different hover message for taking the presenter role yourself
          title = "Take the presenter role";
+         me_selectors.push($(this));
+         $(this).find('p').html("You");
          var localStreams;
          if(webRTC.peerConn && webRTC.peerConn.getLocalStreams()){
             localStreams = webRTC.peerConn.getLocalStreams()[0];
@@ -1788,6 +1779,13 @@ collaboration.buildMembersList = function(data) {
       });
    });
 
+   if(me_selectors.length > 0){
+      // Makes sure that your person div(s) is at the top of the list
+      for(var i in me_selectors){
+         var parent_selector = me_selectors[i].parent();
+         me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+      }
+   }
    // Enable/Disable webRTC media
    $('.js-toggle-rtc').click(function() {
       var enabled = webRTC.isChannelReady || false;
@@ -1837,6 +1835,17 @@ collaboration.buildMembersList = function(data) {
          button.toggleClass('off-btn', true).toggleClass('on-btn', false);
       }
    });
+};
+
+collaboration.divergeAlert = function(){
+   var pulltab = $('.collaboration-pulltab');
+   var panel = $('.collaboration-panel');
+   var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
+   pulltab.toggleClass('open', true);
+   panel.toggleClass('hidden', false);
+   person.find('.person-message').remove();
+   person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+   collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
 };
 
 collaboration.setUserSavedState = function() {

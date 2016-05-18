@@ -409,7 +409,7 @@ gisportal.addLayersForm.keydownListener = function ( e ) {
             break;
       }
    }
-}
+};
 
 gisportal.addLayersForm.addToDict = function(standard_name, display_name, tags){
    $.ajax({

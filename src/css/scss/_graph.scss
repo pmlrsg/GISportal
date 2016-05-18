@@ -160,6 +160,7 @@ div.js-plot-popup{
   height: 100%;
   max-width: none;
   margin: auto;
+  z-index: 10100 !important;
 }
 
 div.js-plot-popup-html{
