@@ -384,7 +384,15 @@ gisportal.selectionTools.toggleTool = function(type)  {
          draw.on('drawend',
             function(evt) {
                gisportal.selectionTools.ROIAdded(sketch);
-               gisportal.events.trigger('olDraw.drawend', sketch.getGeometry().getCoordinates());
+               var coordinates = sketch.getGeometry().getCoordinates();
+               for(var poly in coordinates){
+                  for(var coor in coordinates[poly]){
+                     for(var num in coordinates[poly][coor]){
+                        coordinates[poly][coor][num] = Math.round(coordinates[poly][coor][num] * 1000 ) / 1000;
+                     }
+                  }
+               }
+               gisportal.events.trigger('olDraw.drawend', coordinates);
             }, this);
       }
    }

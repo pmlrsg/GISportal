@@ -68,10 +68,12 @@ user.getAccessLevel = function(req, domain) {
       var config = GLOBAL.config[domain] || GLOBAL.config
       // check to see if they are an admin
       var admins = config.admins;
-      for (var i = 0; i < admins.length; i++) {
-         if (admins[i] == req.session.passport.user.emails[0].value) {
-            level = "admin";
-            break;
+      if(admins){
+         for (var i = 0; i < admins.length; i++) {
+            if (admins[i] == req.session.passport.user.emails[0].value) {
+               level = "admin";
+               break;
+            }
          }
       }
    }
