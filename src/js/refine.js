@@ -311,7 +311,7 @@ gisportal.refinePanel.layerFound = function(layerId, style) {
    gisportal.indicatorsPanel.open();
    gisportal.refinePanel.reset();
    gisportal.configurePanel.reset();
-   if(gisportal.config.autoScale){
+   if(gisportal.layers[layerId].autoScale){
       gisportal.scalebars.autoScale(layerId);
    }
 };

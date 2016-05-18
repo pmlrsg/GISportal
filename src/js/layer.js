@@ -44,8 +44,6 @@ gisportal.layer = function( options ) {
       provider: {},
       offsetVectors: null,
       serviceType: null,
-
-      autoScale: gisportal.config.autoScale
    };
 
    $.extend(true, this, defaults, options);
@@ -53,6 +51,14 @@ gisportal.layer = function( options ) {
 
    // id used to identify the layer internally 
    this.id = options.name.replace(/[^a-zA-Z0-9]/g, '_' ).replace(/_+/g, '_' ) + "__" + options.providerTag;
+
+
+   // The autoScale option:
+   if(typeof(options.autoScale) == "boolean"){
+      this.autoScale = options.autoScale;
+   }else{
+      this.autoScale = gisportal.config.autoScale || false;
+   }
 
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
