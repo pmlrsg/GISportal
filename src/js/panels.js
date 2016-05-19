@@ -69,7 +69,7 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
       gisportal.events.trigger('userFeedback.submit');
 
    });
-   $('.user-feedback-input').on('change keyup paste', function(e){
+   $('.user-feedback-input').select().on('change keyup paste', function(e){
    	var value = $(this).val();
    	if(e.type == "paste"){
    		try{
