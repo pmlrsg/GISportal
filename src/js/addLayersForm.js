@@ -270,11 +270,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    });
 
    // This adds the click listener to the 'add to all layers' spans
-   $('div.layers-form-right span.add-to-all-layers ').on( 'click', function () {
+   $('span.add-to-all-layers').on( 'click', function () {
       // Gets the information from the related input
       var field = $(this).data("field");
       var key = field.replace(/-/g,"_");
-      var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"]").val();
+      var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"], select[data-field="+key+"]").val();
       key = key.replace("-", "_");
       if(key == "indicator_type"){
          key_val = key_val.split(",");
@@ -284,7 +284,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then added to every layer in the list
       for(var item in gisportal.addLayersForm.layers_list){
-         gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
+         if(key == "originalAutoScale"){
+            gisportal.addLayersForm.layers_list[item][key] = key_val;
+         }else{
+            gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
+         }
       }
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();

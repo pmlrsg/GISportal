@@ -112,6 +112,12 @@
 .overlay-container-form select{
    text-transform: none;
    margin-top: 0px;
+   float: left;
+}
+
+.layers-form-left select[data-id="1"] {
+    max-width: calc(100% - 30px);
+    min-width: calc(100% - 30px);
 }
 
 .overlay-container-form label{
@@ -131,6 +137,10 @@
    line-height: 1px;
    color:#111111;
    padding-top: 5px;
+}
+
+.layers-form .btn-mini{
+   font-size: 15px;
 }
 
 .layers-form .text-button{
