@@ -162,7 +162,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
          if( ! autoScaleCheck.prop('checked') ){
             return;
          }
-      }else if( !gisportal.layers[id].autoScale ){
+      }else if( !gisportal.getAutoScaleFromString(gisportal.layers[id].autoScale) ){
          return;
       }
    }

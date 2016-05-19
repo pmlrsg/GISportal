@@ -617,7 +617,7 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
    if(gisportal.methodThatSelectedCurrentRegion.justCoords){
       gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
    }else if(features.length > 0){
-      var wkt_features = gisportal.wkt.writeFeatures(features)
+      var wkt_features = gisportal.wkt.writeFeatures(features);
       wkt_features = wkt_features.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });

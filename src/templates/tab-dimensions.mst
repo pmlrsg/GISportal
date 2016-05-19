@@ -18,7 +18,7 @@
             Logarithmic
          </label>
          <label>
-            <input type="checkbox" {{#if ../autoScale}}checked{{/if}} id="tab-{{../id}}-autoScale" class="js-auto" data-id="{{../id}}" />
+            <input type="checkbox" {{#if_auto_scale ../autoScale}}checked{{/if_auto_scale}} id="tab-{{../id}}-autoScale" class="js-auto" data-id="{{../id}}" />
             Auto Scale
          </label>
          <a class="js-reset text-button" data-id="{{../id}}">Reset</a>

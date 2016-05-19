@@ -53,12 +53,10 @@ gisportal.layer = function( options ) {
    this.id = options.name.replace(/[^a-zA-Z0-9]/g, '_' ).replace(/_+/g, '_' ) + "__" + options.providerTag;
 
 
-   // The autoScale option:
-   if(typeof(options.autoScale) == "boolean"){
-      this.autoScale = options.autoScale;
-   }else{
-      this.autoScale = gisportal.config.autoScale || false;
-   }
+   // The autoScale options
+   this.autoScale = options.autoScale;
+   // This is used to keep track of the config autoScale setting so that the addLayers form isn't effected by any user changes 
+   this.originalAutoScale = options.autoScale;
 
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
@@ -591,6 +589,20 @@ gisportal.layer = function( options ) {
    
    // Store new layer.
    //gisportal.layers[this.id] = this;
+};
+
+/** Takes a string parameter 'autoScale'
+ *  Determines if the value should be the default
+ *  or the value itself converted to a boolean
+ */
+gisportal.getAutoScaleFromString = function(autoScale){
+   if(typeof(autoScale) == "undefined" || autoScale == "default"){
+      return gisportal.config.autoScale;
+   }else if(autoScale == "true" || autoScale == "True"){
+      return true;
+   }else{
+      return false;
+   }
 };
 
 gisportal.removeLayersByProperty = function(property, value){

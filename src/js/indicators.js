@@ -113,8 +113,8 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('change', '.js-auto', function() {
       var id = $(this).data('id');
       var layer = gisportal.layers[id];
-      layer.autoScale = $(this).prop('checked');
-      if(layer.autoScale){
+      layer.autoScale = $(this).prop('checked').toString();
+      if($(this).prop('checked')){
          layer.minScaleVal = null;
          layer.maxScaleVal = null;
       }

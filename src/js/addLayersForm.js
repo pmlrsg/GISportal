@@ -103,6 +103,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "nice_name":layer.tags.niceName,
       "original_name":layer.urlName, //used to input the data into the correct files int the end.
       "abstract":layer.abstract,
+      "originalAutoScale":layer.originalAutoScale,
       "id":layer.id,
       "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
       "include":layer.include,
@@ -178,17 +179,25 @@ gisportal.addLayersForm.displayPaginator = function(total_pages, current_page, a
 * @param String form_div - The JQuery selector of the element that the form should be applied to.
 */
 gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_div){
+   var this_layer = gisportal.addLayersForm.layers_list[current_page];
    // Makes sure that the user is not still drawing a polygon;
    cancelDraw();
    for(var value in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[value].total_pages = total_pages; //This passes the total number of pages to each layer for later use.
    }
    // Takes the current page information and adds it to the element given
-   var layer_form = gisportal.templates['add-layers-form'](gisportal.addLayersForm.layers_list[current_page]);
+   var layer_form = gisportal.templates['add-layers-form'](this_layer);
    $(form_div).html(layer_form);
    //Makes sure the suggestions are displayed/hidden
    gisportal.addLayersForm.displaySuggestions();
    gisportal.addLayersForm.displayTagSuggestions(current_page);
+   // Makes sure that the autoScale value is set correctly and changes the value when the user selects a value
+   $('select[data-field="originalAutoScale"]').val(this_layer.originalAutoScale).on('change', function(){
+      this_layer.originalAutoScale = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
+
+   });
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
    // The form then goes through validation to display corrections required to the user.
@@ -199,7 +208,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    //The following block shows the scale Points option if it is available.
    var l;
    try{
-      l = gisportal.layers[gisportal.addLayersForm.layers_list[current_page].id];
+      l = gisportal.layers[this_layer.id];
       var bbox = l.exBoundingBox.WestBoundLongitude + "," +
             l.exBoundingBox.SouthBoundLatitude + "," +
             l.exBoundingBox.EastBoundLongitude + "," +

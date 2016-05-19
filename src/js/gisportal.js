@@ -242,6 +242,12 @@ gisportal.createOpLayers = function() {
       var wcs_url = indicator.wcsURL || server.wcsURL;
 
       var include_bool = true;
+      var autoScale = indicator.autoScale;
+      if(autoScale){
+         autoScale = autoScale.toString(); // Just incase a user types a booleanin the config
+      }else{
+         autoScale = "default";
+      }
 
       if(indicator.include === false){
          include_bool = false;
@@ -259,7 +265,7 @@ gisportal.createOpLayers = function() {
          "productAbstract": indicator.productAbstract,
          "legendSettings": indicator.LegendSettings,
          "type": "opLayers",
-         "autoScale": indicator.autoScale,
+         "autoScale": autoScale,
 
          //orginal
          "firstDate": indicator.FirstDate, 
@@ -1069,7 +1075,7 @@ gisportal.loadLayerState = function(){
          var auto = $('.js-auto[data-id="' + id + '"]');
          $('.js-indicator-is-log[data-id="' + id + '"]').prop('checked', log);
          auto.prop('checked', autoScale);
-         gisportal.layers[id].autoScale = autoScale;
+         gisportal.layers[id].autoScale = autoScale.toString();
          if(autoScale){
             auto.trigger('change');
             return false;
@@ -1084,7 +1090,7 @@ gisportal.loadLayerState = function(){
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
          var log = layer_state.log || false;
-         var autoScale = layer_state.autoScale || false;
+         var autoScale = gisportal.getAutoScaleFromString(layer_state.autoScale.toString());
          var opacity = layer_state.opacity || 1;
 
          // This opens the tab that the user had open

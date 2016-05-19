@@ -49,6 +49,11 @@ Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
       return options.fn();
 });
 
+Handlebars.registerHelper('if_auto_scale', function(attr, options) {
+   if( gisportal.getAutoScaleFromString(attr) )
+      return options.fn();
+});
+
 Handlebars.registerHelper('unless_equals', function(attr1, attr2, options) {
    if( attr1 != attr2 )
       return options.fn();
