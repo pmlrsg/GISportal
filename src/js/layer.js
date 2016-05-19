@@ -22,7 +22,6 @@
  * 
  * @param {object} options - Options to extend the defaults
  */
- //gisportal.layer = function(name, title, productAbstract, type, opts) {
 gisportal.layer = function( options ) {
    var layer = this;
 
@@ -125,7 +124,8 @@ gisportal.layer = function( options ) {
    this.defaultMaxScaleVal = options.defaultMaxScaleVal;
    this.minScaleVal = null;
    this.defaultMinScaleVal = options.defaultMinScaleVal;
-   this.log = false;
+   this.log = options.log;
+   this.defaultLog = options.log;
    //--------------------------------------------------------------------------
    
    // Set this to true of the layer is a temporal layer with date-time based data
@@ -472,8 +472,14 @@ gisportal.layer = function( options ) {
                if (layer.maxScaleVal === null || layer.maxScaleVal === undefined || isNaN(layer.maxScaleVal)){
                   layer.maxScaleVal = layer.defaultMaxScaleVal;
                }
-               layer.units = json_data.units; 
-               layer.log = json_data.logScaling === true ? true : false;
+               layer.units = json_data.units;
+               if(layer.log == undefined){
+                  layer.log = json_data.logScaling === true ? true : false;
+               }
+               // Makes sure that log is only true if it is valid 
+               if(layer.minScaleVal <= 0){
+                  layer.log = false;
+               }
                layer.mergeNewParams({
                   colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
                   logscale: layer.log

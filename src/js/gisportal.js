@@ -248,6 +248,14 @@ gisportal.createOpLayers = function() {
       }else{
          autoScale = "default";
       }
+      var max = indicator.defaultMaxScaleVal;
+      var min = indicator.defaultMinScaleVal;
+      if(max){
+         max = parseFloat(max);
+      }
+      if(min){
+         min = parseFloat(min);
+      }
 
       if(indicator.include === false){
          include_bool = false;
@@ -266,8 +274,9 @@ gisportal.createOpLayers = function() {
          "legendSettings": indicator.LegendSettings,
          "type": "opLayers",
          "autoScale": autoScale,
-         "defaultMaxScaleVal": indicator.defaultMaxScaleVal,
-         "defaultMinScaleVal": indicator.defaultMinScaleVal,
+         "defaultMaxScaleVal": max,
+         "defaultMinScaleVal": min,
+         "log": indicator.log,
 
          //orginal
          "firstDate": indicator.FirstDate, 

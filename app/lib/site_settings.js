@@ -473,6 +473,8 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   new_data_layer.Abstract = this_new_layer.abstract;
                   new_data_layer.include = this_new_layer.include;
                   new_data_layer.autoScale = this_new_layer.originalAutoScale;
+                  new_data_layer.defaultMinScaleVal = this_new_layer.defaultMinScaleVal;
+                  new_data_layer.defaultMaxScaleVal = this_new_layer.defaultMaxScaleVal;
                   for(key in this_new_layer.tags){
                      var val = this_new_layer.tags[key];
                      if(val && val.length > 0 && val[0] != ""){

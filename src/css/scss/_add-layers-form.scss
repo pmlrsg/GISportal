@@ -124,8 +124,13 @@
    padding-top:10px;
    display:inline-block;
 }
+
 .overlay-container-form label:first-of-type {
    padding-top: 0 !important;
+}
+
+.scale-val {
+  width: 48%;
 }
 
 .overlay-container-form .js-layers-form-submit{

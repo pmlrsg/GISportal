@@ -99,19 +99,21 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    }
 
    var layer_info={
-      "list_id":list_id,
-      "nice_name":layer.tags.niceName,
-      "original_name":layer.urlName, //used to input the data into the correct files int the end.
-      "abstract":layer.abstract,
-      "originalAutoScale":layer.originalAutoScale,
-      "id":layer.id,
-      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
-      "include":layer.include,
-      "styles_file":styles_file,
-      "legendSettings":legendSettings,
-      "title":layer.serverName,
-      "dict":dict,
-      "tags_dict":reformatted_tags_dict
+      "list_id": list_id,
+      "nice_name": layer.tags.niceName,
+      "original_name": layer.urlName, //used to input the data into the correct files int the end.
+      "abstract": layer.abstract,
+      "originalAutoScale": layer.originalAutoScale,
+      "defaultMinScaleVal": layer.defaultMinScaleVal,
+      "defaultMaxScaleVal": layer.defaultMaxScaleVal,
+      "id": layer.id,
+      "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
+      "include": layer.include,
+      "styles_file": styles_file,
+      "legendSettings": legendSettings,
+      "title": layer.serverName,
+      "dict": dict,
+      "tags_dict": reformatted_tags_dict
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -704,7 +706,7 @@ gisportal.addLayersForm.addInputListeners = function(){
          if($(this).parent('div.legend-parameters').length > 0){
             gisportal.addLayersForm.layers_list[index].legendSettings.Parameters[key] = key_val;
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
-         }else if($(this).parents('div.legend-settings').length > 0){
+         }else if($(this).parents('div.legend-settings').length > 0 && !$(this).hasClass('ignore-nesting')){
             if(key == "Rotation"){
                if(key_val == "LEFT"){
                   key_val = gisportal.addLayersForm.layers_list[index].legendSettings[key] - 90;
