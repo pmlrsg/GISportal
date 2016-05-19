@@ -266,6 +266,8 @@ gisportal.createOpLayers = function() {
          "legendSettings": indicator.LegendSettings,
          "type": "opLayers",
          "autoScale": autoScale,
+         "defaultMaxScaleVal": indicator.defaultMaxScaleVal,
+         "defaultMinScaleVal": indicator.defaultMinScaleVal,
 
          //orginal
          "firstDate": indicator.FirstDate, 

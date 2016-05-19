@@ -122,9 +122,9 @@ gisportal.layer = function( options ) {
    //--------------------------------------------------------------------------
    // The min and max scale range, used by the scalebar
    this.maxScaleVal = null;
-   this.origMaxScaleVal = null;
+   this.defaultMaxScaleVal = options.defaultMaxScaleVal;
    this.minScaleVal = null;
-   this.origMinScaleVal = null;
+   this.defaultMinScaleVal = options.defaultMinScaleVal;
    this.log = false;
    //--------------------------------------------------------------------------
    
@@ -460,12 +460,24 @@ gisportal.layer = function( options ) {
          success: function(data) {
             try{
                json_data = JSON.parse(data);
-                 if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
-                 if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
-                 if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
-                 if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-                 layer.units = json_data.units; 
-                 layer.log = json_data.logScaling === true ? true : false;
+               if (layer.defaultMinScaleVal === null || layer.defaultMinScaleVal === undefined){
+                  layer.defaultMinScaleVal = parseFloat(json_data.scaleRange[0]);
+               }
+               if (layer.defaultMaxScaleVal === null || layer.defaultMaxScaleVal === undefined){
+                 layer.defaultMaxScaleVal = parseFloat(json_data.scaleRange[1]);
+               }
+               if (layer.minScaleVal === null || layer.minScaleVal === undefined || isNaN(layer.minScaleVal)){
+                  layer.minScaleVal = layer.defaultMinScaleVal;
+               }
+               if (layer.maxScaleVal === null || layer.maxScaleVal === undefined || isNaN(layer.maxScaleVal)){
+                  layer.maxScaleVal = layer.defaultMaxScaleVal;
+               }
+               layer.units = json_data.units; 
+               layer.log = json_data.logScaling === true ? true : false;
+               layer.mergeNewParams({
+                  colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
+                  logscale: layer.log
+               });
             }catch(e){
                //var layer.scaling = 'raw';
             }
@@ -476,10 +488,10 @@ gisportal.layer = function( options ) {
 
          },
          error: function(request, errorType, exception) {
-            layer.origMinScaleVal = 0;
-            layer.origMaxScaleVal = 1;
-            layer.minScaleVal = layer.origMinScaleVal;
-            layer.maxScaleVal = layer.origMaxScaleVal;
+            layer.defaultMinScaleVal = 0;
+            layer.defaultMaxScaleVal = 1;
+            layer.minScaleVal = layer.defaultMinScaleVal;
+            layer.maxScaleVal = layer.defaultMaxScaleVal;
             layer.log = false;
             
             $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");

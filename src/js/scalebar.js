@@ -184,14 +184,24 @@ gisportal.scalebars.autoScale = function(id, force)  {
 
       if(typeof(l.minScaleVal) == "number" && typeof(l.maxScaleVal) == "number"){
          gisportal.scalebars.validateScale(id, l.minScaleVal, l.maxScaleVal);
+      }else if(typeof(l.autoMinScaleVal) == "number" && typeof(l.autoMaxScaleVal) == "number"){
+         gisportal.scalebars.validateScale(id, l.autoMinScaleVal, l.autoMaxScaleVal);
       }else{
+         gisportal.loading.increment();
          $.ajax({
             url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
             dataType: 'json',
             success: function( data ) {
                if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+                  var layer = gisportal.layers[id]
+                  layer.autoMinScaleVal = data.min;
+                  layer.autoMaxScaleVal = data.max;
                   gisportal.scalebars.validateScale(id, data.min, data.max);
+                  gisportal.loading.decrement();
                }
+            },
+            error: function(){
+               gisportal.loading.decrement();
             }
          });
       }
@@ -207,8 +217,8 @@ gisportal.scalebars.autoScale = function(id, force)  {
  * @param {string} id - The id of the layer
  */
 gisportal.scalebars.resetScale = function(id)  {
-   min = gisportal.layers[id].origMinScaleVal;
-   max = gisportal.layers[id].origMaxScaleVal;
+   min = gisportal.layers[id].defaultMinScaleVal;
+   max = gisportal.layers[id].defaultMaxScaleVal;
    gisportal.scalebars.validateScale(id, min, max);
 
    gisportal.events.trigger('scalebar.reset', id);
