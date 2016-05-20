@@ -447,6 +447,13 @@ gisportal.events.bind('toggleAllLayers.clicked', function(event) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('logToAllLayers.clicked', function(event) {
+   var params = {
+      "event": "logToAllLayers.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addToAll.clicked', function(event, field) {
    var params = {
       "event": "addToAll.clicked",
