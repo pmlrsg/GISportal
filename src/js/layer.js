@@ -473,7 +473,7 @@ gisportal.layer = function( options ) {
                   layer.maxScaleVal = layer.defaultMaxScaleVal;
                }
                layer.units = json_data.units;
-               if(layer.log == undefined){
+               if(layer.log === undefined){
                   layer.log = json_data.logScaling === true ? true : false;
                }
                // Makes sure that log is only true if it is valid 
