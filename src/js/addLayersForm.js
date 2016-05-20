@@ -227,6 +227,9 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          for(style in styles){
             styleSelect.append("<option value='" + styles[style] + "'>" + styles[style] + "</option>");
          }
+         if(styles.length <= 1){
+            $('[data-field="defaultStyle"]').toggleClass('hidden', true);
+         }
          styleSelect.val(this_layer.defaultStyle || site_style);
       }
    });
