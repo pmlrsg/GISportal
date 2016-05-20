@@ -57,6 +57,8 @@ gisportal.layer = function( options ) {
    // This is used to keep track of the config autoScale setting so that the addLayers form isn't effected by any user changes 
    this.originalAutoScale = options.autoScale;
 
+   this.defaultStyle = options.defaultStyle;
+
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
 
@@ -526,6 +528,15 @@ gisportal.layer = function( options ) {
       // Create WMS layer.
       if(this.type == 'opLayers') {    
 
+         var style = this.style;
+         if(this.defaultStyle){
+            for(var i in this.styles){
+               var this_style = this.styles[i];
+               if(this_style.Name == this.defaultStyle){
+                  this.style = style = this_style.Name;
+               }
+            }
+         }
          layer = new ol.layer.Tile({
             title: this.displayName(),
             id: this.id,
@@ -538,7 +549,8 @@ gisportal.layer = function( options ) {
                   TRANSPARENT: true,
                   wrapDateLine: true,
                   SRS: gisportal.projection,
-                  VERSION: '1.1.1'
+                  VERSION: '1.1.1',
+                  STYLES: style
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
                // that existed in ol2. It is planned so this function could be replaced in time

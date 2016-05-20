@@ -276,6 +276,7 @@ gisportal.createOpLayers = function() {
          "autoScale": autoScale,
          "defaultMaxScaleVal": max,
          "defaultMinScaleVal": min,
+         "defaultStyle": indicator.defaultStyle,
          "log": indicator.log,
 
          //orginal
@@ -1097,10 +1098,14 @@ gisportal.loadLayerState = function(){
       for(var layer in gisportal.loadLayersState){
          var layer_state = gisportal.loadLayersState[layer];
          var id = layer_state.id;
-         var style = layer_state.style || gisportal.config.defaultStyle;
+         var defaultStyle = gisportal.config.defaultStyle || "boxfill/rainbow";
+         var style = layer_state.style || defaultStyle;
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
          var log = layer_state.log || false;
+         if(layer_state.autoScale === undefined){
+            layer_state.autoScale = "default";
+         }
          var autoScale = gisportal.getAutoScaleFromString(layer_state.autoScale.toString());
          var opacity = layer_state.opacity || 1;
 
