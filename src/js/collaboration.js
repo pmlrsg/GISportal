@@ -978,7 +978,7 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('logToLayers.clicked', function(data) {
+         socket.on('logToAllLayers.clicked', function(data) {
             if(collaboration.diverged){
                return true;
             }
