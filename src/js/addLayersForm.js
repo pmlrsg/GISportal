@@ -106,7 +106,6 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "originalAutoScale": layer.originalAutoScale,
       "defaultMinScaleVal": layer.defaultMinScaleVal,
       "defaultMaxScaleVal": layer.defaultMaxScaleVal,
-      "defaultLog": layer.defaultLog,
       "id": layer.id,
       "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
       "include": layer.include,
@@ -331,16 +330,6 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.events.trigger('toggleAllLayers.clicked');
-   });
-
-   // This adds the click listener to the 'log to all layers' span
-   $('span.log-to-all-layers').on( 'click', function () {
-      var prop = $('input[data-field="defaultLog"]').prop('checked');
-      for(var value in gisportal.addLayersForm.layers_list){
-         gisportal.addLayersForm.layers_list[value].defaultLog = prop;
-      }
-      gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('logToAllLayers.clicked');
    });
 
    // Adds a listener to the span for adding tags.

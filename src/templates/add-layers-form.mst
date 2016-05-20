@@ -6,10 +6,8 @@
    <div class="layers-form-left">
 
       {{#unless_equals total_pages "1"}}
-      <label data-field="include">
-         Do Not Include This Layer:
-         <input type="checkbox" data-field="include" {{#unless ../include}}checked{{/unless}} data-id="{{../list_id}}"/>
-      </label>
+      <label data-field="include">Do Not Include This Layer:</label>
+      <input type="checkbox" data-field="include" {{#unless ../include}}checked{{/unless}} data-id="{{../list_id}}"/>
       {{#if_equals ../list_id "1"}}<span title="Copy to all" class="toggle-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="include"></span>{{/if_equals}}</br>
       {{/unless_equals}}
 
@@ -32,10 +30,8 @@
       <div class="clearfix legend-settings">
 
          <div class="scale-points-div hidden">
-            <label data-field="scalePoints" >
-               Scale Points?
-               <input type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/>
-            </label>
+            <label data-field="scalePoints" >Scale Points?</label>
+            <input type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/>
             {{#if_equals list_id "1"}}<span title="Add Scale Points to all" class="scale-to-all-layers icon-clipboard-edit btn icon-btn btn-mini"></span>{{/if_equals}}</br>
          </div>
 
@@ -44,10 +40,8 @@
 
          <div class="clearfix legend-parameters">
             {{#with legendSettings.Parameters}}
-               <label data-field="colorbaronly">
-                  Color Bar Only?
-                  <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/></br>
-               </label>
+               <label data-field="colorbaronly">Color Bar Only?</label>
+               <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/></br>
 
                <label data-field="height">Height:</label></br>
                <input type="text" value="{{height}}" data-field="height" data-id="{{../list_id}}"/></br>
@@ -57,16 +51,18 @@
             {{/with}}
          </div>
 
-         <label data-field="defaultLog">
-            Logarithmic
-            <input type="checkbox" data-field="defaultLog" class="ignore-nesting" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
-         </label>
-         {{#if_equals list_id "1"}}<span title="Add to all" class="log-to-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="defaultLog"></span>{{/if_equals}}<br/>
-         <div class="split-input pull-left">
+         <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
+         <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>
+         </span>
+         <span title="Rotate Right" class="add-to-all-layers icon-forward-3 btn icon-btn" data-field="Rotation">
+         <input class="hidden" data-field="Rotation" value="RIGHT" data-id="{{list_id}}"/>
+         </span><br/>
+
+         <div class="scale-val pull-left">
             <label data-field="defaultMinScaleVal">Min:</label>
             <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
          </div>
-         <div class="split-input pull-right">
+         <div class="scale-val pull-right">
             <label data-field="defaultMaxScaleVal">Max:</label>
             <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
          </div>
@@ -78,13 +74,6 @@
             <option value="default">Default</option>
          </select>
          {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="originalAutoScale"></span>{{/if_equals}}<br/>
-
-         <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
-         <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>
-         </span>
-         <span title="Rotate Right" class="add-to-all-layers icon-forward-3 btn icon-btn" data-field="Rotation">
-         <input class="hidden" data-field="Rotation" value="RIGHT" data-id="{{list_id}}"/>
-         </span><br/>
          <div class="scalebar-preview clearfix">
          </div>
 

@@ -978,18 +978,6 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('logToLayers.clicked', function(data) {
-            if(collaboration.diverged){
-               return true;
-            }
-            collaboration.log(data.presenter +': "Add to all" clicked');
-            if (collaboration.role == "member") {
-               var toggle_all_elem = $('.log-to-all-layers');
-               collaboration.highlightElement(toggle_all_elem);
-               toggle_all_elem.trigger('click');
-            }
-         });
-
          socket.on('addToAll.clicked', function(data) {
             if(collaboration.diverged){
                return true;
