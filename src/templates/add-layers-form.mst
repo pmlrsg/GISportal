@@ -82,11 +82,6 @@
          </select>
          {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="originalAutoScale"></span>{{/if_equals}}<br/>
 
-         <label data-field="defaultStyle">Default Style:</label>
-         <select data-field="defaultStyle" data-id="{{list_id}}">
-         </select>
-         {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultStyle"></span>{{/if_equals}}<br/>
-
          <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
          <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>
          </span>

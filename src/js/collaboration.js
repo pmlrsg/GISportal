@@ -435,17 +435,6 @@ collaboration.initSession = function() {
             }
          });
 
-         socket.on('addLayersForm.defaultStyle-changed', function(data) {
-            if(collaboration.diverged){
-               return true;
-            }
-            if (collaboration.role == "member") {
-               var select_elem = $('select[data-field="defaultStyle"]');
-               select_elem.val(data.params.value).trigger('change');
-               collaboration.highlightElement(select_elem);
-            }
-         });
-
          socket.on('addLayersForm.close', function(data) {
             if(collaboration.diverged){
                return true;

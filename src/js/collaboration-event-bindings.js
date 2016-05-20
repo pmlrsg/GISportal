@@ -395,14 +395,6 @@ gisportal.events.bind('addLayersForm.autoScale-changed', function(event, value) 
    collaboration._emit('c_event', params);
 });
 
-gisportal.events.bind('addLayersForm.defaultStyle-changed', function(event, value) {
-   var params = {
-      "event": "addLayersForm.defaultStyle-changed",
-      "value": value
-   };
-   collaboration._emit('c_event', params);
-});
-
 gisportal.events.bind('addLayersForm.close', function(event) {
    var params = {
       "event": "addLayersForm.close"

@@ -193,10 +193,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
             dataType: 'json',
             success: function( data ) {
                if(typeof(data.min) == "number" && typeof(data.max) == "number"){
-                  var layer = gisportal.layers[id] || gisportal.original_layers[id];
-                  if(!layer){
-                     return false;
-                  }
+                  var layer = gisportal.layers[id];
                   layer.autoMinScaleVal = data.min;
                   layer.autoMaxScaleVal = data.max;
                   gisportal.scalebars.validateScale(id, data.min, data.max);

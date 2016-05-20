@@ -98,7 +98,6 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       }
    }
 
-
    var layer_info={
       "list_id": list_id,
       "nice_name": layer.tags.niceName,
@@ -112,7 +111,6 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
       "include": layer.include,
       "styles_file": styles_file,
-      "defaultStyle": layer.defaultStyle,
       "legendSettings": legendSettings,
       "title": layer.serverName,
       "dict": dict,
@@ -201,39 +199,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       this_layer.originalAutoScale = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
-   });
 
-   // Makes sure that the defaultStyle value is set correctly and changes the value when the user selects a value
-   var site_style = gisportal.config.defaultStyle || "boxfill/rainbow";
-   var display = this_layer.defaultStyle;
-   if(display === undefined){
-      display = "Site deafult (" + site_style + ")";
-   }
-
-   // This block loads the list of available styles. idealy would be nice to put on the focus of the styleSelect, but at the moment the list does not load a sensible height on the first occasion.
-   var layer = gisportal.layers[this_layer.id];
-   var styleSelect = $('select[data-field="defaultStyle"]');
-   $.ajax({
-      url: gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_" + layer.urlName + ".json" || "",
-      dataType: 'json',
-      success:function(data){
-         var styles = [];
-         var style;
-         for(style in data.Styles){
-            styles.push(data.Styles[style].Name);
-         }
-         styles = styles.sort();
-         styleSelect.html("");
-         for(style in styles){
-            styleSelect.append("<option value='" + styles[style] + "'>" + styles[style] + "</option>");
-         }
-         styleSelect.val(this_layer.defaultStyle || site_style);
-      }
-   });
-   styleSelect.html("<option value='' disabled selected>" + display + "</option>").on('change', function(){
-      this_layer.defaultStyle = $(this).val();
-      gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('addLayersForm.defaultStyle-changed', $(this).val());
    });
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
@@ -321,7 +287,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then added to every layer in the list
       for(var item in gisportal.addLayersForm.layers_list){
-         if(key == "originalAutoScale" || key == "defaultStyle"){
+         if(key == "originalAutoScale"){
             gisportal.addLayersForm.layers_list[item][key] = key_val;
          }else{
             gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
@@ -862,11 +828,9 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          dataType: 'json',
          success: function( data ){
             var style_index = 0;
-            var style_found = false;
             for(var style in data.Styles){
                if(data.Styles[style].Name == gisportal.config.defaultStyle){
                   style_index = style;
-                  style_found = true;
                }
             }
             gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
