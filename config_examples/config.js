@@ -79,7 +79,9 @@ $.extend(gisportal.config, {
    browserRestristion: "strict", //(none|advisory|strict)
 
    // The HTML that you would like to be displayed on the splash welcome page.
-   startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>'
+   startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>',
+
+   aboutPage: "https://rsg.pml.ac.uk/" // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
 
 });
 
