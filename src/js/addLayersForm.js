@@ -200,6 +200,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    $('select[data-field="originalAutoScale"]').val(this_layer.originalAutoScale).on('change', function(){
       this_layer.originalAutoScale = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
       gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
    });
 
@@ -236,6 +237,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    styleSelect.html("<option value='' disabled selected>" + display + "</option>").on('change', function(){
       this_layer.defaultStyle = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
       gisportal.events.trigger('addLayersForm.defaultStyle-changed', $(this).val());
    });
    //Adds the scalebar preview
@@ -266,6 +268,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             // If there is a min & max value returned the label and input are both shown.
             if(typeof(data.min) == "number" && typeof(data.max) == "number"){
                $('.scale-points-div').toggleClass('hidden', false);
+               l.autoMinScaleVal = data.min;
+               l.autoMaxScaleVal = data.max;
+               if(gisportal.addLayersForm.layers_list && gisportal.addLayersForm.layers_list[current_page]){
+                  gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+               }
             }
          }
       });
@@ -785,6 +792,9 @@ gisportal.addLayersForm.addInputListeners = function(){
          }else{
             gisportal.addLayersForm.layers_list[index][key] = key_val;
          }
+         if($(this).hasClass("refresh-scalebar") && e.type == "change"){
+            gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview')
+         }
       }else{
          if(key == "wcsURL"){
             key_val = key_val.split("?")[0];
@@ -848,15 +858,27 @@ gisportal.addLayersForm.addInputListeners = function(){
 * @param String scalebar_div - The JQuery selector of the scalebar preview div.
 */
 gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div){
-   layer = gisportal.addLayersForm.layers_list[current_page];
+   var layer = gisportal.addLayersForm.layers_list[current_page];
+   var portal_layer = gisportal.layers[layer.id];
+   if(parseFloat(layer.defaultMinScaleVal) > parseFloat(layer.defaultMaxScaleVal)){
+      $(scalebar_div).html("<p>Invalid Min & Max values (Min is more than max)</p>");
+      return false;
+   }
    if(layer.styles_url){
-      var legendURL = layer.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(layer, layer.styles_url));
+      var legendURL = layer.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(layer, layer.styles_url, preview=true));
       var data = {
          'scalePoints':layer.legendSettings.scalePoints,
+         'id':layer.list_id,
          'angle':layer.legendSettings.Rotation,
          'legendURL':legendURL,
          'middleware':gisportal.middlewarePath
       };
+      if(layer.defaultLog){
+         var scale = layer.originalAutoScale;
+         if((scale == "true" || (scale == "default" && gisportal.config.autoScale) && portal_layer.autoMinScaleVal <= 0) || (scale == "false" && layer.defaultMinScaleVal <= 0)){
+            $('label[data-field="defaultLog"]').notify("Cannot use a logarithmic scale with negative or zero values, this will currently be ignored.", {position:"right"});
+         }
+      }
       var preview = gisportal.templates['scalebar-preview'](data);
       $(scalebar_div).html(preview);
    }else{

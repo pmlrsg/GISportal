@@ -62,16 +62,16 @@
 
          <label data-field="defaultLog" class="no-padding">
             Logarithmic
-            <input type="checkbox" data-field="defaultLog" class="ignore-nesting" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
+            <input type="checkbox" data-field="defaultLog" class="ignore-nesting refresh-scalebar" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
          </label>
          {{#if_equals list_id "1"}}<span title="Add to all" class="log-to-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="defaultLog"></span>{{/if_equals}}<br/>
          <div class="split-input pull-left">
             <label data-field="defaultMinScaleVal">Min:</label>
-            <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
+            <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
          </div>
          <div class="split-input pull-right">
             <label data-field="defaultMaxScaleVal">Max:</label>
-            <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
+            <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
          </div>
 
          <label data-field="originalAutoScale">Auto Scale:</label>

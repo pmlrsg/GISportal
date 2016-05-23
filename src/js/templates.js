@@ -44,6 +44,40 @@ Handlebars.registerHelper('rotate_image', function(imgUrl, angle) {
   return gisportal.middlewarePath + "/rotate?angle=" + angle + "&url=" + encodeURIComponent(imgUrl);
 });
 
+Handlebars.registerHelper('scale_point', function(list_id, point, readable) {
+   var layer = gisportal.addLayersForm.layers_list[list_id];
+   var portal_layer = gisportal.layers[layer.id];
+   var min = layer.defaultMinScaleVal;
+   var max = layer.defaultMaxScaleVal;
+   if(layer.originalAutoScale == "true" || (layer.originalAutoScale == "default" && gisportal.config.autoScale)){
+      if(typeof(portal_layer.autoMinScaleVal) == "number" && typeof(portal_layer.autoMaxScaleVal) == "number"){
+         min = portal_layer.autoMinScaleVal;
+         max = portal_layer.autoMaxScaleVal;
+      }else{
+         return "AUTO";
+      }
+   }
+   min = parseFloat(min);
+   max = parseFloat(max);
+
+   if( layer.defaultLog && min > 0 ){
+      range = Math.log(max) - Math.log(min);
+      var minScaleLog =  Math.log(min);
+      step = (range / 4) * point;
+      value = minScaleLog + step;
+      value = Math.exp( value );
+   }else{
+      range = max - min;
+      step = (range / 4) * point;
+      value = min + step;
+   }
+   if(readable){
+      return gisportal.utils.makePointReadable(value);
+   }else{
+      return gisportal.utils.delimiterisePoint(value);
+   }
+});
+
 Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {
    if( attr1 == attr2 )
       return options.fn();

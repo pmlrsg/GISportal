@@ -1,9 +1,9 @@
 <label>Scalebar Preview:</label><br/>
 <img src="{{middleware}}/settings/rotate?angle={{angle}}&url={{legendURL}}"></img>
 {{#if scalePoints}}
-   <span class="scalebar-overlay"><span title="0">0</span></span>
-   <span class="scalebar-overlay"><span title="0">0</span></span>
-   <span class="scalebar-overlay"><span title="0">0</span></span>
-   <span class="scalebar-overlay"><span title="0">0</span></span>
-   <span class="scalebar-overlay"><span title="0">0</span></span>
+   <span class="scalebar-overlay"><span title="{{scale_point ../id 0 false}}">{{scale_point ../id 0 true}}</span></span>
+   <span class="scalebar-overlay"><span title="{{scale_point ../id 1 false}}">{{scale_point ../id 1 true}}</span></span>
+   <span class="scalebar-overlay"><span title="{{scale_point ../id 2 false}}">{{scale_point ../id 2 true}}</span></span>
+   <span class="scalebar-overlay"><span title="{{scale_point ../id 3 false}}">{{scale_point ../id 3 true}}</span></span>
+   <span class="scalebar-overlay"><span title="{{scale_point ../id 4 false}}">{{scale_point ../id 4 true}}</span></span>
 {{/if}}
