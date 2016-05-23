@@ -65,7 +65,10 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    timeUnits = getUnits(time)
    start = None
    if timeUnits:
-      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      try:
+         start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      except:
+         start = ''.join(times[0])
    else: 
       start = ''.join(times[0])
    
@@ -85,7 +88,11 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       #print i
       if timeUnits:
          if (i < len(time)):
-            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            try:
+               date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            except:
+               date = ''.join(times[i])
+
       else:     
          date = ''.join(times[i])
       mean = getMean(row)
@@ -167,7 +174,10 @@ def gen_data(time, times, maskedArray):
    timeUnits = getUnits(time)
    start = None
    if timeUnits:
-      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      try:
+          start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      except:
+          start = ''.join(times[0])
    else: 
       start = ''.join(times[0])
    
@@ -187,7 +197,10 @@ def gen_data(time, times, maskedArray):
       #print i
       if timeUnits:
          if (i < len(time)):
-            date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            try:
+                date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+            except:
+                date = ''.join(times[i])
       else:     
          date = ''.join(times[i])
       mean = getMean(row)
@@ -522,7 +535,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    timeUnits = getUnits(time)
    start = None
    if timeUnits:
-      start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      try:
+          start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
+      except:
+          start = ''.join(times[0])
    else: 
       start = ''.join(times[0])
    
@@ -563,7 +579,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
       #print times[i]
       date = None   
       if timeUnits:
-         date = netCDF.num2date(times[i], time.units, calendar='standard').isoformat()
+         try:
+             date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
+         except:
+             date = ''.join(times[i])
       else:     
          date = ''.join(times[i])
       #print date
