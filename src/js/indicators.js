@@ -120,7 +120,11 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-reset', function() {
       var id = $(this).data('id');
       gisportal.layers[id].colorbands = gisportal.layers[id].defaultColorbands;
+      gisportal.layers[id].aboveMaxColor = gisportal.layers[id].defaultAboveMaxColor;
+      gisportal.layers[id].belowMinColor = gisportal.layers[id].defaultBelowMinColor;
       $('#tab-' + id + '-colorbands').val(gisportal.layers[id].colorbands).trigger('change');
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: gisportal.layers[id].aboveMaxColor});
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: gisportal.layers[id].belowMinColor});
       $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
       gisportal.scalebars.resetScale(id);
       gisportal.events.trigger('scale.reset', id);
@@ -843,7 +847,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          }
          colorbands_keydown_timeout = setTimeout(function(){
             _this.trigger('change');
-         }, 500)
+         }, 500);
       });
 
       $('#tab-' + indicator.id + '-elevation').ddslick({
@@ -863,6 +867,30 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                indicator.style = data.selectedData.value;
                indicator.mergeNewParams({
                   STYLES: data.selectedData.value
+               });
+               gisportal.indicatorsPanel.scalebarTab(id);
+            }
+         }
+      });
+
+      $('#tab-' + indicator.id + '-aboveMaxColor').ddslick({
+         onSelected: function(data) {
+            if (data.selectedData) {
+               indicator.aboveMaxColor = data.selectedData.value;
+               indicator.mergeNewParams({
+                  ABOVEMAXCOLOR: data.selectedData.value
+               });
+               gisportal.indicatorsPanel.scalebarTab(id);
+            }
+         }
+      });
+
+      $('#tab-' + indicator.id + '-belowMinColor').ddslick({
+         onSelected: function(data) {
+            if (data.selectedData) {
+               indicator.belowMinColor = data.selectedData.value;
+               indicator.mergeNewParams({
+                  BELOWMINCOLOR: data.selectedData.value
                });
                gisportal.indicatorsPanel.scalebarTab(id);
             }

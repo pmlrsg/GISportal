@@ -133,8 +133,13 @@
    padding-top:0;
 }
 
-.split-input {
+.split-input-3 {
   width: calc((100% / 3) - 3px);
+  display: inline-block;
+}
+
+.split-input-2 {
+  width: 48%;
   display: inline-block;
 }
 

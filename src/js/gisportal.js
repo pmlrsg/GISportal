@@ -251,6 +251,8 @@ gisportal.createOpLayers = function() {
       var max = indicator.defaultMaxScaleVal;
       var min = indicator.defaultMinScaleVal;
       var colorbands = indicator.colorbands || gisportal.config.colorbands;
+      var aboveMaxColor = indicator.aboveMaxColor || gisportal.config.aboveMaxColor;
+      var belowMinColor = indicator.belowMinColor || gisportal.config.belowMinColor;
       if(max){
          max = parseFloat(max);
       }
@@ -278,6 +280,8 @@ gisportal.createOpLayers = function() {
          "defaultMaxScaleVal": max,
          "defaultMinScaleVal": min,
          "colorbands": colorbands,
+         "aboveMaxColor": aboveMaxColor,
+         "belowMinColor": belowMinColor,
          "defaultStyle": indicator.defaultStyle,
          "log": indicator.log,
 
@@ -853,6 +857,8 @@ gisportal.saveState = function(state) {
             'isVisible': indicator.isVisible,
             'autoScale': indicator.autoScale,
             'colorbands': indicator.colorbands,
+            'aboveMaxColor': indicator.aboveMaxColor,
+            'belowMinColor': indicator.belowMinColor,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
@@ -1112,6 +1118,8 @@ gisportal.loadLayerState = function(){
          var autoScale = gisportal.getAutoScaleFromString(layer_state.autoScale.toString());
          var opacity = layer_state.opacity || 1;
          var colorbands = layer_state.colorbands || gisportal.config.colorbands;
+         var aboveMaxColor = layer_state.aboveMaxColor || gisportal.config.aboveMaxColor;
+         var belowMinColor = layer_state.belowMinColor || gisportal.config.belowMinColor;
 
          // This opens the tab that the user had open
          if(layer_state.openTab){
@@ -1144,6 +1152,11 @@ gisportal.loadLayerState = function(){
 
          // Sets the layers opacity to the value that the user had previously
          $('#tab-' + id + '-colorbands').val(colorbands);
+
+         // This sets the aboveMaxColor to the same as what the user had before
+         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor});
+         // This sets the belowMinColor to the same as what the user had before
+         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor});
 
       }
    }
@@ -1311,6 +1324,36 @@ gisportal.main = function() {
    }
    if(!gisportal.config.colorbands){
       gisportal.config.colorbands = gisportal.config.colourbands || 255;
+   }
+   var col;
+   if(!gisportal.config.aboveMaxColor){
+      gisportal.config.aboveMaxColor = gisportal.config.aboveMaxColour;
+   }
+   if(gisportal.config.aboveMaxColor){
+      col = gisportal.config.aboveMaxColor;
+      if(col == "black"){
+         col = "0x000000";
+      }else if(col == "white"){
+         col = "0xFFFFFF";
+      }else if(col != "transparent"){
+         col = null;
+      }
+      gisportal.config.aboveMaxColor = col;
+   }
+
+   if(!gisportal.config.belowMinColor){
+      gisportal.config.belowMinColor = gisportal.config.belowMinColour;
+   }
+   if(gisportal.config.belowMinColor){
+      col = gisportal.config.belowMinColor;
+      if(col == "black"){
+         col = "0x000000";
+      }else if(col == "white"){
+         col = "0xFFFFFF";
+      }else if(col != "transparent"){
+         col = null;
+      }
+      gisportal.config.belowMinColor = col;
    }
 
    // Compile Templates

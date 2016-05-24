@@ -405,6 +405,22 @@ gisportal.events.bind('addLayersForm.autoScale-changed', function(event, value) 
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('addLayersForm.aboveMaxColor-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.aboveMaxColor-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.belowMinColor-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.belowMinColor-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addLayersForm.defaultStyle-changed', function(event, value) {
    var params = {
       "event": "addLayersForm.defaultStyle-changed",

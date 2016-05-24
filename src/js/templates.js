@@ -105,7 +105,7 @@ Handlebars.registerHelper('scalebar_overlay_text', function(colorbands, min, max
          to_val = gisportal.utils.makePointReadable(to_val);
          title = "'" + from_val + "' - '" + to_val + "'";
          var left =  width * i;
-         html += '<span class="scalebar-overlay-text" title="' + title + '" style="left: ' + left +'%; width: ' + width +'%;"></span>'
+         html += '<span class="scalebar-overlay-text" title="' + title + '" style="left: ' + left +'%; width: ' + width +'%;"></span>';
       }
    }
    return html;

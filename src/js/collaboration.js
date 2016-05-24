@@ -302,6 +302,9 @@ collaboration.initSession = function() {
                   $('.collab-overlay').toggleClass('hidden', true);
                   break;
                } else {
+                  if(collaboration.role == "presenter"){
+                     gisportal.showModalMessage('You are no longer the presenter');
+                  }
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
                   if(!collaboration.diverged){
@@ -430,6 +433,28 @@ collaboration.initSession = function() {
             }
             if (collaboration.role == "member") {
                var select_elem = $('select[data-field="originalAutoScale"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
+            }
+         });
+
+         socket.on('addLayersForm.aboveMaxColor-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="defaultAboveMaxColor"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
+            }
+         });
+
+         socket.on('addLayersForm.belowMinColor-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="defaultBelowMinColor"]');
                select_elem.val(data.params.value).trigger('change');
                collaboration.highlightElement(select_elem);
             }
@@ -791,8 +816,9 @@ collaboration.initSession = function() {
                var colorbands = value;
                if (collaboration.role == "member") {
                   collaboration.highlightElement($('#tab-' + id + '-colorbands'));
+                  collaboration.highlightElement($('#tab-' + id + '-colorbands-value'));
                   
-                  $('#tab-' + id + '-colorbands').val(colorbands).trigger('change');
+                  $('#tab-' + id + '-colorbands-value').val(colorbands).trigger('change');
                }
             }
          });

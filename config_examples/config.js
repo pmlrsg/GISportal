@@ -70,6 +70,15 @@ $.extend(gisportal.config, {
    // Should layers auto scale by default
    autoScale: true,
 
+   // How many colourbands should scalebars have (1-255)
+   colourbands: 255,
+
+   // What the BELOWMINCOLOR should default to ('black', 'white', or 'transparent')
+   belowMinColor: 'black',
+
+   // What the ABOVEMAXCOLOR should default to ('black', 'white', or 'transparent')
+   aboveMaxColor: 'black',
+
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',
 

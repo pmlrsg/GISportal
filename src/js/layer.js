@@ -62,6 +62,11 @@ gisportal.layer = function( options ) {
    this.colorbands = options.colorbands;
    this.defaultColorbands = options.colorbands;
 
+   this.aboveMaxColor = options.aboveMaxColor;
+   this.defaultAboveMaxColor = options.aboveMaxColor;
+   this.belowMinColor = options.belowMinColor;
+   this.defaultBelowMinColor = options.belowMinColor;
+
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
 
@@ -553,7 +558,10 @@ gisportal.layer = function( options ) {
                   wrapDateLine: true,
                   SRS: gisportal.projection,
                   VERSION: '1.1.1',
-                  STYLES: style
+                  STYLES: style,
+                  NUMCOLORBANDS: this.colorbands,
+                  ABOVEMAXCOLOR: this.aboveMaxColor,
+                  BELOWMINCOLOR: this.belowMinColor,
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
                // that existed in ol2. It is planned so this function could be replaced in time

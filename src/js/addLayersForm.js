@@ -115,6 +115,8 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "defaultMinScaleVal": layer.defaultMinScaleVal,
       "defaultMaxScaleVal": layer.defaultMaxScaleVal,
       "defaultColorbands": layer.defaultColorbands,
+      "defaultAboveMaxColor": layer.defaultAboveMaxColor,
+      "defaultBelowMinColor": layer.defaultBelowMinColor,
       "defaultLog": layer.defaultLog,
       "id": layer.id,
       "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
@@ -210,6 +212,22 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
       gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
+   });
+
+   // Makes sure that the aboveMaxColor value is set correctly and changes the value when the user selects a value
+   $('select[data-field="defaultAboveMaxColor"]').val(this_layer.defaultAboveMaxColor).on('change', function(){
+      this_layer.defaultAboveMaxColor = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.aboveMaxColor-changed', $(this).val());
+   });
+
+   // Makes sure that the belowMinColor value is set correctly and changes the value when the user selects a value
+   $('select[data-field="defaultBelowMinColor"]').val(this_layer.defaultBelowMinColor).on('change', function(){
+      this_layer.defaultBelowMinColor = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.belowMinColor-changed', $(this).val());
    });
 
    // Makes sure that the defaultStyle value is set correctly and changes the value when the user selects a value
@@ -339,7 +357,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then added to every layer in the list
       for(var item in gisportal.addLayersForm.layers_list){
-         if(key == "originalAutoScale" || key == "defaultStyle"){
+         if(key == "originalAutoScale" || key == "defaultStyle" || key == "defaultAboveMaxColor" || key == "defaultBelowMinColor"){
             gisportal.addLayersForm.layers_list[item][key] = key_val;
          }else{
             gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
