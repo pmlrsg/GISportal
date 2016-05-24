@@ -121,6 +121,12 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
             parameters += "&PALETTE=" + layer.defaultStyle.replace(/.+?(?=\/)\//g, "");
          }
       }catch(e){}
+
+      try{
+         if(layer.defaultColorbands){
+            parameters += "&NUMCOLORBANDS=" + layer.defaultColorbands;
+         }
+      }catch(e){}
    }else{
       try{
          if(typeof layer.minScaleVal == "number" && typeof layer.maxScaleVal == "number" ){
@@ -131,6 +137,12 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
       try{
          if(layer.defaultLog){
             parameters += "&logscale=" + layer.defaultLog;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.colorbands){
+            parameters += "&NUMCOLORBANDS=" + layer.colorbands;
          }
       }catch(e){}
    }
@@ -296,7 +308,8 @@ gisportal.scalebars.updateScalebar = function(id)  {
    
    var params = {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
-      logscale: indicator.log
+      logscale: indicator.log,
+      numcolorbands: indicator.colorbands
    };
    
    gisportal.layers[id].mergeNewParams(params);

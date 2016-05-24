@@ -31,6 +31,13 @@ gisportal.addLayersForm.validation_functions = {
                               return "The wcsURL must start with 'http://' or 'https://'";
                            }
    },
+   'defaultColorbands':function(value){
+                           if(isNaN(value)){
+                              return "value must be a numerical value";
+                           }else if(parseInt(value) <= 0 || parseInt(value) > 255){
+                              return "value must be between 1 and 255";
+                           }
+   },
 };
 
 /**
@@ -107,6 +114,7 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "originalAutoScale": layer.originalAutoScale,
       "defaultMinScaleVal": layer.defaultMinScaleVal,
       "defaultMaxScaleVal": layer.defaultMaxScaleVal,
+      "defaultColorbands": layer.defaultColorbands,
       "defaultLog": layer.defaultLog,
       "id": layer.id,
       "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
@@ -793,7 +801,7 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.layers_list[index][key] = key_val;
          }
          if($(this).hasClass("refresh-scalebar") && e.type == "change"){
-            gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview')
+            gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }
       }else{
          if(key == "wcsURL"){
@@ -894,7 +902,9 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
                   style_found = true;
                }
             }
-            gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
+            if(data.Styles && data.Styles[style_index]){
+               gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
+            }
             if(gisportal.addLayersForm.layers_list[current_page].styles_url){
                gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
             }

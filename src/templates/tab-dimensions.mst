@@ -2,28 +2,31 @@
 <div class="panel-tab dimensions-tab">
    <div class="scale-options">
       {{#unless_equals minScaleVal null}}
-      <div class="scalevalues">
-         <div class="clearfix">
-            <div class="pull-left scale-editor">
-               <b>Min:</b>
-               <input class="js-scale-min grid-cell" placeholder="Min" value="{{../minScaleVal}}" data-id="{{../id}}">
-            </div>
-            <div class="pull-right scale-editor">
-               <b>Max:</b>
-               <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{../maxScaleVal}}" data-id="{{../id}}">
-            </div>
-        </div>
-         <label>
-            <input type="checkbox" {{#if ../log}}checked{{/if}} id="tab-{{../id}}-log" class="js-indicator-is-log" data-id="{{../id}}">
-            Logarithmic
-         </label>
-         <label>
-            <input type="checkbox" {{#if_auto_scale ../autoScale}}checked{{/if_auto_scale}} id="tab-{{../id}}-autoScale" class="js-auto" data-id="{{../id}}" />
-            Auto Scale
-         </label>
-         <a class="js-reset text-button" data-id="{{../id}}">Reset</a>
-      </div>
-         {{/unless_equals}}
+         <div class="scalevalues">
+            <div class="clearfix">
+               <div class="pull-left scale-editor">
+                  <b>Min:</b>
+                  <input class="js-scale-min grid-cell" placeholder="Min" value="{{../minScaleVal}}" data-id="{{../id}}">
+               </div>
+               <div class="pull-right scale-editor">
+                  <b>Max:</b>
+                  <input class="js-scale-max scale-editor grid-cell" placeholder="Max" value="{{../maxScaleVal}}" data-id="{{../id}}">
+               </div>
+           </div>
+            <label>
+               <input type="checkbox" {{#if ../log}}checked{{/if}} id="tab-{{../id}}-log" class="js-indicator-is-log" data-id="{{../id}}">
+               Logarithmic
+            </label>
+            <label>
+               <input type="checkbox" {{#if_auto_scale ../autoScale}}checked{{/if_auto_scale}} id="tab-{{../id}}-autoScale" class="js-auto" data-id="{{../id}}" />
+               Auto Scale
+            </label>
+            <a class="js-reset text-button" data-id="{{../id}}">Reset</a>
+            <br/>
+            <label for="tab-{{../id}}-colorbands">Color Bands:</label><input id="tab-{{../id}}-colorbands-value" class="colorbands-value" maxlength="3" value="255"></input>
+            <div id="tab-{{../id}}-colorbands" class="layer-colorbands-slider"></div>
+         </div>
+      {{/unless_equals}}
    <div class="indicator-options"> 
       <div class="indicator-option">
          <label for="tab-{{id}}-opacity">Layer Opacity</label> - <span id="tab-{{id}}-opacity-value">100%</span>

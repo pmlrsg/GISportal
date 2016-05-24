@@ -59,6 +59,9 @@ gisportal.layer = function( options ) {
 
    this.defaultStyle = options.defaultStyle;
 
+   this.colorbands = options.colorbands;
+   this.defaultColorbands = options.colorbands;
+
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
 

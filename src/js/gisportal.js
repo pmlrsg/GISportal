@@ -250,6 +250,7 @@ gisportal.createOpLayers = function() {
       }
       var max = indicator.defaultMaxScaleVal;
       var min = indicator.defaultMinScaleVal;
+      var colorbands = indicator.colorbands || gisportal.config.colorbands;
       if(max){
          max = parseFloat(max);
       }
@@ -276,6 +277,7 @@ gisportal.createOpLayers = function() {
          "autoScale": autoScale,
          "defaultMaxScaleVal": max,
          "defaultMinScaleVal": min,
+         "colorbands": colorbands,
          "defaultStyle": indicator.defaultStyle,
          "log": indicator.log,
 
@@ -850,6 +852,7 @@ gisportal.saveState = function(state) {
             'selected': indicator.selected,
             'isVisible': indicator.isVisible,
             'autoScale': indicator.autoScale,
+            'colorbands': indicator.colorbands,
             'opacity': indicator.opacity !== null ? indicator.opacity : 1,
             'style': indicator.style !== null ? indicator.style : '',
             'minScaleVal': indicator.minScaleVal,
@@ -1108,6 +1111,7 @@ gisportal.loadLayerState = function(){
          }
          var autoScale = gisportal.getAutoScaleFromString(layer_state.autoScale.toString());
          var opacity = layer_state.opacity || 1;
+         var colorbands = layer_state.colorbands || gisportal.config.colorbands;
 
          // This opens the tab that the user had open
          if(layer_state.openTab){
@@ -1137,6 +1141,9 @@ gisportal.loadLayerState = function(){
          // Sets the layers opacity to the value that the user had previously
          $('#tab-' + id + '-opacity').val(opacity*100);
          gisportal.layers[id].setOpacity(opacity);
+
+         // Sets the layers opacity to the value that the user had previously
+         $('#tab-' + id + '-colorbands').val(colorbands);
 
       }
    }
@@ -1301,6 +1308,9 @@ gisportal.main = function() {
    } else {
       $('body').prepend('<div class="dev-warning">DEVELOPMENT MODE</div>');
       $('.js-start-container').addClass('start-dev');
+   }
+   if(!gisportal.config.colorbands){
+      gisportal.config.colorbands = gisportal.config.colourbands || 255;
    }
 
    // Compile Templates

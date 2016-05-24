@@ -477,6 +477,7 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   new_data_layer.defaultMaxScaleVal = this_new_layer.defaultMaxScaleVal;
                   new_data_layer.defaultStyle = this_new_layer.defaultStyle;
                   new_data_layer.log = this_new_layer.defaultLog;
+                  new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   for(key in this_new_layer.tags){
                      var val = this_new_layer.tags[key];
                      if(val && val.length > 0 && val[0] != ""){

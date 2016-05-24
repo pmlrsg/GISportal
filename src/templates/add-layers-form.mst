@@ -46,8 +46,8 @@
             {{#with legendSettings.Parameters}}
                <label data-field="colorbaronly">
                   Color Bar Only?
-                  <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/></br>
-               </label>
+                  <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/>
+               </label></br>
 
                <label data-field="height">Height:</label></br>
                <input type="text" value="{{height}}" data-field="height" data-id="{{../list_id}}"/></br>
@@ -58,34 +58,41 @@
          </div>
          <br/>
 
-         <p class="small-text">Min and Max values are overwitten by Auto Scale if it is on, Logarithmic is not valid with min and/or max values of zero or less</p>
+         <div class="scale-points-div hidden">
+            <p class="small-text">Min and Max values are overwitten by Auto Scale if it is on, Logarithmic is not valid with min and/or max values of zero or less</p>
 
-         <label data-field="defaultLog" class="no-padding">
-            Logarithmic
-            <input type="checkbox" data-field="defaultLog" class="ignore-nesting refresh-scalebar" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
-         </label>
-         {{#if_equals list_id "1"}}<span title="Add to all" class="log-to-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="defaultLog"></span>{{/if_equals}}<br/>
-         <div class="split-input pull-left">
-            <label data-field="defaultMinScaleVal">Min:</label>
-            <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
+            <label data-field="defaultLog" class="no-padding">
+               Logarithmic
+               <input type="checkbox" data-field="defaultLog" class="ignore-nesting refresh-scalebar" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
+            </label>
+            {{#if_equals list_id "1"}}<span title="Add to all" class="log-to-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="defaultLog"></span>{{/if_equals}}<br/>
+
+            <div class="split-input">
+               <label data-field="defaultMinScaleVal">Min:</label>
+               <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
+            </div>
+            <div class="split-input">
+               <label data-field="defaultMaxScaleVal">Max:</label>
+               <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
+            </div>
+            <div class="split-input">
+               <label data-field="defaultColorbands">Colour Bands:</label>
+               <input type="text" data-field="defaultColorbands" class="ignore-nesting refresh-scalebar" value="{{defaultColorbands}}" data-id="{{list_id}}" maxlength="3"/>
+            </div>
+
+            <label data-field="originalAutoScale">Auto Scale:</label>
+            <select data-field="originalAutoScale" data-id="{{list_id}}">
+               <option value="true">Yes</option>
+               <option value="false">No</option>
+               <option value="default">Default</option>
+            </select>
+            {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="originalAutoScale"></span>{{/if_equals}}<br/>
+
+            <label data-field="defaultStyle">Default Style:</label>
+            <select data-field="defaultStyle" data-id="{{list_id}}">
+            </select>
+            {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultStyle"></span>{{/if_equals}}<br/>
          </div>
-         <div class="split-input pull-right">
-            <label data-field="defaultMaxScaleVal">Max:</label>
-            <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
-         </div>
-
-         <label data-field="originalAutoScale">Auto Scale:</label>
-         <select data-field="originalAutoScale" data-id="{{list_id}}">
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-            <option value="default">Default</option>
-         </select>
-         {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="originalAutoScale"></span>{{/if_equals}}<br/>
-
-         <label data-field="defaultStyle">Default Style:</label>
-         <select data-field="defaultStyle" data-id="{{list_id}}">
-         </select>
-         {{#if_equals list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultStyle"></span>{{/if_equals}}<br/>
 
          <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
          <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>

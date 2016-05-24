@@ -60,6 +60,7 @@ Handlebars.registerHelper('scale_point', function(list_id, point, readable) {
    min = parseFloat(min);
    max = parseFloat(max);
 
+   var range;
    if( layer.defaultLog && min > 0 ){
       range = Math.log(max) - Math.log(min);
       var minScaleLog =  Math.log(min);
@@ -76,6 +77,38 @@ Handlebars.registerHelper('scale_point', function(list_id, point, readable) {
    }else{
       return gisportal.utils.delimiterisePoint(value);
    }
+});
+
+Handlebars.registerHelper('scalebar_overlay_text', function(colorbands, min, max, log) {
+
+   var html = "";
+   if(colorbands && colorbands <= 20 && typeof(min) == "number" && typeof(max) == "number"){
+      var range = max - min;
+      var log_range = Math.log(max) - Math.log(min);
+      var log_min = Math.log(min);
+      var width = (100/colorbands);
+      for(var i = 0; i < colorbands; i ++){
+         var title = "";
+         var from_val, to_val, from_step, to_step;
+         if(log){
+            from_step = (log_range / colorbands) * i;
+            to_step = (log_range / colorbands) * (i+1);
+            from_val = Math.exp(log_min + from_step);
+            to_val = Math.exp(log_min + to_step);
+         }else{
+            from_step = (range / colorbands) * i;
+            to_step = (range / colorbands) * (i+1);
+            from_val = min + from_step;
+            to_val = min + to_step;
+         }
+         from_val = gisportal.utils.makePointReadable(from_val);
+         to_val = gisportal.utils.makePointReadable(to_val);
+         title = "'" + from_val + "' - '" + to_val + "'";
+         var left =  width * i;
+         html += '<span class="scalebar-overlay-text" title="' + title + '" style="left: ' + left +'%; width: ' + width +'%;"></span>'
+      }
+   }
+   return html;
 });
 
 Handlebars.registerHelper('if_equals', function(attr1, attr2, options) {

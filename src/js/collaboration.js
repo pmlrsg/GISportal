@@ -777,7 +777,24 @@ collaboration.initSession = function() {
                   gisportal.layers[id].setOpacity(value);
                }
             }
-            
+         });
+
+         // Layer colorbands value changed
+         socket.on('scalebar.colorbands', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var id = data.params.id;
+            var value = data.params.value;
+
+            if (typeof value != 'undefined') {
+               var colorbands = value;
+               if (collaboration.role == "member") {
+                  collaboration.highlightElement($('#tab-' + id + '-colorbands'));
+                  
+                  $('#tab-' + id + '-colorbands').val(colorbands).trigger('change');
+               }
+            }
          });
 
 		  	// reset scalebar

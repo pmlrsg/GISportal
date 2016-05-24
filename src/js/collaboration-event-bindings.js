@@ -210,6 +210,16 @@ gisportal.events.bind("scalebar.opacity", function(event, id, value) {
    collaboration._emit('c_event', params);
 });
 
+// layer colorbands changed
+gisportal.events.bind("scalebar.colorbands", function(event, id, value) {
+   var params = {
+      "event" : "scalebar.colorbands",
+      "id" : id,
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
 // auto scale a layer
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
