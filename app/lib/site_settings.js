@@ -11,6 +11,9 @@ var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
 var utils = require('./utils.js');
+var redis = require('redis');
+var client = redis.createClient();
+var crypto = require('crypto');
 
 var child_process = require('child_process');
 
@@ -725,6 +728,26 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    }else{
       res.send(fs.readFileSync(file_path));
    }
+});
+
+router.all('/app/settings/create_share', function(req, res){
+   var data = req.body; // Gets the data back to restore previously deleted file
+   var shasum = crypto.createHash('sha256');
+   shasum.update(Date.now().toString());
+   var shareId = shasum.digest('hex').substr(0,6);
+   client.set(shareId, data.state, function(err){});
+   res.send(shareId);
+});
+
+router.get('/app/settings/get_share', function(req, res){
+   var shareId = req.query.id // Gets the given shareId
+   client.get(shareId, function(err, data) {
+      if(err){
+         res.status(500).send();
+      }else{
+         res.send(data);
+      }
+   });
 });
 
 function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){

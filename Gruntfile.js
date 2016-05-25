@@ -6,6 +6,7 @@ var coreFiles = [
     "src/js/loading.js",
     "src/js/templates.js",
     "src/js/portal.js",
+    "src/js/share.js",
     "src/js/panels.js",
     "src/js/panel-slideout.js",
     "src/js/ui.js",
