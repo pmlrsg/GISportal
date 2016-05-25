@@ -70,6 +70,9 @@ $.extend(gisportal.config, {
    // Should layers auto scale by default
    autoScale: true,
 
+   // Should layers log by default
+   defaultLog: false,
+
    // How many colourbands should scalebars have (1-255)
    colourbands: 255,
 

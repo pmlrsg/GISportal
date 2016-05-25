@@ -134,8 +134,14 @@ gisportal.layer = function( options ) {
    this.defaultMaxScaleVal = options.defaultMaxScaleVal;
    this.minScaleVal = null;
    this.defaultMinScaleVal = options.defaultMinScaleVal;
-   this.log = options.log;
-   this.defaultLog = options.log;
+   var log = gisportal.config.defaultLog;
+   if(options.log == undefined){
+      this.defaultLog = log;
+      this.log = log;
+   }else{
+      this.defaultLog = options.log;
+      this.log = options.log;
+   }
    //--------------------------------------------------------------------------
    
    // Set this to true of the layer is a temporal layer with date-time based data

@@ -1154,9 +1154,9 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-colorbands').val(colorbands);
 
          // This sets the aboveMaxColor to the same as what the user had before
-         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor});
+         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
          // This sets the belowMinColor to the same as what the user had before
-         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor});
+         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
 
       }
    }

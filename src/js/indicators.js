@@ -119,14 +119,18 @@ gisportal.indicatorsPanel.initDOM = function() {
    // Reset scale range
    $('.js-indicators').on('click', '.js-reset', function() {
       var id = $(this).data('id');
-      gisportal.layers[id].colorbands = gisportal.layers[id].defaultColorbands;
-      gisportal.layers[id].aboveMaxColor = gisportal.layers[id].defaultAboveMaxColor;
-      gisportal.layers[id].belowMinColor = gisportal.layers[id].defaultBelowMinColor;
-      $('#tab-' + id + '-colorbands').val(gisportal.layers[id].colorbands).trigger('change');
-      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: gisportal.layers[id].aboveMaxColor});
-      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: gisportal.layers[id].belowMinColor});
-      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
-      gisportal.scalebars.resetScale(id);
+      var layer = gisportal.layers[id]
+      layer.autoScale = layer.originalAutoScale;
+      layer.colorbands = layer.defaultColorbands;
+      layer.aboveMaxColor = layer.defaultAboveMaxColor;
+      layer.belowMinColor = layer.defaultBelowMinColor;
+      layer.minScaleVal = layer.defaultMinScaleVal;
+      layer.maxScaleVal = layer.defaultMaxScaleVal;
+      $('#tab-' + id + '-colorbands').val(layer.colorbands).trigger('change');
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: layer.aboveMaxColor || "0"});
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: layer.belowMinColor || "0"});
+      $('#tab-' + id + '-log').prop( 'checked', layer.defaultLog || false ).trigger('change');
+      $('.js-auto[data-id="' + id + '"]').prop( 'checked', gisportal.getAutoScaleFromString(layer.autoScale) ).trigger('change');
       gisportal.events.trigger('scale.reset', id);
    });
 
@@ -878,6 +882,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-aboveMaxColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
+               if(data.selectedData.value == "0"){
+                  data.selectedData.value = "";
+               }
                indicator.aboveMaxColor = data.selectedData.value;
                indicator.mergeNewParams({
                   ABOVEMAXCOLOR: data.selectedData.value
@@ -889,6 +896,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-belowMinColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
+               if(data.selectedData.value == "0"){
+                  data.selectedData.value = "";
+               }
                indicator.belowMinColor = data.selectedData.value;
                indicator.mergeNewParams({
                   BELOWMINCOLOR: data.selectedData.value
