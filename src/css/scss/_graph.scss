@@ -175,6 +175,13 @@ div.js-plot-popup-html{
   z-index: 10100;
 }
 
+.bk-bs-modal{
+  z-index: 10104 !important;
+}
+.bk-bs-modal-backdrop.bk-bs-in{
+  z-index: 10102;
+}
+
 div.js-plot-metadata{
   margin-left: 15px;
 }
