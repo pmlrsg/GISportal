@@ -731,17 +731,17 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
 });
 
 router.all('/app/settings/create_share', function(req, res){
-   var data = req.body; // Gets the data back to restore previously deleted file
+   var data = req.body;
    var shasum = crypto.createHash('sha256');
    shasum.update(Date.now().toString());
    var shareId = shasum.digest('hex').substr(0,6);
-   client.set(shareId, data.state, function(err){});
+   client.set("share_" + shareId, data.state, function(err){});
    res.send(shareId);
 });
 
 router.get('/app/settings/get_share', function(req, res){
    var shareId = req.query.id // Gets the given shareId
-   client.get(shareId, function(err, data) {
+   client.get("share_" + shareId, function(err, data) {
       if(err){
          res.status(500).send();
       }else{
