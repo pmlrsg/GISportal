@@ -43,16 +43,6 @@ from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerSt
 # Set the default logging verbosity to lowest.
 verbosity = 0
 
-
-
-#<link
-#    href="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.css"
-#    rel="stylesheet" type="text/css"
-#>
-#<script 
-#    src="http://cdn.pydata.org/bokeh/release/bokeh-0.11.0.js"
-#></script>
-
 template = jinja2.Template("""
 <!DOCTYPE html>
 <html lang="en-US">
