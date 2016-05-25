@@ -15,7 +15,9 @@ gisportal.panels.initDOM = function() {
 gisportal.panels.showPanel = function(panelName) {
 	gisportal.hideAllPopups();
 	if(panelName != "refine-indicator"){
-		$('.dd-container').ddslick('close');
+		if(gisportal.config.browseMode != "simplelist"){
+			$('.dd-container').ddslick('close');
+		}
 		gisportal.configurePanel.reset();
 	}
 	
