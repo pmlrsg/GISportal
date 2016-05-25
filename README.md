@@ -18,10 +18,6 @@ Our CSS: **src/css/**
 Our Images: **html/img/**  
 HTML: **src/index.html** and **src/templates/**
 
-The portal consists of one main page contains the portal itself and the other is part of the OpenID login system. The main page uses jQuery and jQuery UI as its main JavaScript libraries.
-
-Communication between the middleware and the frontend is done with AJAX directed at URLs created by Flask.
-
 ### Middleware ###
 
 Written in **Node.js**, the middleware facilitates communication between the backend **OGC WxS** services and the web frontend. 

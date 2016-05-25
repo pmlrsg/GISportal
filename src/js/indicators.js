@@ -170,8 +170,8 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    //Share this map
    $('.js-share').on('click', function() {
-      gisportal.openid.showShare();
-      gisportal.openid.getLink();
+      gisportal.share.showShare();
+      gisportal.share.getLink();
    });
 
    // Store a layers current tab being viewed

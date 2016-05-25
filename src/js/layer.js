@@ -773,7 +773,9 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
       cache: false,
       success: function(data) {
          // Initialises the layer with the data from the AJAX call
-         gisportal.layers[id].init(data, options, style);
+         if(gisportal.layers[id]){
+            gisportal.layers[id].init(data, options, style);
+         }
       },
       error: function() {
          $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
