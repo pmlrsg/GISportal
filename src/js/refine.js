@@ -84,13 +84,13 @@ gisportal.refinePanel.refreshData = function(data) {
    // an array to hold the filters that could be available
    var furtherFilters = [];
 
-   var i = 0;
+   var i;
    // work out if any of the browseCategories for the selected indicator name has more than one option
    for (tag in indicatorTags) {
       if (indicatorTags.hasOwnProperty(tag)) {
          if ( _.keys(indicatorTags[tag]).length > 1 && gisportal.browseCategories[tag]) {
             // has the category already been added to the refine array
-            for (i; i < data.refine.length; i++) {
+            for (i = 0; i < data.refine.length; i++) {
                if (data.refine[i].cat !== tag) {
                   furtherFilters.push( tag );
                   break;   // to only add it once
