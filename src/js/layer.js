@@ -22,7 +22,6 @@
  * 
  * @param {object} options - Options to extend the defaults
  */
- //gisportal.layer = function(name, title, productAbstract, type, opts) {
 gisportal.layer = function( options ) {
    var layer = this;
 
@@ -44,8 +43,6 @@ gisportal.layer = function( options ) {
       provider: {},
       offsetVectors: null,
       serviceType: null,
-
-      autoScale: gisportal.config.autoScale
    };
 
    $.extend(true, this, defaults, options);
@@ -53,6 +50,22 @@ gisportal.layer = function( options ) {
 
    // id used to identify the layer internally 
    this.id = options.name.replace(/[^a-zA-Z0-9]/g, '_' ).replace(/_+/g, '_' ) + "__" + options.providerTag;
+
+
+   // The autoScale options
+   this.autoScale = options.autoScale;
+   // This is used to keep track of the config autoScale setting so that the addLayers form isn't effected by any user changes 
+   this.originalAutoScale = options.autoScale;
+
+   this.defaultStyle = options.defaultStyle;
+
+   this.colorbands = options.colorbands;
+   this.defaultColorbands = options.colorbands;
+
+   this.aboveMaxColor = options.aboveMaxColor;
+   this.defaultAboveMaxColor = options.aboveMaxColor;
+   this.belowMinColor = options.belowMinColor;
+   this.defaultBelowMinColor = options.belowMinColor;
 
    // The grouped name of the indicator (eg Oxygen)
    this.name = options.tags.niceName || options.name.replace("/","-");
@@ -118,10 +131,11 @@ gisportal.layer = function( options ) {
    //--------------------------------------------------------------------------
    // The min and max scale range, used by the scalebar
    this.maxScaleVal = null;
-   this.origMaxScaleVal = null;
+   this.defaultMaxScaleVal = options.defaultMaxScaleVal;
    this.minScaleVal = null;
-   this.origMinScaleVal = null;
-   this.log = false;
+   this.defaultMinScaleVal = options.defaultMinScaleVal;
+   this.log = options.log;
+   this.defaultLog = options.log;
    //--------------------------------------------------------------------------
    
    // Set this to true of the layer is a temporal layer with date-time based data
@@ -456,12 +470,30 @@ gisportal.layer = function( options ) {
          success: function(data) {
             try{
                json_data = JSON.parse(data);
-                 if (layer.origMinScaleVal === null) layer.origMinScaleVal = parseFloat(json_data.scaleRange[0]);
-                 if (layer.origMaxScaleVal === null) layer.origMaxScaleVal = parseFloat(json_data.scaleRange[1]);
-                 if (layer.minScaleVal === null) layer.minScaleVal = layer.origMinScaleVal;
-                 if (layer.maxScaleVal === null) layer.maxScaleVal = layer.origMaxScaleVal;
-                 layer.units = json_data.units; 
-                 layer.log = json_data.logScaling === true ? true : false;
+               if (layer.defaultMinScaleVal === null || layer.defaultMinScaleVal === undefined){
+                  layer.defaultMinScaleVal = parseFloat(json_data.scaleRange[0]);
+               }
+               if (layer.defaultMaxScaleVal === null || layer.defaultMaxScaleVal === undefined){
+                 layer.defaultMaxScaleVal = parseFloat(json_data.scaleRange[1]);
+               }
+               if (layer.minScaleVal === null || layer.minScaleVal === undefined || isNaN(layer.minScaleVal)){
+                  layer.minScaleVal = layer.defaultMinScaleVal;
+               }
+               if (layer.maxScaleVal === null || layer.maxScaleVal === undefined || isNaN(layer.maxScaleVal)){
+                  layer.maxScaleVal = layer.defaultMaxScaleVal;
+               }
+               layer.units = json_data.units;
+               if(layer.log === undefined){
+                  layer.log = json_data.logScaling === true ? true : false;
+               }
+               // Makes sure that log is only true if it is valid 
+               if(layer.minScaleVal <= 0){
+                  layer.log = false;
+               }
+               layer.mergeNewParams({
+                  colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
+                  logscale: layer.log
+               });
             }catch(e){
                //var layer.scaling = 'raw';
             }
@@ -472,10 +504,10 @@ gisportal.layer = function( options ) {
 
          },
          error: function(request, errorType, exception) {
-            layer.origMinScaleVal = 0;
-            layer.origMaxScaleVal = 1;
-            layer.minScaleVal = layer.origMinScaleVal;
-            layer.maxScaleVal = layer.origMaxScaleVal;
+            layer.defaultMinScaleVal = 0;
+            layer.defaultMaxScaleVal = 1;
+            layer.minScaleVal = layer.defaultMinScaleVal;
+            layer.maxScaleVal = layer.defaultMaxScaleVal;
             layer.log = false;
             
             $.notify("Sorry\nThere was an error getting the metadata, the scale values are likely incorrect.", "error");
@@ -504,6 +536,15 @@ gisportal.layer = function( options ) {
       // Create WMS layer.
       if(this.type == 'opLayers') {    
 
+         var style = this.style;
+         if(this.defaultStyle){
+            for(var i in this.styles){
+               var this_style = this.styles[i];
+               if(this_style.Name == this.defaultStyle){
+                  this.style = style = this_style.Name;
+               }
+            }
+         }
          layer = new ol.layer.Tile({
             title: this.displayName(),
             id: this.id,
@@ -516,7 +557,11 @@ gisportal.layer = function( options ) {
                   TRANSPARENT: true,
                   wrapDateLine: true,
                   SRS: gisportal.projection,
-                  VERSION: '1.1.1'
+                  VERSION: '1.1.1',
+                  STYLES: style,
+                  NUMCOLORBANDS: this.colorbands,
+                  ABOVEMAXCOLOR: this.aboveMaxColor,
+                  BELOWMINCOLOR: this.belowMinColor,
                },
                // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
                // that existed in ol2. It is planned so this function could be replaced in time
@@ -585,6 +630,20 @@ gisportal.layer = function( options ) {
    
    // Store new layer.
    //gisportal.layers[this.id] = this;
+};
+
+/** Takes a string parameter 'autoScale'
+ *  Determines if the value should be the default
+ *  or the value itself converted to a boolean
+ */
+gisportal.getAutoScaleFromString = function(autoScale){
+   if(typeof(autoScale) == "undefined" || autoScale == "default"){
+      return gisportal.config.autoScale;
+   }else if(autoScale == "true" || autoScale == "True"){
+      return true;
+   }else{
+      return false;
+   }
 };
 
 gisportal.removeLayersByProperty = function(property, value){

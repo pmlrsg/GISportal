@@ -70,6 +70,15 @@ $.extend(gisportal.config, {
    // Should layers auto scale by default
    autoScale: true,
 
+   // How many colourbands should scalebars have (1-255)
+   colourbands: 255,
+
+   // What the BELOWMINCOLOR should default to ('black', 'white', or 'transparent')
+   belowMinColor: 'black',
+
+   // What the ABOVEMAXCOLOR should default to ('black', 'white', or 'transparent')
+   aboveMaxColor: 'black',
+
    // Bing Maps; in order to use the Bing Maps base layer you will need to register for an API key at https://www.bingmapsportal.com and enter your key here
    //bingMapsAPIKey: 'xxxxxxxxxxxx',
 
@@ -79,7 +88,9 @@ $.extend(gisportal.config, {
    browserRestristion: "strict", //(none|advisory|strict)
 
    // The HTML that you would like to be displayed on the splash welcome page.
-   startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>'
+   startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>',
+
+   aboutPage: "https://rsg.pml.ac.uk/" // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
 
 });
 

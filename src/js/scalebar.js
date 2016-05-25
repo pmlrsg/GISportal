@@ -17,7 +17,6 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       var url = null;
       var width = 1;
       var height = 500;
-      var scaleSteps = 5;
       if(indicator.styles){
          // Iter over styles
          $.each(indicator.styles, function(index, value)
@@ -42,46 +41,29 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       
       var scalePoints = [];
       
-      var i, range, step, value, makePointReadable;
+      var i, range, step, value;
       if( indicator.log ){
          range = Math.log(indicator.maxScaleVal) - Math.log(indicator.minScaleVal);
          var minScaleLog =  Math.log(indicator.minScaleVal);
-         for(i = 0; i < scaleSteps; i++ ){
-            step = (range / (scaleSteps-1)) * i;
+         for(i = 0; i < 5; i++ ){
+            step = (range / 4) * i;
             value = minScaleLog + step;
             value = Math.exp( value );
-	        scalePoints.push( value );
+	         scalePoints.push( value );
          }
       }else{
          range = indicator.maxScaleVal - indicator.minScaleVal;
-         for(i = 0; i < scaleSteps; i++ ){
-            step = (range / (scaleSteps-1)) * i;
+         for(i = 0; i < 5; i++ ){
+            step = (range / 4) * i;
             value = indicator.minScaleVal + step;
-	        scalePoints.push( value );
+	         scalePoints.push( value );
          }
-      }
-      
-      var isExponentOver3 = scalePoints.some(function( point ){
-         //return point.toExponential().match(/\.(.+)e/)[1].length > 4
-         return ( Math.abs(Number(point.toExponential().split('e')[1])) > 3 );
-      });
-      
-      if( isExponentOver3 ){
-	      makePointReadable = function( point ){
-	         point = point.toExponential();
-	         if( point.indexOf('.') == -1 )
-	            return point;
-	         var original = point.match(/\.(.+)e/)[1];
-	         return point.replace( original, original.substr(0,2) );
-	      };
-      }else{
-	      makePointReadable = function( point ){ return Math.round(point * 10) / 10; };
       }
       
       scalePoints = scalePoints.map(function( point ){
 	      return {
-	         original: isExponentOver3 ? point.toExponential() : point,
-	         nicePrint: makePointReadable(point)
+	         original: point.toString(),
+	         nicePrint: gisportal.utils.makePointReadable(point)
 	      };
       });
 
@@ -99,7 +81,7 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
  * @param {object} layer - The gisportal.layer
  * @parama {boolean} hasBase - True if you have the base URL (wmsURL)
  */
-gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
+gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
    var given_parameters;
    var parameters = "";
 
@@ -125,25 +107,77 @@ gisportal.scalebars.createGetLegendURL = function(layer,  base)  {
       }
    }catch(e){}
 
-   try{
-      if(typeof layer.minScaleVal == "number" && typeof layer.maxScaleVal == "number" ){
-         parameters += "&COLORSCALERANGE=" + layer.minScaleVal + ',' + layer.maxScaleVal;
-      }
-   }catch(e){}
+   // If this is a preview (e.g. from the add layers form)
+   if(preview){
+      try{
+         if(typeof layer.defaultMinScaleVal == "number" && typeof layer.defaultMaxScaleVal == "number" ){
+            parameters += "&COLORSCALERANGE=" + layer.defaultMinScaleVal + ',' + layer.defaultMaxScaleVal;
+         }
+      }catch(e){}
 
-   try{
-      if(layer.log){
-         parameters += "&logscale=" + layer.log;
-      }
-   }catch(e){}
+      try{
+         if(layer.defaultStyle){
+            base = base.replace(/&PALETTE=.+/g, "");
+            parameters += "&PALETTE=" + layer.defaultStyle.replace(/.+?(?=\/)\//g, "");
+         }
+      }catch(e){}
+
+      try{
+         if(layer.defaultColorbands){
+            parameters += "&NUMCOLORBANDS=" + layer.defaultColorbands;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.defaultAboveMaxColor){
+            parameters += "&ABOVEMAXCOLOR=" + layer.defaultAboveMaxColor;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.defaultBelowMinColor){
+            parameters += "&BELOWMINCOLOR=" + layer.defaultBelowMinColor;
+         }
+      }catch(e){}
+   }else{
+      try{
+         if(typeof layer.minScaleVal == "number" && typeof layer.maxScaleVal == "number" ){
+            parameters += "&COLORSCALERANGE=" + layer.minScaleVal + ',' + layer.maxScaleVal;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.defaultLog){
+            parameters += "&logscale=" + layer.defaultLog;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.colorbands){
+            parameters += "&NUMCOLORBANDS=" + layer.colorbands;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.aboveMaxColor){
+            parameters += "&ABOVEMAXCOLOR=" + layer.aboveMaxColor;
+         }
+      }catch(e){}
+
+      try{
+         if(layer.belowMinColor){
+            parameters += "&BELOWMINCOLOR=" + layer.belowMinColor;
+         }
+      }catch(e){}
+   }
 
    if(parameters.length > 0 && base.indexOf("?") ==-1){
       parameters = "?" + parameters;
    }
 
-   if (base.length > 0)
+   if (base.length > 0){
       return base + parameters;
-   else
+   }else
       return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + 'format=image/png';
 };
 
@@ -162,7 +196,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
          if( ! autoScaleCheck.prop('checked') ){
             return;
          }
-      }else if( ! gisportal.config.autoScale ){
+      }else if( !gisportal.getAutoScaleFromString(gisportal.layers[id].autoScale) ){
          return;
       }
    }
@@ -184,14 +218,27 @@ gisportal.scalebars.autoScale = function(id, force)  {
 
       if(typeof(l.minScaleVal) == "number" && typeof(l.maxScaleVal) == "number"){
          gisportal.scalebars.validateScale(id, l.minScaleVal, l.maxScaleVal);
+      }else if(typeof(l.autoMinScaleVal) == "number" && typeof(l.autoMaxScaleVal) == "number"){
+         gisportal.scalebars.validateScale(id, l.autoMinScaleVal, l.autoMaxScaleVal);
       }else{
+         gisportal.loading.increment();
          $.ajax({
             url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
             dataType: 'json',
             success: function( data ) {
                if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+                  var layer = gisportal.layers[id] || gisportal.original_layers[id];
+                  if(!layer){
+                     return false;
+                  }
+                  layer.autoMinScaleVal = data.min;
+                  layer.autoMaxScaleVal = data.max;
                   gisportal.scalebars.validateScale(id, data.min, data.max);
+                  gisportal.loading.decrement();
                }
+            },
+            error: function(){
+               gisportal.loading.decrement();
             }
          });
       }
@@ -207,8 +254,8 @@ gisportal.scalebars.autoScale = function(id, force)  {
  * @param {string} id - The id of the layer
  */
 gisportal.scalebars.resetScale = function(id)  {
-   min = gisportal.layers[id].origMinScaleVal;
-   max = gisportal.layers[id].origMaxScaleVal;
+   min = gisportal.layers[id].defaultMinScaleVal;
+   max = gisportal.layers[id].defaultMaxScaleVal;
    gisportal.scalebars.validateScale(id, min, max);
 
    gisportal.events.trigger('scalebar.reset', id);
@@ -285,7 +332,10 @@ gisportal.scalebars.updateScalebar = function(id)  {
    
    var params = {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
-      logscale: indicator.log
+      logscale: indicator.log,
+      numcolorbands: indicator.colorbands,
+      ABOVEMAXCOLOR: indicator.aboveMaxColor,
+      BELOWMINCOLOR: indicator.belowMinColor
    };
    
    gisportal.layers[id].mergeNewParams(params);

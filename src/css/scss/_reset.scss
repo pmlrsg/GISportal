@@ -22,6 +22,7 @@ time, mark, audio, video {
    font-size: inherit;
    font: inherit;
    vertical-align: baseline;
+   font-weight: inherit !important;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
@@ -49,4 +50,7 @@ q:before, q:after {
 table {
    border-collapse: collapse;
    border-spacing: 0;
+}
+b{
+   font-weight:bold !important;
 }

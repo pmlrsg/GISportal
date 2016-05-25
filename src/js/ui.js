@@ -35,6 +35,9 @@ $(document).ready(function()  {
    $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);
    $('.panel').on('mousedown', '.js-closable', closeTab);
+   $('.js-about-button').on('click', function(){
+      window.open(gisportal.config.aboutPage || "/",'_blank');
+   });
 });
 
 

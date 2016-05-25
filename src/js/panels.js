@@ -15,7 +15,9 @@ gisportal.panels.initDOM = function() {
 gisportal.panels.showPanel = function(panelName) {
 	gisportal.hideAllPopups();
 	if(panelName != "refine-indicator"){
-		$('.dd-container').ddslick('close');
+		if(gisportal.config.browseMode != "simplelist"){
+			$('.dd-container').ddslick('close');
+		}
 		gisportal.configurePanel.reset();
 	}
 	
@@ -69,7 +71,7 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
       gisportal.events.trigger('userFeedback.submit');
 
    });
-   $('.user-feedback-input').on('change keyup paste', function(e){
+   $('.user-feedback-input').select().on('change keyup paste', function(e){
    	var value = $(this).val();
    	if(e.type == "paste"){
    		try{

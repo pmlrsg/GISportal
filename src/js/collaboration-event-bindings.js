@@ -210,6 +210,16 @@ gisportal.events.bind("scalebar.opacity", function(event, id, value) {
    collaboration._emit('c_event', params);
 });
 
+// layer colorbands changed
+gisportal.events.bind("scalebar.colorbands", function(event, id, value) {
+   var params = {
+      "event" : "scalebar.colorbands",
+      "id" : id,
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
 // auto scale a layer
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
@@ -387,6 +397,38 @@ gisportal.events.bind('addLayersForm.input', function(event, inputValue, field) 
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('addLayersForm.autoScale-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.autoScale-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.aboveMaxColor-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.aboveMaxColor-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.belowMinColor-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.belowMinColor-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('addLayersForm.defaultStyle-changed', function(event, value) {
+   var params = {
+      "event": "addLayersForm.defaultStyle-changed",
+      "value": value
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('addLayersForm.close', function(event) {
    var params = {
       "event": "addLayersForm.close"
@@ -435,6 +477,13 @@ gisportal.events.bind('cancelChanges.clicked', function(event) {
 gisportal.events.bind('toggleAllLayers.clicked', function(event) {
    var params = {
       "event": "toggleAllLayers.clicked"
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('logToAllLayers.clicked', function(event) {
+   var params = {
+      "event": "logToAllLayers.clicked"
    };
    collaboration._emit('c_event', params);
 });

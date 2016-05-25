@@ -472,6 +472,14 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
                   new_data_layer.Abstract = this_new_layer.abstract;
                   new_data_layer.include = this_new_layer.include;
+                  new_data_layer.autoScale = this_new_layer.originalAutoScale;
+                  new_data_layer.defaultMinScaleVal = this_new_layer.defaultMinScaleVal;
+                  new_data_layer.defaultMaxScaleVal = this_new_layer.defaultMaxScaleVal;
+                  new_data_layer.defaultStyle = this_new_layer.defaultStyle;
+                  new_data_layer.log = this_new_layer.defaultLog;
+                  new_data_layer.colorbands = this_new_layer.defaultColorbands;
+                  new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
+                  new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
                   for(key in this_new_layer.tags){
                      var val = this_new_layer.tags[key];
                      if(val && val.length > 0 && val[0] != ""){
