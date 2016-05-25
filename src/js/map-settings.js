@@ -493,7 +493,7 @@ gisportal.selectBaseLayer = function(id) {
    var setViewRequired = true;
 
    // the selected base map isn't available in the current projection
-   if (_.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
+   if (gisportal.baseLayers[id] && _.indexOf(gisportal.baseLayers[id].getProperties().projections, current_projection) < 0) {
       // if there's only one available projection for the selected base map set the projection to that value and then load the base map
       if (gisportal.baseLayers[id].getProperties().projections.length == 1) {
          msg = 'The projection has been changed to ' + gisportal.baseLayers[id].getProperties().projections[0] + ' in order to display the ' + gisportal.baseLayers[id].getProperties().title + ' base layer';
@@ -548,12 +548,13 @@ gisportal.setProjection = function(new_projection) {
    var old_projection = map.getView().getProjection().getCode();
    // first make sure that base layer can accept the projection
    var current_basemap = $('#select-basemap').data('ddslick').selectedData.value;
+   var base_layer = gisportal.baseLayers[current_basemap];
 
    // does the current base map allow the requested projection?
-   if (_.indexOf(gisportal.baseLayers[current_basemap].getProperties().projections, new_projection) < 0) {
+   if (base_layer && _.indexOf(base_layer.getProperties().projections, new_projection) < 0) {
       // no, tell the user then bail out
       $('.js-map-settings-message')
-         .html('The \'' + gisportal.baseLayers[current_basemap].getProperties().title + '\' base map cannot be used with '+ new_projection +'. Try changing the base map and then selecting the required projection.')
+         .html('The \'' + base_layer.getProperties().title + '\' base map cannot be used with '+ new_projection +'. Try changing the base map and then selecting the required projection.')
          .toggleClass('alert-danger', true)
          .toggleClass('hidden', false);
       // set the projection ddslick value back to original value
@@ -585,8 +586,15 @@ gisportal.setView = function(centre, extent, projection) {
    var min_zoom = 3;
    var max_zoom = 12;
    if (projection == 'EPSG:3857') max_zoom = 19;
+   var value = $('#select-basemap').data('ddslick').selectedData.value;
 
-   var viewSettings = gisportal.baseLayers[$('#select-basemap').data('ddslick').selectedData.value].getProperties().viewSettings;
+   var viewSettings;
+   if(value && value != "none"){
+      viewSettings = gisportal.baseLayers[$('#select-basemap').data('ddslick').selectedData.value].getProperties().viewSettings;
+   }else{
+      viewSettings = undefined;
+   }
+
    if (typeof viewSettings !== 'undefined') {
       if (typeof viewSettings.minZoom !== 'undefined') min_zoom = viewSettings.minZoom;
       if (typeof viewSettings.maxZoom !== 'undefined') max_zoom = viewSettings.maxZoom;
@@ -617,7 +625,7 @@ gisportal.selectedRegionProjectionChange = function(old_proj, new_proj){
    if(gisportal.methodThatSelectedCurrentRegion.justCoords){
       gisportal.currentSelectedRegion = gisportal.reprojectBoundingBox(gisportal.currentSelectedRegion.split(","), old_proj, new_proj).toString();
    }else if(features.length > 0){
-      var wkt_features = gisportal.wkt.writeFeatures(features)
+      var wkt_features = gisportal.wkt.writeFeatures(features);
       wkt_features = wkt_features.replace(/[\d\.]+/g, function(num){
          return Math.round(num * 1000 ) / 1000;
       });

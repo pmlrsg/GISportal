@@ -302,6 +302,9 @@ collaboration.initSession = function() {
                   $('.collab-overlay').toggleClass('hidden', true);
                   break;
                } else {
+                  if(collaboration.role == "presenter"){
+                     gisportal.showModalMessage('You are no longer the presenter');
+                  }
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
                   if(!collaboration.diverged){
@@ -421,6 +424,50 @@ collaboration.initSession = function() {
                if(highlight_elem){
                   collaboration.highlightElement(highlight_elem);
                }
+            }
+         });
+
+         socket.on('addLayersForm.autoScale-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="originalAutoScale"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
+            }
+         });
+
+         socket.on('addLayersForm.aboveMaxColor-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="defaultAboveMaxColor"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
+            }
+         });
+
+         socket.on('addLayersForm.belowMinColor-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="defaultBelowMinColor"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
+            }
+         });
+
+         socket.on('addLayersForm.defaultStyle-changed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               var select_elem = $('select[data-field="defaultStyle"]');
+               select_elem.val(data.params.value).trigger('change');
+               collaboration.highlightElement(select_elem);
             }
          });
 
@@ -755,7 +802,25 @@ collaboration.initSession = function() {
                   gisportal.layers[id].setOpacity(value);
                }
             }
-            
+         });
+
+         // Layer colorbands value changed
+         socket.on('scalebar.colorbands', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var id = data.params.id;
+            var value = data.params.value;
+
+            if (typeof value != 'undefined') {
+               var colorbands = value;
+               if (collaboration.role == "member") {
+                  collaboration.highlightElement($('#tab-' + id + '-colorbands'));
+                  collaboration.highlightElement($('#tab-' + id + '-colorbands-value'));
+                  
+                  $('#tab-' + id + '-colorbands-value').val(colorbands).trigger('change');
+               }
+            }
          });
 
 		  	// reset scalebar
@@ -962,6 +1027,18 @@ collaboration.initSession = function() {
             collaboration.log(data.presenter +': "Copy to all" clicked');
             if (collaboration.role == "member") {
                var toggle_all_elem = $('.toggle-all-layers');
+               collaboration.highlightElement(toggle_all_elem);
+               toggle_all_elem.trigger('click');
+            }
+         });
+
+         socket.on('logToAllLayers.clicked', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            collaboration.log(data.presenter +': "Add to all" clicked');
+            if (collaboration.role == "member") {
+               var toggle_all_elem = $('.log-to-all-layers');
                collaboration.highlightElement(toggle_all_elem);
                toggle_all_elem.trigger('click');
             }

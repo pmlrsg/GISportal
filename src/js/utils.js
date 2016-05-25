@@ -445,3 +445,17 @@ HashMap.prototype.any = function any(value) {
 gisportal.utils.titleCase = function(str){
    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 };
+
+gisportal.utils.makePointReadable = function(point){
+   var string = point.toString();
+   var exponential = parseFloat(point).toExponential(2);
+   if(exponential){
+      return exponential;
+   }else{
+      return string;
+   }
+};
+
+gisportal.utils.delimiterisePoint = function(point){
+   return point.toString().replace(/(\d)(?=(\d{3})+(?!\d)\.)/g, '$1,');
+};

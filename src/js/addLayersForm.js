@@ -31,6 +31,13 @@ gisportal.addLayersForm.validation_functions = {
                               return "The wcsURL must start with 'http://' or 'https://'";
                            }
    },
+   'defaultColorbands':function(value){
+                           if(isNaN(value)){
+                              return "value must be a numerical value";
+                           }else if(parseInt(value) <= 0 || parseInt(value) > 255){
+                              return "value must be between 1 and 255";
+                           }
+   },
 };
 
 /**
@@ -98,19 +105,28 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       }
    }
 
+
    var layer_info={
-      "list_id":list_id,
-      "nice_name":layer.tags.niceName,
-      "original_name":layer.urlName, //used to input the data into the correct files int the end.
-      "abstract":layer.abstract,
-      "id":layer.id,
-      "tags":{"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
-      "include":layer.include,
-      "styles_file":styles_file,
-      "legendSettings":legendSettings,
-      "title":layer.serverName,
-      "dict":dict,
-      "tags_dict":reformatted_tags_dict
+      "list_id": list_id,
+      "nice_name": layer.tags.niceName,
+      "original_name": layer.urlName, //used to input the data into the correct files int the end.
+      "abstract": layer.abstract,
+      "originalAutoScale": layer.originalAutoScale,
+      "defaultMinScaleVal": layer.defaultMinScaleVal,
+      "defaultMaxScaleVal": layer.defaultMaxScaleVal,
+      "defaultColorbands": layer.defaultColorbands,
+      "defaultAboveMaxColor": layer.defaultAboveMaxColor,
+      "defaultBelowMinColor": layer.defaultBelowMinColor,
+      "defaultLog": layer.defaultLog,
+      "id": layer.id,
+      "tags": {"indicator_type":indicator_type, "region":region, "interval":interval, "model":model}, //ensures that these tags are displayed on the form
+      "include": layer.include,
+      "styles_file": styles_file,
+      "defaultStyle": layer.defaultStyle,
+      "legendSettings": legendSettings,
+      "title": layer.serverName,
+      "dict": dict,
+      "tags_dict": reformatted_tags_dict
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -178,17 +194,78 @@ gisportal.addLayersForm.displayPaginator = function(total_pages, current_page, a
 * @param String form_div - The JQuery selector of the element that the form should be applied to.
 */
 gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_div){
+   var this_layer = gisportal.addLayersForm.layers_list[current_page];
    // Makes sure that the user is not still drawing a polygon;
    cancelDraw();
    for(var value in gisportal.addLayersForm.layers_list){
       gisportal.addLayersForm.layers_list[value].total_pages = total_pages; //This passes the total number of pages to each layer for later use.
    }
    // Takes the current page information and adds it to the element given
-   var layer_form = gisportal.templates['add-layers-form'](gisportal.addLayersForm.layers_list[current_page]);
+   var layer_form = gisportal.templates['add-layers-form'](this_layer);
    $(form_div).html(layer_form);
    //Makes sure the suggestions are displayed/hidden
    gisportal.addLayersForm.displaySuggestions();
    gisportal.addLayersForm.displayTagSuggestions(current_page);
+   // Makes sure that the autoScale value is set correctly and changes the value when the user selects a value
+   $('select[data-field="originalAutoScale"]').val(this_layer.originalAutoScale).on('change', function(){
+      this_layer.originalAutoScale = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
+   });
+
+   // Makes sure that the aboveMaxColor value is set correctly and changes the value when the user selects a value
+   $('select[data-field="defaultAboveMaxColor"]').val(this_layer.defaultAboveMaxColor).on('change', function(){
+      this_layer.defaultAboveMaxColor = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.aboveMaxColor-changed', $(this).val());
+   });
+
+   // Makes sure that the belowMinColor value is set correctly and changes the value when the user selects a value
+   $('select[data-field="defaultBelowMinColor"]').val(this_layer.defaultBelowMinColor).on('change', function(){
+      this_layer.defaultBelowMinColor = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.belowMinColor-changed', $(this).val());
+   });
+
+   // Makes sure that the defaultStyle value is set correctly and changes the value when the user selects a value
+   var site_style = gisportal.config.defaultStyle || "boxfill/rainbow";
+   var display = this_layer.defaultStyle;
+   if(display === undefined){
+      display = "Site deafult (" + site_style + ")";
+   }
+
+   // This block loads the list of available styles. idealy would be nice to put on the focus of the styleSelect, but at the moment the list does not load a sensible height on the first occasion.
+   var layer = gisportal.layers[this_layer.id];
+   var styleSelect = $('select[data-field="defaultStyle"]');
+   $.ajax({
+      url: gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_" + layer.urlName + ".json" || "",
+      dataType: 'json',
+      success:function(data){
+         var styles = [];
+         var style;
+         for(style in data.Styles){
+            styles.push(data.Styles[style].Name);
+         }
+         styles = styles.sort();
+         styleSelect.html("");
+         for(style in styles){
+            styleSelect.append("<option value='" + styles[style] + "'>" + styles[style] + "</option>");
+         }
+         if(styles.length <= 1){
+            $('[data-field="defaultStyle"]').toggleClass('hidden', true);
+         }
+         styleSelect.val(this_layer.defaultStyle || site_style);
+      }
+   });
+   styleSelect.html("<option value='' disabled selected>" + display + "</option>").on('change', function(){
+      this_layer.defaultStyle = $(this).val();
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      gisportal.events.trigger('addLayersForm.defaultStyle-changed', $(this).val());
+   });
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
    // The form then goes through validation to display corrections required to the user.
@@ -199,7 +276,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    //The following block shows the scale Points option if it is available.
    var l;
    try{
-      l = gisportal.layers[gisportal.addLayersForm.layers_list[current_page].id];
+      l = gisportal.layers[this_layer.id];
       var bbox = l.exBoundingBox.WestBoundLongitude + "," +
             l.exBoundingBox.SouthBoundLatitude + "," +
             l.exBoundingBox.EastBoundLongitude + "," +
@@ -217,6 +294,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             // If there is a min & max value returned the label and input are both shown.
             if(typeof(data.min) == "number" && typeof(data.max) == "number"){
                $('.scale-points-div').toggleClass('hidden', false);
+               l.autoMinScaleVal = data.min;
+               l.autoMaxScaleVal = data.max;
+               if(gisportal.addLayersForm.layers_list && gisportal.addLayersForm.layers_list[current_page]){
+                  gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+               }
             }
          }
       });
@@ -261,11 +343,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    });
 
    // This adds the click listener to the 'add to all layers' spans
-   $('div.layers-form-right span.add-to-all-layers ').on( 'click', function () {
+   $('span.add-to-all-layers').on( 'click', function () {
       // Gets the information from the related input
       var field = $(this).data("field");
       var key = field.replace(/-/g,"_");
-      var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"]").val();
+      var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"], select[data-field="+key+"]").val();
       key = key.replace("-", "_");
       if(key == "indicator_type"){
          key_val = key_val.split(",");
@@ -275,7 +357,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then added to every layer in the list
       for(var item in gisportal.addLayersForm.layers_list){
-         gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
+         if(key == "originalAutoScale" || key == "defaultStyle" || key == "defaultAboveMaxColor" || key == "defaultBelowMinColor"){
+            gisportal.addLayersForm.layers_list[item][key] = key_val;
+         }else{
+            gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
+         }
       }
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
@@ -315,6 +401,16 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.events.trigger('toggleAllLayers.clicked');
+   });
+
+   // This adds the click listener to the 'log to all layers' span
+   $('span.log-to-all-layers').on( 'click', function () {
+      var prop = $('input[data-field="defaultLog"]').prop('checked');
+      for(var value in gisportal.addLayersForm.layers_list){
+         gisportal.addLayersForm.layers_list[value].defaultLog = prop;
+      }
+      gisportal.addLayersForm.refreshStorageInfo();
+      gisportal.events.trigger('logToAllLayers.clicked');
    });
 
    // Adds a listener to the span for adding tags.
@@ -691,7 +787,7 @@ gisportal.addLayersForm.addInputListeners = function(){
          if($(this).parent('div.legend-parameters').length > 0){
             gisportal.addLayersForm.layers_list[index].legendSettings.Parameters[key] = key_val;
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
-         }else if($(this).parents('div.legend-settings').length > 0){
+         }else if($(this).parents('div.legend-settings').length > 0 && !$(this).hasClass('ignore-nesting')){
             if(key == "Rotation"){
                if(key_val == "LEFT"){
                   key_val = gisportal.addLayersForm.layers_list[index].legendSettings[key] - 90;
@@ -721,6 +817,9 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.layers_list[index].tags[key] = key_val;
          }else{
             gisportal.addLayersForm.layers_list[index][key] = key_val;
+         }
+         if($(this).hasClass("refresh-scalebar") && e.type == "change"){
+            gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }
       }else{
          if(key == "wcsURL"){
@@ -785,15 +884,27 @@ gisportal.addLayersForm.addInputListeners = function(){
 * @param String scalebar_div - The JQuery selector of the scalebar preview div.
 */
 gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div){
-   layer = gisportal.addLayersForm.layers_list[current_page];
+   var layer = gisportal.addLayersForm.layers_list[current_page];
+   var portal_layer = gisportal.layers[layer.id];
+   if(parseFloat(layer.defaultMinScaleVal) > parseFloat(layer.defaultMaxScaleVal)){
+      $(scalebar_div).html("<p>Invalid Min & Max values (Min is more than max)</p>");
+      return false;
+   }
    if(layer.styles_url){
-      var legendURL = layer.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(layer, layer.styles_url));
+      var legendURL = layer.legendSettings.URL || encodeURIComponent(gisportal.scalebars.createGetLegendURL(layer, layer.styles_url, preview=true));
       var data = {
          'scalePoints':layer.legendSettings.scalePoints,
+         'id':layer.list_id,
          'angle':layer.legendSettings.Rotation,
          'legendURL':legendURL,
          'middleware':gisportal.middlewarePath
       };
+      if(layer.defaultLog){
+         var scale = layer.originalAutoScale;
+         if((scale == "true" || (scale == "default" && gisportal.config.autoScale) && portal_layer.autoMinScaleVal <= 0) || (scale == "false" && layer.defaultMinScaleVal <= 0)){
+            $('label[data-field="defaultLog"]').notify("Cannot use a logarithmic scale with negative or zero values, this will currently be ignored.", {position:"right"});
+         }
+      }
       var preview = gisportal.templates['scalebar-preview'](data);
       $(scalebar_div).html(preview);
    }else{
@@ -802,12 +913,16 @@ gisportal.addLayersForm.addScalebarPreview = function(current_page, scalebar_div
          dataType: 'json',
          success: function( data ){
             var style_index = 0;
+            var style_found = false;
             for(var style in data.Styles){
                if(data.Styles[style].Name == gisportal.config.defaultStyle){
                   style_index = style;
+                  style_found = true;
                }
             }
-            gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
+            if(data.Styles && data.Styles[style_index]){
+               gisportal.addLayersForm.layers_list[current_page].styles_url = data.Styles[style_index].LegendURL;
+            }
             if(gisportal.addLayersForm.layers_list[current_page].styles_url){
                gisportal.addLayersForm.addScalebarPreview(current_page, scalebar_div);
             }

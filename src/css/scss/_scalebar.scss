@@ -35,6 +35,11 @@
 	display: block;
 }
 
+.colorbands-value{
+   margin: 4px 0 0 5px;
+   width: 30px;
+}
+
 .panel-tab.dimensions-tab  {
   background-color: #fbfafb;
   padding: 9px;
@@ -50,11 +55,18 @@
   padding-bottom: 10px;
 }
 
+.above-below-color-selects {
+   padding-top: 7px;
+   display: inline-block;
+   width: 100%;
+}
+
 .indicator-option  {
   margin-bottom: 10px;
 }
 
-.layer-opacity-slider {
+.layer-opacity-slider,
+.layer-colorbands-slider {
 	margin: 10px;
 }
 
@@ -154,3 +166,10 @@
 	right: 0%;
 }
 
+span.scalebar-overlay-text {
+   position: absolute;
+   width: calc(100%/4);
+   height: 100%;
+   top: 0;
+   display: -webkit-box;
+}
