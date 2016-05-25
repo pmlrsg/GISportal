@@ -782,23 +782,25 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          }
       });
 
-      $('#tab-' + indicator.id + '-colorbands').noUiSlider({
-         start: [ indicator.colorbands || gisportal.config.colorbands ],
-         margin: 20,
-         connect: "lower",
-         range: {
-            'min': [   1 ],
-            'max': [ 255 ]
-         },
-         serialization: {
-            lower: [
-               $.Link({
-                  target: $('#tab-' + indicator.id + '-colorbands-value'),
-                  method: setColorbandsValue
-               })
-            ],
-         }
-      });
+      if($('#tab-' + indicator.id + '-colorbands').length > 0){
+         $('#tab-' + indicator.id + '-colorbands').noUiSlider({
+            start: [ indicator.colorbands || gisportal.config.colorbands ],
+            margin: 20,
+            connect: "lower",
+            range: {
+               'min': [   1 ],
+               'max': [ 255 ]
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: $('#tab-' + indicator.id + '-colorbands-value'),
+                     method: setColorbandsValue
+                  })
+               ],
+            }
+         });
+      }
       
       function setOpacityValue(value) {
          $(this).html(parseInt(value) +'%');
@@ -868,7 +870,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                indicator.mergeNewParams({
                   STYLES: data.selectedData.value
                });
-               gisportal.indicatorsPanel.scalebarTab(id);
+               gisportal.scalebars.updateScalebar(indicator.id);
             }
          }
       });
@@ -880,7 +882,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                indicator.mergeNewParams({
                   ABOVEMAXCOLOR: data.selectedData.value
                });
-               gisportal.indicatorsPanel.scalebarTab(id);
             }
          }
       });
@@ -892,7 +893,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                indicator.mergeNewParams({
                   BELOWMINCOLOR: data.selectedData.value
                });
-               gisportal.indicatorsPanel.scalebarTab(id);
             }
          }
       });
