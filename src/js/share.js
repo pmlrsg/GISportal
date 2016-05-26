@@ -43,4 +43,4 @@ gisportal.share.initDOM = function(){
          $('.share').toggleClass('hidden', true);
       });
    };
-}
+};

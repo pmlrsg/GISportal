@@ -135,7 +135,7 @@ gisportal.layer = function( options ) {
    this.minScaleVal = null;
    this.defaultMinScaleVal = options.defaultMinScaleVal;
    var log = gisportal.config.defaultLog;
-   if(options.log == undefined){
+   if(options.log === undefined){
       this.defaultLog = log;
       this.log = log;
    }else{
@@ -193,14 +193,12 @@ gisportal.layer = function( options ) {
          // A list of styles available for the layer
          this.styles = _.sortBy(layerData.Styles, function(style){return style.Name;}); // Can be 'Null'.
          var default_style = null;
-         //console.log("before style add");
          if(this.styles){
             $.each(this.styles, function(index, value){
                if(value.Name == gisportal.config.defaultStyle){
                   default_style = prev_style || value.Name;
                }
             });
-            //console.log("adding style");
             this.style = default_style || this.styles[0].Name;
          }       
       } else if(this.type == "refLayers") {
@@ -256,6 +254,29 @@ gisportal.layer = function( options ) {
          }
       });
    };
+
+   this.setScalebarTimeout = function(){
+      var layer = this;
+      layer.clearScalebarTimeout();
+      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', false).off('click').on('click', function(){
+         clearTimeout(layer.scalebarTimeout);
+         $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
+         gisportal.scalebars.autoScale(layer.id);
+         gisportal.scalebars.updateScalebar(layer.id);
+      });
+      layer.scalebarTimeout = setTimeout(function(){
+         $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
+         gisportal.scalebars.autoScale(layer.id);
+         gisportal.scalebars.updateScalebar(layer.id);
+      }, 10000);
+   };
+
+   this.clearScalebarTimeout = function(){
+      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
+      if(layer.scalebarTimeout){
+         clearTimeout(layer.scalebarTimeout);
+      }
+   };
    
    //--------------------------------------------------------------------------
    
@@ -274,7 +295,7 @@ gisportal.layer = function( options ) {
             params[prop] = object[prop];
          }
          this.openlayers.anID.getSource().updateParams(params);
-         gisportal.scalebars.autoScale( this.id );   
+         gisportal.scalebars.autoScale( this.id );
       }
    };
    
@@ -767,7 +788,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
   //console.log("getting layer data 222");
   if (layer.serviceType=="WFS"){
 
-    gisportal.layers[id].init(options,layer);
+    layer.init(options,layer);
   }
   else {
     //console.log("inside ajax getting");
@@ -779,12 +800,32 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
       cache: false,
       success: function(data) {
          // Initialises the layer with the data from the AJAX call
-         if(gisportal.layers[id]){
-            gisportal.layers[id].init(data, options, style);
+         if(layer){
+            layer.init(data, options, style);
          }
       },
       error: function() {
          $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
+      }
+   });
+   var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
+         layer.exBoundingBox.SouthBoundLatitude + "," +
+         layer.exBoundingBox.EastBoundLongitude + "," +
+         layer.exBoundingBox.NorthBoundLatitude;
+   var time = "";
+   try{
+      time = '&time=' + new Date(layer.selectedDateTime).toISOString();
+   }
+   catch(e){}
+   $.ajax({
+      url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+      dataType: 'json',
+      success: function( data ) {
+         // If there is a min & max value returned the label and input are both shown.
+         if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+            layer.autoMinScaleVal = data.min;
+            layer.autoMaxScaleVal = data.max;
+         }
       }
    });
  }

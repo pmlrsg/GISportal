@@ -22,6 +22,7 @@
                Auto Scale
             </label>
             <a class="js-reset text-button" data-id="{{../id}}">Reset</a>
+            <button data-id="{{../id}}" class="brand small js-apply-changes pull-right hidden">Apply Changes</button>
          </div>
       {{/unless_equals}}
    <div class="indicator-options"> 

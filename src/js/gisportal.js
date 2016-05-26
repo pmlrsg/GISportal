@@ -282,7 +282,7 @@ gisportal.createOpLayers = function() {
          "colorbands": colorbands,
          "aboveMaxColor": aboveMaxColor,
          "belowMinColor": belowMinColor,
-         "defaultStyle": indicator.defaultStyle,
+         "defaultStyle": indicator.defaultStyle || gisportal.config.defaultStyle,
          "log": indicator.log,
 
          //orginal
