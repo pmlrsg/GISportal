@@ -258,21 +258,27 @@ gisportal.layer = function( options ) {
    this.setScalebarTimeout = function(){
       var layer = this;
       layer.clearScalebarTimeout();
-      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', false).off('click').on('click', function(){
-         clearTimeout(layer.scalebarTimeout);
-         $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
-         gisportal.scalebars.autoScale(layer.id);
-         gisportal.scalebars.updateScalebar(layer.id);
-      });
-      layer.scalebarTimeout = setTimeout(function(){
-         $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
-         gisportal.scalebars.autoScale(layer.id);
-         gisportal.scalebars.updateScalebar(layer.id);
-      }, 10000);
+      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
+      apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
+      // THIS IS IMPORTANT, it makes sure the animation is reset
+      setTimeout(function(){
+        apply_changes.offsetWidth = apply_changes.offsetWidth;
+        apply_changes.addClass('progress-btn').off('click').on('click', function(){
+           clearTimeout(layer.scalebarTimeout);
+           apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
+           gisportal.scalebars.autoScale(layer.id);
+           gisportal.scalebars.updateScalebar(layer.id);
+        });
+        layer.scalebarTimeout = setTimeout(function(){
+           apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
+           gisportal.scalebars.autoScale(layer.id);
+           gisportal.scalebars.updateScalebar(layer.id);
+        }, 10000);
+      }, 200);
    };
 
    this.clearScalebarTimeout = function(){
-      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true);
+      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true).toggleClass('progress-btn', false);
       if(layer.scalebarTimeout){
          clearTimeout(layer.scalebarTimeout);
       }

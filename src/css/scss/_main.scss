@@ -277,6 +277,29 @@ dd {
   } 
 }
 
+.progress-btn {
+    position:relative;
+}
+.progress-btn:after {
+    content:'\A';
+    position:absolute;
+    background: transparentize($panel-content-header, 0.6);
+    top:0; bottom:0;
+    left:0;
+    border-radius: 5px;
+    animation:progress 10s linear;
+    -webkit-animation:progress 10s linear;
+    width:0%;
+}
+
+@keyframes progress {
+  from {
+    width:0%;
+  }
+  to{
+    width:100%;
+  }
+}
 
 
 /* ddslisk CSS */
