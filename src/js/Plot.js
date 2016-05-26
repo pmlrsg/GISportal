@@ -328,13 +328,6 @@ gisportal.graphs.Plot =(function(){
          if( component.elevation )
             meta += "Depth: " + component.elevation + layer.elevationUnits + "<br>";
 
-         // Add the external meta data URLS
-         var markdowns = [];
-         if( layer.moreIndicatorInfo )
-            markdowns.push( gisportal.middlewarePath + '/metadata/indicator/' + layer.name );
-         if( layer.moreProviderInfo )
-            markdowns.push( gisportal.middlewarePath + '/metadata/provider/' + layer.providerTag );
-
          if(layer.provider){
             logo = layer.provider.logo;
          }
@@ -389,7 +382,6 @@ gisportal.graphs.Plot =(function(){
             "yAxis": yAxis,
             "type": "line",
             "meta": meta,
-            "markdown": markdowns,
             "logo": gisportal.middlewarePath + logo
          };
 

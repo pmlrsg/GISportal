@@ -1375,6 +1375,31 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('slideout.close', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var slideoutName = data.params.slideoutName;
+            collaboration.log(data.presenter +': Close panel: ' + slideoutName);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-close');
+               gisportal.panelSlideout.closeSlideout(slideoutName);
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
+         socket.on('more-info.clicked', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var id = data.params.layerId;
+            collaboration.log(data.presenter +': More Info: ' + id);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('.show-more[data-id="' + id + '"]').trigger('click');
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
          socket.on('graphTitle.edit', function(data) {
             if(collaboration.diverged){
                return true;

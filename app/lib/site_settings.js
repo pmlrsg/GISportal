@@ -21,7 +21,6 @@ var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
-var METADATA_PATH = CURRENT_PATH + "/../../markdown/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
@@ -234,17 +233,6 @@ router.get('/app/cache/*?', function(req, res) {
          utils.handleError(err, res);
       }
    });
-});
-
-router.get('/app/metadata/*?', function(req, res) {
-   var html_path = path.join(METADATA_PATH, req.params[0] + ".md");// Gets the given path
-
-   var markdown_data = fs.readFileSync(html_path).toString();
-
-
-   var markdown = require( "markdown" ).markdown;
-
-   res.send( markdown.toHTML(markdown_data) );
 });
 
 router.get('/app/settings/get_cache', function(req, res) {
@@ -750,6 +738,72 @@ router.get('/app/settings/get_share', function(req, res){
    });
 });
 
+router.all('/app/settings/get_markdown_metadata', function(req, res) {
+   var markdown = require( "node-markdown" ).Markdown;
+   var domain = utils.getDomainName(req);
+   var tags = req.body; // Gets the data (tags)
+   var html = "";
+   var markdown_folder_path = path.join(MASTER_CONFIG_PATH, domain, "markdown");
+   var markdown_file_path;
+   var markdown_data;
+   var html_data;
+
+   delete tags.indicator_type;
+   if(tags.providerTag){
+      markdown_file_path = path.join(markdown_folder_path, "providerTag", tags.providerTag.toLowerCase() + ".md");
+      if(utils.fileExists(markdown_file_path)){
+         markdown_data = fs.readFileSync(markdown_file_path).toString();
+         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+         html += html_data;
+      }
+      delete tags.providerTag;
+   }
+   if(tags.niceName){
+      markdown_file_path = path.join(markdown_folder_path, "niceName", tags.niceName.toLowerCase() + ".md");
+      if(utils.fileExists(markdown_file_path)){
+         markdown_data = fs.readFileSync(markdown_file_path).toString();
+         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+         html += html_data;
+      }
+      delete tags.niceName;
+   }
+   if(tags.model){
+      markdown_file_path = path.join(markdown_folder_path, "model", tags.model.toLowerCase() + ".md");
+      if(utils.fileExists(markdown_file_path)){
+         markdown_data = fs.readFileSync(markdown_file_path).toString();
+         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+         html += html_data;
+      }
+      delete tags.model;
+   }
+   for(var tag in tags){
+      markdown_file_path = path.join(markdown_folder_path, tag, tags[tag].toLowerCase() + ".md");
+      if(utils.fileExists(markdown_file_path)){
+         markdown_data = fs.readFileSync(markdown_file_path).toString();
+         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+         html += html_data;
+      }
+   }
+   res.send(html);
+});
+
+
+
+router.get('/app/metadata/*?', function(req, res) {
+   var domain = utils.getDomainName(req);
+
+   var html_path = path.join(MASTER_CONFIG_PATH, domain, "markdown", req.params[0].toLowerCase() + ".md");// Gets the given path
+
+   var markdown_data = fs.readFileSync(html_path).toString();
+
+
+   var markdown = require( "node-markdown" ).Markdown;
+
+   res.send( markdown(markdown_data, true, null, {"a":"href|target"} ));
+});
+
+
+
 function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){
    for(index in parent_layer.Layer){
       var layer = parent_layer.Layer[index]
@@ -785,7 +839,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          }
       }
       if(name && service_title && title && bounding_box){
-         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "MoreIndicatorInfo" : false})
+         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
          if(!utils.directoryExists(LAYER_CONFIG_PATH)){
             utils.mkdirpSync(LAYER_CONFIG_PATH);

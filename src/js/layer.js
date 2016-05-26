@@ -789,51 +789,59 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
-  options = options || {};
-  var id = layer.id; 
-  //console.log("getting layer data 222");
-  if (layer.serviceType=="WFS"){
+   options = options || {};
+   var id = layer.id; 
+   if (layer.serviceType=="WFS"){
 
-    layer.init(options,layer);
-  }
-  else {
-    //console.log("inside ajax getting");
-   $.ajax({
-      type: 'GET',
-      url: gisportal.middlewarePath + "/cache/layers/" + fileName,
-      dataType: 'json',
-      async: true,
-      cache: false,
-      success: function(data) {
-         // Initialises the layer with the data from the AJAX call
-         if(layer){
-            layer.init(data, options, style);
+      layer.init(options,layer);
+   }else {
+      $.ajax({
+         type: 'GET',
+         url: gisportal.middlewarePath + "/cache/layers/" + fileName,
+         dataType: 'json',
+         async: true,
+         cache: false,
+         success: function(data) {
+            // Initialises the layer with the data from the AJAX call
+            if(layer){
+               layer.init(data, options, style);
+            }
+         },
+         error: function() {
+            $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
          }
-      },
-      error: function() {
-         $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
+      });
+      var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
+            layer.exBoundingBox.SouthBoundLatitude + "," +
+            layer.exBoundingBox.EastBoundLongitude + "," +
+            layer.exBoundingBox.NorthBoundLatitude;
+      var time = "";
+      try{
+         time = '&time=' + new Date(layer.selectedDateTime).toISOString();
       }
-   });
-   var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
-         layer.exBoundingBox.SouthBoundLatitude + "," +
-         layer.exBoundingBox.EastBoundLongitude + "," +
-         layer.exBoundingBox.NorthBoundLatitude;
-   var time = "";
-   try{
-      time = '&time=' + new Date(layer.selectedDateTime).toISOString();
+      catch(e){}
+      $.ajax({
+         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+         dataType: 'json',
+         success: function( data ) {
+            // If there is a min & max value returned the label and input are both shown.
+            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+               layer.autoMinScaleVal = data.min;
+               layer.autoMaxScaleVal = data.max;
+            }
+         }
+      });
+      $.ajax({
+         method: 'POST',
+         url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
+         data: layer.tags,
+         success: function( data ) {
+            if(data){
+               layer.metadataHTML = data;
+               $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
+            }
+         }
+      });
    }
-   catch(e){}
-   $.ajax({
-      url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
-      dataType: 'json',
-      success: function( data ) {
-         // If there is a min & max value returned the label and input are both shown.
-         if(typeof(data.min) == "number" && typeof(data.max) == "number"){
-            layer.autoMinScaleVal = data.min;
-            layer.autoMaxScaleVal = data.max;
-         }
-      }
-   });
- }
 };
 

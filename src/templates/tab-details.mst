@@ -19,14 +19,6 @@
             <td><a href="mailto:{{provider.email}}">{{provider.email}}</a></td>
          </tr>
       {{/if}}
-      {{#if moreIndicatorInfo}}
-      <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
-      {{else}}
-        {{#if moreProviderInfo}}
-        <tr><td></td><td><a id="show_more" href="#">more information</a></td></tr>
-        {{/if}}
-
-      {{/if}}
       {{#if abstract}}
          <tr>
             <td>Abstract</td>
@@ -70,6 +62,8 @@
             {{/if}}
          {{/with}}
       {{/if}}
+
+      <tr data-id="{{id}}" class="{{#unless metadataHTML}}hidden {{/unless}}more-info-row"><td></td><td><a class="show-more" href="#" data-id="{{id}}">More Information...</a></td></tr>
 
 
    </tbody>
