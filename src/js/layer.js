@@ -257,6 +257,9 @@ gisportal.layer = function( options ) {
 
    this.setScalebarTimeout = function(){
       var layer = this;
+      if(layer.resetting){
+         return false;
+      }
       layer.clearScalebarTimeout();
       var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
       apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
@@ -268,6 +271,7 @@ gisportal.layer = function( options ) {
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
            gisportal.scalebars.autoScale(layer.id);
            gisportal.scalebars.updateScalebar(layer.id);
+           gisportal.events.trigger('scalebar.apply-changes', layer.id);
         });
         layer.scalebarTimeout = setTimeout(function(){
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);

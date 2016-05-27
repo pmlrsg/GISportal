@@ -280,7 +280,7 @@ dd {
 .progress-btn {
     position:relative;
 }
-.progress-btn:after {
+.progress-btn:before {
     content:'\A';
     position:absolute;
     background: transparentize($panel-content-header, 0.6);

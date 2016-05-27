@@ -220,7 +220,7 @@ gisportal.events.bind("scalebar.colorbands", function(event, id, value) {
    collaboration._emit('c_event', params);
 });
 
-// auto scale a layer
+// reset layer settings
 gisportal.events.bind("scalebar.reset", function(event, id) {
    var params = {
       "event" : "scalebar.reset",
@@ -229,6 +229,14 @@ gisportal.events.bind("scalebar.reset", function(event, id) {
    collaboration._emit('c_event', params);
 });
 
+// apply setting changes
+gisportal.events.bind("scalebar.apply-changes", function(event, id) {
+   var params = {
+      "event" : "scalebar.apply-changes",
+      "id" : id
+   };
+   collaboration._emit('c_event', params);
+});
 
 // search string changes
 gisportal.events.bind("search.typing", function(event, searchValue) {
