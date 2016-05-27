@@ -239,7 +239,7 @@ router.get('/app/cache/*?', function(req, res) {
 router.get('/resources/*?', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var config_path = path.join(MASTER_CONFIG_PATH, domain, "resources", req.params[0]);// Gets the given path
-   if(!utils.fileExists){
+   if(!utils.fileExists(config_path)){
       res.status(404).send();
       return;
    }
@@ -763,58 +763,32 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
    var markdown_data;
    var html_data;
 
+   function addMarkdown(tagName, deleteAfter){
+      markdown_file_path = path.join(markdown_folder_path, tagName, tags[tagName].toLowerCase().replace(/\//g, "_") + ".md");
+      if(utils.fileExists(markdown_file_path)){
+         markdown_data = fs.readFileSync(markdown_file_path).toString();
+         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+         html += html_data;
+      }
+      if(deleteAfter === true){
+         delete tags[tagName];
+      }
+   }
+
    delete tags.indicator_type;
    if(tags.providerTag){
-      markdown_file_path = path.join(markdown_folder_path, "providerTag", tags.providerTag.toLowerCase() + ".md");
-      if(utils.fileExists(markdown_file_path)){
-         markdown_data = fs.readFileSync(markdown_file_path).toString();
-         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
-         html += html_data;
-      }
-      delete tags.providerTag;
+      addMarkdown("providerTag", true);
    }
    if(tags.niceName){
-      markdown_file_path = path.join(markdown_folder_path, "niceName", tags.niceName.toLowerCase() + ".md");
-      if(utils.fileExists(markdown_file_path)){
-         markdown_data = fs.readFileSync(markdown_file_path).toString();
-         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
-         html += html_data;
-      }
-      delete tags.niceName;
+      addMarkdown("niceName", true);
    }
    if(tags.model){
-      markdown_file_path = path.join(markdown_folder_path, "model", tags.model.toLowerCase() + ".md");
-      if(utils.fileExists(markdown_file_path)){
-         markdown_data = fs.readFileSync(markdown_file_path).toString();
-         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
-         html += html_data;
-      }
-      delete tags.model;
+      addMarkdown("model", true);
    }
    for(var tag in tags){
-      markdown_file_path = path.join(markdown_folder_path, tag, tags[tag].toLowerCase() + ".md");
-      if(utils.fileExists(markdown_file_path)){
-         markdown_data = fs.readFileSync(markdown_file_path).toString();
-         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
-         html += html_data;
-      }
+      addMarkdown("tag", false);
    }
    res.send(html);
-});
-
-
-
-router.get('/app/metadata/*?', function(req, res) {
-   var domain = utils.getDomainName(req);
-
-   var html_path = path.join(MASTER_CONFIG_PATH, domain, "markdown", req.params[0].toLowerCase() + ".md");// Gets the given path
-
-   var markdown_data = fs.readFileSync(html_path).toString();
-
-
-   var markdown = require( "node-markdown" ).Markdown;
-
-   res.send( markdown(markdown_data, true, null, {"a":"href|target"} ));
 });
 
 
