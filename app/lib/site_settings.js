@@ -235,6 +235,21 @@ router.get('/app/cache/*?', function(req, res) {
    });
 });
 
+
+router.get('/resources/*?', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var config_path = path.join(MASTER_CONFIG_PATH, domain, "resources", req.params[0]);// Gets the given path
+   if(!utils.fileExists){
+      res.status(404).send();
+      return;
+   }
+   res.sendFile(config_path, function (err) {
+      if (err) {
+         utils.handleError(err, res);
+      }
+   });
+});
+
 router.get('/app/settings/get_cache', function(req, res) {
    var this_username = user.getUsername(req);
    var usernames = [this_username];
