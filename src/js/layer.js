@@ -257,6 +257,9 @@ gisportal.layer = function( options ) {
 
    this.setScalebarTimeout = function(){
       var layer = this;
+      if(layer.resetting){
+         return false;
+      }
       layer.clearScalebarTimeout();
       var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
       apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
