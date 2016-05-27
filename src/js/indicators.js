@@ -825,9 +825,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          onSelected: function(data) {
             if (data.selectedData) {
                indicator.style = data.selectedData.value;
-               if(!indicator.resetting){
-                  indicator.setScalebarTimeout();
-               }
+               indicator.setScalebarTimeout();
             }
          }
       });
@@ -839,9 +837,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                   data.selectedData.value = null;
                }
                indicator.aboveMaxColor = data.selectedData.value;
-               if(!indicator.resetting){
-                  indicator.setScalebarTimeout();
-               }
+               indicator.setScalebarTimeout();
             }
          }
       });
@@ -853,9 +849,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                   data.selectedData.value = null;
                }
                indicator.belowMinColor = data.selectedData.value;
-               if(!indicator.resetting){
-                  indicator.setScalebarTimeout();
-               }
+               indicator.setScalebarTimeout();
             }
          }
       });

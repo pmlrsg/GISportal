@@ -1136,7 +1136,7 @@ gisportal.loadLayerState = function(){
          }else{
             gisportal.indicatorsPanel.showLayer(id);
          }
-
+         gisportal.layers[id].resetting = true;
          // This sets the layer style to the same as what the user had before
          $('#tab-' + id + '-layer-style').ddslick('select', {value: style});
 
@@ -1155,6 +1155,7 @@ gisportal.loadLayerState = function(){
          // This sets the belowMinColor to the same as what the user had before
          $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
 
+         gisportal.layers[id].resetting = false;
       }
    }
    gisportal.loadLayersState = null;
