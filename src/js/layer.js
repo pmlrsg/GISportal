@@ -271,6 +271,7 @@ gisportal.layer = function( options ) {
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
            gisportal.scalebars.autoScale(layer.id);
            gisportal.scalebars.updateScalebar(layer.id);
+           gisportal.events.trigger('scalebar.apply-changes', layer.id);
         });
         layer.scalebarTimeout = setTimeout(function(){
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);

@@ -823,17 +823,31 @@ collaboration.initSession = function() {
             }
          });
 
-		  	// reset scalebar
+         // reset scalebar
          socket.on('scalebar.reset', function(data) {
             if(collaboration.diverged){
                return true;
             }
-		  		collaboration.log(data.presenter +': Scalebar was reset');
+            collaboration.log(data.presenter +': Scalebar was reset');
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-reset[data-id="'+ data.params.id +'"]'));
-            	$('.js-reset[data-id="'+ data.params.id +'"]').click();
+               var elem = $('.js-reset[data-id="'+ data.params.id +'"]');
+               collaboration.highlightElement(elem);
+               elem.click();
             }
-		  	});            
+         });
+
+         // apply changes
+         socket.on('scalebar.apply-changes', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            collaboration.log(data.presenter +': Changes Applied');
+            if (collaboration.role == "member") {
+               var elem = $('.js-apply-changes[data-id="'+ data.params.id +'"]');
+               collaboration.highlightElement(elem);
+               elem.click();
+            }
+         });
 
          // search value changed
          socket.on('search.typing', function(data) {
