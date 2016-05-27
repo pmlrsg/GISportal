@@ -217,9 +217,9 @@ gisportal.scalebars.autoScale = function(id, force)  {
       }
 
       if(typeof(l.minScaleVal) == "number" && typeof(l.maxScaleVal) == "number"){
-         gisportal.scalebars.validateScale(id, l.minScaleVal, l.maxScaleVal);
+         gisportal.scalebars.validateScale(id, l.minScaleVal, l.maxScaleVal, force=true);
       }else if(typeof(l.autoMinScaleVal) == "number" && typeof(l.autoMaxScaleVal) == "number"){
-         gisportal.scalebars.validateScale(id, l.autoMinScaleVal, l.autoMaxScaleVal);
+         gisportal.scalebars.validateScale(id, l.autoMinScaleVal, l.autoMaxScaleVal, force=true);
       }else{
          gisportal.loading.increment();
          $.ajax({
@@ -233,7 +233,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
                   }
                   layer.autoMinScaleVal = data.min;
                   layer.autoMaxScaleVal = data.max;
-                  gisportal.scalebars.validateScale(id, data.min, data.max);
+                  gisportal.scalebars.validateScale(id, data.min, data.max, force=true);
                   gisportal.loading.decrement();
                }
             },
@@ -269,7 +269,7 @@ gisportal.scalebars.resetScale = function(id)  {
  * @param {number} newMin - The min scale
  * @param {number} newMax - The max scale
  */
-gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
+gisportal.scalebars.validateScale = function(id, newMin, newMax, force)  {
    var indicator = gisportal.layers[id];
 
    if(newMin === null || typeof newMin === 'undefined')
@@ -315,7 +315,11 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax)  {
          gisportal.layers[id].maxScaleVal = max;
          gisportal.layers[id].log = isLog;
 
-         this.updateScalebar(id);
+         if(force){
+            this.updateScalebar(id);
+         }else{
+            indicator.setScalebarTimeout();
+         }
 
    }
 };
@@ -334,8 +338,10 @@ gisportal.scalebars.updateScalebar = function(id)  {
       colorscalerange: indicator.minScaleVal + ',' + indicator.maxScaleVal,
       logscale: indicator.log,
       numcolorbands: indicator.colorbands,
+      STYLES: indicator.style,
       ABOVEMAXCOLOR: indicator.aboveMaxColor,
-      BELOWMINCOLOR: indicator.belowMinColor
+      BELOWMINCOLOR: indicator.belowMinColor,
+      ELEVATION: indicator.selectedElevation
    };
    
    gisportal.layers[id].mergeNewParams(params);
@@ -345,7 +351,7 @@ gisportal.scalebars.updateScalebar = function(id)  {
 
 gisportal.scalebars.scalebarImageError = function(layer_id){
    $("li[data-id=" + layer_id + "] div.scalebar-tab").addClass("alert-danger");
-   $("li[data-id=" + layer_id + "] div.scalebar-linear").html("There was an error loading the scalebar from <a href='" + gisportal.layers[layer_id].legend + "'>this URL</a>");
+   $("li[data-id=" + layer_id + "] div.scalebar-linear").html("There was an error loading the scalebar from <a href='" + gisportal.layers[layer_id].legend + "' target='_blank'>this URL</a>");
 };
 
 gisportal.scalebars.scalebarImageSuccess = function(layer_id){

@@ -112,21 +112,44 @@ gisportal.indicatorsPanel.initDOM = function() {
          layer.minScaleVal = null;
          layer.maxScaleVal = null;
       }
-      gisportal.scalebars.autoScale(id);
+      layer.setScalebarTimeout();
       gisportal.events.trigger('scalebar.autoscale-checkbox', id, $(this).prop('checked'));
    });
 
    // Reset scale range
    $('.js-indicators').on('click', '.js-reset', function() {
       var id = $(this).data('id');
-      gisportal.layers[id].colorbands = gisportal.layers[id].defaultColorbands;
-      gisportal.layers[id].aboveMaxColor = gisportal.layers[id].defaultAboveMaxColor;
-      gisportal.layers[id].belowMinColor = gisportal.layers[id].defaultBelowMinColor;
-      $('#tab-' + id + '-colorbands').val(gisportal.layers[id].colorbands).trigger('change');
-      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: gisportal.layers[id].aboveMaxColor});
-      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: gisportal.layers[id].belowMinColor});
-      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
-      gisportal.scalebars.resetScale(id);
+      var layer = gisportal.layers[id];
+      layer.clearScalebarTimeout();
+      layer.resetting = true;
+      layer.autoScale = layer.originalAutoScale;
+      layer.colorbands = layer.defaultColorbands;
+      layer.aboveMaxColor = layer.defaultAboveMaxColor;
+      layer.belowMinColor = layer.defaultBelowMinColor;
+      layer.minScaleVal = layer.defaultMinScaleVal;
+      layer.maxScaleVal = layer.defaultMaxScaleVal;
+      layer.log = layer.defaultLog || false;
+      layer.style = layer.defaultStyle || "boxfill/rainbow";
+
+      $('#tab-' + id + '-colorbands').val(layer.colorbands);
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: layer.aboveMaxColor || "0"});
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: layer.belowMinColor || "0"});
+      $('#tab-' + id + '-layer-style').ddslick('select', {value: layer.style});
+      $('#tab-' + id + '-log').prop( 'checked', layer.defaultLog || false );
+      var autoScale = gisportal.getAutoScaleFromString(layer.autoScale);
+      $('.js-auto[data-id="' + id + '"]').prop( 'checked', autoScale );
+      if(autoScale){
+         layer.minScaleVal = null;
+         layer.maxScaleVal = null;
+         if(layer.log && layer.minScaleVal <= 0){
+            layer.log = false;
+            $('#tab-' + id + '-log').prop( 'checked',false );
+         }
+         gisportal.scalebars.autoScale(id);
+      }else{
+         gisportal.scalebars.updateScalebar(id);
+      }
+      layer.resetting = false;
       gisportal.events.trigger('scale.reset', id);
    });
 
@@ -181,23 +204,18 @@ gisportal.indicatorsPanel.initDOM = function() {
       layer.visibleTab = $(this).data('tab-name');
    });
 
-   $('.js-indicators').on('click', '#show_more', function(e) {
+   $('.js-indicators').on('click', '.show-more', function(e) {
       e.preventDefault();
+      var id = $(this).data('id');
+      var layer = gisportal.layers[id];
       if(gisportal.panelSlideout.isOut('metadata')){
-         gisportal.events.trigger('metadata.close');
+         gisportal.panelSlideout.closeSlideout( 'metadata' );
       }
       else {
-         var indicator = $(this).closest('[data-name]').data('name');//('ul').siblings('.indicator-header').data('name');
-         var provider = $(this).closest('[data-provider]').data('provider'); //.parents('ul').siblings('.indicator-header').data('provider');
-         var layer = gisportal.layers[$(this).closest('[data-id]').data('id')];
-         // grey out other things here - grey needs to be clickable to disable and hide.
-         $('.js-indicators > li[data-name!="' + indicator + '"]').each(function() {
-
-            $(this).append("<div class='indicator-overlay'></div>");
-         });
-          gisportal.indicatorsPanel.getMetadata(layer, indicator, provider);
+         gisportal.panelSlideout.openSlideout('metadata');
+         $('.metadata-html').html(layer.metadataHTML);
       }
-      
+      gisportal.events.trigger('more-info.clicked', id);      
    });
 
    $('.js-indicators').on('click', '.indicator-overlay', function(){
@@ -303,64 +321,6 @@ gisportal.events.bind('metadata.close', function() {
    $('.indicator-overlay').remove();
    gisportal.panelSlideout.closeSlideout('metadata');
 });
-
-
-
-gisportal.indicatorsPanel.getMetadata = function(layer, indicator, provider) {
-   $('.metadata_provider').html('');
-   $('.metadata_indicator').html('');
-   var some = function(promises){
-      var d = $.Deferred(), results = [];
-      var remaining = promises.length;
-      var alwaysFunction = function(res){
-         remaining--; // always mark as finished
-         if(!remaining) d.resolve(results);
-      };
-      var pushResults = function(res){
-         results.push(res); // on success, add to results
-      };
-      for(var i = 0; i < promises.length; i++){
-         promises[i].then(pushResults).always(alwaysFunction);
-       }
-       return d.promise(); // return a promise
-   };
-
-   var urls = [gisportal.middlewarePath + '/metadata/provider/' + provider, gisportal.middlewarePath + '/metadata/indicator/' + indicator].map($.get);
-
-   some(urls).then(function(results){
-      for(var i = 0; i < results.length; i++) {
-         if (results[i].indexOf('Provider') != -1) {
-            $('.metadata_provider').html(results[i]);
-            var text;
-            switch( layer.tags.Confidence ){
-               case"Low":
-                  text = "&#9785; Low";
-                  break;
-               case"Medium":
-                  text = "&#128528; Medium";
-                  break;
-               case"High":
-                  text = "&#9786; High";
-                  break;
-            }
-            var confidence = '<p>' +
-                  '<strong>Confidence:</strong>' +
-                  text +
-                  '<br><i>Model provider\'s level of confidence in the data based on a combination of skill assessment and their expert judgment.</i>' +
-               '</p>';
-            $('.metadata_provider').append(confidence);
-
-         }else {
-            $('.metadata_indicator').html(results[i]);
-         }
-      }
-   }).always(function(){
-      gisportal.panelSlideout.openSlideout('metadata');
-   });
-
-};
-
-
 
 gisportal.indicatorsPanel.refreshData = function(indicators) {
    $('.js-indicators').html('');
@@ -822,7 +782,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          var colorbands = $(this).val();
 
          gisportal.events.trigger('scalebar.colorbands', indicator.id, colorbands);
-         gisportal.scalebars.updateScalebar(indicator.id);
+         indicator.setScalebarTimeout();
       });
 
       var colorbands_keydown_timeout;
@@ -856,9 +816,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          onSelected: function(data) {
             if (data.selectedData) {
                indicator.selectedElevation = data.selectedData.value;
-               indicator.mergeNewParams({
-                  elevation: data.selectedData.value
-               });   
+               indicator.setScalebarTimeout();  
             }
          }
       });
@@ -867,10 +825,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          onSelected: function(data) {
             if (data.selectedData) {
                indicator.style = data.selectedData.value;
-               indicator.mergeNewParams({
-                  STYLES: data.selectedData.value
-               });
-               gisportal.scalebars.updateScalebar(indicator.id);
+               if(!indicator.resetting){
+                  indicator.setScalebarTimeout();
+               }
             }
          }
       });
@@ -878,10 +835,13 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-aboveMaxColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
+               if(data.selectedData.value == "0"){
+                  data.selectedData.value = null;
+               }
                indicator.aboveMaxColor = data.selectedData.value;
-               indicator.mergeNewParams({
-                  ABOVEMAXCOLOR: data.selectedData.value
-               });
+               if(!indicator.resetting){
+                  indicator.setScalebarTimeout();
+               }
             }
          }
       });
@@ -889,10 +849,13 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-belowMinColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
+               if(data.selectedData.value == "0"){
+                  data.selectedData.value = null;
+               }
                indicator.belowMinColor = data.selectedData.value;
-               indicator.mergeNewParams({
-                  BELOWMINCOLOR: data.selectedData.value
-               });
+               if(!indicator.resetting){
+                  indicator.setScalebarTimeout();
+               }
             }
          }
       });

@@ -27,8 +27,7 @@ gisportal.Vector = function(options) {
         srsName: 'EPSG:4326', // SRS for the vector layer
         defaultProperty: null,
         defaultProperties : [],
-        unit : null,
-        moreIndicatorInfo : false
+        unit : null
     };
 
 

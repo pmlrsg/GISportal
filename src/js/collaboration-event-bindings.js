@@ -678,6 +678,22 @@ gisportal.events.bind('slideout.togglePeak', function(event, slideoutName) {
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind('slideout.close', function(event, slideoutName) {
+   var params = {
+      "event": "slideout.close",
+      "slideoutName": slideoutName
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind('more-info.clicked', function(event, layerId) {
+   var params = {
+      "event": "more-info.clicked",
+      "layerId": layerId
+   };
+   collaboration._emit('c_event', params);
+});
+
 gisportal.events.bind('graphTitle.edit', function(event, value) {
    var params = {
       "event": "graphTitle.edit",

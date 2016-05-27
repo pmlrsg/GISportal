@@ -193,8 +193,7 @@ gisportal.createVectorLayers = function() {
          "defaultProperty" : vector.defaultProperty,
          "defaultProperties" : vector.defaultProperties,
          "descriptiveName" : vector.tags.niceName,
-         "unit" : vector.unit,
-         "moreIndicatorInfo" : vector.moreIndicatorInfo
+         "unit" : vector.unit
       };
       //console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
@@ -282,7 +281,7 @@ gisportal.createOpLayers = function() {
          "colorbands": colorbands,
          "aboveMaxColor": aboveMaxColor,
          "belowMinColor": belowMinColor,
-         "defaultStyle": indicator.defaultStyle,
+         "defaultStyle": indicator.defaultStyle || gisportal.config.defaultStyle,
          "log": indicator.log,
 
          //orginal
@@ -297,9 +296,7 @@ gisportal.createOpLayers = function() {
          "positive" : server.options.positive, 
          "provider" : indicator.providerDetails, 
          "offsetVectors" : indicator.OffsetVectors, 
-         "tags": indicator.tags,
-         "moreProviderInfo" : indicator.MoreProviderInfo,
-         "moreIndicatorInfo" : indicator.MoreIndicatorInfo,
+         "tags": indicator.tags
       };
 
       var layer = new gisportal.layer( layerOptions );
@@ -1154,9 +1151,9 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-colorbands').val(colorbands);
 
          // This sets the aboveMaxColor to the same as what the user had before
-         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor});
+         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
          // This sets the belowMinColor to the same as what the user had before
-         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor});
+         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
 
       }
    }

@@ -123,6 +123,12 @@ git submodule update
     0 2 * * * find /tmp -name "*.nc" -mtime +1 exec rm -rf {} \;
     ```
 
+## Additional Indicator Information ##
+
+To give users more information, you can set up some markdown files that can be shown on indicators.
+
+To do this you need to create a markdown folder inside the domain level `site_settings` folder. Inside this folder you should create a folder for each of the layer tags that you want to describe further. Finally fill each tag folder with markdown files in the format: `tag_value.md` where `tag_value` is the lowercase value of the tag.
+
 
 ## nginx Configuration ##
 

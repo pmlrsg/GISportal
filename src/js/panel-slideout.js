@@ -27,6 +27,7 @@ gisportal.panelSlideout.initDOM = function(  ){
 		.on( 'click', '.js-slideout-close', function(){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.closeSlideout( slideoutName );
+			gisportal.events.trigger('slideout.close', slideoutName);
 		});
 	$('.js-slideout-content').bind('scroll', function() {
 	   var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
