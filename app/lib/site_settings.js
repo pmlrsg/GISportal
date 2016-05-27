@@ -764,6 +764,9 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
    var html_data;
 
    function addMarkdown(tagName, deleteAfter){
+      if(tags[tagName] === undefined){
+         return false;
+      }
       markdown_file_path = path.join(markdown_folder_path, tagName, tags[tagName].toLowerCase().replace(/\//g, "_") + ".md");
       if(utils.fileExists(markdown_file_path)){
          markdown_data = fs.readFileSync(markdown_file_path).toString();
@@ -776,17 +779,11 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
    }
 
    delete tags.indicator_type;
-   if(tags.providerTag){
-      addMarkdown("providerTag", true);
-   }
-   if(tags.niceName){
-      addMarkdown("niceName", true);
-   }
-   if(tags.model){
-      addMarkdown("model", true);
-   }
+   addMarkdown("providerTag", true);
+   addMarkdown("niceName", true);
+   addMarkdown("model", true);
    for(var tag in tags){
-      addMarkdown("tag", false);
+      addMarkdown(tag, false);
    }
    res.send(html);
 });
