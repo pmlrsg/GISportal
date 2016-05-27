@@ -1375,6 +1375,31 @@ collaboration.initSession = function() {
             }
          });
 
+         socket.on('slideout.close', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var slideoutName = data.params.slideoutName;
+            collaboration.log(data.presenter +': Close panel: ' + slideoutName);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-close');
+               gisportal.panelSlideout.closeSlideout(slideoutName);
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
+         socket.on('more-info.clicked', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var id = data.params.layerId;
+            collaboration.log(data.presenter +': More Info: ' + id);
+            if (collaboration.role == "member") {
+               var clicked_elem = $('.show-more[data-id="' + id + '"]').trigger('click');
+               collaboration.highlightElement(clicked_elem);
+            }
+         });
+
          socket.on('graphTitle.edit', function(data) {
             if(collaboration.diverged){
                return true;
@@ -1645,7 +1670,7 @@ collaboration.buildMembersList = function(data) {
    $('.js-invite-people').click(function() {
       $('.js-collab-invite').toggleClass('hidden');
       $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
-      $('.js-collab-room-url').focus(function() { $(this).select(); } ).mouseup(function (e) {e.preventDefault(); });
+      $('.js-collab-room-url').focus(function() { $(this).select(); } ).on('mouseup cut paste', function (e) {e.preventDefault();}).on('keydown', function(){$(this).select();});
    });
 
    $('.js-collab-notifications-toggle').click(function() {

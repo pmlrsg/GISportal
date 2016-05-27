@@ -134,8 +134,14 @@ gisportal.layer = function( options ) {
    this.defaultMaxScaleVal = options.defaultMaxScaleVal;
    this.minScaleVal = null;
    this.defaultMinScaleVal = options.defaultMinScaleVal;
-   this.log = options.log;
-   this.defaultLog = options.log;
+   var log = gisportal.config.defaultLog;
+   if(options.log === undefined){
+      this.defaultLog = log;
+      this.log = log;
+   }else{
+      this.defaultLog = options.log;
+      this.log = options.log;
+   }
    //--------------------------------------------------------------------------
    
    // Set this to true of the layer is a temporal layer with date-time based data
@@ -187,14 +193,12 @@ gisportal.layer = function( options ) {
          // A list of styles available for the layer
          this.styles = _.sortBy(layerData.Styles, function(style){return style.Name;}); // Can be 'Null'.
          var default_style = null;
-         //console.log("before style add");
          if(this.styles){
             $.each(this.styles, function(index, value){
                if(value.Name == gisportal.config.defaultStyle){
                   default_style = prev_style || value.Name;
                }
             });
-            //console.log("adding style");
             this.style = default_style || this.styles[0].Name;
          }       
       } else if(this.type == "refLayers") {
@@ -250,6 +254,35 @@ gisportal.layer = function( options ) {
          }
       });
    };
+
+   this.setScalebarTimeout = function(){
+      var layer = this;
+      layer.clearScalebarTimeout();
+      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
+      apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
+      // THIS IS IMPORTANT, it makes sure the animation is reset
+      setTimeout(function(){
+        apply_changes.offsetWidth = apply_changes.offsetWidth;
+        apply_changes.addClass('progress-btn').off('click').on('click', function(){
+           clearTimeout(layer.scalebarTimeout);
+           apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
+           gisportal.scalebars.autoScale(layer.id);
+           gisportal.scalebars.updateScalebar(layer.id);
+        });
+        layer.scalebarTimeout = setTimeout(function(){
+           apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
+           gisportal.scalebars.autoScale(layer.id);
+           gisportal.scalebars.updateScalebar(layer.id);
+        }, 10000);
+      }, 200);
+   };
+
+   this.clearScalebarTimeout = function(){
+      $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true).toggleClass('progress-btn', false);
+      if(layer.scalebarTimeout){
+         clearTimeout(layer.scalebarTimeout);
+      }
+   };
    
    //--------------------------------------------------------------------------
    
@@ -268,7 +301,7 @@ gisportal.layer = function( options ) {
             params[prop] = object[prop];
          }
          this.openlayers.anID.getSource().updateParams(params);
-         gisportal.scalebars.autoScale( this.id );   
+         gisportal.scalebars.autoScale( this.id );
       }
    };
    
@@ -756,31 +789,59 @@ gisportal.filterLayersByDate = function(date) {
  * @param {object} options - Any extra options for the layer
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
-  options = options || {};
-  var id = layer.id; 
-  //console.log("getting layer data 222");
-  if (layer.serviceType=="WFS"){
+   options = options || {};
+   var id = layer.id; 
+   if (layer.serviceType=="WFS"){
 
-    gisportal.layers[id].init(options,layer);
-  }
-  else {
-    //console.log("inside ajax getting");
-   $.ajax({
-      type: 'GET',
-      url: gisportal.middlewarePath + "/cache/layers/" + fileName,
-      dataType: 'json',
-      async: true,
-      cache: false,
-      success: function(data) {
-         // Initialises the layer with the data from the AJAX call
-         if(gisportal.layers[id]){
-            gisportal.layers[id].init(data, options, style);
+      layer.init(options,layer);
+   }else {
+      $.ajax({
+         type: 'GET',
+         url: gisportal.middlewarePath + "/cache/layers/" + fileName,
+         dataType: 'json',
+         async: true,
+         cache: false,
+         success: function(data) {
+            // Initialises the layer with the data from the AJAX call
+            if(layer){
+               layer.init(data, options, style);
+            }
+         },
+         error: function() {
+            $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
          }
-      },
-      error: function() {
-         $.notify("Sorry\nThere was a problem loading this layer, please try again", "error");
+      });
+      var bbox = layer.exBoundingBox.WestBoundLongitude + "," +
+            layer.exBoundingBox.SouthBoundLatitude + "," +
+            layer.exBoundingBox.EastBoundLongitude + "," +
+            layer.exBoundingBox.NorthBoundLatitude;
+      var time = "";
+      try{
+         time = '&time=' + new Date(layer.selectedDateTime).toISOString();
       }
-   });
- }
+      catch(e){}
+      $.ajax({
+         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+         dataType: 'json',
+         success: function( data ) {
+            // If there is a min & max value returned the label and input are both shown.
+            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+               layer.autoMinScaleVal = data.min;
+               layer.autoMaxScaleVal = data.max;
+            }
+         }
+      });
+      $.ajax({
+         method: 'POST',
+         url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
+         data: layer.tags,
+         success: function( data ) {
+            if(data){
+               layer.metadataHTML = data;
+               $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
+            }
+         }
+      });
+   }
 };
 

@@ -143,6 +143,10 @@
   display: inline-block;
 }
 
+.js-apply-changes {
+  max-width: calc(100% - 220px);
+}
+
 .overlay-container-form .js-layers-form-submit{
    margin-left:5px;
 }
