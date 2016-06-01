@@ -173,7 +173,7 @@ collaboration.init = function(io, app, config) {
          client.get(roomId, function(err, obj) {
             if(!obj){
                console.log(roomId +' does not exist');
-               //io.sockets.connected[socket.id].emit('room.invalid-id');
+               io.sockets.connected[socket.id].emit('room.invalid-id', roomId);
                return;
             }
             var room = JSON.parse(obj);

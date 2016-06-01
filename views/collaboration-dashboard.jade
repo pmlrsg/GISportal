@@ -8,7 +8,12 @@ script(type='text/javascript')
    |      if (roomId) {
    |         collaboration.joinRoom(roomId);
    |      } else {
-   |         alert('Please enter the reference number of the room that you would like to join');
+   |         var message = 'Please enter the reference number of the room that you would like to join';
+   |         try{
+   |            $('#roomId').notify(message);
+   |         }catch(e){
+   |            alert(message);
+   |         }
    |      }
    |   });
    |});
