@@ -12,6 +12,7 @@ collaboration.diverged = false;
 
 collaboration.active = false;
 collaboration.role = '';
+collaboration.messages = "";
 
 collaboration.initDOM = function() {     
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
@@ -345,6 +346,41 @@ collaboration.initSession = function() {
                }
             }
             collaboration.buildMembersList(data);
+         });
+
+         socket.on('message.recieved', function(data) {
+            // This builds the message and adds it to the collaboration messages object and to the div
+            var message = data.message;
+            var id = data.sender;
+            var me = false;
+            var side = "right";
+            var email = "You";
+            var color = "#000000";
+            if(id == socket.io.engine.id){
+               me = true;
+               side = "left";
+            }
+            for(var person in data.people){
+               if(data.people[person].id == id){
+                  var this_person = data.people[person];
+                  color = this_person.color;
+                  if(!me){
+                     email = this_person.email;
+                  }
+
+               }
+            }
+            collaboration.messages += '<p title="' + email + '" class="side-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
+            $(".messages").each(function() {
+               var re_scroll = false;
+               if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight){
+                  re_scroll = true;
+               }
+               $(this).html(collaboration.messages);
+               if(re_scroll){
+                  $(this).scrollTop($(this)[0].scrollHeight);
+               }
+            });
          });
 
          socket.on('members.update', function(data) {
@@ -1729,9 +1765,13 @@ collaboration.buildMembersList = function(data) {
    if(webRTC){
       data.AVEnabled = webRTC.isChannelReady;
    }
+   var message = $($('.message-input')[0]).val() || $($('.message-input')[1]).val();
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
+   if(message){
+      $('.message-input').val(message);
+   }
 
    $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
 
@@ -1740,8 +1780,10 @@ collaboration.buildMembersList = function(data) {
       $('.collaboration-panel').toggleClass('hidden', true);
       $('.collab-overlay').toggleClass('hidden', true);
       $('.collaboration-pulltab').toggleClass('hidden', true);
+      hangup();
       socket.disconnect();
       collaboration.roomId = null;
+      collaboration.messages = "";
       collaboration.owner = false;
       $('.notifyjs-gisportal-collab-notification-base').parent().remove();
 
@@ -1770,6 +1812,14 @@ collaboration.buildMembersList = function(data) {
          },
 
       });
+   });
+   $('button.js-submit-message').on('click', function(e)  {
+      e.preventDefault();
+      var input = $(this).siblings('.message-input');
+      if(input.val().length >= 1){
+         collaboration._emit('message.sent', {message: input.val(), id: socket.io.engine.id}, force=true);
+         $('.message-input').val("");
+      }
    });
 
    $('.js-invite-people').click(function() {
@@ -1889,6 +1939,7 @@ collaboration.buildMembersList = function(data) {
          collaboration._emit('room.make-presenter', id, force = true);
       });
    });
+   $('.messages').html(collaboration.messages);
 
    if(me_selectors.length > 0){
       // Makes sure that your person div(s) is at the top of the list
@@ -1956,6 +2007,9 @@ collaboration.divergeAlert = function(){
    panel.toggleClass('hidden', false);
    person.find('.person-message').remove();
    person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
+   person.find('p.person-message').on('click', function(){
+      $(this).remove();
+   });
    collaboration.highlightElementPulse($('.collaboration-panel .js-collab-diverge'));
 };
 

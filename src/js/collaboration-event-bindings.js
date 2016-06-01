@@ -18,6 +18,15 @@ gisportal.events.bind("room.member-diverged", function(event, email) {
    collaboration._emit('c_event', params, force=true);
 });
 
+gisportal.events.bind("message.recieved", function(event, message, sender) {
+   var params = {
+      "event" : "message.recieved",
+      "message" : message,
+      "sender" : sender
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
 gisportal.events.bind("date.selected", function(event, date) {
    var params = {
       "event" : "date.selected",

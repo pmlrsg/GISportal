@@ -23,6 +23,15 @@
 <div data-id="{{id}}" class="person">
    {{#presenter}}<div class="presenter" title="Presenter"></div>{{/presenter}}
    {{#diverged}}<div class="diverged" title="Diverged"></div>{{/diverged}}
-   <p title="{{email}}">{{name}}</p>
+   <p title="{{email}}" style="color:{{color}}"><b>{{name}}</b></p>
 </div>
 {{/people}}
+
+<div class="messenger">
+   <div class="messages"></div>
+   <div class="message-form">
+      <form>
+         <input type="text" class="message-input"></input>
+         <button class="brand small js-submit-message pull-right">Send</button>
+   </div>
+</div>

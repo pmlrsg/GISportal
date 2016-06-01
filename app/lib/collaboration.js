@@ -9,6 +9,22 @@ var collaboration = {};
 
 module.exports = collaboration;
 
+function getRandomColorValue(){
+   return 255 - Math.floor(Math.random() * 156);
+}
+
+function getRandomRGBColor(){
+   var r = getRandomColorValue();
+   var g = getRandomColorValue();
+   var b = getRandomColorValue();
+   while((0.2126*r + 0.7152*g + 0.0722*b) > 180){
+      r = getRandomColorValue();
+      g = getRandomColorValue();
+      b = getRandomColorValue();
+   }
+   return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
+
 collaboration.init = function(io, app, config) {
    // Makes sure that when node is restarted, all people are removed from rooms so there are no duplicates
    client.lrange("rooms_list", 0, -1, function(err, list){
@@ -146,6 +162,7 @@ collaboration.init = function(io, app, config) {
             "people": [{
                "id": socket.id,
                "email": user.email,
+               "color": getRandomRGBColor(),
                "name": user.name,
                "presenter": true,
                "owner": true,
@@ -195,6 +212,7 @@ collaboration.init = function(io, app, config) {
                   "id": socket.id,
                   "email": user.email,
                   "name": user.name,
+                  "color": getRandomRGBColor(),
                   "presenter": presenter,
                   "owner": owner,
                   "diverged": false
@@ -211,7 +229,6 @@ collaboration.init = function(io, app, config) {
                if(duplicate && room.people[duplicate]){
                   room.people.splice(duplicate, 1);
                }
-               console.log(room.people);
                room.people.push(member);
                client.set(roomId, JSON.stringify(room), function(err){
                   if(!err){
@@ -403,6 +420,32 @@ collaboration.init = function(io, app, config) {
                      "people": people,
                      "merger": name,
                      "email": email
+                  });
+               }
+            });
+         });
+      });
+
+      socket.on('message.sent', function(data) {
+         var sender = data.id;
+         var message = data.message;
+         var roomId = socket.room;
+         console.log(user.email + ' : ' + message);
+         
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var room = JSON.parse(obj);
+            var people = room.people;
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(roomId).emit('message.recieved', {
+                     "roomId": roomId,
+                     "people": people,
+                     "message": message,
+                     "sender": sender
                   });
                }
             });

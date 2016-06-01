@@ -318,9 +318,11 @@ function handleRemoteStreamRemoved(event) {
 
 function hangup() {
    console.log('Hanging up.');
-   gisportal.showModalMessage('Call ended');
-   webRTC.stop();
-   sendMessage('bye');
+   if(webRTC.isStarted){
+      gisportal.showModalMessage('Call ended');
+      webRTC.stop();
+      sendMessage('bye');
+   }
 }
 
 function handleRemoteHangup() {
