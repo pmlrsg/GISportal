@@ -351,8 +351,15 @@ collaboration.initSession = function() {
             collaboration.buildMembersList(data);
          });
 
+         socket.on('room.double-login', function(data) {
+            $('.js-leave-room').trigger('click');
+            $('.js-collab-message').toggleClass('hidden', false).toggleClass('alert-warning', true).html("You account has logged in from elsewhere, you have been taken out of the room");
+         });
+
          socket.on('room.member-left', function(data) {
-            collaboration.log(data.departed +' has left the room');
+            if(data.departed){
+               collaboration.log(data.departed +' has left the room');
+            }
             collaboration.buildMembersList(data);
             var presenterFound = false;
             for(var person in data.people){

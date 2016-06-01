@@ -199,6 +199,19 @@ collaboration.init = function(io, app, config) {
                   "owner": owner,
                   "diverged": false
                }
+               var duplicate;
+               for( var person in room.people){
+                  if(room.people[person].email == user.email){
+                     if(io.sockets.connected[room.people[person].id]){
+                        io.sockets.connected[room.people[person].id].emit('room.double-login');
+                     }
+                     duplicate = person
+                  }
+               }
+               if(duplicate && room.people[duplicate]){
+                  room.people.splice(duplicate, 1);
+               }
+               console.log(room.people);
                room.people.push(member);
                client.set(roomId, JSON.stringify(room), function(err){
                   if(!err){
