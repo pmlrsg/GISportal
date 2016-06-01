@@ -456,6 +456,51 @@ gisportal.utils.makePointReadable = function(point){
    }
 };
 
+$.fn.keepOnScreen = function(){
+   var element = this.get(0);
+   var bounds = element.getBoundingClientRect();
+   var exceeds = [];
+   if(bounds.left < 0){
+      element.style.left = 0 + "px";
+   }
+   if(bounds.top < 0){
+      element.style.top = 0 + "px";
+   }
+   if(bounds.bottom > window.innerHeight){
+      element.style.top = parseInt(window.innerHeight - bounds.height) + "px";
+   }
+   if(bounds.right > window.innerWidth){
+      element.style.left = parseInt(window.innerWidth - bounds.width) + "px";
+   }
+};
+
 gisportal.utils.delimiterisePoint = function(point){
    return point.toString().replace(/(\d)(?=(\d{3})+(?!\d)\.)/g, '$1,');
+};
+
+$.fn.fullScreen = function(){
+   this.attr('fullscreen', true);
+   var elem = this.get(0);
+   if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+   } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+   } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+   } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+   }
+};
+
+$.fn.exitFullScreen = function(){
+   this.attr('fullscreen', false);
+   if (document.exitFullscreen) {
+      document.exitFullscreen();
+   } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+   } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+   } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+   }
 };

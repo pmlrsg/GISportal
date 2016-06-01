@@ -61,6 +61,89 @@ collaboration.initDOM = function() {
          .toggleClass('alert-warning', true)
          .html('You have been invited to join room '+ roomId.toUpperCase() +'; please login to enter the room');
    }
+   var maxWidth = parseInt($(document).width()*0.48);
+   $('.main-collaboration-video').draggable({containment: "document"});
+   $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 130, "maxWidth": maxWidth, handles:"se"});
+   $('#remoteVideo, #localVideo').on('dblclick', function(){
+      if($(this).attr('fullscreen') == "false"){
+         $(this).fullScreen();
+      }else{
+         $(this).exitFullScreen();
+      }
+   });
+
+   // Makes sure that the fullscreen attribute is changed when videos are changed to and from full screen
+   $("video").bind('webkitfullscreenchange mozfullscreenchange msfullscreenchange fullscreenchange', function(e) {
+      var state = document.fullScreen || document.mozFullScreen || document.msFullScreen || document.webkitIsFullScreen;
+      $(this).attr('fullscreen', state);
+   });
+
+   var idleMouseTimer = {};
+   var forceControlsDivHide = {'remoteVideo':false, 'localVideo': false};
+   $(".display-div").off('mousemove click');
+   $(".display-div").on('mousemove click', function(ev) {
+      var id = $(this).find('video').attr('id');
+      var controls = $(this).find('.video-controls');
+      if(!forceControlsDivHide[id]) {
+         clearTimeout(idleMouseTimer[id]);
+         if(!controls.hasClass('fadeIn')){
+            controls.toggleClass('fadeIn', true).toggleClass('hidden', false).toggleClass('fadeOut', false);
+         }
+         idleMouseTimer[id] = setTimeout(function() {
+            if(!controls.hasClass('fadeOut')){
+               controls.toggleClass('fadeOut', true).toggleClass('fadeIn', false);
+            }
+
+            forceControlsDivHide[id] = true;
+            setTimeout(function() {
+               forceControlsDivHide[id] = false;
+            }, 200);
+         }, 1000);
+      }
+   });
+   $(".collab-videos-minimize").off('click');
+   $(".collab-videos-minimize").on('click', function(ev) {
+      $('.main-collaboration-video').toggleClass('overlay-minimized', true)
+         .toggleClass('overlay-maximized', false)
+         .attr('title', "Click to Maximize")
+         .draggable('destroy');
+
+      // Makes sure it is not activated straight away.
+      setTimeout(function(){
+         $('.main-collaboration-video.overlay-minimized').off('click');
+         // Makes sure that it is only called once
+         $('.main-collaboration-video.overlay-minimized').one('click', function(){
+            $('.main-collaboration-video').toggleClass('overlay-minimized', false)
+               .toggleClass('overlay-maximized', true)
+               .attr('title', "")
+               .draggable({containment: "document"});
+            setTimeout(function(){
+               $('.main-collaboration-video').toggleClass('overlay-maximized', false);
+            }, 500);
+         });
+      },200);
+
+   });
+   collaboration.addVideoActionListeners();
+};
+
+collaboration.addVideoActionListeners = function(){
+   $('.js-video-fullscreen').on('click', function(){
+      var video = $(this).closest('.display-div').find('video');
+      video.fullScreen();
+   });
+   $('.js-video-mute-toggle').on('click', function(){
+      var video = $(this).closest('.display-div').find('video');
+      var muted = video.is('[muted]');
+      if(muted){
+         // Make sure this actually mutes and unmuted the videos
+         video[0].removeAttribute('muted');
+         $(this).toggleClass("icon-volume-medium-1", true).toggleClass("icon-volume-mute-1", false).attr('title', "Mute");
+      }else{
+         video[0].setAttribute('muted', true);
+         $(this).toggleClass("icon-volume-mute-1", true).toggleClass("icon-volume-medium-1", false).attr('title', "Un-mute");
+      }
+   });
 };
 
 
@@ -109,7 +192,7 @@ collaboration.initSession = function() {
             if(ev.type == "click"){
                collaboration.divergeAlert();
             }
-    });
+         });
 
     		// -------------------------------------------------
     		// socket core event functions
@@ -273,6 +356,10 @@ collaboration.initSession = function() {
                   }
                }
             }
+            collaboration.buildMembersList(data);
+         });
+
+         socket.on('members.update', function(data) {
             collaboration.buildMembersList(data);
          });
 
@@ -1606,6 +1693,12 @@ collaboration.initSession = function() {
             }
          });
 
+         // WebRTC gubbins...
+         socket.on('webrtc_event', function(data) {
+            console.log('Client received message:', data.message);
+            webRTC.messageCallback(data);
+         });
+
 		  	// control whether the user is a presenter or a member
 			$('#btn-presenter').click(function() {
 				collaboration.role = 'presenter';
@@ -1637,6 +1730,9 @@ collaboration.buildMembersList = function(data) {
       if(!person.name || person.name === ""){
          person.name = person.email;
       }
+   }
+   if(webRTC){
+      data.AVEnabled = webRTC.isChannelReady;
    }
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
@@ -1710,12 +1806,23 @@ collaboration.buildMembersList = function(data) {
       }
    }
 
+   var people_list = data.people;
+
    // Because there are two panels
    var me_selectors = [];
 
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
+      var this_person;
+      for(var person_data in people_list){
+         if(people_list[person_data].id == id){
+            this_person = people_list[person_data];
+         }
+         if(people_list[person_data].id == me){
+            my_data = people_list[person_data];
+         }
+      }
       var link;
       var title = "Make this person the presenter";
       if(me == id){
@@ -1723,6 +1830,35 @@ collaboration.buildMembersList = function(data) {
          title = "Take the presenter role";
          me_selectors.push($(this));
          $(this).find('p').html("You");
+         var localStreams;
+         if(webRTC.peerConn && webRTC.peerConn.getLocalStreams()){
+            localStreams = webRTC.peerConn.getLocalStreams()[0];
+         }
+         var video, mic;
+         if(localStreams){
+            video = localStreams.getVideoTracks()[0];
+            mic = localStreams.getAudioTracks()[0];
+         }else{
+            video = {};
+            mic = {};
+         }
+         var on_class = "off";
+         title = "Un-mute";
+         if(mic.enabled){
+            on_class = "on";
+            title = "Mute";
+         }
+         link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + title + '"></span>');
+         $(this).prepend(link);
+         on_class = "off";
+         title = "Enable Webcam";
+         if(video.enabled){
+            on_class = "on";
+            title = "Disable Webcam";
+         }
+         link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + title + '"></span>');
+         $(this).prepend(link);
+         $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
                link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
@@ -1732,6 +1868,11 @@ collaboration.buildMembersList = function(data) {
                $(this).prepend(link);
             }
          }
+      }else if(my_data && my_data.dataEnabled){
+         if(this_person && this_person.dataEnabled){
+            link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
+            $(this).prepend(link);
+         }
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
          if(presenter != id && divergents.indexOf(id) == -1){
@@ -1739,6 +1880,19 @@ collaboration.buildMembersList = function(data) {
             $(this).prepend(link);
          }
       }
+
+      $('.js-collab-diverge').on('click', function(){
+         collaboration._emit('room.diverge', socket.io.engine.id, force=true);
+      });
+
+      $('.js-collab-merge').on('click', function(){
+         collaboration._emit('room.merge', socket.io.engine.id, force=true);
+      });
+
+      $('.js-make-presenter').click(function() {
+         var id = $(this).data('id');
+         collaboration._emit('room.make-presenter', id, force = true);
+      });
    });
 
    if(me_selectors.length > 0){
@@ -1748,21 +1902,54 @@ collaboration.buildMembersList = function(data) {
          me_selectors[i].detach().insertAfter(parent_selector.children('p'));
       }
    }
-
-   $('.js-collab-diverge').off('click');
-   $('.js-collab-diverge').on('click', function(){
-      collaboration._emit('room.diverge', socket.io.engine.id, force=true);
+   // Enable/Disable webRTC media
+   $('.js-toggle-rtc').click(function() {
+      var enabled = webRTC.isChannelReady || false;
+      if (!enabled) {
+         webRTC.initMedia();
+         $(this).find('.btn-value').text('Disable Video/Audio');
+      } else {
+         webRTC.deinitMedia();
+         $('.js-webrtc-online').toggleClass('hidden', true);
+         $(this).find('.btn-value').text('Enable Video/Audio');
+      }
    });
 
-   $('.js-collab-merge').off('click');
-   $('.js-collab-merge').on('click', function(){
-      collaboration._emit('room.merge', socket.io.engine.id, force=true);
+   $('.js-webrtc-online').on('click', function() {
+      webRTC.isInitiator = true;
+      maybeStart();
    });
 
-   $('.js-make-presenter').off('click');
-   $('.js-make-presenter').click(function() {
-      var id = $(this).data('id');
-      collaboration._emit('room.make-presenter', id, force = true);
+   $('.js-toggle-webcam').off('click');
+   $('.js-toggle-webcam').on('click', function() {
+      var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var button = $('.js-toggle-webcam');
+      var video = localStreams.getVideoTracks()[0];
+      video.enabled = !video.enabled;
+      
+      if (video.enabled) {
+         button.attr('title', 'Disable Webcam');
+         button.toggleClass('off-btn', false).toggleClass('on-btn', true);
+      } else {
+         button.attr('title', 'Enable Webcam');
+         button.toggleClass('off-btn', true).toggleClass('on-btn', false);
+      }
+   });
+
+   $('.js-toggle-microphone').off('click');
+   $('.js-toggle-microphone').on('click', function() {
+      var localStreams = webRTC.peerConn.getLocalStreams()[0];
+      var button = $('.js-toggle-microphone');
+      var mic = localStreams.getAudioTracks()[0];
+      mic.enabled = !mic.enabled;
+
+      if (mic.enabled) {
+         button.attr('title', 'Mute');
+         button.toggleClass('off-btn', false).toggleClass('on-btn', true);
+      } else {
+         button.attr('title', 'Un-mute');
+         button.toggleClass('off-btn', true).toggleClass('on-btn', false);
+      }
    });
 };
 

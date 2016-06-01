@@ -479,7 +479,8 @@ gisportal.mapInit = function() {
       target: 'map',
       controls: [
          new ol.control.FullScreen({
-            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body'),
+            source: document.documentElement
          }),
          new ol.control.Zoom({
             zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
@@ -731,6 +732,14 @@ gisportal.mapInit = function() {
    });
  
    gisportal.loadLayers();
+
+   // Adds and removes the correct grabbing css for the pointer.
+   $('#map canvas').on('mousedown', function(){
+      $(this).toggleClass('grabbing', true).toggleClass('grab', false);
+   });
+   $('#map canvas').on('mouseup', function(){
+      $(this).toggleClass('grab', true).toggleClass('grabbing', false);
+   });
 
    // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
@@ -1766,6 +1775,14 @@ gisportal.showModalMessage = function(html, timeout) {
    setTimeout(function() {
       holder.toggleClass('hidden', true);
    }, t);
+};
+
+gisportal.hideModalMessage = function() {
+   var holder = $('.js-modal-message-popup');
+   var target = $('.js-modal-message-html');
+
+   target.html("");
+   holder.toggleClass('hidden', true);
 };
 
 // This function gets a list of all the available tags
