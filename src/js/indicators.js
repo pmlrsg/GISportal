@@ -1100,10 +1100,10 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
             this_feature = features[feature];
             features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, gisportal.projection, "EPSG:4326"));
          }
-         urlParams.bbox = gisportal.wkt.writeFeatures(features);
+         urlParams.bbox = gisportal.wkt.writeFeatures(features) || "-180,-90,180,90";
       }
    }else{
-      urlParams.bbox = gisportal.currentSelectedRegion;
+      urlParams.bbox = gisportal.currentSelectedRegion || "-180,-90,180,90";
    }
    urlParams.time = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
