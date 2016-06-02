@@ -373,7 +373,7 @@ collaboration.initSession = function() {
             collaboration.messages += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
             $(".messages").each(function() {
                var re_scroll = false;
-               if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight){
+               if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me){
                   re_scroll = true;
                }
                $(this).html(collaboration.messages);
