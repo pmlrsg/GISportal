@@ -1077,6 +1077,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
 gisportal.indicatorsPanel.exportRawUrl = function(id) {
    var indicator = gisportal.layers[id];
    var graphParams = (this.getParams(id));
+   var fullBounds = false;
 
    var download_data = null;
    var urlParams = {
@@ -1100,10 +1101,10 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
             this_feature = features[feature];
             features[feature] = gisportal.geoJSONToFeature(gisportal.featureToGeoJSON(this_feature, gisportal.projection, "EPSG:4326"));
          }
-         urlParams.bbox = gisportal.wkt.writeFeatures(features) || "-180,-90,180,90";
+         urlParams.bbox = gisportal.wkt.writeFeatures(features);
       }
    }else{
-      urlParams.bbox = gisportal.currentSelectedRegion || "-180,-90,180,90";
+      urlParams.bbox = gisportal.currentSelectedRegion;
    }
    urlParams.time = $('.js-export-raw-slideout .js-min').val() + "/" + $('.js-export-raw-slideout .js-max').val();
 
@@ -1115,6 +1116,13 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
          urlParams.vertical = '-' + Math.abs( vert );
    }
 
+   if(!urlParams.bbox){
+      urlParams.bbox = indicator.exBoundingBox.WestBoundLongitude + "," +
+            indicator.exBoundingBox.SouthBoundLatitude + "," +
+            indicator.exBoundingBox.EastBoundLongitude + "," +
+            indicator.exBoundingBox.NorthBoundLatitude;
+      fullBounds = true;
+   }
    graphParams.type = 'file';
    graphParams.time = urlParams.time;
    graphParams.bbox = urlParams.bbox;
@@ -1122,7 +1130,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 
 
    var request = $.param(urlParams);
-   if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true) {
+   if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
    } else {
       download_data = {url:indicator.wcsURL + request, irregular:false};
