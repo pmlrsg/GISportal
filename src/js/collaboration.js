@@ -370,7 +370,7 @@ collaboration.initSession = function() {
 
                }
             }
-            collaboration.messages += '<p title="' + email + '" class="side-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
+            collaboration.messages += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
             $(".messages").each(function() {
                var re_scroll = false;
                if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight){
@@ -1766,6 +1766,8 @@ collaboration.buildMembersList = function(data) {
       data.AVEnabled = webRTC.isChannelReady;
    }
    var message = $($('.message-input')[0]).val() || $($('.message-input')[1]).val();
+   var scrollTop0 = $($('.messages')[0]).scrollTop();
+   var scrollTop1 = $($('.messages')[1]).scrollTop();
    var rendered = gisportal.templates['collaboration-room'](data);
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
@@ -1940,6 +1942,8 @@ collaboration.buildMembersList = function(data) {
       });
    });
    $('.messages').html(collaboration.messages);
+   $($('.messages')[0]).scrollTop(scrollTop0);
+   $($('.messages')[1]).scrollTop(scrollTop1);
 
    if(me_selectors.length > 0){
       // Makes sure that your person div(s) is at the top of the list
