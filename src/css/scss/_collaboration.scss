@@ -265,11 +265,23 @@ input.message-input {
 div.panel-container[data-panel-name="collaboration"] .alert-danger,
 div.panel-container[data-panel-name="collaboration"] .alert-warning,
 div.panel-container[data-panel-name="collaboration"] .alert-success{
-  margin: 10px -8px;
-  padding: 10px;
+   margin: 10px -8px;
+   padding: 10px;
 }
 
 .person-message{
-  color:#FB0401;
-  cursor: pointer;
+   color:#FB0401;
+   cursor: pointer;
+}
+
+.new-message-popup {
+   height: auto;
+   width: 70%;
+   bottom: 35px;
+   left: 15%;
+   position: absolute;
+   text-align: center;
+   background-color: rgba(0,0,0,0.3);
+   color: white;
+   cursor: pointer;
 }

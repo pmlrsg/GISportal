@@ -29,6 +29,7 @@
 
 <div class="messenger">
    <div class="messages"></div>
+   <div class="new-message-popup hidden">More Messages Below...</div>
    <div class="message-form">
       <form>
          <input type="text" class="message-input"></input>

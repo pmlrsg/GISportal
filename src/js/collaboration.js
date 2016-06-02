@@ -375,6 +375,8 @@ collaboration.initSession = function() {
                var re_scroll = false;
                if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me){
                   re_scroll = true;
+               }else{
+                  $(this).siblings(".new-message-popup").toggleClass('hidden', false);
                }
                $(this).html(collaboration.messages);
                if(re_scroll){
@@ -1769,10 +1771,26 @@ collaboration.buildMembersList = function(data) {
    var scrollTop0 = $($('.messages')[0]).scrollTop();
    var scrollTop1 = $($('.messages')[1]).scrollTop();
    var rendered = gisportal.templates['collaboration-room'](data);
+   var new_message_popup0 = false;
+   var new_message_popup1 = false;
+   if($('.new-message-popup').length > 1){
+      if(!$($('.new-message-popup')[0]).hasClass('hidden')){
+         new_message_popup0 = true;
+      }
+      if(!$($('.new-message-popup')[1]).hasClass('hidden')){
+         new_message_popup1 = true;
+      }
+   }
    $('.js-collaboration-holder').html('').html(rendered);
    $('.collaboration-pulltab').toggleClass('hidden', false);
    if(message){
       $('.message-input').val(message);
+   }
+   if(new_message_popup0){
+      $($('.new-message-popup')[0]).toggleClass('hidden', false);
+   }
+   if(new_message_popup1){
+      $($('.new-message-popup')[1]).toggleClass('hidden', false);
    }
 
    $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
@@ -1815,12 +1833,25 @@ collaboration.buildMembersList = function(data) {
 
       });
    });
+
    $('button.js-submit-message').on('click', function(e)  {
       e.preventDefault();
       var input = $(this).siblings('.message-input');
       if(input.val().length >= 1){
          collaboration._emit('message.sent', {message: input.val(), id: socket.io.engine.id}, force=true);
          $('.message-input').val("");
+      }
+   });
+
+   $('.new-message-popup').on('click', function(e){
+      $(this).toggleClass("hidden", true);
+      var messages = $(this).siblings('.messages');
+      messages.scrollTop(messages[0].scrollHeight);
+   });
+
+   $('.messages').bind('scroll', function() {
+      if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight){
+         $(this).siblings('.new-message-popup').toggleClass("hidden", true);
       }
    });
 
