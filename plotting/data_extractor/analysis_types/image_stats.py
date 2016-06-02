@@ -1,5 +1,5 @@
 import netCDF4 as netCDF
-from ..extraction_utils import basic, getCoordinateVariable
+from extraction_utils import basic, getCoordinateVariable
 import json
 import matplotlib.pyplot as plt
 import decimal

@@ -1,9 +1,9 @@
-from ..extraction_utils import create_mask
+from extraction_utils import create_mask
 from . import Extractor
-from ..extraction_utils import WCSRawHelper, basic
+from extraction_utils import WCSRawHelper, basic
 import tempfile
 import uuid
-from ..analysis_types import BasicStats
+from analysis_types import BasicStats
 
 
 class IrregularExtractor(Extractor):

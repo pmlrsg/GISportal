@@ -1,5 +1,5 @@
 import netCDF4 as netCDF
-from ..extraction_utils import basic, hovmoller
+from extraction_utils import basic, hovmoller
 import json
 
 class HovmollerStats(object):
