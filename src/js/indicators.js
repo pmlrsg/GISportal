@@ -1133,7 +1133,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
    } else {
-      download_data = {url:indicator.wcsURL + request, irregular:false};
+      download_data = {url:indicator.wcsURL.replace(/\?/, "") + "?" + request, irregular:false};
    }
    return download_data;
 };
