@@ -241,7 +241,6 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('ul.js-indicators').addClass('sortable-list');
 
    $(".sortable-list").sortable({
-      cancel: "td,p",
       start: function(event, ui) {
          $(ui.item).children('.indicator-header').addClass('indicator-header-moving');
       },
