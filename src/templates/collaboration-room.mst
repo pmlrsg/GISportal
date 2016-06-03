@@ -23,7 +23,7 @@
 <div data-id="{{id}}" class="person">
    {{#presenter}}<div class="presenter" title="Presenter"></div>{{/presenter}}
    {{#diverged}}<div class="diverged" title="Diverged"></div>{{/diverged}}
-   <p title="{{email}}" style="color:{{color}}"><b>{{name}}</b></p>
+   <p title="{{email}}" style="color:{{color}}">{{name}}</p>
 </div>
 {{/people}}
 
