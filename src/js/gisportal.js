@@ -1569,12 +1569,15 @@ gisportal.launchMap = function(){
    setInterval( gisportal.autoSaveState, 60000 );
 
    //Once they are past the splash page warn them if they leave
-   window.onbeforeunload = function(){
+   window.onbeforeunload = function(e){
       gisportal.autoSaveState();
-      if( gisportal.config.siteMode == "production")
-         return "Warning. You're about to leave the page";
-      else
+      var msg = "Warning. You're about to leave the page";
+      if( gisportal.config.siteMode == "production"){
+         e.returnValue = msg;
+         return msg;
+      }else{
          return;
+      }
    };
 
 };
