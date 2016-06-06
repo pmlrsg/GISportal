@@ -413,14 +413,8 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
    $('.js-timeline-labels').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
       // Update label
-      //var positionTop = $('.timeline > g').position().top;
-      //positionTop += this.barHeight * i;
-      //positionTop += this.barMargin * i;
-      var positionTop = (i+1) * (this.barHeight + this.barMargin) - 2; 
-      var barTop = $(this.bars[0][i]).position().top;
-      // The 300 below is ARBITARY. In Firefox it can get massive
-      // whereas in Chrome it is required occasionally. TO DO: fix.
-      if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
+      var positionTop = (i+1) * (this.barHeight + this.barMargin);
+      positionTop += (i+1) * 3;
       var id = this.timebars[i].id;
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
