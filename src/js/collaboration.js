@@ -152,7 +152,7 @@ collaboration.addVideoActionListeners = function(){
 collaboration.initSession = function() {
 
 	// get the socket.io script and open a connection
-	$.getScript("socket.io/socket.io.js")
+	$.getScript(gisportal.middlewarePath + "/socket.io/")
 		.done(function( script, textStatus ) {
          socket = io.connect('/', {
 		   	"connect timeout": 1000

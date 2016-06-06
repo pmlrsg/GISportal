@@ -320,7 +320,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       var key = field.replace(/-/g,"_");
       var key_val = $(this).siblings("input[data-field="+key+"], textarea[data-field="+key+"], select[data-field="+key+"]").val();
       key = key.replace("-", "_");
-      if(key == "indicator_type"){
+      if($(this).data("tag")){
          key_val = key_val.split(",");
          for (value in key_val){
             key_val[value] = key_val[value].trim();
@@ -806,15 +806,13 @@ gisportal.addLayersForm.addInputListeners = function(){
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }else if(tag){ // If it is a tag it needs to be added to the tags list.
             gisportal.addLayersForm.displayTagSuggestions(index);
-            if(key == "indicator_type"){ // As the indacator type is a list, it must be split first.
-               if(key_val !== ""){
-                  key_val = key_val.split(",");
-                  for(var value in key_val){
-                     key_val[value] = key_val[value].trim();
-                  }
-               }else{
-                  key_val = null;
+            if(key_val !== ""){
+               key_val = key_val.split(",");
+               for(var value in key_val){
+                  key_val[value] = key_val[value].trim();
                }
+            }else{
+               key_val = null;
             }
             gisportal.addLayersForm.layers_list[index].tags[key] = key_val;
          }else{

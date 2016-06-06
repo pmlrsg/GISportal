@@ -1,5 +1,5 @@
 import netCDF4 as netCDF
-from ..extraction_utils import basic_scatter
+from extraction_utils import basic_scatter
 import json
 
 class ScatterStats(object):

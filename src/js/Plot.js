@@ -332,7 +332,7 @@ gisportal.graphs.Plot =(function(){
             logo = layer.provider.logo;
          }
          else{
-            logo = "undefined";
+            logo = undefined;
          }
          var nice_bbox = component.bbox;
          var current_projection = gisportal.projection;
@@ -382,7 +382,7 @@ gisportal.graphs.Plot =(function(){
             "yAxis": yAxis,
             "type": "line",
             "meta": meta,
-            "logo": gisportal.middlewarePath + logo
+            //"logo": gisportal.middlewarePath + "/" + logo
          };
 
          // If its a hovmoller then 

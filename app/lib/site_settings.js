@@ -22,6 +22,7 @@ var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
+var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io/node_modules/socket.io-client/socket.io.js";
 
 var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
 
@@ -225,7 +226,6 @@ router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(r
    res.status(200).send();
 });
 
-
 router.get('/app/cache/*?', function(req, res) {
    var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
    res.sendFile(config_path, function (err) {
@@ -235,6 +235,10 @@ router.get('/app/cache/*?', function(req, res) {
    });
 });
 
+router.get('/app/socket.io/', function(req, res) {
+   var socket_file = fs.readFileSync(SOCKETIO_FILE_PATH);
+   res.send(socket_file);
+});
 
 router.get('/resources/*?', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain

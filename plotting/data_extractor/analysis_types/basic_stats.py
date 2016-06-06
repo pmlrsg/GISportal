@@ -1,5 +1,5 @@
 import netCDF4 as netCDF
-from ..extraction_utils import basic
+from extraction_utils import basic
 import json
 
 class BasicStats(object):

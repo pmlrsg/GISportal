@@ -1317,11 +1317,11 @@ gisportal.setState = function(state) {
 gisportal.main = function() {
 
    if( gisportal.config.browserRestristion ){
-      if( gisportal.validateBrowser() === false )
+      if( gisportal.validateBrowser() === false ){
          return;
+      }
    }
-      
-
+   $('title').html(gisportal.config.pageTitle || "GIS portal");
 
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();

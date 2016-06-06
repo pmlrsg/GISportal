@@ -93,7 +93,8 @@ $.extend(gisportal.config, {
    // The HTML that you would like to be displayed on the splash welcome page.
    startPageHTML: '<p>The GIS portal provides model simulated, earth observation and in-situ data for global water resources.</p><p>Enter the portal now and plot data on a map, analyse it through graphs or export and share.</p>',
 
-   aboutPage: "https://visual.pml.ac.uk/gisportal/" // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
+   aboutPage: "https://visual.pml.ac.uk/gisportal/", // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
 
+   pageTitle: "GIS Portal" // The Page title to be shown in the browser. If blank the title will be "GIS Portal"
 });
 
