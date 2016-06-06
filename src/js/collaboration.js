@@ -357,7 +357,6 @@ collaboration.initSession = function() {
             var me = false;
             var side = "right";
             var email = "You";
-            var color = "#000000";
             var this_message_div = "";
             if(id == socket.io.engine.id){
                me = true;
@@ -366,17 +365,16 @@ collaboration.initSession = function() {
             for(var person in data.people){
                if(data.people[person].id == id){
                   var this_person = data.people[person];
-                  color = this_person.color;
                   if(!me){
                      email = this_person.email;
                   }
                   if(this_person.image){
-                     this_message_div += '<img src="' + this_person.image + '" class="avatar-small pull-' + side + '">';
+                     this_message_div += '<img src="' + this_person.image + '" title="' + email + '" class="avatar-small pull-' + side + '">';
                   }
                }
             }
-            this_message_div += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p>';
-            collaboration.messages += '<div class="clearfix">' + this_message_div + '</div>'
+            this_message_div += '<p title="' + email + '" class="pull-' + side + '" style="text-align:' + side + '; margin-'+ side +':5px;">' + message + '</p>';
+            collaboration.messages += '<div class="clearfix outer-div"><div class="inner-div pull-' + side + '">' + this_message_div + '</div></div>';
             var showNotification = false;
             $(".messages").each(function() {
                var collab_panel = $(this).closest('.collaboration-panel');

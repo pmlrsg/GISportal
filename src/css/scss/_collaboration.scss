@@ -133,7 +133,21 @@
 }
 
 p[title] {
-  width: 75%;
+  max-width: 230px;
+}
+
+.messages div.inner-div{
+  background: linear-gradient(45deg, #d7d5d8, #efedf1);
+  margin-bottom: 7px;
+  padding: 4px 6px;
+  width: auto;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 0 5px #58545a;
+}
+
+.messages div.outer-div{
+  width: 100%;
 }
 
 input.message-input {

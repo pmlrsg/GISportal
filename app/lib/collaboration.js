@@ -5,26 +5,11 @@ var crypto = require('crypto');
 var redis = require('redis');
 var client = redis.createClient();
 var swearJar = require('swearjar');
+var Jimp = require('jimp');
 
 var collaboration = {};
 
 module.exports = collaboration;
-
-function getRandomColorValue(){
-   return 255 - Math.floor(Math.random() * 156);
-}
-
-function getRandomRGBColor(){
-   var r = getRandomColorValue();
-   var g = getRandomColorValue();
-   var b = getRandomColorValue();
-   while((0.2126*r + 0.7152*g + 0.0722*b) > 180){
-      r = getRandomColorValue();
-      g = getRandomColorValue();
-      b = getRandomColorValue();
-   }
-   return 'rgb(' + r + ',' + g + ',' + b + ')';
-}
 
 collaboration.init = function(io, app, config) {
    // Makes sure that when node is restarted, all people are removed from rooms so there are no duplicates
@@ -87,6 +72,19 @@ collaboration.init = function(io, app, config) {
          user.name = session.passport.user.displayName;
          user.provider = session.passport.user.provider;
          user.image = session.passport.user._json.picture;
+
+         Jimp.read(user.image, function(err, image1){ // Gets the image file from the URL
+            if (!err){
+               Jimp.read(__dirname + "/../../html/img/google_default.jpg", function(err, image2){ // Gets the image file from the img folder
+                  if (!err){
+                     if(Jimp.distance(image1, image2) === 0){
+                        user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
+                     }
+                  }
+               });
+            }
+         });
+         if(crypto)
          
          console.log(user.email +' connected: '+sid);
       });
@@ -164,7 +162,6 @@ collaboration.init = function(io, app, config) {
             "people": [{
                "id": socket.id,
                "email": user.email,
-               "color": getRandomRGBColor(),
                "name": user.name,
                "image": user.image,
                "presenter": true,
@@ -216,7 +213,6 @@ collaboration.init = function(io, app, config) {
                   "email": user.email,
                   "name": user.name,
                   "image": user.image,
-                  "color": getRandomRGBColor(),
                   "presenter": presenter,
                   "owner": owner,
                   "diverged": false
