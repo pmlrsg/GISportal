@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
 var redis = require('redis');
 var client = redis.createClient();
+var swearJar = require('swearjar');
 
 var collaboration = {};
 
@@ -431,6 +432,7 @@ collaboration.init = function(io, app, config) {
          var message = data.message;
          var roomId = socket.room;
          console.log(user.email + ' : ' + message);
+         var message = swearJar.censor(message.replace(/<\/?[^>]+(>|$)/g, ""));
          
          client.get(roomId, function(err, obj) {
             if(!obj){

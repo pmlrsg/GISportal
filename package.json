@@ -42,7 +42,8 @@
     "csv-parser": "~1.9.3",
     "md2html": "0.0.1",
     "moment": "~2.12.0",
-    "node-markdown": "~0.1.1"
+    "node-markdown": "~0.1.1",
+    "swearjar": "~0.1.2"
   },
   "engines": {
     "node": ">= 0.8.0",

@@ -120,6 +120,7 @@
   margin-top: 5px;
   position: relative;
 }
+
 .messages{
   border: 1px solid #ccc;
   background-color: #fff;
@@ -127,6 +128,10 @@
   overflow: auto;
   height: 200px;
   word-break: break-word;
+}
+
+p[title] {
+  width: 75%;
 }
 
 input.message-input {

@@ -1838,8 +1838,11 @@ collaboration.buildMembersList = function(data) {
       e.preventDefault();
       var input = $(this).siblings('.message-input');
       if(input.val().length >= 1){
-         collaboration._emit('message.sent', {message: input.val(), id: socket.io.engine.id}, force=true);
+         var msg = input.val().replace(/<\/?[^>]+(>|$)/g, "");
          $('.message-input').val("");
+         if(msg){
+            collaboration._emit('message.sent', {message: msg, id: socket.io.engine.id}, force=true);
+         }
       }
    });
 
@@ -1903,6 +1906,9 @@ collaboration.buildMembersList = function(data) {
       }
       var link;
       var title = "Make this person the presenter";
+      if(!this_person || !this_person.email){
+         $(this).remove();
+      }
       if(me == id){
          // Different hover message for taking the presenter role yourself
          title = "Take the presenter role";
