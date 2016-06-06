@@ -376,12 +376,23 @@ collaboration.initSession = function() {
             collaboration.messages += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
             var showNotification = false;
             $(".messages").each(function() {
+               var collab_panel = $(this).closest('.collaboration-panel');
+               var hidden = collab_panel.hasClass('hidden');
                var re_scroll = false;
                if(($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me) && !$('.collaboration-panel').hasClass('hidden') &&  document.visibilityState == 'visible'){
                   re_scroll = true;
-               }else if(this.scrollHeight > this.clientHeight){
-                  showNotification = true;
-                  $(this).siblings(".new-message-popup").toggleClass('hidden', false);
+               }else{
+                  // Need to make sure that the panel is not hidden to check if the messages has a scrollbar
+                  if(hidden){
+                     collab_panel.toggleClass('hidden', false);
+                  }
+                  if(this.scrollHeight > this.clientHeight){
+                     showNotification = true;
+                     $(this).siblings(".new-message-popup").toggleClass('hidden', false);
+                  }
+                  if(hidden){
+                     collab_panel.toggleClass('hidden', true);
+                  }
                }
                $(this).html(collaboration.messages);
                if(re_scroll){
@@ -421,14 +432,17 @@ collaboration.initSession = function() {
 
          socket.on('room.presenter-changed', function(data) {
             // am I now the presenter?
+            var presenter;
             for (var p in data.people) {
                var person = data.people[p];
+               if(person.presenter && person.id){
+                  presenter = person;
+               }
                if (person.presenter && person.id == socket.io.engine.id) {
                   collaboration.role = "presenter";
                   collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
                   $('.collab-overlay').toggleClass('hidden', true);
-                  break;
                } else {
                   if(collaboration.role == "presenter"){
                      gisportal.showModalMessage('You are no longer the presenter');
@@ -439,9 +453,9 @@ collaboration.initSession = function() {
                      $('.collab-overlay').toggleClass('hidden', false);
                   }
                }
-               var pName = person.name || person.email;
-               collaboration.log("Presenter changed to " + pName);
             }
+            var pName = presenter.name || presenter.email;
+            collaboration.log("Presenter changed to " + pName);
             collaboration.buildMembersList(data);
          });
 
