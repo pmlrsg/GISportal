@@ -165,13 +165,12 @@ collaboration.initSession = function() {
             if(pulltab.hasClass('open')){
                pulltab.toggleClass('open', false);
                panel.toggleClass('hidden', true);
-
             }else{
                pulltab.toggleClass('open', true);
                panel.toggleClass('hidden', false);
-            }
-            if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
-               gisportal.pageTitleNotification.Off();
+               if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
+                  gisportal.pageTitleNotification.Off();
+               }
             }
          });
 
@@ -359,6 +358,7 @@ collaboration.initSession = function() {
             var side = "right";
             var email = "You";
             var color = "#000000";
+            var this_message_div = "";
             if(id == socket.io.engine.id){
                me = true;
                side = "left";
@@ -370,10 +370,13 @@ collaboration.initSession = function() {
                   if(!me){
                      email = this_person.email;
                   }
-
+                  if(this_person.image){
+                     this_message_div += '<img src="' + this_person.image + '" class="avatar-small pull-' + side + '">';
+                  }
                }
             }
-            collaboration.messages += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
+            this_message_div += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p>';
+            collaboration.messages += '<div class="clearfix">' + this_message_div + '</div>'
             var showNotification = false;
             $(".messages").each(function() {
                var collab_panel = $(this).closest('.collaboration-panel');
@@ -2133,8 +2136,17 @@ collaboration.highlightElement = function(element) {
 };
 
 collaboration.highlightElementShake = function(element) {
+   if(!element.hasClass('highlight-shake')){
    element.addClass('highlight-shake');
    setTimeout(function() { element.removeClass('highlight-shake'); }, 1000);
+}
+};
+
+collaboration.highlightElementShakeUp = function(element) {
+   if(!element.hasClass('highlight-shake-up')){
+      element.addClass('highlight-shake-up');
+      setTimeout(function() { element.removeClass('highlight-shake-up'); }, 1000);
+   }
 };
 
 collaboration.highlightElementPulse = function(element) {

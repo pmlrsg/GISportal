@@ -1362,10 +1362,11 @@ gisportal.main = function() {
          if(messageNotify){
             var notify_number = $('.collaboration-pulltab span.notify-number');
             if(notify_number.length <= 0){
-               $('.collaboration-pulltab span[title]').append('<span class="notify-number">1</span>');
+               $('.collaboration-pulltab span[title]').append('<span class="notify-number" title="No. of New Messages">1</span>');
             }else{
                notify_number.html(parseInt(notify_number.html()) + 1);
             }
+            collaboration.highlightElementShakeUp($('.collaboration-pulltab'));
          }
       },
       Off: function(){

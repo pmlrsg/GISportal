@@ -197,6 +197,10 @@ input.message-input {
     animation: shake 0.75s;
 }
 
+.highlight-shake-up {
+    animation: shake-up 0.75s;
+}
+
 .pulse-attention {
     animation: pulse 0.5s 4;
 }
@@ -215,6 +219,23 @@ input.message-input {
   40%, 80% {
     -webkit-transform: translate3d(10px, 0, 0);
     transform: translate3d(10px, 0, 0);
+  }
+}
+
+@keyframes shake-up {
+  from, to {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+
+  20%, 60%{
+    -webkit-transform: translate3d(0, -10px, 0);
+    transform: translate3d(0, -10px, 0);
+  }
+
+  40%, 80% {
+    -webkit-transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 10px, 0);
   }
 }
 
@@ -300,4 +321,10 @@ span.notify-number {
   top: 0;
   right: 0;
   font-size: 10px;
+}
+
+.avatar-small {
+  width: auto;
+  height: 19px;
+  border-radius: 50%;
 }

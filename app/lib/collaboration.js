@@ -86,6 +86,7 @@ collaboration.init = function(io, app, config) {
          user.email = emails[0].value;
          user.name = session.passport.user.displayName;
          user.provider = session.passport.user.provider;
+         user.image = session.passport.user._json.picture;
          
          console.log(user.email +' connected: '+sid);
       });
@@ -165,6 +166,7 @@ collaboration.init = function(io, app, config) {
                "email": user.email,
                "color": getRandomRGBColor(),
                "name": user.name,
+               "image": user.image,
                "presenter": true,
                "owner": true,
                "diverged": false
@@ -213,6 +215,7 @@ collaboration.init = function(io, app, config) {
                   "id": socket.id,
                   "email": user.email,
                   "name": user.name,
+                  "image": user.image,
                   "color": getRandomRGBColor(),
                   "presenter": presenter,
                   "owner": owner,
