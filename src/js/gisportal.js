@@ -1348,6 +1348,33 @@ gisportal.main = function() {
       gisportal.config.aboveMaxColor = col;
    }
 
+   gisportal.pageTitleNotification = {
+      Vars:{
+         OriginalTitle: document.title,
+         Interval: null
+      },    
+      On: function(notification, intervalSpeed, messageNotify){
+         var _this = this;
+         clearInterval(_this.Vars.Interval);
+         _this.Vars.Interval = setInterval(function(){
+            document.title = (_this.Vars.OriginalTitle == document.title) ? notification : _this.Vars.OriginalTitle;
+         }, (intervalSpeed) ? intervalSpeed : 1000);
+         if(messageNotify){
+            var notify_number = $('.collaboration-pulltab span.notify-number');
+            if(notify_number.length <= 0){
+               $('.collaboration-pulltab span[title]').append('<span class="notify-number">1</span>');
+            }else{
+               notify_number.html(parseInt(notify_number.html()) + 1);
+            }
+         }
+      },
+      Off: function(){
+         $('.collaboration-pulltab span.notify-number').remove();
+         clearInterval(this.Vars.Interval);
+         document.title = this.Vars.OriginalTitle;   
+      }
+   };
+
    if(!gisportal.config.belowMinColor){
       gisportal.config.belowMinColor = gisportal.config.belowMinColour;
    }

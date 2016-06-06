@@ -294,3 +294,10 @@ div.panel-container[data-panel-name="collaboration"] .alert-success{
    color: white;
    cursor: pointer;
 }
+
+span.notify-number {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 10px;
+}

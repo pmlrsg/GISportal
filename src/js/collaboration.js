@@ -170,6 +170,9 @@ collaboration.initSession = function() {
                pulltab.toggleClass('open', true);
                panel.toggleClass('hidden', false);
             }
+            if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
+               gisportal.pageTitleNotification.Off();
+            }
          });
 
          var idleMouseTimer;
@@ -371,11 +374,13 @@ collaboration.initSession = function() {
                }
             }
             collaboration.messages += '<p title="' + email + '" class="pull-' + side + '" style="color:' + color + '; text-align:' + side + ';">' + message + '</p><br/>';
+            var showNotification = false;
             $(".messages").each(function() {
                var re_scroll = false;
-               if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me){
+               if(($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me) && !$('.collaboration-panel').hasClass('hidden') &&  document.visibilityState == 'visible'){
                   re_scroll = true;
-               }else{
+               }else if(this.scrollHeight > this.clientHeight){
+                  showNotification = true;
                   $(this).siblings(".new-message-popup").toggleClass('hidden', false);
                }
                $(this).html(collaboration.messages);
@@ -383,6 +388,9 @@ collaboration.initSession = function() {
                   $(this).scrollTop($(this)[0].scrollHeight);
                }
             });
+            if(showNotification || document.visibilityState != 'visible' || $('.collaboration-panel').hasClass('hidden')){
+               gisportal.pageTitleNotification.On("New Message", null, true);
+            }
          });
 
          socket.on('members.update', function(data) {
@@ -1758,6 +1766,15 @@ collaboration.joinRoom = function(roomId) {
 };
 
 collaboration.buildMembersList = function(data) {
+   if(!window.onfocus){
+      window.onfocus = function(){
+         if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
+            if(!$('.collaboration-panel').hasClass('hidden')){
+               gisportal.pageTitleNotification.Off();
+            }
+         }
+      };
+   }
    for(var people in data.people){
       person = data.people[people];
       if(!person.name || person.name === ""){
@@ -1767,30 +1784,24 @@ collaboration.buildMembersList = function(data) {
    if(webRTC){
       data.AVEnabled = webRTC.isChannelReady;
    }
-   var message = $($('.message-input')[0]).val() || $($('.message-input')[1]).val();
-   var scrollTop0 = $($('.messages')[0]).scrollTop();
-   var scrollTop1 = $($('.messages')[1]).scrollTop();
+   var message = $('.message-input').val();
+   var scrollTop = $('.messages').scrollTop();
    var rendered = gisportal.templates['collaboration-room'](data);
-   var new_message_popup0 = false;
-   var new_message_popup1 = false;
+   var new_message_popup = false;
    if($('.new-message-popup').length > 1){
-      if(!$($('.new-message-popup')[0]).hasClass('hidden')){
-         new_message_popup0 = true;
-      }
-      if(!$($('.new-message-popup')[1]).hasClass('hidden')){
-         new_message_popup1 = true;
+      if(!$('.new-message-popup').hasClass('hidden')){
+         new_message_popup = true;
       }
    }
    $('.js-collaboration-holder').html('').html(rendered);
+   // Makes sure there is only one messenger
+   $('#collaborationPanel .js-collaboration-holder .messenger').remove();
    $('.collaboration-pulltab').toggleClass('hidden', false);
    if(message){
       $('.message-input').val(message);
    }
-   if(new_message_popup0){
-      $($('.new-message-popup')[0]).toggleClass('hidden', false);
-   }
-   if(new_message_popup1){
-      $($('.new-message-popup')[1]).toggleClass('hidden', false);
+   if(new_message_popup){
+      $('.new-message-popup').toggleClass('hidden', false);
    }
 
    $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
@@ -1855,6 +1866,7 @@ collaboration.buildMembersList = function(data) {
    $('.messages').bind('scroll', function() {
       if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight){
          $(this).siblings('.new-message-popup').toggleClass("hidden", true);
+         gisportal.pageTitleNotification.Off();
       }
    });
 
@@ -1979,8 +1991,7 @@ collaboration.buildMembersList = function(data) {
       });
    });
    $('.messages').html(collaboration.messages);
-   $($('.messages')[0]).scrollTop(scrollTop0);
-   $($('.messages')[1]).scrollTop(scrollTop1);
+   $('.messages').scrollTop(scrollTop);
 
    if(me_selectors.length > 0){
       // Makes sure that your person div(s) is at the top of the list
