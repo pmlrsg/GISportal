@@ -12,7 +12,6 @@ collaboration.diverged = false;
 
 collaboration.active = false;
 collaboration.role = '';
-collaboration.messages = "";
 
 collaboration.initDOM = function() {     
    collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
@@ -352,54 +351,58 @@ collaboration.initSession = function() {
 
          socket.on('message.recieved', function(data) {
             // This builds the message and adds it to the collaboration messages object and to the div
-            var message = data.message;
+            var message_data = {};
+            message_data.message = data.message;
+            message_data.side = "left";
+            message_data.email = "You";
             var id = data.sender;
             var me = false;
-            var side = "right";
-            var email = "You";
             var this_message_div = "";
             if(id == socket.io.engine.id){
                me = true;
-               side = "left";
+               message_data.side = "right";
             }
+            var this_person;
             for(var person in data.people){
                if(data.people[person].id == id){
                   var this_person = data.people[person];
                   if(!me){
-                     email = this_person.email;
+                     message_data.email = this_person.name || this_person.email;
                   }
-                  if(this_person.image){
-                     this_message_div += '<img src="' + this_person.image + '" title="' + email + '" class="avatar-small pull-' + side + '">';
-                  }
+                  message_data.image = this_person.image;
                }
             }
-            this_message_div += '<p title="' + email + '" class="pull-' + side + '" style="text-align:' + side + '; margin-'+ side +':5px;">' + message + '</p>';
-            collaboration.messages += '<div class="clearfix outer-div"><div class="inner-div pull-' + side + '">' + this_message_div + '</div></div>';
+            var rendered = gisportal.templates['collaboration-message'](message_data);
             var showNotification = false;
-            $(".messages").each(function() {
-               var collab_panel = $(this).closest('.collaboration-panel');
-               var hidden = collab_panel.hasClass('hidden');
-               var re_scroll = false;
-               if(($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight || me) && !$('.collaboration-panel').hasClass('hidden') &&  document.visibilityState == 'visible'){
-                  re_scroll = true;
-               }else{
-                  // Need to make sure that the panel is not hidden to check if the messages has a scrollbar
-                  if(hidden){
-                     collab_panel.toggleClass('hidden', false);
-                  }
-                  if(this.scrollHeight > this.clientHeight){
-                     showNotification = true;
-                     $(this).siblings(".new-message-popup").toggleClass('hidden', false);
-                  }
-                  if(hidden){
-                     collab_panel.toggleClass('hidden', true);
-                  }
+            var collab_panel = $(".messages").closest('.collaboration-panel');
+            var hidden = collab_panel.hasClass('hidden');
+            var re_scroll = false;
+            if(($(".messages").scrollTop() + $(".messages").innerHeight() >= $(".messages")[0].scrollHeight || me) && !$('.collaboration-panel').hasClass('hidden') &&  document.visibilityState == 'visible'){
+               re_scroll = true;
+            }else{
+               // Need to make sure that the panel is not hidden to check if the messages has a scrollbar
+               if(hidden){
+                  collab_panel.toggleClass('hidden', false);
                }
-               $(this).html(collaboration.messages);
-               if(re_scroll){
-                  $(this).scrollTop($(this)[0].scrollHeight);
+               if(this.scrollHeight > this.clientHeight){
+                  showNotification = true;
+                  $(".messages").siblings(".new-message-popup").toggleClass('hidden', false);
                }
-            });
+               if(hidden){
+                  collab_panel.toggleClass('hidden', true);
+               }
+            }
+            var last_message = $(".messages").find('div.outer-div:last');
+
+            if(last_message.data('sender') == message_data.email){
+               last_message.find('p').append('<br/>' + message_data.message);
+            }else{
+               $(".messages").append(gisportal.templates['collaboration-message'](message_data));
+            }
+            if(re_scroll){
+               $(".messages").scrollTop($(".messages")[0].scrollHeight);
+            }
+
             if(showNotification || document.visibilityState != 'visible' || $('.collaboration-panel').hasClass('hidden')){
                gisportal.pageTitleNotification.On("New Message", null, true);
             }
@@ -1801,6 +1804,7 @@ collaboration.buildMembersList = function(data) {
    }
    var message = $('.message-input').val();
    var scrollTop = $('.messages').scrollTop();
+   var messages_data = $('.messages').html();
    var rendered = gisportal.templates['collaboration-room'](data);
    var new_message_popup = false;
    if($('.new-message-popup').length > 1){
@@ -1829,7 +1833,6 @@ collaboration.buildMembersList = function(data) {
       hangup();
       socket.disconnect();
       collaboration.roomId = null;
-      collaboration.messages = "";
       collaboration.owner = false;
       $('.notifyjs-gisportal-collab-notification-base').parent().remove();
 
@@ -2005,7 +2008,7 @@ collaboration.buildMembersList = function(data) {
          collaboration._emit('room.make-presenter', id, force = true);
       });
    });
-   $('.messages').html(collaboration.messages);
+   $('.messages').html(messages_data);
    $('.messages').scrollTop(scrollTop);
 
    if(me_selectors.length > 0){

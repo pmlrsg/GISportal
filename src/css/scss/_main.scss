@@ -58,6 +58,10 @@ button, .btn{
    cursor:-moz-grabbing;
 }
 
+#data-reading-popup{
+  cursor: auto;
+}
+
 .brand  {
   background-color: $button-primary;
   border-style: none;

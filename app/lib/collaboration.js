@@ -79,6 +79,27 @@ collaboration.init = function(io, app, config) {
                   if (!err){
                      if(Jimp.distance(image1, image2) === 0){
                         user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
+                        var roomId = socket.room;
+                        client.get(roomId, function(err, obj) {
+                           if(!obj){
+                              return;
+                           }
+                           var room = JSON.parse(obj);
+                           for(var person in room.people){
+                              var this_person = room.people[person];
+                              if(this_person.email == user.email){
+                                 this_person.image = user.image;
+                              }
+                           }
+                           client.set(roomId, JSON.stringify(room), function(err){
+                              if(!err){
+                                 io.sockets.in(socket.room).emit('members.update', {
+                                    "roomId": socket.room,
+                                    "people": room.people
+                                 });
+                              }
+                           });
+                        });
                      }
                   }
                });

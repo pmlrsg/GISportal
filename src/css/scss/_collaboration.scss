@@ -133,17 +133,16 @@
 }
 
 p[title] {
-  max-width: 230px;
+  max-width: 200px;
 }
 
 .messages div.inner-div{
-  background: linear-gradient(45deg, #d7d5d8, #efedf1);
+  background: #d7d5d8;
   margin-bottom: 7px;
   padding: 4px 6px;
   width: auto;
   border-radius: 8px;
   display: inline-block;
-  box-shadow: 0 0 5px #58545a;
 }
 
 .messages div.outer-div{
@@ -341,6 +340,16 @@ span.notify-number {
 
 .avatar-small {
   width: auto;
-  height: 19px;
+  height: 24px;
   border-radius: 50%;
+}
+
+.person p{
+  padding-left: 2px;
+}
+
+.person img.avatar-small{
+  margin-top: -2.5px;
+  padding-right: 3px;
+  margin-left: -4px;
 }
