@@ -167,6 +167,7 @@ collaboration.initSession = function() {
             }else{
                pulltab.toggleClass('open', true);
                panel.toggleClass('hidden', false);
+               $('.message-input').select();
                if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
                   gisportal.pageTitleNotification.Off();
                }
@@ -384,7 +385,7 @@ collaboration.initSession = function() {
                if(hidden){
                   collab_panel.toggleClass('hidden', false);
                }
-               if(this.scrollHeight > this.clientHeight){
+               if($(".messages")[0].scrollHeight > $(".messages")[0].clientHeight){
                   showNotification = true;
                   $(".messages").siblings(".new-message-popup").toggleClass('hidden', false);
                }

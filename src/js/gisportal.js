@@ -1364,7 +1364,11 @@ gisportal.main = function() {
             if(notify_number.length <= 0){
                $('.collaboration-pulltab span[title]').append('<span class="notify-number" title="No. of New Messages">1</span>');
             }else{
-               notify_number.html(parseInt(notify_number.html()) + 1);
+               if(notify_number.html() == "∞" || parseInt(notify_number.html()) >= 99){
+                  notify_number.html("∞");
+               }else{
+                  notify_number.html(parseInt(notify_number.html()) + 1);
+               }
             }
             collaboration.highlightElementShakeUp($('.collaboration-pulltab'));
          }
