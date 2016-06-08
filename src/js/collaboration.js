@@ -164,9 +164,11 @@ collaboration.initSession = function() {
             if(pulltab.hasClass('open')){
                pulltab.toggleClass('open', false);
                panel.toggleClass('hidden', true);
+               pulltab.find('span[class^="icon"]').toggleClass('icon-connection-2', true).toggleClass('icon-arrow-right-1', false).attr('title', "Collaboration");
             }else{
                pulltab.toggleClass('open', true);
                panel.toggleClass('hidden', false);
+               pulltab.find('span[class^="icon"]').toggleClass('icon-connection-2', false).toggleClass('icon-arrow-right-1', true).attr('title', "Close Collaboration");
                $('.message-input').select();
                if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
                   gisportal.pageTitleNotification.Off();
@@ -353,7 +355,7 @@ collaboration.initSession = function() {
          socket.on('message.recieved', function(data) {
             // This builds the message and adds it to the collaboration messages object and to the div
             var message_data = {};
-            message_data.message = data.message;
+            message_data.message = data.message.replace(/\n/g, "<br/>");
             message_data.side = "left";
             message_data.email = "You";
             var id = data.sender;
@@ -366,14 +368,13 @@ collaboration.initSession = function() {
             var this_person;
             for(var person in data.people){
                if(data.people[person].id == id){
-                  var this_person = data.people[person];
+                  this_person = data.people[person];
                   if(!me){
                      message_data.email = this_person.name || this_person.email;
                   }
                   message_data.image = this_person.image;
                }
             }
-            var rendered = gisportal.templates['collaboration-message'](message_data);
             var showNotification = false;
             var collab_panel = $(".messages").closest('.collaboration-panel');
             var hidden = collab_panel.hasClass('hidden');
@@ -396,7 +397,7 @@ collaboration.initSession = function() {
             var last_message = $(".messages").find('div.outer-div:last');
 
             if(last_message.data('sender') == message_data.email){
-               last_message.find('p').append('<br/>' + message_data.message);
+               last_message.find('p').append('<br/><span class="individual-message">' + message_data.message + '<span/>');
             }else{
                $(".messages").append(gisportal.templates['collaboration-message'](message_data));
             }
@@ -1817,8 +1818,23 @@ collaboration.buildMembersList = function(data) {
    // Makes sure there is only one messenger
    $('#collaborationPanel .js-collaboration-holder .messenger').remove();
    $('.collaboration-pulltab').toggleClass('hidden', false);
+   $('.message-input').on({
+      input: function(){
+         counter = 0;
+         while($(this).css('height') != $(this).prop('scrollHeight') && counter < 20){
+            $(this).css({'height':$(this).prop('scrollHeight')});
+            counter ++;
+         }
+      },
+      keypress: function(e){
+         if(e.which == 13 && !e.shiftKey){
+            e.preventDefault();
+            $('.js-submit-message').trigger('click');
+         }
+      }
+   });
    if(message){
-      $('.message-input').val(message);
+      $('.message-input').val(message).trigger('input');
    }
    if(new_message_popup){
       $('.new-message-popup').toggleClass('hidden', false);
@@ -1868,8 +1884,8 @@ collaboration.buildMembersList = function(data) {
       e.preventDefault();
       var input = $(this).siblings('.message-input');
       if(input.val().length >= 1){
-         var msg = input.val().replace(/<\/?[^>]+(>|$)/g, "");
-         $('.message-input').val("");
+         var msg = input.val().replace(/<\/?[^>]+(>|$)/g, "").replace(/^\s+|\s+$/g, '');
+         $('.message-input').val("").css({'height':""});
          if(msg){
             collaboration._emit('message.sent', {message: msg, id: socket.io.engine.id}, force=true);
          }

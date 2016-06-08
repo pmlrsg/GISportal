@@ -32,7 +32,7 @@
    <div class="new-message-popup hidden">More Messages Below...</div>
    <div class="message-form">
       <form>
-         <input type="text" class="message-input"></input>
+         <textarea class="message-input"></textarea>
          <button class="brand small js-submit-message pull-right">Send</button>
    </div>
 </div>
