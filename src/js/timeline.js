@@ -484,13 +484,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    // ensure that the timeline is visible and adjust the panel heights accordingly
    $('.timeline-container').css('bottom','0px');
    var h = $('.timeline-container').height();
-   $('.panel').css('bottom', h + 35 +'px');
-   var collab_panel = $('.collaboration-panel');
-   var collab_hidden = collab_panel.hasClass('hidden');
-   var top = collab_panel.toggleClass('hidden', false).position().top;
-   collab_panel.toggleClass('hidden', collab_hidden);
-   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
-   
+   $('.panel, .collaboration-panel').css('bottom', h + 35 +'px');
 };
 
 
@@ -554,12 +548,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
       $('.timeline-container').css('bottom','-1000px');
       h = 0;
    }
-   $('.panel').css('bottom', h + 35 +'px');
-   var collab_panel = $('.collaboration-panel');
-   var collab_hidden = collab_panel.hasClass('hidden');
-   var top = collab_panel.toggleClass('hidden', false).position().top;
-   collab_panel.toggleClass('hidden', collab_hidden);
-   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
+   $('.panel, .collaboration-panel').css('bottom', h + 35 +'px');
 };
 
 // Set the currently selected date and animated the transition
