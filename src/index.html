@@ -95,10 +95,46 @@
 
    <div class="collab-overlay hidden"></div>
 
-   <div class="collaboration-status hidden"></div>
+   <button class="js-show-collaboration show-collaboration hidden">Show Collaboration<span class="icon-arrow-left-1"></span></button>
+   <div class="collaboration-panel hidden">
+      <div class="panel-header">      
+         <div class="pull-left">
+            <span class="btn icon-arrow-right-1 icon-btn js-hide-collaboration panel-icon-tab pull-left" title="Hide Collaboration"></span>
+            <div data-panel-name="collab-home" class="js-show-panel tab">
+               <span  class="icon-house-2" title="Home"></span>
+            </div>
+            <div data-panel-name="collab-chat" class="js-show-panel tab ">
+               <span  class="icon-chat-5" title="Chat"></span>
+            </div>
+            <div data-panel-name="collab-video" class="js-show-panel tab">
+               <span  class="icon-camera-symbol-1" title="Video"></span>
+            </div>
+            <div data-panel-name="collab-history" class="js-show-panel tab ">
+               <span  class="icon-list-4" title="History"></span>
+            </div>
+         </div>
+      </div>
+      <div class="collaboration-status hidden"></div>
 
-   <div class="collaboration-pulltab hidden"><span class="icon-connection-2" title="Collaboration"></span></div>
-   <div class="collaboration-panel hidden"><div class="js-collaboration-holder"></div></div>
+      <div id="collab-homePanel" data-panel-name="collab-home" class="panel-container">
+         <div class="panel-container-solid-backdrop"></div>
+      </div>
+      <div id="collab-chatPanel" data-panel-name="collab-chat" class="panel-container">
+         <div class="panel-container-solid-backdrop"></div>
+      </div>
+      <div id="collab-videoPanel" data-panel-name="collab-video" class="panel-container">
+         <div class="panel-container-solid-backdrop"></div>
+      </div>
+      <div id="collab-historyPanel" data-panel-name="collab-history" class="panel-container">
+         <div class="panel-container-solid-backdrop">
+            <label>
+               Show Collaboration Notifications
+               <input type="checkbox" checked class="js-collab-notifications-toggle">
+            </label>
+            <div class="history-log"></div>
+         </div>
+      </div>
+   </div>
 
    <div class="view-title hidden"><span class="icon-delete-3 right-icon remove-view icon-btn"></span><p></p></div>
    
@@ -158,7 +194,7 @@
             <div data-panel-name="user" class="js-show-panel tab">
                <span  class="icon-profile-1" title="User dashboard"></span>
             </div>
-            <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab" title="Hide Tools"></span>
+            <span class="btn icon-arrow-left-1 icon-btn js-hide-panel panel-icon-tab pull-right" title="Hide Tools"></span>
          </div>
       </div>
        

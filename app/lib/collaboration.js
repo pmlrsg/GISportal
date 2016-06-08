@@ -1,4 +1,3 @@
-
 var cookie = require('cookie');
 var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
@@ -123,6 +122,7 @@ collaboration.init = function(io, app, config) {
             var leavingUserId = socket.id;
             var people = room.people;
             var departed = '';
+            var image;
             var reassignPresenter = false;
             var newPresenterId = null;
             var newPresenterEmail = null;
@@ -136,6 +136,7 @@ collaboration.init = function(io, app, config) {
                      }
                      // get their name so others can be warned that `departed` has left the building
                      departed = people[i].name || people[i].email;
+                     image = people[i].image;
                      // take the user out of the people array
                      people.splice(i, 1);
                      break;
@@ -159,7 +160,8 @@ collaboration.init = function(io, app, config) {
                      io.sockets.in(socket.room).emit('room.member-left', {
                         "roomId": roomId,
                         "people": people,
-                        "departed" : departed
+                        "departed" : departed,
+                        "image": image
                      });
 
                      if (newPresenterId !== null) {
@@ -335,6 +337,7 @@ collaboration.init = function(io, app, config) {
          console.log(data);
          io.sockets.in(socket.room).emit(data.event, {
             "presenter": user.name || user.email,
+            "image": user.image,
             "provider": user.provider,
             "params" : data
          })
@@ -394,12 +397,14 @@ collaboration.init = function(io, app, config) {
                return;
             }
             var name;
+            var image;
             var room = JSON.parse(obj);
             var people = room.people;
             for (var p in people) {
                if (people[p].id == id) {
                   people[p].diverged = true;
                   name = people[p].name || people[p].email;
+                  image = people[p].image;
                }
             }
 
@@ -408,7 +413,8 @@ collaboration.init = function(io, app, config) {
                   io.sockets.in(socket.room).emit('room.member-diverged', {
                      "roomId": socket.room,
                      "people": people,
-                     "divergent": name
+                     "divergent": name,
+                     "image": image
                   });
                }
             });
@@ -431,6 +437,7 @@ collaboration.init = function(io, app, config) {
                   people[p].diverged = false;
                   name = people[p].name || people[p].email;
                   email = people[p].email;
+                  image = people[p].image;
                }
             }
 
@@ -440,7 +447,8 @@ collaboration.init = function(io, app, config) {
                      "roomId": socket.room,
                      "people": people,
                      "merger": name,
-                     "email": email
+                     "email": email,
+                     "image": image
                   });
                }
             });

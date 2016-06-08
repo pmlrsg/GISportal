@@ -4,37 +4,49 @@ gisportal.panels.activePanel = null;
 
 gisportal.panels.initDOM = function() {
 
-	$('.panel').on('click', '.js-show-panel', function() {
+	$('.js-show-panel').on('click', function() {
 		gisportal.panels.showPanel($(this).data('panel-name'));
-		
-
 	});
 	gisportal.panels.showPanel(gisportal.panels.defaultPanel);
+	gisportal.panels.showPanel("collab-home");
 };
 
 gisportal.panels.showPanel = function(panelName) {
-	gisportal.hideAllPopups();
-	if(panelName != "refine-indicator"){
-		if(gisportal.config.browseMode != "simplelist"){
-			$('.dd-container').ddslick('close');
+	var collab = panelName.startsWith('collab-');
+	if(!collab){
+		gisportal.hideAllPopups();
+		if(panelName != "refine-indicator"){
+			if(gisportal.config.browseMode != "simplelist"){
+				$('.dd-container').ddslick('close');
+			}
+			gisportal.configurePanel.reset();
 		}
-		gisportal.configurePanel.reset();
+		
+		$('.panel [data-panel-name="' + gisportal.panels.activePanel + '"]').removeClass('active');
+		$('.panel [data-panel-name="' + panelName + '"]').addClass('active');
+		if (gisportal.panels.activePanel !== null) {
+			gisportal.panels.trigger('close-panel', {
+				"panel-name": gisportal.panels.activePanel
+			});
+		}
+		if(gisportal.panels.activePanel == "choose-indicator" && $('#refine-layers')[0]){
+			// Makes sure the ddslick is always open;
+			$('#refine-layers').ddslick('close');
+			$('#refine-layers').ddslick('open');
+		}
+		gisportal.panels.activePanel = panelName;
+		gisportal.events.trigger('panels.showpanel', panelName);
+	}else{
+		$('.collaboration-panel [data-panel-name="' + collaboration.activePanel + '"]').removeClass('active');
+		$('.collaboration-panel [data-panel-name="' + panelName + '"]').addClass('active');
+		if(panelName == "collab-chat"){
+			$('.message-input').select();
+         if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
+            gisportal.pageTitleNotification.Off();
+         }
+		}
+		collaboration.activePanel = panelName;
 	}
-	
-	$('[data-panel-name="' + gisportal.panels.activePanel + '"]').removeClass('active');
-	$('[data-panel-name="' + panelName + '"]').addClass('active');
-	if (gisportal.panels.activePanel !== null) {
-		gisportal.panels.trigger('close-panel', {
-			"panel-name": gisportal.panels.activePanel
-		});
-	}
-	if(gisportal.panels.activePanel == "choose-indicator" && $('#refine-layers')[0]){
-		// Makes sure the ddslick is always open;
-		$('#refine-layers').ddslick('close');
-		$('#refine-layers').ddslick('open');
-	}
-	gisportal.panels.activePanel = panelName;
-	gisportal.events.trigger('panels.showpanel', panelName);
 
 };
 

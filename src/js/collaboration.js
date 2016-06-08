@@ -125,6 +125,44 @@ collaboration.initDOM = function() {
 
    });
    collaboration.addVideoActionListeners();
+
+   if(!window.onfocus){
+      window.onfocus = function(){
+         if(collaboration.activePanel == "collab-chat" && $('.messages').length > 0 && $('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
+            if(!$('.collaboration-panel').hasClass('hidden')){
+               gisportal.pageTitleNotification.Off();
+            }
+         }
+      };
+   }
+
+   $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
+
+   $('.message-input').on({
+      input: function(){
+         counter = 0;
+         while($(this).css('height') != $(this).prop('scrollHeight') && counter < 20){
+            $(this).css({'height':$(this).prop('scrollHeight')});
+            counter ++;
+         }
+      },
+      keypress: function(e){
+         if(e.which == 13 && !e.shiftKey){
+            e.preventDefault();
+            $('.js-submit-message').trigger('click');
+         }
+      }
+   });
+
+   $('.js-collab-notifications-toggle').off('click');
+   $('.js-collab-notifications-toggle').on('click', function() {
+      var log = $(this).prop('checked');
+      collaboration.displayLog = log;
+      if(log === false){
+         $('.notifyjs-gisportal-collab-notification-base').parent().remove();
+      }
+   });
+
 };
 
 collaboration.addVideoActionListeners = function(){
@@ -157,23 +195,21 @@ collaboration.initSession = function() {
 		   	"connect timeout": 1000
 		  	});
 
-         $('.collaboration-pulltab').off('click').toggleClass('open', false);
-         $('.collaboration-pulltab').on('click', function(){
-            var pulltab = $(this);
-            var panel = $('.collaboration-panel');
-            if(pulltab.hasClass('open')){
-               pulltab.toggleClass('open', false);
-               panel.toggleClass('hidden', true);
-               pulltab.find('span[class^="icon"]').toggleClass('icon-connection-2', true).toggleClass('icon-arrow-right-1', false).attr('title', "Collaboration");
-            }else{
-               pulltab.toggleClass('open', true);
-               panel.toggleClass('hidden', false);
-               pulltab.find('span[class^="icon"]').toggleClass('icon-connection-2', false).toggleClass('icon-arrow-right-1', true).attr('title', "Close Collaboration");
+         $('.js-show-collaboration').off('click').toggleClass('open', false);
+         $('.js-hide-collaboration').off('click').toggleClass('open', false);
+         $('.js-show-collaboration').on('click', function(){
+            $(this).toggleClass('hidden', true);
+            $('.collaboration-panel').toggleClass('hidden', false);
+            if(collaboration.activePanel == "collab-chat"){
                $('.message-input').select();
                if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
                   gisportal.pageTitleNotification.Off();
                }
             }
+         });
+         $('.js-hide-collaboration').on('click', function(){
+            $('.collaboration-panel').toggleClass('hidden', true);
+            $('.js-show-collaboration').toggleClass('hidden', false);
          });
 
          var idleMouseTimer;
@@ -262,10 +298,11 @@ collaboration.initSession = function() {
             console.log('Room created: '+ data.roomId);
 		  		collaboration.roomId = data.roomId;
             
-            collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
+            collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
             $('.collab-overlay').toggleClass('hidden', true);
             collaboration.owner = true;
-            collaboration.log("Welcome to collaboration " + data.owner);
+            $('.show-collaboration').toggleClass('hidden', true);
+            $('.collaboration-panel').toggleClass('hidden', false);
 
             // load the room template
             collaboration.buildMembersList(data);
@@ -276,8 +313,10 @@ collaboration.initSession = function() {
             if (data.sessionId == socket.io.engine.id) { // yes, so set the role, status and show the room details
                collaboration.roomId = data.roomId;
                collaboration.role = 'member';
-               collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
+               collaboration.setStatus('connected', 'You are in room '+ data.roomId.toUpperCase());
                $('.collab-overlay').toggleClass('hidden', false);
+               $('.show-collaboration').toggleClass('hidden', true);
+               $('.collaboration-panel').toggleClass('hidden', false);
             }
 
             // if I am the presenter send my state so that the new member can catch up
@@ -303,7 +342,7 @@ collaboration.initSession = function() {
             }
             var name = data.user.name || data.user.email;
             if(data.user.email != gisportal.user.info.email){
-               collaboration.log(name + " has joined.");
+               collaboration.log(collaboration.nameOrAvatar(name, data.user.image) + " has joined.");
             }
             // load/update the member listings
             collaboration.buildMembersList(data);
@@ -320,7 +359,7 @@ collaboration.initSession = function() {
                }
             }
             if (collaboration.role == 'presenter') {
-               collaboration.log(data.divergent + " has diverged from your room");
+               collaboration.log(collaboration.nameOrAvatar(data.divergent, data.image) + " has diverged from your room");
             }
             collaboration.buildMembersList(data);
          });
@@ -337,11 +376,11 @@ collaboration.initSession = function() {
                   "joining-member": data.email
                };
                collaboration._emit('c_event', params);
-               collaboration.log(data.merger + " has merged back with your room");
+               collaboration.log(collaboration.nameOrAvatar(data.merger, data.image) + " has merged back with your room");
             }else{
                for (var p in data.people) {
                   var person = data.people[p];
-                  if (!person.diverged && person.id == socket.io.engine.id) {
+                  if (!person.diverged && person.id == socket.io.engine.id && data.email == person.email) {
                      collaboration.setStatus('connected', 'Merged. You have been merged back into room '+ data.roomId.toUpperCase());
                      collaboration.diverged = false;
                      $('.collab-overlay').toggleClass('hidden', false);
@@ -376,22 +415,22 @@ collaboration.initSession = function() {
                }
             }
             var showNotification = false;
-            var collab_panel = $(".messages").closest('.collaboration-panel');
-            var hidden = collab_panel.hasClass('hidden');
+            var chat_panel = $("#collab-chatPanel");
+            var hidden = !chat_panel.hasClass('active');
             var re_scroll = false;
-            if(($(".messages").scrollTop() + $(".messages").innerHeight() >= $(".messages")[0].scrollHeight || me) && !$('.collaboration-panel').hasClass('hidden') &&  document.visibilityState == 'visible'){
+            if(($(".messages").scrollTop() + $(".messages").innerHeight() >= $(".messages")[0].scrollHeight || me) && $('#collab-chatPanel').hasClass('active') &&  document.visibilityState == 'visible'){
                re_scroll = true;
             }else{
-               // Need to make sure that the panel is not hidden to check if the messages has a scrollbar
+               // Need to make sure that the panel is active to check if the messages has a scrollbar
                if(hidden){
-                  collab_panel.toggleClass('hidden', false);
+                  chat_panel.toggleClass('active', true);
                }
                if($(".messages")[0].scrollHeight > $(".messages")[0].clientHeight){
                   showNotification = true;
                   $(".messages").siblings(".new-message-popup").toggleClass('hidden', false);
                }
                if(hidden){
-                  collab_panel.toggleClass('hidden', true);
+                  chat_panel.toggleClass('active', false);
                }
             }
             var last_message = $(".messages").find('div.outer-div:last');
@@ -405,7 +444,7 @@ collaboration.initSession = function() {
                $(".messages").scrollTop($(".messages")[0].scrollHeight);
             }
 
-            if(showNotification || document.visibilityState != 'visible' || $('.collaboration-panel').hasClass('hidden')){
+            if(showNotification || document.visibilityState != 'visible' || hidden){
                gisportal.pageTitleNotification.On("New Message", null, true);
             }
          });
@@ -421,7 +460,7 @@ collaboration.initSession = function() {
 
          socket.on('room.member-left', function(data) {
             if(data.departed){
-               collaboration.log(data.departed +' has left the room');
+               collaboration.log(collaboration.nameOrAvatar(data.departed, data.image) + ' has left the room');
             }
             collaboration.buildMembersList(data);
             var presenterFound = false;
@@ -446,7 +485,7 @@ collaboration.initSession = function() {
                }
                if (person.presenter && person.id == socket.io.engine.id) {
                   collaboration.role = "presenter";
-                  collaboration.setStatus('connected', 'Connected. You are the presenter of room '+ data.roomId.toUpperCase());
+                  collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
                   $('.collab-overlay').toggleClass('hidden', true);
                } else {
@@ -454,14 +493,14 @@ collaboration.initSession = function() {
                      gisportal.showModalMessage('You are no longer the presenter');
                   }
                   collaboration.role = "member";
-                  collaboration.setStatus('connected', 'Connected. You are in room '+ data.roomId.toUpperCase());
+                  collaboration.setStatus('connected', 'You are in room '+ data.roomId.toUpperCase());
                   if(!collaboration.diverged){
                      $('.collab-overlay').toggleClass('hidden', false);
                   }
                }
             }
             var pName = presenter.name || presenter.email;
-            collaboration.log("Presenter changed to " + pName);
+            collaboration.log("Presenter changed to " + collaboration.nameOrAvatar(pName, presenter.image));
             collaboration.buildMembersList(data);
          });
 
@@ -623,7 +662,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Add Layers Form Closed');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Add Layers Form Closed');
             if (collaboration.role == "member") {
                $('span.js-layer-form-close').trigger('click');
             }
@@ -654,7 +693,7 @@ collaboration.initSession = function() {
                   keyName = "RIGHT Arrow";
                   break;
             }
-            collaboration.log(data.presenter +': Keydown: '+ keyName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Keydown: '+ keyName);
          });
 
          socket.on('date.selected', function(data) {
@@ -669,7 +708,7 @@ collaboration.initSession = function() {
                   gisportal.timeline.setDate(date);
                }
             }
-            collaboration.log(data.presenter +': Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
          });
 
          socket.on('date.zoom', function(data) {
@@ -737,7 +776,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Layer hidden - '+ data.params.layerName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
                var id = data.params.id;
                gisportal.indicatorsPanel.hideLayer(id);
@@ -750,7 +789,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Panel hidden');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel hidden');
             if (collaboration.role == "member") {
                $('.js-hide-panel').trigger('click');
             }
@@ -761,7 +800,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Panel shown');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel shown');
             if (collaboration.role == "member") {
                $('.js-show-tools').trigger('click');
             }
@@ -772,7 +811,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-		  		collaboration.log(data.presenter +': Layer removed - '+ data.params.layerName);
+		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer removed - '+ data.params.layerName);
             if (collaboration.role == "member") {
             	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
             }
@@ -786,7 +825,7 @@ collaboration.initSession = function() {
             var newLayerOrder = data.params.newLayerOrder;
             var ul = $('ul.js-indicators');
 
-            collaboration.log(data.presenter +': Layers re-ordered: '+ newLayerOrder);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layers re-ordered: '+ newLayerOrder);
             if (collaboration.role == "member") {
                for (var i = newLayerOrder.length; i > -1; i--) {
                   var li = $('.indicator-header').parent('[data-id="'+ newLayerOrder[i] +'"]');
@@ -802,7 +841,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-		  		collaboration.log(data.presenter +': Layer un-hidden - '+ data.params.layerName);
+		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer un-hidden - '+ data.params.layerName);
             if (collaboration.role == "member") {
                var id = data.params.id;
             	gisportal.indicatorsPanel.showLayer(id);
@@ -838,7 +877,7 @@ collaboration.initSession = function() {
             }else if(panel_div.html() && panel_div.html().length > 0){
                nicePanelName = panel_div.html();
             }
-            collaboration.log(data.presenter +': Panel selected - '+ nicePanelName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel selected - '+ nicePanelName);
             if (collaboration.role == "member") {
                collaboration.highlightElementShake($('[data-panel-name="' + p + '"].tab'));
                gisportal.panels.showPanel(p);
@@ -849,7 +888,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Cancel" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Cancel" clicked');
             if (collaboration.role == "member") {
                $('.js-refine-configure').trigger('click');
             }
@@ -861,7 +900,7 @@ collaboration.initSession = function() {
             }
             var cat = data.params.cat;
             var nice_cat = gisportal.browseCategories[cat] || cat;
-            collaboration.log(data.presenter +': Category removed: ' + nice_cat);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Category removed: ' + nice_cat);
             if (collaboration.role == "member") {
                $('.refine-remove[data-cat="' + cat + '"]').trigger('click');
             }
@@ -884,7 +923,7 @@ collaboration.initSession = function() {
             }
             var id = data.params.id;
             var isChecked = data.params.isChecked;
-            collaboration.log(data.presenter +': Autoscale set to ' + isChecked + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Autoscale set to ' + isChecked + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
                $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked ).trigger('change');
@@ -898,7 +937,7 @@ collaboration.initSession = function() {
             }
             var id = data.params.id;
             var isLog = data.params.isLog;
-            collaboration.log(data.presenter +': Logarithmic set to ' + isLog + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Logarithmic set to ' + isLog + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
                $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog ).trigger('change');
@@ -912,7 +951,7 @@ collaboration.initSession = function() {
             }
             var id = data.params.id;
             var value = data.params.value;
-            collaboration.log(data.presenter +': Max set to ' + value + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Max set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
                $('.js-scale-max[data-id="' + id + '"]').val(value).change();
@@ -926,7 +965,7 @@ collaboration.initSession = function() {
             }
             var id = data.params.id;
             var value = data.params.value;
-            collaboration.log(data.presenter +': Min set to ' + value + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Min set to ' + value + ' - '+ id);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
                $('.js-scale-min[data-id="' + id + '"]').val(value).change();
@@ -976,7 +1015,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Scalebar was reset');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Scalebar was reset');
             if (collaboration.role == "member") {
                var elem = $('.js-reset[data-id="'+ data.params.id +'"]');
                collaboration.highlightElement(elem);
@@ -989,7 +1028,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Changes Applied');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Changes Applied');
             if (collaboration.role == "member") {
                var elem = $('.js-apply-changes[data-id="'+ data.params.id +'"]');
                collaboration.highlightElement(elem);
@@ -1017,7 +1056,7 @@ collaboration.initSession = function() {
             }
             var eType = data.params.eType;
             var typedValue = data.params.typedValue;
-            collaboration.log(data.presenter +': WMS entry: ' + typedValue);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' WMS entry: ' + typedValue);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('input.js-wms-url'));
                $('input.js-wms-url').val(typedValue).trigger(eType);
@@ -1030,7 +1069,7 @@ collaboration.initSession = function() {
                return true;
             }
             var checked = data.params.checked;
-            collaboration.log(data.presenter +': refreshCacheBox: ' + checked);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' refreshCacheBox: ' + checked);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('#refresh-cache-box'));
                $('#refresh-cache-box')[0].checked = checked;
@@ -1042,7 +1081,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': WMS submitted');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' WMS submitted');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('button.js-wms-url'));
                $('button.js-wms-url').trigger('click');
@@ -1054,7 +1093,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': more info clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' more info clicked');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('.more-info'));
                $('.more-info').trigger('click');
@@ -1066,7 +1105,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Reset" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Reset" clicked');
             if (collaboration.role == "member") {
                $('button#reset-list').trigger('click');
             }
@@ -1077,7 +1116,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Add layers" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add layers" clicked');
             if (collaboration.role == "member") {
                collaboration.highlightElement($('button#js-add-layers-form'));
                $('button#js-add-layers-form').trigger('click');
@@ -1089,7 +1128,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': search cancelled');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' search cancelled');
             if (collaboration.role == "member") {
                $('.js-search-results').css('display', 'none');
             }
@@ -1101,7 +1140,7 @@ collaboration.initSession = function() {
                return true;
             }
             var searchResult = data.params.searchResult;
-            collaboration.log(data.presenter +': search result selected: ' + searchResult);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' search result selected: ' + searchResult);
             if (collaboration.role == "member") {
                gisportal.configurePanel.toggleIndicator(searchResult, '');
                $('.js-search-results').css('display', 'none');
@@ -1115,7 +1154,7 @@ collaboration.initSession = function() {
             }
             var layerId = data.params.layerId;
             var tabName = data.params.tabName;
-            collaboration.log(data.presenter +': ' + tabName + ' tab selected for ' + layerId);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' ' + tabName + ' tab selected for ' + layerId);
             if (collaboration.role == "member") {
                collaboration.highlightElement($('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]'));
                gisportal.indicatorsPanel.selectTab( layerId, tabName );
@@ -1141,7 +1180,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Page ' + data.params.page + ' selected');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Page ' + data.params.page + ' selected');
             if (collaboration.role == "member") {
                $('.js-go-to-form-page').find('a[data-page="' + data.params.page + '"]').trigger('click');
             }
@@ -1152,7 +1191,7 @@ collaboration.initSession = function() {
                return true;
             }
             var id = data.params.layer;
-            collaboration.log(data.presenter +': Zoom to data clicked: ' + id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Zoom to data clicked: ' + id);
             if (collaboration.role == "member") {
                var zoom_elem = $('.js-zoom-data[data-id="' + id + '"]');
                collaboration.highlightElement(zoom_elem);
@@ -1164,7 +1203,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Submit Layers" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Submit Layers" clicked');
             if (collaboration.role == "member") {
                var submit_elem = $('.js-layers-form-submit');
                collaboration.highlightElement(submit_elem);
@@ -1176,7 +1215,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Cancel Changes" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Cancel Changes" clicked');
             if (collaboration.role == "member") {
                $('.js-layers-form-cancel').trigger('click');
             }
@@ -1186,7 +1225,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Copy to all" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Copy to all" clicked');
             if (collaboration.role == "member") {
                var toggle_all_elem = $('.toggle-all-layers');
                collaboration.highlightElement(toggle_all_elem);
@@ -1198,7 +1237,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Add to all" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add to all" clicked');
             if (collaboration.role == "member") {
                var toggle_all_elem = $('.log-to-all-layers');
                collaboration.highlightElement(toggle_all_elem);
@@ -1210,7 +1249,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Add to all" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add to all" clicked');
             if (collaboration.role == "member") {
                var field = data.params.field;
                var add_to_all_elem = $('.add-to-all-layers[data-field="' + field + '"]');
@@ -1223,7 +1262,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Add Scale Points to all" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add Scale Points to all" clicked');
             if (collaboration.role == "member") {
                var add_to_all_elem = $('.scale-to-all-layers');
                collaboration.highlightElement(add_to_all_elem);
@@ -1235,7 +1274,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Add Another Tag" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add Another Tag" clicked');
             if (collaboration.role == "member") {
                var add_tag_elem = $('.add-tag-input');
                collaboration.highlightElement(add_tag_elem);
@@ -1247,7 +1286,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': User feedback closed');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' User feedback closed');
             if (collaboration.role == "member") {
                $('.js-user-feedback-close').trigger('click');
             }
@@ -1257,7 +1296,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': User feedback submitted');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' User feedback submitted');
             if (collaboration.role == "member") {
                $('.js-user-feedback-submit').trigger('click');
             }
@@ -1279,7 +1318,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Draw Polygon" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Draw Polygon" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-draw-box');
                button_elem.trigger('click');
@@ -1291,7 +1330,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Draw Irregular Polygon" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Draw Irregular Polygon" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-draw-polygon');
                button_elem.trigger('click');
@@ -1303,7 +1342,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Select Existing Polygon" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Select Existing Polygon" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-draw-select-polygon');
                button_elem.trigger('click');
@@ -1315,7 +1354,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Delete Selected Polygon" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Delete Selected Polygon" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-remove-geojson');
                button_elem.trigger('click');
@@ -1329,7 +1368,7 @@ collaboration.initSession = function() {
             }
             var eType = data.params.eventType;
             var value = data.params.value;
-            collaboration.log(data.presenter +': Coordinates value set to: "' + value + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Coordinates value set to: "' + value + '"');
             if (collaboration.role == "member") {
                var input_elem = $('.js-coordinates');
                input_elem.val(value);
@@ -1342,7 +1381,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Clear Selection" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Clear Selection" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-clear-selection');
                button_elem.trigger('click');
@@ -1402,7 +1441,7 @@ collaboration.initSession = function() {
                return true;
             }
             var coordinates = data.params.coordinates;
-            collaboration.log(data.presenter +': Polygon drawn');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Polygon drawn');
             if (collaboration.role == "member") {
                var sketch = new ol.Feature({geometry:new ol.geom.Polygon(coordinates)});
                gisportal.selectionTools.ROIAdded(sketch);
@@ -1416,7 +1455,7 @@ collaboration.initSession = function() {
             }
             var coordinate = data.params.coordinate;
             var id = data.params.id;
-            collaboration.log(data.presenter +': Polygon hover: ' + id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Polygon hover: ' + id);
             if (collaboration.role == "member") {
                var pixel = map.getPixelFromCoordinate(coordinate);
                var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
@@ -1435,7 +1474,7 @@ collaboration.initSession = function() {
             }
             var coordinate = data.params.coordinate;
             var id = data.params.id;
-            collaboration.log(data.presenter +': Polygon selected: ' + id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Polygon selected: ' + id);
             if (collaboration.role == "member") {
                var pixel = map.getPixelFromCoordinate(coordinate);
                var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
@@ -1452,7 +1491,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Save Coordinates clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Save Coordinates clicked');
             if (collaboration.role == "member") {
                $('.js-add-coordinates-to-profile').trigger('click');
             }
@@ -1463,7 +1502,7 @@ collaboration.initSession = function() {
                return true;
             }
             var overlayType = data.params.overlayType;
-            collaboration.log(data.presenter +': Remove ' + overlayType);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Remove ' + overlayType);
             if (collaboration.role == "member") {
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, overlayType);
             }
@@ -1493,7 +1532,7 @@ collaboration.initSession = function() {
                return true;
             }
             var id = data.params.id;
-            collaboration.log(data.presenter +': "Make new graph" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Make new graph" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-make-new-plot[data-id="' + id + '"]');
                button_elem.trigger('click');
@@ -1506,7 +1545,7 @@ collaboration.initSession = function() {
                return true;
             }
             var id = data.params.id;
-            collaboration.log(data.presenter +': "Add to graph" Clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add to graph" Clicked');
             if (collaboration.role == "member") {
                var button_elem = $('.js-add-to-plot[data-id="' + id + '"]');
                button_elem.trigger('click');
@@ -1518,7 +1557,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': Closed Plot');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Closed Plot');
             if (collaboration.role == "member") {
                gisportal.graphs.deleteActiveGraph();
             }
@@ -1529,7 +1568,7 @@ collaboration.initSession = function() {
                return true;
             }
             var slideoutName = data.params.slideoutName;
-            collaboration.log(data.presenter +': Show panel: ' + slideoutName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Show panel: ' + slideoutName);
             if (collaboration.role == "member") {
                var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-toggle-peak');
                gisportal.panelSlideout.togglePeak(slideoutName);
@@ -1542,7 +1581,7 @@ collaboration.initSession = function() {
                return true;
             }
             var slideoutName = data.params.slideoutName;
-            collaboration.log(data.presenter +': Close panel: ' + slideoutName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Close panel: ' + slideoutName);
             if (collaboration.role == "member") {
                var clicked_elem = $('[data-slideout-name="' + slideoutName + '"] .js-slideout-close');
                gisportal.panelSlideout.closeSlideout(slideoutName);
@@ -1555,7 +1594,7 @@ collaboration.initSession = function() {
                return true;
             }
             var id = data.params.layerId;
-            collaboration.log(data.presenter +': More Info: ' + id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' More Info: ' + id);
             if (collaboration.role == "member") {
                var clicked_elem = $('.show-more[data-id="' + id + '"]').trigger('click');
                collaboration.highlightElement(clicked_elem);
@@ -1567,7 +1606,7 @@ collaboration.initSession = function() {
                return true;
             }
             var value = data.params.value;
-            collaboration.log(data.presenter +': Title value set to: "' + value + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Title value set to: "' + value + '"');
             if (collaboration.role == "member") {
                var input_elem = $('.js-active-plot-title');
                input_elem.val(value);
@@ -1581,8 +1620,8 @@ collaboration.initSession = function() {
             }
             var value = data.params.value;
             var input_elem = $('.js-active-plot-type');
-            var nice_val = input_elem.find(':selected').html() || value;
-            collaboration.log(data.presenter +': Graph type set to: "' + nice_val + '"');
+            var nice_val = input_elem.find('[value="' + value + '"]').html() || value;
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Graph type set to: "' + nice_val + '"');
             if (collaboration.role == "member") {
                input_elem.val(value);
                input_elem.trigger('change');
@@ -1597,7 +1636,7 @@ collaboration.initSession = function() {
             var value = data.params.value;
             var input_elem = $('.js-analysis-elevation');
             var nice_val = input_elem.find(':selected').html() || value;
-            collaboration.log(data.presenter +': Layer Depth set to: "' + nice_val + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer Depth set to: "' + nice_val + '"');
             if (collaboration.role == "member") {
                input_elem.val(value);
                input_elem.trigger('change');
@@ -1614,7 +1653,7 @@ collaboration.initSession = function() {
             var end_date_elem = $('.js-active-plot-end-date');
             var slider_elem = $('.js-range-slider');
             var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
-            collaboration.log(data.presenter +': Graph date range set to: "' + dates.join(' - ') + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Graph date range set to: "' + dates.join(' - ') + '"');
             if (collaboration.role == "member") {
                start_date_elem.val(dates[0]);
                start_date_elem.trigger('change');
@@ -1632,7 +1671,7 @@ collaboration.initSession = function() {
             var index = data.params.index;
             var tr_elem = $('.js-components tr:eq(' + index + ')');
             var title = tr_elem.find('td span').html() || "Component";
-            collaboration.log(data.presenter +': ' + title + ' removed"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' ' + title + ' removed"');
             if (collaboration.role == "member") {
                var del_elem = tr_elem.find('.js-close-acitve-plot-component');
                del_elem.trigger('click');
@@ -1654,7 +1693,7 @@ collaboration.initSession = function() {
                collaboration.highlightElement(select_elem);
             }
             var select_value = select_elem.find("option:selected").text();
-            collaboration.log(data.presenter +': ' + title + ': axis changed to "' + select_value);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' ' + title + ': axis changed to "' + select_value);
          });
 
          socket.on('graphStartDate.change', function(data) {
@@ -1663,7 +1702,7 @@ collaboration.initSession = function() {
             }
             var value = new Date(data.params.value).toISOString().split("T")[0];
             var date_elem = $('.js-active-plot-start-date');
-            collaboration.log(data.presenter +': Graph start date set to: "' + value + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Graph start date set to: "' + value + '"');
             if (collaboration.role == "member") {
                date_elem.val(value);
                date_elem.trigger('change');
@@ -1677,7 +1716,7 @@ collaboration.initSession = function() {
             }
             var value = new Date(data.params.value).toISOString().split("T")[0];
             var date_elem = $('.js-active-plot-end-date');
-            collaboration.log(data.presenter +': Graph end date set to: "' + value + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Graph end date set to: "' + value + '"');
             if (collaboration.role == "member") {
                date_elem.val(value);
                date_elem.trigger('change');
@@ -1689,7 +1728,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter +': "Create Graph" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Create Graph" clicked');
             if (collaboration.role == "member") {
                $('.js-create-graph').trigger('click');
             }
@@ -1702,7 +1741,7 @@ collaboration.initSession = function() {
             var hash = data.params.hash;
             var open_elem = $('.js-graph-status-open[data-hash="' + hash + '"]');
             var title = open_elem.data('title');
-            collaboration.log(data.presenter + ': "' + title + '": "Open" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' "' + title + '": "Open" clicked');
             if (collaboration.role == "member") {
                open_elem.trigger('click');
             }
@@ -1715,7 +1754,7 @@ collaboration.initSession = function() {
             var hash = data.params.hash;
             var copy_elem = $('.js-graph-status-copy[data-hash="' + hash + '"]');
             var title = copy_elem.data('title');
-            collaboration.log(data.presenter + ': "' + title + '": "Copy/Edit" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' "' + title + '": "Copy/Edit" clicked');
             if (collaboration.role == "member") {
                copy_elem.trigger('click');
             }
@@ -1728,7 +1767,7 @@ collaboration.initSession = function() {
             var hash = data.params.hash;
             var delete_elem = $('.js-graph-status-delete[data-hash="' + hash + '"]');
             var title = delete_elem.data('title') || "Graph";
-            collaboration.log(data.presenter + ': "' + title + '": "Delete" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' "' + title + '": "Delete" clicked');
             if (collaboration.role == "member") {
                delete_elem.trigger('click');
             }
@@ -1738,7 +1777,7 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(data.presenter + ': Plot closed');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' Plot closed');
             if (collaboration.role == "member") {
                collaboration.forcePopupClose = true;
                $('.js-plot-popup-close').trigger('click');
@@ -1786,15 +1825,6 @@ collaboration.joinRoom = function(roomId) {
 };
 
 collaboration.buildMembersList = function(data) {
-   if(!window.onfocus){
-      window.onfocus = function(){
-         if($('.messages').scrollTop() + $('.messages').innerHeight() >= $('.messages')[0].scrollHeight){
-            if(!$('.collaboration-panel').hasClass('hidden')){
-               gisportal.pageTitleNotification.Off();
-            }
-         }
-      };
-   }
    for(var people in data.people){
       person = data.people[people];
       if(!person.name || person.name === ""){
@@ -1804,49 +1834,19 @@ collaboration.buildMembersList = function(data) {
    if(webRTC){
       data.AVEnabled = webRTC.isChannelReady;
    }
-   var message = $('.message-input').val();
-   var scrollTop = $('.messages').scrollTop();
-   var messages_data = $('.messages').html();
-   var rendered = gisportal.templates['collaboration-room'](data);
-   var new_message_popup = false;
-   if($('.new-message-popup').length > 1){
-      if(!$('.new-message-popup').hasClass('hidden')){
-         new_message_popup = true;
-      }
-   }
-   $('.js-collaboration-holder').html('').html(rendered);
-   // Makes sure there is only one messenger
-   $('#collaborationPanel .js-collaboration-holder .messenger').remove();
-   $('.collaboration-pulltab').toggleClass('hidden', false);
-   $('.message-input').on({
-      input: function(){
-         counter = 0;
-         while($(this).css('height') != $(this).prop('scrollHeight') && counter < 20){
-            $(this).css({'height':$(this).prop('scrollHeight')});
-            counter ++;
-         }
-      },
-      keypress: function(e){
-         if(e.which == 13 && !e.shiftKey){
-            e.preventDefault();
-            $('.js-submit-message').trigger('click');
-         }
-      }
-   });
-   if(message){
-      $('.message-input').val(message).trigger('input');
-   }
-   if(new_message_popup){
-      $('.new-message-popup').toggleClass('hidden', false);
-   }
+   var rendered = gisportal.templates['collaboration-home'](data);
+   $('#collab-homePanel div.panel-container-solid-backdrop').html('').html(rendered);
 
-   $('.js-collab-notifications-toggle').prop('checked', collaboration.displayLog);
+   if(gisportal.panels.activePanel == "collaboration"){
+      gisportal.panels.showPanel('choose-indicator');
+      $('.js-show-panel[data-panel-name="collaboration"]').toggleClass('hidden', true);
+   }
 
    // add events to the various action links
    $('.js-leave-room').click(function() {
       $('.collaboration-panel').toggleClass('hidden', true);
       $('.collab-overlay').toggleClass('hidden', true);
-      $('.collaboration-pulltab').toggleClass('hidden', true);
+      $('.show-collaboration').toggleClass('hidden', true);
       hangup();
       socket.disconnect();
       collaboration.roomId = null;
@@ -1857,6 +1857,8 @@ collaboration.buildMembersList = function(data) {
       $('.js-collaboration-holder').html('');
       $('#collaborationPanel .js-collaboration-holder').html(rendered);
 
+      gisportal.panels.showPanel('collaboration');
+      $('.js-show-panel[data-panel-name="collaboration"]').toggleClass('hidden', false);
       $.ajax({
          url: gisportal.middlewarePath + '/collaboration/dashboard',
          statusCode: {
@@ -1867,7 +1869,7 @@ collaboration.buildMembersList = function(data) {
                      $('#collab-content').html(data);
                      $('.js-google-auth-button').click(function() {
                         var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
-                     }); 
+                     });
                   },
                });
             },
@@ -1909,14 +1911,6 @@ collaboration.buildMembersList = function(data) {
       $('.js-collab-invite').toggleClass('hidden');
       $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
       $('.js-collab-room-url').focus(function() { $(this).select(); } ).on('mouseup cut paste', function (e) {e.preventDefault();}).on('keydown', function(){$(this).select();});
-   });
-
-   $('.js-collab-notifications-toggle').click(function() {
-      var log = $(this).prop('checked');
-      collaboration.displayLog = log;
-      if(log === false){
-         $('.notifyjs-gisportal-collab-notification-base').parent().remove();
-      }
    });
    var presenter, me, id;
    var divergents = [];
@@ -1974,18 +1968,19 @@ collaboration.buildMembersList = function(data) {
             mic = {};
          }
          var on_class = "off";
-         title = "Un-mute";
+         var av_title;
+         av_title = "Un-mute";
          if(mic.enabled){
             on_class = "on";
-            title = "Mute";
+            av_title = "Mute";
          }
-         link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + title + '"></span>');
+         link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
          $(this).prepend(link);
          on_class = "off";
-         title = "Enable Webcam";
+         av_title = "Enable Webcam";
          if(video.enabled){
             on_class = "on";
-            title = "Disable Webcam";
+            av_title = "Disable Webcam";
          }
          link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + title + '"></span>');
          $(this).prepend(link);
@@ -2012,21 +2007,19 @@ collaboration.buildMembersList = function(data) {
          }
       }
 
-      $('.js-collab-diverge').on('click', function(){
+      $(this).find('.js-collab-diverge').on('click', function(){
          collaboration._emit('room.diverge', socket.io.engine.id, force=true);
       });
 
-      $('.js-collab-merge').on('click', function(){
+      $(this).find('.js-collab-merge').on('click', function(){
          collaboration._emit('room.merge', socket.io.engine.id, force=true);
       });
 
-      $('.js-make-presenter').click(function() {
+      $(this).find('.js-make-presenter').click(function() {
          var id = $(this).data('id');
          collaboration._emit('room.make-presenter', id, force = true);
       });
    });
-   $('.messages').html(messages_data);
-   $('.messages').scrollTop(scrollTop);
 
    if(me_selectors.length > 0){
       // Makes sure that your person div(s) is at the top of the list
@@ -2087,10 +2080,11 @@ collaboration.buildMembersList = function(data) {
 };
 
 collaboration.divergeAlert = function(){
-   var pulltab = $('.collaboration-pulltab');
+   var pulltab = $('.show-collaboration');
    var panel = $('.collaboration-panel');
    var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
-   pulltab.toggleClass('open', true);
+   gisportal.panels.showPanel('collab-home');
+   pulltab.toggleClass('hidden', true);
    panel.toggleClass('hidden', false);
    person.find('.person-message').remove();
    person.append('<p class="person-message">Click \'<span class="icon-link-broken-1"></span>\' to diverge from the room</p>');
@@ -2133,20 +2127,16 @@ collaboration.log = function(msg) {
    if (collaboration.displayLog) {
       var notificationText = $(".notifyjs-gisportal-collab-notification-base div.title");
 
-      if(notificationText.length === 0){
-         $.notify({'title':msg, "hide-text":"Hide"},{style:"gisportal-collab-notification", autoHide:false});
-      }else{
-         notificationText.html(msg);
-      }
-      $(document).off('click', '.notifyjs-gisportal-collab-notification-base .hide-opt');
-      $(document).one('click', '.notifyjs-gisportal-collab-notification-base .hide-opt', function(e) {
-         e.preventDefault();
-         $('.js-collab-notifications-toggle').prop('checked', false);
-         collaboration.displayLog = false;
-      });
+      $('.history-log').append("<p>" + msg + "</p>");
    }
-
 };
+
+collaboration.nameOrAvatar = function(name, img){
+   if(img){
+      name = '<img src="' + img + '" class="avatar-small" title="' + name + '"/>';
+   }
+   return name;
+}
 
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');

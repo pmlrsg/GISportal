@@ -8,45 +8,47 @@
 }
 
 .collaboration-panel{
-    top: 200px;
-    right: 0px;
-    max-height: calc(100% - 217px);
-    width: 300px;
-    position: absolute;
-    background-color: #efedf1;
-    box-shadow: 0px 0px 11px -2px black;
-    padding: 8px;
-    z-index:10150;
-    overflow: auto;
+  width: 300px;
+  z-index: 10150;
+  overflow: auto;
+  position: absolute;
+  top: 70px;
+  bottom: 35px;
+  right: 25px;
+  box-shadow: 0px 0px 11px -2px black;
+  padding-top: 45px;
+  padding-bottom: 36px;
 }
 
-.collaboration-pulltab{
-    top: 210px;
-    position: absolute;
-    right: 0px;
-    padding: 8px;
-    transform-origin: top right;
-    background-color: #efedf1;
-    cursor: pointer;
-    text-align: center;
-    border: 1px solid;
-    border-right: none;
-    z-index:10160;
+.show-collaboration{
+  z-index: 10150;
+  font-family: "Open Sans";
+  background-color: #fafafb;
+  box-shadow: 0px 0px 11px -2px black;
+  border: 1px solid #fafafb;
+  line-height: 32px;
+  padding-left: 15px;
+  right: 25px;
+  top: 118px;
+  position: absolute;
+  height: 40px;
 }
-.collaboration-pulltab.open{
-    right: 300px;
+
+.show-collaboration span {
+    font-size: 20px;
+    position: relative;
+    top: 4px;
+    margin-left: 8px;
 }
 
 .collaboration-status {
-   top: 70px;
-   right: 25px;
-   height: 35px;
-   min-width: 50px;
-   position: absolute;
-   background-color: #fafafb;
-   box-shadow: 0px 0px 11px -2px black;
-   padding: 7px 10px 7px 24px;
-   z-index: 1;
+  height: 35px;
+  min-width: 50px;
+  max-width: 100%;
+  position: relative;
+  background-color: #efedf1;
+  padding: 7px 10px 7px 24px;
+  z-index: 1;
 }
 
 .js-collaboration-status-icon {
@@ -91,31 +93,29 @@
 .person {
   border: 1px solid #ccc;
   background-color: #fff;
-  padding: 8px 8px 8px 28px;
+  padding: 8px;
   margin-top: 5px;
   position: relative;
 }
 
 .person p[title]{
   font-weight: bold !important;
+  display: inline-block;
+}
+
+.presenter,
+.diverged{
+  display: inline-block;
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }
 .presenter {
-   position:absolute;
-   top: 12px;
-   left: 10px;
-   width: 10px;
-   height: 10px;
-   border-radius: 50%;
-   background: radial-gradient(circle at 3px 3px, #5cabff, #000);
+  background: radial-gradient(circle at 3px 3px, #5cabff, #000);
 }
 .diverged {
-   position:absolute;
-   top: 12px;
-   left: 10px;
-   width: 10px;
-   height: 10px;
-   border-radius: 50%;
-   background: radial-gradient(circle at 3px 3px, #ff5e5c, #000);
+  background: radial-gradient(circle at 3px 3px, #ff5e5c, #000);
 }
 
 .messenger{
@@ -128,7 +128,7 @@
   background-color: #fff;
   padding: 8px;
   overflow: auto;
-  height: 200px;
+  height: 400px;
   word-break: break-word;
 }
 
@@ -322,7 +322,7 @@ div.panel-container[data-panel-name="collaboration"] .alert-success{
 .new-message-popup {
    height: auto;
    width: 70%;
-   bottom: 35px;
+   bottom: 45px;
    left: 15%;
    position: absolute;
    text-align: center;
@@ -333,17 +333,17 @@ div.panel-container[data-panel-name="collaboration"] .alert-success{
 
 span.notify-number {
   position: absolute;
-  top: 0;
+  top: 2px;
   right: 0;
   font-size: 16px;
-  background-color: #800000;
+  background-color: #b30000;
   border-radius: 50%;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   color: #efedf1;
-  margin-top: 2px;
-  margin-right: 2px;
   font-weight: bold !important;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .avatar-small {
@@ -360,10 +360,6 @@ span.notify-number {
   margin-top: -2.5px;
   padding-right: 3px;
   margin-left: -4px;
-}
-
-.collaboration-pulltab span[class^="icon"]{
-  font-size: 30px;
 }
 
 .message-input{

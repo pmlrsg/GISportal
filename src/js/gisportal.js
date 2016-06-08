@@ -1360,9 +1360,9 @@ gisportal.main = function() {
             document.title = (_this.Vars.OriginalTitle == document.title) ? notification : _this.Vars.OriginalTitle;
          }, (intervalSpeed) ? intervalSpeed : 1000);
          if(messageNotify){
-            var notify_number = $('.collaboration-pulltab span.notify-number');
+            var notify_number = $('[data-panel-name="collab-chat"] span.notify-number');
             if(notify_number.length <= 0){
-               $('.collaboration-pulltab span[title]').append('<span class="notify-number" title="No. of New Messages">1</span>');
+               $('[data-panel-name="collab-chat"] span[title]').append('<span class="notify-number" title="No. of New Messages">1</span>');
             }else{
                if(notify_number.html() == "∞" || parseInt(notify_number.html()) >= 99){
                   notify_number.html("∞");
@@ -1370,11 +1370,11 @@ gisportal.main = function() {
                   notify_number.html(parseInt(notify_number.html()) + 1);
                }
             }
-            collaboration.highlightElementShakeUp($('.collaboration-pulltab'));
+            collaboration.highlightElementShake($('.js-show-panel[data-panel-name="collab-chat"]'));
          }
       },
       Off: function(){
-         $('.collaboration-pulltab span.notify-number').remove();
+         $('[data-panel-name="collab-chat"] span.notify-number').remove();
          clearInterval(this.Vars.Interval);
          document.title = this.Vars.OriginalTitle;   
       }

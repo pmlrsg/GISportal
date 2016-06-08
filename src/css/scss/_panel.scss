@@ -46,14 +46,13 @@
 }
 
 .panel-header .tab{
-    float: left;
-    display: inline;
-    border-bottom: 0px;
-    
-    margin: 7px 4px 0px 4px;
-    padding: 8px 8px 9px 8px;
-    
-    cursor: pointer;
+  float: left;
+  display: inline;
+  border-bottom: 0px;
+  margin: 7px 4px 0px 4px;
+  padding: 8px 8px 9px 8px;
+  cursor: pointer;
+  position: relative;
 
 }
 
@@ -73,7 +72,6 @@
 
 
 .panel-header .panel-icon-tab{
-    float: right;
     font-size: 22px;
     margin: 7px;
 }
