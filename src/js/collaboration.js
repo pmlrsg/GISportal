@@ -488,6 +488,7 @@ collaboration.initSession = function() {
                   collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
                   $('.collab-overlay').toggleClass('hidden', true);
+                  break;
                } else {
                   if(collaboration.role == "presenter"){
                      gisportal.showModalMessage('You are no longer the presenter');
@@ -756,6 +757,28 @@ collaboration.initSession = function() {
             if (collaboration.role == "member") {
                obj.ddslick('select', { "value": value });
             }
+         });
+
+         socket.on('view.loaded', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            var view = data.params.view_name;
+            var nice_val = $('.js-views-list').find('[value="' + view + '"]').html() || view;
+            if (collaboration.role == "member") {
+               gisportal.view.loadView(view);
+            }
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' View Loaded: "' + nice_val + '"');
+         });
+
+         socket.on('view.removed', function(data) {
+            if(collaboration.diverged){
+               return true;
+            }
+            if (collaboration.role == "member") {
+               gisportal.view.removeView();
+            }
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' View Removed');
          });
 
    	  	socket.on('indicatorspanel.scroll', function(data) {

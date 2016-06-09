@@ -53,6 +53,7 @@ gisportal.configurePanel.loadViewList = function(){
             $('select.js-views-list').off('change');
             $('select.js-views-list').on('change', function(){
                gisportal.view.loadView($(this).val());
+               gisportal.events.trigger('view.loaded', $(this).val());
             });
          }else{
             $('li.views-list').toggleClass('hidden', true);

@@ -70,6 +70,21 @@ gisportal.events.bind("ddslick.selectValue", function(event, obj, value, doCallb
    collaboration._emit('c_event', params);
 });
 
+gisportal.events.bind("view.loaded", function(event, view_name) {
+   var params = {
+      "event" : "view.loaded",
+      "view_name" : view_name
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind("view.removed", function(event) {
+   var params = {
+      "event" : "view.removed"
+   };
+   collaboration._emit('c_event', params);
+});
+
 // hide the panel
 gisportal.events.bind("panel.hide", function(event) {
    var params = {

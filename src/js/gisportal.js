@@ -1153,8 +1153,10 @@ gisportal.loadLayerState = function(){
          setScaleValues(id, min, max, log, autoScale);
 
          // Sets the layers opacity to the value that the user had previously
-         $('#tab-' + id + '-opacity').val(opacity*100);
-         gisportal.layers[id].setOpacity(opacity);
+         if(gisportal.layers[id].setOpacity){
+            $('#tab-' + id + '-opacity').val(opacity*100);
+            gisportal.layers[id].setOpacity(opacity);
+         }
 
          // Sets the layers opacity to the value that the user had previously
          $('#tab-' + id + '-colorbands').val(colorbands);
