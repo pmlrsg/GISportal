@@ -176,7 +176,7 @@ collaboration.init = function(io, app, config) {
          })
       })
 
-      socket.on('room.new', function() {
+      socket.on('room.new', function(mapSize) {
          console.log('starting room');
          var shasum = crypto.createHash('sha256');
          shasum.update(Date.now().toString());
@@ -189,7 +189,8 @@ collaboration.init = function(io, app, config) {
                "image": user.image,
                "presenter": true,
                "owner": true,
-               "diverged": false
+               "diverged": false,
+               "mapSize": mapSize
             }],
             "owner": user.email,
             "presenter": user.email,
@@ -209,7 +210,9 @@ collaboration.init = function(io, app, config) {
          
       })
 
-      socket.on('room.join', function(roomId) {
+      socket.on('room.join', function(obj) {
+         roomId = obj.roomId;
+         mapSize = obj.mapSize;
          client.get(roomId, function(err, obj) {
             if(!obj){
                console.log(roomId +' does not exist');
@@ -238,7 +241,8 @@ collaboration.init = function(io, app, config) {
                   "image": user.image,
                   "presenter": presenter,
                   "owner": owner,
-                  "diverged": false
+                  "diverged": false,
+                  "mapSize": mapSize
                }
                var duplicate;
                for( var person in room.people){
@@ -482,6 +486,33 @@ collaboration.init = function(io, app, config) {
          });
       });
 
+      socket.on('window.resized', function(data) {
+         var id = data.id;
+         var mapSize = data.mapSize;
+         var roomId = socket.room;
+         console.log(user.email + ' : resize window : ' + mapSize);
 
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var room = JSON.parse(obj);
+            var people = room.people;
+
+            for (var p in people) {
+               if (people[p].id == id) {
+                  people[p].mapSize = mapSize;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(roomId).emit('extent.changed', {
+                     "people": people
+                  });
+               }
+            });
+         });
+      });
    });
 }

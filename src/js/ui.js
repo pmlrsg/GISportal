@@ -46,6 +46,9 @@ $(document).ready(function()  {
       if(!$('.main-collaboration-video').hasClass('hidden')){
          $('.main-collaboration-video').keepOnScreen();
       }
+      if(collaboration.active && socket && socket.io && socket.io.engine){
+         collaboration._emit("window.resized", {id: socket.io.engine.id, mapSize: [this.innerWidth, this.innerHeight]}, force=true);
+      }
    });
    $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);

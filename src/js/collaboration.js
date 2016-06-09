@@ -145,6 +145,11 @@ collaboration.initDOM = function() {
             $(this).css({'height':$(this).prop('scrollHeight')});
             counter ++;
          }
+         if(parseInt($(this).css('height')) >= 170){
+            $(this).css({'height':"170px", 'overflow':"auto"});
+         }else{
+            $(this).css({'overflow':"hidden"});
+         }
       },
       keypress: function(e){
          if(e.which == 13 && !e.shiftKey){
@@ -300,6 +305,7 @@ collaboration.initSession = function() {
             
             collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
             $('.collab-overlay').toggleClass('hidden', true);
+            $('.collab-extent-overlay').toggleClass('hidden', false);
             collaboration.owner = true;
             $('.show-collaboration').toggleClass('hidden', true);
             $('.collaboration-panel').toggleClass('hidden', false);
@@ -324,6 +330,8 @@ collaboration.initSession = function() {
                if(gisportal.panels.activePanel != "refine-indicator"){
                   $('.dd-container').ddslick('close');
                }
+               var minimumExtent = collaboration.getMinimumExtent(data.people);
+               $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
@@ -360,12 +368,23 @@ collaboration.initSession = function() {
             }
             if (collaboration.role == 'presenter') {
                collaboration.log(collaboration.nameOrAvatar(data.divergent, data.image) + " has diverged from your room");
+               var minimumExtent = collaboration.getMinimumExtent(data.people);
+               $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
             }
             collaboration.buildMembersList(data);
          });
 
+         socket.on('extent.changed', function(data) {
+            if (collaboration.role == 'presenter') {
+               var minimumExtent = collaboration.getMinimumExtent(data.people);
+               $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
+            }
+         });
+
          socket.on('room.member-merged', function(data) {
             if (collaboration.role == 'presenter') {
+               var minimumExtent = collaboration.getMinimumExtent(data.people);
+               $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
                if(gisportal.panels.activePanel != "refine-indicator"){
                   $('.dd-container').ddslick('close');
                }
@@ -473,6 +492,10 @@ collaboration.initSession = function() {
             if(!presenterFound && gisportal.user.info.email == data.people[0].email){
                collaboration._emit('room.make-presenter', data.people[0].id, force=true);
             }
+            if(collaboration.role == "presenter"){
+               var minimumExtent = collaboration.getMinimumExtent(data.people);
+               $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
+            }
          });
 
          socket.on('room.presenter-changed', function(data) {
@@ -488,10 +511,14 @@ collaboration.initSession = function() {
                   collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
                   gisportal.showModalMessage('You are now the presenter');
                   $('.collab-overlay').toggleClass('hidden', true);
+                  $('.collab-extent-overlay').toggleClass('hidden', false);
+                  var minimumExtent = collaboration.getMinimumExtent(data.people);
+                  $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
                   break;
                } else {
                   if(collaboration.role == "presenter"){
                      gisportal.showModalMessage('You are no longer the presenter');
+                     $('.collab-extent-overlay').toggleClass('hidden', true);
                   }
                   collaboration.role = "member";
                   collaboration.setStatus('connected', 'You are in room '+ data.roomId.toUpperCase());
@@ -1840,11 +1867,11 @@ collaboration.initSession = function() {
 
 collaboration.startNewRoom = function() {
    collaboration.role = 'presenter';
-   collaboration._emit('room.new');
+   collaboration._emit('room.new', map.getSize());
 };
 
 collaboration.joinRoom = function(roomId) {
-   collaboration._emit('room.join', roomId.toLowerCase(), true);
+   collaboration._emit('room.join', {roomId:roomId.toLowerCase(), mapSize: map.getSize()}, force=true);
 };
 
 collaboration.buildMembersList = function(data) {
@@ -1871,6 +1898,7 @@ collaboration.buildMembersList = function(data) {
    $('.js-leave-room').click(function() {
       $('.collaboration-panel').toggleClass('hidden', true);
       $('.collab-overlay').toggleClass('hidden', true);
+      $('.collab-extent-overlay').toggleClass('hidden', true);
       $('.show-collaboration').toggleClass('hidden', true);
       hangup();
       socket.disconnect();
@@ -2212,3 +2240,20 @@ collaboration.setStatus = function(icon, message) {
    }
    $(collaboration.statusMessage).html(message);
 };
+
+collaboration.getMinimumExtent = function(people){
+   var width, height;
+   for (var p in people) {
+      var person = people[p];
+      if(!person.diverged){
+         if(!width || width > person.mapSize[0]){
+            width = person.mapSize[0];
+         }
+         if(!height || height > person.mapSize[1]){
+            height = person.mapSize[1];
+         }
+      }
+   }
+   console.log([width, height]);
+   return [width, height];
+}

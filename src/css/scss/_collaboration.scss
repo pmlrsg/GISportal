@@ -153,10 +153,6 @@ p[title] {
   width: 100%;
 }
 
-input.message-input {
-    width: calc(100% - 70px);
-}
-
 .js-submit-message{
   margin-top: 3px;
 }
@@ -372,6 +368,8 @@ span.notify-number {
   overflow: hidden;
   padding-top: 5px;
   min-height: 35px;
+  bottom: 15px;
+  position: absolute;
 }
 
 span.individual-message {
