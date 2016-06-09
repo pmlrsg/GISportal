@@ -1834,6 +1834,8 @@ collaboration.buildMembersList = function(data) {
    if(webRTC){
       data.AVEnabled = webRTC.isChannelReady;
    }
+   data.invite_hidden = $('.js-collab-invite').hasClass('hidden') || $('.js-collab-invite').length <= 0 ;
+   data.invite_url = gisportal.domainName +'?room='+ collaboration.roomId.toUpperCase();
    var rendered = gisportal.templates['collaboration-home'](data);
    $('#collab-homePanel div.panel-container-solid-backdrop').html('').html(rendered);
 
@@ -1909,7 +1911,7 @@ collaboration.buildMembersList = function(data) {
 
    $('.js-invite-people').click(function() {
       $('.js-collab-invite').toggleClass('hidden');
-      $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
+      $('.js-collab-room-url').val(gisportal.domainName +'?room='+ collaboration.roomId.toUpperCase());
       $('.js-collab-room-url').focus(function() { $(this).select(); } ).on('mouseup cut paste', function (e) {e.preventDefault();}).on('keydown', function(){$(this).select();});
    });
    var presenter, me, id;
