@@ -65,16 +65,18 @@ gisportal.graphs.PlotEditor = (function(){
       });
 
       this._editorParent.find('.js-close-active-plot').click(function(){
-         $.notify({'title':"Are you sure you want to delete this plot?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-close-plot-option", autoHide:false, clickToHide: false});
-         $(document).one('click', '.notifyjs-gisportal-close-plot-option-base .no', function() {
-            //hide notification
-            $(this).trigger('notify-hide');
-         });
-         $(document).one('click', '.notifyjs-gisportal-close-plot-option-base .yes', function() {
-            gisportal.graphs.deleteActiveGraph();
-            gisportal.events.trigger('graphs.deleteActive');
-            $(this).trigger('notify-hide');
-         });
+         if($(".notifyjs-gisportal-close-plot-option-info").length <= 0){
+            $.notify({'title':"Are you sure you want to delete this plot?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-close-plot-option", autoHide:false, clickToHide: false});
+            $(document).one('click', '.notifyjs-gisportal-close-plot-option-base .no', function() {
+               //hide notification
+               $(this).trigger('notify-hide');
+            });
+            $(document).one('click', '.notifyjs-gisportal-close-plot-option-base .yes', function() {
+               gisportal.graphs.deleteActiveGraph();
+               gisportal.events.trigger('graphs.deleteActive');
+               $(this).trigger('notify-hide');
+            });
+         }
       });
 
    };
