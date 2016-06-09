@@ -33,13 +33,13 @@
 .ol-zoom, .ol-full-screen {
    position: absolute; 
    top: 25px; 
-   right: 25px;
+   right: 10px;
    background-color: #fafafb;
    box-shadow: 0px 0px 11px -2px black;
 }
 
 .ol-full-screen {
-   right: 120px;
+   right: 105px;
 }
 
 .ol-zoom button, .ol-full-screen button {
@@ -68,7 +68,7 @@
 .ol-scale-line {
    position: absolute;
    top: 25px;
-   right: 176px;
+   right: 160px;
    background-color: #fafafb;
    box-shadow: 0px 0px 11px -2px black;
    padding: 7px;

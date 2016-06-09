@@ -6,14 +6,12 @@
   position: absolute;
   top: 25px;
   bottom: 35px;
-  left: 25px;
-
+  left: 10px;
   min-width: 355px;
   width: 25%;
   max-width: 500px;
   user-select: none;
   box-shadow: 0px 0px 11px -2px black;
-  
   padding-top: 45px;
   padding-bottom: 39px;
   z-index: 10;
@@ -455,7 +453,7 @@ input.search:focus  {
    border: 1px solid #fafafb;
    line-height: 32px;
    padding-right: 15px;
-   left: 25px;
+   left: 10px;
    top: 25px;
    position: absolute;
    -webkit-appearance: none;
