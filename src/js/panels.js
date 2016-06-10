@@ -5,7 +5,11 @@ gisportal.panels.activePanel = null;
 gisportal.panels.initDOM = function() {
 
 	$('.js-show-panel').on('click', function() {
-		gisportal.panels.showPanel($(this).data('panel-name'));
+		var panelName = $(this).data('panel-name');
+		gisportal.panels.showPanel(panelName);
+		if(!panelName.startsWith("collab-")){
+			gisportal.events.trigger('panels.showpanel', panelName);
+		}
 	});
 	gisportal.panels.showPanel(gisportal.panels.defaultPanel);
 	gisportal.panels.showPanel("collab-home");
@@ -35,7 +39,6 @@ gisportal.panels.showPanel = function(panelName) {
 			$('#refine-layers').ddslick('open');
 		}
 		gisportal.panels.activePanel = panelName;
-		gisportal.events.trigger('panels.showpanel', panelName);
 	}else{
 		$('.collaboration-panel [data-panel-name="' + collaboration.activePanel + '"]').removeClass('active');
 		$('.collaboration-panel [data-panel-name="' + panelName + '"]').addClass('active');

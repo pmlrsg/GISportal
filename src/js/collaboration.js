@@ -137,6 +137,20 @@ collaboration.initDOM = function() {
    }
 
    $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
+   $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]);
+
+   // Enable/Disable webRTC media
+   $('.js-toggle-rtc').click(function() {
+      var enabled = webRTC.isChannelReady || false;
+      if (!enabled) {
+         webRTC.initMedia();
+         $(this).find('.btn-value').text('Disable Video/Audio');
+      } else {
+         webRTC.deinitMedia();
+         $('.js-webrtc-online').toggleClass('hidden', true);
+         $(this).find('.btn-value').text('Enable Video/Audio');
+      }
+   });
 
    $('.message-input').on({
       input: function(){
@@ -875,7 +889,7 @@ collaboration.initSession = function() {
             var newLayerOrder = data.params.newLayerOrder;
             var ul = $('ul.js-indicators');
 
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layers re-ordered: '+ newLayerOrder);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layers re-ordered');
             if (collaboration.role == "member") {
                for (var i = newLayerOrder.length; i > -1; i--) {
                   var li = $('.indicator-header').parent('[data-id="'+ newLayerOrder[i] +'"]');
@@ -1986,6 +2000,7 @@ collaboration.buildMembersList = function(data) {
    // Because there are two panels
    var me_selectors = [];
 
+   $('#collab-videoPanel .video-people-list').html("");
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -2028,15 +2043,19 @@ collaboration.buildMembersList = function(data) {
             av_title = "Mute";
          }
          link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
-         $(this).prepend(link);
+         if(my_data && my_data.dataEnabled){
+            var clone = $(this).clone();
+            $('#collab-videoPanel .video-people-list').append(clone.prepend(link));
+            me_selectors.push(clone);
+         }
          on_class = "off";
          av_title = "Enable Webcam";
          if(video.enabled){
             on_class = "on";
             av_title = "Disable Webcam";
          }
-         link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + title + '"></span>');
-         $(this).prepend(link);
+         link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
+         $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').prepend(link);
          $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
@@ -2050,7 +2069,7 @@ collaboration.buildMembersList = function(data) {
       }else if(my_data && my_data.dataEnabled){
          if(this_person && this_person.dataEnabled){
             link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
-            $(this).prepend(link);
+            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link))
          }
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
@@ -2078,21 +2097,13 @@ collaboration.buildMembersList = function(data) {
       // Makes sure that your person div(s) is at the top of the list
       for(var i in me_selectors){
          var parent_selector = me_selectors[i].parent();
-         me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+         if(parent_selector.hasClass('panel-container-solid-backdrop')){
+            me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+         }else{
+            me_selectors[i].detach().prependTo('.video-people-list');
+         }
       }
    }
-   // Enable/Disable webRTC media
-   $('.js-toggle-rtc').click(function() {
-      var enabled = webRTC.isChannelReady || false;
-      if (!enabled) {
-         webRTC.initMedia();
-         $(this).find('.btn-value').text('Disable Video/Audio');
-      } else {
-         webRTC.deinitMedia();
-         $('.js-webrtc-online').toggleClass('hidden', true);
-         $(this).find('.btn-value').text('Enable Video/Audio');
-      }
-   });
 
    $('.js-webrtc-online').on('click', function() {
       webRTC.isInitiator = true;
@@ -2180,7 +2191,8 @@ collaboration.log = function(msg) {
    if (collaboration.displayLog) {
       var notificationText = $(".notifyjs-gisportal-collab-notification-base div.title");
 
-      $('.history-log').append("<p>" + msg + "</p>");
+      $('.history-log').prepend("<p>" + msg + "</p>");
+      $('.history-log :nth-child(20)').remove();
    }
 };
 
@@ -2189,7 +2201,7 @@ collaboration.nameOrAvatar = function(name, img){
       name = '<img src="' + img + '" class="avatar-small" title="' + name + '"/>';
    }
    return name;
-}
+};
 
 collaboration.highlightElement = function(element) {
    element.addClass('highlight-click');
@@ -2254,6 +2266,5 @@ collaboration.getMinimumExtent = function(people){
          }
       }
    }
-   console.log([width, height]);
    return [width, height];
-}
+};

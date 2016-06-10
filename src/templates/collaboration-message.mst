@@ -3,6 +3,6 @@
       {{#if image}}
          <img src="{{image}}" title="{{email}}" class="avatar-small pull-{{side}}">
       {{/if}}
-         <p title="{{email}}" class="pull-{{side}}" style="text-align:{{side}}; margin-{{side}}:5px;"><span class="individual-message">{{{message}}}<span/></p>
+         <p title="{{email}}" class="pull-{{side}}" margin-{{side}}:5px;"><span class="individual-message">{{{message}}}<span/></p>
    </div>
 </div>

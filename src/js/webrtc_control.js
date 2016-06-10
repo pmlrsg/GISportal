@@ -41,10 +41,10 @@ webRTC.initMedia = function() {
 };
 
 webRTC.deinitMedia = function() {
+   hangup();
    sendMessage('media.disabled');
    webRTC.isChannelReady = false;
    webRTC.stop();
-
 };
 
 if (webrtcDetectedBrowser === 'firefox') {
@@ -122,7 +122,17 @@ webRTC.messageCallback = function(data) {
 
    // OTHER END HANGS UP
    if (message === 'bye' && webRTC.isStarted) {
-      handleRemoteHangup();
+      handleRemoteHangup('Call Ended');
+   }
+
+   // OTHER END REJECTS
+   if (message === 'reject' && webRTC.isStarted) {
+      handleRemoteHangup('Call Rejected');
+   }
+
+   // OTHER END DOESN'T ANSWER
+   if (message === 'no_answer' && webRTC.isStarted) {
+      handleRemoteHangup('No Answer');
    }
 };
 
@@ -167,10 +177,6 @@ function maybeStart() {
       }
    }
 }
-
-window.onbeforeunload = function(e) {
-   sendMessage('bye');
-};
 
 /////////////////////////////////////////////////////////
 
@@ -231,7 +237,7 @@ function acceptIncomingCall(caller) {
       "caller": caller
    };
    var rendered = gisportal.templates['webrtc-inbound-call'](data);
-   gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
+   gisportal.showModalMessage(rendered, 20000, answerTimeout=true); // user has 20 seconds to answer
 
    $('.js-answer-webrtc-call').click(function() { 
       // hide the message
@@ -239,17 +245,30 @@ function acceptIncomingCall(caller) {
       // show the videos and controls
       $('.collaboration-video').toggleClass('hidden', false);
       // actually answer the call
-      doAnswer(); 
+      doAnswer();
    });
    $('.js-reject-webrtc-call').click(function() { 
       gisportal.hideModalMessage();
-      hangup();
+      doReject();
    });
 }
+
 function doAnswer() {
+   clearTimeout(gisportal.modalTimeout);
    console.log('Sending answer to peer.');
    webRTC.peerConn.createAnswer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
    webRTC.isStarted = true;
+}
+
+function doReject() {
+   clearTimeout(gisportal.modalTimeout);
+   console.log('Sending rejection to peer.');
+   sendMessage('reject');
+}
+
+function doNoAnswer() {
+   console.log('Sending rejection to peer.');
+   sendMessage('no_answer');
 }
 
 function mergeConstraints(cons1, cons2) {
@@ -325,9 +344,9 @@ function hangup() {
    }
 }
 
-function handleRemoteHangup() {
+function handleRemoteHangup(message) {
    console.log('Session terminated.');
-   gisportal.showModalMessage('Call ended');
+   gisportal.showModalMessage(message);
    webRTC.stop();
    webRTC.isInitiator = false;
 }

@@ -346,9 +346,10 @@ span.notify-number {
 }
 
 .avatar-small {
-  width: auto;
+  width: 24px;
   height: 24px;
   border-radius: 50%;
+  vertical-align: middle;
 }
 
 .person p{
@@ -357,7 +358,7 @@ span.notify-number {
 
 .person img.avatar-small{
   margin-top: -2.5px;
-  padding-right: 3px;
+  margin-right: 3px;
   margin-left: -4px;
 }
 
@@ -378,4 +379,17 @@ span.individual-message {
 
 .collaboration-panel .panel-container{
   height: calc( 100% - 35px );
+}
+
+#collab-historyPanel,
+#collab-historyPanel .panel-container-solid-backdrop{
+  overflow: hidden;
+}
+
+.history-log p {
+  padding-top: 7px;
+}
+
+#collab-videoPanel .collaboration-actions{
+  margin-top: 0;
 }

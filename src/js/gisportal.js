@@ -1605,6 +1605,7 @@ gisportal.launchMap = function(){
    //Once they are past the splash page warn them if they leave
    window.onbeforeunload = function(e){
       gisportal.autoSaveState();
+      hangup();
       var msg = "Warning. You're about to leave the page";
       if( gisportal.config.siteMode == "production"){
          e.returnValue = msg;
@@ -1802,15 +1803,18 @@ gisportal.hideAllPopups = function() {
    });
 };
 
-gisportal.showModalMessage = function(html, timeout) {
+gisportal.showModalMessage = function(html, timeout, answerTimeout) {
    var t = parseInt(timeout) || 2000;
    var holder = $('.js-modal-message-popup');
    var target = $('.js-modal-message-html');
 
    target.html(html);
    holder.toggleClass('hidden', false);
-   setTimeout(function() {
+   gisportal.modalTimeout = setTimeout(function() {
       holder.toggleClass('hidden', true);
+      if(answerTimeout){
+         doNoAnswer();
+      }
    }, t);
 };
 
