@@ -459,6 +459,7 @@ input.search:focus  {
    -webkit-appearance: none;
    -moz-appearance: none;
    height: 40px;
+   z-index: 10;
 }
 
 .show-tools span{
