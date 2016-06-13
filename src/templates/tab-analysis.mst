@@ -5,12 +5,12 @@
       {{#if wcsURL}}
          <li class="full-size">
          <div class="full-width">
-            <b>ANALYSIS</b>
+            <p><b>ANALYSIS</b></p>
             <p>To refine the data before analysis you can:</p>
             <br/>
             
             <div class="analysis-draw-bbox-buttons">
-               <b>DRAW</b>
+               <p><b>DRAW</b></p>
                <p>Draw a selection box on the map</p>
                <button class="brand secondary extra-small js-draw-box" data-id="{{id}}" title="Draw Polygon">
                   <span class=" icon-anchor-point-1" data-id="Ph" title="Draw Polygon"></span>
@@ -29,7 +29,7 @@
                </div>
                <div {{#if noOAuth}}class="hidden"{{/if}}>
                   <br/>
-                  <b>UPLOAD</b>
+                  <p><b>UPLOAD</b></p>
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                      <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
                      or<br/>
@@ -48,7 +48,7 @@
                </div>
                <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                   <br/>
-                  <b>SELECT</b>
+                  <p><b>SELECT</b></p>
                   <p>Use this dropdown or select an existing polygon:</p>
                   <select class="users-geojson-files">
                      <option selected value="default">Loading...</option>
