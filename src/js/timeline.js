@@ -413,14 +413,8 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
    $('.js-timeline-labels').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
       // Update label
-      //var positionTop = $('.timeline > g').position().top;
-      //positionTop += this.barHeight * i;
-      //positionTop += this.barMargin * i;
-      var positionTop = (i+1) * (this.barHeight + this.barMargin) - 2; 
-      var barTop = $(this.bars[0][i]).position().top;
-      // The 300 below is ARBITARY. In Firefox it can get massive
-      // whereas in Chrome it is required occasionally. TO DO: fix.
-      if (positionTop < barTop && barTop < 300 ) positionTop = barTop;
+      var positionTop = (i+1) * (this.barHeight + this.barMargin);
+      positionTop += (i+1) * 3;
       var id = this.timebars[i].id;
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
@@ -483,8 +477,15 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
    // ensure that the timeline is visible and adjust the panel heights accordingly
    $('.timeline-container').css('bottom','0px');
-   var h = $('.timeline-container').height();
-   $('.panel, .collaboration-panel').css('bottom', h + 35 +'px');
+   var h = $('.timeline-container').height() + 10; // +10 for the padding
+   $('.panel').css('bottom', h + 35 +'px');
+   $('.ol-attribution').css('bottom', h +'px');
+   var collab_panel = $('.collaboration-panel');
+   var collab_hidden = collab_panel.hasClass('hidden');
+   var top = collab_panel.toggleClass('hidden', false).position().top;
+   collab_panel.toggleClass('hidden', collab_hidden);
+   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
+   
 };
 
 
@@ -540,7 +541,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.redraw();
    this.updatePickerBounds();
 
-   var h = $('.timeline-container').height();
+   var h = $('.timeline-container').height() + 10; // +10 for the padding
    if(gisportal.timeline.timebars.length <= 0){
       gisportal.timeline = null;
       $('#timeline').html("");
@@ -548,7 +549,13 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
       $('.timeline-container').css('bottom','-1000px');
       h = 0;
    }
-   $('.panel, .collaboration-panel').css('bottom', h + 35 +'px');
+   $('.panel').css('bottom', h + 35 +'px');
+   $('.ol-attribution').css('bottom', h +'px');
+   var collab_panel = $('.collaboration-panel');
+   var collab_hidden = collab_panel.hasClass('hidden');
+   var top = collab_panel.toggleClass('hidden', false).position().top;
+   collab_panel.toggleClass('hidden', collab_hidden);
+   collab_panel.css('max-height', "calc(100% - "+ (h + top + 35) +'px)');
 };
 
 // Set the currently selected date and animated the transition
