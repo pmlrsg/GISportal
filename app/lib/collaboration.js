@@ -176,8 +176,10 @@ collaboration.init = function(io, app, config) {
          })
       })
 
-      socket.on('room.new', function(mapSize) {
+      socket.on('room.new', function(data) {
          console.log('starting room');
+         var invitees = data.invitees;
+         var roomURL = data.roomURL;
          var shasum = crypto.createHash('sha256');
          shasum.update(Date.now().toString());
          var roomId = shasum.digest('hex').substr(0,6);
@@ -190,7 +192,7 @@ collaboration.init = function(io, app, config) {
                "presenter": true,
                "owner": true,
                "diverged": false,
-               "mapSize": mapSize
+               "mapSize": data.mapSize
             }],
             "owner": user.email,
             "presenter": user.email,
@@ -203,6 +205,7 @@ collaboration.init = function(io, app, config) {
             if(!err){
                socket.join(socket.room, function() {
                   io.sockets.in(socket.room).emit('room.created', room);
+                  invitePeopleToRoom(invitees, roomURL, socket.room);
                });
             }
          });
@@ -514,4 +517,9 @@ collaboration.init = function(io, app, config) {
          });
       });
    });
-}
+};
+
+invitePeopleToRoom = function(invitees, roomURL, roomID){
+   var portalURL = roomURL + roomID;
+   console.log(invitees + " : " + portalURL);
+};

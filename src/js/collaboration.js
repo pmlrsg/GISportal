@@ -1882,7 +1882,11 @@ collaboration.initSession = function() {
 
 collaboration.startNewRoom = function() {
    collaboration.role = 'presenter';
-   collaboration._emit('room.new', map.getSize());
+   invitees = [];
+   $('.email-list > span').each(function(){
+      invitees.push($(this).find('span.email-txt').html());
+   });
+   collaboration._emit('room.new', {mapSize: map.getSize(), invitees: invitees, roomURL: gisportal.domainName +'?room='});
 };
 
 collaboration.joinRoom = function(roomId) {

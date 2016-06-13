@@ -74,14 +74,16 @@
 
 #roomId, .roomId {
    text-transform: uppercase;
+   width: calc(100% - 115px);
 }
+
 #roomId.error { border: 2px solid #900; color: #900;}
 .js-room-id-message { padding: 4px; }
 .js-room-id-message.error { color: #900;}
 
 
 .collaboration-actions { 
-   margin: 10px 0px;
+   margin-bottom: 10px;
 }
 
 .js-collab-invite { margin-bottom: 20px; }
@@ -390,6 +392,35 @@ span.individual-message {
   padding-top: 7px;
 }
 
-#collab-videoPanel .collaboration-actions{
-  margin-top: 0;
+.email-list{
+  background-color: #fff;
+  border: 1px solid #D8D3DD;
+  color: #8a7b9b;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.email-list > span{
+  display:block;
+  height:35px;
+  float:left;
+  padding:5px;
+  margin:4px;
+  border: 1px solid black;
+}
+
+.email-list > input{
+  width: 100%;
+  border: none;
+  margin-left: -10px;
+  padding-left: 20px;}
+
+span.remove-email{
+  color: black;
+  margin-left: 2px;
+  vertical-align: middle;
+}
+
+.email-list > input:focus {
+  outline: none;
 }
