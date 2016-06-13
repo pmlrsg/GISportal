@@ -1683,7 +1683,7 @@ collaboration.buildMembersList = function(data) {
 
    $('.js-invite-people').click(function() {
       $('.js-collab-invite').toggleClass('hidden');
-      $('.js-collab-room-url').val(top.location.origin +'/?room='+ collaboration.roomId.toUpperCase());
+      $('.js-collab-room-url').val(gisportal.domainName +'?room='+ collaboration.roomId.toUpperCase());
       $('.js-collab-room-url').focus(function() { $(this).select(); } ).on('mouseup cut paste', function (e) {e.preventDefault();}).on('keydown', function(){$(this).select();});
    });
 
