@@ -1,6 +1,7 @@
 gisportal.view = {};
 
 gisportal.view.loadView = function(view_name){
+   $(".js-start").trigger('click');
    $.ajax({
       url: gisportal.middlewarePath + '/settings/view?view=' + view_name,
       dataType: 'json',
