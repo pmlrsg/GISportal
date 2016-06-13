@@ -771,18 +771,22 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
       if(tags[tagName] === undefined){
          return false;
       }
-      markdown_file_path = path.join(markdown_folder_path, tagName, tags[tagName].toLowerCase().replace(/\//g, "_") + ".md");
-      if(utils.fileExists(markdown_file_path)){
-         markdown_data = fs.readFileSync(markdown_file_path).toString();
-         html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
-         html += html_data;
+      if(typeof(tags[tagName]) != "object"){
+         tags[tagName] = [tags[tagName]];
+      }
+      for(var tag_name in tags[tagName]){
+         markdown_file_path = path.join(markdown_folder_path, tagName, tags[tagName][tag_name].toLowerCase().replace(/\//g, "_") + ".md");
+         if(utils.fileExists(markdown_file_path)){
+            markdown_data = fs.readFileSync(markdown_file_path).toString();
+            html_data = markdown(markdown_data, true, null, {"a":"href|target"} );
+            html += html_data;
+         }
       }
       if(deleteAfter === true){
          delete tags[tagName];
       }
    }
 
-   delete tags.indicator_type;
    addMarkdown("providerTag", true);
    addMarkdown("niceName", true);
    addMarkdown("model", true);
