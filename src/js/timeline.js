@@ -477,8 +477,9 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
    // ensure that the timeline is visible and adjust the panel heights accordingly
    $('.timeline-container').css('bottom','0px');
-   var h = $('.timeline-container').height();
+   var h = $('.timeline-container').height() + 10; // +10 for the padding
    $('.panel').css('bottom', h + 35 +'px');
+   $('.ol-attribution').css('bottom', h +'px');
    var collab_panel = $('.collaboration-panel');
    var collab_hidden = collab_panel.hasClass('hidden');
    var top = collab_panel.toggleClass('hidden', false).position().top;
@@ -540,7 +541,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.redraw();
    this.updatePickerBounds();
 
-   var h = $('.timeline-container').height();
+   var h = $('.timeline-container').height() + 10; // +10 for the padding
    if(gisportal.timeline.timebars.length <= 0){
       gisportal.timeline = null;
       $('#timeline').html("");
@@ -549,6 +550,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
       h = 0;
    }
    $('.panel').css('bottom', h + 35 +'px');
+   $('.ol-attribution').css('bottom', h +'px');
    var collab_panel = $('.collaboration-panel');
    var collab_hidden = collab_panel.hasClass('hidden');
    var top = collab_panel.toggleClass('hidden', false).position().top;
