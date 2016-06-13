@@ -144,11 +144,11 @@ collaboration.initDOM = function() {
       var enabled = webRTC.isChannelReady || false;
       if (!enabled) {
          webRTC.initMedia();
-         $(this).find('.btn-value').text('Disable Video/Audio');
+         $(this).find('.btn-value').text('Disable Audio/Video');
       } else {
          webRTC.deinitMedia();
-         $('.js-webrtc-online').toggleClass('hidden', true);
-         $(this).find('.btn-value').text('Enable Video/Audio');
+         $('.js-webrtc-call').toggleClass('hidden', true);
+         $(this).find('.btn-value').text('Enable Audio/Video');
       }
    });
 
@@ -337,6 +337,7 @@ collaboration.initSession = function() {
                $('.collab-overlay').toggleClass('hidden', false);
                $('.show-collaboration').toggleClass('hidden', true);
                $('.collaboration-panel').toggleClass('hidden', false);
+               $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
             }
 
             // if I am the presenter send my state so that the new member can catch up
@@ -2066,10 +2067,13 @@ collaboration.buildMembersList = function(data) {
                $(this).prepend(link);
             }
          }
-      }else if(my_data && my_data.dataEnabled){
+      }else{
          if(this_person && this_person.dataEnabled){
-            link = $('<span class="icon-call-1 js-webrtc-online collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
-            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link))
+            link = $('<span class="icon-call-1 js-webrtc-call collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
+            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link));
+            if(!my_data || !my_data.dataEnabled || webRTC.isStarted){
+               link.toggleClass('hidden', true);
+            }
          }
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
@@ -2105,8 +2109,10 @@ collaboration.buildMembersList = function(data) {
       }
    }
 
-   $('.js-webrtc-online').on('click', function() {
+   $('.js-webrtc-call').on('click', function() {
       webRTC.isInitiator = true;
+      $('.js-webrtc-call').toggleClass('hidden', true);
+      webRTC.peerId = $(this).parent().data('id');
       maybeStart();
    });
 

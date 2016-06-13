@@ -349,7 +349,6 @@ collaboration.init = function(io, app, config) {
 
       var mediaChange = function(change){
          var roomId = socket.room;
-         console.log(user.email + ' has diverged from room ' + roomId);
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -387,7 +386,7 @@ collaboration.init = function(io, app, config) {
             "socketId": socket.id,
             "params" : data
          });
-         if(data.message == "media.disabaled" || data.message == "media.enabled"){
+         if(data.message == "media.disabled" || data.message == "media.enabled"){
             mediaChange(data.message.split('.')[1]);
          }
       });

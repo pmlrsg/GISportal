@@ -80,7 +80,7 @@ webRTC.messageCallback = function(data) {
    if (message === 'media.enabled') {
       // update the user who's media was enabled with an 'available status'
       memberId = data.socketId;
-      $('[data-id="' + memberId + '"] .js-webrtc-online').toggleClass('hidden', false);
+      $('[data-id="' + memberId + '"] .js-webrtc-call').toggleClass('hidden', false);
 
       // then start?
       maybeStart();
@@ -91,17 +91,21 @@ webRTC.messageCallback = function(data) {
    if (message === 'media.disabled') {
       // update the user who's media was disabled 
       memberId = data.socketId;
-      $('[data-id="' + memberId + '"] .js-webrtc-online').toggleClass('hidden', true);
+      $('[data-id="' + memberId + '"] .js-webrtc-call').toggleClass('hidden', true);
       
    } 
 
    // AN OFFER 
    if (message.type === 'offer') {
+      var for_me = false;
+      if(data.params.peerId == socket.io.engine.id){
+         for_me = true;
+      }
       if (!webRTC.isInitiator && !webRTC.isStarted) {
          maybeStart();
       }
       webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
-      if (!webRTC.isInitiator) {
+      if (!webRTC.isInitiator && for_me) {
          acceptIncomingCall(data.sender_name);
       }
    } 
@@ -140,7 +144,8 @@ webRTC.messageCallback = function(data) {
 function sendMessage(message){
    var params = {
       'event': 'webrtc_event',
-      'message': message
+      'message': message,
+      'peerId': webRTC.peerId
    };
    console.log('Sending message: ', message);
    collaboration._emit('webrtc_event', params, true);
@@ -171,6 +176,7 @@ function maybeStart() {
       webRTC.peerConn.addStream(webRTC.localStream);
       if (webRTC.isInitiator) {
          webRTC.isStarted = true;
+         $('.js-webrtc-call').toggleClass('hidden', true);
          doCall();
          // show the videos and controls
          $('.collaboration-video').toggleClass('hidden', false);
@@ -255,6 +261,7 @@ function acceptIncomingCall(caller) {
 
 function doAnswer() {
    clearTimeout(gisportal.modalTimeout);
+   $('.js-webrtc-call').toggleClass('hidden', true);
    console.log('Sending answer to peer.');
    webRTC.peerConn.createAnswer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
    webRTC.isStarted = true;
@@ -341,6 +348,7 @@ function hangup() {
       gisportal.showModalMessage('Call ended');
       webRTC.stop();
       sendMessage('bye');
+      $('.js-webrtc-call').toggleClass('hidden', false);
    }
 }
 
@@ -349,6 +357,8 @@ function handleRemoteHangup(message) {
    gisportal.showModalMessage(message);
    webRTC.stop();
    webRTC.isInitiator = false;
+   $('.js-webrtc-call').toggleClass('hidden', false);
+   webRTC.isChannelReady = false;
 }
 
 webRTC.stop = function() {
