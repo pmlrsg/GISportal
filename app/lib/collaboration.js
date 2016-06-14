@@ -5,6 +5,7 @@ var redis = require('redis');
 var client = redis.createClient();
 var swearJar = require('swearjar');
 var Jimp = require('jimp');
+var utils = require('./utils.js');
 
 var collaboration = {};
 
@@ -179,7 +180,7 @@ collaboration.init = function(io, app, config) {
       socket.on('room.new', function(data) {
          console.log('starting room');
          var invitees = data.invitees;
-         var roomURL = data.roomURL;
+         var pageTitle = data.pageTitle;
          var shasum = crypto.createHash('sha256');
          shasum.update(Date.now().toString());
          var roomId = shasum.digest('hex').substr(0,6);
@@ -205,7 +206,10 @@ collaboration.init = function(io, app, config) {
             if(!err){
                socket.join(socket.room, function() {
                   io.sockets.in(socket.room).emit('room.created', room);
-                  invitePeopleToRoom(invitees, roomURL, socket.room);
+                  var domain_name = socket.handshake.headers.referer.split('?')[0];
+                  var domain_config = config[utils.nicifyDomain(domain_name)];
+                  var mailgun = require('mailgun-js')({apiKey: domain_config.email.mailgun_api_key, domain: domain_config.email.mailgun_domain});
+                  invitePeopleToRoom(invitees, domain_name + "?room=" + socket.room.toUpperCase(), pageTitle, user, mailgun);
                });
             }
          });
@@ -519,7 +523,16 @@ collaboration.init = function(io, app, config) {
    });
 };
 
-invitePeopleToRoom = function(invitees, roomURL, roomID){
-   var portalURL = roomURL + roomID;
-   console.log(invitees + " : " + portalURL);
+invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mailgun){
+   var data = {
+     from: pageTitle + ' on behalf of ' + user.name + ' <' + user.email + '>',
+     subject: pageTitle + ' Collaboration Invitation',
+     text: 'You have been invited to join a portal collaboration session.\n\nPlease go to: ' + roomURL + ' to join the room.'
+   };
+   for(var person in invitees){
+      data.to = invitees[person];
+      mailgun.messages().send(data, function (error, body) {
+         console.log(body);
+      });
+   }
 };

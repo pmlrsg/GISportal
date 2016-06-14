@@ -36,6 +36,10 @@ utils.getDomainName = function(req){
    if(req.SUBFOLDER){
       domain += "_" + req.SUBFOLDER
    }
+   return utils.nicifyDomain(domain);
+}
+
+utils.nicifyDomain = function(domain){
    return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 }
 

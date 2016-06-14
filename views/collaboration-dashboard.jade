@@ -26,7 +26,7 @@ script(type='text/javascript')
    |         }
    |         var already_added = false;
    |         $('.email-list > span').each(function(){
-   |            if($(this).find('span.email-txt').html == txt){
+   |            if($(this).find('span.email-txt').html() == txt){
    |               already_added = true;
    |               return false;
    |            }
@@ -40,7 +40,7 @@ script(type='text/javascript')
    |      keyup : function(ev) {
    |         if(/(188|13)/.test(ev.which)){
    |            if(ev.which == 188){
-   |               this.value = this.value.replace(/\,$/g, "");
+   |               this.value = this.value.replace(/\,$/, "");
    |            }
    |            $(this).focusout();
    |         }
@@ -48,6 +48,16 @@ script(type='text/javascript')
    |   });
    |   $('.email-list').on('click', 'span.remove-email', function() {
    |      $(this).parent().remove();
+   |   });
+   |   $.ajax({
+   |      url: gisportal.middlewarePath + '/settings/email_setup',
+   |      success: function(data){
+   |         if(data){
+   |            $('div.email-list').toggleClass('hidden', false);
+   |         }else{
+   |            $('div.email-list').remove();
+   |         }
+   |      }
    |   });
    |});
 
@@ -64,7 +74,7 @@ div.collabHolder
    div.host
       h3 Host a session
       p Select this option to host a new session and invite people to join you
-      div.email-list
+      div.email-list.hidden
          input(type="text", class="start-new-room-emails", id="startNewTextBox", placeholder="Invite Email Addresses", autocomplete="off")
       button(class="js-start-new-room brand small pull-right") Start new
    div.clearfix

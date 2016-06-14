@@ -1883,10 +1883,14 @@ collaboration.initSession = function() {
 collaboration.startNewRoom = function() {
    collaboration.role = 'presenter';
    invitees = [];
+   var pageTitle;
    $('.email-list > span').each(function(){
       invitees.push($(this).find('span.email-txt').html());
    });
-   collaboration._emit('room.new', {mapSize: map.getSize(), invitees: invitees, roomURL: gisportal.domainName +'?room='});
+   if(gisportal.pageTitleNotification && gisportal.pageTitleNotification.Vars){
+      pageTitle = gisportal.pageTitleNotification.Vars.OriginalTitle || document.title;
+   }
+   collaboration._emit('room.new', {mapSize: map.getSize(), invitees: invitees, pageTitle: pageTitle || document.title});
 };
 
 collaboration.joinRoom = function(roomId) {
