@@ -99,6 +99,7 @@ $.extend(gisportal.config, {
 
    aboutText: "About", // The Text you would like the user to see on the 'About' button. If not specified 'About' will be used.
 
-   pageTitle: "GIS Portal" // The Page title to be shown in the browser. If blank the title will be "GIS Portal"
+   pageTitle: "GIS Portal", // The Page title to be shown in the browser. If blank the title will be "GIS Portal",
+   splashImage: '../img/PML-MAP-2.jpg' // The image that you would like to be displayed on the splash page
 });
 
