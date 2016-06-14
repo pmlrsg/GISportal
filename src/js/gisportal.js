@@ -1315,7 +1315,10 @@ gisportal.main = function() {
    $('title').html(gisportal.config.pageTitle || "GIS portal");
    $('#about').html(gisportal.config.aboutText || "About");
    if(gisportal.config.splashImage){
-      $('.start').css({"background-image": "url('" + gisportal.config.splashImage + "')"})
+      $('.start').css({"background-image": "url('" + gisportal.config.splashImage + "')"});
+   }
+   if(gisportal.config.logoImage){
+      $('.footer-logo').attr({"src": gisportal.config.logoImage}).parent().toggleClass('hidden', false);
    }
 
    if( gisportal.config.siteMode == "production" ) {

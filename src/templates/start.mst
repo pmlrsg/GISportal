@@ -15,8 +15,8 @@
    <nav class="start-nav">
       {{#if hasAutoSaveState}}
 
-         <a class="btn brand with-border js-load-last-state">Load your previous map</a>
+         <button class="start-btn btn brand js-load-last-state">Load your previous map</button>
       {{/if}}
-      <button class="brand with-border js-start">Start building a map</button>
+      <button class="start-btn brand js-start">Start building a map</button>
    </nav>
 </div>
