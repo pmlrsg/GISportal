@@ -95,6 +95,8 @@ $.extend(gisportal.config, {
 
    aboutPage: "https://visual.pml.ac.uk/gisportal/", // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
 
+   aboutText: "About", // The Text you would like the user to see on the 'About' button. If not specified 'About' will be used.
+
    pageTitle: "GIS Portal" // The Page title to be shown in the browser. If blank the title will be "GIS Portal"
 });
 
