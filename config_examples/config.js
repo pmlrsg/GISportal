@@ -49,6 +49,8 @@ $.extend(gisportal.config, {
    browseMode : 'selectlist',                       // (tabs|selectlist|simplelist) selectlist (default) = original method of 3 tabs; selectlist = makes all available categories selectable from a drop down list; simplelist = a simple list of all the ids in the portal
    defaultCategory: 'indicator_type',                     // used to give the default category to show.
    hiddenCategories: ['testing'],                     // a list of categories to not be shown.
+   categoryPriorities: ['indicator_type', 'interval'], // This is a prioritised list of tags so they are shown at the top of the selectlist
+   markdownPriorities: ['data_provider', 'indicator_type'], // This is a prioritised list of tags so they are shown in the right order in the markdown
    countryBorder : {
       'defaultLayer' : 'countries_all_white',      // (countries_all_white|countries_all_black|countries_all_blue)
       'alwaysVisible' : false                      // (true|false)  > If true the defaultLayer will be visible at page load
@@ -95,6 +97,9 @@ $.extend(gisportal.config, {
 
    aboutPage: "https://visual.pml.ac.uk/gisportal/", // The Page you would like the user to be taken to when they click 'About'. If not specified '/' will be used
 
-   pageTitle: "GIS Portal" // The Page title to be shown in the browser. If blank the title will be "GIS Portal"
+   aboutText: "About", // The Text you would like the user to see on the 'About' button. If not specified 'About' will be used.
+
+   pageTitle: "GIS Portal", // The Page title to be shown in the browser. If blank the title will be "GIS Portal",
+   splashImage: '../img/PML-MAP-2.jpg' // The image that you would like to be displayed on the splash page
 });
 
