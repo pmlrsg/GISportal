@@ -3,8 +3,6 @@
 \*------------------------------------*/
 
 .start  {
-   background-color: #635078;
-   background-image: url('../img/PML-MAP-2@2x.png');
    background-repeat: no-repeat;
    background-position:  center center;
    background-size: cover;
@@ -12,7 +10,7 @@
    overflow-y: auto;
 }
 .start-dev { 
-   background: $splash-background ; 
+   background-color: $splash-color;
 }
 
 .start-container  {

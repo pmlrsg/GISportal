@@ -838,7 +838,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
       $.ajax({
          method: 'POST',
          url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
-         data: layer.tags,
+         data: {tags: layer.tags, order: gisportal.config.markdownPriorities},
          success: function( data ) {
             if(data){
                layer.metadataHTML = data;

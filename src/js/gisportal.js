@@ -1313,6 +1313,10 @@ gisportal.main = function() {
       }
    }
    $('title').html(gisportal.config.pageTitle || "GIS portal");
+   $('#about').html(gisportal.config.aboutText || "About");
+   if(gisportal.config.splashImage){
+      $('.start').css({"background-image": "url('" + gisportal.config.splashImage + "')"})
+   }
 
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
@@ -1814,5 +1818,18 @@ gisportal.loadBrowseCategories = function(data){
       var deleteCat = gisportal.config.hiddenCategories[category];
       delete gisportal.browseCategories[deleteCat];
       console.log("Removing '" + deleteCat + "' category");
+   }
+   // This makes sure that the proritised categories ARE prioritised
+   var priority = gisportal.config.categoryPriorities;
+   if(priority){
+      var temp_cats = {};
+      for(var i in priority){
+         var p_cat = priority[i];
+         if(gisportal.browseCategories[p_cat]){
+            temp_cats[p_cat] = gisportal.browseCategories[p_cat];
+            delete gisportal.browseCategories[p_cat];
+         }
+      }
+      gisportal.browseCategories = _.extend(temp_cats, gisportal.browseCategories);
    }
 };

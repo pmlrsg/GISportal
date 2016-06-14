@@ -11,6 +11,7 @@ gisportal.config = {
     graphServer: 'plotting',
     middlewarePath: 'app'
    },
-   defaultStyle: "boxfill/rainbow"
+   defaultStyle: "boxfill/rainbow",
+   markdownPriorities: ['providerTag', 'niceName', 'model']
 };
 
