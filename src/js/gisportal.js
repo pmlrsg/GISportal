@@ -1816,4 +1816,17 @@ gisportal.loadBrowseCategories = function(data){
       delete gisportal.browseCategories[deleteCat];
       console.log("Removing '" + deleteCat + "' category");
    }
+   // This makes sure that the proritised categories ARE prioritised
+   var priority = gisportal.config.categoryPriorities;
+   if(priority){
+      var temp_cats = {};
+      for(var i in priority){
+         var p_cat = priority[i];
+         if(gisportal.browseCategories[p_cat]){
+            temp_cats[p_cat] = gisportal.browseCategories[p_cat];
+            delete gisportal.browseCategories[p_cat];
+         }
+      }
+      gisportal.browseCategories = _.extend(temp_cats, gisportal.browseCategories);
+   }
 };
