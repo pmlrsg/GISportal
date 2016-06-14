@@ -6,6 +6,7 @@ var client = redis.createClient();
 var swearJar = require('swearjar');
 var Jimp = require('jimp');
 var utils = require('./utils.js');
+var nodemailer = require("nodemailer");
 
 var collaboration = {};
 
@@ -207,9 +208,20 @@ collaboration.init = function(io, app, config) {
                socket.join(socket.room, function() {
                   io.sockets.in(socket.room).emit('room.created', room);
                   var domain_name = socket.handshake.headers.referer.split('?')[0];
-                  var domain_config = config[utils.nicifyDomain(domain_name)];
-                  var mailgun = require('mailgun-js')({apiKey: domain_config.email.mailgun_api_key, domain: domain_config.email.mailgun_domain});
-                  invitePeopleToRoom(invitees, domain_name + "?room=" + socket.room.toUpperCase(), pageTitle, user, mailgun);
+                  var email_config = config[utils.nicifyDomain(domain_name)].email;
+                  var mail_system;
+                  if(email_config.method == "mailgun"){
+                     if(email_config.mailgun_api_key && email_config.mailgun_domain){
+                        mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain});
+                     }
+                  }else if(email_config.method == "gmail"){
+                     if(email_config.gmail_email && email_config.gmail_pass){
+                        mail_system = nodemailer.createTransport('smtps://' + email_config.gmail_email.replace(/@/g, "%40") + ':' + email_config.gmail_pass + '@smtp.gmail.com');
+                     }
+                  }
+                  if(mail_system){
+                     invitePeopleToRoom(invitees, domain_name + "?room=" + socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method );
+                  }
                });
             }
          });
@@ -523,7 +535,7 @@ collaboration.init = function(io, app, config) {
    });
 };
 
-invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mailgun){
+invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mail_system, mail_system_name){
    var data = {
      from: pageTitle + ' on behalf of ' + user.name + ' <' + user.email + '>',
      subject: pageTitle + ' Collaboration Invitation',
@@ -531,8 +543,19 @@ invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mailgun){
    };
    for(var person in invitees){
       data.to = invitees[person];
-      mailgun.messages().send(data, function (error, body) {
-         console.log(body);
-      });
+      if(mail_system_name == "mailgun"){
+         mail_system.messages().send(data, function (error, body) {
+            console.log(body);
+         });
+      }else if(mail_system_name == "gmail"){
+         console.log(mail_system);
+         mail_system.sendMail(data, function (error, response) {
+            if(error){
+               console.log(error);
+            }else{
+               console.log("Message sent: " + response.message);
+            }
+         });
+      }
    }
 };

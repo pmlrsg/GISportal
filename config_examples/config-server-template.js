@@ -10,21 +10,22 @@ GLOBAL.config['DOMAIN_NAME'] = {
    },
    admins:['ADMINISTRATOR'],
    email:{
-      method:"mailgun", //"mailgun", "smtp", "gmail"
+      method:"mailgun", //"mailgun", "gmail", "other"
       //MAILGUN
       //-----------------------------------------------------
       mailgun_api_key: "mailgun_api_key",
       mailgun_domain: "mailgun_domain",
       //-----------------------------------------------------
-      //SMTP
-      //-----------------------------------------------------
-      smtp_server: "smtp_server",
-      smtp_domain: "smtp_domain",
-      //-----------------------------------------------------
       //GMAIL
       //-----------------------------------------------------
-      gmail_api_key: "gmail_api_key",
-      gmail_domain: "gmail_domain"
+      gmail_email: "gmail_email",
+      gmail_pass: "gmail_pass",
+      //-----------------------------------------------------
+      //-----------------------------------------------------
+      //OTHER
+      //-----------------------------------------------------
+      other_email: "other_email",
+      other_pass: "other_pass"
       //-----------------------------------------------------
    }
 }
