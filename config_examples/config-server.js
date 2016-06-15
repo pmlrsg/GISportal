@@ -11,5 +11,11 @@ GLOBAL.config = {
       secret : 'SECRET',
       age : 0
    },
+   admins:[
+      'admin1@admin.co.uk',
+      'admin2@admin.co.uk',
+      'admin3@admin.co.uk',
+      'admin4@admin.co.uk'
+   ],
    cssFile:"GISportal"
 }

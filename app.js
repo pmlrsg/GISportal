@@ -32,7 +32,6 @@ if(!utils.directoryExists(site_setings_path)){
    var layers_path = path.join(site_setings_path, "layers");
    utils.mkdirpSync(site_setings_path);
    utils.mkdirpSync(layers_path);
-   fs.writeFileSync('./config/base_config.js', fs.readFileSync('./config_examples/base_config.js'));
 }
 var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
 site_setings_list.forEach(function(foldername){
