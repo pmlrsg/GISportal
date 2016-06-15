@@ -58,17 +58,16 @@ button, .btn{
   display: inline-block;
 }
 
-.brand.with-border  {
-  border-top: 6px solid $button-border ;
-  height: 41px;
-}
-
 .secondary  {
    background-color: $secondary-background ;
    border: none;
    color: #fff;
    padding: 6px 12px;
    border-radius: 5px;
+}
+
+.start-btn{
+  background-color: $start-btn-background ;
 }
 
 .brand.extra-small{
@@ -98,11 +97,6 @@ button, .btn{
   padding: 1px 6px;
   margin: 2px;
 
-}
-
-.brand:active,
-.brand.loading {
-   background-color: $button-border;
 }
 
 .brand.loading  {
@@ -258,7 +252,7 @@ button.top-space {
 }
 
 .tac-container{
-  background-color: #32273d;
+  background-color: $primary-purple;
   color: #f7f6f8;
   padding: 25px;
   width: 500px;
@@ -347,4 +341,16 @@ dd {
 
 .small-text{
   font-size: 10px;
+}
+
+.footer-logo{
+  height: 35px;
+}
+
+.footer-logo-div{
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 100%;
+  text-align: center;
 }
