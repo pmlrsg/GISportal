@@ -109,8 +109,8 @@ router.get('/app/settings/email_setup', function(req, res) {
          email_setup = true;
       }
    }
-   if(email_config.method == "gmail"){
-      if(email_config.gmail_email && email_config.gmail_pass){
+   if(email_config.method == "smtp"){
+      if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
          email_setup = true;
       }
    }

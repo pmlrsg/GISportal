@@ -6,7 +6,7 @@ var client = redis.createClient();
 var swearJar = require('swearjar');
 var Jimp = require('jimp');
 var utils = require('./utils.js');
-var nodemailer = require("nodemailer");
+var email   = require("emailjs");
 
 var collaboration = {};
 
@@ -212,11 +212,20 @@ collaboration.init = function(io, app, config) {
                   var mail_system;
                   if(email_config.method == "mailgun"){
                      if(email_config.mailgun_api_key && email_config.mailgun_domain){
-                        mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain});
+                        mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain}).messages();
                      }
-                  }else if(email_config.method == "gmail"){
-                     if(email_config.gmail_email && email_config.gmail_pass){
-                        mail_system = nodemailer.createTransport('smtps://' + email_config.gmail_email.replace(/@/g, "%40") + ':' + email_config.gmail_pass + '@smtp.gmail.com');
+                  }else if(email_config.method == "smtp"){
+                     if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
+                        mail_system = email.server.connect({
+                           user: email_config.smtp_email, 
+                           password: email_config.smtp_pass, 
+                           host: email_config.smtp_host, 
+                           domain: email_config.smtp_host, 
+                           ssl: email_config.smtp_ssl, 
+                           port: email_config.smtp_port, 
+                           authentication: email_config.smtp_auth
+                        });
+                        console.log(mail_system);
                      }
                   }
                   if(mail_system){
@@ -543,19 +552,12 @@ invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mail_system, m
    };
    for(var person in invitees){
       data.to = invitees[person];
-      if(mail_system_name == "mailgun"){
-         mail_system.messages().send(data, function (error, body) {
-            console.log(body);
-         });
-      }else if(mail_system_name == "gmail"){
-         console.log(mail_system);
-         mail_system.sendMail(data, function (error, response) {
-            if(error){
-               console.log(error);
-            }else{
-               console.log("Message sent: " + response.message);
-            }
-         });
-      }
+      mail_system.send(data, function (error, response) {
+         if(error){
+            console.log("Error: " + error);
+         }else{
+            console.log("Message sent: " + response.message);
+         }
+      });
    }
 };
