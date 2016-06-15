@@ -675,7 +675,7 @@ gisportal.layer = function( options ) {
  */
 gisportal.getAutoScaleFromString = function(autoScale){
    if(typeof(autoScale) == "undefined" || autoScale == "default"){
-      return gisportal.config.autoScale;
+      return Boolean(gisportal.config.autoScale);
    }else if(autoScale == "true" || autoScale == "True"){
       return true;
    }else{
