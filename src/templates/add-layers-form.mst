@@ -144,11 +144,11 @@
    <div class="layers-form-right">
       {{#each tags}}
          {{#if @first}}
-            <label data-field="{{@key}}"">{{title_case @key}} (comma seperated values):</label></br>
+            <label data-field="{{@key}}"">{{category_case @key}} (comma seperated values):</label></br>
             <textarea data-tag=true data-field="{{@key}}" data-id="{{../../list_id}}" >{{#each this}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</textarea>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="indicator-type"></span>{{/if_equals}}<br/>
          {{/if}}
          {{#unless @first}}
-            <label data-field="{{@key}}">{{title_case @key}}:</label></br>
+            <label data-field="{{@key}}">{{category_case @key}}:</label></br>
             <input data-tag=true type="text" value="{{this}}" data-field="{{@key}}" data-id="{{../../list_id}}"/>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="{{@key}}"></span>{{/if_equals}}</br>
          {{/unless}}
 
