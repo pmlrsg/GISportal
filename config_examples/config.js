@@ -14,7 +14,7 @@
 gisportal.config = {
    analytics:{
       active:false,
-      UATrackingId: 'UA-52647976-2', // Replace with real tracking ID if enabled
+      UATrackingId: 'UATrackingId', // Replace with real tracking ID if enabled
       customDefinitions: {
          "cd1": 'indicator_name',
          "cd2": 'indicator_id',
