@@ -121,11 +121,6 @@ button, .btn{
 
 }
 
-.brand:active,
-.brand.loading {
-   background-color: $button-border;
-}
-
 .brand.loading  {
    background-image: url('../img/ajax-loader-green.gif');
    background-repeat: no-repeat;
