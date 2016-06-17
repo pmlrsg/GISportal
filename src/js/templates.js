@@ -144,8 +144,12 @@ Handlebars.registerHelper('dotdotdot', function(str) {
    return str;
 });
 
-Handlebars.registerHelper('title_case', function(str) {
-   return str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+Handlebars.registerHelper('category_case', function(str) {
+   var nice_cat;
+   if(gisportal.config.catDisplayNames){
+      nice_cat = gisportal.config.catDisplayNames[str];
+   }
+   return nice_cat || str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 });
 
 Handlebars.registerHelper('tags_list', function(obj, key) {

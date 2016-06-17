@@ -9,6 +9,7 @@ GLOBAL.config['DOMAIN_NAME'] = {
       }
    },
    admins:['ADMINISTRATOR'],
+   cssFile:"GISportal",
    email:{
       method:"mailgun", //"mailgun", "gmail", "other"
       //MAILGUN

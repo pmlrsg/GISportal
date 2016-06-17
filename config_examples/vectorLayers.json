@@ -599,7 +599,7 @@
                   },
                   "ignoredParams" : ["the_geom"],
                   "defaultProperty" : ["Heritage_Ca"],
-		  "defaultProperties" : [["Heritage_Ca", "Catagory"],["Name", "Name"],["Grade", "Grade"]],
+		            "defaultProperties" : [["Heritage_Ca", "Catagory"],["Name", "Name"],["Grade", "Grade"]],
                   "moreInformation" : true 
 
                }

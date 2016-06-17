@@ -777,7 +777,9 @@ router.get('/app/settings/get_share', function(req, res){
 router.all('/app/settings/get_markdown_metadata', function(req, res) {
    var markdown = require( "node-markdown" ).Markdown;
    var domain = utils.getDomainName(req);
-   var tags = req.body; // Gets the data (tags)
+   var data = req.body; // Gets the data
+   var tags = data.tags;
+   var order = data.order;
    var html = "";
    var markdown_folder_path = path.join(MASTER_CONFIG_PATH, domain, "markdown");
    var markdown_file_path;
@@ -804,10 +806,14 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
       }
    }
 
-   addMarkdown("providerTag", true);
-   addMarkdown("niceName", true);
-   addMarkdown("model", true);
-   for(var tag in tags){
+   var tag;
+   if(order){
+      for(tag in order){
+         addMarkdown(order[tag], true);
+      }
+   }
+   
+   for(tag in tags){
       addMarkdown(tag, false);
    }
    res.send(html);
