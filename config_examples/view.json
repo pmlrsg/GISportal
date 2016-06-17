@@ -29,7 +29,7 @@
 	"_comment":"Set to true if you would like to prevent the user from zooming in and out of the map",
    "noZoom": true,
 
-   "_comment"":This refines the layers you want to list",
+   "_comment":"This refines the layers you want to list",
    "layerListFilter": [
       {
          "tags":{
