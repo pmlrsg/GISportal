@@ -1333,6 +1333,10 @@ gisportal.main = function() {
    }
    if(gisportal.config.logoImage){
       $('.footer-logo').attr({"src": gisportal.config.logoImage}).parent().toggleClass('hidden', false);
+      // Makes sure that the logo image is centered between the buttons properly
+      var left = parseInt($('.about-button').css('width')) + 5;
+      var right = parseInt($('#share-map').css('width')) + 5;
+      $('.footer-logo').css({"max-width": "calc(100% - " + (left + right) + "px)", "margin-left": left + "px", "margin-right": right + "px"});
    }
 
    if( gisportal.config.siteMode == "production" ) {
