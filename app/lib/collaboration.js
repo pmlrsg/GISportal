@@ -225,7 +225,6 @@ collaboration.init = function(io, app, config) {
                            port: email_config.smtp_port, 
                            authentication: email_config.smtp_auth
                         });
-                        console.log(mail_system);
                      }
                   }
                   if(mail_system){
@@ -550,14 +549,23 @@ invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mail_system, m
      subject: pageTitle + ' Collaboration Invitation',
      text: 'You have been invited to join a portal collaboration session.\n\nPlease go to: ' + roomURL + ' to join the room.'
    };
-   for(var person in invitees){
-      data.to = invitees[person];
-      mail_system.send(data, function (error, response) {
-         if(error){
-            console.log("Error: " + error);
-         }else{
-            console.log("Message sent: " + response.message);
+
+   client.lrange("logged_in_users", 0, -1, function(err, list){
+      for(var person in invitees){
+         data.to = invitees[person];
+         mail_system.send(data, function (error, response) {
+            if(error){
+               console.log("Error: " + error);
+            }else{
+               console.log("Email " + response.message);
+            }
+         });
+         for(var index in list){
+            if(data.to == list[index]){
+               console.log("They are available");
+            }
+            
          }
-      });
-   }
+      }
+   });
 };

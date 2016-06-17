@@ -2,6 +2,7 @@ var utils = {}
 var fs = require("fs");
 var path = require("path");
 var bunyan = require('bunyan');
+var client = require('redis').createClient();
 
 module.exports = utils;
 
@@ -63,3 +64,11 @@ utils.handleError = function(err, res){
    }catch(e){
    }
 }
+
+utils.loginEmail = function(email){
+   client.rpush(["logged_in_users", email], function(err) {});
+}
+
+utils.logoutEmail = function(email){
+   client.lrem("logged_in_users", 0, email, function(err) {});
+};
