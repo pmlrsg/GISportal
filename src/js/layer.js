@@ -261,7 +261,7 @@ gisportal.layer = function( options ) {
          return false;
       }
       layer.clearScalebarTimeout();
-      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
+      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]');
       apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
       // THIS IS IMPORTANT, it makes sure the animation is reset
       setTimeout(function(){

@@ -147,7 +147,7 @@ Handlebars.registerHelper('dotdotdot', function(str) {
 Handlebars.registerHelper('category_case', function(str) {
    var nice_cat;
    if(gisportal.config.catDisplayNames){
-      nice_cat = gisportal.config.catDisplayNames[str]
+      nice_cat = gisportal.config.catDisplayNames[str];
    }
    return nice_cat || str.replace(/_/g, " ").replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 });

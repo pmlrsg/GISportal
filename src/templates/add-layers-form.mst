@@ -1,5 +1,5 @@
 <div class="form-header">
-   <p>{{original_name}} &nbsp; ({{list_id}}/{{total_pages}})</p>
+   <p>{{original_name}} &nbsp; ({{list_id}}/{{total_pages}})<a href="https://github.com/pmlrsg/GISportal/wiki/Admin-Panel" target="_blank" title="Help"><span class="icon-bubble-ask-2 js-layer-form-help btn right-icon icon-btn"></span></a></p>
 </div>
 <div class="js-layers-form-validation form-validation-div alert-danger hidden"></div>
 <form class="layers-form">
@@ -37,7 +37,7 @@
                <input type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/>
             </label>
             {{#if_equals list_id "1"}}
-               <span title="Add Scale Points to all" class="scale-to-all-layers icon-clipboard-edit btn icon-btn btn-mini"></span>
+               <span title="Add Scalebar Information To All" class="scale-to-all-layers icon-clipboard-edit btn icon-btn btn-mini"></span>
             {{/if_equals}}
             </br>
          </div>
@@ -144,7 +144,7 @@
    <div class="layers-form-right">
       {{#each tags}}
          {{#if @first}}
-            <label data-field="{{@key}}"">{{category_case @key}} (comma seperated values):</label></br>
+            <label data-field="{{@key}}"">{{category_case @key}} (comma separated values):</label></br>
             <textarea data-tag=true data-field="{{@key}}" data-id="{{../../list_id}}" >{{#each this}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</textarea>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="indicator-type"></span>{{/if_equals}}<br/>
          {{/if}}
          {{#unless @first}}

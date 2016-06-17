@@ -313,6 +313,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // The keydown event listener that is added allows for the user to close the form by pressing the 'Esc' key, and to navigate through layers by pressing the arrow keys.
    $(document).on( 'keydown', function ( e ) {
       if(document.activeElement.nodeName == "BODY"){
+         var current_page = gisportal.addLayersForm.form_info.current_page;
          switch(e.keyCode){
             case 27:
                if(!$( '.js-user-feedback-popup' ).hasClass('hidden')){
