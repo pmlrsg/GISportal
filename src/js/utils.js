@@ -466,11 +466,11 @@ $.fn.keepOnScreen = function(){
    if(bounds.top < 0){
       element.style.top = 0 + "px";
    }
-   if(bounds.bottom > window.innerHeight){
-      element.style.top = parseInt(window.innerHeight - bounds.height) + "px";
+   if(bounds.right > window.innerWidth * 0.99){
+      element.style.left = parseInt((window.innerWidth * 0.99) - bounds.width) + "px";
    }
-   if(bounds.right > window.innerWidth){
-      element.style.left = parseInt(window.innerWidth - bounds.width) + "px";
+   if(bounds.bottom > window.innerHeight * 0.99){
+      element.style.top = parseInt((window.innerHeight * 0.99) - bounds.height) + "px";
    }
 };
 

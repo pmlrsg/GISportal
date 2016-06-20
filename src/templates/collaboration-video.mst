@@ -4,4 +4,7 @@
 
 <p>People With Audio/Video Enabled:</p>
 
-<div class="video-people-list"></div>
+<div class="video-people-list">
+	<div class="video-people-me"></div>
+	<div class="video-people-them"></div>
+</div>
