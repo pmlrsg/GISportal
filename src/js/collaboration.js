@@ -2038,6 +2038,7 @@ collaboration.buildMembersList = function(data) {
    // Because there are two panels
    var me_selectors = [];
 
+   $('#collab-videoPanel .video-people-list').html("");
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -2082,7 +2083,8 @@ collaboration.buildMembersList = function(data) {
          link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
          if(my_data && my_data.dataEnabled && $('#collab-videoPanel .video-people-me').find('.js-toggle-microphone').length <= 0){
             var clone = $(this).clone();
-            $('#collab-videoPanel .video-people-me').append(clone.prepend(link));
+            $('#collab-videoPanel .video-people-list').append(clone.prepend(link));
+            me_selectors.push(clone);
          }
          on_class = "off";
          av_title = "Enable Webcam";
@@ -2091,9 +2093,7 @@ collaboration.buildMembersList = function(data) {
             av_title = "Disable Webcam";
          }
          link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
-         if($('#collab-videoPanel .video-people-me').find('.js-toggle-webcam').length <= 0){
-            $('#collab-videoPanel .video-people-me').find('.person[data-id="' + id + '"]').prepend(link);
-         }
+         $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').prepend(link);
          $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
@@ -2105,9 +2105,9 @@ collaboration.buildMembersList = function(data) {
             }
          }
       }else{
-         if(this_person && this_person.dataEnabled && $('#collab-videoPanel .video-people-them').find('div[data-id="' + this_person.id + '"]').length <= 0){
+         if(this_person && this_person.dataEnabled){
             link = $('<span class="icon-call-1 js-webrtc-call collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
-            $('#collab-videoPanel .video-people-them').append($(this).clone().prepend(link));
+            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link));
             if(!my_data || !my_data.dataEnabled || webRTC.isStarted){
                link.toggleClass('hidden', true);
             }
@@ -2140,6 +2140,8 @@ collaboration.buildMembersList = function(data) {
          var parent_selector = me_selectors[i].parent();
          if(parent_selector.hasClass('panel-container-solid-backdrop')){
             me_selectors[i].detach().insertAfter(parent_selector.children('p'));
+         }else{
+            me_selectors[i].detach().prependTo('.video-people-list');
          }
       }
    }
