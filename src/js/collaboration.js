@@ -325,9 +325,9 @@ collaboration.initSession = function() {
          });
          
          socket.on('room.created', function(data) {
-		  		var roomId = data.roomId;
+            var roomId = data.roomId;
             console.log('Room created: '+ data.roomId);
-		  		collaboration.roomId = data.roomId;
+            collaboration.roomId = data.roomId;
             
             collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
             $('.collab-overlay').toggleClass('hidden', true);
@@ -338,7 +338,24 @@ collaboration.initSession = function() {
 
             // load the room template
             collaboration.buildMembersList(data);
-		  	});
+         });
+         
+         socket.on('room.invite', function(data) {
+            var domain = data.domain;
+            if(domain != gisportal.domainName){
+               return false;
+            }
+            var rendered = gisportal.templates['collaboration-invite'](data);
+            gisportal.showModalMessage(rendered, 20000); // user has 20 seconds to answer
+            $('.js-accept-invite').click(function() { 
+               // hide the message
+               gisportal.hideModalMessage();
+               collaboration.joinRoom($(this).data("room"));
+            });
+            $('.js-reject-invite').click(function() { 
+               gisportal.hideModalMessage();
+            });
+         });
 
          socket.on('room.member-joined', function(data) {
             // is this confirmation that I have joined?
@@ -2205,7 +2222,7 @@ collaboration.userAuthorised = function() {
    $('.js-collaboration-holder').html('');
    $('#collaborationPanel .js-collaboration-holder').html(rendered); 
 	
-   //collaboration.initSession();
+   collaboration.initSession();
    if(gisportal.config.collaborationFeatures.enabled){
       collaboration.initDOM();
    }

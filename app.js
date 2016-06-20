@@ -10,16 +10,11 @@ var session = require('express-session');
 var jade = require("jade");
 var path = require('path');
 var fs = require("fs");
-var client = require('redis').createClient();
 
 
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
 
-// Makes sure that the list of logged in users is always removed when the service restarts.
-try{
-   client.ltrim("logged_in_users", 0, -1);
-}catch(err){};
 
 // Express setup
 var app = express();

@@ -24,6 +24,7 @@ collaboration.init = function(io, app, config) {
          });
       }
    });
+   client.ltrim("people", 1, 0);
 
    io.set('authorization', function (handshakeData, accept) {
       // check if there's a cookie header
@@ -81,12 +82,13 @@ collaboration.init = function(io, app, config) {
                      if(Jimp.distance(image1, image2) === 0){
                         user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
                         var roomId = socket.room;
+                        var person;
                         client.get(roomId, function(err, obj) {
                            if(!obj){
-                              return;
+                              return false;
                            }
                            var room = JSON.parse(obj);
-                           for(var person in room.people){
+                           for(person in room.people){
                               var this_person = room.people[person];
                               if(this_person.email == user.email){
                                  this_person.image = user.image;
@@ -105,6 +107,18 @@ collaboration.init = function(io, app, config) {
                   }
                });
             }
+         });
+         client.lrange("people", 0, -1, function(err, obj) {
+            if(!obj){
+               return false;
+            }
+            for(person in obj){
+               var this_person = JSON.parse(obj[person]);
+               if(this_person.email == user.email && this_person.id == sid){
+                  return false;
+               }
+            }
+            client.rpush(["people", JSON.stringify({"email": user.email, "id": socket.id})], function(err) {});
          });
          if(crypto)
          
@@ -227,9 +241,7 @@ collaboration.init = function(io, app, config) {
                         });
                      }
                   }
-                  if(mail_system){
-                     invitePeopleToRoom(invitees, domain_name + "?room=" + socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method );
-                  }
+                  invitePeopleToRoom(invitees, domain_name, socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method, io);
                });
             }
          });
@@ -543,28 +555,36 @@ collaboration.init = function(io, app, config) {
    });
 };
 
-invitePeopleToRoom = function(invitees, roomURL, pageTitle, user, mail_system, mail_system_name){
+invitePeopleToRoom = function(invitees, domain, roomId, pageTitle, user, mail_system, mail_system_name, io){
+   roomURL = domain + "?room=" + roomId;
    var data = {
      from: pageTitle + ' on behalf of ' + user.name + ' <' + user.email + '>',
      subject: pageTitle + ' Collaboration Invitation',
      text: 'You have been invited to join a portal collaboration session.\n\nPlease go to: ' + roomURL + ' to join the room.'
    };
-
-   client.lrange("logged_in_users", 0, -1, function(err, list){
+   client.lrange("people", 0, -1, function(err, list){
       for(var person in invitees){
          data.to = invitees[person];
-         mail_system.send(data, function (error, response) {
-            if(error){
-               console.log("Error: " + error);
-            }else{
-               console.log("Email " + response.message);
-            }
-         });
+         if(mail_system){
+            mail_system.send(data, function (error, response) {
+               if(error){
+                  console.log("Error: " + error);
+               }else{
+                  console.log("Email " + response.message);
+               }
+            });
+         }
          for(var index in list){
-            if(data.to == list[index]){
-               console.log("They are available");
+            var info = JSON.parse(list[index]);
+            if(data.to == info.email){
+               if(io.sockets.connected[info.id]){
+                  console.log(io.sockets.connected[info.id].handshake.headers.referer)
+                  console.log(domain)
+                  if(io.sockets.connected[info.id].handshake.headers.referer == domain){
+                     io.sockets.connected[info.id].emit('room.invite', {"domain": domain, "roomId": roomId, "from": user.name});
+                  }
+               }
             }
-            
          }
       }
    });
