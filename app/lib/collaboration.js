@@ -224,24 +224,26 @@ collaboration.init = function(io, app, config) {
                   var domain_name = socket.handshake.headers.referer.split('?')[0];
                   var email_config = config[utils.nicifyDomain(domain_name)].email;
                   var mail_system;
-                  if(email_config.method == "mailgun"){
-                     if(email_config.mailgun_api_key && email_config.mailgun_domain){
-                        mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain}).messages();
+                  if(email_config){
+                     if(email_config.method == "mailgun"){
+                        if(email_config.mailgun_api_key && email_config.mailgun_domain){
+                           mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain}).messages();
+                        }
+                     }else if(email_config.method == "smtp"){
+                        if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
+                           mail_system = email.server.connect({
+                              user: email_config.smtp_email, 
+                              password: email_config.smtp_pass, 
+                              host: email_config.smtp_host, 
+                              domain: email_config.smtp_host, 
+                              ssl: email_config.smtp_ssl, 
+                              port: email_config.smtp_port, 
+                              authentication: email_config.smtp_auth
+                           });
+                        }
                      }
-                  }else if(email_config.method == "smtp"){
-                     if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
-                        mail_system = email.server.connect({
-                           user: email_config.smtp_email, 
-                           password: email_config.smtp_pass, 
-                           host: email_config.smtp_host, 
-                           domain: email_config.smtp_host, 
-                           ssl: email_config.smtp_ssl, 
-                           port: email_config.smtp_port, 
-                           authentication: email_config.smtp_auth
-                        });
-                     }
+                     invitePeopleToRoom(invitees, domain_name, socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method, io);
                   }
-                  invitePeopleToRoom(invitees, domain_name, socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method, io);
                });
             }
          });
