@@ -101,11 +101,21 @@ webRTC.messageCallback = function(data) {
       if(data.params.peerId == socket.io.engine.id){
          for_me = true;
       }
-      if (!webRTC.isInitiator && !webRTC.isStarted) {
+      if(for_me && (webRTC.isStarted || !$('.js-modal-message-popup').hasClass('hidden'))){
+         sendMessage({
+         type: 'callee_busy',
+         sender: data.sender
+      });
+         return false;
+      }
+      if (!webRTC.isInitiator && !webRTC.isStarted && for_me) {
          maybeStart();
       }
-      webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+      if(for_me){
+         webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+      }
       if (!webRTC.isInitiator && for_me) {
+         webRTC.peerId = data.socketId;
          acceptIncomingCall(data.sender_name);
       }
    } 
@@ -124,8 +134,12 @@ webRTC.messageCallback = function(data) {
       webRTC.peerConn.addIceCandidate(candidate);
    } 
 
+   // This makes sure that the call is only ended or rejecteed if it is meant for this user
+   if(data.socketId != webRTC.peerId){
+      return false;
+   }
    // OTHER END HANGS UP
-   if (message === 'bye' && webRTC.isStarted) {
+   if (message === 'bye' && (webRTC.isStarted || !$('.js-modal-message-popup').hasClass('hidden'))) {
       handleRemoteHangup('Call Ended');
    }
 
@@ -137,6 +151,11 @@ webRTC.messageCallback = function(data) {
    // OTHER END DOESN'T ANSWER
    if (message === 'no_answer' && webRTC.isStarted) {
       handleRemoteHangup('No Answer');
+   }
+
+   // OTHER END is busy
+   if (message.type === 'callee_busy' && webRTC.isStarted && gisportal.user.info.email == message.sender) {
+      handleRemoteHangup('User Busy');
    }
 };
 
@@ -347,6 +366,7 @@ function hangup() {
    if(webRTC.isStarted){
       gisportal.showModalMessage('Call ended');
       webRTC.stop();
+      webRTC.isInitiator = false;
       sendMessage('bye');
       $('.js-webrtc-call').toggleClass('hidden', false);
    }
@@ -358,7 +378,6 @@ function handleRemoteHangup(message) {
    webRTC.stop();
    webRTC.isInitiator = false;
    $('.js-webrtc-call').toggleClass('hidden', false);
-   webRTC.isChannelReady = false;
 }
 
 webRTC.stop = function() {

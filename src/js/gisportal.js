@@ -1819,6 +1819,7 @@ gisportal.showModalMessage = function(html, timeout, answerTimeout) {
    target.html(html);
    holder.toggleClass('hidden', false);
    gisportal.modalTimeout = setTimeout(function() {
+      gisportal.hideModalMessage();
       holder.toggleClass('hidden', true);
       if(answerTimeout){
          doNoAnswer();
@@ -1832,6 +1833,9 @@ gisportal.hideModalMessage = function() {
 
    target.html("");
    holder.toggleClass('hidden', true);
+   if(gisportal.modalTimeout){
+      clearTimeout(gisportal.modalTimeout);
+   }
 };
 
 // This function gets a list of all the available tags
