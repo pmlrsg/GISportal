@@ -1,7 +1,11 @@
-<div class="collaboration-actions">
-   <button class="js-toggle-rtc brand secondary extra-small gray"><span class="icon-webcam"></span><span class="btn-value">{{#if AVEnabled}}Disable{{else}}Enable{{/if}} Audio/Video</span></button>
-</div>
+{{#unless insecure}}
+	<div class="collaboration-actions">
+	   <button class="js-toggle-rtc brand secondary extra-small gray"><span class="icon-webcam"></span><span class="btn-value">Enable Audio/Video</span></button>
+	</div>
 
-<p>People With Audio/Video Enabled:</p>
+	<p>People With Audio/Video Enabled:</p>
 
-<div class="video-people-list"></div>
+	<div class="video-people-list"></div>
+{{else}}
+	<p>Video is not available on insecure origins.</p>
+{{/unless}}
