@@ -98,6 +98,11 @@ gisportal.view.loadView = function(view_name){
          if(data.layerLoadFilter){
             gisportal.configurePanel.filterLayersLoad(data.layerLoadFilter, data.layerListFilter);
          }
+
+         if(data.date){
+            var date = new Date(data.date);
+            gisportal.timeline.setDate(date);
+         }
          $('.add-wms-form').toggleClass('hidden', true);
       },
       error: function(err, reason) {
