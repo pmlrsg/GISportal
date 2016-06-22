@@ -256,7 +256,7 @@ gisportal.layer = function( options ) {
    };
 
    this.setScalebarTimeout = function(){
-      var layer = gisportal.layers[this.id];
+      var layer = this;
       if(layer.resetting){
          return false;
       }
