@@ -261,7 +261,7 @@ gisportal.layer = function( options ) {
          return false;
       }
       layer.clearScalebarTimeout();
-      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]')
+      var apply_changes = $('.js-apply-changes[data-id="' + layer.id + '"]');
       apply_changes.toggleClass('hidden', false).removeClass('progress-btn');
       // THIS IS IMPORTANT, it makes sure the animation is reset
       setTimeout(function(){
@@ -574,7 +574,7 @@ gisportal.layer = function( options ) {
       if(this.type == 'opLayers') {    
 
          var style = this.style;
-         if(this.defaultStyle){
+         if(!style && this.defaultStyle){
             for(var i in this.styles){
                var this_style = this.styles[i];
                if(this_style.Name == this.defaultStyle){
@@ -675,7 +675,7 @@ gisportal.layer = function( options ) {
  */
 gisportal.getAutoScaleFromString = function(autoScale){
    if(typeof(autoScale) == "undefined" || autoScale == "default"){
-      return gisportal.config.autoScale;
+      return Boolean(gisportal.config.autoScale);
    }else if(autoScale == "true" || autoScale == "True"){
       return true;
    }else{

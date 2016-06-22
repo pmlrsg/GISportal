@@ -700,7 +700,6 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
    var layer = gisportal.layers[id];
    
    var onMetadata = function(){
-      //console.log("inside on metadata");
       var indicator = gisportal.layers[id];
       if (indicator.elevationCache && indicator.elevationCache.length > 0) {
          indicator.hasElevation = true;
@@ -746,7 +745,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       if($('#tab-' + indicator.id + '-colorbands').length > 0){
          $('#tab-' + indicator.id + '-colorbands').noUiSlider({
-            start: [ indicator.colorbands || gisportal.config.colorbands ],
+            start: [ gisportal.layers[indicator.id].colorbands || gisportal.config.colorbands ],
             margin: 20,
             connect: "lower",
             range: {
@@ -770,7 +769,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       
       function setColorbandsValue(value) {
          $(this).val(parseInt(value));
-         indicator.colorbands = parseInt(value);
+         gisportal.layers[indicator.id].colorbands = parseInt(value);
       }
 
       $('#tab-' + indicator.id + '-opacity').on('slide', function() {
@@ -784,7 +783,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          var colorbands = $(this).val();
 
          gisportal.events.trigger('scalebar.colorbands', indicator.id, colorbands);
-         indicator.setScalebarTimeout();
+         gisportal.layers[indicator.id].setScalebarTimeout();
       });
 
       var colorbands_keydown_timeout;
@@ -817,8 +816,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-elevation').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
-               indicator.selectedElevation = data.selectedData.value;
-               indicator.setScalebarTimeout();  
+               gisportal.layers[indicator.id].selectedElevation = data.selectedData.value;
+               gisportal.layers[indicator.id].setScalebarTimeout();  
             }
          }
       });
@@ -826,8 +825,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-layer-style').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
-               indicator.style = data.selectedData.value;
-               indicator.setScalebarTimeout();
+               gisportal.layers[indicator.id].style = data.selectedData.value;
+               gisportal.layers[indicator.id].setScalebarTimeout();
             }
          }
       });
@@ -838,8 +837,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                if(data.selectedData.value == "0"){
                   data.selectedData.value = null;
                }
-               indicator.aboveMaxColor = data.selectedData.value;
-               indicator.setScalebarTimeout();
+               gisportal.layers[indicator.id].aboveMaxColor = data.selectedData.value;
+               gisportal.layers[indicator.id].setScalebarTimeout();
             }
          }
       });
@@ -850,8 +849,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                if(data.selectedData.value == "0"){
                   data.selectedData.value = null;
                }
-               indicator.belowMinColor = data.selectedData.value;
-               indicator.setScalebarTimeout();
+               gisportal.layers[indicator.id].belowMinColor = data.selectedData.value;
+               gisportal.layers[indicator.id].setScalebarTimeout();
             }
          }
       });

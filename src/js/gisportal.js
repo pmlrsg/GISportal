@@ -1312,6 +1312,9 @@ gisportal.main = function() {
          return;
       }
    }
+   if(!gisportal.config.cacheTimeout){
+      gisportal.config.cacheTimeout = 60;
+   }
    $('title').html(gisportal.config.pageTitle || "GIS portal");
    $('#about').html(gisportal.config.aboutText || "About");
    if(gisportal.config.splashImage){
@@ -1621,10 +1624,6 @@ gisportal.validateBrowser = function(){
    if( gisportal.config.browserRestristion == void(0) )
       return true;
 
-   var level = gisportal.config.browserRestristion;
-   if( level == "none" )
-      return true;
-
    var requirements = [ 'svg', 'boxsizing', 'csscalc','inlinesvg' ];
 
    var valid = true;
@@ -1641,8 +1640,6 @@ gisportal.validateBrowser = function(){
       $('.js-browse-not-compatible').show();
       $('.js-start').hide();
       return false;
-   }else{
-      throw new Error( 'Invalid config.browserRestristion value "' + gisportal.config.browserRestristion + '"' );
    }
 
 };

@@ -24,7 +24,7 @@ var app = express();
 // Set the settings
 found = false;
 try{
-   require('./config/config-server.js');
+   require('./config/global-config-server.js');
    found = true;
 }catch(e){};
 var site_setings_path = path.join(__dirname, "config/site_settings");
@@ -32,7 +32,6 @@ if(!utils.directoryExists(site_setings_path)){
    var layers_path = path.join(site_setings_path, "layers");
    utils.mkdirpSync(site_setings_path);
    utils.mkdirpSync(layers_path);
-   fs.writeFileSync('./config/base_config.js', fs.readFileSync('./config_examples/base_config.js'));
 }
 var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
 site_setings_list.forEach(function(foldername){
@@ -49,14 +48,14 @@ site_setings_list.forEach(function(foldername){
 });
 if(!found) {
    try{
-      fs.writeFileSync('./config/config-server.js', fs.readFileSync('./config_examples/config-server.js'));
-      require('./config/config-server.js');
+      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
+      require('./config/global-config-server.js');
    }catch(e){
       console.log('There doesn\'t appear to be a server config settings file in place');
       console.log('');
       console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
       console.log('');
-      console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/config-server.js '+ __dirname +'/config/config-server.js');
+      console.log('    mkdir '+ __dirname +'/config; cp '+ __dirname +'/config_examples/global-config-server.js '+ __dirname +'/config/global-config-server.js');
       console.log('');
       console.log('Exiting application, bye   o/');
       console.log('');
@@ -125,8 +124,8 @@ app.use('/:subfolder', plotting);
 
 // Start listening...
 server = http.createServer(app)
-server.listen(config.app.port, function() {
-	console.log('GISportal server listening on port %d', config.app.port)
+server.listen(config.appPort, function() {
+	console.log('GISportal server listening on port %d', config.appPort)
 });
 io = io.listen(server);
 

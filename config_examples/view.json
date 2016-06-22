@@ -31,34 +31,34 @@
 
    "_comment":"This refines the layers you want to list",
    "layerListFilter": [
-   {
-      "tags":{
-         "data_provider":"CEH",
-         "interval":"Daily"
+      {
+         "tags":{
+            "data_provider":"CEH",
+            "interval":"Daily"
+         }
+      },
+      {
+         "tags":{
+            "data_provider":"CNRS"
+         }
       }
-   },
-   {
-      "tags":{
-         "data_provider":"CNRS"
-      }
-   }
    ],
 
    "_comment":"This refines the layers you want to load (Know that if you have a list filter the load filter will have to match layers in the filtered)",
    "layerLoadFilter": [
-   {
-      "tags":{
-         "data_provider":"CEH",
-         "interval":"Daily"
+      {
+         "tags":{
+            "data_provider":"CEH",
+            "interval":"Daily"
+         },
+         "urlName":"SWnet"
       },
-      "urlName":"SWnet"
-   },
-   {
-      "tags":{
-         "data_provider":"CNRS",
-         "interval":"Daily"
-      },
-      "urlName":"SWnet"
-   }
+      {
+         "tags":{
+            "data_provider":"CNRS",
+            "interval":"Daily"
+         },
+         "urlName":"SWnet"
+      }
    ]
 }

@@ -8,5 +8,6 @@ GLOBAL.config['DOMAIN_NAME'] = {
          prompt: 'select_account'
       }
    },
-   admins:['ADMINISTRATOR']
+   admins:['ADMINISTRATOR'],
+   cssFile:"GISportal"
 }
