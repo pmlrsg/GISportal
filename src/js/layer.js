@@ -256,7 +256,7 @@ gisportal.layer = function( options ) {
    };
 
    this.setScalebarTimeout = function(){
-      var layer = this;
+      var layer = gisportal.layers[this.id];
       if(layer.resetting){
          return false;
       }
@@ -574,7 +574,7 @@ gisportal.layer = function( options ) {
       if(this.type == 'opLayers') {    
 
          var style = this.style;
-         if(this.defaultStyle){
+         if(!style && this.defaultStyle){
             for(var i in this.styles){
                var this_style = this.styles[i];
                if(this_style.Name == this.defaultStyle){
