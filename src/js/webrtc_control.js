@@ -44,6 +44,7 @@ webRTC.deinitMedia = function() {
    hangup();
    sendMessage('media.disabled');
    webRTC.isChannelReady = false;
+   $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
    webRTC.stop();
 };
 
@@ -175,13 +176,18 @@ function handleUserMedia(stream) {
    attachMediaStream(localVideo, stream);
    webRTC.isChannelReady = true;
    console.log('Adding local stream.');
-   sendMessage('media.enabled');         // expand on this to tell others of the users video and/or audio availability
+   sendMessage('media.enabled');
+   $('.js-toggle-rtc').find('.btn-value').text('Disable Audio/Video');
    if (webRTC.isInitiator) {
       maybeStart();                       // probably don't need this here
    }
 }
 
 function handleUserMediaError(error) {
+   webRTC.localStream = undefined;
+   webRTC.isChannelReady = false;
+   sendMessage('media.disabled');
+   $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
    console.log('getUserMedia error: ', error);
 }
 

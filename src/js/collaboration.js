@@ -144,11 +144,9 @@ collaboration.initDOM = function() {
       var enabled = webRTC.isChannelReady || false;
       if (!enabled) {
          webRTC.initMedia();
-         $(this).find('.btn-value').text('Disable Audio/Video');
       } else {
          webRTC.deinitMedia();
          $('.js-webrtc-call').toggleClass('hidden', true);
-         $(this).find('.btn-value').text('Enable Audio/Video');
       }
    });
 
