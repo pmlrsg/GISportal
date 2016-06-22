@@ -11,6 +11,9 @@
 	"_comment":"The bounds of the area you would like the view to zoom to (Must be in degrees)",
    "bounds": [-10.723,49.219,2.637,62.402],
 
+   "_comment":"The date you would like the view to load",
+   "date": "2009-11-22",
+
    "_comment":"Would you like to display lat/lon graticules?",
    "graticules": false,
 
