@@ -378,9 +378,14 @@ gisportal.TimeLine.prototype.redraw = function() {
       .attr('width', 10).attr('height', self.height - 2)
       .attr('rx', 6).attr('ry', 6);
   
-   this.drawLabels(); 
-      
-   //-------------------------------------------------------------------------- 
+   this.drawLabels();
+
+   if(self.getDate() < moment(self.minDate).startOf('day').toDate()){
+      self.setDate(self.minDate);
+   }
+   if(self.getDate() > moment(self.maxDate).startOf('day').toDate()){
+      self.setDate(self.maxDate);
+   }
 };
 
 // Re-calculate the dynamic widget height
@@ -572,7 +577,6 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
    gisportal.filterLayersByDate(date);
    self.showDate(date);
-   $('.js-current-date').val(moment(date).format('YYYY-MM-DD')).trigger('change');
    gisportal.timeline.redraw();
 
    gisportal.events.trigger('date.selected', date);
