@@ -76,15 +76,10 @@ if [ $domain != "/" ] && [ $auth == "y" ]
       sed s/ADMINISTRATOR/$admin_email/ > config/site_settings/$nicedomain/config-server.js;
 fi
 
-
-if [ ! -e config/config-server.js ]
-	then
-		cp ./config_examples/config-server.js ./config/config-server.js;
-      cat config_examples/config-server.js | sed s/SECRET/$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)/ > config/config-server.js;
-fi
-if [ ! -e config/base_config.js ]
-	then
-		cp ./config_examples/base_config.js ./config/base_config.js;
+if [ ! -e config/global-config-server.js ]
+   then
+      cp ./config_examples/global-config-server.js ./config/global-config-server.js;
+      cat config_examples/global-config-server.js | sed s/SECRET/$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 150 | head -n 1)/ > config/global-config-server.js;
 fi
 
 echo "Adding the submodules from git"

@@ -11,10 +11,10 @@
 
 
 
-$.extend(gisportal.config, {
+gisportal.config = {
    analytics:{
       active:false,
-      UATrackingId: 'UA-52647976-2', // Replace with real tracking ID if enabled
+      UATrackingId: 'UATrackingId', // Replace with real tracking ID if enabled
       customDefinitions: {
          "cd1": 'indicator_name',
          "cd2": 'indicator_id',
@@ -101,5 +101,5 @@ $.extend(gisportal.config, {
 
    pageTitle: "GIS Portal", // The Page title to be shown in the browser. If blank the title will be "GIS Portal",
    splashImage: '../img/PML-MAP-2.jpg' // The image that you would like to be displayed on the splash page
-});
+};
 
