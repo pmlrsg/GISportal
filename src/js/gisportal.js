@@ -804,9 +804,11 @@ gisportal.initVectorLayers = function(data, opts) {
 gisportal.nonLayerDependent = function() {
    
    // Setup timeline, from timeline.js
+
+   var date = gisportal.utils.getURLParameter('date') || "1900-01-01T00:00:00Z";
    gisportal.timeline = new gisportal.TimeLine('timeline', {
       comment: "Sample timeline data",
-      selectedDate: new Date("1900-01-01T00:00:00Z"),
+      selectedDate: new Date(date),
       chartMargins: {
          top: 7,
          right: 0,
@@ -817,6 +819,8 @@ gisportal.nonLayerDependent = function() {
       barMargin: 2,
       timebars: [] 
    });
+   // Makes sure that the pikaday is set correctly
+   gisportal.timeline.setDate(new Date(date));
 };
 
 /*===========================================================================*/
