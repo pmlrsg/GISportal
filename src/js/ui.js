@@ -32,7 +32,7 @@ $(document).ready(function()  {
 
       gisportal.events.trigger('tab.select', layerId, tabName);
    });
-   $(window).resize(function(){
+   $(window).resize(function(e){
       if ($('.video-div').is('.ui-resizable')){
          // Makes sure that the videos are only resizable to just under the screen width
          var maxWidth = parseInt($(document).width()*0.48);
@@ -46,7 +46,7 @@ $(document).ready(function()  {
       if(!$('.main-collaboration-video').hasClass('hidden')){
          $('.main-collaboration-video').keepOnScreen();
       }
-      if(collaboration.active && socket && socket.io && socket.io.engine){
+      if(e.target == window && collaboration.active && socket && socket.io && socket.io.engine){
          collaboration._emit("window.resized", {id: socket.io.engine.id, mapSize: [this.innerWidth, this.innerHeight]}, force=true);
       }
    });
