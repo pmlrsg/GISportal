@@ -217,6 +217,11 @@ function maybeStart() {
          // show the videos and controls
          $('.collaboration-video').toggleClass('hidden', false);
          $('.local-display-div').toggleClass('hidden', !webRTC.hasVideo);
+         var hide = false;
+         if(webRTC.peerMedia){
+            hide = !webRTC.peerMedia.video;
+         }
+         $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
       }
    }
 }
@@ -288,6 +293,11 @@ function acceptIncomingCall(caller) {
       // show the videos and controls
       $('.collaboration-video').toggleClass('hidden', false);
       $('.local-display-div').toggleClass('hidden', !webRTC.hasVideo);
+      var hide = false;
+      if(webRTC.peerMedia){
+         hide = !webRTC.peerMedia.video;
+      }
+      $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
       // actually answer the call
       doAnswer();
    });
@@ -375,6 +385,7 @@ function handleRemoteStreamAdded(event) {
       hide = !webRTC.peerMedia.video;
    }
    $('.remote-video-div').toggleClass('hidden', hide);
+   $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
    attachMediaStream(remoteVideo, event.stream);
    remoteStream = event.stream;
    //  waitForRemoteVideo();

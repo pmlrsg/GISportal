@@ -2082,6 +2082,11 @@ collaboration.buildMembersList = function(data) {
             }else{
                webRTC.hasAudio = false;
             }
+            var hide = false;
+            if(webRTC.peerMedia){
+               hide = !webRTC.peerMedia.video;
+            }
+            $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
          }else{
             webRTC.hasAudio = webRTC.hasVideo = false;
          }
