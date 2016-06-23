@@ -4,6 +4,6 @@
    </div>
    <div class="local-video-controls video-controls hidden">
       <span class="icon-call-delete js-end-webrtc-call video-control btn off-btn" title="End Call"></span>
-      <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen"></span>
+      <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen" data-source="local"></span>
    </div>
 </div>

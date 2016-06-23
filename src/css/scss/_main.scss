@@ -84,6 +84,11 @@ button, .btn{
   background-color: $start-btn-background ;
 }
 
+.answer-call span,
+.reject-call span{
+   padding-right: 3px;
+}
+
 .answer-call  {
    background-color: #16970D ;
 }

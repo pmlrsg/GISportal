@@ -15,8 +15,8 @@
 
 {{#people}}
 <div data-id="{{id}}" class="person">
+   <img src="{{image}}" title="{{email}}" class="avatar-small pull-left"><p title="{{email}}">{{name}}</p>
    {{#presenter}}<div class="presenter" title="Presenter"></div>{{/presenter}}
    {{#diverged}}<div class="diverged" title="Diverged"></div>{{/diverged}}
-   <img src="{{image}}" title="{{email}}" class="avatar-small pull-left"><p title="{{email}}">{{name}}</p>
 </div>
 {{/people}}

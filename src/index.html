@@ -386,7 +386,7 @@
          </div>
          <div class="local-video-controls video-controls hidden">
             <span class="icon-call-delete js-end-webrtc-call video-control btn off-btn" title="End Call"></span>
-            <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen"></span>
+            <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen" data-source="local"></span>
          </div>
       </div>
       <div class="remote-display-div display-div">
@@ -394,8 +394,8 @@
             <video id="remoteVideo" autoplay fullscreen="false"></video>
          </div>
          <div class="remote-video-controls video-controls hidden">
-            <span class="icon-volume-medium-1 js-video-mute-toggle video-control btn" title="Mute"></span>
-            <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen"></span>
+            <span class="icon-microphone-2 js-video-mute-toggle video-control btn on-btn" title="Mute"></span>
+            <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen" data-source="remote"></span>
          </div>
       </div>
       <span class="icon-window-minimize btn collab-videos-minimize" title="Minimize"></span>

@@ -183,20 +183,25 @@ collaboration.initDOM = function() {
 };
 
 collaboration.addVideoActionListeners = function(){
+   $('.js-video-fullscreen').off('click');
+   $('.js-video-mute-toggle').off('click');
    $('.js-video-fullscreen').on('click', function(){
       var video = $(this).closest('.display-div').find('video');
+      if(video.length <= 0){
+         video = $('.' + $(this).data('source') + '-display-div').find('video');
+      }
       video.fullScreen();
    });
    $('.js-video-mute-toggle').on('click', function(){
-      var video = $(this).closest('.display-div').find('video');
+      var video = $('.remote-display-div').find('video');
       var muted = video.is('[muted]');
       if(muted){
          // Make sure this actually mutes and unmuted the videos
          video[0].removeAttribute('muted');
-         $(this).toggleClass("icon-volume-medium-1", true).toggleClass("icon-volume-mute-1", false).attr('title', "Mute");
+         $('.js-video-mute-toggle').toggleClass('off-btn', false).toggleClass('on-btn', true).attr('title', "Mute");
       }else{
          video[0].setAttribute('muted', true);
-         $(this).toggleClass("icon-volume-mute-1", true).toggleClass("icon-volume-medium-1", false).attr('title', "Un-mute");
+         $('.js-video-mute-toggle').toggleClass('off-btn', true).toggleClass('on-btn', false).attr('title', "Un-mute");
       }
    });
 };
@@ -2063,13 +2068,22 @@ collaboration.buildMembersList = function(data) {
          if(webRTC.peerConn && webRTC.peerConn.getLocalStreams()){
             localStreams = webRTC.peerConn.getLocalStreams()[0];
          }
-         var video, mic;
+         var video = mic = {};
          if(localStreams){
-            video = localStreams.getVideoTracks()[0];
-            mic = localStreams.getAudioTracks()[0];
+            if(localStreams.getVideoTracks()[0]){
+               video = localStreams.getVideoTracks()[0] || video;
+               webRTC.hasVideo = true;
+            }else{
+               webRTC.hasVideo = false;
+            }
+            if(localStreams.getAudioTracks()[0]){
+               mic = localStreams.getAudioTracks()[0] || mic;
+               webRTC.hasAudio = true;
+            }else{
+               webRTC.hasAudio = false;
+            }
          }else{
-            video = {};
-            mic = {};
+            webRTC.hasAudio = webRTC.hasVideo = false;
          }
          var on_class = "off";
          var av_title;
@@ -2091,7 +2105,8 @@ collaboration.buildMembersList = function(data) {
             av_title = "Disable Webcam";
          }
          link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
-         $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').prepend(link);
+         var call_link = $('<span class="icon-call-delete collab-btn js-end-webrtc-call btn pull-right collaboration-video off-btn" title="End Call"></span>');
+         $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').prepend(link).prepend(call_link);
          $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
          if(collaboration.role != 'presenter'){
             if(divergents.indexOf(id) >= 0){
@@ -2104,10 +2119,14 @@ collaboration.buildMembersList = function(data) {
          }
       }else{
          if(this_person && this_person.dataEnabled){
-            link = $('<span class="icon-call-1 js-webrtc-call collab-btn pull-right" title="Call ' + $(this).find('p').html() + '"></span>');
-            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link));
+            link = $('<span class="icon-call-1 js-webrtc-call collab-btn pull-right on-btn" title="Call ' + $(this).find('p').html() + '"></span>');
+            var mute_link = $('<span class="icon-microphone-2 js-video-mute-toggle collab-btn btn pull-right collaboration-video on-btn hidden" title="Mute"></span>');
+            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link).prepend(mute_link));
             if(!my_data || !my_data.dataEnabled || webRTC.isStarted){
                link.toggleClass('hidden', true);
+            }
+            if(webRTC.isStarted && webRTC.peerId == this_person.id){
+               mute_link.toggleClass('hidden', false);
             }
          }
       }
@@ -2182,6 +2201,12 @@ collaboration.buildMembersList = function(data) {
          button.toggleClass('off-btn', true).toggleClass('on-btn', false);
       }
    });
+
+   $('.js-end-webrtc-call').off('click');
+   $('.js-end-webrtc-call').on('click', function() { 
+      hangup();
+   });
+   collaboration.addVideoActionListeners();
 };
 
 collaboration.divergeAlert = function(){

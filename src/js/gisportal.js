@@ -1816,6 +1816,7 @@ gisportal.hideAllPopups = function() {
 };
 
 gisportal.showModalMessage = function(html, timeout, answerTimeout) {
+   gisportal.hideModalMessage();
    var t = parseInt(timeout) || 2000;
    var holder = $('.js-modal-message-popup');
    var target = $('.js-modal-message-html');
