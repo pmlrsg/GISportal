@@ -17,10 +17,10 @@ webRTC.initMedia = function() {
    var startTime;
    // Gets the two vieo elements
    webRTC.localVideo = function(){
-      return $('#localVideo')
+      return $('#localVideo');
    };
    webRTC.remoteVideo = function(){
-      return $('#remoteVideo')
+      return $('#remoteVideo');
    };
 
    webRTC.peerConfig = {

@@ -2041,7 +2041,6 @@ collaboration.buildMembersList = function(data) {
    // Because there are two panels
    var me_selectors = [];
 
-   $('#collab-videoPanel .video-people-list').html("");
    // Adds all of the tools to the peoples list
    $('.person').each(function() {
       id = $(this).data('id');
@@ -2068,7 +2067,8 @@ collaboration.buildMembersList = function(data) {
          if(webRTC.peerConn && webRTC.peerConn.getLocalStreams()){
             localStreams = webRTC.peerConn.getLocalStreams()[0];
          }
-         var video = mic = {};
+         var video = {};
+         var mic = {};
          if(localStreams){
             if(localStreams.getVideoTracks()[0]){
                video = localStreams.getVideoTracks()[0] || video;
@@ -2090,53 +2090,48 @@ collaboration.buildMembersList = function(data) {
          }else{
             webRTC.hasAudio = webRTC.hasVideo = false;
          }
-         var on_class = "off";
-         var av_title;
-         av_title = "Un-mute";
-         if(mic.enabled){
-            on_class = "on";
-            av_title = "Mute";
-         }
-         link = $('<span class="icon-microphone-2 collab-btn js-toggle-microphone btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
-         if(my_data && my_data.dataEnabled && $('#collab-videoPanel .video-people-me').find('.js-toggle-microphone').length <= 0){
-            var clone = $(this).clone();
-            $('#collab-videoPanel .video-people-list').append(clone.prepend(link));
-            me_selectors.push(clone);
-         }
-         on_class = "off";
-         av_title = "Enable Webcam";
-         if(video.enabled){
-            on_class = "on";
-            av_title = "Disable Webcam";
-         }
-         link = $('<span class="icon-camera-symbol-3 collab-btn js-toggle-webcam btn pull-right collaboration-video ' + on_class + '-btn" title="' + av_title + '"></span>');
-         var call_link = $('<span class="icon-call-delete collab-btn js-end-webrtc-call btn pull-right collaboration-video off-btn" title="End Call"></span>');
-         $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').prepend(link).prepend(call_link);
          $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
-         if(collaboration.role != 'presenter'){
-            if(divergents.indexOf(id) >= 0){
-               link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
-               $(this).prepend(link);
-            }else{
-               link = $('<span class="icon-link-broken-1 collab-btn js-collab-diverge pull-right" title="Diverge from collaboration"></span>');
-               $(this).prepend(link);
+         if(collaboration.role != 'presenter' && $(this).parent().is('.panel-container-solid-backdrop')){
+            if($(this).parent().is('.panel-container-solid-backdrop')){
+               if(divergents.indexOf(id) >= 0){
+                  link = $('<span class="icon-link-1 collab-btn js-collab-merge pull-right" title="Merge with collaboration"></span>');
+                  $(this).prepend(link);
+               }else{
+                  link = $('<span class="icon-link-broken-1 collab-btn js-collab-diverge pull-right" title="Diverge from collaboration"></span>');
+                  $(this).prepend(link);
+               }
             }
+         }
+         var me_data = {
+            "mic_on": mic.enabled,
+            "cam_on": video.enabled,
+            "person": this_person
+         };
+         if($('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').length <= 0){
+            $('#collab-videoPanel .video-people-list').prepend(gisportal.templates['collaboration-person-local'](me_data));
+         }
+         $('.in-call-button').toggleClass('hidden', !webRTC.isStarted);
+         if(!my_data || !my_data.dataEnabled){
+            $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').remove();
          }
       }else{
          if(this_person && this_person.dataEnabled){
-            link = $('<span class="icon-call-1 js-webrtc-call collab-btn pull-right on-btn" title="Call ' + $(this).find('p').html() + '"></span>');
-            var mute_link = $('<span class="icon-microphone-2 js-video-mute-toggle collab-btn btn pull-right collaboration-video on-btn hidden" title="Mute"></span>');
-            $('#collab-videoPanel .video-people-list').append($(this).clone().prepend(link).prepend(mute_link));
-            if(!my_data || !my_data.dataEnabled || webRTC.isStarted){
-               link.toggleClass('hidden', true);
+            var them_data = {
+               "show_call": my_data && my_data.dataEnabled && !webRTC.isStarted,
+               "show_mute": webRTC.isStarted && webRTC.peerId == this_person.id,
+               "person": this_person
+            };
+            if($('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').length <= 0){
+               $('#collab-videoPanel .video-people-list').append(gisportal.templates['collaboration-person-remote'](them_data));
             }
-            if(webRTC.isStarted && webRTC.peerId == this_person.id){
-               mute_link.toggleClass('hidden', false);
-            }
+            $('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').find('.js-video-mute-toggle').toggleClass('hidden', !them_data.show_mute);
+            $('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').find('.js-webrtc-call').toggleClass('hidden', !them_data.show_call);
+         }else if(this_person){
+            $('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').remove();
          }
       }
       if(collaboration.role == 'presenter' || collaboration.owner){
-         if(presenter != id && divergents.indexOf(id) == -1){
+         if(presenter != id && divergents.indexOf(id) == -1 && $(this).parent().is('.panel-container-solid-backdrop')){
             link = $('<span class="js-make-presenter collab-btn icon-profile-4 pull-right" title="' + title + '" data-id="' + id + '"></span>');
             $(this).prepend(link);
          }
@@ -2162,8 +2157,6 @@ collaboration.buildMembersList = function(data) {
          var parent_selector = me_selectors[i].parent();
          if(parent_selector.hasClass('panel-container-solid-backdrop')){
             me_selectors[i].detach().insertAfter(parent_selector.children('p'));
-         }else{
-            me_selectors[i].detach().prependTo('.video-people-list');
          }
       }
    }
