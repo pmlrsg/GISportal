@@ -61,70 +61,6 @@ collaboration.initDOM = function() {
          .toggleClass('alert-warning', true)
          .html('You have been invited to join room '+ roomId.toUpperCase() +'; please login to enter the room');
    }
-   var maxWidth = parseInt($(document).width()*0.48);
-   $('.main-collaboration-video').draggable({containment: ".collab-video-bounds"});
-   $('.video-div').resizable({containment: "document", "aspectRatio": true, "minWidth": 130, "maxWidth": maxWidth, handles:"se"});
-   $('#remoteVideo, #localVideo').on('dblclick', function(){
-      if($(this).attr('fullscreen') == "false"){
-         $(this).fullScreen();
-      }else{
-         $(this).exitFullScreen();
-      }
-   });
-
-   // Makes sure that the fullscreen attribute is changed when videos are changed to and from full screen
-   $("video").bind('webkitfullscreenchange mozfullscreenchange msfullscreenchange fullscreenchange', function(e) {
-      var state = document.fullScreen || document.mozFullScreen || document.msFullScreen || document.webkitIsFullScreen;
-      $(this).attr('fullscreen', state);
-   });
-
-   var idleMouseTimer = {};
-   var forceControlsDivHide = {'remoteVideo':false, 'localVideo': false};
-   $(".display-div").off('mousemove click');
-   $(".display-div").on('mousemove click', function(ev) {
-      var id = $(this).find('video').attr('id');
-      var controls = $(this).find('.video-controls');
-      if(!forceControlsDivHide[id]) {
-         clearTimeout(idleMouseTimer[id]);
-         if(!controls.hasClass('fadeIn')){
-            controls.toggleClass('fadeIn', true).toggleClass('hidden', false).toggleClass('fadeOut', false);
-         }
-         idleMouseTimer[id] = setTimeout(function() {
-            if(!controls.hasClass('fadeOut')){
-               controls.toggleClass('fadeOut', true).toggleClass('fadeIn', false);
-            }
-
-            forceControlsDivHide[id] = true;
-            setTimeout(function() {
-               forceControlsDivHide[id] = false;
-            }, 200);
-         }, 1000);
-      }
-   });
-   $(".collab-videos-minimize").off('click');
-   $(".collab-videos-minimize").on('click', function(ev) {
-      $('.main-collaboration-video').toggleClass('overlay-minimized', true)
-         .toggleClass('overlay-maximized', false)
-         .attr('title', "Click to Maximize")
-         .draggable('destroy');
-
-      // Makes sure it is not activated straight away.
-      setTimeout(function(){
-         $('.main-collaboration-video.overlay-minimized').off('click');
-         // Makes sure that it is only called once
-         $('.main-collaboration-video.overlay-minimized').one('click', function(){
-            $('.main-collaboration-video').toggleClass('overlay-minimized', false)
-               .toggleClass('overlay-maximized', true)
-               .attr('title', "")
-               .draggable({containment: "document"});
-            setTimeout(function(){
-               $('.main-collaboration-video').toggleClass('overlay-maximized', false);
-            }, 500);
-         });
-      },200);
-
-   });
-   collaboration.addVideoActionListeners();
 
    if(!window.onfocus){
       window.onfocus = function(){
@@ -186,11 +122,10 @@ collaboration.addVideoActionListeners = function(){
    $('.js-video-fullscreen').off('click');
    $('.js-video-mute-toggle').off('click');
    $('.js-video-fullscreen').on('click', function(){
-      var video = $(this).closest('.display-div').find('video');
-      if(video.length <= 0){
-         video = $('.' + $(this).data('source') + '-display-div').find('video');
+      var video = $(this).siblings('video');
+      if(video.length > 0){
+         video.fullScreen();
       }
-      video.fullScreen();
    });
    $('.js-video-mute-toggle').on('click', function(){
       var video = $('.remote-display-div').find('video');
@@ -203,6 +138,20 @@ collaboration.addVideoActionListeners = function(){
          video[0].setAttribute('muted', true);
          $('.js-video-mute-toggle').toggleClass('off-btn', true).toggleClass('on-btn', false).attr('title', "Un-mute");
       }
+   });
+   $('.remoteVideo, .localVideo').off('dblclick');
+   $('.remoteVideo, .localVideo').on('dblclick', function(){
+      if($(this).attr('fullscreen') == "false"){
+         $(this).fullScreen();
+      }else{
+         $(this).exitFullScreen();
+      }
+   });
+
+   // Makes sure that the fullscreen attribute is changed when videos are changed to and from full screen
+   $("video").bind('webkitfullscreenchange mozfullscreenchange msfullscreenchange fullscreenchange', function(e) {
+      var state = document.fullScreen || document.mozFullScreen || document.msFullScreen || document.webkitIsFullScreen;
+      $(this).attr('fullscreen', state);
    });
 };
 
@@ -2086,11 +2035,9 @@ collaboration.buildMembersList = function(data) {
             if(webRTC.peerMedia){
                hide = !webRTC.peerMedia.video;
             }
-            $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
          }else{
             webRTC.hasAudio = webRTC.hasVideo = false;
          }
-         $('.collaboration-video').toggleClass('hidden', !webRTC.isStarted);
          if(collaboration.role != 'presenter' && $(this).parent().is('.panel-container-solid-backdrop')){
             if($(this).parent().is('.panel-container-solid-backdrop')){
                if(divergents.indexOf(id) >= 0){
@@ -2210,7 +2157,7 @@ collaboration.buildMembersList = function(data) {
 collaboration.divergeAlert = function(){
    var pulltab = $('.show-collaboration');
    var panel = $('.collaboration-panel');
-   var person = panel.find('div[data-id="' + socket.io.engine.id + '"]');
+   var person = panel.find('#collab-homePanel div[data-id="' + socket.io.engine.id + '"]');
    gisportal.panels.showPanel('collab-home');
    pulltab.toggleClass('hidden', true);
    panel.toggleClass('hidden', false);

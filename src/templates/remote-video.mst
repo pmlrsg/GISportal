@@ -1,7 +1,0 @@
-<div class="remote-video-div video-div hidden">
-   <video id="remoteVideo" autoplay fullscreen="false"></video>
-</div>
-<div class="remote-video-controls video-controls hidden">
-   <span class="icon-microphone-2 js-video-mute-toggle video-control btn on-btn" title="Mute"></span>
-   <span class="icon-scale-spread-2 js-video-fullscreen video-control btn" title="Fullscreen" data-source="remote"></span>
-</div>

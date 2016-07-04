@@ -69,16 +69,12 @@
   outline: 1000px solid rgba(0, 0, 0, 0.3);
 }
 
-.collab-video-bounds{
-  width: 99%;
-  height: 99%;
-}
-
-#localVideo, #remoteVideo{
+.localVideo, .remoteVideo{
    width: 100%;
+   padding-top: 5px;
 }
 
-#localVideo{
+.localVideo{
    transform: rotateY(180deg);
 }
 
@@ -90,107 +86,10 @@
   pointer-events: all;
 }
 
-.video-div{
-  min-width: 130px;
-  max-width: 48vw;
-}
-
-.main-collaboration-video{
-  z-index: 10125;
-  display: inline;
-  pointer-events: none;
-  width: auto !important;
-  height: auto !important;
-  position: absolute !important;
-  top: 10px;
-  left: 10px;
-}
-
-.ui-resizable-handle {
-  height: 10px;
-  width: 10px;
-  z-index: 10140 !important;
-  display: block;
-  position: absolute;
-  bottom: 5px;
-  right: 0;
-}
-
-.ui-icon-gripsmall-diagonal-se:hover{
-    cursor: se-resize;
-}
-
-.video-controls{
-  position: absolute;
-  width: 100%;
-  bottom: 0;
-  text-align: center;
-}
-
-.collab-videos-minimize{
-  position: absolute;
-  right: 0;
-  text-shadow: white 0px 0px 5px;
-  pointer-events: all;
-  font-size: 2em;
-  line-height: 1;
-}
-
 .off-btn{
   color: #800000;
 }
 
 .on-btn{
   color: #16970D;
-}
-
-#localVideo::-webkit-media-controls-volume-slider,
-#localVideo::-webkit-media-controls-mute-button {
-  display: none
-}
-
-.video-controls:hover{
-  opacity: 1 !important;
-  animation: fadeIn !important;
-}
-
-span.video-control {
-  font-size: 30px;
-  text-shadow: white 0px 0px 5px;
-}
-
-.overlay-minimized{
-  animation: minimize 0.5s 1 forwards;
-  top: 0 !important;
-  left: 0 !important;
-  cursor: pointer;
-  display: inline-block;
-}
-
-@keyframes minimize {
-  to {
-    -webkit-transform: scale3d(.05, .05, .05);
-    transform: scale3d(.05, .05, .05);
-    -webkit-transform-origin: 5% top;
-    transform-origin: 5% top;
-  }
-}
-
-.overlay-maximized{
-  animation: maximize 0.5s 1 forwards;
-  -webkit-transform: scale3d(.05, .05, .05);
-  transform: scale3d(.05, .05, .05);
-  -webkit-transform-origin: 5% top;
-  transform-origin: 5% top;
-  display: inline-block;
-}
-
-@keyframes maximize {
-  to {
-    -webkit-transform: none;
-    transform: none;
-    -webkit-transform-origin: none;
-    transform-origin: none;
-    display: inline;
-  }
 }

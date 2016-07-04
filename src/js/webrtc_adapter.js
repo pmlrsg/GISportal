@@ -337,13 +337,16 @@ if (navigator.mozGetUserMedia) {
    navigator.getUserMedia = getUserMedia;
 
    // Attach a media stream to an element.
-   attachMediaStream = function(element, stream) {
-      if (typeof element.srcObject !== 'undefined') {
-         element.srcObject = stream;
-      } else if (typeof element.src !== 'undefined') {
-         element.src = URL.createObjectURL(stream);
-      } else {
-         console.log('Error attaching stream to element.');
+   attachMediaStream = function(elements, stream) {
+      for(elem in elements){
+         var element = elements[elem];
+         if (typeof element.srcObject !== 'undefined') {
+            element.srcObject = stream;
+         } else if (typeof element.src !== 'undefined') {
+            element.src = URL.createObjectURL(stream);
+         } else {
+            console.log('Error attaching stream to element.');
+         }
       }
    };
 

@@ -15,13 +15,6 @@ webRTC.initMedia = function() {
    //webRTC.isChannelReady = true;
 
    var startTime;
-   // Gets the two vieo elements
-   webRTC.localVideo = function(){
-      return $('#localVideo');
-   };
-   webRTC.remoteVideo = function(){
-      return $('#remoteVideo');
-   };
 
    webRTC.peerConfig = {
       'iceServers': [{
@@ -132,6 +125,7 @@ webRTC.messageCallback = function(data) {
    if (message.type === 'answer' && webRTC.isStarted) {
       if(data.params.peerId == socket.io.engine.id && data.params.peerMedia){
          webRTC.peerMedia = data.params.peerMedia;
+         addLocalVideoStream();
       }
       webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
    } 
@@ -184,7 +178,6 @@ function sendMessage(message){
 }
 function handleUserMedia(stream) {
    webRTC.localStream = stream;
-   attachMediaStream(localVideo, stream);
    webRTC.isChannelReady = true;
    console.log('Adding local stream.');
    sendMessage('media.enabled');
@@ -192,6 +185,12 @@ function handleUserMedia(stream) {
    if (webRTC.isInitiator) {
       maybeStart();                       // probably don't need this here
    }
+}
+
+function addLocalVideoStream(){
+   var localVideo = $('.localVideo[data-id="' + socket.io.engine.id + '"]');
+   localVideo.toggleClass('hidden', false);
+   attachMediaStream(localVideo, webRTC.localStream);
 }
 
 function handleUserMediaError(error) {
@@ -221,7 +220,6 @@ function maybeStart() {
          if(webRTC.peerMedia){
             hide = !webRTC.peerMedia.video;
          }
-         $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
       }
    }
 }
@@ -297,7 +295,6 @@ function acceptIncomingCall(caller) {
       if(webRTC.peerMedia){
          hide = !webRTC.peerMedia.video;
       }
-      $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
       // actually answer the call
       doAnswer();
    });
@@ -313,10 +310,14 @@ function doAnswer() {
    console.log('Sending answer to peer.');
    webRTC.peerConn.createAnswer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
    webRTC.isStarted = true;
+   addLocalVideoStream();
+   var remoteVideo = $('.remoteVideo[data-id="' + webRTC.peerId + '"]');
+   remoteVideo.toggleClass('hidden', false);
 }
 
 function doReject() {
    clearTimeout(gisportal.modalTimeout);
+   $('.collab-call-vid').toggleClass('hidden', true);
    console.log('Sending rejection to peer.');
    sendMessage('reject');
 }
@@ -379,13 +380,14 @@ function requestTurn(turn_url) {
 
 function handleRemoteStreamAdded(event) {
    console.log('Remote stream added.');
-   // reattachMediaStream(miniVideo, localVideo);
    var hide = false;
    if(webRTC.peerMedia){
       hide = !webRTC.peerMedia.video;
    }
-   $('.remote-video-div').toggleClass('hidden', hide);
-   $('.main-collaboration-video').toggleClass('hidden', hide && !webRTC.hasVideo);
+   var remoteVideo = $('.remoteVideo[data-id="' + webRTC.peerId + '"]');
+   if(webRTC.isStarted){
+      remoteVideo.toggleClass('hidden', false);
+   }
    attachMediaStream(remoteVideo, event.stream);
    remoteStream = event.stream;
    //  waitForRemoteVideo();
@@ -403,6 +405,7 @@ function hangup() {
       webRTC.isInitiator = false;
       sendMessage('bye');
       $('.js-webrtc-call').toggleClass('hidden', false);
+      $('.collab-call-vid').toggleClass('hidden', true);
    }
 }
 
@@ -417,6 +420,7 @@ function handleRemoteHangup(message) {
 webRTC.stop = function() {
    $('.collaboration-video').toggleClass('hidden', true);
    $('.remote-video-div').toggleClass('hidden', true);
+   $('.collab-call-vid').toggleClass('hidden', true);
    
    webRTC.isStarted = false;
    if(webRTC.peerConn){
