@@ -471,6 +471,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
    });
    gisportal.addLayersForm.form_info.current_page = current_page;// Saves the current_page for loading next time.
+   gisportal.addLayersForm.form_info.total_pages = total_pages;// Saves the current_page for loading next time.
    gisportal.addLayersForm.refreshStorageInfo();
    // Input listeners are then added to the paginator and the buttons.
    gisportal.addLayersForm.addInputListeners();
@@ -478,6 +479,9 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
 gisportal.addLayersForm.keydownListener = function ( e ) {
    if(document.activeElement.nodeName == "BODY"){
+      var current_page = gisportal.addLayersForm.form_info.current_page;
+      var total_pages = gisportal.addLayersForm.form_info.total_pages;
+      var form_div = "div.js-layer-form-html";
       switch(e.keyCode){
          case 27:
             if(!$( '.js-user-feedback-popup' ).hasClass('hidden')){
