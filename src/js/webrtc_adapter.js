@@ -174,7 +174,11 @@ if (navigator.mozGetUserMedia) {
    // Attach a media stream to an element.
    attachMediaStream = function(element, stream) {
       console.log('Attaching media stream');
-      element.mozSrcObject = stream;
+      if (typeof element.mozSrcObject !== 'undefined') {
+         element.mozSrcObject = stream;
+      } else{
+         element.src = URL.createObjectURL(stream);
+      }
    };
 
    reattachMediaStream = function(to, from) {
@@ -342,10 +346,8 @@ if (navigator.mozGetUserMedia) {
          var element = elements[elem];
          if (typeof element.srcObject !== 'undefined') {
             element.srcObject = stream;
-         } else if (typeof element.src !== 'undefined') {
+         } else{
             element.src = URL.createObjectURL(stream);
-         } else {
-            console.log('Error attaching stream to element.');
          }
       }
    };
@@ -392,7 +394,11 @@ if (navigator.mozGetUserMedia) {
    webrtcMinimumVersion = 12;
 
    attachMediaStream = function(element, stream) {
-      element.srcObject = stream;
+      if (typeof element.srcObject !== 'undefined') {
+         element.srcObject = stream;
+      } else{
+         element.src = URL.createObjectURL(stream);
+      }
    };
    reattachMediaStream = function(to, from) {
       to.srcObject = from.srcObject;

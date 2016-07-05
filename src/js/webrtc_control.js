@@ -8,7 +8,7 @@ webRTC.isChannelReady = false;
 webRTC.isInitiator = false;
 webRTC.isStarted = false;
 webRTC.turnReady = false;
-
+webRTC.remoteStreams = {};
 
 webRTC.initMedia = function() {
 
@@ -128,6 +128,7 @@ webRTC.messageCallback = function(data) {
          addLocalVideoStream();
       }
       webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
+         collaboration.showVideoButtons();
    } 
 
    // A CANDIDATE IS ADDED
@@ -189,8 +190,18 @@ function handleUserMedia(stream) {
 
 function addLocalVideoStream(){
    var localVideo = $('.localVideo[data-id="' + socket.io.engine.id + '"]');
-   localVideo.toggleClass('hidden', false);
+   if(webRTC.hasVideo){
+      localVideo.toggleClass('hidden', false);
+   }
    attachMediaStream(localVideo, webRTC.localStream);
+}
+
+function addRemoteVideoStream(peerId){
+   var remoteVideo = $('.remoteVideo[data-id="' + peerId + '"]');
+   if(webRTC.peerMedia.video){
+      remoteVideo.toggleClass('hidden', false);
+   }
+   attachMediaStream(remoteVideo, webRTC.remoteStreams[peerId]);
 }
 
 function handleUserMediaError(error) {
@@ -199,6 +210,7 @@ function handleUserMediaError(error) {
    sendMessage('media.disabled');
    $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
    console.log('getUserMedia error: ', error);
+   $.notify("Error Getting Media: " + (error.message || "Internal Error") + "\nPlease try again");
 }
 
 // if (location.hostname != "localhost") {
@@ -214,7 +226,7 @@ function maybeStart() {
          $('.js-webrtc-call').toggleClass('hidden', true);
          doCall();
          // show the videos and controls
-         $('.collaboration-video').toggleClass('hidden', false);
+         collaboration.showVideoButtons();
          $('.local-display-div').toggleClass('hidden', !webRTC.hasVideo);
          var hide = false;
          if(webRTC.peerMedia){
@@ -289,7 +301,6 @@ function acceptIncomingCall(caller) {
       // hide the message
       gisportal.hideModalMessage();
       // show the videos and controls
-      $('.collaboration-video').toggleClass('hidden', false);
       $('.local-display-div').toggleClass('hidden', !webRTC.hasVideo);
       var hide = false;
       if(webRTC.peerMedia){
@@ -312,12 +323,15 @@ function doAnswer() {
    webRTC.isStarted = true;
    addLocalVideoStream();
    var remoteVideo = $('.remoteVideo[data-id="' + webRTC.peerId + '"]');
-   remoteVideo.toggleClass('hidden', false);
+   collaboration.showVideoButtons();
+   if(webRTC.peerMedia.video){
+      remoteVideo.toggleClass('hidden', false);
+   }
 }
 
 function doReject() {
    clearTimeout(gisportal.modalTimeout);
-   $('.collab-call-vid').toggleClass('hidden', true);
+   hideVideos();
    console.log('Sending rejection to peer.');
    sendMessage('reject');
 }
@@ -385,12 +399,11 @@ function handleRemoteStreamAdded(event) {
       hide = !webRTC.peerMedia.video;
    }
    var remoteVideo = $('.remoteVideo[data-id="' + webRTC.peerId + '"]');
-   if(webRTC.isStarted){
+   if(webRTC.isStarted && webRTC.peerMedia.video){
       remoteVideo.toggleClass('hidden', false);
    }
    attachMediaStream(remoteVideo, event.stream);
-   remoteStream = event.stream;
-   //  waitForRemoteVideo();
+   webRTC.remoteStreams[webRTC.peerId] = event.stream;
 }
 
 function handleRemoteStreamRemoved(event) {
@@ -403,9 +416,10 @@ function hangup() {
       gisportal.showModalMessage('Call ended');
       webRTC.stop();
       webRTC.isInitiator = false;
+      webRTC.peerMedia = {};
       sendMessage('bye');
       $('.js-webrtc-call').toggleClass('hidden', false);
-      $('.collab-call-vid').toggleClass('hidden', true);
+      hideVideos();
    }
 }
 
@@ -414,13 +428,14 @@ function handleRemoteHangup(message) {
    gisportal.showModalMessage(message);
    webRTC.stop();
    webRTC.isInitiator = false;
+   webRTC.peerMedia = {};
    $('.js-webrtc-call').toggleClass('hidden', false);
 }
 
 webRTC.stop = function() {
    $('.collaboration-video').toggleClass('hidden', true);
    $('.remote-video-div').toggleClass('hidden', true);
-   $('.collab-call-vid').toggleClass('hidden', true);
+   hideVideos();
    
    webRTC.isStarted = false;
    if(webRTC.peerConn){
@@ -428,6 +443,13 @@ webRTC.stop = function() {
       webRTC.peerConn = null;
    }
 };
+
+function hideVideos(){
+   $('.collab-call-vid').toggleClass('hidden', true)
+      .each(function(){
+         this.src = "";
+      });
+}
 
 ///////////////////////////////////////////
 

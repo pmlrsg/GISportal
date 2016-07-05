@@ -128,16 +128,21 @@ collaboration.addVideoActionListeners = function(){
       }
    });
    $('.js-video-mute-toggle').on('click', function(){
-      var video = $('.remote-display-div').find('video');
-      var muted = video.is('[muted]');
-      if(muted){
-         // Make sure this actually mutes and unmuted the videos
-         video[0].removeAttribute('muted');
-         $('.js-video-mute-toggle').toggleClass('off-btn', false).toggleClass('on-btn', true).attr('title', "Mute");
-      }else{
-         video[0].setAttribute('muted', true);
-         $('.js-video-mute-toggle').toggleClass('off-btn', true).toggleClass('on-btn', false).attr('title', "Un-mute");
-      }
+      var video = $(this).siblings('video');
+      var _this = this;
+      video.each(function(){
+         var vid = this
+         if(vid.muted){
+            // Make sure this actually mutes and unmuted the videos
+            vid.removeAttribute('muted');
+            vid.muted = false;
+            $(_this).toggleClass('off-btn', false).toggleClass('on-btn', true).attr('title', "Mute");
+         }else{
+            vid.setAttribute('muted', true);
+            vid.muted = true;
+            $(_this).toggleClass('off-btn', true).toggleClass('on-btn', false).attr('title', "Un-mute");
+         }
+      });
    });
    $('.remoteVideo, .localVideo').off('dblclick');
    $('.remoteVideo, .localVideo').on('dblclick', function(){
@@ -152,6 +157,16 @@ collaboration.addVideoActionListeners = function(){
    $("video").bind('webkitfullscreenchange mozfullscreenchange msfullscreenchange fullscreenchange', function(e) {
       var state = document.fullScreen || document.mozFullScreen || document.msFullScreen || document.webkitIsFullScreen;
       $(this).attr('fullscreen', state);
+   });
+   // Makes sure that the muted attribute is changed when videos are muted
+   $("video").bind('volumechange', function(e) {
+      if(this.muted){
+         this.setAttribute('muted', true);
+         $(this).siblings('.js-video-mute-toggle').toggleClass('off-btn', true).toggleClass('on-btn', false).attr('title', "Un-mute");
+      }else{
+         this.removeAttribute('muted');
+         $(this).siblings('.js-video-mute-toggle').toggleClass('off-btn', false).toggleClass('on-btn', true).attr('title', "Mute");
+      }
    });
 };
 
@@ -2057,7 +2072,7 @@ collaboration.buildMembersList = function(data) {
          if($('#collab-videoPanel .video-people-list [data-id="' + this_person.id + '"]').length <= 0){
             $('#collab-videoPanel .video-people-list').prepend(gisportal.templates['collaboration-person-local'](me_data));
          }
-         $('.in-call-button').toggleClass('hidden', !webRTC.isStarted);
+         collaboration.showVideoButtons();
          if(!my_data || !my_data.dataEnabled){
             $('#collab-videoPanel .video-people-list').find('.person[data-id="' + id + '"]').remove();
          }
@@ -2139,10 +2154,10 @@ collaboration.buildMembersList = function(data) {
       mic.enabled = !mic.enabled;
 
       if (mic.enabled) {
-         button.attr('title', 'Mute');
+         button.attr('title', 'Disable Microphone');
          button.toggleClass('off-btn', false).toggleClass('on-btn', true);
       } else {
-         button.attr('title', 'Un-mute');
+         button.attr('title', 'Enable Microphone');
          button.toggleClass('off-btn', true).toggleClass('on-btn', false);
       }
    });
@@ -2152,6 +2167,20 @@ collaboration.buildMembersList = function(data) {
       hangup();
    });
    collaboration.addVideoActionListeners();
+};
+
+collaboration.showVideoButtons = function(){
+   $('div[data-id="' + webRTC.peerId + '"] .collaboration-video, div[data-id="' + socket.io.engine.id + '"] .collaboration-video').toggleClass('hidden', false);
+   $('div[data-id="' + webRTC.peerId + '"] .in-call-button, div[data-id="' + socket.io.engine.id + '"] .in-call-button').toggleClass('hidden', !webRTC.isStarted);
+   if(!webRTC.hasAudio){
+      $('.js-toggle-microphone').toggleClass('hidden', true);
+   }
+   if(!webRTC.hasVideo){
+      $('.js-toggle-webcam').toggleClass('hidden', true);
+   }
+   if(!webRTC.peerMedia || !webRTC.isStarted || !webRTC.peerMedia.audio){
+      $('.js-video-mute-toggle').toggleClass('hidden', true);
+   }
 };
 
 collaboration.divergeAlert = function(){
