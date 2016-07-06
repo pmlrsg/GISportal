@@ -1,0 +1,4 @@
+<p>Calling{{#if callee}} {{callee}}{{/if}}...</p>
+<div class="accpet-reject-buttons">
+	<button class="button js-end-webrtc-call brand secondary reject-call"><span class="icon-call-delete"></span>Cancel</button>
+</div>

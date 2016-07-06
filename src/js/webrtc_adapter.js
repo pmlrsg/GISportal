@@ -172,12 +172,14 @@ if (navigator.mozGetUserMedia) {
       };
    }
    // Attach a media stream to an element.
-   attachMediaStream = function(element, stream) {
-      console.log('Attaching media stream');
-      if (typeof element.mozSrcObject !== 'undefined') {
-         element.mozSrcObject = stream;
-      } else{
-         element.src = URL.createObjectURL(stream);
+   attachMediaStream = function(elements, stream) {
+      for(var elem in elements){
+         var element = elements[elem];
+         if (typeof element.mozSrcObject !== 'undefined') {
+            element.mozSrcObject = stream;
+         } else{
+            element.src = URL.createObjectURL(stream);
+         }
       }
    };
 
@@ -342,7 +344,7 @@ if (navigator.mozGetUserMedia) {
 
    // Attach a media stream to an element.
    attachMediaStream = function(elements, stream) {
-      for(elem in elements){
+      for(var elem in elements){
          var element = elements[elem];
          if (typeof element.srcObject !== 'undefined') {
             element.srcObject = stream;
@@ -393,11 +395,14 @@ if (navigator.mozGetUserMedia) {
    // the minimum version still supported by adapter.
    webrtcMinimumVersion = 12;
 
-   attachMediaStream = function(element, stream) {
-      if (typeof element.srcObject !== 'undefined') {
-         element.srcObject = stream;
-      } else{
-         element.src = URL.createObjectURL(stream);
+   attachMediaStream = function(elements, stream) {
+      for(var elem in elements){
+         var element = elements[elem];
+         if (typeof element.srcObject !== 'undefined') {
+            element.srcObject = stream;
+         } else{
+            element.src = URL.createObjectURL(stream);
+         }
       }
    };
    reattachMediaStream = function(to, from) {

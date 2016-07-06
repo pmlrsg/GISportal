@@ -1,7 +1,6 @@
 <div data-id="{{person.id}}" class="person clearfix">
 	<span class="icon-call-1 js-webrtc-call collab-btn pull-right on-btn {{#unless show_call}}hidden{{/unless}}" title="Call {{person.name}}"></span>
    <img src="{{person.image}}" title="{{person.email}}" class="avatar-small pull-left"><p title="{{person.email}}">{{person.name}}</p>
-   <div class="presenter" title="Presenter"></div>
    <video data-id="{{person.id}}" class="remoteVideo hidden collab-call-vid" autoplay="" fullscreen="false"></video>
    <span class="icon-scale-spread-2 collab-btn in-call-button js-video-fullscreen btn pull-right collaboration-video hidden" title="Fullscreen"></span>
 	<span class="icon-microphone-2 js-video-mute-toggle collab-btn btn pull-right collaboration-video on-btn {{#unless show_mute}}hidden{{/unless}}" title="Mute"></span>

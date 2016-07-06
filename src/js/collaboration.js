@@ -2128,6 +2128,14 @@ collaboration.buildMembersList = function(data) {
       $('.js-webrtc-call').toggleClass('hidden', true);
       webRTC.peerId = $(this).parent().data('id');
       maybeStart();
+      var data = {
+         "callee": $(this).parent().find('p').html()
+      };
+      var rendered = gisportal.templates['webrtc-outbound-call'](data);
+      gisportal.showModalMessage(rendered, 20000);
+      $('.accpet-reject-buttons .js-end-webrtc-call').one('click', function(e){
+         $('.collaboration-panel .js-end-webrtc-call').trigger('click');
+      });
    });
 
    $('.js-toggle-webcam').off('click');

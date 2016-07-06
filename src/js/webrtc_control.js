@@ -42,6 +42,7 @@ webRTC.deinitMedia = function() {
    sendMessage('media.disabled');
    webRTC.isChannelReady = false;
    $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
+   webRTC.localStream.getTracks().forEach(function(track) { track.stop() });
    webRTC.stop();
 };
 
@@ -123,12 +124,13 @@ webRTC.messageCallback = function(data) {
 
    // THE CALLEE ANSWERS
    if (message.type === 'answer' && webRTC.isStarted) {
+      gisportal.hideModalMessage();
       if(data.params.peerId == socket.io.engine.id && data.params.peerMedia){
          webRTC.peerMedia = data.params.peerMedia;
          addLocalVideoStream();
       }
       webRTC.peerConn.setRemoteDescription(new RTCSessionDescription(message));
-         collaboration.showVideoButtons();
+      collaboration.showVideoButtons();
    } 
 
    // A CANDIDATE IS ADDED
@@ -296,6 +298,7 @@ function acceptIncomingCall(caller) {
    };
    var rendered = gisportal.templates['webrtc-inbound-call'](data);
    gisportal.showModalMessage(rendered, 20000, answerTimeout=true); // user has 20 seconds to answer
+   webRTC.playRingtone();
 
    $('.js-answer-webrtc-call').click(function() { 
       // hide the message
@@ -316,6 +319,7 @@ function acceptIncomingCall(caller) {
 }
 
 function doAnswer() {
+   webRTC.stopRingtone();
    clearTimeout(gisportal.modalTimeout);
    $('.js-webrtc-call').toggleClass('hidden', true);
    console.log('Sending answer to peer.');
@@ -330,6 +334,7 @@ function doAnswer() {
 }
 
 function doReject() {
+   webRTC.stopRingtone();
    clearTimeout(gisportal.modalTimeout);
    hideVideos();
    console.log('Sending rejection to peer.');
@@ -337,6 +342,7 @@ function doReject() {
 }
 
 function doNoAnswer() {
+   webRTC.stopRingtone();
    console.log('Sending rejection to peer.');
    sendMessage('no_answer');
 }
@@ -424,6 +430,7 @@ function hangup() {
 }
 
 function handleRemoteHangup(message) {
+   webRTC.stopRingtone();
    console.log('Session terminated.');
    gisportal.showModalMessage(message);
    webRTC.stop();
@@ -528,3 +535,13 @@ function removeCN(sdpLines, mLineIndex) {
    return sdpLines;
 }
 
+webRTC.playRingtone = function(){
+   var tone = $('.ringtone')[0];
+   tone.play();
+};
+
+webRTC.stopRingtone = function(){
+   var tone = $('.ringtone')[0];
+   tone.pause();
+   tone.currentTime = 0;
+};
