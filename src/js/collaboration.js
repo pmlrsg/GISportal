@@ -131,7 +131,7 @@ collaboration.addVideoActionListeners = function(){
       var video = $(this).siblings('video');
       var _this = this;
       video.each(function(){
-         var vid = this
+         var vid = this;
          if(vid.muted){
             // Make sure this actually mutes and unmuted the videos
             vid.removeAttribute('muted');

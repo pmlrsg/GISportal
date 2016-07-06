@@ -42,7 +42,7 @@ webRTC.deinitMedia = function() {
    sendMessage('media.disabled');
    webRTC.isChannelReady = false;
    $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
-   webRTC.localStream.getTracks().forEach(function(track) { track.stop() });
+   webRTC.localStream.getTracks().forEach(function(track) { track.stop(); });
    webRTC.stop();
 };
 
