@@ -73,7 +73,7 @@ collaboration.initDOM = function() {
    }
 
    $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
-   $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:"}));
+   $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", browser: webrtcDetectedBrowser}));
 
    // Enable/Disable webRTC media
    $('.js-toggle-rtc').click(function() {
