@@ -72,41 +72,6 @@ collaboration.initDOM = function() {
       };
    }
 
-   $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
-   $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", browser: webrtcDetectedBrowser}));
-
-   // Enable/Disable webRTC media
-   $('.js-toggle-rtc').click(function() {
-      var enabled = webRTC.isChannelReady || false;
-      if (!enabled) {
-         webRTC.initMedia();
-      } else {
-         webRTC.deinitMedia();
-         $('.js-webrtc-call').toggleClass('hidden', true);
-      }
-   });
-
-   $('.message-input').on({
-      input: function(){
-         counter = 0;
-         while($(this).css('height') != $(this).prop('scrollHeight') && counter < 20){
-            $(this).css({'height':$(this).prop('scrollHeight')});
-            counter ++;
-         }
-         if(parseInt($(this).css('height')) >= 170){
-            $(this).css({'height':"170px", 'overflow':"auto"});
-         }else{
-            $(this).css({'overflow':"hidden"});
-         }
-      },
-      keypress: function(e){
-         if(e.which == 13 && !e.shiftKey){
-            e.preventDefault();
-            $('.js-submit-message').trigger('click');
-         }
-      }
-   });
-
    $('.js-collab-notifications-toggle').off('click');
    $('.js-collab-notifications-toggle').on('click', function() {
       var log = $(this).prop('checked');
@@ -173,6 +138,51 @@ collaboration.addVideoActionListeners = function(){
 
 
 collaboration.initSession = function() {
+   $.ajax({
+      url: "js-libs/webrtc_adapter/adapter.js",
+      dataType: 'script',
+      success: function(script){
+         eval(script);
+         $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
+         $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", compatable: adapter.browserDetails.version && adapter.browserDetails.version >= adapter.browserDetails.minVersion}));
+         if (adapter.browserDetails.browser === 'firefox') {
+            webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:23.21.150.121' }] }; // number IP
+         } else {
+            webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] };
+         }
+         // Enable/Disable webRTC media
+         $('.js-toggle-rtc').click(function() {
+            var enabled = webRTC.isChannelReady || false;
+            if (!enabled) {
+               webRTC.initMedia();
+            } else {
+               webRTC.deinitMedia();
+               $('.js-webrtc-call').toggleClass('hidden', true);
+            }
+         });
+
+   $('.message-input').on({
+      input: function(){
+         counter = 0;
+         while($(this).css('height') != $(this).prop('scrollHeight') && counter < 20){
+            $(this).css({'height':$(this).prop('scrollHeight')});
+            counter ++;
+         }
+         if(parseInt($(this).css('height')) >= 170){
+            $(this).css({'height':"170px", 'overflow':"auto"});
+         }else{
+            $(this).css({'overflow':"hidden"});
+         }
+      },
+      keypress: function(e){
+         if(e.which == 13 && !e.shiftKey){
+            e.preventDefault();
+            $('.js-submit-message').trigger('click');
+         }
+      }
+   });
+     }
+   });
 
 	// get the socket.io script and open a connection
 	$.getScript(gisportal.middlewarePath + "/socket.io/")

@@ -36,7 +36,6 @@ var coreFiles = [
     "src/js/user.js",
     "src/js/collaboration.js",
     "src/js/collaboration-event-bindings.js",
-    "src/js/webrtc_adapter.js",
     "src/js/webrtc_control.js"
   ];
 

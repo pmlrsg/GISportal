@@ -28,7 +28,7 @@ webRTC.initMedia = function() {
       audio: true
    };
 
-   getUserMedia(constraints, handleUserMedia, handleUserMediaError);
+   navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
 
    $('.js-end-webrtc-call').off('click');
    $('.js-end-webrtc-call').on('click', function() { 
@@ -45,12 +45,6 @@ webRTC.deinitMedia = function() {
    webRTC.localStream.getTracks().forEach(function(track) { track.stop(); });
    webRTC.stop();
 };
-
-if (webrtcDetectedBrowser === 'firefox') {
-   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:23.21.150.121' }] }; // number IP
-} else {
-   webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] };
-}
 
 webRTC.pc_constraints = {
    'optional': [{
@@ -190,6 +184,19 @@ function handleUserMedia(stream) {
    }
 }
 
+function attachMediaStream(elements, stream) {
+   for(var elem in elements){
+      var element = elements[elem];
+      if (typeof element.srcObject !== 'undefined') {
+         element.srcObject = stream;
+      } else if (typeof element.mozSrcObject !== 'undefined') {
+         element.mozSrcObject = stream;
+      } else{
+         element.src = URL.createObjectURL(stream);
+      }
+   }
+};
+
 function addLocalVideoStream(){
    var localVideo = $('.localVideo[data-id="' + socket.io.engine.id + '"]');
    if(webRTC.hasVideo){
@@ -279,7 +286,7 @@ function doCall() {
       }
    };
    // temporary measure to remove Moz* constraints in Chrome
-   if (webrtcDetectedBrowser === 'chrome') {
+   if (adapter.browserDetails.browser === 'chrome') {
       for (var prop in constraints.mandatory) {
          if (prop.indexOf('Moz') !== -1) {
             delete constraints.mandatory[prop];
@@ -538,11 +545,15 @@ function removeCN(sdpLines, mLineIndex) {
 
 webRTC.playRingtone = function(){
    var tone = $('.ringtone')[0];
-   tone.play();
+   try{
+      tone.play();
+   }catch(e){};
 };
 
 webRTC.stopRingtone = function(){
    var tone = $('.ringtone')[0];
-   tone.pause();
-   tone.currentTime = 0;
+   try{
+      tone.pause();
+      tone.currentTime = 0;
+   }catch(e){};
 };
