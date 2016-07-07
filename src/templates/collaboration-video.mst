@@ -1,4 +1,4 @@
-{{#unless browser}}
+{{#if browser}}
 	{{#unless insecure}}
 		<div class="collaboration-actions">
 		   <button class="js-toggle-rtc brand secondary extra-small gray"><span class="icon-webcam"></span><span class="btn-value">Enable Audio/Video</span></button>
@@ -12,4 +12,4 @@
 	{{/unless}}
 {{else}}
 	<p>Audio/Video is not available on this browser.</p>
-{{/unless}}
+{{/if}}
