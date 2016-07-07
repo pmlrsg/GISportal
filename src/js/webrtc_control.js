@@ -319,6 +319,7 @@ function acceptIncomingCall(caller) {
 }
 
 function doAnswer() {
+   gisportal.panels.showPanel('collab-video');
    webRTC.stopRingtone();
    clearTimeout(gisportal.modalTimeout);
    $('.js-webrtc-call').toggleClass('hidden', true);
