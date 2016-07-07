@@ -492,7 +492,7 @@ collaboration.initSession = function() {
             if(data.departed){
                collaboration.log(collaboration.nameOrAvatar(data.departed, data.image) + ' has left the room');
             }
-            if(webRTC.peerId == departedId && webRTC.isStarted){
+            if(webRTC.peerId == data.departedId && webRTC.isStarted){
                handleRemoteHangup('User Unavailable');
             }
             collaboration.buildMembersList(data);
