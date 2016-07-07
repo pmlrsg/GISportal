@@ -492,6 +492,9 @@ collaboration.initSession = function() {
             if(data.departed){
                collaboration.log(collaboration.nameOrAvatar(data.departed, data.image) + ' has left the room');
             }
+            if(webRTC.peerId == departedId && webRTC.isStarted){
+               handleRemoteHangup('User Unavailable');
+            }
             collaboration.buildMembersList(data);
             var presenterFound = false;
             for(var person in data.people){

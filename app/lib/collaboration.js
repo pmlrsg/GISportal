@@ -177,7 +177,8 @@ collaboration.init = function(io, app, config) {
                         "roomId": roomId,
                         "people": people,
                         "departed" : departed,
-                        "image": image
+                        "image": image,
+                        "departedId": leavingUserId
                      });
 
                      if (newPresenterId !== null) {
