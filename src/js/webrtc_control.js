@@ -56,8 +56,10 @@ webRTC.pc_constraints = {
 
 // Set up audio and video regardless of what devices are present.
 var sdpConstraints = {
-   'offerToReceiveAudio': true,
-   'offerToReceiveVideo': true
+   mandatory: {
+      'OfferToReceiveAudio': true,
+      'OfferToReceiveVideo': true
+   }
 };
 
 
