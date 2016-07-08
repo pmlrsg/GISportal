@@ -56,10 +56,8 @@ webRTC.pc_constraints = {
 
 // Set up audio and video regardless of what devices are present.
 var sdpConstraints = {
-   'mandatory': {
-      'OfferToReceiveAudio': true,
-      'OfferToReceiveVideo': true
-   }
+   offerToReceiveAudio: true,
+   offerToReceiveVideo: true
 };
 
 
@@ -279,24 +277,9 @@ function handleIceCandidate(event) {
 }
 
 function doCall() {
-   var constraints = {
-      'optional': [],
-      'mandatory': {
-         'MozDontOfferDataChannel': true
-      }
-   };
-   // temporary measure to remove Moz* constraints in Chrome
-   if (adapter.browserDetails.browser === 'chrome') {
-      for (var prop in constraints.mandatory) {
-         if (prop.indexOf('Moz') !== -1) {
-            delete constraints.mandatory[prop];
-         }
-      }
-   }
-   constraints = mergeConstraints(constraints, sdpConstraints);
    console.log('Sending offer to peer, with constraints: \n' +
-      '  \'' + JSON.stringify(constraints) + '\'.');
-   webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, constraints);
+      '  \'' + JSON.stringify(sdpConstraints) + '\'.');
+   webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
 }
 
 function acceptIncomingCall(caller) {
