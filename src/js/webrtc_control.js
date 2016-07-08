@@ -280,7 +280,7 @@ function handleIceCandidate(event) {
 
 function doCall() {
    console.log('Sending offer to peer, with constraints: \n' +
-      '  \'' + JSON.stringify(call_cons) + '\'.');
+      '  \'' + JSON.stringify(sdpConstraints) + '\'.');
    webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
 }
 
