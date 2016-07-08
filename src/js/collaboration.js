@@ -156,6 +156,12 @@ collaboration.initSession = function() {
                $('.js-webrtc-call').toggleClass('hidden', true);
             }
          });
+         if(adapter.browserDetails.browser == "firefox"){
+            sdpConstraints = {
+               'offerToReceiveAudio': true,
+               'offerToReceiveVideo': true
+            };
+         }
 
    $('.message-input').on({
       input: function(){
