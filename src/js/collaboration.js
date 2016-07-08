@@ -145,7 +145,7 @@ collaboration.initSession = function() {
          eval(script);
          $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
          $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", compatable: adapter.browserDetails.version && adapter.browserDetails.version >= adapter.browserDetails.minVersion}));
-         webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun.l.google.com:19302' }] };
+         webRTC.pc_config = { 'iceServers': [{ 'url': 'stun:stun1.l.google.com:19302' }, { 'url': 'stun:stun2.l.google.com:19302' }, { 'url': 'stun:stun3.l.google.com:19302' }, { 'url': 'stun:stun4.l.google.com:19302' }] };
          // Enable/Disable webRTC media
          $('.js-toggle-rtc').click(function() {
             var enabled = webRTC.isChannelReady || false;
