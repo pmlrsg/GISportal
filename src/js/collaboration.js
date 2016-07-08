@@ -162,6 +162,17 @@ collaboration.initSession = function() {
                'offerToReceiveVideo': true
             };
          }
+            $(".video-people-list").sortable({
+               cancel: "span,video",
+               cursor: "move",
+               items: '.person:not(:first)',
+               stop : function(event, ui) {
+                  var pid = $(ui.item).data('id');
+                  if(webRTC.isStarted && webRTC.peerId == pid){
+                     addRemoteVideoStream($(ui.item).data('id'));
+                  }
+               }
+            });
 
    $('.message-input').on({
       input: function(){
@@ -2193,9 +2204,9 @@ collaboration.buildMembersList = function(data) {
 };
 
 collaboration.showVideoButtons = function(){
-   $('div[data-id="' + webRTC.peerId + '"] .collaboration-video, div[data-id="' + socket.io.engine.id + '"] .collaboration-video').toggleClass('hidden', false);
-   $('div[data-id="' + webRTC.peerId + '"] .in-call-button, div[data-id="' + socket.io.engine.id + '"] .in-call-button').toggleClass('hidden', !webRTC.isStarted);
-   if(!webRTC.hasAudio){
+   $('li[data-id="' + webRTC.peerId + '"] .collaboration-video, li[data-id="' + socket.io.engine.id + '"] .collaboration-video').toggleClass('hidden', false);
+   $('li[data-id="' + webRTC.peerId + '"] .in-call-button, li[data-id="' + socket.io.engine.id + '"] .in-call-button').toggleClass('hidden', !webRTC.isStarted);
+   if(!webRTC.hasAudio || webRTC.isStarted){
       $('.js-toggle-microphone').toggleClass('hidden', true);
    }
    if(!webRTC.hasVideo){

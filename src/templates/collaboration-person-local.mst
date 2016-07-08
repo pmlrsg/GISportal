@@ -1,7 +1,7 @@
-<div data-id="{{person.id}}" class="person clearfix">
+<li data-id="{{person.id}}" class="person clearfix">
    <img src="{{person.image}}" title="{{person.email}}" class="avatar-small pull-left"><p title="{{person.email}}">You</p>
    <video data-id="{{person.id}}" class="localVideo hidden collab-call-vid" autoplay="" fullscreen="false" muted></video>
 	<span class="icon-call-delete collab-btn in-call-button js-end-webrtc-call btn pull-right collaboration-video off-btn" title="End Call"></span>
 	<span class="icon-microphone-2 collab-btn in-call-button js-toggle-microphone btn pull-right collaboration-video {{#if mic_on}}on{{else}}off{{/if}}-btn" title="{{#if mic_on}}Disable{{else}}Enable{{/if}} Microphone"></span>
 	<span class="icon-camera-symbol-3 collab-btn in-call-button js-toggle-webcam btn pull-right collaboration-video {{#if cam_on}}on{{else}}off{{/if}}-btn" title="{{#if cam_on}}Disable{{else}}Enable{{/if}} Webcam"></span>
-</div>
+</li>

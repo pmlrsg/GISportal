@@ -6,7 +6,7 @@
 
 		<p>People With Audio/Video Enabled:</p>
 
-		<div class="video-people-list"></div>
+		<ul class="video-people-list"></ul>
 	{{else}}
 		<p>Audio/Video is not available on insecure origins.</p>
 	{{/unless}}
