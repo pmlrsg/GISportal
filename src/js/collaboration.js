@@ -151,9 +151,6 @@ collaboration.initSession = function() {
                   'url': 'turn:turn.eofrom.space:3478',
                   'username': 'portaluser',
                   'credential': 'notmypassword'
-               },
-               {
-                  'url': 'stun:stun.l.google.com:19302'
                }
             ]
          };
