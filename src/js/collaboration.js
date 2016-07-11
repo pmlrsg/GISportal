@@ -149,6 +149,7 @@ collaboration.initSession = function() {
             'iceServers': [
                {
                   'url': 'turn:portaluser@turn.eofrom.space:3478',
+                  'username': 'portaluser',
                   'credential': 'notmypassword'
                },
                {
