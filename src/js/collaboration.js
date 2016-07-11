@@ -148,11 +148,11 @@ collaboration.initSession = function() {
          webRTC.pc_config = { 
             'iceServers': [
                {
-                  'url': 'stun:stun.l.google.com:19302'
-               },
-               {
                   'url': 'turn:portaluser@turn.eofrom.space:3478',
                   'credential': 'notmypassword'
+               },
+               {
+                  'url': 'stun:stun.l.google.com:19302'
                }
             ]
          };

@@ -195,7 +195,7 @@ function attachMediaStream(elements, stream) {
          element.src = URL.createObjectURL(stream);
       }
    }
-};
+}
 
 function addLocalVideoStream(){
    var localVideo = $('.localVideo[data-id="' + socket.io.engine.id + '"]');
@@ -532,7 +532,7 @@ webRTC.playRingtone = function(){
    var tone = $('.ringtone')[0];
    try{
       tone.play();
-   }catch(e){};
+   }catch(e){}
 };
 
 webRTC.stopRingtone = function(){
@@ -540,5 +540,5 @@ webRTC.stopRingtone = function(){
    try{
       tone.pause();
       tone.currentTime = 0;
-   }catch(e){};
+   }catch(e){}
 };
