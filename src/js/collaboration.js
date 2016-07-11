@@ -148,7 +148,10 @@ collaboration.initSession = function() {
          webRTC.pc_config = { 
             'iceServers': [
                {
-                  'url': 'turn:turn.eofrom.space:3478',
+                  'url': 'stun:turn2.eofrom.space'
+               },
+               {
+                  'url': 'turn:turn2.eofrom.space',
                   'username': 'portaluser',
                   'credential': 'notmypassword'
                }
