@@ -310,19 +310,10 @@ collaboration.initSession = function() {
 		  	// -------------------------------------------------
 		  	
          socket.on('room.invalid-id', function(data) {
-            console.log('invalid Room Id requested');
-            var iframe = $('iframe');
-            $('.js-room-id-message', iframe.contents()).html('The collaboration room ID does not exist, please check and try again').removeClass('hidden').addClass('error');
-            $('#roomId', iframe.contents()).addClass('error');
-
-            // if there's a `room` url parameter alter the warning message
-            var roomId = gisportal.utils.getURLParameter('room');
-            if (roomId !== null) {
-               $('.js-collab-message')
-                  .toggleClass('hidden', false)
-                  .toggleClass('alert-danger', true)
-                  .html('The requested room does not exist; the room may have been closed by the organiser, or the link you clicked on could be wrong.');
-            }
+            $('.js-collab-message')
+               .toggleClass('hidden', false)
+               .toggleClass('alert-warning', true)
+               .html('The collaboration room ID does not exist, please check and try again');
          });
          
          socket.on('room.created', function(data) {
