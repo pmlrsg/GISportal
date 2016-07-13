@@ -1884,7 +1884,12 @@ collaboration.initSession = function() {
 
          // WebRTC gubbins...
          socket.on('webrtc_event', function(data) {
-            console.log('Client received message:', data.message);
+            var params_msg = data.params.message
+            if(params_msg && params_msg.type){
+               params_msg = params_msg.type;
+            }
+            var log = data.message || params_msg;
+            console.log('Client received message:', log);
             webRTC.messageCallback(data);
          });
 
@@ -2240,7 +2245,7 @@ collaboration.setUserSavedState = function() {
 	collaboration._emit('setSavedState', params);
 };
 
-// This is the function actually sends the message if the collaboration is active and the user is the presenter
+// This is the function that actually sends the message if the collaboration is active and the user is the presenter
 collaboration._emit = function(cmd, params, force) {
 	if (collaboration.active && (collaboration.role == "presenter" || force)) {
 		socket.emit(cmd, params);	
