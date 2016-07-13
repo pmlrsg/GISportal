@@ -6,6 +6,6 @@
 	</div>
 	{{{html}}}
 	<div class="extra-plot-info" data-hash="{{hash}}">
-		<a class="brand secondary" href='/plots/{{hash}}.zip'>Download</a>
+		<a class="brand secondary" href='plots/{{hash}}.zip'>Download</a>
 	</div>
 </div>
