@@ -64,6 +64,7 @@ gisportal.config = {
    
    collaborationFeatures : {
       enabled : false,                               // (true|false) > If false the collaboration tab will be hidden
+      videoEnabled : false,                          // (true|false) > If false (or omitted) the collaboration video tab will be hidden
       protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
       host : 'localhost',                  // the hostname of the node server running collaboration/index.js
       port : '',                                    // must match the port specified in collaboration/config/config.js
