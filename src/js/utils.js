@@ -344,7 +344,7 @@ gisportal.utils.flattenObject = function(obj, keep) {
          case "[object Object]":
             for (var prop in current)
             {
-               traverse(current[prop], (prefix.length ? prefix + "." : "") + prop);
+               traverse(current[prop], (prefix.length ? prefix + "." : "") + prop.replace('.', '__'));
             }
             // when there were no properties it's an empty object instance
             if (!prop && keep.contains(prefix))
