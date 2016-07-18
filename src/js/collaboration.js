@@ -14,15 +14,19 @@ collaboration.active = false;
 collaboration.role = '';
 
 collaboration.initDOM = function() {     
-   collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
-   collaboration.videoEnabled = gisportal.config.collaborationFeatures.videoEnabled || false;
-   
-   if(!collaboration.videoEnabled){
-      $('[data-panel-name="collab-video"]').remove();
+   if(gisportal.config.collaborationFeatures){
+      collaboration.enabled = gisportal.config.collaborationFeatures.enabled || false; // indicates whether collaboration is globally enabled; set to false and no collaboration features will be visible
+   }else{
+      gisportal.config.collaborationFeatures = {};
    }
 
    if(!collaboration.enabled){
       return;
+   }
+   collaboration.videoEnabled = gisportal.config.collaborationFeatures.videoEnabled || false;
+   
+   if(!collaboration.videoEnabled){
+      $('[data-panel-name="collab-video"]').remove();
    }
 
    collaboration.owner = false;
