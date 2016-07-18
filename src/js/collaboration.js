@@ -378,7 +378,7 @@ collaboration.initSession = function() {
                   "state": state,
                   "joining-member": data.user.email
                };
-               collaboration._emit('c_event', params);
+               gisportal.events.trigger('room.presenter-state-update', params);
             }
             // set the owner variable
             if(data.owner && data.user.email == gisportal.user.info.email){
@@ -434,7 +434,7 @@ collaboration.initSession = function() {
                   "state": state,
                   "joining-member": data.email
                };
-               collaboration._emit('c_event', params);
+               gisportal.events.trigger('room.presenter-state-update', params);
                collaboration.log(collaboration.nameOrAvatar(data.merger, data.image) + " has merged back with your room");
             }else{
                for (var p in data.people) {
@@ -1888,7 +1888,7 @@ collaboration.initSession = function() {
 
          // WebRTC gubbins...
          socket.on('webrtc_event', function(data) {
-            var params_msg = data.params.message
+            var params_msg = data.params.message;
             if(params_msg && params_msg.type){
                params_msg = params_msg.type;
             }

@@ -10,10 +10,18 @@ gisportal.graphs.PlotEditor = (function(){
                value = e.originalEvent.clipboardData.getData('text/plain');
             }catch(err){}
          }
-         gisportal.events.trigger('graphTitle.edit', value);
+         var params = {
+            "event": "graphTitle.edit",
+            "value":value
+         };
+         gisportal.events.trigger('graphTitle.edit', params);
       });
       $('.js-active-plot-type').on('change', function(){
-         gisportal.events.trigger('graphType.edit', $(this).val());
+         var params = {
+            "event": "graphType.edit",
+            "value": $(this).val()
+         };
+         gisportal.events.trigger('graphType.edit', params);
       });
    };
 
@@ -61,7 +69,10 @@ gisportal.graphs.PlotEditor = (function(){
       //Setup the active "create graph" button
       this._editorParent.find('.js-create-graph').click(function(){
          _this.submitRequest();
-         gisportal.events.trigger('graph.submitted');
+         var params = {
+            "event": "graph.submitted"
+         };
+         gisportal.events.trigger('graph.submitted', params);
       });
 
       this._editorParent.find('.js-close-active-plot').click(function(){
@@ -73,7 +84,10 @@ gisportal.graphs.PlotEditor = (function(){
             });
             $(document).one('click', '.notifyjs-gisportal-close-plot-option-base .yes', function() {
                gisportal.graphs.deleteActiveGraph();
-               gisportal.events.trigger('graphs.deleteActive');
+               var params = {
+                  "event": "graphs.deleteActive"
+               };
+               gisportal.events.trigger('graphs.deleteActive', params);
                $(this).trigger('notify-hide');
             });
          }
@@ -297,13 +311,21 @@ gisportal.graphs.PlotEditor = (function(){
       })
       // Listen for when the user moves the slider and sends a trigger
       .on('change', function(event, val){
-         gisportal.events.trigger('graphRange.change', val);
+         var params = {
+            "event": "graphRange.change",
+            "value":val
+         };
+         gisportal.events.trigger('graphRange.change', params);
       });
       
       // The start date input element is manually typed update  tBounds
       this._startDateInput.change(function(){
          var newDate = new Date( $(this).val() );
-         gisportal.events.trigger('graphStartDate.change', newDate.getTime());
+         var params = {
+            "event": "graphStartDate.change",
+            "value": newDate.getTime()
+         };
+         gisportal.events.trigger('graphStartDate.change', params);
          var currentTBounds = _this.plot().tBounds();
          
          if( isNaN( newDate.getTime() ) )
@@ -315,7 +337,11 @@ gisportal.graphs.PlotEditor = (function(){
       // The end date input element is manually typed update  tBounds
       this._endDateInput.change(function(){
          var newDate = new Date( $(this).val() );
-         gisportal.events.trigger('graphEndDate.change', newDate.getTime());
+         var params = {
+            "event": "graphEndDate.change",
+            "value": newDate.getTime()
+         };
+         gisportal.events.trigger('graphEndDate.change', params);
          var currentTBounds = _this.plot().tBounds();
          
          if( isNaN( newDate.getTime() ) )
@@ -369,7 +395,11 @@ gisportal.graphs.PlotEditor = (function(){
             _this.plot().removeComponent( component );
             //TODO: When this is no longer a table, give each component an id to be identified easier.
             var tableIndex = $(this).closest('tr').index();
-            gisportal.events.trigger('graphComponent.remove', tableIndex);
+            var params = {
+               "event": "graphComponent.remove",
+               "index": tableIndex
+            };
+            gisportal.events.trigger('graphComponent.remove', params);
          });
 
 
@@ -378,7 +408,12 @@ gisportal.graphs.PlotEditor = (function(){
             //TODO: When this is no longer a table, give each component an id to be identified easier.
             var tableIndex = $(this).closest('tr').index();
             var value = $(this).val();
-            gisportal.events.trigger('graphComponent.axisChange', tableIndex, value);
+            var params = {
+               "event": "graphComponent.axisChange",
+               "index": tableIndex,
+               "value": value
+            };
+            gisportal.events.trigger('graphComponent.axisChange', params);
          });
 
          // The tooltip which tells the user about the range of available data

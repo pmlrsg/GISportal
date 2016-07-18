@@ -54,7 +54,11 @@ gisportal.map_settings.init = function() {
 
    $('#refresh-cache-box').on('change', function(){
       var checked = $(this).is(':checked');
-      gisportal.events.trigger('refreshCacheBox.clicked', checked);
+      var params = {
+         "event" : "refreshCacheBox.clicked",
+         "checked" : checked
+      };
+      gisportal.events.trigger('refreshCacheBox.clicked', params);
    });
 
    // enable ddslick'ness
@@ -108,7 +112,11 @@ gisportal.map_settings.init = function() {
 
    $('#mapSettingsPanel').bind('scroll', function() {
       var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
-      gisportal.events.trigger('mapsettingspanel.scroll', scrollPercent);
+      var params = {
+         "event": "mapsettingspanel.scroll",
+         "scrollPercent": scrollPercent
+      };
+      gisportal.events.trigger('mapsettingspanel.scroll', params);
    });
 
    // WMS URL event handler
@@ -145,7 +153,10 @@ gisportal.map_settings.init = function() {
             gisportal.addLayersForm.refreshStorageInfo();
          }
       }
-      gisportal.events.trigger('wms.submitted');
+      var params = {
+         "event" : "wms.submitted"
+      };
+      gisportal.events.trigger('wms.submitted', params);
    });
 
    // WMS URL event handler for refresh cache checkbox
@@ -186,7 +197,12 @@ gisportal.map_settings.init = function() {
             typed = e.originalEvent.clipboardData.getData('text/plain');
          }catch(err){}
       }
-      gisportal.events.trigger('wms.typing', typed, e.type);
+      var params = {
+         "event" : "wms.typing",
+         "typedValue" : typed,
+         "eType" : e.type
+      };
+      gisportal.events.trigger('wms.typing', params);
    });
 
 };

@@ -444,7 +444,12 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
-   gisportal.events.trigger('date.zoom', startDate, endDate);
+   var params = {
+      "event" : "date.zoom",
+      "startDate" : startDate,
+      "endDate": endDate
+   };
+   gisportal.events.trigger('date.zoom', params);
 };
 
 // Add a new time bar using detailed parameters
@@ -578,8 +583,11 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    gisportal.filterLayersByDate(date);
    self.showDate(date);
    gisportal.timeline.redraw();
-
-   gisportal.events.trigger('date.selected', date);
+   var params = {
+      "event" : "date.selected",
+      "date" : date
+   };
+   gisportal.events.trigger('date.selected', params);
 };
 
 gisportal.TimeLine.prototype.showDate = function(date) {

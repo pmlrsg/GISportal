@@ -243,7 +243,13 @@
         var index = ddOptions.index(selectedOption);
 
         selectIndex(obj, index, doCallback);
-        gisportal.events.trigger('ddslick.selectValue', obj, value, doCallback);
+        var params = {
+            "event" : "ddslick.selectValue",
+            "obj" : obj.attr('id'),
+            "value": value,
+            "doCallback": doCallback
+        };
+        gisportal.events.trigger('ddslick.selectValue', params);
     }
 
     //Private: Select index
@@ -336,7 +342,12 @@
 
         //Fix text height (i.e. display title in center), if there is no description
         adjustOptionsHeight(obj);
-        gisportal.events.trigger('ddslick.open', obj);
+
+        var params = {
+            "event" : "ddslick.open",
+            "obj" : obj.attr('id')
+        };
+        gisportal.events.trigger('ddslick.open', params);
     }
 
     //Private: Close the drop down options
@@ -344,8 +355,11 @@
         //Close drop down and adjust pointer direction
         obj.find('.dd-options').slideUp(50);
         obj.find('.dd-pointer').removeClass('dd-pointer-up').parent().removeClass('active');
-        
-        gisportal.events.trigger('ddslick.close', obj);
+        var params = {
+            "event" : "ddslick.close",
+            "obj" : obj.attr('id')
+        };
+        gisportal.events.trigger('ddslick.close', params);
     }
 
     //Private: Adjust appearence for selected option (move title to middle), when no desripction

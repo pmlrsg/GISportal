@@ -51,7 +51,10 @@ gisportal.refinePanel.initDOM = function(data) {
       gisportal.configurePanel.reset();
       gisportal.configurePanel.open();
       gisportal.refinePanel.close();
-      gisportal.events.trigger('refinePanel.cancel');
+      var params = {
+         "event" : "refinePanel.cancel"
+      };
+      gisportal.events.trigger('refinePanel.cancel'. params);
    });
 };
 
@@ -157,11 +160,19 @@ gisportal.refinePanel.refreshData = function(data) {
          }else{
             gisportal.refinePanel.removeCategory(cat);
          }
-         gisportal.events.trigger('refinePanel.removeCat', cat);
+         var params = {
+            "event" : "refinePanel.removeCat",
+            "cat": cat
+         };
+         gisportal.events.trigger('refinePanel.removeCat', params);
       });
       $('.indicator-select').bind('scroll', function() {
          var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
-         gisportal.events.trigger('refinePanel.scroll', scrollPercent);
+         var params = {
+            "event": "refinePanel.scroll",
+            "scrollPercent": scrollPercent
+         };
+         gisportal.events.trigger('refinePanel.scroll', params);
       });
 
       // build an object of gisportal.layers based on refinedIndicators so that we can pass this to 

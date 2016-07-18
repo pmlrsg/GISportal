@@ -471,7 +471,10 @@ gisportal.mapInit = function() {
          feature[0].setStyle(feature[1]);
       });
       gisportal.selectedFeatures = [];
-      gisportal.events.trigger('dataPopup.close');
+      var params = {
+         "event": "dataPopup.close"
+      };
+      gisportal.events.trigger('dataPopup.close', params);
       return false;
    };
 
@@ -595,7 +598,11 @@ gisportal.mapInit = function() {
          }
       }
       if(overlay == gisportal.featureOverlay && found){
-         gisportal.events.trigger('featureOverlay.removeType', overlayType);
+         var params = {
+            "event": "featureOverlay.removeType",
+            "overlayType": overlayType
+         };
+         gisportal.events.trigger('featureOverlay.removeType', params);
       }
    };
 
@@ -615,6 +622,7 @@ gisportal.mapInit = function() {
       }
       var hoverFeatures = gisportal.featureOverlay.getSource().getFeatures();
       // TODO: Filter this list to only "hover" layers
+      var params;
       if(hoverFeatures.length > 0){
          if(!feature){
             // Makes sure any hover features are removed
@@ -626,11 +634,21 @@ gisportal.mapInit = function() {
          if(!_.isEqual(hovered_feature.getGeometry().getCoordinates(), feature.getGeometry().getCoordinates())){
             gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
             gisportal.hoverFeature(feature);
-            gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
+            params = {
+               "event": "selectPolygon.hover",
+               "coordinate": map.getCoordinateFromPixel(e.pixel),
+               "id": feature.getId()
+            };
+            gisportal.events.trigger("selectPolygon.hover", params);
          }
       }else if(feature){
          gisportal.hoverFeature(feature);
-         gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
+         params = {
+            "event": "selectPolygon.hover",
+            "coordinate": map.getCoordinateFromPixel(e.pixel),
+            "id": feature.getId()
+         };
+         gisportal.events.trigger("selectPolygon.hover", params);
       }
    });
    gisportal.hoverFeature = function(feature){
@@ -655,14 +673,23 @@ gisportal.mapInit = function() {
                return;
             }
             gisportal.selectFeature(feature);
-            gisportal.events.trigger("selectPolygon.select", map.getCoordinateFromPixel(e.pixel), feature.getId());
+            var params = {
+               "event": "selectPolygon.select",
+               "coordinate": map.getCoordinateFromPixel(e.pixel),
+               "id": feature.getId()
+            };
+            gisportal.events.trigger("selectPolygon.select", params);
             // Only does it for one feature
             return;
          });
       }
       else {
          gisportal.displayDataPopup(e.pixel);
-         gisportal.events.trigger('dataPopup.display', map.getCoordinateFromPixel(e.pixel));
+         var params = {
+            "event": "dataPopup.display",
+            "coordinate": map.getCoordinateFromPixel(e.pixel)
+         };
+         gisportal.events.trigger('dataPopup.display', params);
       }
    });
    gisportal.selectFeature = function(feature){
@@ -721,14 +748,23 @@ gisportal.mapInit = function() {
          gisportal.addDataPopup(coordinate, pixel);
       }
       if(gisportal.selectionTools.isDrawing){
-         gisportal.events.trigger('olDraw.click', coordinate);
+         var params = {
+            "event": "olDraw.click",
+            "coordinate": coordinate
+         };
+         gisportal.events.trigger('olDraw.click', params);
       }
    };
 
    map.on("moveend", function(data) {
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
-      gisportal.events.trigger('map.move', centre, zoom);
+      var params = { 
+         "event" : "map.move",
+         "centre" : centre,
+         "zoom": zoom
+      };
+      gisportal.events.trigger('map.move', params);
    });
  
    gisportal.loadLayers();
@@ -1443,7 +1479,10 @@ gisportal.main = function() {
       function showPanel()  {
          $('.js-show-tools').toggleClass('hidden', true);
          $('.panel.active').toggleClass('hidden', false);
-         gisportal.events.trigger('panel.show');
+         var params = {
+            "event" : "panel.show"
+         };
+         gisportal.events.trigger('panel.show', params);
       }
 
       $('.js-hide-panel').on('click', hidePanel);
@@ -1451,7 +1490,10 @@ gisportal.main = function() {
       function hidePanel()  {
          $('.panel.active').toggleClass('hidden', true);
          $('.js-show-tools').toggleClass('hidden', false);
-         gisportal.events.trigger('panel.hide');
+         var params = {
+            "event" : "panel.hide"
+         };
+         gisportal.events.trigger('panel.hide', params);
       }
 
       // Start setting up anything that is not layer dependent

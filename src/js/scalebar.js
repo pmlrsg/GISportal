@@ -245,7 +245,12 @@ gisportal.scalebars.autoScale = function(id, force)  {
    }
    }catch(e){}
 
-   gisportal.events.trigger('scalebar.autoscale', id, force);
+   var params = {
+      "event" : "scalebar.autoscale",
+      "id" : id,
+      "force" : force
+   };
+   gisportal.events.trigger('scalebar.autoscale', params);
 };
 
 /**
@@ -258,7 +263,11 @@ gisportal.scalebars.resetScale = function(id)  {
    max = gisportal.layers[id].defaultMaxScaleVal;
    gisportal.scalebars.validateScale(id, min, max);
 
-   gisportal.events.trigger('scalebar.reset', id);
+   var params = {
+      "event" : "scalebar.reset",
+      "id" : id
+   };
+   gisportal.events.trigger('scalebar.reset', params);
 };
 
 /**
