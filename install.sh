@@ -12,7 +12,7 @@ function getDomainInfo {
    read -p "Do you wish to setup authentication for this domain? (y/n)?" -n 1 choice2 #-
    case "$choice2" in 
      y|Y ) auth="y";;
-     * ) return ;;
+     * ) auth="n"; return ;;
    esac
    while [ -e config/site_settings/"$nicedomain"/config-server.js ]
    do
@@ -56,23 +56,56 @@ do
 	getDomainInfo;
 done
 
+mail=
+echo ""
+# Add this back in when the rest of the email information is sorted
+#echo "Which email service would you like to use to send collaboraiton invites? (leave blank if none) ['mailgun', 'gmail' or 'other']: "; read -e mail;
+
+if [ -n "$mail" ]
+   then
+      if [ $mail == 'mailgun' ]
+         then
+            echo "";
+            echo "Please enter a mailgun API key: "; read -e key;
+            echo "Please enter a mailgun domain: "; read -e domain;
+            mailconf="email{method:'$mail', mailgun_api_key: '$key', mailgun_domain: '$domain'}"
+      fi
+
+      if [ $mail == 'gmail' ] ||  [ $mail == 'other' ]
+         then
+            echo "";
+            echo "Please enter the email address: "; read -e email;
+            echo "Please enter the password: "; read -e pass;
+            mailconf="email{method:'$mail', $mail_email: '$email', $mail_pass: '$pass'}"
+      fi
+fi
+
+
 if [ ! -e config/site_settings/"$nicedomain" ]
 	then
-		mkdir -p config/site_settings/"$nicedomain";
+		mkdir -p config/site_settings/"$nicedomain"
 fi
 
 if [ ! -e config/site_settings/layers ]
 	then
-		mkdir -p config/site_settings/layers;
+		mkdir -p config/site_settings/layers
 fi
 
-if [ $domain != "/" ] && [ $auth == "y" ]
+conf=false
+
+if [ $auth == 'y' ] || [ -n "$mailconf" ]
+   then
+      conf=true;
+fi
+
+if [ $domain != "/" ] && [ "$conf" == true ]
    then
    TEMPLATE=$(cat config_examples/config-server-template.js);
    echo ${TEMPLATE} | sed s/DOMAIN_NAME/$nicedomain/ | \
       sed s/CLIENT_ID/$clientid/ | \
       sed s/CLIENT_SECRET/$clientsecret/ | \
       sed s_CALLBACK_http$ssl://$domain/app/user/auth/google/callback_ | \
+      sed "s|EMAIL|$mailconf|" | \
       sed s/ADMINISTRATOR/$admin_email/ > config/site_settings/$nicedomain/config-server.js;
 fi
 

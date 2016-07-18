@@ -10,23 +10,5 @@ GLOBAL.config['DOMAIN_NAME'] = {
    },
    admins:['ADMINISTRATOR'],
    cssFile:"GISportal",
-   email:{
-      method:"mailgun", //"mailgun", "gmail", "other"
-      //MAILGUN
-      //-----------------------------------------------------
-      mailgun_api_key: "mailgun_api_key",
-      mailgun_domain: "mailgun_domain",
-      //-----------------------------------------------------
-      //GMAIL
-      //-----------------------------------------------------
-      gmail_email: "gmail_email",
-      gmail_pass: "gmail_pass",
-      //-----------------------------------------------------
-      //-----------------------------------------------------
-      //OTHER
-      //-----------------------------------------------------
-      other_email: "other_email",
-      other_pass: "other_pass"
-      //-----------------------------------------------------
-   }
+   EMAIL
 }
