@@ -469,11 +469,10 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       // redraw is done in zoom
       var data = gisportal.timeline.layerbars[0];
       gisportal.timeline.zoomDate(data.startDate, data.endDate);
-      //Fix
-      if(gisportal.timeline.getDate().toISOString() == "1900-01-01T00:00:00.000Z"){
-         gisportal.timeline.setDate(data.endDate);
+
+      if(!moment(gisportal.timeline.getDate()).isBetween(moment(startDate), moment(endDate))){
+         gisportal.timeline.setDate(endDate);
       }
-      
    }  
    
    this.reHeight();
