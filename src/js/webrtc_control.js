@@ -16,12 +16,6 @@ webRTC.initMedia = function() {
 
    var startTime;
 
-   webRTC.peerConfig = {
-      'iceServers': [{
-         'url': 'stun:stun.l.google.com:19302'
-      }]
-   };
-
    // Gets the audio and video
    var constraints = {
       video: true,
@@ -222,10 +216,6 @@ function handleUserMediaError(error) {
    $.notify("Error Getting Media: " + (error.message || "Internal Error") + "\nPlease try again");
 }
 
-// if (location.hostname != "localhost") {
-//    requestTurn('https://computeengineondemand.appspot.com/turn?username=41784574&key=4080218913');
-// }
-
 function maybeStart() {
    if (!webRTC.isStarted && webRTC.localStream && webRTC.isChannelReady) {
       createPeerConnection();
@@ -360,35 +350,6 @@ function handlePeerConnError(err) {
    var msg = "Problem with the peer connection";
 
    console.log(msg + " : " + err);
-}
-
-function requestTurn(turn_url) {
-   var turnExists = false;
-   for (var i in webRTC.pc_config.iceServers) {
-      if (webRTC.pc_config.iceServers[i].url.substr(0, 5) === 'turn:') {
-         turnExists = true;
-         webRTC.turnReady = true;
-         break;
-      }
-   }
-   if (!turnExists) {
-      console.log('Getting TURN server from ', turn_url);
-      // No TURN server. Get one from computeengineondemand.appspot.com:
-      var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
-         if (xhr.readyState === 4 && xhr.status === 200) {
-            var turnServer = JSON.parse(xhr.responseText);
-            console.log('Got TURN server: ', turnServer);
-            webRTC.pc_config.iceServers.push({
-               'url': 'turn:' + turnServer.username + '@' + turnServer.turn,
-               'credential': turnServer.password
-            });
-            webRTC.turnReady = true;
-         }
-      };
-      xhr.open('GET', turn_url, true);
-      xhr.send();
-   }
 }
 
 function handleRemoteStreamAdded(event) {
