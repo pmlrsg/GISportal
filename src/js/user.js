@@ -7,6 +7,10 @@ gisportal.user.loggedIn = function(){
       $.ajax({
          url: gisportal.middlewarePath + '/user/logout',
          success: function() {
+            collaboration.active = false;
+            collaboration.role = "";
+            collaboration.diverged = false;
+            socket.disconnect();
             gisportal.user.initDOM();
             if(gisportal.config.collaborationFeatures.enabled){
                collaboration.initDOM();

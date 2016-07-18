@@ -32,6 +32,11 @@ $(document).ready(function()  {
 
       gisportal.events.trigger('tab.select', layerId, tabName);
    });
+   $(window).resize(function(e){
+      if(e.target == window && collaboration.active && socket && socket.io && socket.io.engine){
+         collaboration._emit("window.resized", {id: socket.io.engine.id, mapSize: [this.innerWidth, this.innerHeight]}, force=true);
+      }
+   });
    $('.panel').on('change', '.js-tab-trigger', changeTab);
    $('.panel').on('change', '.js-icon-trigger', activeIcon);
    $('.panel').on('mousedown', '.js-closable', closeTab);

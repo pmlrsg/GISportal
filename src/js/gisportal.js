@@ -479,7 +479,8 @@ gisportal.mapInit = function() {
       target: 'map',
       controls: [
          new ol.control.FullScreen({
-            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body')
+            label: $('<span class="icon-arrow-move-1"><span>').appendTo('body'),
+            source: document.documentElement
          }),
          new ol.control.Zoom({
             zoomInLabel: $('<span class="icon-zoom-in"></span>').appendTo('body'),
@@ -731,6 +732,14 @@ gisportal.mapInit = function() {
    });
  
    gisportal.loadLayers();
+
+   // Adds and removes the correct grabbing css for the pointer.
+   $('#map canvas').on('mousedown', function(){
+      $(this).toggleClass('grabbing', true).toggleClass('grab', false);
+   });
+   $('#map canvas').on('mouseup', function(){
+      $(this).toggleClass('grab', true).toggleClass('grabbing', false);
+   });
 
    // Create the base layers, country borders layers and graticules; set defaults
    gisportal.map_settings.init();         // map-settings.js
@@ -1148,8 +1157,10 @@ gisportal.loadLayerState = function(){
          setScaleValues(id, min, max, log, autoScale);
 
          // Sets the layers opacity to the value that the user had previously
-         $('#tab-' + id + '-opacity').val(opacity*100);
-         gisportal.layers[id].setOpacity(opacity);
+         if(gisportal.layers[id].setOpacity){
+            $('#tab-' + id + '-opacity').val(opacity*100);
+            gisportal.layers[id].setOpacity(opacity);
+         }
 
          // Sets the layers opacity to the value that the user had previously
          $('#tab-' + id + '-colorbands').val(colorbands);
@@ -1326,6 +1337,10 @@ gisportal.main = function() {
    }
    if(gisportal.config.logoImage){
       $('.footer-logo').attr({"src": gisportal.config.logoImage}).parent().toggleClass('hidden', false);
+      // Makes sure that the logo image is centered between the buttons properly
+      var left = parseInt($('.about-button').css('width')) + 5;
+      var right = parseInt($('#share-map').css('width')) + 5;
+      $('.footer-logo').css({"max-width": "calc(100% - " + (left + right) + "px)", "margin-left": left + "px", "margin-right": right + "px"});
    }
 
    if( gisportal.config.siteMode == "production" ) {
@@ -1352,6 +1367,38 @@ gisportal.main = function() {
       }
       gisportal.config.aboveMaxColor = col;
    }
+
+   gisportal.pageTitleNotification = {
+      Vars:{
+         OriginalTitle: document.title,
+         Interval: null
+      },    
+      On: function(notification, intervalSpeed, messageNotify){
+         var _this = this;
+         clearInterval(_this.Vars.Interval);
+         _this.Vars.Interval = setInterval(function(){
+            document.title = (_this.Vars.OriginalTitle == document.title) ? notification : _this.Vars.OriginalTitle;
+         }, (intervalSpeed) ? intervalSpeed : 1000);
+         if(messageNotify){
+            var notify_number = $('[data-panel-name="collab-chat"] span.notify-number');
+            if(notify_number.length <= 0){
+               $('[data-panel-name="collab-chat"] span[title]').append('<span class="notify-number" title="No. of New Messages">1</span>');
+            }else{
+               if(notify_number.html() == "∞" || parseInt(notify_number.html()) >= 99){
+                  notify_number.html("∞");
+               }else{
+                  notify_number.html(parseInt(notify_number.html()) + 1);
+               }
+            }
+            collaboration.highlightElementShake($('.js-show-panel[data-panel-name="collab-chat"]'));
+         }
+      },
+      Off: function(){
+         $('[data-panel-name="collab-chat"] span.notify-number').remove();
+         clearInterval(this.Vars.Interval);
+         document.title = this.Vars.OriginalTitle;   
+      }
+   };
 
    if(!gisportal.config.belowMinColor){
       gisportal.config.belowMinColor = gisportal.config.belowMinColour;
@@ -1574,12 +1621,16 @@ gisportal.launchMap = function(){
    setInterval( gisportal.autoSaveState, 60000 );
 
    //Once they are past the splash page warn them if they leave
-   window.onbeforeunload = function(){
+   window.onbeforeunload = function(e){
       gisportal.autoSaveState();
-      if( gisportal.config.siteMode == "production")
-         return "Warning. You're about to leave the page";
-      else
+      hangup();
+      var msg = "Warning. You're about to leave the page";
+      if( gisportal.config.siteMode == "production"){
+         e.returnValue = msg;
+         return msg;
+      }else{
          return;
+      }
    };
 
 };
@@ -1764,16 +1815,32 @@ gisportal.hideAllPopups = function() {
    });
 };
 
-gisportal.showModalMessage = function(html, timeout) {
+gisportal.showModalMessage = function(html, timeout, answerTimeout) {
+   gisportal.hideModalMessage();
    var t = parseInt(timeout) || 2000;
    var holder = $('.js-modal-message-popup');
    var target = $('.js-modal-message-html');
 
    target.html(html);
    holder.toggleClass('hidden', false);
-   setTimeout(function() {
+   gisportal.modalTimeout = setTimeout(function() {
+      gisportal.hideModalMessage();
       holder.toggleClass('hidden', true);
+      if(answerTimeout){
+         doNoAnswer();
+      }
    }, t);
+};
+
+gisportal.hideModalMessage = function() {
+   var holder = $('.js-modal-message-popup');
+   var target = $('.js-modal-message-html');
+
+   target.html("");
+   holder.toggleClass('hidden', true);
+   if(gisportal.modalTimeout){
+      clearTimeout(gisportal.modalTimeout);
+   }
 };
 
 // This function gets a list of all the available tags

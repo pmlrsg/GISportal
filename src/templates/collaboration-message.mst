@@ -1,0 +1,8 @@
+<div class="clearfix outer-div" data-sender="{{email}}">
+   <div class="inner-div pull-{{side}}">
+      {{#if image}}
+         <img src="{{image}}" title="{{email}}" class="avatar-small pull-{{side}}">
+      {{/if}}
+         <p title="{{email}}" class="pull-{{side}}" margin-{{side}}:5px;"><span class="individual-message">{{{message}}}</span></p>
+   </div>
+</div>

@@ -18,6 +18,22 @@ gisportal.events.bind("room.member-diverged", function(event, email) {
    collaboration._emit('c_event', params, force=true);
 });
 
+gisportal.events.bind("extent.changed", function(event) {
+   var params = {
+      "event" : "extent.changed"
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
+gisportal.events.bind("message.recieved", function(event, message, sender) {
+   var params = {
+      "event" : "message.recieved",
+      "message" : message,
+      "sender" : sender
+   };
+   collaboration._emit('c_event', params, force=true);
+});
+
 gisportal.events.bind("date.selected", function(event, date) {
    var params = {
       "event" : "date.selected",
@@ -57,6 +73,21 @@ gisportal.events.bind("ddslick.selectValue", function(event, obj, value, doCallb
       "obj" : obj.attr('id'),
       "value": value,
       "doCallback": doCallback
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind("view.loaded", function(event, view_name) {
+   var params = {
+      "event" : "view.loaded",
+      "view_name" : view_name
+   };
+   collaboration._emit('c_event', params);
+});
+
+gisportal.events.bind("view.removed", function(event) {
+   var params = {
+      "event" : "view.removed"
    };
    collaboration._emit('c_event', params);
 });

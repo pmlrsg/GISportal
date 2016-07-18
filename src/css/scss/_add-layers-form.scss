@@ -98,13 +98,15 @@
 
 .layers-form-left textarea{
    max-height:400px;
+   min-height:50px;
    max-width:100%;
    min-width:100%;
    height:150px;
 }
 
 .server-form .layers-form-left textarea{
-   max-height:200px;
+   max-height:160px;
+   min-height:50px;
    overflow: hidden;
    height:100px;
 }
@@ -149,6 +151,7 @@
 
 .overlay-container-form .js-layers-form-submit{
    margin-left:5px;
+   margin-bottom: 15px;
 }
 
 .layers-form .icon-btn{
@@ -181,6 +184,7 @@
 .layers-form-right textarea {
    height:50px;
    max-height: 150px;
+   min-height:30px;
 }
 
 .layers-form-right textarea[data-id="1"] {
