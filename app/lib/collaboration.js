@@ -1,9 +1,12 @@
-
 var cookie = require('cookie');
 var cookieParser = require('cookie-parser');
 var crypto = require('crypto');
 var redis = require('redis');
 var client = redis.createClient();
+var swearJar = require('swearjar');
+var Jimp = require('jimp');
+var utils = require('./utils.js');
+var email   = require("emailjs");
 
 var collaboration = {};
 
@@ -21,6 +24,7 @@ collaboration.init = function(io, app, config) {
          });
       }
    });
+   client.ltrim("people", 1, 0);
 
    io.set('authorization', function (handshakeData, accept) {
       // check if there's a cookie header
@@ -69,6 +73,54 @@ collaboration.init = function(io, app, config) {
          user.email = emails[0].value;
          user.name = session.passport.user.displayName;
          user.provider = session.passport.user.provider;
+         user.image = session.passport.user._json.picture;
+
+         Jimp.read(user.image, function(err, image1){ // Gets the image file from the URL
+            if (!err){
+               Jimp.read(__dirname + "/../../html/img/google_default.jpg", function(err, image2){ // Gets the image file from the img folder
+                  if (!err){
+                     if(Jimp.distance(image1, image2) === 0){
+                        user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
+                        var roomId = socket.room;
+                        var person;
+                        client.get(roomId, function(err, obj) {
+                           if(!obj){
+                              return false;
+                           }
+                           var room = JSON.parse(obj);
+                           for(person in room.people){
+                              var this_person = room.people[person];
+                              if(this_person.email == user.email){
+                                 this_person.image = user.image;
+                              }
+                           }
+                           client.set(roomId, JSON.stringify(room), function(err){
+                              if(!err){
+                                 io.sockets.in(socket.room).emit('members.update', {
+                                    "roomId": socket.room,
+                                    "people": room.people
+                                 });
+                              }
+                           });
+                        });
+                     }
+                  }
+               });
+            }
+         });
+         client.lrange("people", 0, -1, function(err, obj) {
+            if(!obj){
+               return false;
+            }
+            for(person in obj){
+               var this_person = JSON.parse(obj[person]);
+               if(this_person.email == user.email && this_person.id == sid){
+                  return false;
+               }
+            }
+            client.rpush(["people", JSON.stringify({"email": user.email, "id": socket.id})], function(err) {});
+         });
+         if(crypto)
          
          console.log(user.email +' connected: '+sid);
       });
@@ -86,6 +138,7 @@ collaboration.init = function(io, app, config) {
             var leavingUserId = socket.id;
             var people = room.people;
             var departed = '';
+            var image;
             var reassignPresenter = false;
             var newPresenterId = null;
             var newPresenterEmail = null;
@@ -99,6 +152,7 @@ collaboration.init = function(io, app, config) {
                      }
                      // get their name so others can be warned that `departed` has left the building
                      departed = people[i].name || people[i].email;
+                     image = people[i].image;
                      // take the user out of the people array
                      people.splice(i, 1);
                      break;
@@ -122,7 +176,9 @@ collaboration.init = function(io, app, config) {
                      io.sockets.in(socket.room).emit('room.member-left', {
                         "roomId": roomId,
                         "people": people,
-                        "departed" : departed
+                        "departed" : departed,
+                        "image": image,
+                        "departedId": leavingUserId
                      });
 
                      if (newPresenterId !== null) {
@@ -137,8 +193,10 @@ collaboration.init = function(io, app, config) {
          })
       })
 
-      socket.on('room.new', function() {
+      socket.on('room.new', function(data) {
          console.log('starting room');
+         var invitees = data.invitees;
+         var pageTitle = data.pageTitle;
          var shasum = crypto.createHash('sha256');
          shasum.update(Date.now().toString());
          var roomId = shasum.digest('hex').substr(0,6);
@@ -147,9 +205,11 @@ collaboration.init = function(io, app, config) {
                "id": socket.id,
                "email": user.email,
                "name": user.name,
+               "image": user.image,
                "presenter": true,
                "owner": true,
-               "diverged": false
+               "diverged": false,
+               "mapSize": data.mapSize
             }],
             "owner": user.email,
             "presenter": user.email,
@@ -162,6 +222,29 @@ collaboration.init = function(io, app, config) {
             if(!err){
                socket.join(socket.room, function() {
                   io.sockets.in(socket.room).emit('room.created', room);
+                  var domain_name = socket.handshake.headers.referer.split('?')[0];
+                  var email_config = config[utils.nicifyDomain(domain_name)].email;
+                  var mail_system;
+                  if(email_config){
+                     if(email_config.method == "mailgun"){
+                        if(email_config.mailgun_api_key && email_config.mailgun_domain){
+                           mail_system = require('mailgun-js')({apiKey: email_config.mailgun_api_key, domain: email_config.mailgun_domain}).messages();
+                        }
+                     }else if(email_config.method == "smtp"){
+                        if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
+                           mail_system = email.server.connect({
+                              user: email_config.smtp_email, 
+                              password: email_config.smtp_pass, 
+                              host: email_config.smtp_host, 
+                              domain: email_config.smtp_host, 
+                              ssl: email_config.smtp_ssl, 
+                              port: email_config.smtp_port, 
+                              authentication: email_config.smtp_auth
+                           });
+                        }
+                     }
+                     invitePeopleToRoom(invitees, domain_name, socket.room.toUpperCase(), pageTitle, user, mail_system, email_config.method, io);
+                  }
                });
             }
          });
@@ -169,11 +252,13 @@ collaboration.init = function(io, app, config) {
          
       })
 
-      socket.on('room.join', function(roomId) {
+      socket.on('room.join', function(obj) {
+         roomId = obj.roomId;
+         mapSize = obj.mapSize;
          client.get(roomId, function(err, obj) {
             if(!obj){
                console.log(roomId +' does not exist');
-               //io.sockets.connected[socket.id].emit('room.invalid-id');
+               io.sockets.connected[socket.id].emit('room.invalid-id', roomId);
                return;
             }
             var room = JSON.parse(obj);
@@ -195,9 +280,23 @@ collaboration.init = function(io, app, config) {
                   "id": socket.id,
                   "email": user.email,
                   "name": user.name,
+                  "image": user.image,
                   "presenter": presenter,
                   "owner": owner,
-                  "diverged": false
+                  "diverged": false,
+                  "mapSize": mapSize
+               }
+               var duplicate;
+               for( var person in room.people){
+                  if(room.people[person].email == user.email){
+                     if(io.sockets.connected[room.people[person].id]){
+                        io.sockets.connected[room.people[person].id].emit('room.double-login');
+                     }
+                     duplicate = person
+                  }
+               }
+               if(duplicate && room.people[duplicate]){
+                  room.people.splice(duplicate, 1);
                }
                room.people.push(member);
                client.set(roomId, JSON.stringify(room), function(err){
@@ -284,15 +383,14 @@ collaboration.init = function(io, app, config) {
          console.log(data);
          io.sockets.in(socket.room).emit(data.event, {
             "presenter": user.name || user.email,
+            "image": user.image,
             "provider": user.provider,
             "params" : data
          })
       });
 
-      socket.on('room.diverge', function(id) {
+      var mediaChange = function(change){
          var roomId = socket.room;
-         console.log(id + ' has diverged from room ' + roomId);
-         
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -301,9 +399,57 @@ collaboration.init = function(io, app, config) {
             var room = JSON.parse(obj);
             var people = room.people;
             for (var p in people) {
+               if (people[p].id == socket.id) {
+                  if(change == "disabled"){
+                     people[p].dataEnabled = false;
+                  }else if(change == "enabled"){
+                     people[p].dataEnabled = true;
+                  }
+                  name = people[p].name || people[p].email;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(socket.room).emit('members.update', {
+                     "roomId": socket.room,
+                     "people": people
+                  });
+               }
+            });
+         });
+      }
+
+      socket.on('webrtc_event', function(data) {
+         console.log(data);
+         io.sockets.in(socket.room).emit(data.event, {
+            "sender": user.email,
+            "sender_name": user.name || user.email,
+            "socketId": socket.id,
+            "params" : data
+         });
+         if(data.message == "media.disabled" || data.message == "media.enabled"){
+            mediaChange(data.message.split('.')[1]);
+         }
+      });
+
+      socket.on('room.diverge', function(id) {
+         var roomId = socket.room;
+         console.log(user.email + ' has diverged from room ' + roomId);
+         
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var name;
+            var image;
+            var room = JSON.parse(obj);
+            var people = room.people;
+            for (var p in people) {
                if (people[p].id == id) {
                   people[p].diverged = true;
                   name = people[p].name || people[p].email;
+                  image = people[p].image;
                }
             }
 
@@ -312,7 +458,8 @@ collaboration.init = function(io, app, config) {
                   io.sockets.in(socket.room).emit('room.member-diverged', {
                      "roomId": socket.room,
                      "people": people,
-                     "divergent": name
+                     "divergent": name,
+                     "image": image
                   });
                }
             });
@@ -321,7 +468,7 @@ collaboration.init = function(io, app, config) {
 
       socket.on('room.merge', function(id) {
          var roomId = socket.room;
-         console.log(id + ' has merged back into room ' + roomId);
+         console.log(user.email + ' has merged back into room ' + roomId);
          
          client.get(roomId, function(err, obj) {
             if(!obj){
@@ -335,6 +482,7 @@ collaboration.init = function(io, app, config) {
                   people[p].diverged = false;
                   name = people[p].name || people[p].email;
                   email = people[p].email;
+                  image = people[p].image;
                }
             }
 
@@ -344,13 +492,103 @@ collaboration.init = function(io, app, config) {
                      "roomId": socket.room,
                      "people": people,
                      "merger": name,
-                     "email": email
+                     "email": email,
+                     "image": image
                   });
                }
             });
          });
       });
 
+      socket.on('message.sent', function(data) {
+         var sender = data.id;
+         var message = data.message;
+         var roomId = socket.room;
+         console.log(user.email + ' : ' + message);
+         var message = swearJar.censor(message.replace(/<\/?[^>]+(>|$)/g, ""));
+         
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var room = JSON.parse(obj);
+            var people = room.people;
 
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(roomId).emit('message.recieved', {
+                     "roomId": roomId,
+                     "people": people,
+                     "message": message,
+                     "sender": sender
+                  });
+               }
+            });
+         });
+      });
+
+      socket.on('window.resized', function(data) {
+         var id = data.id;
+         var mapSize = data.mapSize;
+         var roomId = socket.room;
+         console.log(user.email + ' : resize window : ' + mapSize);
+
+         client.get(roomId, function(err, obj) {
+            if(!obj){
+               return;
+            }
+            var room = JSON.parse(obj);
+            var people = room.people;
+
+            for (var p in people) {
+               if (people[p].id == id) {
+                  people[p].mapSize = mapSize;
+               }
+            }
+
+            client.set(roomId, JSON.stringify(room), function(err){
+               if(!err){
+                  io.sockets.in(roomId).emit('extent.changed', {
+                     "people": people
+                  });
+               }
+            });
+         });
+      });
    });
-}
+};
+
+invitePeopleToRoom = function(invitees, domain, roomId, pageTitle, user, mail_system, mail_system_name, io){
+   roomURL = domain + "?room=" + roomId;
+   var data = {
+     from: pageTitle + ' on behalf of ' + user.name + ' <' + user.email + '>',
+     subject: pageTitle + ' Collaboration Invitation',
+     text: 'You have been invited to join a portal collaboration session.\n\nPlease go to: ' + roomURL + ' to join the room.'
+   };
+   client.lrange("people", 0, -1, function(err, list){
+      for(var person in invitees){
+         data.to = invitees[person];
+         if(mail_system){
+            mail_system.send(data, function (error, response) {
+               if(error){
+                  console.log("Error: " + error);
+               }else{
+                  console.log("Email " + response.message);
+               }
+            });
+         }
+         for(var index in list){
+            var info = JSON.parse(list[index]);
+            if(data.to == info.email){
+               if(io.sockets.connected[info.id]){
+                  console.log(io.sockets.connected[info.id].handshake.headers.referer)
+                  console.log(domain)
+                  if(io.sockets.connected[info.id].handshake.headers.referer == domain){
+                     io.sockets.connected[info.id].emit('room.invite', {"domain": domain, "roomId": roomId, "from": user.name});
+                  }
+               }
+            }
+         }
+      }
+   });
+};

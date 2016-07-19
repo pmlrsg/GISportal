@@ -308,40 +308,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    }
    
    // The keydown event listener is removed from the document so that there is only ever one on there.
-   $(document).off( 'keydown' );
+   $(document).off('keydown', gisportal.addLayersForm.keydownListener);
 
    // The keydown event listener that is added allows for the user to close the form by pressing the 'Esc' key, and to navigate through layers by pressing the arrow keys.
-   $(document).on( 'keydown', function ( e ) {
-      if(document.activeElement.nodeName == "BODY"){
-         var current_page = gisportal.addLayersForm.form_info.current_page;
-         switch(e.keyCode){
-            case 27:
-               if(!$( '.js-user-feedback-popup' ).hasClass('hidden')){
-                  $( '.js-user-feedback-popup' ).toggleClass('hidden', true);
-               }else{
-                  if(!gisportal.form_working){
-                     $( 'div.js-layer-form-popup' ).toggleClass('hidden', true);
-                     gisportal.addLayersForm.form_info.display_form = false;
-                     gisportal.addLayersForm.refreshStorageInfo();
-                  }
-               }
-               gisportal.events.trigger('body.keydown', e.keyCode);
-               break;
-            case 37:
-               if(current_page > 1){
-                  gisportal.addLayersForm.displayForm(total_pages, current_page-1, form_div);
-               }
-               gisportal.events.trigger('body.keydown', e.keyCode);
-               break;
-            case 39:
-               if(current_page < total_pages){
-                  gisportal.addLayersForm.displayForm(total_pages, current_page+1, form_div);
-               }
-               gisportal.events.trigger('body.keydown', e.keyCode);
-               break;
-         }
-      }
-   });
+   $(document).on( 'keydown', gisportal.addLayersForm.keydownListener);
 
    // This adds the click listener to the 'add to all layers' spans
    $('span.add-to-all-layers').on( 'click', function () {
@@ -501,9 +471,44 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
    });
    gisportal.addLayersForm.form_info.current_page = current_page;// Saves the current_page for loading next time.
+   gisportal.addLayersForm.form_info.total_pages = total_pages;// Saves the current_page for loading next time.
    gisportal.addLayersForm.refreshStorageInfo();
    // Input listeners are then added to the paginator and the buttons.
    gisportal.addLayersForm.addInputListeners();
+};
+
+gisportal.addLayersForm.keydownListener = function ( e ) {
+   if(document.activeElement.nodeName == "BODY"){
+      var current_page = gisportal.addLayersForm.form_info.current_page;
+      var total_pages = gisportal.addLayersForm.form_info.total_pages;
+      var form_div = "div.js-layer-form-html";
+      switch(e.keyCode){
+         case 27:
+            if(!$( '.js-user-feedback-popup' ).hasClass('hidden')){
+               $( '.js-user-feedback-popup' ).toggleClass('hidden', true);
+            }else{
+               if(!gisportal.form_working){
+                  $( 'div.js-layer-form-popup' ).toggleClass('hidden', true);
+                  gisportal.addLayersForm.form_info.display_form = false;
+                  gisportal.addLayersForm.refreshStorageInfo();
+               }
+            }
+            gisportal.events.trigger('body.keydown', e.keyCode);
+            break;
+         case 37:
+            if(current_page > 1){
+               gisportal.addLayersForm.displayForm(total_pages, current_page-1, form_div);
+            }
+            gisportal.events.trigger('body.keydown', e.keyCode);
+            break;
+         case 39:
+            if(current_page < total_pages){
+               gisportal.addLayersForm.displayForm(total_pages, current_page+1, form_div);
+            }
+            gisportal.events.trigger('body.keydown', e.keyCode);
+            break;
+      }
+   }
 };
 
 gisportal.addLayersForm.addToDict = function(standard_name, display_name, tags){

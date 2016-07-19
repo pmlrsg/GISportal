@@ -1,0 +1,4 @@
+<p>You have been invited to join a collaboration session{{#if from}} by {{from}}{{/if}}</p>
+<div class="accpet-reject-buttons">
+<button class="button js-accept-invite brand secondary answer-call" data-room="{{roomId}}"><span class="icon-call-3"></span>Accept Invitation</button>
+<button class="button js-reject-invite brand secondary reject-call"><span class="icon-hang-up"></span>Reject</button>

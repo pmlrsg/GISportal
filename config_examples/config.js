@@ -64,6 +64,7 @@ gisportal.config = {
    
    collaborationFeatures : {
       enabled : false,                               // (true|false) > If false the collaboration tab will be hidden
+      videoEnabled : false,                          // (true|false) > If false (or omitted) the collaboration video tab will be hidden
       protocol : 'http',                            // 'http' or 'https'; the connection is automagically upgraded to a websocket connection
       host : 'localhost',                  // the hostname of the node server running collaboration/index.js
       port : '',                                    // must match the port specified in collaboration/config/config.js
@@ -100,6 +101,9 @@ gisportal.config = {
    aboutText: "About", // The Text you would like the user to see on the 'About' button. If not specified 'About' will be used.
 
    pageTitle: "GIS Portal", // The Page title to be shown in the browser. If blank the title will be "GIS Portal",
-   splashImage: '../img/PML-MAP-2.png' // The image that you would like to be displayed on the splash page
+
+   splashImage: '../img/PML-MAP-2.png', // The image that you would like to be displayed on the splash page
+
+   logoImage: '../img/PML_LOGO.png'
 };
 

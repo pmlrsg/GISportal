@@ -189,7 +189,7 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
                features_list.push(geoJSON_data);
             }
          }else{
-            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Date\', \'Longitude\', \'Latitude\' in that order. \n Please correct the errors and upload again')
+            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. \n Please correct the errors and upload again')
          }
       })
       .on('error', function(err){

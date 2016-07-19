@@ -6,14 +6,12 @@
   position: absolute;
   top: 25px;
   bottom: 35px;
-  left: 25px;
-
+  left: 10px;
   min-width: 355px;
   width: 25%;
   max-width: 500px;
   user-select: none;
   box-shadow: 0px 0px 11px -2px black;
-  
   padding-top: 45px;
   padding-bottom: 39px;
   z-index: 10;
@@ -46,19 +44,18 @@
 }
 
 .panel-header .tab{
-    float: left;
-    display: inline;
-    border-bottom: 0px;
-    
-    margin: 7px 4px 0px 4px;
-    padding: 8px 8px 9px 8px;
-    
-    cursor: pointer;
+  float: left;
+  display: inline;
+  border-bottom: 0px;
+  margin: 7px 4px 0px 4px;
+  padding: 8px 8px 9px 8px;
+  cursor: pointer;
+  position: relative;
 
 }
 
 .analysis-coordinates input[type="text"]{
-  width: calc(100% - 65px);
+  width: calc(100% - 70px);
 }
 
 .panel-header .tab.active{
@@ -73,7 +70,6 @@
 
 
 .panel-header .panel-icon-tab{
-    float: right;
     font-size: 22px;
     margin: 7px;
 }
@@ -457,12 +453,13 @@ input.search:focus  {
    border: 1px solid #fafafb;
    line-height: 32px;
    padding-right: 15px;
-   left: 25px;
+   left: 10px;
    top: 25px;
    position: absolute;
    -webkit-appearance: none;
    -moz-appearance: none;
    height: 40px;
+   z-index: 10;
 }
 
 .show-tools span{

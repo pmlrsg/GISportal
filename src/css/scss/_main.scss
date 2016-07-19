@@ -34,6 +34,8 @@ button, .btn{
 .collab-btn{
   cursor: pointer;
   padding-left: 5px;
+  font-size: 20px;
+  line-height: 20px;
 }
 
 #map  {
@@ -46,6 +48,20 @@ button, .btn{
    left: 0;
    margin: 0;
    padding: 0;
+}
+
+.grab{
+   cursor: -webkit-grab;
+   cursor:-moz-grab;
+}
+
+.grabbing{
+   cursor: -webkit-grabbing;
+   cursor:-moz-grabbing;
+}
+
+#data-reading-popup{
+  cursor: auto;
 }
 
 .brand  {
@@ -68,6 +84,19 @@ button, .btn{
 
 .start-btn{
   background-color: $start-btn-background ;
+}
+
+.answer-call span,
+.reject-call span{
+   padding-right: 3px;
+}
+
+.answer-call  {
+   background-color: #16970D ;
+}
+
+.reject-call  {
+   background-color: #800000 ;
 }
 
 .brand.extra-small{
@@ -232,7 +261,7 @@ button.top-space {
   text-align: center;
   color: #fff;
   font-weight: bold;
-  z-index: 1;
+  z-index: 10;
 }
 
 .view-title{
@@ -243,7 +272,7 @@ button.top-space {
   text-align: center;
   color: #fff;
   font-weight: bold;
-  z-index: 1;
+  z-index: 10;
 }
 
 .dark-background{
