@@ -592,9 +592,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('#configurePanel');
-               var scrollPercent = data.params.scrollPercent;
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['configurepanel.scroll'](data);
             }
          });
 
@@ -603,9 +601,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('#mapSettingsPanel');
-               var scrollPercent = data.params.scrollPercent;
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['mapsettingspanel.scroll'](data);
             }
          });
 
@@ -614,9 +610,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('.overlay-container-form');
-               var scrollPercent = data.params.scrollPercent;
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['addLayersForm.scroll'](data);
             }
          });
 
@@ -625,9 +619,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('.js-slideout-content');
-               var scrollPercent = data.params.scrollPercent;
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['slideout.scroll'](data);
             }
          });
 
@@ -636,9 +628,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('.indicator-select');
-               var scrollPercent = data.params.scrollPercent;
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['refinePanel.scroll'](data);
             }
          });
 
@@ -646,14 +636,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var layer = data.params.layer;
-            var server = data.params.server;
-            var add_elem = $('.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]');
             if (collaboration.role == "member") {
-               if(add_elem.length > 0){
-                  collaboration.highlightElement(add_elem);
-                  add_elem.trigger('click');
-               }
+               gisportal.api['addLayerServer.clicked'](data, {highligh: true});
             }
          });
 
@@ -662,26 +646,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var input = data.params.inputValue;
-               var field = data.params.field;
-               var input_elem = $('textarea[data-field="' + field + '"],input[data-field="' + field + '"]');
-               var highlight_elem = input_elem;
-               if(field == "Rotation"){
-                  input_elem = input_elem.filter('[value="' + input + '"]');
-                  highlight_elem = input_elem.parent();
-               }else if(input_elem.is(':checkbox')){
-                  input_elem.prop('checked', input);
-               }else{
-                  // Makes sure the element is only highlighted if there has been a change
-                  if(input_elem.val() == input){
-                     highlight_elem = undefined;
-                  }
-                  input_elem.val(input);
-               }
-               input_elem.trigger('change');
-               if(highlight_elem){
-                  collaboration.highlightElement(highlight_elem);
-               }
+               gisportal.api['addLayersForm.input'](data, {highligh: true});
             }
          });
 
@@ -690,9 +655,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var select_elem = $('select[data-field="originalAutoScale"]');
-               select_elem.val(data.params.value).trigger('change');
-               collaboration.highlightElement(select_elem);
+               gisportal.api['addLayersForm.autoScale-changed'](data, {highligh: true});
             }
          });
 
@@ -701,9 +664,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var select_elem = $('select[data-field="defaultAboveMaxColor"]');
-               select_elem.val(data.params.value).trigger('change');
-               collaboration.highlightElement(select_elem);
+               gisportal.api['addLayersForm.aboveMaxColor-changed'](data, {highligh: true});
             }
          });
 
@@ -712,9 +673,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var select_elem = $('select[data-field="defaultBelowMinColor"]');
-               select_elem.val(data.params.value).trigger('change');
-               collaboration.highlightElement(select_elem);
+               gisportal.api['addLayersForm.belowMinColor-changed'](data, {highligh: true});
             }
          });
 
@@ -723,9 +682,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var select_elem = $('select[data-field="defaultStyle"]');
-               select_elem.val(data.params.value).trigger('change');
-               collaboration.highlightElement(select_elem);
+               gisportal.api['addLayersForm.defaultStyle-changed'](data, {highligh: true});
             }
          });
 
@@ -733,9 +690,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Add Layers Form Closed');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['addLayersForm.close'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('span.js-layer-form-close').trigger('click');
+               gisportal.api['addLayersForm.close'](data);
             }
          });
 
@@ -743,57 +700,28 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var keyCode = data.params.code;
-
             if (collaboration.role == "member") {
-               var e = jQuery.Event("keydown");
-               e.which = keyCode; // # Some key code value
-               e.keyCode = keyCode;
-               document.activeElement.blur();
-               $('body').trigger(e);
+               gisportal.api['body.keydown'](data);
             }
-            var keyName;
-            switch(keyCode){
-               case 27:
-                  keyName = "Esc";
-                  break;
-               case 37:
-                  keyName = "LEFT Arrow";
-                  break;
-               case 39:
-                  keyName = "RIGHT Arrow";
-                  break;
-            }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Keydown: '+ keyName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['body.keydown'](data, {describeOnly: true}));
          });
 
          socket.on('date.selected', function(data) {
             if(collaboration.diverged){
                return true;
             }
-            var date = new Date(data.params.date);
-
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-current-date'));
-               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-                  gisportal.timeline.setDate(date);
-               }
+               gisportal.api['date.selected'](data, {highligh: true});
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Date changed to '+ moment(date).format('YYYY-MM-DD hh:mm'));
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['date.selected'](data, {describeOnly: true}));
          });
 
          socket.on('date.zoom', function(data) {
             if(collaboration.diverged){
                return true;
             }
-            var startDate = new Date(data.params.startDate);
-            var endDate = new Date(data.params.endDate);
-
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('#timeline'));
-               if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-                  gisportal.timeline.zoomDate(startDate, endDate);
-               }
+               gisportal.api['date.zoom'](data, {highligh: true});
             }
          });
 
@@ -801,10 +729,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               collaboration.highlightElement(obj);
-               obj.ddslick('open');
+               gisportal.api['ddslick.open'](data, {highligh: true});
             }
          });
 
@@ -812,9 +738,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var obj = $('#' + data.params.obj);
             if (collaboration.role == "member") {
-               obj.ddslick('close');
+               gisportal.api['ddslick.open'](data, {highligh: true});
             }
          });
 
@@ -822,10 +747,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var obj = $('#' + data.params.obj);
-            var value = data.params.value;
             if (collaboration.role == "member") {
-               obj.ddslick('select', { "value": value });
+               gisportal.api['ddslick.selectValue'](data, {highligh: true});
             }
          });
 
@@ -833,12 +756,10 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var view = data.params.view_name;
-            var nice_val = $('.js-views-list').find('[value="' + view + '"]').html() || view;
             if (collaboration.role == "member") {
-               gisportal.view.loadView(view);
+               gisportal.api['view.loaded'](data);
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' View Loaded: "' + nice_val + '"');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['view.loaded'](data, {describeOnly: true}));
          });
 
          socket.on('view.removed', function(data) {
@@ -846,9 +767,9 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.view.removeView();
+               gisportal.api['view.removed'](data);
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' View Removed');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['view.removed'](data, {describeOnly: true}));
          });
 
    	  	socket.on('indicatorspanel.scroll', function(data) {
@@ -856,11 +777,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               var div = $('#indicatorsPanel');
-               var scrollPercent = data.params.scrollPercent;
-               // This stops the animation that scrolls to a layer
-               div.trigger('mousewheel');
-               div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
+               gisportal.api['indicatorspanel.scroll'](data);
             }
          });
 
@@ -869,11 +786,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer hidden - '+ data.params.layerName);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['layer.hide'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               var id = data.params.id;
-               gisportal.indicatorsPanel.hideLayer(id);
-               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
+               gisportal.api['layer.hide'](data, {highlight: true});
             }
          });
 
@@ -882,9 +797,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel hidden');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['panel.hide'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('.js-hide-panel').trigger('click');
+               gisportal.api['panel.hide'](data);
             }
          });
 
@@ -893,9 +808,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel shown');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['panel.hide'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('.js-show-tools').trigger('click');
+               gisportal.api['panel.show'](data);
             }
          });
 
@@ -904,9 +819,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer removed - '+ data.params.layerName);
+		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['layer.remove'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-            	gisportal.indicatorsPanel.removeFromPanel(data.params.id);
+            	gisportal.api['layer.remove'](data);
             }
 		  	});
 
@@ -915,17 +830,10 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var newLayerOrder = data.params.newLayerOrder;
-            var ul = $('ul.js-indicators');
 
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layers re-ordered');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['layer.reorder'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               for (var i = newLayerOrder.length; i > -1; i--) {
-                  var li = $('.indicator-header').parent('[data-id="'+ newLayerOrder[i] +'"]');
-                  li.remove();                            // take it out of its current position 
-                  ul.prepend(li).hide().slideDown();      // and put it back at the start of the list
-               }
-               gisportal.indicatorsPanel.reorderLayers();
+               gisportal.api['layer.reorder'](data);
             }
          });
 
@@ -934,11 +842,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Layer un-hidden - '+ data.params.layerName);
+		  		collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' ' + gisportal.api['layer.show'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               var id = data.params.id;
-            	gisportal.indicatorsPanel.showLayer(id);
-               collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
+               gisportal.api['layer.show'](data, {highlight: true});
             }
 		  	});
                         
@@ -947,13 +853,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var params = data.params;
             if (collaboration.role == "member") {
-               var view = map.getView();
-               if (view) {
-                  if (params.zoom) view.setZoom(params.zoom);
-                  if (params.centre) view.setCenter(params.centre);
-               }
+               gisportal.api['map.move'](data);
             }
          });
 
@@ -962,18 +863,10 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var p = data.params.panelName;
-            var nicePanelName = data.params.panelName;
-            var panel_div = $('.js-show-panel[data-panel-name="'+ nicePanelName +'"]');
-            if(panel_div.find('span').length > 0){
-               nicePanelName = panel_div.find('span').attr('title');
-            }else if(panel_div.html() && panel_div.html().length > 0){
-               nicePanelName = panel_div.html();
-            }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Panel selected - '+ nicePanelName);
+            
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['panels.showpanel'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElementShake($('[data-panel-name="' + p + '"].tab'));
-               gisportal.panels.showPanel(p);
+               gisportal.api['layer.show'](data, {highlight: true});
             }
          });
 
@@ -981,9 +874,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Cancel" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['refinePanel.cancel'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('.js-refine-configure').trigger('click');
+               gisportal.api['refinePanel.cancel'](data);
             }
          });
 
@@ -991,11 +884,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var cat = data.params.cat;
-            var nice_cat = gisportal.browseCategories[cat] || cat;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Category removed: ' + nice_cat);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['refinePanel.removeCat'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('.refine-remove[data-cat="' + cat + '"]').trigger('click');
+               gisportal.api['refinePanel.removeCat'](data);
             }
          });
 
@@ -1005,7 +896,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-            	gisportal.scalebars.autoScale(data.params.id, data.params.force);
+            	gisportal.api['scalebar.autoscale'](data);
             }
 		  	});
 
@@ -1014,12 +905,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var isChecked = data.params.isChecked;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Autoscale set to ' + isChecked + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.autoscale-checkbox'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
-               $('.js-auto[data-id="' + id + '"]').prop( 'checked', isChecked ).trigger('change');
+               gisportal.api['scalebar.autoscale-checkbox'](data, {highlight: true});
             }
          });
 
@@ -1028,12 +916,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var isLog = data.params.isLog;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Logarithmic set to ' + isLog + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.log-set'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
-               $('.js-indicator-is-log[data-id="' + id + '"]').prop( 'checked', isLog ).trigger('change');
+               gisportal.api['scalebar.log-set'](data, {highlight: true});
             }
          });
 
@@ -1042,12 +927,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var value = data.params.value;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Max set to ' + value + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.max-set'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
-               $('.js-scale-max[data-id="' + id + '"]').val(value).change();
+               gisportal.api['scalebar.max-set'](data, {highlight: true});
             }
          });
 
@@ -1056,12 +938,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var value = data.params.value;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Min set to ' + value + ' - '+ id);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.min-set'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
-               $('.js-scale-min[data-id="' + id + '"]').val(value).change();
+               gisportal.api['scalebar.min-set'](data, {highlight: true});
             }
          });
 
