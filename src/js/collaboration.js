@@ -637,7 +637,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayerServer.clicked'](data, {highligh: true});
+               gisportal.api['addLayerServer.clicked'](data, {highlight: true});
             }
          });
 
@@ -646,7 +646,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayersForm.input'](data, {highligh: true});
+               gisportal.api['addLayersForm.input'](data, {highlight: true});
             }
          });
 
@@ -655,7 +655,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayersForm.autoScale-changed'](data, {highligh: true});
+               gisportal.api['addLayersForm.autoScale-changed'](data, {highlight: true});
             }
          });
 
@@ -664,7 +664,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayersForm.aboveMaxColor-changed'](data, {highligh: true});
+               gisportal.api['addLayersForm.aboveMaxColor-changed'](data, {highlight: true});
             }
          });
 
@@ -673,7 +673,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayersForm.belowMinColor-changed'](data, {highligh: true});
+               gisportal.api['addLayersForm.belowMinColor-changed'](data, {highlight: true});
             }
          });
 
@@ -682,7 +682,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['addLayersForm.defaultStyle-changed'](data, {highligh: true});
+               gisportal.api['addLayersForm.defaultStyle-changed'](data, {highlight: true});
             }
          });
 
@@ -711,7 +711,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['date.selected'](data, {highligh: true});
+               gisportal.api['date.selected'](data, {highlight: true});
             }
             collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['date.selected'](data, {describeOnly: true}));
          });
@@ -721,7 +721,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['date.zoom'](data, {highligh: true});
+               gisportal.api['date.zoom'](data, {highlight: true});
             }
          });
 
@@ -730,7 +730,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['ddslick.open'](data, {highligh: true});
+               gisportal.api['ddslick.open'](data, {highlight: true});
             }
          });
 
@@ -739,7 +739,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['ddslick.open'](data, {highligh: true});
+               gisportal.api['ddslick.open'](data, {highlight: true});
             }
          });
 
@@ -748,7 +748,7 @@ collaboration.initSession = function() {
                return true;
             }
             if (collaboration.role == "member") {
-               gisportal.api['ddslick.selectValue'](data, {highligh: true});
+               gisportal.api['ddslick.selectValue'](data, {highlight: true});
             }
          });
 
@@ -863,10 +863,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            
             collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['panels.showpanel'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               gisportal.api['layer.show'](data, {highlight: true});
+               gisportal.api['panels.showpanel'](data, {highlight: true});
             }
          });
 
@@ -949,17 +948,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var value = data.params.value;
-
-            if (typeof value != 'undefined') {
-               var opacity = value * 100;
-               if (collaboration.role == "member") {
-                  collaboration.highlightElement($('#tab-' + id + '-opacity'));
-                  
-                  $('#tab-' + id + '-opacity').val(opacity);
-                  gisportal.layers[id].setOpacity(value);
-               }
+            if (collaboration.role == "member") {
+               gisportal.api['scalebar.opacity'](data, {highlight: true});
             }
          });
 
@@ -968,17 +958,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var id = data.params.id;
-            var value = data.params.value;
-
-            if (typeof value != 'undefined') {
-               var colorbands = value;
-               if (collaboration.role == "member") {
-                  collaboration.highlightElement($('#tab-' + id + '-colorbands'));
-                  collaboration.highlightElement($('#tab-' + id + '-colorbands-value'));
-                  
-                  $('#tab-' + id + '-colorbands-value').val(colorbands).trigger('change');
-               }
+            if (collaboration.role == "member") {
+               gisportal.api['scalebar.colorbands'](data, {highlight: true});
             }
          });
 
@@ -987,11 +968,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Scalebar was reset');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.reset'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               var elem = $('.js-reset[data-id="'+ data.params.id +'"]');
-               collaboration.highlightElement(elem);
-               elem.click();
+               gisportal.api['scalebar.reset'](data, {highlight: true});
             }
          });
 
@@ -1000,11 +979,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' Changes Applied');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['scalebar.apply-changes'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               var elem = $('.js-apply-changes[data-id="'+ data.params.id +'"]');
-               collaboration.highlightElement(elem);
-               elem.click();
+               gisportal.api['scalebar.reset'](data, {highlight: true});
             }
          });
 
@@ -1013,11 +990,8 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var searchValue = data.params.searchValue;
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.js-search'));
-               $('.js-search').val(searchValue);
-               gisportal.configurePanel.search(searchValue);
+               gisportal.api['search.typing'](data, {highlight: true});
             }
          });
 
@@ -1026,12 +1000,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var eType = data.params.eType;
-            var typedValue = data.params.typedValue;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' WMS entry: ' + typedValue);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['wms.typing'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('input.js-wms-url'));
-               $('input.js-wms-url').val(typedValue).trigger(eType);
+               gisportal.api['wms.typing'](data, {highlight: true});
             }
          });
 
@@ -1040,11 +1011,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            var checked = data.params.checked;
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' refreshCacheBox: ' + checked);
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['refreshCacheBox.clicked'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('#refresh-cache-box'));
-               $('#refresh-cache-box')[0].checked = checked;
+               gisportal.api['refreshCacheBox.clicked'](data, {highlight: true});
             }
          });
 
@@ -1053,10 +1022,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' WMS submitted');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['wms.submitted'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('button.js-wms-url'));
-               $('button.js-wms-url').trigger('click');
+               gisportal.api['wms.submitted'](data, {highlight: true});
             }
          });
 
@@ -1065,10 +1033,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' more info clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['moreInfo.clicked'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('.more-info'));
-               $('.more-info').trigger('click');
+               gisportal.api['moreInfo.clicked'](data, {highlight: true});
             }
          });
 
@@ -1077,9 +1044,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Reset" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['resetList.clicked'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               $('button#reset-list').trigger('click');
+               gisportal.api['resetList.clicked'](data, {highlight: true});
             }
          });
 
@@ -1088,21 +1055,9 @@ collaboration.initSession = function() {
             if(collaboration.diverged){
                return true;
             }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Add layers" clicked');
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['addLayersForm.clicked'](data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               collaboration.highlightElement($('button#js-add-layers-form'));
-               $('button#js-add-layers-form').trigger('click');
-            }
-         });
-
-         // search cancelled
-         socket.on('search.cancel', function(data) {
-            if(collaboration.diverged){
-               return true;
-            }
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' search cancelled');
-            if (collaboration.role == "member") {
-               $('.js-search-results').css('display', 'none');
+               gisportal.api['addLayersForm.clicked'](data, {highlight: true});
             }
          });
 
@@ -1791,6 +1746,36 @@ collaboration.initSession = function() {
     		$(collaboration.statusMessage).html('Could not connect to server; the response was \''+ exception+'\' - <a href="javascript:collaboration.initSession();">try again</a>');
 	   });
 }; // end initSession
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 
 collaboration.startNewRoom = function() {
    collaboration.role = 'presenter';

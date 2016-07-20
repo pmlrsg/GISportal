@@ -456,3 +456,140 @@ gisportal.api['scalebar.min-set'] = function(data, options){
 	}
    $('.js-scale-min[data-id="' + id + '"]').val(value).change();
 };
+
+gisportal.api['scalebar.opacity'] = function(data, options){
+	options = options || {};
+	var id = data.params.id;
+   var value = data.params.value;
+   var opacity;
+   if (typeof value != 'undefined') {
+   	opacity = value * 100;
+	}
+
+	if(options.describeOnly){
+		return 'Opacity set to ' + opacity + '% - '+ id;
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('#tab-' + id + '-opacity'));
+	}
+	if(opacity){
+	   $('#tab-' + id + '-opacity').val(opacity);
+	   gisportal.layers[id].setOpacity(value);
+	}
+};
+
+gisportal.api['scalebar.colorbands'] = function(data, options){
+	options = options || {};
+	var id = data.params.id;
+   var value = data.params.value;
+
+	if(options.describeOnly){
+		return 'Colorbands value set to ' + opacity + ' - '+ id;
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('#tab-' + id + '-colorbands'));
+      collaboration.highlightElement($('#tab-' + id + '-colorbands-value'));
+	}
+	$('#tab-' + id + '-colorbands-value').val(value).trigger('change');
+};
+
+gisportal.api['scalebar.reset'] = function(data, options){
+	options = options || {};
+	var id = data.params.id;
+
+	if(options.describeOnly){
+		return 'Scalebar reset - '+ id;
+	}
+	var elem = $('.js-reset[data-id="'+ id +'"]');
+	if(options.highlight){
+   	collaboration.highlightElement(elem);
+	}
+   elem.click();
+};
+
+gisportal.api['scalebar.apply-changes'] = function(data, options){
+	options = options || {};
+	var id = data.params.id;
+
+	if(options.describeOnly){
+		return 'Changes Applied - '+ id;
+	}
+	var elem = $('.js-apply-changes[data-id="'+ data.params.id +'"]');
+	if(options.highlight){
+   	collaboration.highlightElement(elem);
+	}
+   elem.click();
+};
+
+gisportal.api['search.typing'] = function(data, options){
+	options = options || {};
+	var searchValue = data.params.searchValue;
+
+	if(options.describeOnly){
+		return 'Search: '+ searchValue;
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.js-search'));
+	}
+   $('.js-search').val(searchValue).trigger('change');
+};
+
+gisportal.api['wms.typing'] = function(data, options){
+	options = options || {};
+	var eType = data.params.eType;
+	var typedValue = data.params.typedValue;
+
+	if(options.describeOnly){
+		return 'WMS entry: ' + typedValue;
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('input.js-wms-url'));
+	}
+   $('input.js-wms-url').val(typedValue).trigger(eType);
+};
+
+gisportal.api['refreshCacheBox.clicked'] = function(data, options){
+	options = options || {};
+	var checked = data.params.checked;
+
+	if(options.describeOnly){
+		return 'refreshCacheBox: ' + checked;
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('#refresh-cache-box'));
+	}
+   $('#refresh-cache-box')[0].checked = checked;
+};
+
+gisportal.api['wms.submitted'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return 'WMS submitted';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('button.js-wms-url'));
+	}
+   $('button.js-wms-url').trigger('click');
+};
+
+gisportal.api['moreInfo.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return '"More Info" Clicked';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.more-info'));
+	}
+   $('.more-info').trigger('click');
+};
+
+gisportal.api['addLayersForm.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return '"Add layers" Clicked';
+	}
+	if(options.highlight){
+		collaboration.highlightElement($('button#js-add-layers-form'));
+	}
+	$('button#js-add-layers-form').trigger('click');
+};
