@@ -50,6 +50,10 @@ gisportal.map_settings.init = function() {
    $('button.js-edit-layers').on('click', function(e){
       e.preventDefault();
       gisportal.editLayersForm.addSeverTable();
+      var params = {
+         "event" : "configureInternalLayers.clicked"
+      };
+      gisportal.events.trigger('configureInternalLayers.clicked', params);
    });
 
    $('#refresh-cache-box').on('change', function(){

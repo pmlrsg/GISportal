@@ -1363,7 +1363,7 @@ gisportal.api['dataPopup.display'] = function(data, options){
  /*
  'data' does not need to contain anything
   */
-gisportal.api['dataPopup.display'] = function(data, options){
+gisportal.api['dataPopup.close'] = function(data, options){
 	options = options || {};
 
 	if(options.describeOnly){
@@ -1499,7 +1499,7 @@ gisportal.api['graphTitle.edit'] = function(data, options){
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
 	}
-	input_elem.val(value);
+	input_elem.val(value).trigger('change');
 };
 
  /*
@@ -1656,9 +1656,6 @@ gisportal.api['graph.submitted'] = function(data, options){
 	if(options.describeOnly){
 		return '"Create Graph" clicked';
 	}
-	if(options.highlight){
-		collaboration.highlightElement(date_elem);
-	}
 	$('.js-create-graph').trigger('click');
 };
 
@@ -1724,4 +1721,28 @@ gisportal.api['graphPopup.close'] = function(data, options){
 	}
 	collaboration.forcePopupClose = true;
    $('.js-plot-popup-close').trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
+gisportal.api['configureInternalLayers.clicked'] = function(data, options){
+	options = options || {};
+
+	if(options.describeOnly){
+		return '"Configure Internal Layers" Clicked';
+	}
+	$('button.js-edit-layers').trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
+gisportal.api['configureInternalLayers.closed'] = function(data, options){
+	options = options || {};
+
+	if(options.describeOnly){
+		return '"Configure Internal Layers" Closed';
+	}
+	$('.js-edit-layers-close').trigger('click');
 };

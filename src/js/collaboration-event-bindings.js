@@ -422,9 +422,9 @@ gisportal.events.bind('more-info.clicked', function(event, data) {
    collaboration._emit('c_event', data);
 });
 
-gisportal.events.bind('graphTitle.edit', function(event, params) {
+gisportal.events.bind('graphTitle.edit', function(event, data) {
    data.collabLog = true;
-   collaboration._emit('c_event', params);
+   collaboration._emit('c_event', data);
 });
 
 gisportal.events.bind('graphType.edit', function(event, data) {
@@ -483,6 +483,16 @@ gisportal.events.bind('graph.delete', function(event, data) {
 });
 
 gisportal.events.bind('graphPopup.close', function(event, data) {
+   data.collabLog = true;
+   collaboration._emit('c_event', data);
+});
+
+gisportal.events.bind('configureInternalLayers.clicked', function(event, data) {
+   data.collabLog = true;
+   collaboration._emit('c_event', data);
+});
+
+gisportal.events.bind('configureInternalLayers.closed', function(event, data) {
    data.collabLog = true;
    collaboration._emit('c_event', data);
 });

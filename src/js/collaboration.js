@@ -585,7 +585,7 @@ collaboration.initSession = function() {
                return true;
             }
             if(data.params.collabLog){
-               collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api[data.event](data, {describeOnly: true}));
+               collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api[data.event](data.params, {describeOnly: true}));
             }
             if (collaboration.role == "member") {
                gisportal.api[data.event](data.params, {highlight: true});

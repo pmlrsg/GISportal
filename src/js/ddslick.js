@@ -384,8 +384,6 @@
         obj.find('.dd-selected').html(pluginData.settings.selectText);
         obj.find('.dd-option-selected').removeClass('dd-option-selected');
         obj.find('li.selected').removeClass('selected');
-
-        gisportal.events.trigger('ddslick.reset', obj);
     }
 
     //Private: Adjust appearence for drop down options (move title to middle), when no desripction

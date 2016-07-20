@@ -490,7 +490,7 @@ gisportal.indicatorsPanel.reorderLayers = function() {
       "event" : "layer.reorder",
       "newLayerOrder" : layers
    };
-   gisportal.events.trigger('layer.reorder', layers);
+   gisportal.events.trigger('layer.reorder', params);
 };
 
 gisportal.indicatorsPanel.removeFromPanel = function(id) {
