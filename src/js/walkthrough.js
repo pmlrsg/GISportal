@@ -467,10 +467,10 @@ gisportal.walkthrough.removeTooltips = function(){
 };
 
 gisportal.walkthrough.highlightElementOverlay = function(elem){
-   if(elem === ""){
+   elem = $(elem);
+   if(!elem[0]){
       return gisportal.walkthrough.hideHighlightOverlay();
    }
-   elem = $(elem);
    $('.walkthrough-highlight-overlay').toggleClass('hidden', false).css({
       width: (elem[0].clientWidth + 20) + "px",
       height: (elem[0].clientHeight + 20) + "px",
