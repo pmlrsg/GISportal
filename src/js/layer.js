@@ -797,8 +797,8 @@ gisportal.filterLayersByDate = function(date) {
    var absoluteLastDate = "1900-01-01";
    for(layer in gisportal.selectedLayers){
       var this_layer = gisportal.layers[gisportal.selectedLayers[layer]];
-      if(moment(layer.lastDate).isAfter(moment(absoluteLastDate))){
-         absoluteLastDate = layer.lastDate;
+      if(moment(this_layer.lastDate).isAfter(moment(absoluteLastDate))){
+         absoluteLastDate = this_layer.lastDate;
       }
       if(!this_layer.isInbounds && !notify_shown){
          $('.js-current-date').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
@@ -809,7 +809,7 @@ gisportal.filterLayersByDate = function(date) {
    }
    if(!one_in_bounds){
       $('.notifyjs-gisportal-info span:contains("You have selected a date that does not fall within")').closest('.notifyjs-wrapper').remove();
-      gisportal.timeline.setDate(absoluteLastDate);
+      gisportal.timeline.setDate(new Date(absoluteLastDate));
    }
 };
 
