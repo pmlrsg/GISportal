@@ -469,7 +469,6 @@ gisportal.graphs.Plot =(function(){
       
 
       // Make the plot
-      gisportal.loading.increment();
       $.ajax({
          method: 'post',
          url: gisportal.middlewarePath + '/plotting/plot',
@@ -482,7 +481,6 @@ gisportal.graphs.Plot =(function(){
             _this.monitorJobStatus();
             gisportal.graphs.storedGraphs.push({id: data.hash, _title: _this._title});
          }, error: function(e){
-            gisportal.loading.decrement();
             var error = 'Sorry, we failed to create a graph: \n'+
                            'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
             $.notify(error, "error");
@@ -512,7 +510,6 @@ gisportal.graphs.Plot =(function(){
                if(response.status == 200){
                   return;
                }
-               gisportal.loading.decrement();
                $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
                if($('.graph-job').length <= 0){
                   $('.no-graphs-text').toggleClass("hidden", false);
@@ -562,7 +559,6 @@ gisportal.graphs.Plot =(function(){
       });
       
       if( _new.completed === true )
-         gisportal.loading.decrement();
          this.stopMonitoringJobStatus();
 
       return this;
