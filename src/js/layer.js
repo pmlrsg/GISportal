@@ -618,6 +618,9 @@ gisportal.layer = function( options ) {
                   tileElement.onload = function() {
                      gisportal.loading.decrement();
                   };
+                  tileElement.onerror = function() {
+                     gisportal.loading.decrement();
+                  };
                   tileElement.src = src;
                }
             })

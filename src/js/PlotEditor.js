@@ -421,6 +421,7 @@ gisportal.graphs.PlotEditor = (function(){
          var validRange =  indicator.firstDate + " - " + indicator.lastDate;
 
          element.tooltipster({
+            contentCloning: true,
             position: 'right',
             maxWidth: 200,
             content: function(){

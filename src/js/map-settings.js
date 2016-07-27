@@ -47,24 +47,6 @@ gisportal.map_settings.init = function() {
    var rendered = gisportal.templates['map-settings'](data);
    $('.js-map-options').html(rendered);
 
-   $('button.js-edit-layers').on('click', function(e){
-      e.preventDefault();
-      gisportal.editLayersForm.addSeverTable();
-      var params = {
-         "event" : "configureInternalLayers.clicked"
-      };
-      gisportal.events.trigger('configureInternalLayers.clicked', params);
-   });
-
-   $('#refresh-cache-box').on('change', function(){
-      var checked = $(this).is(':checked');
-      var params = {
-         "event" : "refreshCacheBox.clicked",
-         "checked" : checked
-      };
-      gisportal.events.trigger('refreshCacheBox.clicked', params);
-   });
-
    // enable ddslick'ness
    $('#select-basemap').ddslick({
       onSelected: function(data) { 
@@ -121,92 +103,6 @@ gisportal.map_settings.init = function() {
          "scrollPercent": scrollPercent
       };
       gisportal.events.trigger('mapsettingspanel.scroll', params);
-   });
-
-   // WMS URL event handler
-   $('button.js-wms-url').on('click', function(e)  {
-      e.preventDefault();
-      $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", false);
-      if(!gisportal.wms_submitted){ // Prevents users from loading the same data multiple times (clicking when the data is loading)
-         gisportal.wms_submitted = true;
-         // Gets the URL and refresh_cache boolean
-         gisportal.autoLayer.given_wms_url = $('input.js-wms-url')[0].value.split("?")[0];
-         gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
-
-         error_div = $("#wms-url-message");
-         // The URL goes through some simple validation before being sent
-         if(!(gisportal.autoLayer.given_wms_url.startsWith('http://') || gisportal.autoLayer.given_wms_url.startsWith('https://'))){
-            error_div.toggleClass('hidden', false);
-            error_div.html("The URL must start with 'http://'' or 'https://'");
-            $('#refresh-cache-div').toggleClass('hidden', true);
-            gisportal.wms_submitted = false;
-         }else{
-            $('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")').closest('.notifyjs-wrapper').remove();
-            // If it passes the error div is hidden and the autoLayer functions are run using the given parameters
-            $('input.js-wms-url').val("");
-            $('#refresh-cache-message').toggleClass('hidden', true);
-            $('#refresh-cache-div').toggleClass('hidden', true);
-            error_div.toggleClass('hidden', true);
-            gisportal.autoLayer.TriedToAddLayer = false;
-            gisportal.autoLayer.loadGivenLayer();
-            gisportal.panels.showPanel('choose-indicator');
-            gisportal.addLayersForm.layers_list = {};
-            gisportal.addLayersForm.server_info = {};
-            // The wms_url is stored in the form_info dict so that it can be loaded the next time the page is loaded
-            gisportal.addLayersForm.form_info = {"wms_url":gisportal.autoLayer.given_wms_url};
-            gisportal.addLayersForm.refreshStorageInfo();
-         }
-      }
-      var params = {
-         "event" : "wms.submitted"
-      };
-      gisportal.events.trigger('wms.submitted', params);
-   });
-
-   // WMS URL event handler for refresh cache checkbox
-   $('input.js-wms-url').on('change keyup paste', function(e)  {
-      gisportal.wms_submitted = false; // Allows the user to submit the different WMS URL again
-      var typed = $('input.js-wms-url')[0].value;
-      var input_value = typed.split("?")[0];
-      if(input_value.length > 0){
-         var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], input_value);
-         // The timeout is measured to see if the cache can be refreshed. if so the option if shown to the user to do so, if not they are told when the cache was last refreshed.
-         $.ajax({
-            url:  gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/temporary_cache/'+clean_url+".json?_="+ new Date().getTime(),
-            dataType: 'json',
-            success: function(layer){
-               if(!gisportal.wms_submitted){
-                  $('#refresh-cache-message').toggleClass('hidden', false);
-                  if(layer.timeStamp){
-                     $('#refresh-cache-message').html("This file was last cached: " + new Date(layer.timeStamp));
-                  }
-                  if(!layer.timeStamp || (+new Date() - +new Date(layer.timeStamp))/60000 > gisportal.config.cacheTimeout){
-                     $('#refresh-cache-div').toggleClass('hidden', false);
-                  }else{
-                     $('#refresh-cache-div').toggleClass('hidden', true);
-                  }
-               }
-            },
-            error: function(e){
-               $('#refresh-cache-message').toggleClass('hidden', true);
-               $('#refresh-cache-div').toggleClass('hidden', true);
-            }
-         });
-      }else{
-         $('#refresh-cache-message').toggleClass('hidden', true);
-         $('#refresh-cache-div').toggleClass('hidden', true);
-      }
-      if(e.type == "paste"){
-         try{
-            typed = e.originalEvent.clipboardData.getData('text/plain');
-         }catch(err){}
-      }
-      var params = {
-         "event" : "wms.typing",
-         "typedValue" : typed,
-         "eType" : e.type
-      };
-      gisportal.events.trigger('wms.typing', params);
    });
 
 };

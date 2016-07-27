@@ -695,7 +695,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    // The server form template is then loaded and displayed in the element given.
    var server_form = gisportal.templates['server-form'](gisportal.addLayersForm.server_info);
    $(form_div).html(server_form);
-   gisportal.addLayersForm.showOwnerOptions(owner);
+   gisportal.addLayersForm.showOwnerOptions(owner, $("form.server-form select[data-field='owner']"));
    // The form is then validated.
    gisportal.addLayersForm.validateForm('div.overlay-container-form');
    // Input listeners are then added
@@ -704,8 +704,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    gisportal.addLayersForm.refreshStorageInfo();
 };
 
-gisportal.addLayersForm.showOwnerOptions = function(given_owner){
-   var select_elem = $("form.server-form select[data-field='owner']");
+gisportal.addLayersForm.showOwnerOptions = function(given_owner, select_elem){
    $.ajax({
       url:  gisportal.middlewarePath + '/settings/get_owners',
       success: function( data ){

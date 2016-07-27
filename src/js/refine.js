@@ -270,6 +270,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
 
          if (holder.length > 0) {
             holder.tooltipster({
+               contentCloning: true,
                content: $(info),
                position: 'right',
             });
@@ -301,6 +302,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
          holder = $('input[value="' + id + '"]').parent();
          if (holder.length > 0) {
             holder.tooltipster({
+               contentCloning: true,
                content: $(info),
                position: 'right',
             });

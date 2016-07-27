@@ -21,6 +21,9 @@ gisportal.api['configurepanel.scroll'] = function(data, options){
 	if(options.describeOnly){
 		return "Configuration panel scrolled to " + scrollPercent + "%.";
 	}
+	if(options.selectorOnly){
+		return '#configurePanel';
+	}
 	var div = $('#configurePanel');
    div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
 };
@@ -29,7 +32,9 @@ gisportal.api['configurepanel.scroll'] = function(data, options){
  'data' must contain the following:
 
  state: The state for the joining member to load
- joining-member: The email of the user who is joining
+ [One of the following:]
+ joining-member: The email of the user who is joining and should update their state
+ force: Should everybody be forced to load the state
   */
 gisportal.api['room.presenter-state-update'] = function(data, options){
 	options = options || {};
@@ -37,7 +42,10 @@ gisportal.api['room.presenter-state-update'] = function(data, options){
 	if(options.describeOnly){
 		return "Member Joining";
 	}
-	if(data['joining-member'] == gisportal.user.info.email){
+	if(options.selectorOnly){
+		return '';
+	}
+	if(data.force || data['joining-member'] == gisportal.user.info.email){
 		gisportal.stopLoadState = false;
       gisportal.loadState(state);
 	}
@@ -52,6 +60,9 @@ gisportal.api['mapsettingspanel.scroll'] = function(data, options){
 	var scrollPercent = data.scrollPercent;
 	if(options.describeOnly){
 		return "Map settings scrolled to " + scrollPercent + "%.";
+	}
+	if(options.selectorOnly){
+		return '#mapSettingsPanel';
 	}
 	var div = $('#mapSettingsPanel');
    div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
@@ -68,6 +79,9 @@ gisportal.api['addLayersForm.scroll'] = function(data, options){
 	if(options.describeOnly){
 		return "Add Layers Form scrolled to " + scrollPercent + "%.";
 	}
+	if(options.selectorOnly){
+		return '.overlay-container-form';
+	}
 	var div = $('.overlay-container-form');
    div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
 };
@@ -83,6 +97,9 @@ gisportal.api['slideout.scroll'] = function(data, options){
 	if(options.describeOnly){
 		return "Slideout scrolled to " + scrollPercent + "%.";
 	}
+	if(options.selectorOnly){
+		return '.js-slideout-content';
+	}
 	var div = $('.js-slideout-content');
    div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
 };
@@ -97,6 +114,9 @@ gisportal.api['refinePanel.scroll'] = function(data, options){
 	var scrollPercent = data.scrollPercent;
 	if(options.describeOnly){
 		return "Refine Panel scrolled to " + scrollPercent + "%.";
+	}
+	if(options.selectorOnly){
+		return '.indicator-select';
 	}
 	var div = $('.indicator-select');
    div.scrollTop(scrollPercent/100*(div[0].scrollHeight - div.height()));
@@ -115,6 +135,9 @@ gisportal.api['addLayerServer.clicked'] = function(data, options){
    var add_elem = $('.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]');
 	if(options.describeOnly){
 		return "Add Server clicked: layer";
+	}
+	if(options.selectorOnly){
+		return '.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]';
 	}
 	if(add_elem.length > 0){
 		if(options.highlight){
@@ -137,6 +160,9 @@ gisportal.api['addLayersForm.input'] = function(data, options){
    var add_elem = $('.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]');
 	if(options.describeOnly){
 		return "'" + input + "' input to '" + field +  "' field.";
+	}
+	if(options.selectorOnly){
+		return 'textarea[data-field="' + field + '"],input[data-field="' + field + '"]';
 	}
    var input_elem = $('textarea[data-field="' + field + '"],input[data-field="' + field + '"]');
    var highlight_elem = input_elem;
@@ -168,6 +194,9 @@ gisportal.api['addLayersForm.autoScale-changed'] = function(data, options){
 	if(options.describeOnly){
 		return "Autoscale changed.";
 	}
+	if(options.selectorOnly){
+		return 'select[data-field="originalAutoScale"]';
+	}
 	var select_elem = $('select[data-field="originalAutoScale"]');
    select_elem.val(data.value).trigger('change');
    if(options.highlight){
@@ -184,6 +213,9 @@ gisportal.api['addLayersForm.aboveMaxColor-changed'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return "Above Max Colour changed.";
+	}
+	if(options.selectorOnly){
+		return 'select[data-field="defaultAboveMaxColor"]';
 	}
 	var select_elem = $('select[data-field="defaultAboveMaxColor"]');
    select_elem.val(data.value).trigger('change');
@@ -202,6 +234,9 @@ gisportal.api['addLayersForm.belowMinColor-changed'] = function(data, options){
 	if(options.describeOnly){
 		return "Below Min Colour changed.";
 	}
+	if(options.selectorOnly){
+		return 'select[data-field="defaultBelowMinColor"]';
+	}
 	var select_elem = $('select[data-field="defaultBelowMinColor"]');
    select_elem.val(data.value).trigger('change');
    if(options.highlight){
@@ -219,6 +254,9 @@ gisportal.api['addLayersForm.defaultStyle-changed'] = function(data, options){
 	if(options.describeOnly){
 		return "Default Style changed.";
 	}
+	if(options.selectorOnly){
+		return 'select[data-field="defaultStyle"]';
+	}
 	var select_elem = $('select[data-field="defaultStyle"]');
    select_elem.val(data.value).trigger('change');
    if(options.highlight){
@@ -233,6 +271,9 @@ gisportal.api['addLayersForm.close'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return "Form closed.";
+	}
+	if(options.selectorOnly){
+		return 'span.js-layer-form-close';
 	}
 	$('span.js-layer-form-close').trigger('click');
 };
@@ -261,6 +302,9 @@ gisportal.api['body.keydown'] = function(data, options){
 	if(options.describeOnly){
 		return "Keydown: "+ keyName;
 	}
+	if(options.selectorOnly){
+		return '';
+	}
 	var e = jQuery.Event("keydown");
    e.which = keyCode; // # Some key code value
    e.keyCode = keyCode;
@@ -279,6 +323,9 @@ gisportal.api['date.selected'] = function(data, options){
 
 	if(options.describeOnly){
 		return "Date changed to " + moment(date).format('YYYY-MM-DD hh:mm');
+	}
+	if(options.selectorOnly){
+		return '.js-current-date';
 	}
 	if(options.highlight){
 		collaboration.highlightElement($('.js-current-date'));
@@ -302,6 +349,9 @@ gisportal.api['date.zoom'] = function(data, options){
 	if(options.describeOnly){
 		return "Date zoomed to " + moment(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment(endDate).format('YYYY-MM-DD hh:mm');
 	}
+	if(options.selectorOnly){
+		return '#timeline';
+	}
 	if(options.highlight){
 		collaboration.highlightElement($('#timeline'));
 	}
@@ -322,22 +372,10 @@ gisportal.api['ddslick.open'] = function(data, options){
 	if(options.describeOnly){
 		return "Dropdown opened";
 	}
-   obj.ddslick('open');
-};
-
- /*
- 'data' must contain the following:
-
- obj: The id of the ddslick to be closed
-  */
-gisportal.api['ddslick.close'] = function(data, options){
-	options = options || {};
-	var obj = $('#' + data.obj);
-
-	if(options.describeOnly){
-		return "Dropdown closed";
+	if(options.selectorOnly){
+		return '#' + data.obj;
 	}
-   obj.ddslick('close');
+   obj.ddslick('open');
 };
 
  /*
@@ -350,11 +388,20 @@ gisportal.api['ddslick.selectValue'] = function(data, options){
 	options = options || {};
 	var obj = $('#' + data.obj);
 	var value = data.value;
+	var niceVal = obj.find('[value="' + data.value + '"]').siblings('label').html();
 
 	if(options.describeOnly){
-		return "Value selected: " + value;
+		return "Value selected: " + niceVal || value;
 	}
-   obj.ddslick('select', { "value": value });
+	if(options.selectorOnly){
+		return '#' + data.obj;
+	}
+	var selected_elem = obj.find('.dd-options input[value="' + value + '"]').closest('li');
+	selected_elem.toggleClass('dd-selected-soon', true);
+	setTimeout(function(){
+		obj.ddslick('select', { "value": value });
+		selected_elem.toggleClass('dd-selected-soon', false);
+	}, 200);
 };
 
  /*
@@ -369,6 +416,9 @@ gisportal.api['view.loaded'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'View Loaded: "' + nice_val + '"';
+	}
+	if(options.selectorOnly){
+		return '';
 	}
    gisportal.view.loadView(view);
 };
@@ -386,6 +436,9 @@ gisportal.api['view.removed'] = function(data, options){
 	if(options.describeOnly){
 		return 'View Removed';
 	}
+	if(options.selectorOnly){
+		return '';
+	}
    gisportal.view.removeView();
 };
 
@@ -400,6 +453,9 @@ gisportal.api['indicatorspanel.scroll'] = function(data, options){
 
 	if(options.describeOnly){
 		return "Indicators Panel scrolled to " + scrollPercent + "%.";
+	}
+	if(options.selectorOnly){
+		return '#indicatorsPanel';
 	}
 	var div = $('#indicatorsPanel');
    // This stops the animation that scrolls to a layer
@@ -420,6 +476,9 @@ gisportal.api['layer.hide'] = function(data, options){
 	if(options.describeOnly){
 		return 'Layer hidden - '+ data.layerName;
 	}
+	if(options.selectorOnly){
+		return '.js-toggleVisibility[data-id="' + id + '"]';
+	}
 	if(options.highlight){
 		collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
 	}
@@ -434,6 +493,9 @@ gisportal.api['panel.hide'] = function(data, options){
 	if(options.describeOnly){
 		return "Panel Hidden";
 	}
+	if(options.selectorOnly){
+		return '.js-hide-panel';
+	}
 	$('.js-hide-panel').trigger('click');
 };
 
@@ -444,6 +506,9 @@ gisportal.api['panel.show'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return "Panel Shown";
+	}
+	if(options.selectorOnly){
+		return '.js-show-tools';
 	}
 	$('.js-show-tools').trigger('click');
 };
@@ -461,6 +526,9 @@ gisportal.api['layer.remove'] = function(data, options){
 	if(options.describeOnly){
 		return 'Layer removed - '+ data.layerName;
 	}
+	if(options.selectorOnly){
+		return '[data-id="' + id + '"] .js-remove';
+	}
 	$('[data-id="' + id + '"] .js-remove').trigger('click');
 };
 
@@ -476,6 +544,9 @@ gisportal.api['layer.reorder'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Layers re-ordered';
+	}
+	if(options.selectorOnly){
+		return 'ul.js-indicators';
 	}
 	for (var i = newLayerOrder.length; i > -1; i--) {
       var li = $('.indicator-header').parent('[data-id="'+ newLayerOrder[i] +'"]');
@@ -498,6 +569,9 @@ gisportal.api['layer.show'] = function(data, options){
 	if(options.describeOnly){
 		return 'Layer un-hidden - '+ data.layerName;
 	}
+	if(options.selectorOnly){
+		return '.js-toggleVisibility[data-id="' + id + '"]';
+	}
 	if(options.highlight){
 		collaboration.highlightElement($('.js-toggleVisibility[data-id="' + id + '"]'));
 	}
@@ -515,6 +589,9 @@ gisportal.api['map.move'] = function(data, options){
 	if(options.describeOnly){
 		return 'Map Moved';
 	}
+	if(options.selectorOnly){
+		return '';
+	}
 	var view = map.getView();
    if (view) {
       if (data.zoom) view.setZoom(data.zoom);
@@ -531,7 +608,7 @@ gisportal.api['panels.showpanel'] = function(data, options){
 	options = options || {};
 	var p = data.panelName;
    var nicePanelName = p;
-   var panel_div = $('.js-show-panel[data-panel-name="'+ nicePanelName +'"]');
+   var panel_div = $('.js-show-panel[data-panel-name="'+ p +'"]');
    if(panel_div.find('span').length > 0){
       nicePanelName = panel_div.find('span').attr('title');
    }else if(panel_div.html() && panel_div.html().length > 0){
@@ -540,6 +617,9 @@ gisportal.api['panels.showpanel'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Panel selected - '+ nicePanelName;
+	}
+	if(options.selectorOnly){
+		return '[data-panel-name="' + p + '"].tab';
 	}
 	if(options.highlight){
 		collaboration.highlightElementShake($('[data-panel-name="' + p + '"].tab'));
@@ -554,6 +634,9 @@ gisportal.api['refinePanel.cancel'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return '"Cancel" clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-refine-configure';
 	}
 	$('.js-refine-configure').trigger('click');
 };
@@ -571,6 +654,9 @@ gisportal.api['panels.removeCat'] = function(data, options){
 	if(options.describeOnly){
 		return 'Category removed: ' + nice_cat;
 	}
+	if(options.selectorOnly){
+		return '.refine-remove[data-cat="' + cat + '"]';
+	}
    $('.refine-remove[data-cat="' + cat + '"]').trigger('click');
 };
 
@@ -583,7 +669,10 @@ gisportal.api['panels.removeCat'] = function(data, options){
 gisportal.api['scalebar.autoscale'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
-		return 'Layer Autoscaled - ' + data.id;
+		return 'Layer Autoscaled - ' + gisportal.layers[data.id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '';
 	}
    gisportal.scalebars.autoScale(data.id, data.force);
 };
@@ -600,7 +689,10 @@ gisportal.api['scalebar.autoscale-checkbox'] = function(data, options){
    var isChecked = data.isChecked;
 
 	if(options.describeOnly){
-		return 'Autoscale set to ' + isChecked + ' - '+ id;
+		return 'Autoscale set to ' + isChecked + ' - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-auto[data-id="' + id + '"]';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('.js-auto[data-id="' + id + '"]'));
@@ -620,7 +712,10 @@ gisportal.api['scalebar.log-set'] = function(data, options){
    var isLog = data.isLog;
 
 	if(options.describeOnly){
-		return 'Logarithmic set to ' + isLog + ' - '+ id;
+		return 'Logarithmic set to ' + isLog + ' - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-indicator-is-log[data-id="' + id + '"]';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('.js-indicator-is-log[data-id="' + id + '"]'));
@@ -640,7 +735,10 @@ gisportal.api['scalebar.max-set'] = function(data, options){
    var value = data.value;
 
 	if(options.describeOnly){
-		return 'Max set to ' + value + ' - '+ id;
+		return 'Max set to ' + value + ' - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-scale-max[data-id="' + id + '"]';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('.js-scale-max[data-id="' + id + '"]'));
@@ -660,7 +758,10 @@ gisportal.api['scalebar.min-set'] = function(data, options){
    var value = data.value;
 
 	if(options.describeOnly){
-		return 'Min set to ' + value + ' - '+ id;
+		return 'Min set to ' + value + ' - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-scale-min[data-id="' + id + '"]';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('.js-scale-min[data-id="' + id + '"]'));
@@ -684,7 +785,10 @@ gisportal.api['scalebar.opacity'] = function(data, options){
 	}
 
 	if(options.describeOnly){
-		return 'Opacity set to ' + opacity + '% - '+ id;
+		return 'Opacity set to ' + opacity + '% - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '#tab-' + id + '-opacity';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('#tab-' + id + '-opacity'));
@@ -707,7 +811,10 @@ gisportal.api['scalebar.colorbands'] = function(data, options){
    var value = data.value;
 
 	if(options.describeOnly){
-		return 'Colorbands value set to ' + opacity + ' - '+ id;
+		return 'Colorbands value set to ' + value + ' - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '#tab-' + id + '-colorbands-value';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('#tab-' + id + '-colorbands'));
@@ -726,7 +833,10 @@ gisportal.api['scalebar.reset'] = function(data, options){
 	var id = data.id;
 
 	if(options.describeOnly){
-		return 'Scalebar reset - '+ id;
+		return 'Scalebar reset - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-reset[data-id="'+ id +'"]';
 	}
 	var elem = $('.js-reset[data-id="'+ id +'"]');
 	if(options.highlight){
@@ -745,7 +855,10 @@ gisportal.api['scalebar.apply-changes'] = function(data, options){
 	var id = data.id;
 
 	if(options.describeOnly){
-		return 'Changes Applied - '+ id;
+		return 'Changes Applied - ' + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-apply-changes[data-id="'+ data.id +'"]';
 	}
 	var elem = $('.js-apply-changes[data-id="'+ data.id +'"]');
 	if(options.highlight){
@@ -765,6 +878,9 @@ gisportal.api['search.typing'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Search: '+ searchValue;
+	}
+	if(options.selectorOnly){
+		return '.js-search';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('.js-search'));
@@ -786,6 +902,9 @@ gisportal.api['wms.typing'] = function(data, options){
 	if(options.describeOnly){
 		return 'WMS entry: ' + typedValue;
 	}
+	if(options.selectorOnly){
+		return 'input.js-wms-url';
+	}
 	if(options.highlight){
    	collaboration.highlightElement($('input.js-wms-url'));
 	}
@@ -804,6 +923,9 @@ gisportal.api['refreshCacheBox.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return 'refreshCacheBox: ' + checked;
 	}
+	if(options.selectorOnly){
+		return '#refresh-cache-box';
+	}
 	if(options.highlight){
    	collaboration.highlightElement($('#refresh-cache-box'));
 	}
@@ -817,6 +939,9 @@ gisportal.api['wms.submitted'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return 'WMS submitted';
+	}
+	if(options.selectorOnly){
+		return 'button.js-wms-url';
 	}
 	if(options.highlight){
    	collaboration.highlightElement($('button.js-wms-url'));
@@ -832,6 +957,9 @@ gisportal.api['moreInfo.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"More Info" Clicked';
 	}
+	if(options.selectorOnly){
+		return '.more-info';
+	}
 	if(options.highlight){
    	collaboration.highlightElement($('.more-info'));
 	}
@@ -845,6 +973,9 @@ gisportal.api['addLayersForm.clicked'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
 		return '"Add layers" Clicked';
+	}
+	if(options.selectorOnly){
+		return 'button#js-add-layers-form';
 	}
 	if(options.highlight){
 		collaboration.highlightElement($('button#js-add-layers-form'));
@@ -864,6 +995,9 @@ gisportal.api['search.resultselected'] = function(data, options){
 	if(options.describeOnly){
 		return 'Search result selected: ' + searchResult;
 	}
+	if(options.selectorOnly){
+		return '.js-search-results';
+	}
 	gisportal.configurePanel.toggleIndicator(searchResult, '');
 	$('.js-search-results').css('display', 'none');
 };
@@ -880,7 +1014,10 @@ gisportal.api['tab.select'] = function(data, options){
 	var tabName = data.tabName;
 
 	if(options.describeOnly){
-		return tabName + ' tab selected for ' + layerId;
+		return gisportal.utils.titleCase(tabName) + ' tab selected for ' + gisportal.layers[layerId].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]';
 	}
 	if(options.highlight){
 		collaboration.highlightElement($('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]'));
@@ -900,7 +1037,10 @@ gisportal.api['layerTab.close'] = function(data, options){
 	var tabName = data.tabName;
 
 	if(options.describeOnly){
-		return tabName + ' tab closed for ' + layerId;
+		return gisportal.utils.titleCase(tabName) + ' tab closed for ' + gisportal.layers[layerId].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]';
 	}
 	var tab_elem = $('[data-tab-name="'+ tabName +'"][for="tab-'+ layerId + '-' + tabName +'"]');
    var button_elem = $('#'+$(tab_elem).attr('for'));
@@ -915,12 +1055,15 @@ gisportal.api['layerTab.close'] = function(data, options){
   */
 gisportal.api['paginator.selected'] = function(data, options){
 	options = options || {};
-	var page = data.page
+	var page = data.page;
 
 	if(options.describeOnly){
 		return 'Page ' + page + ' selected';
 	}
-	$('.js-go-to-form-page').find('a[data-page="' + data.page + '"]').trigger('click');
+	if(options.selectorOnly){
+		return '.js-go-to-form-page a[data-page="' + data.page + '"]';
+	}
+	$('.js-go-to-form-page a[data-page="' + data.page + '"]').trigger('click');
 };
 
  /*
@@ -934,7 +1077,10 @@ gisportal.api['zoomToData.clicked'] = function(data, options){
 	var zoom_elem = $('.js-zoom-data[data-id="' + id + '"]');
 
 	if(options.describeOnly){
-		return 'Zoom to data clicked: ' + id;
+		return 'Zoom to data clicked: '  + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.js-zoom-data[data-id="' + id + '"]';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(zoom_elem);
@@ -952,6 +1098,9 @@ gisportal.api['submitLayers.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Submit Layers" clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-layers-form-submit';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(submit_elem);
 	}
@@ -967,6 +1116,9 @@ gisportal.api['cancelChanges.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Cancel Changes" clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-layers-form-cancel';
+	}
 	$('.js-layers-form-cancel').trigger('click');
 };
 
@@ -979,6 +1131,9 @@ gisportal.api['toggleAllLayers.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Copy to all" clicked';
+	}
+	if(options.selectorOnly){
+		return '.toggle-all-layers';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(toggle_all_elem);
@@ -995,6 +1150,9 @@ gisportal.api['logToAllLayers.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Add to all" clicked';
+	}
+	if(options.selectorOnly){
+		return '.log-to-all-layers';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(toggle_all_elem);
@@ -1015,6 +1173,9 @@ gisportal.api['addToAll.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Add to all" clicked';
 	}
+	if(options.selectorOnly){
+		return '.add-to-all-layers[data-field="' + field + '"]';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(add_to_all_elem);
 	}
@@ -1030,6 +1191,9 @@ gisportal.api['addScalePointsToAll.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Add Scale Points to all" clicked';
+	}
+	if(options.selectorOnly){
+		return '.scale-to-all-layers';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(add_to_all_elem);
@@ -1047,6 +1211,9 @@ gisportal.api['addTagInput.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Add Another Tag" clicked';
 	}
+	if(options.selectorOnly){
+		return '.add-tag-input';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(add_tag_elem);
 	}
@@ -1062,6 +1229,9 @@ gisportal.api['userFeedback.close'] = function(data, options){
 	if(options.describeOnly){
 		return 'User feedback closed';
 	}
+	if(options.selectorOnly){
+		return '.js-user-feedback-close';
+	}
 	$('.js-user-feedback-close').trigger('click');
 };
 
@@ -1073,6 +1243,9 @@ gisportal.api['userFeedback.submit'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'User feedback submitted';
+	}
+	if(options.selectorOnly){
+		return '.js-user-feedback-submit';
 	}
 	$('.js-user-feedback-submit').trigger('click');
 };
@@ -1090,6 +1263,9 @@ gisportal.api['userFeedback.input'] = function(data, options){
 	if(options.describeOnly){
 		return 'User feedback input: ' + input;
 	}
+	if(options.selectorOnly){
+		return '.user-feedback-input';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
 	}
@@ -1105,6 +1281,9 @@ gisportal.api['drawBox.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Draw Polygon" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-draw-box';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
@@ -1122,6 +1301,9 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Draw Irregular Polygon" Clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-draw-polygon';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
 	}
@@ -1138,6 +1320,9 @@ gisportal.api['selectPolygon.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Select Existing Polygon" Clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-draw-select-polygon';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
 	}
@@ -1153,6 +1338,9 @@ gisportal.api['removeGeoJSON.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Delete Selected Polygon" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-remove-geojson';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
@@ -1175,6 +1363,9 @@ gisportal.api['jsCoordinate.edit'] = function(data, options){
 	if(options.describeOnly){
 		return 'Coordinates value set to: "' + value + '"';
 	}
+	if(options.selectorOnly){
+		return '.js-coordinates';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
 	}
@@ -1191,6 +1382,9 @@ gisportal.api['clearSelection.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Clear Selection" Clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-clear-selection';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
 	}
@@ -1205,9 +1399,13 @@ gisportal.api['clearSelection.clicked'] = function(data, options){
 gisportal.api['olDraw.click'] = function(data, options){
 	options = options || {};
 	var coordinate = data.coordinate;
+	var niceCoordinate = coordinate;
 
 	if(options.describeOnly){
-		return 'Draw click at coordinate: ' + coordinate;
+		return 'Draw click at coordinate: [' + coordinate[0].toFixed(2) + ", " + coordinate[1].toFixed(2) + "]";
+	}
+	if(options.selectorOnly){
+		return '';
 	}
 	gisportal.drawingPoints.push(coordinate);
 
@@ -1247,6 +1445,9 @@ gisportal.api['olDraw.drawstart'] = function(data, options){
 	if(options.describeOnly){
 		return 'Draw Started';
 	}
+	if(options.selectorOnly){
+		return '';
+	}
 	gisportal.vectorLayer.getSource().clear();
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
@@ -1265,6 +1466,9 @@ gisportal.api['olDraw.drawend'] = function(data, options){
 	if(options.describeOnly){
 		return 'Polygon drawn';
 	}
+	if(options.selectorOnly){
+		return '';
+	}
 	gisportal.selectionTools.ROIAdded(sketch);
 	gisportal.vectorLayer.getSource().addFeature(sketch);
 };
@@ -1282,7 +1486,10 @@ gisportal.api['selectPolygon.hover'] = function(data, options){
 	var pixel = map.getPixelFromCoordinate(coordinate);
 
 	if(options.describeOnly){
-		return 'Polygon hovered: ' + id;
+		return 'Polygon hovered: '  + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '';
 	}
 	var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
       // Gets the first vector layer it finds
@@ -1306,7 +1513,10 @@ gisportal.api['selectPolygon.select'] = function(data, options){
 	var pixel = map.getPixelFromCoordinate(coordinate);
 
 	if(options.describeOnly){
-		return 'Polygon selected: ' + id;
+		return 'Polygon selected: '  + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '';
 	}
 	var feature = map.forEachFeatureAtPixel(pixel, function(feature, layer) {
       // Gets the first vector layer it finds
@@ -1326,6 +1536,9 @@ gisportal.api['coordinates.save'] = function(data, options){
 	if(options.describeOnly){
 		return 'Save Coordinates clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-add-coordinates-to-profile';
+	}
 	$('.js-add-coordinates-to-profile').trigger('click');
 };
 
@@ -1341,6 +1554,9 @@ gisportal.api['featureOverlay.removeType'] = function(data, options){
 	if(options.describeOnly){
 		return 'Remove ' + overlayType;
 	}
+	if(options.selectorOnly){
+		return '';
+	}
 	gisportal.removeTypeFromOverlay(gisportal.featureOverlay, overlayType);
 };
 
@@ -1355,7 +1571,10 @@ gisportal.api['dataPopup.display'] = function(data, options){
 	var pixel = map.getPixelFromCoordinate(coordinate);
 
 	if(options.describeOnly){
-		return 'Data popup shown at coordinate: ' + coordinate;
+		return 'Data popup shown at coordinate: [' + coordinate[0].toFixed(2) + ", " + coordinate[1].toFixed(2) + "]";
+	}
+	if(options.selectorOnly){
+		return '';
 	}
 	gisportal.displayDataPopup(pixel);
 };
@@ -1368,6 +1587,9 @@ gisportal.api['dataPopup.close'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Data popup closed';
+	}
+	if(options.selectorOnly){
+		return '';
 	}
 	gisportal.dataReadingPopupCloser.click();
 };
@@ -1384,6 +1606,9 @@ gisportal.api['newPlot.clicked'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Make new graph" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-make-new-plot[data-id="' + id + '"]';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
@@ -1404,6 +1629,9 @@ gisportal.api['addToPlot.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Add to graph" Clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-add-to-plot[data-id="' + id + '"]';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(button_elem);
 	}
@@ -1423,6 +1651,9 @@ gisportal.api['graphs.deleteActive'] = function(data, options){
 	if(options.describeOnly){
 		return 'Closed plot';
 	}
+	if(options.selectorOnly){
+		return '.js-add-to-plot[data-id="' + id + '"]';
+	}
 	gisportal.graphs.deleteActiveGraph();
 };
 
@@ -1438,6 +1669,9 @@ gisportal.api['slideout.togglePeak'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Show panel: ' + slideoutName;
+	}
+	if(options.selectorOnly){
+		return '[data-slideout-name="' + slideoutName + '"] .js-slideout-toggle-peak';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(clicked_elem);
@@ -1458,6 +1692,9 @@ gisportal.api['slideout.close'] = function(data, options){
 	if(options.describeOnly){
 		return 'Close panel: ' + slideoutName;
 	}
+	if(options.selectorOnly){
+		return '[data-slideout-name="' + slideoutName + '"] .js-slideout-close';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(clicked_elem);
 	}
@@ -1472,10 +1709,13 @@ gisportal.api['slideout.close'] = function(data, options){
 gisportal.api['more-info.clicked'] = function(data, options){
 	options = options || {};
 	var id = data.layerId;
-	var clicked_elem = $('.show-more[data-id="' + id + '"]')
+	var clicked_elem = $('.show-more[data-id="' + id + '"]');
 
 	if(options.describeOnly){
-		return 'More Info: ' + id;
+		return 'More Info: '  + gisportal.layers[id].descriptiveName;
+	}
+	if(options.selectorOnly){
+		return '.show-more[data-id="' + id + '"]';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(clicked_elem);
@@ -1496,6 +1736,9 @@ gisportal.api['graphTitle.edit'] = function(data, options){
 	if(options.describeOnly){
 		return 'Title value set to: "' + value + '"';
 	}
+	if(options.selectorOnly){
+		return '.js-active-plot-title';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
 	}
@@ -1515,6 +1758,9 @@ gisportal.api['graphType.edit'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Graph type set to: "' + nice_val + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-active-plot-type';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
@@ -1537,6 +1783,9 @@ gisportal.api['layerDepth.change'] = function(data, options){
 	if(options.describeOnly){
 		return 'Layer Depth set to: "' + nice_val + '"';
 	}
+	if(options.selectorOnly){
+		return '.js-analysis-elevation';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
 	}
@@ -1558,6 +1807,9 @@ gisportal.api['graphRange.change'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Graph date range set to: "' + dates.join(' - ') + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-range-slider';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(slider_elem);
@@ -1582,6 +1834,9 @@ gisportal.api['graphComponent.remove'] = function(data, options){
 	if(options.describeOnly){
 		return title + ' removed"';
 	}
+	if(options.selectorOnly){
+		return '.js-components tr:eq(' + index + ')';
+	}
 	del_elem.trigger('click');
 };
 
@@ -1603,6 +1858,9 @@ gisportal.api['graphComponent.axisChange'] = function(data, options){
 	if(options.describeOnly){
 		return title + ': axis changed to "' + select_value;
 	}
+	if(options.selectorOnly){
+		return '.js-components tr:eq(' + index + ')';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(select_elem);
 	}
@@ -1621,6 +1879,9 @@ gisportal.api['graphStartDate.change'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Graph start date set to: "' + value + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-active-plot-start-date';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(date_elem);
@@ -1641,6 +1902,9 @@ gisportal.api['graphEndDate.change'] = function(data, options){
 	if(options.describeOnly){
 		return 'Graph end date set to: "' + value + '"';
 	}
+	if(options.selectorOnly){
+		return '.js-active-plot-end-date';
+	}
 	if(options.highlight){
 		collaboration.highlightElement(date_elem);
 	}
@@ -1655,6 +1919,9 @@ gisportal.api['graph.submitted'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Create Graph" clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-create-graph';
 	}
 	$('.js-create-graph').trigger('click');
 };
@@ -1673,6 +1940,9 @@ gisportal.api['graph.open'] = function(data, options){
 	if(options.describeOnly){
 		return '"' + title + '": "Open" clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-graph-status-open[data-hash="' + hash + '"]';
+	}
 	open_elem.trigger('click');
 };
 
@@ -1689,6 +1959,9 @@ gisportal.api['graph.copy'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"' + title + '": "Copy/Edit" clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-graph-status-copy[data-hash="' + hash + '"]';
 	}
 	copy_elem.trigger('click');
 };
@@ -1707,6 +1980,9 @@ gisportal.api['graph.delete'] = function(data, options){
 	if(options.describeOnly){
 		return '"' + title + '": "Delete" clicked';
 	}
+	if(options.selectorOnly){
+		return '.js-graph-status-delete[data-hash="' + hash + '"]';
+	}
 	delete_elem.trigger('click');
 };
 
@@ -1718,6 +1994,9 @@ gisportal.api['graphPopup.close'] = function(data, options){
 
 	if(options.describeOnly){
 		return 'Plot closed';
+	}
+	if(options.selectorOnly){
+		return '.js-plot-popup-close';
 	}
 	collaboration.forcePopupClose = true;
    $('.js-plot-popup-close').trigger('click');
@@ -1732,6 +2011,9 @@ gisportal.api['configureInternalLayers.clicked'] = function(data, options){
 	if(options.describeOnly){
 		return '"Configure Internal Layers" Clicked';
 	}
+	if(options.selectorOnly){
+		return 'button.js-edit-layers';
+	}
 	$('button.js-edit-layers').trigger('click');
 };
 
@@ -1743,6 +2025,9 @@ gisportal.api['configureInternalLayers.closed'] = function(data, options){
 
 	if(options.describeOnly){
 		return '"Configure Internal Layers" Closed';
+	}
+	if(options.selectorOnly){
+		return '.js-edit-layers-close';
 	}
 	$('.js-edit-layers-close').trigger('click');
 };

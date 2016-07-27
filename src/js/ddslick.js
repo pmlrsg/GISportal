@@ -359,7 +359,7 @@
             "event" : "ddslick.close",
             "obj" : obj.attr('id')
         };
-        gisportal.events.trigger('ddslick.close', params);
+        //gisportal.events.trigger('ddslick.close', params);
     }
 
     //Private: Adjust appearence for selected option (move title to middle), when no desripction

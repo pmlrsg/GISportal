@@ -255,7 +255,9 @@ collaboration.initSession = function() {
                }, 1000);
             }
             if(ev.type == "click"){
-               collaboration.divergeAlert();
+               if(Boolean(collaboration.role)){
+                  collaboration.divergeAlert();
+               }
             }
          });
 
@@ -367,9 +369,6 @@ collaboration.initSession = function() {
 
             // if I am the presenter send my state so that the new member can catch up
             if (collaboration.role == 'presenter') {
-               if(gisportal.panels.activePanel != "refine-indicator"){
-                  $('.dd-container').ddslick('close');
-               }
                var minimumExtent = collaboration.getMinimumExtent(data.people);
                $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
                var state = gisportal.saveState();
@@ -379,6 +378,9 @@ collaboration.initSession = function() {
                   "joining-member": data.user.email
                };
                gisportal.events.trigger('room.presenter-state-update', params);
+            }
+            if(gisportal.panels.activePanel != "refine-indicator"){
+               $('.dd-container').ddslick('close');
             }
             // set the owner variable
             if(data.owner && data.user.email == gisportal.user.info.email){
@@ -425,9 +427,6 @@ collaboration.initSession = function() {
             if (collaboration.role == 'presenter') {
                var minimumExtent = collaboration.getMinimumExtent(data.people);
                $('.collab-extent-overlay').css({width: minimumExtent[0] + "px", height: minimumExtent[1] + "px"});
-               if(gisportal.panels.activePanel != "refine-indicator"){
-                  $('.dd-container').ddslick('close');
-               }
                var state = gisportal.saveState();
                var params = {
                   "event": "room.presenter-state-update",
@@ -446,6 +445,9 @@ collaboration.initSession = function() {
                      break;
                   }
                }
+            }
+            if(gisportal.panels.activePanel != "refine-indicator"){
+               $('.dd-container').ddslick('close');
             }
             collaboration.buildMembersList(data);
          });
@@ -595,9 +597,9 @@ collaboration.initSession = function() {
          // User saved state
          socket.on('setSavedState', function(data) {
             
-            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api['setSavedState'](data, {describeOnly: true}));
+            collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) + ' ' + gisportal.api.setSavedState(data, {describeOnly: true}));
             if (collaboration.role == "member") {
-               gisportal.api['setSavedState'](data, {highlight: true});
+               gisportal.api.setSavedState(data, {highlight: true});
             }
          });
 

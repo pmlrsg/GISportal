@@ -502,6 +502,7 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
       holder = $('input[value="' + layer + '"]').parent();
       if (holder.length > 0) {
          holder.tooltipster({
+            contentCloning: true,
             content: $(info),
             position: 'right',
          });

@@ -438,6 +438,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    //Add the scale bar tooltip
    var renderedTooltip = gisportal.templates['tooltip-scalebar']( layer );
    $('[data-id="' + id + '"] .js-scalebar').tooltipster({
+      contentCloning: true,
       contentAsHTML: true,
       content: renderedTooltip,
       position: "right",
@@ -847,7 +848,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       }
 
       $('#tab-' + indicator.id + '-opacity').on('slide', function() {
-         var opacity = $(this).val() / 100;
+         var opacity = ($(this).val() / 100).toFixed(2);
 
          var params = {
             "event" : "scalebar.opacity",
@@ -859,7 +860,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       });
 
       $('#tab-' + indicator.id + '-colorbands').on('change', function() {
-         var colorbands = $(this).val();
+         var colorbands = parseInt($(this).val());
 
          var params = {
             "event" : "scalebar.colorbands",

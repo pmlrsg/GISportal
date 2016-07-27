@@ -569,6 +569,9 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
+   if(gisportal.timeline.getDate().toDateString() == date.toDateString()){
+      return false;
+   }
    gisportal.hideAllPopups();
    var self = this;  // Useful for when the scope/meaning of "this" changes
    this.selectedDate = self.draggedDate = new Date(date);

@@ -685,11 +685,6 @@ gisportal.mapInit = function() {
       }
       else {
          gisportal.displayDataPopup(e.pixel);
-         var params = {
-            "event": "dataPopup.display",
-            "coordinate": map.getCoordinateFromPixel(e.pixel)
-         };
-         gisportal.events.trigger('dataPopup.display', params);
       }
    });
    gisportal.selectFeature = function(feature){
@@ -715,6 +710,7 @@ gisportal.mapInit = function() {
    gisportal.displayDataPopup = function(pixel){
       var isFeature = false;
       var coordinate = map.getCoordinateFromPixel(pixel);
+      var params;
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
          if (feature && _.keys(feature.getProperties()).length >1 ) {
@@ -746,9 +742,14 @@ gisportal.mapInit = function() {
       });
       if (!isFeature && !gisportal.selectionTools.isDrawing) {
          gisportal.addDataPopup(coordinate, pixel);
+         params = {
+            "event": "dataPopup.display",
+            "coordinate": coordinate
+         };
+         gisportal.events.trigger('dataPopup.display', params);
       }
       if(gisportal.selectionTools.isDrawing){
-         var params = {
+         params = {
             "event": "olDraw.click",
             "coordinate": coordinate
          };
@@ -862,7 +863,7 @@ gisportal.nonLayerDependent = function() {
 /*===========================================================================*/
 
 gisportal.autoSaveState = function(){
-   var state = JSON.stringify(gisportal.saveState());
+   var state = JSON.stringify(gisportal.walkthrough.state_before_walkthrough || gisportal.saveState());
    gisportal.storage.set( gisportal.niceDomainName + '_state', state );
 };
 
@@ -1057,12 +1058,17 @@ gisportal.loadState = function(state){
 
    // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
+      if(!gisportal.state_indicators_list){
+         return false;
+      }
       var index = gisportal.state_indicators_list.indexOf(id);
       if(index > -1){
          // splice used because pop was not removing the correct value.
-         state.selectedIndicators.splice(index, 1);
+         if(state.selectedIndicators){
+            state.selectedIndicators.splice(index, 1);
+         }
       }
-      if(state.selectedIndicators.length === 0){
+      if(state.selectedIndicators && state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
       }
    });
@@ -1382,7 +1388,7 @@ gisportal.main = function() {
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
    } else {
-      $('body').prepend('<div class="dev-warning">DEVELOPMENT MODE</div>');
+      $('body').prepend('<div class="dev-warning noselect">DEVELOPMENT MODE</div>');
       $('.js-start-container').addClass('start-dev');
    }
    if(!gisportal.config.colorbands){
