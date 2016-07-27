@@ -295,6 +295,12 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
 
          // The keydown event listener that is added allows for the user to control the walkthrough.
          $(document).on( 'keydown', gisportal.walkthrough.keydownListener);
+         var params = {
+            "event": "room.presenter-state-update",
+            "state": gisportal.saveState(),
+            "force": true
+         };
+         gisportal.events.trigger('room.presenter-state-update', params);
       }
    });
 };
@@ -353,7 +359,7 @@ gisportal.walkthrough.nextStep = function(force){
       WT.current_step++;
       var this_step = WT.walkthrough.step[WT.current_step];
       if(this_step.data){
-         gisportal.api[this_step.data.event](this_step.data);
+         gisportal.api[this_step.data.event](this_step.data, {highlight: true});
       }
       this_step.pause_here = this_step.pause_here === "true" || this_step.pause_here;
       if(this_step.pause_here){
@@ -507,7 +513,7 @@ gisportal.walkthrough.destroyWalkthrough = function(){
    if(this.timeout){
       clearTimeout(this.timeout);
    }
-   if(!collaboration.role){
+   if(collaboration.role != "member"){
       $('.collab-overlay').toggleClass('hidden', true);
    }
    this.init();
