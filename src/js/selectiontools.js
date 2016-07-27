@@ -76,7 +76,6 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   $(document).off( 'keydown' );
    sketch = null;
    if(draw){
       map.removeInteraction(draw);

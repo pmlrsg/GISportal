@@ -247,6 +247,11 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
             gisportal.stopLoadState = false;
             gisportal.loadState(state);
          }
+         // The keydown event listener is removed from the document so that there is only ever one on there.
+         $(document).off('keydown', gisportal.walkthrough.keydownListener);
+
+         // The keydown event listener that is added allows for the user to control the walkthrough.
+         $(document).on( 'keydown', gisportal.walkthrough.keydownListener);
       }
    });
 };
@@ -337,7 +342,9 @@ gisportal.walkthrough.nextStep = function(force){
       }
       $('.js-next-step-walkthrough-tooltip').on('click', function(e){
          e.preventDefault();
-         $('.js-play-walkthrough').trigger('click');
+         gisportal.walkthrough.paused = false;
+         gisportal.walkthrough.renderControls();
+         $('.js-skip-step-walkthrough').trigger('click');
       });
    }, timeout);
 };
@@ -348,6 +355,7 @@ gisportal.walkthrough.backStep = function(force){
    if(!WT.walkthrough.step[WT.current_step - 1]){
       return;
    }
+   gisportal.walkthrough.removeTooltips();
    var state = WT.walkthrough.step[WT.current_step - 1].state;
    gisportal.stopLoadState = false;
    gisportal.loadState(state);
@@ -429,3 +437,28 @@ gisportal.walkthrough.highlightElementOverlay = function(elem){
 gisportal.walkthrough.hideHighlightOverlay = function(){
    $('.walkthrough-highlight-overlay').toggleClass('hidden', true);
 };
+
+gisportal.walkthrough.keydownListener = function(e){
+   if(gisportal.walkthrough.walkthrough_playing){
+      switch(e.keyCode){
+         case 13:
+         case 32:
+            if($('.js-next-step-walkthrough-tooltip').length > 0){
+               $('.js-next-step-walkthrough-tooltip').trigger('click');
+            }else if(gisportal.walkthrough.paused){
+               $('.js-play-walkthrough').trigger('click');
+            }else{
+               $('.js-pause-walkthrough').trigger('click');
+            }
+            break;
+         case 37:
+         case 38:
+            $('.js-back-step-walkthrough').trigger('click');
+            break;
+         case 39:
+         case 40:
+            $('.js-skip-step-walkthrough').trigger('click');
+            break;
+      }
+   }
+}
