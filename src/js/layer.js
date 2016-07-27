@@ -809,7 +809,7 @@ gisportal.filterLayersByDate = function(date) {
    }
    if(!one_in_bounds){
       $('.notifyjs-gisportal-info span:contains("You have selected a date that does not fall within")').closest('.notifyjs-wrapper').remove();
-      gisportal.timeline.setDate(new Date(absoluteLastDate));
+      gisportal.timeline.setDate(new Date(moment(absoluteLastDate).subtract(1, 'day')));
    }
 };
 
