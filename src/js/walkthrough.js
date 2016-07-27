@@ -241,9 +241,12 @@ gisportal.walkthrough.loadEditForm = function(){
 
    // Changes the selector of the step
    $('.default-selector').on('click', function(){
+      var selector;
       var this_step = $(this).data('step');
       var data = gisportal.walkthrough.recording_object.step[this_step].data;
-      var selector = gisportal.api[data.event](data, {selectorOnly: true});
+      if(data){
+         selector = gisportal.api[data.event](data, {selectorOnly: true});
+      }
       var input = $('.selector-input[data-step="' + this_step + '"]');
       if(selector){
          input.val(selector).trigger('change');
@@ -383,7 +386,7 @@ gisportal.walkthrough.nextStep = function(force){
       }else if(WT.playback_speed === 0 || (this_step.pause_here)){
          WT.elemTooltip("Click 'Forward' to run the next step", ".controls-holder");
       }
-      if(WT.current_step >= _.size(WT.walkthrough.step)-1){
+      if(WT.current_step >= _.size(WT.walkthrough.step)-1 && !(this_step.pause_here)){
          return WT.finished();
       }
       if(!WT.paused && WT.playback_speed !== 0 && !(this_step.pause_here)){

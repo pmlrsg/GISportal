@@ -487,7 +487,9 @@ gisportal.layer = function( options ) {
             layer.selectedDateTime = '';
             layer.isInbounds = false;
          }
-         if (this.openlayers.anID) this.openlayers.anID.setVisible(layer.isInbounds && layer.isVisible);
+         if (this.openlayers.anID){
+            this.openlayers.anID.setVisible(layer.isInbounds && layer.isVisible);
+         }
          $('.indicator-header[data-id="' + layer.id + '"]').toggleClass('hidden-layer', !(layer.isInbounds));
       }
    };
@@ -789,14 +791,26 @@ gisportal.filterLayersByDate = function(date) {
          layer.selectDateTimeLayer(date);
       }
    });
-   for(var layer in gisportal.selectedLayers){
+   var layer
+   var notify_shown = false;
+   var one_in_bounds = false;
+   var absoluteLastDate = "1900-01-01";
+   for(layer in gisportal.selectedLayers){
       var this_layer = gisportal.layers[gisportal.selectedLayers[layer]];
-      if(!this_layer.isInbounds){
+      if(moment(layer.lastDate).isAfter(moment(absoluteLastDate))){
+         absoluteLastDate = layer.lastDate;
+      }
+      if(!this_layer.isInbounds && !notify_shown){
          $('.js-current-date').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
-         return false;
+         notify_shown = true;
+      }else if(this_layer.isInbounds){
+         one_in_bounds = true;
       }
    }
-   $('.notifyjs-gisportal-info span:contains("You have selected a date that does not fall within")').closest('.notifyjs-wrapper').remove();
+   if(!one_in_bounds){
+      $('.notifyjs-gisportal-info span:contains("You have selected a date that does not fall within")').closest('.notifyjs-wrapper').remove();
+      gisportal.timeline.setDate(absoluteLastDate);
+   }
 };
 
 /**
