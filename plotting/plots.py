@@ -16,6 +16,7 @@ import traceback
 import requests
 import urllib2
 
+from scipy import stats
 import numpy as np
 import pandas as pd
 import json
@@ -985,6 +986,18 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 
    shutil.rmtree(csv_dir)
 
+   # Calculate the linear regression line
+   slope, intercept, r_value, p_value, std_err = stats.linregress(data1, data2)
+   regr_f = np.poly1d([slope, intercept])
+
+   # Use the slope and intercept to create some points for bokeh to plot.
+   # Not sure how long the line should be. As a first stab just extend the x up and down
+   # by the full x range.
+   regression_x = [data1.min()-(data1.max()-data1.min()), data1.max()+(data1.max()-data1.min())]
+   regression_y = [regr_f(regression_x[0]), regr_f(regression_x[1])]
+
+   debug(3,"r:{}, p:{}, std:{}".format(r_value, p_value, std_err))
+
    datasource = dict(date=date,
                      sdate=dateData,
                      x=data1,
@@ -1003,15 +1016,35 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    scatter_plot.xaxis.axis_label_text_font_size = "10pt"
    scatter_plot.yaxis.axis_label_text_font_size = "10pt"
 
-   hover = HoverTool(
+   # If we had bokeh version 0.12 we could do this
+   #mytext = Label(x=70, y=70, text='r-value: {}'.format(r_value))
+   #scatter_plot.add_layout(mytext)
+
+   # Plot the points of the scatter.
+   points = scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   
+   # Plot the regression line using default style.
+   reg_line = scatter_plot.line(x=regression_x, y=regression_y)
+      
+   # Set up the hover tooltips for the points and lines.
+   point_hover = HoverTool(
       tooltips=[
          ("Date", "@sdate"),
          (cov_meta['x']['coverage'], "@x{0.000}"),
          (cov_meta['y']['coverage'], "@y{0.000}")
-      ]
+      ],
+         renderers=[points]
    )
 
-   scatter_plot.add_tools(hover)
+   line_hover = HoverTool(
+      tooltips=("Slope: {:04.3f}<br>Intercept: {:04.3f}<br>R<sup>2</sup>: {:04.3f}".format(slope, intercept, r_value**2)),
+      renderers=[reg_line],
+      line_policy='interp'
+   )
+
+   # Set up the hover tools in this order so the point hover is on top of the line.
+   scatter_plot.add_tools(line_hover)
+   scatter_plot.add_tools(point_hover)
 
    scatter_plot.xaxis.axis_label = plot['xAxis']['label']
    
@@ -1019,8 +1052,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    # if we run it later.
    scatter_plot.yaxis.axis_label = plot['y1Axis']['label']
    
-   scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
-      
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
    scatter_plot.legend.location = "top_left"

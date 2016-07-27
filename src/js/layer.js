@@ -321,7 +321,7 @@ gisportal.layer = function( options ) {
     */
    this.isVisible = true;  
    this.setVisibility = function(visibility) {
-      if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility);
+      if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility && this.isInbounds);
       this.isVisible = visibility;
    };
    
@@ -467,7 +467,7 @@ gisportal.layer = function( options ) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];
-            layer.isVisible = true;
+            layer.isInbounds = true;
             
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
@@ -481,17 +481,14 @@ gisportal.layer = function( options ) {
                   }
                }
             } 
-            //-----------------------------------------------------------------       
-            
-            layer.setVisibility(layer.isVisible);
-            //console.info('Layer ' + layer.name + ' data available for date-time ' + layer.selectedDateTime + '. Layer selection and display: ' + layer.selected);
          }
          else {
             layer.currentDateTimes = [];
             layer.selectedDateTime = '';
-            layer.setVisibility(false);
-            //console.info('Layer ' + layer.name + ' no data available for date-time ' + uidate + '. Not displaying layer.');
+            layer.isInbounds = false;
          }
+         if (this.openlayers.anID) this.openlayers.anID.setVisible(layer.isInbounds && layer.isVisible);
+         $('.indicator-header[data-id="' + layer.id + '"]').toggleClass('hidden-layer', !(layer.isInbounds));
       }
    };
    
@@ -791,7 +788,15 @@ gisportal.filterLayersByDate = function(date) {
       if (layer.temporal) {
          layer.selectDateTimeLayer(date);
       }
-   });      
+   });
+   for(var layer in gisportal.selectedLayers){
+      var this_layer = gisportal.layers[gisportal.selectedLayers[layer]];
+      if(!this_layer.isInbounds){
+         $('.js-current-date').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
+         return false;
+      }
+   }
+   $('.notifyjs-gisportal-info span:contains("You have selected a date that does not fall within")').closest('.notifyjs-wrapper').remove();
 };
 
 /**
