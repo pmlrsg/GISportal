@@ -87,6 +87,19 @@ gisportal.walkthrough.renderControls = function(){
    $('.js-walkthrough-speed').val(this.playback_speed).on('change', function(){
       gisportal.walkthrough.playback_speed = parseInt($(this).val());
    });
+   $('.js-walkthrough-playing-close').on('click', function(){
+      gisportal.walkthrough.finished();
+   });
+   $('.js-walkthrough-recording-close').on('click', function(){
+      gisportal.walkthrough.is_recording = false;
+      gisportal.walkthrough.starting_recording = false;
+      gisportal.walkthrough.last_step_time = null;
+      gisportal.walkthrough.renderControls();
+      gisportal.walkthrough.recording_object = {};
+      if(gisportal.user.info.permission == "admin"){
+         $('.walkthrough-record').toggleClass("hidden", false);
+      }
+   });
 };
 
 gisportal.walkthrough.loadEditForm = function(){
@@ -146,6 +159,16 @@ gisportal.walkthrough.loadEditForm = function(){
       var title = $(this).val();
       $('.walkthrough-temp-title').html(title);
       gisportal.walkthrough.recording_object.title = title;
+   });
+
+   // Changes the start text of the walkthrough
+   $('.start-text-input').on('change', function(){
+      gisportal.walkthrough.recording_object.start_text = $(this).val();
+   });
+
+   // Changes the requires_logged_in_user of the walkthrough
+   $('.requires-logged-in-user-toggle').on('change', function(){
+      gisportal.walkthrough.recording_object.requires_logged_in_user = $(this).is(':checked');
    });
 
    // Deletes a step in the walkthrough.
@@ -242,11 +265,31 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
          gisportal.walkthrough.current_step = 0;
          gisportal.walkthrough.state_before_walkthrough = gisportal.saveState();
          $('.collab-overlay').toggleClass('hidden', false);
-         var state = gisportal.walkthrough.walkthrough.step[0].state;
+         var state = data.step[0].state;
          if(state){
             gisportal.stopLoadState = false;
             gisportal.loadState(state);
          }
+         if(data.requires_logged_in_user){
+            $('.js-google-auth-button').trigger('click');
+         }
+         var start_text = data.start_text;
+         if(!start_text){
+            start_text = "You have loaded a walkthrough, You can use the panel at the top to control the walkthrough. When you have finished, you will have the option to carry on, or go back to where you started from.";
+         }
+         var holder = $('.js-modal-message-popup');
+         var target = $('.js-modal-message-html');
+         target.html(start_text + '</br><button class="brand secondary js-start-walkthrough">Start</button>');
+         holder.toggleClass('hidden', false);
+         if(gisportal.modalTimeout){
+            clearTimeout(gisportal.modalTimeout);
+         }
+         $('.js-start-walkthrough').on('click', function(){
+            target.html("");
+            holder.toggleClass('hidden', true);
+            $('.js-play-walkthrough').trigger('click');
+         });
+
          // The keydown event listener is removed from the document so that there is only ever one on there.
          $(document).off('keydown', gisportal.walkthrough.keydownListener);
 
@@ -372,14 +415,10 @@ gisportal.walkthrough.backStep = function(force){
 };
 
 gisportal.walkthrough.finished = function(){
-   gisportal.walkthrough.removeTooltips();
-   $('.collab-overlay').toggleClass('hidden', true);
-   this.init();
-   gisportal.walkthrough.renderControls();
    var state = this.state_before_walkthrough;
-   $('select.js-walkthrough-list').val('default');
+   this.destroyWalkthrough();
    if(!state){
-      return gisportal.walkthrough.elemTooltip("The walkhrough has now finished", ".controls-holder");
+      return $.notify("The walkhrough has now finished");
    }
    $.notify({'title':"Would you like to continue from here or go back to how things were before?", "yes-text":"Revert", "no-text":"Continue"},{style:"gisportal-walkthrough-option", autoHide:false});
    $(document).off('click', '.notifyjs-gisportal-walkthrough-option-base .no, .notifyjs-gisportal-walkthrough-option-base .yes');
@@ -422,7 +461,7 @@ gisportal.walkthrough.removeTooltips = function(){
 };
 
 gisportal.walkthrough.highlightElementOverlay = function(elem){
-   if(elem == ""){
+   if(elem === ""){
       return gisportal.walkthrough.hideHighlightOverlay();
    }
    elem = $(elem);
@@ -461,4 +500,17 @@ gisportal.walkthrough.keydownListener = function(e){
             break;
       }
    }
-}
+};
+
+gisportal.walkthrough.destroyWalkthrough = function(){
+   this.removeTooltips();
+   if(this.timeout){
+      clearTimeout(this.timeout);
+   }
+   if(!collaboration.role){
+      $('.collab-overlay').toggleClass('hidden', true);
+   }
+   this.init();
+   this.renderControls();
+   $('select.js-walkthrough-list').val('default');
+};

@@ -985,6 +985,7 @@ gisportal.loadState = function(state){
    }
    gisportal.stopLoadState = true;
    $('.start').toggleClass('hidden', true);
+   cancelDraw();
    state = state || {};
 
    var stateTimeline = state.timeline;

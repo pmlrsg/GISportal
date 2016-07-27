@@ -1,6 +1,10 @@
 <div class="walkthrough-controls">
 	{{#if starting_recording}}
 		{{#unless ../is_recording}}
+			<div class="walkthrough-title noselect">
+				<h3><b>Ready...</b></h3>
+				<span class="icon-delete-3 js-walkthrough-recording-close btn right-icon icon-btn"></span>
+			</div>
 			<button class="brand secondary js-start-record">
 				<span class='icon-record-1'></span>Record
 			</button>
@@ -8,6 +12,10 @@
 	{{/if}}
 	{{#if is_recording}}
 		{{#unless ../starting_recording}}
+			<div class="walkthrough-title noselect">
+				<h3><b>Recording</b></h3>
+				<span class="icon-delete-3 js-walkthrough-recording-close btn right-icon icon-btn"></span>
+			</div>
 			<button class="brand selected secondary js-stop-record">
 				<span class='icon-stop-2'></span>Stop
 			</button>
@@ -17,6 +25,7 @@
 	{{#if walkthrough_playing}}
 		<div class="walkthrough-title noselect">
 			<h3><b>{{walkthrough.title}}</b></h3>
+			<span class="icon-delete-3 js-walkthrough-playing-close btn right-icon icon-btn"></span>
 		</div>
 		<button class="brand secondary js-back-step-walkthrough">
 			<span class='icon-previous-2'></span>Back

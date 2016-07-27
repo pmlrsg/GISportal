@@ -9,6 +9,11 @@
 <div class="walkthrough-main-field">
    <label>Owner:</label><select class="owner-input"></select>
 </div>
+<div class="walkthrough-main-field">
+   <label>Requires logged in user:</label><input type="checkbox" {{#if requires_logged_in_user}}selected {{/if}}class="requires-logged-in-user-toggle">
+</div>
+<br/>
+<label title="A message to display when the walkthrough is loaded">Start Message:</label><textarea type="textarea" class="start-text-input">{{start_text}}</textarea>
 
 {{#each step}}
    {{#if @first}}
