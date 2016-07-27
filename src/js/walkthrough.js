@@ -321,6 +321,7 @@ gisportal.walkthrough.nextStep = function(force){
             popup_string += '</br><button class="brand secondary js-next-step-walkthrough-tooltip">Continue</button>';
          }
          if(this_step.selector){
+            gisportal.walkthrough.highlightElementOverlay(this_step.selector);
             WT.elemTooltip(popup_string, this_step.selector);
          }else{
             WT.elemTooltip(popup_string, ".controls-holder");
@@ -404,9 +405,27 @@ gisportal.walkthrough.elemTooltip = function(text, elem){
 };
 
 gisportal.walkthrough.removeTooltips = function(){
+   gisportal.walkthrough.hideHighlightOverlay();
    for(var elem in this.tooltipster_elements){
       var _this = $(this.tooltipster_elements[elem]);
       _this.tooltipster('disable');
    }
    this.tooltipster_elements = [];
+};
+
+gisportal.walkthrough.highlightElementOverlay = function(elem){
+   if(elem == ""){
+      return gisportal.walkthrough.hideHighlightOverlay();
+   }
+   elem = $(elem);
+   $('.walkthrough-highlight-overlay').toggleClass('hidden', false).css({
+      width: (elem[0].clientWidth + 20) + "px",
+      height: (elem[0].clientHeight + 20) + "px",
+      left: (elem.offset().left - 10) + "px",
+      top: (elem.offset().top - 10) + "px"
+   });
+};
+
+gisportal.walkthrough.hideHighlightOverlay = function(){
+   $('.walkthrough-highlight-overlay').toggleClass('hidden', true);
 };
