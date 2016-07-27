@@ -40,7 +40,8 @@ gisportal.user.initDOM = function() {
                   $('.js-user-dashboard').html(data); 
                   $('.js-google-auth-button').click(function() {
                      var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
-                  });        
+                  });
+                  gisportal.walkthrough.loadWalkthroughList();
                },
             });
          },
@@ -49,11 +50,13 @@ gisportal.user.initDOM = function() {
             gisportal.config.collaborationFeatures.enabled = false;
             $('[data-panel-name="collaboration"]').toggleClass('hidden', true);
             gisportal.noOAuth = true;
+            gisportal.walkthrough.loadWalkthroughList();
          }
       },
       success: function(data) {
          $('.js-user-dashboard').html(data);
          gisportal.user.loggedIn();
+         gisportal.walkthrough.loadWalkthroughList();
       },
    });
    var rendered = gisportal.templates.user();
@@ -173,7 +176,6 @@ gisportal.user.initDOM = function() {
          gisportal.walkthrough.renderControls();
       }
    });
-   gisportal.walkthrough.loadWalkthroughList();
 };
 
 // This gets the logged in users information or the default guest values
