@@ -429,6 +429,9 @@ gisportal.walkthrough.backStep = function(force){
 };
 
 gisportal.walkthrough.finished = function(){
+   if(gisportal.utils.getURLParameter('walkthrough_popup')){
+      self.close();
+   }
    var state = this.state_before_walkthrough;
    this.destroyWalkthrough();
    if(!state){
@@ -576,4 +579,8 @@ gisportal.walkthrough.loadManagementPanel = function(){
          $.notify("There was a problem loading walkthroughs, plase try again.");
       }
    });
-}
+};
+
+gisportal.walkthrough.openVisualPortalWalkthrough = function(walkthrough_name){
+   var walkthrough_popup = window.open('https://visual.pml.ac.uk?walkthrough_name=' + walkthrough_name + '&walkthrough_owner=visual.pml.ac.uk&walkthrough_popup=true','Walkthrough','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
+};

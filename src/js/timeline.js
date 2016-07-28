@@ -424,7 +424,7 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
       if (!label || label === "") label =  this.timebars[i].label;
-      if(gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
+      if(gisportal.layers[id] && gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
       
       $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
    }
