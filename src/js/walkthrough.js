@@ -66,9 +66,11 @@ gisportal.walkthrough.renderControls = function(){
       gisportal.walkthrough.loadEditForm();
       if(gisportal.user.info.permission == "admin"){
          $('.walkthrough-record').toggleClass("hidden", false);
+         $('.walkthroughs-manage').toggleClass("hidden", false);
       }
    });
    $('.js-play-walkthrough').on('click', function(){
+      gisportal.hideModalMessage();
       gisportal.walkthrough.paused = false;
       gisportal.walkthrough.nextStep();
       gisportal.walkthrough.renderControls();
@@ -98,6 +100,7 @@ gisportal.walkthrough.renderControls = function(){
       gisportal.walkthrough.recording_object = {};
       if(gisportal.user.info.permission == "admin"){
          $('.walkthrough-record').toggleClass("hidden", false);
+         $('.walkthroughs-manage').toggleClass("hidden", false);
       }
    });
 };
@@ -288,8 +291,6 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
             clearTimeout(gisportal.modalTimeout);
          }
          $('.js-start-walkthrough').on('click', function(){
-            target.html("");
-            holder.toggleClass('hidden', true);
             $('.js-play-walkthrough').trigger('click');
          });
 
@@ -346,10 +347,10 @@ gisportal.walkthrough.nextStep = function(force){
    var timeout = WT.walkthrough.step[WT.current_step + 1].delay * 1000;
 
    if(force){
-      timeout = 0;
+      timeout = 250;
    }
-   if(WT.playback_speed == 2){
-      timeout = 100;
+   if(WT.playback_speed == 2 || timeout < 250){
+      timeout = 250;
    }
    WT.timeout = setTimeout(function(){
       // While still loading
@@ -375,7 +376,11 @@ gisportal.walkthrough.nextStep = function(force){
       }
       if(popup_string){
          if(this_step.pause_here){
-            popup_string += '</br><button class="brand secondary js-next-step-walkthrough-tooltip">Continue</button>';
+            var text = "Continue";
+            if(WT.current_step >= _.size(WT.walkthrough.step)-1){
+               text = "Finish";
+            }
+            popup_string += '</br><button class="brand secondary js-next-step-walkthrough-tooltip">' + text + '</button>';
          }
          if(this_step.selector){
             gisportal.walkthrough.highlightElementOverlay(this_step.selector);
@@ -475,8 +480,8 @@ gisportal.walkthrough.highlightElementOverlay = function(elem){
       return gisportal.walkthrough.hideHighlightOverlay();
    }
    $('.walkthrough-highlight-overlay').toggleClass('hidden', false).css({
-      width: (elem[0].clientWidth + 20) + "px",
-      height: (elem[0].clientHeight + 20) + "px",
+      width: ((elem[0].clientWidth || elem.innerWidth()) + 20) + "px",
+      height: ((elem[0].clientHeight || elem.innerHeight()) + 20) + "px",
       left: (elem.offset().left - 10) + "px",
       top: (elem.offset().top - 10) + "px"
    });
@@ -523,3 +528,52 @@ gisportal.walkthrough.destroyWalkthrough = function(){
    this.renderControls();
    $('select.js-walkthrough-list').val('default');
 };
+
+gisportal.walkthrough.loadManagementPanel = function(){
+   $.ajax({
+      url: gisportal.middlewarePath + '/settings/get_walkthroughs',
+      dataType: 'json',
+      success: function(data) {
+         $( '.js-walkthrough-management-popup' ).toggleClass('hidden', false);
+         var template = gisportal.templates['walkthrough-management-table'](data);
+         $( '.js-walkthrough-management-html' ).html(template);
+
+         $('.js-walkthrough-management-close').on('click', function(){
+            $( '.js-walkthrough-management-popup' ).toggleClass('hidden', true);
+            $( '.js-walkthrough-management-html' ).html("");
+         });
+
+         $('.js-edit-walkthrough').on('click', function(){
+            var walkthrough = $(this).data('walkthrough');
+            var owner = $(this).data('owner');
+            $.ajax({
+               url: gisportal.middlewarePath + '/settings/walkthrough?walkthrough=' + encodeURI(walkthrough) + '&owner=' + encodeURI(owner),
+               dataType: 'json',
+               success: function(data) {
+                  gisportal.walkthrough.recording_object = data;
+                  gisportal.walkthrough.recording_object.overwrite = true;
+                  gisportal.walkthrough.loadEditForm();
+                  $( '.js-walkthrough-management-popup' ).toggleClass('hidden', true);
+                  $( '.js-walkthrough-management-html' ).html("");
+               }
+            });
+         });
+
+         $('.js-delete-walkthrough').on('click', function(){
+            var walkthrough = $(this).data('walkthrough');
+            var owner = $(this).data('owner');
+            $.ajax({
+               url: gisportal.middlewarePath + '/settings/delete_walkthrough?walkthrough=' + encodeURI(walkthrough) + '&owner=' + encodeURI(owner),
+               dataType: 'json',
+               success: function() {
+                  gisportal.walkthrough.loadWalkthroughList();
+                  gisportal.walkthrough.loadManagementPanel();
+               }
+            });
+         });
+      },
+      error: function(error) {
+         $.notify("There was a problem loading walkthroughs, plase try again.");
+      }
+   });
+}

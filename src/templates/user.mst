@@ -49,4 +49,12 @@
 		<option value="default" selected="" disabled="">Please select a walkthrough...</option>
 		</select>
 	</div>
+	<div class='hidden clearfix walkthroughs-manage'>
+		<b>MANAGE</b>
+		</br>
+		<label>You can manage walkthroughs here:</label>
+		<button class="brand pull-right secondary js-manage-walkthroughs">
+			Manage Walkthroughs
+		</button>
+	</div>
 </div>

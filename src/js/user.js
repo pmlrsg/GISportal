@@ -63,6 +63,7 @@ gisportal.user.initDOM = function() {
    $('.js-secondary-user-dashboard').html(rendered);
    if(gisportal.walkthrough.is_recording){
       $('.walkthrough-record').toggleClass("hidden", true);
+      $('.walkthroughs-manage').toggleClass("hidden", true);
    }
 
    $('button.js-edit-layers').on('click', function(e){
@@ -173,8 +174,13 @@ gisportal.user.initDOM = function() {
       if(!gisportal.walkthrough.is_recording){
          gisportal.walkthrough.starting_recording = true;
          $('.walkthrough-record').toggleClass("hidden", true);
+         $('.walkthroughs-manage').toggleClass("hidden", true);
          gisportal.walkthrough.renderControls();
       }
+   });
+
+   $('.js-manage-walkthroughs').on('click', function(){
+      gisportal.walkthrough.loadManagementPanel();
    });
 };
 
@@ -242,8 +248,10 @@ gisportal.loadLayerEditButtons = function(){
    }
    if(gisportal.user.info.permission != "admin" || gisportal.walkthrough.is_recording){
       $('.walkthrough-record').toggleClass("hidden", true);
+      $('.walkthroughs-manage').toggleClass("hidden", true);
    }else{
       $('.walkthrough-record').toggleClass("hidden", false);
+      $('.walkthroughs-manage').toggleClass("hidden", false);
    }
 };
 

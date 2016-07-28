@@ -150,6 +150,26 @@ router.get('/app/settings/walkthrough', function(req, res) {
    }
 });
 
+router.get('/app/settings/delete_walkthrough', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var walkthrough = req.query.walkthrough;
+   var owner = req.query.owner;
+
+   var file_path;
+   if(owner == domain){
+      file_path = path.join(MASTER_CONFIG_PATH, domain, walkthrough + "_walkthrough.json");
+   }else{
+      file_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + owner, walkthrough + "_walkthrough.json");
+   }
+   var walkthrough_file;
+   if(utils.fileExists(file_path)){
+      fs.unlinkSync(file_path);
+      res.send({});
+   }else{
+      res.status(404).send();
+   }
+});
+
 router.get('/app/settings/get_views', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
 
@@ -896,6 +916,12 @@ router.all('/app/settings/save_walkthrough', function(req, res){
    var walkthrough = req.body; // Gets the given walkthrough
    var domain = utils.getDomainName(req); // Gets the domain
    var username = walkthrough.owner; // Gets the given owner
+   var permission = user.getAccessLevel(req, domain);
+   var overwrite = walkthrough.overwrite;
+   // Makes sure the user is an admin if they are trying to overwrite a walkthrough
+   if(permission != "admin"){
+      overwrite = false;
+   }
 
    var filename = walkthrough.title + '_walkthrough.json';
    if(domain == username){
@@ -905,7 +931,7 @@ router.all('/app/settings/save_walkthrough', function(req, res){
       // If it is to be a user file
       var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
    }
-   if(utils.fileExists(save_path)){
+   if(utils.fileExists(save_path) && !overwrite){
       return res.status(400).send('Filename Taken');
    }
    fs.writeFileSync(save_path, JSON.stringify(walkthrough));
