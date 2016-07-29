@@ -66,7 +66,7 @@
   transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
-  outline: 1000px solid rgba(0, 0, 0, 0.3);
+  outline: 50vmax solid rgba(0, 0, 0, 0.3);
 }
 
 .walkthrough-highlight-overlay{
@@ -74,7 +74,7 @@
   height: 100%;
   position: absolute;
   z-index: 10750;
-  outline: 2000px solid rgba(0, 0, 0, 0.6);
+  outline: 100vmax solid rgba(0, 0, 0, 0.6);
 }
 
 .localVideo, .remoteVideo{

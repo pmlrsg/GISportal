@@ -107,6 +107,12 @@ gisportal.walkthrough.renderControls = function(){
 
 gisportal.walkthrough.loadEditForm = function(){
    $( '.js-edit-walkthrough-popup' ).toggleClass('hidden', false);
+   // Makes sure that the pause and logged_in_user variables are set to booleans (JSON sometimes stores it as strings)
+   for(var step in gisportal.walkthrough.recording_object.step){
+      var this_step = gisportal.walkthrough.recording_object.step[step];
+      this_step.pause_here = this_step.pause_here && this_step.pause_here.toString() == "true";
+      this_step.requires_logged_in_user = this_step.requires_logged_in_user && this_step.requires_logged_in_user.toString() == "true";
+   }
    var template = gisportal.templates['walkthrough-form'](gisportal.walkthrough.recording_object);
    $( '.js-edit-walkthrough-html' ).html(template);
 
@@ -264,6 +270,8 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
       url: gisportal.middlewarePath + '/settings/walkthrough?walkthrough=' + encodeURI(walkthrough) + '&owner=' + encodeURI(owner),
       dataType: 'json',
       success: function(data) {
+         // Removes any notifies from the other walkthroughs so that users cannot revert to a previous state and mess everything up
+         $('.notifyjs-gisportal-walkthrough-option-base div:contains("Would you like to")').closest('.notifyjs-wrapper').remove();
          gisportal.walkthrough.walkthrough = data;
          gisportal.walkthrough.walkthrough_playing = true;
          gisportal.walkthrough.paused = true;
@@ -365,7 +373,7 @@ gisportal.walkthrough.nextStep = function(force){
       if(this_step.data){
          gisportal.api[this_step.data.event](this_step.data, {highlight: true});
       }
-      this_step.pause_here = this_step.pause_here === "true" || this_step.pause_here;
+      this_step.pause_here = this_step.pause_here.toString() === "true";
       if(this_step.pause_here){
          $('.js-pause-walkthrough').trigger('click');
       }

@@ -499,6 +499,11 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
    $('.js-indicators > li[data-id="' + id + '"]').remove();
    if (gisportal.layers[id]) gisportal.removeLayer(gisportal.layers[id]);
    gisportal.timeline.removeTimeBarById(id);
+   if(gisportal.layers[id]){
+      gisportal.layers[id].log = null;
+      gisportal.layers[id].style = null;
+      gisportal.layers[id].colorbands = null;
+   }
 
    var params = {
       "event" : "layer.remove",

@@ -33,7 +33,7 @@
       </div>
       </br>
    {{/unless}}
-   <span data-step="{{@index}}" class="icon-add-3 js-add-step btn" title="Add Step"></span>
+   <span data-step="{{@index}}" class="icon-add-3 js-add-step btn" title="Add Message"></span>
 {{/each}}
 <h3><b>END</b></h3>
 
