@@ -367,6 +367,8 @@ gisportal.graphs.Plot =(function(){
                "coverage"  : layer.urlName,
                // Layer ID
                "layer_id"  : layer.id,
+               // The currently selected layer style
+               "layer_style"  : layer.style,
                // Time range of the data
                // Rounded so that the requests stay the same over collaboration
                "t_bounds"  : [this.tBounds()[0].toISOString().split("T")[0], this.tBounds()[1].toISOString().split("T")[0]],
