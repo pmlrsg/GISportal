@@ -150,10 +150,7 @@ gisportal.loadVectorLayers = function() {
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
-      success: gisportal.initVectorLayers,
-      error: function(e){
-            console.log("No Vector Layers Found");
-         }
+      success: gisportal.initVectorLayers
 
    });
 
@@ -164,7 +161,6 @@ gisportal.createVectorLayers = function() {
    gisportal.vlayers = [];
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
-      //console.log(vector);
       vector.services.wfs.vectors.forEach(function( v ){
       processVectorLayer(vector.services.wfs.url, v);
 
@@ -195,16 +191,12 @@ gisportal.createVectorLayers = function() {
          "descriptiveName" : vector.tags.niceName,
          "unit" : vector.unit
       };
-      //console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
 
 gisportal.layers[vectorOptions.id] = vectorLayer;
 
-      //console.log(vectorLayer);
       vectorLayerOL = vectorLayer.createOLLayer();
-      //vectorLayer.openlayers.anID = vectorLayerOL;
-      //console.log(vectorLayerOL);
       gisportal.vlayers.push(vectorLayerOL);
    }
 
@@ -215,8 +207,6 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
  * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
-   var layers = [];
-
    // Loop over each server
    gisportal.cache.wmsLayers.forEach(function( server ){
       processServer( server );
@@ -300,8 +290,6 @@ gisportal.createOpLayers = function() {
       };
 
       var layer = new gisportal.layer( layerOptions );
-//console.log("adding info for Indicator : ");
-            //console.log(layer);
       // If theres a duplicate id, increase a counter
       var postfix = "";
       while( gisportal.layers[layer.id + postfix ] !== void(0) )
@@ -325,9 +313,7 @@ gisportal.createOpLayers = function() {
       try{
          gisportal.layers[id].mergeNewParams({STYLES:style});
          gisportal.refinePanel.layerFound(id, style);
-      }catch(e){
-         console.log("Cannot add that layer!");
-      }
+      }catch(e){}
    }
    gisportal.tempSelectedLayers = [];
 
@@ -336,9 +322,7 @@ gisportal.createOpLayers = function() {
       id = gisportal.addLayersForm.selectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
-      }catch(e){
-         console.log("Cannot add that layer!");
-      }
+      }catch(e){}
    }
    gisportal.addLayersForm.selectedLayers = [];
 
@@ -644,7 +628,6 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e){
-      var response = '';
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       if(gisportal.selectionTools.isSelecting){
@@ -691,7 +674,6 @@ gisportal.mapInit = function() {
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
          if (feature && _.keys(feature.getProperties()).length >1 ) {
-            var geom = feature.getGeometry();
             _.each(gisportal.selectedFeatures, function(feature) {
             });
             var tlayer;
@@ -977,9 +959,7 @@ gisportal.loadState = function(state){
       if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
       else indicator = gisportal.layers[available_keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
-         if(indicator.serviceType == "WFS"){
-            console.log("Please load the vector properly");
-         }else{
+         if(indicator.serviceType != "WFS"){
             var state_indicator = state.selectedLayers[indicator.id];
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
@@ -1461,11 +1441,7 @@ gisportal.main = function() {
       // for retrieving a state object.
       var stateID = gisportal.utils.getURLParameter('state');
       if(stateID !== null) {
-         //console.log('Retrieving State...');
          gisportal.ajaxState(stateID);
-      }
-      else {
-         //console.log('Loading Default State...');
       }
 
       collaboration.initDOM();
@@ -1490,10 +1466,6 @@ gisportal.ajaxState = function(id) {
       dataType: 'json',
       success: function( data ) {         
          gisportal.setState( data );
-         //console.log('Success! State retrieved');
-      },
-      error: function( request ){
-         //console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
       }
    });
 };
@@ -1888,7 +1860,6 @@ gisportal.loadBrowseCategories = function(data){
    for(category in gisportal.config.hiddenCategories){
       var deleteCat = gisportal.config.hiddenCategories[category];
       delete gisportal.browseCategories[deleteCat];
-      console.log("Removing '" + deleteCat + "' category");
    }
    // This makes sure that the proritised categories ARE prioritised
    var priority = gisportal.config.categoryPriorities;

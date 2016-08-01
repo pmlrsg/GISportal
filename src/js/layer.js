@@ -180,7 +180,6 @@ gisportal.layer = function( options ) {
     * @param {object} options - The options
     */
    this.init = function(layerData, options, prev_style) {
-      var self = this;
       this.displayName = function() { return this.providerTag + ': ' + this.name; };
       
       // A list of styles available for the layer
@@ -201,9 +200,6 @@ gisportal.layer = function( options ) {
             });
             this.style = default_style || this.styles[0].Name;
          }       
-      } else if(this.type == "refLayers") {
-        //console.log("gett wfs metadat if block")
-         // intended for WFS type layers that are not time related
       }
       
       var olLayer = this.createOLLayer(); // Create OL layer.
@@ -366,10 +362,6 @@ gisportal.layer = function( options ) {
       // If the layer has date-time data, use special select routine
       // that checks for valid data on the current date to decide if to show data
       if(layer.temporal) {
-         var currentDate = gisportal.timeline.getDate();
-         
-         //Nope
-         //this.selectedDateTime = gisportal.timeline.selectedDate.toISOString();
          layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
          
          // Now display the layer on the timeline
@@ -436,7 +428,6 @@ gisportal.layer = function( options ) {
          return filtArray;
       } 
       else  if (nearestDate !== null) {
-         //console.log("Using nearest date: " + nearestDate);
          return [nearestDate];
       }
       else {
@@ -567,8 +558,7 @@ gisportal.layer = function( options ) {
     * with gisportal.layer. 
     */
    this.createOLLayer = function() {
-      var self = this,
-         layer = null;
+      layer = null;
       
       // Create WMS layer.
       if(this.type == 'opLayers') {    
@@ -734,7 +724,6 @@ gisportal.addLayer = function(layer, options) {
  * @param {object} layer - A gisportal.layer object
  */
 gisportal.removeLayer = function(layer) {
-  //console.log("removing Layer");
    var index = _.indexOf(gisportal.selectedLayers, layer.id);
    
    // Using splice to remove the index from selectedLayers 
@@ -802,7 +791,6 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
-   var id = layer.id; 
    if (layer.serviceType=="WFS"){
 
       layer.init(options,layer);

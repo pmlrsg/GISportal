@@ -783,7 +783,6 @@ gisportal.addLayersForm.addInputListeners = function(){
       var raw_key_val = key_val;
       if(key == 'include'){
          key_val = !key_val;
-         var toggle_elem = $('.toggle-all-layers');
       }
       if(key == 'nice_name'){
          gisportal.addLayersForm.displaySuggestions();

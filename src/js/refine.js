@@ -63,8 +63,7 @@ gisportal.refinePanel.refreshData = function(data) {
       gisportal.refinePanel.currentData = data;
    }
    data = gisportal.refinePanel.currentData;
-
-   var id = data.id;
+   
    var name = data.name;
    var refine = data.refine;
 
@@ -266,8 +265,6 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       }
 
    } else {
-
-      console.log('addToPanel');
       placeholder = $('<div class="js-refine-section-external' + '"><div id="refine-external"></div></div>');
       $('.js-refined-tags').append(placeholder);
       data = {};

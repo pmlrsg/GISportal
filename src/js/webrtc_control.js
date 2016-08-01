@@ -11,24 +11,16 @@ webRTC.turnReady = false;
 webRTC.remoteStreams = {};
 
 webRTC.initMedia = function() {
-
-   //webRTC.isChannelReady = true;
-
-   var startTime;
-
    // Gets the audio and video
    var constraints = {
       video: true,
       audio: true
    };
-
    navigator.mediaDevices.getUserMedia(constraints).then(handleUserMedia).catch(handleUserMediaError);
-
    $('.js-end-webrtc-call').off('click');
    $('.js-end-webrtc-call').on('click', function() { 
       hangup();
    });
-
 };
 
 webRTC.deinitMedia = function() {
@@ -61,7 +53,6 @@ var sdpConstraints = {
 webRTC.messageCallback = function(data) {
    var message = data.params.message;
    var memberId;
-   console.log('Received message:', message);
    
    // USER ENABLES THEIR AUDIO/VIDEO
    if (message === 'media.enabled') {
@@ -163,14 +154,12 @@ function sendMessage(message){
       'peerId': webRTC.peerId,
       'peerMedia': {video: webRTC.hasVideo, audio: webRTC.hasAudio}
    };
-   console.log('Sending message: ', message);
    collaboration._emit('webrtc_event', params, true);
    
 }
 function handleUserMedia(stream) {
    webRTC.localStream = stream;
    webRTC.isChannelReady = true;
-   console.log('Adding local stream.');
    sendMessage('media.enabled');
    $('.js-toggle-rtc').find('.btn-value').text('Disable Audio/Video');
    if (webRTC.isInitiator) {
@@ -212,7 +201,6 @@ function handleUserMediaError(error) {
    webRTC.isChannelReady = false;
    sendMessage('media.disabled');
    $('.js-toggle-rtc').find('.btn-value').text('Enable Audio/Video');
-   console.log('getUserMedia error: ', error);
    $.notify("Error Getting Media: " + (error.message || "Internal Error") + "\nPlease try again");
 }
 
@@ -241,11 +229,7 @@ function createPeerConnection() {
    try {
       webRTC.peerConn = new RTCPeerConnection(webRTC.pc_config, webRTC.pc_constraints);
       webRTC.peerConn.onicecandidate = handleIceCandidate;
-      console.log('Created RTCPeerConnnection with:\n' +
-         '  config: \'' + JSON.stringify(webRTC.pc_config) + '\';\n' +
-         '  constraints: \'' + JSON.stringify(webRTC.pc_constraints) + '\'.');
    } catch (e) {
-      console.log('Failed to create PeerConnection, exception: ' + e.message);
       alert('Cannot create RTCPeerConnection object.');
       return;
    }
@@ -255,7 +239,6 @@ function createPeerConnection() {
 }
 
 function handleIceCandidate(event) {
-   console.log('handleIceCandidate event: ', event);
    if (event.candidate) {
       sendMessage({
          type: 'candidate',
@@ -263,14 +246,10 @@ function handleIceCandidate(event) {
          id: event.candidate.sdpMid,
          candidate: event.candidate.candidate
       });
-   } else {
-      console.log('End of candidates.');
    }
 }
 
 function doCall() {
-   console.log('Sending offer to peer, with constraints: \n' +
-      '  \'' + JSON.stringify(sdpConstraints) + '\'.');
    webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
 }
 
@@ -305,7 +284,6 @@ function doAnswer() {
    webRTC.stopRingtone();
    clearTimeout(gisportal.modalTimeout);
    $('.js-webrtc-call').toggleClass('hidden', true);
-   console.log('Sending answer to peer.');
    webRTC.peerConn.createAnswer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
    webRTC.isStarted = true;
    addLocalVideoStream();
@@ -320,13 +298,11 @@ function doReject() {
    webRTC.stopRingtone();
    clearTimeout(gisportal.modalTimeout);
    hideVideos();
-   console.log('Sending rejection to peer.');
    sendMessage('reject');
 }
 
 function doNoAnswer() {
    webRTC.stopRingtone();
-   console.log('Sending rejection to peer.');
    sendMessage('no_answer');
 }
 
@@ -346,14 +322,7 @@ function setLocalAndSendMessage(sessionDescription) {
    sendMessage(sessionDescription);
 }
 
-function handlePeerConnError(err) {
-   var msg = "Problem with the peer connection";
-
-   console.log(msg + " : " + err);
-}
-
 function handleRemoteStreamAdded(event) {
-   console.log('Remote stream added.');
    var hide = false;
    if(webRTC.peerMedia){
       hide = !webRTC.peerMedia.video;
@@ -366,12 +335,7 @@ function handleRemoteStreamAdded(event) {
    webRTC.remoteStreams[webRTC.peerId] = event.stream;
 }
 
-function handleRemoteStreamRemoved(event) {
-   console.log('Remote stream removed. Event: ', event);
-}
-
 function hangup() {
-   console.log('Hanging up.');
    if(webRTC.isStarted){
       gisportal.showModalMessage('Call ended');
       webRTC.stop();
@@ -385,7 +349,6 @@ function hangup() {
 
 function handleRemoteHangup(message) {
    webRTC.stopRingtone();
-   console.log('Session terminated.');
    gisportal.showModalMessage(message);
    webRTC.stop();
    webRTC.isInitiator = false;

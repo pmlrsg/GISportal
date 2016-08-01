@@ -423,9 +423,6 @@ gisportal.graphs.PlotEditor = (function(){
          });
       });
 
-      // When the tBounds change change each component for if it has data in range
-      var tBounds = this.plot().tBounds();
-
       this.plot().on('tBounds-change', function(){
          _this._componentsTable.children().each(function(){
             

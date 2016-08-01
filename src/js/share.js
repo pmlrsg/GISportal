@@ -10,9 +10,6 @@ gisportal.share.initDOM = function(){
                   gisportal.stopLoadState = false;
                   gisportal.loadState(JSON.parse(data));
                }
-            },
-            error: function(err) {
-               console.log(err);
             }
          });
       }
@@ -30,9 +27,6 @@ gisportal.share.initDOM = function(){
                $('.js-shareurl').val(location.origin + location.pathname + '?state=' + data);
                $('.js-shareurl').focus(function() { $(this).select(); } ).on('mouseup cut paste', function (e) {e.preventDefault();}).on('keydown', function(){$(this).select();});
             }
-         },
-         error: function(err) {
-            console.log(err);
          }
       });
    };
