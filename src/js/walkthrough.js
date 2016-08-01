@@ -406,7 +406,7 @@ gisportal.walkthrough.nextStep = function(force){
             WT.elemTooltip(popup_string, ".controls-holder", hideArrow = true);
          }
       }else if(WT.playback_speed === 0 || (this_step.pause_here)){
-         WT.elemTooltip("Click 'Forward' to run the next step", ".controls-holder");
+         WT.elemTooltip("Click 'Forward' to run the next step", ".controls-holder", hideArrow = true);
       }
       if(WT.current_step >= _.size(WT.walkthrough.step)-1 && !(this_step.pause_here)){
          return WT.finished();

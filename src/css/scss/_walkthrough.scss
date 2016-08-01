@@ -3,13 +3,11 @@
   border: 1px solid $analysis-button;
   cursor: pointer;
   padding: 4px 8px;
-  box-shadow: 0px 0px 11px -2px black;
 }
 
 .controls-holder button.selected {
   background-color: #EFEFEF;
   color: $analysis-button;
-  box-shadow: 0px 0px 11px -2px black;
 }
 
 div.js-user-dashboard,
@@ -30,10 +28,25 @@ div.js-user-dashboard:after{
 
 .controls-holder{
   position: absolute;
-  left: 582px;
+  left: calc(25% + 20px);
   z-index: 10750;
-  top: 10px
+  top: 25px;
+  max-width: 300px;
+  box-shadow: 0px 0px 11px -2px black;
 }
+
+@media screen and (min-width: 2000px) {
+  .controls-holder{
+    left: 520px;
+  }
+}
+
+@media screen and (max-width: 1420px) {
+  .controls-holder{
+    left: 375px;
+  }
+}
+
 
 div.js-edit-walkthrough-html {
   width: 1000px;
@@ -106,26 +119,29 @@ input.selector-input {
 }
 
 .notifyjs-gisportal-walkthrough-global-base.notifyjs-gisportal-walkthrough-global-info {
-  background: white;  
+  background: #fff;  
   width: 200px;
   padding: 10px;
   box-shadow: 0px 0px 11px -2px black;
 }
 
 .notifyjs-gisportal-walkthrough-elem-base.notifyjs-gisportal-walkthrough-elem-info {
-  background: white;
+  background: #fff;
   box-shadow: 0px 0px 11px -2px black;
   padding: 5px;
   width: 100px;
 }
 
 .walkthrough-title{
-  background-color: $panel-content-header;
+  background-color: $panel-headfoot;
+  min-height: 45px;
+  border-bottom: 2px solid #EFEDF3;
+  box-shadow: 0px 1px 5px -2px #000000;
   padding-left: 5px;
-  box-shadow: 0px 0px 11px -2px black;
-  margin-bottom: 10px;
-  color: white;
-  display: flex;
+  color: #fff;
+  display: inline-flex;
+  position: relative;
+  width: 100%;
 }
 
 .js-edit-walkthrough-popup input[type="checkbox"]{
@@ -141,4 +157,23 @@ input.selector-input {
   min-height:50px;
   max-height: 300px;
   display: inherit;
+}
+.walkthrough-title h3{
+  float: left;
+  display: inline;
+  border-bottom: 0px;
+  margin-top: 5px;
+  padding: 7px 7px 7px 7px;
+  position: relative;
+}
+
+.walkthrough-controls-content{
+  text-align: center;
+}
+
+.js-walkthrough-recording-close,
+.js-walkthrough-playing-close{
+  float: right;
+  font-size: 22px;
+  padding: 5px 5px 5px 5px;
 }

@@ -240,19 +240,21 @@ collaboration.initSession = function() {
          var forceMouseHide = false;
          $(".collab-overlay").off('mousemove click');
          $(".collab-overlay").on('mousemove click', function(ev) {
-            if(!forceMouseHide) {
-               $(".collab-overlay").css('cursor', '');
+            if(collaboration.role == "member"){
+               if(!forceMouseHide) {
+                  $(".collab-overlay").css('cursor', '');
 
-               clearTimeout(idleMouseTimer);
+                  clearTimeout(idleMouseTimer);
 
-               idleMouseTimer = setTimeout(function() {
-                  $(".collab-overlay").css('cursor', 'none');
+                  idleMouseTimer = setTimeout(function() {
+                     $(".collab-overlay").css('cursor', 'none');
 
-                  forceMouseHide = true;
-                  setTimeout(function() {
-                     forceMouseHide = false;
-                  }, 200);
-               }, 1000);
+                     forceMouseHide = true;
+                     setTimeout(function() {
+                        forceMouseHide = false;
+                     }, 200);
+                  }, 1000);
+               }
             }
             if(ev.type == "click"){
                if(Boolean(collaboration.role)){

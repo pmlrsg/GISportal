@@ -37,10 +37,7 @@
 	</h3>
 	<div class='hidden clearfix walkthrough-record'>
 		<b>RECORD</b>
-		<p>To record a walkthrough, click 'Begin Recording'. Once the 'Record' button appears, get to the stage you would like the walkthrough to begin at. Click record and start recording the events you would like to replicate. When you have finished click 'Stop' to end the recording</p>
-		<button class="brand pull-right secondary js-show-recording-controls">
-			Begin Recording
-		</button>
+		<button class="brand pull-right secondary js-show-recording-controls">Make New Recording</button>
 	</div>
 	<div class='walkthrough-select'>
 		<b>SELECT</b>
