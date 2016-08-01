@@ -111,6 +111,7 @@ gisportal.walkthrough.loadEditForm = function(){
    for(var step in gisportal.walkthrough.recording_object.step){
       var this_step = gisportal.walkthrough.recording_object.step[step];
       this_step.pause_here = this_step.pause_here && this_step.pause_here.toString() == "true";
+      this_step.click_element_to_continue = this_step.click_element_to_continue && this_step.click_element_to_continue.toString() == "true";
       this_step.requires_logged_in_user = this_step.requires_logged_in_user && this_step.requires_logged_in_user.toString() == "true";
    }
    var template = gisportal.templates['walkthrough-form'](gisportal.walkthrough.recording_object);
@@ -243,6 +244,11 @@ gisportal.walkthrough.loadEditForm = function(){
       gisportal.walkthrough.recording_object.step[$(this).data('step')].pause_here = $(this).is(':checked');
    });
 
+   // Changes the click_element_to_continue of the step
+   $('.click-element-to-continue-toggle').on('change', function(){
+      gisportal.walkthrough.recording_object.step[$(this).data('step')].click_element_to_continue = $(this).is(':checked');
+   });
+
    // Changes the selector of the step
    $('.selector-input').on('change', function(){
       gisportal.walkthrough.recording_object.step[$(this).data('step')].selector = $(this).val();
@@ -373,7 +379,7 @@ gisportal.walkthrough.nextStep = function(force){
       if(this_step.data){
          gisportal.api[this_step.data.event](this_step.data, {highlight: true});
       }
-      this_step.pause_here = this_step.pause_here.toString() === "true";
+      this_step.pause_here = this_step.pause_here && this_step.pause_here.toString() == "true";
       if(this_step.pause_here){
          $('.js-pause-walkthrough').trigger('click');
       }
@@ -391,10 +397,13 @@ gisportal.walkthrough.nextStep = function(force){
             popup_string += '</br><button class="brand secondary js-next-step-walkthrough-tooltip">' + text + '</button>';
          }
          if(this_step.selector){
+            if(this_step.click_element_to_continue){
+               $(this_step.selector).toggleClass('js-next-step-walkthrough-tooltip', true);
+            }
             gisportal.walkthrough.highlightElementOverlay(this_step.selector);
             WT.elemTooltip(popup_string, this_step.selector);
          }else{
-            WT.elemTooltip(popup_string, ".controls-holder");
+            WT.elemTooltip(popup_string, ".controls-holder", hideArrow = true);
          }
       }else if(WT.playback_speed === 0 || (this_step.pause_here)){
          WT.elemTooltip("Click 'Forward' to run the next step", ".controls-holder");
@@ -407,6 +416,7 @@ gisportal.walkthrough.nextStep = function(force){
       }
       $('.js-next-step-walkthrough-tooltip').on('click', function(e){
          e.preventDefault();
+         $(this).toggleClass('js-next-step-walkthrough-tooltip', false);
          gisportal.walkthrough.paused = false;
          gisportal.walkthrough.renderControls();
          $('.js-skip-step-walkthrough').trigger('click');
@@ -462,12 +472,13 @@ gisportal.walkthrough.finished = function(){
    });
 };
 
-gisportal.walkthrough.elemTooltip = function(text, elem){
+gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
    this.tooltipster_elements.push(elem);
    $(elem).tooltipster({
       contentCloning: true,
       maxWidth: 300,
       content: $.parseHTML(text),
+      arrow: !hideArrow,
       trigger:"custom",
       updateAnimation: null
    });

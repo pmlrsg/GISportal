@@ -128,7 +128,7 @@ input.selector-input {
   display: flex;
 }
 
-input.requires-logged-in-user-toggle{
+.js-edit-walkthrough-popup input[type="checkbox"]{
   vertical-align: middle;
   margin: auto;
   margin-left: 5px;

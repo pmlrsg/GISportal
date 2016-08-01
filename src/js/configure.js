@@ -854,14 +854,6 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilte
    }
 };
 
-
-/**
- * Default tool tip styling
- */
-$.fn.tooltipster('setDefaults', {
-  theme: 'tooltipster-shadow'
-});
-
 /**
  * Provides all local storage.
  * API - http://www.jstorage.info/

@@ -214,6 +214,19 @@ gisportal.selectCountryBorderLayer = function(id) {
  */
 gisportal.createBaseLayers = function() {
 
+   var baseLayerTitleLoadFunction = function(tile, src) {
+      gisportal.loading.increment();
+
+      var tileElement = tile.getImage();
+      tileElement.onload = function() {
+         gisportal.loading.decrement();
+      };
+      tileElement.onerror = function() {
+         gisportal.loading.decrement();
+      };
+      tileElement.src = src;
+   }
+
    gisportal.baseLayers = {
       EOX: new ol.layer.Tile({
          id: 'EOX',                       // required to populate the display options drop down list
@@ -224,15 +237,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: function(tile, src) {
-               gisportal.loading.increment();
-
-               var tileElement = tile.getImage();
-               tileElement.onload = function() {
-                  gisportal.loading.decrement();
-               };
-               tileElement.src = src;
-            }
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       }),
       GEBCO: new ol.layer.Tile({
@@ -243,15 +248,7 @@ gisportal.createBaseLayers = function() {
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
-            tileLoadFunction: function(tile, src) {
-               gisportal.loading.increment();
-
-               var tileElement = tile.getImage();
-               tileElement.onload = function() {
-                  gisportal.loading.decrement();
-               };
-               tileElement.src = src;
-            }
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       }),
       MetacartaBasic: new ol.layer.Tile({
@@ -263,15 +260,7 @@ gisportal.createBaseLayers = function() {
             url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
             crossOrigin: null,
             params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: function(tile, src) {
-               gisportal.loading.increment();
-
-               var tileElement = tile.getImage();
-               tileElement.onload = function() {
-                  gisportal.loading.decrement();
-               };
-               tileElement.src = src;
-            }
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       }),
       Landsat: new ol.layer.Tile({
@@ -282,15 +271,7 @@ gisportal.createBaseLayers = function() {
             url: 'http://irs.gis-lab.info/?',
             crossOrigin: null,
             params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: function(tile, src) {
-               gisportal.loading.increment();
-
-               var tileElement = tile.getImage();
-               tileElement.onload = function() {
-                  gisportal.loading.decrement();
-               };
-               tileElement.src = src;
-            }
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       }),
       BlueMarble: new ol.layer.Tile({
@@ -301,15 +282,7 @@ gisportal.createBaseLayers = function() {
             url: 'http://demonstrator.vegaspace.com/wmspub/?',
             crossOrigin: null,
             params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: function(tile, src) {
-               gisportal.loading.increment();
-
-               var tileElement = tile.getImage();
-               tileElement.onload = function() {
-                  gisportal.loading.decrement();
-               };
-               tileElement.src = src;
-            }
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       }),
       OSM: new ol.layer.Tile({

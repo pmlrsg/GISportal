@@ -30,6 +30,7 @@
          <label>Element Selector (global if blank):</label><input type="text" data-step="{{@index}}" value="{{selector}}" class="selector-input"><a href="javascript:void(0)" class="default-selector" data-step="{{@index}}">Default</a>
          </br>
          <label>Pause on this step:</label><input type="checkbox" data-step="{{@index}}" {{#if pause_here}}checked {{/if}}class="pause-here-toggle">
+         <label>Click element to continue:</label><input type="checkbox" data-step="{{@index}}" {{#if click_element_to_continue}}checked {{/if}}class="click-element-to-continue-toggle">  
       </div>
       </br>
    {{/unless}}
