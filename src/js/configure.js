@@ -795,6 +795,54 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
    gisportal.configurePanel.resetPanel(filteredLayers);
 };
 
+gisportal.configurePanel.filterLayersByBoundingBox = function(boundingBox){
+   var layers_obj;
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
+
+   var temp_bbox = boundingBox;
+   // This bit just makes sure that the Terraformer can interprate the values as it doesn't work with scientific notation
+   temp_bbox = temp_bbox.split(",");
+   for(var val in temp_bbox){
+      temp_bbox[val] = Number(temp_bbox[val]);
+   }
+   temp_bbox = temp_bbox.join(",");
+   // Make sure it is the right projection!
+   // Make sure it is the right projection!
+   // Make sure it is the right projection!
+   // Make sure it is the right projection!
+   // Make sure it is the right projection!
+   // Make sure it is the right projection!
+   var bb1;
+   try{
+      bb1 = Terraformer.WKT.parse( boundingBox );
+   }catch( e ){
+      // Assume the old bbox style
+      try{
+         bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
+      }catch(err){
+         $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
+      }
+   }
+
+   var filteredLayers = {};
+   for(var layer in layers_obj){
+      var indicator = layers_obj[layer];
+      var layerBoundingBox = indicator.exBoundingBox.WestBoundLongitude + "," +
+            indicator.exBoundingBox.SouthBoundLatitude + "," +
+            indicator.exBoundingBox.EastBoundLongitude + "," +
+            indicator.exBoundingBox.NorthBoundLatitude;
+      bb2 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(layerBoundingBox) );
+      if(bb1.intersects(bb2)){
+         filteredLayers[layer] = indicator;
+      }
+   }
+   gisportal.configurePanel.resetPanel(filteredLayers);
+};
+
 gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilter){
    var layers_obj, layer, filter;
    // This is required if the user loads a view when they have loaded some external layers using the interface

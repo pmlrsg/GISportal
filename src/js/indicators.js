@@ -1208,7 +1208,7 @@ gisportal.indicatorsPanel.bboxToWKT = function( bboxString ){
       elements[0] + " " + elements[3],
 
       elements[2] + " " + elements[3],
-      elements[0] + " " + elements[1],
+      elements[2] + " " + elements[1],
 
       elements[0] + " " + elements[1],
    ];
