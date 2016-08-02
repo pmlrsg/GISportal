@@ -1,0 +1,59 @@
+<div class="walkthrough-controls">
+	{{#if starting_recording}}
+		{{#unless ../is_recording}}
+			<div class="walkthrough-title noselect">
+				<h3><b>Ready...</b></h3>
+				<span class="icon-delete-3 js-walkthrough-recording-close btn right-icon icon-btn"></span>
+			</div>
+			<div class="panel-container-solid-backdrop walkthrough-controls-content">
+				<p>To record a walkthrough get to the stage you would like the walkthrough to begin at. Click 'Record' and start recording the events you would like to replicate. When you have finished click 'Stop' to end the recording</p>
+				<button class="brand secondary js-start-record">
+					<span class='icon-record-1'></span>Record
+				</button>
+			</div>
+		{{/unless}}
+	{{/if}}
+	{{#if is_recording}}
+		{{#unless ../starting_recording}}
+			<div class="walkthrough-title noselect">
+				<h3><b>Recording</b></h3>
+				<span class="icon-delete-3 js-walkthrough-recording-close btn right-icon icon-btn"></span>
+			</div>
+			<div class="panel-container-solid-backdrop walkthrough-controls-content">
+				<button class="brand secondary js-stop-record">
+					<span class='icon-stop-2'></span>Stop
+				</button>
+			</div>
+		{{/unless}}
+	{{/if}}
+
+	{{#if walkthrough_playing}}
+		<div class="walkthrough-title noselect">
+			<h3><b>{{walkthrough.title}}</b></h3>
+			<span class="icon-delete-3 js-walkthrough-playing-close btn right-icon icon-btn"></span>
+		</div>
+		<div class="panel-container-solid-backdrop walkthrough-controls-content">
+			<button class="brand secondary js-back-step-walkthrough">
+				<span class='icon-previous-2'></span>Back
+			</button>
+			{{#if paused}}
+				<button class="brand secondary js-play-walkthrough">
+					<span class='icon-play-2'></span>Play
+				</button>
+			{{else}}
+				<button class="brand secondary js-pause-walkthrough">
+					<span class='icon-pause-2'></span>Pause
+				</button>
+			{{/if}}
+			<button class="brand secondary js-skip-step-walkthrough">
+				<span class='icon-next-2'></span>Forward
+			</button>
+			<select class="js-walkthrough-speed">
+			<option value="default" disabled="">Please select a speed...</option>
+			<option value="0">Manual Pace</option>
+			<option value="1">Recorded Pace</option>
+			<option value="2">Full Speed</option>
+			</select>
+		</div>
+	{{/if}}
+</div>

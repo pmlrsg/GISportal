@@ -45,6 +45,9 @@ gisportal.graphs.PlotStatus = (function(){
       // IE, success, error, processing
       this.renderedState = plot.state();
 
+      // Makes sure that any identical plots are removed
+      $('.js-graphs-history-list [data-graph-id="' + this._plot.id + '"]').closest('.graph-job:not(:first-child)').find('.js-graph-status-delete').trigger('click');
+
       // Replace the HTML in the dom if needed
       if( this._element )
          this._element.replaceWith( newElement );

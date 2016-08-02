@@ -1,0 +1,24 @@
+<div class="form-header">
+   Walkthrough List
+   <span class="icon-delete-3 js-walkthrough-management-close btn right-icon icon-btn"></span>
+</div>
+{{#if this}}
+   <table class="walkthrough-management-table">
+      <tr>
+         <th>Title</th>
+         <th>Owner</th>
+         <th colspan="100%">Tools</th>
+      </tr>
+      {{#each this}}
+         <tr>
+            <td class="break-word">{{title}}</td>
+            <td>{{owner}}</td>
+            <td><span title="Edit" class="js-edit-walkthrough icon-pencil-2 btn icon-btn" data-walkthrough="{{title}}" data-owner="{{owner}}"></span></td>
+            <td><span title="Delete" class="js-delete-walkthrough icon-delete-2 btn icon-btn" data-walkthrough="{{title}}" data-owner="{{owner}}"></span></td>
+
+         </tr>
+      {{/each}}
+   </table>
+{{else}}
+There are currently no walkthroughs available for you to configure. You either are not an admin, or there are no walkthroughs recorded on this portal yet.
+{{/if}}
