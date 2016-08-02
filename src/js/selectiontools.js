@@ -147,20 +147,6 @@ gisportal.selectionTools.initDOM = function()  {
       gisportal.events.trigger("removeGeoJSON.clicked");
    });
 
-
-   // TODO, perhaps...
-   // // map image export - problems with cross origin tainting the canvas are preventing this from working. 
-   // // With cross origin set to 'anonymous' it should work but the headers at rsg.pml.ac.uk then prevent the 
-   // // country borders from loading
-   // $('<button class="js-export-image" title="Download current view as image" download="map.png"><span class="icon-download-10"></span></button>').appendTo('.ol-full-screen');
-   // $('.js-export-image').on('click', function(e) {
-   //    map.once('postcompose', function(event) {
-   //    var canvas = event.context.canvas;
-   //       $('.js-export-image').href = canvas.toDataURL('image/png');
-   //    });
-   //    map.renderSync();
-   // })
-
 };
 
 gisportal.selectionTools.shapesUploaded = function(){

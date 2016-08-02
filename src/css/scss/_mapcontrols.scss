@@ -43,6 +43,16 @@
    right: 105px;
 }
 
+.ol-geocoder-trigger{
+   position: absolute;
+   top: 25px;
+   right: 160px;
+   background-color: #fafafb;
+   box-shadow: 0px 0px 11px -2px black;
+   padding: 7px;
+   z-index: 10;
+}
+
 .ol-zoom button, .ol-full-screen button {
    border: 0;
    cursor: pointer;
@@ -69,7 +79,7 @@
 .ol-scale-line {
    position: absolute;
    top: 25px;
-   right: 160px;
+   right: 200px;
    background-color: #fafafb;
    box-shadow: 0px 0px 11px -2px black;
    padding: 7px;
@@ -82,4 +92,35 @@
    border-color: #666;
    padding-left: 7px;
 }
-.js-map-settings-message { margin: 6px -8px; padding: 8px; }
+.js-map-settings-message {
+   margin: 6px -8px;
+   padding: 8px;
+}
+
+.ol3-geocoder-search{
+   display: none;
+}
+
+.ol3-geocoder-search-expanded{
+   display: inline;
+}
+
+.ol3-geocoder-search-expanded #gcd-input,
+.ol3-geocoder-result{
+  right:10px !important;
+  left: auto !important;
+  width: 260px !important;
+}
+
+.ol3-geocoder-container{
+  left: auto !important;
+  right: 0.5em !important;
+}
+
+button.ol3-geocoder-btn-search {
+  display: none !important;
+}
+
+ul.ol3-geocoder-result>li:nth-child(odd) {
+    background-color: #eee;
+}

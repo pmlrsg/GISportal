@@ -514,6 +514,44 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
+   var geocoder = new Geocoder('nominatim', {
+      provider: 'photon',
+      lang: 'en',
+      placeholder: 'Search for a place...',
+      limit: 7,
+      keepOpen: true,
+      preventDefault: true
+   });
+   map.addControl(geocoder);
+
+   geocoder.on('addresschosen', function(evt) {
+      $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
+      $('#gcd-input').val("");
+      $('.ol3-geocoder-result').html("");
+      gisportal.currentSearchedPoint = gisportal.reprojectPoint(evt.coordinate, gisportal.projection, 'EPSG:4326');
+
+      // Makes sure that there is a sensible zoom level.
+      var details = evt.address.details;
+      if(details.postcode){
+         map.getView().setZoom(19);
+      }else if(details.city){
+         map.getView().setZoom(17);
+      }else if(details.state){
+         map.getView().setZoom(13);
+      }else if(details.country){
+         map.getView().setZoom(5);
+      }else{
+         map.getView().setZoom(3);
+      }
+      map.getView().setCenter(evt.coordinate);
+   });
+
+   $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>')
+
+   $('.ol-geocoder-trigger').on('click', function(){
+      $('.ol3-geocoder-btn-search').trigger('click');
+   });
+
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
