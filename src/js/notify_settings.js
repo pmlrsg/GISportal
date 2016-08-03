@@ -62,6 +62,19 @@ $.notify.addStyle('gisportal-delete-option', {
     "</div>"
 });
 
+$.notify.addStyle('gisportal-delete-step', {
+  html: 
+    "<div data-option='delete'>" +
+      "<div class='clearfix'>" +
+        "<div class='title' data-notify-html='title'/>" +
+        "<div class='buttons'>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
+        "</div>" +
+      "</div>" +
+    "</div>"
+});
+
 $.notify.addStyle('gisportal-restore-option', {
   html: 
     "<div data-option='restore'>" +
@@ -88,12 +101,22 @@ $.notify.addStyle('gisportal-close-plot-option', {
     "</div>"
 });
 
-$.notify.addStyle('gisportal-collab-notification', {
+$.notify.addStyle('gisportal-walkthrough-global', {
+    html: "<div>\n<span data-notify-text></span>\n</div>"});
+
+$.notify.addStyle('gisportal-walkthrough-elem', {
+    html: "<div>\n<span data-notify-text></span>\n</div>"
+});
+
+$.notify.addStyle('gisportal-walkthrough-option', {
   html: 
-    "<div data-option='collab'>" +
+    "<div data-option='walkthrough'>" +
       "<div class='clearfix'>" +
         "<div class='title' data-notify-html='title'/>" +
-        "<a href='javascript:;'' class='hide-opt pull-right' data-notify-text='hide-text'></a>" +
+        "<div class='buttons'>" +
+          "<button class='no brand small pull-right' data-notify-text='no-text'></button>" +
+          "<button class='yes brand small pull-right' data-notify-text='yes-text'></button>" +
+        "</div>" +
       "</div>" +
     "</div>"
 });

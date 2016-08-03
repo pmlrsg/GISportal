@@ -381,11 +381,12 @@ collaboration.init = function(io, app, config) {
       // a simple collaboration event; just echo back what was sent with details of who sent it
       socket.on('c_event', function(data) {
          console.log(data);
-         io.sockets.in(socket.room).emit(data.event, {
+         io.sockets.in(socket.room).emit('main_event', {
             "presenter": user.name || user.email,
             "image": user.image,
             "provider": user.provider,
-            "params" : data
+            "params" : data,
+            "event": data.event
          })
       });
 

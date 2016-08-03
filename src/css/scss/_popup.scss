@@ -102,3 +102,31 @@ button.js-user-feedback-submit{
 .bk-tooltip td{
   color: #2c2c2c !important;
 }
+
+div.js-walkthrough-management-html {
+  width: 1250px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  color: #111111;
+  background-color: white;
+}
+
+div.js-walkthrough-management-popup {
+  align-items: inherit;
+  margin: 10px auto;
+}
+
+div.js-walkthrough-management-html table {
+    width: 100%;
+}
+
+div.js-walkthrough-management-html table span {
+  color: black;
+  font-size: 15px;
+}
+
+div.js-walkthrough-management-html td, div.js-walkthrough-management-html th {
+  padding: 5px 10px 5px 10px;
+  text-align: left;
+}

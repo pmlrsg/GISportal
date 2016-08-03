@@ -30,7 +30,12 @@ $(document).ready(function()  {
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
 
-      gisportal.events.trigger('tab.select', layerId, tabName);
+      var params = {
+         "event" : "tab.select",
+         "layerId": layerId,
+         "tabName": tabName
+      };
+      gisportal.events.trigger('tab.select', params);
    });
    $(window).resize(function(e){
       if(e.target == window && collaboration.active && socket && socket.io && socket.io.engine){
@@ -77,7 +82,12 @@ function closeTab(){
       setTimeout(function(){
         button.removeAttr('checked');
         e.removeClass('active');
-        gisportal.events.trigger("layerTab.close", e.attr('for').split('-')[1], e.data('tab-name'));
+        var params = {
+          "event" : "layerTab.close",
+          "layerId": e.attr('for').split('-')[1],
+          "tabName": e.data('tab-name')
+        };
+        gisportal.events.trigger("layerTab.close", params);
       },0);
     };
     var unbind = function(){

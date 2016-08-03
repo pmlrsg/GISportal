@@ -31,7 +31,10 @@ gisportal.view.loadView = function(view_name){
          $('.view-title span.remove-view').off('click');
          $('.view-title span.remove-view').on('click', function(){
             gisportal.view.removeView();
-            gisportal.events.trigger('view.removed');
+            var params = {
+               "event" : "view.removed"
+            };
+            gisportal.events.trigger('view.removed', params);
          });
          data.view_name = view_name;
          gisportal.current_view = data;

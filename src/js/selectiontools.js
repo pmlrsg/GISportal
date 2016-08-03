@@ -76,7 +76,6 @@ gisportal.selectionTools.init = function()  {
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   $(document).off( 'keydown' );
    sketch = null;
    if(draw){
       map.removeInteraction(draw);
@@ -96,7 +95,12 @@ gisportal.selectionTools.initDOM = function()  {
             value = e.originalEvent.clipboardData.getData('text/plain');
          }catch(err){}
       }
-      gisportal.events.trigger('jsCoordinate.edit', e.type, value);
+      var params = {
+         "event": "jsCoordinate.edit",
+         "eventType": e.type,
+         "value":value
+      };
+      gisportal.events.trigger('jsCoordinate.edit', params);
    })
    .on('change', '.js-upload-shape', gisportal.selectionTools.shapesUploaded)
    .on('focus', '.js-coordinates', function(){
@@ -110,7 +114,10 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-      gisportal.events.trigger("drawBox.clicked");
+      var params = {
+         "event": "drawBox.clicked"
+      };
+      gisportal.events.trigger("drawBox.clicked", params);
    })
    .on('click', '.js-draw-polygon', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
@@ -120,7 +127,10 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-      gisportal.events.trigger("drawPolygon.clicked");
+      var params = {
+         "event": "drawPolygon.clicked"
+      };
+      gisportal.events.trigger("drawPolygon.clicked", params);
    })
    .on('click', '.js-draw-select-polygon', function() {
       var hasntClass = !$(this).hasClass("drawInProgress");
@@ -130,7 +140,10 @@ gisportal.selectionTools.initDOM = function()  {
          cancelDraw();
       }
       $(this).toggleClass("drawInProgress", hasntClass);
-      gisportal.events.trigger("selectPolygon.clicked");
+      var params = {
+         "event": "selectPolygon.clicked"
+      };
+      gisportal.events.trigger("selectPolygon.clicked", params);
    })
    .on('click', '.js-remove-geojson', function() {
       $.ajax({
@@ -144,7 +157,10 @@ gisportal.selectionTools.initDOM = function()  {
             $.notify("Sorry, that didn't delete properly, please try again", "error");
          }
       });
-      gisportal.events.trigger("removeGeoJSON.clicked");
+      var params = {
+         "event": "removeGeoJSON.clicked"
+      };
+      gisportal.events.trigger("removeGeoJSON.clicked", params);
    });
 
 
@@ -172,18 +188,18 @@ gisportal.selectionTools.shapesUploaded = function(){
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
-         // FOR STUPID WINDOWS (not reporting file types!!
+         // FOR STUPID WINDOWS (not reporting file types!!)
          if(this_file.type === ""){
             var ext = this_file.name.split('.');
             ext = ext[ext.length-1];
             if(ext == "csv"){
                this_file.type = "text/csv";
             }else if(ext == "dbf"){
-               this_file.type = "application/x-dbf";
+               dbf_found = true;
             }else if(ext == "shp"){
-               this_file.type = "application/x-esri-shape";
+               shp_found = true;
             }else if(ext == "shx"){
-               this_file.type = "application/x-esri-shape-index";
+               shx_found = true;
             }
          }
          files_total_size += this_file.size;
@@ -373,7 +389,10 @@ gisportal.selectionTools.toggleTool = function(type)  {
          });
          draw.on('drawstart',
             function(evt) {
-               gisportal.events.trigger('olDraw.drawstart');
+               var params = {
+                  "event": "olDraw.drawstart"
+               };
+               gisportal.events.trigger('olDraw.drawstart', params);
                gisportal.vectorLayer.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
@@ -392,7 +411,11 @@ gisportal.selectionTools.toggleTool = function(type)  {
                      }
                   }
                }
-               gisportal.events.trigger('olDraw.drawend', coordinates);
+               var params = {
+                  "event": "olDraw.drawend",
+                  "coordinates": coordinates
+               };
+               gisportal.events.trigger('olDraw.drawend', params);
             }, this);
       }
    }

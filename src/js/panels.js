@@ -8,7 +8,11 @@ gisportal.panels.initDOM = function() {
 		var panelName = $(this).data('panel-name');
 		gisportal.panels.showPanel(panelName);
 		if(!panelName.startsWith("collab-")){
-			gisportal.events.trigger('panels.showpanel', panelName);
+			var params = {
+		      "event" : "panels.showpanel",
+		      "panelName" : panelName
+		   };
+			gisportal.events.trigger('panels.showpanel', params);
 		}
 	});
 	gisportal.panels.showPanel(gisportal.panels.defaultPanel);
@@ -71,11 +75,18 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	$('.js-user-feedback-close').on('click', function(e) {
 		e.preventDefault();
       $('div.js-user-feedback-popup').toggleClass('hidden', true);
-      gisportal.events.trigger('userFeedback.close');
+      var params = {
+	      "event": "userFeedback.close"
+	   };
+      gisportal.events.trigger('userFeedback.close', params);
    });
 	$('.js-user-feedback-submit').on('click', function(e) {
 		e.preventDefault();
 		var str = $('.user-feedback-input').val();
+	   var params = {
+	      "event": "userFeedback.submit"
+	   };
+      gisportal.events.trigger('userFeedback.submit', params);
 		if(/^[a-zA-Z _][a-zA-Z0-9 _]+$/.test(str) && str.length < 50){
 			given_function(str);
 	      $('div.js-user-feedback-popup').toggleClass('hidden', true);
@@ -83,7 +94,6 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
 	   	//error
 	   	gisportal.panels.userFeedback(message, given_function, true);
 	   }
-      gisportal.events.trigger('userFeedback.submit');
 
    });
    $('.user-feedback-input').select().on('change keyup paste', function(e){
@@ -93,7 +103,11 @@ gisportal.panels.userFeedback = function(message, given_function, string_error){
          	value = e.originalEvent.clipboardData.getData('text/plain');
          }catch(err){}
       }
-      gisportal.events.trigger('userFeedback.input', value);
+      var params = {
+	      "event": "userFeedback.input",
+	      "inputValue": value
+	   };
+      gisportal.events.trigger('userFeedback.input', params);
    });
 
 };
