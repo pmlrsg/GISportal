@@ -214,7 +214,8 @@
             <li class="">
               <div class="panel-tab no-gap active clearix instructions">
                 <span>
-                  Choose an indicator below by searching or using the dropdowns. 
+                  <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
+                  <p>You can also filter the results by searching for a region or drawing a bounding box.</p>
                 </span>
               </div>
             </li>
@@ -222,6 +223,14 @@
                <div class="panel-tab no-gap active full-height">
                   <input type="text" id="search" placeholder="Search for an indicator" class="js-search search">
                   <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+               </div>
+            </li>
+            <li>
+               <div class="panel-tab no-gap active js-geolocation-filter">
+                  <label  class="brand secondary extra-small js-place-search-filter" title="Search for a Place">
+                     <span class=" icon-magnifier" title="Search for a Place"></span>
+                     Search for a Place
+                  </label>
                </div>
             </li>
             <li>
