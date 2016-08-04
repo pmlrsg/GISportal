@@ -610,6 +610,9 @@ gisportal.layer = function( options ) {
                   tileElement.onerror = function() {
                      gisportal.loading.decrement();
                   };
+                  if(src.startsWith("http://")){
+                     src = gisportal.ProxyHost + encodeURIComponent(src);
+                  }
                   tileElement.src = src;
                }
             })
