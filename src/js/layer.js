@@ -611,7 +611,7 @@ gisportal.layer = function( options ) {
                      gisportal.loading.decrement();
                   };
                   if(src.startsWith("http://")){
-                     src = gisportal.ProxyHost + encodeURIComponent(src);
+                     src = gisportal.ImageProxyHost + encodeURIComponent(src);
                   }
                   tileElement.src = src;
                }

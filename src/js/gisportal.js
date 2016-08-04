@@ -37,6 +37,9 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 // Define a proxy for the map to allow async javascript http protocol requests
 gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';
 
+// Define a proxy for the map to allow async javascript http protocol requests
+gisportal.ImageProxyHost = gisportal.middlewarePath + '/settings/img_proxy?url=';
+
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
 gisportal.cache = {};
