@@ -514,49 +514,14 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
-   var geocoder = new Geocoder('nominatim', {
-      provider: 'photon',
-      lang: 'en',
-      placeholder: 'Search for a place...',
-      limit: 7,
-      keepOpen: true,
-      preventDefault: true
-   });
-   map.addControl(geocoder);
-
-   geocoder.on('addresschosen', function(evt) {
-      $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
-      $('#gcd-input').val("");
-      $('.ol3-geocoder-result').html("");
-      gisportal.currentSearchedPoint = gisportal.reprojectPoint(evt.coordinate, gisportal.projection, 'EPSG:4326');
-
-      // Makes sure that there is a sensible zoom level.
-      var details = evt.address.details;
-      if(details.postcode){
-         map.getView().setZoom(19);
-      }else if(details.city){
-         map.getView().setZoom(17);
-      }else if(details.state){
-         map.getView().setZoom(13);
-      }else if(details.country){
-         map.getView().setZoom(5);
-      }else{
-         map.getView().setZoom(3);
-      }
-      map.getView().setCenter(evt.coordinate);
-   });
-
-   $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>')
-
-   $('.ol-geocoder-trigger').on('click', function(){
-      $('.ol3-geocoder-btn-search').trigger('click');
-   });
+   gisportal.geolocationFilter.init();
 
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
       cancelDraw();
@@ -576,9 +541,8 @@ gisportal.mapInit = function() {
          fillColour = 'rgba(142,142,142,1)';
          strokeColour = "white";
       }else{
-         //If there is not a recognised overlay type it will set the colour to red
-         fillColour = 'red';
-         strokeColour = 'red';
+         fillColour = 'rgba(0, 77, 167, 0.4)';
+         strokeColour = "white";
       }
       if(feature.getGeometry().getType() == "Point"){
          return [new ol.style.Style({
@@ -682,6 +646,8 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e){
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
       var response = '';
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
@@ -697,8 +663,7 @@ gisportal.mapInit = function() {
             // Only does it for one feature
             return;
          });
-      }
-      else {
+      }else if(!gisportal.geolocationFilter.draw){
          gisportal.displayDataPopup(e.pixel);
          gisportal.events.trigger('dataPopup.display', map.getCoordinateFromPixel(e.pixel));
       }
@@ -728,7 +693,8 @@ gisportal.mapInit = function() {
       var coordinate = map.getCoordinateFromPixel(pixel);
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-         if (feature && _.keys(feature.getProperties()).length >1 ) {
+         var overlayType = feature.getProperties().overlayType
+         if (feature && _.keys(feature.getProperties()).length >1 && overlayType != "filter" && overlayType != "selected") {
             var geom = feature.getGeometry();
             _.each(gisportal.selectedFeatures, function(feature) {
             });
@@ -764,6 +730,8 @@ gisportal.mapInit = function() {
    };
 
    map.on("moveend", function(data) {
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
       gisportal.events.trigger('map.move', centre, zoom);

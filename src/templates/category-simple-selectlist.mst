@@ -1,5 +1,13 @@
 <ul class="category-select-list">
-   <li class="selectoptions">
+      <li class="filtered-list-error-message selectoptions alert-warning hidden">
+         <div reset-layers-div>
+            <p id="list-message">No layers match your filtering. Click reset to clear your filters.</p>
+            <div id="reset-list-button-div" class="clearfix">
+               <button class="reset-list small pull-right brand">Reset</button>
+            </div>
+         </div>
+      </li>
+   <li class="selectoptions js-category-filter-options-li">
       Available indicators:
       <div class="js-category-filter-options"></div>
    </li>

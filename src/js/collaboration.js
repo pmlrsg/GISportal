@@ -1200,7 +1200,7 @@ collaboration.initSession = function() {
             }
             collaboration.log(collaboration.nameOrAvatar(data.presenter, data.image) +' "Reset" clicked');
             if (collaboration.role == "member") {
-               $('button#reset-list').trigger('click');
+               $('button.reset-list').trigger('click');
             }
          });
 
@@ -1526,6 +1526,7 @@ collaboration.initSession = function() {
                gisportal.vectorLayer.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+               gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
             }
          });
 
@@ -1888,7 +1889,7 @@ collaboration.initSession = function() {
 
          // WebRTC gubbins...
          socket.on('webrtc_event', function(data) {
-            var params_msg = data.params.message
+            var params_msg = data.params.message;
             if(params_msg && params_msg.type){
                params_msg = params_msg.type;
             }

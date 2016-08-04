@@ -324,7 +324,7 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       }
       gisportal.events.trigger('moreInfo.clicked');
    });
-   $('button#reset-list').on('click', function() {
+   $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
       gisportal.events.trigger('resetList.clicked');
    });
@@ -396,7 +396,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       }
       gisportal.events.trigger('moreInfo.clicked');
    });
-   $('button#reset-list').on('click', function() {
+   $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
       gisportal.events.trigger('resetList.clicked');
    });
@@ -475,6 +475,10 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
       onSelected: function(data) {
          gisportal.refinePanel.layerFound(data.selectedData.text);
       }
+   });
+   $('button.reset-list').on('click', function() {
+      gisportal.configurePanel.resetPanel();
+      gisportal.events.trigger('resetList.clicked');
    });
 
    for (layer in gisportal.layers){
@@ -748,7 +752,12 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
       // Reloads the browse categories
       gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
+      if(_.size(given_layers) === 0){
+         $('.filtered-list-error-message').toggleClass('hidden', false);
+         $('.js-category-filter-options-li').hide();
+      }else{
          $('.filtered-list-message').show();
+      }
       for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
@@ -760,6 +769,9 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);
       gisportal.storage.set("form_info", undefined);
+      gisportal.currentSearchedPoint = null;
+      gisportal.currentSearchedBoundingBox = null;
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && _.size(gisportal.original_layers) > 0 && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
@@ -795,7 +807,7 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
    gisportal.configurePanel.resetPanel(filteredLayers);
 };
 
-gisportal.configurePanel.filterLayersByBoundingBox = function(boundingBox){
+gisportal.configurePanel.filterLayersByGeometry = function(geom1){
    var layers_obj;
    if(_.size(gisportal.original_layers) > 0){
       layers_obj = gisportal.original_layers;
@@ -803,37 +815,6 @@ gisportal.configurePanel.filterLayersByBoundingBox = function(boundingBox){
       layers_obj = gisportal.layers;
    }
 
-   var temp_bbox = boundingBox;
-   // This bit just makes sure that the Terraformer can interprate the values as it doesn't work with scientific notation
-   temp_bbox = temp_bbox.split(",");
-   for(var val in temp_bbox){
-      temp_bbox[val] = Number(temp_bbox[val]);
-   }
-   temp_bbox = temp_bbox.join(",");
-   // Make sure it is the right projection!
-   // Make sure it is the right projection!
-   // Make sure it is the right projection!
-   // Make sure it is the right projection!
-   // Make sure it is the right projection!
-   // Make sure it is the right projection!
-   var bb1;
-   try{
-      bb1 = Terraformer.WKT.parse( boundingBox );
-   }catch( e ){
-      // Assume the old bbox style
-      try{
-         bb1 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(temp_bbox) );
-      }catch(err){
-         $.notify("This shape is not a polygon and cannot be used to select data for graphing, please try another shape", "error");
-      }
-   }
-   if(gisportal.projection != "EPSG:4326"){
-      bb1 = bb1.toMercator();
-   }
-   gisportal.configurePanel.filterLayersByGeometry(bb1);
-};
-
-gisportal.configurePanel.filterLayersByGeometry = function(geom1){
    var filteredLayers = {};
    for(var layer in layers_obj){
       var indicator = layers_obj[layer];
@@ -842,12 +823,12 @@ gisportal.configurePanel.filterLayersByGeometry = function(geom1){
             indicator.exBoundingBox.EastBoundLongitude + "," +
             indicator.exBoundingBox.NorthBoundLatitude;
       geom2 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(layerBoundingBox) );
-      if(geom1.intersects(geom2)){
+      if(geom2.intersects(geom1)){
          filteredLayers[layer] = indicator;
       }
    }
    gisportal.configurePanel.resetPanel(filteredLayers);
-}
+};
 
 gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilter){
    var layers_obj, layer, filter;

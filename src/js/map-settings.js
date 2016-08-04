@@ -579,6 +579,7 @@ gisportal.setProjection = function(new_projection) {
       gisportal.selectedRegionProjectionChange(old_projection, new_projection);
    }
    gisportal.projection = map.getView().getProjection().getCode();
+   gisportal.geolocationFilter.drawCurrentFilter();
 };
 
 gisportal.setView = function(centre, extent, projection) {

@@ -369,7 +369,6 @@ gisportal.selectionTools.toggleTool = function(type)  {
 
          draw.on('drawend',
             function(evt) {
-               gisportal.selectionTools.ROIAdded(sketch);
                var coordinates = sketch.getGeometry().getCoordinates();
                for(var poly in coordinates){
                   for(var coor in coordinates[poly]){
@@ -377,6 +376,20 @@ gisportal.selectionTools.toggleTool = function(type)  {
                         coordinates[poly][coor][num] = Math.round(coordinates[poly][coor][num] * 1000 ) / 1000;
                      }
                   }
+               }
+               if(gisportal.geolocationFilter.filteringByPolygon){
+                  setTimeout(function() {
+                     cancelDraw();
+                     gisportal.selectionTools.toggleTool('None'); // So that people don't misclick
+                  }, 300);
+                  var wkt = Terraformer.WKT.parse(gisportal.wkt.writeGeometry(sketch.getGeometry()));
+                  gisportal.currentSearchedBoundingBox = wkt;
+                  if(gisportal.projection != 'EPSG:4326'){
+                     wkt.toGeographic();
+                  }
+                  gisportal.configurePanel.filterLayersByGeometry(wkt);
+               }else{
+                  gisportal.selectionTools.ROIAdded(sketch);
                }
                gisportal.events.trigger('olDraw.drawend', coordinates);
             }, this);
@@ -423,6 +436,7 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       if(!gisportal.current_view || !gisportal.current_view.noPan){
