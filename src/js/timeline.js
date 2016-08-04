@@ -57,12 +57,6 @@ gisportal.TimeLine = function(id, options) {
    
    // Use "self" to refer to this instance of the TimeLine object
    var self = this;
-   
-   // Check to see if the element with id exists, if not throw an error and return a null object
-   if (!$('div#' + id).length) {
-      //console.error('No DIV with ID, "' + id + '" exists. Cannot render TimeLine.');
-      return;
-   }
 
     $('.js-current-date').pikaday({
       format: "YYYY-MM-DD",
@@ -129,7 +123,6 @@ gisportal.TimeLine = function(id, options) {
    
    // Set initial y scale
    this.xScale = d3.time.scale().domain([this.minDate, this.maxDate]).range([0, this.width]);
-   //console.log("xscale width:" + this.width);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
    //--------------------------------------------------------------------------
@@ -172,7 +165,7 @@ gisportal.TimeLine = function(id, options) {
       .attr('class', 'timeline')
       .call(self.zoom)
       .on('click', self.clickDate)
-      .on('mousedown', function() {  isDragging = false; console.log('mousedown || ' + isDragging); });
+      .on('mousedown', function() {  isDragging = false; });
 
 
    //--------------------------------------------------------------------------
@@ -432,14 +425,11 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
 
 // Zoom function to a new date range
 gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
-   var self = this;
    var minDate = new Date(startDate);
    var maxDate = new Date(endDate);
    var padding = (maxDate - minDate) * 0.05; 
    this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime() - padding) : this.minDate);
    this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime() + padding) : this.maxDate);
-   //console.log(minDate, maxDate);
-   //console.log(this.xScale.domain());
    this.xScale.domain([this.minDate * 0.9, this.maxDate * 1.1]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();

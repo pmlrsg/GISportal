@@ -44,33 +44,6 @@ gisportal.selectionTools.init = function()  {
       map:map
    });
 
-   var feature;
-   // map.on('pointermove', function(evt) {
-   //    feature = null;
-   //    var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
-   //    if (features.length) {
-   //       feature = features[0];
-   //    }
-   // });
-      // map.on('pointermove', function(evt) {
-      //  var pixel = evt.pixel;
-      // map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-      //    console.log(feature);
-      //    console.log(layer);
-       
-         
-      // //gisportal.featureOverlay.getSource().clear()
-
-      //   // gisportal.featureOverlay.getSource().addFeature(feature)
-      // });
-
-  // });
-   map.on('postrender', function(renderEvent) {
-      if (feature) {
-         //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
-      }
-   });
-
    gisportal.wkt = new ol.format.WKT();
 };
 

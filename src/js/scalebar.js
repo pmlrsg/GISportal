@@ -340,7 +340,6 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax, force)  {
  * @param {string} id - The id of the layer
  */
 gisportal.scalebars.updateScalebar = function(id)  {
-   var scale = this.getScalebarDetails(id);
    var indicator = gisportal.layers[id];
    
    var params = {

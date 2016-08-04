@@ -32,7 +32,6 @@ gisportal.editLayersForm.produceServerList = function(){
       if((gisportal.user.info.permission != "admin" && this_layer.owner != gisportal.user.info.email) || this_layer.serviceType =="WFS"){
          continue;
       }
-      var contactInfo;
       var provider;
       var serverName;
       serverName = this_layer.serverName;

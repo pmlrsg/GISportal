@@ -433,7 +433,6 @@ HashMap.prototype.normalize = function normalize(value) {
 };
 
 HashMap.prototype.any = function any(value) {
-   var result = false;
    for (var key in this.hash)
    {
       if (value === key || value.substr(0, key.length) === key)
@@ -459,7 +458,6 @@ gisportal.utils.makePointReadable = function(point){
 $.fn.keepOnScreen = function(){
    var element = this.get(0);
    var bounds = element.getBoundingClientRect();
-   var exceeds = [];
    if(bounds.left < 0){
       element.style.left = 0 + "px";
    }

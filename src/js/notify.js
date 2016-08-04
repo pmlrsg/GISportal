@@ -104,9 +104,6 @@
       //remove existing style
       var existing = styles[name];
       if (existing && existing.cssElem) {
-         if (window.console) {
-            console.warn(pluginName + ": overwriting style '" + name + "'");
-         }
          styles[name].cssElem.remove();
       }
       def.name = name;
@@ -141,8 +138,7 @@
    };
 
    var insertCSS = function(cssText) {
-      var e, elem, error;
-      elem = createElem("style");
+      var elem = createElem("style");
       elem.attr("type", 'text/css');
       $("head").append(elem);
       try {
@@ -543,7 +539,7 @@
          if (prev) {
             prev.destroy();
          }
-         var curr = new Notification($(this), data, options);
+         new Notification($(this), data, options);
       });
       return this;
    };

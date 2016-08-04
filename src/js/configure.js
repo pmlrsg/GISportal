@@ -18,9 +18,6 @@ gisportal.configurePanel = {};
 gisportal.configurePanel.refreshData = function()  {
    this.searchInit();
 
-   var groupedTags = gisportal.groupTags();
-   var categories = this.browseCategories;
-
    if(_.size(gisportal.browseCategories) > 0 && gisportal.config.browseMode != 'simplelist'){
       if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'selectlist') {
          this.renderTagsAsSelectlist();
@@ -122,9 +119,6 @@ gisportal.configurePanel.reset = function(){
  * is added, this function automatically gets called.
  */
 gisportal.configurePanel.buildMap = function(indicator)  {
-   //console.log("bla blah");
-   //console.log(indicator);
-
    if (indicator) gisportal.refinePanel.open(indicator);
    else gisportal.indicatorsPanel.open();
 };
@@ -308,7 +302,6 @@ gisportal.groupNames = function(layers)  {
  *
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
-   var grouped = gisportal.groupTags();
    var addable_layers = false;
    if(gisportal.user.info.permission != "guest"){
       for(var layer in gisportal.layers){
@@ -330,11 +323,17 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
          $(this).html("less info...");
          message_block.slideDown('slow');
       }
-      gisportal.events.trigger('moreInfo.clicked');
+      var params = {
+         "event" : "moreInfo.clicked"
+      };
+      gisportal.events.trigger('moreInfo.clicked', params);
    });
    $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.events.trigger('resetList.clicked');
+      var params = {
+         "event" : "resetList.clicked"
+      };
+      gisportal.events.trigger('resetList.clicked', params);
    });
 
    // Listener is added to the add layers button
@@ -408,7 +407,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       var params = {
          "event" : "moreInfo.clicked"
       };
-      gisportal.events.trigger('moreInfo.clicked');
+      gisportal.events.trigger('moreInfo.clicked', params);
    });
    $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
@@ -451,11 +450,8 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('#js-category-filter-select').ddslick({
       data: categories,
       onSelected: function(data) {
-         //console.log(data.selectedData);
          if(data.selectedData.value=="vector"){
-            //console.log("adding vector layers now");
             targetDiv.html('');
-            gisportal.addVectorLayers(gisportal.vlayers);
             gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
          }
          else if (data.selectedData) {
@@ -498,7 +494,10 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
    });
    $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.events.trigger('resetList.clicked');
+      var params = {
+         "event" : "resetList.clicked"
+      };
+      gisportal.events.trigger('resetList.clicked', params);
    });
 
    for (layer in gisportal.layers){
@@ -533,7 +532,6 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
       tagNames.sort(); 
    } 
    var catName = gisportal.browseCategories[cat];
-   var catNameKeys = Object.keys(gisportal.browseCategories);
 
    var addIndicators = function(d)  {
       var tmp = {};
@@ -690,7 +688,6 @@ gisportal.configurePanel.search = function(val)  {
    
    $('.js-search-results').html(rendered);
    $('.js-search-results a').click(function() {
-      //console.log("clicked/..................");
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
       $('.js-search-results').css('display', 'none');
       var params = {
@@ -708,8 +705,6 @@ gisportal.configurePanel.search = function(val)  {
       $('[class*="icon-"]').removeClass('icon-sombrero');
       $('[class*="icon-"]').removeClass('jiggly');
    }
-   var selected = [];
-
 };
 
 /**
@@ -744,8 +739,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
  * @param {string} name - The name of the layer
  */
 gisportal.configurePanel.hasIndicator = function(name)  {
-   var index = -1;
-   var id;
    for (var i in gisportal.layers)  {
       if (gisportal.layers[i].name.toLowerCase() === name.toLowerCase()) return gisportal.layers[i].id;
    }

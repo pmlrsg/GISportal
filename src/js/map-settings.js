@@ -472,7 +472,6 @@ gisportal.setProjection = function(new_projection) {
 };
 
 gisportal.setView = function(centre, extent, projection) {
-   var current_zoom = map.getView().getZoom();
    var min_zoom = 3;
    var max_zoom = 12;
    if (projection == 'EPSG:3857') max_zoom = 19;
