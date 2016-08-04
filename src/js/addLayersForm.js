@@ -211,7 +211,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       this_layer.originalAutoScale = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-      gisportal.events.trigger('addLayersForm.autoScale-changed', $(this).val());
+      var params = {
+         "event": "addLayersForm.autoScale-changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('addLayersForm.autoScale-changed', params);
    });
 
    // Makes sure that the aboveMaxColor value is set correctly and changes the value when the user selects a value
@@ -219,7 +223,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       this_layer.defaultAboveMaxColor = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-      gisportal.events.trigger('addLayersForm.aboveMaxColor-changed', $(this).val());
+      var params = {
+         "event": "addLayersForm.aboveMaxColor-changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('addLayersForm.aboveMaxColor-changed', params);
    });
 
    // Makes sure that the belowMinColor value is set correctly and changes the value when the user selects a value
@@ -227,7 +235,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       this_layer.defaultBelowMinColor = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-      gisportal.events.trigger('addLayersForm.belowMinColor-changed', $(this).val());
+      var params = {
+         "event": "addLayersForm.belowMinColor-changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('addLayersForm.belowMinColor-changed', params);
    });
 
    // Makes sure that the defaultStyle value is set correctly and changes the value when the user selects a value
@@ -264,7 +276,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       this_layer.defaultStyle = $(this).val();
       gisportal.addLayersForm.refreshStorageInfo();
       gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-      gisportal.events.trigger('addLayersForm.defaultStyle-changed', $(this).val());
+      var params = {
+         "event": "addLayersForm.defaultStyle-changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('addLayersForm.defaultStyle-changed', params);
    });
    //Adds the scalebar preview
    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
@@ -336,7 +352,11 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       }
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('addToAll.clicked', field);
+      var params = {
+         "event": "addToAll.clicked",
+         "field": field
+      };
+      gisportal.events.trigger('addToAll.clicked', params);
    });
 
    // This adds the click listener to the 'add scale points to all layers' spans
@@ -361,7 +381,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
 
       // The information is then updated to the browser cache so that it is there next time.
       gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('addScalePointsToAll.clicked');
+      var params = {
+         "event": "addScalePointsToAll.clicked"
+      };
+      gisportal.events.trigger('addScalePointsToAll.clicked', params);
    });
 
    // This adds the click listener to the 'exclude all layers' span
@@ -371,7 +394,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.layers_list[value].include = !prop;
       }
       gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('toggleAllLayers.clicked');
+      var params = {
+         "event": "toggleAllLayers.clicked"
+      };
+      gisportal.events.trigger('toggleAllLayers.clicked', params);
    });
 
    // This adds the click listener to the 'log to all layers' span
@@ -381,20 +407,29 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.layers_list[value].defaultLog = prop;
       }
       gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('logToAllLayers.clicked');
+      var params = {
+         "event": "logToAllLayers.clicked"
+      };
+      gisportal.events.trigger('logToAllLayers.clicked', params);
    });
 
    // Adds a listener to the span for adding tags.
    $('div.layers-form-right span.add-tag-input ').on( 'click', function () {
       // This gets a responce from the user asking for the tag name.
       gisportal.panels.userFeedback("Please enter a tag name to add it", gisportal.addLayersForm.addTagInput);
-      gisportal.events.trigger('addTagInput.clicked');
+      var params = {
+         "event": "addTagInput.clicked"
+      };
+      gisportal.events.trigger('addTagInput.clicked', params);
    });
 
    // Adds a listener to the submit button on the form.
    $('.layers-form-buttons-div button.js-layers-form-submit').on('click', function(e){
       e.preventDefault();
-      gisportal.events.trigger('submitLayers.clicked');
+      var params = {
+         "event": "submitLayers.clicked"
+      };
+      gisportal.events.trigger('submitLayers.clicked', params);
       if(!gisportal.form_working){
          gisportal.form_working = true;
          // If there are errors on the server information form then notify the user.
@@ -467,7 +502,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.refreshStorageInfo();
          // The form is then hidden.
          $('div.js-layer-form-popup').toggleClass('hidden', true);
-         gisportal.events.trigger('cancelChanges.clicked');
+         var params = {
+            "event": "cancelChanges.clicked"
+         };
+         gisportal.events.trigger('cancelChanges.clicked', params);
       }
    });
    gisportal.addLayersForm.form_info.current_page = current_page;// Saves the current_page for loading next time.
@@ -476,6 +514,14 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
    // Input listeners are then added to the paginator and the buttons.
    gisportal.addLayersForm.addInputListeners();
 };
+
+function keyDownTrigger(code){
+   var params = {
+      "event": "body.keydown",
+      "code": code
+   };
+   gisportal.events.trigger('body.keydown', params);
+}
 
 gisportal.addLayersForm.keydownListener = function ( e ) {
    if(document.activeElement.nodeName == "BODY"){
@@ -493,19 +539,19 @@ gisportal.addLayersForm.keydownListener = function ( e ) {
                   gisportal.addLayersForm.refreshStorageInfo();
                }
             }
-            gisportal.events.trigger('body.keydown', e.keyCode);
+            keyDownTrigger(e.keyCode);
             break;
          case 37:
             if(current_page > 1){
                gisportal.addLayersForm.displayForm(total_pages, current_page-1, form_div);
             }
-            gisportal.events.trigger('body.keydown', e.keyCode);
+            keyDownTrigger(e.keyCode);
             break;
          case 39:
             if(current_page < total_pages){
                gisportal.addLayersForm.displayForm(total_pages, current_page+1, form_div);
             }
-            gisportal.events.trigger('body.keydown', e.keyCode);
+            keyDownTrigger(e.keyCode);
             break;
       }
    }
@@ -649,7 +695,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    // The server form template is then loaded and displayed in the element given.
    var server_form = gisportal.templates['server-form'](gisportal.addLayersForm.server_info);
    $(form_div).html(server_form);
-   gisportal.addLayersForm.showOwnerOptions(owner);
+   gisportal.addLayersForm.showOwnerOptions(owner, $("form.server-form select[data-field='owner']"));
    // The form is then validated.
    gisportal.addLayersForm.validateForm('div.overlay-container-form');
    // Input listeners are then added
@@ -658,8 +704,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
    gisportal.addLayersForm.refreshStorageInfo();
 };
 
-gisportal.addLayersForm.showOwnerOptions = function(given_owner){
-   var select_elem = $("form.server-form select[data-field='owner']");
+gisportal.addLayersForm.showOwnerOptions = function(given_owner, select_elem){
    $.ajax({
       url:  gisportal.middlewarePath + '/settings/get_owners',
       success: function( data ){
@@ -763,7 +808,11 @@ gisportal.addLayersForm.addInputListeners = function(){
 
    $('.overlay-container-form').bind('scroll', function() {
       var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
-      gisportal.events.trigger('addLayersForm.scroll', scrollPercent);
+      var params = {
+         "event": "addLayersForm.scroll",
+         "scrollPercent": scrollPercent
+      };
+      gisportal.events.trigger('addLayersForm.scroll', params);
    });
 
    $('.js-layer-form-html span[data-field="Rotation"]').on('click', function(){
@@ -840,7 +889,12 @@ gisportal.addLayersForm.addInputListeners = function(){
             raw_key_val = e.originalEvent.clipboardData.getData('text/plain');
          }catch(err){}
       }
-      gisportal.events.trigger('addLayersForm.input', raw_key_val, key);
+      var params = {
+         "event": "addLayersForm.input",
+         "field": key,
+         "inputValue": raw_key_val
+      };
+      gisportal.events.trigger('addLayersForm.input', params);
    });
    // When you focus out of a field, the form is then validated again.
    $('div.overlay-container-form input, div.overlay-container-form textarea').on('focusout', function(){
@@ -852,7 +906,10 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.form_info.display_form = false; // display_form set to false so that the portal knows that the form was not displayed last time the user was viewing it.
       // The browser cache is updaed witht the changes.
       gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.events.trigger('addLayersForm.close');
+      var params = {
+         "event": "addLayersForm.close"
+      };
+      gisportal.events.trigger('addLayersForm.close', params);
    });
 
    $('.js-add-dict').on('click', function(e){
@@ -875,7 +932,11 @@ gisportal.addLayersForm.addInputListeners = function(){
    $('.js-go-to-form-page').find('a').off('click');
    $('.js-go-to-form-page').find('a').on('click', function(){
       var page = $(this).data('page');
-      gisportal.events.trigger('paginator.selected', page);
+      var params = {
+         "event": "paginator.selected",
+         "page": page
+      };
+      gisportal.events.trigger('paginator.selected', params);
    });
 };
 

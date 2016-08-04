@@ -1,83 +1,179 @@
-#walkthrough li.active  {
-   background: rgba(0,0,0,0.8);
-   border-radius: 4px;
-   cursor: pointer;
-   display: block;
-   position: absolute;
-   max-width: 45%;
-   left: 100px;
-   top: 100px;
-   padding: 25px;
-   z-index: 10002;
+.controls-holder button{
+  background-color: $analysis-button;
+  border: 1px solid $analysis-button;
+  cursor: pointer;
+  padding: 4px 8px;
 }
 
-#walkthrough li.active:last-of-type  {
-	cursor: default;
+.controls-holder button.selected {
+  background-color: #EFEFEF;
+  color: $analysis-button;
 }
 
-#walkthrough li.active .js-walkthrough-buttons  {
-   margin-top: 20px; 	
+div.js-user-dashboard,
+div.layers-user-panel{
+	position: relative;
 }
 
-#walkthrough li.active .js-walkthrough-next  {
-   float: right;
+div.js-user-dashboard:after{
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  background: #000000;
+  content: "";
+  width: 100%;
+  display: block;
 }
 
-.js-walkthrough-close.ui-dialog-titlebar-close  {
-	position: absolute;
-	right: 10px;
-	top: 10px;
+.controls-holder{
+  position: absolute;
+  left: calc(25% + 20px);
+  z-index: 10750;
+  top: 25px;
+  max-width: 300px;
+  box-shadow: 0px 0px 11px -2px black;
 }
 
-#walkthrough .ui-icon.next  {
-	background-position: -49px -192px;
-	background-image: url(images/ui-icons_222222_256x240.png);
+@media screen and (min-width: 2000px) {
+  .controls-holder{
+    left: 520px;
+  }
 }
 
-
-#walkthrough li.active:last-of-type .ui-icon.next  {
-	display: none;
-}
-
-/* TODO: Switch to class */
-[aria-describedby="js-walkthrough-confirm"] {
-	z-index: 10003;
-}
-
-.arrow::before  {
-   border: solid transparent;
-   border-color: rgba(0, 0, 0, 0);
-   border-width: 10px;
-   content: " ";
-   height: 0;
-   margin-top: -10px;
-   pointer-events: none;
-   position: absolute;
-   top: 50%;
-   width: 0;
-}
-
-.arrow.left::before  {
-   border-right-color: rgba(0,0,0,0.8);
-   right: 100%;
-}
-
-.arrow.right::before  {
-   border-left-color: rgba(0,0,0,0.8);
-   left: 100%;
+@media screen and (max-width: 1420px) {
+  .controls-holder{
+    left: 375px;
+  }
 }
 
 
-.arrow.down::before  {
-   border-top-color: rgba(0,0,0,0.8);
-   top: 100%;
-   left: 50%;
-   margin-top: 0;
+div.js-edit-walkthrough-html {
+  width: 1000px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  color: #111111;
+  background-color: white;
 }
 
-.arrow.up::before  {
-   border-bottom-color: rgba(0,0,0,0.8);
-   top: 0;
-   left: 50%;
-   margin-top: -20px;
+div.js-edit-walkthrough-html tr:first-child {
+  border-top: none;
+}
+
+.walkthrough-form-buttons-div{
+  padding: 5px;
+}
+
+.walkthrough-form-submit{
+  margin-left: 5px; 
+}
+
+div.js-edit-walkthrough-html input.spinner{
+  width: 50px;
+  text-align: center; 
+}
+
+a.ui-spinner-button {
+  cursor: default;
+}
+
+.walkthrough-step-box {
+  margin: 5px auto;
+  border: 1px solid;
+  display: inline-block;
+  padding: 2px 5px;
+}
+
+.walkthrough-main-field {
+  display: inline-block;
+}
+
+input.title-input {
+  width: 150px;
+  margin-left: 5px;
+}
+
+select.owner-input {
+  width: 200px;
+  display: inline-block;
+  margin-left: 5px;
+  text-transform: none;
+}
+
+input.message-input,
+input.selector-input {
+  display: inline-block;
+  position: inherit;
+  margin-left: 5px;
+  padding-top: 0;
+}
+
+input.message-input{
+  width: 400px;
+}
+
+input.selector-input {
+  width: 200px;
+  margin-top: 5px;
+}
+
+.notifyjs-gisportal-walkthrough-global-base.notifyjs-gisportal-walkthrough-global-info {
+  background: #fff;  
+  width: 200px;
+  padding: 10px;
+  box-shadow: 0px 0px 11px -2px black;
+}
+
+.notifyjs-gisportal-walkthrough-elem-base.notifyjs-gisportal-walkthrough-elem-info {
+  background: #fff;
+  box-shadow: 0px 0px 11px -2px black;
+  padding: 5px;
+  width: 100px;
+}
+
+.walkthrough-title{
+  background-color: $panel-headfoot;
+  min-height: 45px;
+  border-bottom: 2px solid #EFEDF3;
+  box-shadow: 0px 1px 5px -2px #000000;
+  padding-left: 5px;
+  color: #fff;
+  display: inline-flex;
+  position: relative;
+  width: 100%;
+}
+
+.js-edit-walkthrough-popup input[type="checkbox"]{
+  vertical-align: middle;
+  margin: auto;
+  margin-left: 5px;
+}
+
+.start-text-input{
+  resize: vertical;
+  width: 50%;
+  height: 50px;
+  min-height:50px;
+  max-height: 300px;
+  display: inherit;
+}
+.walkthrough-title h3{
+  float: left;
+  display: inline;
+  border-bottom: 0px;
+  margin-top: 5px;
+  padding: 7px 7px 7px 7px;
+  position: relative;
+}
+
+.walkthrough-controls-content{
+  text-align: center;
+}
+
+.js-walkthrough-recording-close,
+.js-walkthrough-playing-close{
+  float: right;
+  font-size: 22px;
+  padding: 5px 5px 5px 5px;
 }

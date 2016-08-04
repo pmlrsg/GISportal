@@ -471,7 +471,10 @@ gisportal.mapInit = function() {
          feature[0].setStyle(feature[1]);
       });
       gisportal.selectedFeatures = [];
-      gisportal.events.trigger('dataPopup.close');
+      var params = {
+         "event": "dataPopup.close"
+      };
+      gisportal.events.trigger('dataPopup.close', params);
       return false;
    };
 
@@ -597,7 +600,11 @@ gisportal.mapInit = function() {
          }
       }
       if(overlay == gisportal.featureOverlay && found){
-         gisportal.events.trigger('featureOverlay.removeType', overlayType);
+         var params = {
+            "event": "featureOverlay.removeType",
+            "overlayType": overlayType
+         };
+         gisportal.events.trigger('featureOverlay.removeType', params);
       }
    };
 
@@ -617,6 +624,7 @@ gisportal.mapInit = function() {
       }
       var hoverFeatures = gisportal.featureOverlay.getSource().getFeatures();
       // TODO: Filter this list to only "hover" layers
+      var params;
       if(hoverFeatures.length > 0){
          if(!feature){
             // Makes sure any hover features are removed
@@ -628,11 +636,21 @@ gisportal.mapInit = function() {
          if(!_.isEqual(hovered_feature.getGeometry().getCoordinates(), feature.getGeometry().getCoordinates())){
             gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
             gisportal.hoverFeature(feature);
-            gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
+            params = {
+               "event": "selectPolygon.hover",
+               "coordinate": map.getCoordinateFromPixel(e.pixel),
+               "id": feature.getId()
+            };
+            gisportal.events.trigger("selectPolygon.hover", params);
          }
       }else if(feature){
          gisportal.hoverFeature(feature);
-         gisportal.events.trigger("selectPolygon.hover", map.getCoordinateFromPixel(e.pixel), feature.getId());
+         params = {
+            "event": "selectPolygon.hover",
+            "coordinate": map.getCoordinateFromPixel(e.pixel),
+            "id": feature.getId()
+         };
+         gisportal.events.trigger("selectPolygon.hover", params);
       }
    });
    gisportal.hoverFeature = function(feature){
@@ -659,13 +677,17 @@ gisportal.mapInit = function() {
                return;
             }
             gisportal.selectFeature(feature);
-            gisportal.events.trigger("selectPolygon.select", map.getCoordinateFromPixel(e.pixel), feature.getId());
+            var params = {
+               "event": "selectPolygon.select",
+               "coordinate": map.getCoordinateFromPixel(e.pixel),
+               "id": feature.getId()
+            };
+            gisportal.events.trigger("selectPolygon.select", params);
             // Only does it for one feature
             return;
          });
       }else if(!gisportal.geolocationFilter.draw){
          gisportal.displayDataPopup(e.pixel);
-         gisportal.events.trigger('dataPopup.display', map.getCoordinateFromPixel(e.pixel));
       }
    });
    gisportal.selectFeature = function(feature){
@@ -691,6 +713,7 @@ gisportal.mapInit = function() {
    gisportal.displayDataPopup = function(pixel){
       var isFeature = false;
       var coordinate = map.getCoordinateFromPixel(pixel);
+      var params;
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
          var overlayType = feature.getProperties().overlayType
@@ -723,9 +746,18 @@ gisportal.mapInit = function() {
       });
       if (!isFeature && !gisportal.selectionTools.isDrawing) {
          gisportal.addDataPopup(coordinate, pixel);
+         params = {
+            "event": "dataPopup.display",
+            "coordinate": coordinate
+         };
+         gisportal.events.trigger('dataPopup.display', params);
       }
       if(gisportal.selectionTools.isDrawing){
-         gisportal.events.trigger('olDraw.click', coordinate);
+         params = {
+            "event": "olDraw.click",
+            "coordinate": coordinate
+         };
+         gisportal.events.trigger('olDraw.click', params);
       }
    };
 
@@ -734,7 +766,12 @@ gisportal.mapInit = function() {
       gisportal.geolocationFilter.filteringByText = false;
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
-      gisportal.events.trigger('map.move', centre, zoom);
+      var params = { 
+         "event" : "map.move",
+         "centre" : centre,
+         "zoom": zoom
+      };
+      gisportal.events.trigger('map.move', params);
    });
  
    gisportal.loadLayers();
@@ -832,7 +869,7 @@ gisportal.nonLayerDependent = function() {
 /*===========================================================================*/
 
 gisportal.autoSaveState = function(){
-   var state = JSON.stringify(gisportal.saveState());
+   var state = JSON.stringify(gisportal.walkthrough.state_before_walkthrough || gisportal.saveState());
    gisportal.storage.set( gisportal.niceDomainName + '_state', state );
 };
 
@@ -954,6 +991,7 @@ gisportal.loadState = function(state){
    }
    gisportal.stopLoadState = true;
    $('.start').toggleClass('hidden', true);
+   cancelDraw();
    state = state || {};
 
    var stateTimeline = state.timeline;
@@ -1027,12 +1065,17 @@ gisportal.loadState = function(state){
 
    // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
+      if(!gisportal.state_indicators_list){
+         return false;
+      }
       var index = gisportal.state_indicators_list.indexOf(id);
       if(index > -1){
          // splice used because pop was not removing the correct value.
-         state.selectedIndicators.splice(index, 1);
+         if(state.selectedIndicators){
+            state.selectedIndicators.splice(index, 1);
+         }
       }
-      if(state.selectedIndicators.length === 0){
+      if(state.selectedIndicators && state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
       }
    });
@@ -1127,7 +1170,7 @@ gisportal.loadLayerState = function(){
          var style = layer_state.style || defaultStyle;
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
-         var log = layer_state.log || false;
+         var log = layer_state.log == "true" || false;
          if(layer_state.autoScale === undefined){
             layer_state.autoScale = "default";
          }
@@ -1352,7 +1395,7 @@ gisportal.main = function() {
    if( gisportal.config.siteMode == "production" ) {
       gisportal.startRemoteErrorLogging();
    } else {
-      $('body').prepend('<div class="dev-warning">DEVELOPMENT MODE</div>');
+      $('body').prepend('<div class="dev-warning noselect">DEVELOPMENT MODE</div>');
       $('.js-start-container').addClass('start-dev');
    }
    if(!gisportal.config.colorbands){
@@ -1449,7 +1492,10 @@ gisportal.main = function() {
       function showPanel()  {
          $('.js-show-tools').toggleClass('hidden', true);
          $('.panel.active').toggleClass('hidden', false);
-         gisportal.events.trigger('panel.show');
+         var params = {
+            "event" : "panel.show"
+         };
+         gisportal.events.trigger('panel.show', params);
       }
 
       $('.js-hide-panel').on('click', hidePanel);
@@ -1457,7 +1503,10 @@ gisportal.main = function() {
       function hidePanel()  {
          $('.panel.active').toggleClass('hidden', true);
          $('.js-show-tools').toggleClass('hidden', false);
-         gisportal.events.trigger('panel.hide');
+         var params = {
+            "event" : "panel.hide"
+         };
+         gisportal.events.trigger('panel.hide', params);
       }
 
       // Start setting up anything that is not layer dependent

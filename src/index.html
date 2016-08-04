@@ -52,7 +52,7 @@
 <script type="text/javascript" src="js-libs/fuse/fuse.js"></script>
 
 <!-- Tooltipster -->
-<script type="text/javascript" src="js-libs/tooltipster/js/jquery.tooltipster.min.js"></script>
+<script type="text/javascript" src="js-libs/tooltipster/js/tooltipster.bundle.min.js"></script>
 
 <!-- jStorage - Used for large local storage -->
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
@@ -102,6 +102,7 @@
    </audio>
    <div class="collab-overlay hidden"></div>
    <div class="collab-extent-overlay hidden"></div>
+   <div class="walkthrough-highlight-overlay hidden"></div>
 
    <button class="js-show-collaboration show-collaboration hidden">Show Collaboration<span class="icon-arrow-left-1"></span></button>
    <div class="collaboration-panel hidden">
@@ -221,7 +222,7 @@
             </li>
             <li>
                <div class="panel-tab no-gap active full-height">
-                  <input type="text" id="search" placeholder="Search for an indicator" class="js-search search">
+                  <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="js-search search">
                   <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
                </div>
             </li>
@@ -300,6 +301,7 @@
       <div id="userPanel" data-panel-name="user" class="panel-container" >
          <div class="panel-container-solid-backdrop" >
             <div class="js-user-dashboard"></div>
+            <div class="js-secondary-user-dashboard"></div>
          </div>
       </div>
       
@@ -393,6 +395,12 @@
    <div class="overlay js-edit-layers-popup hidden">
       <div class="overlay-container js-edit-layers-html"></div>
    </div>
+   <div class="overlay js-walkthrough-management-popup hidden">
+      <div class="overlay-container js-walkthrough-management-html"></div>
+   </div>
+   <div class="overlay js-edit-walkthrough-popup hidden">
+      <div class="overlay-container js-edit-walkthrough-html"></div>
+   </div>
    <div class="overlay js-modal-message-popup hidden">
       <div class="overlay-container js-modal-message-html"></div>
    </div>
@@ -403,6 +411,8 @@
    <div class="overlay js-plot-popup hidden"></div>
 
    <div class="global-loading-icon">
+   </div>
+   <div class="controls-holder">
    </div>
 
    <div class="helpBox">

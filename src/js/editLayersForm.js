@@ -104,6 +104,10 @@ gisportal.editLayersForm.addListeners = function(){
          gisportal.autoLayer.loadGivenLayer();
          gisportal.panels.showPanel('choose-indicator');
       }
+      var params = {
+         "event" : "configureInternalLayers.closed"
+      };
+      gisportal.events.trigger('configureInternalLayers.closed', params);
    });
 
    // This shows or hides the list of laers relating to the server.
