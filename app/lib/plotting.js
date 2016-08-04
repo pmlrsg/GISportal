@@ -165,7 +165,7 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
    var csv_file = req.file; // Gets the data given
 
    if(csv_file.mimetype != "text/csv"){
-      res.status(415).send('Please upload a CSV file');
+      return res.status(415).send('Please upload a CSV file');
    }
 
    var csv_path = path.join(csv_file.destination, csv_file.originalname);
@@ -197,9 +197,9 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
       })
       .on('finish', function(){
          if(error_lines.length > 0){
-            res.status(400).send('The data on CSV line(s) ' + error_lines.join(", ") + ' is invalid \n Please correct the errors and upload again');
+            return res.status(400).send('The data on CSV line(s) ' + error_lines.join(", ") + ' is invalid \n Please correct the errors and upload again');
          }else{
-            res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path});
+            return res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path});
          }   
       });
    

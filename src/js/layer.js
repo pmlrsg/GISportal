@@ -271,7 +271,11 @@ gisportal.layer = function( options ) {
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
            gisportal.scalebars.autoScale(layer.id);
            gisportal.scalebars.updateScalebar(layer.id);
-           gisportal.events.trigger('scalebar.apply-changes', layer.id);
+           var params = {
+              "event" : "scalebar.apply-changes",
+              "id" : layer.id
+           };
+           gisportal.events.trigger('scalebar.apply-changes', params);
         });
         layer.scalebarTimeout = setTimeout(function(){
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
@@ -483,7 +487,9 @@ gisportal.layer = function( options ) {
             layer.selectedDateTime = '';
             layer.isInbounds = false;
          }
-         if (this.openlayers.anID) this.openlayers.anID.setVisible(layer.isInbounds && layer.isVisible);
+         if (this.openlayers.anID){
+            this.openlayers.anID.setVisible(layer.isInbounds && layer.isVisible);
+         }
          $('.indicator-header[data-id="' + layer.id + '"]').toggleClass('hidden-layer', !(layer.isInbounds));
       }
    };
@@ -609,6 +615,9 @@ gisportal.layer = function( options ) {
 
                   var tileElement = tile.getImage();
                   tileElement.onload = function() {
+                     gisportal.loading.decrement();
+                  };
+                  tileElement.onerror = function() {
                      gisportal.loading.decrement();
                   };
                   tileElement.src = src;

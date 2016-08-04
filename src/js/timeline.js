@@ -424,7 +424,7 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
       if (!label || label === "") label =  this.timebars[i].label;
-      if(gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
+      if(gisportal.layers[id] && gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
       
       $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
    }
@@ -444,7 +444,12 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate){
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
-   gisportal.events.trigger('date.zoom', startDate, endDate);
+   var params = {
+      "event" : "date.zoom",
+      "startDate" : startDate,
+      "endDate": endDate
+   };
+   gisportal.events.trigger('date.zoom', params);
 };
 
 // Add a new time bar using detailed parameters
@@ -564,6 +569,9 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
+   if(gisportal.timeline.getDate().toDateString() == date.toDateString()){
+      return false;
+   }
    gisportal.hideAllPopups();
    var self = this;  // Useful for when the scope/meaning of "this" changes
    this.selectedDate = self.draggedDate = new Date(date);
@@ -577,8 +585,11 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    gisportal.filterLayersByDate(date);
    self.showDate(date);
    gisportal.timeline.redraw();
-
-   gisportal.events.trigger('date.selected', date);
+   var params = {
+      "event" : "date.selected",
+      "date" : date
+   };
+   gisportal.events.trigger('date.selected', params);
 };
 
 gisportal.TimeLine.prototype.showDate = function(date) {

@@ -342,7 +342,7 @@ dd {
 }
 
 
-/* ddslisk CSS */
+/* ddslick CSS */
 .dd-select{ background: #fff; border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}
 .dd-select.active { background:$panel-content-header; color:#fff; }
 .dd-select.active .dd-selected { color:#fff; }
@@ -363,6 +363,7 @@ dd {
 .dd-option-icon { font-size: 17px; line-height: 19px; margin-right: 5px; }
 .dd-image-right { float:right; margin-right:15px; margin-left:5px;}
 .dd-container{ position:relative; margin-bottom:10px;} .dd-selected-text { font-weight:bold; }
+.dd-selected-soon{ background: $panel-content-header; } .dd-selected-soon a{ color: #fff; }
 
 .noUi-dragable {
   cursor: ew-resize !important;
@@ -384,4 +385,15 @@ dd {
   width: 100%;
   text-align: center;
   pointer-events: none;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
+  cursor: default;
 }

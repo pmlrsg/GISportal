@@ -21,17 +21,29 @@ gisportal.panelSlideout.initDOM = function(  ){
 		})
 		.on( 'click', '.js-slideout-toggle-peak', function(){
 			var slideoutName = findRelatedSlideoutName( this );
-			gisportal.events.trigger('slideout.togglePeak', slideoutName);
+			var params = {
+		      "event": "slideout.togglePeak",
+		      "slideoutName": slideoutName
+		   };
+			gisportal.events.trigger('slideout.togglePeak', params);
 			gisportal.panelSlideout.togglePeak( slideoutName );
 		})
 		.on( 'click', '.js-slideout-close', function(){
 			var slideoutName = findRelatedSlideoutName( this );
 			gisportal.panelSlideout.closeSlideout( slideoutName );
-			gisportal.events.trigger('slideout.close', slideoutName);
+			var params = {
+		      "event": "slideout.close",
+		      "slideoutName": slideoutName
+		   };
+			gisportal.events.trigger('slideout.close', params);
 		});
 	$('.js-slideout-content').bind('scroll', function() {
 	   var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
-	   gisportal.events.trigger('slideout.scroll', scrollPercent);
+	   var params = {
+	      "event": "slideout.scroll",
+	      "scrollPercent": scrollPercent
+	   };
+	   gisportal.events.trigger('slideout.scroll', params);
 	});
 };
 

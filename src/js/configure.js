@@ -35,7 +35,11 @@ gisportal.configurePanel.refreshData = function()  {
 
    $('#configurePanel').bind('scroll', function() {
       var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
-      gisportal.events.trigger('configurepanel.scroll', scrollPercent);
+      var params = {
+         "event": "configurepanel.scroll",
+         "scrollPercent": scrollPercent
+      };
+      gisportal.events.trigger('configurepanel.scroll', params);
    });
 };
 
@@ -53,7 +57,11 @@ gisportal.configurePanel.loadViewList = function(){
             $('select.js-views-list').off('change');
             $('select.js-views-list').on('change', function(){
                gisportal.view.loadView($(this).val());
-               gisportal.events.trigger('view.loaded', $(this).val());
+               var params = {
+                  "event" : "view.loaded",
+                  "view_name" : $(this).val()
+               };
+               gisportal.events.trigger('view.loaded', params);
             });
          }else{
             $('li.views-list').toggleClass('hidden', true);
@@ -342,7 +350,10 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
-      gisportal.events.trigger('addLayersForm.clicked');
+      var params = {
+         "event" : "addLayersForm.clicked"
+      };
+      gisportal.events.trigger('addLayersForm.clicked', params);
    });
 
    // iterate over each category
@@ -394,11 +405,17 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
          $(this).html("less info...");
          message_block.slideDown('slow');
       }
+      var params = {
+         "event" : "moreInfo.clicked"
+      };
       gisportal.events.trigger('moreInfo.clicked');
    });
    $('button#reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.events.trigger('resetList.clicked');
+      var params = {
+         "event" : "resetList.clicked"
+      };
+      gisportal.events.trigger('resetList.clicked', params);
    });
 
    // Listener is added to the add layers button
@@ -414,7 +431,10 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       gisportal.addLayersForm.validation_errors = {};
       // The form is then loaded (loading the first layer)
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
-      gisportal.events.trigger('addLayersForm.clicked');
+      var params = {
+         "event" : "addLayersForm.clicked"
+      };
+      gisportal.events.trigger('addLayersForm.clicked', params);
    });
 
    var categories = [];
@@ -482,6 +502,7 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
       holder = $('input[value="' + layer + '"]').parent();
       if (holder.length > 0) {
          holder.tooltipster({
+            contentCloning: true,
             content: $(info),
             position: 'right',
          });
@@ -619,7 +640,11 @@ gisportal.configurePanel.searchInit = function()  {
       if( currentSearchValue != searchBoxVal ){
          currentSearchValue = searchBoxVal;
          
-         gisportal.events.trigger('search.typing', searchBoxVal);
+         var params = {
+            "event" : "search.typing",
+            "searchValue" : searchBoxVal
+         };
+         gisportal.events.trigger('search.typing', params);
 
          gisportal.configurePanel.search(searchBoxVal);
       }
@@ -663,8 +688,12 @@ gisportal.configurePanel.search = function(val)  {
    $('.js-search-results a').click(function() {
       //console.log("clicked/..................");
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
-      $('.js-search-results').css('display', 'none');   
-      gisportal.events.trigger('search.resultselected', $(this).text());
+      $('.js-search-results').css('display', 'none');
+      var params = {
+         "event" : "search.resultselected",
+         "searchResult" : $(this).text()
+      };
+      gisportal.events.trigger('search.resultselected', params);
    });
    $('.js-search-results').css('display', 'block');
    if (val == 'sombrero') {
@@ -824,14 +853,6 @@ gisportal.configurePanel.filterLayersLoad = function(layerFilter, layerListFilte
       }
    }
 };
-
-
-/**
- * Default tool tip styling
- */
-$.fn.tooltipster('setDefaults', {
-  theme: 'tooltipster-shadow'
-});
 
 /**
  * Provides all local storage.

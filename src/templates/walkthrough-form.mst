@@ -1,0 +1,44 @@
+<div class="form-header">
+   Walkthrough Editor (<span class="walkthrough-temp-title">{{title}}</span>)
+   <span class="icon-delete-3 js-walkthrough-form-close btn right-icon icon-btn"></span>
+</div>
+
+<div class="walkthrough-main-field">
+   <label>Title:</label><input type="text" value="{{title}}" class="title-input">
+</div>
+<div class="walkthrough-main-field">
+   <label>Owner:</label><select class="owner-input"></select>
+</div>
+<div class="walkthrough-main-field">
+   <label>Requires logged in user:</label><input type="checkbox" {{#if requires_logged_in_user}}checked {{/if}}class="requires-logged-in-user-toggle">
+</div>
+<br/>
+<label title="A message to display when the walkthrough is loaded">Start Message:</label><textarea type="textarea" class="start-text-input">{{start_text}}</textarea>
+
+{{#each step}}
+   {{#if @first}}
+      <h3><b>START</b></h3>
+   {{/if}}
+   {{#unless @first}}
+      <p>Delay of <input value="{{delay}}" data-step="{{@index}}" class="spinner"/> seconds</p>
+      <div class="walkthrough-step-box">
+         <b>{{description}}</b>
+         <span data-step="{{@index}}" class="icon-delete-3 js-delete-step btn pull-right" title="Delete Step"></span>
+         </br>
+         <label>Message Text (After):</label><input type="text" data-step="{{@index}}" value="{{message}}" class="message-input">
+         </br>
+         <label>Element Selector (global if blank):</label><input type="text" data-step="{{@index}}" value="{{selector}}" class="selector-input"><a href="javascript:void(0)" class="default-selector" data-step="{{@index}}">Default</a>
+         </br>
+         <label>Pause on this step:</label><input type="checkbox" data-step="{{@index}}" {{#if pause_here}}checked {{/if}}class="pause-here-toggle">
+         <label>Click element to continue:</label><input type="checkbox" data-step="{{@index}}" {{#if click_element_to_continue}}checked {{/if}}class="click-element-to-continue-toggle">  
+      </div>
+      </br>
+   {{/unless}}
+   <span data-step="{{@index}}" class="icon-add-3 js-add-step btn" title="Add Message"></span>
+{{/each}}
+<h3><b>END</b></h3>
+
+<div class="clearfix walkthrough-form-buttons-div">
+   <button class="brand small walkthrough-form-submit pull-right" href="javascript:void(0)">&#10004; Submit</button>
+   <button class="brand small walkthrough-form-cancel pull-right" href="javascript:void(0)">&#10006; Cancel</button>
+</div>

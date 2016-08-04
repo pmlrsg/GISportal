@@ -4,6 +4,10 @@ gisportal.autoLayer.viewLoaded = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
+   if(gisportal.utils.getURLParameter('walkthrough_name') && gisportal.utils.getURLParameter('walkthrough_owner')){
+      gisportal.walkthrough.loadWalkthrough(gisportal.utils.getURLParameter('walkthrough_name'), gisportal.utils.getURLParameter('walkthrough_owner'));
+      return;
+   }
    if(gisportal.utils.getURLParameter('view') && !gisportal.autoLayer.viewLoaded){
       gisportal.autoLayer.viewLoaded = true;
       gisportal.view.loadView(gisportal.utils.getURLParameter('view'));

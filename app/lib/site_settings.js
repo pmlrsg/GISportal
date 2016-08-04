@@ -130,6 +130,46 @@ router.get('/app/settings/view', function(req, res) {
    }
 });
 
+router.get('/app/settings/walkthrough', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var walkthrough = req.query.walkthrough;
+   var owner = req.query.owner;
+
+   var file_path;
+   if(owner == domain){
+      file_path = path.join(MASTER_CONFIG_PATH, domain, walkthrough + "_walkthrough.json");
+   }else{
+      file_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + owner, walkthrough + "_walkthrough.json");
+   }
+   var walkthrough_file;
+   if(utils.fileExists(file_path)){
+      walkthrough_file = fs.readFileSync(file_path);
+      res.send(walkthrough_file);
+   }else{
+      res.status(404).send();
+   }
+});
+
+router.get('/app/settings/delete_walkthrough', function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var walkthrough = req.query.walkthrough;
+   var owner = req.query.owner;
+
+   var file_path;
+   if(owner == domain){
+      file_path = path.join(MASTER_CONFIG_PATH, domain, walkthrough + "_walkthrough.json");
+   }else{
+      file_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + owner, walkthrough + "_walkthrough.json");
+   }
+   var walkthrough_file;
+   if(utils.fileExists(file_path)){
+      fs.unlinkSync(file_path);
+      res.send({});
+   }else{
+      res.status(404).send();
+   }
+});
+
 router.get('/app/settings/get_views', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
 
@@ -148,13 +188,66 @@ router.get('/app/settings/get_views', function(req, res) {
       if(utils.fileExists(view_path)){
          view_file = fs.readFileSync(view_path);
          try{
-            var niceName = filename.replace('.json', "")
+            var niceName = filename.replace('.json', "");
             views_obj[niceName] = JSON.parse(view_file).title || niceName;
          }catch(e){};
       }
    });
 
    res.send(views_obj);
+
+});
+
+router.get('/app/settings/get_walkthroughs', function(req, res) {
+   var this_username = user.getUsername(req);
+   var usernames = [this_username];
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   var walkthrough_list = [];
+
+   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+
+   if(!utils.directoryExists(master_path)){
+      utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
+   }
+
+   var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
+   master_list.forEach(function(filename){
+      var file_path = path.join(master_path, filename);
+      if(utils.fileExists(file_path) && filename.substring(filename.length-17, filename.length) == "_walkthrough.json"){
+         var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+         walkthrough_list.push({'title': json_data.title, 'owner': json_data.owner});
+      }
+   });
+   if(permission != "guest"){
+      if(permission == "admin"){
+         master_list.forEach(function(filename){
+            if(utils.directoryExists(path.join(master_path, filename))){
+               if(stringStartsWith(filename, USER_CACHE_PREFIX)){
+                  usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
+               }
+            }
+         });
+      }
+      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
+      // Eventually should just remove all admins here!
+      for(username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
+         var user_config_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
+         if(!utils.directoryExists(user_config_path)){
+            utils.mkdirpSync(user_config_path); // Creates the directory if it doesn't already exist
+         }
+         var user_list = fs.readdirSync(user_config_path); // Gets all the user files
+         user_list.forEach(function(filename){
+            var file_path = path.join(user_config_path, filename);
+            if(utils.fileExists(file_path) && filename.substring(filename.length-17, filename.length) == "_walkthrough.json"){
+               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+         walkthrough_list.push({'title': json_data.title, 'owner': json_data.owner});
+            }
+         });
+      }
+   }
+   res.send(JSON.stringify(walkthrough_list)); // Returns the cache to the browser.
 
 });
 
@@ -287,7 +380,7 @@ router.get('/app/settings/get_cache', function(req, res) {
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
    master_list.forEach(function(filename){
       var file_path = path.join(master_path, filename);
-      if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json"){
+      if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length-17, filename.length) != "_walkthrough.json"){
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
          if(permission != "admin"){ // The Layers list is filtered .
             json_data.server.Layers = json_data.server.Layers.filter(function(val){
@@ -320,7 +413,7 @@ router.get('/app/settings/get_cache', function(req, res) {
          var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
          user_list.forEach(function(filename){
             var file_path = path.join(user_cache_path, filename);
-            if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json"){
+            if(utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length-17, filename.length) != "_walkthrough.json"){
                var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
                if(permission != "admin" && this_username != filename.replace(USER_CACHE_PREFIX, "")){ // The Layers list is filtered.
                   json_data.server.Layers = json_data.server.Layers.filter(function(val){
@@ -819,6 +912,31 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
    res.send(html);
 });
 
+router.all('/app/settings/save_walkthrough', function(req, res){
+   var walkthrough = req.body; // Gets the given walkthrough
+   var domain = utils.getDomainName(req); // Gets the domain
+   var username = walkthrough.owner; // Gets the given owner
+   var permission = user.getAccessLevel(req, domain);
+   var overwrite = walkthrough.overwrite;
+   // Makes sure the user is an admin if they are trying to overwrite a walkthrough
+   if(permission != "admin"){
+      overwrite = false;
+   }
+
+   var filename = walkthrough.title + '_walkthrough.json';
+   if(domain == username){
+      // If is is a global file
+      var save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
+   }else{
+      // If it is to be a user file
+      var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
+   }
+   if(utils.fileExists(save_path) && !overwrite){
+      return res.status(400).send('Filename Taken');
+   }
+   fs.writeFileSync(save_path, JSON.stringify(walkthrough));
+   res.status(200).send({success: true});
+});
 
 
 function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){

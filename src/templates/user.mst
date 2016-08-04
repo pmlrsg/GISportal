@@ -1,0 +1,57 @@
+<div class="layers-user-panel">
+	<h3>
+		<b>
+			Layers
+		</b>
+	</h3>
+	<div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
+	<form class="add-wms-form">
+		<b>LOAD</b>
+		</br>
+	   <label>You can add an external Web Map Service (WMS) URL here:</label>
+	   <input type="text" class="js-wms-url" placeholder="WMS URL">
+	   <div class="wms-url-message alert-info hidden" id="refresh-cache-message"/>
+	   <div class="clearfix hidden" id="refresh-cache-div">
+	      <label class="pull-right">
+	         Please check this box to refresh the cache
+	         <input type="checkbox" id="refresh-cache-box" />
+	      </label>
+	   </div>
+	   <div class="clearfix wms-url-div">
+	      <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
+	   </div>
+	</form>
+	<div class="hidden clearfix server-list-div">
+		<b>MANAGE</b>
+		</br>
+	   <label>You can edit internal layers here:</label>
+	   <button class="brand small js-edit-layers pull-right">Configure Internal Layers</button>
+	</div>
+</div>
+
+<div class="walkthrough-user-panel">
+	<h3>
+		<b>
+			Walkthrough
+		</b>
+	</h3>
+	<div class='hidden clearfix walkthrough-record'>
+		<b>RECORD</b>
+		<button class="brand pull-right secondary js-show-recording-controls">Make New Recording</button>
+	</div>
+	<div class='walkthrough-select'>
+		<b>SELECT</b>
+		<p>Select a walkthrough to load:</p>
+		<select class="js-walkthrough-list">
+		<option value="default" selected="" disabled="">Please select a walkthrough...</option>
+		</select>
+	</div>
+	<div class='hidden clearfix walkthroughs-manage'>
+		<b>MANAGE</b>
+		</br>
+		<label>You can manage walkthroughs here:</label>
+		<button class="brand pull-right secondary js-manage-walkthroughs">
+			Manage Walkthroughs
+		</button>
+	</div>
+</div>
