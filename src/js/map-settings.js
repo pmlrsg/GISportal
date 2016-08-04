@@ -225,7 +225,7 @@ gisportal.createBaseLayers = function() {
          gisportal.loading.decrement();
       };
       tileElement.src = src;
-   }
+   };
 
    gisportal.baseLayers = {
       EOX: new ol.layer.Tile({

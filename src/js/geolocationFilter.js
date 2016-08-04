@@ -77,7 +77,7 @@ gisportal.geolocationFilter.init = function(){
          gisportal.geolocationFilter.toggleDraw('Polygon');
       }
    });
-}
+};
 
 gisportal.geolocationFilter.toggleDraw = function(type)  {
    cancelDraw();
@@ -145,7 +145,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                }
                setTimeout(function() {
                   gisportal.geolocationFilter.cancelDraw();
-               }, 300);
+               }, 1000);
                var wkt = Terraformer.WKT.parse(gisportal.wkt.writeGeometry(sketch.getGeometry()));
                gisportal.currentSearchedBoundingBox = wkt;
                if(gisportal.projection != 'EPSG:4326'){
@@ -179,6 +179,7 @@ gisportal.geolocationFilter.drawCurrentFilter = function(){
       }
       feature = gisportal.wkt.readFeature(gisportal.coordinatesToPolygon(nice_circle.geometry.coordinates));
       new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"filter"});
+      gisportal.mapFit(new_feature.getGeometry().getExtent());
    }else if(gisportal.currentSearchedBoundingBox){
       var poly = gisportal.currentSearchedBoundingBox;
       var nice_poly = poly;
@@ -199,5 +200,4 @@ gisportal.geolocationFilter.drawCurrentFilter = function(){
    gisportal.configurePanel.filterLayersByGeometry(wkt);
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
    gisportal.featureOverlay.getSource().addFeature(new_feature);
-   gisportal.mapFit(new_feature.getGeometry().getExtent());
 };
