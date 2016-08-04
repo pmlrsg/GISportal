@@ -208,7 +208,7 @@ gisportal.layer = function( options ) {
 
       if (options.show !== false)  { 
          gisportal.checkIfLayerFromState(layer);
-         gisportal.addLayer(layer, options);    
+         gisportal.addLayer(this, options);
       }
 
       this.select();
