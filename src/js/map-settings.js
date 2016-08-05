@@ -224,6 +224,9 @@ gisportal.createBaseLayers = function() {
       tileElement.onerror = function() {
          gisportal.loading.decrement();
       };
+      if(src.startsWith("http://")){
+         src = gisportal.ImageProxyHost + encodeURIComponent(src);
+      }
       tileElement.src = src;
    };
 
