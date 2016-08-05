@@ -58,23 +58,36 @@ gisportal.geolocationFilter.init = function(){
       }else if($(".ol3-geocoder-search-expanded").length === 0){
          $(this).toggleClass('searchInProgress', true);
          gisportal.geolocationFilter.filteringByText = true;
+         gisportal.geolocationFilter.cancelDraw();
       }
       $('.ol3-geocoder-btn-search').trigger('click');
    });
 
    $('.js-box-search-filter').on('click', function(){
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      if($('.ol3-geocoder-search-expanded').length > 0){
+         $('.ol-geocoder-trigger').trigger('click');
+      }
       if($(this).hasClass('searchInProgress')){
+         $(this).toggleClass('searchInProgress', false);
          gisportal.geolocationFilter.cancelDraw();
       }else{
          gisportal.geolocationFilter.toggleDraw('Box');
+         $(this).toggleClass('searchInProgress', true);
       }
    });
 
    $('.js-polygon-search-filter').on('click', function(){
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      if($('.ol3-geocoder-search-expanded').length > 0){
+         $('.ol-geocoder-trigger').trigger('click');
+      }
       if($(this).hasClass('searchInProgress')){
+         $(this).toggleClass('searchInProgress', false);
          gisportal.geolocationFilter.cancelDraw();
       }else{
          gisportal.geolocationFilter.toggleDraw('Polygon');
+         $(this).toggleClass('searchInProgress', true);
       }
    });
 };
