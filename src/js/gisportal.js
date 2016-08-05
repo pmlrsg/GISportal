@@ -274,6 +274,7 @@ gisportal.createOpLayers = function() {
          "belowMinColor": belowMinColor,
          "defaultStyle": indicator.defaultStyle || gisportal.config.defaultStyle,
          "log": indicator.log,
+         "serviceType": indicator.serviceType || "WMS",
 
          //orginal
          "firstDate": indicator.FirstDate, 

@@ -198,7 +198,11 @@ gisportal.layer = function( options ) {
                   default_style = prev_style || value.Name;
                }
             });
-            this.style = default_style || this.styles[0].Name;
+            var style_name;
+            if(this.styles && this.styles[0]){
+               style_name = this.styles[0].Name;
+            }
+            this.style = default_style || style_name;
          }       
       }
       
@@ -578,45 +582,86 @@ gisportal.layer = function( options ) {
                }
             }
          }
-         layer = new ol.layer.Tile({
-            title: this.displayName(),
-            id: this.id,
-            type: 'OLLayer',
-            source: new ol.source.TileWMS({
-               url:  this.wmsURL,
-               crossOrigin: null,
-               params: {
-                  LAYERS: this.urlName,
-                  TRANSPARENT: true,
-                  wrapDateLine: true,
-                  SRS: gisportal.projection,
-                  VERSION: '1.1.1',
-                  STYLES: style,
-                  NUMCOLORBANDS: this.colorbands,
-                  ABOVEMAXCOLOR: this.aboveMaxColor,
-                  BELOWMINCOLOR: this.belowMinColor,
-               },
-               // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
-               // that existed in ol2. It is planned so this function could be replaced in time
+         if(this.serviceType =="WMS"){
+            layer = new ol.layer.Tile({
+               title: this.displayName(),
+               id: this.id,
+               type: 'OLLayer',
+               source: new ol.source.TileWMS({
+                  url:  this.wmsURL,
+                  crossOrigin: null,
+                  params: {
+                     LAYERS: this.urlName,
+                     TRANSPARENT: true,
+                     wrapDateLine: true,
+                     SRS: gisportal.projection,
+                     VERSION: '1.1.1',
+                     STYLES: style,
+                     NUMCOLORBANDS: this.colorbands,
+                     ABOVEMAXCOLOR: this.aboveMaxColor,
+                     BELOWMINCOLOR: this.belowMinColor,
+                  },
+                  // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
+                  // that existed in ol2. It is planned so this function could be replaced in time
+                  tileLoadFunction: function(tile, src) {
+                     gisportal.loading.increment();
 
-               // TODO - work out how to handle tiles that don't finish loading before the map has been moved
-               tileLoadFunction: function(tile, src) {
-                  gisportal.loading.increment();
-
-                  var tileElement = tile.getImage();
-                  tileElement.onload = function() {
-                     gisportal.loading.decrement();
-                  };
-                  tileElement.onerror = function() {
-                     gisportal.loading.decrement();
-                  };
-                  if(src.startsWith("http://")){
-                     src = gisportal.ImageProxyHost + encodeURIComponent(src);
+                     var tileElement = tile.getImage();
+                     tileElement.onload = function() {
+                        gisportal.loading.decrement();
+                     };
+                     tileElement.onerror = function() {
+                        gisportal.loading.decrement();
+                     };
+                     if(src.startsWith("http://")){
+                        src = gisportal.ImageProxyHost + encodeURIComponent(src);
+                     }
+                     tileElement.src = src;
                   }
-                  tileElement.src = src;
-               }
-            })
-         });
+               })
+            });
+         }else if(this.serviceType =="WMTS"){
+            layer = new ol.layer.Tile({
+               title: this.displayName(),
+               id: this.id,
+               type: 'OLLayer',
+               source: new ol.source.WMTS({
+                  url:  this.wmsURL,
+                  crossOrigin: null,
+                  params: {
+                     LAYERS: this.urlName,
+                     TRANSPARENT: true,
+                     wrapDateLine: true,
+                     SRS: gisportal.projection,
+                     VERSION: '1.1.1',
+                     STYLES: style,
+                     NUMCOLORBANDS: this.colorbands,
+                     ABOVEMAXCOLOR: this.aboveMaxColor,
+                     BELOWMINCOLOR: this.belowMinColor,
+                  },
+                  // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
+                  // that existed in ol2. It is planned so this function could be replaced in time
+                  tileLoadFunction: function(tile, src) {
+                     gisportal.loading.increment();
+
+                     var tileElement = tile.getImage();
+                     tileElement.onload = function() {
+                        gisportal.loading.decrement();
+                     };
+                     tileElement.onerror = function() {
+                        gisportal.loading.decrement();
+                     };
+                     if(src.startsWith("http://")){
+                        src = gisportal.ImageProxyHost + encodeURIComponent(src);
+                     }
+                     tileElement.src = src;
+                  }
+               })
+            });
+         }else{
+            return false;
+         }
+         
 
       } else if(this.type == 'refLayers') {
          // intended for WFS type layers that are not time related

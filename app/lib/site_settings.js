@@ -750,10 +750,15 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                if(err){
                   utils.handleError(err, res);
                }else{
+                  var base = result.WMS_Capabilities || result.WMT_MS_Capabilities;
+                  var serviceType = (typeof result.WMS_Capabilities === 'undefined') ? "WMTS" : "WMS";
                   try{
-                     var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
-                     var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
-                     var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
+                     var contact_data = base.Service[0].ContactInformation[0];
+                     var contact_person, contact_organization;
+                     if(contact_data.ContactPersonPrimary){
+                        contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
+                        contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
+                     }
                      var contact_position = contact_data.ContactPosition;
                      var contact_address;
                      var contact_city;
@@ -771,10 +776,10 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                      var contact_phone = contact_data.ContactVoiceTelephone;
                      var contact_email = contact_data.ContactElectronicMailAddress;
 
-                     if(contact_person[0].length > 0){
+                     if(contact_person && contact_person[0].length > 0){
                         contact_info.person = contact_person[0];
                      }
-                     if(typeof(contact_organization[0]) == 'string'){
+                     if(contact_organization && typeof(contact_organization[0]) == 'string'){
                         var provider = contact_organization[0];
                      }
                      if(contact_position && contact_position[0].length > 0){
@@ -804,9 +809,8 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                      if(address.length > 0){
                         contact_info.address = address;
                      }
-
-                     for(index in result.WMS_Capabilities.Capability[0].Layer){
-                        var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
+                     for(index in base.Capability[0].Layer){
+                        var parent_layer = base.Capability[0].Layer[index]
                         var layers = [];
                         var name;
                         var service_title;
@@ -837,7 +841,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                            }
                         }
 
-                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
+                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider, serviceType);
                      }
                      if(layers.length > 0){
                         sub_master_cache.server.Layers = sortLayersList(layers, "Title");
@@ -845,7 +849,9 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         sub_master_cache.wmsURL = url;
                         sub_master_cache.serverName = clean_url;
                         sub_master_cache.contactInfo = contact_info;
-                        sub_master_cache.provider = provider.replace(/&amp;/g, '&');
+                        if(provider){
+                           sub_master_cache.provider = provider.replace(/&amp;/g, '&');
+                        }
                         sub_master_cache.timeStamp = new Date();
 
                         var data = JSON.stringify(sub_master_cache)
@@ -958,14 +964,14 @@ router.all('/app/settings/save_walkthrough', function(req, res){
 });
 
 
-function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){
+function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider, serviceType){
    for(index in parent_layer.Layer){
       var layer = parent_layer.Layer[index]
 
       var name_elem = layer.Name;
       var title_elem = layer.Title;
       var abstract_elem = layer.Abstract;
-      var ex_bounding_elem = layer.EX_GeographicBoundingBox;
+      var bounding_elem = layer.EX_GeographicBoundingBox || layer.LatLonBoundingBox;
       var dimension_elem = layer.Dimension;
       var style_elem = layer.Style;
 
@@ -983,7 +989,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          dimensions = createDimensionsArray(layer)
       }
 
-      if(typeof(ex_bounding_elem) != "undefined"){
+      if(typeof(bounding_elem) != "undefined"){
          bounding_box = createBoundingBox(layer);
       }
       if(style_elem){
@@ -993,7 +999,7 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          }
       }
       if(name && service_title && title && bounding_box){
-         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box})
+         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "serviceType": serviceType})
          var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
          if(!utils.directoryExists(LAYER_CONFIG_PATH)){
             utils.mkdirpSync(LAYER_CONFIG_PATH);
@@ -1002,20 +1008,35 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;
       }else{
-         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
+         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider, serviceType);
       }
 
    }
 
 }
 
-function createBoundingBox(layer){   
-   bounding_elem = layer.EX_GeographicBoundingBox[0]
-   var exGeographicBoundingBox = {
-      "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
-      "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
-      "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
-      "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
+function createBoundingBox(layer){
+   var bounding_elem;
+   var exGeographicBoundingBox;
+
+   if(layer.EX_GeographicBoundingBox){
+      bounding_elem = layer.EX_GeographicBoundingBox[0];
+      exGeographicBoundingBox = {
+         "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
+         "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
+         "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
+         "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
+      }
+   }else{
+      if(layer.LatLonBoundingBox){
+         bounding_elem = layer.LatLonBoundingBox[0].$;
+         exGeographicBoundingBox = {
+            "WestBoundLongitude": bounding_elem.miny,
+            "EastBoundLongitude": bounding_elem.maxy,
+            "SouthBoundLatitude": bounding_elem.minx,
+            "NorthBoundLatitude": bounding_elem.maxx
+         }
+      }
    }
    return exGeographicBoundingBox;
 }
