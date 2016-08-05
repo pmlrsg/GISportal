@@ -112,10 +112,12 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
          request_url = clean_url;
       }
       // If the information is already available then it will be loaded from the file instead of the middleware doing so.
+      gisportal.loading.increment();
       $.ajax({
          url:  request_url,
          dataType: 'text',
          success: function(layer){
+            gisportal.loading.decrement();
             $('.notifyjs-gisportal-info span:contains("Finding Layers")').closest('.notifyjs-wrapper').remove();
             gisportal.autoLayer.addGivenLayer(layer);
          },
@@ -125,9 +127,11 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
                   url:  clean_url,
                   dataType: 'text',
                   success: function(layer){
+                     gisportal.loading.decrement();
                      gisportal.autoLayer.addGivenLayer(layer);
                   },
                   error: function(e){
+                     gisportal.loading.decrement();
                      $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                      gisportal.addLayersForm.form_info = {};
                      gisportal.addLayersForm.refreshStorageInfo();
@@ -135,6 +139,7 @@ gisportal.autoLayer.findGivenLayer = function(wms_url, given_cache_refresh){
                });
             }
             else{
+               gisportal.loading.decrement();
                $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                gisportal.addLayersForm.form_info = {};
                gisportal.addLayersForm.refreshStorageInfo();

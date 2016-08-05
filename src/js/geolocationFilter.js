@@ -160,10 +160,10 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                   gisportal.geolocationFilter.cancelDraw();
                }, 1000);
                var wkt = Terraformer.WKT.parse(gisportal.wkt.writeGeometry(sketch.getGeometry()));
-               gisportal.currentSearchedBoundingBox = wkt;
                if(gisportal.projection != 'EPSG:4326'){
                   wkt.toGeographic();
                }
+               gisportal.currentSearchedBoundingBox = wkt;
                gisportal.geolocationFilter.drawCurrentFilter();
             }, this);
       }
@@ -197,7 +197,7 @@ gisportal.geolocationFilter.drawCurrentFilter = function(){
       var poly = gisportal.currentSearchedBoundingBox;
       var nice_poly = poly;
       if(gisportal.projection != 'EPSG:4326'){
-         poly.toMercator();
+         nice_poly.toMercator();
       }
       feature = gisportal.wkt.readFeature(gisportal.coordinatesToPolygon(nice_poly.coordinates));
       new_feature = new ol.Feature({geometry:feature.getGeometry(), overlayType:"filter"});
