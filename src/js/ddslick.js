@@ -49,7 +49,7 @@
             //If the plugin has not been initialized yet
             if (!data) {
 
-                var ddSelect = [], ddJson = options.data;
+                var ddSelect = [];
 
                 //Get data from HTML select options
                 obj.find('option').each(function () {
@@ -266,8 +266,6 @@
         //Get required elements
         var ddSelected = obj.find('.dd-selected'),
             ddSelectedValue = ddSelected.siblings('.dd-selected-value'),
-            ddOptions = obj.find('.dd-options'),
-            ddPointer = ddSelected.siblings('.dd-pointer'),
             selectedOption = obj.find('.dd-option').eq(index),
             selectedLiItem = selectedOption.closest('li'),
             settings = pluginData.settings,
@@ -308,9 +306,6 @@
         //Close options on selection
         close(obj);
 
-        //Adjust appearence for selected option
-        adjustSelectedHeight(obj);
-
         //Callback function on selection
         if (doCallback && typeof settings.onSelected == 'function') {
             settings.onSelected.call(this, pluginData);
@@ -340,9 +335,6 @@
             ddPointer.parent().addClass('active');
         }
 
-        //Fix text height (i.e. display title in center), if there is no description
-        adjustOptionsHeight(obj);
-
         var params = {
             "event" : "ddslick.open",
             "obj" : obj.attr('id')
@@ -355,25 +347,6 @@
         //Close drop down and adjust pointer direction
         obj.find('.dd-options').slideUp(50);
         obj.find('.dd-pointer').removeClass('dd-pointer-up').parent().removeClass('active');
-        var params = {
-            "event" : "ddslick.close",
-            "obj" : obj.attr('id')
-        };
-        //gisportal.events.trigger('ddslick.close', params);
-    }
-
-    //Private: Adjust appearence for selected option (move title to middle), when no desripction
-    function adjustSelectedHeight(obj) {
-
-        //Get height of dd-selected
-        var lSHeight = obj.find('.dd-select').css('height');
-
-        //Check if there is selected description
-        var descriptionSelected = obj.find('.dd-selected-description');
-        var imgSelected = obj.find('.dd-selected-image');
-        if (descriptionSelected.length <= 0 && imgSelected.length > 0) {
-            //obj.find('.dd-selected-text').css('lineHeight', lSHeight);        // this makes the line height expand each time the drop down is opened and closed
-        }
     }
 
     function reset(obj) {
@@ -384,19 +357,6 @@
         obj.find('.dd-selected').html(pluginData.settings.selectText);
         obj.find('.dd-option-selected').removeClass('dd-option-selected');
         obj.find('li.selected').removeClass('selected');
-    }
-
-    //Private: Adjust appearence for drop down options (move title to middle), when no desripction
-    function adjustOptionsHeight(obj) {
-        obj.find('.dd-option').each(function () {
-            var $this = $(this);
-            var lOHeight = $this.css('height');
-            var descriptionOption = $this.find('.dd-option-description');
-            var imgOption = obj.find('.dd-option-image');
-            if (descriptionOption.length <= 0 && imgOption.length > 0) {
-                //$this.find('.dd-option-text').css('lineHeight', lOHeight);        // this makes the line height expand each time the drop down is opened and closed
-            }
-        });
     }
 
 })(jQuery);

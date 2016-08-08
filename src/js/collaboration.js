@@ -50,7 +50,7 @@ collaboration.initDOM = function() {
                success: function(data) {
                   $('#collab-content').html(data);
                   $('.js-google-auth-button').click(function() {
-                     var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                     window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                   }); 
                },
             });
@@ -151,7 +151,7 @@ collaboration.initSession = function() {
       url: "js-libs/webrtc_adapter/adapter.js",
       dataType: 'script',
       success: function(script){
-         eval(script);
+         eval(script); // jshint ignore:line
          $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
          $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", compatable: adapter.browserDetails.version && adapter.browserDetails.version >= adapter.browserDetails.minVersion}));
          webRTC.pc_config = { 
@@ -325,8 +325,6 @@ collaboration.initSession = function() {
          });
          
          socket.on('room.created', function(data) {
-            var roomId = data.roomId;
-            console.log('Room created: '+ data.roomId);
             collaboration.roomId = data.roomId;
             
             collaboration.setStatus('connected', 'You are the presenter of room '+ data.roomId.toUpperCase());
@@ -462,7 +460,6 @@ collaboration.initSession = function() {
             message_data.email = "You";
             var id = data.sender;
             var me = false;
-            var this_message_div = "";
             if(id == socket.io.engine.id){
                me = true;
                message_data.side = "right";
@@ -611,8 +608,6 @@ collaboration.initSession = function() {
             if(params_msg && params_msg.type){
                params_msg = params_msg.type;
             }
-            var log = data.message || params_msg;
-            console.log('Client received message:', log);
             webRTC.messageCallback(data);
          });
 
@@ -696,7 +691,7 @@ collaboration.buildMembersList = function(data) {
                   success: function(data) {
                      $('#collab-content').html(data);
                      $('.js-google-auth-button').click(function() {
-                        var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                        window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                      });
                   },
                });
@@ -970,7 +965,6 @@ collaboration._emit = function(cmd, params, force) {
 };
 
 collaboration.userAuthorised = function() {
-	console.log('user authorised');
 	
 	// add the collaboration template into the mix...
 	var rendered = gisportal.templates.collaboration();
@@ -987,8 +981,6 @@ collaboration.userAuthorised = function() {
 
 collaboration.log = function(msg) {
    if (collaboration.displayLog) {
-      var notificationText = $(".notifyjs-gisportal-collab-notification-base div.title");
-
       $('.history-log').prepend("<p>" + msg + "</p>");
       $('.history-log :nth-child(20)').remove();
    }

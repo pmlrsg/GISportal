@@ -228,3 +228,24 @@ table.stripe td:nth-child(odd) {
 .export-raw-slideout{
   padding: 19px;
 }
+
+.js-geolocation-filter{
+  padding: 0px 10px;
+}
+
+.js-geolocation-filter-btn{
+  cursor: pointer;
+}
+
+.js-place-search-filter-radius{
+  width:50px !important;
+}
+
+.js-geolocation-filter-btn.searchInProgress {
+  background-color: #fff;
+  color: $secondary-background;
+}
+
+.js-geolocation-filter-btn{
+  border: 1px solid $secondary-background;
+}

@@ -183,7 +183,6 @@ gisportal.walkthrough.loadEditForm = function(){
 
    // Deletes a step in the walkthrough.
    $('.js-delete-step').on('click', function(){
-      var _this = this;
       var step = parseInt($(this).data('step'));
       $(this).notify({'title':"Are you sure you want to delete this step?\nDeleting this step may cause others to not work if they are dependant on this step. Remove any dependant steps and test the walkthrough.", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-delete-step", autoHide:false});
       
@@ -211,7 +210,6 @@ gisportal.walkthrough.loadEditForm = function(){
 
    // Adds a step in the walkthrough.
    $('.js-add-step').on('click', function(){
-      var _this = this;
       var step = parseInt($(this).data('step')) + 1;
       
       //hide notification
@@ -601,5 +599,5 @@ gisportal.walkthrough.loadManagementPanel = function(){
 };
 
 gisportal.walkthrough.openVisualPortalWalkthrough = function(walkthrough_name){
-   var walkthrough_popup = window.open('https://visual.pml.ac.uk?walkthrough_name=' + walkthrough_name + '&walkthrough_owner=visual.pml.ac.uk&walkthrough_popup=true','Walkthrough','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
+   window.open('https://visual.pml.ac.uk?walkthrough_name=' + walkthrough_name + '&walkthrough_owner=visual.pml.ac.uk&walkthrough_popup=true','Walkthrough','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
 };

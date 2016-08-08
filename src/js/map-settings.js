@@ -224,8 +224,11 @@ gisportal.createBaseLayers = function() {
       tileElement.onerror = function() {
          gisportal.loading.decrement();
       };
+      if(src.startsWith("http://")){
+         src = gisportal.ImageProxyHost + encodeURIComponent(src);
+      }
       tileElement.src = src;
-   }
+   };
 
    gisportal.baseLayers = {
       EOX: new ol.layer.Tile({
@@ -468,10 +471,10 @@ gisportal.setProjection = function(new_projection) {
       gisportal.selectedRegionProjectionChange(old_projection, new_projection);
    }
    gisportal.projection = map.getView().getProjection().getCode();
+   gisportal.geolocationFilter.drawCurrentFilter();
 };
 
 gisportal.setView = function(centre, extent, projection) {
-   var current_zoom = map.getView().getZoom();
    var min_zoom = 3;
    var max_zoom = 12;
    if (projection == 'EPSG:3857') max_zoom = 19;

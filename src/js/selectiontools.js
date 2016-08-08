@@ -44,38 +44,12 @@ gisportal.selectionTools.init = function()  {
       map:map
    });
 
-   var feature;
-   // map.on('pointermove', function(evt) {
-   //    feature = null;
-   //    var features = gisportal.vectorLayer.getSource().getFeaturesAtCoordinate(evt.coordinate);
-   //    if (features.length) {
-   //       feature = features[0];
-   //    }
-   // });
-      // map.on('pointermove', function(evt) {
-      //  var pixel = evt.pixel;
-      // map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-      //    console.log(feature);
-      //    console.log(layer);
-       
-         
-      // //gisportal.featureOverlay.getSource().clear()
-
-      //   // gisportal.featureOverlay.getSource().addFeature(feature)
-      // });
-
-  // });
-   map.on('postrender', function(renderEvent) {
-      if (feature) {
-         //renderEvent.vectorContext.renderFeature(feature, highlightStyle);
-      }
-   });
-
    gisportal.wkt = new ol.format.WKT();
 };
 
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
+   $(document).off( 'keydown' );
    sketch = null;
    if(draw){
       map.removeInteraction(draw);
@@ -162,20 +136,6 @@ gisportal.selectionTools.initDOM = function()  {
       };
       gisportal.events.trigger("removeGeoJSON.clicked", params);
    });
-
-
-   // TODO, perhaps...
-   // // map image export - problems with cross origin tainting the canvas are preventing this from working. 
-   // // With cross origin set to 'anonymous' it should work but the headers at rsg.pml.ac.uk then prevent the 
-   // // country borders from loading
-   // $('<button class="js-export-image" title="Download current view as image" download="map.png"><span class="icon-download-10"></span></button>').appendTo('.ol-full-screen');
-   // $('.js-export-image').on('click', function(e) {
-   //    map.once('postcompose', function(event) {
-   //    var canvas = event.context.canvas;
-   //       $('.js-export-image').href = canvas.toDataURL('image/png');
-   //    });
-   //    map.renderSync();
-   // })
 
 };
 
@@ -402,7 +362,6 @@ gisportal.selectionTools.toggleTool = function(type)  {
 
          draw.on('drawend',
             function(evt) {
-               gisportal.selectionTools.ROIAdded(sketch);
                var coordinates = sketch.getGeometry().getCoordinates();
                for(var poly in coordinates){
                   for(var coor in coordinates[poly]){
@@ -410,6 +369,20 @@ gisportal.selectionTools.toggleTool = function(type)  {
                         coordinates[poly][coor][num] = Math.round(coordinates[poly][coor][num] * 1000 ) / 1000;
                      }
                   }
+               }
+               if(gisportal.geolocationFilter.filteringByPolygon){
+                  setTimeout(function() {
+                     cancelDraw();
+                     gisportal.selectionTools.toggleTool('None'); // So that people don't misclick
+                  }, 300);
+                  var wkt = Terraformer.WKT.parse(gisportal.wkt.writeGeometry(sketch.getGeometry()));
+                  gisportal.currentSearchedBoundingBox = wkt;
+                  if(gisportal.projection != 'EPSG:4326'){
+                     wkt.toGeographic();
+                  }
+                  gisportal.configurePanel.filterLayersByGeometry(wkt);
+               }else{
+                  gisportal.selectionTools.ROIAdded(sketch);
                }
                var params = {
                   "event": "olDraw.drawend",
@@ -460,6 +433,7 @@ gisportal.selectionTools.updateROI = function()  {
       gisportal.vectorLayer.getSource().clear();
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       cancelDraw();
       gisportal.vectorLayer.getSource().addFeature(this_feature);
       if(!gisportal.current_view || !gisportal.current_view.noPan){

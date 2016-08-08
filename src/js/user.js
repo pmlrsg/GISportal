@@ -39,7 +39,7 @@ gisportal.user.initDOM = function() {
                success: function(data) {
                   $('.js-user-dashboard').html(data); 
                   $('.js-google-auth-button').click(function() {
-                     var authWin = window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
+                     window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
                   });
                   gisportal.walkthrough.loadWalkthroughList();
                },

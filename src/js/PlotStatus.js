@@ -30,8 +30,6 @@ gisportal.graphs.PlotStatus = (function(){
      * says the status of the plot has changed
      */
    PlotStatus.prototype.rebuildElement = function(){
-      var _this = this;
-
       // Get the plot
       var plot = this.plot();
 

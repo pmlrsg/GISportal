@@ -68,6 +68,10 @@
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-arcgis-parser/1.0.4/terraformer-arcgis-parser.min.js"></script>
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.0.0/terraformer-wkt-parser.min.js"></script>
 
+<!-- Geocoder search for OL3 -->
+<link href="//cdn.jsdelivr.net/openlayers.geocoder/latest/ol3-geocoder.min.css" rel="stylesheet">
+<script src="//cdn.jsdelivr.net/openlayers.geocoder/latest/ol3-geocoder.js"></script>
+
 <!-- Custom JavaScript -->
 <script type="text/javascript" src="@@GISportal.min.js"></script>
 
@@ -211,7 +215,8 @@
             <li class="">
               <div class="panel-tab no-gap active clearix instructions">
                 <span>
-                  Choose an indicator below by searching or using the dropdowns. 
+                  <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
+                  <p>You can also filter the results by searching for a region or drawing a bounding box.</p>
                 </span>
               </div>
             </li>
@@ -219,6 +224,25 @@
                <div class="panel-tab no-gap active full-height">
                   <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="js-search search">
                   <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+               </div>
+            </li>
+            <li>
+               <div class="panel-tab no-gap active js-geolocation-filter">
+                  <label class="brand secondary extra-small js-place-search-filter js-geolocation-filter-btn" title="Search for a place to filter">
+                     <span class=" icon-magnifier"></span>
+                     Filter by Place
+                  </label>
+                  <label>Radius:</label>
+                  <input type="text" value="1" class="js-place-search-filter-radius"/>Km
+                  <br/>
+                  <label class="brand secondary extra-small js-box-search-filter js-geolocation-filter-btn" title="Draw an area to filter">
+                     <span class=" icon-magnifier"></span>
+                     Filter by Polygon
+                  </label>
+                  <label class="brand secondary extra-small js-polygon-search-filter js-geolocation-filter-btn" title="Draw an area to filter">
+                     <span class=" icon-magnifier"></span>
+                     Filter by Irregular Polygon
+                  </label>
                </div>
             </li>
             <li>

@@ -37,6 +37,9 @@ gisportal.stateLocation = gisportal.middlewarePath + '/state';
 // Define a proxy for the map to allow async javascript http protocol requests
 gisportal.ProxyHost = gisportal.middlewarePath + '/settings/proxy?url=';
 
+// Define a proxy for the map to allow async javascript http protocol requests
+gisportal.ImageProxyHost = gisportal.middlewarePath + '/settings/img_proxy?url=';
+
 // Stores the data provided by the master cache file on the server. This 
 // includes layer names, titles, abstracts, etc.
 gisportal.cache = {};
@@ -150,13 +153,8 @@ gisportal.loadVectorLayers = function() {
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
-      success: gisportal.initVectorLayers,
-      error: function(e){
-            console.log("No Vector Layers Found");
-         }
-
+      success: gisportal.initVectorLayers
    });
-
 };
 
 
@@ -164,7 +162,6 @@ gisportal.createVectorLayers = function() {
    gisportal.vlayers = [];
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
-      //console.log(vector);
       vector.services.wfs.vectors.forEach(function( v ){
       processVectorLayer(vector.services.wfs.url, v);
 
@@ -195,16 +192,12 @@ gisportal.createVectorLayers = function() {
          "descriptiveName" : vector.tags.niceName,
          "unit" : vector.unit
       };
-      //console.log("  CREATING WITH VECTOR FUNCTION   ");
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
 
 gisportal.layers[vectorOptions.id] = vectorLayer;
 
-      //console.log(vectorLayer);
       vectorLayerOL = vectorLayer.createOLLayer();
-      //vectorLayer.openlayers.anID = vectorLayerOL;
-      //console.log(vectorLayerOL);
       gisportal.vlayers.push(vectorLayerOL);
    }
 
@@ -215,8 +208,6 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
  * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
-   var layers = [];
-
    // Loop over each server
    gisportal.cache.wmsLayers.forEach(function( server ){
       processServer( server );
@@ -300,8 +291,6 @@ gisportal.createOpLayers = function() {
       };
 
       var layer = new gisportal.layer( layerOptions );
-//console.log("adding info for Indicator : ");
-            //console.log(layer);
       // If theres a duplicate id, increase a counter
       var postfix = "";
       while( gisportal.layers[layer.id + postfix ] !== void(0) )
@@ -325,9 +314,7 @@ gisportal.createOpLayers = function() {
       try{
          gisportal.layers[id].mergeNewParams({STYLES:style});
          gisportal.refinePanel.layerFound(id, style);
-      }catch(e){
-         console.log("Cannot add that layer!");
-      }
+      }catch(e){}
    }
    gisportal.tempSelectedLayers = [];
 
@@ -336,9 +323,7 @@ gisportal.createOpLayers = function() {
       id = gisportal.addLayersForm.selectedLayers[i];
       try{
          gisportal.refinePanel.layerFound(id);
-      }catch(e){
-         console.log("Cannot add that layer!");
-      }
+      }catch(e){}
    }
    gisportal.addLayersForm.selectedLayers = [];
 
@@ -442,9 +427,7 @@ gisportal.refreshDateCache = function() {
       }
    });
    
-   gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);  
-   
-   //console.info('Global date cache now has ' + gisportal.enabledDays.length + ' members.'); // DEBUG
+   gisportal.enabledDays = gisportal.utils.arrayDeDupe(gisportal.enabledDays);
 };
 
 /**
@@ -517,11 +500,14 @@ gisportal.mapInit = function() {
 
    map.addInteraction(gisportal.dragAndDropInteraction);
 
+   gisportal.geolocationFilter.init();
+
    gisportal.dragAndDropInteraction.on('addfeatures', function(event) {
       // Make sure only one feature is loaded at a time
       gisportal.vectorLayer.getSource().clear();
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       gisportal.vectorLayer.getSource().addFeatures(event.features);
       gisportal.currentSelectedRegion = gisportal.wkt.writeFeatures(event.features);
       cancelDraw();
@@ -541,9 +527,8 @@ gisportal.mapInit = function() {
          fillColour = 'rgba(142,142,142,1)';
          strokeColour = "white";
       }else{
-         //If there is not a recognised overlay type it will set the colour to red
-         fillColour = 'red';
-         strokeColour = 'red';
+         fillColour = 'rgba(0, 77, 167, 0.4)';
+         strokeColour = "white";
       }
       if(feature.getGeometry().getType() == "Point"){
          return [new ol.style.Style({
@@ -662,7 +647,8 @@ gisportal.mapInit = function() {
 
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e){
-      var response = '';
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
       if(gisportal.selectionTools.isSelecting){
@@ -682,8 +668,7 @@ gisportal.mapInit = function() {
             // Only does it for one feature
             return;
          });
-      }
-      else {
+      }else if(!gisportal.geolocationFilter.draw){
          gisportal.displayDataPopup(e.pixel);
       }
    });
@@ -713,8 +698,8 @@ gisportal.mapInit = function() {
       var params;
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
-         if (feature && _.keys(feature.getProperties()).length >1 ) {
-            var geom = feature.getGeometry();
+         var overlayType = feature.getProperties().overlayType;
+         if (feature && _.keys(feature.getProperties()).length >1 && overlayType != "filter" && overlayType != "selected") {
             _.each(gisportal.selectedFeatures, function(feature) {
             });
             var tlayer;
@@ -758,6 +743,8 @@ gisportal.mapInit = function() {
    };
 
    map.on("moveend", function(data) {
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
       var params = { 
@@ -1015,9 +1002,7 @@ gisportal.loadState = function(state){
       if (typeof available_keys[i] === "object") indicator = gisportal.layers[available_keys[i].id];
       else indicator = gisportal.layers[available_keys[i]];
       if (indicator && !gisportal.selectedLayers[indicator.id]) {
-         if(indicator.serviceType == "WFS"){
-            console.log("Please load the vector properly");
-         }else{
+         if(indicator.serviceType != "WFS"){
             var state_indicator = state.selectedLayers[indicator.id];
             gisportal.configurePanel.close();
             // this stops the map from auto zooming to the max extent of all loaded layers
@@ -1510,11 +1495,7 @@ gisportal.main = function() {
       // for retrieving a state object.
       var stateID = gisportal.utils.getURLParameter('state');
       if(stateID !== null) {
-         //console.log('Retrieving State...');
          gisportal.ajaxState(stateID);
-      }
-      else {
-         //console.log('Loading Default State...');
       }
 
       collaboration.initDOM();
@@ -1539,10 +1520,6 @@ gisportal.ajaxState = function(id) {
       dataType: 'json',
       success: function( data ) {         
          gisportal.setState( data );
-         //console.log('Success! State retrieved');
-      },
-      error: function( request ){
-         //console.log('Error: Failed to retrieved state. The server returned a ' + data.output.status);
       }
    });
 };
@@ -1937,7 +1914,6 @@ gisportal.loadBrowseCategories = function(data){
    for(category in gisportal.config.hiddenCategories){
       var deleteCat = gisportal.config.hiddenCategories[category];
       delete gisportal.browseCategories[deleteCat];
-      console.log("Removing '" + deleteCat + "' category");
    }
    // This makes sure that the proritised categories ARE prioritised
    var priority = gisportal.config.categoryPriorities;
