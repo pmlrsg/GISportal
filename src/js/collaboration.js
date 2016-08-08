@@ -151,7 +151,7 @@ collaboration.initSession = function() {
       url: "js-libs/webrtc_adapter/adapter.js",
       dataType: 'script',
       success: function(script){
-         eval(script);
+         eval(script); // jshint ignore:line
          $('#collab-chatPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-messenger"]);
          $('#collab-videoPanel div.panel-container-solid-backdrop').html('').html(gisportal.templates["collaboration-video"]({"insecure": window.location.protocol != "https:", compatable: adapter.browserDetails.version && adapter.browserDetails.version >= adapter.browserDetails.minVersion}));
          webRTC.pc_config = { 
