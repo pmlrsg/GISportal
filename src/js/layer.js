@@ -500,6 +500,9 @@ gisportal.layer = function( options ) {
     */
    this.getMetadata = function() {
       var layer = this;
+      if(layer.serviceType == "WMTS"){
+         return false;
+      }
       $.ajax({
          type: 'GET',
          url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=layerDetails&version=1.1.0&service=wms&layerName=' + layer.urlName + '&coverage=' + layer.id + '&request=GetMetadata'),
@@ -583,7 +586,7 @@ gisportal.layer = function( options ) {
             }
          }
          if(this.serviceType =="WMS"){
-            layer = new ol.layer.Tile({
+            return new ol.layer.Tile({
                title: this.displayName(),
                id: this.id,
                type: 'OLLayer',
@@ -621,26 +624,32 @@ gisportal.layer = function( options ) {
                })
             });
          }else if(this.serviceType =="WMTS"){
-            layer = new ol.layer.Tile({
+            var projection = ol.proj.get(gisportal.projection);
+            var projectionExtent = projection.getExtent();
+            var size = ol.extent.getWidth(projectionExtent) / 256;
+            var resolutions = new Array(14);
+            var matrixIds = new Array(14);
+            for (var z = 0; z < 14; ++z) {
+               // generate resolutions and matrixIds arrays for this WMTS
+               resolutions[z] = size / Math.pow(2, z);
+               matrixIds[z] = z;
+            }
+            return new ol.layer.Tile({
                title: this.displayName(),
                id: this.id,
                type: 'OLLayer',
                source: new ol.source.WMTS({
-                  url:  this.wmsURL,
-                  crossOrigin: null,
-                  params: {
-                     LAYERS: this.urlName,
-                     TRANSPARENT: true,
-                     wrapDateLine: true,
-                     SRS: gisportal.projection,
-                     VERSION: '1.1.1',
-                     STYLES: style,
-                     NUMCOLORBANDS: this.colorbands,
-                     ABOVEMAXCOLOR: this.aboveMaxColor,
-                     BELOWMINCOLOR: this.belowMinColor,
-                  },
-                  // this function is needed as at the time of writing this there is no 'loadstart' or 'loadend' events 
-                  // that existed in ol2. It is planned so this function could be replaced in time
+                  url: this.wmsURL,
+                  matrixSet: gisportal.projection,
+                  format: 'image/png',
+                  projection: gisportal.projection,
+                  tileGrid: new ol.tilegrid.WMTS({
+                     origin: ol.extent.getTopLeft(projectionExtent),
+                     resolutions: resolutions,
+                     matrixIds: matrixIds
+                  }),
+                  style: 'default',
+                  wrapX: true,
                   tileLoadFunction: function(tile, src) {
                      gisportal.loading.increment();
 
@@ -661,13 +670,7 @@ gisportal.layer = function( options ) {
          }else{
             return false;
          }
-         
-
-      } else if(this.type == 'refLayers') {
-         // intended for WFS type layers that are not time related
       }
-      
-      return layer;
    };
   
    /**
@@ -849,7 +852,6 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
    if (layer.serviceType=="WFS"){
-
       layer.init(options,layer);
    }else {
       $.ajax({
@@ -877,28 +879,30 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          time = '&time=' + new Date(layer.selectedDateTime).toISOString();
       }
       catch(e){}
-      $.ajax({
-         url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
-         dataType: 'json',
-         success: function( data ) {
-            // If there is a min & max value returned the label and input are both shown.
-            if(typeof(data.min) == "number" && typeof(data.max) == "number"){
-               layer.autoMinScaleVal = data.min;
-               layer.autoMaxScaleVal = data.max;
+      if(layer.serviceType=="WMS"){
+         $.ajax({
+            url: gisportal.ProxyHost + encodeURIComponent(layer.wmsURL + 'item=minmax&layers=' + layer.urlName + time + '&bbox=' + bbox + '&srs=' + gisportal.projection + '&width=50&height=50&request=GetMetadata'),
+            dataType: 'json',
+            success: function( data ) {
+               // If there is a min & max value returned the label and input are both shown.
+               if(typeof(data.min) == "number" && typeof(data.max) == "number"){
+                  layer.autoMinScaleVal = data.min;
+                  layer.autoMaxScaleVal = data.max;
+               }
             }
-         }
-      });
-      $.ajax({
-         method: 'POST',
-         url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
-         data: {tags: layer.tags, order: gisportal.config.markdownPriorities},
-         success: function( data ) {
-            if(data){
-               layer.metadataHTML = data;
-               $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
-            }
-         }
-      });
+         });
+      }
    }
+   $.ajax({
+      method: 'POST',
+      url: gisportal.middlewarePath + "/settings/get_markdown_metadata",
+      data: {tags: layer.tags, order: gisportal.config.markdownPriorities},
+      success: function( data ) {
+         if(data){
+            layer.metadataHTML = data;
+            $('.more-info-row[data-id="' + layer.id + '"]').toggleClass('hidden', false);
+         }
+      }
+   });
 };
 
