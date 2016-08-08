@@ -32,6 +32,7 @@ var coreFiles = [
     "src/js/autoLayer.js",
     "src/js/addLayersForm.js",
     "src/js/editLayersForm.js",
+    "src/js/geolocationFilter.js",
     "src/js/view.js",
     "src/js/user.js",
     "src/js/collaboration.js",

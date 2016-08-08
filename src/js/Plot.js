@@ -62,11 +62,9 @@ gisportal.graphs.Plot =(function(){
    */
    Plot.prototype.addComponent = function( component ){
       // Check the plot type id allowed more then 1 series
-      if(this.components().length >= this.maxComponents )
+      if(this.components().length >= this.maxComponents ){
          return new Error( "You already have the maximum number of series for this graph type" );
-
-      var plot = this;
-      
+      }
       // Does the current graph title match the generated one ?
       // If it does then remember that because we want to update
       // it when the new component has been added
@@ -78,10 +76,12 @@ gisportal.graphs.Plot =(function(){
       // Was the yAxis set manually?
       // If not auto set it
       if( !component.yAxis ){
-         if( this._components.length === 0 )
+         if( this._components.length === 0 ){
             component.yAxis = 1;
-         else
+         }
+         else{
             component.yAxis = 2;
+         }
       }
 
       // Add the component to the list of components
@@ -96,8 +96,9 @@ gisportal.graphs.Plot =(function(){
 
       // Update the graph title is the user hasnt
       // edited it
-      if( updateGraphTitle )
+      if( updateGraphTitle ){
          this.title( this.getGraphTitle( this._components ) );
+      }
    };
    
    /**
@@ -108,8 +109,9 @@ gisportal.graphs.Plot =(function(){
       var index = this._components.indexOf( component );
       
       // Is the component in the components array ?
-      if( index == -1 )
+      if( index == -1 ){
          return;
+      }
 
       // Does the current graph title match the generated one ?
       // If it does then remember that because we want to update
@@ -122,8 +124,9 @@ gisportal.graphs.Plot =(function(){
       this._components.splice( index, 1);
 
       // Update the graph title
-      if( updateGraphTitle )
+      if( updateGraphTitle ){
          this.title( this.getGraphTitle( this._components ) );
+      }
       
       // Event emit so listeners know it went
       this.emit('component-removed', { component: component });
@@ -193,12 +196,14 @@ gisportal.graphs.Plot =(function(){
       this._components.forEach(function( component ){
          var layer = gisportal.layers[ component.indicator ];
 
-         if( ! layer.provider || ! layer.provider.logo )
+         if( ! layer.provider || ! layer.provider.logo ){
             return;
+         }
 
          var providerLogo = gisportal.middlewarePath + layer.provider.logo;
-         if( providers.indexOf( providerLogo ) == -1 )
+         if( providers.indexOf( providerLogo ) == -1 ){
             providers.push( providerLogo );
+         }
       });
 
       plotStyle.logos = providers;
@@ -367,6 +372,8 @@ gisportal.graphs.Plot =(function(){
                "coverage"  : layer.urlName,
                // Layer ID
                "layer_id"  : layer.id,
+               // The currently selected layer style
+               "layer_style"  : layer.style,
                // Time range of the data
                // Rounded so that the requests stay the same over collaboration
                "t_bounds"  : [this.tBounds()[0].toISOString().split("T")[0], this.tBounds()[1].toISOString().split("T")[0]],

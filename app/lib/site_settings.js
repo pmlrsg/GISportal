@@ -88,6 +88,25 @@ router.get('/app/settings/proxy', function(req, res) {
    });
 });
 
+router.get('/app/settings/img_proxy', function(req, res){
+   var url = decodeURI(req.query.url) // Gets the given URL
+   jimp.read(url, function(err, image){ // Gets the image file from the URL
+      if (err){
+         utils.handleError(err, res);
+      }else{
+         image.getBuffer(jimp.MIME_PNG, function(err2, image2){ // Buffers the image so it sends correctly
+            if(err2){
+               utils.handleError(err2, res);
+            }else{
+               res.setHeader('Content-type', 'image/png'); // Makes sure its a png
+               res.send(image2); // Sends the image to the browser.
+            }
+            
+         });
+      }
+   });
+});
+
 router.get('/app/settings/config', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var config_path = path.join(MASTER_CONFIG_PATH, domain, "config.js");

@@ -178,7 +178,7 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
    if (base.length > 0){
       return base + parameters;
    }else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + 'format=image/png';
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + '&format=image/png';
 };
 
 /**
@@ -340,7 +340,6 @@ gisportal.scalebars.validateScale = function(id, newMin, newMax, force)  {
  * @param {string} id - The id of the layer
  */
 gisportal.scalebars.updateScalebar = function(id)  {
-   var scale = this.getScalebarDetails(id);
    var indicator = gisportal.layers[id];
    
    var params = {

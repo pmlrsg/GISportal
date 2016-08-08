@@ -18,9 +18,6 @@ gisportal.configurePanel = {};
 gisportal.configurePanel.refreshData = function()  {
    this.searchInit();
 
-   var groupedTags = gisportal.groupTags();
-   var categories = this.browseCategories;
-
    if(_.size(gisportal.browseCategories) > 0 && gisportal.config.browseMode != 'simplelist'){
       if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'selectlist') {
          this.renderTagsAsSelectlist();
@@ -122,9 +119,6 @@ gisportal.configurePanel.reset = function(){
  * is added, this function automatically gets called.
  */
 gisportal.configurePanel.buildMap = function(indicator)  {
-   //console.log("bla blah");
-   //console.log(indicator);
-
    if (indicator) gisportal.refinePanel.open(indicator);
    else gisportal.indicatorsPanel.open();
 };
@@ -308,7 +302,6 @@ gisportal.groupNames = function(layers)  {
  *
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
-   var grouped = gisportal.groupTags();
    var addable_layers = false;
    if(gisportal.user.info.permission != "guest"){
       for(var layer in gisportal.layers){
@@ -330,11 +323,17 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
          $(this).html("less info...");
          message_block.slideDown('slow');
       }
-      gisportal.events.trigger('moreInfo.clicked');
+      var params = {
+         "event" : "moreInfo.clicked"
+      };
+      gisportal.events.trigger('moreInfo.clicked', params);
    });
-   $('button#reset-list').on('click', function() {
+   $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
-      gisportal.events.trigger('resetList.clicked');
+      var params = {
+         "event" : "resetList.clicked"
+      };
+      gisportal.events.trigger('resetList.clicked', params);
    });
 
    // Listener is added to the add layers button
@@ -408,9 +407,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       var params = {
          "event" : "moreInfo.clicked"
       };
-      gisportal.events.trigger('moreInfo.clicked');
+      gisportal.events.trigger('moreInfo.clicked', params);
    });
-   $('button#reset-list').on('click', function() {
+   $('button.reset-list').on('click', function() {
       gisportal.configurePanel.resetPanel();
       var params = {
          "event" : "resetList.clicked"
@@ -451,11 +450,8 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('#js-category-filter-select').ddslick({
       data: categories,
       onSelected: function(data) {
-         //console.log(data.selectedData);
          if(data.selectedData.value=="vector"){
-            //console.log("adding vector layers now");
             targetDiv.html('');
-            gisportal.addVectorLayers(gisportal.vlayers);
             gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
          }
          else if (data.selectedData) {
@@ -496,6 +492,13 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
          gisportal.refinePanel.layerFound(data.selectedData.text);
       }
    });
+   $('button.reset-list').on('click', function() {
+      gisportal.configurePanel.resetPanel();
+      var params = {
+         "event" : "resetList.clicked"
+      };
+      gisportal.events.trigger('resetList.clicked', params);
+   });
 
    for (layer in gisportal.layers){
       info = gisportal.templates['tooltip-refine-external-details'](gisportal.layers[layer]);
@@ -529,7 +532,6 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
       tagNames.sort(); 
    } 
    var catName = gisportal.browseCategories[cat];
-   var catNameKeys = Object.keys(gisportal.browseCategories);
 
    var addIndicators = function(d)  {
       var tmp = {};
@@ -686,7 +688,6 @@ gisportal.configurePanel.search = function(val)  {
    
    $('.js-search-results').html(rendered);
    $('.js-search-results a').click(function() {
-      //console.log("clicked/..................");
       gisportal.configurePanel.toggleIndicator($(this).text(), '');
       $('.js-search-results').css('display', 'none');
       var params = {
@@ -704,8 +705,6 @@ gisportal.configurePanel.search = function(val)  {
       $('[class*="icon-"]').removeClass('icon-sombrero');
       $('[class*="icon-"]').removeClass('jiggly');
    }
-   var selected = [];
-
 };
 
 /**
@@ -740,8 +739,6 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
  * @param {string} name - The name of the layer
  */
 gisportal.configurePanel.hasIndicator = function(name)  {
-   var index = -1;
-   var id;
    for (var i in gisportal.layers)  {
       if (gisportal.layers[i].name.toLowerCase() === name.toLowerCase()) return gisportal.layers[i].id;
    }
@@ -777,7 +774,12 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
       // Reloads the browse categories
       gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
+      if(_.size(given_layers) === 0){
+         $('.filtered-list-error-message').toggleClass('hidden', false);
+         $('.js-category-filter-options-li').hide();
+      }else{
          $('.filtered-list-message').show();
+      }
       for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
@@ -789,6 +791,9 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);
       gisportal.storage.set("form_info", undefined);
+      gisportal.currentSearchedPoint = null;
+      gisportal.currentSearchedBoundingBox = null;
+      gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
       // Ensures the panel is only reset when it really needs to be
       if(gisportal.original_layers && _.size(gisportal.original_layers) > 0 && gisportal.layers != gisportal.original_layers){
          gisportal.layers = gisportal.original_layers; // Resets back to the original layers
@@ -819,6 +824,29 @@ gisportal.configurePanel.filterLayersList = function(layerFilter){
          if(_.isMatch(layers_obj[layer], layerFilter[filter])){
             filteredLayers[layer] = layers_obj[layer];
          }
+      }
+   }
+   gisportal.configurePanel.resetPanel(filteredLayers);
+};
+
+gisportal.configurePanel.filterLayersByGeometry = function(geom1){
+   var layers_obj;
+   if(_.size(gisportal.original_layers) > 0){
+      layers_obj = gisportal.original_layers;
+   }else{
+      layers_obj = gisportal.layers;
+   }
+
+   var filteredLayers = {};
+   for(var layer in layers_obj){
+      var indicator = layers_obj[layer];
+      var layerBoundingBox = indicator.exBoundingBox.WestBoundLongitude + "," +
+            indicator.exBoundingBox.SouthBoundLatitude + "," +
+            indicator.exBoundingBox.EastBoundLongitude + "," +
+            indicator.exBoundingBox.NorthBoundLatitude;
+      geom2 = Terraformer.WKT.parse( gisportal.indicatorsPanel.bboxToWKT(layerBoundingBox) );
+      if(geom2.intersects(geom1)){
+         filteredLayers[layer] = indicator;
       }
    }
    gisportal.configurePanel.resetPanel(filteredLayers);

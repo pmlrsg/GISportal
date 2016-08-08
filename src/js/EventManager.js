@@ -1,4 +1,4 @@
-(function (window) {"use strict";
+(function (window) {
 
   // (C) WebReflection - Mit Style License
   // compatible with both yuno and all browsers
@@ -21,8 +21,7 @@
       return i === length ? -1 : i - 1;
     },
     slice = methods.slice,
-    i = 0,
-    undefined
+    i = 0
   ;
 
   try {
@@ -68,8 +67,9 @@
       handlers = getHandlers(self, type),
       i = indexOf.call(handlers, listener)
     ;
-    //Not sure what this line does, JShint complains!
-    -1 < i && handlers.splice(i, 1);
+    if(i >= 0){
+      handlers.splice(i, 1);
+    }
     if (!handlers.length) delete self._events[type];
     return self;
   }

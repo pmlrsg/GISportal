@@ -12,26 +12,6 @@ gisportal.vectorStyles.coloursInUse = [];
 
 gisportal.vectorStyles.binSize = 10;
 
-gisportal.vectorStyles.createOLStyle = function(options){
-	
-
-	var defaults = {
-        
-        styleType: null, //  one from [numerical, catagorised]
-        parameter: null, // the vector feature parameter to be styled
-        catagories: null, // if styleType is catagories this should be array of catagories ["catagory1","catagory2"]
-        vectorType: "polygon", // one from [point|polygon|line],
-        preferredColour: null // if a preffered colour is selected provide it here as rgba string "rgba(125,125,125,0.5)"
-       
-    };
-
-
-    var opts = $.extend({}, defaults, options);
-
-    //console.log(opts);
-
-};
-
 gisportal.vectorStyles.createPalette = function(startingColour, steps){
    var startColour;
 	if (startingColour in gisportal.vectorStyles.startingColours)
@@ -126,7 +106,6 @@ gisportal.vectorStyles.genColour = function(opacity) {
       var g = Math.floor(Math.random() * (255 - 0) + 0);
       var b = Math.floor(Math.random() * (255 - 0) + 0);
     var colour = 'rgba('+ r.toString() +',' + g.toString() +',' + b.toString() + ',' +opacity.toString() + ')';
-    //console.log(colour);
     return colour;
 };
 

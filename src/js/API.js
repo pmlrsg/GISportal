@@ -157,7 +157,6 @@ gisportal.api['addLayersForm.input'] = function(data, options){
 	options = options || {};
 	var input = data.inputValue;
    var field = data.field;
-   var add_elem = $('.js-add-layer-server[data-layer="' + layer + '"][data-server="' + server + '"]');
 	if(options.describeOnly){
 		return "'" + input + "' input to '" + field +  "' field.";
 	}
@@ -430,8 +429,6 @@ gisportal.api['view.loaded'] = function(data, options){
   */
 gisportal.api['view.removed'] = function(data, options){
 	options = options || {};
-	var view = data.view_name;
-	var nice_val = $('.js-views-list').find('[value="' + view + '"]').html() || view;
 
 	if(options.describeOnly){
 		return 'View Removed';
@@ -1399,7 +1396,6 @@ gisportal.api['clearSelection.clicked'] = function(data, options){
 gisportal.api['olDraw.click'] = function(data, options){
 	options = options || {};
 	var coordinate = data.coordinate;
-	var niceCoordinate = coordinate;
 
 	if(options.describeOnly){
 		return 'Draw click at coordinate: [' + coordinate[0].toFixed(2) + ", " + coordinate[1].toFixed(2) + "]";
@@ -1646,7 +1642,6 @@ gisportal.api['addToPlot.clicked'] = function(data, options){
 gisportal.api['graphs.deleteActive'] = function(data, options){
 	options = options || {};
 	var id = data.id;
-	var button_elem = $('.js-add-to-plot[data-id="' + id + '"]');
 
 	if(options.describeOnly){
 		return 'Closed plot';
