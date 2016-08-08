@@ -90,6 +90,20 @@ gisportal.geolocationFilter.init = function(){
          $(this).toggleClass('searchInProgress', true);
       }
    });
+   $('.show-geocoder').on('click', function() {
+      var geocoder_block = $(this).prev();
+      if(geocoder_block.is(':visible')){
+         $(this).find('p').html("Geographic filter").next().toggleClass('icon-arrow-65', true).toggleClass('icon-arrow-66', false);
+         geocoder_block.slideUp();
+      }else{
+         $(this).find('p').html("Hide").next().toggleClass('icon-arrow-65', false).toggleClass('icon-arrow-66', true);
+         geocoder_block.slideDown();
+      }
+      var params = {
+         "event" : "showGeocoder.clicked"
+      };
+      gisportal.events.trigger('showGeocoder.clicked', params);
+   });
 };
 
 gisportal.geolocationFilter.toggleDraw = function(type)  {

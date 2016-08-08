@@ -249,3 +249,14 @@ table.stripe td:nth-child(odd) {
 .js-geolocation-filter-btn{
   border: 1px solid $secondary-background;
 }
+
+.show-geocoder{
+  background-color: #ffffff;
+  width: 100%;
+  padding-left: 10px;
+}
+
+.show-geocoder-text{
+  display: inline-block;
+  padding-right: 5px;
+}

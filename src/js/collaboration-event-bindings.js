@@ -196,6 +196,13 @@ gisportal.events.bind("moreInfo.clicked", function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+// show geocoder clicked
+gisportal.events.bind("showGeocoder.clicked", function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 // reset list clicked
 gisportal.events.bind("resetList.clicked", function(event, data) {
    var new_data = _.clone(data);
