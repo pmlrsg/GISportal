@@ -162,9 +162,6 @@ function handleUserMedia(stream) {
    webRTC.isChannelReady = true;
    sendMessage('media.enabled');
    $('.js-toggle-rtc').find('.btn-value').text('Disable Audio/Video');
-   if (webRTC.isInitiator) {
-      maybeStart();                       // probably don't need this here
-   }
 }
 
 function attachMediaStream(elements, stream) {
@@ -234,7 +231,6 @@ function createPeerConnection() {
       return;
    }
    webRTC.peerConn.onaddstream = handleRemoteStreamAdded;
-   webRTC.peerConn.onremovestream = handleRemoteStreamRemoved;
 
 }
 

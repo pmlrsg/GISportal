@@ -243,6 +243,9 @@ table.stripe td:nth-child(odd) {
 
 .js-geolocation-filter-btn.searchInProgress {
   background-color: #fff;
-  border: 1px solid $secondary-background;
   color: $secondary-background;
+}
+
+.js-geolocation-filter-btn{
+  border: 1px solid $secondary-background;
 }
