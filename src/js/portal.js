@@ -15,7 +15,7 @@ $(document).ready(function() {
 	  url: gisportal.middlewarePath + '/settings/config',
 	  dataType: 'script',
 	  success: function(script){
-	  		eval(script);
+	  		eval(script); // jshint ignore:line
 	  		gisportal.main();
 	  }
 	});
