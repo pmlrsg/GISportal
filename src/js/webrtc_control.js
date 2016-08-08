@@ -245,6 +245,11 @@ function handleIceCandidate(event) {
    }
 }
 
+// Needed as the offer needs an error function.
+function handlePeerConnError(err) {
+   return false;
+}
+
 function doCall() {
    webRTC.peerConn.createOffer(setLocalAndSendMessage, handlePeerConnError, sdpConstraints);
 }
