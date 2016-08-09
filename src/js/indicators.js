@@ -35,6 +35,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
       gisportal.graphs.deleteActiveGraph();
+      gisportal.graphs.creatorId = id;
       gisportal.indicatorsPanel.addToPlot(id);
       var params = {
          "event": "newPlot.clicked",

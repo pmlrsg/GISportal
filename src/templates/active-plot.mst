@@ -4,7 +4,6 @@
 </div>
 <ol class="steps panel-list">
 	<li>
-		<!-- <p class="number">1</p> -->
 		<div class="">
 			<p>Title:</p>
 			<input type="text" class="js-active-plot-title" value="{{plot._title}}" />
@@ -12,12 +11,11 @@
 	</li>
 	
 	<li>
-		<!-- <p class="number">2</p> -->
-		<div class="">
+		<div>
 			<p>Choose a graph type</p>
 			<select class="js-active-plot-type">
 			{{#if transect_plot}}
-				<option value="transect" {{selected "transect" (call 'plot.plotType')}} selected="selected">Transect</option>
+				<option value="transect" selected>Transect</option>
 			{{else}}
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>
@@ -29,8 +27,31 @@
 		</div>
 	</li>
 	<li>
-		<!-- <p class="number">3</p> -->
-		<div class="{{#if transect_plot}} hidden{{/if}}">
+		<div>
+			<p>Choose a graph style</p>
+			<select class="js-active-plot-style">
+				<option value="default" selected>Please Select a Style...</option>
+				<option value="boxfill/alg">boxfill/alg</option>
+				<option value="boxfill/alg2">boxfill/alg2</option>
+				<option value="boxfill/blue">boxfill/blue</option>
+				<option value="boxfill/blue-descending">boxfill/blue-descending</option>
+				<option value="boxfill/colour-blind-safe">boxfill/colour-blind-safe</option>
+				<option value="boxfill/ferret">boxfill/ferret</option>
+				<option value="boxfill/green-descending">boxfill/green-descending</option>
+				<option value="boxfill/greyscale">boxfill/greyscale</option>
+				<option value="boxfill/ncview">boxfill/ncview</option>
+				<option value="boxfill/occam">boxfill/occam</option>
+				<option value="boxfill/occam_pastel-30">boxfill/occam_pastel-30</option>
+				<option value="boxfill/orange">boxfill/orange</option>
+				<option value="boxfill/orange-descending">boxfill/orange-descending</option>
+				<option value="boxfill/rainbow">boxfill/rainbow</option>
+				<option value="boxfill/redblue">boxfill/redblue</option>
+				<option value="boxfill/sst_36">boxfill/sst_36</option>
+			 </select>
+		</div>
+	</li>
+	<li>
+		<div{{#if transect_plot}} class="hidden"{{/if}}>
 			<p>Set a date range using the timeline below</p>
 			<div class="clearfix">
 				<input placeholder="Start" class="js-min graph-min js-active-plot-start-date" type="text">
@@ -48,8 +69,7 @@
 	
 	
 	<li class="js-components-area" >
-		<!-- <p class="number">4</p> -->
-		<div class="">
+		<div>
 			<table> 
 				<tbody class="js-components components"></tbody>
 			</table>
