@@ -91,9 +91,9 @@ gisportal.geolocationFilter.init = function(){
       }
    });
    $('.show-geocoder').on('click', function() {
-      var geocoder_block = $(this).prev();
+      var geocoder_block = $('.js-geolocation-filter');
       if(geocoder_block.is(':visible')){
-         $(this).find('p').html("Geographic filter").next().toggleClass('icon-arrow-65', true).toggleClass('icon-arrow-66', false);
+         $(this).find('p').html("Geographic filters").next().toggleClass('icon-arrow-65', true).toggleClass('icon-arrow-66', false);
          geocoder_block.slideUp();
       }else{
          $(this).find('p').html("Hide").next().toggleClass('icon-arrow-65', false).toggleClass('icon-arrow-66', true);
