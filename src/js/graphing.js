@@ -163,6 +163,9 @@ gisportal.graphs.popup.loadPlot = function(html, hash){
 
 gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
    element
+   .off('click', '.js-graph-status-delete')
+   .off('click', '.js-graph-status-copy')
+   .off('click', '.js-graph-status-open')
    .on('click', '.js-graph-status-delete', function(){
       var hash = $(this).data("hash");
       $(this).closest('.graph-job').remove();

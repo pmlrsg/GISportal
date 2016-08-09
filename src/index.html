@@ -216,7 +216,7 @@
               <div class="panel-tab no-gap active clearix instructions">
                 <span>
                   <p>Choose an indicator below by searching or using the dropdowns.</p><br/>
-                  <p>You can also filter the results by searching for a region or drawing a bounding box.</p>
+                  <p>You can also filter the results geographically by searching for a region or drawing a bounding box.</p>
                 </span>
               </div>
             </li>
@@ -227,7 +227,10 @@
                </div>
             </li>
             <li>
-               <div class="panel-tab no-gap active js-geolocation-filter">
+               <div class="show-geocoder-holder">
+                  <label href="javascript:;" class="show-geocoder"><p class="show-geocoder-text">Geographic filters </p><span class="icon-arrow-65"/></label>
+               </div>
+               <div class="panel-tab no-gap active js-geolocation-filter" style="display: none">
                   <label class="brand secondary extra-small js-place-search-filter js-geolocation-filter-btn" title="Search for a place to filter">
                      <span class=" icon-magnifier"></span>
                      Filter by Place
