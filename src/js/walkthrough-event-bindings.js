@@ -204,6 +204,13 @@ gisportal.events.bind("moreInfo.clicked", function(event, data) {
    }
 });
 
+// show geocoder clicked
+gisportal.events.bind("showGeocoder.clicked", function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 // reset list clicked
 gisportal.events.bind("resetList.clicked", function(event, data) {
    if(gisportal.walkthrough.is_recording){
