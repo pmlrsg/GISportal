@@ -966,6 +966,23 @@ gisportal.api['moreInfo.clicked'] = function(data, options){
  /*
  data' does not need to contain anything
   */
+gisportal.api['showGeocoder.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return '"Show Geocoder" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.show-geocoder';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.show-geocoder'));
+	}
+   $('.show-geocoder').trigger('click');
+};
+
+ /*
+ data' does not need to contain anything
+  */
 gisportal.api['addLayersForm.clicked'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
