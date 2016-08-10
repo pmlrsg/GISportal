@@ -160,6 +160,7 @@ gisportal.editLayersForm.addListeners = function(){
       // The form is then loaded (loading the first layer)
 
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'));
+      gisportal.addLayersForm.loadedFromTheManagementPanel = true;
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
