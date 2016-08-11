@@ -285,7 +285,6 @@ gisportal.walkthrough.loadEditForm = function(){
       }
       for(step; step < _.size(gisportal.walkthrough.recording_object.step) - 1; step++){
          gisportal.walkthrough.recording_object.step[step] = gisportal.walkthrough.recording_object.step[(step + 1)];
-         var index = gisportal.walkthrough.selected_steps.indexOf(step);
       }
       gisportal.walkthrough.recording_object.step.splice(step, 1);
    };
