@@ -174,12 +174,24 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
    var features_list = [];
    var line_number = 1;
    var error_lines = [];
+   var is_match_up = false;
 
    fs.createReadStream(csv_path)
       .pipe(csv())
       .on('data', function(data) {
          line_number ++;
-         if(data.Date && data.Longitude && data.Latitude){
+         if(data.Date && data.Longitude && data.Latitude && data.data_point){
+            is_match_up = true;
+            if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
+               error_lines.push(line_number);
+            }else{
+               var longitude = parseFloat(data.Longitude);
+               var latitude = parseFloat(data.Latitude);
+               var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Data Point":data.data_point, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}}
+               features_list.push(geoJSON_data);
+            }
+         }
+         else if(data.Date && data.Longitude && data.Latitude){
             if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
                error_lines.push(line_number);
             }else{
@@ -189,7 +201,7 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
                features_list.push(geoJSON_data);
             }
          }else{
-            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. \n Please correct the errors and upload again')
+            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. There may be an optional 4th column titled data_point for match up files. \n Please correct the errors and upload again')
          }
       })
       .on('error', function(err){
@@ -199,7 +211,13 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
          if(error_lines.length > 0){
             return res.status(400).send('The data on CSV line(s) ' + error_lines.join(", ") + ' is invalid \n Please correct the errors and upload again');
          }else{
-            return res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path});
+            if(is_match_up) {
+               return res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path, matchup: true});
+
+            }
+            else {
+               return res.send({geoJSON :{ "type": "FeatureCollection", "features": features_list}, filename: csv_path});
+            }
          }   
       });
    

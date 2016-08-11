@@ -1355,6 +1355,48 @@ def get_plot_data(json_request, plot=dict()):
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
 
+   elif plot_type == "matchup":
+      for s in series:
+         ds = s['data_source']
+         yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
+
+         coverage = ds['coverage']
+         csv_file = json_request['plot']['transectFile']
+         wcs_url = ds['threddsUrl']
+         bbox = get_transect_bounds(csv_file)
+         time = get_transect_times(csv_file)
+         data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
+         filename = extractor.getData()
+         debug(4, "Extracted to {}".format(filename))
+         stats = TransectStats(filename, coverage, csv_file)
+         output_data = stats.process()
+         debug(4, "Transect extract: {}".format(output_data))
+
+         #TODO LEGACY - Change if the format is altered.
+         df = []
+         for details in output_data:
+            line = []
+            [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
+            #TODO This strips out nulls as they break the plotting at the moment.
+            if line[1] != 'null': df.append(line)
+    
+         #TODO This was in the extractor command line butnot sure we need it at the moment.
+         #output_metadata = extractor.metadataBlock()
+         #output = {}
+         #output['metadata'] = output_metadata
+         #output['data'] = output_data
+
+         # And convert it to a nice simple dict the plotter understands.
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
+         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+
+
    else:
       # We should not be here!
       debug(0, "Unrecognised data request, {}.".format(data_request))
@@ -1452,6 +1494,8 @@ def execute_plot(dirname, plot, request):
    elif plot['type'] in ("hovmollerLat", "hovmollerLon"):
       plot_file = hovmoller(plot, file_path)
    elif plot['type'] == 'transect':
+      plot_file = transect(plot, file_path)
+   elif plot['type'] == 'matchup' :
       plot_file = transect(plot, file_path)
    elif plot['type'] == 'extract':
       plot_file = extract(plot, file_path)

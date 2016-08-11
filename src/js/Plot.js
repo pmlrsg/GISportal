@@ -459,7 +459,8 @@ gisportal.graphs.Plot =(function(){
       _this.series_total = _.size(series_list);
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
-      if(_this._plotType != "transect"){
+      console.log(_this._plotType);
+      if(_this._plotType != "transect" && _this._plotType != "matchup" ){
          for(var series in series_list){
             $.ajax({
                method: 'post',
