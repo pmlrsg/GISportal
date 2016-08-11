@@ -37,12 +37,20 @@ gisportal.walkthrough.keydownListener = function(e){
             break;
       }
    }
-   if(e.keyCode == 27){
-      gisportal.walkthrough.clearSelectedSteps();
-   }
-   if(e.keyCode == 46){
-      gisportal.walkthrough.deleteSelectedSteps();
-   }
+   switch(e.keyCode){
+         case 27:
+            gisportal.walkthrough.clearSelectedSteps();
+            break;
+         case 46:
+            gisportal.walkthrough.deleteSelectedSteps();
+            break;
+         case 37:
+            $('.notifyjs-gisportal-delete-step-base .yes').focus();
+            break;
+         case 39:
+            $('.notifyjs-gisportal-delete-step-base .no').focus();
+            break;
+      }
 };
 
 gisportal.walkthrough.init();
@@ -246,6 +254,11 @@ gisportal.walkthrough.loadEditForm = function(){
       $('.js-walkthrough-form-close').trigger('click');
    });
 
+   // Tests the recording object
+   $('button.walkthrough-form-test').on('click', function(e){
+      gisportal.walkthrough.testWalkthrough(gisportal.walkthrough.recording_object);
+   });
+
    // Changes the title of the walkthrough
    $('.title-input').on('change', function(){
       var title = $(this).val();
@@ -421,6 +434,7 @@ gisportal.walkthrough.deleteSelectedSteps = function(){
       $( '.js-edit-walkthrough-html' ).html("");
       gisportal.walkthrough.loadEditForm();
    });
+   $('.notifyjs-gisportal-delete-step-base .yes').focus();
 };
 
 gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
@@ -428,46 +442,51 @@ gisportal.walkthrough.loadWalkthrough = function(walkthrough, owner){
       url: gisportal.middlewarePath + '/settings/walkthrough?walkthrough=' + encodeURI(walkthrough) + '&owner=' + encodeURI(owner),
       dataType: 'json',
       success: function(data) {
-         // Removes any notifies from the other walkthroughs so that users cannot revert to a previous state and mess everything up
-         $('.notifyjs-gisportal-walkthrough-option-base div:contains("Would you like to")').closest('.notifyjs-wrapper').remove();
-         gisportal.walkthrough.walkthrough = data;
-         gisportal.walkthrough.walkthrough_playing = true;
-         gisportal.walkthrough.paused = true;
-         gisportal.walkthrough.renderControls();
-         gisportal.walkthrough.current_step = 0;
-         gisportal.walkthrough.state_before_walkthrough = gisportal.saveState();
-         $('.collab-overlay').toggleClass('hidden', false);
-         var state = data.step[0].state;
-         if(state){
-            gisportal.stopLoadState = false;
-            gisportal.loadState(state);
-         }
-         if(data.requires_logged_in_user){
-            $('.js-google-auth-button').trigger('click');
-         }
-         var start_text = data.start_text;
-         if(!start_text){
-            start_text = "You have loaded a walkthrough, You can use the panel at the top to control the walkthrough. When you have finished, you will have the option to carry on, or go back to where you started from.";
-         }
-         var holder = $('.js-modal-message-popup');
-         var target = $('.js-modal-message-html');
-         target.html(start_text + '</br><button class="brand secondary js-start-walkthrough">Start</button>');
-         holder.toggleClass('hidden', false);
-         if(gisportal.modalTimeout){
-            clearTimeout(gisportal.modalTimeout);
-         }
-         $('.js-start-walkthrough').on('click', function(){
-            $('.js-play-walkthrough').trigger('click');
-         });
-
-         var params = {
-            "event": "room.presenter-state-update",
-            "state": gisportal.saveState(),
-            "force": true
-         };
-         gisportal.events.trigger('room.presenter-state-update', params);
+         gisportal.walkthrough.loadWalkthroughData(data);
       }
    });
+};
+
+gisportal.walkthrough.loadWalkthroughData = function(data){
+   // Removes any notifies from the other walkthroughs so that users cannot revert to a previous state and mess everything up
+   $('.notifyjs-gisportal-walkthrough-option-base div:contains("Would you like to")').closest('.notifyjs-wrapper').remove();
+   gisportal.walkthrough.walkthrough = data;
+   gisportal.walkthrough.walkthrough_playing = true;
+   gisportal.walkthrough.paused = true;
+   gisportal.walkthrough.renderControls();
+   gisportal.walkthrough.current_step = 0;
+   gisportal.walkthrough.state_before_walkthrough = gisportal.saveState();
+   $('.collab-overlay').toggleClass('hidden', false);
+   var state = data.step[0].state;
+   if(state){
+      gisportal.stopLoadState = false;
+      gisportal.loadState(state);
+   }
+   if(data.requires_logged_in_user){
+      $('.js-google-auth-button').trigger('click');
+   }
+   var start_text = data.start_text;
+   if(!start_text){
+      start_text = "You have loaded a walkthrough, You can use the panel at the top to control the walkthrough. When you have finished, you will have the option to carry on, or go back to where you started from.";
+   }
+   var holder = $('.js-modal-message-popup');
+   var target = $('.js-modal-message-html');
+   target.html(start_text + '</br><button class="brand secondary js-start-walkthrough">Start</button>');
+   holder.toggleClass('hidden', false);
+   if(gisportal.modalTimeout){
+      clearTimeout(gisportal.modalTimeout);
+   }
+   $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+   $('.js-start-walkthrough').on('click', function(){
+      $('.js-play-walkthrough').trigger('click');
+   });
+
+   var params = {
+      "event": "room.presenter-state-update",
+      "state": gisportal.saveState(),
+      "force": true
+   };
+   gisportal.events.trigger('room.presenter-state-update', params);
 };
 
 gisportal.walkthrough.loadWalkthroughList = function(){
@@ -662,6 +681,9 @@ gisportal.walkthrough.hideHighlightOverlay = function(){
 
 gisportal.walkthrough.destroyWalkthrough = function(){
    this.removeTooltips();
+   if(gisportal.config.showTutorialLinks){
+      $('.walkthrough-tutorial-btn').toggleClass('hidden', false);
+   }
    if(this.timeout){
       clearTimeout(this.timeout);
    }
@@ -725,4 +747,9 @@ gisportal.walkthrough.loadManagementPanel = function(){
 
 gisportal.walkthrough.openVisualPortalWalkthrough = function(walkthrough_name){
    window.open('https://visual.pml.ac.uk?walkthrough_name=' + walkthrough_name + '&walkthrough_owner=visual.pml.ac.uk&walkthrough_popup=true','Walkthrough','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
+};
+
+gisportal.walkthrough.testWalkthrough = function(walkthrough_data){
+   var popupWindow = window.open(window.location.href + '?walkthrough_test=true&walkthrough_popup=true','Walkthrough Test','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
+   popupWindow.walkthrough_data = walkthrough_data;
 };

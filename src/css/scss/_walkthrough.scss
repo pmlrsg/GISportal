@@ -71,7 +71,8 @@ div.js-edit-walkthrough-html tr:first-child {
   padding: 5px;
 }
 
-.walkthrough-form-submit{
+.walkthrough-form-submit,
+.walkthrough-form-cancel{
   margin-left: 5px; 
 }
 
@@ -186,4 +187,11 @@ input.selector-input {
 
 .walkthrough-step-box.selected{
   background-color: #bfbfbf;
+}
+
+.walkthrough-tutorial-btn {
+  font-size: 23px;
+  width: 35px;
+  display: inline-block;
+  text-align: center;
 }
