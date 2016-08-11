@@ -47,6 +47,10 @@ gisportal.map_settings.init = function() {
    var rendered = gisportal.templates['map-settings'](data);
    $('.js-map-options').html(rendered);
 
+   if(!gisportal.config.showTutorialLinks || gisportal.walkthrough.is_playing){
+      $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+   }
+
    // enable ddslick'ness
    $('#select-basemap').ddslick({
       onSelected: function(data) { 

@@ -55,6 +55,12 @@ div.js-edit-walkthrough-html {
   overflow: auto;
   color: #111111;
   background-color: white;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 div.js-edit-walkthrough-html tr:first-child {
@@ -65,7 +71,8 @@ div.js-edit-walkthrough-html tr:first-child {
   padding: 5px;
 }
 
-.walkthrough-form-submit{
+.walkthrough-form-submit,
+.walkthrough-form-cancel{
   margin-left: 5px; 
 }
 
@@ -176,4 +183,15 @@ input.selector-input {
   float: right;
   font-size: 22px;
   padding: 5px 5px 5px 5px;
+}
+
+.walkthrough-step-box.selected{
+  background-color: #bfbfbf;
+}
+
+.walkthrough-tutorial-btn {
+  font-size: 23px;
+  width: 35px;
+  display: inline-block;
+  text-align: center;
 }

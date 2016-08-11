@@ -6,6 +6,7 @@
 	</h3>
 	<div class="wms-url-message hidden alert-danger" id="wms-url-message"/>
 	<form class="add-wms-form">
+		<span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Loading an External WMS')" title="Help (Loading an External WMS)"></span>
 		<b>LOAD</b>
 		</br>
 	   <label>You can add an external Web Map Service (WMS) URL here:</label>

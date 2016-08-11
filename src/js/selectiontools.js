@@ -47,9 +47,16 @@ gisportal.selectionTools.init = function()  {
    gisportal.wkt = new ol.format.WKT();
 };
 
+gisportal.selectionTools.keydownListener = function(e){
+   if(e.keyCode == 27){
+      cancelDraw();
+      gisportal.events.trigger('body.keydown', e.keyCode);
+   }
+};
+
 function cancelDraw() {
    $('.drawInProgress').toggleClass('drawInProgress', false);
-   $(document).off( 'keydown' );
+   $(document).off('keydown', gisportal.selectionTools.keydownListener);
    sketch = null;
    if(draw){
       map.removeInteraction(draw);
@@ -341,12 +348,7 @@ gisportal.selectionTools.toggleTool = function(type)  {
 
 
       if(draw){
-         $(document).on( 'keydown', function ( e ) {
-            if(e.keyCode == 27){
-               cancelDraw();
-               gisportal.events.trigger('body.keydown', e.keyCode);
-            }
-         });
+         $(document).one( 'keydown', gisportal.selectionTools.keydownListener);
          draw.on('drawstart',
             function(evt) {
                var params = {

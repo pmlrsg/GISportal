@@ -4,8 +4,14 @@ gisportal.autoLayer.viewLoaded = false;
 
 // This function decides either to load a single layer or to refine the panel to show a list of matching layers
 gisportal.autoLayer.loadGivenLayer = function(){
-   if(gisportal.utils.getURLParameter('walkthrough_name') && gisportal.utils.getURLParameter('walkthrough_owner')){
-      gisportal.walkthrough.loadWalkthrough(gisportal.utils.getURLParameter('walkthrough_name'), gisportal.utils.getURLParameter('walkthrough_owner'));
+   if(gisportal.utils.getURLParameter('walkthrough_tutorial') && !gisportal.walkthrough.loaded_from_url){
+      gisportal.walkthrough.loadWalkthrough(walkthrough_data.name, walkthrough_data.owner);
+      gisportal.walkthrough.loaded_from_url = true;
+      return;
+   }
+   if(gisportal.utils.getURLParameter('walkthrough_test') && !gisportal.walkthrough.loaded_from_url){
+      gisportal.walkthrough.loadWalkthroughData(walkthrough_data);
+      gisportal.walkthrough.loaded_from_url = true;
       return;
    }
    if(gisportal.utils.getURLParameter('view') && !gisportal.autoLayer.viewLoaded){
