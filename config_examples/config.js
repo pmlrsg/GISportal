@@ -70,6 +70,9 @@ gisportal.config = {
       port : '',                                    // must match the port specified in collaboration/config/config.js
       path : '',                                    // optional path; must start with a /
    },
+
+   showTutorialLinks: true, //Should links be shown to the tutorial walkthroughs?
+
    // Should layers auto scale by default
    autoScale: true,
 

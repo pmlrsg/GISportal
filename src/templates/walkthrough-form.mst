@@ -41,4 +41,5 @@
 <div class="clearfix walkthrough-form-buttons-div">
    <button class="brand small walkthrough-form-submit pull-right" href="javascript:void(0)">&#10004; Submit</button>
    <button class="brand small walkthrough-form-cancel pull-right" href="javascript:void(0)">&#10006; Cancel</button>
+   <button class="brand small walkthrough-form-test pull-right icon-play-2" href="javascript:void(0)"> Test</button>
 </div>

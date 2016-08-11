@@ -1,6 +1,7 @@
 <input type="radio" id="tab-{{id}}-dimensions" name="tabs" data-tab-name="dimensions" {{checked visibleTab "dimensions"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab dimensions-tab">
    <div class="scale-options">
+      <span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Using the Layer Settings Tab')" title="Help (Using the Layer Settings Tab)"></span>
       {{#unless_equals minScaleVal null}}
          <div class="scalevalues">
             <div class="clearfix">

@@ -18,7 +18,9 @@
    </li>
    <li class="unfiltered-list-message selectoptions alert-success" style="display: none"><p>You are now viewing the full list of available layers.</p>
    </li>
-   <li class="selectoptions">Available indicators:
+   <li class="selectoptions">
+      <span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Load Layers Using the Dropdowns')" title="Help (Load Layers Using the Dropdowns)"></span>
+      Available indicators:
       <div class="js-category-filter-options"></div>
    </li>
 </ul>

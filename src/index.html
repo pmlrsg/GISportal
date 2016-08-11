@@ -222,8 +222,11 @@
             </li>
             <li>
                <div class="panel-tab no-gap active full-height">
-                  <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="js-search search">
-                  <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+                  <div class="js-search">
+                     <span class="search-help btn walkthrough-tutorial-btn icon-question-mark" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Search for an indicator')" title="Help (Search for an indicator)"></span>
+                     <input type="text" autocomplete="off" id="search" placeholder="Search for an indicator" class="search">
+                     <ul class="js-search-results search-results panel-tab-content panel-list grid-list"></ul>
+                  </div>
                </div>
             </li>
             <li>
@@ -252,8 +255,10 @@
                <div class="js-category-filter panel-tab no-gap active"></div>
             </li>
             <li class="views-list hidden">
-               <div class="js-views-list panel-tab no-gap active">Select a view:<br/>
-               <select class="js-views-list"></select>
+               <div class="js-views-list panel-tab no-gap active">
+                  <span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Loading a view')" title="Help (Loading a view)"></span>
+                  Select a view:<br/>
+                  <select class="js-views-list"></select>
                </div>
             </li>
          </ul>
