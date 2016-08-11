@@ -23,6 +23,13 @@ gisportal.graphs.PlotEditor = (function(){
          };
          gisportal.events.trigger('graphType.edit', params);
       });
+      $('.js-active-plot-style').on('change', function(){
+         var params = {
+            "event": "graphStyle.edit",
+            "value": $(this).val()
+         };
+         gisportal.events.trigger('graphStyle.edit', params);
+      });
    };
 
    /**
@@ -52,6 +59,19 @@ gisportal.graphs.PlotEditor = (function(){
       });
 
       this._editorParent.find('.js-slideout-content').html( rendered );
+
+      var layer;
+      if(this._plot._components[0]){
+         layer = gisportal.layers[this._plot._components[0].indicator];
+      }else{
+         layer = gisportal.layers[gisportal.graphs.creatorId];
+      }
+      var style = layer.style || layer.defaultStyle;
+      if($('.js-active-plot-style').has('option[value="' + style + '"]').length <= 0){
+        style = "default";
+      }
+      this._plot._plotStyle = this._plot._plotStyle || style;
+      $('.js-active-plot-style').val(this._plot._plotStyle);
 
       addPlottingTriggers();
 
@@ -100,7 +120,7 @@ gisportal.graphs.PlotEditor = (function(){
     * Adds a 2 way binding so if the INPUT is edited it updates the Plot
     * and if the Plot is updates it updates the INPUT.
     */
-   PlotEditor.prototype.setupTitleInput = function(  ){
+   PlotEditor.prototype.setupTitleInput = function(){
       var _this = this;
 
       this._plotTitleInput = this._editorParent.find('.js-active-plot-title');
@@ -121,10 +141,11 @@ gisportal.graphs.PlotEditor = (function(){
     * Adds a 2 way binding so if the select is edited it updates the Plot
     * and if the Plot is updates it updates the SELECT.
     */
-   PlotEditor.prototype.setupPlotTypeSelect = function(  ){
+   PlotEditor.prototype.setupPlotTypeSelect = function(){
       var _this = this;
 
       this._plotTypeSelect = this._editorParent.find('.js-active-plot-type');
+      this._plotStyleSelect = this._editorParent.find('.js-active-plot-style');
 
       // Setup the title input box sync
       this.plot().on('plotType-change', function(value){
@@ -134,6 +155,9 @@ gisportal.graphs.PlotEditor = (function(){
       });
       this._plotTypeSelect.change(function(){
          _this.plot().plotType( $(this).val() );
+      });
+      this._plotStyleSelect.change(function(){
+         _this._plot._plotStyle = $(this).val();
       });
    };
 

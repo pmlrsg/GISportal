@@ -540,6 +540,12 @@ gisportal.events.bind('graphType.edit', function(event, data) {
    }
 });
 
+gisportal.events.bind('graphStyle.edit', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 gisportal.events.bind('layerDepth.change', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);

@@ -1180,6 +1180,7 @@ gisportal.loadLayerState = function(){
          gisportal.layers[id].resetting = true;
          // This sets the layer style to the same as what the user had before
          $('#tab-' + id + '-layer-style').ddslick('select', {value: style});
+         gisportal.layers[layer].style = style;
 
          // Sets the min & max and log of the scalebar to the value that the user had previously set
          setScaleValues(id, min, max, log, autoScale);
@@ -1199,6 +1200,7 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
 
          gisportal.layers[id].resetting = false;
+         gisportal.scalebars.updateScalebar(layer);
       }
    }
    gisportal.loadLayersState = null;

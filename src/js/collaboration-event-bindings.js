@@ -494,6 +494,12 @@ gisportal.events.bind('graphType.edit', function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+gisportal.events.bind('graphStyle.edit', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 gisportal.events.bind('layerDepth.change', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;

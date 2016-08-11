@@ -1783,6 +1783,29 @@ gisportal.api['graphType.edit'] = function(data, options){
  /*
  'data' must contain the following:
 
+ value: The value of the graph style to be selected
+  */
+gisportal.api['graphStyle.edit'] = function(data, options){
+	options = options || {};
+	var value = data.value;
+   var input_elem = $('.js-active-plot-style');
+   var nice_val = input_elem.find('[value="' + value + '"]').html() || value;
+
+	if(options.describeOnly){
+		return 'Graph style set to: "' + nice_val + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-active-plot-style';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(input_elem);
+	}
+	input_elem.val(value).trigger('change');
+};
+
+ /*
+ 'data' must contain the following:
+
  value: The value of the layer depth to be selected
   */
 gisportal.api['layerDepth.change'] = function(data, options){
