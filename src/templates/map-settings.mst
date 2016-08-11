@@ -1,3 +1,4 @@
+<span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Display Options')" title="Help (Display Options)"></span>
 <h3>Display Options</h3>
 <div class="hidden js-map-settings-message"></div>
 <ul class="map-settings-list">

@@ -60,6 +60,11 @@ gisportal.user.initDOM = function() {
       },
    });
    var rendered = gisportal.templates.user();
+
+   if(!gisportal.config.showTutorialLinks || gisportal.walkthrough.is_playing){
+      $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+   }
+   
    $('.js-secondary-user-dashboard').html(rendered);
    if(gisportal.walkthrough.is_recording){
       $('.walkthrough-record').toggleClass("hidden", true);

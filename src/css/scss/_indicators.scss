@@ -153,6 +153,21 @@
   text-align: center;
 }
 
+.js-category-filter-options{
+  padding-top: 10px;
+}
+
+.search-help{
+  position: absolute;
+  z-index: 1;
+  right: 10px;
+  top: 7px;
+}
+
+.js-search{
+  position: relative;
+}
+
 .indicator-header-icon.active{
   border-bottom: 2px solid #a19d63;
 }

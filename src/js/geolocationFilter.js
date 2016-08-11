@@ -146,12 +146,7 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
 
 
       if(gisportal.geolocationFilter.draw){
-         $(document).on( 'keydown', function ( e ) {
-            if(e.keyCode == 27){
-               gisportal.geolocationFilter.cancelDraw();
-               gisportal.events.trigger('body.keydown', e.keyCode);
-            }
-         });
+         $(document).on('keydown', gisportal.geolocationFilter.keydownListener);
          gisportal.geolocationFilter.draw.once('drawstart',
             function(evt) {
                gisportal.geolocationFilter.geocoder.getSource().clear();
@@ -184,8 +179,15 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
    }
 };
 
+gisportal.geolocationFilter.keydownListener = function(e){
+   if(e.keyCode == 27){
+      gisportal.geolocationFilter.cancelDraw();
+      gisportal.events.trigger('body.keydown', e.keyCode);
+   }
+};
+
 gisportal.geolocationFilter.cancelDraw = function(){
-   $(document).off( 'keydown' );
+   $(document).off('keydown', gisportal.geolocationFilter.keydownListener);
    sketch = null;
    $('.js-box-search-filter, .js-polygon-search-filter').toggleClass('searchInProgress', false);
    if(gisportal.geolocationFilter.draw){
