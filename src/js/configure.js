@@ -100,7 +100,7 @@ gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
  * Resets the tabs and search box on the portal
  */
 gisportal.configurePanel.reset = function(){
-   $('.js-search').val("").change();
+   $('.js-search input').val("").change();
    changeTab( $('#configurePanel .js-default-tab'));
    
    // This seems most unnecessary as it reloads the data and the templates each time an indicator is selected
@@ -395,6 +395,9 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
    var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
    $('.js-category-filter').html(catFilter);
+   if(!gisportal.config.showTutorialLinks || gisportal.walkthrough.is_playing){
+      $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+   }
    $('.more-info').on('click', function() {
       var message_block = $(this).prev();
       if(message_block.is(':visible')){
@@ -625,7 +628,7 @@ gisportal.configurePanel.searchInit = function()  {
 
    $('.js-search').addClear({
       onClear: function(){
-         $('.js-search').change();
+         $('.js-search input').change();
          $('.js-search-results').css('display', 'none');
       },
       right: '20px',
@@ -637,7 +640,7 @@ gisportal.configurePanel.searchInit = function()  {
    // If statement is needed to stop the change event trigger on lose of focus
    // This caused issues when selecting indicators (its needed....)
    var currentSearchValue = "";
-   $('.js-search').on('keyup change', function()  {
+   $('.js-search input').on('keyup change', function()  {
       var searchBoxVal = $(this).val();
       if( currentSearchValue != searchBoxVal ){
          currentSearchValue = searchBoxVal;

@@ -502,6 +502,10 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          gisportal.addLayersForm.refreshStorageInfo();
          // The form is then hidden.
          $('div.js-layer-form-popup').toggleClass('hidden', true);
+         if(gisportal.addLayersForm.loadedFromTheManagementPanel){
+            gisportal.editLayersForm.addSeverTable();
+            gisportal.addLayersForm.loadedFromTheManagementPanel = false;
+         }
          var params = {
             "event": "cancelChanges.clicked"
          };
@@ -537,6 +541,10 @@ gisportal.addLayersForm.keydownListener = function ( e ) {
                   $( 'div.js-layer-form-popup' ).toggleClass('hidden', true);
                   gisportal.addLayersForm.form_info.display_form = false;
                   gisportal.addLayersForm.refreshStorageInfo();
+                  if(gisportal.addLayersForm.loadedFromTheManagementPanel){
+                     gisportal.editLayersForm.addSeverTable();
+                     gisportal.addLayersForm.loadedFromTheManagementPanel = false;
+                  }
                }
             }
             keyDownTrigger(e.keyCode);
@@ -608,6 +616,10 @@ gisportal.addLayersForm.sendLayers = function(layer){
          $('div.js-layer-form-popup').toggleClass('hidden', true);
          // A message is diaplyed to the user so they know the layers were added.
          $.notify("Success \n We have now added the layers to the portal.", "success");
+         if(gisportal.addLayersForm.loadedFromTheManagementPanel){
+            gisportal.editLayersForm.addSeverTable();
+            gisportal.addLayersForm.loadedFromTheManagementPanel = false;
+         }
       },
       error: function(e){
          gisportal.form_working = false; // Will allow the submit button to be clicked again
@@ -905,6 +917,10 @@ gisportal.addLayersForm.addInputListeners = function(){
       gisportal.addLayersForm.form_info.display_form = false; // display_form set to false so that the portal knows that the form was not displayed last time the user was viewing it.
       // The browser cache is updaed witht the changes.
       gisportal.addLayersForm.refreshStorageInfo();
+      if(gisportal.addLayersForm.loadedFromTheManagementPanel){
+         gisportal.editLayersForm.addSeverTable();
+         gisportal.addLayersForm.loadedFromTheManagementPanel = false;
+      }
       var params = {
          "event": "addLayersForm.close"
       };

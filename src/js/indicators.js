@@ -775,6 +775,9 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       var rendered = gisportal.templates['tab-dimensions'](indicator);
 
       $('[data-id="' + indicator.id + '"] .js-tab-dimensions').html(rendered);
+      if(!gisportal.config.showTutorialLinks || gisportal.walkthrough.is_playing){
+         $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+      }
       $('[data-id="' + indicator.id + '"] .js-icon-scalebar').toggleClass('hidden', false);
 
       $('#tab-' + indicator.id + '-opacity').noUiSlider({

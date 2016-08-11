@@ -877,12 +877,12 @@ gisportal.api['search.typing'] = function(data, options){
 		return 'Search: '+ searchValue;
 	}
 	if(options.selectorOnly){
-		return '.js-search';
+		return '.js-search input';
 	}
 	if(options.highlight){
-   	collaboration.highlightElement($('.js-search'));
+   	collaboration.highlightElement($('.js-search input'));
 	}
-   $('.js-search').val(searchValue).trigger('change');
+   $('.js-search input').val(searchValue).trigger('change');
 };
 
  /*

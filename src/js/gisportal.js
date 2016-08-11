@@ -1360,6 +1360,9 @@ gisportal.main = function() {
    if(!gisportal.config.cacheTimeout){
       gisportal.config.cacheTimeout = 60;
    }
+   if(!gisportal.config.showTutorialLinks){
+      $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
+   }
    $('title').html(gisportal.config.pageTitle || "GIS portal");
    $('#about').html(gisportal.config.aboutText || "About");
    if(gisportal.config.splashImage){
