@@ -391,29 +391,6 @@ gisportal.checkNameUnique = function(layer, count) {
 };
 
 /**
- * Returns availability (boolean) of data for the given JavaScript date for all layers.
- * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
- * 
- * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
- * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
- */
-gisportal.allowedDays = function(thedate) {
-   var uidate = gisportal.utils.ISODateString(thedate);
-   // Filter the datetime array to see if it matches the date using jQuery grep utility
-   var filtArray = $.grep(gisportal.enabledDays, function(dt, i) {
-      var datePart = dt.substring(0, 10);
-      return (datePart == uidate);
-   });
-   // If the filtered array has members it has matched this day one or more times
-   if(filtArray.length > 0) {
-      return [true];
-   }
-   else {
-      return [false];
-   }
-};
-
-/**
  * Map function to re-generate the global date cache for selected layers.
  */
 gisportal.refreshDateCache = function() {
