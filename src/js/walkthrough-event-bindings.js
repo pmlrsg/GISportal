@@ -414,6 +414,18 @@ gisportal.events.bind('drawPolygon.clicked', function(event, data) {
    }
 });
 
+gisportal.events.bind('drawFilterBox.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('drawFilterPolygon.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 gisportal.events.bind('selectPolygon.clicked', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
@@ -451,6 +463,12 @@ gisportal.events.bind('olDraw.drawstart', function(event, data) {
 });
 
 gisportal.events.bind('olDraw.drawend', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('filterDraw.drawend', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
    }

@@ -668,7 +668,7 @@ gisportal.mapInit = function() {
             // Only does it for one feature
             return;
          });
-      }else if(!gisportal.geolocationFilter.draw){
+      }else{
          gisportal.displayDataPopup(e.pixel);
       }
    });
@@ -725,7 +725,7 @@ gisportal.mapInit = function() {
             gisportal.dataReadingPopupOverlay.setPosition(coordinate);
          }
       });
-      if (!isFeature && !gisportal.selectionTools.isDrawing) {
+      if (!isFeature && !gisportal.selectionTools.isDrawing && !gisportal.geolocationFilter.filteringByPolygon) {
          gisportal.addDataPopup(coordinate, pixel);
          params = {
             "event": "dataPopup.display",
@@ -733,7 +733,7 @@ gisportal.mapInit = function() {
          };
          gisportal.events.trigger('dataPopup.display', params);
       }
-      if(gisportal.selectionTools.isDrawing){
+      if(gisportal.selectionTools.isDrawing || gisportal.geolocationFilter.filteringByPolygon){
          params = {
             "event": "olDraw.click",
             "coordinate": coordinate

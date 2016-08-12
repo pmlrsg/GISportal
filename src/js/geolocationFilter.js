@@ -41,6 +41,11 @@ gisportal.geolocationFilter.init = function(){
 
    $('.js-place-search-filter-radius').on('change', function(){
       gisportal.geolocationFilter.drawCurrentFilter();
+      var params = {
+         "event": "geocoderRadius.changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('geocoderRadius.changed', params);
    });
 
    $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
@@ -74,7 +79,12 @@ gisportal.geolocationFilter.init = function(){
       }else{
          gisportal.geolocationFilter.toggleDraw('Box');
          $(this).toggleClass('searchInProgress', true);
+         gisportal.geolocationFilter.filteringByPolygon = true;
       }
+      var params = {
+         "event": "drawFilterBox.clicked"
+      };
+      gisportal.events.trigger("drawFilterBox.clicked", params);
    });
 
    $('.js-polygon-search-filter').on('click', function(){
@@ -88,7 +98,12 @@ gisportal.geolocationFilter.init = function(){
       }else{
          gisportal.geolocationFilter.toggleDraw('Polygon');
          $(this).toggleClass('searchInProgress', true);
+         gisportal.geolocationFilter.filteringByPolygon = true;
       }
+      var params = {
+         "event": "drawFilterPolygon.clicked"
+      };
+      gisportal.events.trigger("drawFilterPolygon.clicked", params);
    });
    $('.show-geocoder').on('click', function() {
       var geocoder_block = $('.js-geolocation-filter');
@@ -149,6 +164,10 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
          $(document).on('keydown', gisportal.geolocationFilter.keydownListener);
          gisportal.geolocationFilter.draw.once('drawstart',
             function(evt) {
+               var params = {
+                  "event": "olDraw.drawstart"
+               };
+               gisportal.events.trigger('olDraw.drawstart', params);
                gisportal.geolocationFilter.geocoder.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
                gisportal.currentSearchedPoint = null;
@@ -174,6 +193,11 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                }
                gisportal.currentSearchedBoundingBox = wkt;
                gisportal.geolocationFilter.drawCurrentFilter();
+               var params = {
+                  "event": "filterDraw.drawend",
+                  "wkt": wkt
+               };
+               gisportal.events.trigger('filterDraw.drawend', params);
             }, this);
       }
    }

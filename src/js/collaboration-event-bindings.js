@@ -378,6 +378,18 @@ gisportal.events.bind('drawPolygon.clicked', function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+gisportal.events.bind('drawFilterBox.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('drawFilterPolygon.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 gisportal.events.bind('selectPolygon.clicked', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
@@ -411,6 +423,12 @@ gisportal.events.bind('olDraw.drawstart', function(event, data) {
 });
 
 gisportal.events.bind('olDraw.drawend', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('filterDraw.drawend', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);
