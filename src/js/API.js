@@ -911,6 +911,29 @@ gisportal.api['wms.typing'] = function(data, options){
  /*
  'data' must contain the following:
 
+ eType: The event type to trigger on the wml textbox
+ value: the value to input to the geocoder textbox
+  */
+gisportal.api['geocoderInput.typing'] = function(data, options){
+	options = options || {};
+	var eType = data.eType;
+	var value = data.value;
+
+	if(options.describeOnly){
+		return 'Search entry: ' + value;
+	}
+	if(options.selectorOnly){
+		return '.ol3-geocoder-input-search';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.ol3-geocoder-input-search'));
+	}
+   $('.ol3-geocoder-input-search').val(value).trigger(eType);
+};
+
+ /*
+ 'data' must contain the following:
+
  checked: Should the refreshCache box be chacked?
   */
 gisportal.api['refreshCacheBox.clicked'] = function(data, options){
@@ -1362,12 +1385,31 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
  /*
  'data' does not need to contain anything
   */
+gisportal.api['placeSearchFilter.clicked'] = function(data, options){
+	options = options || {};
+	var button_elem = $('.js-place-search-filter');
+
+	if(options.describeOnly){
+		return '"Filter By Place" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-place-search-filter';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(button_elem);
+	}
+	button_elem.trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
 gisportal.api['drawFilterBox.clicked'] = function(data, options){
 	options = options || {};
 	var button_elem = $('.js-box-search-filter');
 
 	if(options.describeOnly){
-		return '"Draw Polygon" Clicked';
+		return '"Filter By Polygon" Clicked';
 	}
 	if(options.selectorOnly){
 		return '.js-box-search-filter';
@@ -1386,7 +1428,7 @@ gisportal.api['drawFilterPolygon.clicked'] = function(data, options){
 	var button_elem = $('.js-polygon-search-filter');
 
 	if(options.describeOnly){
-		return '"Draw Irregular Polygon" Clicked';
+		return '"Filter By Irregular Polygon" Clicked';
 	}
 	if(options.selectorOnly){
 		return '.js-polygon-search-filter';
@@ -1536,6 +1578,7 @@ gisportal.api['olDraw.drawstart'] = function(data, options){
 	gisportal.vectorLayer.getSource().clear();
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+   gisportal.currentSearchedPoint = null;
 };
 
  /*
@@ -1578,6 +1621,26 @@ gisportal.api['filterDraw.drawend'] = function(data, options){
 	gisportal.drawingOverlaySource.clear();
 	gisportal.currentSearchedBoundingBox = wkt;
    gisportal.geolocationFilter.drawCurrentFilter();
+};
+
+ /*
+ 'data' must contain the following:
+
+ coordinate: The coordinate of the place to filter by.
+ address_details (optional): The details of the address from the geocoder to work out a sensible zoom level
+  */
+gisportal.api['geolocationFilter.filterByPlace'] = function(data, options){
+	options = options || {};
+	var coordinate = data.coordinate;
+	var address_details = data.address;
+
+	if(options.describeOnly){
+		return 'Place Filtered';
+	}
+	if(options.selectorOnly){
+		return '';
+	}
+	gisportal.geolocationFilter.filterByPlace(coordinate, address_details);
 };
 
  /*

@@ -7,36 +7,13 @@ gisportal.geolocationFilter.init = function(){
       placeholder: 'Search for a place...',
       limit: 7,
       keepOpen: true,
-      preventDefault: true
+      preventDefault: true,
+      autocomplete: true
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
    gisportal.geolocationFilter.geocoder.on('addresschosen', function(evt) {
-      $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
-      $('#gcd-input').val("");
-      $('.ol3-geocoder-result').html("");
-      if(gisportal.geolocationFilter.filteringByText){
-         gisportal.currentSearchedPoint = gisportal.reprojectPoint(evt.coordinate, gisportal.projection, 'EPSG:4326');
-         $('.js-place-search-filter').toggleClass('searchInProgress', false);
-         gisportal.geolocationFilter.filteringByText = false;
-         gisportal.currentSearchedBoundingBox = null;
-         gisportal.geolocationFilter.drawCurrentFilter();
-      }
-
-      // Makes sure that there is a sensible zoom level.
-      var details = evt.address.details;
-      if(details.postcode){
-         map.getView().setZoom(19);
-      }else if(details.city){
-         map.getView().setZoom(17);
-      }else if(details.state){
-         map.getView().setZoom(13);
-      }else if(details.country){
-         map.getView().setZoom(5);
-      }else{
-         map.getView().setZoom(3);
-      }
-      map.getView().setCenter(evt.coordinate);
+      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address.details);
    });
 
    $('.js-place-search-filter-radius').on('change', function(){
@@ -46,6 +23,15 @@ gisportal.geolocationFilter.init = function(){
          "value": $(this).val()
       };
       gisportal.events.trigger('geocoderRadius.changed', params);
+   });
+
+   $('.ol3-geocoder-input-search').on('keyup', function(e){
+      var params = {
+         "event": "geocoderInput.typing",
+         "value": $(this).val(),
+         "eType" : e.type
+      };
+      gisportal.events.trigger('geocoderInput.typing', params);
    });
 
    $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
@@ -66,6 +52,10 @@ gisportal.geolocationFilter.init = function(){
          gisportal.geolocationFilter.cancelDraw();
       }
       $('.ol3-geocoder-btn-search').trigger('click');
+      var params = {
+         "event": "placeSearchFilter.clicked"
+      };
+      gisportal.events.trigger("placeSearchFilter.clicked", params);
    });
 
    $('.js-box-search-filter').on('click', function(){
@@ -119,6 +109,41 @@ gisportal.geolocationFilter.init = function(){
       };
       gisportal.events.trigger('showGeocoder.clicked', params);
    });
+};
+
+gisportal.geolocationFilter.filterByPlace = function(coordinate, address_details){
+   $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
+   $('#gcd-input').val("");
+   $('.ol3-geocoder-result').html("");
+   if(gisportal.geolocationFilter.filteringByText){
+      gisportal.currentSearchedPoint = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
+      gisportal.currentSearchedBoundingBox = null;
+      gisportal.geolocationFilter.drawCurrentFilter();
+   }
+
+   // Makes sure that there is a sensible zoom level.
+   if(address_details){
+      if(address_details.postcode){
+         map.getView().setZoom(19);
+      }else if(address_details.city){
+         map.getView().setZoom(17);
+      }else if(address_details.state){
+         map.getView().setZoom(13);
+      }else if(address_details.country){
+         map.getView().setZoom(5);
+      }else{
+         map.getView().setZoom(3);
+      }
+   }
+   map.getView().setCenter(coordinate);
+   var params = {
+      "event": "geolocationFilter.filterByPlace",
+      "coordinate":coordinate,
+      "address": address_details
+   };
+   gisportal.events.trigger('geolocationFilter.filterByPlace', params);
 };
 
 gisportal.geolocationFilter.toggleDraw = function(type)  {

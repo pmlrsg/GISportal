@@ -648,6 +648,9 @@ gisportal.mapInit = function() {
    //add a click event to get the clicked point's data reading
    map.on('singleclick', function(e){
       $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      if($('.ol3-geocoder-search-expanded').length > 0){
+         $('.ol-geocoder-trigger').trigger('click');
+      }
       gisportal.geolocationFilter.filteringByText = false;
       // Removes all hover features from the overlay
       gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
@@ -744,6 +747,9 @@ gisportal.mapInit = function() {
 
    map.on("moveend", function(data) {
       $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      if($('.ol3-geocoder-search-expanded').length > 0){
+         $('.ol-geocoder-trigger').trigger('click');
+      }
       gisportal.geolocationFilter.filteringByText = false;
       var centre = data.map.getView().getCenter();
       var zoom = data.map.getView().getZoom() || 3;      // 3 being the default zoom level, but ol3 doesn't explicitly return this if the zoom hasn't changed since first load
@@ -877,6 +883,7 @@ gisportal.saveState = function(state) {
    state.graphs = {};
    state.panel = {};
    state.refine = {};
+   state.geolocationFilter = {};
 
    // Get the current layers and any settings/options for them.
    var keys = gisportal.selectedLayers;
@@ -955,6 +962,16 @@ gisportal.saveState = function(state) {
    }
 
    state.panel.activePanel = gisportal.panels.activePanel;
+
+   state.geolocationFilter.showGeolocationFilter = $('.js-geolocation-filter').is(':visible');
+
+   state.geolocationFilter.radiusVal = $('.js-place-search-filter-radius').val();
+   if(gisportal.currentSearchedBoundingBox){
+      state.geolocationFilter.currentSearchedBoundingBox = gisportal.indicatorsPanel.polygonToWKT(gisportal.currentSearchedBoundingBox.coordinates);
+   }
+   if(gisportal.currentSearchedPoint){
+      state.geolocationFilter.currentSearchedPoint = gisportal.currentSearchedPoint;
+   }
 
    state.refine.category = gisportal.refinePanel.selectedCategory;
    state.refine.refineData = gisportal.refinePanel.currentData;
@@ -1113,6 +1130,25 @@ gisportal.loadState = function(state){
 
    if(state.panel && state.panel.activePanel){
       gisportal.panels.showPanel(state.panel.activePanel);
+   }
+
+   if(state.geolocationFilter){
+      if(state.geolocationFilter.showGeolocationFilter){
+         $('.show-geocoder').trigger('click');
+      }
+      if(state.geolocationFilter.radiusVal){
+         $('.js-place-search-filter-radius').val(state.geolocationFilter.radiusVal);
+      }
+
+      if(state.geolocationFilter.currentSearchedBoundingBox){
+         gisportal.currentSearchedBoundingBox = Terraformer.WKT.parse(state.geolocationFilter.currentSearchedBoundingBox);
+      }
+      if(state.geolocationFilter.currentSearchedPoint){
+         gisportal.currentSearchedPoint = state.geolocationFilter.currentSearchedPoint;
+      }
+      if(state.geolocationFilter.currentSearchedBoundingBox || state.geolocationFilter.currentSearchedPoint){
+         gisportal.geolocationFilter.drawCurrentFilter();
+      }
    }
 
    if(state.refine){

@@ -183,6 +183,13 @@ gisportal.events.bind("wms.typing", function(event, data) {
    }
 });
 
+// geocoder search string changes
+gisportal.events.bind("geocoderInput.typing", function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 // refresh cache box changed
 gisportal.events.bind("refreshCacheBox.clicked", function(event, data) {
    if(gisportal.walkthrough.is_recording){
@@ -414,6 +421,12 @@ gisportal.events.bind('drawPolygon.clicked', function(event, data) {
    }
 });
 
+gisportal.events.bind('placeSearchFilter.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 gisportal.events.bind('drawFilterBox.clicked', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
@@ -421,6 +434,12 @@ gisportal.events.bind('drawFilterBox.clicked', function(event, data) {
 });
 
 gisportal.events.bind('drawFilterPolygon.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('geocoderRadius.changed', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
    }
@@ -469,6 +488,12 @@ gisportal.events.bind('olDraw.drawend', function(event, data) {
 });
 
 gisportal.events.bind('filterDraw.drawend', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('geolocationFilter.filterByPlace', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
    }
