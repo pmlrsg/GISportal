@@ -8,12 +8,13 @@ gisportal.geolocationFilter.init = function(){
       limit: 7,
       keepOpen: true,
       preventDefault: true,
-      autocomplete: true
+      autoComplete: true,
+      autoCompleteMinLength: 1
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
    gisportal.geolocationFilter.geocoder.on('addresschosen', function(evt) {
-      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address.details);
+      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address);
    });
 
    $('.js-place-search-filter-radius').on('change', function(){
@@ -28,8 +29,7 @@ gisportal.geolocationFilter.init = function(){
    $('.ol3-geocoder-input-search').on('keyup', function(e){
       var params = {
          "event": "geocoderInput.typing",
-         "value": $(this).val(),
-         "eType" : e.type
+         "value": $(this).val()
       };
       gisportal.events.trigger('geocoderInput.typing', params);
    });
@@ -111,7 +111,8 @@ gisportal.geolocationFilter.init = function(){
    });
 };
 
-gisportal.geolocationFilter.filterByPlace = function(coordinate, address_details){
+gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
+   var address_details = address.details;
    $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
    $('#gcd-input').val("");
    $('.ol3-geocoder-result').html("");
@@ -141,7 +142,7 @@ gisportal.geolocationFilter.filterByPlace = function(coordinate, address_details
    var params = {
       "event": "geolocationFilter.filterByPlace",
       "coordinate":coordinate,
-      "address": address_details
+      "address": address
    };
    gisportal.events.trigger('geolocationFilter.filterByPlace', params);
 };

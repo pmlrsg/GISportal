@@ -911,12 +911,10 @@ gisportal.api['wms.typing'] = function(data, options){
  /*
  'data' must contain the following:
 
- eType: The event type to trigger on the wml textbox
  value: the value to input to the geocoder textbox
   */
 gisportal.api['geocoderInput.typing'] = function(data, options){
 	options = options || {};
-	var eType = data.eType;
 	var value = data.value;
 
 	if(options.describeOnly){
@@ -928,7 +926,7 @@ gisportal.api['geocoderInput.typing'] = function(data, options){
 	if(options.highlight){
    	collaboration.highlightElement($('.ol3-geocoder-input-search'));
 	}
-   $('.ol3-geocoder-input-search').val(value).trigger(eType);
+   $('.ol3-geocoder-input-search').val(value)[0].dispatchEvent(new CustomEvent('input'));
 };
 
  /*
@@ -1409,7 +1407,7 @@ gisportal.api['drawFilterBox.clicked'] = function(data, options){
 	var button_elem = $('.js-box-search-filter');
 
 	if(options.describeOnly){
-		return '"Filter By Polygon" Clicked';
+		return '"Filter Polygon" Clicked';
 	}
 	if(options.selectorOnly){
 		return '.js-box-search-filter';
@@ -1428,7 +1426,7 @@ gisportal.api['drawFilterPolygon.clicked'] = function(data, options){
 	var button_elem = $('.js-polygon-search-filter');
 
 	if(options.describeOnly){
-		return '"Filter By Irregular Polygon" Clicked';
+		return '"Filter Irregular Polygon" Clicked';
 	}
 	if(options.selectorOnly){
 		return '.js-polygon-search-filter';
@@ -1632,15 +1630,15 @@ gisportal.api['filterDraw.drawend'] = function(data, options){
 gisportal.api['geolocationFilter.filterByPlace'] = function(data, options){
 	options = options || {};
 	var coordinate = data.coordinate;
-	var address_details = data.address;
+	var address = data.address;
 
 	if(options.describeOnly){
-		return 'Place Filtered';
+		return 'Place Filtered'
 	}
 	if(options.selectorOnly){
 		return '';
 	}
-	gisportal.geolocationFilter.filterByPlace(coordinate, address_details);
+	gisportal.geolocationFilter.filterByPlace(coordinate, address);
 };
 
  /*
