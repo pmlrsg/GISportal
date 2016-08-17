@@ -263,6 +263,10 @@
         //Get plugin data
         var pluginData = obj.data('ddslick');
 
+        if(!pluginData){
+            return false;
+        }
+
         //Get required elements
         var ddSelected = obj.find('.dd-selected'),
             ddSelectedValue = ddSelected.siblings('.dd-selected-value'),

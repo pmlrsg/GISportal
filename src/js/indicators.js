@@ -1273,6 +1273,17 @@ gisportal.indicatorsPanel.bboxToWKT = function( bboxString ){
    return 'POLYGON((' + newPoints.join(",") + '))';
 };
 
+gisportal.indicatorsPanel.polygonToWKT = function( polygon ){
+   var elements = polygon[0];
+   if( elements.length === false ) return false;
+   var newPoints = [];
+   for(var coordinate in elements){
+      newPoints.push(elements[coordinate].join(' '));
+   }
+
+   return 'POLYGON((' + newPoints.join(",") + '))';
+};
+
 gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, to_proj){
    for(var point in coordsArray){
       if(typeof(coordsArray[point][0]) == "object"){
