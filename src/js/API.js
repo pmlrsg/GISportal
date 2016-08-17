@@ -1633,7 +1633,7 @@ gisportal.api['geolocationFilter.filterByPlace'] = function(data, options){
 	var address = data.address;
 
 	if(options.describeOnly){
-		return 'Place Filtered'
+		return 'Place Filtered';
 	}
 	if(options.selectorOnly){
 		return '';

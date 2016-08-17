@@ -641,7 +641,7 @@ gisportal.walkthrough.finished = function(){
 
 gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
    this.tooltipster_elements.push(elem);
-   $(elem).tooltipster({
+   $($(elem)[0]).tooltipster({
       contentCloning: true,
       maxWidth: 300,
       content: $.parseHTML(text),
@@ -657,7 +657,7 @@ gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
 gisportal.walkthrough.removeTooltips = function(){
    gisportal.walkthrough.hideHighlightOverlay();
    for(var elem in this.tooltipster_elements){
-      var _this = $(this.tooltipster_elements[elem]);
+      var _this = $($(this.tooltipster_elements[elem])[0]);
       _this.tooltipster('disable');
    }
    this.tooltipster_elements = [];

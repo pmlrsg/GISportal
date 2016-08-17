@@ -1,6 +1,9 @@
 <div class="form-header">
    Walkthrough List
    <span class="icon-delete-3 js-walkthrough-management-close btn right-icon icon-btn"></span>
+   <a href="https://github.com/pmlrsg/GISportal/wiki/Walkthroughs#management" target="_blank" title="Help">
+      <span class="icon-bubble-ask-2 js-walkthrough-help btn right-icon icon-btn"></span>
+   </a>
 </div>
 {{#if this}}
    <table class="walkthrough-management-table">
