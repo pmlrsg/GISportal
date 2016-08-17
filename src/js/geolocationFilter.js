@@ -7,40 +7,31 @@ gisportal.geolocationFilter.init = function(){
       placeholder: 'Search for a place...',
       limit: 7,
       keepOpen: true,
-      preventDefault: true
+      preventDefault: true,
+      autoComplete: true,
+      autoCompleteMinLength: 1
    });
    map.addControl(gisportal.geolocationFilter.geocoder);
 
    gisportal.geolocationFilter.geocoder.on('addresschosen', function(evt) {
-      $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
-      $('#gcd-input').val("");
-      $('.ol3-geocoder-result').html("");
-      if(gisportal.geolocationFilter.filteringByText){
-         gisportal.currentSearchedPoint = gisportal.reprojectPoint(evt.coordinate, gisportal.projection, 'EPSG:4326');
-         $('.js-place-search-filter').toggleClass('searchInProgress', false);
-         gisportal.geolocationFilter.filteringByText = false;
-         gisportal.currentSearchedBoundingBox = null;
-         gisportal.geolocationFilter.drawCurrentFilter();
-      }
-
-      // Makes sure that there is a sensible zoom level.
-      var details = evt.address.details;
-      if(details.postcode){
-         map.getView().setZoom(19);
-      }else if(details.city){
-         map.getView().setZoom(17);
-      }else if(details.state){
-         map.getView().setZoom(13);
-      }else if(details.country){
-         map.getView().setZoom(5);
-      }else{
-         map.getView().setZoom(3);
-      }
-      map.getView().setCenter(evt.coordinate);
+      gisportal.geolocationFilter.filterByPlace(evt.coordinate, evt.address);
    });
 
    $('.js-place-search-filter-radius').on('change', function(){
       gisportal.geolocationFilter.drawCurrentFilter();
+      var params = {
+         "event": "geocoderRadius.changed",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('geocoderRadius.changed', params);
+   });
+
+   $('.ol3-geocoder-input-search').on('keyup', function(e){
+      var params = {
+         "event": "geocoderInput.typing",
+         "value": $(this).val()
+      };
+      gisportal.events.trigger('geocoderInput.typing', params);
    });
 
    $('.ol-viewport .ol-overlaycontainer-stopevent').append('<div class="ol-unselectable ol-control "><span class="ol-geocoder-trigger icon-magnifier btn" title="Search for a place"></span></div>');
@@ -61,6 +52,10 @@ gisportal.geolocationFilter.init = function(){
          gisportal.geolocationFilter.cancelDraw();
       }
       $('.ol3-geocoder-btn-search').trigger('click');
+      var params = {
+         "event": "placeSearchFilter.clicked"
+      };
+      gisportal.events.trigger("placeSearchFilter.clicked", params);
    });
 
    $('.js-box-search-filter').on('click', function(){
@@ -74,7 +69,12 @@ gisportal.geolocationFilter.init = function(){
       }else{
          gisportal.geolocationFilter.toggleDraw('Box');
          $(this).toggleClass('searchInProgress', true);
+         gisportal.geolocationFilter.filteringByPolygon = true;
       }
+      var params = {
+         "event": "drawFilterBox.clicked"
+      };
+      gisportal.events.trigger("drawFilterBox.clicked", params);
    });
 
    $('.js-polygon-search-filter').on('click', function(){
@@ -88,7 +88,12 @@ gisportal.geolocationFilter.init = function(){
       }else{
          gisportal.geolocationFilter.toggleDraw('Polygon');
          $(this).toggleClass('searchInProgress', true);
+         gisportal.geolocationFilter.filteringByPolygon = true;
       }
+      var params = {
+         "event": "drawFilterPolygon.clicked"
+      };
+      gisportal.events.trigger("drawFilterPolygon.clicked", params);
    });
    $('.show-geocoder').on('click', function() {
       var geocoder_block = $('.js-geolocation-filter');
@@ -104,6 +109,42 @@ gisportal.geolocationFilter.init = function(){
       };
       gisportal.events.trigger('showGeocoder.clicked', params);
    });
+};
+
+gisportal.geolocationFilter.filterByPlace = function(coordinate, address){
+   var address_details = address.details;
+   $('.ol3-geocoder-search-expanded').toggleClass('ol3-geocoder-search-expanded', false);
+   $('#gcd-input').val("");
+   $('.ol3-geocoder-result').html("");
+   if(gisportal.geolocationFilter.filteringByText){
+      gisportal.currentSearchedPoint = gisportal.reprojectPoint(coordinate, gisportal.projection, 'EPSG:4326');
+      $('.js-place-search-filter').toggleClass('searchInProgress', false);
+      gisportal.geolocationFilter.filteringByText = false;
+      gisportal.currentSearchedBoundingBox = null;
+      gisportal.geolocationFilter.drawCurrentFilter();
+   }
+
+   // Makes sure that there is a sensible zoom level.
+   if(address_details){
+      if(address_details.postcode){
+         map.getView().setZoom(19);
+      }else if(address_details.city){
+         map.getView().setZoom(17);
+      }else if(address_details.state){
+         map.getView().setZoom(13);
+      }else if(address_details.country){
+         map.getView().setZoom(5);
+      }else{
+         map.getView().setZoom(3);
+      }
+   }
+   map.getView().setCenter(coordinate);
+   var params = {
+      "event": "geolocationFilter.filterByPlace",
+      "coordinate":coordinate,
+      "address": address
+   };
+   gisportal.events.trigger('geolocationFilter.filterByPlace', params);
 };
 
 gisportal.geolocationFilter.toggleDraw = function(type)  {
@@ -149,6 +190,10 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
          $(document).on('keydown', gisportal.geolocationFilter.keydownListener);
          gisportal.geolocationFilter.draw.once('drawstart',
             function(evt) {
+               var params = {
+                  "event": "olDraw.drawstart"
+               };
+               gisportal.events.trigger('olDraw.drawstart', params);
                gisportal.geolocationFilter.geocoder.getSource().clear();
                gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'filter');
                gisportal.currentSearchedPoint = null;
@@ -174,6 +219,11 @@ gisportal.geolocationFilter.toggleDraw = function(type)  {
                }
                gisportal.currentSearchedBoundingBox = wkt;
                gisportal.geolocationFilter.drawCurrentFilter();
+               var params = {
+                  "event": "filterDraw.drawend",
+                  "wkt": wkt
+               };
+               gisportal.events.trigger('filterDraw.drawend', params);
             }, this);
       }
    }

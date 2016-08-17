@@ -89,7 +89,7 @@ Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "faile
 
 def get_palette(palette="rsg_colour"):
    colours = []
-   my_palette = palettes.getPalette('rsg_colour')
+   my_palette = palettes.getPalette(palette)
    
    for i in range(0, len(my_palette), 4):
        colours.append("#{:02x}{:02x}{:02x}".format(my_palette[i], my_palette[i+1], my_palette[i+2]))
@@ -277,6 +277,7 @@ def extract(plot, outfile="image.html"):
    plot_type = plot['type']
    plot_title = plot['title']
    plot_units = plot['y1Axis']['label']
+   palette = plot['palette']
 
    my_hash = plot['req_hash']
    my_id = plot['req_id']
@@ -369,7 +370,7 @@ def extract(plot, outfile="image.html"):
    max_val = np.nanmax(values)
    debug(3, "min_val {}, max_val {}".format(min_val,max_val))
 
-   colours = get_palette()
+   colours = get_palette(palette)
    legend = plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
 
    # Create an RGBA array to show the Hovmoller. We do this rather than using the Bokeh image glyph
@@ -382,7 +383,7 @@ def extract(plot, outfile="image.html"):
    view = img.view(dtype=np.uint8).reshape((y_size, x_size, 4))
    debug(3, "RGBA shape: {}".format(view.shape))
    # We are going to set the RGBA based on our chosen palette. The RSG library returns a flat list of values.
-   my_palette = palettes.getPalette('rsg_colour')
+   my_palette = palettes.getPalette(palette)
    slope = (max_val - min_val) / (len(colours) - 1)
    intercept = min_val
    debug(3, "Slope: {}, intercept: {}".format(slope, intercept))
@@ -439,6 +440,7 @@ def hovmoller(plot, outfile="image.html"):
    plot_type = plot['type']
    plot_title = plot['title']
    plot_units = plot['y1Axis']['label']
+   palette = plot['palette']
 
    my_hash = plot['req_hash']
    my_id = plot['req_id']
@@ -549,7 +551,7 @@ def hovmoller(plot, outfile="image.html"):
    max_val = np.nanmax(values)
    #print(min_val, max_val)
    #print(values[:])
-   colours = get_palette()
+   colours = get_palette(palette)
    legend = plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot)
 
    # Create an RGBA array to show the Hovmoller. We do this rather than using the Bokeh image glyph
@@ -562,7 +564,7 @@ def hovmoller(plot, outfile="image.html"):
    view = img.view(dtype=np.uint8).reshape((x_size, y_size, 4))
 
    # We are going to set the RGBA based on our chosen palette. The RSG library returns a flat list of values.
-   my_palette = palettes.getPalette('rsg_colour')
+   my_palette = palettes.getPalette(palette)
    slope = (max_val - min_val) / (len(colours) - 1)
    intercept = min_val
    lat_order_reversed = latlon[0] > latlon[1]
@@ -1076,6 +1078,7 @@ def get_plot_data(json_request, plot=dict()):
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
    scale = json_request['plot']['y1Axis']['scale']
+   style = json_request['plot']['style']
    units = json_request['plot']['y1Axis']['label']
    y1Axis = json_request['plot']['y1Axis']
    xAxis = json_request['plot']['xAxis']
@@ -1093,6 +1096,7 @@ def get_plot_data(json_request, plot=dict()):
    plot['xAxis'] = xAxis
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
+   plot['palette'] = style.split("/")[1]
 
    debug(3, plot)
 

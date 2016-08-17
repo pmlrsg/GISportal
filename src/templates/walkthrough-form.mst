@@ -1,6 +1,9 @@
 <div class="form-header">
    Walkthrough Editor (<span class="walkthrough-temp-title">{{title}}</span>)
    <span class="icon-delete-3 js-walkthrough-form-close btn right-icon icon-btn"></span>
+   <a href="https://github.com/pmlrsg/GISportal/wiki/Walkthroughs#editing" target="_blank" title="Help">
+      <span class="icon-bubble-ask-2 js-walkthrough-help btn right-icon icon-btn"></span>
+   </a>
 </div>
 
 <div class="walkthrough-main-field">

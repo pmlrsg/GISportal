@@ -35,6 +35,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
       gisportal.graphs.deleteActiveGraph();
+      gisportal.graphs.creatorId = id;
       gisportal.indicatorsPanel.addToPlot(id);
       var params = {
          "event": "newPlot.clicked",
@@ -1266,6 +1267,17 @@ gisportal.indicatorsPanel.bboxToWKT = function( bboxString ){
 
       elements[0] + " " + elements[1],
    ];
+
+   return 'POLYGON((' + newPoints.join(",") + '))';
+};
+
+gisportal.indicatorsPanel.polygonToWKT = function( polygon ){
+   var elements = polygon[0];
+   if( elements.length === false ) return false;
+   var newPoints = [];
+   for(var coordinate in elements){
+      newPoints.push(elements[coordinate].join(' '));
+   }
 
    return 'POLYGON((' + newPoints.join(",") + '))';
 };
