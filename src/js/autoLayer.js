@@ -14,6 +14,11 @@ gisportal.autoLayer.loadGivenLayer = function(){
       gisportal.walkthrough.loaded_from_url = true;
       return;
    }
+   if(gisportal.utils.getURLParameter('walkthrough_name') && gisportal.utils.getURLParameter('walkthrough_owner')){
+      gisportal.walkthrough.loadWalkthrough(gisportal.utils.getURLParameter('walkthrough_name'), gisportal.utils.getURLParameter('walkthrough_owner'));
+      gisportal.walkthrough.loaded_from_url = true;
+      return;
+   }
    if(gisportal.utils.getURLParameter('view') && !gisportal.autoLayer.viewLoaded){
       gisportal.autoLayer.viewLoaded = true;
       gisportal.view.loadView(gisportal.utils.getURLParameter('view'));
