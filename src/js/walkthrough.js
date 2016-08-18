@@ -657,7 +657,7 @@ gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
 gisportal.walkthrough.removeTooltips = function(){
    gisportal.walkthrough.hideHighlightOverlay();
    for(var elem in this.tooltipster_elements){
-      var _this = $($(this.tooltipster_elements[elem])[0]);
+      var _this = $(this.tooltipster_elements[elem] + ".tooltipstered");
       _this.tooltipster('disable');
    }
    this.tooltipster_elements = [];

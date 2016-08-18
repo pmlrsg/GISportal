@@ -1110,7 +1110,7 @@ gisportal.loadState = function(state){
    }
 
    if(state.geolocationFilter){
-      if(state.geolocationFilter.showGeolocationFilter){
+      if(state.geolocationFilter.showGeolocationFilter == "true" || state.geolocationFilter.showGeolocationFilter === true){
          $('.show-geocoder').trigger('click');
       }
       if(state.geolocationFilter.radiusVal){
