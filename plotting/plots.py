@@ -88,11 +88,15 @@ class Enum(set):
 Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
 def get_palette(palette="rsg_colour"):
+   debug(2, "get_palette(palette={})".format(palette))
    colours = []
    my_palette = palettes.getPalette(palette)
    
    for i in range(0, len(my_palette), 4):
        colours.append("#{:02x}{:02x}{:02x}".format(my_palette[i], my_palette[i+1], my_palette[i+2]))
+   
+   debug(3, "get_palette: {})".format(colours))
+
 
    return(colours)
 #END get_palette
