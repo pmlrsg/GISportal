@@ -460,7 +460,7 @@ gisportal.graphs.Plot =(function(){
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
       console.log(_this._plotType);
-      if(_this._plotType != "transect" && _this._plotType != "matchup" ){
+      if(_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" ){
          for(var series in series_list){
             $.ajax({
                method: 'post',

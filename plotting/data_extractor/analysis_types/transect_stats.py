@@ -7,11 +7,12 @@ import numpy as np
 
 class TransectStats(object):
    """docstring for TransectStats"""
-   def __init__(self, filename, variable, _csv):
+   def __init__(self, filename, variable, _csv, matchup=False):
       super(TransectStats, self).__init__()
       self.filename = filename
       self.variable = variable
       self._csv = _csv
+      self.matchup = matchup
       
 
    def process(self):
@@ -61,11 +62,14 @@ class TransectStats(object):
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 
          time_index = find_closest(times, track_date, last_time,time=True)
-         last_lat = lat_index
-         last_lon = lon_index
-         last_time = time_index
 
-         data = data_var[time_index][lat_index][lon_index]
+
+
+         last_lat = lat_index -1
+         last_lon = lon_index -1
+         last_time = time_index  -1
+
+         data = data_var[last_time][last_lat][last_lon]
 
          _ret = {}
          _ret['track_date'] = track_date.isoformat()
@@ -74,6 +78,9 @@ class TransectStats(object):
          else:
             _ret['data_date'] = time_var[time_index].tostring()
          
+         if self.matchup:
+            _ret['match_value'] = row['data_point']
+
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
          _ret['data_value'] = float(data) if not np.isnan(data)  else "null"

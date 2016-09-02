@@ -18,9 +18,10 @@
 			<select class="js-active-plot-type">
 			{{#if transect_plot}}
 				<option value="transect" {{selected "transect" (call 'plot.plotType')}} selected="selected">Transect</option>
-				{{#if matchup_plot}}
-				<option value="matchup" {{selected "natchup" (call 'plot.plotType')}}>Match Up</option>
-				{{/if}}
+			{{else if matchup_plot}}
+				<option value="matchup" {{selected "matchup" (call 'plot.plotType')}}>Match Up - Timeseries</option>
+				<option value="scatter_matchup"  {{selected "scatter_match" (call 'plot.plotType')}}>Match Up - Scatter</option>
+	
 			{{else}}
 				<option value="timeseries" {{selected "timeseries" (call 'plot.plotType')}} >Timeseries</option>
 				<option value="hovmollerLat"  {{selected "hovmollerLat" (call 'plot.plotType')}} >Hovmoller Lat</option>

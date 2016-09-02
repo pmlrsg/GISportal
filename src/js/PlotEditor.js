@@ -47,7 +47,8 @@ gisportal.graphs.PlotEditor = (function(){
       if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
          transect_plot = true;
          if(gisportal.methodThatSelectedCurrentRegion.matchup === true){
-           matchup_plot = true;  
+           matchup_plot = true;
+           transect_plot = false;
          }
       }
       var rendered = gisportal.templates['active-plot']({
