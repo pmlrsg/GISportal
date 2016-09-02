@@ -285,9 +285,8 @@ gisportal.walkthrough.loadEditForm = function(){
       }
       for(step; step < _.size(gisportal.walkthrough.recording_object.step) - 1; step++){
          gisportal.walkthrough.recording_object.step[step] = gisportal.walkthrough.recording_object.step[(step + 1)];
-         var index = gisportal.walkthrough.selected_steps.indexOf(step);
       }
-      gisportal.walkthrough.recording_object.step.splice(step, 1);
+      delete gisportal.walkthrough.recording_object.step[step];
    };
 
    // Deletes a step in the walkthrough.
@@ -426,7 +425,7 @@ gisportal.walkthrough.deleteSelectedSteps = function(){
       //hide notification
       $(this).trigger('notify-hide');
       $(document).off('click', '.notifyjs-gisportal-delete-step-base .no, .notifyjs-gisportal-delete-step-base .yes');
-      var temp_selected_steps = _.uniq(gisportal.walkthrough.selected_steps).sort(function(a, b){return a < b;});
+      var temp_selected_steps = _.uniq(gisportal.walkthrough.selected_steps).sort(function(a, b){return b - a;});
       for(var step in temp_selected_steps){
          gisportal.walkthrough.deleteStep(temp_selected_steps[step]);
       }
@@ -459,6 +458,7 @@ gisportal.walkthrough.loadWalkthroughData = function(data){
    $('.collab-overlay').toggleClass('hidden', false);
    var state = data.step[0].state;
    if(state){
+      console.log(state);
       gisportal.stopLoadState = false;
       gisportal.loadState(state);
    }
@@ -564,7 +564,7 @@ gisportal.walkthrough.nextStep = function(force){
          }
          if(this_step.selector){
             if(this_step.click_element_to_continue){
-               $(this_step.selector).toggleClass('js-next-step-walkthrough-tooltip', true);
+               $(this_step.selector).toggleClass('js-next-step-walkthrough-selector', true);
             }
             gisportal.walkthrough.highlightElementOverlay(this_step.selector);
             WT.elemTooltip(popup_string, this_step.selector);
@@ -580,9 +580,10 @@ gisportal.walkthrough.nextStep = function(force){
       if(!WT.paused && WT.playback_speed !== 0 && !(this_step.pause_here)){
          WT.nextStep();
       }
-      $('.js-next-step-walkthrough-tooltip').on('click', function(e){
+      $('.js-next-step-walkthrough-tooltip, .js-next-step-walkthrough-selector').on('click', function(e){
          e.preventDefault();
          $(this).toggleClass('js-next-step-walkthrough-tooltip', false);
+         $(this).toggleClass('js-next-step-walkthrough-selector', false);
          gisportal.walkthrough.paused = false;
          gisportal.walkthrough.renderControls();
          $('.js-skip-step-walkthrough').trigger('click');
@@ -640,7 +641,7 @@ gisportal.walkthrough.finished = function(){
 
 gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
    this.tooltipster_elements.push(elem);
-   $(elem).tooltipster({
+   $($(elem)[0]).tooltipster({
       contentCloning: true,
       maxWidth: 300,
       content: $.parseHTML(text),
@@ -656,7 +657,7 @@ gisportal.walkthrough.elemTooltip = function(text, elem, hideArrow){
 gisportal.walkthrough.removeTooltips = function(){
    gisportal.walkthrough.hideHighlightOverlay();
    for(var elem in this.tooltipster_elements){
-      var _this = $(this.tooltipster_elements[elem]);
+      var _this = $($(this.tooltipster_elements[elem])[0]);
       _this.tooltipster('disable');
    }
    this.tooltipster_elements = [];
@@ -750,6 +751,9 @@ gisportal.walkthrough.openVisualPortalWalkthrough = function(walkthrough_name){
 };
 
 gisportal.walkthrough.testWalkthrough = function(walkthrough_data){
-   var popupWindow = window.open(window.location.href + '?walkthrough_test=true&walkthrough_popup=true','Walkthrough Test','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes');
-   popupWindow.walkthrough_data = walkthrough_data;
+   if(gisportal.popupWindow){
+      gisportal.popupWindow.close();
+   }
+   gisportal.popupWindow = window.open(window.location.href + '?walkthrough_test=true&walkthrough_popup=true','Walkthrough Test','directories=no,titlebar=no,toolbar=no,location=no,status=no,menubar=no,scrollbars=no, fullscreen=yes, width=1000,height=700');
+   gisportal.popupWindow.walkthrough_data = walkthrough_data;
 };

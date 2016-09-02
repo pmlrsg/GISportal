@@ -165,11 +165,20 @@ gisportal.events.bind("scalebar.apply-changes", function(event, data) {
 
 // search string changes
 gisportal.events.bind("search.typing", function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
    collaboration._emit('c_event', data);
 });
 
 // wms string changes
 gisportal.events.bind("wms.typing", function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+// geocoder string changes
+gisportal.events.bind("geocoderInput.typing", function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);
@@ -378,6 +387,30 @@ gisportal.events.bind('drawPolygon.clicked', function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+gisportal.events.bind('placeSearchFilter.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('drawFilterBox.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('drawFilterPolygon.clicked', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('geocoderRadius.changed', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 gisportal.events.bind('selectPolygon.clicked', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
@@ -411,6 +444,18 @@ gisportal.events.bind('olDraw.drawstart', function(event, data) {
 });
 
 gisportal.events.bind('olDraw.drawend', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('filterDraw.drawend', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('geolocationFilter.filterByPlace', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);
@@ -489,6 +534,12 @@ gisportal.events.bind('graphTitle.edit', function(event, data) {
 });
 
 gisportal.events.bind('graphType.edit', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+gisportal.events.bind('graphStyle.edit', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;
    collaboration._emit('c_event', new_data);

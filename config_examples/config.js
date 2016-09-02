@@ -71,7 +71,7 @@ gisportal.config = {
       path : '',                                    // optional path; must start with a /
    },
 
-   showTutorialLinks: true, //Should links be shown to the tutorial walkthroughs?
+   showTutorialLinks: false, //Should links be shown to the tutorial walkthroughs?
 
    // Should layers auto scale by default
    autoScale: true,

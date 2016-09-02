@@ -18,6 +18,7 @@ gisportal.graphs.Plot =(function(){
       
       
       this._plotType = null;
+      this._plotStyle = null;
       this._title = "";
       this._createdOn = new Date();
       this._tBounds = [
@@ -176,7 +177,7 @@ gisportal.graphs.Plot =(function(){
    Plot.prototype.buildRequestBasics = function( plotRequest ){
       plotRequest.type = this.plotType();
       plotRequest.title = this.title();
-      plotRequest.style = "basic";
+      plotRequest.style = this._plotStyle;
       plotRequest.downloadTypes = [
          { key: 'csv', label: 'CSV' },
          { key: 'png', label: 'PNG' },
@@ -372,8 +373,6 @@ gisportal.graphs.Plot =(function(){
                "coverage"  : layer.urlName,
                // Layer ID
                "layer_id"  : layer.id,
-               // The currently selected layer style
-               "layer_style"  : layer.style,
                // Time range of the data
                // Rounded so that the requests stay the same over collaboration
                "t_bounds"  : [this.tBounds()[0].toISOString().split("T")[0], this.tBounds()[1].toISOString().split("T")[0]],
@@ -388,7 +387,7 @@ gisportal.graphs.Plot =(function(){
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": yAxis,
             "type": "line",
-            "meta": meta,
+            "meta": meta
             //"logo": gisportal.middlewarePath + "/" + logo
          };
 
@@ -856,6 +855,7 @@ gisportal.graphs.Plot =(function(){
       var newCopy = new Plot();
       newCopy.title( this.title() );
       newCopy.plotType( this.plotType() );
+      newCopy._plotStyle = this._plotStyle;
       newCopy.dateRangeBounds( this.dateRangeBounds() );
       newCopy.tBounds( this.tBounds() );
 
@@ -878,6 +878,7 @@ gisportal.graphs.createPlotFromState = function(plotState){
    plot._createdOn = plotState._createdOn;
    plot._dateRangeBounds = plotState._dateRangeBounds;
    plot._plotType = plotState._plotType;
+   plot._plotStyle = plotState._plotStyle;
    plot._state = plotState._state;
    plot._tBounds = plotState._tBounds;
    plot._title = plotState._title;

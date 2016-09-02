@@ -467,7 +467,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    var defaultCategory = gisportal.config.defaultCategory;
    if (typeof(defaultCategory) !== 'undefined' && defaultCategory && defaultCategory in gisportal.browseCategories) {
       defaultValue = { value: defaultCategory };
-   } 
+   }
    $('#js-category-filter-select').ddslick('select', defaultValue);
 };
 

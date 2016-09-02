@@ -911,6 +911,27 @@ gisportal.api['wms.typing'] = function(data, options){
  /*
  'data' must contain the following:
 
+ value: the value to input to the geocoder textbox
+  */
+gisportal.api['geocoderInput.typing'] = function(data, options){
+	options = options || {};
+	var value = data.value;
+
+	if(options.describeOnly){
+		return 'Search entry: ' + value;
+	}
+	if(options.selectorOnly){
+		return '.ol3-geocoder-input-search';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.ol3-geocoder-input-search'));
+	}
+   $('.ol3-geocoder-input-search').val(value)[0].dispatchEvent(new CustomEvent('input'));
+};
+
+ /*
+ 'data' must contain the following:
+
  checked: Should the refreshCache box be chacked?
   */
 gisportal.api['refreshCacheBox.clicked'] = function(data, options){
@@ -966,6 +987,20 @@ gisportal.api['moreInfo.clicked'] = function(data, options){
  /*
  data' does not need to contain anything
   */
+gisportal.api['resetList.clicked'] = function(data, options){
+	options = options || {};
+	if(options.describeOnly){
+		return '"Reset" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.button#reset-list';
+	}
+   $('button.reset-list').trigger('click');
+};
+
+ /*
+ data' does not need to contain anything
+  */
 gisportal.api['showGeocoder.clicked'] = function(data, options){
 	options = options || {};
 	if(options.describeOnly){
@@ -978,6 +1013,27 @@ gisportal.api['showGeocoder.clicked'] = function(data, options){
    	collaboration.highlightElement($('.show-geocoder'));
 	}
    $('.show-geocoder').trigger('click');
+};
+
+ /*
+ 'data' must contain the following:
+
+ value: The value to be entered into the radius field
+  */
+gisportal.api['geocoderRadius.changed'] = function(data, options){
+	options = options || {};
+	var value = data.value;
+
+	if(options.describeOnly){
+		return 'Radius value set to: "' + value + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-place-search-filter-radius';
+	}
+	if(options.highlight){
+   	collaboration.highlightElement($('.js-place-search-filter-radius'));
+	}
+   $('.js-place-search-filter-radius').val(value).trigger('change');
 };
 
  /*
@@ -1327,6 +1383,63 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
  /*
  'data' does not need to contain anything
   */
+gisportal.api['placeSearchFilter.clicked'] = function(data, options){
+	options = options || {};
+	var button_elem = $('.js-place-search-filter');
+
+	if(options.describeOnly){
+		return '"Filter By Place" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-place-search-filter';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(button_elem);
+	}
+	button_elem.trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
+gisportal.api['drawFilterBox.clicked'] = function(data, options){
+	options = options || {};
+	var button_elem = $('.js-box-search-filter');
+
+	if(options.describeOnly){
+		return '"Filter Polygon" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-box-search-filter';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(button_elem);
+	}
+	button_elem.trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
+gisportal.api['drawFilterPolygon.clicked'] = function(data, options){
+	options = options || {};
+	var button_elem = $('.js-polygon-search-filter');
+
+	if(options.describeOnly){
+		return '"Filter Irregular Polygon" Clicked';
+	}
+	if(options.selectorOnly){
+		return '.js-polygon-search-filter';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(button_elem);
+	}
+	button_elem.trigger('click');
+};
+
+ /*
+ 'data' does not need to contain anything
+  */
 gisportal.api['selectPolygon.clicked'] = function(data, options){
 	options = options || {};
 	var button_elem = $('.js-draw-select-polygon');
@@ -1431,21 +1544,20 @@ gisportal.api['olDraw.click'] = function(data, options){
    gisportal.drawingOverlaySource.clear();
    var geom;
    if(gisportal.drawingPoints.length === 2){
-      // Only if drawing a polygon
-      if($('.js-draw-polygon').hasClass('drawInProgress')){
-         geom = new ol.geom.LineString(gisportal.drawingPoints);
-      }
+        geom = new ol.geom.LineString(gisportal.drawingPoints);
    }
    if(gisportal.drawingPoints.length > 2){
       var polygon_array = _.clone(gisportal.drawingPoints);
       polygon_array.push(polygon_array[0]);
       geom = new ol.geom.Polygon([polygon_array]);
    }
-   if(geom && drawOverlay){
-      gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:geom}));
-   }
-   for(var point in gisportal.drawingPoints){
-      gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:new ol.geom.Point(gisportal.drawingPoints[point])}));
+   if(gisportal.selectionTools.isDrawing || gisportal.geolocationFilter.filteringByPolygon){
+   	if(geom && drawOverlay){
+         gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:geom}));
+      }
+      for(var point in gisportal.drawingPoints){
+         gisportal.drawingOverlaySource.addFeature(new ol.Feature({geometry:new ol.geom.Point(gisportal.drawingPoints[point])}));
+      }
    }
 };
 
@@ -1464,6 +1576,7 @@ gisportal.api['olDraw.drawstart'] = function(data, options){
 	gisportal.vectorLayer.getSource().clear();
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'hover');
    gisportal.removeTypeFromOverlay(gisportal.featureOverlay, 'selected');
+   gisportal.currentSearchedPoint = null;
 };
 
  /*
@@ -1482,8 +1595,50 @@ gisportal.api['olDraw.drawend'] = function(data, options){
 	if(options.selectorOnly){
 		return '';
 	}
+	gisportal.drawingOverlaySource.clear();
 	gisportal.selectionTools.ROIAdded(sketch);
 	gisportal.vectorLayer.getSource().addFeature(sketch);
+};
+
+ /*
+ 'data' must contain the following:
+
+ wkt: The wkt of the polygon to be drawn
+  */
+gisportal.api['filterDraw.drawend'] = function(data, options){
+	options = options || {};
+	var wkt = data.wkt;
+
+	if(options.describeOnly){
+		return 'Polygon drawn';
+	}
+	if(options.selectorOnly){
+		return '';
+	}
+	gisportal.geolocationFilter.cancelDraw();
+	gisportal.drawingOverlaySource.clear();
+	gisportal.currentSearchedBoundingBox = wkt;
+   gisportal.geolocationFilter.drawCurrentFilter();
+};
+
+ /*
+ 'data' must contain the following:
+
+ coordinate: The coordinate of the place to filter by.
+ address_details (optional): The details of the address from the geocoder to work out a sensible zoom level
+  */
+gisportal.api['geolocationFilter.filterByPlace'] = function(data, options){
+	options = options || {};
+	var coordinate = data.coordinate;
+	var address = data.address;
+
+	if(options.describeOnly){
+		return 'Place Filtered';
+	}
+	if(options.selectorOnly){
+		return '';
+	}
+	gisportal.geolocationFilter.filterByPlace(coordinate, address);
 };
 
  /*
@@ -1773,6 +1928,29 @@ gisportal.api['graphType.edit'] = function(data, options){
 	}
 	if(options.selectorOnly){
 		return '.js-active-plot-type';
+	}
+	if(options.highlight){
+		collaboration.highlightElement(input_elem);
+	}
+	input_elem.val(value).trigger('change');
+};
+
+ /*
+ 'data' must contain the following:
+
+ value: The value of the graph style to be selected
+  */
+gisportal.api['graphStyle.edit'] = function(data, options){
+	options = options || {};
+	var value = data.value;
+   var input_elem = $('.js-active-plot-style');
+   var nice_val = input_elem.find('[value="' + value + '"]').html() || value;
+
+	if(options.describeOnly){
+		return 'Graph style set to: "' + nice_val + '"';
+	}
+	if(options.selectorOnly){
+		return '.js-active-plot-style';
 	}
 	if(options.highlight){
 		collaboration.highlightElement(input_elem);
