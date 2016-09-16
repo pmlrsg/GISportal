@@ -269,7 +269,7 @@ def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
                    
    # Set the y axis format so it does not default to scientific notation.
    legend.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
-   legend.yaxis.axis_label = "{} {}".format(var_name, plot_units)
+   legend.yaxis.axis_label = u"{} {}".format(var_name, plot_units)
 
    legend.xaxis.visible = False
    
@@ -712,7 +712,7 @@ def transect(plot, outfile="transect.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
