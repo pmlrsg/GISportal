@@ -216,12 +216,7 @@ gisportal.scalebars.autoScale = function(id, force)  {
       catch(e){
          time = "";
       }
-      console.log("getting info for time : ", time);
-      // if(typeof(l.minScaleVal) == "number" && typeof(l.maxScaleVal) == "number"){
-      //    gisportal.scalebars.validateScale(id, l.minScaleVal, l.maxScaleVal, force=true);
-      // }else if(typeof(l.autoMinScaleVal) == "number" && typeof(l.autoMaxScaleVal) == "number"){
-      //    gisportal.scalebars.validateScale(id, l.autoMinScaleVal, l.autoMaxScaleVal, force=true);
-      // }else{
+
          gisportal.loading.increment();
          $.ajax({
             url: gisportal.ProxyHost + encodeURIComponent(l.wmsURL + 'item=minmax&layers=' + l.urlName + '&bbox=' + bbox + '&elevation=' + (l.selectedElevation || -1) + time + '&srs=EPSG:4326&width=50&height=50&request=GetMetadata'),
@@ -242,7 +237,6 @@ gisportal.scalebars.autoScale = function(id, force)  {
                gisportal.loading.decrement();
             }
          });
-      // }
    }
    }catch(e){}
 
