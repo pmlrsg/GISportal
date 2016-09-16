@@ -877,7 +877,7 @@ def timeseries(plot, outfile="time.html"):
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(3,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
@@ -890,7 +890,7 @@ def timeseries(plot, outfile="time.html"):
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-         debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
          # Setting the second y axis range name and range
          yrange[1] = "y2"
          ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
