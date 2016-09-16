@@ -190,7 +190,6 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
  * @param {bool} force - Should the autoScale be forced, ignoring the checkbox
  */
 gisportal.scalebars.autoScale = function(id, force)  {
-   console.log("inside autoscale func ");
    var autoScaleCheck = $('#tab-' + id + '-autoScale');
    if( force !== true){
       if( autoScaleCheck.length == 1 ){
