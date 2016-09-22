@@ -313,7 +313,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
    wms_url = wms_url || new_data.wmsURL;
    var clean_wms_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], wms_url);
 
-   var ajax_url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + "/";
+   var ajax_url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + "/"; // Assigned and then overwritten?
    if(user != domain){
       ajax_url += "user_" + user + "/";
    }

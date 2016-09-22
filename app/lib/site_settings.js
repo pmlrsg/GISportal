@@ -549,7 +549,7 @@ router.all('/app/settings/restore_server_cache', function(req, res){
 router.all('/app/settings/update_layer', function(req, res){
    var username = req.query.username; // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
-   // var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   // var permission = user.getAccessLevel(req, domain); // Gets the user permission NOT USED
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json"; // Gets the given filename
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
