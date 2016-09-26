@@ -6,7 +6,7 @@ module.exports = redis;
 redis.startRedis = function(app, config) {
    // Redis config 
    var url = require('url');
-   var redis = require('redis')
+   var redis = require('redis');
 
    var redisConfig = url.parse(config.redisURL);
    var redisClient = redis.createClient(redisConfig.port, redisConfig.hostname);
@@ -21,4 +21,4 @@ redis.startRedis = function(app, config) {
       });
 
    return redisClient;
-}
+};

@@ -1,8 +1,8 @@
 
-var cookie = require('cookie');
-var cookieParser = require('cookie-parser');
+// var cookie = require('cookie'); // NOT USED
+// var cookieParser = require('cookie-parser'); // NOT USED
 
-var user = {}
+var user = {};
 module.exports = user;
 var utils = require('./utils.js');
 
@@ -29,7 +29,7 @@ user.requiresValidUser = function(req, res, next) {
    } else {
       res.sendStatus(401);
    }
-}
+};
 
 /**
  * requiresAdminUser is to be used as a chained router function; if the current user is an
@@ -47,10 +47,10 @@ user.requiresAdminUser = function(req, res, next) {
    if (level == "admin") {
       return next();
    } else {
-      console.log(session.passport.user.emails[0].value +' is not an admin');
+      console.log(req.session.passport.user.emails[0].value +' is not an admin');
       res.sendStatus(401);
    }
-}
+};
 
 /**
  * getAccessLevel checks the request user cookie against the session object stored in Redis
@@ -64,8 +64,8 @@ user.getAccessLevel = function(req, domain) {
    if(typeof(req.session.passport.user) != 'undefined') {
       // there is a valid session so they are a logged in user
       level = "user";
-      domain = domain || req.query.domain
-      var config = GLOBAL.config[domain] || GLOBAL.config
+      domain = domain || req.query.domain;
+      var config = GLOBAL.config[domain] || GLOBAL.config;
       // check to see if they are an admin
       var admins = config.admins;
       if(admins){
@@ -78,7 +78,7 @@ user.getAccessLevel = function(req, domain) {
       }
    }
    return level;
-}
+};
 
 /**
  * getUsername checks the request user cookie against the session object stored in Redis
@@ -92,4 +92,4 @@ user.getUsername = function(req) {
       username = req.session.passport.user.emails[0].value;
    }
    return username;
-}
+};

@@ -1,9 +1,12 @@
+var utils = require('./utils.js');
+
 var apiAuth = {};
 module.exports = apiAuth;
 
 apiAuth.authenticateToken = function(req, res, next) {
    var token = req.params.token;
-   var config = GLOBAL.config[domain] || GLOBAL.config;
+   var domain = utils.getDomainName(req);
+   var config = global.config[domain] || global.config;
    var tokens = config.tokens;
 
    if (tokens) {

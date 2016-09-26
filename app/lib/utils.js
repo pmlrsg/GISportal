@@ -1,4 +1,4 @@
-var utils = {}
+var utils = {};
 var fs = require("fs");
 var path = require("path");
 var bunyan = require('bunyan');
@@ -17,7 +17,7 @@ utils.fileExists = function(filePath)
    {
       return false;
    }
-}
+};
 
 utils.directoryExists = function(filePath)
 {
@@ -29,30 +29,30 @@ utils.directoryExists = function(filePath)
    {
       return false;
    }
-}
+};
 
 utils.getDomainName = function(req){
    var domain = req.headers.host;
    if(req.SUBFOLDER){
-      domain += "_" + req.SUBFOLDER
+      domain += "_" + req.SUBFOLDER;
    }
    return utils.nicifyDomain(domain);
-}
+};
 
 utils.nicifyDomain = function(domain){
    return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
-}
+};
 
 utils.mkdirpSync = function (dirpath) {
    var parts = dirpath.split(path.sep);
    for( var i = 1; i <= parts.length; i++ ) {
-      var part_path = path.join.apply(null, parts.slice(0, i))
+      var part_path = path.join.apply(null, parts.slice(0, i));
       part_path = "/" + part_path;
       if(!utils.directoryExists(part_path)){
          fs.mkdirSync( part_path );
       }
    }
-}
+};
 
 
 utils.handleError = function(err, res){
@@ -62,4 +62,4 @@ utils.handleError = function(err, res){
       log.error(err);
    }catch(e){
    }
-}
+};

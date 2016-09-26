@@ -12,17 +12,17 @@ var child_process = require('child_process');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
-var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
+// var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js"; // NOT USED
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
-var METADATA_PATH = CURRENT_PATH + "/../../markdown/";
-var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
+// var METADATA_PATH = CURRENT_PATH + "/../../markdown/"; // NOT USED
+// var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/"; // NOT USED
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
 var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
 var TEMP_UPLOADS_PATH = __dirname + "/../../uploads/";
 
-var multer  = require('multer')
-var upload = multer({ dest: TEMP_UPLOADS_PATH })
+var multer  = require('multer');
+var upload = multer({ dest: TEMP_UPLOADS_PATH });
 
 module.exports = router;
 
@@ -71,7 +71,7 @@ router.all('/app/plotting/check_plot', function(req, res){
    }else{
       process_info.push('-b=' + series_data.bbox);
    }
-   var child = child_process.spawn('python', process_info)
+   var child = child_process.spawn('python', process_info);
 
    child.stdout.on('data', function(data){
       data = JSON.parse(data);
@@ -121,7 +121,7 @@ router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('f
       var geoJSONData = fs.readFileSync(geoJSON_path);
       geoJSONData = JSON.parse(geoJSONData);
       try{
-         res.send({shapeName: shape_file.originalname.replace(".shp", ""), geojson:geoJSONData})
+         res.send({shapeName: shape_file.originalname.replace(".shp", ""), geojson:geoJSONData});
       }catch(err){
          utils.handleError(err, res);
       }
@@ -160,8 +160,8 @@ router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req,
 });
 
 router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res){
-   var username = user.getUsername(req); // Gets the given username
-   var domain = utils.getDomainName(req); // Gets the given domain
+   // var username = user.getUsername(req); // Gets the given username NOT USED
+   // var domain = utils.getDomainName(req); // Gets the given domain NOT USED
    var csv_file = req.file; // Gets the data given
 
    if(csv_file.mimetype != "text/csv"){
@@ -185,11 +185,11 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
             }else{
                var longitude = parseFloat(data.Longitude);
                var latitude = parseFloat(data.Latitude);
-               var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}}
+               var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}};
                features_list.push(geoJSON_data);
             }
          }else{
-            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. \n Please correct the errors and upload again')
+            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. \n Please correct the errors and upload again');
          }
       })
       .on('error', function(err){
@@ -237,7 +237,7 @@ router.all('/app/prep_download', function(req, res){
       process_info.push(depth);
    }
 
-   var child = child_process.spawn('python', process_info)
+   var child = child_process.spawn('python', process_info);
 
    child.stdout.on('data', function(data){
       var temp_file = path.normalize(data.toString().replace("\n", ""));
@@ -256,8 +256,8 @@ router.all('/app/prep_download', function(req, res){
 });
 
 router.all('/app/download', function(req, res){
-   var filename = req.query.filename
-   var coverage = req.query.coverage
+   var filename = req.query.filename;
+   var coverage = req.query.coverage;
 
    var temp_file = path.join(TEMP_UPLOADS_PATH, filename);
 
