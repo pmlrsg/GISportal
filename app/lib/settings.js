@@ -5,26 +5,18 @@ var path = require('path');
 var fs = require("fs");
 var _ = require("underscore");
 var jimp = require("jimp");
-var bodyParser = require('body-parser');
 var titleCase = require('to-title-case');
 var user = require('./user.js');
 var utils = require('./utils.js');
 var redis = require('redis');
 var client = redis.createClient();
 var crypto = require('crypto');
-var api = require('./api.js');
-var settings = require('./settings.js');
-
-var child_process = require('child_process');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
-var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io/node_modules/socket.io-client/socket.io.js";
-
-var WMS_NAMESPACE = '{http://www.opengis.net/wms}';
 
 var settings = {};
 module.exports = settings;
