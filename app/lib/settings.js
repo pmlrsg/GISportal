@@ -1,8 +1,6 @@
-var xml2js = require('xml2js'); // Added
+var xml2js = require('xml2js');
 var request = require('request');
-var express = require('express'); // Added
-var router = express.Router();
-var util = require('util');
+// var util = require('util');
 var path = require('path');
 var fs = require("fs");
 var _ = require("underscore");
@@ -15,6 +13,7 @@ var redis = require('redis');
 var client = redis.createClient();
 var crypto = require('crypto');
 var api = require('./api.js');
+var settings = require('./settings.js');
 
 var child_process = require('child_process');
 
@@ -25,8 +24,10 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io/node_modules/socket.io-client/socket.io.js";
 
-var WMS_NAMESPACE = '{http://www.opengis.net/wms}'
+var WMS_NAMESPACE = '{http://www.opengis.net/wms}';
 
+var settings = {};
+module.exports = settings;
 
 // This is for the xml2js parsing, it removes any silly namespaces.
 var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
@@ -34,7 +35,6 @@ var stripPrefix = function(str) {
    return str.replace(prefixMatch, '');
 };
 
-module.exports = router;
 /**
  * Returns true or false depending if a string stars with another string.
  * @param  {String} string The string to be evaluated
@@ -47,7 +47,7 @@ function stringStartsWith(string, prefix) {
 
 function sortLayersList(data, param){
    var byParam = data.slice(0);
-   for(layer in byParam){
+   for(var layer in byParam){
       if(!byParam[layer][param]){
          return byParam;
       }
@@ -60,37 +60,149 @@ function sortLayersList(data, param){
    return byParam;
 }
 
-router.use(function (req, res, next) {
-   res.setHeader('Access-Control-Allow-Origin', '*');
-   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-Modified-Since');
-   next();
-});
+function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){
+   for(var index in parent_layer.Layer){
+      var layer = parent_layer.Layer[index];
 
-router.use(bodyParser.json({limit: '1mb'}));
-router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
+      var name_elem = layer.Name;
+      var title_elem = layer.Title;
+      var abstract_elem = layer.Abstract;
+      var ex_bounding_elem = layer.EX_GeographicBoundingBox;
+      var dimension_elem = layer.Dimension;
+      var style_elem = layer.Style;
 
-router.get('/app/settings/proxy', function(req, res) {
-   var url = decodeURI(req.query.url) // Gets the given URL
+      if(name_elem && typeof(name_elem[0]) == "string"){
+         name = name_elem[0];
+      }
+      if(title_elem && typeof(title_elem[0]) == "string"){
+         title = title_elem[0];
+      }
+      if(abstract_elem && typeof(abstract_elem[0]) == "string"){
+         abstract = abstract_elem[0];
+      }
+
+      if(dimension_elem){
+         dimensions = createDimensionsArray(layer);
+      }
+
+      if(typeof(ex_bounding_elem) != "undefined"){
+         bounding_box = createBoundingBox(layer);
+      }
+      if(style_elem){
+         style = createStylesArray(layer);
+         if(style.length === 0){
+            style = undefined;
+         }
+      }
+      if(name && service_title && title && bounding_box){
+         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box});
+         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
+         if(!utils.directoryExists(LAYER_CONFIG_PATH)){
+            utils.mkdirpSync(LAYER_CONFIG_PATH);
+         }
+         var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
+         fs.writeFileSync(save_path, JSON.stringify(layer_data));
+         style = undefined;
+      }else{
+         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
+      }
+
+   }
+
+}
+
+function createBoundingBox(layer){   
+   var bounding_elem = layer.EX_GeographicBoundingBox[0];
+   var exGeographicBoundingBox = {
+      "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
+      "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
+      "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
+      "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
+   };
+   return exGeographicBoundingBox;
+}
+
+function createStylesArray(layer){
+   var styles = [];
+   for(var index in layer.Style){
+      var style_tag = layer.Style[index];
+      var name = style_tag.Name;
+      var legend = style_tag.LegendURL;
+
+      if(name && legend){
+         name = name[0];
+         legend = legend[0];
+         styles.push({
+            "Name": name,
+            "LegendURL": legend.OnlineResource[0].$.href,
+            "Width": legend.$.width,
+            "Height": legend.$.height
+         });
+      }
+   }
+   return styles;
+}
+
+function createDimensionsArray(layer){
+   var dimensions = {};
+   dimensions.dimensions = [];
+   dimensions.temporal = false;
+   // dimensions.firstDate;
+   // dimensions.lastDate;
+
+   for(var index in layer.Dimension){
+      var dimension = layer.Dimension[index];
+      var dimensionList = dimension._.split(",");
+      var dimensionValue = dimension._.trim();
+
+      if(dimension.$.name == "time"){
+         dimensions.temporal = true;
+         var newDates = [];
+         for(var dimension_index in dimensionList){
+            var dimension_str = dimensionList[dimension_index];
+            var dateTime = dimension_str.trim();
+            if(dateTime.search("-") == 4){
+               newDates.push(dateTime);
+            }
+         }
+         if(newDates.length > 0){
+            dimensions.firstDate = newDates[0].trim().substring(0, 10);
+            dimensions.lastDate = newDates[newDates.length-1].trim().substring(0, 10);
+         }
+         dimensionValue = newDates.join().trim();
+      }
+      dimensions.dimensions.push({
+         "Name" : dimension.$.name,
+         "Units" : dimension.$.units,
+         "Default" : dimension.$.default,
+         "Value" : dimensionValue
+      });
+   }
+   return dimensions;
+}
+
+
+settings.proxy = function(req, res) {
+   var url = decodeURI(req.query.url); // Gets the given URL
    request(url, function(err, response, body){
       if(err){
          utils.handleError(err, res);
       }else{
          res.status(response.statusCode);
-         var content_type = response.headers['content-type']
+         var content_type = response.headers['content-type'];
          if(content_type){
             if(content_type == "WMS_XML"){ // TODO: see if there is a smaller brick to crack this walnut
-               content_type = "text/xml"
+               content_type = "text/xml";
             }
             res.setHeader("content-type", content_type.split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
          }
          res.send(body);
       }
    });
-});
+};
 
-router.get('/app/settings/img_proxy', function(req, res){
-   var url = decodeURI(req.query.url) // Gets the given URL
+settings.img_proxy = function(req, res){
+   var url = decodeURI(req.query.url); // Gets the given URL
    jimp.read(url, function(err, image){ // Gets the image file from the URL
       if (err){
          utils.handleError(err, res);
@@ -106,9 +218,9 @@ router.get('/app/settings/img_proxy', function(req, res){
          });
       }
    });
-});
+};
 
-router.get('/app/settings/config', function(req, res) {
+settings.config = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var config_path = path.join(MASTER_CONFIG_PATH, domain, "config.js");
    var js_file;
@@ -118,11 +230,11 @@ router.get('/app/settings/config', function(req, res) {
       js_file = fs.readFileSync(EXAMPLE_CONFIG_PATH);
    }
    res.send(js_file);
-});
+};
 
-router.get('/app/settings/email_setup', function(req, res) {
+settings.email_setup = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
-   var email_config = config[domain].email;
+   var email_config = global.config[domain].email;
    var email_setup = false;
    if(email_config.method == "mailgun"){
       if(email_config.mailgun_api_key && email_config.mailgun_domain){
@@ -135,9 +247,9 @@ router.get('/app/settings/email_setup', function(req, res) {
       }
    }
    res.send(email_setup);
-});
+};
 
-router.get('/app/settings/view', function(req, res) {
+settings.view = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var view_name = req.query.view;
    var view_path = path.join(MASTER_CONFIG_PATH, domain, "views", view_name + ".json");
@@ -148,9 +260,9 @@ router.get('/app/settings/view', function(req, res) {
    }else{
       res.status(404).send();
    }
-});
+};
 
-router.get('/app/settings/walkthrough', function(req, res) {
+settings.walkthrough = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var walkthrough = req.query.walkthrough;
    var owner = req.query.owner;
@@ -168,9 +280,9 @@ router.get('/app/settings/walkthrough', function(req, res) {
    }else{
       res.status(404).send();
    }
-});
+};
 
-router.get('/app/settings/delete_walkthrough', function(req, res) {
+settings.delete_walkthrough = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var walkthrough = req.query.walkthrough;
    var owner = req.query.owner;
@@ -181,16 +293,16 @@ router.get('/app/settings/delete_walkthrough', function(req, res) {
    }else{
       file_path = path.join(MASTER_CONFIG_PATH, domain, "user_" + owner, walkthrough + "_walkthrough.json");
    }
-   var walkthrough_file;
+   // var walkthrough_file; // NOT USED
    if(utils.fileExists(file_path)){
       fs.unlinkSync(file_path);
       res.send({});
    }else{
       res.status(404).send();
    }
-});
+};
 
-router.get('/app/settings/get_views', function(req, res) {
+settings.get_views = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
 
    var views_path = path.join(MASTER_CONFIG_PATH, domain, "views");
@@ -206,19 +318,19 @@ router.get('/app/settings/get_views', function(req, res) {
       var view_path = path.join(views_path, filename);
 
       if(utils.fileExists(view_path)){
-         view_file = fs.readFileSync(view_path);
+         var view_file = fs.readFileSync(view_path);
          try{
             var niceName = filename.replace('.json', "");
             views_obj[niceName] = JSON.parse(view_file).title || niceName;
-         }catch(e){};
+         }catch(e){}
       }
    });
 
    res.send(views_obj);
 
-});
+};
 
-router.get('/app/settings/get_walkthroughs', function(req, res) {
+settings.get_walkthroughs = function(req, res) {
    var this_username = user.getUsername(req);
    var usernames = [this_username];
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -252,7 +364,7 @@ router.get('/app/settings/get_walkthroughs', function(req, res) {
       }
       usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
       // Eventually should just remove all admins here!
-      for(username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
+      for(var username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
          var user_config_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
          if(!utils.directoryExists(user_config_path)){
             utils.mkdirpSync(user_config_path); // Creates the directory if it doesn't already exist
@@ -269,9 +381,9 @@ router.get('/app/settings/get_walkthroughs', function(req, res) {
    }
    res.send(JSON.stringify(walkthrough_list)); // Returns the cache to the browser.
 
-});
+};
 
-router.get('/app/settings/get_owners', function(req, res) {
+settings.get_owners = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);
    var permission = user.getAccessLevel(req, domain);
@@ -293,9 +405,9 @@ router.get('/app/settings/get_owners', function(req, res) {
       owners.push(domain);
    }
    res.send({owners:owners});
-});
+};
 
-router.get('/app/settings/get_dictionary', function(req, res) {
+settings.get_dictionary = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);
    var dict_path = path.join(MASTER_CONFIG_PATH, "dictionary.json");
@@ -305,15 +417,15 @@ router.get('/app/settings/get_dictionary', function(req, res) {
       var dict_file = JSON.parse(fs.readFileSync(dict_path));
       if(utils.fileExists(user_dict_path)){
          var user_dict_file = JSON.parse(fs.readFileSync(user_dict_path));
-         _.extend(dict_file, user_dict_file)
+         _.extend(dict_file, user_dict_file);
       }
       res.send(dict_file);
    }else{
       res.send({});
    }
-});
+};
 
-router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(req, res) {
+settings.add_to_dictionary = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var standard_name = req.query.standard_name;
    var display_name = req.query.display_name;
@@ -354,37 +466,9 @@ router.all('/app/settings/add_to_dictionary', user.requiresValidUser, function(r
       fs.writeFileSync(dict_path, JSON.stringify(dict));
    }
    res.status(200).send();
-});
+};
 
-router.get('/app/cache/*?', function(req, res) {
-   var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
-   res.sendFile(config_path, function (err) {
-      if (err) {
-         utils.handleError(err, res);
-      }
-   });
-});
-
-router.get('/app/socket.io/', function(req, res) {
-   var socket_file = fs.readFileSync(SOCKETIO_FILE_PATH);
-   res.send(socket_file);
-});
-
-router.get('/resources/*?', function(req, res) {
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var config_path = path.join(MASTER_CONFIG_PATH, domain, "resources", req.params[0]);// Gets the given path
-   if(!utils.fileExists(config_path)){
-      res.status(404).send();
-      return;
-   }
-   res.sendFile(config_path, function (err) {
-      if (err) {
-         utils.handleError(err, res);
-      }
-   });
-});
-
-router.get('/app/settings/get_cache', function(req, res) {
+settings.get_cache = function(req, res) {
    var this_username = user.getUsername(req);
    var usernames = [this_username];
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -425,7 +509,7 @@ router.get('/app/settings/get_cache', function(req, res) {
       }
       usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
       // Eventually should just remove all admins here!
-      for(username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
+      for(var username in usernames){ // Usernames is now a list of all users or just the single loggeed in user.
          var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
          if(!utils.directoryExists(user_cache_path)){
             utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
@@ -449,12 +533,12 @@ router.get('/app/settings/get_cache', function(req, res) {
       }
    }
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
-});
+};
 
-router.all('/app/settings/rotate', function(req, res){
+settings.rotate = function(req, res){
    var angle = parseInt(req.query.angle); // Gets the given angle
-   var url = req.query.url // Gets the given URL
-   if(angle == "undefined" || angle == "" || typeof(angle) != "number"){
+   var url = req.query.url; // Gets the given URL
+   if(angle == "undefined" || angle === "" || typeof(angle) != "number"){
       angle = 0; // Sets angle to 0 if its not set to a number
    }
    angle = Math.round(angle/90)*90; // Rounds the angle to the neerest 90 degrees
@@ -475,9 +559,9 @@ router.all('/app/settings/rotate', function(req, res){
          });
       }
    });   
-});
+};
 
-router.get('/app/settings/remove_server_cache', function(req, res){
+settings.remove_server_cache = function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain); // Gets the user permission
@@ -507,13 +591,13 @@ router.get('/app/settings/remove_server_cache', function(req, res){
          }
       });
    }
-});
+};
 
-router.get('/app/settings/add_wcs_url', function(req, res){
+settings.add_wcs_url = function(req, res){
    var url = req.query.url.split('?')[0] + "?"; // Gets the given url
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   // var permission = user.getAccessLevel(req, domain); // Gets the user permission // NOT USED
    var filename = req.query.filename + ".json"; // Gets the given filename
 
    var base_path = path.join(MASTER_CONFIG_PATH, domain);
@@ -521,13 +605,13 @@ router.get('/app/settings/add_wcs_url', function(req, res){
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
    var this_path = path.join(base_path, filename);
-   json_data = JSON.parse(fs.readFileSync(this_path));
+   var json_data = JSON.parse(fs.readFileSync(this_path));
    json_data.wcsURL = url;
    fs.writeFileSync(this_path, JSON.stringify(json_data));
    res.send(this_path);
-});
+};
 
-router.all('/app/settings/restore_server_cache', function(req, res){
+settings.restore_server_cache = function(req, res){
    var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain); // Gets the user permission
@@ -544,35 +628,46 @@ router.all('/app/settings/restore_server_cache', function(req, res){
          }
       });
    }
-});
+};
 
-router.all('/app/settings/update_layer', function(req, res){
+settings.update_layer = function(req, res){
    var username = req.query.username; // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    // var permission = user.getAccessLevel(req, domain); // Gets the user permission NOT USED
    var data = JSON.parse(req.body.data); // Gets the data given
    var filename = data.serverName + ".json"; // Gets the given filename
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
-   api.update_layer(username, domain, data, filename, base_path);
-});
+   if (username != domain) {
+      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
+   }
+   var this_path = path.join(base_path, filename);
+   fs.writeFile(this_path, JSON.stringify(data), function(err) {
+      if (err) {
+         utils.handleError(err, res);
+      } else {
+         res.send("");
+      }
+   });
+};
 
-router.all('/app/settings/add_user_layer', function(req, res){
+settings.add_user_layer = function(req, res){
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = server_info.owner; // Gets the given username
-
+   var cache_path;
+   var save_path;
 
    if('provider' in server_info && 'server_name' in server_info){ // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
       if(domain == username){
          // If is is a global file it is refreshed from the URL
-         var cache_path = path.join(MASTER_CONFIG_PATH, domain);
-         var save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
+         cache_path = path.join(MASTER_CONFIG_PATH, domain);
+         save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
       }else{
          // If it is to be a user file the data is retrieved from the temorary cache
-         var cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
-         var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
+         cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
+         save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
       }
       if(!utils.directoryExists(cache_path)){
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
@@ -592,11 +687,11 @@ router.all('/app/settings/add_user_layer', function(req, res){
          return res.status(404).send();
       }
       var new_data = []; // The list for the new data to go into
-      for(new_layer in layers_list){ // Loops through each new layer.
+      for(var new_layer in layers_list){ // Loops through each new layer.
          var this_new_layer = layers_list[new_layer];
          if('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer){ // Checks that the layer has the required fields
             var found = false;
-            for(old_layer in data.server.Layers){ // Loops through each old layer to be compared.
+            for(var old_layer in data.server.Layers){ // Loops through each old layer to be compared.
                if(data.server.Layers[old_layer].Name == this_new_layer.original_name){ // When the layers match
                   var new_data_layer = data.server.Layers[old_layer]; // 
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
@@ -610,9 +705,9 @@ router.all('/app/settings/add_user_layer', function(req, res){
                   new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
-                  for(key in this_new_layer.tags){
+                  for(var key in this_new_layer.tags){
                      var val = this_new_layer.tags[key];
-                     if(val && val.length > 0 && val[0] != ""){
+                     if(val && val.length > 0 && val[0] !== ""){
                         new_data_layer.tags[key] = val;
                      }else{
                         new_data_layer.tags[key] = undefined;
@@ -653,9 +748,9 @@ router.all('/app/settings/add_user_layer', function(req, res){
    }else{
       res.send("Error");
    }
-});
+};
 
-router.get('/app/settings/load_data_values', function(req, res){
+settings.load_data_values = function(req, res){
    var url = req.query.url; // Gets the given URL
    var name = req.query.name; // Gets the given name
    var units = req.query.units; // getst the given units
@@ -675,7 +770,7 @@ router.get('/app/settings/load_data_values', function(req, res){
                   try{
                      response_text = name + ": " + result.FeatureInfoResponse.FeatureInfo[0].value[0] + " " + units;
                   }catch(e){
-                     response_text = "Sorry, could not calculate a value for: " + name
+                     response_text = "Sorry, could not calculate a value for: " + name;
                   }
                   res.send(response_text);
                }
@@ -691,9 +786,9 @@ router.get('/app/settings/load_data_values', function(req, res){
                         if(err){
                            utils.handleError(err, res);
                         }else{
-                           var output = name + ":"
+                           var output = name + ":";
                            try{
-                              for(key in result.FeatureInfoResponse.FIELDS[0].$){
+                              for(var key in result.FeatureInfoResponse.FIELDS[0].$){
                                  output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
                               }
                            }catch(e){
@@ -711,10 +806,9 @@ router.get('/app/settings/load_data_values', function(req, res){
          }
       }
    });
-});
+};
 
-
-router.get('/app/settings/load_new_wms_layer', function(req, res){
+settings.load_new_wms_layer = function(req, res){
    var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
    var refresh = req.query.refresh; // Gets the given refresh
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -742,6 +836,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                   utils.handleError(err, res);
                }else{
                   try{
+                     var provider;
                      var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
                      var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
                      var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
@@ -766,7 +861,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         contact_info.person = contact_person[0];
                      }
                      if(typeof(contact_organization[0]) == 'string'){
-                        var provider = contact_organization[0];
+                        provider = contact_organization[0];
                      }
                      if(contact_position && contact_position[0].length > 0){
                         contact_info.position = contact_position[0];
@@ -796,9 +891,11 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         contact_info.address = address;
                      }
 
-                     for(index in result.WMS_Capabilities.Capability[0].Layer){
-                        var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index]
-                        var layers = [];
+                     var layers = [];
+
+                     for(var index in result.WMS_Capabilities.Capability[0].Layer){
+                        var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index];
+                        layers = [];
                         var name;
                         var service_title;
                         var title;
@@ -823,7 +920,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         }
                         if(style_elem){
                            style = createStylesArray(parent_layer);
-                           if(style.length == 0){
+                           if(style.length === 0){
                               style = undefined;
                            }
                         }
@@ -839,7 +936,7 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
                         sub_master_cache.timeStamp = new Date();
 
-                        var data = JSON.stringify(sub_master_cache)
+                        var data = JSON.stringify(sub_master_cache);
                         fs.writeFileSync(file_path, data);
                         res.send(data);
                      }else{
@@ -855,19 +952,19 @@ router.get('/app/settings/load_new_wms_layer', function(req, res){
    }else{
       res.send(fs.readFileSync(file_path));
    }
-});
+};
 
-router.all('/app/settings/create_share', function(req, res){
+settings.create_share = function(req, res){
    var data = req.body;
    var shasum = crypto.createHash('sha256');
    shasum.update(Date.now().toString());
    var shareId = shasum.digest('hex').substr(0,6);
    client.set("share_" + shareId, data.state, function(err){});
    res.send(shareId);
-});
+};
 
-router.get('/app/settings/get_share', function(req, res){
-   var shareId = req.query.id // Gets the given shareId
+settings.get_share = function(req, res){
+   var shareId = req.query.id; // Gets the given shareId
    client.get("share_" + shareId, function(err, data) {
       if(err){
          res.status(500).send();
@@ -875,9 +972,9 @@ router.get('/app/settings/get_share', function(req, res){
          res.send(data);
       }
    });
-});
+};
 
-router.all('/app/settings/get_markdown_metadata', function(req, res) {
+settings.get_markdown_metadata = function(req, res) {
    var markdown = require( "node-markdown" ).Markdown;
    var domain = utils.getDomainName(req);
    var data = req.body; // Gets the data
@@ -920,9 +1017,9 @@ router.all('/app/settings/get_markdown_metadata', function(req, res) {
       addMarkdown(tag, false);
    }
    res.send(html);
-});
+};
 
-router.all('/app/settings/save_walkthrough', function(req, res){
+settings.save_walkthrough = function(req, res){
    var walkthrough = req.body; // Gets the given walkthrough
    var domain = utils.getDomainName(req); // Gets the domain
    var username = walkthrough.owner; // Gets the given owner
@@ -934,138 +1031,17 @@ router.all('/app/settings/save_walkthrough', function(req, res){
    }
 
    var filename = walkthrough.title + '_walkthrough.json';
+   var save_path;
    if(domain == username){
       // If is is a global file
-      var save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
+      save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
    }else{
       // If it is to be a user file
-      var save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
+      save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
    }
    if(utils.fileExists(save_path) && !overwrite){
       return res.status(400).send('Filename Taken');
    }
    fs.writeFileSync(save_path, JSON.stringify(walkthrough));
    res.status(200).send({success: true});
-});
-
-
-function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider){
-   for(index in parent_layer.Layer){
-      var layer = parent_layer.Layer[index]
-
-      var name_elem = layer.Name;
-      var title_elem = layer.Title;
-      var abstract_elem = layer.Abstract;
-      var ex_bounding_elem = layer.EX_GeographicBoundingBox;
-      var dimension_elem = layer.Dimension;
-      var style_elem = layer.Style;
-
-      if(name_elem && typeof(name_elem[0]) == "string"){
-         name = name_elem[0];
-      }
-      if(title_elem && typeof(title_elem[0]) == "string"){
-         title = title_elem[0];
-      }
-      if(abstract_elem && typeof(abstract_elem[0]) == "string"){
-         abstract = abstract_elem[0];
-      }
-
-      if(dimension_elem){
-         dimensions = createDimensionsArray(layer)
-      }
-
-      if(typeof(ex_bounding_elem) != "undefined"){
-         bounding_box = createBoundingBox(layer);
-      }
-      if(style_elem){
-         style = createStylesArray(layer);
-         if(style.length == 0){
-            style = undefined;
-         }
-      }
-      if(name && service_title && title && bounding_box){
-         layers.push({"Name": name, "Title": title, "tags":{ "indicator_type": [ service_title.replace(/_/g, " ")],"niceName": titleCase(title), "data_provider" : provider}, "Abstract": abstract, "FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box})
-         var layer_data = {"FirstDate": dimensions.firstDate, "LastDate": dimensions.lastDate, "EX_GeographicBoundingBox": bounding_box, "Dimensions": dimensions.dimensions || [], "Styles": style};
-         if(!utils.directoryExists(LAYER_CONFIG_PATH)){
-            utils.mkdirpSync(LAYER_CONFIG_PATH);
-         }
-         var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
-         fs.writeFileSync(save_path, JSON.stringify(layer_data));
-         style = undefined;
-      }else{
-         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
-      }
-
-   }
-
-}
-
-function createBoundingBox(layer){   
-   bounding_elem = layer.EX_GeographicBoundingBox[0]
-   var exGeographicBoundingBox = {
-      "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
-      "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
-      "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
-      "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
-   }
-   return exGeographicBoundingBox;
-}
-
-function createStylesArray(layer){
-   var styles = [];
-   for(index in layer.Style){
-      var style_tag = layer.Style[index];
-      var name = style_tag.Name;
-      var legend = style_tag.LegendURL;
-
-      if(name && legend){
-         name = name[0];
-         legend = legend[0];
-         styles.push({
-            "Name": name,
-            "LegendURL": legend.OnlineResource[0].$['href'],
-            "Width": legend.$.width,
-            "Height": legend.$.height
-         });
-      }
-   }
-   return styles;
-}
-
-function createDimensionsArray(layer){
-   var dimensions = {};
-   dimensions.dimensions = [];
-   dimensions.temporal = false;
-   dimensions.firstDate;
-   dimensions.lastDate;
-
-   for(index in layer.Dimension){
-      var dimension = layer.Dimension[index];
-      var dimensionList = dimension._.split(",");
-      var dimensionValue = dimension._.trim();
-
-      if(dimension.$.name == "time"){
-         dimensions['temporal'] = true;
-         var newDates = []
-         for(dimension_index in dimensionList){
-            var dimension_str = dimensionList[dimension_index];
-            var dateTime = dimension_str.trim();
-            if(dateTime.search("-") == 4){
-               newDates.push(dateTime);
-            }
-         }
-         if(newDates.length > 0){
-            dimensions.firstDate = newDates[0].trim().substring(0, 10);
-            dimensions.lastDate = newDates[newDates.length-1].trim().substring(0, 10);
-         }
-         dimensionValue = newDates.join().trim();
-      }
-      dimensions.dimensions.push({
-         "Name" : dimension.$.name,
-         "Units" : dimension.$.units,
-         "Default" : dimension.$.default,
-         "Value" : dimensionValue
-      });
-   }
-   return dimensions;
-}
+};
