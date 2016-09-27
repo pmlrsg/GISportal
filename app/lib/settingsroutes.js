@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var path = require('path');
-var fs = require("fs");
 var bodyParser = require('body-parser');
+var express = require('express');
+var fs = require("fs");
+var path = require('path');
+var settings = require('./settings.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
-var settings = require('./settings.js');
 
+var router = express.Router();
 
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
