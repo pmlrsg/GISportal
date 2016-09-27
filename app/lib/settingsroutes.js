@@ -14,15 +14,20 @@ var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io/node_modu
 
 module.exports = router;
 
-router.use(function (req, res, next) {
+router.use(function(req, res, next) {
    res.setHeader('Access-Control-Allow-Origin', '*');
    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-Modified-Since');
    next();
 });
 
-router.use(bodyParser.json({limit: '1mb'}));
-router.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
+router.use(bodyParser.json({
+   limit: '1mb'
+}));
+router.use(bodyParser.urlencoded({
+   extended: true,
+   limit: '1mb'
+}));
 
 router.get('/app/settings/proxy', settings.proxy);
 
@@ -49,12 +54,25 @@ router.get('/app/settings/get_dictionary', settings.get_dictionary);
 router.all('/app/settings/add_to_dictionary', user.requiresValidUser, settings.add_to_dictionary);
 
 router.get('/app/cache/*?', function(req, res) {
-   var config_path = path.join(MASTER_CONFIG_PATH, req.params[0]);// Gets the given path
-   res.sendFile(config_path, function (err) {
-      if (err) {
-         utils.handleError(err, res);
+   var reqPath = req.params[0];
+   var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
+
+   // Check the path isn't requesting something it shouldn't
+   if (!cleanPath.includes('config') && cleanPath.endsWith('.json')) {
+      var configPath = path.join(MASTER_CONFIG_PATH, cleanPath); // Gets the given path
+      if (utils.fileExists(configPath)) {
+         res.sendFile(configPath, function(err) {
+            if (err) {
+               utils.handleError(err, res);
+            }
+         });
+      } else {
+         // Send just 404 to avoid revealing the full server path
+         res.status(404).send();
       }
-   });
+   } else {
+      res.status(400).send();
+   }
 });
 
 router.get('/app/socket.io/', function(req, res) {
@@ -64,16 +82,20 @@ router.get('/app/socket.io/', function(req, res) {
 
 router.get('/resources/*?', function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
-   var config_path = path.join(MASTER_CONFIG_PATH, domain, "resources", req.params[0]);// Gets the given path
-   if(!utils.fileExists(config_path)){
+   var reqPath = req.params[0];
+   var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
+   var configPath = path.join(MASTER_CONFIG_PATH, domain, "resources", cleanPath); // Gets the given path
+   
+   if (utils.fileExists(configPath)) {
+      res.sendFile(configPath, function(err) {
+         if (err) {
+            utils.handleError(err, res);
+         }
+      });
+   } else {
+      // Send just 404 to avoid revealing the full server path
       res.status(404).send();
-      return;
    }
-   res.sendFile(config_path, function (err) {
-      if (err) {
-         utils.handleError(err, res);
-      }
-   });
 });
 
 router.get('/app/settings/get_cache', settings.get_cache);
