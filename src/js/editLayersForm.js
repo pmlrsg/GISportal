@@ -319,54 +319,83 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
    }
    ajax_url += clean_wms_url+".json?_="+ new Date().getTime();
    $.ajax({
-      url:  ajax_url, // The user cache is the retrieved to be compared with the new data.
+      url:  ajax_url, // The user cache (old_data) is retrieved to be compared with new_data
       dataType: 'json',
-      success: function(user_data){
-         // Lists for storing diffences.
-         var missing_layers = [];
-         var new_layers = [];
+      success: function(old_data){
+         // new_data layers that have been matched and updated
+         var matched_layers = [];
+         // CURRENTLY NOT USED
+         // // new_data layers that are new to the server
+         // var new_layers = [];
+         // // new_data layers that have matching old_data layers
+         // var existing_layers = [];
+         // // old_data layers that are missing from new_data
+         // var missing_layers = [];
+
          var provider;
-         // For each of the layers in the user data. 
-         for(var user_layer in user_data.server.Layers){
-            var found = false;
-            // Loop through the new data and update the information of the matching layer.
-            var new_server = _.keys(new_data.server)[0];
-            for(var new_layer in new_data.server[new_server]){
-               if(user_data.server.Layers[user_layer].Name == new_data.server[new_server][new_layer].Name){
-                  new_data.server[new_server][new_layer].Abstract = user_data.server.Layers[user_layer].Abstract;
-                  new_data.server[new_server][new_layer].Title = user_data.server.Layers[user_layer].Title;
-                  new_data.server[new_server][new_layer].include = user_data.server.Layers[user_layer].include || false;
-                  new_data.server[new_server][new_layer].tags = user_data.server.Layers[user_layer].tags;
-                  new_data.server[new_server][new_layer].LegendSettings = user_data.server.Layers[user_layer].LegendSettings;
-                  new_data.server[new_server][new_layer].ProviderDetails = user_data.server.Layers[user_layer].ProviderDetails || undefined;
-                  // The provider is saved so that it can be out into the provider variable.
-                  provider = user_data.server.Layers[user_layer].tags.data_provider;
-                  found = true;
-               }else if(new_layers.indexOf(new_data.server[new_server][new_layer].Name) == -1){
-                  // for layers that don't match, loop back through the user data to check that there are no layers that are new to the server.
-                  var missing = true;
-                  for(var second_user_layer in user_data.server.Layers){
-                     if(user_data.server.Layers[second_user_layer].Name == new_data.server[new_server][new_layer].Name){
-                        missing = false;
-                     }
-                  }
-                  if(missing){
-                     new_layers.push(new_data.server[new_server][new_layer].Name);
-                  }
-               }
+         var new_server = _.keys(new_data.server)[0];
+
+         // Iterate through old_data layers
+         for (var i_old = 0; i_old < old_data.server.Layers.length; i_old++) {
+            var matched = false;
+
+            // Iterate through new_data layers
+            var i_new = 0;
+            if (old_data.server.Layers[i_old].Name == new_data.server[new_server][i_old].Name) {
+               // If the new_data and old_data layers match with i_old, set i_new to i_old to avoid unnecessary iteration
+               i_new = i_old;
             }
-            // If the layer was not found in the new data it is added to the missing layers list.
-            if(!found){
-               missing_layers.push(user_data.server.Layers[user_layer].Name);
+            for (; i_new < new_data.server[new_server].length; i_new++) {
+               if (old_data.server.Layers[i_old].Name == new_data.server[new_server][i_new].Name) {
+                  // If the new_data layer matches the old_data layer, update it's information from the old_data layer
+                  new_data.server[new_server][i_new].Abstract = old_data.server.Layers[i_old].Abstract;
+                  new_data.server[new_server][i_new].Title = old_data.server.Layers[i_old].Title;
+                  new_data.server[new_server][i_new].include = old_data.server.Layers[i_old].include || false;
+                  new_data.server[new_server][i_new].tags = old_data.server.Layers[i_old].tags;
+                  new_data.server[new_server][i_new].LegendSettings = old_data.server.Layers[i_old].LegendSettings;
+                  new_data.server[new_server][i_new].ProviderDetails = old_data.server.Layers[i_old].ProviderDetails || undefined;
+                  provider = old_data.server.Layers[i_old].tags.data_provider; // The provider is saved so that it can be out into the provider variable
+                  matched_layers.push(new_data.server[new_server][i_new].Name); // Add the new_data layer to matched_layers
+                  matched = true;
+                  break;
+               } 
+               // CURRENTLY NOT USED
+               // else if (!matched_layers.includes(new_data.server[new_server][i_new].Name) &&
+               //    !new_layers.includes(new_data.server[new_server][i_new].Name) &&
+               //    !existing_layers.includes(new_data.server[new_server][i_new].Name)) {
+               //    // If the layers don't match and the new_data layer isn't already recorded as matched, new, or existing
+               //    // then iterate through old_data layers to check if this layer is new to the server.
+               //    var new_layer = true;
+               //    for (var i_old2 = 0; i_old2 < old_data.server.Layers.length; i_old2++) {
+               //       if (old_data.server.Layers[i_old2].Name == new_data.server[new_server][i_new].Name) {
+               //          // If the new_data layer matches an old_data layer, add it to existing_layers
+               //          new_layer = false;
+               //          existing_layers.push(new_data.server[new_server][i_new].Name);
+               //          break;
+               //       }
+               //    }
+               //    if (new_layer) {
+               //       // If the new_data layer doesn't match an old_data layer, add it to new_layers
+               //       new_layers.push(new_data.server[new_server][i_new].Name);
+               //    }
+               // }
             }
+
+            // CURRENTLY NOT USED
+            // if (!matched) {
+            //    // If the old_data layer was not matched with a new_data layer, add it to missing_layers
+            //    missing_layers.push(old_data.server.Layers[i_old].Name);
+            // }
          }
-         // The new data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info.
-         // If present the wcsURL is also added.
-         new_data.options = user_data.options;
-         new_data.contactInfo = user_data.contactInfo;
-         new_data.wcsURL = user_data.wcsURL || undefined;
-         new_data.provider= provider || user_data.options.providerShortTag;
-         // The data is sent off to the middleware to relace the old user cahce file.
+
+         // The new_data options is updated so that it contains the correct provider (not 'UserDefinedLayer') and contact info
+         // If present the wcsURL is also added
+         new_data.options = old_data.options;
+         new_data.contactInfo = old_data.contactInfo;
+         new_data.wcsURL = old_data.wcsURL || undefined;
+         new_data.provider = provider || old_data.options.providerShortTag;
+
+         // The data is sent off to the middleware to replace the old user cache file
          $.ajax({
             method: 'post',
             url: gisportal.middlewarePath + '/settings/update_layer?username=' + user,
@@ -376,7 +405,7 @@ gisportal.editLayersForm.refreshOldData = function(new_data, span, user, domain,
                span.parent("td").parent("tr").toggleClass('alert-warning', false);
                span.parent("td").parent("tr").toggleClass('alert-success', true);
                setTimeout(function(){span.parent("td").parent("tr").toggleClass('alert-success', false);},2000);
-               // Refreshes the timestamp.
+               // Refreshes the timestamp
                span.parent("td").siblings(".time-stamp").html(new_data.timeStamp);
                // The layers are then refreshed
                gisportal.loadLayers();
