@@ -4,3 +4,4 @@ from irregular_extraction import IrregularExtractor
 from transect_extraction import TransectExtractor
 from single_test_extraction import SingleExtractor
 from scatter_extraction import ScatterExtractor
+from sos_extractor import SOSExtractor

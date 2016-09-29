@@ -36,7 +36,7 @@ from shapely import wkt
 
 import palettes
 
-from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
+from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, SOSExtractor
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
@@ -937,7 +937,154 @@ def timeseries(plot, outfile="time.html"):
    
    #save(ts_plot)
    return(ts_plot)
-#END timeseries   
+#END timeseries 
+
+def timeseriesSOS(plot, outfile="time-sos.html"):
+
+   plot_data = plot['data']
+   plot_type = plot['type']
+   plot_title = plot['title']
+ 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
+   sources = []
+
+   ymin = []
+   ymax = []
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
+
+   for df in plot_data:
+          
+      # Build the numerical indices into our data based on the variable list supplied.
+      varindex = {j: i for i, j in enumerate(df['vars'])}
+
+      plot_scale= df['scale']
+
+      debug(4, "timeseries: varindex = {}".format(varindex))
+
+      # Grab the data as a numpy array.
+      dfarray = np.array(df['data'])
+      debug(4, dfarray)
+
+      # Flip it so we have columns for each variable ordered by time.
+      data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
+
+      # Write out the CSV of the data.
+      # TODO Should we put this in a function
+ 
+      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      zf.write(csv_file, arcname=df['coverage'] + ".csv")
+
+      debug(4, data[varindex['value']]) 
+      min_value = np.amin(data[varindex['value']].astype(np.float64))
+      max_value = np.amax(data[varindex['value']].astype(np.float64))
+      buffer_value = (max_value - min_value) /20
+      ymin.append(min_value - buffer_value)
+      ymax.append(max_value + buffer_value)
+      debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
+
+      date = datetime(data[varindex['date']])
+      
+      datasource = dict(date=date,
+                        sdate=data[varindex['date']],
+                        value=data[varindex['value']])
+
+      sources.append(ColumnDataSource(data=datasource))
+      
+   zf.close()
+   shutil.rmtree(csv_dir)
+
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+              height=400, responsive=True
+   )
+   ts_plot.title_text_font_size = "14pt"
+   ts_plot.xaxis.axis_label_text_font_size = "10pt"
+   ts_plot.yaxis.axis_label_text_font_size = "10pt"
+   
+   tooltips = [("Date", "@sdate")]
+   tooltips.append(("value", "@value{0.000}"))
+
+   ts_plot.add_tools(CrosshairTool())
+
+   ts_plot.xaxis.axis_label = 'Date'
+   
+   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+   # if we run it later.
+   debug(3,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+   ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+   #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
+   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   yrange = [None, None]
+
+   # Adding the second axis to the plot.  
+   #ts_plot.add_layout(LinearAxis(y_range_name="y1", axis_label=plot['y1Axis']['label']), 'left')
+   
+   for i, source in enumerate(sources):
+      # If we want 2 Y axes then the lines below do this
+      if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+         debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # Setting the second y axis range name and range
+         yrange[1] = "y2"
+         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+   
+         # Adding the second axis to the plot.  
+         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+   
+      if 'min' in datasource and len(sources) == 1:
+         debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
+         # Plot the max and min as a shaded band.
+         # Cannot use this dataframe because we have twice as many band variables as the rest of the 
+         # dataframe.
+         # So use this.
+         ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
+      
+      
+      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      # Plot the mean as line
+      debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
+
+      # as a point
+      debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
+      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      
+      if 'err_xs' in datasource:
+         # Plot error bars
+         debug(2, "Plotting error bars for {}".format(plot_data[i]['coverage']))
+         ts_plot.multi_line('err_xs', 'err_ys', y_range_name=y_range_name, color=plot_palette[i][3], line_alpha=0.5, source=source)
+      
+   hover = HoverTool(tooltips=tooltips)
+   ts_plot.add_tools(hover)
+
+   # Legend placement needs to be after the first glyph set up.
+   # Cannot place legend outside plot.
+   ts_plot.legend.location = "top_left"
+   
+   script, div = components(ts_plot)
+
+   # plot the points
+   #output_file(outfile, 'Time Series')
+   with open(outfile, 'w') as output_file:
+      print(template.render(script=script, div=div), file=output_file)
+   
+   #save(ts_plot)
+   return(ts_plot)
+#END timeseriesSOS  
 
 def scatter(plot, outfile='/tmp/scatter.html'):
 
@@ -1273,8 +1420,58 @@ def get_plot_data(json_request, plot=dict()):
              line = [date]
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
-    
+         print(df)
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+   elif plot_type in ("timeseries-sos"):
+      #Can have more than 1 series so need a loop.
+      for s in series:
+         ds = s['data_source']
+         yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
+         depth = None
+         if 'depth' in ds:
+            depth = ds['depth']
+         coverage = ds['coverage']
+         wcs_url = ds['threddsUrl']
+         bbox = ds['bbox']
+         time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
+
+         data_request = "SOSExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
+         try:
+            extractor = SOSExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extract = extractor.getData()
+            response_file = open(extract, 'r')
+            response = json.loads(response_file.read())
+
+         except ValueError:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return dict(data=[])
+         #except urllib2.HTTPError:
+            #debug(2, "Data request, {}, failed".format(data_request))
+            #return dict(data=[])
+         except requests.exceptions.ReadTimeout:
+            debug(2, "Data request, {}, failed".format(data_request))
+            return dict(data=[])
+         
+         debug(4, "Response: {}".format(response))
+
+         
+         data = response['resultValues']
+         values = data.split('#')
+
+         # the first item in the list is the number of results, which we don't need
+         values.pop(0)
+         
+         df = []
+         for row in values:
+            df.append(row.split(','))
+    
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'value'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
@@ -1459,6 +1656,8 @@ def execute_plot(dirname, plot, request):
    update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
+   elif plot['type'] == 'timeseries-sos':
+      plot_file = timeseriesSOS(plot, file_path)
    elif plot['type'] == 'scatter':
       plot_file = scatter(plot, file_path)
    elif plot['type'] in ("hovmollerLat", "hovmollerLon"):
@@ -1519,17 +1718,18 @@ To execute a plot
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
       # Now try and make the plot.
-      try:
-         if execute_plot(opts.dirname, plot, request):
-            debug(1, "Plot complete")
-         else:
-            debug(0, "Error executing. Failed to complete plot")
-            sys.exit(2)
-      except:
-         trace_message = traceback.format_exc()
-         debug(0, "Uncaught Exception. Failed to complete plot - {}".format(trace_message))
-         update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
-         raise
+      execute_plot(opts.dirname, plot, request)
+      # try:
+      #    if execute_plot(opts.dirname, plot, request):
+      #       debug(1, "Plot complete")
+      #    else:
+      #       debug(0, "Error executing. Failed to complete plot")
+      #       sys.exit(2)
+      # except:
+      #    trace_message = traceback.format_exc()
+      #    debug(0, "Uncaught Exception. Failed to complete plot - {}".format(trace_message))
+      #    update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
+      #    raise
 
    else:
       # We should not be here
