@@ -164,7 +164,11 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
    var domain = utils.getDomainName(req); // Gets the given domain
    var csv_file = req.file; // Gets the data given
 
-   if(csv_file.mimetype != "text/csv"){
+   // we use the file's extension to identifty type rather than `this_file.mimetype` as machines that have
+   // Microsoft Excel installed will identify these as `application/vnd.mx-excel` rather than `text\csv`
+   var ext = csv_file.originalname.split('.');
+   ext = ext[ext.length-1];
+   if(ext.toLowerCase() != "csv"){
       return res.status(415).send('Please upload a CSV file');
    }
 
