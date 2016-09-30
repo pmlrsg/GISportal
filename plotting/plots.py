@@ -1001,7 +1001,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       
       datasource = dict(date=date,
                         sdate=data[varindex['date']],
-                        value=data[varindex['value']])
+                        mean=data[varindex['value']])
 
       sources.append(ColumnDataSource(data=datasource))
       
@@ -1016,8 +1016,8 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("value", "@value{0.000}"))
-
+   tooltips.append(("value", "@mean{0.000}"))
+   
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
@@ -1061,7 +1061,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], size=1, alpha=0.5, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars
