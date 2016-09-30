@@ -6,6 +6,7 @@ var xml2js = require('xml2js');
 
 var utils = require('./utils.js');
 
+var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
@@ -32,6 +33,18 @@ settingsApi.sortLayersList = function(data, param) {
       return x < y ? -1 : x > y ? 1 : 0;
    });
    return byParam;
+};
+
+settingsApi.update_layer = function(username, domain, data, callback) {
+   var filename = data.serverName + ".json"; // Gets the given filename
+   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
+   if (username != domain) {
+      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
+   }
+   var this_path = path.join(base_path, filename);
+   fs.writeFile(this_path, JSON.stringify(data), function(err) {
+      callback(err);
+   });
 };
 
 settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {

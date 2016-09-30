@@ -497,13 +497,8 @@ settings.update_layer = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    // var permission = user.getAccessLevel(req, domain); // Gets the user permission NOT USED
    var data = JSON.parse(req.body.data); // Gets the data given
-   var filename = data.serverName + ".json"; // Gets the given filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
-   if (username != domain) {
-      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
-   }
-   var this_path = path.join(base_path, filename);
-   fs.writeFile(this_path, JSON.stringify(data), function(err) {
+   
+   settingsApi.update_layer(username, domain, data, function(err) {
       if (err) {
          utils.handleError(err, res);
       } else {
