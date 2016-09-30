@@ -246,8 +246,10 @@ gisportal.graphs.Plot =(function(){
             return output;
          }).join(' / ');
 
+         y1AxisIsLog = $('.js-indicator-is-log[data-id="' + leftHandSideComoponents[0].indicator + '"]')[0].checked;
+
          y1Axis = {
-            "scale" : "linear", //( linear | log_scale | ordinal | time)
+            "scale" : y1AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label" : yAxis1Label,
             "ticks" : "auto",
             "weight" : "auto",
@@ -279,8 +281,10 @@ gisportal.graphs.Plot =(function(){
             return output;
          }).join(' / ');
 
+         y2AxisIsLog = $('.js-indicator-is-log[data-id="' + rightHandSideComoponents[0].indicator + '"]')[0].checked;
+         
          var y2Axis = {
-            "scale" : "linear", //( linear | log_scale | ordinal | time)
+            "scale" : y2AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label" : yAxis2Label,
             "ticks" : "auto",
             "weight" : "auto",
