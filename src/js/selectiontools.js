@@ -150,48 +150,38 @@ gisportal.selectionTools.shapesUploaded = function(){
    gisportal.loading.increment();
    var files_list = this.files;
    if(files_list.length > 0){
-      var dbf_found, shp_found, shx_found, files_total_size = 0;
+      var csv_found, dbf_found, shp_found, shx_found, files_total_size = 0;
       var formData = new FormData($(this).parent()[0]);
 
       for(var i = 0; i < files_list.length; i++){
          this_file = files_list[i];
-         // FOR STUPID WINDOWS (not reporting file types!!)
-         if(this_file.type === ""){
-            var ext = this_file.name.split('.');
-            ext = ext[ext.length-1];
-            if(ext == "csv"){
-               this_file.type = "text/csv";
-            }else if(ext == "dbf"){
-               dbf_found = true;
-            }else if(ext == "shp"){
-               shp_found = true;
-            }else if(ext == "shx"){
-               shx_found = true;
-            }
+
+         // we use the file's extension to identifty type rather than `this_file.mimetype` as machines that have
+         // Microsoft Excel installed will identify these as `application/vnd.mx-excel` rather than `text\csv` 
+         var ext = this_file.name.split('.');
+         ext = ext[ext.length-1];
+         if(ext.toLowerCase() == "csv"){
+            gisportal.selectionTools.csvFound(formData);
+            gisportal.loading.decrement();
+            return true;
+         }else if(ext == "dbf"){
+            dbf_found = true;
+         }else if(ext == "shp"){
+            shp_found = true;
+         }else if(ext == "shx"){
+            shx_found = true;
          }
+      
          files_total_size += this_file.size;
          if(files_total_size > 5242880){
             $.notify("There is a  5MB limit on file uploads", "error");
             gisportal.loading.decrement();
             return;
          }
-         if(this_file.type == "application/x-dbf"){
-            dbf_found = true;
-         }
-         if(this_file.type == "application/x-esri-shape"){
-            shp_found = true;
-         }
-         if(this_file.type == "application/x-esri-shape-index"){
-            shx_found = true;
-         }
-         if(this_file.type == "text/csv"){
-            gisportal.selectionTools.csvFound(formData);
-            gisportal.loading.decrement();
-            return true;
-         }
       }
       if(files_list.length !== 3 || !dbf_found || !shp_found || !shx_found){
          $.notify("You must provide 3 Files (.shp & .dbf & .shx)", "error");
+         gisportal.loading.decrement();
       }else{
          $.ajax({
             url: gisportal.middlewarePath + '/plotting/upload_shape',  //Server script to process data
@@ -242,11 +232,11 @@ gisportal.selectionTools.csvFound = function(formData){
       },
       error: function(e) {
          if(e.status == 401){
-            $.notify("Sorry, You nust be logged in to use this feature.", "error");
+            $.notify("Sorry, You must be logged in to use this feature.", "error");
          }else if(e.status == 413){
             $.notify("The server cannot take requests of that size \nPlease select a smaller file", {className:"error", autoHide: false});
          }else if(e.status == 400){
-            $.notify("Sorry, There was an error with your File: " + e.responseText, {className:"error", autoHide: false});
+            $.notify("Sorry, There was an error with your file: " + e.responseText, {className:"error", autoHide: false});
          }else if(e.status == 415){
             $.notify("Sorry, There was an error with that: " + e.responseText, {className:"error", autoHide: false});
          }else{
