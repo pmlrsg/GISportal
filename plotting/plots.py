@@ -28,7 +28,7 @@ import zipfile
 import shutil
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
-from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
+from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool, DatetimeTickFormatter
 from bokeh.resources import CSSResources
 from bokeh.embed import components
 
@@ -95,6 +95,16 @@ hovmoller_template = jinja2.Template("""
 
 # Just pick some random colours. Probably need to make this configurable.
 plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
+
+# Date/time x-axis data formatter
+plot_xaxis_date_format = DatetimeTickFormatter(
+      formats = dict(
+         hours = ["%H:%M"],
+         days = ["%d/%m/%Y"],
+         months = ["%b %Y"],
+         years = ["%Y"]
+         )
+      )
 
 # Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
@@ -726,6 +736,8 @@ def transect(plot, outfile="transect.html"):
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
+   ts_plot.xaxis.formatter = plot_xaxis_date_format
+
    ts_plot.title_text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "10pt"
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
@@ -897,6 +909,7 @@ def timeseries(plot, outfile="time.html"):
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
+   ts_plot.xaxis.formatter = plot_xaxis_date_format
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
@@ -1047,6 +1060,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
+   ts_plot.xaxis.formatter = plot_xaxis_date_format
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
@@ -1083,7 +1097,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='{}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
@@ -1470,15 +1484,15 @@ def get_plot_data(json_request, plot=dict()):
          depth = None
          if 'depth' in ds:
             depth = ds['depth']
-         coverage = ds['coverage']
-         wcs_url = ds['threddsUrl']
-         bbox = ds['bbox']
-         time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
+         offering = ds['offering']
+         observed_property = ds['observed_property']
+         feature = ds['feature']
+         time_bounds = ds['t_bounds']
 
-         data_request = "SOSExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
-         debug(3, "Requesting data: {}".format(data_request))
+         #data_request = "SOSExtractor('{}',{}, {}, {}, {},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, offering, observed_property, feature, bbox, coverage)
+         #debug(3, "Requesting data: {}".format(data_request))
          try:
-            extractor = SOSExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extractor = SOSExtractor(ds['threddsUrl'], time_bounds, offering, observed_property, feature, extract_area='', extract_variable='', extract_depth='')
             extract = extractor.getData()
             response_file = open(extract, 'r')
             response = json.loads(response_file.read())
@@ -1506,7 +1520,7 @@ def get_plot_data(json_request, plot=dict()):
          for row in values:
             df.append(row.split(','))
     
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'value'], data=df))
+         plot_data.append(dict(scale=scale, coverage='', yaxis=yaxis,  vars=['date', 'value'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
