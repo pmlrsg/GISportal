@@ -23,16 +23,6 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var settings = {};
 module.exports = settings;
 
-/**
- * Returns true or false depending if a string stars with another string.
- * @param  {String} string The string to be evaluated
- * @param  {String} prefix The prefix to be looked for
- * @return {boolean} If the given string has the given prefix
- */
-function stringStartsWith(string, prefix) {
-   return string.slice(0, prefix.length) == prefix;
-}
-
 settings.proxy = function(req, res) {
    var url = decodeURI(req.query.url); // Gets the given URL
    request(url, function(err, response, body) {
@@ -210,7 +200,7 @@ settings.get_walkthroughs = function(req, res) {
       if (permission == "admin") {
          master_list.forEach(function(filename) {
             if (utils.directoryExists(path.join(master_path, filename))) {
-               if (stringStartsWith(filename, USER_CACHE_PREFIX)) {
+               if (filename.startsWith(USER_CACHE_PREFIX)) {
                   usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
                }
             }
@@ -252,7 +242,7 @@ settings.get_owners = function(req, res) {
       var domain_folder = fs.readdirSync(domain_path); // The list of files and folders in the domain folder
       domain_folder.forEach(function(folder) {
          var folder_name = path.join(domain_path, folder);
-         if (utils.directoryExists(folder_name) && stringStartsWith(folder, USER_CACHE_PREFIX)) {
+         if (utils.directoryExists(folder_name) && folder.startsWith(USER_CACHE_PREFIX)) {
             var folder_owner = folder.replace(USER_CACHE_PREFIX, "");
             if (folder_owner != username) {
                owners.push(folder_owner);
@@ -328,69 +318,12 @@ settings.add_to_dictionary = function(req, res) {
 };
 
 settings.get_cache = function(req, res) {
-   var this_username = user.getUsername(req);
-   var usernames = [this_username];
+   var username = user.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
 
-   var cache = []; // The list of cache deatils to be returned to the browser
-   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+   var cache = settingsApi.get_cache(username, domain, permission);
 
-   if (!utils.directoryExists(master_path)) {
-      utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
-   }
-
-   var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
-   master_list.forEach(function(filename) {
-      var file_path = path.join(master_path, filename);
-      if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
-         var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-         if (permission != "admin") { // The Layers list is filtered .
-            json_data.server.Layers = json_data.server.Layers.filter(function(val) {
-               return val.include === true || typeof(val.include) === "undefined";
-            });
-         }
-         json_data.owner = domain; // Adds the owner to the file (for the server list)
-         if (json_data.wmsURL) {
-            cache.push(json_data); // Adds each file to the cache to be returned
-         }
-      }
-   });
-   if (permission != "guest") {
-      if (permission == "admin") {
-         master_list.forEach(function(filename) {
-            if (utils.directoryExists(path.join(master_path, filename))) {
-               if (stringStartsWith(filename, USER_CACHE_PREFIX)) {
-                  usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
-               }
-            }
-         });
-      }
-      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
-      // Eventually should just remove all admins here!
-      for (var username in usernames) { // Usernames is now a list of all users or just the single loggeed in user.
-         var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[username]);
-         if (!utils.directoryExists(user_cache_path)) {
-            utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
-         }
-         var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
-         user_list.forEach(function(filename) {
-            var file_path = path.join(user_cache_path, filename);
-            if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
-               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-               if (permission != "admin" && this_username != filename.replace(USER_CACHE_PREFIX, "")) { // The Layers list is filtered.
-                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
-                     return val.include === true || typeof(val.include) === "undefined";
-                  });
-               }
-               json_data.owner = usernames[username]; // Adds the owner to the file (for the server list)
-               if (json_data.wmsURL) {
-                  cache.push(json_data); // Adds each file to the cache to be returned
-               }
-            }
-         });
-      }
-   }
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 };
 

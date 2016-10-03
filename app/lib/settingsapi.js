@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require('path');
 var request = require('request');
 var titleCase = require('to-title-case');
+var _ = require("underscore");
 var xml2js = require('xml2js');
 
 var utils = require('./utils.js');
@@ -13,6 +14,70 @@ var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 
 var settingsApi = {};
 module.exports = settingsApi;
+
+settingsApi.get_cache = function(username, domain, permission) {
+   var usernames = [username];
+   var cache = []; // The list of cache deatils to be returned to the browser
+   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+
+   if (!utils.directoryExists(master_path)) {
+      utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
+   }
+
+   var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
+   master_list.forEach(function(filename) {
+      var file_path = path.join(master_path, filename);
+      if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
+         var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+         if (permission != "admin") { // The Layers list is filtered .
+            json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+               return val.include === true || typeof(val.include) === "undefined";
+            });
+         }
+         json_data.owner = domain; // Adds the owner to the file (for the server list)
+         if (json_data.wmsURL) {
+            cache.push(json_data); // Adds each file to the cache to be returned
+         }
+      }
+   });
+   if (permission != "guest") {
+      if (permission == "admin") {
+         master_list.forEach(function(filename) {
+            if (utils.directoryExists(path.join(master_path, filename))) {
+               // if (stringStartsWith(filename, USER_CACHE_PREFIX)) {
+               if (filename.startsWith(USER_CACHE_PREFIX)) {
+                  usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
+               }
+            }
+         });
+      }
+      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
+      // Eventually should just remove all admins here!
+      for (var i = 0; i < usernames.length; i++) { // Usernames is now a list of all users or just the single loggeed in user.
+         var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[i]);
+         if (!utils.directoryExists(user_cache_path)) {
+            utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
+         }
+         var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+         user_list.forEach(function(filename) {
+            var file_path = path.join(user_cache_path, filename);
+            if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
+               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+               if (permission != "admin" && username != filename.replace(USER_CACHE_PREFIX, "")) { // The Layers list is filtered.
+                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+                     return val.include === true || typeof(val.include) === "undefined";
+                  });
+               }
+               json_data.owner = usernames[i]; // Adds the owner to the file (for the server list)
+               if (json_data.wmsURL) {
+                  cache.push(json_data); // Adds each file to the cache to be returned
+               }
+            }
+         });
+      }
+   }
+   return cache;
+};
 
 settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
    var data = null;
