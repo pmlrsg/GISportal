@@ -14,39 +14,6 @@ var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
 var settingsApi = {};
 module.exports = settingsApi;
 
-// This is for the xml2js parsing, it removes any silly namespaces.
-var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
-settingsApi.stripPrefix = function(str) {
-   return str.replace(prefixMatch, '');
-};
-
-settingsApi.sortLayersList = function(data, param) {
-   var byParam = data.slice(0);
-   for (var layer in byParam) {
-      if (!byParam[layer][param]) {
-         return byParam;
-      }
-   }
-   byParam.sort(function(a, b) {
-      var x = a[param].toLowerCase();
-      var y = b[param].toLowerCase();
-      return x < y ? -1 : x > y ? 1 : 0;
-   });
-   return byParam;
-};
-
-settingsApi.update_layer = function(username, domain, data, callback) {
-   var filename = data.serverName + ".json"; // Gets the given filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
-   if (username != domain) {
-      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
-   }
-   var this_path = path.join(base_path, filename);
-   fs.writeFile(this_path, JSON.stringify(data), function(err) {
-      callback(err);
-   });
-};
-
 settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
    var data = null;
    var clean_url = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
@@ -192,6 +159,109 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
    }
 };
 
+settingsApi.sortLayersList = function(data, param) {
+   var byParam = data.slice(0);
+   for (var layer in byParam) {
+      if (!byParam[layer][param]) {
+         return byParam;
+      }
+   }
+   byParam.sort(function(a, b) {
+      var x = a[param].toLowerCase();
+      var y = b[param].toLowerCase();
+      return x < y ? -1 : x > y ? 1 : 0;
+   });
+   return byParam;
+};
+
+settingsApi.stripPrefix = function(str) {
+   // This is for the xml2js parsing, it removes any silly namespaces.
+   var prefixMatch = new RegExp(/(?!xmlns)^.*:/);
+   return str.replace(prefixMatch, '');
+};
+
+settingsApi.update_layer = function(username, domain, data, callback) {
+   var filename = data.serverName + ".json"; // Gets the given filename
+   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
+   if (username != domain) {
+      base_path = path.join(base_path, USER_CACHE_PREFIX + username);
+   }
+   var this_path = path.join(base_path, filename);
+   fs.writeFile(this_path, JSON.stringify(data), function(err) {
+      callback(err);
+   });
+};
+
+function createBoundingBox(layer) {
+   var bounding_elem = layer.EX_GeographicBoundingBox[0];
+   var exGeographicBoundingBox = {
+      "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
+      "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
+      "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
+      "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
+   };
+   return exGeographicBoundingBox;
+}
+
+function createDimensionsArray(layer) {
+   var dimensions = {};
+   dimensions.dimensions = [];
+   dimensions.temporal = false;
+   // dimensions.firstDate;
+   // dimensions.lastDate;
+
+   for (var index in layer.Dimension) {
+      var dimension = layer.Dimension[index];
+      var dimensionList = dimension._.split(",");
+      var dimensionValue = dimension._.trim();
+
+      if (dimension.$.name == "time") {
+         dimensions.temporal = true;
+         var newDates = [];
+         for (var dimension_index in dimensionList) {
+            var dimension_str = dimensionList[dimension_index];
+            var dateTime = dimension_str.trim();
+            if (dateTime.search("-") == 4) {
+               newDates.push(dateTime);
+            }
+         }
+         if (newDates.length > 0) {
+            dimensions.firstDate = newDates[0].trim().substring(0, 10);
+            dimensions.lastDate = newDates[newDates.length - 1].trim().substring(0, 10);
+         }
+         dimensionValue = newDates.join().trim();
+      }
+      dimensions.dimensions.push({
+         "Name": dimension.$.name,
+         "Units": dimension.$.units,
+         "Default": dimension.$.default,
+         "Value": dimensionValue
+      });
+   }
+   return dimensions;
+}
+
+function createStylesArray(layer) {
+   var styles = [];
+   for (var index in layer.Style) {
+      var style_tag = layer.Style[index];
+      var name = style_tag.Name;
+      var legend = style_tag.LegendURL;
+
+      if (name && legend) {
+         name = name[0];
+         legend = legend[0];
+         styles.push({
+            "Name": name,
+            "LegendURL": legend.OnlineResource[0].$.href,
+            "Width": legend.$.width,
+            "Height": legend.$.height
+         });
+      }
+   }
+   return styles;
+}
+
 function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider) {
    for (var index in parent_layer.Layer) {
       var layer = parent_layer.Layer[index];
@@ -259,74 +329,4 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
 
    }
 
-}
-
-function createBoundingBox(layer) {
-   var bounding_elem = layer.EX_GeographicBoundingBox[0];
-   var exGeographicBoundingBox = {
-      "WestBoundLongitude": bounding_elem.westBoundLongitude[0],
-      "EastBoundLongitude": bounding_elem.eastBoundLongitude[0],
-      "SouthBoundLatitude": bounding_elem.southBoundLatitude[0],
-      "NorthBoundLatitude": bounding_elem.northBoundLatitude[0]
-   };
-   return exGeographicBoundingBox;
-}
-
-function createStylesArray(layer) {
-   var styles = [];
-   for (var index in layer.Style) {
-      var style_tag = layer.Style[index];
-      var name = style_tag.Name;
-      var legend = style_tag.LegendURL;
-
-      if (name && legend) {
-         name = name[0];
-         legend = legend[0];
-         styles.push({
-            "Name": name,
-            "LegendURL": legend.OnlineResource[0].$.href,
-            "Width": legend.$.width,
-            "Height": legend.$.height
-         });
-      }
-   }
-   return styles;
-}
-
-function createDimensionsArray(layer) {
-   var dimensions = {};
-   dimensions.dimensions = [];
-   dimensions.temporal = false;
-   // dimensions.firstDate;
-   // dimensions.lastDate;
-
-   for (var index in layer.Dimension) {
-      var dimension = layer.Dimension[index];
-      var dimensionList = dimension._.split(",");
-      var dimensionValue = dimension._.trim();
-
-      if (dimension.$.name == "time") {
-         dimensions.temporal = true;
-         var newDates = [];
-         for (var dimension_index in dimensionList) {
-            var dimension_str = dimensionList[dimension_index];
-            var dateTime = dimension_str.trim();
-            if (dateTime.search("-") == 4) {
-               newDates.push(dateTime);
-            }
-         }
-         if (newDates.length > 0) {
-            dimensions.firstDate = newDates[0].trim().substring(0, 10);
-            dimensions.lastDate = newDates[newDates.length - 1].trim().substring(0, 10);
-         }
-         dimensionValue = newDates.join().trim();
-      }
-      dimensions.dimensions.push({
-         "Name": dimension.$.name,
-         "Units": dimension.$.units,
-         "Default": dimension.$.default,
-         "Value": dimensionValue
-      });
-   }
-   return dimensions;
 }
