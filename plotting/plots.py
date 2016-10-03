@@ -59,6 +59,25 @@ template = jinja2.Template("""
 </html>
 """)
 
+template_external = jinja2.Template("""
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+   <script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+   <link href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" rel="stylesheet" type="text/css">
+    
+</head>
+<body>
+<div id="plot">
+    {{ script }}
+    
+    {{ div }}
+</div>
+</body>
+
+</html>
+""")
+
 hovmoller_template = jinja2.Template("""
 <!DOCTYPE html>
 <html lang="en-US">
@@ -750,7 +769,10 @@ def transect(plot, outfile="transect.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    with open(outfile, 'w') as output_file:
-      print(template.render(script=script, div=div), file=output_file)
+      if plot_is_standalone:
+         print(template_external.render(script=script, div=div), file=output_file)
+      else:
+         print(template.render(script=script, div=div), file=output_file)
    
    #save(ts_plot)
    return(ts_plot)
@@ -761,7 +783,8 @@ def timeseries(plot, outfile="time.html"):
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
- 
+   plot_is_standalone = plot['is_standalone']
+
    my_hash = plot['req_hash']
    my_id = plot['req_id']
    dir_name = plot['dir_name']
@@ -933,18 +956,21 @@ def timeseries(plot, outfile="time.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    with open(outfile, 'w') as output_file:
-      print(template.render(script=script, div=div), file=output_file)
-   
+      if plot_is_standalone:
+         print(template_external.render(script=script, div=div), file=output_file)
+      else:
+         print(template.render(script=script, div=div), file=output_file)
+
    #save(ts_plot)
    return(ts_plot)
 #END timeseries 
 
 def timeseriesSOS(plot, outfile="time-sos.html"):
-
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
- 
+   plot_is_standalone = plot['is_standalone']
+   
    my_hash = plot['req_hash']
    my_id = plot['req_id']
    dir_name = plot['dir_name']
@@ -1080,7 +1106,10 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    with open(outfile, 'w') as output_file:
-      print(template.render(script=script, div=div), file=output_file)
+      if plot_is_standalone:
+         print(template_external.render(script=script, div=div), file=output_file)
+      else:
+         print(template.render(script=script, div=div), file=output_file)
    
    #save(ts_plot)
    return(ts_plot)
@@ -1232,6 +1261,11 @@ def get_plot_data(json_request, plot=dict()):
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
+   try:
+      plot_is_standalone = bool(json_request['plot']['is_standalone'])
+   except:
+      plot_is_standalone = False
+
    scale = json_request['plot']['y1Axis']['scale']
    style = json_request['plot']['style']
    units = json_request['plot']['y1Axis']['label']
@@ -1252,6 +1286,7 @@ def get_plot_data(json_request, plot=dict()):
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
    plot['palette'] = style.split("/")[1]
+   plot['is_standalone'] = plot_is_standalone
 
    debug(3, plot)
 
@@ -1420,7 +1455,7 @@ def get_plot_data(json_request, plot=dict()):
              line = [date]
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
-         print(df)
+        
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type in ("timeseries-sos"):

@@ -23,8 +23,8 @@ class SOSExtractor(Extractor):
                "during": {
                "ref": "om:phenomenonTime",
                "value": [
-                  "2014-08-01T00:00:00+00:00",
-                  "2014-08-31T23:59:59+00:00"
+                  "2014-05-02T11:20:00.000Z",
+                 "2019-08-22T18:00:00.000Z"
                   ]
                }
             }
