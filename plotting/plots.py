@@ -107,7 +107,7 @@ plot_xaxis_date_format = DatetimeTickFormatter(
       )
 
 # tool settings for the interactive toolsbar
-tool_settings = "pan,wheel_zoom,box_zoom,resize,reset"
+tool_settings = "pan,wheel_zoom,box_zoom,resize,reset,save"
 
 # Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
