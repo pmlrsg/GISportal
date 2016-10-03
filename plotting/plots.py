@@ -106,6 +106,9 @@ plot_xaxis_date_format = DatetimeTickFormatter(
          )
       )
 
+# tool settings for the interactive toolsbar
+tool_settings = "pan,wheel_zoom,box_zoom,resize,reset"
+
 # Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
     def __getattr__(self, name):
@@ -294,7 +297,7 @@ def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
       legend_y_range=(min_val, max_val)
       legend_y_axis_type="linear"
    
-   legend = figure(width=150, y_axis_type=legend_y_axis_type, y_range=legend_y_range)
+   legend = figure(width=150, y_axis_type=legend_y_axis_type, y_range=legend_y_range, tools=tool_settings)
                    
    # Set the y axis format so it does not default to scientific notation.
    legend.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
@@ -454,7 +457,7 @@ def extract(plot, outfile="image.html"):
    plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Image extract - {}".format(plot_title))
+              title="Image extract - {}".format(plot_title), tools=tool_settings)
    p.title_text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "10pt"
    p.yaxis.axis_label_text_font_size = "10pt"
@@ -630,7 +633,7 @@ def hovmoller(plot, outfile="image.html"):
    plot_width = 800
    p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Hovmoller - {}".format(plot_title), responsive=True)
+              title="Hovmoller - {}".format(plot_title), responsive=True, tools=tool_settings)
    p.title_text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "10pt"
    p.yaxis.axis_label_text_font_size = "10pt"
@@ -725,7 +728,7 @@ def transect(plot, outfile="transect.html"):
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True
+              height=400, responsive=True, tools=tool_settings
    )
    
    tooltips = [("Date", "@sdate")]
@@ -894,7 +897,7 @@ def timeseries(plot, outfile="time.html"):
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True
+              height=400, responsive=True, tools=tool_settings
    )
    ts_plot.title_text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "10pt"
@@ -1048,7 +1051,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True
+              height=400, responsive=True, tools=tool_settings
    )
    ts_plot.title_text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "10pt"
@@ -1211,7 +1214,8 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       y_axis_type=plot['y1Axis']['scale'], 
       width=800,
       height=400,
-      responsive=True)
+      responsive=True, 
+      tools=tool_settings)
    scatter_plot.title_text_font_size = "14pt"
    scatter_plot.xaxis.axis_label_text_font_size = "10pt"
    scatter_plot.yaxis.axis_label_text_font_size = "10pt"
