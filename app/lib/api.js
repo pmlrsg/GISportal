@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore'); // Could change to lodash later
+var apiAuth = require('./apiauth.js');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 
@@ -9,6 +10,15 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 
 var api = {};
 module.exports = api;
+
+api.get_cache = function(req, res) {
+   var username = apiAuth.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = apiAuth.getAccessLevel(req, domain);
+
+   var cache = settingsApi.get_cache(username, domain, permission);
+   res.send(JSON.stringify(cache));
+};
 
 api.refresh_wms_layer = function(req, res) {
    if (req.query.url) {
@@ -37,7 +47,7 @@ api.refresh_wms_layer = function(req, res) {
                      }
                   });
                } else {
-                  res.status(404).send("Error: can't find " + oldDataPath);
+                  res.status(404).send("Error: Can't find config for provided url");
                   // res.status(404).send('Error: config for provided WMS not found');
                }
             } else {

@@ -24,3 +24,9 @@ apiRouter.get('/test', function(req, res) {
 });
 
 apiRouter.get('/refresh_wms_layer', api.refresh_wms_layer);
+
+apiRouter.get('/get_cache', api.get_cache);
+
+router.get('/api/*', function(req, res) {
+   res.status(400).send("Invalid API request");
+});
