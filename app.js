@@ -1,15 +1,16 @@
 // Imports
-var utils = require('./app/lib/utils.js');
-var express = require('express');
-var http = require('http');
-var io = require('socket.io')(http);
+var connect = require('connect');
 var cookie = require('cookie');
 var cookieParser = require('cookie-parser');
-var connect = require('connect');
+var express = require('express');
 var session = require('express-session');
+var fs = require("fs");
+var http = require('http');
 var jade = require("jade");
 var path = require('path');
-var fs = require("fs");
+var io = require('socket.io')(http);
+var utils = require('./app/lib/utils.js');
+require('./app/lib/polyfills.js');
 
 
 var CURRENT_PATH = __dirname;
