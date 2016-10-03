@@ -1489,8 +1489,8 @@ def get_plot_data(json_request, plot=dict()):
          feature = ds['feature']
          time_bounds = ds['t_bounds']
 
-         #data_request = "SOSExtractor('{}',{}, {}, {}, {},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, offering, observed_property, feature, bbox, coverage)
-         #debug(3, "Requesting data: {}".format(data_request))
+         data_request = "SOSExtractor('{}',{}, {}, {}, {},extract_area=,extract_variable=)".format(ds['threddsUrl'], time_bounds, offering, observed_property, feature)
+         debug(3, "Requesting data: {}".format(data_request))
          try:
             extractor = SOSExtractor(ds['threddsUrl'], time_bounds, offering, observed_property, feature, extract_area='', extract_variable='', extract_depth='')
             extract = extractor.getData()
