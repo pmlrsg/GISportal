@@ -19,11 +19,11 @@ apiAuth.authenticateToken = function(req, res, next) {
 };
 
 apiAuth.getAccessLevel = function(req, domain) {
-   var level = "guest";
+   var level = 'guest';
 
    if(apiAuth.getUsername(req) != 'guest') {
       // If they aren't using the guest token
-      level = "user";
+      level = 'user';
       domain = domain || req.query.domain;
       var config = GLOBAL.config[domain] || GLOBAL.config;
       // Check to see if they are an admin
@@ -32,7 +32,7 @@ apiAuth.getAccessLevel = function(req, domain) {
          // If there are any admins
          for (var i = 0; i < admins.length; i++) {
             if (admins[i] == apiAuth.getUsername(req)) {
-               level = "admin";
+               level = 'admin';
                break;
             }
          }

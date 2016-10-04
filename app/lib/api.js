@@ -7,6 +7,7 @@ var utils = require('./utils.js');
 
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
+var USER_CACHE_PREFIX = "user_";
 
 var api = {};
 module.exports = api;
@@ -25,6 +26,22 @@ api.refresh_wms_layer = function(req, res) {
       var url = req.query.url.replace(/\?.*/g, "") + "?"; // Gets the given url
       var refresh = true;
       var domain = utils.getDomainName(req); // Gets the given domain
+      var username;
+
+      if (req.query.user) {
+         if (apiAuth.getAccessLevel(req, domain) === 'admin') {
+            if (req.query.user === 'global') {
+               username = domain;
+            } else {
+               username = req.query.user;
+            }
+         } else {
+            res.status(401).send("Error: You must be an admin to refresh another user's config!");
+            return;
+         }
+      } else {
+         username = apiAuth.getUsername(req);
+      }
 
       settingsApi.load_new_wms_layer(url, refresh, domain, function(err, strData) {
          if (err) {
@@ -34,21 +51,24 @@ api.refresh_wms_layer = function(req, res) {
                var newData = JSON.parse(strData);
                var oldData = null;
                var cleanPath = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
-               var oldDataPath = path.join(MASTER_CONFIG_PATH, domain, cleanPath) + '.json'; // Gets the given path
+               var basePath = path.join(MASTER_CONFIG_PATH, domain); // Gets the given path
+               if (username != domain) {
+                  basePath = path.join(basePath, USER_CACHE_PREFIX + username);
+               }
+               var oldDataPath = path.join(basePath, cleanPath + '.json');
 
                if (utils.fileExists(oldDataPath)) {
                   oldData = JSON.parse(fs.readFileSync(oldDataPath, 'utf8'));
                   var data = updateData(oldData, newData);
-                  settingsApi.update_layer(domain, domain, data, function(err) {
+                  settingsApi.update_layer(username, domain, data, function(err) {
                      if (err) {
                         utils.handleError(err, res);
                      } else {
-                        res.send("Success!");
+                        res.send('Successfully updated ' + cleanPath + ' for ' + username);
                      }
                   });
                } else {
-                  res.status(404).send("Error: Can't find config for provided url");
-                  // res.status(404).send('Error: config for provided WMS not found');
+                  res.status(404).send("Error: Can't find config for provided url. If the file isn't yours, you must specify user=global or user=username.");
                }
             } else {
                res.send({
