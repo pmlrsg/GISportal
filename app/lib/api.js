@@ -16,9 +16,29 @@ api.get_cache = function(req, res) {
    var username = apiAuth.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = apiAuth.getAccessLevel(req, domain);
-
    var cache = settingsApi.get_cache(username, domain, permission);
    res.send(JSON.stringify(cache));
+};
+
+api.get_cache_list = function(req, res) {
+   var username = apiAuth.getUsername(req);
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = apiAuth.getAccessLevel(req, domain);
+   var cache = settingsApi.get_cache(username, domain, permission);
+   var list = [];
+
+   for (var i = 0; i < cache.length; i++) {
+      var item = {};
+      item.wmsURL = cache[i].wmsURL;
+      item.serverName = cache[i].serverName;
+      item.contactInfo = cache[i].contactInfo;
+      item.provider = cache[i].provider;
+      item.timeStamp = cache[i].timeStamp;
+      item.owner = cache[i].owner;
+      list.push(item);
+   }
+
+   res.send(JSON.stringify(list));
 };
 
 api.refresh_wms_layer = function(req, res) {
