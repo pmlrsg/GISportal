@@ -13,3 +13,5 @@ html/plots/*
 node_modules
 uploads/*
 !uploads/.gitkeep
+app/modules/*
+!app/modules/.gitkeep
