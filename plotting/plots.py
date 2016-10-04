@@ -1078,6 +1078,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    #ts_plot.add_layout(LinearAxis(y_range_name="y1", axis_label=plot['y1Axis']['label']), 'left')
    
    for i, source in enumerate(sources):
+      print(source.data)
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
          debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
@@ -1100,6 +1101,8 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
+
+      ## TODO: correct the legend settings
       ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='{}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
@@ -1771,18 +1774,17 @@ To execute a plot
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
       # Now try and make the plot.
-      execute_plot(opts.dirname, plot, request)
-      # try:
-      #    if execute_plot(opts.dirname, plot, request):
-      #       debug(1, "Plot complete")
-      #    else:
-      #       debug(0, "Error executing. Failed to complete plot")
-      #       sys.exit(2)
-      # except:
-      #    trace_message = traceback.format_exc()
-      #    debug(0, "Uncaught Exception. Failed to complete plot - {}".format(trace_message))
-      #    update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
-      #    raise
+      try:
+         if execute_plot(opts.dirname, plot, request):
+            debug(1, "Plot complete")
+         else:
+            debug(0, "Error executing. Failed to complete plot")
+            sys.exit(2)
+      except:
+         trace_message = traceback.format_exc()
+         debug(0, "Uncaught Exception. Failed to complete plot - {}".format(trace_message))
+         update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
+         raise
 
    else:
       # We should not be here
