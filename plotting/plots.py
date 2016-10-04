@@ -1256,9 +1256,36 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
 
    data1 = np.array(xData)
    #data1 = np.transpose(dfarray1[np.argsort(dfarray1[:,0])])
-      
+   var_headers = plot['data'][0]['vars']
+   var_headers[var_headers.index('track_lat')] = "Latitude"
+   var_headers[var_headers.index('track_lon')] = "Longitude"
+   var_headers[var_headers.index('match_value')] = "Provided Value"
+   var_headers[var_headers.index('track_date')] = "Provided Date"
+   var_headers[var_headers.index('data_date')] = "Matched Date"
+   var_headers[var_headers.index('data_value')] = "Matched Value"
+
+
 
    data2 = np.array(yData)
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   csv_file1 = csv_dir + "/" + cov_name + ".csv"
+   np.savetxt(csv_file1, df, comments='', header=",".join(var_headers), fmt="%s",delimiter=",")
+   with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
+      zf.write(csv_file1, arcname=cov_name + ".csv")
+      debug(3, "ZIP: {}".format(zf.namelist()))
+
+   shutil.rmtree(csv_dir)
+
 
    slope, intercept, r_value, p_value, std_err = stats.linregress(data1, data2)
    regr_f = np.poly1d([slope, intercept])

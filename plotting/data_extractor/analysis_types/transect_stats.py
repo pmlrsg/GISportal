@@ -50,7 +50,6 @@ class TransectStats(object):
             current_lat = float(row['Latitude'])
             t_lat = current_lat - lat_var[0]
             lat_index = int(round(abs(t_lat / lat_offset)))
-
          if (len(lon_var) <= 1):
             lon_index = 0
          else:
@@ -62,14 +61,19 @@ class TransectStats(object):
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 
          time_index = find_closest(times, track_date, last_time,time=True)
-
+         print time_index
+         print len(time_var)
 
 
          last_lat = lat_index -1
          last_lon = lon_index -1
-         last_time = time_index  -1
+         last_time = (time_index  -1) if time_index > 0 else 0
+         
 
-         data = data_var[last_time][last_lat][last_lon]
+         if lat_index > len(lat_var) or lon_index > len(lon_var):
+            data = np.nan
+         else:
+            data = data_var[last_time][last_lat][last_lon]
 
          _ret = {}
          _ret['track_date'] = track_date.isoformat()

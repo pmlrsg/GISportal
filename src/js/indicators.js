@@ -1198,13 +1198,25 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
 
 gisportal.indicatorsPanel.addToPlot = function( id )  {
    var graphParams = this.getParams( id );
-
+   var bound_error;
+   var errorElement;
    // Gets any error with the bounding box and puts it into the div
    if(gisportal.methodThatSelectedCurrentRegion.method != "csvUpload"){
-      var bound_error = gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds( id );
+      bound_error = gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds( id );
       if( bound_error !== true ){
          errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
-         var errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
+         errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
+         setTimeout( function(){
+            errorElement.remove();
+         }, 6000 );
+         return;
+      }
+   }
+   else {
+      bound_error = gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds( id );
+      if( bound_error !== true ){
+         errorHtml = '<div class="alert alert-danger">' + bound_error + '</div>';
+         errorElement = $( errorHtml ).prependTo('.js-tab-analysis[data-id="' + id + '"] .analysis-coordinates');
          setTimeout( function(){
             errorElement.remove();
          }, 6000 );
@@ -1290,6 +1302,62 @@ gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, t
          coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
       }
    }
+};
+
+
+gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerId ){
+   if( gisportal.currentSelectedRegion === "" ) return true;
+
+   //bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
+   var tar = gisportal.currentSelectedRegion.split('GEOMETRYCOLLECTION(POINT(')[1].split('),POINT(');
+   tar[tar.length-1] = tar[tar.length-1].split(')')[0];
+
+
+
+   var layer = gisportal.layers[ layerId ];
+   var bounds = layer.exBoundingBox;
+
+   var arr = [
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
+      ],
+      [
+         Number(bounds.EastBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
+      ],
+      [
+         Number(bounds.EastBoundLongitude),
+         Number(bounds.SouthBoundLatitude)
+      ],
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.SouthBoundLatitude)
+      ],
+      [
+         Number(bounds.WestBoundLongitude),
+         Number(bounds.NorthBoundLatitude)
+      ]
+   ];
+
+   bb2 = new Terraformer.Polygon( {
+      "type": "Polygon",
+      "coordinates": [arr] 
+   });
+
+   for(var x = 0; x < tar.length -1; x++ ){
+      var t_point = new Terraformer.Point({
+         "type" : "Point",
+         "coordinates" : [Number(tar[x].split(' ')[0]), Number(tar[x].split(' ')[1])]
+      });
+      // test if point inside bbox
+      if(bb2.contains(t_point)){
+         return true;
+      }
+   }
+   return "None of the points uploaded are contained within the bounding box of the data selected.";;
+
+
 };
 
 gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = function( layerId ){
