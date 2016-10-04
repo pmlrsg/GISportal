@@ -1,3 +1,7 @@
+/**
+ * This module provides the routes for settings access from the front end.
+ */
+
 var bodyParser = require('body-parser');
 var express = require('express');
 var fs = require("fs");
@@ -85,7 +89,7 @@ router.get('/resources/*?', function(req, res) {
    var reqPath = req.params[0];
    var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
    var configPath = path.join(MASTER_CONFIG_PATH, domain, "resources", cleanPath); // Gets the given path
-   
+
    if (utils.fileExists(configPath)) {
       res.sendFile(configPath, function(err) {
          if (err) {

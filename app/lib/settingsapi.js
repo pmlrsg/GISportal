@@ -1,3 +1,7 @@
+/**
+ * This module provides the settings functions that are shared by the API and the front end.
+ */
+
 var fs = require("fs");
 var path = require('path');
 var request = require('request');

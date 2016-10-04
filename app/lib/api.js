@@ -1,3 +1,7 @@
+/**
+ * This module provides the functions to handle API requests.
+ */
+
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore'); // Could change to lodash later
@@ -12,6 +16,12 @@ var USER_CACHE_PREFIX = "user_";
 var api = {};
 module.exports = api;
 
+/**
+ * Get all the cache files the user has access to in a JSON string.
+ * @param  {object} req Express router request
+ * @param  {object} res Express router response
+ * @return  JSON string
+ */
 api.get_cache = function(req, res) {
    var username = apiAuth.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -20,6 +30,12 @@ api.get_cache = function(req, res) {
    res.send(JSON.stringify(cache));
 };
 
+/**
+ * Get the important details of each cache file the user has access to without all the layers in a JSON string.
+ * @param  {object} req Express router request
+ * @param  {object} res Express router response
+ * @return  JSON string
+ */
 api.get_cache_list = function(req, res) {
    var username = apiAuth.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -41,7 +57,13 @@ api.get_cache_list = function(req, res) {
    res.send(JSON.stringify(list));
 };
 
-api.refresh_wms_layer = function(req, res) {
+/**
+ * Refresh the api user's cache file for the provided WMS url. Admins may refresh global cache files or other user's
+ *    cache files by specifying a username.
+ * @param  {object} req Express router request
+ * @param  {object} res Express router response
+ */
+api.refresh_wms_cache = function(req, res) {
    if (req.query.url) {
       var url = req.query.url.replace(/\?.*/g, "") + "?"; // Gets the given url
       var refresh = true;
@@ -102,10 +124,15 @@ api.refresh_wms_layer = function(req, res) {
    }
 };
 
+/**
+ * Copy the layer settings from old wms cache data to new wms cache data.
+ * @param  {object} oldData The old cache data to copy settings from
+ * @param  {object} newData The new cache data to copy settings to
+ * @return {object}         The updated new cache data
+ */
 function updateData(oldData, newData) {
    // newData layers that have been matched and updated
    var matched_layers = [];
-
    var provider;
    var new_server = _.keys(newData.server)[0];
 
@@ -115,13 +142,13 @@ function updateData(oldData, newData) {
 
       // Iterate through newData layers
       var i_new = 0;
+      // If the newData and oldData layers match with i_old, set i_new to i_old to avoid unnecessary iteration
       if (oldData.server.Layers[i_old].Name == newData.server[new_server][i_old].Name) {
-         // If the newData and oldData layers match with i_old, set i_new to i_old to avoid unnecessary iteration
          i_new = i_old;
       }
       for (; i_new < newData.server[new_server].length; i_new++) {
+         // If the newData layer matches the oldData layer, update it's information from the oldData layer
          if (oldData.server.Layers[i_old].Name == newData.server[new_server][i_new].Name) {
-            // If the newData layer matches the oldData layer, update it's information from the oldData layer
             newData.server[new_server][i_new].Abstract = oldData.server.Layers[i_old].Abstract;
             newData.server[new_server][i_new].Title = oldData.server.Layers[i_old].Title;
             newData.server[new_server][i_new].include = oldData.server.Layers[i_old].include || false;

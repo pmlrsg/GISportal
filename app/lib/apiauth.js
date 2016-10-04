@@ -1,8 +1,19 @@
+/**
+ * This module provides the functions for API authentication.
+ */
+
 var utils = require('./utils.js');
 
 var apiAuth = {};
 module.exports = apiAuth;
 
+/**
+ * For use in Express routing chains to authenticate an api token.
+ * @param  {object}   req  Express router request
+ * @param  {object}   res  Express router reqsponse
+ * @param  {Function} next The next function in the chain
+ * @return                 next() or a 401 not authorised response
+ */
 apiAuth.authenticateToken = function(req, res, next) {
    var token = req.params.token;
    var domain = utils.getDomainName(req);
@@ -18,18 +29,22 @@ apiAuth.authenticateToken = function(req, res, next) {
    }
 };
 
+/**
+ * Checks the access level of the api user.
+ * @param  {object} req    Express router request
+ * @param  {string} domain The domain the user is accessing
+ * @return {string}        The user's access level
+ */
 apiAuth.getAccessLevel = function(req, domain) {
    var level = 'guest';
 
-   if(apiAuth.getUsername(req) != 'guest') {
-      // If they aren't using the guest token
+   // If they aren't using the guest token
+   if (apiAuth.getUsername(req) != 'guest') {
       level = 'user';
       domain = domain || req.query.domain;
       var config = GLOBAL.config[domain] || GLOBAL.config;
-      // Check to see if they are an admin
       var admins = config.admins;
-      if(admins){
-         // If there are any admins
+      if (admins) {
          for (var i = 0; i < admins.length; i++) {
             if (admins[i] == apiAuth.getUsername(req)) {
                level = 'admin';
@@ -41,11 +56,33 @@ apiAuth.getAccessLevel = function(req, domain) {
    return level;
 };
 
+/**
+ * Gets the username of the api user from their token.
+ * @param  {object} req Express router request
+ * @return {string}     The user's username
+ */
 apiAuth.getUsername = function(req) {
    var token = req.params.token;
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;
    var tokens = config.tokens;
+   var username = tokens[token];
 
-   return tokens[token];
+   return username;
+};
+
+/**
+ * For use in Express routing chains to deny guest users.
+ * @param  {object}   req  Exress router request
+ * @param  {object}   res  Express router response
+ * @param  {Function} next The next function in the chain
+ * @return                 next() or a 401 not authorised response
+ */
+apiAuth.denyGuest = function(req, res, next) {
+   var level = apiAuth.getAccessLevel(req);
+   if (level != 'guest') {
+      return next();
+   } else {
+      res.status(401).send('Guests cannot do this!');
+   }
 };

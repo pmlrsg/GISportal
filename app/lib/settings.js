@@ -1,3 +1,7 @@
+/**
+ * This module provides the functions to handle settings access from the front end.
+ */
+
 var crypto = require('crypto');
 var fs = require("fs");
 var jimp = require("jimp");
