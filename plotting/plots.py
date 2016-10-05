@@ -682,6 +682,16 @@ def transect(plot, outfile="transect.html"):
       buffer_value = (max_value - min_value) /20
       ymin.append(min_value-buffer_value)
       ymax.append(max_value+buffer_value)
+      if plot_scale == "log":
+         if min_value < 0:
+            debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
+            plot_scale = "linear"
+         else:
+            # Make sure we do not ask for a negative range as this does not 
+            # work for log space.
+            if ymin[-1] < 0:
+               ymin[-1] = min_value
+ 
       date = datetime(data[varindex['track_date']])
       
       datasource = dict(date=date,
