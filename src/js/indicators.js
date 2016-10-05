@@ -1355,7 +1355,7 @@ gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerI
          return true;
       }
    }
-   return "None of the points uploaded are contained within the bounding box of the data selected.";;
+   return "None of the points uploaded are contained within the bounding box of the data selected.";
 
 
 };

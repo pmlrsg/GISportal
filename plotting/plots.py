@@ -1230,8 +1230,10 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    pprint.pprint('-'*20)
    print(plot)
    plot_data = plot['data']
+
    plot_type = plot['type']
    plot_title = plot['title']
+   log_data = plot['matchup_log']
    df = plot_data[0]['data']
 
    my_hash = plot['req_hash']
@@ -1244,13 +1246,21 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    yVar = 'data_value'
    tVar = 'track_date'
    mVar = 'data_date'
+   logText = ''
 
+   print(log_data)
 
    xData_raw = [float(x[varindex[xVar]]) for x in df]
    yData_raw = [float(x[varindex[yVar]]) for x in df]
 
-   xData = [log(float(x[varindex[xVar]])) for x in df]
-   yData = [log(float(x[varindex[yVar]])) for x in df]
+
+   if (log_data):
+      logText = 'Log of '
+      xData = [log(float(x[varindex[xVar]])) for x in df]
+      yData = [log(float(x[varindex[yVar]])) for x in df]
+   else:
+      xData = [float(x[varindex[xVar]]) for x in df]
+      yData = [float(x[varindex[yVar]]) for x in df]
    tData = [x[varindex[tVar]] for x in df]
    mData = [x[varindex[mVar]] for x in df]
 
@@ -1324,7 +1334,7 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    points = scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
    
    # Plot the regression line using default style.
-   reg_line = scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend="Log {}".format(cov_name))
+   reg_line = scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend=logText + cov_name)
 
 
 
@@ -1358,11 +1368,11 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    scatter_plot.add_tools(line_hover)
    scatter_plot.add_tools(point_hover)
 
-   scatter_plot.xaxis.axis_label = "Log of values provided in matchup CSV"
+   scatter_plot.xaxis.axis_label = logText+"values provided in matchup CSV"
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   scatter_plot.yaxis.axis_label = "Log values of "+plot['y1Axis']['label']
+   scatter_plot.yaxis.axis_label = logText+plot['y1Axis']['label']
    
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
@@ -1385,6 +1395,7 @@ def get_plot_data(json_request, plot=dict()):
 
    debug(2, "get_plot_data: Started")
    irregular = False
+   matchup_log = False
    # Common data for all plots. 
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
@@ -1396,9 +1407,12 @@ def get_plot_data(json_request, plot=dict()):
    xAxis = json_request['plot']['xAxis']
    dirname = plot['dir_name']
    my_hash = plot['req_hash']
+  
    if 'isIrregular' in json_request['plot']:
       irregular = True
 
+   if 'matchup_log' in json_request['plot']:
+      matchup_log = json_request['plot']['matchup_log']
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
    # as a list.
    plot_data = []
@@ -1409,6 +1423,7 @@ def get_plot_data(json_request, plot=dict()):
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
    plot['palette'] = style.split("/")[1]
+   plot['matchup_log'] = matchup_log
 
    debug(3, plot)
 

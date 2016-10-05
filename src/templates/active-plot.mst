@@ -28,6 +28,10 @@
 				<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
 			{{/if}}
 			 </select>
+			{{#if matchup_plot}}
+			<input id="matchup_log_switch" class="js-matchup-log" checked="" type="checkbox" > 
+			Log data before producing regression
+			{{/if}}
 		</div>
 	</li>
 	<li>
