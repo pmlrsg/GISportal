@@ -3,13 +3,13 @@
  */
 
 var express = require('express');
+var api = require('./api.js');
+var apiAuth = require('./apiauth.js');
+
 var router = express.Router();
 var apiRouter = express.Router({
    mergeParams: true
 });
-var apiAuth = require('./apiauth.js');
-
-var api = require('./api.js');
 
 module.exports = router;
 
