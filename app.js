@@ -91,9 +91,12 @@ app.use(express.static(path.join(__dirname, 'html')));
 // Passport settings
 var passportConfig = require('./app/lib/passport.js');
 passportConfig.init(config);
-
 var passport = require('passport');
 app.use(passport.initialize());
+
+// Load additional modules
+var moduleLoader = require('./app/lib/moduleloader.js');
+var modules = moduleLoader.loadModules();
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
@@ -104,6 +107,9 @@ app.use('/', routes);
 app.use('/', apiRoutes);
 app.use('/', settingsRoutes);
 app.use('/', plotting);
+for (var mod in modules) {
+   app.use('/', modules[mod]);
+}
 app.param('subfolder', function(req, res, next, subfolder){
    if(subfolder != "app"){
       req.SUBFOLDER = subfolder;
@@ -122,7 +128,9 @@ app.use('/:subfolder', routes);
 app.use('/:subfolder', apiRoutes);
 app.use('/:subfolder', settingsRoutes);
 app.use('/:subfolder', plotting);
-
+for (var mod in modules) {
+   app.use('/:subfolder', modules[mod]);
+}
 
 // Start listening...
 server = http.createServer(app)
