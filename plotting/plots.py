@@ -1056,7 +1056,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    ts_plot.title_text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "10pt"
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
-   
+
    tooltips = [("Date", "@sdate")]
    tooltips.append(("value", "@mean{0.000}"))
    
@@ -1078,7 +1078,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    #ts_plot.add_layout(LinearAxis(y_range_name="y1", axis_label=plot['y1Axis']['label']), 'left')
    
    for i, source in enumerate(sources):
-      print(source.data)
+      legend_name = plot['y1Axis']['label']
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
          debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
@@ -1088,7 +1088,9 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
-   
+         ts_plot.yaxis[1].axis_label_text_font_size = "10pt"         
+         legend_name = plot['y2Axis']['label']
+
       if 'min' in datasource and len(sources) == 1:
          debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
          # Plot the max and min as a shaded band.
@@ -1103,7 +1105,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
 
       ## TODO: correct the legend settings
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='{}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='{}'.format(legend_name), source=source)
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
@@ -1491,6 +1493,7 @@ def get_plot_data(json_request, plot=dict()):
          depth = None
          if 'depth' in ds:
             depth = ds['depth']
+         coverage = ds['coverage']
          offering = ds['offering']
          observed_property = ds['observed_property']
          feature = ds['feature']
@@ -1499,7 +1502,7 @@ def get_plot_data(json_request, plot=dict()):
          data_request = "SOSExtractor('{}',{}, {}, {}, {},extract_area=,extract_variable=)".format(ds['threddsUrl'], time_bounds, offering, observed_property, feature)
          debug(3, "Requesting data: {}".format(data_request))
          try:
-            extractor = SOSExtractor(ds['threddsUrl'], time_bounds, offering, observed_property, feature, extract_area='', extract_variable='', extract_depth='')
+            extractor = SOSExtractor(ds['threddsUrl'], time_bounds, offering, observed_property, feature, extract_area='', extract_variable=coverage, extract_depth='')
             extract = extractor.getData()
             response_file = open(extract, 'r')
             response = json.loads(response_file.read())
@@ -1713,6 +1716,7 @@ def execute_plot(dirname, plot, request):
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'timeseries-sos':
+      print(plot)
       plot_file = timeseriesSOS(plot, file_path)
    elif plot['type'] == 'scatter':
       plot_file = scatter(plot, file_path)
