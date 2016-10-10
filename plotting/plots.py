@@ -1051,7 +1051,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True, tools=tool_settings
+              height=600, responsive=True, tools=tool_settings
    )
    ts_plot.title_text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "10pt"
@@ -1079,6 +1079,14 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    
    for i, source in enumerate(sources):
       legend_name = plot['y1Axis']['label']
+      line_colour = plot_palette[i][1]
+
+      try:
+         line_colour = plot['y1Axis']['linecolour']  
+      except Exception as e:
+         pass
+         # no need to worry, it's all good
+         
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
          debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
@@ -1091,6 +1099,12 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
          ts_plot.yaxis[1].axis_label_text_font_size = "10pt"         
          legend_name = plot['y2Axis']['label']
 
+         try:
+            line_colour = plot['y2Axis']['linecolour']
+         except Exception as e:
+            pass
+            # meh, whatever
+
       if 'min' in datasource and len(sources) == 1:
          debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
          # Plot the max and min as a shaded band.
@@ -1099,17 +1113,15 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
          # So use this.
          ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
       
-      
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
 
-      ## TODO: correct the legend settings
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='{}'.format(legend_name), source=source)
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=line_colour, legend='{}'.format(legend_name), source=source)
 
       # as a point
       debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], size=1, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=line_colour, size=1, alpha=0.5, line_alpha=0, source=source)
       
       if 'err_xs' in datasource:
          # Plot error bars

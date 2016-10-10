@@ -39,7 +39,7 @@ class SOSExtractor(Extractor):
          ]
       }
       data = json.dumps(request_data)
-      print data
+      
       headers = {
          'Accept': 'application/json',
          'Content-Type': 'application/json'
