@@ -453,7 +453,7 @@ gisportal.layer = function( options ) {
          var uidate = gisportal.utils.ISODateString(date);
          var matchedDate = layer.matchDate(uidate);
          // Makes sure that the selected date is within the bounds of the first and last date
-         var inBounds = moment(date).isBetween(moment(layer.firstDate).subtract(1, 'second'), moment(layer.lastDate).add(1, 'second'));
+         var inBounds = moment(date.toGMTString()).isBetween(moment(new Date(layer.firstDate).toGMTString()).subtract(1, 'second'), moment(new Date(layer.lastDate).toGMTString()).add(1, 'second'));
          if(matchedDate && inBounds) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
@@ -524,9 +524,14 @@ gisportal.layer = function( options ) {
                if(layer.minScaleVal <= 0){
                   layer.log = false;
                }
+               // set the style
+               var style = layer.defaultStyle || gisportal.config.defautlStyle || layer.styles[0].Name;
+               layer.style = style;
+
                layer.mergeNewParams({
                   colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
-                  logscale: layer.log
+                  logscale: layer.log,
+                  STYLES: style
                });
             }catch(e){
                //var layer.scaling = 'raw';
