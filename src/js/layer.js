@@ -524,9 +524,14 @@ gisportal.layer = function( options ) {
                if(layer.minScaleVal <= 0){
                   layer.log = false;
                }
+               // set the style
+               var style = layer.defaultStyle || gisportal.config.defautlStyle || layer.styles[0].Name;
+               layer.style = style;
+
                layer.mergeNewParams({
                   colorscalerange: layer.minScaleVal + ',' + layer.maxScaleVal,
-                  logscale: layer.log
+                  logscale: layer.log,
+                  STYLES: style
                });
             }catch(e){
                //var layer.scaling = 'raw';
