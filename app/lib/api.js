@@ -31,12 +31,17 @@ api.get_cache = function(req, res) {
 };
 
 /**
- * Get the important details of each cache file the user has access to without all the layers in a JSON string.
+ * Get the important details of each cache file (server) the user has access to with or without a summary of their layers in a JSON string.
  * @param  {object} req Express router request
  * @param  {object} res Express router response
  * @return  JSON string
  */
 api.get_cache_list = function(req, res) {
+   // Check if the user requested just servers or servers and layers
+   var layers = false;
+   if (req.params.type === 'layers') {
+      layers = true;
+   }
    var username = apiAuth.getUsername(req);
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = apiAuth.getAccessLevel(req, domain);
@@ -44,14 +49,30 @@ api.get_cache_list = function(req, res) {
    var list = [];
 
    for (var i = 0; i < cache.length; i++) {
-      var item = {};
-      item.wmsURL = cache[i].wmsURL;
-      item.serverName = cache[i].serverName;
-      item.contactInfo = cache[i].contactInfo;
-      item.provider = cache[i].provider;
-      item.timeStamp = cache[i].timeStamp;
-      item.owner = cache[i].owner;
-      list.push(item);
+      var serverTemp = cache[i];
+      var server = {};
+      server.wmsURL = serverTemp.wmsURL;
+      server.serverName = serverTemp.serverName;
+      server.contactInfo = serverTemp.contactInfo;
+      server.provider = serverTemp.provider;
+      server.timeStamp = serverTemp.timeStamp;
+      server.owner = serverTemp.owner;
+      if (layers) {
+         server.server = {};
+         server.server.Layers = [];
+         for (var j = 0; j < serverTemp.server.Layers.length; j++) {
+            var layerTemp = serverTemp.server.Layers[j];
+            var layer= {};
+            layer.Name = layerTemp.Name;
+            layer.Title = layerTemp.Title;
+            layer.Abstract = layerTemp.Abstract;
+            layer.FirstDate = layerTemp.FirstDate;
+            layer.LastDate = layerTemp.LastDate;
+            layer.EX_GeographicBoundingBox = layerTemp.EX_GeographicBoundingBox;
+            server.server.Layers.push(layer);
+         }
+      }
+      list.push(server);
    }
 
    res.send(JSON.stringify(list));

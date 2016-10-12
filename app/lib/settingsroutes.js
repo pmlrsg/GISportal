@@ -62,7 +62,7 @@ router.get('/app/cache/*?', function(req, res) {
    var cleanPath = reqPath.replace(/\.\./g, ""); // Clean the path to remove ..
 
    // Check the path isn't requesting something it shouldn't
-   if (!cleanPath.includes('config') && cleanPath.endsWith('.json')) {
+   if (cleanPath.endsWith('.json') || cleanPath.endsWith('.geojson')) {
       var configPath = path.join(MASTER_CONFIG_PATH, cleanPath); // Gets the given path
       if (utils.fileExists(configPath)) {
          res.sendFile(configPath, function(err) {

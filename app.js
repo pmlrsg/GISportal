@@ -118,6 +118,8 @@ app.param('subfolder', function(req, res, next, subfolder) {
       var domain = utils.getDomainName(req);
       if (utils.directoryExists(path.join(MASTER_CONFIG_PATH, domain))) {
          next();
+      } else if (subfolder === 'api') {
+         res.status(400).send("Invalid API request");
       } else {
          res.status(404).send('Sorry, This portal doesn\'t exist, try running the install script');
       }
