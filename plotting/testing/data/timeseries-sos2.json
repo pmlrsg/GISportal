@@ -1,0 +1,85 @@
+{
+   "plot": {
+      "type": "timeseries-sos",
+      "title": "",
+      "style": "boxfill/rainbow",
+      "downloadTypes": [{
+         "key": "csv",
+         "label": "CSV"
+      }, {
+         "key": "png",
+         "label": "PNG"
+      }, {
+         "key": "meta-data",
+         "label": "Meta Data"
+      }, {
+         "key": "logos",
+         "label": "Logos"
+      }, {
+         "key": "svg",
+         "label": "SVG"
+      }],
+      "xAxis": {
+         "scale": "linear",
+         "label": "Date/Time",
+         "ticks": "auto",
+         "weight": "auto",
+         "tickFormat": "%d/%m/%Y"
+      },
+      "y1Axis": {
+         "scale": "linear",
+         "label": "Air Pressure (millibars)",
+         "linecolour": "pink",
+         "ticks": "auto",
+         "weight": "auto",
+         "tickFormat": "auto"
+      },
+      "y2Axis": {
+         "scale": "linear",
+         "label": "Relative Humidity (%)",
+         "linecolour": "purple",
+         "ticks": "auto",
+         "weight": "auto",
+         "tickFormat": "auto"
+      },
+      "data": {
+         "series": [{
+            "data_source": {
+               "observed_property": "http://mmisw.org/ont/cf/parameter/air_pressure",
+               "coverage": "air_pressure",
+               "offering": "PenleeMetData",
+               "feature": "penlee",
+               "t_bounds": [
+                  "2015-01-02T13:50:00.000Z",
+                  "2016-09-08T11:00:00.000Z"
+               ],
+               "threddsUrl": "https://rsg.pml.ac.uk/sensorweb/service"
+            },
+            "label": "1) Penlee Point Air Temperature (deg C)",
+            "yAxis": 1,
+            "type": "line",
+            "meta": "Metadata goes here"
+         }, {
+            "data_source": {
+               "observed_property": "http://mmisw.org/ont/cf/parameter/relative_humidity",
+               "coverage": "relative_humidity",
+               "offering": "PenleeMetData",
+               "feature": "penlee",
+               "t_bounds": [
+                  "2015-01-02T13:50:00.000Z",
+                  "2016-09-08T11:00:00.000Z"
+               ],
+               "threddsUrl": "https://rsg.pml.ac.uk/sensorweb/service"
+            },
+            "label": "RH",
+            "yAxis": 2,
+            "type": "line",
+            "meta": "Metadata goes here"
+         }]
+      },
+      "is_standalone": false
+   },
+   "style": {
+      "logos": []
+   }
+}
