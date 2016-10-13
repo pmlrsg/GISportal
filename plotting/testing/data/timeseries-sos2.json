@@ -3,6 +3,7 @@
       "type": "timeseries-sos",
       "title": "",
       "style": "boxfill/rainbow",
+      "gap_detect": false,
       "downloadTypes": [{
          "key": "csv",
          "label": "CSV"
@@ -77,7 +78,7 @@
             "meta": "Metadata goes here"
          }]
       },
-      "is_standalone": false
+      "is_standalone": true
    },
    "style": {
       "logos": []

@@ -37,6 +37,7 @@
           "series": [{
              "data_source": {
                 "observed_property": "http://mmisw.org/ont/cf/parameter/air_pressure",
+                "coverage": "Air Pressure",
                 "offering": "PenleeMetData",
                 "feature": "penlee",
                 "t_bounds": [
