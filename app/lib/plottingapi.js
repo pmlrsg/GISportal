@@ -2,14 +2,41 @@
  * This module provides plotting functions that are shared by the API and the front end.
  */
 
+var child_process = require('child_process');
 var csv = require('csv-parser');
 var fs = require("fs");
 var moment = require('moment');
 var path = require('path');
 var utils = require('./utils.js');
 
+var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
+var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
+
 var plottingApi = {};
 module.exports = plottingApi;
+
+plottingApi.plot = function(request, cb) {
+   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION]);
+
+   var hash;
+   child.stdout.on('data', function(data) {
+      hash = data.toString().replace(/\n|\r\n|\r/g, '');
+      cb(null, hash);
+   });
+
+   child.stdin.write(JSON.stringify(request));
+   child.stdin.end();
+
+   var error;
+   child.stderr.on('data', function(data) {
+      error += data.toString();
+   });
+   child.on('exit', function() {
+      if (error) {
+         cb(error, null);
+      }
+   });
+};
 
 plottingApi.processCSV = function(req, res, cb) {
    // var username = user.getUsername(req); // Gets the given username NOT USED

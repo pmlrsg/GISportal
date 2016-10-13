@@ -72,6 +72,7 @@ app.set('sessionStore', new redisStore({
 }));
 
 // Configure Express app with:
+app.enable('trust proxy');
 // * Cookie parser
 app.use(cookieParser(global.config.session.secret));
 // * Session manager
