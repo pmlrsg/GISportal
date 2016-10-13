@@ -131,7 +131,7 @@ def read_status(dirname, my_hash):
    return status
 #END read_status
 
-def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback=""):
+def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback="", base_url=""):
    '''
       Updates a JSON status file whose name is defined by dirname and my_hash.
    '''
@@ -170,6 +170,8 @@ def update_status(dirname, my_hash, plot_status, message="", percentage=0, trace
       status["completed"] = True
       status['filename'] = dirname + "/" + my_hash + "-plot.html"
       status['csv'] = dirname + "/" + my_hash + ".zip"
+      if base_url:
+         status['csv_url'] = base_url + "/" + my_hash + ".zip"
    elif plot_status == Plot_status.failed:
       status["completed"] = True
       status['filename'] = None
@@ -1425,7 +1427,7 @@ def prepare_plot(request, outdir):
    return plot
 #END prepare_plot
 
-def execute_plot(dirname, plot, request):
+def execute_plot(dirname, plot, request, base_url):
    debug(3, u"Received request: {}".format(request))
 
    my_hash = plot['req_hash']
@@ -1498,7 +1500,7 @@ def execute_plot(dirname, plot, request):
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
       return False
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete")
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
    return True
 #END execute_plot
 
@@ -1525,16 +1527,17 @@ To execute a plot
    cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output, more v's, more verbose.")
    cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory.")
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
+   cmdParser.add_argument("-u", "--url", action="store", dest="url", default="", help="The portal url including plots directory for including in the status file.")
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose 
+   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):
       debug(0,u"'{}' is not a directory".format(opts.dirname))
       sys.exit(1)
-   
+
    if opts.command not in valid_commands:
       debug(0,u"Command must be one of {}".format(valid_commands))
       sys.exit(1)
@@ -1546,7 +1549,7 @@ To execute a plot
       my_hash = plot['req_hash']
       # Now try and make the plot.
       try:
-         if execute_plot(opts.dirname, plot, request):
+         if execute_plot(opts.dirname, plot, request, opts.url):
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")

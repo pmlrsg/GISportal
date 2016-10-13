@@ -11,12 +11,25 @@ var utils = require('./utils.js');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
+var PLOT_DIRECTORY = path.join("/plots/");
 
 var plottingApi = {};
 module.exports = plottingApi;
 
-plottingApi.plot = function(request, next) {
-   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION]);
+plottingApi.getPlotDirUrl = function(req) {
+   var url = req.protocol + '://' + req.headers.host + req.originalUrl;
+   if (url.includes('/api/')) {
+      url = url.split('/api/')[0];
+   } else {
+      url = url.split('/app/')[0];
+   }
+   url += PLOT_DIRECTORY;
+   return url;
+};
+
+plottingApi.plot = function(req, request, next) {
+   var url = plottingApi.getPlotDirUrl(req);
+   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url]);
 
    var hash;
    child.stdout.on('data', function(data) {

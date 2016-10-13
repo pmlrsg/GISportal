@@ -34,7 +34,7 @@ router.use(function(req, res, next) {
 router.all('/app/plotting/plot', function(req, res) {
    var request = req.body.request;
 
-   plottingApi.plot(request, function(err, hash) {
+   plottingApi.plot(req, request, function(err, hash) {
       if (err) {
          utils.handleError(err, res);
       } else if (hash) {
