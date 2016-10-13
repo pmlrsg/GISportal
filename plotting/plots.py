@@ -36,7 +36,7 @@ from shapely import wkt
 
 import palettes
 
-from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor
+from data_extractor.extractors import BasicExtractor, IrregularExtractor, TransectExtractor, SingleExtractor, SOSExtractor
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
@@ -807,6 +807,8 @@ def timeseries(plot, outfile="time.html"):
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
+   plot_is_standalone = plot['is_standalone']
+   gap_detect = plot['gap_detect'] 
 
    my_hash = plot['req_hash']
    my_id = plot['req_id']
@@ -829,6 +831,7 @@ def timeseries(plot, outfile="time.html"):
 
    zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
 
+   # We can get requests to plot multiple datasets so iterate through.
    for df in plot_data:
           
       # Build the numerical indices into our data based on the variable list supplied.
@@ -852,7 +855,7 @@ def timeseries(plot, outfile="time.html"):
       np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-      #debug(4, data[varindex['mean']]) 
+      # Calculate maxes and mins to set the display range later
       min_value = np.amin(data[varindex['mean']].astype(np.float64))
       max_value = np.amax(data[varindex['mean']].astype(np.float64))
       buffer_value = (max_value - min_value) /20
@@ -861,19 +864,56 @@ def timeseries(plot, outfile="time.html"):
       ymax.append(max_value + buffer_value)
       debug(4, u"ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
 
-      date = datetime(data[varindex['date']])
-      
+      sdate = data[varindex['date']]
+      date0 = datetime(data[varindex['date']])
+      mean = data[varindex['mean']].astype(np.float64)
+
+      if gap_detect == True:
+         # Find the intervals in the dates
+         interval = np.diff(date0)
+         # We will assume that it is a regular interval and will normally never be
+         # more than twice the smallest gap.
+         min_interval = np.min(interval)
+         debug(3, "Gap detect")
+         debug(4, "interval = {}".format(interval))
+         gaps = np.where(np.diff(date0) > min_interval * 2)[0]
+
+         # Now make some dates that fit in the gaps so that our min/max plotting doesn't 
+         # get confused. We can't do NaN with the dates as they are integer and it will try and
+         # plot any integer, giving strange dates.
+         # Numpy insert puts the new stuff before the item indexed by gaps. We want it after so move it on one.
+         gaps = [i+1 for i in gaps]
+         fills = [date0[i-1] + min_interval for i in gaps]
+         debug(4, gaps)
+         debug(4, fills)
+
+         # Fill the gaps.
+         mean = np.insert(mean, gaps, np.nan)
+         date = np.insert(date0, gaps, fills)
+         sdate = np.insert(sdate, gaps, "")
+         debug(4, date)
+         debug(4, mean)
+      else:
+         date = date0
+         
       datasource = dict(date=date,
-                        sdate=data[varindex['date']],
-                        mean=data[varindex['mean']])
+                        sdate=sdate,
+                        mean=mean)
 
       if 'std' in df['vars']:
+         std = data[varindex['std']].astype(np.float64)
          # Set the errorbars
          err_xs = []
          err_ys = []
-         for x, y, std in zip(date, data[varindex['mean']].astype(np.float64), data[varindex['std']].astype(np.float64)):
-            err_xs.append((x, x))
-            err_ys.append((y - std, y + std))
+         if gap_detect == True:
+            debug(3, "Gap filling stderr")
+            std = np.insert(std, gaps, 0.0)
+            debug(4, std)
+            
+         for x, y, s in zip(date, mean, std):
+            if not np.isnan(y):
+               err_xs.append((x, x))
+               err_ys.append((y - s, y + s))
 
          min_value = np.amin(np.array(err_ys).astype(np.float64))
          max_value = np.amax(np.array(err_ys).astype(np.float64))
@@ -893,19 +933,29 @@ def timeseries(plot, outfile="time.html"):
 
          debug(4, u"min_value: {}, max_value:{}".format(min_value,max_value))
          debug(4, u"ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
-         datasource['err_xs'] = err_xs
-         datasource['err_ys'] = err_ys
-         datasource['stderr'] = data[varindex['std']]
+         debug(4, err_xs)
+         debug(4, err_ys)
+
+         datasource['stderr'] = std
       
       if 'max' in df['vars'] and 'min' in df['vars']:
+         vmax = data[varindex['max']].astype(np.float64)
+         vmin = data[varindex['min']].astype(np.float64)
          # Set the min/max envelope. 
          # We create a list of coords starting with the max for the first date then join up all
          # the maxes in date order before moving down to the min for the last date and coming
          # back to the first date.
-         band_y = np.append(data[varindex['max']].astype(np.float64),data[varindex['min']].astype(np.float64)[::-1])
-         band_x = np.append(date,date[::-1])
-         datasource['min'] = data[varindex['min']]
-         datasource['max'] = data[varindex['max']]
+         band_y = np.append(vmax,vmin[::-1])
+         band_x = np.append(date0,date0[::-1])
+         if gap_detect == True:
+            debug(3, "Gap filling max & min")
+            vmax = np.insert(vmax, gaps, np.nan)
+            vmin = np.insert(vmin, gaps, np.nan)
+            debug(4, vmax)
+            debug(4, vmin)
+
+         datasource['min'] = vmin
+         datasource['max'] = vmax
 
       sources.append(ColumnDataSource(data=datasource))
       
@@ -938,6 +988,8 @@ def timeseries(plot, outfile="time.html"):
    yrange = [None, None]
 
    for i, source in enumerate(sources):
+      debug(2, "Starting plotting")
+      debug(4, source.data)
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
          debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
@@ -948,8 +1000,10 @@ def timeseries(plot, outfile="time.html"):
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
    
-      if 'min' in datasource and len(sources) == 1:
+      if 'min' in source.data and len(sources) == 1:
          debug(2, u"Plotting min/max for {}".format(plot_data[i]['coverage']))
+         debug(4, band_x)
+         debug(4, band_y)
          # Plot the max and min as a shaded band.
          # Cannot use this dataframe because we have twice as many band variables as the rest of the 
          # dataframe.
@@ -966,10 +1020,13 @@ def timeseries(plot, outfile="time.html"):
       debug(2, u"Plotting mean points for {}".format(plot_data[i]['coverage']))
       ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
       
-      if 'err_xs' in datasource:
-         # Plot error bars
-         debug(2, u"Plotting error bars for {}".format(plot_data[i]['coverage']))
-         ts_plot.multi_line('err_xs', 'err_ys', y_range_name=y_range_name, color=plot_palette[i][3], line_alpha=0.5, source=source)
+      try:
+         if len(err_xs) > 0:
+            # Plot error bars
+            debug(2, u"Plotting error bars for {}".format(plot_data[i]['coverage']))
+            ts_plot.multi_line(err_xs, err_ys, color=plot_palette[i][3], line_alpha=0.5)
+      except NameError:
+            debug(3, u"Not plotting error bars")
       
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
@@ -981,23 +1038,22 @@ def timeseries(plot, outfile="time.html"):
    script, div = components(ts_plot)
 
    # plot the points
-   if verbosity > 0:
-      output_file(outfile, 'Time Series')
-      save(ts_plot)
-   else:
-      with open(outfile, 'w') as ofile:
+   with open(outfile, 'w') as ofile:
+      if plot_is_standalone:
+         print(template_external.render(script=script, div=div), file=ofile)
+      else:
          print(template.render(script=script, div=div), file=ofile)
    
-   
-   #save(ts_plot)
    return(1)
 #END timeseries   
 
 def timeseriesSOS(plot, outfile="time-sos.html"):
+   # Set plot global variables. Some others are specific to the actual dataset so will be set later.
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
    plot_is_standalone = plot['is_standalone']
+   gap_detect = plot['gap_detect'] 
    
    my_hash = plot['req_hash']
    my_id = plot['req_id']
@@ -1008,6 +1064,8 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    ymin = []
    ymax = []
 
+   # Create the directory to hold our exported data. 
+   #TODO This is common to all plots so should probably be done before.
    csv_dir = dir_name + "/" + my_hash
 
    try:
@@ -1025,6 +1083,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
 
+      # Local dataset config.
       plot_scale= df['scale']
 
       debug(4, "timeseries: varindex = {}".format(varindex))
@@ -1036,10 +1095,11 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
 
-      # Write out the CSV of the data.
-      # TODO Should we put this in a function
- 
+      # Write out the CSV of the data. Datasets may have different time ranges so it does not make
+      # sense to try and merge CSVs, just produce one per dataset.
+      #TODO Should we put this in a function
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+      debug(3, "Writing to {}".format(csv_dir + "/" + df['coverage'] + ".csv"))
       np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
@@ -1049,19 +1109,52 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
       buffer_value = (max_value - min_value) /20
       ymin.append(min_value - buffer_value)
       ymax.append(max_value + buffer_value)
-      debug(4, "ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
+      debug(4, u"ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
 
-      date = datetime(data[varindex['date']])
-      
+      sdate = data[varindex['date']]
+      date0 = datetime(data[varindex['date']])
+      val = data[varindex['value']].astype(np.float64)
+
+      if gap_detect == True:
+         # Find the intervals in the dates
+         interval = np.diff(date0)
+         # We will assume that it is a regular interval and will normally never be
+         # more than twice the smallest gap.
+         min_interval = np.min(interval)
+         debug(3, "Gap detect")
+         debug(4, "interval = {}".format(interval))
+         gaps = np.where(np.diff(date0) > min_interval * 2)[0]
+
+         # Now make some dates that fit in the gaps so that our min/max plotting doesn't 
+         # get confused. We can't do NaN with the dates as they are integer and it will try and
+         # plot any integer, giving strange dates.
+         # Numpy insert puts the new stuff before the item indexed by gaps. We want it after so move it on one.
+         gaps = [i+1 for i in gaps]
+         fills = [date0[i-1] + min_interval for i in gaps]
+         debug(4, gaps)
+         debug(4, fills)
+
+         # Fill the gaps.
+         val = np.insert(val, gaps, np.nan)
+         date = np.insert(date0, gaps, fills)
+         sdate = np.insert(sdate, gaps, "")
+         debug(4, date)
+         debug(4, val)
+      else:
+         date = date0
+         
       datasource = dict(date=date,
-                        sdate=data[varindex['date']],
-                        mean=data[varindex['value']])
+                        sdate=sdate,
+                        val=val)
 
       sources.append(ColumnDataSource(data=datasource))
+   #END for
       
+   # Finish the CSV export and tidy up as we have processed all datasets.
    zf.close()
    shutil.rmtree(csv_dir)
 
+   # Now set up the Bokeh plots.
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=600, responsive=True, tools=tool_settings
    )
@@ -1070,7 +1163,7 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
 
    tooltips = [("Date", "@sdate")]
-   tooltips.append(("value", "@mean{0.000}"))
+   tooltips.append(("Value", "@val{0.000}"))
    
    ts_plot.add_tools(CrosshairTool())
 
@@ -1082,7 +1175,6 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    debug(3,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-   #ts_plot.extra_y_ranges = {"y1": Range1d(start=ymin[0], end=ymax[0])}
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
@@ -1117,28 +1209,15 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
             pass
             # meh, whatever
 
-      if 'min' in datasource and len(sources) == 1:
-         debug(2, "Plotting min/max for {}".format(plot_data[i]['coverage']))
-         # Plot the max and min as a shaded band.
-         # Cannot use this dataframe because we have twice as many band variables as the rest of the 
-         # dataframe.
-         # So use this.
-         ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
-      
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
-      # Plot the mean as line
-      debug(2, "Plotting mean line for {}".format(plot_data[i]['coverage']))
 
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=line_colour, legend='{}'.format(legend_name), source=source)
-
+      # Plot the value as line
+      debug(2, "Plotting val line for {}".format(plot_data[i]['coverage']))
+      ts_plot.line('date', 'val', y_range_name=y_range_name, color=line_colour, legend='{}'.format(legend_name), source=source)
       # as a point
-      debug(2, "Plotting mean points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'mean', y_range_name=y_range_name, color=line_colour, size=1, alpha=0.5, line_alpha=0, source=source)
-      
-      if 'err_xs' in datasource:
-         # Plot error bars
-         debug(2, "Plotting error bars for {}".format(plot_data[i]['coverage']))
-         ts_plot.multi_line('err_xs', 'err_ys', y_range_name=y_range_name, color=plot_palette[i][3], line_alpha=0.5, source=source)
+      debug(2, "Plotting val points for {}".format(plot_data[i]['coverage']))
+      ts_plot.circle('date', 'val', y_range_name=y_range_name, color=line_colour, size=1, alpha=0.5, line_alpha=0, source=source)
+   #END for
       
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
@@ -1150,14 +1229,12 @@ def timeseriesSOS(plot, outfile="time-sos.html"):
    script, div = components(ts_plot)
 
    # plot the points
-   #output_file(outfile, 'Time Series')
    with open(outfile, 'w') as output_file:
       if plot_is_standalone:
          print(template_external.render(script=script, div=div), file=output_file)
       else:
          print(template.render(script=script, div=div), file=output_file)
    
-   #save(ts_plot)
    return(ts_plot)
 #END timeseriesSOS  
 
@@ -1308,10 +1385,16 @@ def get_plot_data(json_request, plot=dict()):
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
+
    try:
       plot_is_standalone = bool(json_request['plot']['is_standalone'])
    except:
       plot_is_standalone = False
+
+   try:
+      gap_detect = bool(json_request['plot']['gap_detect'])
+   except:
+      gap_detect = True
 
    scale = json_request['plot']['y1Axis']['scale']
    style = json_request['plot']['style']
@@ -1332,6 +1415,8 @@ def get_plot_data(json_request, plot=dict()):
    plot['xAxis'] = xAxis
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
+   plot['is_standalone'] = plot_is_standalone
+   plot['gap_detect'] = gap_detect
    try:
       plot['palette'] = style.split("/")[1]
    except IndexError:
@@ -1557,7 +1642,7 @@ def get_plot_data(json_request, plot=dict()):
          for row in values:
             df.append(row.split(','))
     
-         plot_data.append(dict(scale=scale, coverage='', yaxis=yaxis,  vars=['date', 'value'], data=df))
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'value'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
