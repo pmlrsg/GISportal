@@ -83,7 +83,7 @@ settingsApi.get_cache = function(username, domain, permission) {
    return cache;
 };
 
-settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
+settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
    var data = null;
    var clean_url = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
    var filename = clean_url + ".json";
@@ -96,14 +96,14 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
    if (refresh === true || !utils.fileExists(file_path)) {
       request(url + "service=WMS&request=GetCapabilities", function(err, response, body) {
          if (err) {
-            callback(err, data);
+            next(err, data);
          } else {
             xml2js.parseString(body, {
                tagNameProcessors: [settingsApi.stripPrefix],
                attrNameProcessors: [settingsApi.stripPrefix]
             }, function(err, result) {
                if (err) {
-                  callback(err, data);
+                  next(err, data);
                } else {
                   try {
                      var provider;
@@ -215,16 +215,16 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, callback) {
                         data = JSON.stringify(sub_master_cache);
                         fs.writeFileSync(file_path, data);
                      }
-                     callback(null, data);
+                     next(null, data);
                   } catch (err) {
-                     callback(err, data);
+                     next(err, data);
                   }
                }
             });
          }
       });
    } else {
-      callback(null, fs.readFileSync(file_path, 'utf8'));
+      next(null, fs.readFileSync(file_path, 'utf8'));
    }
 };
 
@@ -249,7 +249,7 @@ settingsApi.stripPrefix = function(str) {
    return str.replace(prefixMatch, '');
 };
 
-settingsApi.update_layer = function(username, domain, data, callback) {
+settingsApi.update_layer = function(username, domain, data, next) {
    var filename = data.serverName + ".json"; // Gets the given filename
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
    if (username != domain) {
@@ -257,7 +257,7 @@ settingsApi.update_layer = function(username, domain, data, callback) {
    }
    var this_path = path.join(base_path, filename);
    fs.writeFile(this_path, JSON.stringify(data), function(err) {
-      callback(err);
+      next(err);
    });
 };
 

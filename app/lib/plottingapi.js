@@ -15,13 +15,13 @@ var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
 var plottingApi = {};
 module.exports = plottingApi;
 
-plottingApi.plot = function(request, cb) {
+plottingApi.plot = function(request, next) {
    var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION]);
 
    var hash;
    child.stdout.on('data', function(data) {
       hash = data.toString().replace(/\n|\r\n|\r/g, '');
-      cb(null, hash);
+      next(null, hash);
    });
 
    child.stdin.write(JSON.stringify(request));
@@ -33,12 +33,12 @@ plottingApi.plot = function(request, cb) {
    });
    child.on('exit', function() {
       if (error) {
-         cb(error, null);
+         next(error, null);
       }
    });
 };
 
-plottingApi.processCSV = function(req, res, cb) {
+plottingApi.processCSV = function(req, res, next) {
    // var username = user.getUsername(req); // Gets the given username NOT USED
    // var domain = utils.getDomainName(req); // Gets the given domain NOT USED
    var csvFile = req.file; // Gets the data given
@@ -91,7 +91,7 @@ plottingApi.processCSV = function(req, res, cb) {
          if (errorLines.length > 0) {
             return res.status(400).send('The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid \n Please correct the errors and upload again');
          } else {
-            cb(featuresList, csvPath);
+            next(featuresList, csvPath);
          }
       });
 };
