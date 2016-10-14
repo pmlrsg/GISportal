@@ -71,8 +71,7 @@ router.get('/app/cache/*?', function(req, res) {
             }
          });
       } else {
-         // Send just 404 to avoid revealing the full server path
-         res.status(404).send();
+         res.status(404).send("Error: File not found.");
       }
    } else {
       res.status(400).send();

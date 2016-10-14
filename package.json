@@ -46,7 +46,8 @@
     "swearjar": "~0.1.2",
     "mailgun-js": "~0.7.11",
     "emailjs": "~1.0.5",
-    "nodemailer": "~2.4.2"
+    "nodemailer": "~2.4.2",
+    "adm-zip": "*"
   },
   "engines": {
     "node": ">= 0.8.0",

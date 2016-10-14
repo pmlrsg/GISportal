@@ -33,18 +33,6 @@ apiRouter.get('/refresh_wms_cache', apiAuth.denyGuest, api.refresh_wms_cache);
 apiRouter.get('/get_cache', api.get_cache);
 
 /**
- * Get the important details of each cache file (server) the user has access to without all the layers in a JSON string.
+ * Get the important details of each cache file (server) the user has access to with or without a summary of their layers in a JSON string.
  */
 apiRouter.get('/get_cache_:type', api.get_cache_list);
-
-/**
- * Get the important details of each cache file (server) the user has access to and a summary of their layers in a JSON string.
- */
-// apiRouter.get('/get_cache_layers', api.get_cache_list);
-
-// /**
-//  * Handle invalid api requests.
-//  */
-// router.get('/api/*', function(req, res) {
-//    res.status(400).send("Invalid API request");
-// });
