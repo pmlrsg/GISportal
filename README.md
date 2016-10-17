@@ -1,3 +1,19 @@
+___
+# International Paint Version
+
+This repository is specifically for the International Paint instance of the GISportal  hosted on charybdis.npm.ac.uk and accessed via https://akzonobel.eofrom.space
+
+Gitlab doesn't offer a method to pull updates from the original repo into a fork (which is a bit daft) so any updates made to the web-development/GISportal repo that are needed in this instance will have to be merged using git on the command line. 
+
+To do this:
+
+```
+cd /path/to/local/clone/of/*this*/repository
+git pull https://gitlab.rsg.pml.ac.uk/web-development/GISportal.git master
+git push origin master
+```
+___
+
 # GIS Portal #
 
 The [GIS portal](https://github.com/pmlrsg/GISportal) is a web-based visualisation and analysis tool for examining geospatial data that is available via Web Map Service (WMS) and Web Coverage Service (WCS)
