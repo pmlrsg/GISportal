@@ -2,7 +2,6 @@
 *.pyc
 .DS_Store
 .sass-cache/*
-config/*
 html/GISportal.js
 html/GISportal.min.js
 html/all_templates.mst
