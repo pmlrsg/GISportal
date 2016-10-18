@@ -11,7 +11,7 @@ var utils = require('./utils.js');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
-var PLOT_DIRECTORY = path.join("/plots/");
+var PLOT_DIRECTORY = '/plots/';
 
 var plottingApi = {};
 module.exports = plottingApi;

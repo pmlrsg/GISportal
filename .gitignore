@@ -2,6 +2,8 @@
 *.pyc
 .DS_Store
 .sass-cache/*
+.tern-project
+.vscode/*
 config/*
 html/GISportal.js
 html/GISportal.min.js
@@ -10,7 +12,11 @@ html/css/*
 html/index.html
 html/plots/*
 !html/plots/.gitkeep
+jsconfig.json
 node_modules
+logs/*
+typings.json
+typings/*
 uploads/*
 !uploads/.gitkeep
 app/modules/*
