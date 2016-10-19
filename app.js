@@ -10,12 +10,12 @@ var http = require('http');
 var path = require('path');
 var io = require('socket.io')(http);
 var utils = require('./app/lib/utils.js');
+var requestLogger = require('./app/lib/requestlogger.js');
 require('./app/lib/polyfills.js');
 
 
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
-
 
 // Express setup
 var app = express();
@@ -41,6 +41,7 @@ site_setings_list.forEach(function(foldername) {
          try {
             require(config_path);
             found = true;
+            requestLogger.init(foldername); // Initialise requestLogger for each domain
          } catch (e) {}
       }
    }
@@ -87,9 +88,19 @@ app.use(session({
    resave: false // don't save session if unmodified
 }));
 
+//Logging
+app.use(requestLogger.log);
+app.use('/api/:version/:token', requestLogger.log);
+
 // template engine
 app.set('view engine', 'jade');
-app.use(express.static(path.join(__dirname, 'html')));
+app.use(express.static(path.join(__dirname, 'html'), {
+   setHeaders: function(res, path) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+   }
+}));
 
 // Passport settings
 var passportConfig = require('./app/lib/passport.js');
