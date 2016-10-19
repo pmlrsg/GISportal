@@ -1,20 +1,33 @@
+/**
+ * This module handles logging of all requests to the portal.
+ */
+
+var json2csv = require('json2csv');
+var path = require('path');
 var winston = require('winston');
 var winstonRotate = require('winston-daily-rotate-file');
-var path = require('path');
-var utils = require('./utils.js');
-var user = require('./user.js');
 var apiAuth = require('./apiauth.js');
-var json2csv = require('json2csv');
+var user = require('./user.js');
+var utils = require('./utils.js');
+// var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 var requestLogger = {};
-
-var domainLoggers = {};
-
 module.exports = requestLogger;
 
+// Loggers for each domain that the portal is hosting
+var domainLoggers = {};
+
+/**
+ * Initialise loggers for each domain that the portal is hosting.
+ * @param  {string} domain A domain
+ */
 requestLogger.init = function(domain) {
-   console.log('Init requestLogger for ' + domain);
    var logDir = path.join(__dirname, '/../../', global.config[domain].logDir);
+   if (!utils.directoryExists(logDir)) {
+      mkdirp.sync(logDir);
+      console.log('Created log directory: ' + global.config[domain].logDir);
+   }
    domainLoggers[domain] = new winston.Logger({
       transports: [new winstonRotate({
          filename: path.join(logDir, '.csv'),
@@ -24,8 +37,15 @@ requestLogger.init = function(domain) {
          formatter: formatter
       })]
    });
+   console.log('Initialised requestLogger for ' + domain);
 };
 
+/**
+ * Log a request.
+ * @param  {object}   req  Express request object
+ * @param  {object}   res  Express response object
+ * @param  {Function} next Next function to call in the routing chain
+ */
 requestLogger.log = function(req, res, next) {
    var api = req.originalUrl.startsWith('/api/');
    var apiParamsSet = req.params.version && req.params.token ? true : false;
@@ -37,6 +57,12 @@ requestLogger.log = function(req, res, next) {
    next();
 };
 
+/**
+ * Build the meta object with the data to log
+ * @param  {object}  req Express router request
+ * @param  {boolean} api True if this is an API request
+ * @return {object}      The meta object
+ */
 function buildMeta(req, api) {
    var meta = {
       date: new Date().toISOString(),
@@ -48,6 +74,12 @@ function buildMeta(req, api) {
    return meta;
 }
 
+/**
+ * Get the path that was requested and remove the token if it was an API request.
+ * @param  {object}  req Express router request
+ * @param  {boolean} api True if this is an API request
+ * @return {string}      The path that was requested
+ */
 function getPath(req, api) {
    if (api) {
       return req.originalUrl.replace('/api/' + req.params.version + '/' + req.params.token, '/api/' + req.params.version + '/TOKEN');
@@ -56,6 +88,12 @@ function getPath(req, api) {
    }
 }
 
+/**
+ * Get the username of the user that made the request
+ * @param  {object}  req Express router request
+ * @param  {boolean} api True if this is an API request
+ * @return {string}      The username of the user that made the request
+ */
 function getUsername(req, api) {
    if (api) {
       return apiAuth.getUsername(req);
@@ -66,6 +104,11 @@ function getUsername(req, api) {
    }
 }
 
+/**
+ * Format the log output to convert it from json to CSV
+ * @param  {object} options The logging options and data
+ * @return {string}         The CSV formatted line to log
+ */
 function formatter(options) {
    try {
       var csv = json2csv({
@@ -74,6 +117,6 @@ function formatter(options) {
       });
       return csv;
    } catch (err) {
-      return 'Formatter error: ' + err.message;
+      return 'Log formatter error: ' + err.message;
    }
 }
