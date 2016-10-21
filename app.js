@@ -89,8 +89,8 @@ app.use(session({
 }));
 
 //Logging
-app.use(requestLogger.log);
-app.use('/api/:version/:token', requestLogger.log);
+app.use(requestLogger.autoLog);
+app.use('/api/:version/:token', requestLogger.autoLog);
 
 // template engine
 app.set('view engine', 'jade');

@@ -9,11 +9,13 @@ var winstonRotate = require('winston-daily-rotate-file');
 var apiAuth = require('./apiauth.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
-// var fs = require('fs');
+var fs = require('fs');
 var mkdirp = require('mkdirp');
 
 var requestLogger = {};
 module.exports = requestLogger;
+
+var DO_NOT_AUTO_LOG = ['/api/1/admin/extras/point_extract'];
 
 // Loggers for each domain that the portal is hosting
 var domainLoggers = {};
@@ -41,20 +43,37 @@ requestLogger.init = function(domain) {
 };
 
 /**
+ * Log a request as long as it isn't in the DO_NOT_AUTO_LOG array.
+ * @param  {object}   req  Express request object
+ * @param  {object}   res  Express response object
+ * @param  {Function} next Next function to call in the routing chain
+ */
+requestLogger.autoLog = function(req, res, next) {
+   if (!DO_NOT_AUTO_LOG.includes(req.originalUrl)) {
+      requestLogger.log(req, res, next);
+   } else {
+      next();
+   }
+};
+
+/**
  * Log a request.
  * @param  {object}   req  Express request object
  * @param  {object}   res  Express response object
  * @param  {Function} next Next function to call in the routing chain
  */
 requestLogger.log = function(req, res, next) {
+//    console.time('log');
    var api = req.originalUrl.startsWith('/api/');
-   var apiParamsSet = req.params.version && req.params.token ? true : false;
-   if (!api || api && apiParamsSet) {
+   //    var apiParamsSet = req.params.version && req.params.token ? true : false;
+   if (!api || api && req.params.token) {
       var domain = utils.getDomainName(req);
-      var meta = buildMeta(req, api);
-      domainLoggers[domain].log('info', 'Request', meta);
+      buildMeta(req, api, function(meta) {
+         domainLoggers[domain].log('info', 'Request', meta);
+      });
    }
-   next();
+//    console.timeEnd('log');
+   return next();
 };
 
 /**
@@ -63,15 +82,34 @@ requestLogger.log = function(req, res, next) {
  * @param  {boolean} api True if this is an API request
  * @return {object}      The meta object
  */
-function buildMeta(req, api) {
+function buildMeta(req, api, next) {
    var meta = {
       date: new Date().toISOString(),
       host: req.headers['x-forwarded-for'],
       path: getPath(req, api),
       user: getUsername(req, api),
-      uploadSize: null
    };
-   return meta;
+   if (req.file) {
+      getNumLines(req, function(numLines) {
+         meta.uploadNumLines = numLines;
+         return next(meta);
+      });
+   } else {
+      return next(meta);
+   }
+}
+
+function getNumLines(req, next) {
+   var i;
+   var count = 0;
+   fs.createReadStream(req.file.path)
+      .on('data', function(chunk) {
+         for (i = 0; i < chunk.length; ++i)
+            if (chunk[i] == 10) count++;
+      })
+      .on('end', function() {
+         return next(count);
+      });
 }
 
 /**
