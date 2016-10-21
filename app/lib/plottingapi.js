@@ -8,6 +8,7 @@ var fs = require("fs");
 var moment = require('moment');
 var path = require('path');
 var utils = require('./utils.js');
+var md5 = require('md5');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
@@ -62,49 +63,80 @@ plottingApi.processCSV = function(req, res, next) {
       return res.status(415).send('Please upload a CSV file');
    }
 
-   var csvPath = path.join(csvFile.destination, csvFile.originalname);
-   fs.renameSync(csvFile.path, csvPath);
-
-   var featuresList = [];
-   var lineNumber = 1;
-   var errorLines = [];
-
-   fs.createReadStream(csvPath)
-      .pipe(csv())
-      .on('data', function(data) {
-         lineNumber++;
-         if (data.Date && data.Longitude && data.Latitude) {
-            if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()) {
-               errorLines.push(lineNumber);
-            } else {
-               var longitude = parseFloat(data.Longitude);
-               var latitude = parseFloat(data.Latitude);
-               var geoJSON_data = {
-                  "type": "Feature",
-                  "properties": {
-                     "Date": data.Date,
-                     "Longitude": longitude.toFixed(3),
-                     "Latitude": latitude.toFixed(3)
-                  },
-                  "geometry": {
-                     "type": "Point",
-                     "coordinates": [longitude, latitude]
-                  }
-               };
-               featuresList.push(geoJSON_data);
-            }
-         } else {
-            return res.status(400).send('The CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. \n Please correct the errors and upload again');
-         }
-      })
-      .on('error', function(err) {
+   fs.readFile(csvFile.path, function(err, buffer) {
+      if (err) {
          utils.handleError(err, res);
-      })
-      .on('finish', function() {
-         if (errorLines.length > 0) {
-            return res.status(400).send('The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid \n Please correct the errors and upload again');
+      } else {
+         var hash = md5(buffer);
+
+         var csvPath = path.join(csvFile.destination, 'cache', hash + '.csv');
+         if (utils.fileExists(csvPath)) {
+            fs.unlink(csvFile.path, function(err) {
+               if (err) {
+                  console.error('err');
+               }
+            });
          } else {
-            next(featuresList, csvPath);
+            fs.renameSync(csvFile.path, csvPath);
          }
-      });
+
+         var archivePath = path.join(csvFile.destination, 'archive', new Date().toISOString() + '_' + csvFile.originalname);
+         // copyFile(csvFile.path, archivePath);
+         fs.link(csvPath, archivePath, function(err) {
+            if (err) {
+               console.error(err);
+            }
+         });
+
+         var featuresList = [];
+         var lineNumber = 1;
+         var errorLines = [];
+         var headerError = false;
+
+         fs.createReadStream(csvPath)
+            .pipe(csv())
+            .on('data', function(data) {
+               lineNumber++;
+               if (data.Date && data.Longitude && data.Latitude) {
+                  var longitude = parseFloat(data.Longitude);
+                  var latitude = parseFloat(data.Latitude);
+                  if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() || isNaN(latitude) || isNaN(longitude)) {
+                     errorLines.push(lineNumber);
+                  } else {
+                     var geoJSON_data = {
+                        "type": "Feature",
+                        "properties": {
+                           "Date": data.Date,
+                           "Longitude": longitude.toFixed(3),
+                           "Latitude": latitude.toFixed(3)
+                        },
+                        "geometry": {
+                           "type": "Point",
+                           "coordinates": [longitude, latitude]
+                        }
+                     };
+                     featuresList.push(geoJSON_data);
+                  }
+               } else {
+                  if (lineNumber == 2) {
+                     headerError = true;
+                     return res.status(400).send(
+                        'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order.\nPlease correct the errors and upload again');
+                  } else if (!headerError) {
+                     errorLines.push(lineNumber);
+                  }
+               }
+            })
+            .on('error', function(err) {
+               utils.handleError(err, res);
+            })
+            .on('finish', function() {
+               if (errorLines.length > 0) {
+                  return res.status(400).send('The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid\nPlease correct the errors and upload again');
+               } else if (!headerError) {
+                  return next(featuresList, csvPath);
+               }
+            });
+      }
+   });
 };
