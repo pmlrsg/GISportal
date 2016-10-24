@@ -5,6 +5,7 @@ var multer = require('multer');
 var ogr2ogr = require('ogr2ogr');
 var path = require('path');
 var plottingApi = require('./plottingapi.js');
+var requestLogger = require('./requestlogger.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
 
@@ -156,7 +157,7 @@ router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req,
    });
 });
 
-router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), function(req, res) {
+router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), requestLogger.log, function(req, res) {
    plottingApi.processCSV(req, res, function(featuresList, csvPath) {
       return res.send({
          geoJSON: {

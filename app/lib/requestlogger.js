@@ -15,7 +15,7 @@ var utils = require('./utils.js');
 var requestLogger = {};
 module.exports = requestLogger;
 
-var DO_NOT_AUTO_LOG = ['/api/1/admin/extras/point_extract'];
+var DO_NOT_AUTO_LOG = ['/api/1/admin/extras/point_extract', '/app/plotting/upload_csv'];
 
 // Loggers for each domain that the portal is hosting
 var domainLoggers = {};
