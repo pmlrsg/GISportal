@@ -120,7 +120,7 @@ collaboration.init = function(io, app, config) {
             }
             client.rpush(["people", JSON.stringify({"email": user.email, "id": socket.id})], function(err) {});
          });
-         if(crypto)
+         if(crypto) // Seems pointless
          
          console.log(user.email +' connected: '+sid);
       });

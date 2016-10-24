@@ -2,15 +2,15 @@
  * This module handles logging of all requests to the portal.
  */
 
+var fs = require('fs');
 var json2csv = require('json2csv');
+var mkdirp = require('mkdirp');
 var path = require('path');
 var winston = require('winston');
 var winstonRotate = require('winston-daily-rotate-file');
 var apiAuth = require('./apiauth.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
 
 var requestLogger = {};
 module.exports = requestLogger;
@@ -49,7 +49,7 @@ requestLogger.init = function(domain) {
  * @param  {Function} next Next function to call in the routing chain
  */
 requestLogger.autoLog = function(req, res, next) {
-   if (!DO_NOT_AUTO_LOG.includes(req.originalUrl)) {
+   if (!utils.arrayIncludes(DO_NOT_AUTO_LOG, req.originalUrl)) {
       requestLogger.log(req, res, next);
    } else {
       next();
