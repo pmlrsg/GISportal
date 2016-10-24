@@ -30,6 +30,11 @@ requestLogger.init = function(domain) {
       mkdirp.sync(logDir);
       console.log('Created log directory: ' + global.config[domain].logDir);
    }
+   var columnsFile = path.join(logDir, 'columns.csv');
+   if (!utils.fileExists(columnsFile)) {
+      var columns = 'Date, Host, Path, Username, UploadFileName, UploadNumLines';
+      fs.writeFile(columnsFile, columns);
+   }
    domainLoggers[domain] = new winston.Logger({
       transports: [new winstonRotate({
          filename: path.join(logDir, '.csv'),
@@ -88,8 +93,11 @@ function buildMeta(req, api, next) {
       host: req.headers['x-forwarded-for'],
       path: getPath(req, api),
       user: getUsername(req, api),
+      uploadFileName: "",
+      uploadNumLines: 0
    };
    if (req.file) {
+      meta.uploadFileName = req.file.originalname;
       getNumLines(req, function(numLines) {
          meta.uploadNumLines = numLines;
          return next(meta);
@@ -120,6 +128,9 @@ function getNumLines(req, next) {
  */
 function getPath(req, api) {
    if (api) {
+      if (!req.params.version) {
+         req.params.version = req.originalUrl.split('/')[2];
+      }
       return req.originalUrl.replace('/api/' + req.params.version + '/' + req.params.token, '/api/' + req.params.version + '/TOKEN');
    } else {
       return req.originalUrl;
