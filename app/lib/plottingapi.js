@@ -91,13 +91,12 @@ plottingApi.processCSV = function(req, res, next) {
          var featuresList = [];
          var lineNumber = 1;
          var errorLines = [];
-         var headerError = false;
 
          fs.createReadStream(csvPath)
             .pipe(csv())
             .on('data', function(data) {
                lineNumber++;
-               if (data.Date && data.Longitude && data.Latitude) {
+               if (data.Date && data.Latitude && data.Longitude) {
                   var longitude = parseFloat(data.Longitude);
                   var latitude = parseFloat(data.Latitude);
                   if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() || isNaN(latitude) || isNaN(longitude)) {
@@ -118,13 +117,7 @@ plottingApi.processCSV = function(req, res, next) {
                      featuresList.push(geoJSON_data);
                   }
                } else {
-                  if (lineNumber == 2) {
-                     headerError = true;
-                     return res.status(400).send(
-                        'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order.\nPlease correct the errors and upload again');
-                  } else if (!headerError) {
                      errorLines.push(lineNumber);
-                  }
                }
             })
             .on('error', function(err) {
@@ -132,9 +125,16 @@ plottingApi.processCSV = function(req, res, next) {
             })
             .on('finish', function() {
                if (errorLines.length > 0) {
-                  return res.status(400).send('The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid\nPlease correct the errors and upload again');
-               } else if (!headerError) {
-                  return next(featuresList, csvPath);
+                  var err = {errorLines: errorLines};
+                  if (utils.arrayIncludes(errorLines, 2)) {
+                     err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Latitude\', \'Longitude\', \'Date\', in any order.\nPlease correct the errors and upload again';
+                  } else {
+                     err. message = 'The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid.\nPlease correct the errors and upload again';
+                  }
+                  err.status = 400;
+                  return next(err);
+               } else {
+                  return next(null, featuresList, csvPath);
                }
             });
       }

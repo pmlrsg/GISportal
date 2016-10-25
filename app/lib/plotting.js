@@ -158,14 +158,18 @@ router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req,
 });
 
 router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('files'), requestLogger.log, function(req, res) {
-   plottingApi.processCSV(req, res, function(featuresList, csvPath) {
-      return res.send({
-         geoJSON: {
-            "type": "FeatureCollection",
-            "features": featuresList
-         },
-         filename: csvPath
-      });
+   plottingApi.processCSV(req, res, function(err, featuresList, csvPath) {
+      if (err) {
+         res.status(err.status).send(err.message);
+      } else {
+         return res.send({
+            geoJSON: {
+               "type": "FeatureCollection",
+               "features": featuresList
+            },
+            filename: csvPath
+         });
+      }
    });
 });
 
