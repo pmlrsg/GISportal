@@ -7,15 +7,15 @@ import numpy as np
 
 class TransectStats(object):
    """docstring for TransectStats"""
-   def __init__(self, filename, variable, _csv):
+   def __init__(self, files, variable, _csv):
       super(TransectStats, self).__init__()
-      self.filename = filename
+      self.files = files
       self.variable = variable
       self._csv = _csv
       
 
    def process(self):
-      netcdf_file = netCDF.Dataset(self.filename, "r")
+      netcdf_file = netCDF.MFDataset(self.files, aggdim='time')
       time_var = netcdf_file.variables['time']
       data_var = netcdf_file.variables[self.variable]
 

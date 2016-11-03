@@ -21,15 +21,13 @@ class TransectExtractor(Extractor):
 		slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
 		files = self.getFiles(slices_in_range, max_slices)
-		# files = ['/tmp/9e0e00ed-f04f-45a1-9e6e-ec242695acb0.nc', '/tmp/3c535f98-f2cf-4dd3-82da-184404d5f13f.nc', '/tmp/99b41b92-58bb-4ff0-90eb-814a20f770c9.nc']
 
-		if len(files) > 1:
-			fname = self.mergeFiles(files)
-		else:
-			fname = files[0]
+		# if len(files) > 1:
+		# 	fname = self.mergeFiles(files)
+		# else:
+		# 	fname = files[0]
 
-		# fname = '/tmp/aff5704a-5f59-43e8-af07-1c0b5d2d904e.nc'
-		return fname
+		return files
 
 	def getFiles(self, slices_in_range, max_slices):
 		# if len(slices_in_range) < max_slices:
@@ -55,8 +53,13 @@ class TransectExtractor(Extractor):
 			data = wcs_extractor.getData()
 
 			fname = self.outdir+str(uuid.uuid4())+".nc"
+			chunk_size = 16 * 1024
 			with open(fname, 'w') as outfile:
-				outfile.write(data.read()) # Stream write instead?
+				while True:
+					chunk = data.read(chunk_size)
+					if not chunk:
+						break
+					outfile.write(chunk)
 			files.append(fname)
 		return files
 

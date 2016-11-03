@@ -1371,9 +1371,9 @@ def get_plot_data(json_request, plot=dict()):
          data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
          debug(3, u"Requesting data: {}".format(data_request))
          extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
-         filename = extractor.getData()
-         debug(4, u"Extracted to {}".format(filename))
-         stats = TransectStats(filename, coverage, csv_file)
+         files = extractor.getData()
+         debug(4, u"Extracted to {}".format(files))
+         stats = TransectStats(files, coverage, csv_file)
          output_data = stats.process()
          debug(4, u"Transect extract: {}".format(output_data))
 
