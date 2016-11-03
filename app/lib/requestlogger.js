@@ -25,26 +25,28 @@ var domainLoggers = {};
  * @param  {string} domain A domain
  */
 requestLogger.init = function(domain) {
-   var logDir = path.join(__dirname, '/../../', global.config[domain].logDir);
-   if (!utils.directoryExists(logDir)) {
-      mkdirp.sync(logDir);
-      console.log('Created log directory: ' + global.config[domain].logDir);
+   if (global.config[domain].logDir) {
+      var logDir = path.join(__dirname, '/../../', global.config[domain].logDir);
+      if (!utils.directoryExists(logDir)) {
+         mkdirp.sync(logDir);
+         console.log('Created log directory: ' + global.config[domain].logDir);
+      }
+      var columnsFile = path.join(logDir, 'columns.csv');
+      if (!utils.fileExists(columnsFile)) {
+         var columns = 'Date, Host, Path, Username, UploadFileName, UploadNumLines';
+         fs.writeFile(columnsFile, columns);
+      }
+      domainLoggers[domain] = new winston.Logger({
+         transports: [new winstonRotate({
+            filename: path.join(logDir, '.csv'),
+            datePattern: 'yyyy-MM-dd',
+            prepend: true,
+            json: false,
+            formatter: formatter
+         })]
+      });
+      console.log('Initialised requestLogger for ' + domain);
    }
-   var columnsFile = path.join(logDir, 'columns.csv');
-   if (!utils.fileExists(columnsFile)) {
-      var columns = 'Date, Host, Path, Username, UploadFileName, UploadNumLines';
-      fs.writeFile(columnsFile, columns);
-   }
-   domainLoggers[domain] = new winston.Logger({
-      transports: [new winstonRotate({
-         filename: path.join(logDir, '.csv'),
-         datePattern: 'yyyy-MM-dd',
-         prepend: true,
-         json: false,
-         formatter: formatter
-      })]
-   });
-   console.log('Initialised requestLogger for ' + domain);
 };
 
 /**
@@ -68,16 +70,18 @@ requestLogger.autoLog = function(req, res, next) {
  * @param  {Function} next Next function to call in the routing chain
  */
 requestLogger.log = function(req, res, next) {
-//    console.time('log');
-   var api = req.originalUrl.startsWith('/api/');
-   //    var apiParamsSet = req.params.version && req.params.token ? true : false;
-   if (!api || api && req.params.token) {
-      var domain = utils.getDomainName(req);
-      buildMeta(req, api, function(meta) {
-         domainLoggers[domain].log('info', 'Request', meta);
-      });
+   var domain = utils.getDomainName(req);
+   if (domainLoggers[domain]) {
+      //    console.time('log');
+      var api = req.originalUrl.startsWith('/api/');
+      //    var apiParamsSet = req.params.version && req.params.token ? true : false;
+      if (!api || api && req.params.token) {
+         buildMeta(req, api, function(meta) {
+            domainLoggers[domain].log('info', 'Request', meta);
+         });
+      }
+      //    console.timeEnd('log');
    }
-//    console.timeEnd('log');
    return next();
 };
 
