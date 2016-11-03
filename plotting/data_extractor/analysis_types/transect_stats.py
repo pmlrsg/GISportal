@@ -17,7 +17,7 @@ class TransectStats(object):
    def process(self):
       netcdf_file = netCDF.Dataset(self.filename, "r")
       time_var = netcdf_file.variables['time']
-      data_var = np.array(netcdf_file.variables[self.variable])
+      data_var = netcdf_file.variables[self.variable]
 
       times = time_var[:]
 
@@ -60,10 +60,10 @@ class TransectStats(object):
 
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 
-         time_index = find_closest(times, track_date, last_time,time=True)
+         time_index = find_closest(times, track_date,time=True)
          last_lat = lat_index
          last_lon = lon_index
-         last_time = time_index
+      #    last_time = time_index
 
          data = data_var[time_index][lat_index][lon_index]
 

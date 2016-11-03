@@ -3,7 +3,7 @@
 .DS_Store
 .sass-cache/*
 .tern-project
-.vscode/*
+*.vscode
 config/*
 html/GISportal.js
 html/GISportal.min.js
