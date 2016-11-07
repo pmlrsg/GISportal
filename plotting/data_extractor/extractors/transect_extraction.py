@@ -1,5 +1,8 @@
 import math
 import uuid
+import hashlib
+import os
+import urllib2
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import netCDF4
@@ -20,7 +23,12 @@ class TransectExtractor(Extractor):
       max_slices = self.getMaxSlices(coverage_description['offset_vectors'])
       slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
-      files = self.getFiles(slices_in_range, max_slices)
+      files = []
+      while not files:
+         try:
+            files = self.getFiles(slices_in_range, max_slices)
+         except urllib2.HTTPError:
+            max_slices = max_slices / 2
 
       # if len(files) > 1:
       #  fname = self.mergeFiles(files)
@@ -39,29 +47,49 @@ class TransectExtractor(Extractor):
 
       files = []
       next_start = 0
-      for _ in range(0, int(math.ceil(len(slices_in_range) / float(max_slices)))):
+      for i in range(0, int(math.ceil(len(slices_in_range) / float(max_slices)))):
          start = slices_in_range[next_start].strftime('%Y-%m-%d %H:%M:%S')
-         if next_start + max_slices < len(slices_in_range):
-            end_index = next_start + max_slices
+         if next_start + max_slices <= len(slices_in_range):
+            end_index = next_start + max_slices - 1
          else:
             end_index = len(slices_in_range) - 1
          end = slices_in_range[end_index].strftime('%Y-%m-%d %H:%M:%S')
-         next_start = next_start + max_slices + 1
+         next_start = next_start + max_slices
          extract_dates = start + '/' + end
 
          wcs_extractor = WCSRawHelper(self.wcs_url, extract_dates, self.extract_variable, self.extract_area, self.extract_depth)
-         data = wcs_extractor.getData()
 
-         fname = self.outdir + str(uuid.uuid4()) + ".nc"
+         # Generate the file name based on the request URL
+         fname = self.outdir + hashlib.md5(wcs_extractor.generateGetCoverageUrl()).hexdigest() + ".nc"
 
-         # Download in 16K chunks. This is most efficient for speed and RAM usage.
-         chunk_size = 16 * 1024
-         with open(fname, 'w') as outfile:
-            while True:
-               chunk = data.read(chunk_size)
-               if not chunk:
-                  break
-               outfile.write(chunk)
+         if not os.path.isfile(fname):
+            # If the same request hasn't been downloaded before
+            download_complete = False
+            while not download_complete:
+               print "Making request {} of {}".format(i+1, int(math.ceil(len(slices_in_range) / float(max_slices))))
+               data = wcs_extractor.getData()
+
+               # Generate a temporary file name to download to
+               fname_temp = self.outdir + str(uuid.uuid4()) + ".nc"
+
+               print "Starting download {} of {}".format(i+1, int(math.ceil(len(slices_in_range) / float(max_slices))))
+               # Download in 16K chunks. This is most efficient for speed and RAM usage.
+               chunk_size = 16 * 1024
+               with open(fname_temp, 'w') as outfile:
+                  while True:
+                     chunk = data.read(chunk_size)
+                     if not chunk:
+                        break
+                     outfile.write(chunk)
+
+               try:
+                  netCDF4.Dataset(fname_temp)
+                  download_complete = True
+               except RuntimeError:
+                  print "Download is corrupt. Retrying..."
+            # Rename the file after it's finished downloading
+            os.rename(fname_temp, fname)
+
          files.append(fname)
       return files
 
