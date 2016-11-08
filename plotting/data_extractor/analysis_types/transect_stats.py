@@ -33,7 +33,7 @@ class TransectStats(object):
       with open(self._csv, "rb") as csvfile:
          numline = len(csvfile.readlines())
 
-      data = csv.DictReader(csv_file.splitlines(), delimiter=',')
+      csv_data = csv.DictReader(csv_file.splitlines(), delimiter=',')
       lats = []
       lons = []
       dates = []
@@ -42,9 +42,11 @@ class TransectStats(object):
       last_lon = 0
       last_time = 0
 
-      for row in data:
-         lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
-         lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
+      for row in csv_data:
+         lat_var = netcdf_file.variables['lat'][:]
+         lon_var = netcdf_file.variables['lon'][:]
+         # lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
+         # lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
          if (len(lat_var) <= 1):
             lat_index = 0
          else:
