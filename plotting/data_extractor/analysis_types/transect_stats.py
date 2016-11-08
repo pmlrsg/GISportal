@@ -81,7 +81,7 @@ class TransectStats(object):
 
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
-         _ret['data_value'] = float(data) if not np.isnan(data)  else "null"
+         _ret['data_value'] = float(data) if not data is np.ma.masked else "null"
          ret.append(_ret)
          print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
 
