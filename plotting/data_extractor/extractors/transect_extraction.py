@@ -26,6 +26,7 @@ class TransectExtractor(Extractor):
 
       print "Getting files..."
       files = []
+      files = self.getRawFiles(slices_in_range)
       while not files:
          try:
             files = self.getFiles(slices_in_range, max_slices)
@@ -36,6 +37,19 @@ class TransectExtractor(Extractor):
       #  fname = self.mergeFiles(files)
       # else:
       #  fname = files[0]
+
+      return files
+
+   def getRawFiles(self, slices_in_range):
+      min_year = min(slices_in_range).year
+      max_year = max(slices_in_range).year
+      files = []
+
+      for i in range (min_year, max_year + 1):
+         folder = "/data/datasets/CCI/v3.0-release/geographic/netcdf/daily/" + self.extract_variable + "/" + str(i)
+         filenames = os.listdir(folder)
+         for f in filenames:
+            files.append(folder + "/" + f)
 
       return files
 
