@@ -30,6 +30,8 @@ class TransectStats(object):
 
       with open(self._csv, "rb") as csvfile:
          csv_file = csvfile.read()
+      with open(self._csv, "rb") as csvfile:
+         numline = len(csvfile.readlines())
 
       data = csv.DictReader(csv_file.splitlines(), delimiter=',')
       lats = []
@@ -39,6 +41,7 @@ class TransectStats(object):
       last_lat = 0
       last_lon = 0
       last_time = 0
+
       for row in data:
          lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
          lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
@@ -73,15 +76,11 @@ class TransectStats(object):
             _ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
          else:
             _ret['data_date'] = time_var[time_index].tostring()
-         
+
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
          _ret['data_value'] = float(data) if not np.isnan(data)  else "null"
          ret.append(_ret)
+         print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
 
       return ret
-
-
-
-
-      

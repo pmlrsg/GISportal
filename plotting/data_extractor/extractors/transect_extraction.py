@@ -19,10 +19,12 @@ class TransectExtractor(Extractor):
       super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,  extract_depth=extract_depth)
 
    def getData(self):
+      print "Getting coverage description..."
       coverage_description = self.getCoverageDescriptionData()
       max_slices = self.getMaxSlices(coverage_description['offset_vectors'])
       slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
+      print "Getting files..."
       files = []
       while not files:
          try:
