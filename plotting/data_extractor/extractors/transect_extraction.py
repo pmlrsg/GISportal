@@ -99,6 +99,11 @@ class TransectExtractor(Extractor):
       area_width = self.extract_area[3] - self.extract_area[1]
       area_height = self.extract_area[2] - self.extract_area[0]
 
+      if area_width == 0:
+         area_width = 1
+      if area_height == 0:
+         area_height = 1
+
       pixel_width = abs(area_width / offset_vectors['x'])
       pixel_height = abs(area_height / offset_vectors['y'])
 
