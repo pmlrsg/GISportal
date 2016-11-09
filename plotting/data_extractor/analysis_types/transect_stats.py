@@ -1,18 +1,19 @@
-import netCDF4 as netCDF
-from extraction_utils import basic, getCsvDict, find_closest, getCoordinateVariable
-import json
 import csv
 import datetime
+import netCDF4 as netCDF
 import numpy as np
+from data_extractor.extraction_utils import find_closest, getCoordinateVariable
+from plotting.status import Plot_status, update_status
 
 class TransectStats(object):
    """docstring for TransectStats"""
-   def __init__(self, files, variable, _csv):
+   def __init__(self, files, variable, _csv, status_details):
       super(TransectStats, self).__init__()
       self.files = files
       self.variable = variable
       self._csv = _csv
-      
+      self.status_details = status_details
+      self.percentage = 1
 
    def process(self):
       netcdf_file = netCDF.MFDataset(self.files, aggdim='time')
@@ -34,13 +35,8 @@ class TransectStats(object):
          numline = len(csvfile.readlines())
 
       data = csv.DictReader(csv_file.splitlines(), delimiter=',')
-      lats = []
-      lons = []
-      dates = []
+
       ret = []
-      last_lat = 0
-      last_lon = 0
-      last_time = 0
 
       times_sorted_indexes = np.argsort(times)
       times_sorted = np.sort(times)
@@ -69,9 +65,6 @@ class TransectStats(object):
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 
          time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
-         last_lat = lat_index
-         last_lon = lon_index
-      #    last_time = time_index
 
          data = data_var[time_index][lat_index][lon_index]
 
@@ -86,6 +79,13 @@ class TransectStats(object):
          _ret['track_lon'] = row['Longitude']
          _ret['data_value'] = float(data) if not np.isnan(data)  else "null"
          ret.append(_ret)
-         print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
+         # print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
+         self.update_status_percent(len(ret), numline)
 
       return ret
+
+   def update_status_percent(self, progress, numline):
+      percentage = int(round(progress / float(numline) * 95))
+      if percentage > self.percentage:
+         self.percentage = percentage
+         update_status(self.status_details['dirname'], self.status_details['my_hash'],Plot_status.extracting, percentage=percentage/self.status_details['series'])
