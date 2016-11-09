@@ -48,7 +48,7 @@ class TransectExtractor(Extractor):
       for i in range (min_year, max_year + 1):
          folder = "/data/datasets/CCI/v3.0-release/geographic/netcdf/daily/all_products/" + str(i)
       #    folder = "/data/datasets/CCI/v3.0-release/geographic/netcdf/daily/" + self.extract_variable + "/" + str(i)
-         filenames = os.listdir(folder)
+         filenames = sorted(os.listdir(folder))
          for f in filenames:
             files.append(folder + "/" + f)
 
