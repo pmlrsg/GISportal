@@ -40,9 +40,8 @@ from data_extractor.extractors import BasicExtractor, IrregularExtractor, Transe
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
-
-# Set the default logging verbosity to lowest.
-verbosity = 0
+from plotting.status import Plot_status, read_status, update_status
+from plotting.debug import verbosity, debug
 
 template = jinja2.Template("""
 <!DOCTYPE html>
@@ -72,20 +71,8 @@ hovmoller_template = jinja2.Template("""
 </html>
 """)
 
-
-
 # Just pick some random colours. Probably need to make this configurable.
 plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
-
-# Home rolled enums as Python 2.7 does not have them.
-class Enum(set):
-    def __getattr__(self, name):
-        if name in self:
-            return name
-        raise AttributeError
-
-# Valid plot status values.
-Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
 def get_palette(palette="rainbow"):
    def_palette = "rainbow"
@@ -111,84 +98,6 @@ def datetime(x):
    return np.array(pd.to_datetime(x).astype(np.int64) // 10**6)
    #return np.array(x, dtype=np.datetime64)
 #END datetime
-
-def read_status(dirname, my_hash):
-   '''
-      Reads a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   status = None
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-      else:
-         raise
-
-   return status
-#END read_status
-
-def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback="", base_url=""):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   initial_status = dict(
-      percentage = 0,
-      state = plot_status,
-      message = message,
-      completed = False,
-      traceback= traceback,
-      job_id = my_hash
-   )
-
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         if plot_status == Plot_status.initialising:
-            status = initial_status
-         else:
-            status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = initial_status
-      else:
-         raise
-
-   # Update the status information.
-   status["message"] = message
-   status["traceback"] = traceback
-   status["state"] = plot_status
-   status['percentage'] = percentage
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-      status['csv'] = dirname + "/" + my_hash + ".zip"
-      if base_url:
-         status['csv_url'] = base_url + "/" + my_hash + ".zip"
-   elif plot_status == Plot_status.failed:
-      status["completed"] = True
-      status['filename'] = None
-      status['csv'] = None
-   else:
-      status["completed"] = False
-      status['filename'] = None
-      status['csv'] = None
-
-   debug(3, u"Status: {}".format(status))
-
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
-
-   return status
-#END update_status
 
 def read_cached_request(dirname, my_hash):
    '''
@@ -223,10 +132,6 @@ def read_cached_data(dirname, my_hash, my_id):
 
    return plot 
 #END read_cached_data
-
-def debug(level, msg):
-   if verbosity >= level: print(msg, file=sys.stderr)
-#END debug
 
 #############################################################################################################
    
@@ -1119,6 +1024,12 @@ def get_plot_data(json_request, plot=dict()):
    if 'isIrregular' in json_request['plot']:
       irregular = True
 
+   status_details = {
+      'dirname': dirname,
+      'my_hash': my_hash,
+      'series': len(series)
+   }
+
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
    # as a list.
    plot_data = []
@@ -1141,7 +1052,7 @@ def get_plot_data(json_request, plot=dict()):
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
 
-   update_status(dirname, my_hash, Plot_status.extracting, percentage=5)
+   update_status(dirname, my_hash, Plot_status.extracting, percentage=1)
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
@@ -1373,7 +1284,7 @@ def get_plot_data(json_request, plot=dict()):
          extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
          files = extractor.getData()
          debug(4, u"Extracted to {}".format(files))
-         stats = TransectStats(files, coverage, csv_file)
+         stats = TransectStats(files, coverage, csv_file, status_details)
          output_data = stats.process()
          debug(4, u"Transect extract: {}".format(output_data))
 
@@ -1384,7 +1295,7 @@ def get_plot_data(json_request, plot=dict()):
             [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
             #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': df.append(line)
-    
+
          #TODO This was in the extractor command line butnot sure we need it at the moment.
          #output_metadata = extractor.metadataBlock()
          #output = {}
@@ -1393,7 +1304,7 @@ def get_plot_data(json_request, plot=dict()):
 
          # And convert it to a nice simple dict the plotter understands.
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
-         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+         # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
 
    else:
       # We should not be here!
@@ -1484,7 +1395,7 @@ def execute_plot(dirname, plot, request, base_url):
    plot['req_id'] = my_id
    plot['dir_name'] = dirname
 
-   update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+   update_status(dirname, my_hash, Plot_status.plotting, "Plotting", percentage=95)
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
@@ -1500,7 +1411,7 @@ def execute_plot(dirname, plot, request, base_url):
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
       return False
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", percentage=100, base_url=base_url)
    return True
 #END execute_plot
 
