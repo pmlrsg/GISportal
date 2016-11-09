@@ -48,7 +48,8 @@ class TransectStats(object):
          if (len(lat_var) <= 1):
             lat_index = 0
          else:
-            lat_offset = lat_var[1] - lat_var[0]
+            lat_end = len(lat_var) - 1
+            lat_offset = (lat_var[lat_end] - lat_var[0]) / lat_end
             current_lat = float(row['Latitude'])
             t_lat = current_lat - lat_var[0]
             lat_index = int(round(abs(t_lat / lat_offset)))
@@ -56,7 +57,8 @@ class TransectStats(object):
          if (len(lon_var) <= 1):
             lon_index = 0
          else:
-            lon_offset = lon_var[1] - lon_var[0]
+            lon_end = len(lon_var) - 1
+            lon_offset = (lon_var[lon_end] - lon_var[0]) / lon_end
             current_lon = float(row['Longitude'])
             t_lon = current_lon - lon_var[0]
             lon_index = int(round(abs(t_lon / lon_offset)))
