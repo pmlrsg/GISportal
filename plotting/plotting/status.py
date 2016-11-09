@@ -28,7 +28,8 @@ def read_status(dirname, my_hash):
          raise
 
    return status
-#END read_status
+# END read_status
+
 
 def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback="", base_url=""):
    '''
@@ -87,4 +88,4 @@ def update_status(dirname, my_hash, plot_status, message="", percentage=0, trace
       json.dump(status, status_file)
 
    return status
-#END update_status
+# END update_status

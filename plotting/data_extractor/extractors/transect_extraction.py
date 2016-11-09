@@ -5,7 +5,7 @@ import os
 import urllib2
 import xml.etree.ElementTree as ET
 from datetime import datetime
-import netCDF4
+import netCDF4 as netCDF
 from data_extractor.extraction_utils import WCSRawHelper
 from . import Extractor
 
@@ -68,13 +68,13 @@ class TransectExtractor(Extractor):
             # If the same request hasn't been downloaded before
             download_complete = False
             while not download_complete:
-               print "Making request {} of {}".format(i+1, int(math.ceil(len(slices_in_range) / float(max_slices))))
+               print "Making request {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices))))
                data = wcs_extractor.getData()
 
                # Generate a temporary file name to download to
                fname_temp = self.outdir + str(uuid.uuid4()) + ".nc"
 
-               print "Starting download {} of {}".format(i+1, int(math.ceil(len(slices_in_range) / float(max_slices))))
+               print "Starting download {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices))))
                # Download in 16K chunks. This is most efficient for speed and RAM usage.
                chunk_size = 16 * 1024
                with open(fname_temp, 'w') as outfile:
@@ -85,7 +85,7 @@ class TransectExtractor(Extractor):
                      outfile.write(chunk)
 
                try:
-                  netCDF4.Dataset(fname_temp)
+                  netCDF.Dataset(fname_temp)
                   download_complete = True
                except RuntimeError:
                   print "Download is corrupt. Retrying..."
@@ -159,10 +159,10 @@ class TransectExtractor(Extractor):
    def mergeFiles(self, files):
       # Create new file
       fname = self.outdir + str(uuid.uuid4()) + ".nc"
-      # new_file = netCDF4.Dataset(fname, 'w', format='NETCDF3_64BIT')
-      new_file = netCDF4.Dataset(fname, 'w', format='NETCDF4')
+      # new_file = netCDF.Dataset(fname, 'w', format='NETCDF3_64BIT')
+      new_file = netCDF.Dataset(fname, 'w', format='NETCDF')
       # Load first downloaded file
-      first_file = netCDF4.Dataset(files[0], 'r')
+      first_file = netCDF.Dataset(files[0], 'r')
       # Copy attrs from first file into new file
       for attr in first_file.ncattrs():
          new_file.setncattr(attr, first_file.getncattr(attr))
@@ -209,7 +209,7 @@ class TransectExtractor(Extractor):
       first_file.close()
 
       for _file in files:
-         f = netCDF4.Dataset(_file, 'r')
+         f = netCDF.Dataset(_file, 'r')
          new_time = f.variables['time']
          new_variable = f.variables[self.extract_variable]
 

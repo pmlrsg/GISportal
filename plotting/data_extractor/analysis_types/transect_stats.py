@@ -5,8 +5,10 @@ import numpy as np
 from data_extractor.extraction_utils import find_closest, getCoordinateVariable
 from plotting.status import Plot_status, update_status
 
+
 class TransectStats(object):
    """docstring for TransectStats"""
+
    def __init__(self, files, variable, _csv, status_details):
       super(TransectStats, self).__init__()
       self.files = files
@@ -44,7 +46,7 @@ class TransectStats(object):
       for row in data:
          lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
          lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
-         if (len(lat_var) <= 1):
+         if len(lat_var) <= 1:
             lat_index = 0
          else:
             lat_end = len(lat_var) - 1
@@ -53,7 +55,7 @@ class TransectStats(object):
             t_lat = current_lat - lat_var[0]
             lat_index = int(round(abs(t_lat / lat_offset)))
 
-         if (len(lon_var) <= 1):
+         if len(lon_var) <= 1:
             lon_index = 0
          else:
             lon_end = len(lon_var) - 1
@@ -77,7 +79,7 @@ class TransectStats(object):
 
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
-         _ret['data_value'] = float(data) if not np.isnan(data)  else "null"
+         _ret['data_value'] = float(data) if not np.isnan(data) else "null"
          ret.append(_ret)
          # print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
          self.update_status_percent(len(ret), numline)
@@ -88,4 +90,4 @@ class TransectStats(object):
       percentage = int(round(progress / float(numline) * 95))
       if percentage > self.percentage:
          self.percentage = percentage
-         update_status(self.status_details['dirname'], self.status_details['my_hash'],Plot_status.extracting, percentage=percentage/self.status_details['series'])
+         update_status(self.status_details['dirname'], self.status_details['my_hash'], Plot_status.extracting, percentage=percentage / self.status_details['series'])
