@@ -42,6 +42,9 @@ class TransectStats(object):
       last_lon = 0
       last_time = 0
 
+      times_sorted_indexes = np.argsort(times)
+      times_sorted = np.sort(times)
+
       for row in data:
          lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
          lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
@@ -65,7 +68,7 @@ class TransectStats(object):
 
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
 
-         time_index = find_closest(times, track_date,time=True)
+         time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
          last_lat = lat_index
          last_lon = lon_index
       #    last_time = time_index
