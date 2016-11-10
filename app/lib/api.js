@@ -6,6 +6,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore'); // Could change to lodash later
 var apiAuth = require('./apiauth.js');
+var apiUtils = require('./apiutils.js');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 
@@ -23,10 +24,7 @@ module.exports = api;
  * @return  JSON string
  */
 api.get_cache = function(req, res) {
-   var username = apiAuth.getUsername(req);
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = apiAuth.getAccessLevel(req, domain);
-   var cache = settingsApi.get_cache(username, domain, permission);
+   var cache = apiUtils.getCache(req);
    res.send(JSON.stringify(cache));
 };
 
@@ -42,10 +40,7 @@ api.get_cache_list = function(req, res) {
    if (req.params.type === 'layers') {
       layers = true;
    }
-   var username = apiAuth.getUsername(req);
-   var domain = utils.getDomainName(req); // Gets the given domain
-   var permission = apiAuth.getAccessLevel(req, domain);
-   var cache = settingsApi.get_cache(username, domain, permission);
+   var cache = apiUtils.getCache(req);
    var list = [];
 
    for (var i = 0; i < cache.length; i++) {
@@ -85,8 +80,11 @@ api.get_cache_list = function(req, res) {
  * @param  {object} res Express router response
  */
 api.refresh_wms_cache = function(req, res) {
+   if (req.query.server) {
+      req.query.url = apiUtils.findServerURL(req, req.query.server);
+   }
    if (req.query.url) {
-      var url = req.query.url.replace(/\?.*/g, "") + "?"; // Gets the given url
+      var url = req.query.url; // Gets the given url
       var refresh = true;
       var domain = utils.getDomainName(req); // Gets the given domain
       var username;
@@ -113,12 +111,12 @@ api.refresh_wms_cache = function(req, res) {
             if (strData !== null) {
                var newData = JSON.parse(strData);
                var oldData = null;
-               var cleanPath = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
+               var serverName = utils.URLtoServerName(url);
                var basePath = path.join(MASTER_CONFIG_PATH, domain); // Gets the given path
                if (username != domain) {
                   basePath = path.join(basePath, USER_CACHE_PREFIX + username);
                }
-               var oldDataPath = path.join(basePath, cleanPath + '.json');
+               var oldDataPath = path.join(basePath, serverName + '.json');
 
                if (utils.fileExists(oldDataPath)) {
                   oldData = JSON.parse(fs.readFileSync(oldDataPath, 'utf8'));
@@ -127,7 +125,7 @@ api.refresh_wms_cache = function(req, res) {
                      if (err) {
                         utils.handleError(err, res);
                      } else {
-                        res.send('Successfully updated ' + cleanPath + ' for ' + username);
+                        res.send('Successfully updated ' + serverName + ' for ' + username);
                      }
                   });
                } else {
@@ -135,7 +133,7 @@ api.refresh_wms_cache = function(req, res) {
                }
             } else {
                res.send({
-                  "Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"
+                  "Error": "Could not find any loadable layers in the WMS file you provided"
                });
             }
          }

@@ -82,7 +82,9 @@ requestLogger.log = function(req, res, next) {
       }
       //    console.timeEnd('log');
    }
-   return next();
+   if (next) {
+      return next();
+   }
 };
 
 /**

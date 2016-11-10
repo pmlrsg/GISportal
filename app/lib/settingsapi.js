@@ -84,9 +84,10 @@ settingsApi.get_cache = function(username, domain, permission) {
 };
 
 settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
+   url = url.replace(/\?.*/g, "") + "?";
    var data = null;
-   var clean_url = url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?/g, "");
-   var filename = clean_url + ".json";
+   var serverName = utils.URLtoServerName(url);
+   var filename = serverName + ".json";
    var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
    if (!utils.directoryExists(directory)) {
       utils.mkdirpSync(directory); // Creates the directory if it doesn't already exist
@@ -197,7 +198,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                            }
                         }
 
-                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
+                        digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, serverName, layers, provider);
                      }
                      if (layers.length > 0) {
                         var sub_master_cache = {};
@@ -207,7 +208,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                            "providerShortTag": "UserDefinedLayer"
                         };
                         sub_master_cache.wmsURL = url;
-                        sub_master_cache.serverName = clean_url;
+                        sub_master_cache.serverName = serverName;
                         sub_master_cache.contactInfo = contact_info;
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
                         sub_master_cache.timeStamp = new Date();
@@ -251,7 +252,7 @@ settingsApi.stripPrefix = function(str) {
 
 settingsApi.update_layer = function(username, domain, data, next) {
    var filename = data.serverName + ".json"; // Gets the given filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of 
+   var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of
    if (username != domain) {
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);
    }
@@ -331,7 +332,7 @@ function createStylesArray(layer) {
    return styles;
 }
 
-function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider) {
+function digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, serverName, layers, provider) {
    for (var index in parent_layer.Layer) {
       var layer = parent_layer.Layer[index];
 
@@ -389,11 +390,11 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          if (!utils.directoryExists(LAYER_CONFIG_PATH)) {
             utils.mkdirpSync(LAYER_CONFIG_PATH);
          }
-         var save_path = path.join(LAYER_CONFIG_PATH, clean_url + "_" + name + ".json");
+         var save_path = path.join(LAYER_CONFIG_PATH, serverName + "_" + name + ".json");
          fs.writeFileSync(save_path, JSON.stringify(layer_data));
          style = undefined;
       } else {
-         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, clean_url, layers, provider);
+         digForLayers(layer, name, service_title, title, abstract, bounding_box, style, dimensions, serverName, layers, provider);
       }
 
    }
