@@ -2,14 +2,13 @@ import csv
 import datetime
 import netCDF4 as netCDF
 import numpy as np
-from data_extractor.extraction_utils import find_closest, getCoordinateVariable
-from plotting.status import Plot_status, update_status
+from extraction_utils import find_closest, getCoordinateVariable
 
 
 class TransectStats(object):
    """docstring for TransectStats"""
 
-   def __init__(self, files, variable, _csv, status_details):
+   def __init__(self, files, variable, _csv, status_details=None):
       super(TransectStats, self).__init__()
       self.files = files
       self.variable = variable
@@ -82,11 +81,13 @@ class TransectStats(object):
          _ret['data_value'] = float(data) if not np.isnan(data) else "null"
          ret.append(_ret)
          # print "Extraction: {}%".format(round(len(ret) / float(numline) * 100, 3))
-         self.update_status_percent(len(ret), numline)
+         if self.status_details:
+            self.update_status_percent(len(ret), numline)
 
       return ret
 
    def update_status_percent(self, progress, numline):
+      from plotting.status import Plot_status, update_status
       percentage = int(round(progress / float(numline) * 95))
       if percentage > self.percentage:
          self.percentage = percentage

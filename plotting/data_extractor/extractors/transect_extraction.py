@@ -6,9 +6,14 @@ import urllib2
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import netCDF4 as netCDF
-from data_extractor.extraction_utils import WCSRawHelper
-from plotting.debug import debug
+from extraction_utils import WCSRawHelper
 from . import Extractor
+try:
+   from plotting.debug import debug
+   plotting = True
+except ImportError:
+   plotting = False
+
 
 
 class TransectExtractor(Extractor):
@@ -20,12 +25,14 @@ class TransectExtractor(Extractor):
       super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,  extract_depth=extract_depth)
 
    def getData(self):
-      debug(1,"Getting coverage description...")
+      if plotting:
+         debug(1,"Getting coverage description...")
       coverage_description = self.getCoverageDescriptionData()
       max_slices = self.getMaxSlices(coverage_description['offset_vectors'])
       slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
-      debug(1, "Getting files...")
+      if plotting:
+         debug(1, "Getting files...")
       files = []
       while not files:
          try:
@@ -69,13 +76,15 @@ class TransectExtractor(Extractor):
             # If the same request hasn't been downloaded before
             download_complete = False
             while not download_complete:
-               debug(1, "Making request {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
+               if plotting:
+                  debug(1, "Making request {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
                data = wcs_extractor.getData()
 
                # Generate a temporary file name to download to
                fname_temp = self.outdir + str(uuid.uuid4()) + ".nc"
 
-               debug(1,"Starting download {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
+               if plotting:
+                  debug(1,"Starting download {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
                # Download in 16K chunks. This is most efficient for speed and RAM usage.
                chunk_size = 16 * 1024
                with open(fname_temp, 'w') as outfile:
@@ -89,7 +98,8 @@ class TransectExtractor(Extractor):
                   netCDF.Dataset(fname_temp)
                   download_complete = True
                except RuntimeError:
-                  debug(1, "Download is corrupt. Retrying...")
+                  if plotting:
+                     debug(1, "Download is corrupt. Retrying...")
             # Rename the file after it's finished downloading
             os.rename(fname_temp, fname)
 
