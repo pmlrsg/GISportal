@@ -10,10 +10,10 @@ from extraction_utils import WCSRawHelper
 from . import Extractor
 try:
    from plotting.debug import debug
+   from plotting.status import Plot_status, update_status
    plotting = True
 except ImportError:
    plotting = False
-
 
 
 class TransectExtractor(Extractor):
@@ -21,18 +21,19 @@ class TransectExtractor(Extractor):
 
    thredds_max_request = 4000
 
-   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None):
+   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None, status_details=None):
       super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,  extract_depth=extract_depth)
+      self.status_details = status_details
 
    def getData(self):
       if plotting:
-         debug(1,"Getting coverage description...")
+         debug(2,"Getting coverage description...")
       coverage_description = self.getCoverageDescriptionData()
       max_slices = self.getMaxSlices(coverage_description['offset_vectors'])
       slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
       if plotting:
-         debug(1, "Getting files...")
+         debug(2, "Getting files...")
       files = []
       while not files:
          try:
@@ -56,6 +57,7 @@ class TransectExtractor(Extractor):
       # else:
 
       files = []
+      total_requests = int(math.ceil(len(slices_in_range) / float(max_slices)))
       next_start = 0
       for i in range(0, int(math.ceil(len(slices_in_range) / float(max_slices)))):
          start = slices_in_range[next_start].strftime('%Y-%m-%d %H:%M:%S')
@@ -77,14 +79,14 @@ class TransectExtractor(Extractor):
             download_complete = False
             while not download_complete:
                if plotting:
-                  debug(1, "Making request {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
+                  debug(3, "Making request {} of {}".format(i + 1, total_requests))
                data = wcs_extractor.getData()
 
                # Generate a temporary file name to download to
                fname_temp = self.outdir + str(uuid.uuid4()) + ".nc"
 
                if plotting:
-                  debug(1,"Starting download {} of {}".format(i + 1, int(math.ceil(len(slices_in_range) / float(max_slices)))))
+                  debug(3,"Starting download {} of {}".format(i + 1, total_requests))
                # Download in 16K chunks. This is most efficient for speed and RAM usage.
                chunk_size = 16 * 1024
                with open(fname_temp, 'w') as outfile:
@@ -99,10 +101,12 @@ class TransectExtractor(Extractor):
                   download_complete = True
                except RuntimeError:
                   if plotting:
-                     debug(1, "Download is corrupt. Retrying...")
+                     debug(3, "Download is corrupt. Retrying...")
             # Rename the file after it's finished downloading
             os.rename(fname_temp, fname)
 
+         if plotting:
+            self.update_status(i + 1, total_requests)
          files.append(fname)
       return files
 
@@ -235,3 +239,8 @@ class TransectExtractor(Extractor):
       new_file.close()
 
       return fname
+
+   def update_status(self, progress, total_requests):
+      percentage = round(progress / float(total_requests) * 19 + 1, 1) / self.status_details['series']
+      update_status(self.status_details['dirname'], self.status_details['my_hash'],
+         Plot_status.extracting, percentage=percentage)

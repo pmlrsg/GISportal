@@ -41,7 +41,8 @@ from data_extractor.extraction_utils import Debug, get_transect_bounds, get_tran
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
 from plotting.status import Plot_status, read_status, update_status
-from plotting.debug import verbosity, debug
+import plotting.debug
+from plotting.debug import debug
 
 template = jinja2.Template("""
 <!DOCTYPE html>
@@ -667,7 +668,7 @@ def transect(plot, outfile="transect.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    #save(ts_plot)
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -856,7 +857,7 @@ def timeseries(plot, outfile="time.html"):
    script, div = components(ts_plot)
 
    # plot the points
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -1281,7 +1282,7 @@ def get_plot_data(json_request, plot=dict()):
          time = get_transect_times(csv_file)
          data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
          debug(3, u"Requesting data: {}".format(data_request))
-         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details)
          files = extractor.getData()
          debug(4, u"Extracted to {}".format(files))
          stats = TransectStats(files, coverage, csv_file, status_details)
@@ -1442,7 +1443,7 @@ To execute a plot
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose
+   if hasattr(opts, 'verbose') and opts.verbose > 0: plotting.debug.verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):
