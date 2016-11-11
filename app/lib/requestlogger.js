@@ -25,7 +25,7 @@ var domainLoggers = {};
  * @param  {string} domain A domain
  */
 requestLogger.init = function(domain) {
-   if (global.config[domain].logDir) {
+   if (global.config[domain] && global.config[domain].logDir) {
       var logDir = path.join(__dirname, '/../../', global.config[domain].logDir);
       if (!utils.directoryExists(logDir)) {
          mkdirp.sync(logDir);

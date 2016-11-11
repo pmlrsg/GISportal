@@ -1007,11 +1007,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #############################################################################################################
    
 
-def get_plot_data(json_request, plot=dict()):
+def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
    debug(2, u"get_plot_data: Started")
    irregular = False
-   # Common data for all plots. 
+   # Common data for all plots.
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
@@ -1080,11 +1080,11 @@ def get_plot_data(json_request, plot=dict()):
             bounds = wkt.loads(bbox).bounds
             data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
          else:
             data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1145,11 +1145,11 @@ def get_plot_data(json_request, plot=dict()):
                bounds = wkt.loads(bbox).bounds
                data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
                data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             map_stats = ImageStats(extract,  coverage)
             response = json.loads(map_stats.process())
@@ -1188,9 +1188,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
@@ -1244,9 +1244,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
@@ -1282,7 +1282,7 @@ def get_plot_data(json_request, plot=dict()):
          time = get_transect_times(csv_file)
          data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
          debug(3, u"Requesting data: {}".format(data_request))
-         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details)
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir)
          files = extractor.getData()
          debug(4, u"Extracted to {}".format(files))
          stats = TransectStats(files, coverage, csv_file, status_details)
@@ -1339,7 +1339,7 @@ def prepare_plot(request, outdir):
    return plot
 #END prepare_plot
 
-def execute_plot(dirname, plot, request, base_url):
+def execute_plot(dirname, plot, request, base_url, download_dir):
    debug(3, u"Received request: {}".format(request))
 
    my_hash = plot['req_hash']
@@ -1365,7 +1365,7 @@ def execute_plot(dirname, plot, request, base_url):
       
       # Call the extractor.
       update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
-      plot = get_plot_data(request, plot)
+      plot = get_plot_data(request, plot, download_dir)
 
       # Only cache the data if we think it is OK.
       if plot['status'] == "success":
@@ -1440,6 +1440,7 @@ To execute a plot
    cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory.")
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
    cmdParser.add_argument("-u", "--url", action="store", dest="url", default="", help="The portal url including plots directory for including in the status file.")
+   cmdParser.add_argument("-dd", "--download_dir", action="store", dest="download_dir", default="/tmp/", help="The directory to store downloaded netCDF files.")
 
    opts = cmdParser.parse_args()
 
@@ -1450,18 +1451,23 @@ To execute a plot
       debug(0,u"'{}' is not a directory".format(opts.dirname))
       sys.exit(1)
 
+   if not os.path.isdir(opts.download_dir):
+      debug(0,u"'{}' is not a directory".format(opts.download_dir))
+      sys.exit(1)
+
    if opts.command not in valid_commands:
       debug(0,u"Command must be one of {}".format(valid_commands))
       sys.exit(1)
 
    if opts.command == "execute":
       request = json.load(sys.stdin)
+      # request = json.loads(raw_input('JSON: '))
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
       # Now try and make the plot.
       try:
-         if execute_plot(opts.dirname, plot, request, opts.url):
+         if execute_plot(opts.dirname, plot, request, opts.url, opts.download_dir):
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")

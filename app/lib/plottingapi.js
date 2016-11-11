@@ -13,6 +13,7 @@ var md5 = require('md5');
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
 var PLOT_DIRECTORY = '/plots/';
+var PLOT_DOWNLOAD_DIRECTORY = '/tmp/';
 
 var plottingApi = {};
 module.exports = plottingApi;
@@ -29,8 +30,15 @@ plottingApi.getPlotDirUrl = function(req) {
 };
 
 plottingApi.plot = function(req, request, next) {
+   var domain = utils.getDomainName(req);
+   var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
+   if (global.config[domain] && global.config[domain].plottingDownloadDir) {
+      if (utils.directoryExists(global.config[domain].plottingDownloadDir)) {
+         downloadDir = global.config[domain].plottingDownloadDir;
+      }
+   }
    var url = plottingApi.getPlotDirUrl(req);
-   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url]);
+   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir]);
 
    var hash;
    child.stdout.on('data', function(data) {
@@ -117,7 +125,7 @@ plottingApi.processCSV = function(req, res, next) {
                      featuresList.push(geoJSON_data);
                   }
                } else {
-                     errorLines.push(lineNumber);
+                  errorLines.push(lineNumber);
                }
             })
             .on('error', function(err) {
@@ -125,11 +133,13 @@ plottingApi.processCSV = function(req, res, next) {
             })
             .on('finish', function() {
                if (errorLines.length > 0) {
-                  var err = {errorLines: errorLines};
+                  var err = {
+                     errorLines: errorLines
+                  };
                   if (utils.arrayIncludes(errorLines, 2)) {
                      err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Latitude\', \'Longitude\', \'Date\', in any order.\nPlease correct the errors and upload again';
                   } else {
-                     err. message = 'The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid.\nPlease correct the errors and upload again';
+                     err.message = 'The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid.\nPlease correct the errors and upload again';
                   }
                   err.status = 400;
                   return next(err);

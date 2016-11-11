@@ -21,8 +21,8 @@ class TransectExtractor(Extractor):
 
    thredds_max_request = 4000
 
-   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None, status_details=None):
-      super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,  extract_depth=extract_depth)
+   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None, status_details=None, outdir="/tmp/"):
+      super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area,extract_variable=extract_variable,  extract_depth=extract_depth, outdir=outdir)
       self.status_details = status_details
 
    def getData(self):
