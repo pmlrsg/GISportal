@@ -21,3 +21,4 @@ uploads/*
 app/modules/*
 !app/modules/.gitkeep
 config/site_settings/charybdis*
+config/site_settings/akzonobel.eofrom.space/temporary_cache/
