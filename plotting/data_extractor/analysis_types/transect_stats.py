@@ -55,6 +55,16 @@ class TransectStats(object):
       lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
       lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
 
+      if np.amax(lat_var) > 90:
+         for i, lat in enumerate(lat_var):
+            if lat > 90:
+               lat_var[i] = lat - 180
+
+      if np.amax(lon_var) > 180:
+         for i, lon in enumerate(lon_var):
+            if lon > 180:
+               lon_var[i] = lon - 360
+
       lat_end = len(lat_var) - 1
       lat_offset = (lat_var[lat_end] - lat_var[0]) / lat_end
 
