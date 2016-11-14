@@ -8,8 +8,8 @@ from analysis_types import BasicStats
 
 class IrregularExtractor(Extractor):
 	"""docstring for IrregularExtractor"""
-	def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, masking_polygon=None):
-		super(IrregularExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,extract_depth=extract_depth)
+	def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, masking_polygon=None, outdir="/tmp"):
+		super(IrregularExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area, extract_variable=extract_variable,extract_depth=extract_depth, outdir=outdir)
 		
 		self.masking_polygon = masking_polygon
 

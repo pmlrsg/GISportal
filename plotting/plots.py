@@ -40,9 +40,9 @@ from data_extractor.extractors import BasicExtractor, IrregularExtractor, Transe
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
-
-# Set the default logging verbosity to lowest.
-verbosity = 0
+from plotting.status import Plot_status, read_status, update_status
+import plotting.debug
+from plotting.debug import debug
 
 template = jinja2.Template("""
 <!DOCTYPE html>
@@ -72,20 +72,8 @@ hovmoller_template = jinja2.Template("""
 </html>
 """)
 
-
-
 # Just pick some random colours. Probably need to make this configurable.
 plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
-
-# Home rolled enums as Python 2.7 does not have them.
-class Enum(set):
-    def __getattr__(self, name):
-        if name in self:
-            return name
-        raise AttributeError
-
-# Valid plot status values.
-Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
 def get_palette(palette="rainbow"):
    def_palette = "rainbow"
@@ -111,84 +99,6 @@ def datetime(x):
    return np.array(pd.to_datetime(x).astype(np.int64) // 10**6)
    #return np.array(x, dtype=np.datetime64)
 #END datetime
-
-def read_status(dirname, my_hash):
-   '''
-      Reads a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   status = None
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-      else:
-         raise
-
-   return status
-#END read_status
-
-def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback="", base_url=""):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   initial_status = dict(
-      percentage = 0,
-      state = plot_status,
-      message = message,
-      completed = False,
-      traceback= traceback,
-      job_id = my_hash
-   )
-
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         if plot_status == Plot_status.initialising:
-            status = initial_status
-         else:
-            status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = initial_status
-      else:
-         raise
-
-   # Update the status information.
-   status["message"] = message
-   status["traceback"] = traceback
-   status["state"] = plot_status
-   status['percentage'] = percentage
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-      status['csv'] = dirname + "/" + my_hash + ".zip"
-      if base_url:
-         status['csv_url'] = base_url + "/" + my_hash + ".zip"
-   elif plot_status == Plot_status.failed:
-      status["completed"] = True
-      status['filename'] = None
-      status['csv'] = None
-   else:
-      status["completed"] = False
-      status['filename'] = None
-      status['csv'] = None
-
-   debug(3, u"Status: {}".format(status))
-
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
-
-   return status
-#END update_status
 
 def read_cached_request(dirname, my_hash):
    '''
@@ -223,10 +133,6 @@ def read_cached_data(dirname, my_hash, my_id):
 
    return plot 
 #END read_cached_data
-
-def debug(level, msg):
-   if verbosity >= level: print(msg, file=sys.stderr)
-#END debug
 
 #############################################################################################################
    
@@ -762,7 +668,7 @@ def transect(plot, outfile="transect.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    #save(ts_plot)
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -951,7 +857,7 @@ def timeseries(plot, outfile="time.html"):
    script, div = components(ts_plot)
 
    # plot the points
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -1101,11 +1007,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #############################################################################################################
    
 
-def get_plot_data(json_request, plot=dict()):
+def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
    debug(2, u"get_plot_data: Started")
    irregular = False
-   # Common data for all plots. 
+   # Common data for all plots.
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
@@ -1118,6 +1024,12 @@ def get_plot_data(json_request, plot=dict()):
    my_hash = plot['req_hash']
    if 'isIrregular' in json_request['plot']:
       irregular = True
+
+   status_details = {
+      'dirname': dirname,
+      'my_hash': my_hash,
+      'series': len(series)
+   }
 
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
    # as a list.
@@ -1141,7 +1053,7 @@ def get_plot_data(json_request, plot=dict()):
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
 
-   update_status(dirname, my_hash, Plot_status.extracting, percentage=5)
+   update_status(dirname, my_hash, Plot_status.extracting, percentage=1)
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
@@ -1168,11 +1080,11 @@ def get_plot_data(json_request, plot=dict()):
             bounds = wkt.loads(bbox).bounds
             data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
          else:
             data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1233,11 +1145,11 @@ def get_plot_data(json_request, plot=dict()):
                bounds = wkt.loads(bbox).bounds
                data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
                data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             map_stats = ImageStats(extract,  coverage)
             response = json.loads(map_stats.process())
@@ -1276,9 +1188,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
@@ -1332,9 +1244,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
@@ -1370,10 +1282,10 @@ def get_plot_data(json_request, plot=dict()):
          time = get_transect_times(csv_file)
          data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
          debug(3, u"Requesting data: {}".format(data_request))
-         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
-         filename = extractor.getData()
-         debug(4, u"Extracted to {}".format(filename))
-         stats = TransectStats(filename, coverage, csv_file)
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir)
+         files = extractor.getData()
+         debug(4, u"Extracted to {}".format(files))
+         stats = TransectStats(files, coverage, csv_file, status_details)
          output_data = stats.process()
          debug(4, u"Transect extract: {}".format(output_data))
 
@@ -1384,7 +1296,7 @@ def get_plot_data(json_request, plot=dict()):
             [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
             #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': df.append(line)
-    
+
          #TODO This was in the extractor command line butnot sure we need it at the moment.
          #output_metadata = extractor.metadataBlock()
          #output = {}
@@ -1393,7 +1305,7 @@ def get_plot_data(json_request, plot=dict()):
 
          # And convert it to a nice simple dict the plotter understands.
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
-         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+         # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
 
    else:
       # We should not be here!
@@ -1427,7 +1339,7 @@ def prepare_plot(request, outdir):
    return plot
 #END prepare_plot
 
-def execute_plot(dirname, plot, request, base_url):
+def execute_plot(dirname, plot, request, base_url, download_dir):
    debug(3, u"Received request: {}".format(request))
 
    my_hash = plot['req_hash']
@@ -1453,7 +1365,7 @@ def execute_plot(dirname, plot, request, base_url):
       
       # Call the extractor.
       update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
-      plot = get_plot_data(request, plot)
+      plot = get_plot_data(request, plot, download_dir)
 
       # Only cache the data if we think it is OK.
       if plot['status'] == "success":
@@ -1484,7 +1396,7 @@ def execute_plot(dirname, plot, request, base_url):
    plot['req_id'] = my_id
    plot['dir_name'] = dirname
 
-   update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+   update_status(dirname, my_hash, Plot_status.plotting, "Plotting", percentage=95)
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
@@ -1500,7 +1412,7 @@ def execute_plot(dirname, plot, request, base_url):
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
       return False
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", percentage=100, base_url=base_url)
    return True
 #END execute_plot
 
@@ -1528,14 +1440,19 @@ To execute a plot
    cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory.")
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
    cmdParser.add_argument("-u", "--url", action="store", dest="url", default="", help="The portal url including plots directory for including in the status file.")
+   cmdParser.add_argument("-dd", "--download_dir", action="store", dest="download_dir", default="/tmp/", help="The directory to store downloaded netCDF files.")
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose
+   if hasattr(opts, 'verbose') and opts.verbose > 0: plotting.debug.verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):
       debug(0,u"'{}' is not a directory".format(opts.dirname))
+      sys.exit(1)
+
+   if not os.path.isdir(opts.download_dir):
+      debug(0,u"'{}' is not a directory".format(opts.download_dir))
       sys.exit(1)
 
    if opts.command not in valid_commands:
@@ -1544,12 +1461,13 @@ To execute a plot
 
    if opts.command == "execute":
       request = json.load(sys.stdin)
+      # request = json.loads(raw_input('JSON: '))
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
       # Now try and make the plot.
       try:
-         if execute_plot(opts.dirname, plot, request, opts.url):
+         if execute_plot(opts.dirname, plot, request, opts.url, opts.download_dir):
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")

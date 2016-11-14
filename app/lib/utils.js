@@ -40,6 +40,10 @@ utils.arrayIncludes = function(array, searchElement, fromIndex) {
    return false;
 };
 
+utils.URLtoServerName = function(url) {
+   return url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "");
+};
+
 utils.fileExists = function(filePath)
 {
    try
@@ -86,7 +90,6 @@ utils.mkdirpSync = function (dirpath) {
       }
    }
 };
-
 
 utils.handleError = function(err, res){
    try{

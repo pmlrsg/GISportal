@@ -609,7 +609,8 @@ settings.load_data_values = function(req, res) {
 };
 
 settings.load_new_wms_layer = function(req, res) {
-   var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
+   // var url = req.query.url.replace(/\?/g, "") + "?"; // Gets the given url
+   var url = req.query.url;
    var refresh = (req.query.refresh == 'true'); // Gets the given refresh
    var domain = utils.getDomainName(req); // Gets the given domain
 
