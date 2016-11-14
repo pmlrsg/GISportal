@@ -20,3 +20,4 @@ uploads/*
 !uploads/.gitkeep
 app/modules/*
 !app/modules/.gitkeep
+config/site_settings/charybdis*
