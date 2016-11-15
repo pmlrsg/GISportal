@@ -2,7 +2,6 @@
  * This module provides the routes for settings access from the front end.
  */
 
-var bodyParser = require('body-parser');
 var express = require('express');
 var fs = require("fs");
 var path = require('path');
@@ -24,14 +23,6 @@ router.use(function(req, res, next) {
    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-Modified-Since');
    next();
 });
-
-router.use(bodyParser.json({
-   limit: '1mb'
-}));
-router.use(bodyParser.urlencoded({
-   extended: true,
-   limit: '1mb'
-}));
 
 router.get('/app/settings/proxy', settings.proxy);
 

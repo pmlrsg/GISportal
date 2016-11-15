@@ -1,6 +1,7 @@
 // Imports
 // var connect = require('connect');
 // var cookie = require('cookie');
+var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var express = require('express');
 var session = require('express-session');
@@ -111,6 +112,15 @@ app.use(passport.initialize());
 // Load additional modules
 var moduleLoader = require('./app/lib/moduleloader.js');
 var modules = moduleLoader.loadModules();
+
+// Configure body parsers
+app.use(bodyParser.json({
+   limit: '40MB'
+}));
+app.use(bodyParser.urlencoded({
+   extended: true,
+   limit: '40MB'
+}));
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
