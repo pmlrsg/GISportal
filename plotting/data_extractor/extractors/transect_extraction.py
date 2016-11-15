@@ -32,14 +32,18 @@ class TransectExtractor(Extractor):
       max_slices = self.getMaxSlices(coverage_description['offset_vectors'])
       slices_in_range = self.getSlicesInRange(coverage_description['time_slices'])
 
-      if plotting:
-         debug(2, "Getting files...")
       files = []
-      while not files:
-         try:
-            files = self.getFiles(slices_in_range, max_slices)
-         except urllib2.HTTPError:
-            max_slices = max_slices / 2
+      if slices_in_range:
+         if plotting:
+            debug(2, "Getting files...")
+         while not files:
+            try:
+               files = self.getFiles(slices_in_range, max_slices)
+            except urllib2.HTTPError:
+               max_slices = max_slices / 2
+      else:
+         if plotting:
+            debug(2, "No time slices in range.")
 
       # if len(files) > 1:
       #  fname = self.mergeFiles(files)

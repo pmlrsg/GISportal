@@ -66,20 +66,24 @@ def update_status(dirname, my_hash, plot_status, message="", percentage=0, trace
    status["message"] = message
    status["traceback"] = traceback
    status["state"] = plot_status
-   status['percentage'] = percentage
-   status['minutes_remaining'] = minutes_remaining
    if plot_status == Plot_status.complete:
       status["completed"] = True
+      status['percentage'] = 100
+      status['minutes_remaining'] = 0
       status['filename'] = dirname + "/" + my_hash + "-plot.html"
       status['csv'] = dirname + "/" + my_hash + ".zip"
       if base_url:
          status['csv_url'] = base_url + "/" + my_hash + ".zip"
    elif plot_status == Plot_status.failed:
       status["completed"] = True
+      status['percentage'] = 100
+      status['minutes_remaining'] = 0
       status['filename'] = None
       status['csv'] = None
    else:
       status["completed"] = False
+      status['percentage'] = percentage
+      status['minutes_remaining'] = minutes_remaining
       status['filename'] = None
       status['csv'] = None
 

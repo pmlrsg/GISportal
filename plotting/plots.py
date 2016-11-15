@@ -1284,35 +1284,41 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          debug(3, u"Requesting data: {}".format(data_request))
          extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir)
          files = extractor.getData()
-         debug(4, u"Extracted to {}".format(files))
-         stats = TransectStats(files, coverage, csv_file, status_details)
-         output_data = stats.process()
-         debug(4, u"Transect extract: {}".format(output_data))
+         if files:
+            debug(4, u"Extracted to {}".format(files))
+            stats = TransectStats(files, coverage, csv_file, status_details)
+            output_data = stats.process()
+            debug(4, u"Transect extract: {}".format(output_data))
 
-         #TODO LEGACY - Change if the format is altered.
-         df = []
-         for details in output_data:
-            line = []
-            [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
-            #TODO This strips out nulls as they break the plotting at the moment.
-            if line[1] != 'null': df.append(line)
+            #TODO LEGACY - Change if the format is altered.
+            df = []
+            for details in output_data:
+               line = []
+               [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
+               #TODO This strips out nulls as they break the plotting at the moment.
+               if line[1] != 'null': df.append(line)
 
-         #TODO This was in the extractor command line butnot sure we need it at the moment.
-         #output_metadata = extractor.metadataBlock()
-         #output = {}
-         #output['metadata'] = output_metadata
-         #output['data'] = output_data
+            #TODO This was in the extractor command line butnot sure we need it at the moment.
+            #output_metadata = extractor.metadataBlock()
+            #output = {}
+            #output['metadata'] = output_metadata
+            #output['data'] = output_data
 
-         # And convert it to a nice simple dict the plotter understands.
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
-         # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+            # And convert it to a nice simple dict the plotter understands.
+            plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
+            # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
 
    else:
       # We should not be here!
       debug(0, u"Unrecognised data request, {}.".format(data_request))
       return dict(data=[])
 
-   plot['status'] = "success"
+   if plot_data:
+      plot['status'] = "success"
+   else:
+      update_status(dirname, my_hash, Plot_status.failed, message="No matching data found.")
+      plot['status'] = "failed"
+
    plot['data'] = plot_data
    return plot
 #END get_plot_data
@@ -1389,7 +1395,7 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
 
    if len(plot_data) == 0:
       debug(0, u"Data request failed")
-      update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
+      # update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
       return False
 
    plot['req_hash'] = my_hash
@@ -1410,9 +1416,10 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
    else:
       # We should not be here.
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
+      update_status(dirname, my_hash, Plot_status.failed, message="Unknown plot type.")
       return False
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", percentage=100, base_url=base_url)
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
    return True
 #END execute_plot
 
@@ -1444,7 +1451,8 @@ To execute a plot
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0: plotting.debug.verbosity = opts.verbose
+   if hasattr(opts, 'verbose') and opts.verbose > 0:
+      plotting.debug.verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):
@@ -1471,7 +1479,7 @@ To execute a plot
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")
-            sys.exit(2)
+            # sys.exit(2)
       except:
          trace_message = traceback.format_exc()
          debug(0, u"Uncaught Exception. Failed to complete plot - {}".format(trace_message))
