@@ -92,7 +92,10 @@ class TransectStats(object):
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
          time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
 
-         data = data_var[time_index][lat_index][lon_index]
+         if len(data_var.dimensions) == 4:
+            data = data_var[time_index][0][lat_index][lon_index]
+         else:
+            data = data_var[time_index][lat_index][lon_index]
 
          _ret = {}
          _ret['track_date'] = track_date.isoformat()

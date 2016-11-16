@@ -652,6 +652,13 @@ def transect(plot, outfile="transect.html"):
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
+   if len(sources) > len(plot_palette[0]):
+      import random
+      r = lambda: random.randint(0,255)
+      while len(sources) > len(plot_palette[0]):
+         plot_palette[0].append('#%02X%02X%02X' % (r(),r(),r()))
+         plot_palette[1].append('#%02X%02X%02X' % (r(),r(),r()))
+
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
@@ -666,11 +673,11 @@ def transect(plot, outfile="transect.html"):
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
       debug(2, u"Plotting points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
       
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
