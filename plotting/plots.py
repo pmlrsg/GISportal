@@ -559,8 +559,10 @@ def transect(plot, outfile="transect.html"):
 
    zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
 
+   headers_merged = []
+   data_merged = []
+
    for df in plot_data:
-          
       # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
 
@@ -571,22 +573,32 @@ def transect(plot, outfile="transect.html"):
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
       dfarray[dfarray == 'null'] = "NaN"
+      dfarray_full = dfarray
+      dfarray = dfarray[dfarray[:,1]!='NaN']
 
       debug(4, dfarray)
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,2])])
+      data_full = dfarray_full[np.argsort(dfarray_full[:,2])]
+
+      if plot_data.index(df) == 0:
+         data_merged = data_full[:,(2,3,4,0,1)]
+         headers_merged = df['vars'][2:5]
+      else:
+         data_merged = np.hstack((data_merged, data_full[:,(0,1)]))
+      headers_merged.extend([df['coverage'] + "_date", df['coverage'] + "_value"])
 
       debug(4,data)
       # Write out the CSV of the data.
       # TODO Should we put this in a function
- 
+
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
-      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      np.savetxt(csv_file, data_full, comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-      min_value = np.amin(data[varindex['data_value']].astype(np.float64))
-      max_value = np.amax(data[varindex['data_value']].astype(np.float64))
+      min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
+      max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
       buffer_value = (max_value - min_value) /20
       ymin.append(min_value-buffer_value)
       ymax.append(max_value+buffer_value)
@@ -595,13 +607,13 @@ def transect(plot, outfile="transect.html"):
             debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
             plot_scale = "linear"
          else:
-            # Make sure we do not ask for a negative range as this does not 
+            # Make sure we do not ask for a negative range as this does not
             # work for log space.
             if ymin[-1] < 0:
                ymin[-1] = min_value
- 
+
       date = datetime(data[varindex['track_date']])
-      
+
       datasource = dict(date=date,
                         sdate=data[varindex['track_date']],
                         lat=data[varindex['track_lat']],
@@ -609,14 +621,18 @@ def transect(plot, outfile="transect.html"):
                         value=data[varindex['data_value']])
 
       sources.append(ColumnDataSource(data=datasource))
-      
+
+   csv_file = csv_dir + "/" + "merged.csv"
+   np.savetxt(csv_file, data_merged, comments='', header=','.join(headers_merged), fmt="%s",delimiter=",")
+   zf.write(csv_file, arcname="merged.csv")
+
    zf.close()
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=400, responsive=True
    )
-   
+
    tooltips = [("Date", "@sdate")]
    tooltips.append(("Value", "@value{0.000}"))
    tooltips.append(("Latitude", "@lat{1.1}"))
@@ -1296,7 +1312,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
                line = []
                [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
                #TODO This strips out nulls as they break the plotting at the moment.
-               if line[1] != 'null': df.append(line)
+               # if line[1] != 'null': df.append(line)
+               df.append(line)
 
             #TODO This was in the extractor command line butnot sure we need it at the moment.
             #output_metadata = extractor.metadataBlock()
