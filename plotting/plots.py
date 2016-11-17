@@ -1051,7 +1051,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
    status_details = {
       'dirname': dirname,
       'my_hash': my_hash,
-      'series': len(series)
+      'current_series': 0,
+      'num_series': len(series)
    }
 
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
@@ -1331,6 +1332,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             # And convert it to a nice simple dict the plotter understands.
             plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
             # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+         status_details['current_series'] += 1
 
    else:
       # We should not be here!

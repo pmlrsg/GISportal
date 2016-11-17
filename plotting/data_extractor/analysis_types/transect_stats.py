@@ -92,6 +92,12 @@ class TransectStats(object):
          track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
          time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
 
+         if lat_index > lat_end:
+            lat_index = lat_end
+         if lon_index > lon_end:
+            lon_index = lat_end
+
+
          if len(data_var.dimensions) == 4:
             data = data_var[time_index][0][lat_index][lon_index]
          else:
@@ -115,13 +121,16 @@ class TransectStats(object):
       return ret
 
    def update_status(self, progress):
-      if time.clock() > self.last_time + 60:
+      if time.clock() > self.last_time + 0:
          self.last_time = time.clock()
-         percentage = round(progress / float(self.numline) * 75 + 20, 1) / self.status_details['series']
-         minutes_remaining = int(round((time.clock() - self.start_time) / progress * (self.numline - progress) / 60))
-
+         starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
+         percentage = int(round((progress / float(self.numline) * 75 + 19) / self.status_details['num_series'] + starting_percentage))
          debug(3, "Overall progress: {}%".format(percentage))
-         debug(3, "Remaining: {} mins".format(minutes_remaining))
+         if self.status_details['current_series'] == self.status_details['num_series'] - 1:
+            minutes_remaining = int(round((time.clock() - self.start_time) / progress * (self.numline - progress) / 60))
+            debug(3, "Remaining: {} mins".format(minutes_remaining))
+         else:
+            minutes_remaining = -1
 
          update_status(self.status_details['dirname'], self.status_details['my_hash'],
             Plot_status.extracting, percentage=percentage,

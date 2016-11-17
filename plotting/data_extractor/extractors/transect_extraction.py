@@ -245,6 +245,8 @@ class TransectExtractor(Extractor):
       return fname
 
    def update_status(self, progress, total_requests):
-      percentage = round(progress / float(total_requests) * 19 + 1, 1) / self.status_details['series']
+      starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
+      percentage = int(round(progress / float(total_requests) * 19 / self.status_details['num_series'] + starting_percentage))
       update_status(self.status_details['dirname'], self.status_details['my_hash'],
          Plot_status.extracting, percentage=percentage)
+      debug(3, "Overall progress: {}%".format(percentage))
