@@ -121,7 +121,7 @@ class TransectStats(object):
       return ret
 
    def update_status(self, progress):
-      if time.clock() > self.last_time + 0:
+      if time.clock() > self.last_time + 60:
          self.last_time = time.clock()
          starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
          percentage = int(round((progress / float(self.numline) * 75 + 19) / self.status_details['num_series'] + starting_percentage))
