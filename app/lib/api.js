@@ -132,14 +132,14 @@ api.refresh_wms_cache = function(req, res) {
                   res.status(404).send("Error: Can't find config for provided url. If the file isn't yours, you must specify user=global or user=username.");
                }
             } else {
-               res.send({
-                  "Error": "Could not find any loadable layers in the WMS file you provided"
+               res.status(400).send({
+                  "Error": "Could not find any loadable layers in the WMS file you provided."
                });
             }
          }
       });
    } else {
-      res.status(400).send("Error: url wasn't specified");
+      res.status(400).send("Error: url wasn't specified or provided server name not found.");
    }
 };
 
