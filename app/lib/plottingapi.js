@@ -32,13 +32,17 @@ plottingApi.getPlotDirUrl = function(req) {
 plottingApi.plot = function(req, request, next) {
    var domain = utils.getDomainName(req);
    var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
-   if (global.config[domain] && global.config[domain].plottingDownloadDir) {
-      if (utils.directoryExists(global.config[domain].plottingDownloadDir)) {
+   var logDir = "";
+   if (global.config[domain]) {
+      if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
          downloadDir = global.config[domain].plottingDownloadDir;
+      }
+      if (global.config[domain].logDir) {
+         logDir = path.join(__dirname, '../..', global.config[domain].logDir, "plotting");
       }
    }
    var url = plottingApi.getPlotDirUrl(req);
-   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir]);
+   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
 
    var hash;
    child.stdout.on('data', function(data) {

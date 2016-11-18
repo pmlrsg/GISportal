@@ -26,7 +26,7 @@ var domainLoggers = {};
  */
 requestLogger.init = function(domain) {
    if (global.config[domain] && global.config[domain].logDir) {
-      var logDir = path.join(__dirname, '/../../', global.config[domain].logDir);
+      var logDir = path.join(__dirname, '../..', global.config[domain].logDir);
       if (!utils.directoryExists(logDir)) {
          mkdirp.sync(logDir);
          console.log('Created log directory: ' + global.config[domain].logDir);
@@ -99,9 +99,13 @@ function buildMeta(req, api, next) {
       host: req.headers['x-forwarded-for'],
       path: getPath(req, api),
       user: getUsername(req, api),
-      uploadFileName: "",
-      uploadNumLines: 0
+      uploadFileName: '',
+      uploadNumLines: 0,
+      extra: ''
    };
+   if (req.logExtra) {
+      meta.extra = req.logExtra;
+   }
    if (req.file) {
       meta.uploadFileName = req.file.originalname;
       getNumLines(req, function(numLines) {

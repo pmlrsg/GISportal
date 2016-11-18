@@ -43,6 +43,7 @@ from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerSt
 from plotting.status import Plot_status, read_status, update_status
 import plotting.debug
 from plotting.debug import debug
+import plotting.logger as logger
 
 template = jinja2.Template("""
 <!DOCTYPE html>
@@ -622,6 +623,7 @@ def transect(plot, outfile="transect.html"):
 
       sources.append(ColumnDataSource(data=datasource))
 
+   logger.num_points = len(data_merged)
    csv_file = csv_dir + "/" + "merged.csv"
    np.savetxt(csv_file, data_merged, comments='', header=','.join(headers_merged), fmt="%s",delimiter=",")
    zf.write(csv_file, arcname="merged.csv")
@@ -1379,9 +1381,10 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
    my_id = plot['req_id']
    my_fullid = my_hash + "_" + my_id
 
+   new_plot = False
    status = read_status(dirname, my_hash)
    if status == None or status['state'] == Plot_status.failed:
-      
+      new_plot = True
       update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
 
       # Output the identifier for the plot on stdout. This is used by the frontend
@@ -1445,6 +1448,9 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
       update_status(dirname, my_hash, Plot_status.failed, message="Unknown plot type.")
       return False
 
+   if new_plot:
+      logger.log_complete(True)
+
    update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
    return True
 #END execute_plot
@@ -1474,6 +1480,7 @@ To execute a plot
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
    cmdParser.add_argument("-u", "--url", action="store", dest="url", default="", help="The portal url including plots directory for including in the status file.")
    cmdParser.add_argument("-dd", "--download_dir", action="store", dest="download_dir", default="/tmp/", help="The directory to store downloaded netCDF files.")
+   cmdParser.add_argument("-ld", "--log_dir", action="store", dest="log_dir", default="", help="The directory to log completed plot extractions.")
 
    opts = cmdParser.parse_args()
 
@@ -1499,17 +1506,25 @@ To execute a plot
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
+
+      # Setup logger
+      logger.log_dir = opts.log_dir
+      logger.plot_hash = my_hash
+      logger.plot_type = request['plot']['type']
+
       # Now try and make the plot.
       try:
          if execute_plot(opts.dirname, plot, request, opts.url, opts.download_dir):
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")
+            logger.log_complete(False)
             # sys.exit(2)
       except:
          trace_message = traceback.format_exc()
          debug(0, u"Uncaught Exception. Failed to complete plot - {}".format(trace_message))
          update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
+         logger.log_complete(False)
          raise
 
    else:
