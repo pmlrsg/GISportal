@@ -10,7 +10,7 @@ from extraction_utils import sizeof_fmt
 
 class SingleExtractor(Extractor):
 	"""docstring for BasicExtractor"""
-	def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, outdir="/tmp"):
+	def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, outdir="/tmp/"):
 		super(SingleExtractor, self).__init__(wcs_url, extract_dates,  extract_area=extract_area, extract_variable=extract_variable, extract_depth=extract_depth, outdir=outdir)
 		
 
