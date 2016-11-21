@@ -103,12 +103,24 @@ plottingApi.processCSV = function(req, res, next) {
          var featuresList = [];
          var lineNumber = 1;
          var errorLines = [];
+         var is_match_up = false;
 
          fs.createReadStream(csvPath)
             .pipe(csv())
             .on('data', function(data) {
                lineNumber++;
-               if (data.Date && data.Latitude && data.Longitude) {
+                if(data.Date && data.Longitude && data.Latitude && data.data_point){
+                  is_match_up = true;
+                  if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
+                        errorLines.push(line_number);
+                  }else{
+                        var longitude = parseFloat(data.Longitude);
+                        var latitude = parseFloat(data.Latitude);
+                        var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Data Point":data.data_point, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}}
+                        featuresList.push(geoJSON_data);
+                  }
+                }
+               else if (data.Date && data.Latitude && data.Longitude) {
                   var longitude = parseFloat(data.Longitude);
                   var latitude = parseFloat(data.Latitude);
                   if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() || isNaN(latitude) || isNaN(longitude)) {
@@ -141,14 +153,19 @@ plottingApi.processCSV = function(req, res, next) {
                      errorLines: errorLines
                   };
                   if (utils.arrayIncludes(errorLines, 2)) {
-                     err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Latitude\', \'Longitude\', \'Date\', in any order.\nPlease correct the errors and upload again';
+                     err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. There may be an optional 4th column titled data_point for match up files. \n Please correct the errors and upload again';
                   } else {
                      err.message = 'The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid.\nPlease correct the errors and upload again';
                   }
                   err.status = 400;
                   return next(err);
                } else {
-                  return next(null, featuresList, csvPath);
+                  if(is_match_up){
+                        return next(null, featuresList, csvPath, true);
+                  }
+                  else {
+                        return next(null, featuresList, csvPath);
+                  }
                }
             });
       }

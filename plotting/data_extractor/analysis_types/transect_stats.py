@@ -16,13 +16,17 @@ import time
 class TransectStats(object):
    """docstring for TransectStats"""
 
-   def __init__(self, files, variable, _csv, status_details=None):
+
+   def __init__(self, files, variable, _csv, status_details=None,  matchup=False):
+
       super(TransectStats, self).__init__()
       self.files = files
       self.variable = variable
       self._csv = _csv
       self.status_details = status_details
       self.percentage = 0
+      self.matchup = matchup
+
 
    def process(self):
       if plotting:
@@ -83,6 +87,7 @@ class TransectStats(object):
             lat_index = int(round(abs(t_lat / lat_offset)))
 
          if len(lon_var) <= 1:
+
             lon_index = 0
          else:
             current_lon = float(row['Longitude'])
@@ -103,12 +108,17 @@ class TransectStats(object):
          else:
             data = data_var[time_index][lat_index][lon_index]
 
+
          _ret = {}
          _ret['track_date'] = track_date.isoformat()
          if time_var.units:
             _ret['data_date'] = netCDF.num2date(time_var[time_index], time_var.units, calendar='standard').isoformat()
          else:
             _ret['data_date'] = time_var[time_index].tostring()
+
+         
+         if self.matchup:
+            _ret['match_value'] = row['data_point']
 
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
