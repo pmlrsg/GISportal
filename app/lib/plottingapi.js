@@ -160,12 +160,7 @@ plottingApi.processCSV = function(req, res, next) {
                   err.status = 400;
                   return next(err);
                } else {
-                  if(is_match_up){
-                        return next(null, featuresList, csvPath, true);
-                  }
-                  else {
-                        return next(null, featuresList, csvPath);
-                  }
+                  return next(null, featuresList, csvPath, is_match_up);
                }
             });
       }

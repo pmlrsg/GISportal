@@ -162,7 +162,7 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
       if (err) {
          res.status(err.status).send(err.message);
       } else {
-         if(matchup !== "undefined"){
+         if(matchup){
             return res.send({
                   geoJSON: {
                   "type": "FeatureCollection",
