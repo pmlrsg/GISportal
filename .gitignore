@@ -18,6 +18,8 @@ typings.json
 typings/*
 uploads/*
 !uploads/.gitkeep
+!uploads/archive/.gitkeep
+!uploads/cache/.gitkeep
 app/modules/* 
 !app/modules/.gitkeep
 .vscode
