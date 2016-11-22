@@ -10,7 +10,6 @@ var redis = require('redis');
 var request = require('request');
 var titleCase = require('to-title-case');
 var _ = require("underscore");
-// var util = require('util');
 var xml2js = require('xml2js');
 
 var settingsApi = require('./settingsapi.js');

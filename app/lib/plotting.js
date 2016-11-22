@@ -11,10 +11,7 @@ var utils = require('./utils.js');
 
 var USER_CACHE_PREFIX = "user_";
 var CURRENT_PATH = __dirname;
-// var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js"; // NOT USED
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
-// var METADATA_PATH = CURRENT_PATH + "/../../markdown/"; // NOT USED
-// var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/"; // NOT USED
 var EXTRACTOR_PATH = path.join(__dirname, "../../plotting/data_extractor/data_extractor_cli.py");
 var TEMP_UPLOADS_PATH = __dirname + "/../../uploads/";
 

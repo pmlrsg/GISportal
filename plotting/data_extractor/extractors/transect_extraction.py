@@ -45,21 +45,9 @@ class TransectExtractor(Extractor):
          if plotting:
             debug(2, "No time slices in range.")
 
-      # if len(files) > 1:
-      #  fname = self.mergeFiles(files)
-      # else:
-      #  fname = files[0]
-
       return files
 
    def getFiles(self, slices_in_range, max_slices):
-      # if len(slices_in_range) < max_slices:
-      #  data = wcs_extractor.getData()
-      #  fname = self.outdir+str(uuid.uuid4())+".nc"
-      #  with open(fname, 'w') as outfile:
-      #     outfile.write(data.read())
-      # else:
-
       files = []
       total_requests = int(math.ceil(len(slices_in_range) / float(max_slices)))
       next_start = 0
@@ -178,8 +166,7 @@ class TransectExtractor(Extractor):
    def mergeFiles(self, files):
       # Create new file
       fname = self.outdir + str(uuid.uuid4()) + ".nc"
-      # new_file = netCDF.Dataset(fname, 'w', format='NETCDF3_64BIT')
-      new_file = netCDF.Dataset(fname, 'w', format='NETCDF')
+      new_file = netCDF.Dataset(fname, 'w', format='NETCDF4')
       # Load first downloaded file
       first_file = netCDF.Dataset(files[0], 'r')
       # Copy attrs from first file into new file
@@ -188,9 +175,7 @@ class TransectExtractor(Extractor):
 
       # Create dimensions and variables in new file
       new_file.createDimension('time', None)
-      # new_file.createDimension('lat', None)
       new_file.createDimension('lat', len(first_file.dimensions['lat']))
-      # new_file.createDimension('lon', None)
       new_file.createDimension('lon', len(first_file.dimensions['lon']))
 
       time = new_file.createVariable('time', first_file.variables['time'].dtype, ('time',), zlib=False)

@@ -124,7 +124,6 @@ class TransectStats(object):
          _ret['track_lon'] = row['Longitude']
          _ret['data_value'] = float(data) if not np.isnan(data) else "null"
          ret.append(_ret)
-         # print "Extraction: {}%".format(round(len(ret) / float(self.numline) * 100, 3))
          if plotting and self.status_details:
             self.update_status(len(ret))
 

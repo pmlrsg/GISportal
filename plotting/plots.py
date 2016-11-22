@@ -736,7 +736,6 @@ def matchup(plot, outfile="transect.html"):
    zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
 
    for df in plot_data:
-          
       # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
 
@@ -756,17 +755,14 @@ def matchup(plot, outfile="transect.html"):
       debug(4,data)
       # Write out the CSV of the data.
       # TODO Should we put this in a function
- 
+
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
       np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
       min_value = np.amin(data[varindex['data_value']].astype(np.float64))
       max_value = np.amax(data[varindex['data_value']].astype(np.float64))
-      #min_match_value = np.amin(data[varindex['match_value']].astype(np.float64))
-      #max_match_value = np.amax(data[varindex['match_value']].astype(np.float64))
-      #min_value = min(min_found_value, min_match_value)
-      #max_value = max(max_found_value, max_match_value)
+
       buffer_value = (max_value - min_value) /20
       if(len(ymin)>0):
          ymin[0] = (min(ymin[0],min_value-buffer_value))
@@ -782,24 +778,15 @@ def matchup(plot, outfile="transect.html"):
                            lon=data[varindex['track_lon']],
                            value=data[varindex['data_value']])
 
-      # datasource_match = dict(date=date,
-      #                      sdate=data[varindex['track_date']],
-      #                      lat=data[varindex['track_lat']],
-      #                      lon=data[varindex['track_lon']],
-      #                      value=data[varindex['match_value']])
-
-
-
       sources.append(ColumnDataSource(data=datasource))
-      # sources.append(ColumnDataSource(data=datasource_match))
-      
+
    zf.close()
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=400, responsive=True
    )
-   
+
    tooltips = [("Date", "@sdate")]
    tooltips.append(("Value", "@value{0.000}"))
    tooltips.append(("Latitude", "@lat{1.1}"))
@@ -1649,18 +1636,6 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
             #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': df.append(line)
-         
-         # m_df = []
-         # for details in output_data:
-         #    line = []
-         #    [line.append(details[i]) for i in ["track_date", "match_value", "track_date","track_lat", "track_lon"]]
-         #    #TODO This strips out nulls as they break the plotting at the moment.
-         #    if line[1] != 'null': m_df.append(line)
-         # #TODO This was in the extractor command line butnot sure we need it at the moment.
-         # #output_metadata = extractor.metadataBlock()
-         #output = {}
-         #output['metadata'] = output_metadata
-         #output['data'] = output_data
 
          # And convert it to a nice simple dict the plotter understands.
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
@@ -1697,15 +1672,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             for details in output_data:
                line = []
                [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
-               #TODO This strips out nulls as they break the plotting at the moment.
-               # if line[1] != 'null': df.append(line)
                df.append(line)
-
-            #TODO This was in the extractor command line butnot sure we need it at the moment.
-            #output_metadata = extractor.metadataBlock()
-            #output = {}
-            #output['metadata'] = output_metadata
-            #output['data'] = output_data
 
             # And convert it to a nice simple dict the plotter understands.
             plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
@@ -1751,11 +1718,6 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             [line.append(details[i]) for i in ["track_date", "match_value", "track_date","track_lat", "track_lon"]]
             #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': m_df.append(line)
-         #TODO This was in the extractor command line butnot sure we need it at the moment.
-         #output_metadata = extractor.metadataBlock()
-         #output = {}
-         #output['metadata'] = output_metadata
-         #output['data'] = output_data
 
          # And convert it to a nice simple dict the plotter understands.
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
@@ -1851,7 +1813,6 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
 
    if len(plot_data) == 0:
       debug(0, u"Data request failed")
-      # update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
       return False
 
    plot['req_hash'] = my_hash

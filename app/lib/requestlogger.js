@@ -45,7 +45,9 @@ requestLogger.init = function(domain) {
             formatter: formatter
          })]
       });
-      console.log('Initialised requestLogger for ' + domain);
+      console.log('Initialised request logger for ' + domain);
+   } else {
+      console.log('Request logger is not setup for ' + domain);
    }
 };
 
@@ -72,15 +74,12 @@ requestLogger.autoLog = function(req, res, next) {
 requestLogger.log = function(req, res, next) {
    var domain = utils.getDomainName(req);
    if (domainLoggers[domain]) {
-      //    console.time('log');
       var api = req.originalUrl.startsWith('/api/');
-      //    var apiParamsSet = req.params.version && req.params.token ? true : false;
       if (!api || api && req.params.token) {
          buildMeta(req, api, function(meta) {
             domainLoggers[domain].log('info', 'Request', meta);
          });
       }
-      //    console.timeEnd('log');
    }
    if (next) {
       return next();
@@ -96,7 +95,7 @@ requestLogger.log = function(req, res, next) {
 function buildMeta(req, api, next) {
    var meta = {
       date: new Date().toISOString(),
-      host: req.headers['x-forwarded-for'],
+      host: req.ip,
       path: getPath(req, api),
       user: getUsername(req, api),
       uploadFileName: '',

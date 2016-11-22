@@ -65,8 +65,6 @@ plottingApi.plot = function(req, request, next) {
 };
 
 plottingApi.processCSV = function(req, res, next) {
-   // var username = user.getUsername(req); // Gets the given username NOT USED
-   // var domain = utils.getDomainName(req); // Gets the given domain NOT USED
    var csvFile = req.file; // Gets the data given
 
    // we use the file's extension to identifty type rather than `this_file.mimetype` as machines that have
