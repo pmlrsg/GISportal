@@ -1,7 +1,3 @@
-
-// var cookie = require('cookie'); // NOT USED
-// var cookieParser = require('cookie-parser'); // NOT USED
-
 var user = {};
 module.exports = user;
 var utils = require('./utils.js');

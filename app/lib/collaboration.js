@@ -32,7 +32,7 @@ collaboration.init = function(io, app, config) {
          try {
             var cookies = cookieParser.signedCookies(cookie.parse(handshakeData.headers.cookie), config.session.secret);
             var sid = cookies.GISportal;
-         
+
             var sessionStore = app.get('sessionStore');
             sessionStore.load(sid, function(err, session) {
                if(err || !session) {
@@ -43,21 +43,21 @@ collaboration.init = function(io, app, config) {
          } catch(e) {
             console.log(e);
          }
-         
+
 
       } else {
          // if there isn't, turn down the connection with a message
          // and leave the function.
          return accept('No cookie transmitted.', false);
-      } 
+      }
       // accept the incoming connection
       accept(null, true);
-   }); 
+   });
 
    io.on('connection', function(socket){
 
       socket.room = '';
-      
+
       var cookies = cookieParser.signedCookies(cookie.parse(socket.request.headers.cookie), config.session.secret);
       var sid = cookies.GISportal;
 
@@ -67,7 +67,7 @@ collaboration.init = function(io, app, config) {
          if (!session || !session.passport.user || err) {
             return 'no passport';
          }
-         
+
          var emails = session.passport.user.emails;
 
          user.email = emails[0].value;
@@ -120,15 +120,14 @@ collaboration.init = function(io, app, config) {
             }
             client.rpush(["people", JSON.stringify({"email": user.email, "id": socket.id})], function(err) {});
          });
-         if(crypto) // Seems pointless
-         
+
          console.log(user.email +' connected: '+sid);
       });
-      
+
       socket.on('disconnect', function(){
          //redisClient.del('sess:'+sid);    can't delete the session on disconnect because joining a room causes users to disconnect (but perphaps it shouldn't?)
          console.log('user disconnected');
-         
+
          var roomId = socket.room;
          client.get(roomId, function(err, obj) {
             if(!obj){
@@ -233,12 +232,12 @@ collaboration.init = function(io, app, config) {
                      }else if(email_config.method == "smtp"){
                         if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
                            mail_system = email.server.connect({
-                              user: email_config.smtp_email, 
-                              password: email_config.smtp_pass, 
-                              host: email_config.smtp_host, 
-                              domain: email_config.smtp_host, 
-                              ssl: email_config.smtp_ssl, 
-                              port: email_config.smtp_port, 
+                              user: email_config.smtp_email,
+                              password: email_config.smtp_pass,
+                              host: email_config.smtp_host,
+                              domain: email_config.smtp_host,
+                              ssl: email_config.smtp_ssl,
+                              port: email_config.smtp_port,
                               authentication: email_config.smtp_auth
                            });
                         }
@@ -249,7 +248,6 @@ collaboration.init = function(io, app, config) {
             }
          });
          console.log(user.email +' is now in room '+ roomId);
-         
       });
 
       socket.on('room.join', function(obj) {
@@ -357,7 +355,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       // sets the value of an element using the class as the selector
       socket.on('setValueByClass', function(data) {
@@ -367,7 +365,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       socket.on('setSavedState', function(data) {
          console.log(data);
@@ -376,7 +374,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       // a simple collaboration event; just echo back what was sent with details of who sent it
       socket.on('c_event', function(data) {
@@ -437,7 +435,7 @@ collaboration.init = function(io, app, config) {
       socket.on('room.diverge', function(id) {
          var roomId = socket.room;
          console.log(user.email + ' has diverged from room ' + roomId);
-         
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -470,7 +468,7 @@ collaboration.init = function(io, app, config) {
       socket.on('room.merge', function(id) {
          var roomId = socket.room;
          console.log(user.email + ' has merged back into room ' + roomId);
-         
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -507,7 +505,7 @@ collaboration.init = function(io, app, config) {
          var roomId = socket.room;
          console.log(user.email + ' : ' + message);
          message = swearJar.censor(message.replace(/<\/?[^>]+(>|$)/g, ""));
-         
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;

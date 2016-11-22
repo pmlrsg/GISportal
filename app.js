@@ -1,13 +1,10 @@
 // Imports
-// var connect = require('connect');
-// var cookie = require('cookie');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var express = require('express');
 var session = require('express-session');
 var fs = require("fs");
 var http = require('http');
-// var jade = require("jade");
 var path = require('path');
 var io = require('socket.io')(http);
 var utils = require('./app/lib/utils.js');
