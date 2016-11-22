@@ -6,8 +6,8 @@ import uuid
 
 class HovmollerExtractor(Extractor):
 	"""docstring for HovmollerExtractor"""
-	def __init__(self, wcs_url, extract_dates,extract_area=None, extract_variable=None , extract_depth=None):
-		super(HovmollerExtractor, self).__init__(wcs_url, extract_dates,  extract_area=extract_area, extract_variable=extract_variable, extract_depth=extract_depth)
+	def __init__(self, wcs_url, extract_dates,extract_area=None, extract_variable=None , extract_depth=None, outdir="/tmp"):
+		super(HovmollerExtractor, self).__init__(wcs_url, extract_dates,  extract_area=extract_area, extract_variable=extract_variable, extract_depth=extract_depth, outdir=outdir)
 		
 
 

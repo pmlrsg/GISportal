@@ -37,6 +37,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;
       if(bboxMethod == "csvUpload"){
          plotType = "transect";
+         console.log("setting transect type");
       }
       if(bboxMethod == "geoJSONSelect"){
          component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;

@@ -20,6 +20,7 @@ gisportal.graphs.Plot =(function(){
       this._plotType = null;
       this._plotStyle = null;
       this._title = "";
+      this._matchUpLog = false;
       this._createdOn = new Date();
       this._tBounds = [
          new Date(0),
@@ -185,6 +186,7 @@ gisportal.graphs.Plot =(function(){
          { key: 'logos', label: 'Logos' },
          { key: 'svg', label: 'SVG' }
       ];
+      plotRequest.matchup_log = this.matchUpLog();
    };
    
 
@@ -462,7 +464,8 @@ gisportal.graphs.Plot =(function(){
       _this.series_total = _.size(series_list);
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
-      if(_this._plotType != "transect"){
+      console.log(_this._plotType);
+      if(_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" ){
          for(var series in series_list){
             $.ajax({
                method: 'post',
@@ -656,6 +659,15 @@ gisportal.graphs.Plot =(function(){
          this.emit('title-change', { 'new': _new, 'old': old });
 
       return this;
+   };
+
+   Plot.prototype.matchUpLog = function(  ){
+      if($('#matchup_log_switch').length > 0){
+         return $('#matchup_log_switch')[0].checked;
+      }
+      else {
+         return false;
+      }
    };
    
    /**

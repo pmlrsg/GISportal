@@ -40,6 +40,12 @@ from data_extractor.extractors import BasicExtractor, IrregularExtractor, Transe
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
+from plotting.status import Plot_status, read_status, update_status
+import plotting.debug
+from plotting.debug import debug
+import plotting.logger as logger
+
+from math import log
 
 # Set the default logging verbosity to lowest.
 verbosity = 0
@@ -72,20 +78,8 @@ hovmoller_template = jinja2.Template("""
 </html>
 """)
 
-
-
 # Just pick some random colours. Probably need to make this configurable.
 plot_palette = [['#7570B3', 'blue', 'red', 'red'], ['#A0A0A0', 'green', 'orange', 'orange']]
-
-# Home rolled enums as Python 2.7 does not have them.
-class Enum(set):
-    def __getattr__(self, name):
-        if name in self:
-            return name
-        raise AttributeError
-
-# Valid plot status values.
-Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
 def get_palette(palette="rainbow"):
    def_palette = "rainbow"
@@ -111,82 +105,6 @@ def datetime(x):
    return np.array(pd.to_datetime(x).astype(np.int64) // 10**6)
    #return np.array(x, dtype=np.datetime64)
 #END datetime
-
-def read_status(dirname, my_hash):
-   '''
-      Reads a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   status = None
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-      else:
-         raise
-
-   return status
-#END read_status
-
-def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback=""):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
-
-   initial_status = dict(
-      percentage = 0,
-      state = plot_status,
-      message = message,
-      completed = False,
-      traceback= traceback,
-      job_id = my_hash
-   )
-
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         if plot_status == Plot_status.initialising:
-            status = initial_status
-         else:
-            status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = initial_status
-      else:
-         raise
-
-   # Update the status information.
-   status["message"] = message
-   status["traceback"] = traceback
-   status["state"] = plot_status
-   status['percentage'] = percentage
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-      status['csv'] = dirname + "/" + my_hash + ".zip"
-   elif plot_status == Plot_status.failed:
-      status["completed"] = True
-      status['filename'] = None
-      status['csv'] = None
-   else:
-      status["completed"] = False
-      status['filename'] = None
-      status['csv'] = None
-
-   debug(3, u"Status: {}".format(status))
-
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
-
-   return status
-#END update_status
 
 def read_cached_request(dirname, my_hash):
    '''
@@ -221,10 +139,6 @@ def read_cached_data(dirname, my_hash, my_id):
 
    return plot 
 #END read_cached_data
-
-def debug(level, msg):
-   if verbosity >= level: print(msg, file=sys.stderr)
-#END debug
 
 #############################################################################################################
    
@@ -651,8 +565,10 @@ def transect(plot, outfile="transect.html"):
 
    zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
 
+   headers_merged = []
+   data_merged = []
+
    for df in plot_data:
-          
       # Build the numerical indices into our data based on the variable list supplied.
       varindex = {j: i for i, j in enumerate(df['vars'])}
 
@@ -663,22 +579,32 @@ def transect(plot, outfile="transect.html"):
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
       dfarray[dfarray == 'null'] = "NaN"
+      dfarray_full = dfarray
+      dfarray = dfarray[dfarray[:,1]!='NaN']
 
       debug(4, dfarray)
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,2])])
+      data_full = dfarray_full[np.argsort(dfarray_full[:,2])]
+
+      if plot_data.index(df) == 0:
+         data_merged = data_full[:,(2,3,4,0,1)]
+         headers_merged = df['vars'][2:5]
+      else:
+         data_merged = np.hstack((data_merged, data_full[:,(0,1)]))
+      headers_merged.extend([df['coverage'] + "_date", df['coverage'] + "_value"])
 
       debug(4,data)
       # Write out the CSV of the data.
       # TODO Should we put this in a function
- 
+
       csv_file = csv_dir + "/" + df['coverage'] + ".csv"
-      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      np.savetxt(csv_file, data_full, comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-      min_value = np.amin(data[varindex['data_value']].astype(np.float64))
-      max_value = np.amax(data[varindex['data_value']].astype(np.float64))
+      min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
+      max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
       buffer_value = (max_value - min_value) /20
       ymin.append(min_value-buffer_value)
       ymax.append(max_value+buffer_value)
@@ -687,13 +613,13 @@ def transect(plot, outfile="transect.html"):
             debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
             plot_scale = "linear"
          else:
-            # Make sure we do not ask for a negative range as this does not 
+            # Make sure we do not ask for a negative range as this does not
             # work for log space.
             if ymin[-1] < 0:
                ymin[-1] = min_value
- 
+
       date = datetime(data[varindex['track_date']])
-      
+
       datasource = dict(date=date,
                         sdate=data[varindex['track_date']],
                         lat=data[varindex['track_lat']],
@@ -701,14 +627,19 @@ def transect(plot, outfile="transect.html"):
                         value=data[varindex['data_value']])
 
       sources.append(ColumnDataSource(data=datasource))
-      
+
+   logger.num_points = len(data_merged)
+   csv_file = csv_dir + "/" + "merged.csv"
+   np.savetxt(csv_file, data_merged, comments='', header=','.join(headers_merged), fmt="%s",delimiter=",")
+   zf.write(csv_file, arcname="merged.csv")
+
    zf.close()
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
               height=400, responsive=True
    )
-   
+
    tooltips = [("Date", "@sdate")]
    tooltips.append(("Value", "@value{0.000}"))
    tooltips.append(("Latitude", "@lat{1.1}"))
@@ -728,6 +659,13 @@ def transect(plot, outfile="transect.html"):
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
+   if len(sources) > len(plot_palette[0]):
+      import random
+      r = lambda: random.randint(0,255)
+      while len(sources) > len(plot_palette[0]):
+         plot_palette[0].append('#%02X%02X%02X' % (r(),r(),r()))
+         plot_palette[1].append('#%02X%02X%02X' % (r(),r(),r()))
+
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
@@ -742,11 +680,11 @@ def transect(plot, outfile="transect.html"):
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
 
       # as a point
       debug(2, u"Plotting points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
       
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
@@ -760,7 +698,7 @@ def transect(plot, outfile="transect.html"):
    # plot the points
    #output_file(outfile, 'Time Series')
    #save(ts_plot)
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -769,7 +707,143 @@ def transect(plot, outfile="transect.html"):
    
    return(ts_plot)
 #END transect
+
+def matchup(plot, outfile="transect.html"):
+
+   plot_data = plot['data']
+   plot_type = plot['type']
+   plot_title = plot['title']
+ 
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+
+   sources = []
+
+   ymin = []
+   ymax = []
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   zf = zipfile.ZipFile(csv_dir+".zip", mode='w')
+
+   for df in plot_data:
+      # Build the numerical indices into our data based on the variable list supplied.
+      varindex = {j: i for i, j in enumerate(df['vars'])}
+
+      plot_scale= df['scale']
+
+      debug(4, "timeseries: varindex = {}".format(varindex))
+
+      # Grab the data as a numpy array.
+      dfarray = np.array(df['data'])
+      dfarray[dfarray == 'null'] = "NaN"
+
+      debug(4, dfarray)
+
+      # Flip it so we have columns for each variable ordered by time.
+      data = np.transpose(dfarray[np.argsort(dfarray[:,2])])
+
+      debug(4,data)
+      # Write out the CSV of the data.
+      # TODO Should we put this in a function
+
+      csv_file = csv_dir + "/" + df['coverage'] + ".csv"
+      np.savetxt(csv_file, np.transpose(data), comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
+      zf.write(csv_file, arcname=df['coverage'] + ".csv")
+
+      min_value = np.amin(data[varindex['data_value']].astype(np.float64))
+      max_value = np.amax(data[varindex['data_value']].astype(np.float64))
+
+      buffer_value = (max_value - min_value) /20
+      if(len(ymin)>0):
+         ymin[0] = (min(ymin[0],min_value-buffer_value))
+         ymax[0] = (max(ymax[0],max_value+buffer_value))
+      else:
+         ymin.append(min_value-buffer_value)
+         ymax.append(max_value+buffer_value)
+      date = datetime(data[varindex['track_date']])
+
+      datasource = dict(date=date,
+                           sdate=data[varindex['track_date']],
+                           lat=data[varindex['track_lat']],
+                           lon=data[varindex['track_lon']],
+                           value=data[varindex['data_value']])
+
+      sources.append(ColumnDataSource(data=datasource))
+
+   zf.close()
+   shutil.rmtree(csv_dir)
+
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+              height=400, responsive=True
+   )
+
+   tooltips = [("Date", "@sdate")]
+   tooltips.append(("Value", "@value{0.000}"))
+   tooltips.append(("Latitude", "@lat{1.1}"))
+   tooltips.append(("Longitude", "@lon{1.1}"))
+
+   ts_plot.add_tools(CrosshairTool())
+
+   ts_plot.xaxis.axis_label = 'Date'
+   ts_plot.title_text_font_size = "14pt"
+   ts_plot.xaxis.axis_label_text_font_size = "10pt"
+   ts_plot.yaxis.axis_label_text_font_size = "10pt"
+   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+   # if we run it later.
+   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+   ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   yrange = [None, None]
+
+   for i, source in enumerate(sources):
+      # If we want 2 Y axes then the lines below do this
+      if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+         debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+         # Setting the second y axis range name and range
+         yrange[1] = "y2"
+         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
    
+         # Adding the second axis to the plot.  
+         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+   
+      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      # Plot the mean as line
+      debug(2, "Plotting line for {}".format(plot_data[i]['coverage']))
+      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+
+      # as a point
+      debug(2, "Plotting points for {}".format(plot_data[i]['coverage']))
+      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
+      
+   hover = HoverTool(tooltips=tooltips)
+   ts_plot.add_tools(hover)
+
+   # Legend placement needs to be after the first glyph set up.
+   # Cannot place legend outside plot.
+   ts_plot.legend.location = "top_left"
+   
+   script, div = components(ts_plot)
+
+   # plot the points
+   #output_file(outfile, 'Time Series')
+   with open(outfile, 'w') as output_file:
+      print(template.render(script=script, div=div), file=output_file)
+   
+   #save(ts_plot)
+   return(ts_plot)
+#END matchup
+
 def timeseries(plot, outfile="time.html"):
 
    plot_data = plot['data']
@@ -949,7 +1023,7 @@ def timeseries(plot, outfile="time.html"):
    script, div = components(ts_plot)
 
    # plot the points
-   if verbosity > 0:
+   if plotting.debug.verbosity > 0:
       output_file(outfile, 'Time Series')
       save(ts_plot)
    else:
@@ -1096,14 +1170,179 @@ def scatter(plot, outfile='/tmp/scatter.html'):
 #END scatter
 
 
+def scatter_matchup(plot, outfile='/tmp/scatter.html'):
+   import pprint
+
+   plot_data = plot['data']
+
+   plot_type = plot['type']
+   plot_title = plot['title']
+   log_data = plot['matchup_log']
+   df = plot_data[0]['data']
+
+   my_hash = plot['req_hash']
+   my_id = plot['req_id']
+   dir_name = plot['dir_name']
+   varindex = {j: i for i, j in enumerate(plot['data'][0]['vars'])}
+   cov_name = plot['data'][0]['coverage']
+
+   xVar = 'match_value'
+   yVar = 'data_value'
+   tVar = 'track_date'
+   mVar = 'data_date'
+   logText = ''
+
+   print(log_data)
+
+   xData_raw = [float(x[varindex[xVar]]) for x in df]
+   yData_raw = [float(x[varindex[yVar]]) for x in df]
+
+
+   if (log_data):
+      logText = 'Log of '
+      xData = [log(float(x[varindex[xVar]])) for x in df]
+      yData = [log(float(x[varindex[yVar]])) for x in df]
+   else:
+      xData = [float(x[varindex[xVar]]) for x in df]
+      yData = [float(x[varindex[yVar]]) for x in df]
+   tData = [x[varindex[tVar]] for x in df]
+   mData = [x[varindex[mVar]] for x in df]
+
+   data1 = np.array(xData)
+   #data1 = np.transpose(dfarray1[np.argsort(dfarray1[:,0])])
+   var_headers = plot['data'][0]['vars']
+   var_headers[var_headers.index('track_lat')] = "Latitude"
+   var_headers[var_headers.index('track_lon')] = "Longitude"
+   var_headers[var_headers.index('match_value')] = "Provided Value"
+   var_headers[var_headers.index('track_date')] = "Provided Date"
+   var_headers[var_headers.index('data_date')] = "Matched Date"
+   var_headers[var_headers.index('data_value')] = "Matched Value"
+
+
+
+   data2 = np.array(yData)
+
+   csv_dir = dir_name + "/" + my_hash
+
+   try:
+      os.mkdir(csv_dir)
+   except OSError as err:
+      if err.errno == 17: #[Errno 17] File exists:
+         pass
+      else:
+         raise
+
+   csv_file1 = csv_dir + "/" + cov_name + ".csv"
+   np.savetxt(csv_file1, df, comments='', header=",".join(var_headers), fmt="%s",delimiter=",")
+   with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
+      zf.write(csv_file1, arcname=cov_name + ".csv")
+      debug(3, "ZIP: {}".format(zf.namelist()))
+
+   shutil.rmtree(csv_dir)
+
+
+   slope, intercept, r_value, p_value, std_err = stats.linregress(data1, data2)
+   regr_f = np.poly1d([slope, intercept])
+
+   # Use the slope and intercept to create some points for bokeh to plot.
+   # Not sure how long the line should be. As a first stab just extend the x up and down
+   # by the full x range.
+   regression_x = [data1.min(), data1.max()+((data1.max()/100)*5)]
+   regression_y = [regr_f(regression_x[0]), regr_f(regression_x[1])]
+   
+   datasource = dict(date=tData,
+                     sdate=mData,
+                     x_raw=xData_raw,
+                     y_raw=yData_raw,
+                     x=xData,
+                     y=yData)
+
+   source = ColumnDataSource(data=datasource)
+   #print(source)
+   scatter_plot = figure(
+      title=plot_title, logo=None,
+      x_axis_type=plot['xAxis']['scale'], 
+      y_axis_type=plot['xAxis']['scale'], 
+      width=800,
+      height=400,
+      responsive=True)
+   scatter_plot.title_text_font_size = "14pt"
+   scatter_plot.xaxis.axis_label_text_font_size = "14pt"
+   scatter_plot.yaxis.axis_label_text_font_size = "14pt"
+
+   # If we had bokeh version 0.12 we could do this
+   #mytext = Label(x=70, y=70, text='r-value: {}'.format(r_value))
+   #scatter_plot.add_layout(mytext)
+
+   # Plot the points of the scatter.
+   points = scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   
+   # Plot the regression line using default style.
+   reg_line = scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend=logText + cov_name)
+
+
+
+   _slope, _intercept, _, _, _ = stats.linregress(data1, data1)
+   _regr_f = np.poly1d([_slope, _intercept])
+   
+
+   _regression_x = [data1.min(), data1.max()+((data1.max()/100)*5)]
+   _regression_y = [_regr_f(_regression_x[0]), _regr_f(_regression_x[1])]
+
+   reg_line_1_1 = scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
+
+
+   # Set up the hover tooltips for the points and lines.
+   point_hover = HoverTool(
+      tooltips=[
+         ("Date", "@sdate"),
+         ('matchup value', "@x_raw{0.000}"),
+         (cov_name, "@y_raw{0.000}")
+      ],
+         renderers=[points]
+   )
+
+   line_hover = HoverTool(
+      tooltips=("Slope: {:04.3f}<br>Intercept: {:04.3f}<br>R<sup>2</sup>: {:04.3f}".format(slope, intercept, r_value**2)),
+      renderers=[reg_line],
+      line_policy='interp'
+   )
+
+   # Set up the hover tools in this order so the point hover is on top of the line.
+   scatter_plot.add_tools(line_hover)
+   scatter_plot.add_tools(point_hover)
+
+   scatter_plot.xaxis.axis_label = logText+"values provided in matchup CSV"
+   
+   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+   # if we run it later.
+   scatter_plot.yaxis.axis_label = logText+plot['y1Axis']['label']
+   
+   # Legend placement needs to be after the first glyph set up.
+   # Cannot place legend outside plot.
+   scatter_plot.legend.location = "top_left"
+   
+   # plot the points
+   output_file(outfile, 'Scatter Plot')
+   
+   save(scatter_plot)
+   return(scatter_plot)
+
+#END scatter_matchup
+
+
+
 #############################################################################################################
    
 
-def get_plot_data(json_request, plot=dict()):
+def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
    debug(2, u"get_plot_data: Started")
    irregular = False
+
+   matchup_log = False
    # Common data for all plots. 
+
    series = json_request['plot']['data']['series']
    plot_type = json_request['plot']['type']
    plot_title = json_request['plot']['title']
@@ -1114,8 +1353,21 @@ def get_plot_data(json_request, plot=dict()):
    xAxis = json_request['plot']['xAxis']
    dirname = plot['dir_name']
    my_hash = plot['req_hash']
+  
    if 'isIrregular' in json_request['plot']:
       irregular = True
+
+
+   status_details = {
+      'dirname': dirname,
+      'my_hash': my_hash,
+      'current_series': 0,
+      'num_series': len(series)
+   }
+
+
+   if 'matchup_log' in json_request['plot']:
+      matchup_log = json_request['plot']['matchup_log']
 
    # We will hold the actual data extracted in plot_data. We may get multiple returns so hold it
    # as a list.
@@ -1126,6 +1378,8 @@ def get_plot_data(json_request, plot=dict()):
    plot['xAxis'] = xAxis
    plot['y1Axis'] = y1Axis
    plot['data'] = plot_data
+   plot['matchup_log'] = matchup_log
+
    try:
       plot['palette'] = style.split("/")[1]
    except IndexError:
@@ -1139,7 +1393,7 @@ def get_plot_data(json_request, plot=dict()):
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
 
-   update_status(dirname, my_hash, Plot_status.extracting, percentage=5)
+   update_status(dirname, my_hash, Plot_status.extracting, percentage=1)
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
@@ -1166,11 +1420,11 @@ def get_plot_data(json_request, plot=dict()):
             bounds = wkt.loads(bbox).bounds
             data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
          else:
             data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1231,11 +1485,11 @@ def get_plot_data(json_request, plot=dict()):
                bounds = wkt.loads(bbox).bounds
                data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox) 
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
                data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             map_stats = ImageStats(extract,  coverage)
             response = json.loads(map_stats.process())
@@ -1274,9 +1528,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             ts_stats = BasicStats(extract, coverage)
             response = json.loads(ts_stats.process())
@@ -1330,9 +1584,9 @@ def get_plot_data(json_request, plot=dict()):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox)
+               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth)
+               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
@@ -1351,6 +1605,43 @@ def get_plot_data(json_request, plot=dict()):
       plot_data.append(dict(cov_meta=t_holder, order=data_order, data=data))
       update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
 
+   elif plot_type == "scatter_matchup":
+
+      for s in series:
+         ds = s['data_source']
+         yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
+
+         coverage = ds['coverage']
+         csv_file = json_request['plot']['transectFile']
+         wcs_url = ds['threddsUrl']
+         bbox = get_transect_bounds(csv_file)
+         time = get_transect_times(csv_file)
+         data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox,status_details=status_details, extract_variable=coverage)
+         filename = extractor.getData()
+         debug(4, "Extracted to {}".format(filename))
+         stats = TransectStats(filename, coverage, csv_file, matchup=True)
+         output_data = stats.process()
+         debug(4, "Scatter Matchup extract: {}".format(output_data))
+
+         #TODO LEGACY - Change if the format is altered.
+         df = []
+         for details in output_data:
+            line = []
+            [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
+            #TODO This strips out nulls as they break the plotting at the moment.
+            if line[1] != 'null': df.append(line)
+
+         # And convert it to a nice simple dict the plotter understands.
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
+         # plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
+         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+
 
    elif plot_type == "transect":
       for s in series:
@@ -1368,37 +1659,83 @@ def get_plot_data(json_request, plot=dict()):
          time = get_transect_times(csv_file)
          data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
          debug(3, u"Requesting data: {}".format(data_request))
-         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage)
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir)
+         files = extractor.getData()
+         if files:
+            debug(4, u"Extracted to {}".format(files))
+            stats = TransectStats(files, coverage, csv_file, status_details)
+            output_data = stats.process()
+            debug(4, u"Transect extract: {}".format(output_data))
+
+            #TODO LEGACY - Change if the format is altered.
+            df = []
+            for details in output_data:
+               line = []
+               [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
+               df.append(line)
+
+            # And convert it to a nice simple dict the plotter understands.
+            plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
+            # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+         status_details['current_series'] += 1
+
+   elif plot_type == "matchup":
+      # add matchup series here then loop through normal series
+
+      for s in series:
+         ds = s['data_source']
+         yaxis = s['yAxis']
+         if yaxis == 1:
+            scale = json_request['plot']['y1Axis']['scale']
+         else:
+            scale = json_request['plot']['y2Axis']['scale']
+
+         coverage = ds['coverage']
+         csv_file = json_request['plot']['transectFile']
+         wcs_url = ds['threddsUrl']
+         bbox = get_transect_bounds(csv_file)
+         time = get_transect_times(csv_file)
+         data_request = "TransectExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         debug(3, "Requesting data: {}".format(data_request))
+         extractor = TransectExtractor(wcs_url, [time], "time", extract_area=bbox, status_details=status_details,extract_variable=coverage)
          filename = extractor.getData()
-         debug(4, u"Extracted to {}".format(filename))
-         stats = TransectStats(filename, coverage, csv_file)
+         debug(4, "Extracted to {}".format(filename))
+         stats = TransectStats(filename, coverage, csv_file, matchup=True)
          output_data = stats.process()
-         debug(4, u"Transect extract: {}".format(output_data))
+         debug(4, "Matchup extract: {}".format(output_data))
 
          #TODO LEGACY - Change if the format is altered.
          df = []
          for details in output_data:
             line = []
-            [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon"]]
+            [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
             #TODO This strips out nulls as they break the plotting at the moment.
             if line[1] != 'null': df.append(line)
-    
-         #TODO This was in the extractor command line butnot sure we need it at the moment.
-         #output_metadata = extractor.metadataBlock()
-         #output = {}
-         #output['metadata'] = output_metadata
-         #output['data'] = output_data
+         
+         m_df = []
+         for details in output_data:
+            line = []
+            [line.append(details[i]) for i in ["track_date", "match_value", "track_date","track_lat", "track_lon"]]
+            #TODO This strips out nulls as they break the plotting at the moment.
+            if line[1] != 'null': m_df.append(line)
 
          # And convert it to a nice simple dict the plotter understands.
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
+         plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+
 
    else:
       # We should not be here!
       debug(0, u"Unrecognised data request, {}.".format(data_request))
       return dict(data=[])
 
-   plot['status'] = "success"
+   if plot_data:
+      plot['status'] = "success"
+   else:
+      update_status(dirname, my_hash, Plot_status.failed, message="No matching data found.")
+      plot['status'] = "failed"
+
    plot['data'] = plot_data
    return plot
 #END get_plot_data
@@ -1425,7 +1762,7 @@ def prepare_plot(request, outdir):
    return plot
 #END prepare_plot
 
-def execute_plot(dirname, plot, request):
+def execute_plot(dirname, plot, request, base_url, download_dir):
    debug(3, u"Received request: {}".format(request))
 
    my_hash = plot['req_hash']
@@ -1433,9 +1770,10 @@ def execute_plot(dirname, plot, request):
    my_id = plot['req_id']
    my_fullid = my_hash + "_" + my_id
 
+   new_plot = False
    status = read_status(dirname, my_hash)
    if status == None or status['state'] == Plot_status.failed:
-      
+      new_plot = True
       update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
 
       # Output the identifier for the plot on stdout. This is used by the frontend
@@ -1451,7 +1789,7 @@ def execute_plot(dirname, plot, request):
       
       # Call the extractor.
       update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
-      plot = get_plot_data(request, plot)
+      plot = get_plot_data(request, plot, download_dir)
 
       # Only cache the data if we think it is OK.
       if plot['status'] == "success":
@@ -1475,14 +1813,13 @@ def execute_plot(dirname, plot, request):
 
    if len(plot_data) == 0:
       debug(0, u"Data request failed")
-      update_status(dirname, my_hash, Plot_status.failed, "Extract failed")
       return False
 
    plot['req_hash'] = my_hash
    plot['req_id'] = my_id
    plot['dir_name'] = dirname
 
-   update_status(dirname, my_hash, Plot_status.plotting, "Plotting")
+   update_status(dirname, my_hash, Plot_status.plotting, "Plotting", percentage=95)
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
@@ -1491,14 +1828,22 @@ def execute_plot(dirname, plot, request):
       plot_file = hovmoller(plot, file_path)
    elif plot['type'] == 'transect':
       plot_file = transect(plot, file_path)
+   elif plot['type'] == 'matchup' :
+      plot_file = matchup(plot, file_path)
    elif plot['type'] == 'extract':
       plot_file = extract(plot, file_path)
+   elif plot['type'] == 'scatter_matchup':
+      plot_file = scatter_matchup(plot, file_path)
    else:
       # We should not be here.
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
+      update_status(dirname, my_hash, Plot_status.failed, message="Unknown plot type.")
       return False
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete")
+   if new_plot:
+      logger.log_complete(True)
+
+   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
    return True
 #END execute_plot
 
@@ -1525,36 +1870,53 @@ To execute a plot
    cmdParser.add_argument("-v", "--verbose", action="count", dest="verbose", help="Enable verbose output, more v's, more verbose.")
    cmdParser.add_argument("-d", "--dir", action="store", dest="dirname", default="", help="Output directory.")
    cmdParser.add_argument("-H", "--hash", action="store", dest="hash", default="", help="Id of prepared command.")
+   cmdParser.add_argument("-u", "--url", action="store", dest="url", default="", help="The portal url including plots directory for including in the status file.")
+   cmdParser.add_argument("-dd", "--download_dir", action="store", dest="download_dir", default="/tmp/", help="The directory to store downloaded netCDF files.")
+   cmdParser.add_argument("-ld", "--log_dir", action="store", dest="log_dir", default="", help="The directory to log completed plot extractions.")
 
    opts = cmdParser.parse_args()
 
-   if hasattr(opts, 'verbose') and opts.verbose > 0: verbosity = opts.verbose 
+   if hasattr(opts, 'verbose') and opts.verbose > 0:
+      plotting.debug.verbosity = opts.verbose
 
    debug(1, u"Verbosity is {}".format(opts.verbose))
    if not os.path.isdir(opts.dirname):
       debug(0,u"'{}' is not a directory".format(opts.dirname))
       sys.exit(1)
-   
+
+   if not os.path.isdir(opts.download_dir):
+      debug(0,u"'{}' is not a directory".format(opts.download_dir))
+      sys.exit(1)
+
    if opts.command not in valid_commands:
       debug(0,u"Command must be one of {}".format(valid_commands))
       sys.exit(1)
 
    if opts.command == "execute":
       request = json.load(sys.stdin)
+      # request = json.loads(raw_input('JSON: '))
 
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
+
+      # Setup logger
+      logger.log_dir = opts.log_dir
+      logger.plot_hash = my_hash
+      logger.plot_type = request['plot']['type']
+
       # Now try and make the plot.
       try:
-         if execute_plot(opts.dirname, plot, request):
+         if execute_plot(opts.dirname, plot, request, opts.url, opts.download_dir):
             debug(1, u"Plot complete")
          else:
             debug(0, u"Error executing. Failed to complete plot")
-            sys.exit(2)
+            logger.log_complete(False)
+            # sys.exit(2)
       except:
          trace_message = traceback.format_exc()
          debug(0, u"Uncaught Exception. Failed to complete plot - {}".format(trace_message))
          update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
+         logger.log_complete(False)
          raise
 
    else:
