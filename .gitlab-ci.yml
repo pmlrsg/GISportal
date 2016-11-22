@@ -1,0 +1,17 @@
+image: pmlrsg/gisportal-host
+
+stages:
+    - build
+
+job1:
+    stage: build
+    script:
+        - npm install --silent
+        - export PYTHONPATH="$PYTHONPATH:/app/GISportal/plotting:/app/GISportal/plotting/data_extractor"
+        - grunt
+        - /usr/bin/redis-server --daemonize yes
+        - node app.js &
+        - sleep 5
+        - wget http://localhost:6789/index.html
+        - wget http://localhost:6789/css/GISportal.min.css
+        - wget http://localhost:6789/GISportal.min.js

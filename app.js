@@ -157,14 +157,30 @@ for (var mod in modules) {
 
 // Start listening...
 var server = http.createServer(app);
-server.listen(global.config.appPort, function() {
-   console.log('GISportal server listening on port %d', global.config.appPort);
-});
-io = io.listen(server);
 
-// the collaboration websocket stuff
-var collaboration = require('./app/lib/collaboration.js');
-collaboration.init(io, app, global.config);
+var boot = function() {
+   server.listen(global.config.appPort, function() {
+      console.log('GISportal server listening on port %d', global.config.appPort);
+   });
+   io = io.listen(server);
+
+   // the collaboration websocket stuff
+   var collaboration = require('./app/lib/collaboration.js');
+   collaboration.init(io, app, global.config);
+};
+
+var shutdown = function() {
+   server.close();
+};
+
+if (require.main === module) {
+   boot();
+} else {
+   console.info('Running app as module');
+   exports.boot = boot;
+   exports.shutdown = shutdown;
+   exports.port = global.config.appPort;
+}
 
 /*
  * Catch uncaught exceptions
