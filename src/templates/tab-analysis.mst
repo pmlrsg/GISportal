@@ -33,7 +33,7 @@
                   <div class="show-when-logged-in {{#unless loggedIn}}hidden{{/unless}}">
                      <p>Upload a shape file (Requires all three of .shp, .shx & .dbf)<br/>
                      or<br/>
-                     Upload a CSV file containing point data</p>
+                     Upload a CSV file containing point data, including matchup data for comparison</p>
                      <label for="js-upload-shape-file-input" class="brand secondary extra-small js-upload-shape" data-id="{{id}}" title="Upload Files">
                         <span class=" icon-file-upload" data-id="Ph" title="Upload Files" ></span>
                         Upload Files

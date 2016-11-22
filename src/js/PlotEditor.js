@@ -50,12 +50,18 @@ gisportal.graphs.PlotEditor = (function(){
    PlotEditor.prototype.buildEditor = function(){
 
       var transect_plot = false;
+      var matchup_plot = false;
       if(gisportal.methodThatSelectedCurrentRegion.method == "csvUpload"){
          transect_plot = true;
+         if(gisportal.methodThatSelectedCurrentRegion.matchup === true){
+           matchup_plot = true;
+           transect_plot = false;
+         }
       }
       var rendered = gisportal.templates['active-plot']({
          plot: this._plot,
-         transect_plot: transect_plot
+         transect_plot: transect_plot,
+         matchup_plot: matchup_plot
       });
 
       this._editorParent.find('.js-slideout-content').html( rendered );

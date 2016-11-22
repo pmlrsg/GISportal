@@ -222,7 +222,12 @@ gisportal.selectionTools.csvFound = function(formData){
       },
       success: function(d){
          gisportal.selectionTools.loadGeoJSON(d.geoJSON);
-         gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+         if (d.matchup === true) {
+            gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false, matchup:d.matchup};
+         }
+         else {
+            gisportal.methodThatSelectedCurrentRegion = {method:"csvUpload", value: d.filename, justCoords:false};
+         }
          gisportal.graphs.deleteActiveGraph();
       },
       error: function(e) {

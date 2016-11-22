@@ -5,9 +5,9 @@ var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 module.exports = passport;
 
 passport.init = function(config) {
-   console.log()
-   console.log("List of domains with Google authentication settings:")
-   for(domain in config){
+   console.log();
+   console.log("List of domains with Google authentication settings:");
+   for(var domain in config){
       if(config[domain].auth){
          console.log(domain.replace(/_/g, "/"));
          passport.use(domain,new GoogleStrategy({
@@ -32,5 +32,5 @@ passport.init = function(config) {
    passport.deserializeUser(function(user, done) {
     done(null, user);
    });
-}
+};
 

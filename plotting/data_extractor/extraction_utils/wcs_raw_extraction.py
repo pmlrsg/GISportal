@@ -37,6 +37,7 @@ class WCSRawHelper(object):
 		if(self.depth):
 			params['Vertical'] = self.depth
 		if(not isinstance(self.dates, basestring)):
+			# Should join with '/'?
 			params['Time'] = urllib.quote_plus(','.join(self.dates))
 		else:
 			params['Time'] = urllib.quote_plus(self.dates)
@@ -53,7 +54,7 @@ class WCSRawHelper(object):
 			ret = ret[:-1]
 		return ret
 
-		
+
 	def getCoverage(self):
 		if self.url.endswith("?"):
 			full_url = self.url + self.generateGetCoverageUrl()
@@ -62,3 +63,26 @@ class WCSRawHelper(object):
 		#print full_url
 		resp = urllib2.urlopen(full_url)
 		return resp
+
+	def generateDescribeCoverageUrl(self):
+		params = {}
+		params['Service'] = 'WCS'
+		params['Request'] = 'DescribeCoverage'
+		params['version'] = '1.0.0'
+		params['Coverage'] = self.variable
+		#print params
+		ret = ''
+		for key in params:
+			ret += key+'='+params[key]+'&'
+		if ret.endswith('&'):
+			ret = ret[:-1]
+		return ret
+
+	def describeCoverage(self):
+		if self.url.endswith("?"):
+			full_url = self.url + self.generateDescribeCoverageUrl()
+		else:
+			full_url = self.url +'?'+ self.generateDescribeCoverageUrl()
+		#print full_url
+		resp = urllib2.urlopen(full_url)
+		return resp.read()
