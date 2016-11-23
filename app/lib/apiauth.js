@@ -26,6 +26,8 @@ apiAuth.authenticateToken = function(req, res, next) {
       } else {
          res.status(401).send('Unauthorised token!');
       }
+   } else {
+      res.status(403).send('No API tokens available.');
    }
 };
 
