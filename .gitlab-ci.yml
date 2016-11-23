@@ -10,4 +10,4 @@ job1:
         - export PYTHONPATH="$PYTHONPATH:/app/GISportal/plotting:/app/GISportal/plotting/data_extractor"
         - grunt
         - /usr/bin/redis-server --daemonize yes
-        - npm test -- --reporter spec
+        - npm test
