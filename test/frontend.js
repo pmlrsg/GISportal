@@ -1,11 +1,14 @@
+var chai = require('chai');
 var request = require('superagent');
-var expect = require('expect.js');
+var app = require('../app.js');
+
+var expect = chai.expect;
 
 describe('Start server', function() {
 
-   var boot = require('../app').boot;
-   var shutdown = require('../app').shutdown;
-   var port = require('../app').port;
+   var boot = app.bootPortal;
+   var shutdown = app.shutdownPortal;
+   var port = app.portalPort;
 
    // first things first, start the application
    before(function(done) {
@@ -18,6 +21,12 @@ describe('Start server', function() {
    // get the index page
    describe('GET /index.html', function() {
       it('respond with html', function(done) {
+         // chai.request(app)
+         //    .get('/')
+         //    .end(function(err, res) {
+         //       expect(res.status).to.equal(200);
+         //       done();
+         //    });
          request
             .get('http://localhost:' + port)
             .end(function(err, res) {
@@ -38,7 +47,7 @@ describe('Start server', function() {
                done();
             });
       });
-   });   
+   });
 
    describe('GET /GISportal.min.js', function() {
       it('respond with minified javascript', function(done) {
@@ -50,7 +59,7 @@ describe('Start server', function() {
                done();
             });
       });
-   });   
+   });
 
    // get the CSS
    describe('GET /css/GISportal.css', function() {
@@ -63,7 +72,7 @@ describe('Start server', function() {
                done();
             });
       });
-   });   
+   });
 
    describe('GET /css/GISportal.min.css', function() {
       it('respond with minified css', function(done) {
@@ -75,7 +84,7 @@ describe('Start server', function() {
                done();
             });
       });
-   });   
+   });
 
    after(function(done) {
       shutdown();

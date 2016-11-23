@@ -177,9 +177,10 @@ if (require.main === module) {
    boot();
 } else {
    console.info('Running app as module');
-   exports.boot = boot;
-   exports.shutdown = shutdown;
-   exports.port = global.config.appPort;
+   app.bootPortal = boot;
+   app.shutdownPortal = shutdown;
+   app.portalPort = global.config.appPort;
+   module.exports = app;
 }
 
 /*

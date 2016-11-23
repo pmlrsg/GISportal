@@ -28,7 +28,7 @@ uploads/archive/*
 uploads/cache/*
 !uploads/cache/.gitkeep
 
-app/modules/* 
+app/modules/*
 !app/modules/.gitkeep
 
 .vscode
