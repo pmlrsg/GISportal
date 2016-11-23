@@ -29,7 +29,7 @@ describe('utils', function() {
       it('should return true for an existing directory', function() {
          var dir = '/tmp/testDir' + Date.now();
          fs.mkdirSync(dir);
-         expect(utils.directoryExists('/tmp/testDir')).to.equal(true);
+         expect(utils.directoryExists(dir)).to.equal(true);
          fs.rmdirSync(dir);
       });
 
