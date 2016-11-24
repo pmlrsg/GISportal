@@ -17,8 +17,10 @@ module.exports = apiAuth;
 apiAuth.authenticateToken = function(req, res, next) {
    var token = req.params.token;
    var domain = utils.getDomainName(req);
+   console.log('domain: ' + domain);
    var config = global.config[domain] || global.config;
    var tokens = config.tokens;
+   console.log(tokens);
 
    if (tokens) {
       if (tokens[token] !== undefined) {

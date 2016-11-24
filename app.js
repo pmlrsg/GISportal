@@ -32,6 +32,7 @@ if (!utils.directoryExists(site_setings_path)) {
 }
 var site_setings_list = fs.readdirSync(site_setings_path); // The list of files and folders in the site_settings folder
 site_setings_list.forEach(function(foldername) {
+   console.log('Have config for: ' + foldername);
    var folder_path = path.join(site_setings_path, foldername);
    if (utils.directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak") {
       var config_path = path.join(folder_path, "config-server.js");
