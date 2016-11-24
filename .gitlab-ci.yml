@@ -11,3 +11,4 @@ job1:
         - grunt
         - /usr/bin/redis-server --daemonize yes
         - npm test
+        - npm --version
