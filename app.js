@@ -39,8 +39,10 @@ site_setings_list.forEach(function(foldername) {
          try {
             console.log('Have config: ' + config_path);
             require(config_path);
+            console.log('Required config okay');
             found = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
+            console.log('Init logger okay');
          } catch (e) {console.log('could not load config: ' + config_path);}
       }
    }
