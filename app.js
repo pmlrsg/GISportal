@@ -39,6 +39,7 @@ site_setings_list.forEach(function(foldername) {
       if (utils.fileExists(config_path)) {
          try {
             console.log('Have config: ' + config_path);
+            console.log(fs.statSync(config_path));
             require(config_path);
             console.log('Required config okay');
             found = true;
