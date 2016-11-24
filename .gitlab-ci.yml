@@ -6,9 +6,10 @@ stages:
 job1:
     stage: build
     script:
+        - node --version
+        - npm --version
         - npm install --silent
         - export PYTHONPATH="$PYTHONPATH:/app/GISportal/plotting:/app/GISportal/plotting/data_extractor"
         - grunt
         - /usr/bin/redis-server --daemonize yes
         - npm test
-        - npm --version
