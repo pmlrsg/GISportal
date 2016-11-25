@@ -68,7 +68,7 @@ if [ -n "$mail" ]
             echo "";
             echo "Please enter a mailgun API key: "; read -e key;
             echo "Please enter a mailgun domain: "; read -e domain;
-            mailconf="email{method:'$mail', mailgun_api_key: '$key', mailgun_domain: '$domain'}"
+            mailconf="email{method:'$mail', mailgun_api_key: '$key', mailgun_domain: '$domain'},"
       fi
 
       if [ $mail == 'gmail' ] ||  [ $mail == 'other' ]
@@ -76,7 +76,7 @@ if [ -n "$mail" ]
             echo "";
             echo "Please enter the email address: "; read -e email;
             echo "Please enter the password: "; read -e pass;
-            mailconf="email{method:'$mail', $mail_email: '$email', $mail_pass: '$pass'}"
+            mailconf="email{method:'$mail', $mail_email: '$email', $mail_pass: '$pass'},"
       fi
 fi
 

@@ -19,11 +19,26 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
 var app = express();
 
 // Set the settings
-var found = false;
+// Load global-config-server.js
 try {
    require('./config/global-config-server.js');
-   found = true;
-} catch (e) {}
+} catch (e) {
+   try {
+      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
+      require('./config/global-config-server.js');
+   } catch (e) {
+      console.log('Failed to load the global server config.');
+      console.log('');
+      console.log('If this is a new installation you should run ./install.sh to create your configurations.');
+      console.log('');
+      console.log('Exiting application, bye   o/');
+      console.log('');
+      process.exit();
+   }
+}
+
+// Load or create the site_settings folder
+var serverFound = false;
 var site_setings_path = path.join(__dirname, "config/site_settings");
 if (!utils.directoryExists(site_setings_path)) {
    var layers_path = path.join(site_setings_path, "layers");
@@ -34,36 +49,28 @@ var site_setings_list = fs.readdirSync(site_setings_path); // The list of files 
 site_setings_list.forEach(function(foldername) {
    var folder_path = path.join(site_setings_path, foldername);
    if (utils.directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak") {
-      // var config_path = path.join(folder_path, "config-server.js");
-      var config_path = path.join(__dirname, 'test_dependencies/config/site_settings/127.0.0.1\:6789', "config-server.js");
+      var config_path = path.join(folder_path, "config-server.js");
+      // var config_path = path.join(__dirname, 'test_dependencies/config/site_settings/127.0.0.1\:6789', "config-server.js");
       if (utils.fileExists(config_path)) {
          try {
             console.log('Have config: ' + config_path);
-            console.log(fs.statSync(config_path));
+            // console.log(fs.statSync(config_path));
             require(config_path);
             console.log('Required config okay');
-            found = true;
+            serverFound = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
             console.log('Init logger okay');
-         } catch (e) {console.log('could not load config: ' + config_path);}
+         } catch (e) {
+            console.log('Failed to load server config: ' + config_path);
+         }
       }
    }
 });
-if (!found) {
-   try {
-      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
-      require('./config/global-config-server.js');
-   } catch (e) {
-      console.log('There doesn\'t appear to be a server config settings file in place');
-      console.log('');
-      console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
-      console.log('');
-      console.log('    mkdir ' + __dirname + '/config; cp ' + __dirname + '/config_examples/global-config-server.js ' + __dirname + '/config/global-config-server.js');
-      console.log('');
-      console.log('Exiting application, bye   o/');
-      console.log('');
-      process.exit();
-   }
+if (!serverFound) {
+   console.log('No server config was found.');
+   console.log('');
+   console.log('If this is a new installation you should run ./install.sh to create a configuration for your domain.');
+   console.log('');
 }
 
 // set up Redis as the session store
