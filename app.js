@@ -50,16 +50,11 @@ site_setings_list.forEach(function(foldername) {
    var folder_path = path.join(site_setings_path, foldername);
    if (utils.directoryExists(folder_path) && foldername != "layers" && foldername.substr(-4) !== ".bak") {
       var config_path = path.join(folder_path, "config-server.js");
-      // var config_path = path.join(__dirname, 'test_dependencies/config/site_settings/127.0.0.1\:6789', "config-server.js");
       if (utils.fileExists(config_path)) {
          try {
-            console.log('Have config: ' + config_path);
-            // console.log(fs.statSync(config_path));
             require(config_path);
-            console.log('Required config okay');
             serverFound = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
-            console.log('Init logger okay');
          } catch (e) {
             console.log('Failed to load server config: ' + config_path);
          }
