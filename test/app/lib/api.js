@@ -1,6 +1,8 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
+
 var app = require('../../../app.js');
+var apiAuth = require('../../../app/lib/apiauth.js');
 
 chai.use(chaiHttp);
 var expect = chai.expect;
@@ -17,7 +19,9 @@ describe('api', function() {
             });
       });
    });
+});
 
+describe('apiAuth', function() {
    describe('authenticateToken', function() {
       it('should not allow bad token', function(done) {
          chai.request(app)
@@ -27,6 +31,117 @@ describe('api', function() {
                expect(res.text).to.equal("Unauthorised token!");
                done();
             });
+      });
+
+      it('should accept valid token', function(done) {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'asd'
+         };
+
+         var res = global.mocks.createRes();
+         res.on('end', function() {
+            expect.fail();
+            done();
+         });
+
+         apiAuth.authenticateToken(req, res, function() {
+            done();
+         });
+      });
+   });
+
+   describe('getUsername', function() {
+      it('should return the username that matches the token', function() {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'asd'
+         };
+         var username = apiAuth.getUsername(req);
+         expect(username).to.equal('a.user@pml.ac.uk');
+      });
+   });
+
+   describe('getAccessLevel', function() {
+      it('should return guest for guest level token', function() {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'zxc'
+         };
+         var level = apiAuth.getAccessLevel(req);
+         expect(level).to.equal('guest');
+      });
+
+      it('should return user for user level token', function() {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'asd'
+         };
+         var level = apiAuth.getAccessLevel(req);
+         expect(level).to.equal('user');
+      });
+
+      it('should return admin for admin level token', function() {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'qwe'
+         };
+         var level = apiAuth.getAccessLevel(req);
+         expect(level).to.equal('admin');
+      });
+   });
+
+   describe('denyGuest', function() {
+      it('should deny guest token', function(done) {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'zxc'
+         };
+
+         var res = global.mocks.createRes();
+         res.on('end', function() {
+            expect(res.statusCode).to.equal(401);
+            done();
+         });
+
+         apiAuth.denyGuest(req, res, function() {
+            expect.fail();
+            done();
+         });
+      });
+
+      it('should allow user token', function(done) {
+         var req = global.mocks.createReq();
+         req.params = {
+            token: 'asd'
+         };
+
+         var res = global.mocks.createRes();
+         res.on('end', function() {
+            expect.fail();
+            done();
+         });
+
+         apiAuth.denyGuest(req, res, function() {
+            done();
+         });
+      });
+
+      it('should allow admin token', function(done) {
+        var req = global.mocks.createReq();
+         req.params = {
+            token: 'qwe'
+         };
+
+         var res = global.mocks.createRes();
+         res.on('end', function() {
+            expect.fail();
+            done();
+         });
+
+         apiAuth.denyGuest(req, res, function() {
+            done();
+         });
       });
    });
 });

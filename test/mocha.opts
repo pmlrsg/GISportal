@@ -3,3 +3,4 @@
 --colors
 --check-leaks
 --trace-deprecation
+--globals mocks
