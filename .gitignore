@@ -1,6 +1,7 @@
 *.orig
 *.pyc
 .DS_Store
+.vscode
 .sass-cache/*
 .tern-project
 config/*
@@ -31,4 +32,4 @@ uploads/cache/*
 app/modules/*
 !app/modules/.gitkeep
 
-.vscode
+test_dependencies/config/site_settings/127.0.0.1:6789/temporary_cache/

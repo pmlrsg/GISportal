@@ -1,5 +1,7 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
+var path = require('path');
+var fs = require('fs');
 
 var app = require('../../../app.js');
 
@@ -29,32 +31,49 @@ describe('api', function() {
 
    describe('refresh_wms_cache', function() {
       this.timeout(10000);
+      var configPath = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/');
+
       it('should successfully refresh a global cache', function(done) {
+         var cachePath = path.join(configPath, 'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json');
+         var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+
          chai.request(app)
             .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW&user=global')
             .end(function(err, res) {
                expect(res).to.have.status(200);
                expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW for 127.0.0.1:6789');
+               var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+               expect(new_time).to.be.above(old_time);
                done();
             });
       });
 
       it('should successfully refresh a user\'s own cache', function(done) {
+         var cachePath = path.join(configPath, 'user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
+         var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+
          chai.request(app)
             .get('/api/1/asd/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW')
             .end(function(err, res) {
                expect(res).to.have.status(200);
                expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW for a.user@pml.ac.uk');
+               var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+               expect(new_time).to.be.above(old_time);
                done();
             });
       });
 
       it('should successfully refresh another user\'s cache', function(done) {
+         var cachePath = path.join(configPath, 'user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
+         var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+
          chai.request(app)
             .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW&user=a.user@pml.ac.uk')
             .end(function(err, res) {
                expect(res).to.have.status(200);
                expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW for a.user@pml.ac.uk');
+               var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
+               expect(new_time).to.be.above(old_time);
                done();
             });
       });
