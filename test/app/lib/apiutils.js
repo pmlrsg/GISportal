@@ -10,18 +10,23 @@ chai.use(chaiHttp);
 var expect = chai.expect;
 
 describe('apiUtils', function() {
-   var globalCachePath1 = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW.json');
-   var globalCache1 = JSON.parse(fs.readFileSync(globalCachePath1));
-   globalCache1.owner = '127.0.0.1:6789';
-   var globalCachePath2 = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json');
-   var globalCache2 = JSON.parse(fs.readFileSync(globalCachePath2));
-   globalCache2.owner = '127.0.0.1:6789';
-
-   var userCachePath = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
-   var userCache = JSON.parse(fs.readFileSync(userCachePath));
-   userCache.owner = 'a.user@pml.ac.uk';
-
+   var globalCache1;
+   var globalCache2;
+   var userCache;
    var testCache;
+
+   before(function() {
+      var globalCachePath1 = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW.json');
+      globalCache1 = JSON.parse(fs.readFileSync(globalCachePath1));
+      globalCache1.owner = '127.0.0.1:6789';
+      var globalCachePath2 = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json');
+      globalCache2 = JSON.parse(fs.readFileSync(globalCachePath2));
+      globalCache2.owner = '127.0.0.1:6789';
+
+      var userCachePath = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
+      userCache = JSON.parse(fs.readFileSync(userCachePath));
+      userCache.owner = 'a.user@pml.ac.uk';
+   });
 
    beforeEach(function() {
       testCache = [];

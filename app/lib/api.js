@@ -57,7 +57,7 @@ api.get_cache_list = function(req, res) {
          server.server.Layers = [];
          for (var j = 0; j < serverTemp.server.Layers.length; j++) {
             var layerTemp = serverTemp.server.Layers[j];
-            var layer= {};
+            var layer = {};
             layer.Name = layerTemp.Name;
             layer.Title = layerTemp.Title;
             layer.Abstract = layerTemp.Abstract;
@@ -97,49 +97,46 @@ api.refresh_wms_cache = function(req, res) {
                username = req.query.user;
             }
          } else {
-            res.status(401).send("Error: You must be an admin to refresh another user's config!");
-            return;
+            return res.status(401).send("Error: You must be an admin to refresh another user's config!");
          }
       } else {
          username = apiAuth.getUsername(req);
       }
+      var serverName = utils.URLtoServerName(url);
+      var basePath = path.join(MASTER_CONFIG_PATH, domain); // Gets the given path
+      if (username != domain) {
+         basePath = path.join(basePath, USER_CACHE_PREFIX + username);
+      }
+      var oldDataPath = path.join(basePath, serverName + '.json');
 
-      settingsApi.load_new_wms_layer(url, refresh, domain, function(err, strData) {
-         if (err) {
-            utils.handleError(err, res);
-         } else {
-            if (strData !== null) {
-               var newData = JSON.parse(strData);
-               var oldData = null;
-               var serverName = utils.URLtoServerName(url);
-               var basePath = path.join(MASTER_CONFIG_PATH, domain); // Gets the given path
-               if (username != domain) {
-                  basePath = path.join(basePath, USER_CACHE_PREFIX + username);
-               }
-               var oldDataPath = path.join(basePath, serverName + '.json');
-
-               if (utils.fileExists(oldDataPath)) {
+      if (utils.fileExists(oldDataPath)) {
+         settingsApi.load_new_wms_layer(url, refresh, domain, function(err, strData) {
+            if (err) {
+               utils.handleError(err, res);
+            } else {
+               if (strData !== null) {
+                  var newData = JSON.parse(strData);
+                  var oldData = null;
                   oldData = JSON.parse(fs.readFileSync(oldDataPath, 'utf8'));
                   var data = updateData(oldData, newData);
                   settingsApi.update_layer(username, domain, data, function(err) {
                      if (err) {
                         utils.handleError(err, res);
                      } else {
-                        res.send('Successfully updated ' + serverName + ' for ' + username);
+                        return res.send('Successfully updated ' + serverName + ' for ' + username);
                      }
                   });
+
                } else {
-                  res.status(404).send("Error: Can't find config for provided url. If the file isn't yours, you must specify user=global or user=username.");
+                  return res.status(400).send("Error: Could not find any loadable layers in the WMS file you provided.");
                }
-            } else {
-               res.status(400).send({
-                  "Error": "Could not find any loadable layers in the WMS file you provided."
-               });
             }
-         }
-      });
+         });
+      } else {
+         return res.status(404).send("Error: Can't find config for provided url. If the file isn't yours, you must specify user=global or user=username.");
+      }
    } else {
-      res.status(400).send("Error: url wasn't specified or provided server name not found.");
+      return res.status(400).send("Error: url wasn't specified or provided server name not found.");
    }
 };
 
