@@ -66,6 +66,10 @@ apiAuth.getUsername = function(req) {
    var tokens = loadTokens(req);
    var username = tokens[token];
 
+   if (username === undefined) {
+      username = 'guest';
+   }
+
    return username;
 };
 

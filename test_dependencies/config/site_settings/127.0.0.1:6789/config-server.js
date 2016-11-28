@@ -8,7 +8,7 @@ GLOBAL.config['127.0.0.1:6789'] = {
          prompt: 'select_account'
       }
    },
-   admins: ['an.admin@pml.ac.uk'],
+   admins: ['an.admin@pml.ac.uk', 'nik@pml.ac.uk'],
    tokens: {
       'zxc': 'guest',
       'asd': 'a.user@pml.ac.uk',
