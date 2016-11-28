@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var httpMocks = require('node-mocks-http');
 var eventEmitter = require('events').EventEmitter;
@@ -20,10 +20,14 @@ before(function() {
          });
       }
    };
+
+   global.test = {
+      expectedPath: path.join(__dirname, '../test_dependencies/expected/')
+   };
 });
 
 after(function() {
    if (!global.configExists) {
-      fs.unlinkSync(configDestination);
+      fs.removeSync(configDestination);
    }
 });

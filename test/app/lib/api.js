@@ -26,7 +26,37 @@ describe('api', function() {
    });
 
    describe('get_cache_list', function() {
-      // TODO
+      var testCacheServers;
+      var testCacheLayers;
+
+      before(function() {
+         var cacheServersPath = path.join(global.test.expectedPath, 'get_cache_servers.json');
+         testCacheServers = fs.readFileSync(cacheServersPath, 'utf8');
+         var cacheLayersPath = path.join(global.test.expectedPath, 'get_cache_layers.json');
+         testCacheLayers = fs.readFileSync(cacheLayersPath, 'utf8');
+      });
+
+      it('should get cache servers correctly', function(done) {
+         chai.request(app)
+            .get('/api/1/asd/get_cache_servers')
+            .end(function(err, res) {
+               // console.log(res.text);
+               expect(res).to.have.status(200);
+               expect(res.text).to.equal(testCacheServers);
+               done();
+            });
+      });
+
+      it('should get cache layers correctly', function(done) {
+         chai.request(app)
+            .get('/api/1/asd/get_cache_layers')
+            .end(function(err, res) {
+               // console.log(res.text);
+               expect(res).to.have.status(200);
+               expect(res.text).to.equal(testCacheLayers);
+               done();
+            });
+      });
    });
 
    describe('refresh_wms_cache', function() {

@@ -32,6 +32,7 @@
     "express": "~4.13.3",
     "express-session": "~1.7.6",
     "express-sessions": "~1.0.5",
+    "fs-extra": "^1.0.0",
     "jade": "~1.10.0",
     "jimp": "0.2.21",
     "json2csv": "^3.7.0",

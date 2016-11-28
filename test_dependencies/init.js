@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var mkdirp = require('mkdirp');
 var path = require('path');
 
@@ -10,8 +10,14 @@ var configDestination = path.join(__dirname, '../config/site_settings/127.0.0.1\
 try {
    if (fs.statSync(configDestination).isDirectory) {
       global.configExists = true;
+      console.error(' ---------------------------------------------------------------- ');
+      console.error('|   Error: config/site_settings/127.0.0.1:6789 already exists!   |');
+      console.error('|   Please move the folder to run the tests.                     |');
+      console.error(' ---------------------------------------------------------------- ');
+      console.error();
+      process.exit(1);
    }
 } catch (e) {
-   fs.symlinkSync(configSource, configDestination);
+   fs.copySync(configSource, configDestination, {clobber: false});
    global.configExists = false;
 }
