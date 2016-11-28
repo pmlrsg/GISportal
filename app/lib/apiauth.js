@@ -16,9 +16,7 @@ module.exports = apiAuth;
  */
 apiAuth.authenticateToken = function(req, res, next) {
    var token = req.params.token;
-   var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;
-   var tokens = config.tokens;
+   var tokens = loadTokens(req);
 
    if (tokens) {
       if (tokens[token] !== undefined) {
@@ -43,8 +41,8 @@ apiAuth.getAccessLevel = function(req, domain) {
    // If they aren't using the guest token
    if (apiAuth.getUsername(req) != 'guest') {
       level = 'user';
-      domain = domain || req.query.domain;
-      var config = GLOBAL.config[domain] || GLOBAL.config;
+      domain = domain || utils.getDomainName(req);
+      var config = global.config[domain] || global.config;
       var admins = config.admins;
       if (admins) {
          for (var i = 0; i < admins.length; i++) {
@@ -65,9 +63,7 @@ apiAuth.getAccessLevel = function(req, domain) {
  */
 apiAuth.getUsername = function(req) {
    var token = req.params.token;
-   var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;
-   var tokens = config.tokens;
+   var tokens = loadTokens(req);
    var username = tokens[token];
 
    return username;
@@ -88,3 +84,9 @@ apiAuth.denyGuest = function(req, res, next) {
       res.status(401).send('Guests cannot do this!');
    }
 };
+
+function loadTokens(req) {
+   var domain = utils.getDomainName(req);
+   var config = global.config[domain] || global.config;
+   return config.tokens;
+}
