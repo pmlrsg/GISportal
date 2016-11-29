@@ -22,6 +22,8 @@ before(function() {
    };
 
    global.test = {
+      appPath: path.join(__dirname, '../'),
+      dependenciesPath: path.join(__dirname, '../test_dependencies/'),
       expectedPath: path.join(__dirname, '../test_dependencies/expected/')
    };
 });
@@ -30,4 +32,6 @@ after(function() {
    if (!global.configExists) {
       fs.removeSync(configDestination);
    }
+   var logDir = path.join(__dirname, '../logs/test');
+   fs.removeSync(logDir);
 });
