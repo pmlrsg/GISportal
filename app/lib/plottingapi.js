@@ -110,11 +110,11 @@ plottingApi.processCSV = function(req, res, next) {
                 if(data.Date && data.Longitude && data.Latitude && data.data_point){
                   is_match_up = true;
                   if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
-                        errorLines.push(line_number);
+                        errorLines.push(lineNumber);
                   }else{
                         var longitude = parseFloat(data.Longitude);
                         var latitude = parseFloat(data.Latitude);
-                        var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Data Point":data.data_point, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}}
+                        var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Data Point":data.data_point, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}};
                         featuresList.push(geoJSON_data);
                   }
                 }
