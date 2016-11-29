@@ -32,12 +32,12 @@ DOWNLOAD_DIR="/tmp"
 MAILTO="rsgweb@pml.ac.uk"
 
 
-PERCENT_FULL=$(df -h . | grep -o '[0-9]*[0-9]'% | sed s/%//)
+PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
 
 if [[ $PERCENT_FULL -ge 90 ]]; then
    tmpwatch -q -m 1h ${DOWNLOAD_DIR}
    # check to see if it made any difference
-   NEW_PERCENT_FULL=$(df -h . | grep -o '[0-9]*[0-9]'% | sed s/%//)
+   NEW_PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
    if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
       echo "The disk on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
    fi
