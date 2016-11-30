@@ -11,6 +11,10 @@ before(function() {
          return httpMocks.createRequest({
             headers: {
                host: '127.0.0.1:6789'
+            },
+            ip: '127.0.0.1',
+            session: {
+               passport: false
             }
          });
       },

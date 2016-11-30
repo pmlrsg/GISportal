@@ -64,6 +64,6 @@
     "npm": ">= 1.0"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha test app/modules/*/test"
   }
 }

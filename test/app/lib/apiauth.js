@@ -9,7 +9,7 @@ var expect = chai.expect;
 
 describe('apiAuth', function() {
    describe('authenticateToken', function() {
-      it('should not allow bad token', function(done) {
+      it('should reject bad token', function(done) {
          chai.request(app)
             .get('/api/1/meep')
             .end(function(err, res) {

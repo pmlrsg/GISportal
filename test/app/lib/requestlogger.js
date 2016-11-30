@@ -10,12 +10,9 @@ describe('requestLogger', function() {
    var logDir = path.join(__dirname, '../../../logs/test');
    var logFile = path.join(logDir, new Date().toISOString().substring(0, 10) + '.csv');
    var req;
+
    beforeEach(function() {
       req = global.mocks.createReq();
-      req.ip = '127.0.0.1';
-      req.session = {
-         passport: false
-      };
    });
 
    describe('init', function() {
