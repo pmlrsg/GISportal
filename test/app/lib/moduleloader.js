@@ -1,16 +1,15 @@
 var chai = require('chai');
 var fs = require('fs-extra');
-var path = require('path');
 
-var moduleLoader = require('../../../app/lib/moduleloader.js');
-var testModule = require('../../../test_dependencies/app/modules/test');
+var moduleLoader = require(global.test.appPath + '/app/lib/moduleloader.js');
+var testModule = require(global.test.dependPath + '/app/modules/test');
 
 var expect = chai.expect;
 
 describe('moduleloader', function() {
    describe('loadModules', function() {
-      var moduleSource = path.join(__dirname, '../../../test_dependencies/app/modules/test');
-      var moduleDestination = path.join(__dirname, '../../../app/modules/test');
+      var moduleSource = global.test.dependPath + '/app/modules/test';
+      var moduleDestination = global.test.appPath + '/app/modules/test';
       var moduleExists = false;
 
       it('should load test module correctly', function(done) {

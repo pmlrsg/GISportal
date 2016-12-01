@@ -2,12 +2,12 @@ var chai = require('chai');
 var fs = require('fs-extra');
 var path = require('path');
 
-var requestLogger = require('../../../app/lib/requestlogger.js');
+var requestLogger = require(global.test.appPath + '/app/lib/requestlogger.js');
 
 var expect = chai.expect;
 
 describe('requestLogger', function() {
-   var logDir = path.join(__dirname, '../../../logs/test');
+   var logDir = global.test.appPath + '/logs/test';
    var logFile = path.join(logDir, new Date().toISOString().substring(0, 10) + '.csv');
    var req;
 
@@ -17,7 +17,7 @@ describe('requestLogger', function() {
 
    describe('init', function() {
       it('should have created log directory and columns file', function() {
-         var columnsPath = path.join(logDir, 'columns.csv');
+         var columnsPath = logDir + '/columns.csv';
 
          expect(fs.statSync(logDir).isDirectory()).to.be.true;
          expect(fs.statSync(columnsPath).isFile()).to.be.true;
@@ -76,8 +76,8 @@ describe('requestLogger', function() {
       var fileDestination;
 
       before(function(done) {
-         fileSource = path.join(global.test.dependenciesPath, 'uploads/testFileUpload.txt');
-         fileDestination = path.join(global.test.appPath, 'uploads/testFileUpload.txt');
+         fileSource = global.test.dependPath + '/uploads/testFileUpload.txt';
+         fileDestination = global.test.appPath + '/uploads/testFileUpload.txt';
          fs.copy(fileSource, fileDestination, {
             clobber: false
          }, function() {
@@ -87,7 +87,7 @@ describe('requestLogger', function() {
 
       it('should log uploaded file correctly', function(done) {
          var res = global.mocks.createRes();
-         var uploadDir = path.join(global.test.appPath, 'uploads');
+         var uploadDir = global.test.appPath + '/uploads';
          req.originalUrl = '/api/1/letmein/testFileUpload';
          req.params = {
             token: 'letmein'

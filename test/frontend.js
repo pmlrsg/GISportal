@@ -1,6 +1,6 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
-var app = require('../app.js');
+var app = require(global.test.appPath + '/app.js');
 
 chai.use(chaiHttp);
 var expect = chai.expect;

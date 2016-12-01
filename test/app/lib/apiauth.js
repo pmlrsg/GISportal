@@ -1,8 +1,8 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 
-var app = require('../../../app.js');
-var apiAuth = require('../../../app/lib/apiauth.js');
+var app = require(global.test.appPath + '/app.js');
+var apiAuth = require(global.test.appPath + '/app/lib/apiauth.js');
 
 chai.use(chaiHttp);
 var expect = chai.expect;

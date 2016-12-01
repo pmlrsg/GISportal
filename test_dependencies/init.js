@@ -1,15 +1,20 @@
 var fs = require('fs-extra');
-var mkdirp = require('mkdirp');
 var path = require('path');
 
-mkdirp.sync(path.join(__dirname, '../config/site_settings'));
+global.test = {
+   appPath: path.join(__dirname, '../'),
+   dependPath: path.join(__dirname, '../test_dependencies/'),
+   expectedPath: path.join(__dirname, '../test_dependencies/expected/')
+};
 
-var configSource = path.join(__dirname, '../test_dependencies/config/site_settings/127.0.0.1\:6789');
-var configDestination = path.join(__dirname, '../config/site_settings/127.0.0.1\:6789');
+fs.mkdirsSync(global.test.appPath + '/config/site_settings');
+
+var configSource = global.test.dependPath + '/config/site_settings/127.0.0.1\:6789';
+var configDestination = global.test.appPath + '/config/site_settings/127.0.0.1\:6789';
 
 try {
    if (fs.statSync(configDestination).isDirectory()) {
-      global.configExists = true;
+      global.test.configExists = true;
       console.error(' ---------------------------------------------------------------- ');
       console.error('|   Error: config/site_settings/127.0.0.1:6789 already exists!   |');
       console.error('|   Please move the folder to run the tests.                     |');
@@ -18,6 +23,9 @@ try {
       process.exit(1);
    }
 } catch (e) {
-   fs.copySync(configSource, configDestination, {clobber: false});
-   global.configExists = false;
+   fs.copySync(configSource, configDestination, {
+      clobber: false
+   });
+   global.test.configExists = false;
+   global.test.configDir = configDestination;
 }

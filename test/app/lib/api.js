@@ -3,7 +3,7 @@ var chaiHttp = require('chai-http');
 var path = require('path');
 var fs = require('fs');
 
-var app = require('../../../app.js');
+var app = require(global.test.appPath + '/app.js');
 
 chai.use(chaiHttp);
 var expect = chai.expect;
@@ -30,9 +30,9 @@ describe('api', function() {
       var testCacheLayers;
 
       before(function() {
-         var cacheServersPath = path.join(global.test.expectedPath, 'get_cache_servers.json');
+         var cacheServersPath = global.test.expectedPath + '/get_cache_servers.json';
          testCacheServers = fs.readFileSync(cacheServersPath, 'utf8');
-         var cacheLayersPath = path.join(global.test.expectedPath, 'get_cache_layers.json');
+         var cacheLayersPath = global.test.expectedPath + '/get_cache_layers.json';
          testCacheLayers = fs.readFileSync(cacheLayersPath, 'utf8');
       });
 
@@ -61,10 +61,10 @@ describe('api', function() {
 
    describe('refresh_wms_cache', function() {
       this.timeout(10000);
-      var configPath = path.join(__dirname, '../../../config/site_settings/127.0.0.1:6789/');
+      var configPath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/';
 
       it('should successfully refresh a global cache', function(done) {
-         var cachePath = path.join(configPath, 'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json');
+         var cachePath = configPath + '/rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
@@ -79,7 +79,7 @@ describe('api', function() {
       });
 
       it('should successfully refresh a user\'s own cache', function(done) {
-         var cachePath = path.join(configPath, 'user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
+         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
@@ -94,7 +94,7 @@ describe('api', function() {
       });
 
       it('should successfully refresh another user\'s cache', function(done) {
-         var cachePath = path.join(configPath, 'user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json');
+         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
