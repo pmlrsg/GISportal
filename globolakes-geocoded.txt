@@ -1,0 +1,4855 @@
+{
+    "_00000002": {
+        "Name": "SUPERIOR",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000003": {
+        "Name": "VICTORIA",
+        "admin_area": "Mwanza Region",
+        "country": "Tanzania"
+    },
+    "_00000004": {
+        "Name": "ARAL-Sea",
+        "admin_area": "Kyzylorda Province",
+        "country": "Kazakhstan"
+    },
+    "_00000005": {
+        "Name": "HURON",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000006": {
+        "Name": "MICHIGAN",
+        "admin_area": "Michigan",
+        "country": "United States"
+    },
+    "_00000007": {
+        "Name": "TANGANYIKA",
+        "admin_area": "Northern Province",
+        "country": "Zambia"
+    },
+    "_00000008": {
+        "Name": "BAYKAL_BAIKAL",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00000009": {
+        "Name": "GREAT-BEAR-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000010": {
+        "Name": "MALAWI_NYASA_NIASSA",
+        "admin_area": "Mbeya Region",
+        "country": "Tanzania"
+    },
+    "_00000011": {
+        "Name": "GREAT-SLAVE-Lake"
+    },
+    "_00000012": {
+        "Name": "ERIE",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000013": {
+        "Name": "WINNIPEG",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000014": {
+        "Name": "CHAD",
+        "admin_area": "Borno",
+        "country": "Nigeria"
+    },
+    "_00000015": {
+        "Name": "ONTARIO",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000016": {
+        "Name": "LADOGA",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000017": {
+        "Name": "BALQASH",
+        "admin_area": "Karagandy Province",
+        "country": "Kazakhstan"
+    },
+    "_00000018": {
+        "Name": "ONEGA",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000020": {
+        "Name": "TITICACA"
+    },
+    "_00000021": {
+        "Name": "NICARAGUA_COCIBOLCA_GRANADA",
+        "admin_area": "Departamento de Boaco",
+        "country": "Nicaragua"
+    },
+    "_00000022": {
+        "Name": "TURKANA",
+        "admin_area": "Southern Nations, Nationalities, and People's Region",
+        "country": "Ethiopia"
+    },
+    "_00000023": {
+        "Name": "ATHABASCA",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000024": {
+        "Name": "VOLTA_-Lake",
+        "admin_area": "Northern Region",
+        "country": "Ghana"
+    },
+    "_00000025": {
+        "Name": "ISSYK-KUL",
+        "admin_area": "Issyk-Kul Region",
+        "country": "Kyrgyzstan"
+    },
+    "_00000026": {
+        "Name": "GREAT-SALT-Lake",
+        "admin_area": "Utah",
+        "country": "United States"
+    },
+    "_00000028": {
+        "Name": "REINDEER-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000029": {
+        "Name": "VÄNERN"
+    },
+    "_00000030": {
+        "Name": "ALBERT",
+        "admin_area": "Northern Region",
+        "country": "Uganda"
+    },
+    "_00000031": {
+        "Name": "WINNIPEGOSIS",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000033": {
+        "Name": "KUYBYSHEVSKOYE",
+        "admin_area": "Respublika Tatarstan",
+        "country": "Russia"
+    },
+    "_00000034": {
+        "Name": "URMIA",
+        "admin_area": "West Azerbaijan Province",
+        "country": "Iran"
+    },
+    "_00000035": {
+        "Name": "KARIBA_-Lake",
+        "admin_area": "Southern Province",
+        "country": "Zambia"
+    },
+    "_00000036": {
+        "Name": "MWERU",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000037": {
+        "Name": "MANITOBA",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000038": {
+        "Name": "NIPIGON",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000039": {
+        "Name": "BRATSKOYE-Reservoir",
+        "admin_area": "Irkutskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000040": {
+        "Name": "ZAYSAN_-Lake",
+        "admin_area": "East Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000041": {
+        "Name": "QINGHAI",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00000042": {
+        "Name": "CAHORA--BASSA_-Lake",
+        "admin_area": "Tete",
+        "country": "Mozambique"
+    },
+    "_00000043": {
+        "Name": "TAYMYR",
+        "admin_area": "Krasnoyarsk Krai",
+        "country": "Russia"
+    },
+    "_00000044": {
+        "Name": "WOODS_-Lake-of-the"
+    },
+    "_00000045": {
+        "Name": "KHANKA-Lake",
+        "admin_area": "Heilongjiang Sheng",
+        "country": "China"
+    },
+    "_00000046": {
+        "Name": "MIRIM",
+        "admin_area": "Rio Grande do Sul",
+        "country": "Brazil"
+    },
+    "_00000047": {
+        "Name": "RYBINKSKOYE-Reservoir",
+        "admin_area": "Vologodskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000048": {
+        "Name": "NASSER_-Lake",
+        "admin_area": "Aswan Governorate",
+        "country": "Egypt"
+    },
+    "_00000050": {
+        "Name": "PEIPUS_PEIPSI",
+        "admin_area": "Leningradskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000051": {
+        "Name": "VAN",
+        "admin_area": "Van",
+        "country": "Turkey"
+    },
+    "_00000053": {
+        "Name": "UVS-Lake",
+        "admin_area": "Tyva Republits",
+        "country": "Russia"
+    },
+    "_00000055": {
+        "Name": "TANA",
+        "admin_area": "Amhara",
+        "country": "Ethiopia"
+    },
+    "_00000057": {
+        "Name": "CEDAR-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000058": {
+        "Name": "ALAKOL",
+        "admin_area": "Almaty Province",
+        "country": "Kazakhstan"
+    },
+    "_00000059": {
+        "Name": "KHUVSGUL-Lake",
+        "admin_area": "Khuvsgul",
+        "country": "Mongolia"
+    },
+    "_00000061": {
+        "Name": "VOLGOGRADSKOYE",
+        "admin_area": "Saratovskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000062": {
+        "Name": "ILIAMNA-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000064": {
+        "Name": "TONLÉ-SAP-Lake",
+        "admin_area": "Battambang Province",
+        "country": "Cambodia"
+    },
+    "_00000066": {
+        "Name": "TAIHU-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00000067": {
+        "Name": "KIVU",
+        "admin_area": "Sud-Kivu",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000068": {
+        "Name": "WOLLASTON-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000069": {
+        "Name": "EDWARD_ÉDOUARD",
+        "admin_area": "Western Region",
+        "country": "Uganda"
+    },
+    "_00000071": {
+        "Name": "TSIMLYANSKOYE-Reservoir",
+        "admin_area": "Volgogradskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000072": {
+        "Name": "SOUTHERN-INDIAN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000073": {
+        "Name": "ZZZZ",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00000075": {
+        "Name": "HULUN-Lake",
+        "admin_area": "Neimenggu Zizhiqu",
+        "country": "China"
+    },
+    "_00000077": {
+        "Name": "THERTHAR-Lake",
+        "admin_area": "Saladin Governorate",
+        "country": "Iraq"
+    },
+    "_00000078": {
+        "Name": "POYANG-Lake",
+        "admin_area": "Jiangxi Sheng",
+        "country": "China"
+    },
+    "_00000079": {
+        "Name": "KAKHOVS'KE-Reservoir",
+        "admin_area": "Khersons'ka oblast",
+        "country": "Ukraine"
+    },
+    "_00000081": {
+        "Name": "BANGWEULU",
+        "admin_area": "Northern Province",
+        "country": "Zambia"
+    },
+    "_00000084": {
+        "Name": "CHIQUITA",
+        "admin_area": "Santiago del Estero",
+        "country": "Argentina"
+    },
+    "_00000086": {
+        "Name": "RUKWA",
+        "admin_area": "Rukwa Region",
+        "country": "Tanzania"
+    },
+    "_00000087": {
+        "Name": "KREMENCHUK_KREMENCHUTS'KE-Reservoir",
+        "admin_area": "Cherkas'ka oblast",
+        "country": "Ukraine"
+    },
+    "_00000088": {
+        "Name": "ZEYSKOYE",
+        "admin_area": "Amurskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000089": {
+        "Name": "IJSSELMEER",
+        "admin_area": "Friesland",
+        "country": "Netherlands"
+    },
+    "_00000090": {
+        "Name": "MAI-NDOMBE",
+        "admin_area": "Bandundu",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000091": {
+        "Name": "NAM-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000092": {
+        "Name": "CHANY"
+    },
+    "_00000093": {
+        "Name": "KRASNOYARSKOYE"
+    },
+    "_00000094": {
+        "Name": "GENERAL-CARRERA_BUENOS-AIRES"
+    },
+    "_00000095": {
+        "Name": "VÄTTERN",
+        "admin_area": "Örebro län",
+        "country": "Sweden"
+    },
+    "_00000099": {
+        "Name": "KYOGA",
+        "admin_area": "Northern Region",
+        "country": "Uganda"
+    },
+    "_00000100": {
+        "Name": "MARTRE",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000102": {
+        "Name": "UST-ILIMSKOYE",
+        "admin_area": "Irkutskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000103": {
+        "Name": "WILLISTON-Lake",
+        "admin_area": "British Columbia",
+        "country": "Canada"
+    },
+    "_00000104": {
+        "Name": "KAMSKOYE_KAMA-Reservoir",
+        "admin_area": "Permskiy kray",
+        "country": "Russia"
+    },
+    "_00000105": {
+        "Name": "SILING",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000106": {
+        "Name": "BROKOPONDO",
+        "admin_area": "Brokopondo",
+        "country": "Suriname"
+    },
+    "_00000109": {
+        "Name": "HUNG-TSE-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00000110": {
+        "Name": "SAKAKAWEA",
+        "admin_area": "North Dakota",
+        "country": "United States"
+    },
+    "_00000111": {
+        "Name": "SAIMAA"
+    },
+    "_00000112": {
+        "Name": "KHANTAYSKOYE-VODOKHRANILISHCHE",
+        "admin_area": "Krasnoyarsk Krai",
+        "country": "Russia"
+    },
+    "_00000113": {
+        "Name": "SARATOVSKOYE",
+        "admin_area": "Samarskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000114": {
+        "Name": "OKEECHOBEE",
+        "admin_area": "Florida",
+        "country": "United States"
+    },
+    "_00000116": {
+        "Name": "KAINJI-Reservoir",
+        "admin_area": "Niger",
+        "country": "Nigeria"
+    },
+    "_00000117": {
+        "Name": "ARGENTINO-Lake",
+        "admin_area": "Santa Cruz Province",
+        "country": "Argentina"
+    },
+    "_00000119": {
+        "Name": "MWERU-WANTIPA",
+        "admin_area": "Northern Province",
+        "country": "Zambia"
+    },
+    "_00000120": {
+        "Name": "TENGIZ",
+        "admin_area": "Akmola Province",
+        "country": "Kazakhstan"
+    },
+    "_00000121": {
+        "Name": "KHYARGAS-Lake",
+        "admin_area": "Uvs",
+        "country": "Mongolia"
+    },
+    "_00000122": {
+        "Name": "OAHE",
+        "admin_area": "North Dakota",
+        "country": "United States"
+    },
+    "_00000125": {
+        "Name": "CLAIRE",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00000127": {
+        "Name": "RONGE",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000131": {
+        "Name": "KAPSHAGAY-Reservoir",
+        "admin_area": "Almaty Province",
+        "country": "Kazakhstan"
+    },
+    "_00000132": {
+        "Name": "RINCÓN-DEL-BONETE_-Lago-de",
+        "admin_area": "Departamento de Durazno",
+        "country": "Uruguay"
+    },
+    "_00000133": {
+        "Name": "POOPÓ-Lake",
+        "admin_area": "Oruro Department",
+        "country": "Bolivia"
+    },
+    "_00000134": {
+        "Name": "ZZZZ",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00000135": {
+        "Name": "SEVAN-Lake",
+        "admin_area": "Gegharkunik Province",
+        "country": "Armenia"
+    },
+    "_00000136": {
+        "Name": "VYGOZERO",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000137": {
+        "Name": "CREE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000142": {
+        "Name": "KHAR-US-Lake",
+        "admin_area": "Khovd",
+        "country": "Mongolia"
+    },
+    "_00000145": {
+        "Name": "BECHAROF-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000146": {
+        "Name": "SAINT-CLAIR",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000147": {
+        "Name": "LESSER-SLAVE-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00000149": {
+        "Name": "ESKIMO-Lakes",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000150": {
+        "Name": "TOBA",
+        "admin_area": "Sumatera Utara",
+        "country": "Indonesia"
+    },
+    "_00000151": {
+        "Name": "RED-Lake-(Upper-&-Lower)",
+        "admin_area": "Minnesota",
+        "country": "United States"
+    },
+    "_00000153": {
+        "Name": "CHAPALA_-Laguna-de",
+        "admin_area": "Jalisco",
+        "country": "Mexico"
+    },
+    "_00000154": {
+        "Name": "GURI-Reservoir",
+        "admin_area": "Bolívar",
+        "country": "Venezuela"
+    },
+    "_00000156": {
+        "Name": "EYASI",
+        "admin_area": "Arusha Region",
+        "country": "Tanzania"
+    },
+    "_00000157": {
+        "Name": "PÄIJÄNNE",
+        "country": "Finland"
+    },
+    "_00000158": {
+        "Name": "SAINT-JEAN",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000160": {
+        "Name": "BELOYE",
+        "admin_area": "Vologodskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000163": {
+        "Name": "MÄLAREN"
+    },
+    "_00000165": {
+        "Name": "CHAMPLAIN",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000166": {
+        "Name": "ABAYA-Lake",
+        "admin_area": "Southern Nations, Nationalities, and People's Region",
+        "country": "Ethiopia"
+    },
+    "_00000167": {
+        "Name": "O'HIGGINS_SAN-MARTÍN-Lake",
+        "admin_area": "XI Región",
+        "country": "Chile"
+    },
+    "_00000171": {
+        "Name": "VIEDMA-Lake",
+        "admin_area": "Santa Cruz",
+        "country": "Argentina"
+    },
+    "_00000172": {
+        "Name": "GOD'S-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000173": {
+        "Name": "RAZAZZA",
+        "admin_area": "Al Anbar Governorate",
+        "country": "Iraq"
+    },
+    "_00000176": {
+        "Name": "MANAGUA",
+        "admin_area": "Departamento de Managua",
+        "country": "Nicaragua"
+    },
+    "_00000179": {
+        "Name": "ZHARI-NAMCO",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000181": {
+        "Name": "BOSTEN-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000186": {
+        "Name": "KUMSKOYE-VODOKHRANILISHCHE",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000187": {
+        "Name": "ORIVESI_-PYHÄSELKÄ",
+        "country": "Finland"
+    },
+    "_00000190": {
+        "Name": "NOVOSIBIRSKOYE",
+        "admin_area": "Novosibirskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000192": {
+        "Name": "ILMEN",
+        "admin_area": "Novgorodskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000193": {
+        "Name": "GORKY-Reservoir",
+        "admin_area": "Ivanovskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000194": {
+        "Name": "SALTON_-Sea",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00000195": {
+        "Name": "PIELINEN",
+        "country": "Finland"
+    },
+    "_00000198": {
+        "Name": "NIPISSING"
+    },
+    "_00000200": {
+        "Name": "ABITIBI",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000201": {
+        "Name": "FORT-PECK-Lake",
+        "admin_area": "Montana",
+        "country": "United States"
+    },
+    "_00000202": {
+        "Name": "OULUJÄRVI",
+        "country": "Finland"
+    },
+    "_00000205": {
+        "Name": "BAY_-Laguna-de",
+        "admin_area": "Calabarzon",
+        "country": "Philippines"
+    },
+    "_00000209": {
+        "Name": "LLANQUIHUE-Lake",
+        "admin_area": "X Región",
+        "country": "Chile"
+    },
+    "_00000210": {
+        "Name": "ALEXANDRINA"
+    },
+    "_00000215": {
+        "Name": "TANGRA-YUMCO",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000219": {
+        "Name": "COLHUÉ-HUAPI",
+        "admin_area": "Chubut",
+        "country": "Argentina"
+    },
+    "_00000220": {
+        "Name": "EZEQUIEL-RAMOS-MEJÍA",
+        "admin_area": "Neuquén",
+        "country": "Argentina"
+    },
+    "_00000222": {
+        "Name": "PETER-POND-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000225": {
+        "Name": "SOUTH-MOOSE-Lake"
+    },
+    "_00000228": {
+        "Name": "SEGOZERSKOYE",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000231": {
+        "Name": "MANGUEIRA",
+        "admin_area": "Rio Grande do Sul",
+        "country": "Brazil"
+    },
+    "_00000233": {
+        "Name": "CHAOHU-Lake",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00000236": {
+        "Name": "SIMCOE",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000237": {
+        "Name": "VOTKINSK-Reservoir",
+        "admin_area": "Permskiy kray",
+        "country": "Russia"
+    },
+    "_00000239": {
+        "Name": "ULUNGUR-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000240": {
+        "Name": "PYASINO",
+        "admin_area": "Krasnoyarsk Krai",
+        "country": "Russia"
+    },
+    "_00000241": {
+        "Name": "SARYGAMYSH-Lake",
+        "admin_area": "Republic of Karakalpakstan",
+        "country": "Uzbekistan"
+    },
+    "_00000242": {
+        "Name": "KOVDOZERO"
+    },
+    "_00000243": {
+        "Name": "TOLEDO-BEND-Reservoir",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00000244": {
+        "Name": "DEAD_-Sea"
+    },
+    "_00000245": {
+        "Name": "IZABAL",
+        "admin_area": "Izabal",
+        "country": "Guatemala"
+    },
+    "_00000247": {
+        "Name": "SASYQKOL",
+        "admin_area": "East Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000249": {
+        "Name": "HIRAKUD-Reservoir"
+    },
+    "_00000250": {
+        "Name": "PROLETARSKOYE",
+        "admin_area": "Rostovskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000255": {
+        "Name": "TUMBA",
+        "admin_area": "Équateur",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000256": {
+        "Name": "CHILWA",
+        "admin_area": "Southern Region",
+        "country": "Malawi"
+    },
+    "_00000262": {
+        "Name": "KULUNDINSKOYE",
+        "admin_area": "Altayskiy kray",
+        "country": "Russia"
+    },
+    "_00000265": {
+        "Name": "CAXIUANA",
+        "admin_area": "State of Pará",
+        "country": "Brazil"
+    },
+    "_00000267": {
+        "Name": "BEYŞEHIR",
+        "admin_area": "Isparta",
+        "country": "Turkey"
+    },
+    "_00000268": {
+        "Name": "BIWA-Lake",
+        "admin_area": "Shiga-ken",
+        "country": "Japan"
+    },
+    "_00000271": {
+        "Name": "SELETYTENIZ",
+        "admin_area": "North Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000273": {
+        "Name": "PYAOZERO",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000277": {
+        "Name": "COARI_-Lago-de",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00000279": {
+        "Name": "AL-ASSAD-Lake",
+        "admin_area": "Aleppo Governorate",
+        "country": "Syria"
+    },
+    "_00000281": {
+        "Name": "DORÉ-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000287": {
+        "Name": "GAOYOU-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00000291": {
+        "Name": "BEI'ER-Lake",
+        "admin_area": "Neimenggu Zizhiqu",
+        "country": "China"
+    },
+    "_00000294": {
+        "Name": "KHAR-Lake"
+    },
+    "_00000295": {
+        "Name": "TAUPO",
+        "admin_area": "Waikato",
+        "country": "New Zealand"
+    },
+    "_00000296": {
+        "Name": "SHARDARA-Reservoir",
+        "admin_area": "South Kazakhstan Region",
+        "country": "Kazakhstan"
+    },
+    "_00000297": {
+        "Name": "EBINUR-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000299": {
+        "Name": "BUFFALO-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000300": {
+        "Name": "ELING_NGORING-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00000301": {
+        "Name": "CROSS-Lake"
+    },
+    "_00000302": {
+        "Name": "HALA-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000303": {
+        "Name": "NORTH-MOOSE-Lake"
+    },
+    "_00000304": {
+        "Name": "FAGNANO_CAMI-Lake",
+        "admin_area": "Tierra del Fuego",
+        "country": "Argentina"
+    },
+    "_00000306": {
+        "Name": "LAGDO",
+        "admin_area": "North",
+        "country": "Cameroon"
+    },
+    "_00000310": {
+        "Name": "BALATON",
+        "country": "Hungary"
+    },
+    "_00000311": {
+        "Name": "ATLIN-Lake",
+        "admin_area": "Yukon Territory",
+        "country": "Canada"
+    },
+    "_00000312": {
+        "Name": "AYAKKUM-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000314": {
+        "Name": "UPEMBA",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000316": {
+        "Name": "TATHLINA-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000322": {
+        "Name": "NATRON",
+        "admin_area": "Arusha Region",
+        "country": "Tanzania"
+    },
+    "_00000323": {
+        "Name": "CHURCHILL-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000326": {
+        "Name": "DESCHAMBAULT-Lake"
+    },
+    "_00000327": {
+        "Name": "GENEVA_LÉMAN",
+        "admin_area": "Vaud",
+        "country": "Switzerland"
+    },
+    "_00000328": {
+        "Name": "MINGACEVIR-Reservoir",
+        "admin_area": "Kakheti",
+        "country": "Azerbaijan"
+    },
+    "_00000329": {
+        "Name": "SALINES-GRANDES",
+        "admin_area": "La Rioja",
+        "country": "Argentina"
+    },
+    "_00000332": {
+        "Name": "TOWUTI",
+        "admin_area": "Sulawesi Selatan",
+        "country": "Indonesia"
+    },
+    "_00000333": {
+        "Name": "BLACK-Lake"
+    },
+    "_00000336": {
+        "Name": "GYARING_ZHALING-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00000337": {
+        "Name": "STEPHENS-Lake"
+    },
+    "_00000339": {
+        "Name": "HAZEN",
+        "admin_area": "Nunavut",
+        "country": "Canada"
+    },
+    "_00000340": {
+        "Name": "WINNEBAGO",
+        "admin_area": "Wisconsin",
+        "country": "United States"
+    },
+    "_00000343": {
+        "Name": "NAHUEL-HUAPI-Lake",
+        "admin_area": "Neuquén",
+        "country": "Argentina"
+    },
+    "_00000344": {
+        "Name": "KRASNOYE",
+        "admin_area": "Chukotka Autonomous Okrug",
+        "country": "Russia"
+    },
+    "_00000347": {
+        "Name": "GANDHI-Reservoir",
+        "admin_area": "Madhya Pradesh",
+        "country": "India"
+    },
+    "_00000350": {
+        "Name": "MALHEUR-Lake",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00000351": {
+        "Name": "DAUPHIN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000352": {
+        "Name": "CONSTANCE_BODENSEE"
+    },
+    "_00000354": {
+        "Name": "NGANGLA-RINGCO",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000356": {
+        "Name": "SANDY-Lake"
+    },
+    "_00000358": {
+        "Name": "RAZIM-Lake",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00000360": {
+        "Name": "JURUMIRIM-Reservoir"
+    },
+    "_00000361": {
+        "Name": "DNIPRODZERZHYNS'KE-Reservoir",
+        "admin_area": "Kirovohrads'ka oblast",
+        "country": "Ukraine"
+    },
+    "_00000362": {
+        "Name": "SAM-RAYBURN_-Lake"
+    },
+    "_00000363": {
+        "Name": "GRANVILLE-Lake"
+    },
+    "_00000366": {
+        "Name": "MILLE-LACS-Lake",
+        "admin_area": "Minnesota",
+        "country": "United States"
+    },
+    "_00000367": {
+        "Name": "TROUT-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000375": {
+        "Name": "FLATHEAD-Lake",
+        "admin_area": "Montana",
+        "country": "United States"
+    },
+    "_00000376": {
+        "Name": "LOKKA-Reservoir"
+    },
+    "_00000377": {
+        "Name": "NAKNEK_-NORTH-ARM-NAKNEK-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000379": {
+        "Name": "CERROS-COLORADOS-Complex",
+        "admin_area": "Neuquén",
+        "country": "Argentina"
+    },
+    "_00000380": {
+        "Name": "TAHOE",
+        "admin_area": "Nevada",
+        "country": "United States"
+    },
+    "_00000382": {
+        "Name": "QYARING-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000383": {
+        "Name": "TARO-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000387": {
+        "Name": "HJÄLMAREN",
+        "admin_area": "Örebro län",
+        "country": "Sweden"
+    },
+    "_00000390": {
+        "Name": "EGIRDIR",
+        "admin_area": "Isparta",
+        "country": "Turkey"
+    },
+    "_00000391": {
+        "Name": "ILE-A-LA-CROSSE",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000393": {
+        "Name": "STORSJÖN",
+        "admin_area": "Jämtlands län",
+        "country": "Sweden"
+    },
+    "_00000399": {
+        "Name": "GRAND-Lake",
+        "admin_area": "Newfoundland and Labrador",
+        "country": "Canada"
+    },
+    "_00000400": {
+        "Name": "BOIS_-Lac-des",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000403": {
+        "Name": "MARKAKOL",
+        "admin_area": "East Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000405": {
+        "Name": "MONTREAL-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000407": {
+        "Name": "SAYRAM-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000408": {
+        "Name": "HAMMAR",
+        "admin_area": "Dhi Qar Governorate",
+        "country": "Iraq"
+    },
+    "_00000409": {
+        "Name": "PRIMROSE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000410": {
+        "Name": "SYVASH-Lake"
+    },
+    "_00000411": {
+        "Name": "PYRAMID-Lake",
+        "admin_area": "Nevada",
+        "country": "United States"
+    },
+    "_00000415": {
+        "Name": "NAM-NGUM",
+        "admin_area": "Vientiane Province",
+        "country": "Laos"
+    },
+    "_00000416": {
+        "Name": "RANCO-Lake",
+        "admin_area": "Región de los Ríos",
+        "country": "Chile"
+    },
+    "_00000418": {
+        "Name": "ABY",
+        "admin_area": "Sud-Comoé",
+        "country": "Côte d'Ivoire"
+    },
+    "_00000420": {
+        "Name": "MILLS-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000423": {
+        "Name": "SAINT-PIERRE_SAINT-PETER-Lake"
+    },
+    "_00000426": {
+        "Name": "COLVILLE-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000427": {
+        "Name": "VOZHE"
+    },
+    "_00000430": {
+        "Name": "FABER-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000434": {
+        "Name": "KUBENSKOYE",
+        "admin_area": "Vologodskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000436": {
+        "Name": "KYIVS'KE-Reservoir",
+        "admin_area": "Kyivs'ka oblast",
+        "country": "Ukraine"
+    },
+    "_00000439": {
+        "Name": "MAPAM-YUMCO",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000442": {
+        "Name": "GOVIND-BALLABH-PANT-Reservoir",
+        "admin_area": "Uttar Pradesh",
+        "country": "India"
+    },
+    "_00000443": {
+        "Name": "CARDIEL-Lake",
+        "admin_area": "Santa Cruz",
+        "country": "Argentina"
+    },
+    "_00000444": {
+        "Name": "NGANGZE-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000445": {
+        "Name": "ZIWAY-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00000447": {
+        "Name": "KLUANE-Lake",
+        "admin_area": "Yukon Territory",
+        "country": "Canada"
+    },
+    "_00000448": {
+        "Name": "MUSTERS",
+        "admin_area": "Chubut",
+        "country": "Argentina"
+    },
+    "_00000450": {
+        "Name": "LEECH-Lake",
+        "admin_area": "Minnesota",
+        "country": "United States"
+    },
+    "_00000454": {
+        "Name": "MOLSON-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000455": {
+        "Name": "WHITE-NILE-Reservoir",
+        "admin_area": "Khartoum",
+        "country": "Sudan"
+    },
+    "_00000456": {
+        "Name": "WULANWULA-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000458": {
+        "Name": "BISTCHO-Lake"
+    },
+    "_00000459": {
+        "Name": "ZZZZ",
+        "admin_area": "Chukotka Autonomous Okrug",
+        "country": "Russia"
+    },
+    "_00000461": {
+        "Name": "KAYRAKKUMSKOYE_KAIRAKUM-Reservoir",
+        "admin_area": "Sughd Province",
+        "country": "Tajikistan"
+    },
+    "_00000462": {
+        "Name": "ITEZHI-TEZHI-Dam",
+        "admin_area": "Southern Province",
+        "country": "Zambia"
+    },
+    "_00000464": {
+        "Name": "GOOSE-Lake",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00000465": {
+        "Name": "KELLER-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000470": {
+        "Name": "KARAKUL-Lake",
+        "admin_area": "Gorno-Badakhshan Autonomous Province",
+        "country": "Tajikistan"
+    },
+    "_00000471": {
+        "Name": "KANIVS'KE-Reservoir",
+        "admin_area": "Kyivs'ka oblast",
+        "country": "Ukraine"
+    },
+    "_00000472": {
+        "Name": "NIZHNEE-KUYTO",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000474": {
+        "Name": "PINEHOUSE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000481": {
+        "Name": "NEAGH",
+        "admin_area": "Northern Ireland",
+        "country": "United Kingdom"
+    },
+    "_00000482": {
+        "Name": "KARSAKUWIGAMAK-Lake"
+    },
+    "_00000483": {
+        "Name": "CHUKCHAGIRSKOYE",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00000484": {
+        "Name": "HADITHAH-Dam-Lake",
+        "admin_area": "Al Anbar Governorate",
+        "country": "Iraq"
+    },
+    "_00000485": {
+        "Name": "LAGOS",
+        "admin_area": "Lagos",
+        "country": "Nigeria"
+    },
+    "_00000486": {
+        "Name": "TROUT-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000487": {
+        "Name": "POSO",
+        "admin_area": "Sulawesi Tengah",
+        "country": "Indonesia"
+    },
+    "_00000488": {
+        "Name": "SCUTARI_SKADARSKO",
+        "admin_area": "Prijestonica Cetinje",
+        "country": "Montenegro"
+    },
+    "_00000489": {
+        "Name": "DORSOIDONG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00000491": {
+        "Name": "AUBRY",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000494": {
+        "Name": "AGUA-VERMELHA_-Represa-de",
+        "admin_area": "Minas Gerais",
+        "country": "Brazil"
+    },
+    "_00000500": {
+        "Name": "UDYL'",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00000501": {
+        "Name": "STUART-Lake",
+        "admin_area": "British Columbia",
+        "country": "Canada"
+    },
+    "_00000502": {
+        "Name": "BOLON'",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00000505": {
+        "Name": "GARDA",
+        "admin_area": "Trentino-Alto Adige",
+        "country": "Italy"
+    },
+    "_00000508": {
+        "Name": "COLD-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00000509": {
+        "Name": "ZZZZ",
+        "admin_area": "Odessa Oblast",
+        "country": "Ukraine"
+    },
+    "_00000511": {
+        "Name": "AQQIKKOL-lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00000513": {
+        "Name": "CANACARI",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00000515": {
+        "Name": "VALENCIA",
+        "admin_area": "Carabobo",
+        "country": "Venezuela"
+    },
+    "_00000518": {
+        "Name": "MJØSA",
+        "admin_area": "Oppland",
+        "country": "Norway"
+    },
+    "_00000520": {
+        "Name": "CHIBZHANG-Lake_-East",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000523": {
+        "Name": "UTAH-Lake",
+        "admin_area": "Utah",
+        "country": "United States"
+    },
+    "_00000524": {
+        "Name": "LANAO",
+        "admin_area": "Northern Mindanao",
+        "country": "Philippines"
+    },
+    "_00000526": {
+        "Name": "OHRID",
+        "admin_area": "Komuna e Strugës",
+        "country": "Macedonia (FYROM)"
+    },
+    "_00000527": {
+        "Name": "ABHE",
+        "admin_area": "Dikhil",
+        "country": "Djibouti"
+    },
+    "_00000528": {
+        "Name": "TUNGABHADRA-Reservoir",
+        "admin_area": "Karnataka",
+        "country": "India"
+    },
+    "_00000529": {
+        "Name": "OXFORD-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000531": {
+        "Name": "LIANGZI-Lake",
+        "admin_area": "Hubei Sheng",
+        "country": "China"
+    },
+    "_00000533": {
+        "Name": "LACHA",
+        "admin_area": "Arkhangelskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000534": {
+        "Name": "LIVINGSTON_-Lake",
+        "admin_area": "Texas",
+        "country": "United States"
+    },
+    "_00000536": {
+        "Name": "BANGONG-Lake"
+    },
+    "_00000538": {
+        "Name": "SAINT-MARTIN",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000539": {
+        "Name": "LONGGAN_LONGHU-Lake",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00000540": {
+        "Name": "MAUNOIR"
+    },
+    "_00000543": {
+        "Name": "URRU-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000545": {
+        "Name": "CORMORANT-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000546": {
+        "Name": "PEND-OREILLE",
+        "admin_area": "Idaho",
+        "country": "United States"
+    },
+    "_00000549": {
+        "Name": "DURGUN-Lake"
+    },
+    "_00000550": {
+        "Name": "QUSMURYN-Lake",
+        "admin_area": "Kostanay Region",
+        "country": "Kazakhstan"
+    },
+    "_00000552": {
+        "Name": "AKŞEHIR",
+        "admin_area": "Afyonkarahisar",
+        "country": "Turkey"
+    },
+    "_00000554": {
+        "Name": "CLARK"
+    },
+    "_00000555": {
+        "Name": "QUINZE_-Lac-des-&-SIMARD",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000556": {
+        "Name": "MARION",
+        "admin_area": "South Carolina",
+        "country": "United States"
+    },
+    "_00000558": {
+        "Name": "OLD-WIVES-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000559": {
+        "Name": "UPPER-KLAMATH-Lake",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00000562": {
+        "Name": "VAAL-Dam"
+    },
+    "_00000566": {
+        "Name": "AMISK-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000569": {
+        "Name": "KAKISA-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000572": {
+        "Name": "YELLOWSTONE-Lake",
+        "admin_area": "Wyoming",
+        "country": "United States"
+    },
+    "_00000579": {
+        "Name": "CHAMO-Lake",
+        "admin_area": "Southern Nations, Nationalities, and People's Region",
+        "country": "Ethiopia"
+    },
+    "_00000581": {
+        "Name": "SPLIT_-Lake"
+    },
+    "_00000586": {
+        "Name": "MALOMBE",
+        "admin_area": "Southern Region",
+        "country": "Malawi"
+    },
+    "_00000588": {
+        "Name": "COCHRANE_PUEYRREDÓN-Lake",
+        "admin_area": "XI Región",
+        "country": "Chile"
+    },
+    "_00000590": {
+        "Name": "CUITZEO"
+    },
+    "_00000592": {
+        "Name": "LUMAJANGDONG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00000594": {
+        "Name": "TORNETRÄSK",
+        "admin_area": "Norrbottens län",
+        "country": "Sweden"
+    },
+    "_00000596": {
+        "Name": "DANJIANGKOU-Reservoir",
+        "admin_area": "Henan Sheng",
+        "country": "China"
+    },
+    "_00000601": {
+        "Name": "KRASNODARSKOYE"
+    },
+    "_00000603": {
+        "Name": "UBOLRATANA",
+        "admin_area": "Chang Wat Nong Bua Lam Phu",
+        "country": "Thailand"
+    },
+    "_00000604": {
+        "Name": "SHALA-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00000608": {
+        "Name": "OREL'",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00000609": {
+        "Name": "KEKEXILI-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000612": {
+        "Name": "ZZZZ"
+    },
+    "_00000613": {
+        "Name": "TSHANGALELE",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000616": {
+        "Name": "CHOMEN-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00000618": {
+        "Name": "SAINT-LUCIA",
+        "admin_area": "KwaZulu-Natal",
+        "country": "South Africa"
+    },
+    "_00000620": {
+        "Name": "DONGTING-Lake",
+        "admin_area": "Hunan Sheng",
+        "country": "China"
+    },
+    "_00000622": {
+        "Name": "MAHARANA-PRATAP-Reservoir",
+        "admin_area": "Himachal Pradesh",
+        "country": "India"
+    },
+    "_00000623": {
+        "Name": "DAGUAN-Lake",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00000624": {
+        "Name": "SWAN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000627": {
+        "Name": "DIANCHI-Pool",
+        "admin_area": "Yunnan Sheng",
+        "country": "China"
+    },
+    "_00000629": {
+        "Name": "DABUXUN-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00000630": {
+        "Name": "ACHIT-Lake",
+        "admin_area": "Uvs",
+        "country": "Mongolia"
+    },
+    "_00000632": {
+        "Name": "TUSTUMENA-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000633": {
+        "Name": "TIMISKAMING",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000634": {
+        "Name": "IZNIK",
+        "admin_area": "Bursa",
+        "country": "Turkey"
+    },
+    "_00000635": {
+        "Name": "BELOT",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000637": {
+        "Name": "HONDO",
+        "admin_area": "Santiago del Estero",
+        "country": "Argentina"
+    },
+    "_00000639": {
+        "Name": "XIJIR-ULAN-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000645": {
+        "Name": "BUUNTSAGAAN-Lake",
+        "admin_area": "Bayankhongor",
+        "country": "Mongolia"
+    },
+    "_00000646": {
+        "Name": "CLEARWATER-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000648": {
+        "Name": "ROGAGUADO-Lake",
+        "admin_area": "Beni Department",
+        "country": "Bolivia"
+    },
+    "_00000649": {
+        "Name": "PUMA-YUMCO",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000654": {
+        "Name": "SILJAN",
+        "admin_area": "Dalarnas län",
+        "country": "Sweden"
+    },
+    "_00000657": {
+        "Name": "HÖYTIÄINEN",
+        "country": "Finland"
+    },
+    "_00000667": {
+        "Name": "SITIDGI-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000669": {
+        "Name": "UTIKUMA-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00000672": {
+        "Name": "SMOOTHSTONE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000674": {
+        "Name": "KISALE",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000676": {
+        "Name": "RAKSHASTAL_LA'NGA",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000677": {
+        "Name": "BEAR-Lake",
+        "admin_area": "Idaho",
+        "country": "United States"
+    },
+    "_00000679": {
+        "Name": "VÕRTSJÄRV",
+        "admin_area": "Viljandi maakond",
+        "country": "Estonia"
+    },
+    "_00000681": {
+        "Name": "NGOIN",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000683": {
+        "Name": "ITANDÉUA",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00000684": {
+        "Name": "KISKITTOGISU-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000685": {
+        "Name": "PAIKU-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000687": {
+        "Name": "GEORGE",
+        "admin_area": "Western Region",
+        "country": "Uganda"
+    },
+    "_00000688": {
+        "Name": "SONG-KUL",
+        "admin_area": "Naryn Region",
+        "country": "Kyrgyzstan"
+    },
+    "_00000690": {
+        "Name": "PRESPA",
+        "admin_area": "Municipality of Resen",
+        "country": "Macedonia (FYROM)"
+    },
+    "_00000699": {
+        "Name": "PAVYLON"
+    },
+    "_00000702": {
+        "Name": "ZZZZ",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000706": {
+        "Name": "BEYSUGSKIY",
+        "admin_area": "Krasnodarskiy kray",
+        "country": "Russia"
+    },
+    "_00000708": {
+        "Name": "HONGHU-Lake",
+        "admin_area": "Hubei Sheng",
+        "country": "China"
+    },
+    "_00000710": {
+        "Name": "UDDJAURE"
+    },
+    "_00000713": {
+        "Name": "TOBIN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000718": {
+        "Name": "GOZHA-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00000723": {
+        "Name": "ENRIQUILLO",
+        "admin_area": "Independencia",
+        "country": "Dominican Republic"
+    },
+    "_00000725": {
+        "Name": "DOGAI-CORING",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00000728": {
+        "Name": "RED-DEER-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000729": {
+        "Name": "TOKTOGUL-Reservoir",
+        "admin_area": "Talas Region",
+        "country": "Kyrgyzstan"
+    },
+    "_00000730": {
+        "Name": "QUILL-LAKES_-West",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000731": {
+        "Name": "ZAPATOSA",
+        "admin_area": "Cesar",
+        "country": "Colombia"
+    },
+    "_00000732": {
+        "Name": "ZHUONAI-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000733": {
+        "Name": "KISKITTO-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000736": {
+        "Name": "KUSAI-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000738": {
+        "Name": "HABBANIYAH-Lake",
+        "admin_area": "Al Anbar Governorate",
+        "country": "Iraq"
+    },
+    "_00000744": {
+        "Name": "DAGZE-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000746": {
+        "Name": "MAUREPAS",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00000748": {
+        "Name": "CALCASIEU-Lake",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00000754": {
+        "Name": "CUMBERLAND-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000755": {
+        "Name": "CHABYER-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000756": {
+        "Name": "KRONOTSKOYE",
+        "admin_area": "Kamchatka Krai",
+        "country": "Russia"
+    },
+    "_00000761": {
+        "Name": "WINNIBIGOSHISH",
+        "admin_area": "Minnesota",
+        "country": "United States"
+    },
+    "_00000767": {
+        "Name": "ERHAI-Lake",
+        "admin_area": "Yunnan Sheng",
+        "country": "China"
+    },
+    "_00000770": {
+        "Name": "VICENTE-GUERRERO-Reservoir",
+        "admin_area": "Tamaulipas",
+        "country": "Mexico"
+    },
+    "_00000771": {
+        "Name": "WASEKAMIO-Lake"
+    },
+    "_00000773": {
+        "Name": "UUREG-Lake",
+        "admin_area": "Uvs",
+        "country": "Mongolia"
+    },
+    "_00000779": {
+        "Name": "WAPAWEKKA-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000782": {
+        "Name": "PASFIELD-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000783": {
+        "Name": "LAMA",
+        "admin_area": "Krasnoyarsk Krai",
+        "country": "Russia"
+    },
+    "_00000785": {
+        "Name": "DEBO",
+        "admin_area": "Mopti Region",
+        "country": "Mali"
+    },
+    "_00000790": {
+        "Name": "WULIANGSU-Sea"
+    },
+    "_00000791": {
+        "Name": "SHIJIU-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00000792": {
+        "Name": "NERPICHYE",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00000794": {
+        "Name": "SARTLAN",
+        "admin_area": "Novosibirskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000797": {
+        "Name": "RED-SUCKER-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000799": {
+        "Name": "ZZZZ",
+        "admin_area": "Khuzestan Province",
+        "country": "Iran"
+    },
+    "_00000800": {
+        "Name": "CORANGAMITE",
+        "admin_area": "Victoria",
+        "country": "Australia"
+    },
+    "_00000801": {
+        "Name": "FEIA"
+    },
+    "_00000804": {
+        "Name": "SACHIGO",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00000805": {
+        "Name": "BICHE_-Lac-la",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00000806": {
+        "Name": "QAROUN",
+        "admin_area": "Faiyum Governorate",
+        "country": "Egypt"
+    },
+    "_00000810": {
+        "Name": "PLONGE_-Lac-la",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000811": {
+        "Name": "STORA-LULEVATTEN"
+    },
+    "_00000812": {
+        "Name": "LEXIE-WUDAN-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000817": {
+        "Name": "GREAT-BITTER-Lake",
+        "admin_area": "Suez Governorate",
+        "country": "Egypt"
+    },
+    "_00000818": {
+        "Name": "TAAL-Lake",
+        "admin_area": "Calabarzon",
+        "country": "Philippines"
+    },
+    "_00000819": {
+        "Name": "DONGGEI-CUONA-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00000824": {
+        "Name": "MOULTRIE",
+        "admin_area": "South Carolina",
+        "country": "United States"
+    },
+    "_00000825": {
+        "Name": "TISHKE",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000827": {
+        "Name": "DALI-NUO'ER",
+        "admin_area": "Neimenggu Zizhiqu",
+        "country": "China"
+    },
+    "_00000829": {
+        "Name": "LANGANO-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00000831": {
+        "Name": "RUPANCO-Lake",
+        "admin_area": "X Región",
+        "country": "Chile"
+    },
+    "_00000833": {
+        "Name": "SIRINDHORN",
+        "admin_area": "Chang Wat Ubon Ratchathani",
+        "country": "Thailand"
+    },
+    "_00000836": {
+        "Name": "SALVADOR",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00000837": {
+        "Name": "WATERHEN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000840": {
+        "Name": "YALPUH-Lake",
+        "admin_area": "Odessa Oblast",
+        "country": "Ukraine"
+    },
+    "_00000849": {
+        "Name": "BLACKWATER-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000851": {
+        "Name": "TENIS",
+        "admin_area": "Omsk Oblast",
+        "country": "Russia"
+    },
+    "_00000870": {
+        "Name": "ZZZZ",
+        "admin_area": "West Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000872": {
+        "Name": "WHITE-Lake",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00000876": {
+        "Name": "WEISHAN-Lake",
+        "admin_area": "Shandong Sheng",
+        "country": "China"
+    },
+    "_00000879": {
+        "Name": "ZZZZ",
+        "admin_area": "Jambyl Province",
+        "country": "Kazakhstan"
+    },
+    "_00000881": {
+        "Name": "BURDUR-Lake",
+        "admin_area": "Isparta",
+        "country": "Turkey"
+    },
+    "_00000882": {
+        "Name": "UPPER-UGASHIK-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000883": {
+        "Name": "MONO-Lake",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00000892": {
+        "Name": "FUXIAN-Lake",
+        "admin_area": "Yunnan Sheng",
+        "country": "China"
+    },
+    "_00000893": {
+        "Name": "NEUCHÂTEL",
+        "admin_area": "Neuchâtel",
+        "country": "Switzerland"
+    },
+    "_00000894": {
+        "Name": "MOLOCHNYI-Lake",
+        "admin_area": "Zaporiz'ka oblast",
+        "country": "Ukraine"
+    },
+    "_0000089B": {
+        "Name": "MARKERMEER",
+        "admin_area": "Flevoland",
+        "country": "Netherlands"
+    },
+    "_00000902": {
+        "Name": "TEKE",
+        "admin_area": "North Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000904": {
+        "Name": "WASWANIPI",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00000905": {
+        "Name": "ONEIDA-Lake",
+        "admin_area": "New York",
+        "country": "United States"
+    },
+    "_00000907": {
+        "Name": "SHALKAR",
+        "admin_area": "West Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00000908": {
+        "Name": "LOCHE_-Lac-la",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000910": {
+        "Name": "CANOE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00000913": {
+        "Name": "XURU-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000915": {
+        "Name": "CABALIANA",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00000917": {
+        "Name": "ZIMBAMBO",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00000920": {
+        "Name": "TELMEN-Lake",
+        "admin_area": "Zavkhan",
+        "country": "Mongolia"
+    },
+    "_00000924": {
+        "Name": "CUORENDEJIA",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00000929": {
+        "Name": "GEORGE",
+        "admin_area": "Florida",
+        "country": "United States"
+    },
+    "_00000931": {
+        "Name": "ROBERT-S.-KERR-Reservoir",
+        "admin_area": "Oklahoma",
+        "country": "United States"
+    },
+    "_00000934": {
+        "Name": "PUKAKI",
+        "admin_area": "Canterbury",
+        "country": "New Zealand"
+    },
+    "_00000936": {
+        "Name": "YANISYARNI",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00000937": {
+        "Name": "RANA-PRATAP-Lake",
+        "admin_area": "Rajasthan",
+        "country": "India"
+    },
+    "_00000940": {
+        "Name": "LABERGE",
+        "admin_area": "Yukon Territory",
+        "country": "Canada"
+    },
+    "_00000944": {
+        "Name": "BOLSHOYE-MORSKOYE",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00000945": {
+        "Name": "HANHOWUZ-HOWDANY-Reservoir",
+        "admin_area": "Mary",
+        "country": "Turkmenistan"
+    },
+    "_00000949": {
+        "Name": "NAMEW-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000953": {
+        "Name": "URUA",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00000954": {
+        "Name": "INLAND-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00000957": {
+        "Name": "ALAOTRA",
+        "admin_area": "Toamasina Province",
+        "country": "Madagascar"
+    },
+    "_00000960": {
+        "Name": "MALYE-CHANY",
+        "admin_area": "Novosibirskaya oblast'",
+        "country": "Russia"
+    },
+    "_00000962": {
+        "Name": "DEL-TORO",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00000970": {
+        "Name": "BAITU_-CAIZI_-XIZI_-DAISAI-Lakes",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00000975": {
+        "Name": "GUIERS_-Lac-de",
+        "admin_area": "Saint-Louis",
+        "country": "Senegal"
+    },
+    "_00000976": {
+        "Name": "BARTLETT-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00000977": {
+        "Name": "REED-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00000982": {
+        "Name": "SANGIIN-DALAY-Lake",
+        "admin_area": "Khuvsgul",
+        "country": "Mongolia"
+    },
+    "_00000983": {
+        "Name": "RINQIN-XUB-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000985": {
+        "Name": "ULAKH-ULYUNG",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00000989": {
+        "Name": "ZIGE-TANG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00000990": {
+        "Name": "GEHU-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00001003": {
+        "Name": "TALBOT-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001007": {
+        "Name": "GUÁRICO-Reservoir",
+        "admin_area": "Guárico",
+        "country": "Venezuela"
+    },
+    "_00001009": {
+        "Name": "MISSISA-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001010": {
+        "Name": "LOWER-UGASHIK-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00001011": {
+        "Name": "BOLSHOY-UVAT",
+        "admin_area": "Tyumenskaya oblast'",
+        "country": "Russia"
+    },
+    "_00001013": {
+        "Name": "RØSSVATNET",
+        "admin_area": "Nordland",
+        "country": "Norway"
+    },
+    "_00001016": {
+        "Name": "COIPASA-Lake",
+        "admin_area": "Departamento de Potosí",
+        "country": "Bolivia"
+    },
+    "_00001019": {
+        "Name": "MAHONEY-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00001026": {
+        "Name": "AMERICAN-FALLS-Reservoir",
+        "admin_area": "Idaho",
+        "country": "United States"
+    },
+    "_00001028": {
+        "Name": "BOLMEN",
+        "admin_area": "Jönköpings län",
+        "country": "Sweden"
+    },
+    "_00001029": {
+        "Name": "EVORON",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00001031": {
+        "Name": "CHAGAN-Lake",
+        "admin_area": "Jilin Sheng",
+        "country": "China"
+    },
+    "_00001035": {
+        "Name": "KYZYLKAK",
+        "admin_area": "Pavlodar Province",
+        "country": "Kazakhstan"
+    },
+    "_00001044": {
+        "Name": "JINGYU-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00001046": {
+        "Name": "KABAMBA",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00001050": {
+        "Name": "KUCHUKSKOYE",
+        "admin_area": "Altayskiy kray",
+        "country": "Russia"
+    },
+    "_00001053": {
+        "Name": "ATHAPAPUSKOW-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001054": {
+        "Name": "CHAMBRI-Lake",
+        "admin_area": "East Sepik Province",
+        "country": "Papua New Guinea"
+    },
+    "_00001057": {
+        "Name": "CORRIB",
+        "admin_area": "County Galway",
+        "country": "Ireland"
+    },
+    "_00001058": {
+        "Name": "MAMAWI-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001059": {
+        "Name": "UKAL",
+        "admin_area": "Gujarat",
+        "country": "India"
+    },
+    "_00001060": {
+        "Name": "CIENAGA-DE-PAJARAL",
+        "admin_area": "Magdalena",
+        "country": "Colombia"
+    },
+    "_00001061": {
+        "Name": "NILAKKA"
+    },
+    "_00001062": {
+        "Name": "WEKUSKO_WEKISKO-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001063": {
+        "Name": "HADA-NAIHAOLAI",
+        "admin_area": "Neimenggu Zizhiqu",
+        "country": "China"
+    },
+    "_00001066": {
+        "Name": "BAM-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001071": {
+        "Name": "KESAGAMI-Lake"
+    },
+    "_00001075": {
+        "Name": "LAST-MOUNTAIN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001076": {
+        "Name": "DUKAN-Lake",
+        "admin_area": "Sulaymaniyah Governorate",
+        "country": "Iraq"
+    },
+    "_00001079": {
+        "Name": "CUONA",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001083": {
+        "Name": "ELTON",
+        "admin_area": "Volgogradskaya oblast'",
+        "country": "Russia"
+    },
+    "_00001096": {
+        "Name": "AKSAYQUIN-Lake"
+    },
+    "_00001099": {
+        "Name": "ZZZZ",
+        "admin_area": "Sermersooq Municipality",
+        "country": "Greenland"
+    },
+    "_00001107": {
+        "Name": "JUNSHAN-Lake",
+        "admin_area": "Jiangxi Sheng",
+        "country": "China"
+    },
+    "_00001109": {
+        "Name": "VILLARRICA",
+        "admin_area": "IX Región",
+        "country": "Chile"
+    },
+    "_00001110": {
+        "Name": "HIRFANLI",
+        "admin_area": "Ankara",
+        "country": "Turkey"
+    },
+    "_00001111": {
+        "Name": "URU-URU",
+        "admin_area": "Departamento de Oruro",
+        "country": "Bolivia"
+    },
+    "_00001115": {
+        "Name": "NEUSIEDLER-Lake",
+        "admin_area": "Burgenland",
+        "country": "Austria"
+    },
+    "_00001116": {
+        "Name": "ROSSIGNOL",
+        "admin_area": "Nova Scotia",
+        "country": "Canada"
+    },
+    "_00001121": {
+        "Name": "NEGRA",
+        "admin_area": "Rocha",
+        "country": "Uruguay"
+    },
+    "_00001128": {
+        "Name": "WALKER-Lake",
+        "admin_area": "Nevada",
+        "country": "United States"
+    },
+    "_00001129": {
+        "Name": "GRAND-Lake",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00001130": {
+        "Name": "TUOSU-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00001137": {
+        "Name": "AIAPUÁ",
+        "admin_area": "State of Amazonas",
+        "country": "Brazil"
+    },
+    "_00001145": {
+        "Name": "KUŞ",
+        "admin_area": "Balıkesir",
+        "country": "Turkey"
+    },
+    "_00001146": {
+        "Name": "ABIJATA-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00001148": {
+        "Name": "MATTAMUSKEET",
+        "admin_area": "North Carolina",
+        "country": "United States"
+    },
+    "_00001149": {
+        "Name": "RANN-OF-KUTCH-Lake",
+        "admin_area": "Gujarat",
+        "country": "India"
+    },
+    "_00001154": {
+        "Name": "ABERT",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00001157": {
+        "Name": "KOKA-Lake",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00001169": {
+        "Name": "WABIGOON-Lake"
+    },
+    "_00001170": {
+        "Name": "GREAT-Lake",
+        "admin_area": "Tasmania",
+        "country": "Australia"
+    },
+    "_00001174": {
+        "Name": "JILI-Lake",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00001184": {
+        "Name": "GUSINOYE",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00001187": {
+        "Name": "OZHOGINO",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00001188": {
+        "Name": "CLEAR-Lake",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00001190": {
+        "Name": "GRANGE-DE-MONTE-ALEGRE",
+        "admin_area": "State of Pará",
+        "country": "Brazil"
+    },
+    "_00001192": {
+        "Name": "KYEBXANG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001193": {
+        "Name": "CANYON-FERRY-Lake",
+        "admin_area": "Montana",
+        "country": "United States"
+    },
+    "_00001195": {
+        "Name": "ZZZZ",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00001196": {
+        "Name": "GALILEE_-Sea-of",
+        "admin_area": "North District",
+        "country": "Israel"
+    },
+    "_00001199": {
+        "Name": "DEVILS-Lake",
+        "admin_area": "North Dakota",
+        "country": "United States"
+    },
+    "_00001201": {
+        "Name": "VANAJAVESI"
+    },
+    "_00001203": {
+        "Name": "ARAS-DAM",
+        "admin_area": "West Azerbaijan Province",
+        "country": "Iran"
+    },
+    "_00001204": {
+        "Name": "KASUMIGAURA",
+        "admin_area": "Ibaraki-ken",
+        "country": "Japan"
+    },
+    "_00001205": {
+        "Name": "DAIHAI-Sea",
+        "admin_area": "Neimenggu Zizhiqu",
+        "country": "China"
+    },
+    "_00001206": {
+        "Name": "DUSHAN-Lake",
+        "admin_area": "Shandong Sheng",
+        "country": "China"
+    },
+    "_00001207": {
+        "Name": "PUYEHUE",
+        "admin_area": "Región de los Ríos",
+        "country": "Chile"
+    },
+    "_00001208": {
+        "Name": "CHLYA",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00001213": {
+        "Name": "CHATYR-KOL",
+        "admin_area": "Naryn Region",
+        "country": "Kyrgyzstan"
+    },
+    "_00001216": {
+        "Name": "BERRE",
+        "admin_area": "Provence-Alpes-Côte d'Azur",
+        "country": "France"
+    },
+    "_00001218": {
+        "Name": "NYUMBA-YA-MUNGU-Reservoir",
+        "admin_area": "Kilimanjaro Region",
+        "country": "Tanzania"
+    },
+    "_00001219": {
+        "Name": "NATH-Lake",
+        "admin_area": "Maharashtra",
+        "country": "India"
+    },
+    "_00001221": {
+        "Name": "PELICAN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001222": {
+        "Name": "BEAVERHILL-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001236": {
+        "Name": "ULUBAT",
+        "admin_area": "Bursa",
+        "country": "Turkey"
+    },
+    "_00001237": {
+        "Name": "FINGER-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001239": {
+        "Name": "TAZLINA-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00001240": {
+        "Name": "PYHÄJÄRVI",
+        "country": "Finland"
+    },
+    "_00001241": {
+        "Name": "TEFÉ",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00001246": {
+        "Name": "LAPPAJÄRVI",
+        "country": "Finland"
+    },
+    "_00001248": {
+        "Name": "BARINGO",
+        "admin_area": "Baringo County",
+        "country": "Kenya"
+    },
+    "_00001249": {
+        "Name": "WALKER-Lake"
+    },
+    "_00001257": {
+        "Name": "TAGE",
+        "admin_area": "Papua",
+        "country": "Indonesia"
+    },
+    "_00001259": {
+        "Name": "STROBEL",
+        "admin_area": "Santa Cruz",
+        "country": "Argentina"
+    },
+    "_00001264": {
+        "Name": "JUNÍN",
+        "admin_area": "Junín",
+        "country": "Peru"
+    },
+    "_00001266": {
+        "Name": "WELLINGTON",
+        "admin_area": "Victoria",
+        "country": "Australia"
+    },
+    "_00001270": {
+        "Name": "BOHU-Lake",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00001273": {
+        "Name": "ARAPA"
+    },
+    "_00001282": {
+        "Name": "TEPOUMA",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00001283": {
+        "Name": "MU_-BINGNI",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001286": {
+        "Name": "KARASOR",
+        "admin_area": "Karagandy Province",
+        "country": "Kazakhstan"
+    },
+    "_00001293": {
+        "Name": "ZZZZ",
+        "admin_area": "Diyala Governorate",
+        "country": "Iraq"
+    },
+    "_00001294": {
+        "Name": "AIRAG-Lake",
+        "admin_area": "Uvs",
+        "country": "Mongolia"
+    },
+    "_00001295": {
+        "Name": "LLANCANELO",
+        "admin_area": "Mendoza",
+        "country": "Argentina"
+    },
+    "_00001302": {
+        "Name": "TSO-MORIRI"
+    },
+    "_00001307": {
+        "Name": "MAINIT",
+        "admin_area": "Caraga",
+        "country": "Philippines"
+    },
+    "_00001319": {
+        "Name": "SVIR'",
+        "admin_area": "Kareliya Republits",
+        "country": "Russia"
+    },
+    "_00001323": {
+        "Name": "PALUNG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001327": {
+        "Name": "TUDAKUL-Lake",
+        "admin_area": "Навоий вилояти",
+        "country": "Uzbekistan"
+    },
+    "_00001336": {
+        "Name": "BONG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001344": {
+        "Name": "OOLOGAH-Lake",
+        "admin_area": "Oklahoma",
+        "country": "United States"
+    },
+    "_00001354": {
+        "Name": "MEMAR-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001355": {
+        "Name": "GENERAL-VINTTER_PALENA-Lake",
+        "admin_area": "X Región",
+        "country": "Chile"
+    },
+    "_00001358": {
+        "Name": "FUTOU-Lake",
+        "admin_area": "Hubei Sheng",
+        "country": "China"
+    },
+    "_00001359": {
+        "Name": "WANAPITEI-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001360": {
+        "Name": "QAMYSTYBAS",
+        "admin_area": "Kyzylorda Province",
+        "country": "Kazakhstan"
+    },
+    "_00001361": {
+        "Name": "ZZZZ",
+        "admin_area": "Sinaloa",
+        "country": "Mexico"
+    },
+    "_00001368": {
+        "Name": "KISSIMMEE",
+        "admin_area": "Florida",
+        "country": "United States"
+    },
+    "_00001370": {
+        "Name": "CALLING-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001375": {
+        "Name": "CANDLE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001377": {
+        "Name": "ROMBEBAI",
+        "admin_area": "Papua",
+        "country": "Indonesia"
+    },
+    "_00001381": {
+        "Name": "SOLUNTAKH",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00001382": {
+        "Name": "DUNG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001392": {
+        "Name": "TYRIFJORDEN",
+        "admin_area": "Buskerud",
+        "country": "Norway"
+    },
+    "_00001409": {
+        "Name": "TANDURE-Lake",
+        "admin_area": "New South Wales",
+        "country": "Australia"
+    },
+    "_00001417": {
+        "Name": "BEIHUO-LUXUN-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00001421": {
+        "Name": "NANHU-Lake",
+        "admin_area": "Anhui Sheng",
+        "country": "China"
+    },
+    "_00001422": {
+        "Name": "HINDMARSH",
+        "admin_area": "Victoria",
+        "country": "Australia"
+    },
+    "_00001423": {
+        "Name": "SKAGERN",
+        "admin_area": "Örebro län",
+        "country": "Sweden"
+    },
+    "_00001424": {
+        "Name": "GOOSE-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001425": {
+        "Name": "WASEKAMIO-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001430": {
+        "Name": "LUOMA-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00001431": {
+        "Name": "OROG-Lake",
+        "admin_area": "Bayankhongor",
+        "country": "Mongolia"
+    },
+    "_00001432": {
+        "Name": "PUNG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001434": {
+        "Name": "ÁLVARO--OBREGÓN",
+        "admin_area": "Sonora",
+        "country": "Mexico"
+    },
+    "_00001437": {
+        "Name": "TANSIN_-Laguna-de",
+        "admin_area": "Departamento de gracias a dios",
+        "country": "Honduras"
+    },
+    "_00001445": {
+        "Name": "BAIRAB-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001467": {
+        "Name": "ROSS-R.-BARNETT-Reservoir",
+        "admin_area": "Mississippi",
+        "country": "United States"
+    },
+    "_00001479": {
+        "Name": "ATITLÁN_-Lago-de",
+        "admin_area": "Sololá",
+        "country": "Guatemala"
+    },
+    "_00001482": {
+        "Name": "ZZZZ",
+        "admin_area": "Dhi Qar Governorate",
+        "country": "Iraq"
+    },
+    "_00001489": {
+        "Name": "WINEFRED-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001493": {
+        "Name": "APOPKA",
+        "admin_area": "Florida",
+        "country": "United States"
+    },
+    "_00001498": {
+        "Name": "SEBAGO-Lake",
+        "admin_area": "Maine",
+        "country": "United States"
+    },
+    "_00001501": {
+        "Name": "MATATILA-DAM-Reservoir",
+        "admin_area": "Madhya Pradesh",
+        "country": "India"
+    },
+    "_00001503": {
+        "Name": "CHANGHU-Lake",
+        "admin_area": "Hubei Sheng",
+        "country": "China"
+    },
+    "_00001504": {
+        "Name": "ZHELIN-Reservoir",
+        "admin_area": "Jiangxi Sheng",
+        "country": "China"
+    },
+    "_00001505": {
+        "Name": "SNIARDWY"
+    },
+    "_00001509": {
+        "Name": "SUMMER-Lake",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00001510": {
+        "Name": "QUILL-LAKES_-East",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001511": {
+        "Name": "PELLEGRINI-Lake",
+        "admin_area": "Río Negro",
+        "country": "Argentina"
+    },
+    "_00001516": {
+        "Name": "BAUNT",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00001518": {
+        "Name": "CILDIR",
+        "admin_area": "Ardahan",
+        "country": "Turkey"
+    },
+    "_00001519": {
+        "Name": "DERG"
+    },
+    "_00001524": {
+        "Name": "GORDON-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001526": {
+        "Name": "ERNE_-Lower",
+        "admin_area": "Northern Ireland",
+        "country": "United Kingdom"
+    },
+    "_00001529": {
+        "Name": "TRASIMENO",
+        "admin_area": "Umbria",
+        "country": "Italy"
+    },
+    "_00001534": {
+        "Name": "DAWA-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001535": {
+        "Name": "GRANDE-DO-CURUAI-(northern-part-of)",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00001537": {
+        "Name": "VICTORIA",
+        "admin_area": "New South Wales",
+        "country": "Australia"
+    },
+    "_00001540": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00001547": {
+        "Name": "CREAN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001551": {
+        "Name": "CHUKOCHYE",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00001555": {
+        "Name": "INDAWGYI-Natural-Lake",
+        "admin_area": "Kachin",
+        "country": "Myanmar (Burma)"
+    },
+    "_00001557": {
+        "Name": "GASI-KULE-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00001560": {
+        "Name": "REI_-Lago-do",
+        "admin_area": "Amazonas",
+        "country": "Brazil"
+    },
+    "_00001567": {
+        "Name": "CHOKE-CANYON-Reservoir",
+        "admin_area": "Texas",
+        "country": "United States"
+    },
+    "_00001569": {
+        "Name": "NIDILI",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00001573": {
+        "Name": "UNARBA-2-ya"
+    },
+    "_00001576": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00001582": {
+        "Name": "NIGHT-HAWK-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001583": {
+        "Name": "CALAFQUÉN",
+        "admin_area": "IX Región",
+        "country": "Chile"
+    },
+    "_00001584": {
+        "Name": "AFRERA",
+        "admin_area": "Afar",
+        "country": "Ethiopia"
+    },
+    "_00001594": {
+        "Name": "SUGGI-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001596": {
+        "Name": "BOLSENA",
+        "admin_area": "Lazio",
+        "country": "Italy"
+    },
+    "_00001597": {
+        "Name": "YANGCHENG-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00001608": {
+        "Name": "KIRPILSKIY_-BOLSHOY-ORLINYY_-ZOLOTOY_-et-al.",
+        "admin_area": "Krasnodarskiy kray",
+        "country": "Russia"
+    },
+    "_00001609": {
+        "Name": "UYALY",
+        "admin_area": "Almaty Province",
+        "country": "Kazakhstan"
+    },
+    "_00001613": {
+        "Name": "KEPPETEKH"
+    },
+    "_00001616": {
+        "Name": "POELELA",
+        "admin_area": "Inhambane",
+        "country": "Mozambique"
+    },
+    "_00001618": {
+        "Name": "MIYUN-Reservoir",
+        "admin_area": "Beijing Shi",
+        "country": "China"
+    },
+    "_00001619": {
+        "Name": "CHEM-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001623": {
+        "Name": "WILLIAM-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001627": {
+        "Name": "AZUEI",
+        "admin_area": "Lwès",
+        "country": "Haiti"
+    },
+    "_00001629": {
+        "Name": "BULMER-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00001632": {
+        "Name": "NARVSKOYE-VODOKHRANILISHCHE"
+    },
+    "_00001640": {
+        "Name": "DAVY-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001649": {
+        "Name": "MÜRITZ",
+        "admin_area": "Mecklenburg-Vorpommern",
+        "country": "Germany"
+    },
+    "_00001652": {
+        "Name": "DAGGYAI-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001653": {
+        "Name": "XIAOHAIZI-Reservoir",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00001656": {
+        "Name": "ZZZZ",
+        "admin_area": "Rio Grande do Sul",
+        "country": "Brazil"
+    },
+    "_00001658": {
+        "Name": "DONGPING-Lake",
+        "admin_area": "Shandong Sheng",
+        "country": "China"
+    },
+    "_00001659": {
+        "Name": "NAIVASHA",
+        "admin_area": "Nakuru County",
+        "country": "Kenya"
+    },
+    "_00001666": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00001676": {
+        "Name": "EGG-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001684": {
+        "Name": "SUQIAN-Lake",
+        "admin_area": "Gansu Sheng",
+        "country": "China"
+    },
+    "_00001703": {
+        "Name": "KISTIGAN-Lake"
+    },
+    "_00001706": {
+        "Name": "ROCKY-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001714": {
+        "Name": "POYGAN"
+    },
+    "_00001726": {
+        "Name": "TEREWAH_NARRAN-Lake",
+        "admin_area": "New South Wales",
+        "country": "Australia"
+    },
+    "_00001730": {
+        "Name": "RINGCO-KONGMA",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001734": {
+        "Name": "OMUK-KYUEL'",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00001735": {
+        "Name": "MALARTIC"
+    },
+    "_00001740": {
+        "Name": "MARFIL",
+        "admin_area": "Mato Grosso",
+        "country": "Brazil"
+    },
+    "_00001745": {
+        "Name": "SKILAK-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00001748": {
+        "Name": "ALMANOR",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00001749": {
+        "Name": "POZUELO_-Laguna-de",
+        "admin_area": "Jujuy",
+        "country": "Argentina"
+    },
+    "_00001752": {
+        "Name": "PARANAPITINGA_-POCÃO-GRANDE_-Lago-do",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00001756": {
+        "Name": "GREAT-SACANDAGA-Lake",
+        "admin_area": "New York",
+        "country": "United States"
+    },
+    "_00001761": {
+        "Name": "CASCADE",
+        "admin_area": "Idaho",
+        "country": "United States"
+    },
+    "_00001771": {
+        "Name": "RWERU",
+        "admin_area": "Eastern Province",
+        "country": "Rwanda"
+    },
+    "_00001774": {
+        "Name": "KABELE",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00001785": {
+        "Name": "EAST-TAIJI-NAI'ER-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00001787": {
+        "Name": "BOLSHOYE-EROVNOYE",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00001789": {
+        "Name": "DENGIZKUL",
+        "admin_area": "Buxoro Viloyati",
+        "country": "Uzbekistan"
+    },
+    "_00001790": {
+        "Name": "YAGGAIN-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001793": {
+        "Name": "SHALKAR-EGAKARA",
+        "admin_area": "Orenburgskaya oblast'",
+        "country": "Russia"
+    },
+    "_00001801": {
+        "Name": "KABWE",
+        "admin_area": "Katanga",
+        "country": "Democratic Republic of the Congo"
+    },
+    "_00001802": {
+        "Name": "SAN-PEDRO",
+        "admin_area": "Santa Fe",
+        "country": "Argentina"
+    },
+    "_00001806": {
+        "Name": "ARU-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001807": {
+        "Name": "JIEZE-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001812": {
+        "Name": "TAIYANG-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00001815": {
+        "Name": "LITTLE-SACHIGO-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001818": {
+        "Name": "MANITOU",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00001827": {
+        "Name": "LAGKOR-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001831": {
+        "Name": "GLAFSFJORDEN",
+        "admin_area": "Värmlands län",
+        "country": "Sweden"
+    },
+    "_00001832": {
+        "Name": "NORTH-WABASCA-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001835": {
+        "Name": "WEST-TAIJI-NAI'ER-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00001840": {
+        "Name": "ERCEK",
+        "admin_area": "Van",
+        "country": "Turkey"
+    },
+    "_00001841": {
+        "Name": "INAWASHIRO",
+        "admin_area": "Fukushima-ken",
+        "country": "Japan"
+    },
+    "_00001853": {
+        "Name": "MANDIORÉ",
+        "admin_area": "State of Mato Grosso do Sul",
+        "country": "Brazil"
+    },
+    "_00001869": {
+        "Name": "IHOTRY",
+        "admin_area": "Toliara Province",
+        "country": "Madagascar"
+    },
+    "_00001871": {
+        "Name": "LUNGMU-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001872": {
+        "Name": "ROGAGUA",
+        "admin_area": "Departamento del Beni",
+        "country": "Bolivia"
+    },
+    "_00001887": {
+        "Name": "ZZZZ",
+        "admin_area": "North Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00001891": {
+        "Name": "DOGAICORING-QANG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001893": {
+        "Name": "ROXEN",
+        "admin_area": "Östergötlands län",
+        "country": "Sweden"
+    },
+    "_00001902": {
+        "Name": "MANINJAU",
+        "admin_area": "Sumatera Barat",
+        "country": "Indonesia"
+    },
+    "_00001904": {
+        "Name": "ZZZZ",
+        "admin_area": "Kalimantan Timur",
+        "country": "Indonesia"
+    },
+    "_00001908": {
+        "Name": "SLED-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001910": {
+        "Name": "PIGEON-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00001913": {
+        "Name": "TRICHONIS_TRICHONIDA",
+        "country": "Greece"
+    },
+    "_00001917": {
+        "Name": "XIANGYANG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001928": {
+        "Name": "HEISHI-NORTH-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001941": {
+        "Name": "VALLI-DI-COMACCHIO",
+        "admin_area": "Emilia-Romagna",
+        "country": "Italy"
+    },
+    "_00001943": {
+        "Name": "CHIUTA",
+        "admin_area": "Niassa",
+        "country": "Mozambique"
+    },
+    "_00001945": {
+        "Name": "KEELEY-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00001951": {
+        "Name": "QUACHUNA-Lake",
+        "admin_area": "Beni Department",
+        "country": "Bolivia"
+    },
+    "_00001954": {
+        "Name": "ZZZZ",
+        "admin_area": "State of Mato Grosso",
+        "country": "Brazil"
+    },
+    "_00001955": {
+        "Name": "ACARÁ_-Lago-do",
+        "admin_area": "State of Amazonas",
+        "country": "Brazil"
+    },
+    "_00001958": {
+        "Name": "ARGAZI-Reservoir",
+        "admin_area": "Chelyabinskaya oblast'",
+        "country": "Russia"
+    },
+    "_00001967": {
+        "Name": "BUROG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00001969": {
+        "Name": "AQKOL",
+        "admin_area": "Kostanay Region",
+        "country": "Kazakhstan"
+    },
+    "_00001970": {
+        "Name": "MUGQU-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001971": {
+        "Name": "GOMANG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00001975": {
+        "Name": "EPECUÉN",
+        "admin_area": "Buenos Aires",
+        "country": "Argentina"
+    },
+    "_00001979": {
+        "Name": "ZHANGDU-Lake",
+        "admin_area": "Hubei Sheng",
+        "country": "China"
+    },
+    "_00001984": {
+        "Name": "UNDEN",
+        "admin_area": "Örebro län",
+        "country": "Sweden"
+    },
+    "_00001989": {
+        "Name": "DOG-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00001993": {
+        "Name": "XIASHAN-Reservoir",
+        "admin_area": "Shandong Sheng",
+        "country": "China"
+    },
+    "_00001997": {
+        "Name": "SYRKOVOYE",
+        "admin_area": "Khanty-Mansiyskiy avtonomnyy okrug",
+        "country": "Russia"
+    },
+    "_00002012": {
+        "Name": "PUEBLO-VIEJO",
+        "admin_area": "Veracruz",
+        "country": "Mexico"
+    },
+    "_00002015": {
+        "Name": "BARROS_-Lagoa-dos",
+        "admin_area": "Rio Grande do Sul",
+        "country": "Brazil"
+    },
+    "_00002018": {
+        "Name": "YUELIANG-Lake",
+        "admin_area": "Jilin Sheng",
+        "country": "China"
+    },
+    "_00002019": {
+        "Name": "TURSUNSKIY-TUMAN",
+        "admin_area": "Khanty-Mansi Autonomous Okrug",
+        "country": "Russia"
+    },
+    "_00002021": {
+        "Name": "LAWFORD-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002027": {
+        "Name": "KOSTROMSKOYE",
+        "admin_area": "Yaroslavskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002032": {
+        "Name": "EAGLE-Lake",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00002048": {
+        "Name": "LINGGO-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002054": {
+        "Name": "VUOHIJÄRVI",
+        "country": "Finland"
+    },
+    "_00002057": {
+        "Name": "ZZZZ",
+        "admin_area": "Pavlodar Province",
+        "country": "Kazakhstan"
+    },
+    "_00002064": {
+        "Name": "KAWEENAKUMIK-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002073": {
+        "Name": "SARMIENTO-Lake",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00002085": {
+        "Name": "JINXI-Lake",
+        "admin_area": "Jiangxi Sheng",
+        "country": "China"
+    },
+    "_00002092": {
+        "Name": "CASTILLOS_-Laguna-de",
+        "admin_area": "Rocha",
+        "country": "Uruguay"
+    },
+    "_00002097": {
+        "Name": "PAKWASH-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00002099": {
+        "Name": "MONTE_-Laguna-del",
+        "admin_area": "Buenos Aires",
+        "country": "Argentina"
+    },
+    "_00002102": {
+        "Name": "MAWDESLEY-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002104": {
+        "Name": "DATONG-Lake",
+        "admin_area": "Hunan Sheng",
+        "country": "China"
+    },
+    "_00002107": {
+        "Name": "OROTKO",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002109": {
+        "Name": "JACQUES_-Lac-a",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002111": {
+        "Name": "CIENAGA-CHILLOA",
+        "admin_area": "Magdalena",
+        "country": "Colombia"
+    },
+    "_00002112": {
+        "Name": "ITARIM",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00002113": {
+        "Name": "TENIZ",
+        "admin_area": "Kostanay Region",
+        "country": "Kazakhstan"
+    },
+    "_00002116": {
+        "Name": "QAGOI-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00002117": {
+        "Name": "BIRCH-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002124": {
+        "Name": "AWASA",
+        "admin_area": "Oromia",
+        "country": "Ethiopia"
+    },
+    "_00002127": {
+        "Name": "HUOSHAOHEI_-TAHLAG_-YAMENQI_-AOBAO_-XIAOSHANG-Lakes",
+        "admin_area": "Heilongjiang Sheng",
+        "country": "China"
+    },
+    "_00002129": {
+        "Name": "KAHUL-Lake",
+        "admin_area": "Găgăuzia",
+        "country": "Moldova"
+    },
+    "_00002130": {
+        "Name": "TADENET-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002132": {
+        "Name": "SPRING-Lake",
+        "admin_area": "Illinois",
+        "country": "United States"
+    },
+    "_00002138": {
+        "Name": "QUEMO-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_0000213A": {
+        "Name": "PLAYGREEN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_0000213B": {
+        "Name": "LITTLE-PLAYGREEN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002148": {
+        "Name": "KISHI-QARAOY-KOLI",
+        "admin_area": "North Kazakhstan Province",
+        "country": "Kazakhstan"
+    },
+    "_00002156": {
+        "Name": "CHANGDANG-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00002157": {
+        "Name": "ATASTA",
+        "admin_area": "Campeche",
+        "country": "Mexico"
+    },
+    "_00002162": {
+        "Name": "GULL-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002167": {
+        "Name": "LUBĀNS",
+        "country": "Latvia"
+    },
+    "_00002168": {
+        "Name": "MILLWOOD-Lake",
+        "admin_area": "Arkansas",
+        "country": "United States"
+    },
+    "_00002179": {
+        "Name": "SEMMENS-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002186": {
+        "Name": "PINGVALLAVATN",
+        "country": "Iceland"
+    },
+    "_00002190": {
+        "Name": "CHILA_-Laguna-de",
+        "admin_area": "Veracruz",
+        "country": "Mexico"
+    },
+    "_00002192": {
+        "Name": "BUFFALO-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002199": {
+        "Name": "ZZZZ",
+        "admin_area": "Qeqqata Municipality",
+        "country": "Greenland"
+    },
+    "_00002201": {
+        "Name": "BILIKOL",
+        "admin_area": "Jambyl Province",
+        "country": "Kazakhstan"
+    },
+    "_00002202": {
+        "Name": "CAM-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002203": {
+        "Name": "SENGLI-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002226": {
+        "Name": "KHANSKOYE",
+        "admin_area": "Krasnodarskiy kray",
+        "country": "Russia"
+    },
+    "_00002228": {
+        "Name": "ZZZZ",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00002232": {
+        "Name": "MOKOAN",
+        "admin_area": "Victoria",
+        "country": "Australia"
+    },
+    "_00002238": {
+        "Name": "BARKOL",
+        "admin_area": "Xinjiang Weiwuerzizhiqu",
+        "country": "China"
+    },
+    "_00002239": {
+        "Name": "URYUM",
+        "admin_area": "Novosibirskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002243": {
+        "Name": "PARU",
+        "admin_area": "Pará",
+        "country": "Brazil"
+    },
+    "_00002245": {
+        "Name": "OAK-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002246": {
+        "Name": "ANOLGYTGYN",
+        "admin_area": "Kamchatka Krai",
+        "country": "Russia"
+    },
+    "_00002253": {
+        "Name": "CLEAR-LAKE-Reservoir",
+        "admin_area": "California",
+        "country": "United States"
+    },
+    "_00002259": {
+        "Name": "BARIL-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002262": {
+        "Name": "DEZADEASH-Lake",
+        "admin_area": "Yukon Territory",
+        "country": "Canada"
+    },
+    "_00002263": {
+        "Name": "KAZAN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002264": {
+        "Name": "KURILSKOYE",
+        "admin_area": "Kamchatka Krai",
+        "country": "Russia"
+    },
+    "_00002270": {
+        "Name": "BAYAN-Lake",
+        "admin_area": "Zavkhan",
+        "country": "Mongolia"
+    },
+    "_00002271": {
+        "Name": "KINKONY",
+        "admin_area": "Mahajanga Province",
+        "country": "Madagascar"
+    },
+    "_00002273": {
+        "Name": "CHONDUYA",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002276": {
+        "Name": "KOTCHO-Lake",
+        "admin_area": "British Columbia",
+        "country": "Canada"
+    },
+    "_00002280": {
+        "Name": "IBERÁ-WETLANDS-(part-of)",
+        "admin_area": "Corrientes Province",
+        "country": "Argentina"
+    },
+    "_00002285": {
+        "Name": "EBEYTY",
+        "admin_area": "Omskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002304": {
+        "Name": "YANGHU-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002305": {
+        "Name": "SALT-WATER-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002313": {
+        "Name": "IHEMA",
+        "admin_area": "Eastern Province",
+        "country": "Rwanda"
+    },
+    "_00002314": {
+        "Name": "KHUKH-Lake",
+        "admin_area": "Dornod",
+        "country": "Mongolia"
+    },
+    "_00002315": {
+        "Name": "BEIDAGANG-Reservoir",
+        "admin_area": "Tianjin Shi",
+        "country": "China"
+    },
+    "_00002316": {
+        "Name": "SUYAHU-Reservoir",
+        "admin_area": "Henan Sheng",
+        "country": "China"
+    },
+    "_00002317": {
+        "Name": "CHIEMSEE",
+        "admin_area": "Bayern",
+        "country": "Germany"
+    },
+    "_00002323": {
+        "Name": "PEERLESS-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002326": {
+        "Name": "CHIP-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002330": {
+        "Name": "HARGRAVE-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002331": {
+        "Name": "ANDREEVSKOYE",
+        "admin_area": "Tyumenskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002335": {
+        "Name": "BIRCH-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002336": {
+        "Name": "NORRA-DELLEN",
+        "admin_area": "Gävleborgs län",
+        "country": "Sweden"
+    },
+    "_00002345": {
+        "Name": "HOUGHTON-Lake",
+        "admin_area": "Michigan",
+        "country": "United States"
+    },
+    "_00002351": {
+        "Name": "COPP-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002358": {
+        "Name": "GLAN",
+        "admin_area": "Östergötlands län",
+        "country": "Sweden"
+    },
+    "_00002361": {
+        "Name": "MARGOG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002364": {
+        "Name": "ZZZZ",
+        "admin_area": "Wilaya de Béchar",
+        "country": "Algeria"
+    },
+    "_00002365": {
+        "Name": "HAWIZEH-MARSHES",
+        "admin_area": "Maysan Governorate",
+        "country": "Iraq"
+    },
+    "_00002367": {
+        "Name": "ASSEAN-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002368": {
+        "Name": "BIG-SANDY-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002369": {
+        "Name": "BLACK-Lake",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00002371": {
+        "Name": "BERING-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00002388": {
+        "Name": "BASKUNCHAK",
+        "admin_area": "Astrakhanskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002395": {
+        "Name": "CADDABASSA",
+        "admin_area": "Afar",
+        "country": "Ethiopia"
+    },
+    "_00002403": {
+        "Name": "BROOKS",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00002408": {
+        "Name": "ZZZZ"
+    },
+    "_00002415": {
+        "Name": "CUODA-RIMA",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00002418": {
+        "Name": "TURTLE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002420": {
+        "Name": "WATERHEN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002421": {
+        "Name": "CHITEK-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002425": {
+        "Name": "NARAČ",
+        "admin_area": "Minsk Region",
+        "country": "Belarus"
+    },
+    "_00002427": {
+        "Name": "FATI",
+        "admin_area": "Région de Tombouctou",
+        "country": "Mali"
+    },
+    "_00002436": {
+        "Name": "WEYAKWIN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002447": {
+        "Name": "MARGARET-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002470": {
+        "Name": "RICHARDSON-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002473": {
+        "Name": "STORSJÖN",
+        "admin_area": "Gävleborgs län",
+        "country": "Sweden"
+    },
+    "_00002475": {
+        "Name": "YUYE-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002477": {
+        "Name": "WELLESLEY-Lake",
+        "admin_area": "Yukon Territory",
+        "country": "Canada"
+    },
+    "_00002484": {
+        "Name": "CATEMACO",
+        "admin_area": "Veracruz",
+        "country": "Mexico"
+    },
+    "_00002485": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002495": {
+        "Name": "CLIVE-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002497": {
+        "Name": "LEUSHINSKIY-TUMAN",
+        "admin_area": "Khanty-Mansiyskiy avtonomnyy okrug",
+        "country": "Russia"
+    },
+    "_00002507": {
+        "Name": "ZZZZ",
+        "admin_area": "Karagandy Province",
+        "country": "Kazakhstan"
+    },
+    "_00002511": {
+        "Name": "MEIRIQIECUOMARI",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002516": {
+        "Name": "LOMOND",
+        "admin_area": "Scotland",
+        "country": "United Kingdom"
+    },
+    "_00002517": {
+        "Name": "GUANTING-Reservoir",
+        "admin_area": "Beijing Shi",
+        "country": "China"
+    },
+    "_00002518": {
+        "Name": "ZZZZ",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00002525": {
+        "Name": "FYORDOVOYE",
+        "admin_area": "Krasnoyarsk Krai",
+        "country": "Russia"
+    },
+    "_00002528": {
+        "Name": "CHUKOCHYE",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002532": {
+        "Name": "NISSUM-FJORD_-BØVLING-FJORD_-FELSTED-KOG",
+        "country": "Denmark"
+    },
+    "_00002535": {
+        "Name": "ULAKHAN-KYUEL'",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002540": {
+        "Name": "ZZZZ",
+        "country": "Greenland"
+    },
+    "_00002544": {
+        "Name": "LENORE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002547": {
+        "Name": "DAYAN-Lake",
+        "admin_area": "Bayan-Ulgii",
+        "country": "Mongolia"
+    },
+    "_00002550": {
+        "Name": "ZZZZ",
+        "admin_area": "Magdalena",
+        "country": "Colombia"
+    },
+    "_00002554": {
+        "Name": "ŁEBSKO-Lake",
+        "admin_area": "pomorskie",
+        "country": "Poland"
+    },
+    "_00002559": {
+        "Name": "LA-GAIBA-Lake",
+        "admin_area": "State of Mato Grosso do Sul",
+        "country": "Brazil"
+    },
+    "_00002560": {
+        "Name": "WITCHEKAN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002569": {
+        "Name": "SERBUG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00002594": {
+        "Name": "JACKFISH-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002595": {
+        "Name": "WASKESIU-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002611": {
+        "Name": "NERI-PUN-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00002613": {
+        "Name": "NYI",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002616": {
+        "Name": "HARRIS",
+        "admin_area": "Florida",
+        "country": "United States"
+    },
+    "_00002627": {
+        "Name": "IK",
+        "admin_area": "Omskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002649": {
+        "Name": "CHIHU-Lake",
+        "admin_area": "Jiangxi Sheng",
+        "country": "China"
+    },
+    "_00002655": {
+        "Name": "TETLIN-Lake",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00002663": {
+        "Name": "OIGON-Lake",
+        "admin_area": "Zavkhan",
+        "country": "Mongolia"
+    },
+    "_00002673": {
+        "Name": "WHITEMOUTH-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002682": {
+        "Name": "UVSIIN-KHAR-US-Lake",
+        "admin_area": "Uvs",
+        "country": "Mongolia"
+    },
+    "_00002693": {
+        "Name": "ILOPANGO_-Lago-de",
+        "admin_area": "San Salvador Department",
+        "country": "El Salvador"
+    },
+    "_00002695": {
+        "Name": "RUZHNIKOVA",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002696": {
+        "Name": "BOLSHOYE-YAROVOYE",
+        "admin_area": "Altayskiy kray",
+        "country": "Russia"
+    },
+    "_00002701": {
+        "Name": "DAXI-HAIZI-Reservoir"
+    },
+    "_00002709": {
+        "Name": "ARSENAULT-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002720": {
+        "Name": "GOMO-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002724": {
+        "Name": "LECHE_-Laguna-de-la",
+        "admin_area": "Ciego de Ávila",
+        "country": "Cuba"
+    },
+    "_00002725": {
+        "Name": "ZZZZ",
+        "admin_area": "Khabarovskiy kray",
+        "country": "Russia"
+    },
+    "_00002731": {
+        "Name": "MURIEL-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002750": {
+        "Name": "SUTURUAKA",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00002762": {
+        "Name": "CORONDA",
+        "admin_area": "Santa Fe",
+        "country": "Argentina"
+    },
+    "_00002779": {
+        "Name": "ZZZZ",
+        "admin_area": "Bolívar",
+        "country": "Colombia"
+    },
+    "_00002786": {
+        "Name": "ZZZZ",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00002798": {
+        "Name": "RUNN",
+        "admin_area": "Dalarnas län",
+        "country": "Sweden"
+    },
+    "_00002799": {
+        "Name": "PHELPS-Lake",
+        "admin_area": "North Carolina",
+        "country": "United States"
+    },
+    "_00002803": {
+        "Name": "KOTLABUKH-Lake",
+        "admin_area": "Odessa Oblast",
+        "country": "Ukraine"
+    },
+    "_00002809": {
+        "Name": "SIMPSON-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002812": {
+        "Name": "POTHOLES-Reservoir",
+        "admin_area": "Washington",
+        "country": "United States"
+    },
+    "_00002819": {
+        "Name": "TELASHI-Lake",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00002839": {
+        "Name": "SHAOBO-Lake",
+        "admin_area": "Jiangsu Sheng",
+        "country": "China"
+    },
+    "_00002877": {
+        "Name": "MARGAI-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00002881": {
+        "Name": "ZZZZ",
+        "admin_area": "Qinghai",
+        "country": "China"
+    },
+    "_00002898": {
+        "Name": "GRENADA-Lake",
+        "admin_area": "Mississippi",
+        "country": "United States"
+    },
+    "_00002907": {
+        "Name": "PARINACOCHAS",
+        "admin_area": "Ayacucho",
+        "country": "Peru"
+    },
+    "_00002923": {
+        "Name": "MANCHAR-Lake",
+        "admin_area": "Sindh",
+        "country": "Pakistan"
+    },
+    "_00002926": {
+        "Name": "ORON",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00002927": {
+        "Name": "VARANO_-Lago-di",
+        "admin_area": "Puglia",
+        "country": "Italy"
+    },
+    "_00002940": {
+        "Name": "TUMAN",
+        "admin_area": "Khanty-Mansiyskiy avtonomnyy okrug",
+        "country": "Russia"
+    },
+    "_00002944": {
+        "Name": "REDBERRY-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00002946": {
+        "Name": "NGOIN",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00002955": {
+        "Name": "UVILDY",
+        "admin_area": "Chelyabinskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002960": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00002961": {
+        "Name": "KURCHANSKIY",
+        "admin_area": "Krasnodarskiy kray",
+        "country": "Russia"
+    },
+    "_00002965": {
+        "Name": "MANDJE",
+        "admin_area": "Nyanga",
+        "country": "Gabon"
+    },
+    "_00002970": {
+        "Name": "NEWELL",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00002974": {
+        "Name": "KELSEY-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00002978": {
+        "Name": "BURT-Lake",
+        "admin_area": "Michigan",
+        "country": "United States"
+    },
+    "_00002985": {
+        "Name": "ZHIZHITSKOYE",
+        "admin_area": "Pskovskaya oblast'",
+        "country": "Russia"
+    },
+    "_00002988": {
+        "Name": "ALLEMANDS_-Lac-des",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00003002": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00003007": {
+        "Name": "CIENAGA-DE-AYAPEL",
+        "admin_area": "Córdoba",
+        "country": "Colombia"
+    },
+    "_00003020": {
+        "Name": "KELUKE-Lake",
+        "admin_area": "Qinghai Sheng",
+        "country": "China"
+    },
+    "_00003025": {
+        "Name": "HOURTIN_-Lac-d'",
+        "admin_area": "Aquitaine-Limousin-Poitou-Charentes",
+        "country": "France"
+    },
+    "_00003040": {
+        "Name": "ZZZZ",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00003044": {
+        "Name": "YIBUG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00003045": {
+        "Name": "XUEJING-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003053": {
+        "Name": "LAS-SALINAS",
+        "admin_area": "Arequipa",
+        "country": "Peru"
+    },
+    "_00003078": {
+        "Name": "NGOINYAR-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00003079": {
+        "Name": "GARSON-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00003097": {
+        "Name": "VYSHNEVOLOTSKOYE",
+        "admin_area": "Tverskaya oblast'",
+        "country": "Russia"
+    },
+    "_00003109": {
+        "Name": "EBRO-Reservoir",
+        "admin_area": "Cantabria",
+        "country": "Spain"
+    },
+    "_00003111": {
+        "Name": "LUOTUO-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003114": {
+        "Name": "NESS",
+        "admin_area": "Scotland",
+        "country": "United Kingdom"
+    },
+    "_00003129": {
+        "Name": "ROREY-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00003132": {
+        "Name": "ZZZZ",
+        "admin_area": "Magdalena",
+        "country": "Colombia"
+    },
+    "_00003133": {
+        "Name": "KILEKALE-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00003135": {
+        "Name": "WUSKWATIM-Lake",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00003150": {
+        "Name": "ZZZZ",
+        "admin_area": "Región de Magallanes y de la Antártica Chilena",
+        "country": "Chile"
+    },
+    "_00003156": {
+        "Name": "YURBA-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003171": {
+        "Name": "MARRYAT-Inlet",
+        "admin_area": "Alaska",
+        "country": "United States"
+    },
+    "_00003173": {
+        "Name": "BALYMA",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00003188": {
+        "Name": "STE.-ANNE",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00003189": {
+        "Name": "GEORGE",
+        "admin_area": "South Australia",
+        "country": "Australia"
+    },
+    "_00003191": {
+        "Name": "TOWADA",
+        "admin_area": "Aomori-ken",
+        "country": "Japan"
+    },
+    "_00003196": {
+        "Name": "CAZAUX-ET-DE-SANGUINET_-ÉTANG-DE",
+        "admin_area": "Aquitaine-Limousin-Poitou-Charentes",
+        "country": "France"
+    },
+    "_00003200": {
+        "Name": "TALIMARDZHAN-Reservoir",
+        "admin_area": "Qashqadaryo Viloyati",
+        "country": "Uzbekistan"
+    },
+    "_00003201": {
+        "Name": "ROLA-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003203": {
+        "Name": "TALAHONG_-DELONG_-YANGCAOHAO-Lakes"
+    },
+    "_00003208": {
+        "Name": "ZZZZ",
+        "admin_area": "Talysh",
+        "country": "Azerbaijan"
+    },
+    "_00003211": {
+        "Name": "ZZZZ",
+        "admin_area": "Qaasuitsup Municipality",
+        "country": "Greenland"
+    },
+    "_00003218": {
+        "Name": "MELINCUÉ-Lake",
+        "admin_area": "Santa Fe",
+        "country": "Argentina"
+    },
+    "_00003219": {
+        "Name": "ZZZZ",
+        "admin_area": "Qeqqata Municipality",
+        "country": "Greenland"
+    },
+    "_00003231": {
+        "Name": "FROG-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00003238": {
+        "Name": "VERRET",
+        "admin_area": "Louisiana",
+        "country": "United States"
+    },
+    "_00003243": {
+        "Name": "KINGSMERE-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00003258": {
+        "Name": "BUGUNSKOYE-WATER-Reservoir",
+        "admin_area": "South Kazakhstan Region",
+        "country": "Kazakhstan"
+    },
+    "_00003268": {
+        "Name": "KORIENTZE",
+        "admin_area": "Région de Mopti",
+        "country": "Mali"
+    },
+    "_00003276": {
+        "Name": "MALOYE-EROVNOYE",
+        "admin_area": "Buryatiya Republits",
+        "country": "Russia"
+    },
+    "_00003281": {
+        "Name": "ORSASJÖN_ORSA-Lake",
+        "admin_area": "Dalarnas län",
+        "country": "Sweden"
+    },
+    "_00003307": {
+        "Name": "BRACCIANO",
+        "admin_area": "Lazio",
+        "country": "Italy"
+    },
+    "_00003309": {
+        "Name": "KYTAI-Lake",
+        "admin_area": "Odessa Oblast",
+        "country": "Ukraine"
+    },
+    "_00003312": {
+        "Name": "KUBUY",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00003343": {
+        "Name": "PONGYIN-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00003347": {
+        "Name": "DUVANKUL'",
+        "admin_area": "Chelyabinskaya oblast'",
+        "country": "Russia"
+    },
+    "_00003350": {
+        "Name": "DABIE",
+        "admin_area": "Województwo zachodniopomorskie",
+        "country": "Poland"
+    },
+    "_00003365": {
+        "Name": "ARAKHLEY",
+        "admin_area": "Zabaykalskiy kray",
+        "country": "Russia"
+    },
+    "_00003373": {
+        "Name": "ASSAL",
+        "admin_area": "Tadjourah",
+        "country": "Djibouti"
+    },
+    "_00003379": {
+        "Name": "RAZNAS",
+        "country": "Latvia"
+    },
+    "_00003392": {
+        "Name": "MAGISS-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00003394": {
+        "Name": "DANGQIONG-Lake",
+        "admin_area": "Xizang Zizhiqu",
+        "country": "China"
+    },
+    "_00003397": {
+        "Name": "MONTIGNY_-Lac-de",
+        "admin_area": "Québec",
+        "country": "Canada"
+    },
+    "_00003398": {
+        "Name": "DYRYN-EBE",
+        "admin_area": "Sakha Republic",
+        "country": "Russia"
+    },
+    "_00003421": {
+        "Name": "ZZZZ",
+        "admin_area": "Kostanay Region",
+        "country": "Kazakhstan"
+    },
+    "_00003446": {
+        "Name": "RUFUS-Lake",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00003471": {
+        "Name": "ZZZZ",
+        "admin_area": "Santa Fe",
+        "country": "Argentina"
+    },
+    "_00003476": {
+        "Name": "SHITOU-KOUMEN-Reservoir",
+        "admin_area": "Jilin Sheng",
+        "country": "China"
+    },
+    "_00003478": {
+        "Name": "SORELL",
+        "admin_area": "Tasmania",
+        "country": "Australia"
+    },
+    "_00003493": {
+        "Name": "CRATER-Lake",
+        "admin_area": "Oregon",
+        "country": "United States"
+    },
+    "_00003500": {
+        "Name": "MARALDY",
+        "admin_area": "Pavlodar Province",
+        "country": "Kazakhstan"
+    },
+    "_00003523": {
+        "Name": "WABIMEIG-Lake",
+        "admin_area": "Ontario",
+        "country": "Canada"
+    },
+    "_00003529": {
+        "Name": "ZZZZ",
+        "admin_area": "Northwest Territories",
+        "country": "Canada"
+    },
+    "_00003534": {
+        "Name": "GARKUNG-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003539": {
+        "Name": "BAIDOI-Lake",
+        "admin_area": "Tibet",
+        "country": "China"
+    },
+    "_00003570": {
+        "Name": "COLEN-Lakes-(western-part-of)",
+        "admin_area": "Manitoba",
+        "country": "Canada"
+    },
+    "_00003587": {
+        "Name": "CARDINAL-Lake",
+        "admin_area": "Alberta",
+        "country": "Canada"
+    },
+    "_00003604": {
+        "Name": "BASIN-Lake",
+        "admin_area": "Saskatchewan",
+        "country": "Canada"
+    },
+    "_00003607": {
+        "Name": "BORAPHET",
+        "admin_area": "Chang Wat Nakhon Sawan",
+        "country": "Thailand"
+    },
+    "_00003614": {
+        "Name": "VENUSTIANO-CARRANZA",
+        "admin_area": "Coahuila de Zaragoza",
+        "country": "Mexico"
+    },
+    "_00004292": {
+        "Name": "BRATEŞ",
+        "admin_area": "Județul Galați",
+        "country": "Romania"
+    },
+    "_00004503": {
+        "Name": "MENDOTA",
+        "admin_area": "Wisconsin",
+        "country": "United States"
+    },
+    "_00005506": {
+        "Name": "GREAT-POND",
+        "admin_area": "Maine",
+        "country": "United States"
+    },
+    "_00006785": {
+        "Name": "ERKEN",
+        "admin_area": "Stockholms län",
+        "country": "Sweden"
+    },
+    "_00006786": {
+        "Name": "TAY",
+        "admin_area": "Scotland",
+        "country": "United Kingdom"
+    },
+    "_00007889": {
+        "Name": "MELVIN",
+        "admin_area": "County Leitrim",
+        "country": "Ireland"
+    },
+    "_00008089": {
+        "Name": "BADABAG",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00009168": {
+        "Name": "DRANOV",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00009322": {
+        "Name": "SUNAPEE",
+        "admin_area": "New Hampshire",
+        "country": "United States"
+    },
+    "_00011740": {
+        "Name": "WINDERMERE",
+        "admin_area": "England",
+        "country": "United Kingdom"
+    },
+    "_00012262": {
+        "Name": "LEVEN",
+        "admin_area": "Scotland",
+        "country": "United Kingdom"
+    },
+    "_00012471": {
+        "Name": "TROUT-lake",
+        "admin_area": "Wisconsin",
+        "country": "United States"
+    },
+    "_00012943": {
+        "Name": "KATRINE",
+        "admin_area": "Scotland",
+        "country": "United Kingdom"
+    },
+    "_00013377": {
+        "Name": "DOUGLAS-Lake",
+        "admin_area": "Michigan",
+        "country": "United States"
+    },
+    "_00013916": {
+        "Name": "GORGOVA",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00015309": {
+        "Name": "ROŞU",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00016662": {
+        "Name": "JIJILA",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00016814": {
+        "Name": "LUMINA",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00017329": {
+        "Name": "MERHEI",
+        "admin_area": "Odessa Oblast",
+        "country": "Ukraine"
+    },
+    "_00163748": {
+        "Name": "BASSENTHWAITE",
+        "admin_area": "England",
+        "country": "United Kingdom"
+    },
+    "_00164293": {
+        "Name": "ULLSWATER",
+        "admin_area": "England",
+        "country": "United Kingdom"
+    },
+    "_00164384": {
+        "Name": "DERWENT-Water",
+        "admin_area": "England",
+        "country": "United Kingdom"
+    },
+    "_00208447": {
+        "Name": "MATITA",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00208662": {
+        "Name": "FORTUNA",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00208962": {
+        "Name": "ISAC",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00209099": {
+        "Name": "PUIU",
+        "admin_area": "Județul Tulcea",
+        "country": "Romania"
+    },
+    "_00211002": {
+        "Name": "AUBURN",
+        "admin_area": "Maine",
+        "country": "United States"
+    },
+    "_00213513": {
+        "Name": "SANABRIA",
+        "admin_area": "Castilla y León",
+        "country": "Spain"
+    },
+    "_GLBL00000001": {
+        "Name": "001_CURONIAN",
+        "admin_area": "Klaipėdos apskritis",
+        "country": "Lithuania"
+    },
+    "_GLBL00000002": {
+        "Name": "002_KATI-THANDA-LAKE-EYRE",
+        "admin_area": "South Australia",
+        "country": "Australia"
+    }
+}

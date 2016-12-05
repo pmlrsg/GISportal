@@ -1,0 +1,1607 @@
+{
+    "server": {
+        "Layers": [
+            {
+                "Name": "fub_cdom_mean",
+                "Title": "Cdom Absorption (443 Nm) (fub-wew)",
+                "tags": {
+                    "indicator_type": [
+                        "acdom",
+                        "cdom",
+                        "fub"
+                    ],
+                    "niceName": "CDOM absorption (443 nm) (FUB-Wew)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean absorption coefficient at 443 nm of yellow substance obtained using the FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_conc_chl_merged_mean",
+                "Title": "Chlorophyll a (coastcolour)",
+                "tags": {
+                    "indicator_type": [
+                        "coastcolour",
+                        "cc",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (CoastColour)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_gons05_chl_mean",
+                "Title": "Chlorophyll a (coastcolour, Gons Et Al. 2005)",
+                "tags": {
+                    "indicator_type": [
+                        "coastcolour",
+                        "cc",
+                        "gons05",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (CoastColour, Gons et al. 2005)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to CoastColour atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "fub_chl_mean",
+                "Title": "Chlorophyll a (fub-wew)",
+                "tags": {
+                    "indicator_type": [
+                        "fub",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (FUB-WeW)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a obtained from FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "megs_gons05_chl_mean",
+                "Title": "Chlorophyll a (megs Ac, Gons Et Al. 2005)",
+                "tags": {
+                    "indicator_type": [
+                        "megs",
+                        "gons05",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (MEGS AC, Gons et al. 2005)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to MEGS8_1 atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_chl_mean",
+                "Title": "Chlorophyll a (mph)",
+                "tags": {
+                    "indicator_type": [
+                        "mph",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (MPH)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "scapem_gons05_chl_mean",
+                "Title": "Chlorophyll a (scape-m Ac, Gons Et Al. 2005)",
+                "tags": {
+                    "indicator_type": [
+                        "scape-m",
+                        "gons05",
+                        "chl",
+                        "chlorophyll"
+                    ],
+                    "niceName": "Chlorophyll a (SCAPE-M AC, Gons et al. 2005)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to SCAPE-M atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "L1_FLH_mean",
+                "Title": "Chlorophyll a Fluorescence Line Height",
+                "tags": {
+                    "indicator_type": [
+                        "flh",
+                        "l1"
+                    ],
+                    "niceName": "Chlorophyll a Fluorescence Line Height",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean fluorescence line height around 681 nm obtained from top-of-atmosphere radiance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_floating_cyanobacteria_mean",
+                "Title": "Floating Cyanobacteria (mean)",
+                "tags": {
+                    "indicator_type": [
+                        "mph",
+                        "cyanobacteria",
+                        "flag"
+                    ],
+                    "niceName": "Floating Cyanobacteria (Mean)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "presence of floating cyanobacteria as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_floating_cyanobacteria_sigma",
+                "Title": "Floating Cyanobacteria (stdev)",
+                "tags": {
+                    "niceName": "Floating Cyanobacteria (Stdev)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "stdev of presence of floating cyanobacteria as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_floating_vegetation_mean",
+                "Title": "Floating Vegetation",
+                "tags": {
+                    "indicator_type": [
+                        "mph",
+                        "vegetation",
+                        "flag"
+                    ],
+                    "niceName": "Floating Vegetation",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "presence of floating vegetation as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_floating_vegetation_sigma",
+                "Title": "Fraction of Number of Observations with Floating Vegetation in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Fraction of Number of Observations with Floating Vegetation in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "stdev of presence of floating vegetation as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_immersed_cyanobacteria_sigma",
+                "Title": "Fraction of Number of Observations with Immersed Cyanobacteria in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Fraction of Number of Observations with Immersed Cyanobacteria in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "stdev of presence of immersed cyanobacteria as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_immersed_cyanobacteria_mean",
+                "Title": "Immersed Cyanobacteria",
+                "tags": {
+                    "indicator_type": [
+                        "cyanobacteria",
+                        "mph",
+                        "flag"
+                    ],
+                    "niceName": "Immersed Cyanobacteria",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "presence of immersed cyanobacteria as fraction of the total number of observations of a pixel obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_Kd_490_mean",
+                "Title": "Kd(490) (coastcolour)",
+                "tags": {
+                    "indicator_type": [
+                        "kd",
+                        "kd490",
+                        "cc",
+                        "coastcolour"
+                    ],
+                    "niceName": "Kd(490) (CoastColour)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean vertical diffuse attenuation at 490 nm obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_conc_chl_merged_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of chlorophyll-a obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_gons05_chl_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to CoastColour atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "megs_gons05_chl_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to MEGS8_1 atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "scapem_gons05_chl_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of chlorophyll-a derived using the Gons et al (2005) algorithm applied to SCAPE-M atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "mph_chl_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of chlorophyll-a obtained from Maximum Peak Height processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "fub_chl_sigma",
+                "Title": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Chlorophyll a in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev concentration of chlorophyll-a obtained from FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "megs_simis05_phycocyanin_sigma",
+                "Title": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of phycocyanin derived using the Simis et al (2005",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_simis05_phycocyanin_sigma",
+                "Title": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of phycocyanin derived using the Simis et al (2005",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "scapem_simis05_phycocyanin_sigma",
+                "Title": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Phycocyanin in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of phycocyanin derived using the Simis et al (2005",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "fub_total_susp_sigma",
+                "Title": "Mass Concentration of Suspended Matter in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Suspended Matter in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of total suspended matter obtained using the FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_tsm_sigma",
+                "Title": "Mass Concentration of Suspended Matter in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Mass Concentration of Suspended Matter in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of concentration of total suspended matter obtained using the CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_Z90_max_mean",
+                "Title": "Maximum Penetration Depth of Sunlight (coastcolour)",
+                "tags": {
+                    "indicator_type": [
+                        "zmax",
+                        "cc",
+                        "coastcolour"
+                    ],
+                    "niceName": "Maximum Penetration Depth of Sunlight (CoastColour)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean maximum depth of sunlight penetration irrespective of wavelength obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_Z90_max_sigma",
+                "Title": "Maximum Penetration Depth of Sunlight in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Maximum Penetration Depth of Sunlight in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean maximum depth of sunlight penetration irrespective of wavelength obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "num_obs",
+                "Title": "Number of Observations",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Number of Observations",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of observations of the pixel area",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "num_passes",
+                "Title": "Number of Observations",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Number of Observations",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of satellite passes over the pixel area",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "stats_cloud_sum",
+                "Title": "Number of Observations of Cloud Affecting Pixel of Water Body Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Number of Observations of Cloud Affecting Pixel of Water Body Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of observations where the pixel was affected by cloud or cloud effects obtained from Idepix processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "stats_ice_snow_sum",
+                "Title": "Number of Observations of Ice or Snow Presence in Water Body Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Number of Observations of Ice or Snow Presence in Water Body Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of observations where the pixel was affected by ice or snow obtained from Idepix processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "stats_land_sum",
+                "Title": "Number of Observations of Land in Pixel of Water Body Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Number of Observations of Land in Pixel of Water Body Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of observations where the pixel was affected by land-like properties obtained from Idepix processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "owt_cc_dominant_class_mode",
+                "Title": "Optical Water Type in Water Body Dominant Class Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Optical Water Type in Water Body Dominant Class Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "optical water type most frequently observed for the pixel within the aggregation period obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "scapem_simis05_phycocyanin_mean",
+                "Title": "Phycocyanin",
+                "tags": {
+                    "indicator_type": [
+                        "pc",
+                        "phycocyanin"
+                    ],
+                    "niceName": "Phycocyanin",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of phycocyanin derived using the Simis et al. (2005) algorithm applied to ??? atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "megs_simis05_phycocyanin_mean",
+                "Title": "Phycocyanin",
+                "tags": {
+                    "indicator_type": [
+                        "pc",
+                        "phycocyanin"
+                    ],
+                    "niceName": "Phycocyanin",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of phycocyanin derived using the Simis et al. (2005) algorithm applied to ??? atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_simis05_phycocyanin_mean",
+                "Title": "Phycocyanin",
+                "tags": {
+                    "indicator_type": [
+                        "pc",
+                        "phycocyanin"
+                    ],
+                    "niceName": "Phycocyanin",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of phycocyanin derived using the Simis et al. (2005) algorithm applied to ??? atmospherically corrected reflectance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "blue",
+                "Title": "Reflectance in Blue Region in Water Body Mean Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Reflectance in Blue Region in Water Body Mean Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean blue reflectance obtained from MERIS tristimulus RGB model applied to MEGS8_1 reflectance bands",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "green",
+                "Title": "Reflectance in Green Region in Water Body Mean Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Reflectance in Green Region in Water Body Mean Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean blue reflectance obtained from MERIS tristimulus RGB model applied to MEGS8_1 reflectance bands",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "red",
+                "Title": "Reflectance in Red Region in Water Body Mean Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Reflectance in Red Region in Water Body Mean Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean blue reflectance obtained from MERIS tristimulus RGB model applied to MEGS8_1 reflectance bands",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "shallow",
+                "Title": "Shallow Area",
+                "tags": {
+                    "indicator_type": [
+                        "shallow"
+                    ],
+                    "niceName": "Shallow Area",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "shallow area in water body determined from inspecting change in the shallow_ratio_490 product over at least one summer",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "L1_FLH_sigma",
+                "Title": "Toa Chlorophyll a Fluorescence Line Height in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Toa Chlorophyll a Fluorescence Line Height in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of fluorescence line height around 681 nm obtained from top-of-atmosphere radiance",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "stats_invalid_sum",
+                "Title": "Toa Number of Observations of Invalid Pixel in Water Body Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Toa Number of Observations of Invalid Pixel in Water Body Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "number of observations where the pixel was flagged as invalid in top-of-atmosphere product",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "ratio490_mean",
+                "Title": "Toa Radiance Ratio of Water Body Mean Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Toa Radiance Ratio of Water Body Mean Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean value of the TOA radiance ratio Band3*Band7/Band5^2 used to generate shallow water mask",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_tsm_mean",
+                "Title": "Total Suspended Matter (coastcolour)",
+                "tags": {
+                    "indicator_type": [
+                        "cc",
+                        "coastcolour",
+                        "tsm"
+                    ],
+                    "niceName": "Total Suspended Matter (CoastColour)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of total suspended matter obtained using the CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "fub_total_susp_mean",
+                "Title": "Total Suspended Matter (fub-wew)",
+                "tags": {
+                    "indicator_type": [
+                        "fub",
+                        "tsm"
+                    ],
+                    "niceName": "Total Suspended Matter (FUB-WeW)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean concentration of total suspended matter obtained using the FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_turbidity_mean",
+                "Title": "Turbidity (coastcolour)",
+                "tags": {
+                    "indicator_type": [
+                        "turbidity",
+                        "cc",
+                        "coastcolour"
+                    ],
+                    "niceName": "Turbidity (CoastColour)",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-mean turbidity obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": true,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_turbidity_sigma",
+                "Title": "Turbidity in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Turbidity in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev turbidity obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "fub_cdom_sigma",
+                "Title": "Volume Absorption Coefficient of Radiative Flux in Water Body Due to Dissolved Organic Matter Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Volume Absorption Coefficient of Radiative Flux in Water Body Due to Dissolved Organic Matter Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of absorption coefficient at 443 nm of yellow substance obtained using the FUB-WeW processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            },
+            {
+                "Name": "cc_Kd_490_sigma",
+                "Title": "Volume Attenuation Coefficient of Downwelling Radiative Flux in Water Body Stdev Within Aggregation Period",
+                "tags": {
+                    "indicator_type": [
+                        "balaton"
+                    ],
+                    "niceName": "Volume Attenuation Coefficient of Downwelling Radiative Flux in Water Body Stdev Within Aggregation Period",
+                    "data_provider": "Plymouth Marine Laboratory",
+                    "interval": "Daily"
+                },
+                "Abstract": "pixel-stdev of vertical diffuse attenuation at 490 nm obtained from CoastColour processor",
+                "FirstDate": "2002-07-21",
+                "LastDate": "2012-04-07",
+                "EX_GeographicBoundingBox": {
+                    "WestBoundLongitude": "17.24305534362793",
+                    "EastBoundLongitude": "18.162500381469727",
+                    "SouthBoundLatitude": "46.70694351196289",
+                    "NorthBoundLatitude": "47.0625"
+                },
+                "include": false,
+                "LegendSettings": {
+                    "scalePoints": true,
+                    "Rotation": 90,
+                    "Parameters": {
+                        "colorbaronly": true,
+                        "height": 500,
+                        "width": 30
+                    }
+                }
+            }
+        ]
+    },
+    "options": {
+        "providerShortTag": "Plymouth_Marine_Laboratory"
+    },
+    "wmsURL": "https://rsg.pml.ac.uk/thredds/wms/globolakes/00000310/00000310_TS-bac.nc?",
+    "serverName": "rsg.pml.ac.uk-thredds-wms-globolakes-00000310-00000310_TS-bac.nc",
+    "contactInfo": {
+        "person": "Remote Sensing Group",
+        "email": "calimnos-support@pml.ac.uk",
+        "address": "",
+        "phone": "",
+        "position": ""
+    },
+    "provider": "Plymouth Marine Laboratory",
+    "timeStamp": "2016-03-07T18:06:58.463Z",
+    "wcsURL": "https://rsg.pml.ac.uk/thredds/wcs/globolakes/00000310/00000310_TS-bac.nc"
+}
