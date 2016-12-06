@@ -89,6 +89,22 @@ apiAuth.denyGuest = function(req, res, next) {
    }
 };
 
+/**
+ * For use in Express routing chains to only allow admin users.
+ * @param  {object}   req  Exress router request
+ * @param  {object}   res  Express router response
+ * @param  {Function} next The next function in the chain
+ * @return                 next() or a 401 not authorised response
+ */
+apiAuth.requireAdmin = function(req, res, next) {
+   var level = apiAuth.getAccessLevel(req);
+   if (level == 'admin') {
+      return next();
+   } else {
+      res.status(401).send('You must be an admin to do this!');
+   }
+};
+
 function loadTokens(req) {
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;

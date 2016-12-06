@@ -145,4 +145,23 @@ describe('api', function() {
             });
       });
    });
+
+   describe('refresh_all_wms_cache', function() {
+      it('should refresh all global caches', function(done) {
+         var expected = {
+            failedServers: [],
+            refreshedServers: [
+               'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW',
+               'rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW'
+            ]
+         };
+
+         chai.request(app)
+            .get('/api/1/qwe/refresh_all_wms_cache')
+            .end(function(err, res) {
+               expect(res.body).to.deep.equal(expected);
+               done();
+            });
+      });
+   });
 });
