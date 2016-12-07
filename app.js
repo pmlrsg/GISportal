@@ -19,11 +19,26 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/config/site_settings/";
 var app = express();
 
 // Set the settings
-var found = false;
+// Load global-config-server.js
 try {
    require('./config/global-config-server.js');
-   found = true;
-} catch (e) {}
+} catch (e) {
+   try {
+      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
+      require('./config/global-config-server.js');
+   } catch (e) {
+      console.log('Failed to load the global server config.');
+      console.log('');
+      console.log('If this is a new installation you should run ./install.sh to create your configurations.');
+      console.log('');
+      console.log('Exiting application, bye   o/');
+      console.log('');
+      process.exit();
+   }
+}
+
+// Load or create the site_settings folder
+var serverFound = false;
 var site_setings_path = path.join(__dirname, "config/site_settings");
 if (!utils.directoryExists(site_setings_path)) {
    var layers_path = path.join(site_setings_path, "layers");
@@ -38,27 +53,19 @@ site_setings_list.forEach(function(foldername) {
       if (utils.fileExists(config_path)) {
          try {
             require(config_path);
-            found = true;
+            serverFound = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
-         } catch (e) {}
+         } catch (e) {
+            console.log('Failed to load server config: ' + config_path);
+         }
       }
    }
 });
-if (!found) {
-   try {
-      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
-      require('./config/global-config-server.js');
-   } catch (e) {
-      console.log('There doesn\'t appear to be a server config settings file in place');
-      console.log('');
-      console.log('If this is a new installation you can copy a config file from the examples folder; run the following command:');
-      console.log('');
-      console.log('    mkdir ' + __dirname + '/config; cp ' + __dirname + '/config_examples/global-config-server.js ' + __dirname + '/config/global-config-server.js');
-      console.log('');
-      console.log('Exiting application, bye   o/');
-      console.log('');
-      process.exit();
-   }
+if (!serverFound) {
+   console.log('No server config was found.');
+   console.log('');
+   console.log('If this is a new installation you should run ./install.sh to create a configuration for your domain.');
+   console.log('');
 }
 
 // set up Redis as the session store
@@ -157,6 +164,7 @@ for (var mod in modules) {
 
 // Start listening...
 var server = http.createServer(app);
+
 server.listen(global.config.appPort, function() {
    console.log('GISportal server listening on port %d', global.config.appPort);
 });
@@ -169,7 +177,9 @@ collaboration.init(io, app, global.config);
 /*
  * Catch uncaught exceptions
  */
-
 app.on('uncaughtException', function(err) {  
    console.log('Exception: ' + err.stack);
 });
+
+// Export server for testing
+module.exports = server;
