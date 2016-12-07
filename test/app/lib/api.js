@@ -1,6 +1,5 @@
 var chai = require('chai');
 var chaiHttp = require('chai-http');
-var path = require('path');
 var fs = require('fs');
 
 var app = require(global.test.appPath + '/app.js');
@@ -149,14 +148,15 @@ describe('api', function() {
          var expected = {
             failedServers: [],
             refreshedServers: [
-               'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW',
-               'rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW'
+               'rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW',
+               'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW'
             ]
          };
 
          chai.request(app)
             .get('/api/1/qwe/refresh_all_wms_cache')
             .end(function(err, res) {
+               res.body.refreshedServers.sort();
                expect(res.body).to.deep.equal(expected);
                done();
             });
