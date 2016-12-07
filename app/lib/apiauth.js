@@ -75,7 +75,7 @@ apiAuth.getUsername = function(req) {
 
 /**
  * For use in Express routing chains to deny guest users.
- * @param  {object}   req  Exress router request
+ * @param  {object}   req  Express router request
  * @param  {object}   res  Express router response
  * @param  {Function} next The next function in the chain
  * @return                 next() or a 401 not authorised response
@@ -91,7 +91,7 @@ apiAuth.denyGuest = function(req, res, next) {
 
 /**
  * For use in Express routing chains to only allow admin users.
- * @param  {object}   req  Exress router request
+ * @param  {object}   req  Express router request
  * @param  {object}   res  Express router response
  * @param  {Function} next The next function in the chain
  * @return                 next() or a 401 not authorised response
@@ -105,6 +105,11 @@ apiAuth.requireAdmin = function(req, res, next) {
    }
 };
 
+/**
+ * Load tokens object from config-server for the domain in the request
+ * @param  {object} req Express router request
+ * @return {object}     The tokens object
+ */
 function loadTokens(req) {
    var domain = utils.getDomainName(req);
    var config = global.config[domain] || global.config;
