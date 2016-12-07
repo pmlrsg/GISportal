@@ -31,5 +31,3 @@ uploads/cache/*
 
 app/modules/*
 !app/modules/.gitkeep
-
-test_dependencies/config/site_settings/127.0.0.1:6789/temporary_cache/
