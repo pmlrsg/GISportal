@@ -1,6 +1,7 @@
 *.orig
 *.pyc
 .DS_Store
+.vscode
 .sass-cache/*
 .tern-project
 config/*
@@ -28,7 +29,5 @@ uploads/archive/*
 uploads/cache/*
 !uploads/cache/.gitkeep
 
-app/modules/* 
+app/modules/*
 !app/modules/.gitkeep
-
-.vscode

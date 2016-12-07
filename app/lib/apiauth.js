@@ -16,9 +16,7 @@ module.exports = apiAuth;
  */
 apiAuth.authenticateToken = function(req, res, next) {
    var token = req.params.token;
-   var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;
-   var tokens = config.tokens;
+   var tokens = loadTokens(req);
 
    if (tokens) {
       if (tokens[token] !== undefined) {
@@ -26,6 +24,8 @@ apiAuth.authenticateToken = function(req, res, next) {
       } else {
          res.status(401).send('Unauthorised token!');
       }
+   } else {
+      res.status(403).send('No API tokens available.');
    }
 };
 
@@ -41,8 +41,8 @@ apiAuth.getAccessLevel = function(req, domain) {
    // If they aren't using the guest token
    if (apiAuth.getUsername(req) != 'guest') {
       level = 'user';
-      domain = domain || req.query.domain;
-      var config = GLOBAL.config[domain] || GLOBAL.config;
+      domain = domain || utils.getDomainName(req);
+      var config = global.config[domain] || global.config;
       var admins = config.admins;
       if (admins) {
          for (var i = 0; i < admins.length; i++) {
@@ -63,17 +63,19 @@ apiAuth.getAccessLevel = function(req, domain) {
  */
 apiAuth.getUsername = function(req) {
    var token = req.params.token;
-   var domain = utils.getDomainName(req);
-   var config = global.config[domain] || global.config;
-   var tokens = config.tokens;
+   var tokens = loadTokens(req);
    var username = tokens[token];
+
+   if (username === undefined) {
+      username = 'guest';
+   }
 
    return username;
 };
 
 /**
  * For use in Express routing chains to deny guest users.
- * @param  {object}   req  Exress router request
+ * @param  {object}   req  Express router request
  * @param  {object}   res  Express router response
  * @param  {Function} next The next function in the chain
  * @return                 next() or a 401 not authorised response
@@ -86,3 +88,30 @@ apiAuth.denyGuest = function(req, res, next) {
       res.status(401).send('Guests cannot do this!');
    }
 };
+
+/**
+ * For use in Express routing chains to only allow admin users.
+ * @param  {object}   req  Express router request
+ * @param  {object}   res  Express router response
+ * @param  {Function} next The next function in the chain
+ * @return                 next() or a 401 not authorised response
+ */
+apiAuth.requireAdmin = function(req, res, next) {
+   var level = apiAuth.getAccessLevel(req);
+   if (level == 'admin') {
+      return next();
+   } else {
+      res.status(401).send('You must be an admin to do this!');
+   }
+};
+
+/**
+ * Load tokens object from config-server for the domain in the request
+ * @param  {object} req Express router request
+ * @return {object}     The tokens object
+ */
+function loadTokens(req) {
+   var domain = utils.getDomainName(req);
+   var config = global.config[domain] || global.config;
+   return config.tokens;
+}
