@@ -39,7 +39,7 @@ RUN yum -y update && \
     pip install numpy bokeh==0.11 owslib shapely netCDF4 && \
     npm install -g grunt-cli --silent && \
     gem install sass && \
-    mkdir -p /app/GISportal/config /app/GISportal/html/plots
+    mkdir -p /app/GISportal/config
  
 ADD ./package.json /app/GISportal/package.json
 
