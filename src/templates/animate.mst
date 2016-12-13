@@ -1,0 +1,14 @@
+<div class="slideout-header">
+   Animate
+   <span class="btn icon-arrow-delete-1 icon-btn js-slideout-close right-icon"></span>
+</div>
+<div class="animate-slideout">
+<p>Animate this layer over time.</p>
+   <div class="clearfix">
+      <input placeholder="Start" class="js-min graph-min grid-cell " type="text">
+      <input placeholder="End" class="js-max graph-max grid-cell " type="text">
+   </div>
+   <div class="js-range-slider grid-cell fill"></div>
+
+   <button class="brand js-render">Render</button>
+</div>

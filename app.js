@@ -55,6 +55,13 @@ site_setings_list.forEach(function(foldername) {
             require(config_path);
             serverFound = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
+
+            // plottingDownloadDir is deprecated. Ensure both plottingDownloadDir and downloadDir are set to the same value.
+            if (global.config[foldername] && global.config[foldername].plottingDownloadDir) {
+               global.config[foldername].downloadDir = global.config[foldername].plottingDownloadDir;
+            } else if (global.config[foldername] && global.config[foldername].downloadDir) {
+               global.config[foldername].plottingDownloadDir = global.config[foldername].downloadDir;
+            }
          } catch (e) {
             console.log('Failed to load server config: ' + config_path);
          }
@@ -128,10 +135,12 @@ app.use(bodyParser.urlencoded({
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
+var animation = require('./app/lib/animation.js');
 var apiRoutes = require('./app/lib/apiroutes.js');
 var settingsRoutes = require('./app/lib/settingsroutes.js');
 var plotting = require('./app/lib/plotting.js');
 app.use('/', routes);
+app.use('/', animation);
 app.use('/', apiRoutes);
 app.use('/', settingsRoutes);
 app.use('/', plotting);
@@ -155,6 +164,7 @@ app.param('subfolder', function(req, res, next, subfolder) {
 });
 app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 app.use('/:subfolder', routes);
+app.use('/:subfolder', animation);
 app.use('/:subfolder', apiRoutes);
 app.use('/:subfolder', settingsRoutes);
 app.use('/:subfolder', plotting);

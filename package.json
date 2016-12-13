@@ -20,6 +20,7 @@
     "pixrem": "~3.0.0"
   },
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.9",
     "adm-zip": "^0.4.7",
     "body-parser": "~1.14.2",
     "bunyan": "~1.5.1",
@@ -32,6 +33,7 @@
     "express": "~4.13.3",
     "express-session": "~1.7.6",
     "express-sessions": "~1.0.5",
+    "fluent-ffmpeg": "^2.1.0",
     "fs-extra": "^1.0.0",
     "glob": "^7.1.1",
     "jade": "~1.10.0",
