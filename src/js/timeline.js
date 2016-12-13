@@ -559,7 +559,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
-   if(gisportal.timeline.getDate().toDateString() == date.toDateString()){
+   if(gisportal.timeline.getDate().toString() == date.toString()){
       return false;
    }
    gisportal.hideAllPopups();
