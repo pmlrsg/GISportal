@@ -25,7 +25,7 @@ module.exports = api;
  */
 api.get_cache = function(req, res) {
    var cache = apiUtils.getCache(req);
-   res.send(JSON.stringify(cache));
+   res.json(cache);
 };
 
 /**
@@ -70,7 +70,7 @@ api.get_cache_list = function(req, res) {
       list.push(server);
    }
 
-   res.send(JSON.stringify(list));
+   res.json(list);
 };
 
 /**
