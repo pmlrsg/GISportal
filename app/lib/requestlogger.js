@@ -15,7 +15,7 @@ var utils = require('./utils.js');
 var requestLogger = {};
 module.exports = requestLogger;
 
-var DO_NOT_AUTO_LOG = ['/api/1/admin/extras/point_extract', '/app/plotting/upload_csv'];
+var DO_NOT_AUTO_LOG = ['/api/1/TOKEN/extras/point_extract', '/app/plotting/upload_csv'];
 
 // Loggers for each domain that the portal is hosting
 var domainLoggers = {};
@@ -58,7 +58,9 @@ requestLogger.init = function(domain) {
  * @param  {Function} next Next function to call in the routing chain
  */
 requestLogger.autoLog = function(req, res, next) {
-   if (!utils.arrayIncludes(DO_NOT_AUTO_LOG, req.originalUrl)) {
+   var api = req.originalUrl.startsWith('/api/');
+   var url = getPath(req, api);
+   if (!utils.arrayIncludes(DO_NOT_AUTO_LOG, url)) {
       requestLogger.log(req, res, next);
    } else {
       next();

@@ -7,6 +7,13 @@ module.exports = utils;
 
 var log = bunyan.createLogger({name: "Portal Middleware"});
 
+/**
+ * Polyfill for arrayIncludes. Here instead of being a proper polyfill to avoid breaking for in loops.
+ * @param  {*[]}     array         The array to search in
+ * @param  {*}       searchElement The item to search for
+ * @param  {int}     fromIndex     The index to start from
+ * @return {boolean}               If searchElement is in array
+ */
 utils.arrayIncludes = function(array, searchElement, fromIndex) {
    'use strict';
    if (array === null) {
@@ -40,10 +47,19 @@ utils.arrayIncludes = function(array, searchElement, fromIndex) {
    return false;
 };
 
+/**
+ * Convert a server URL (such as WMS/WCS) into it's name.
+ * @param {string} url The server's url
+ */
 utils.URLtoServerName = function(url) {
    return url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "");
 };
 
+/**
+ * Check if a file exists.
+ * @param  {string}  filePath The file to check
+ * @return {boolean}          If the file exists
+ */
 utils.fileExists = function(filePath)
 {
    try
@@ -56,6 +72,11 @@ utils.fileExists = function(filePath)
    }
 };
 
+/**
+ * Check if directory exists.
+ * @param  {string}  filePath The directory to check
+ * @return {boolean}          If the directory exists
+ */
 utils.directoryExists = function(filePath)
 {
    try
@@ -68,6 +89,11 @@ utils.directoryExists = function(filePath)
    }
 };
 
+/**
+ * Get the domain name from a request.
+ * @param  {object} req Express request
+ * @return {string}     The domain name
+ */
 utils.getDomainName = function(req){
    var domain = req.headers.host;
    if(req.SUBFOLDER){

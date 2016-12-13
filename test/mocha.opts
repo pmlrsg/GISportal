@@ -1,0 +1,6 @@
+--recursive
+--require ./test_dependencies/init.js
+--colors
+--check-leaks
+--trace-deprecation
+--globals mocks,test

@@ -27,6 +27,8 @@ router.use('/api/1/:token/', apiAuth.authenticateToken, apiRouter);
  */
 apiRouter.get('/refresh_wms_cache', apiAuth.denyGuest, api.refresh_wms_cache);
 
+apiRouter.get('/refresh_all_wms_cache', apiAuth.requireAdmin, api.refresh_all_wms_cache);
+
 /**
  * Get all the cache files the user has access to in a JSON string.
  */
