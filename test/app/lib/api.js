@@ -40,6 +40,7 @@ describe('api', function() {
             .get('/api/1/asd/get_cache_servers')
             .end(function(err, res) {
                expect(res).to.have.status(200);
+               expect(res).to.be.json;
                expect(res.text).to.equal(testCacheServers);
                done();
             });
@@ -50,6 +51,7 @@ describe('api', function() {
             .get('/api/1/asd/get_cache_layers')
             .end(function(err, res) {
                expect(res).to.have.status(200);
+               expect(res).to.be.json;
                expect(res.text).to.equal(testCacheLayers);
                done();
             });

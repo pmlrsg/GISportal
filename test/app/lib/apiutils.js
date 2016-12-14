@@ -49,6 +49,7 @@ describe('apiUtils', function() {
             .get('/api/1/zxc/get_cache')
             .end(function(err, res) {
                expect(res).to.have.status(200);
+               expect(res).to.be.json;
                expect(res.text).to.equal(testCache);
                done();
             });
@@ -70,6 +71,7 @@ describe('apiUtils', function() {
             .get('/api/1/asd/get_cache')
             .end(function(err, res) {
                expect(res).to.have.status(200);
+               expect(res).to.be.json;
                expect(res.text).to.equal(testCache);
                done();
             });
@@ -91,6 +93,7 @@ describe('apiUtils', function() {
             .get('/api/1/qwe/get_cache')
             .end(function(err, res) {
                expect(res).to.have.status(200);
+               expect(res).to.be.json;
                expect(res.text).to.equal(testCache);
                done();
             });
