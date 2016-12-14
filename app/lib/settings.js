@@ -229,6 +229,7 @@ settings.get_walkthroughs = function(req, res) {
          });
       }
    }
+   // TODO change to res.json
    res.send(JSON.stringify(walkthrough_list)); // Returns the cache to the browser.
 
 };
@@ -327,6 +328,7 @@ settings.get_cache = function(req, res) {
 
    var cache = settingsApi.get_cache(username, domain, permission);
 
+   // TODO change to res.json(cache) and test
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
 };
 
@@ -382,6 +384,7 @@ settings.remove_server_cache = function(req, res) {
          if (err) {
             utils.handleError(err, res);
          } else {
+            // TODO change to res.json
             res.send(JSON.stringify({
                'path': delete_file_path,
                'owner': owner

@@ -134,6 +134,7 @@ router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res
          shape_list.push(filename.replace(".geojson", ""));
       }
    });
+   // TODO change to res.json
    res.send(JSON.stringify({
       list: shape_list
    })); // Returns the list to the browser.
