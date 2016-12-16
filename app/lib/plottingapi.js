@@ -9,6 +9,7 @@ var moment = require('moment');
 var path = require('path');
 var utils = require('./utils.js');
 var md5 = require('md5');
+var animation = require('./animation.js');
 
 var PLOTTING_PATH = path.join(__dirname, "../../plotting/plots.py");
 var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
@@ -30,38 +31,43 @@ plottingApi.getPlotDirUrl = function(req) {
 };
 
 plottingApi.plot = function(req, request, next) {
-   var domain = utils.getDomainName(req);
-   var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
-   var logDir = "";
-   if (global.config[domain]) {
-      if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
-         downloadDir = global.config[domain].plottingDownloadDir;
+   if (request.plot.type == 'animation') {
+      animation.animate(request);
+      next(null, 'abc');
+   } else {
+      var domain = utils.getDomainName(req);
+      var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
+      var logDir = "";
+      if (global.config[domain]) {
+         if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
+            downloadDir = global.config[domain].plottingDownloadDir;
+         }
+         if (global.config[domain].logDir) {
+            logDir = path.join(__dirname, '../..', global.config[domain].logDir, "plotting");
+         }
       }
-      if (global.config[domain].logDir) {
-         logDir = path.join(__dirname, '../..', global.config[domain].logDir, "plotting");
-      }
+      var url = plottingApi.getPlotDirUrl(req);
+      var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
+
+      var hash;
+      child.stdout.on('data', function(data) {
+         hash = data.toString().replace(/\n|\r\n|\r/g, '');
+         next(null, hash);
+      });
+
+      child.stdin.write(JSON.stringify(request));
+      child.stdin.end();
+
+      var error;
+      child.stderr.on('data', function(data) {
+         error += data.toString();
+      });
+      child.on('exit', function() {
+         if (error) {
+            next(error, null);
+         }
+      });
    }
-   var url = plottingApi.getPlotDirUrl(req);
-   var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
-
-   var hash;
-   child.stdout.on('data', function(data) {
-      hash = data.toString().replace(/\n|\r\n|\r/g, '');
-      next(null, hash);
-   });
-
-   child.stdin.write(JSON.stringify(request));
-   child.stdin.end();
-
-   var error;
-   child.stderr.on('data', function(data) {
-      error += data.toString();
-   });
-   child.on('exit', function() {
-      if (error) {
-         next(error, null);
-      }
-   });
 };
 
 plottingApi.processCSV = function(req, res, next) {

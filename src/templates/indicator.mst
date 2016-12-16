@@ -20,8 +20,6 @@
                <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Edit Data"></span>
             {{/if}}
 
-            <span class="js-animate animate icon-btn indicator-header-icon " data-name="{{name}}" data-id="{{id}}" title="Animate Demo">Animate Demo</span>
-
             <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
             <span class="icon-btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Basic Layer Management')" title="Help (Basic Layer Management)"></span>
          </div>

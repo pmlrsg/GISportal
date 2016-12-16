@@ -187,8 +187,22 @@ gisportal.graphs.Plot =(function(){
          { key: 'svg', label: 'SVG' }
       ];
       plotRequest.matchup_log = this.matchUpLog();
+      if (this.plotType() == 'animation') {
+         var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
+         var borders = $('#select-country-borders').data('ddslick').selectedData.value;
+         plotRequest.baseMap = {
+            wmsUrl: gisportal.baseLayers[baseMap].getSource().getUrls()[0],
+            wmsParams: gisportal.baseLayers[baseMap].getSource().getParams()
+         };
+         if (borders != "0") {
+            plotRequest.countryBorders = {
+               wmsUrl: gisportal.countryBorderLayers[borders].getSource().getUrls()[0],
+               wmsParams: gisportal.countryBorderLayers[borders].getSource().getParams()
+            };
+         }
+      }
    };
-   
+
 
    /**
     * Adds the logos for the providers used int this graph.
@@ -386,7 +400,7 @@ gisportal.graphs.Plot =(function(){
                "bbox": nice_bbox,
                // Depth, optional
                "depth": component.elevation,
-               
+
                // Threads URL, passed to the middleware URL
                "threddsUrl"  : layer.wcsURL.split("?")[0],
             },
@@ -397,17 +411,39 @@ gisportal.graphs.Plot =(function(){
             //"logo": gisportal.middlewarePath + "/" + logo
          };
 
-         // If its a hovmoller then 
+         // If its a hovmoller then
          // set the correct axis'
          if( this.plotType() == "hovmollerLat" ){
             newSeries.data_source.graphXAxis = "Time";
             newSeries.data_source.graphYAxis = "Lat";
             newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
-         }else 
-         if( this.plotType() == "hovmollerLon" ){
+         } else if( this.plotType() == "hovmollerLon" ){
             newSeries.data_source.graphXAxis = "Lon";
             newSeries.data_source.graphYAxis = "Time";
             newSeries.data_source.graphZAxis = newSeries.data_source.coverage;
+         } else if (this.plotType() == 'animation') {
+            newSeries.data_source.wmsUrl = gisportal.layers[layer.id].openlayers.anID.getSource().getUrls()[0];
+            newSeries.data_source.wmsParams = gisportal.layers[layer.id].openlayers.anID.getSource().getParams();
+
+            var times = gisportal.layers[layer.id].DTCache;
+            var start = new Date(this.tBounds()[0]);
+            var end = new Date(this.tBounds()[1]);
+
+            var startIndex, endIndex;
+
+            for (var j = 0; j < times.length; j++) {
+               var time = new Date(times[j]);
+               if (time >= start && time <= end) {
+                  if (startIndex === undefined) {
+                     startIndex = j;
+                  }
+                  endIndex = j;
+               }
+            }
+
+            var slicesInRange = times.slice(startIndex, endIndex);
+
+            newSeries.data_source.timesSlices = slicesInRange;
          }
 
          seriesArray.push( newSeries );
@@ -465,7 +501,7 @@ gisportal.graphs.Plot =(function(){
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
       console.log(_this._plotType);
-      if(_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" ){
+      if(_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" && _this._plotType != "animation"){
          for(var series in series_list){
             $.ajax({
                method: 'post',

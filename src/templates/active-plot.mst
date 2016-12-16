@@ -26,6 +26,7 @@
 				<option value="hovmollerLon"  {{selected "hovmollerLon" (call 'plot.plotType')}} >Hovmoller Lon</option>
 				<option value="scatter"  {{selected "scatter" (call 'plot.plotType')}}>Scatter</option>
 				<option value="extract"  {{selected "extract" (call 'plot.plotType')}}>Geographic</option>
+				<option value="animation" {{selected "animation" (call 'plot.plotType')}}>Animation</option>
 			{{/if}}
 			 </select>
 			{{#if matchup_plot}}

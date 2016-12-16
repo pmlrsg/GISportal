@@ -135,12 +135,10 @@ app.use(bodyParser.urlencoded({
 
 // Configure routes
 var routes = require('./app/lib/routes.js');
-var animation = require('./app/lib/animation.js');
 var apiRoutes = require('./app/lib/apiroutes.js');
 var settingsRoutes = require('./app/lib/settingsroutes.js');
 var plotting = require('./app/lib/plotting.js');
 app.use('/', routes);
-app.use('/', animation);
 app.use('/', apiRoutes);
 app.use('/', settingsRoutes);
 app.use('/', plotting);
@@ -164,7 +162,6 @@ app.param('subfolder', function(req, res, next, subfolder) {
 });
 app.use('/:subfolder', express.static(path.join(__dirname, 'html')));
 app.use('/:subfolder', routes);
-app.use('/:subfolder', animation);
 app.use('/:subfolder', apiRoutes);
 app.use('/:subfolder', settingsRoutes);
 app.use('/:subfolder', plotting);
