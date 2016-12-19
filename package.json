@@ -20,7 +20,7 @@
     "pixrem": "~3.0.0"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.9",
+    "@ffmpeg-installer/ffmpeg": "https://registry.npmjs.org/@ffmpeg-installer/ffmpeg/-/ffmpeg-1.0.9.tgz",
     "adm-zip": "^0.4.7",
     "async": "^2.1.4",
     "body-parser": "~1.14.2",
