@@ -6,7 +6,7 @@ var fs = require('fs-extra');
 var request = require('request');
 var url = require('url');
 var Jimp = require('jimp');
-// var async = require('async');
+var async = require('async');
 
 var animation = {};
 
@@ -108,54 +108,70 @@ animation.animate = function(options) {
    var slicesDownloaded = [];
    var slicesCount = 0;
 
-   // var q = async.queue(download, 5);
+   var q = async.queue(download, 16);
 
-   download(url.format(mapUrl), '/tmp/map.jpg', 'map', downloadComplete);
+   q.push({
+      uri: url.format(mapUrl),
+      filename: '/tmp/map.jpg',
+      id: 'map'
+   }, downloadComplete);
 
    if (borders) {
-      download(url.format(bordersUrl), '/tmp/borders.png', 'borders', downloadComplete);
+      q.push({
+         uri: url.format(bordersUrl),
+         filename: '/tmp/borders.png',
+         id: 'borders'
+      }, downloadComplete);
    }
 
    for (var i = 0; i < slices.length; i++) {
       dataURL.query.TIME = slices[i];
       var filename = '/tmp/' + id + '_' + slices[i] + '.png';
-      download(url.format(dataURL), filename, slices[i], downloadComplete);
+      q.push({
+         uri: url.format(dataURL),
+         filename: filename,
+         id: slices[i]
+      }, downloadComplete);
    }
 
    var retries = {};
 
-   function downloadComplete(err, uri, filename, fileId) {
+   function downloadComplete(err, task) {
+      // console.log('Download Complete: ' + task.id);
       if (err) {
-         if (retries[fileId] === undefined) {
-            retries[fileId] = 0;
+         if (retries[task.id] === undefined) {
+            retries[task.id] = 0;
          }
-         if (retries[fileId] < 4) {
-            retries[fileId]++;
-            download(uri, filename, fileId, downloadComplete);
+         if (retries[task.id] < 4) {
+            retries[task.id]++;
+            q.push({
+               uri: task.uri,
+               filename: task.filename,
+               id: task.id
+            }, downloadComplete);
          } else {
             console.error(err);
          }
       } else {
-         if (fileId == 'map') {
+         if (task.id == 'map') {
             mapDownloaded = true;
-            // console.log("map downloaded");
-         } else if (fileId == 'borders') {
+         } else if (task.id == 'borders') {
             bordersDownloaded = true;
-            // console.log("borders downloaded");
          } else {
-            Jimp.read(filename, function(err, image) {
+            Jimp.read(task.filename, function(err, image) {
                Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(font) {
-                  image.print(font, 10, 10, fileId);
-                  image.write(filename, function() {
+                  image.print(font, 10, 10, task.id);
+                  image.write(task.filename, function() {
+                     // console.log('Adding date to ' + task.id);
                      slicesCount++;
-                     slicesDownloaded.push(filename);
+                     slicesDownloaded.push(task.filename);
                      if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
                         render();
                      }
                   });
                });
             });
-            // console.log(fileId);
+            // console.log(id);
             // console.log('Slice:' + slicesCount);
          }
       }
@@ -200,17 +216,17 @@ animation.animate = function(options) {
    }
 };
 
-function download(uri, filename, id, callback) {
-   console.log('Downloading ' + id);
-   request(uri, {
+function download(task, callback) {
+   // console.log('Downloading ' + task.id);
+   request(task.uri, {
          timeout: 60000
       })
       .on('error', done)
-      .pipe(fs.createWriteStream(filename))
+      .pipe(fs.createWriteStream(task.filename))
       .on('error', done)
       .on('close', done);
 
    function done(err) {
-      callback(err, uri, filename, id);
+      callback(err, task);
    }
 }
