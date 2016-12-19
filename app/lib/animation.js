@@ -15,9 +15,9 @@ module.exports = animation;
 animation.animate = function(options) {
    console.log('Animation called');
 
-   var width = 1024;
-   var height = 512;
-   var bbox = '-180,-90,180,90';
+   var maxWidth = 1024;
+   var maxHeight = 1024;
+   // var bbox = '-180,-90,180,90';
 
    var mapOptions = options.plot.baseMap;
 
@@ -31,6 +31,22 @@ animation.animate = function(options) {
    var wmsUrl = dataOptions.wmsUrl;
    var params = dataOptions.wmsParams;
    var slices = dataOptions.timesSlices;
+
+   var bbox = dataOptions.bbox;
+   var bboxArr = bbox.split(',');
+   var bboxWidth = bboxArr[2] - bboxArr[0];
+   var bboxHeight = bboxArr[3] - bboxArr[1];
+
+   var height;
+   var width;
+
+   if ((bboxHeight / bboxWidth) <= 1) {
+      height = Math.round((bboxHeight / bboxWidth) * maxWidth);
+      width = maxWidth;
+   } else {
+      height = maxHeight;
+      width = Math.round((bboxWidth / bboxHeight) * maxHeight);
+   }
 
    var mapUrl = url.parse(mapOptions.wmsUrl);
    mapUrl.search = undefined;
@@ -108,7 +124,7 @@ animation.animate = function(options) {
    var slicesDownloaded = [];
    var slicesCount = 0;
 
-   var q = async.queue(download, 16);
+   var q = async.queue(download, 10);
 
    q.push({
       uri: url.format(mapUrl),

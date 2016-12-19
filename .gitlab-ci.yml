@@ -8,9 +8,9 @@ job1:
     script:
         - node --version
         - npm --version
-        - npm install npm
+        - npm install npm --silent
         - ./node_modules/.bin/npm --version
-        - ./node_modules/.bin/npm install --silent
+        - ./node_modules/.bin/npm install --silent --depth 0
         - grunt
         - /usr/bin/redis-server --daemonize yes
         - ./node_modules/.bin/npm test
