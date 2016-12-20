@@ -32,8 +32,9 @@ plottingApi.getPlotDirUrl = function(req) {
 
 plottingApi.plot = function(req, request, next) {
    if (request.plot.type == 'animation') {
-      animation.animate(request);
-      next(null, 'abc');
+      animation.animate(request, function(err, hash) {
+         next(err, hash);
+      });
    } else {
       var domain = utils.getDomainName(req);
       var downloadDir = PLOT_DOWNLOAD_DIRECTORY;

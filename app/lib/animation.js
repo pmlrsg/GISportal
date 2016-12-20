@@ -7,26 +7,45 @@ var request = require('request');
 var url = require('url');
 var Jimp = require('jimp');
 var async = require('async');
+var path = require('path');
+var utils = require('./utils.js');
+var sha1 = require('sha1');
+
+var PLOT_DESTINATION = path.join(__dirname, "../../html/plots/");
+
+var PlotStatus = Object.freeze({
+   initialising: 'initialising',
+   extracting: 'extracting',
+   rendering: 'rendering',
+   complete: 'complete',
+   failed: 'failed'
+});
 
 var animation = {};
 
 module.exports = animation;
 
-animation.animate = function(options) {
+animation.animate = function(plotRequest, next) {
    console.log('Animation called');
+
+   var hash = sha1(JSON.stringify(plotRequest));
+
+   updateStatus(hash, PlotStatus.initialising, null, null, null, null, function(err) {
+      next(err, hash);
+   });
 
    var maxWidth = 1024;
    var maxHeight = 1024;
    // var bbox = '-180,-90,180,90';
 
-   var mapOptions = options.plot.baseMap;
+   var mapOptions = plotRequest.plot.baseMap;
 
    var bordersOptions;
-   if (options.plot.countryBorders) {
-      bordersOptions = options.plot.countryBorders;
+   if (plotRequest.plot.countryBorders) {
+      bordersOptions = plotRequest.plot.countryBorders;
    }
 
-   var dataOptions = options.plot.data.series[0].data_source;
+   var dataOptions = plotRequest.plot.data.series[0].data_source;
    var id = dataOptions.layer_id;
    var wmsUrl = dataOptions.wmsUrl;
    var params = dataOptions.wmsParams;
@@ -126,23 +145,25 @@ animation.animate = function(options) {
 
    var q = async.queue(download, 10);
 
+   updateStatus(hash, PlotStatus.extracting);
+
    q.push({
       uri: url.format(mapUrl),
-      filename: '/tmp/map.jpg',
+      filename: '/tmp/ani/map.jpg',
       id: 'map'
    }, downloadComplete);
 
    if (borders) {
       q.push({
          uri: url.format(bordersUrl),
-         filename: '/tmp/borders.png',
+         filename: '/tmp/ani/borders.png',
          id: 'borders'
       }, downloadComplete);
    }
 
    for (var i = 0; i < slices.length; i++) {
       dataURL.query.TIME = slices[i];
-      var filename = '/tmp/' + id + '_' + slices[i] + '.png';
+      var filename = '/tmp/ani/' + id + '_' + slices[i] + '.png';
       q.push({
          uri: url.format(dataURL),
          filename: filename,
@@ -152,35 +173,36 @@ animation.animate = function(options) {
 
    var retries = {};
 
-   function downloadComplete(err, task) {
-      // console.log('Download Complete: ' + task.id);
+   function downloadComplete(err, options) {
+      // console.log('Download Complete: ' + options.id);
       if (err) {
-         if (retries[task.id] === undefined) {
-            retries[task.id] = 0;
+         if (retries[options.id] === undefined) {
+            retries[options.id] = 0;
          }
-         if (retries[task.id] < 4) {
-            retries[task.id]++;
+         if (retries[options.id] < 4) {
+            retries[options.id]++;
             q.push({
-               uri: task.uri,
-               filename: task.filename,
-               id: task.id
+               uri: options.uri,
+               filename: options.filename,
+               id: options.id
             }, downloadComplete);
          } else {
             console.error(err);
          }
       } else {
-         if (task.id == 'map') {
+         if (options.id == 'map') {
             mapDownloaded = true;
-         } else if (task.id == 'borders') {
+         } else if (options.id == 'borders') {
             bordersDownloaded = true;
          } else {
-            Jimp.read(task.filename, function(err, image) {
-               Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(font) {
-                  image.print(font, 10, 10, task.id);
-                  image.write(task.filename, function() {
-                     // console.log('Adding date to ' + task.id);
+            Jimp.read(options.filename, function(err, image) {
+               Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(font) {
+                  image.print(font, 10, 10, options.id);
+                  image.write(options.filename, function() {
+                     // console.log('Adding date to ' + options.id);
                      slicesCount++;
-                     slicesDownloaded.push(task.filename);
+                     slicesDownloaded.push(options.filename);
+                     console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
                      if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
                         render();
                      }
@@ -194,55 +216,147 @@ animation.animate = function(options) {
    }
 
    function render() {
+      updateStatus(hash, PlotStatus.rendering);
       console.log('Rendering');
+
+      var videoPath = path.join(PLOT_DESTINATION, hash + '-video.mp4');
+
       // Do the render thing!
-      if (borders) {
-         ffmpeg()
-            .input('/tmp/map.jpg')
-            .input('/tmp/' + id + '_' + '*' + '.png')
-            .inputOption('-pattern_type glob')
-            .inputFPS(1)
-            .input('/tmp/borders.png')
-            .complexFilter('overlay,overlay')
-            .output('/tmp/test.mp4')
-            .outputFPS(30)
-            .noAudio()
-            .on('end', finishedRendering)
-            .run();
-      } else {
-         ffmpeg()
-            .input('/tmp/map.jpg')
-            .input('/tmp/' + id + '_' + '*' + '.png')
-            .inputOption('-pattern_type glob')
-            .inputFPS(1)
-            .complexFilter('overlay')
-            .output('/tmp/test.mp4')
-            .outputFPS(30)
-            .noAudio()
-            .on('end', finishedRendering)
-            .run();
+      try {
+         if (borders) {
+            ffmpeg()
+               .input('/tmp/ani/map.jpg')
+               .input('/tmp/ani/' + id + '_' + '*' + '.png')
+               .inputOption('-pattern_type glob')
+               .inputFPS(1)
+               .input('/tmp/ani/borders.png')
+               .complexFilter('overlay,overlay')
+               .output(videoPath)
+               .outputFPS(30)
+               .noAudio()
+               .on('end', finishedRendering)
+               .run();
+         } else {
+            ffmpeg()
+               .input('/tmp/ani/map.jpg')
+               .input('/tmp/ani/' + id + '_' + '*' + '.png')
+               .inputOption('-pattern_type glob')
+               .inputFPS(1)
+               .complexFilter('overlay')
+               .output(videoPath)
+               .outputFPS(30)
+               .noAudio()
+               .on('end', finishedRendering)
+               .run();
+         }
+      } catch (e) {
+         finishedRendering(e);
       }
    }
 
-   function finishedRendering() {
-      console.log('Finished rendering! ^_^');
-      for (var i = 0; i < slicesDownloaded.length; i++) {
-         fs.remove(slicesDownloaded[i]);
+   function finishedRendering(err) {
+      if (err) {
+         updateStatus(hash, PlotStatus.failed);
+         console.log('Failed rendering! ;_;');
+         console.log(err);
+         cleanup();
+      }
+
+      buildHtml(hash, function(err) {
+         if (!err) {
+            updateStatus(hash, PlotStatus.complete);
+            console.log('Finished rendering! ^_^');
+            cleanup();
+         }
+      });
+
+      function cleanup() {
+         for (var i = 0; i < slicesDownloaded.length; i++) {
+            fs.remove(slicesDownloaded[i]);
+         }
       }
    }
 };
 
-function download(task, callback) {
-   // console.log('Downloading ' + task.id);
-   request(task.uri, {
+function buildHtml(hash, next) {
+   var htmlPath = path.join(PLOT_DESTINATION, hash + '-plot.html');
+   var video = '<video controls><source src="/plots/' + hash + '-video.mp4"/></video>';
+   var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + video + '</div></body></html>';
+   fs.writeFile(htmlPath, html, 'utf8', function(err) {
+      next(err);
+   });
+}
+
+function download(options, next) {
+   // console.log('Downloading ' + options.id);
+   request(options.uri, {
          timeout: 60000
       })
       .on('error', done)
-      .pipe(fs.createWriteStream(task.filename))
+      .pipe(fs.createWriteStream(options.filename))
       .on('error', done)
       .on('close', done);
 
    function done(err) {
-      callback(err, task);
+      next(err, options);
    }
+}
+
+var saveStatusQ = async.queue(saveStatus, 1);
+
+function updateStatus(hash, state, message, percentage, minRemaining, traceback, next) {
+   var statusPath = path.join(PLOT_DESTINATION, hash + '-status.json');
+   var status;
+
+   if (utils.fileExists(statusPath)) {
+      fs.readFile(statusPath, 'utf8', gotStatus);
+   } else {
+      status = {
+         job_id: hash,
+         completed: false,
+      };
+      gotStatus();
+   }
+
+   function gotStatus(err, statusString) {
+      if (!err) {
+         if (statusString) {
+            status = JSON.parse(statusString);
+         }
+         status.message = message || '';
+         status.traceback = traceback || '';
+         status.state = state;
+
+         if (state == PlotStatus.complete) {
+            status.completed = true;
+            status.percentage = 100;
+            status.minutes_remaining = 0;
+         } else if (state == PlotStatus.failed) {
+            status.completed = true;
+            status.percentage = 100;
+            status.minutes_remaining = 0;
+         } else {
+            status.completed = false;
+            status.percentage = percentage || 0;
+            status.minutes_remaining = minRemaining || -1;
+         }
+         saveStatusQ.push({
+            statusPath: statusPath,
+            status: status
+         }, function(err) {
+            if (err) {
+               // :'(
+            }
+            if (next) {
+               next(err);
+            }
+         });
+      }
+   }
+}
+
+function saveStatus(options, next) {
+   fs.writeFile(options.statusPath, JSON.stringify(options.status), 'utf8', function(err) {
+      next(err);
+   });
 }
