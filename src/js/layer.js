@@ -423,9 +423,8 @@ gisportal.layer = function( options ) {
       var layer = this;
       var nearestDate = null; 
       var filtArray = $.grep(layer.DTCache, function(dt, i) {
-         var datePart = dt.substring(0, 10);
-         if (nearestDate === null || (datePart > nearestDate && datePart < date) || (datePart < nearestDate && datePart > date)) nearestDate = dt; 
-         return (datePart == date);
+         if (nearestDate === null || (dt > nearestDate && dt < date) || (dt < nearestDate && dt > date)) nearestDate = dt; 
+         return (dt == date);
       });
       
       if (filtArray.length > 0) {
@@ -450,10 +449,10 @@ gisportal.layer = function( options ) {
       var layer = this;
       
       if(date) {
-         var uidate = gisportal.utils.ISODateString(date);
+         var uidate = date.toISOString();
          var matchedDate = layer.matchDate(uidate);
          // Makes sure that the selected date is within the bounds of the first and last date
-         var inBounds = moment(date.toGMTString()).isBetween(moment(new Date(layer.firstDate).toGMTString()).subtract(1, 'second'), moment(new Date(layer.lastDate).toGMTString()).add(1, 'second'));
+         var inBounds = moment(date).isBetween(moment(layer.firstDate).subtract(1, 'second'), moment(layer.lastDate).add(1, 'second'));
          if(matchedDate && inBounds) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
