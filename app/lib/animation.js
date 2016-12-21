@@ -36,7 +36,6 @@ animation.animate = function(plotRequest, next) {
 
    var maxWidth = 1024;
    var maxHeight = 1024;
-   // var bbox = '-180,-90,180,90';
 
    var mapOptions = plotRequest.plot.baseMap;
 
@@ -60,11 +59,11 @@ animation.animate = function(plotRequest, next) {
    var width;
 
    if ((bboxHeight / bboxWidth) <= 1) {
-      height = Math.round((bboxHeight / bboxWidth) * maxWidth);
+      height = 2 * Math.round(((bboxHeight / bboxWidth) * maxWidth) / 2);
       width = maxWidth;
    } else {
       height = maxHeight;
-      width = Math.round((bboxWidth / bboxHeight) * maxHeight);
+      width = 2 * Math.round(((bboxWidth / bboxHeight) * maxHeight) / 2);
    }
 
    var mapUrl = url.parse(mapOptions.wmsUrl);
@@ -174,7 +173,6 @@ animation.animate = function(plotRequest, next) {
    var retries = {};
 
    function downloadComplete(err, options) {
-      // console.log('Download Complete: ' + options.id);
       if (err) {
          if (retries[options.id] === undefined) {
             retries[options.id] = 0;
@@ -196,21 +194,21 @@ animation.animate = function(plotRequest, next) {
             bordersDownloaded = true;
          } else {
             Jimp.read(options.filename, function(err, image) {
-               Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(font) {
-                  image.print(font, 10, 10, options.id);
-                  image.write(options.filename, function() {
-                     // console.log('Adding date to ' + options.id);
-                     slicesCount++;
-                     slicesDownloaded.push(options.filename);
-                     console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
-                     if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
-                        render();
-                     }
+               Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(fontB) {
+                  Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(fontW) {
+                     image.print(fontB, 10, 10, options.id);
+                     image.print(fontW, 11, 11, options.id);
+                     image.write(options.filename, function() {
+                        slicesCount++;
+                        slicesDownloaded.push(options.filename);
+                        console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
+                        if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
+                           render();
+                        }
+                     });
                   });
                });
             });
-            // console.log(id);
-            // console.log('Slice:' + slicesCount);
          }
       }
    }
@@ -219,42 +217,63 @@ animation.animate = function(plotRequest, next) {
       updateStatus(hash, PlotStatus.rendering);
       console.log('Rendering');
 
-      var videoPath = path.join(PLOT_DESTINATION, hash + '-video.mp4');
+      var videoPathMP4 = path.join(PLOT_DESTINATION, hash + '-video.mp4');
+      var videoPathWebM = path.join(PLOT_DESTINATION, hash + '-video.webm');
 
-      // Do the render thing!
-      try {
-         if (borders) {
-            ffmpeg()
-               .input('/tmp/ani/map.jpg')
-               .input('/tmp/ani/' + id + '_' + '*' + '.png')
-               .inputOption('-pattern_type glob')
-               .inputFPS(1)
-               .input('/tmp/ani/borders.png')
-               .complexFilter('overlay,overlay')
-               .output(videoPath)
-               .outputFPS(30)
-               .noAudio()
-               .on('end', finishedRendering)
-               .run();
-         } else {
-            ffmpeg()
-               .input('/tmp/ani/map.jpg')
-               .input('/tmp/ani/' + id + '_' + '*' + '.png')
-               .inputOption('-pattern_type glob')
-               .inputFPS(1)
-               .complexFilter('overlay')
-               .output(videoPath)
-               .outputFPS(30)
-               .noAudio()
-               .on('end', finishedRendering)
-               .run();
-         }
-      } catch (e) {
-         finishedRendering(e);
+      if (borders) {
+         ffmpeg()
+            .input('/tmp/ani/map.jpg')
+            .input('/tmp/ani/' + id + '_' + '*' + '.png')
+            .inputOption('-pattern_type glob')
+            .inputFPS(1)
+            .input('/tmp/ani/borders.png')
+            .complexFilter('overlay,overlay,split=2[out1][out2]')
+            .output(videoPathMP4)
+            .outputOptions("-map [out1]")
+            .outputFPS(30)
+            .noAudio()
+            .output(videoPathWebM)
+            .outputOptions("-map [out2]")
+            .outputFPS(30)
+            .noAudio()
+            .on('end', finishedRendering)
+            .on('error', errorRendering)
+            .run();
+      } else {
+         ffmpeg()
+            .input('/tmp/ani/map.jpg')
+            .input('/tmp/ani/' + id + '_' + '*' + '.png')
+            .inputOption('-pattern_type glob')
+            .inputFPS(1)
+            .complexFilter('overlay,split=2[out1][out2]')
+            .output(videoPathMP4)
+            .outputOptions("-map [out1]")
+            .outputFPS(30)
+            .noAudio()
+            .output(videoPathWebM)
+            .outputOptions("-map [out2]")
+            .outputFPS(30)
+            .noAudio()
+            .on('end', finishedRendering)
+            .on('error', errorRendering)
+            .run();
       }
    }
 
-   function finishedRendering(err) {
+   function errorRendering(err, stdout, stderr) {
+      updateStatus(hash, PlotStatus.failed);
+      console.log('Failed rendering! ;_;');
+      console.log(err);
+      console.log(stdout);
+      console.log(stderr);
+      cleanup();
+   }
+
+   function finishedRendering(err, stdout, stderr) {
+      // console.log(err);
+      // console.log(stdout);
+      // console.log(stderr);
+
       if (err) {
          updateStatus(hash, PlotStatus.failed);
          console.log('Failed rendering! ;_;');
@@ -269,18 +288,20 @@ animation.animate = function(plotRequest, next) {
             cleanup();
          }
       });
+   }
 
-      function cleanup() {
-         for (var i = 0; i < slicesDownloaded.length; i++) {
-            fs.remove(slicesDownloaded[i]);
-         }
+   function cleanup() {
+      for (var i = 0; i < slicesDownloaded.length; i++) {
+         fs.remove(slicesDownloaded[i]);
       }
+      fs.remove('/tmp/ani/map.jpg');
+      fs.remove('/tmp/ani/borders.png');
    }
 };
 
 function buildHtml(hash, next) {
    var htmlPath = path.join(PLOT_DESTINATION, hash + '-plot.html');
-   var video = '<video controls><source src="/plots/' + hash + '-video.mp4"/></video>';
+   var video = '<video controls><source src="/plots/' + hash + '-video.webm" type="video/webm"><source src="/plots/' + hash + '-video.mp4" type="video/mp4"/></video>';
    var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + video + '</div></body></html>';
    fs.writeFile(htmlPath, html, 'utf8', function(err) {
       next(err);
