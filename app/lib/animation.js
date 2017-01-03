@@ -220,59 +220,49 @@ animation.animate = function(plotRequest, next) {
       var videoPathMP4 = path.join(PLOT_DESTINATION, hash + '-video.mp4');
       var videoPathWebM = path.join(PLOT_DESTINATION, hash + '-video.webm');
 
+      var renderer = ffmpeg()
+         .input('/tmp/ani/map.jpg')
+         .input('/tmp/ani/' + id + '_' + '*' + '.png')
+         .inputOption('-pattern_type glob')
+         .inputFPS(1);
+
       if (borders) {
-         ffmpeg()
-            .input('/tmp/ani/map.jpg')
-            .input('/tmp/ani/' + id + '_' + '*' + '.png')
-            .inputOption('-pattern_type glob')
-            .inputFPS(1)
+         renderer = renderer
             .input('/tmp/ani/borders.png')
-            .complexFilter('overlay,overlay,split=2[out1][out2]')
-            .output(videoPathMP4)
-            .outputOptions("-map [out1]")
-            .outputFPS(30)
-            .noAudio()
-            .output(videoPathWebM)
-            .outputOptions("-map [out2]")
-            .outputFPS(30)
-            .noAudio()
-            .on('end', finishedRendering)
-            .on('error', errorRendering)
-            .run();
+            .complexFilter('overlay,overlay,split=2[out1][out2]');
       } else {
-         ffmpeg()
-            .input('/tmp/ani/map.jpg')
-            .input('/tmp/ani/' + id + '_' + '*' + '.png')
-            .inputOption('-pattern_type glob')
-            .inputFPS(1)
-            .complexFilter('overlay,split=2[out1][out2]')
-            .output(videoPathMP4)
-            .outputOptions("-map [out1]")
-            .outputFPS(30)
-            .noAudio()
-            .output(videoPathWebM)
-            .outputOptions("-map [out2]")
-            .outputFPS(30)
-            .noAudio()
-            .on('end', finishedRendering)
-            .on('error', errorRendering)
-            .run();
+         renderer = renderer.complexFilter('overlay,split=2[out1][out2]');
       }
+
+      renderer
+         .output(videoPathMP4)
+         .videoCodec('libx264')
+         .outputOptions(['-map [out1]', '-crf 23', '-preset medium'])
+         .outputFPS(30)
+         .noAudio()
+         .output(videoPathWebM)
+         .videoCodec('libvpx-vp9')
+         .outputOptions(['-map [out2]', '-crf 20', '-b:v 0'])
+         .outputFPS(30)
+         .noAudio()
+         .on('end', finishedRendering)
+         .on('error', errorRendering)
+         .run();
    }
 
    function errorRendering(err, stdout, stderr) {
       updateStatus(hash, PlotStatus.failed);
       console.log('Failed rendering! ;_;');
-      console.log(err);
-      console.log(stdout);
-      console.log(stderr);
+      console.log('err: \n' + err);
+      console.log('stdout: \n' + stdout);
+      console.log('stderr: \n' + stderr);
       cleanup();
    }
 
    function finishedRendering(err, stdout, stderr) {
-      // console.log(err);
-      // console.log(stdout);
-      // console.log(stderr);
+      // console.log('err: \n' + err);
+      // console.log('stdout: \n' + stdout);
+      // console.log('stderr: \n' + stderr);
 
       if (err) {
          updateStatus(hash, PlotStatus.failed);
