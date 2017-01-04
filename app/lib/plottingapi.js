@@ -31,22 +31,23 @@ plottingApi.getPlotDirUrl = function(req) {
 };
 
 plottingApi.plot = function(req, request, next) {
+   var domain = utils.getDomainName(req);
+   var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
+   var logDir = "";
+   if (global.config[domain]) {
+      if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
+         downloadDir = global.config[domain].plottingDownloadDir;
+      }
+      if (global.config[domain].logDir) {
+         logDir = path.join(__dirname, '../..', global.config[domain].logDir, "plotting");
+      }
+   }
+
    if (request.plot.type == 'animation') {
-      animation.animate(request, function(err, hash) {
+      animation.animate(request, downloadDir, logDir, function(err, hash) {
          next(err, hash);
       });
    } else {
-      var domain = utils.getDomainName(req);
-      var downloadDir = PLOT_DOWNLOAD_DIRECTORY;
-      var logDir = "";
-      if (global.config[domain]) {
-         if (global.config[domain].plottingDownloadDir && utils.directoryExists(global.config[domain].plottingDownloadDir)) {
-            downloadDir = global.config[domain].plottingDownloadDir;
-         }
-         if (global.config[domain].logDir) {
-            logDir = path.join(__dirname, '../..', global.config[domain].logDir, "plotting");
-         }
-      }
       var url = plottingApi.getPlotDirUrl(req);
       var child = child_process.spawn('python', ["-u", PLOTTING_PATH, "-c", "execute", "-d", PLOT_DESTINATION, "-u", url, "-dd", downloadDir, "-ld", logDir]);
 
@@ -114,18 +115,29 @@ plottingApi.processCSV = function(req, res, next) {
             .pipe(csv())
             .on('data', function(data) {
                lineNumber++;
-                if(data.Date && data.Longitude && data.Latitude && data.data_point){
+               if (data.Date && data.Longitude && data.Latitude && data.data_point) {
                   is_match_up = true;
-                  if(!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()){
-                        errorLines.push(lineNumber);
-                  }else{
-                        var longitude = parseFloat(data.Longitude);
-                        var latitude = parseFloat(data.Latitude);
-                        var geoJSON_data = {"type":"Feature", "properties":{"Date":data.Date, "Data Point":data.data_point, "Longitude":longitude.toFixed(3), "Latitude":latitude.toFixed(3)}, "geometry": {"type": "Point", "coordinates": [longitude, latitude]}};
-                        featuresList.push(geoJSON_data);
+                  if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()) {
+                     errorLines.push(lineNumber);
+                  } else {
+                     var longitude = parseFloat(data.Longitude);
+                     var latitude = parseFloat(data.Latitude);
+                     var geoJSON_data = {
+                        "type": "Feature",
+                        "properties": {
+                           "Date": data.Date,
+                           "Data Point": data.data_point,
+                           "Longitude": longitude.toFixed(3),
+                           "Latitude": latitude.toFixed(3)
+                        },
+                        "geometry": {
+                           "type": "Point",
+                           "coordinates": [longitude, latitude]
+                        }
+                     };
+                     featuresList.push(geoJSON_data);
                   }
-                }
-               else if (data.Date && data.Latitude && data.Longitude) {
+               } else if (data.Date && data.Latitude && data.Longitude) {
                   var longitude = parseFloat(data.Longitude);
                   var latitude = parseFloat(data.Latitude);
                   if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() || isNaN(latitude) || isNaN(longitude)) {

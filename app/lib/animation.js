@@ -26,7 +26,7 @@ var animation = {};
 
 module.exports = animation;
 
-animation.animate = function(plotRequest, next) {
+animation.animate = function(plotRequest, downloadDir, logDir, next) {
    console.log('Animation called');
 
    var hash = sha1(JSON.stringify(plotRequest));
@@ -46,7 +46,7 @@ animation.animate = function(plotRequest, next) {
    }
 
    var dataOptions = plotRequest.plot.data.series[0].data_source;
-   var id = dataOptions.layer_id;
+   var layerID = dataOptions.layer_id;
    var wmsUrl = dataOptions.wmsUrl;
    var params = dataOptions.wmsParams;
    var slices = dataOptions.timesSlices;
@@ -141,35 +141,40 @@ animation.animate = function(plotRequest, next) {
    var mapDownloaded = false;
    var bordersDownloaded = false;
    var slicesDownloaded = [];
-   var slicesCount = 0;
 
-   var q = async.queue(download, 10);
+   var downloadQueue = async.queue(download, 10);
 
    updateStatus(hash, PlotStatus.extracting);
 
-   q.push({
-      uri: url.format(mapUrl),
-      filename: '/tmp/ani/map.jpg',
-      id: 'map'
-   }, downloadComplete);
+   fs.mkdirs(path.join(downloadDir, hash), function(err) {
+      if (!err) {
+         downloadQueue.push({
+            uri: url.format(mapUrl),
+            filepath: path.join(downloadDir, hash, 'map.jpg'),
+            id: 'map'
+         }, downloadComplete);
 
-   if (borders) {
-      q.push({
-         uri: url.format(bordersUrl),
-         filename: '/tmp/ani/borders.png',
-         id: 'borders'
-      }, downloadComplete);
-   }
+         if (borders) {
+            downloadQueue.push({
+               uri: url.format(bordersUrl),
+               filepath: path.join(downloadDir, hash, 'borders.png'),
+               id: 'borders'
+            }, downloadComplete);
+         }
 
-   for (var i = 0; i < slices.length; i++) {
-      dataURL.query.TIME = slices[i];
-      var filename = '/tmp/ani/' + id + '_' + slices[i] + '.png';
-      q.push({
-         uri: url.format(dataURL),
-         filename: filename,
-         id: slices[i]
-      }, downloadComplete);
-   }
+         for (var i = 0; i < slices.length; i++) {
+            dataURL.query.TIME = slices[i];
+            var filename = layerID + '_' + bbox.replace(/\,/, '-') + '_' + slices[i].replace(/\:/, '-') + '.png';
+            var filepath = path.join(downloadDir, filename);
+            downloadQueue.push({
+               uri: url.format(dataURL),
+               filename: filename,
+               filepath: filepath,
+               id: slices[i]
+            }, downloadComplete);
+         }
+      }
+   });
 
    var retries = {};
 
@@ -180,9 +185,9 @@ animation.animate = function(plotRequest, next) {
          }
          if (retries[options.id] < 4) {
             retries[options.id]++;
-            q.push({
+            downloadQueue.push({
                uri: options.uri,
-               filename: options.filename,
+               filepath: options.filepath,
                id: options.id
             }, downloadComplete);
          } else {
@@ -191,25 +196,39 @@ animation.animate = function(plotRequest, next) {
       } else {
          if (options.id == 'map') {
             mapDownloaded = true;
+            done();
          } else if (options.id == 'borders') {
             bordersDownloaded = true;
+            done();
          } else {
-            Jimp.read(options.filename, function(err, image) {
-               Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(fontB) {
-                  Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(fontW) {
-                     image.print(fontB, 10, 10, options.id);
-                     image.print(fontW, 11, 11, options.id);
-                     image.write(options.filename, function() {
-                        slicesCount++;
-                        slicesDownloaded.push(options.filename);
-                        console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
-                        if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
-                           render();
-                        }
+            if (options.existing) {
+               fs.copy(options.filepath, path.join(downloadDir, hash, options.filename), done);
+            } else {
+               Jimp.read(options.filepath, function(err, image) {
+                  Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(fontB) {
+                     Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(fontW) {
+                        image.print(fontB, 10, 10, options.id);
+                        image.print(fontW, 11, 11, options.id);
+                        image.write(options.filepath, function() {
+                           fs.copy(options.filepath, path.join(downloadDir, hash, options.filename), done);
+                        });
                      });
                   });
                });
-            });
+            }
+         }
+      }
+
+      function done(err) {
+         if (err) {
+            console.error(err);
+         }
+         if (options.id != 'map' && options.id != 'borders') {
+            slicesDownloaded.push(options.filepath);
+            console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
+         }
+         if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
+            render();
          }
       }
    }
@@ -224,14 +243,14 @@ animation.animate = function(plotRequest, next) {
       var renderer = ffmpeg({
             stdoutLines: 0
          })
-         .input('/tmp/ani/map.jpg')
-         .input('/tmp/ani/' + id + '_' + '*' + '.png')
+         .input(path.join(downloadDir, hash, 'map.jpg'))
+         .input(path.join(downloadDir, hash, layerID + '_' + bbox.replace(/\,/, '-') + '_' + '*' + '.png'))
          .inputOption('-pattern_type glob')
          .inputFPS(1);
 
       if (borders) {
          renderer = renderer
-            .input('/tmp/ani/borders.png')
+            .input(path.join(downloadDir, hash, 'borders.png'))
             .complexFilter('overlay,overlay,split=2[out1][out2]');
       } else {
          renderer = renderer.complexFilter('overlay,split=2[out1][out2]');
@@ -243,14 +262,12 @@ animation.animate = function(plotRequest, next) {
          .outputOptions(['-map [out1]', '-crf 23', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputFPS(30)
          .noAudio()
-
-      .output(videoPathWebM)
+         .output(videoPathWebM)
          .videoCodec('libvpx-vp9')
          .outputOptions(['-map [out2]', '-crf 20', '-b:v 0', '-pix_fmt yuv420p'])
          .outputFPS(30)
          .noAudio()
-
-      .on('end', finishedRendering)
+         .on('end', finishedRendering)
          .on('error', errorRendering)
          .run();
    }
@@ -286,11 +303,12 @@ animation.animate = function(plotRequest, next) {
    }
 
    function cleanup() {
-      for (var i = 0; i < slicesDownloaded.length; i++) {
-         fs.remove(slicesDownloaded[i]);
-      }
-      fs.remove('/tmp/ani/map.jpg');
-      fs.remove('/tmp/ani/borders.png');
+      // for (var i = 0; i < slicesDownloaded.length; i++) {
+      //    fs.remove(slicesDownloaded[i]);
+      // }
+      // fs.remove(path.join(downloadDir, hash, 'map.jpg'));
+      // fs.remove(path.join(downloadDir, hash, 'borders.png'));
+      fs.remove(path.join(downloadDir, hash));
    }
 };
 
@@ -305,20 +323,26 @@ function buildHtml(hash, next) {
 
 function download(options, next) {
    // console.log('Downloading ' + options.id);
-   request(options.uri, {
-         timeout: 60000
-      })
-      .on('error', done)
-      .pipe(fs.createWriteStream(options.filename))
-      .on('error', done)
-      .on('close', done);
+   if (utils.fileExists(options.filepath)) {
+      options.existing = true;
+      done();
+   } else {
+      options.existing = false;
+      request(options.uri, {
+            timeout: 60000
+         })
+         .on('error', done)
+         .pipe(fs.createWriteStream(options.filepath))
+         .on('error', done)
+         .on('close', done);
+   }
 
    function done(err) {
       next(err, options);
    }
 }
 
-var saveStatusQ = async.queue(saveStatus, 1);
+var saveStatusQueue = async.queue(saveStatus, 1);
 
 function updateStatus(hash, state, message, percentage, minRemaining, traceback, next) {
    var statusPath = path.join(PLOT_DESTINATION, hash + '-status.json');
@@ -356,7 +380,7 @@ function updateStatus(hash, state, message, percentage, minRemaining, traceback,
             status.percentage = percentage || 0;
             status.minutes_remaining = minRemaining || -1;
          }
-         saveStatusQ.push({
+         saveStatusQueue.push({
             statusPath: statusPath,
             status: status
          }, function(err) {
