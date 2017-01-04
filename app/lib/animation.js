@@ -2,6 +2,7 @@ var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
+var admZip = require('adm-zip');
 var fs = require('fs-extra');
 var request = require('request');
 var url = require('url');
@@ -220,7 +221,9 @@ animation.animate = function(plotRequest, next) {
       var videoPathMP4 = path.join(PLOT_DESTINATION, hash + '-video.mp4');
       var videoPathWebM = path.join(PLOT_DESTINATION, hash + '-video.webm');
 
-      var renderer = ffmpeg()
+      var renderer = ffmpeg({
+            stdoutLines: 0
+         })
          .input('/tmp/ani/map.jpg')
          .input('/tmp/ani/' + id + '_' + '*' + '.png')
          .inputOption('-pattern_type glob')
@@ -237,15 +240,17 @@ animation.animate = function(plotRequest, next) {
       renderer
          .output(videoPathMP4)
          .videoCodec('libx264')
-         .outputOptions(['-map [out1]', '-crf 23', '-preset medium'])
+         .outputOptions(['-map [out1]', '-crf 23', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputFPS(30)
          .noAudio()
-         .output(videoPathWebM)
+
+      .output(videoPathWebM)
          .videoCodec('libvpx-vp9')
-         .outputOptions(['-map [out2]', '-crf 20', '-b:v 0'])
+         .outputOptions(['-map [out2]', '-crf 20', '-b:v 0', '-pix_fmt yuv420p'])
          .outputFPS(30)
          .noAudio()
-         .on('end', finishedRendering)
+
+      .on('end', finishedRendering)
          .on('error', errorRendering)
          .run();
    }
@@ -260,24 +265,24 @@ animation.animate = function(plotRequest, next) {
    }
 
    function finishedRendering(err, stdout, stderr) {
-      // console.log('err: \n' + err);
-      // console.log('stdout: \n' + stdout);
-      // console.log('stderr: \n' + stderr);
+      console.log('err: \n' + err);
+      console.log('stdout: \n' + stdout);
+      console.log('stderr: \n' + stderr);
 
       if (err) {
          updateStatus(hash, PlotStatus.failed);
          console.log('Failed rendering! ;_;');
          console.log(err);
          cleanup();
+      } else {
+         buildHtml(hash, function(err) {
+            if (!err) {
+               updateStatus(hash, PlotStatus.complete);
+               console.log('Finished rendering! ^_^');
+               cleanup();
+            }
+         });
       }
-
-      buildHtml(hash, function(err) {
-         if (!err) {
-            updateStatus(hash, PlotStatus.complete);
-            console.log('Finished rendering! ^_^');
-            cleanup();
-         }
-      });
    }
 
    function cleanup() {
