@@ -2,7 +2,7 @@ var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 var ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-var admZip = require('adm-zip');
+var yazl = require('yazl');
 var fs = require('fs-extra');
 var request = require('request');
 var url = require('url');
@@ -26,7 +26,7 @@ var animation = {};
 
 module.exports = animation;
 
-animation.animate = function(plotRequest, downloadDir, logDir, next) {
+animation.animate = function(plotRequest, domain, downloadDir, logDir, next) {
    console.log('Animation called');
 
    var hash = sha1(JSON.stringify(plotRequest));
@@ -146,8 +146,9 @@ animation.animate = function(plotRequest, downloadDir, logDir, next) {
 
    updateStatus(hash, PlotStatus.extracting);
 
-   fs.mkdirs(path.join(downloadDir, hash), function(err) {
+   fs.mkdirs(path.join(downloadDir, domain, hash), function(err) {
       if (!err) {
+         downloadDir = path.join(downloadDir, domain);
          downloadQueue.push({
             uri: url.format(mapUrl),
             filepath: path.join(downloadDir, hash, 'map.jpg'),
@@ -260,12 +261,12 @@ animation.animate = function(plotRequest, downloadDir, logDir, next) {
          .output(videoPathMP4)
          .videoCodec('libx264')
          .outputOptions(['-map [out1]', '-crf 23', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
-         .outputFPS(30)
+         .outputFPS(1)
          .noAudio()
          .output(videoPathWebM)
          .videoCodec('libvpx-vp9')
          .outputOptions(['-map [out2]', '-crf 20', '-b:v 0', '-pix_fmt yuv420p'])
-         .outputFPS(30)
+         .outputFPS(1)
          .noAudio()
          .on('end', finishedRendering)
          .on('error', errorRendering)
@@ -294,9 +295,11 @@ animation.animate = function(plotRequest, downloadDir, logDir, next) {
       } else {
          buildHtml(hash, function(err) {
             if (!err) {
-               updateStatus(hash, PlotStatus.complete);
-               console.log('Finished rendering! ^_^');
-               cleanup();
+               buildZip(hash, function() {
+                  updateStatus(hash, PlotStatus.complete);
+                  console.log('Finished rendering! ^_^');
+                  cleanup();
+               });
             }
          });
       }
@@ -319,6 +322,22 @@ function buildHtml(hash, next) {
    fs.writeFile(htmlPath, html, 'utf8', function(err) {
       next(err);
    });
+}
+
+function buildZip(hash, next) {
+   var zipPath = path.join(PLOT_DESTINATION, hash + '.zip');
+   var zip = new yazl.ZipFile();
+   zip.outputStream.pipe(fs.createWriteStream(zipPath))
+      .on('close', function() {
+         next();
+      })
+      .on('error', function(err) {
+         // :(
+      });
+
+   zip.addFile(path.join(PLOT_DESTINATION, hash + '-video.mp4'), hash + '-video.mp4');
+   zip.addFile(path.join(PLOT_DESTINATION, hash + '-video.webm'), hash + '-video.webm');
+   zip.end();
 }
 
 function download(options, next) {
