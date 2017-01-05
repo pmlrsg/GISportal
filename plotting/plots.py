@@ -1888,6 +1888,9 @@ To execute a plot
       debug(0,u"'{}' is not a directory".format(opts.download_dir))
       sys.exit(1)
 
+   if not opts.download_dir.endswith("/"):
+      opts.download_dir += "/"
+
    if opts.command not in valid_commands:
       debug(0,u"Command must be one of {}".format(valid_commands))
       sys.exit(1)
