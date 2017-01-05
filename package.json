@@ -3,6 +3,7 @@
   "description": "web based GIS for Earth Observation data",
   "version": "2.0.1",
   "devDependencies": {
+    "adm-zip": "^0.4.7",
     "autoprefixer": "~6.1.2",
     "chai": "^3.5.0",
     "chai-http": "^3.0.0",
@@ -21,7 +22,6 @@
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.9",
-    "adm-zip": "^0.4.7",
     "async": "^2.1.4",
     "body-parser": "~1.14.2",
     "bunyan": "~1.5.1",
