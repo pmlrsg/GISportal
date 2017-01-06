@@ -44,7 +44,7 @@ plottingApi.plot = function(req, request, next) {
    }
 
    if (request.plot.type == 'animation') {
-      animation.animate(request, domain, downloadDir, logDir, function(err, hash) {
+      animation.animate(request, domain, PLOT_DESTINATION, downloadDir, logDir, function(err, hash) {
          next(err, hash);
       });
    } else {
