@@ -14,8 +14,8 @@ var utils = require('./utils.js');
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-var MAXWIDTH = 2048;
-var MAXHEIGHT = 2048;
+var MAXWIDTH = 1920;
+var MAXHEIGHT = 1080;
 
 var PlotStatus = Object.freeze({
    initialising: 'initialising',
@@ -203,7 +203,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       var height;
       var width;
 
-      if ((bboxHeight / bboxWidth) <= 1) {
+      if ((bboxHeight / bboxWidth) <= maxHeight / maxWidth) {
          height = 2 * Math.round(((bboxHeight / bboxWidth) * maxWidth) / 2);
          width = maxWidth;
       } else {
