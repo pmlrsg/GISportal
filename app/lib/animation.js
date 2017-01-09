@@ -399,6 +399,30 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       updateStatus(PlotStatus.rendering);
       console.log('Rendering');
 
+      var inputFPS = plotRequest.framerate || 1;
+      var outputFPS = inputFPS;
+
+      while (outputFPS < 10) {
+         outputFPS = outputFPS * 2;
+      }
+
+      switch (inputFPS) {
+         case 1:
+         case 2:
+            outputFPS = 10;
+            break;
+         case 3:
+         case 4:
+            outputFPS = 12;
+            break;
+         default:
+            if (inputFPS < 10) {
+               outputFPS = inputFPS * 2;
+            } else {
+               outputFPS = inputFPS;
+            }
+      }
+
       var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
       var videoPathWebM = path.join(plotDir, hash + '-video.webm');
 
@@ -408,7 +432,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          .input(path.join(downloadDir, hash, 'map.jpg'))
          .input(path.join(downloadDir, hash, layerID + '_' + bbox.replace(/\,/, '-') + '_' + '*' + '.png'))
          .inputOption('-pattern_type glob')
-         .inputFPS(1);
+         .inputFPS(inputFPS);
 
       if (borders) {
          renderer = renderer
@@ -422,12 +446,12 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          .output(videoPathMP4)
          .videoCodec('libx264')
          .outputOptions(['-map [out1]', '-crf 23', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
-         .outputFPS(10)
+         .outputFPS(outputFPS)
          .noAudio()
          .output(videoPathWebM)
          .videoCodec('libvpx-vp9')
          .outputOptions(['-map [out2]', '-crf 20', '-b:v 0', '-pix_fmt yuv420p'])
-         .outputFPS(10)
+         .outputFPS(outputFPS)
          .noAudio()
          .on('end', next)
          .on('error', next)
