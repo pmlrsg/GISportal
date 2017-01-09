@@ -6,11 +6,16 @@ var path = require('path');
 var request = require('request');
 var sha1 = require('sha1');
 var url = require('url');
+var xml2js = require('xml2js');
 var yazl = require('yazl');
+var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
+
+var MAXWIDTH = 2048;
+var MAXHEIGHT = 2048;
 
 var PlotStatus = Object.freeze({
    initialising: 'initialising',
@@ -27,8 +32,11 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
    console.log('Animation called');
    var bbox;
    var borders = false;
-   var hash = sha1(JSON.stringify(plotRequest));
    var layerID;
+   var maxHeight = MAXHEIGHT;
+   var maxWidth = MAXWIDTH;
+
+   var hash = sha1(JSON.stringify(plotRequest));
    var saveStatusQueue = async.queue(saveStatus, 1);
 
    readStatus(function(status) {
@@ -39,31 +47,41 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             next(err, hash);
          });
 
-         downloadTiles(function() {
-            render(function(err, stdout, stderr) {
-               console.log('err: \n' + err);
-               console.log('stdout: \n' + stdout);
-               console.log('stderr: \n' + stderr);
+         var mapOptions = plotRequest.plot.baseMap;
+         var dataOptions = plotRequest.plot.data.series[0].data_source;
 
-               if (!err) {
-                  buildHtml(function(err) {
-                     if (!err) {
-                        buildZip(function() {
-                           updateStatus(PlotStatus.complete);
-                           console.log('Finished rendering! ^_^');
+         var bordersOptions;
+         if (plotRequest.plot.countryBorders) {
+            bordersOptions = plotRequest.plot.countryBorders;
+         }
+
+         getMaxResolution(mapOptions, dataOptions, bordersOptions, function() {
+            downloadTiles(mapOptions, dataOptions, bordersOptions, function() {
+               render(function(err, stdout, stderr) {
+                  console.log('err: \n' + err);
+                  console.log('stdout: \n' + stdout);
+                  console.log('stderr: \n' + stderr);
+
+                  if (!err) {
+                     buildHtml(function(err) {
+                        if (!err) {
+                           buildZip(function() {
+                              updateStatus(PlotStatus.complete);
+                              console.log('Finished rendering! ^_^');
+                              cleanup();
+                           });
+                        } else {
+                           updateStatus(PlotStatus.failed, null, null, null, err);
                            cleanup();
-                        });
-                     } else {
-                        updateStatus(PlotStatus.failed, null, null, null, err);
-                        cleanup();
-                     }
-                  });
-               } else {
-                  updateStatus(PlotStatus.failed, null, null, null, err);
-                  console.log('Failed rendering! ;_;');
-                  // console.log(err);
-                  cleanup();
-               }
+                        }
+                     });
+                  } else {
+                     updateStatus(PlotStatus.failed, null, null, null, err);
+                     console.log('Failed rendering! ;_;');
+                     // console.log(err);
+                     cleanup();
+                  }
+               });
             });
          });
       } else {
@@ -71,19 +89,107 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       }
    });
 
-   function downloadTiles(next) {
-      console.log('starting download');
-      var maxWidth = 1024;
-      var maxHeight = 1024;
+   function getMaxResolution(mapOptions, dataOptions, bordersOptions, next) {
+      var mapDone = false;
+      var bordersDone = false;
+      var dataDone = false;
 
-      var mapOptions = plotRequest.plot.baseMap;
+      var mapUrl = url.parse(mapOptions.wmsUrl);
+      mapUrl.search = undefined;
+      mapUrl.query = {
+         SERVICE: 'WMS',
+         REQUEST: 'GetCapabilities'
+      };
+      makeRequest(url.format(mapUrl), function(err) {
+         mapDone = true;
+         done();
+      });
 
-      var bordersOptions;
-      if (plotRequest.plot.countryBorders) {
-         bordersOptions = plotRequest.plot.countryBorders;
+      var bordersUrl;
+      if (bordersOptions) {
+         borders = true;
+         bordersUrl = url.parse(bordersOptions.wmsUrl);
+         bordersUrl.search = undefined;
+         bordersUrl.query = {
+            SERVICE: 'WMS',
+            REQUEST: 'GetCapabilities'
+         };
+         makeRequest(url.format(bordersUrl), function(err) {
+            bordersDone = true;
+            done();
+         });
+      } else {
+         bordersDone = true;
       }
 
-      var dataOptions = plotRequest.plot.data.series[0].data_source;
+      var dataURL = url.parse(dataOptions.wmsUrl, true);
+      dataURL.search = undefined;
+      dataURL.query = {
+         SERVICE: 'WMS',
+         REQUEST: 'GetCapabilities'
+      };
+      makeRequest(url.format(dataURL), function(err) {
+         dataDone = true;
+         done();
+      });
+
+      function done() {
+         if (mapDone && bordersDone && dataDone) {
+            next();
+         }
+      }
+
+      function makeRequest(wmsUrl, next) {
+         request(wmsUrl, function(err, response, body) {
+            if (err) {
+               next(err);
+            } else {
+               xml2js.parseString(body, {
+                  tagNameProcessors: [settingsApi.stripPrefix],
+                  attrNameProcessors: [settingsApi.stripPrefix]
+               }, function(err, result) {
+                  if (err) {
+                     next(err);
+                  } else {
+                     try {
+                        var layerMaxWidth;
+                        var layerMaxHeight;
+
+                        // console.log('maxWidth: ' + maxWidth);
+                        // console.log('maxHeight: ' + maxHeight);
+
+                        layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
+                        layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
+
+                        // console.log('LayerMaxWidth: ' + layerMaxWidth);
+                        // console.log('LayerMaxHeight: ' + layerMaxHeight);
+
+                        if (layerMaxWidth < maxWidth) {
+                           maxWidth = layerMaxWidth;
+                        }
+
+                        if (layerMaxHeight < maxHeight) {
+                           maxHeight = layerMaxHeight;
+                        }
+
+                        // console.log('maxWidth: ' + maxWidth);
+                        // console.log('maxHeight: ' + maxHeight);
+
+                        next();
+                     } catch (err) {
+                        next(err);
+                     }
+                  }
+               });
+            }
+         });
+      }
+
+   }
+
+   function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
+      console.log('starting download');
+
       layerID = dataOptions.layer_id;
       var wmsUrl = dataOptions.wmsUrl;
       var params = dataOptions.wmsParams;
