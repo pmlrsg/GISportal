@@ -49,7 +49,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          fs.writeFile(path.join(plotDir, hash + '-request.json'), JSON.stringify(plotRequest));
 
          OFF_DEATH = ON_DEATH(function(signal) {
-            console.log('ON_DEATH called');
+            console.log('\nON_DEATH called');
             updateStatus(PlotStatus.failed);
             cleanup(function() {
                process.kill(process.pid, signal);
@@ -164,40 +164,26 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                   if (err) {
                      next(err);
                   } else {
-                     try {
-                        var layerMaxWidth;
-                        var layerMaxHeight;
-
-                        // console.log('maxWidth: ' + maxWidth);
-                        // console.log('maxHeight: ' + maxHeight);
-
-                        layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
-                        layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
-
-                        // console.log('LayerMaxWidth: ' + layerMaxWidth);
-                        // console.log('LayerMaxHeight: ' + layerMaxHeight);
+                     if (result.WMS_Capabilities) {
+                        var layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
+                        var layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
 
                         if (layerMaxWidth < maxWidth) {
                            maxWidth = layerMaxWidth;
                         }
-
                         if (layerMaxHeight < maxHeight) {
                            maxHeight = layerMaxHeight;
                         }
 
-                        // console.log('maxWidth: ' + maxWidth);
-                        // console.log('maxHeight: ' + maxHeight);
-
                         next();
-                     } catch (err) {
-                        next(err);
+                     } else {
+                        next();
                      }
                   }
                });
             }
          });
       }
-
    }
 
    function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
@@ -293,7 +279,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
       var mapDownloaded = false;
       var bordersDownloaded = false;
-      var slicesDownloaded = [];
+      var slicesDownloaded = 0;
 
       var downloadQueue = async.queue(download, 10);
 
@@ -394,7 +380,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                            image.print(fontW, 11, 11, options.id);
                            image.write(options.tempPath, function() {
                               fs.move(options.tempPath, options.filePath, function() {
-                                 console.log('moved!');
                                  fs.copy(options.filePath, path.join(hashDir, options.filename), done);
                               });
                            });
@@ -410,10 +395,11 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                console.error(err);
             }
             if (options.id != 'map' && options.id != 'borders') {
-               slicesDownloaded.push(options.filePath);
-               console.log('downloaded: ' + slicesDownloaded.length + ' of ' + slices.length);
+               // slicesDownloaded.push(options.filePath);
+               slicesDownloaded++;
+               console.log('downloaded: ' + slicesDownloaded + ' of ' + slices.length);
             }
-            if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded.length == slices.length) {
+            if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
                next();
             }
          }
@@ -495,16 +481,24 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       var numFiles = 0;
 
       glob(path.join(downloadDir, 'temp_*'), function(err, files) {
-         if (!err) {
+         if (err) {
+            console.log(err);
+         } else {
             numFiles = files.length;
-            files.forEach(function(file) {
-               fs.remove(file, done);
-            });
+            if (numFiles > 0) {
+               files.forEach(function(file) {
+                  fs.remove(file, done);
+               });
+            } else {
+               done();
+            }
          }
       });
 
       function done() {
-         i++;
+         if (numFiles > 0) {
+            i++;
+         }
          if (i == numFiles) {
             fs.remove(path.join(downloadDir, hash), next);
          }
