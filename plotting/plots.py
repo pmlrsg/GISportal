@@ -578,8 +578,11 @@ def transect(plot, outfile="transect.html"):
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
+      # Convert null values to NaN
       dfarray[dfarray == 'null'] = "NaN"
+      # Make a copy of the full array for saving
       dfarray_full = dfarray
+      # Remove NaN values for plotting
       dfarray = dfarray[dfarray[:,1]!='NaN']
 
       debug(4, dfarray)
@@ -603,30 +606,31 @@ def transect(plot, outfile="transect.html"):
       np.savetxt(csv_file, data_full, comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-      min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
-      max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
-      buffer_value = (max_value - min_value) /20
-      ymin.append(min_value-buffer_value)
-      ymax.append(max_value+buffer_value)
-      if plot_scale == "log":
-         if min_value < 0:
-            debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
-            plot_scale = "linear"
-         else:
-            # Make sure we do not ask for a negative range as this does not
-            # work for log space.
-            if ymin[-1] < 0:
-               ymin[-1] = min_value
+      if dfarray.size > 0:
+         min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
+         max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
+         buffer_value = (max_value - min_value) /20
+         ymin.append(min_value-buffer_value)
+         ymax.append(max_value+buffer_value)
+         if plot_scale == "log":
+            if min_value < 0:
+               debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
+               plot_scale = "linear"
+            else:
+               # Make sure we do not ask for a negative range as this does not
+               # work for log space.
+               if ymin[-1] < 0:
+                  ymin[-1] = min_value
 
-      date = datetime(data[varindex['track_date']])
+         date = datetime(data[varindex['track_date']])
 
-      datasource = dict(date=date,
-                        sdate=data[varindex['track_date']],
-                        lat=data[varindex['track_lat']],
-                        lon=data[varindex['track_lon']],
-                        value=data[varindex['data_value']])
+         datasource = dict(date=date,
+                           sdate=data[varindex['track_date']],
+                           lat=data[varindex['track_lat']],
+                           lon=data[varindex['track_lon']],
+                           value=data[varindex['data_value']])
 
-      sources.append(ColumnDataSource(data=datasource))
+         sources.append(ColumnDataSource(data=datasource))
 
    logger.num_points = len(data_merged)
    csv_file = csv_dir + "/" + "merged.csv"
