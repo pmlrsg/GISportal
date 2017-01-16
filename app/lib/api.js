@@ -47,6 +47,7 @@ api.get_cache_list = function(req, res) {
       var serverTemp = cache[i];
       var server = {};
       server.wmsURL = serverTemp.wmsURL;
+      server.wcsURL = serverTemp.wcsURL || "";
       server.serverName = serverTemp.serverName;
       server.contactInfo = serverTemp.contactInfo;
       server.provider = serverTemp.provider;
