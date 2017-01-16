@@ -124,16 +124,35 @@ class TransectExtractor(Extractor):
       return max_slices
 
    def getSlicesInRange(self, time_slices):
+      time_slices.sort()
       date_range = '/'.join(self.extract_dates).split('/')
 
       for i, date in enumerate(date_range):
          date_range[i] = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
 
       slices_in_range = []
-      for time_slice in time_slices:
+      pre_range_slice_index = 0
+      last_slice_index = 0
+
+      for i, time_slice in enumerate(time_slices):
          time_slice = datetime.strptime(time_slice, '%Y-%m-%dT%H:%M:%SZ')
-         if time_slice >= date_range[0] and time_slice <= date_range[1]:
+
+         if not slices_in_range and time_slice < date_range[0]:
+            pre_range_time_slice = time_slice
+            pre_range_slice_index = i
+         elif time_slice >= date_range[0] and time_slice <= date_range[1]:
+            if not slices_in_range:
+               slices_in_range.append(pre_range_time_slice)
             slices_in_range.append(time_slice)
+            last_slice_index = i
+         elif time_slice > date_range[1]:
+            break
+
+      if not slices_in_range:
+         slices_in_range.append(pre_range_time_slice)
+         last_slice_index = pre_range_slice_index
+      post_range_time_slice = datetime.strptime(time_slices[last_slice_index + 1], '%Y-%m-%dT%H:%M:%SZ')
+      slices_in_range.append(post_range_time_slice)
 
       return slices_in_range
 
