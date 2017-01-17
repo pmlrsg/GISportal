@@ -574,7 +574,7 @@ def transect(plot, outfile="transect.html"):
 
       plot_scale= df['scale']
 
-      debug(4, u"timeseries: varindex = {}".format(varindex))
+      debug(4, u"transect: varindex = {}".format(varindex))
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
@@ -653,7 +653,8 @@ def transect(plot, outfile="transect.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"transect: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
@@ -741,7 +742,7 @@ def matchup(plot, outfile="transect.html"):
 
       plot_scale= df['scale']
 
-      debug(4, "timeseries: varindex = {}".format(varindex))
+      debug(4, "matchup: varindex = {}".format(varindex))
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
@@ -800,7 +801,8 @@ def matchup(plot, outfile="transect.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"matchup: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
@@ -973,7 +975,8 @@ def timeseries(plot, outfile="time.html"):
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+   debug(2,u"timeseries: y1Axis is {}".format(plot['y1Axis']['label']))
+   debug(2,u"timeseries: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
