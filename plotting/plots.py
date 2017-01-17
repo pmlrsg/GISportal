@@ -578,8 +578,11 @@ def transect(plot, outfile="transect.html"):
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
+      # Convert null values to NaN
       dfarray[dfarray == 'null'] = "NaN"
+      # Make a copy of the full array for saving
       dfarray_full = dfarray
+      # Remove NaN values for plotting
       dfarray = dfarray[dfarray[:,1]!='NaN']
 
       debug(4, dfarray)
@@ -603,30 +606,31 @@ def transect(plot, outfile="transect.html"):
       np.savetxt(csv_file, data_full, comments='', header=','.join(df['vars']), fmt="%s",delimiter=",")
       zf.write(csv_file, arcname=df['coverage'] + ".csv")
 
-      min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
-      max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
-      buffer_value = (max_value - min_value) /20
-      ymin.append(min_value-buffer_value)
-      ymax.append(max_value+buffer_value)
-      if plot_scale == "log":
-         if min_value < 0:
-            debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
-            plot_scale = "linear"
-         else:
-            # Make sure we do not ask for a negative range as this does not
-            # work for log space.
-            if ymin[-1] < 0:
-               ymin[-1] = min_value
+      if dfarray.size > 0:
+         min_value = np.nanmin(data[varindex['data_value']].astype(np.float64))
+         max_value = np.nanmax(data[varindex['data_value']].astype(np.float64))
+         buffer_value = (max_value - min_value) /20
+         ymin.append(min_value-buffer_value)
+         ymax.append(max_value+buffer_value)
+         if plot_scale == "log":
+            if min_value < 0:
+               debug(0, u"Cannot have negative value, {}, when using log scale.".format(min_value))
+               plot_scale = "linear"
+            else:
+               # Make sure we do not ask for a negative range as this does not
+               # work for log space.
+               if ymin[-1] < 0:
+                  ymin[-1] = min_value
 
-      date = datetime(data[varindex['track_date']])
+         date = datetime(data[varindex['track_date']])
 
-      datasource = dict(date=date,
-                        sdate=data[varindex['track_date']],
-                        lat=data[varindex['track_lat']],
-                        lon=data[varindex['track_lon']],
-                        value=data[varindex['data_value']])
+         datasource = dict(date=date,
+                           sdate=data[varindex['track_date']],
+                           lat=data[varindex['track_lat']],
+                           lon=data[varindex['track_lon']],
+                           value=data[varindex['data_value']])
 
-      sources.append(ColumnDataSource(data=datasource))
+         sources.append(ColumnDataSource(data=datasource))
 
    logger.num_points = len(data_merged)
    csv_file = csv_dir + "/" + "merged.csv"
@@ -636,77 +640,82 @@ def transect(plot, outfile="transect.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True
-   )
+   ts_plot = None
 
-   tooltips = [("Date", "@sdate")]
-   tooltips.append(("Value", "@value{0.000}"))
-   tooltips.append(("Latitude", "@lat{1.1}"))
-   tooltips.append(("Longitude", "@lon{1.1}"))
+   if sources:
+      ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+                 height=400, responsive=True
+      )
 
-   ts_plot.add_tools(CrosshairTool())
+      tooltips = [("Date", "@sdate")]
+      tooltips.append(("Value", "@value{0.000}"))
+      tooltips.append(("Latitude", "@lat{1.1}"))
+      tooltips.append(("Longitude", "@lon{1.1}"))
 
-   ts_plot.xaxis.axis_label = 'Date'
-   ts_plot.title_text_font_size = "14pt"
-   ts_plot.xaxis.axis_label_text_font_size = "10pt"
-   ts_plot.yaxis.axis_label_text_font_size = "10pt"
-   # Set up the axis label here as it writes to all y axes so overwrites the right hand one
-   # if we run it later.
-   debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
-   debug(2,u"transect: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
-   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
-   ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
-   yrange = [None, None]
+      ts_plot.add_tools(CrosshairTool())
 
-   if len(sources) > len(plot_palette[0]):
-      import random
-      r = lambda: random.randint(0,255)
-      while len(sources) > len(plot_palette[0]):
-         plot_palette[0].append('#%02X%02X%02X' % (r(),r(),r()))
-         plot_palette[1].append('#%02X%02X%02X' % (r(),r(),r()))
+      ts_plot.xaxis.axis_label = 'Date'
+      ts_plot.title_text_font_size = "14pt"
+      ts_plot.xaxis.axis_label_text_font_size = "10pt"
+      ts_plot.yaxis.axis_label_text_font_size = "10pt"
+      # Set up the axis label here as it writes to all y axes so overwrites the right hand one
+      # if we run it later.
+      debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+      ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+      ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+      ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+      yrange = [None, None]
 
-   for i, source in enumerate(sources):
-      # If we want 2 Y axes then the lines below do this
-      if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
-         debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
-         # Setting the second y axis range name and range
-         yrange[1] = "y2"
-         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
-   
-         # Adding the second axis to the plot.  
-         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
-   
-      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
-      # Plot the mean as line
-      debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
+      if len(sources) > len(plot_palette[0]):
+         import random
+         r = lambda: random.randint(0,255)
+         while len(sources) > len(plot_palette[0]):
+            plot_palette[0].append('#%02X%02X%02X' % (r(),r(),r()))
+            plot_palette[1].append('#%02X%02X%02X' % (r(),r(),r()))
 
-      # as a point
-      debug(2, u"Plotting points for {}".format(plot_data[i]['coverage']))
-      ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
+      for i, source in enumerate(sources):
+         # If we want 2 Y axes then the lines below do this
+         if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
+            debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
+            # Setting the second y axis range name and range
+            yrange[1] = "y2"
+            ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
       
-   hover = HoverTool(tooltips=tooltips)
-   ts_plot.add_tools(hover)
+            # Adding the second axis to the plot.  
+            ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+      
+         y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+         # Plot the mean as line
+         debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
+         ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
 
-   # Legend placement needs to be after the first glyph set up.
-   # Cannot place legend outside plot.
-   ts_plot.legend.location = "top_left"
-   
-   script, div = components(ts_plot)
+         # as a point
+         debug(2, u"Plotting points for {}".format(plot_data[i]['coverage']))
+         ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[1][i], size=5, alpha=0.5, line_alpha=0, source=source)
+         
+      hover = HoverTool(tooltips=tooltips)
+      ts_plot.add_tools(hover)
 
-   # plot the points
-   #output_file(outfile, 'Time Series')
-   #save(ts_plot)
-   if plotting.debug.verbosity > 0:
-      output_file(outfile, 'Time Series')
-      save(ts_plot)
+      # Legend placement needs to be after the first glyph set up.
+      # Cannot place legend outside plot.
+      ts_plot.legend.location = "top_left"
+      
+      script, div = components(ts_plot)
+
+      # plot the points
+      #output_file(outfile, 'Time Series')
+      #save(ts_plot)
+      if plotting.debug.verbosity > 0:
+         output_file(outfile, 'Time Series')
+         save(ts_plot)
+      else:
+         with open(outfile, 'w') as ofile:
+            print(template.render(script=script, div=div), file=ofile)
    else:
       with open(outfile, 'w') as ofile:
-         print(template.render(script=script, div=div), file=ofile)
-   
-   return(ts_plot)
+         print(template.render(script="", div="<p>Not enough data to draw plot</p>"), file=ofile)
+
+   return ts_plot
 #END transect
 
 def matchup(plot, outfile="transect.html"):
@@ -1890,6 +1899,9 @@ To execute a plot
    if not os.path.isdir(opts.download_dir):
       debug(0,u"'{}' is not a directory".format(opts.download_dir))
       sys.exit(1)
+
+   if not opts.download_dir.endswith("/"):
+      opts.download_dir += "/"
 
    if opts.command not in valid_commands:
       debug(0,u"Command must be one of {}".format(valid_commands))

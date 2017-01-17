@@ -104,6 +104,7 @@ class TransectStats(object):
 
 
          if len(data_var.dimensions) == 4:
+            # If the file has a depth variable, use the first depth
             data = data_var[time_index][0][lat_index][lon_index]
          else:
             data = data_var[time_index][lat_index][lon_index]
@@ -116,13 +117,13 @@ class TransectStats(object):
          else:
             _ret['data_date'] = time_var[time_index].tostring()
 
-         
+
          if self.matchup:
             _ret['match_value'] = row['data_point']
 
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
-         _ret['data_value'] = float(data) if not np.isnan(data) else "null"
+         _ret['data_value'] = float(data) if not np.isnan(float(data)) else "null"
          ret.append(_ret)
          if plotting and self.status_details:
             self.update_status(len(ret))
