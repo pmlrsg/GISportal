@@ -30,6 +30,12 @@ var PlotStatus = Object.freeze({
 var animation = {};
 module.exports = animation;
 
+
+var blocked = require('blocked');
+blocked(function(time) {
+   console.log('Node was blocked for ' + time + ' ms');
+}, {threshold:5});
+
 animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, next) {
    console.log('Animation called');
 
@@ -158,6 +164,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                next(err);
             } else {
                xml2js.parseString(body, {
+                  async: true,
                   tagNameProcessors: [settingsApi.stripPrefix],
                   attrNameProcessors: [settingsApi.stripPrefix]
                }, function(err, result) {
@@ -410,7 +417,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       updateStatus(PlotStatus.rendering);
       console.log('Rendering');
 
-      var inputFPS = plotRequest.framerate || 1;
+      var inputFPS = plotRequest.plot.framerate || 1;
+      if (inputFPS > 1) {
+         inputFPS = Math.round(inputFPS);
+      }
       var outputFPS = inputFPS;
 
       switch (inputFPS) {
@@ -423,15 +433,33 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             outputFPS = 12;
             break;
          default:
-            if (inputFPS < 10) {
+            if (inputFPS < 1) {
+               outputFPS = 10;
+            } else if (inputFPS < 10) {
                outputFPS = inputFPS * 2;
             } else {
                outputFPS = inputFPS;
             }
       }
 
-      console.log(inputFPS);
-      console.log(outputFPS);
+      var maxWebMBitrate;
+      if (inputFPS <= 5) {
+         maxWebMBitrate = '12M';
+      } else if (inputFPS <= 10) {
+         maxWebMBitrate = '20M';
+      } else if (inputFPS <= 15) {
+         maxWebMBitrate = '25M';
+      } else if (inputFPS <= 20) {
+         maxWebMBitrate = '30M';
+      } else if (inputFPS <= 25) {
+         maxWebMBitrate = '35M';
+      } else {
+         maxWebMBitrate = '45M';
+      }
+      console.log(maxWebMBitrate);
+
+      console.log('inputFPS: ' + inputFPS);
+      console.log('outputFPS: ' + outputFPS);
 
       var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
       var videoPathWebM = path.join(plotDir, hash + '-video.webm');
@@ -440,37 +468,44 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             stdoutLines: 0
          })
          .input(path.join(downloadDir, hash, 'map.jpg'))
+         .inputOptions(['-loop 1', '-framerate ' + inputFPS])
          .input(path.join(downloadDir, hash, layerID + '_' + bbox.replace(/\,/, '-') + '_' + '*' + '.png'))
-         .inputOptions(['-pattern_type glob', '-thread_queue_size 512'])
-         .inputFPS(inputFPS);
+         .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (borders) {
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
-            // .complexFilter('overlay,overlay');
-            .complexFilter('overlay,overlay,split=2[out1][out2]');
+            .inputOptions(['-loop 1', '-framerate ' + inputFPS])
+            // .complexFilter('overlay=shortest=1,overlay=shortest=1');
+            .complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
       } else {
-         renderer = renderer.complexFilter('overlay,split=2[out1][out2]');
-         // renderer = renderer.complexFilter('overlay');
+         renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
+         // renderer = renderer.complexFilter('overlay=shortest=1');
       }
 
       renderer
          .output(videoPathMP4)
          .videoCodec('libx264')
-         // .outputOptions(['-map [out1]', '-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
+         // .outputOptions(['-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputOptions(['-map [out1]', '-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputFPS(outputFPS)
          .noAudio()
+         // .output(videoPathWebM)
+         // .videoCodec('libvpx-vp9')
+         // .outputOptions(['-b:v 0', '-crf 20', '-aq-mode 1', '-threads 2', '-speed 3', '-deadline good', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
+         // // .outputOptions(['-map [out2]', '-b:v 0', '-crf 30', '-threads 2', '-speed 3', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
+         // .outputFPS(outputFPS)
+         // .noAudio()
          .output(videoPathWebM)
-         .videoCodec('libvpx-vp9')
-         .outputOptions(['-map [out2]', '-b:v 0', '-crf 20', '-threads 2', '-speed 3', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
-         // .outputOptions(['-map [out2]', '-crf 20', '-b:v 0', '-pix_fmt yuv420p'])
+         .videoCodec('libvpx')
+         .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 2', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
+         // .outputOptions(['-map [out2]', '-b:v 0', '-crf 30', '-threads 2', '-speed 3', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
          .outputFPS(outputFPS)
          .noAudio()
          .on('end', next)
          .on('error', next)
          .on('progress', function(progress) {
-            console.log(progress);
+            console.log(progress.timemark);
          })
          .run();
    }
@@ -507,7 +542,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
    function buildHtml(next) {
       var htmlPath = path.join(plotDir, hash + '-plot.html');
-      var video = '<video controls><source src="/plots/' + hash + '-video.webm" type="video/webm"><source src="/plots/' + hash + '-video.mp4" type="video/mp4"/></video>';
+      var video = '<video controls><source src="/plots/' + hash + '-video.mp4" type="video/mp4"/><source src="/plots/' + hash + '-video.webm" type="video/webm"></video>';
       var html = '<!DOCTYPE html><html lang="en-US"><body><div id="plot">' + video + '</div></body></html>';
       fs.writeFile(htmlPath, html, 'utf8', function(err) {
          next(err);

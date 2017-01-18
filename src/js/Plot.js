@@ -21,6 +21,7 @@ gisportal.graphs.Plot =(function(){
       this._plotStyle = null;
       this._title = "";
       this._matchUpLog = false;
+      this._animationFramerate = 1;
       this._createdOn = new Date();
       this._tBounds = [
          new Date(0),
@@ -188,6 +189,7 @@ gisportal.graphs.Plot =(function(){
       ];
       plotRequest.matchup_log = this.matchUpLog();
       if (this.plotType() == 'animation') {
+         plotRequest.framerate = this._animationFramerate;
          var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
          var borders = $('#select-country-borders').data('ddslick').selectedData.value;
          plotRequest.baseMap = {
@@ -546,17 +548,17 @@ gisportal.graphs.Plot =(function(){
       // dont start another monitor ! Makes sense right ?
       if( this._monitorJobStatusInterval !== null )
          return;
-      
+
       var _this = this;
       function updateStatus(){
          $.ajax({
             url: "plots/" + _this.id + "-status.json?_="+ new Date().getTime(),
             dataType:'json',
             success: function( serverStatus ){
-               _this.serverStatus( serverStatus );               
+               _this.serverStatus( serverStatus );
             },
-            error: function( response ){
-               if(response.status == 200){
+            error: function(response){
+               if(response.status == 200 || response.status === 0){
                   return;
                }
                $('.graph-job[data-created="' +_this._createdOn + '"]').remove();
@@ -568,7 +570,7 @@ gisportal.graphs.Plot =(function(){
             }
          });
       }
-      
+
       this._monitorJobStatusInterval = setInterval(updateStatus, 1000);
       updateStatus();
    };
@@ -862,6 +864,21 @@ gisportal.graphs.Plot =(function(){
          }
       }
       $('.graph-date-range-error-li').toggleClass("hidden", true);
+   };
+
+   Plot.prototype.animationFramerate = function (_new) {
+      if( !arguments.length ) return this._animationFramerate;
+
+      var old = this._animationFramerate;
+
+      this._animationFramerate = parseFloat(_new);
+
+      if( ! _.isEqual(this._animationFramerate, old) )
+         this.emit('animationFramerate-change', { 'new': this._animationFramerate, 'old': old });
+
+      console.log('Framerate: ' + this._animationFramerate);
+
+      return this;
    };
 
    /**

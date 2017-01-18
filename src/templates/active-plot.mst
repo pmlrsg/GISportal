@@ -60,6 +60,16 @@
 		</div>
 	</li>
 	<li>
+		<div>
+			<p>Set the framerate using the slider below</p>
+			<div class="clearfix">
+				<label for="js-active-plot-framerate">Framerate</label>
+				<input placeholder="Framerate" class="js-min graph-min js-active-plot-framerate" type="text">
+			</div>
+			<div class="js-framerate-slider "></div>
+		</div>
+	</li>
+	<li>
 		<div{{#if transect_plot}} class="hidden"{{/if}}>
 			<p>Set a date range using the timeline below</p>
 			<div class="clearfix">

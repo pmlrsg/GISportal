@@ -87,6 +87,7 @@ gisportal.graphs.PlotEditor = (function(){
       //Store all the relevent varibles
       this.setupTitleInput();
       this.setupPlotTypeSelect();
+      this.setupFramerateSlider();
       this.setupDateRangeSlider();
       this.setupAddIndicatorBtn();
 
@@ -289,6 +290,42 @@ gisportal.graphs.PlotEditor = (function(){
       }, true);
    };
 
+   PlotEditor.prototype.setupFramerateSlider = function() {
+      var _this = this;
+      this._framerateSlider = this._editorParent.find('.js-framerate-slider');
+      this._framerateInput = this._editorParent.find('.js-active-plot-framerate');
+
+      this._framerateSlider.noUiSlider({
+            start: [1],
+            connect: 'lower',
+            range: {
+               'min': [1 / 10],
+               'max': [60]
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: this._framerateInput
+                  })
+               ],
+               format: {
+                  decimals: 1
+               }
+            }
+         })
+         .on('slide', function(event, val) {
+            _this.plot().animationFramerate(val);
+         });
+
+      this.plot().on('animationFramerate-change', function() {
+         var framerate = _this.plot().animationFramerate();
+         this._framerateSlider.noUiSlider({
+            start: [
+               framerate
+            ]
+         }, true);
+      });
+   };
    /**
     * Setups the the date slider on graph pane.
     * - Starts the slide and sets its initails values
