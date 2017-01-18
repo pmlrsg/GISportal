@@ -63,14 +63,14 @@ describe('api', function() {
       var configPath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/';
 
       it('should successfully refresh a global cache', function(done) {
-         var cachePath = configPath + '/rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json';
+         var cachePath = configPath + '/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-DAILY.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
-            .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW&user=global')
+            .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-DAILY&user=global')
             .end(function(err, res) {
                expect(res).to.have.status(200);
-               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW for 127.0.0.1:6789');
+               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-DAILY for 127.0.0.1:6789');
                var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
                expect(new_time).to.be.above(old_time);
                done();
@@ -78,14 +78,14 @@ describe('api', function() {
       });
 
       it('should successfully refresh a user\'s own cache', function(done) {
-         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json';
+         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
-            .get('/api/1/asd/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW')
+            .get('/api/1/asd/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY')
             .end(function(err, res) {
                expect(res).to.have.status(200);
-               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW for a.user@pml.ac.uk');
+               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY for a.user@pml.ac.uk');
                var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
                expect(new_time).to.be.above(old_time);
                done();
@@ -93,14 +93,14 @@ describe('api', function() {
       });
 
       it('should successfully refresh another user\'s cache', function(done) {
-         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json';
+         var cachePath = configPath + '/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY.json';
          var old_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
 
          chai.request(app)
-            .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW&user=a.user@pml.ac.uk')
+            .get('/api/1/qwe/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY&user=a.user@pml.ac.uk')
             .end(function(err, res) {
                expect(res).to.have.status(200);
-               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW for a.user@pml.ac.uk');
+               expect(res.text).to.equal('Successfully updated rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY for a.user@pml.ac.uk');
                var new_time = JSON.parse(fs.readFileSync(cachePath)).timeStamp;
                expect(new_time).to.be.above(old_time);
                done();
@@ -109,7 +109,7 @@ describe('api', function() {
 
       it('should not allow a user to refresh another user\'s cache', function(done) {
          chai.request(app)
-            .get('/api/1/asd/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW&user=a.user@pml.ac.uk')
+            .get('/api/1/asd/refresh_wms_cache?server=rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY&user=a.user@pml.ac.uk')
             .end(function(err, res) {
                expect(res).to.have.status(401);
                expect(res.text).to.equal('Error: You must be an admin to refresh another user\'s config!');
@@ -147,11 +147,12 @@ describe('api', function() {
 
    describe('refresh_all_wms_cache', function() {
       it('should refresh all global caches', function(done) {
+         this.timeout(10000);
          var expected = {
             failedServers: [],
             refreshedServers: [
-               'rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW',
-               'rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW'
+               'rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-5DAY',
+               'rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-DAILY'
             ]
          };
 

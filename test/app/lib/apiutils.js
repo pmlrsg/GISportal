@@ -15,14 +15,14 @@ describe('apiUtils', function() {
    var testCache;
 
    before(function() {
-      var globalCachePath1 = global.test.appPath + '/config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW.json';
+      var globalCachePath1 = global.test.appPath + '/config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-5DAY.json';
       globalCache1 = JSON.parse(fs.readFileSync(globalCachePath1));
       globalCache1.owner = '127.0.0.1:6789';
-      var globalCachePath2 = global.test.appPath + '/config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-PML-S-AGGSLOW.json';
+      var globalCachePath2 = global.test.appPath + '/config/site_settings/127.0.0.1:6789/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-DAILY.json';
       globalCache2 = JSON.parse(fs.readFileSync(globalCachePath2));
       globalCache2.owner = '127.0.0.1:6789';
 
-      var userCachePath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-PML-Y-AGGSLOW.json';
+      var userCachePath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY.json';
       userCache = JSON.parse(fs.readFileSync(userCachePath));
       userCache.owner = 'a.user@pml.ac.uk';
    });
@@ -101,8 +101,8 @@ describe('apiUtils', function() {
    });
 
    describe('findServerURL', function() {
-      var testName = 'rsg.pml.ac.uk-thredds-wms-PML-M-AGGSLOW';
-      var testURL = 'http://rsg.pml.ac.uk/thredds/wms/PML-M-AGGSLOW?';
+      var testName = 'rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-5DAY';
+      var testURL = 'http://rsg.pml.ac.uk/thredds/wms/CCI_ALL-v3.0-5DAY?';
 
       it('should find the server URL without a cache provided', function() {
          var req = global.mocks.createReq();
