@@ -660,10 +660,11 @@ def transect(plot, outfile="transect.html"):
       ts_plot.yaxis.axis_label_text_font_size = "10pt"
       # Set up the axis label here as it writes to all y axes so overwrites the right hand one
       # if we run it later.
-      debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
+      debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
       ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
       ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-      ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+      if ymin[0] != ymax[0]:
+         ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
       yrange = [None, None]
 
       if len(sources) > len(plot_palette[0]):
@@ -679,7 +680,8 @@ def transect(plot, outfile="transect.html"):
             debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
             # Setting the second y axis range name and range
             yrange[1] = "y2"
-            ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+            if ymin[1] != ymax[1]:
+               ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
       
             # Adding the second axis to the plot.  
             ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
@@ -718,7 +720,7 @@ def transect(plot, outfile="transect.html"):
    return ts_plot
 #END transect
 
-def matchup(plot, outfile="transect.html"):
+def matchup(plot, outfile="matchup.html"):
 
    plot_data = plot['data']
    plot_type = plot['type']
@@ -810,11 +812,11 @@ def matchup(plot, outfile="transect.html"):
    ts_plot.yaxis.axis_label_text_font_size = "10pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,u"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
-   debug(2,u"matchup: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
+   debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   if ymin[0] != ymax[0]:
+      ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
    for i, source in enumerate(sources):
@@ -823,7 +825,8 @@ def matchup(plot, outfile="transect.html"):
          debug(2, "Plotting y2Axis, {}".format(plot['y2Axis']['label']))
          # Setting the second y axis range name and range
          yrange[1] = "y2"
-         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+         if ymin[1] != ymax[1]:
+            ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
    
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
@@ -984,11 +987,11 @@ def timeseries(plot, outfile="time.html"):
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   debug(2,u"timeseries: y1Axis is {}".format(plot['y1Axis']['label']))
-   debug(2,u"timeseries: y1Axis range = {}, {}".format(ymin[0], ymax[0]))
+   debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
    ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
-   ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
+   if ymin[0] != ymax[0]:
+      ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
    for i, source in enumerate(sources):
@@ -997,7 +1000,8 @@ def timeseries(plot, outfile="time.html"):
          debug(2, u"Plotting y2Axis, {}".format(plot['y2Axis']['label']))
          # Setting the second y axis range name and range
          yrange[1] = "y2"
-         ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
+         if ymin[1] != ymax[1]:
+            ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
    
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
