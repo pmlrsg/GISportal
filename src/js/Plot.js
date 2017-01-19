@@ -431,19 +431,14 @@ gisportal.graphs.Plot =(function(){
             var start = new Date(this.tBounds()[0]);
             var end = new Date(this.tBounds()[1]);
 
-            var startIndex, endIndex;
+            var slicesInRange = [];
 
             for (var j = 0; j < times.length; j++) {
                var time = new Date(times[j]);
                if (time >= start && time <= end) {
-                  if (startIndex === undefined) {
-                     startIndex = j;
-                  }
-                  endIndex = j;
+                  slicesInRange.push(times[j]);
                }
             }
-
-            var slicesInRange = times.slice(startIndex, endIndex);
 
             newSeries.data_source.timesSlices = slicesInRange;
          }

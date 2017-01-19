@@ -1,4 +1,5 @@
 var async = require('async');
+var child_process = require('child_process');
 var ON_DEATH = require('death');
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs-extra');
@@ -6,12 +7,12 @@ var glob = require('glob');
 var path = require('path');
 var request = require('request');
 var sha1 = require('sha1');
+var _ = require('underscore');
 var url = require('url');
 var xml2js = require('xml2js');
 var yazl = require('yazl');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
-var child_process = require('child_process');
 
 // Temporary inclusion to spot blocking issues
 var blocked = require('blocked');
@@ -205,7 +206,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       layerID = dataOptions.layer_id;
       var wmsUrl = dataOptions.wmsUrl;
       var params = dataOptions.wmsParams;
-      var slices = dataOptions.timesSlices;
+      var slices = _.uniq(dataOptions.timesSlices);
 
       bbox = dataOptions.bbox;
       var bboxArr = bbox.split(',');
