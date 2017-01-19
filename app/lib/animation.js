@@ -3,7 +3,6 @@ var ON_DEATH = require('death');
 var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs-extra');
 var glob = require('glob');
-var Jimp = require('jimp');
 var path = require('path');
 var request = require('request');
 var sha1 = require('sha1');
@@ -12,6 +11,15 @@ var xml2js = require('xml2js');
 var yazl = require('yazl');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
+var child_process = require('child_process');
+
+// Temporary inclusion to spot blocking issues
+var blocked = require('blocked');
+blocked(function(time) {
+   console.log('Node was blocked for ' + time + ' ms');
+}, {
+   threshold: 5
+});
 
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -30,15 +38,10 @@ var PlotStatus = Object.freeze({
 var animation = {};
 module.exports = animation;
 
-
-var blocked = require('blocked');
-blocked(function(time) {
-   console.log('Node was blocked for ' + time + ' ms');
-}, {threshold:5});
-
 animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, next) {
    console.log('Animation called');
 
+   // OFF_DEATH variable that will hold the function to disable the ON_DEATH hook
    var OFF_DEATH;
 
    var bbox;
@@ -56,9 +59,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
          OFF_DEATH = ON_DEATH(function(signal) {
             console.log('\nON_DEATH called');
-            updateStatus(PlotStatus.failed);
-            cleanup(function() {
-               process.kill(process.pid, signal);
+            updateStatus(PlotStatus.failed, null, null, null, null, function() {
+               cleanup(function() {
+                  process.kill(process.pid, signal);
+               });
             });
          });
 
@@ -81,7 +85,12 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                   console.log('stdout: \n' + stdout);
                   console.log('stderr: \n' + stderr);
 
-                  if (!err) {
+                  if (err) {
+                     updateStatus(PlotStatus.failed, null, null, null, err);
+                     console.log('Failed rendering! ;_;');
+                     // console.log(err);
+                     cleanup();
+                  } else {
                      buildHtml(function(err) {
                         if (!err) {
                            buildZip(function() {
@@ -94,11 +103,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                            cleanup();
                         }
                      });
-                  } else {
-                     updateStatus(PlotStatus.failed, null, null, null, err);
-                     console.log('Failed rendering! ;_;');
-                     // console.log(err);
-                     cleanup();
                   }
                });
             });
@@ -124,10 +128,9 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          done();
       });
 
-      var bordersUrl;
       if (bordersOptions) {
          borders = true;
-         bordersUrl = url.parse(bordersOptions.wmsUrl);
+         var bordersUrl = url.parse(bordersOptions.wmsUrl);
          bordersUrl.search = undefined;
          bordersUrl.query = {
             SERVICE: 'WMS',
@@ -171,15 +174,18 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                   if (err) {
                      next(err);
                   } else {
-                     if (result.WMS_Capabilities) {
-                        var layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
-                        var layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
-
-                        if (layerMaxWidth < maxWidth) {
-                           maxWidth = layerMaxWidth;
+                     if (result.WMS_Capabilities && result.WMS_Capabilities.Service) {
+                        if (result.WMS_Capabilities.Service[0].MaxWidth) {
+                           var layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
+                           if (layerMaxWidth < maxWidth) {
+                              maxWidth = layerMaxWidth;
+                           }
                         }
-                        if (layerMaxHeight < maxHeight) {
-                           maxHeight = layerMaxHeight;
+                        if (result.WMS_Capabilities.Service[0].MaxHeight) {
+                           var layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
+                           if (layerMaxHeight < maxHeight) {
+                              maxHeight = layerMaxHeight;
+                           }
                         }
 
                         next();
@@ -325,6 +331,19 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
       });
 
+      var timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
+
+      timeStamper.on('message', function(options) {
+         fs.unlink(options.tempPath, function(err) {
+            if (err) {
+               console.error(err);
+            }
+         });
+         fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
+            imageReady(options);
+         });
+      });
+
       var retries = {};
 
       function download(options, next) {
@@ -370,6 +389,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                console.error(err);
             }
          } else {
+            // console.log('Downloaded ' + options.id);
             if (options.id == 'map') {
                mapDownloaded = true;
                done();
@@ -378,21 +398,9 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                done();
             } else {
                if (options.existing) {
-                  fs.copy(options.filePath, path.join(hashDir, options.filename), done);
+                  fs.link(options.filePath, path.join(hashDir, options.filename), done);
                } else {
-                  Jimp.read(options.tempPath, function(err, image) {
-                     Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then(function(fontB) {
-                        Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(fontW) {
-                           image.print(fontB, 10, 10, options.id);
-                           image.print(fontW, 11, 11, options.id);
-                           image.write(options.tempPath, function() {
-                              fs.move(options.tempPath, options.filePath, function() {
-                                 fs.copy(options.filePath, path.join(hashDir, options.filename), done);
-                              });
-                           });
-                        });
-                     });
-                  });
+                  timeStamper.send(options);
                }
             }
          }
@@ -401,14 +409,18 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             if (err) {
                console.error(err);
             }
-            if (options.id != 'map' && options.id != 'borders') {
-               // slicesDownloaded.push(options.filePath);
-               slicesDownloaded++;
-               console.log('downloaded: ' + slicesDownloaded + ' of ' + slices.length);
-            }
-            if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
-               next();
-            }
+            imageReady(options);
+         }
+      }
+
+      function imageReady(options) {
+         if (options.id != 'map' && options.id != 'borders') {
+            slicesDownloaded++;
+            // console.log('downloaded: ' + slicesDownloaded + ' of ' + slices.length);
+         }
+         if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
+            timeStamper.kill();
+            next();
          }
       }
    }
@@ -476,30 +488,20 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS])
-            // .complexFilter('overlay=shortest=1,overlay=shortest=1');
             .complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
       } else {
          renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
-         // renderer = renderer.complexFilter('overlay=shortest=1');
       }
 
       renderer
          .output(videoPathMP4)
          .videoCodec('libx264')
-         // .outputOptions(['-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputOptions(['-map [out1]', '-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputFPS(outputFPS)
          .noAudio()
-         // .output(videoPathWebM)
-         // .videoCodec('libvpx-vp9')
-         // .outputOptions(['-b:v 0', '-crf 20', '-aq-mode 1', '-threads 2', '-speed 3', '-deadline good', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
-         // // .outputOptions(['-map [out2]', '-b:v 0', '-crf 30', '-threads 2', '-speed 3', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
-         // .outputFPS(outputFPS)
-         // .noAudio()
          .output(videoPathWebM)
          .videoCodec('libvpx')
          .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 2', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
-         // .outputOptions(['-map [out2]', '-b:v 0', '-crf 30', '-threads 2', '-speed 3', '-tile-columns 6', '-frame-parallel 1', '-auto-alt-ref 1', '-lag-in-frames 25', '-pix_fmt yuv420p'])
          .outputFPS(outputFPS)
          .noAudio()
          .on('end', next)
