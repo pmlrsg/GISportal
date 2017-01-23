@@ -86,6 +86,7 @@ gisportal.graphs.PlotEditor = (function(){
       
       //Store all the relevent varibles
       this.setupTitleInput();
+      this.setupAnimationDuration();
       this.setupPlotTypeSelect();
       this.setupFramerateSlider();
       this.setupDateRangeSlider();
@@ -153,6 +154,7 @@ gisportal.graphs.PlotEditor = (function(){
 
       this._plotTypeSelect = this._editorParent.find('.js-active-plot-type');
       this._plotStyleSelect = this._editorParent.find('.js-active-plot-style');
+      toggleStyles();
 
       // Setup the title input box sync
       this.plot().on('plotType-change', function(value){
@@ -162,10 +164,32 @@ gisportal.graphs.PlotEditor = (function(){
       });
       this._plotTypeSelect.change(function(){
          _this.plot().plotType( $(this).val() );
+         toggleStyles();
       });
       this._plotStyleSelect.change(function(){
          _this._plot._plotStyle = $(this).val();
       });
+
+      function toggleStyles() {
+         var styleOptions = $('.graph-style-options-li');
+         var framerateOptions = $('.graph-framerate-options-li');
+         var animationDuration = $('.graph-animation-duration-info');
+         if (_this._plotTypeSelect.val() == 'animation' || _this._plotTypeSelect.val() == 'timeseries' || _this._plotTypeSelect.val() == 'scatter') {
+            styleOptions.toggleClass('hidden', true);
+         } else {
+            styleOptions.toggleClass('hidden', false);
+         }
+         if (_this._plotTypeSelect.val() == 'animation') {
+            framerateOptions.toggleClass('hidden', false);
+            animationDuration.toggleClass('hidden', false);
+            if (_this.plot().plotType() == 'animation') {
+               _this.updateAnimationDuration();
+            }
+         } else {
+            framerateOptions.toggleClass('hidden', true);
+            animationDuration.toggleClass('hidden', true);
+         }
+      }
    };
 
    /**
@@ -255,18 +279,108 @@ gisportal.graphs.PlotEditor = (function(){
       }
    };
 
+   PlotEditor.prototype.setupFramerateSlider = function() {
+      var _this = this;
+      this._framerateSlider = this._editorParent.find('.js-framerate-slider');
+      this._framerateInput = this._editorParent.find('.js-active-plot-framerate');
+
+      this._framerateSlider.noUiSlider({
+            start: [this.plot().animationFramerate()],
+            connect: 'lower',
+            range: {
+               'min': [1 / 10],
+               'max': [60]
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: this._framerateInput,
+                     method: setFramerate
+                  })
+               ],
+               format: {
+                  decimals: 1
+               }
+            }
+         })
+         .on('slide', function(event, val) {
+            if (val > 1) {
+               val = Math.round(val);
+            }
+            _this.plot().animationFramerate(val);
+            _this.updateAnimationDuration();
+         })
+         .on('change', function(event, val) {
+            if (!val) {
+               val = _this._framerateSlider.val();
+            }
+            if (val > 1) {
+               val = Math.round(val);
+            }
+            _this.plot().animationFramerate(val);
+            _this.updateAnimationDuration();
+            var params = {
+               "event": "graphFramerate.change",
+               "value": val
+            };
+            gisportal.events.trigger('graphFramerate.change', params);
+         });
+
+      this._framerateInput.change(function() {
+         var newFramerate = $(this).val();
+         if (isNaN(newFramerate) || newFramerate > 60 || newFramerate < 0.1) {
+            setFramerate.call(this, _this.plot().animationFramerate());
+         } else {
+            // _this.plot().animationFramerate(newFramerate);
+            _this._framerateSlider.val(newFramerate).trigger('change');
+         }
+      });
+
+      function setFramerate(value) {
+         if (value > 1) {
+            value = Math.round(value);
+         }
+         $(this).val(value);
+      }
+   };
+
+   PlotEditor.prototype.setupAnimationDuration = function() {
+      this._animationDuration = this._editorParent.find('.js-active-plot-animation-duration');
+   };
+
+   PlotEditor.prototype.updateAnimationDuration = function() {
+      var frames = this.plot().slicesInRange().length;
+      var framerate = this.plot().animationFramerate();
+      var seconds = frames / framerate;
+      var duration = secondsToHHmmss(seconds);
+
+      this._animationDuration.html(duration);
+
+      function secondsToHHmmss(seconds) {
+         seconds = Number(seconds);
+         var h = Math.floor(seconds / 3600);
+         var m = Math.floor(seconds % 3600 / 60);
+         var s = Math.floor(seconds % 3600 % 60);
+         return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s);
+      }
+   };
+
    /**
     * Updates the UI time bounds slider's currently selection
     */
-   PlotEditor.prototype.updateDateRangeSliderTBounds = function(){
+   PlotEditor.prototype.updateDateRangeSliderTBounds = function() {
 
       var tBounds = this.plot().tBounds();
-      var tBoundMillisec = tBounds.map(function( date ){ return date.getTime();});
-      var sliderValInInts = this._rangeSlider.val().map(function(val){ return parseInt(val); });
+      var tBoundMillisec = tBounds.map(function(date) {
+         return date.getTime();
+      });
+      var sliderValInInts = this._rangeSlider.val().map(function(val) {
+         return parseInt(val);
+      });
 
-      if( _.isEqual( tBoundMillisec, sliderValInInts) )
+      if (_.isEqual(tBoundMillisec, sliderValInInts))
          return;
-      
+
       this._rangeSlider.noUiSlider({
          start: [
             tBounds[0].getTime(),
@@ -279,59 +393,23 @@ gisportal.graphs.PlotEditor = (function(){
     * Updates the UI time bounds slider's out bounds
     * @return {[type]} [description]
     */
-   PlotEditor.prototype.updateDateRangeSliderBounds = function(){
+   PlotEditor.prototype.updateDateRangeSliderBounds = function() {
       var dateRangeBounds = this.plot().dateRangeBounds();
 
       this._rangeSlider.noUiSlider({
-         range:{
+         range: {
             min: dateRangeBounds.min.getTime(),
             max: dateRangeBounds.max.getTime()
          }
       }, true);
    };
 
-   PlotEditor.prototype.setupFramerateSlider = function() {
-      var _this = this;
-      this._framerateSlider = this._editorParent.find('.js-framerate-slider');
-      this._framerateInput = this._editorParent.find('.js-active-plot-framerate');
-
-      this._framerateSlider.noUiSlider({
-            start: [1],
-            connect: 'lower',
-            range: {
-               'min': [1 / 10],
-               'max': [60]
-            },
-            serialization: {
-               lower: [
-                  $.Link({
-                     target: this._framerateInput
-                  })
-               ],
-               format: {
-                  decimals: 1
-               }
-            }
-         })
-         .on('slide', function(event, val) {
-            _this.plot().animationFramerate(val);
-         });
-
-      this.plot().on('animationFramerate-change', function() {
-         var framerate = _this.plot().animationFramerate();
-         this._framerateSlider.noUiSlider({
-            start: [
-               framerate
-            ]
-         }, true);
-      });
-   };
    /**
     * Setups the the date slider on graph pane.
     * - Starts the slide and sets its initails values
     * - Sets up the 2 date text boxes to accept change events
     */
-   PlotEditor.prototype.setupDateRangeSlider = function(){
+   PlotEditor.prototype.setupDateRangeSlider = function() {
       var tBounds = this.plot().tBounds();
       var dateRangeBounds = this.plot().dateRangeBounds();
       var _this = this;
@@ -342,85 +420,96 @@ gisportal.graphs.PlotEditor = (function(){
 
       //Setup the date slider
       this._rangeSlider.noUiSlider({
-         start: [
-            tBounds[0].getTime(),
-            tBounds[1].getTime(),
-         ],
-         connect: true,
-         behaviour: 'tap-drag',
-         range: {
-            'min': dateRangeBounds.min.getTime(),
-            'max': dateRangeBounds.max.getTime()
-         },
-         serialization: {
-            lower: [
-               $.Link({
-                  target: this._startDateInput,
-                  method: setDate 
-               })
+            start: [
+               tBounds[0].getTime(),
+               tBounds[1].getTime(),
             ],
-            upper: [
-               $.Link({
-                  target: this._endDateInput,
-                  method: setDate
-               })
-            ],
-            format: {
-               decimals: 0
+            connect: true,
+            behaviour: 'tap-drag',
+            range: {
+               'min': dateRangeBounds.min.getTime(),
+               'max': dateRangeBounds.max.getTime()
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: this._startDateInput,
+                     method: setDate
+                  })
+               ],
+               upper: [
+                  $.Link({
+                     target: this._endDateInput,
+                     method: setDate
+                  })
+               ],
+               format: {
+                  decimals: 0
+               }
             }
-         }
-      })
-      // Listen for when the user moves the slider and update the tBounds
-      .on('slide', function(event, val){
-        // Rounds the date to the day so that the plot requests are the same and return the same hash
-         var tBounds = val.map(Number).map(function(stamp){return new Date(stamp);});
-         _this.plot().tBounds( tBounds );
-      })
-      // Listen for when the user moves the slider and sends a trigger
-      .on('change', function(event, val){
-         var params = {
-            "event": "graphRange.change",
-            "value":val
-         };
-         gisportal.events.trigger('graphRange.change', params);
-      });
-      
+         })
+         // Listen for when the user moves the slider and update the tBounds
+         .on('slide', function(event, val) {
+            // Rounds the date to the day so that the plot requests are the same and return the same hash
+            var tBounds = val.map(Number).map(function(stamp) {
+               return new Date(stamp);
+            });
+            _this.plot().tBounds(tBounds);
+            if (_this.plot().plotType() == 'animation') {
+               _this.updateAnimationDuration();
+            }
+         })
+         // Listen for when the user moves the slider and sends a trigger
+         .on('change', function(event, val) {
+            var params = {
+               "event": "graphRange.change",
+               "value": val
+            };
+            gisportal.events.trigger('graphRange.change', params);
+         });
+
       // The start date input element is manually typed update  tBounds
-      this._startDateInput.change(function(){
-         var newDate = new Date( $(this).val() );
+      this._startDateInput.change(function() {
+         var newDate = new Date($(this).val());
          var params = {
             "event": "graphStartDate.change",
             "value": newDate.getTime()
          };
          gisportal.events.trigger('graphStartDate.change', params);
          var currentTBounds = _this.plot().tBounds();
-         
-         if( isNaN( newDate.getTime() ) )
-            setDate.call(this, currentTBounds[0] );
+
+         if (isNaN(newDate.getTime()))
+            setDate.call(this, currentTBounds[0]);
          else
-            _this.plot().tBounds( [ newDate, currentTBounds[1] ] );
+            _this.plot().tBounds([newDate, currentTBounds[1]]);
+         if (_this.plot().plotType() == 'animation') {
+            _this.updateAnimationDuration();
+         }
       });
-      
+
       // The end date input element is manually typed update  tBounds
-      this._endDateInput.change(function(){
-         var newDate = new Date( $(this).val() );
+      this._endDateInput.change(function() {
+         var newDate = new Date($(this).val());
          var params = {
             "event": "graphEndDate.change",
             "value": newDate.getTime()
          };
          gisportal.events.trigger('graphEndDate.change', params);
          var currentTBounds = _this.plot().tBounds();
-         
-         if( isNaN( newDate.getTime() ) )
-            setDate.call(this, currentTBounds[1] );
+
+         if (isNaN(newDate.getTime()))
+            setDate.call(this, currentTBounds[1]);
          else
-            _this.plot().tBounds( [ currentTBounds[0] , newDate ] );
+            _this.plot().tBounds([currentTBounds[0], newDate]);
+         if (_this.plot().plotType() == 'animation') {
+            _this.updateAnimationDuration();
+         }
       });
 
-      this.plot().on('dateRangeBounds-change', function(){
+      this.plot().on('dateRangeBounds-change', function() {
          _this.updateDateRangeSliderBounds();
       });
-      this.plot().on('tBounds-change', function(){
+      this.plot().on('tBounds-change', function() {
          _this.updateDateRangeSliderTBounds();
       });
    };

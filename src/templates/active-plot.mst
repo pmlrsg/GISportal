@@ -9,7 +9,7 @@
 			<input type="text" class="js-active-plot-title" value="{{plot._title}}" />
 		</div>
 	</li>
-	
+
 	<li>
 		<div>
 			<p>Choose a graph type</p>
@@ -35,7 +35,7 @@
 			{{/if}}
 		</div>
 	</li>
-	<li>
+	<li class="graph-style-options-li">
 		<div>
 			<p>Choose a graph style</p>
 			<select class="js-active-plot-style">
@@ -59,11 +59,10 @@
 			 </select>
 		</div>
 	</li>
-	<li>
+	<li class="graph-framerate-options-li hidden">
 		<div>
 			<p>Set the framerate using the slider below</p>
 			<div class="clearfix">
-				<label for="js-active-plot-framerate">Framerate</label>
 				<input placeholder="Framerate" class="js-min graph-min js-active-plot-framerate" type="text">
 			</div>
 			<div class="js-framerate-slider "></div>
@@ -85,16 +84,18 @@
 	<li class="graph-date-range-error-li alert-danger hidden">
 		<div class="graph-date-range-error-div alert-danger"></div>
 	</li>
-	
-	
+	<li class="graph-animation-duration-info hidden">
+		<p>Animation duration (HH:mm:ss) - <span class="js-active-plot-animation-duration">00:01:00</span></p>
+	</li>
+
 	<li class="js-components-area" >
 		<div>
-			<table> 
+			<table>
 				<tbody class="js-components components"></tbody>
 			</table>
 		</div>
 	</li>
-	
+
 	<li>
 		<div class="pull-right">
 			<button class="brand create-graph js-create-graph small">Create graph</button>

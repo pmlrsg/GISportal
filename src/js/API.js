@@ -1982,6 +1982,25 @@ gisportal.api['layerDepth.change'] = function(data, options){
 	input_elem.val(value).trigger('change');
 };
 
+gisportal.api['graphFramerate.change'] = function(data, options){
+   options = options || {};
+   var value = data.value;
+   var input_elem = $('.js-active-plot-framerate');
+   var slider_elem = $('.js-framerate-slider');
+
+   if(options.describeOnly){
+      return 'Framerate set to: ' + value;
+   }
+   if(options.selectorOnly){
+      return '.js-framerate-slider';
+   }
+   if(options.highlight){
+      collaboration.highlightElement(slider_elem);
+   }
+   input_elem.val(value).trigger('change');
+   // slider_elem.val(value);
+};
+
  /*
  'data' must contain the following:
 
