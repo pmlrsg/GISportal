@@ -8,7 +8,6 @@ process.on('message', function(options) {
 });
 
 function processImage(options, next) {
-   // console.log('Timestamping ' + options.id);
    Jimp.read(options.tempPath, function(err, image) {
       if (err) {
          console.error(err);
@@ -17,7 +16,7 @@ function processImage(options, next) {
          Jimp.loadFont(Jimp.FONT_SANS_16_WHITE).then(function(fontW) {
             image.print(fontB, 10, 10, options.id);
             image.print(fontW, 11, 11, options.id);
-            image.write(options.filePath, function(err) {
+            image.write(options.tempPath, function(err) {
                next(err, options);
             });
          });
@@ -26,9 +25,6 @@ function processImage(options, next) {
 }
 
 function imageDone(err, options) {
-   if (err) {
-      console.error(err);
-   }
-   // console.log('Timestamped ' + options.id);
+   options.err = err;
    process.send(options);
 }

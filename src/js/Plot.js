@@ -509,7 +509,6 @@ gisportal.graphs.Plot = (function() {
       _this.series_total = _.size(series_list);
       _this.timeEstimate = 0;
       _this.sizeEstimate = 0;
-      console.log(_this._plotType);
       if (_this._plotType != "transect" && _this._plotType != "matchup" && _this._plotType != "scatter_matchup" && _this._plotType != "animation") {
          for (var series in series_list) {
             $.ajax({
@@ -893,7 +892,6 @@ gisportal.graphs.Plot = (function() {
       if (this._animationFramerate === 0) {
          this._animationFramerate = 0.1;
       }
-      console.log('Framerate: ' + this._animationFramerate);
       return this;
    };
 

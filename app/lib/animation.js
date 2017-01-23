@@ -40,8 +40,6 @@ var animation = {};
 module.exports = animation;
 
 animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, next) {
-   console.log('Animation called');
-
    // OFF_DEATH variable that will hold the function to disable the ON_DEATH hook
    var OFF_DEATH;
 
@@ -80,31 +78,26 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
 
          getMaxResolution(mapOptions, dataOptions, bordersOptions, function() {
-            downloadTiles(mapOptions, dataOptions, bordersOptions, function() {
+            downloadTiles(mapOptions, dataOptions, bordersOptions, function(err) {
+               if (err) {
+                  return handleError(err);
+               }
                render(function(err, stdout, stderr) {
-                  console.log('err: \n' + err);
-                  console.log('stdout: \n' + stdout);
-                  console.log('stderr: \n' + stderr);
-
                   if (err) {
-                     updateStatus(PlotStatus.failed, null, null, null, err);
-                     console.log('Failed rendering! ;_;');
-                     // console.log(err);
-                     cleanup();
-                  } else {
-                     buildHtml(function(err) {
-                        if (!err) {
-                           buildZip(function() {
-                              updateStatus(PlotStatus.complete);
-                              console.log('Finished rendering! ^_^');
-                              cleanup();
-                           });
-                        } else {
-                           updateStatus(PlotStatus.failed, null, null, null, err);
-                           cleanup();
-                        }
-                     });
+                     return handleError(stderr);
                   }
+                  buildHtml(function(err) {
+                     if (err) {
+                        return handleError(err);
+                     }
+                     buildZip(function(err) {
+                        if (err) {
+                           return handleError(err);
+                        }
+                        updateStatus(PlotStatus.complete);
+                        cleanup();
+                     });
+                  });
                });
             });
          });
@@ -112,6 +105,11 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          next(null, hash);
       }
    });
+
+   function handleError(err) {
+      updateStatus(PlotStatus.failed, null, null, null, err);
+      cleanup();
+   }
 
    function getMaxResolution(mapOptions, dataOptions, bordersOptions, next) {
       var mapDone = false;
@@ -124,7 +122,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          SERVICE: 'WMS',
          REQUEST: 'GetCapabilities'
       };
-      makeRequest(url.format(mapUrl), function(err) {
+      makeRequest(url.format(mapUrl), function() {
          mapDone = true;
          done();
       });
@@ -137,7 +135,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             SERVICE: 'WMS',
             REQUEST: 'GetCapabilities'
          };
-         makeRequest(url.format(bordersUrl), function(err) {
+         makeRequest(url.format(bordersUrl), function() {
             bordersDone = true;
             done();
          });
@@ -151,7 +149,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          SERVICE: 'WMS',
          REQUEST: 'GetCapabilities'
       };
-      makeRequest(url.format(dataURL), function(err) {
+      makeRequest(url.format(dataURL), function() {
          dataDone = true;
          done();
       });
@@ -188,11 +186,8 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                               maxHeight = layerMaxHeight;
                            }
                         }
-
-                        next();
-                     } else {
-                        next();
                      }
+                     next();
                   }
                });
             }
@@ -201,8 +196,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
    }
 
    function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
-      console.log('starting download');
-
       layerID = dataOptions.layer_id;
       var wmsUrl = dataOptions.wmsUrl;
       var params = dataOptions.wmsParams;
@@ -213,8 +206,8 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       var bboxWidth = bboxArr[2] - bboxArr[0];
       var bboxHeight = bboxArr[3] - bboxArr[1];
 
-      var height;
-      var width;
+      var height = 0;
+      var width = 0;
 
       if ((bboxHeight / bboxWidth) <= maxHeight / maxWidth) {
          height = 2 * Math.round(((bboxHeight / bboxWidth) * maxWidth) / 2);
@@ -294,6 +287,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       var mapDownloaded = false;
       var bordersDownloaded = false;
       var slicesDownloaded = 0;
+      var retries = {};
 
       var downloadQueue = async.queue(download, 10);
 
@@ -302,7 +296,13 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       downloadDir = path.join(downloadDir, domain);
       var hashDir = path.join(downloadDir, hash);
 
+      var timeStamper = null;
+      setupTimeStamper();
+
       fs.mkdirs(hashDir, function(err) {
+         if (err) {
+            return next(err);
+         }
          downloadQueue.push({
             uri: url.format(mapUrl),
             dir: hashDir,
@@ -332,28 +332,41 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
       });
 
-      var timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
+      function setupTimeStamper() {
+         timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
+         timeStamper.on('message', function(options) {
+            if (options.err) return handleError(options.err);
 
-      timeStamper.on('message', function(options) {
-         fs.unlink(options.tempPath, function(err) {
-            if (err) {
-               console.error(err);
+            // Rename the image from it's tempPath
+            fs.rename(options.tempPath, options.filePath, function(err) {
+               if (err) return handleError(err);
+
+               // Link the image in the hashdir (TODO replace with symlink if possible)
+               fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
+                  if (err) return handleError(err);
+
+                  imageReady(options);
+               });
+            });
+
+            function handleError(err) {
+               // If there was an error, kill the timestamper and call next with the error
+               timeStamper.kill();
+               next(err);
             }
          });
-         fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
-            imageReady(options);
-         });
-      });
-
-      var retries = {};
+      }
 
       function download(options, next) {
          options.filePath = path.join(options.dir, options.filename);
          if (options.cache) {
+            // If this download should be cached for later usage (it is a data tile)
             if (utils.fileExists(options.filePath)) {
+               // If it already exists, no need to download it again
                options.existing = true;
                done();
             } else {
+               // If it doesn't exist, download to a temporary path
                options.existing = false;
                options.tempPath = path.join(options.dir, 'temp_' + options.filename);
                makeRequest(options.tempPath);
@@ -387,10 +400,9 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                retries[options.id]++;
                downloadQueue.push(options, downloadComplete);
             } else {
-               console.error(err);
+               done(err);
             }
          } else {
-            // console.log('Downloaded ' + options.id);
             if (options.id == 'map') {
                mapDownloaded = true;
                done();
@@ -408,16 +420,17 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
          function done(err) {
             if (err) {
-               console.error(err);
+               timeStamper.kill();
+               next(err);
+            } else {
+               imageReady(options);
             }
-            imageReady(options);
          }
       }
 
       function imageReady(options) {
          if (options.id != 'map' && options.id != 'borders') {
             slicesDownloaded++;
-            // console.log('downloaded: ' + slicesDownloaded + ' of ' + slices.length);
          }
          if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
             timeStamper.kill();
@@ -428,7 +441,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
    function render(next) {
       updateStatus(PlotStatus.rendering);
-      console.log('Rendering');
 
       var inputFPS = plotRequest.plot.framerate || 1;
       if (inputFPS > 1) {
@@ -455,7 +467,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             }
       }
 
-      var maxWebMBitrate;
+      var maxWebMBitrate = null;
       if (inputFPS <= 5) {
          maxWebMBitrate = '12M';
       } else if (inputFPS <= 10) {
@@ -469,10 +481,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       } else {
          maxWebMBitrate = '45M';
       }
-      console.log(maxWebMBitrate);
-
-      console.log('inputFPS: ' + inputFPS);
-      console.log('outputFPS: ' + outputFPS);
 
       var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
       var videoPathWebM = path.join(plotDir, hash + '-video.webm');
@@ -507,9 +515,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          .noAudio()
          .on('end', next)
          .on('error', next)
-         .on('progress', function(progress) {
-            console.log(progress.timemark);
-         })
+         // TODO monitor progress and update status file
+         // .on('progress', function(progress) {
+         //    console.log(progress.timemark);
+         // })
          .run();
    }
 
@@ -519,9 +528,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       var numFiles = 0;
 
       glob(path.join(downloadDir, 'temp_*'), function(err, files) {
-         if (err) {
-            console.log(err);
-         } else {
+         if (!err) {
             numFiles = files.length;
             if (numFiles > 0) {
                files.forEach(function(file) {
@@ -560,7 +567,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             next();
          })
          .on('error', function(err) {
-            // :(
+            next(err);
          });
 
       zip.addFile(path.join(plotDir, hash + '-video.mp4'), hash + '-video.mp4');
@@ -573,11 +580,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
       if (utils.fileExists(statusPath)) {
          fs.readFile(statusPath, 'utf8', function(err, statusString) {
-            if (!err) {
-               next(JSON.parse(statusString));
-            } else {
-               next(null);
+            if (err) {
+               return next(null);
             }
+            next(JSON.parse(statusString));
          });
       } else {
          next(null);
@@ -625,7 +631,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                status: status
             }, function(err) {
                if (err) {
-                  // :'(
+                  console.error(err);
                }
                if (next) {
                   next(err);
