@@ -214,11 +214,17 @@ gisportal.graphs.Plot = (function() {
             wmsUrl: gisportal.baseLayers[baseMap].getSource().getUrls()[0],
             wmsParams: gisportal.baseLayers[baseMap].getSource().getParams()
          };
+         if (plotRequest.baseMap.wmsParams.t) {
+            delete plotRequest.baseMap.wmsParams.t;
+         }
          if (borders != "0") {
             plotRequest.countryBorders = {
                wmsUrl: gisportal.countryBorderLayers[borders].getSource().getUrls()[0],
                wmsParams: gisportal.countryBorderLayers[borders].getSource().getParams()
             };
+            if (plotRequest.countryBorders.wmsParams.t) {
+               delete plotRequest.countryBorders.wmsParams.t;
+            }
          }
       }
    };
@@ -443,6 +449,9 @@ gisportal.graphs.Plot = (function() {
          } else if (this.plotType() == 'animation') {
             newSeries.data_source.wmsUrl = gisportal.layers[layer.id].openlayers.anID.getSource().getUrls()[0];
             newSeries.data_source.wmsParams = gisportal.layers[layer.id].openlayers.anID.getSource().getParams();
+            if (newSeries.data_source.wmsParams.t) {
+               delete newSeries.data_source.wmsParams.t;
+            }
             newSeries.data_source.timesSlices = this.slicesInRange();
          }
 
