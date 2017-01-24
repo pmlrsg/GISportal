@@ -14,11 +14,18 @@
 		</div>
 	</div>
 	<div>
-		{{#if_equals (call 'state') 'extracting' }}
+		{{!-- Using helpers from templates.js:134
+				Equivilent to:
+				if state == 'extracting' or state == 'plotting' or state == 'rendering' --}}
+		{{#if (or
+					(eq (call 'state') 'extracting')
+					(eq (call 'state') 'plotting')
+					(eq (call 'state') 'rendering')
+				)}}
 			<div class="loading-image"></div>
 			<button class="js-graph-status-delete brand secondary">Delete</button>
 			<div class="js-message"></div>
-		{{/if_equals}}
+		{{/if}}
 		{{#if_equals (call 'state') 'complete' }}
 			<div></div>
 			<div class="graph-buttons">

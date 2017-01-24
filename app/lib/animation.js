@@ -232,6 +232,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          HEIGHT: height,
          BBOX: bbox
       };
+      utils.deleteNullProperies(mapUrl.query);
 
       var bordersUrl;
       if (bordersOptions) {
@@ -252,6 +253,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             HEIGHT: height,
             BBOX: bbox
          };
+         utils.deleteNullProperies(bordersUrl.query);
       }
 
       var dataURL = url.parse(wmsUrl, true);
@@ -269,6 +271,8 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          SRS: params.SRS,
          STYLES: params.STYLES,
          NUMCOLORBANDS: params.NUMCOLORBANDS,
+         ABOVEMAXCOLOR: params.ABOVEMAXCOLOR,
+         BELOWMINCOLOR: params.BELOWMINCOLOR,
          TIME: time.toISOString(),
          colorscalerange: params.colorscalerange,
          logscale: params.logscale,
@@ -276,13 +280,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          HEIGHT: height,
          BBOX: bbox
       };
-
-      if (params.ABOVEMAXCOLOR) {
-         dataURL.query.ABOVEMAXCOLOR = params.ABOVEMAXCOLOR;
-      }
-      if (params.BELOWMINCOLOR) {
-         dataURL.query.BELOWMINCOLOR = params.BELOWMINCOLOR;
-      }
+      utils.deleteNullProperies(dataURL.query);
 
       var mapDownloaded = false;
       var bordersDownloaded = false;
@@ -335,25 +333,24 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       function setupTimeStamper() {
          timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
          timeStamper.on('message', function(options) {
-            if (options.err) return handleError(options.err);
+            if (options.err) {
+               return handleError(options.err);
+            }
 
             // Rename the image from it's tempPath
             fs.rename(options.tempPath, options.filePath, function(err) {
-               if (err) return handleError(err);
+               if (err) {
+                  return handleError(err);
+               }
 
                // Link the image in the hashdir (TODO replace with symlink if possible)
                fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
-                  if (err) return handleError(err);
-
+                  if (err) {
+                     return handleError(err);
+                  }
                   imageReady(options);
                });
             });
-
-            function handleError(err) {
-               // If there was an error, kill the timestamper and call next with the error
-               timeStamper.kill();
-               next(err);
-            }
          });
       }
 
@@ -413,18 +410,18 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                if (options.existing) {
                   fs.link(options.filePath, path.join(hashDir, options.filename), done);
                } else {
-                  timeStamper.send(options);
+                  if (timeStamper.connected) {
+                     timeStamper.send(options);
+                  }
                }
             }
          }
 
          function done(err) {
             if (err) {
-               timeStamper.kill();
-               next(err);
-            } else {
-               imageReady(options);
+               return handleError(err);
             }
+            imageReady(options);
          }
       }
 
@@ -436,6 +433,13 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             timeStamper.kill();
             next();
          }
+      }
+
+      function handleError(err) {
+         // If there was an error, kill the queue and timestamper and call next with the error
+         downloadQueue.kill();
+         timeStamper.kill();
+         next(err);
       }
    }
 

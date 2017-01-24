@@ -75,6 +75,7 @@ gisportal.graphs.PlotStatus = (function(){
                break;
             case "extracting":
             case "plotting":
+            case "rendering":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;
