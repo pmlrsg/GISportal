@@ -46,6 +46,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
    var bbox;
    var borders = false;
    var layerID;
+   var layerURLHash;
    var maxHeight = MAXHEIGHT;
    var maxWidth = MAXWIDTH;
 
@@ -258,7 +259,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
       var dataURL = url.parse(wmsUrl, true);
       dataURL.search = undefined;
-      var time = new Date(params.time);
 
       dataURL.query = {
          SERVICE: 'WMS',
@@ -273,7 +273,6 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          NUMCOLORBANDS: params.NUMCOLORBANDS,
          ABOVEMAXCOLOR: params.ABOVEMAXCOLOR,
          BELOWMINCOLOR: params.BELOWMINCOLOR,
-         TIME: time.toISOString(),
          colorscalerange: params.colorscalerange,
          logscale: params.logscale,
          WIDTH: width,
@@ -281,6 +280,8 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          BBOX: bbox
       };
       utils.deleteNullProperies(dataURL.query);
+
+      layerURLHash = sha1(url.format(dataURL));
 
       var mapDownloaded = false;
       var bordersDownloaded = false;
@@ -319,7 +320,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
 
          for (var i = 0; i < slices.length; i++) {
             dataURL.query.TIME = slices[i];
-            var filename = layerID + '_' + bbox.replace(/\,/, '-') + '_' + slices[i].replace(/\:/, '-') + '.png';
+            var filename = layerURLHash + '_' + slices[i].replace(/\:/, '-') + '.png';
             downloadQueue.push({
                uri: url.format(dataURL),
                dir: downloadDir,
@@ -494,7 +495,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          })
          .input(path.join(downloadDir, hash, 'map.jpg'))
          .inputOptions(['-loop 1', '-framerate ' + inputFPS])
-         .input(path.join(downloadDir, hash, layerID + '_' + bbox.replace(/\,/, '-') + '_' + '*' + '.png'))
+         .input(path.join(downloadDir, hash, layerURLHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (borders) {
