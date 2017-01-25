@@ -16,11 +16,10 @@
 	<div>
 		{{!-- Using helpers from templates.js:134
 				Equivilent to:
-				if state == 'extracting' or state == 'plotting' or state == 'rendering' --}}
-		{{#if (or
-					(eq (call 'state') 'extracting')
-					(eq (call 'state') 'plotting')
-					(eq (call 'state') 'rendering')
+				if state != 'complete' and state != 'failed' --}}
+		{{#if (and
+					(ne (call 'state') 'complete')
+					(ne (call 'state') 'failed')
 				)}}
 			<div class="loading-image"></div>
 			<button class="js-graph-status-delete brand secondary">Delete</button>

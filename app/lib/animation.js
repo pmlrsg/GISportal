@@ -14,20 +14,15 @@ var yazl = require('yazl');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 
-// Temporary inclusion to spot blocking issues
-var blocked = require('blocked');
-blocked(function(time) {
-   console.log('Node was blocked for ' + time + ' ms');
-}, {
-   threshold: 5
-});
-
 var ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 var MAXWIDTH = 1920;
 var MAXHEIGHT = 1080;
 
+/**
+ * Frozen PlotStatus object for use as enum
+ */
 var PlotStatus = Object.freeze({
    initialising: 'initialising',
    extracting: 'extracting',
@@ -39,26 +34,40 @@ var PlotStatus = Object.freeze({
 var animation = {};
 module.exports = animation;
 
-animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, next) {
-   // OFF_DEATH variable that will hold the function to disable the ON_DEATH hook
-   var OFF_DEATH;
+/**
+ * Produce a video animation from a single WMS layer
+ * @param  {object}   plotRequest The plot request object
+ * @param  {string}   plotDir     The directory to output the plot files to
+ * @param  {string}   downloadDir The directory to download tiles (frames) to and use as a cache
+ * @param  {string}   logDir      The directory to log requests to
+ * @param  {Function} next        The function to call with the request hash
+ */
+animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
+   /** Variable that will hold the function to disable the ON_DEATH hook */
+   var OFF_DEATH = null;
 
-   var bbox;
+   /** @type {string} The bounding box coordinates */
+   var bbox = null;
+   /** @type {Boolean} true to include country borders */
    var borders = false;
-   var layerID;
-   var layerURLHash;
+   /** @type {string} The hash of the layer WMS url, used for cache file naming */
+   var layerURLHash = null;
+   /** @type {number} Maximum allowed height of the images and video */
    var maxHeight = MAXHEIGHT;
+   /** @type {number} Maximum allowed width of the images and video */
    var maxWidth = MAXWIDTH;
-
+   /** @type {string} sha1 hash of the request object */
    var hash = sha1(JSON.stringify(plotRequest));
+   /** @type {QueueObject} Queue for saving status file updates */
    var saveStatusQueue = async.queue(saveStatus, 1);
 
    readStatus(function(status) {
       if (!status || status.state == PlotStatus.failed) {
+         // If this is a new plot or has previously failed
          fs.writeFile(path.join(plotDir, hash + '-request.json'), JSON.stringify(plotRequest));
 
+         // Setup the handler to gracefully cleanup if the progam is killed
          OFF_DEATH = ON_DEATH(function(signal) {
-            console.log('\nON_DEATH called');
             updateStatus(PlotStatus.failed, null, null, null, null, function() {
                cleanup(function() {
                   process.kill(process.pid, signal);
@@ -67,17 +76,20 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          });
 
          updateStatus(PlotStatus.initialising, null, null, null, null, function(err) {
+            // Once the status file has been created/updated, call next with the hash
             next(err, hash);
          });
 
+         // Load the map, layer, and border options from the request
          var mapOptions = plotRequest.plot.baseMap;
          var dataOptions = plotRequest.plot.data.series[0].data_source;
-
-         var bordersOptions;
+         var bordersOptions = null;
          if (plotRequest.plot.countryBorders) {
+            borders = true;
             bordersOptions = plotRequest.plot.countryBorders;
          }
 
+         // Do all the processing
          getMaxResolution(mapOptions, dataOptions, bordersOptions, function() {
             downloadTiles(mapOptions, dataOptions, bordersOptions, function(err) {
                if (err) {
@@ -103,20 +115,24 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             });
          });
       } else {
-         next(null, hash);
+         // Else it's a previously completed plot so just return the hash and finish
+         return next(null, hash);
       }
    });
 
-   function handleError(err) {
-      updateStatus(PlotStatus.failed, null, null, null, err);
-      cleanup();
-   }
-
+   /**
+    * Get the maximum supported resolution from the map, borders and layer
+    * @param  {object}   mapOptions     The map options
+    * @param  {object}   dataOptions    The layer options
+    * @param  {object}   bordersOptions The border options or null
+    * @param  {Function} next           Function to call when done
+    */
    function getMaxResolution(mapOptions, dataOptions, bordersOptions, next) {
       var mapDone = false;
       var bordersDone = false;
       var dataDone = false;
 
+      // Get the map capabilities
       var mapUrl = url.parse(mapOptions.wmsUrl);
       mapUrl.search = undefined;
       mapUrl.query = {
@@ -128,8 +144,8 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          done();
       });
 
+      // Get the border capabilities
       if (bordersOptions) {
-         borders = true;
          var bordersUrl = url.parse(bordersOptions.wmsUrl);
          bordersUrl.search = undefined;
          bordersUrl.query = {
@@ -144,6 +160,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          bordersDone = true;
       }
 
+      // Get the layer capabilities
       var dataURL = url.parse(dataOptions.wmsUrl, true);
       dataURL.search = undefined;
       dataURL.query = {
@@ -155,12 +172,21 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          done();
       });
 
+      /**
+       * Called when a GetCapabilities request is complete
+       * Calls next when map, borders and layer are all done
+       */
       function done() {
          if (mapDone && bordersDone && dataDone) {
             next();
          }
       }
 
+      /**
+       * Handles making a request and updating the max width and height as required
+       * @param  {string}   wmsUrl The WMS url to request
+       * @param  {Function} next   Function to call when done
+       */
       function makeRequest(wmsUrl, next) {
          request(wmsUrl, function(err, response, body) {
             if (err) {
@@ -175,20 +201,23 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                      next(err);
                   } else {
                      if (result.WMS_Capabilities && result.WMS_Capabilities.Service) {
+                        // If WMS_Capabilities and WMS_Capabilities.Service are defined
                         if (result.WMS_Capabilities.Service[0].MaxWidth) {
+                           // Update the max width if it needs to be reduced
                            var layerMaxWidth = result.WMS_Capabilities.Service[0].MaxWidth[0];
                            if (layerMaxWidth < maxWidth) {
                               maxWidth = layerMaxWidth;
                            }
                         }
                         if (result.WMS_Capabilities.Service[0].MaxHeight) {
+                           // Update the max height if it needs to be reduced
                            var layerMaxHeight = result.WMS_Capabilities.Service[0].MaxHeight[0];
                            if (layerMaxHeight < maxHeight) {
                               maxHeight = layerMaxHeight;
                            }
                         }
                      }
-                     next();
+                     return next();
                   }
                });
             }
@@ -196,17 +225,34 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       }
    }
 
+   /**
+    * Handles downloading all the tiles/images for the map, borders, and layer
+    * @param  {object}   mapOptions     The map options
+    * @param  {object}   dataOptions    The data options
+    * @param  {object}   bordersOptions The border options
+    * @param  {Function} next           Function to call when done
+    */
    function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
-      layerID = dataOptions.layer_id;
-      var wmsUrl = dataOptions.wmsUrl;
-      var params = dataOptions.wmsParams;
+      /** @type {array} Unique array of all the time slices in the request */
       var slices = _.uniq(dataOptions.timesSlices);
+      /** @type {Object} Object for recording download retries */
+      var retries = {};
+      /** @type {QueueObject} Queue for managing downloads */
+      var downloadQueue = async.queue(download, 10);
+      /** @type {string} Hash temporary directory path for this requests images to be stored */
+      var hashDir = path.join(downloadDir, hash);
+      /** @type {Object} The child process that handles adding a timestamp to each image */
+      var timeStamper = setupTimeStamper();
 
+      var mapDownloaded = false;
+      var bordersDownloaded = false;
+      var slicesDownloaded = 0;
+
+      // Calculate the image width and height from the bbox and maximum allowed
       bbox = dataOptions.bbox;
       var bboxArr = bbox.split(',');
       var bboxWidth = bboxArr[2] - bboxArr[0];
       var bboxHeight = bboxArr[3] - bboxArr[1];
-
       var height = 0;
       var width = 0;
 
@@ -218,6 +264,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          width = 2 * Math.round(((bboxWidth / bboxHeight) * maxHeight) / 2);
       }
 
+      // Setup the map request url
       var mapUrl = url.parse(mapOptions.wmsUrl);
       mapUrl.search = undefined;
       mapUrl.query = {
@@ -235,6 +282,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       };
       utils.deleteNullProperies(mapUrl.query);
 
+      // Setup the borders request url
       var bordersUrl;
       if (bordersOptions) {
          borders = true;
@@ -257,51 +305,41 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          utils.deleteNullProperies(bordersUrl.query);
       }
 
-      var dataURL = url.parse(wmsUrl, true);
+      // Setup the layer request url
+      var dataURL = url.parse(dataOptions.wmsUrl, true);
       dataURL.search = undefined;
-
       dataURL.query = {
          SERVICE: 'WMS',
-         VERSION: params.VERSION,
+         VERSION: dataOptions.wmsParams.VERSION,
          REQUEST: 'GetMap',
          FORMAT: 'image/png',
          TRANSPARENT: true,
-         LAYERS: params.LAYERS,
-         wrapDateLine: params.wrapDateLine,
-         SRS: params.SRS,
-         STYLES: params.STYLES,
-         NUMCOLORBANDS: params.NUMCOLORBANDS,
-         ABOVEMAXCOLOR: params.ABOVEMAXCOLOR,
-         BELOWMINCOLOR: params.BELOWMINCOLOR,
-         colorscalerange: params.colorscalerange,
-         logscale: params.logscale,
+         LAYERS: dataOptions.wmsParams.LAYERS,
+         wrapDateLine: dataOptions.wmsParams.wrapDateLine,
+         SRS: dataOptions.wmsParams.SRS,
+         STYLES: dataOptions.wmsParams.STYLES,
+         NUMCOLORBANDS: dataOptions.wmsParams.NUMCOLORBANDS,
+         ABOVEMAXCOLOR: dataOptions.wmsParams.ABOVEMAXCOLOR,
+         BELOWMINCOLOR: dataOptions.wmsParams.BELOWMINCOLOR,
+         colorscalerange: dataOptions.wmsParams.colorscalerange,
+         logscale: dataOptions.wmsParams.logscale,
          WIDTH: width,
          HEIGHT: height,
          BBOX: bbox
       };
       utils.deleteNullProperies(dataURL.query);
 
+      // Generate a hash from the layer url for use in the image filenames
       layerURLHash = sha1(url.format(dataURL));
-
-      var mapDownloaded = false;
-      var bordersDownloaded = false;
-      var slicesDownloaded = 0;
-      var retries = {};
-
-      var downloadQueue = async.queue(download, 10);
 
       updateStatus(PlotStatus.extracting);
 
-      downloadDir = path.join(downloadDir, domain);
-      var hashDir = path.join(downloadDir, hash);
-
-      var timeStamper = null;
-      setupTimeStamper();
-
+      // Create the hash directory
       fs.mkdirs(hashDir, function(err) {
          if (err) {
             return next(err);
          }
+         // Push the map to the download queue
          downloadQueue.push({
             uri: url.format(mapUrl),
             dir: hashDir,
@@ -309,6 +347,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             id: 'map'
          }, downloadComplete);
 
+         // Push the borders to the download queue
          if (borders) {
             downloadQueue.push({
                uri: url.format(bordersUrl),
@@ -318,6 +357,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             }, downloadComplete);
          }
 
+         // Push all the layer slices to the download queue
          for (var i = 0; i < slices.length; i++) {
             dataURL.query.TIME = slices[i];
             var filename = layerURLHash + '_' + slices[i].replace(/\:/, '-') + '.png';
@@ -326,24 +366,28 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                dir: downloadDir,
                filename: filename,
                id: slices[i],
-               cache: true
+               isLayer: true
             }, downloadComplete);
          }
       });
 
+      /**
+       * Setup the timeStamper child process and handler for images that have been stamped
+       * @return {Object} The timeStamper
+       */
       function setupTimeStamper() {
          timeStamper = child_process.fork(path.join(__dirname, '../scripts/animation-timestamper.js'));
+
+         // Handler for images that have been stamped
          timeStamper.on('message', function(options) {
             if (options.err) {
                return handleError(options.err);
             }
-
             // Rename the image from it's tempPath
             fs.rename(options.tempPath, options.filePath, function(err) {
                if (err) {
                   return handleError(err);
                }
-
                // Link the image in the hashdir (TODO replace with symlink if possible)
                fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
                   if (err) {
@@ -353,18 +397,24 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
                });
             });
          });
+         return timeStamper;
       }
 
+      /**
+       * Download an image
+       * @param  {Object}   options The download options
+       * @param  {Function} next    Function to call when done
+       */
       function download(options, next) {
          options.filePath = path.join(options.dir, options.filename);
-         if (options.cache) {
-            // If this download should be cached for later usage (it is a data tile)
+         if (options.isLayer) {
+            // If this download is a layer tile
             if (utils.fileExists(options.filePath)) {
                // If it already exists, no need to download it again
                options.existing = true;
                done();
             } else {
-               // If it doesn't exist, download to a temporary path
+               // If it doesn't exist, download to a temporary path for time stamping
                options.existing = false;
                options.tempPath = path.join(options.dir, 'temp_' + options.filename);
                makeRequest(options.tempPath);
@@ -374,6 +424,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             makeRequest(options.filePath);
          }
 
+         /**
+          * Make the download request
+          * @param  {string} path The path to write the file to
+          */
          function makeRequest(path) {
             request(options.uri, {
                   timeout: 60000
@@ -389,31 +443,41 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
       }
 
+      /**
+       * Called when a download has completed
+       * Keeps track of overall download progress and calls timestamper on new layer tiles
+       * @param  {object} err     Any error or null
+       * @param  {object} options Download options
+       */
       function downloadComplete(err, options) {
          if (err) {
+            // If there was an error, retry the download up to 4 times
             if (retries[options.id] === undefined) {
-               retries[options.id] = 0;
-            }
-            if (retries[options.id] < 4) {
+               retries[options.id] = 1;
+               return downloadQueue.push(options, downloadComplete);
+            } else if (retries[options.id] < 4) {
                retries[options.id]++;
-               downloadQueue.push(options, downloadComplete);
+               return downloadQueue.push(options, downloadComplete);
             } else {
-               done(err);
+               return done(err);
             }
+         }
+
+         if (options.id == 'map') {
+            mapDownloaded = true;
+            done();
+         } else if (options.id == 'borders') {
+            bordersDownloaded = true;
+            done();
          } else {
-            if (options.id == 'map') {
-               mapDownloaded = true;
-               done();
-            } else if (options.id == 'borders') {
-               bordersDownloaded = true;
-               done();
+            if (options.existing) {
+               // If the tile was already downloaded, just link it in the hash directory
+               // TODO replace with symlink if possible
+               fs.link(options.filePath, path.join(hashDir, options.filename), done);
             } else {
-               if (options.existing) {
-                  fs.link(options.filePath, path.join(hashDir, options.filename), done);
-               } else {
-                  if (timeStamper.connected) {
-                     timeStamper.send(options);
-                  }
+               // Else send the image to the timestamper
+               if (timeStamper.connected) {
+                  timeStamper.send(options);
                }
             }
          }
@@ -426,6 +490,11 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
       }
 
+      /**
+       * Called when an image is ready to be used by the renderer
+       * Keeps track of progress and calls next when all images are ready
+       * @param  {object} options The image options
+       */
       function imageReady(options) {
          if (options.id != 'map' && options.id != 'borders') {
             slicesDownloaded++;
@@ -436,23 +505,37 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          }
       }
 
+      /**
+       * If there was an error, kill the queue and timestamper and call next with the error
+       * @param  {object} err The error
+       */
       function handleError(err) {
-         // If there was an error, kill the queue and timestamper and call next with the error
          downloadQueue.kill();
          timeStamper.kill();
          next(err);
       }
    }
 
+   /**
+    * Render the video in MP4 and WebM
+    * @param  {Function} next Function to call when done
+    */
    function render(next) {
       updateStatus(PlotStatus.rendering);
 
+      var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
+      var videoPathWebM = path.join(plotDir, hash + '-video.webm');
       var inputFPS = plotRequest.plot.framerate || 1;
+
       if (inputFPS > 1) {
+         // Only allow integer values above 1 FPS
          inputFPS = Math.round(inputFPS);
       }
+
       var outputFPS = inputFPS;
 
+      // Determine the correct output framerate based on the input framerate
+      // A minimum of 10 FPS is used as lower values can cause playback issues
       switch (inputFPS) {
          case 1:
          case 2:
@@ -472,6 +555,7 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
             }
       }
 
+      // Determine the maximum bitrate for WebM based on the input framerate
       var maxWebMBitrate = null;
       if (inputFPS <= 5) {
          maxWebMBitrate = '12M';
@@ -487,35 +571,34 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          maxWebMBitrate = '45M';
       }
 
-      var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
-      var videoPathWebM = path.join(plotDir, hash + '-video.webm');
-
-      var renderer = ffmpeg({
-            stdoutLines: 0
-         })
+      // Setup the renderer with the map and layer inputs
+      var renderer = ffmpeg()
          .input(path.join(downloadDir, hash, 'map.jpg'))
          .inputOptions(['-loop 1', '-framerate ' + inputFPS])
          .input(path.join(downloadDir, hash, layerURLHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (borders) {
+         // If borders then setup the borders input and complex filter
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS])
             .complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
       } else {
+         // Else just setup the complex filter
          renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
       }
 
+      // Set up the output options and start the renderer
       renderer
          .output(videoPathMP4)
          .videoCodec('libx264')
-         .outputOptions(['-map [out1]', '-crf 23', '-threads 2', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
+         .outputOptions(['-map [out1]', '-crf 23', '-threads 1', '-preset medium', '-pix_fmt yuv420p', '-movflags +faststart'])
          .outputFPS(outputFPS)
          .noAudio()
          .output(videoPathWebM)
          .videoCodec('libvpx')
-         .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 2', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
+         .outputOptions(['-map [out2]', '-b:v ' + maxWebMBitrate, '-crf 15', '-threads 1', '-speed 1', '-quality good', '-pix_fmt yuv420p'])
          .outputFPS(outputFPS)
          .noAudio()
          .on('end', next)
@@ -527,34 +610,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
          .run();
    }
 
-   function cleanup(next) {
-      OFF_DEATH();
-      var i = 0;
-      var numFiles = 0;
-
-      glob(path.join(downloadDir, 'temp_*'), function(err, files) {
-         if (!err) {
-            numFiles = files.length;
-            if (numFiles > 0) {
-               files.forEach(function(file) {
-                  fs.remove(file, done);
-               });
-            } else {
-               done();
-            }
-         }
-      });
-
-      function done() {
-         if (numFiles > 0) {
-            i++;
-         }
-         if (i == numFiles) {
-            fs.remove(path.join(downloadDir, hash), next);
-         }
-      }
-   }
-
+   /**
+    * Build the plot html file
+    * @param  {Function} next Function to call when done
+    */
    function buildHtml(next) {
       var htmlPath = path.join(plotDir, hash + '-plot.html');
       var video = '<video controls><source src="/plots/' + hash + '-video.mp4" type="video/mp4"/><source src="/plots/' + hash + '-video.webm" type="video/webm"></video>';
@@ -564,6 +623,10 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       });
    }
 
+   /**
+    * Build the plot zip with both video files
+    * @param  {Function} next Function to call when done
+    */
    function buildZip(next) {
       var zipPath = path.join(plotDir, hash + '.zip');
       var zip = new yazl.ZipFile();
@@ -580,6 +643,52 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       zip.end();
    }
 
+   /**
+    * Handle an error by setting the status to failed and calling cleanup
+    * @param  {object} err The error
+    */
+   function handleError(err) {
+      updateStatus(PlotStatus.failed, null, null, null, err);
+      cleanup();
+   }
+
+   /**
+    * Cleanup temporary files after rendering has finished or failed
+    * @param  {Function} next Function to call when done
+    */
+   function cleanup(next) {
+      OFF_DEATH();
+      var i = 0;
+      var numFiles = 0;
+
+      glob(path.join(downloadDir, 'temp_*'), function(err, files) {
+         if (err) {
+            return done();
+         }
+         numFiles = files.length;
+         if (numFiles > 0) {
+            files.forEach(function(file) {
+               fs.remove(file, done);
+            });
+         } else {
+            done();
+         }
+      });
+
+      function done() {
+         if (numFiles > 0) {
+            i++;
+         }
+         if (i == numFiles) {
+            fs.remove(path.join(downloadDir, hash), next);
+         }
+      }
+   }
+
+   /**
+    * Read the status file
+    * @param  {Function} next Function to call with the status file
+    */
    function readStatus(next) {
       var statusPath = path.join(plotDir, hash + '-status.json');
 
@@ -595,6 +704,15 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       }
    }
 
+   /**
+    * Update the status file
+    * @param  {string}   state        The plot state
+    * @param  {string}   message      An optional message
+    * @param  {string}   percentage   Percentage complete
+    * @param  {number}   minRemaining Number of minutes remaining
+    * @param  {object}   traceback    The traceback or error message of an error
+    * @param  {Function} next         Function to call when done
+    */
    function updateStatus(state, message, percentage, minRemaining, traceback, next) {
       var statusPath = path.join(plotDir, hash + '-status.json');
       var status;
@@ -646,6 +764,11 @@ animation.animate = function(plotRequest, domain, plotDir, downloadDir, logDir, 
       }
    }
 
+   /**
+    * Save the status file to disk
+    * @param  {object}   options Options containing statuspath and status
+    * @param  {Function} next    Function to call when done
+    */
    function saveStatus(options, next) {
       fs.writeFile(options.statusPath, JSON.stringify(options.status), 'utf8', function(err) {
          next(err);
