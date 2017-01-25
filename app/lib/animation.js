@@ -35,7 +35,7 @@ var animation = {};
 module.exports = animation;
 
 /**
- * Produce a video animation from a single WMS layer
+ * Produce a video animation from a single WMS data layer
  * @param  {object}   plotRequest The plot request object
  * @param  {string}   plotDir     The directory to output the plot files to
  * @param  {string}   downloadDir The directory to download tiles (frames) to and use as a cache
@@ -50,8 +50,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    var bbox = null;
    /** @type {Boolean} true to include country borders */
    var borders = false;
-   /** @type {string} The hash of the layer WMS url, used for cache file naming */
-   var layerURLHash = null;
+   /** @type {string} The hash of the data layer WMS url, used for cache file naming */
+   var dataUrlHash = null;
    /** @type {number} Maximum allowed height of the images and video */
    var maxHeight = MAXHEIGHT;
    /** @type {number} Maximum allowed width of the images and video */
@@ -80,7 +80,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             next(err, hash);
          });
 
-         // Load the map, layer, and border options from the request
+         // Load the map, data, and border options from the request
          var mapOptions = plotRequest.plot.baseMap;
          var dataOptions = plotRequest.plot.data.series[0].data_source;
          var bordersOptions = null;
@@ -121,9 +121,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    });
 
    /**
-    * Get the maximum supported resolution from the map, borders and layer
+    * Get the maximum supported resolution from the map, borders and data layer
     * @param  {object}   mapOptions     The map options
-    * @param  {object}   dataOptions    The layer options
+    * @param  {object}   dataOptions    The data layer options
     * @param  {object}   bordersOptions The border options or null
     * @param  {Function} next           Function to call when done
     */
@@ -160,7 +160,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          bordersDone = true;
       }
 
-      // Get the layer capabilities
+      // Get the data layer capabilities
       var dataURL = url.parse(dataOptions.wmsUrl, true);
       dataURL.search = undefined;
       dataURL.query = {
@@ -174,7 +174,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
       /**
        * Called when a GetCapabilities request is complete
-       * Calls next when map, borders and layer are all done
+       * Calls next when map, borders and data layer are all done
        */
       function done() {
          if (mapDone && bordersDone && dataDone) {
@@ -226,7 +226,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    }
 
    /**
-    * Handles downloading all the tiles/images for the map, borders, and layer
+    * Handles downloading all the tiles/images for the map, borders, and data layer
     * @param  {object}   mapOptions     The map options
     * @param  {object}   dataOptions    The data options
     * @param  {object}   bordersOptions The border options
@@ -305,7 +305,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          utils.deleteNullProperies(bordersUrl.query);
       }
 
-      // Setup the layer request url
+      // Setup the data layer request url
       var dataURL = url.parse(dataOptions.wmsUrl, true);
       dataURL.search = undefined;
       dataURL.query = {
@@ -329,8 +329,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       };
       utils.deleteNullProperies(dataURL.query);
 
-      // Generate a hash from the layer url for use in the image filenames
-      layerURLHash = sha1(url.format(dataURL));
+      // Generate a hash from the data layer url for use in the image filenames
+      dataUrlHash = sha1(url.format(dataURL));
 
       updateStatus(PlotStatus.extracting);
 
@@ -357,16 +357,16 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             }, downloadComplete);
          }
 
-         // Push all the layer slices to the download queue
+         // Push all the data layer slices to the download queue
          for (var i = 0; i < slices.length; i++) {
             dataURL.query.TIME = slices[i];
-            var filename = layerURLHash + '_' + slices[i].replace(/\:/, '-') + '.png';
+            var filename = dataUrlHash + '_' + slices[i].replace(/\:/, '-') + '.png';
             downloadQueue.push({
                uri: url.format(dataURL),
                dir: downloadDir,
                filename: filename,
                id: slices[i],
-               isLayer: true
+               isDataLayer: true
             }, downloadComplete);
          }
       });
@@ -407,8 +407,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
        */
       function download(options, next) {
          options.filePath = path.join(options.dir, options.filename);
-         if (options.isLayer) {
-            // If this download is a layer tile
+         if (options.isDataLayer) {
+            // If this download is a data layer tile
             if (utils.fileExists(options.filePath)) {
                // If it already exists, no need to download it again
                options.existing = true;
@@ -445,7 +445,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
       /**
        * Called when a download has completed
-       * Keeps track of overall download progress and calls timestamper on new layer tiles
+       * Keeps track of overall download progress and calls timestamper on new data layer tiles
        * @param  {object} err     Any error or null
        * @param  {object} options Download options
        */
@@ -571,11 +571,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          maxWebMBitrate = '45M';
       }
 
-      // Setup the renderer with the map and layer inputs
+      // Setup the renderer with the map and data layer inputs
       var renderer = ffmpeg()
          .input(path.join(downloadDir, hash, 'map.jpg'))
          .inputOptions(['-loop 1', '-framerate ' + inputFPS])
-         .input(path.join(downloadDir, hash, layerURLHash + '_' + '*' + '.png'))
+         .input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (borders) {
