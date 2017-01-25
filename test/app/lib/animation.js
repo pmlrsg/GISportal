@@ -1,7 +1,7 @@
+var admZip = require('adm-zip');
 var chai = require('chai');
 var fs = require('fs-extra');
 var glob = require('glob');
-var admZip = require('adm-zip');
 var md5 = require('md5');
 
 var expect = chai.expect;
@@ -32,9 +32,8 @@ describe('animation', function() {
    });
 
    it('should produce all the correct files when it completes', function(done) {
-      this.timeout(10000);
+      this.timeout(60000);
 
-      // var complete = false;
       var status = null;
 
       checkComplete();
@@ -47,12 +46,6 @@ describe('animation', function() {
             setTimeout(checkComplete, 1000);
          }
       }
-      // while (!complete) {
-      //    status = JSON.parse(fs.readFileSync(plotDir + '/e5f991c76bd84a354a6f23870eb6d74886d62bf6-status.json', 'utf8'));
-      //    if (status.completed) {
-      //       complete = true;
-      //    }
-      // }
 
       function doTests() {
          var testFilesPath = global.test.dependPath + '/expected/plotting/animation/' + testHash;
