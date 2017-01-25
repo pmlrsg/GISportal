@@ -32,7 +32,7 @@ describe('animation', function() {
    });
 
    it('should produce all the correct files when it completes', function(done) {
-      this.timeout(60000);
+      this.timeout(30000);
 
       var status = null;
 
