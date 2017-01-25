@@ -188,7 +188,10 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
        * @param  {Function} next   Function to call when done
        */
       function makeRequest(wmsUrl, next) {
-         request(wmsUrl, function(err, response, body) {
+         request({
+            url: wmsUrl,
+            timeout: 5000
+         }, function(err, response, body) {
             if (err) {
                next(err);
             } else {
