@@ -200,6 +200,13 @@ gisportal.graphs.PlotEditor = (function(){
    PlotEditor.prototype.addComponent = function( component ){
 
       var result = this.plot().addComponent( component );
+
+      if (!(result instanceof Error) && component.bbox.substr(0,7) == 'POLYGON') {
+            var animation = $('.js-active-plot-type option[value*="animation"]');
+            animation.prop('disabled', true);
+            animation.text('Animation (requires regular polygon)');
+         }
+
       // Couldnt add component, show error
       if( result instanceof Error ){
          var alert = $('<div>')
@@ -361,7 +368,7 @@ gisportal.graphs.PlotEditor = (function(){
          var h = Math.floor(seconds / 3600);
          var m = Math.floor(seconds % 3600 / 60);
          var s = Math.floor(seconds % 3600 % 60);
-         return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s);
+         return ((h > 0 ? h + ' hours, ' : '') + (m > 0 ? m + ' minutes, ' : '') + s + ' seconds');
       }
    };
 

@@ -59,15 +59,6 @@
 			 </select>
 		</div>
 	</li>
-	<li class="plot-framerate-options-li hidden">
-		<div>
-			<p>Set the framerate using the slider below</p>
-			<div class="clearfix">
-				<input placeholder="Framerate" class="js-min graph-min js-active-plot-framerate" type="text">
-			</div>
-			<div class="js-framerate-slider "></div>
-		</div>
-	</li>
 	<li>
 		<div{{#if transect_plot}} class="hidden"{{/if}}>
 			<p>Set a date range using the timeline below</p>
@@ -78,6 +69,15 @@
 			<div class="js-range-slider "></div>
 		</div>
 	</li>
+	<li class="plot-framerate-options-li hidden">
+		<div>
+			<p>Adjust the number of time slices per second using the slider below</p>
+			<div class="clearfix">
+				<input placeholder="Framerate" class="js-min graph-min js-active-plot-framerate" type="text">
+			</div>
+			<div class="js-framerate-slider "></div>
+		</div>
+	</li>
 	<li class="graph-date-range-info-li alert-info hidden">
 		<div class="graph-date-range-info-div alert-info"></div>
 	</li>
@@ -85,7 +85,9 @@
 		<div class="graph-date-range-error-div alert-danger"></div>
 	</li>
 	<li class="plot-animation-duration-info hidden">
-		<p>Animation duration (HH:mm:ss) - <span class="js-active-plot-animation-duration">00:01:00</span></p>
+		<h3>Animation duration</h3>
+		<p class="js-active-plot-animation-duration"></p>
+		<p><i>You can reduce the duration by increasing the number of time slices per second.</i></p>
 	</li>
 
 	<li class="js-components-area" >

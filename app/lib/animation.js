@@ -48,6 +48,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
    /** @type {string} The bounding box coordinates */
    var bbox = null;
+   /** @type {Number} The number of time slices */
+   var numSlices = 0;
    /** @type {Boolean} true to include country borders */
    var borders = false;
    /** @type {string} The hash of the data layer WMS url, used for cache file naming */
@@ -68,7 +70,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
          // Setup the handler to gracefully cleanup if the progam is killed
          OFF_DEATH = ON_DEATH(function(signal) {
-            updateStatus(PlotStatus.failed, null, null, null, null, function() {
+            updateStatus(PlotStatus.failed, 'Program was killed while processing.', null, null, null, function() {
                cleanup(function() {
                   process.kill(process.pid, signal);
                });
@@ -238,6 +240,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
       /** @type {array} Unique array of all the time slices in the request */
       var slices = _.uniq(dataOptions.timesSlices);
+      numSlices = slices.length;
       /** @type {Object} Object for recording download retries */
       var retries = {};
       /** @type {QueueObject} Queue for managing downloads */
@@ -335,7 +338,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       // Generate a hash from the data layer url for use in the image filenames
       dataUrlHash = sha1(url.format(dataURL));
 
-      updateStatus(PlotStatus.extracting);
+      updateStatus(PlotStatus.extracting, 'Downloading time slices');
 
       // Create the hash directory
       fs.mkdirs(hashDir, function(err) {
@@ -501,8 +504,12 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       function imageReady(options) {
          if (options.id != 'map' && options.id != 'borders') {
             slicesDownloaded++;
+            if (slicesDownloaded % 10 === 0) {
+               updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
+            }
          }
          if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
+            updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             timeStamper.kill();
             next();
          }
@@ -524,7 +531,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     * @param  {Function} next Function to call when done
     */
    function render(next) {
-      updateStatus(PlotStatus.rendering);
+      updateStatus(PlotStatus.rendering, 'Rendering');
 
       var videoPathMP4 = path.join(plotDir, hash + '-video.mp4');
       var videoPathWebM = path.join(plotDir, hash + '-video.webm');
@@ -557,6 +564,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                outputFPS = inputFPS;
             }
       }
+
+      // Calculate the total number of frames for progress calculation
+      var numFrames = (outputFPS / inputFPS) * numSlices;
 
       // Determine the maximum bitrate for WebM based on the input framerate
       var maxWebMBitrate = null;
@@ -606,10 +616,10 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          .noAudio()
          .on('end', next)
          .on('error', next)
-         // TODO monitor progress and update status file
-         // .on('progress', function(progress) {
-         //    console.log(progress.timemark);
-         // })
+         .on('progress', function(progress) {
+            var percentage = Math.round((progress.frames / numFrames) * 99);
+            updateStatus(PlotStatus.rendering, 'Rendering<br>' + percentage + '%', percentage);
+         })
          .run();
    }
 
@@ -651,8 +661,16 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     * @param  {object} err The error
     */
    function handleError(err) {
-      updateStatus(PlotStatus.failed, null, null, null, err);
-      cleanup();
+      readStatus(function(status) {
+         var message = '';
+         if (status) {
+            message = 'Failed ' + status.state + '.';
+         } else {
+            message = 'Failed creating animation.';
+         }
+         updateStatus(PlotStatus.failed, message, null, null, err);
+         cleanup();
+      });
    }
 
    /**

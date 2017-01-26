@@ -38,7 +38,7 @@
 		{{#if_equals (call 'state') 'failed' }}
 			<div></div>
 			<div>
-				The graph could not be built. Downstream error.<br>
+				The plot could not be built. Downstream error.<br>
 				<button class="js-graph-status-delete brand secondary">Delete</button>
 				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
 			</div>
