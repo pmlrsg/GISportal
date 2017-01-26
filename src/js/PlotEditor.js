@@ -171,9 +171,9 @@ gisportal.graphs.PlotEditor = (function(){
       });
 
       function toggleStyles() {
-         var styleOptions = $('.graph-style-options-li');
-         var framerateOptions = $('.graph-framerate-options-li');
-         var animationDuration = $('.graph-animation-duration-info');
+         var styleOptions = $('.plot-style-options-li');
+         var framerateOptions = $('.plot-framerate-options-li');
+         var animationDuration = $('.plot-animation-duration-info');
          if (_this._plotTypeSelect.val() == 'animation' || _this._plotTypeSelect.val() == 'timeseries' || _this._plotTypeSelect.val() == 'scatter') {
             styleOptions.toggleClass('hidden', true);
          } else {

@@ -1,5 +1,5 @@
 <div class="slideout-header">
-   Graph
+   Plot
    <span class="btn icon-arrow-delete-1 icon-btn right-icon js-close-active-plot"></span>
 </div>
 <ol class="steps panel-list">
@@ -12,7 +12,7 @@
 
 	<li>
 		<div>
-			<p>Choose a graph type</p>
+			<p>Choose a plot type</p>
 			<select class="js-active-plot-type">
 			{{#if transect_plot}}
 				<option value="transect" selected>Transect</option>
@@ -35,9 +35,9 @@
 			{{/if}}
 		</div>
 	</li>
-	<li class="graph-style-options-li">
+	<li class="plot-style-options-li">
 		<div>
-			<p>Choose a graph style</p>
+			<p>Choose a plot style</p>
 			<select class="js-active-plot-style">
 				<option value="default" selected>Please Select a Style...</option>
 				<option value="boxfill/alg">boxfill/alg</option>
@@ -59,7 +59,7 @@
 			 </select>
 		</div>
 	</li>
-	<li class="graph-framerate-options-li hidden">
+	<li class="plot-framerate-options-li hidden">
 		<div>
 			<p>Set the framerate using the slider below</p>
 			<div class="clearfix">
@@ -84,7 +84,7 @@
 	<li class="graph-date-range-error-li alert-danger hidden">
 		<div class="graph-date-range-error-div alert-danger"></div>
 	</li>
-	<li class="graph-animation-duration-info hidden">
+	<li class="plot-animation-duration-info hidden">
 		<p>Animation duration (HH:mm:ss) - <span class="js-active-plot-animation-duration">00:01:00</span></p>
 	</li>
 
@@ -98,7 +98,7 @@
 
 	<li>
 		<div class="pull-right">
-			<button class="brand create-graph js-create-graph small">Create graph</button>
+			<button class="brand create-graph js-create-graph small">Create plot</button>
 		</div>
 	</li>
 
