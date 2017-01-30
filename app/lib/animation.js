@@ -10,7 +10,6 @@ var sha1 = require('sha1');
 var _ = require('underscore');
 var url = require('url');
 var xml2js = require('xml2js');
-var yazl = require('yazl');
 var settingsApi = require('./settingsapi.js');
 var utils = require('./utils.js');
 
@@ -112,13 +111,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                      if (err) {
                         return handleError(err);
                      }
-                     buildZip(function(err) {
-                        if (err) {
-                           return handleError(err);
-                        }
-                        updateStatus(PlotStatus.complete);
-                        cleanup();
-                     });
+                     updateStatus(PlotStatus.complete);
+                     cleanup();
                   });
                });
             });
@@ -641,26 +635,6 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       fs.writeFile(htmlPath, html, 'utf8', function(err) {
          next(err);
       });
-   }
-
-   /**
-    * Build the plot zip with both video files
-    * @param  {Function} next Function to call when done
-    */
-   function buildZip(next) {
-      var zipPath = path.join(plotDir, hash + '.zip');
-      var zip = new yazl.ZipFile();
-      zip.outputStream.pipe(fs.createWriteStream(zipPath))
-         .on('close', function() {
-            next();
-         })
-         .on('error', function(err) {
-            next(err);
-         });
-
-      zip.addFile(path.join(plotDir, hash + '-video.mp4'), hash + '-video.mp4');
-      zip.addFile(path.join(plotDir, hash + '-video.webm'), hash + '-video.webm');
-      zip.end();
    }
 
    /**

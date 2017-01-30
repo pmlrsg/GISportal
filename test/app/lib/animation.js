@@ -53,29 +53,17 @@ describe('animation', function() {
          var testStatus = JSON.parse(fs.readFileSync(testFilesPath + '-status.json', 'utf8'));
          var testMp4 = md5(fs.readFileSync(testFilesPath + '-video.mp4'));
          var testWebM = md5(fs.readFileSync(testFilesPath + '-video.webm'));
-         var testZipFile = testFilesPath + '.zip';
-         var testZip = admZip(testZipFile);
 
          var filesPath = plotDir + _hash;
          var request = JSON.parse(fs.readFileSync(filesPath + '-request.json', 'utf8'));
          var mp4 = md5(fs.readFileSync(filesPath + '-video.mp4'));
          var webM = md5(fs.readFileSync(filesPath + '-video.webm'));
-         var zipFile = filesPath + '.zip';
-         var zip = admZip(zipFile);
 
          expect(request, 'Request file').to.deep.equal(testRequest);
          expect(status, 'Status file').to.deep.equal(testStatus);
          expect(mp4, 'MP4 file').to.equal(testMp4);
          expect(webM, 'WebM file').to.equal(testWebM);
 
-         var testZipEntries = testZip.getEntries();
-         var zipEntries = zip.getEntries();
-
-         for (var i = 0; i < testZipEntries.length; i++) {
-            var testEntry = md5(testZip.readFile(testZipEntries[i]));
-            var entry = md5(zip.readFile(zipEntries[i]));
-            expect(entry).to.equal(testEntry);
-         }
          done();
       }
    });
