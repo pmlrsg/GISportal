@@ -112,6 +112,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                         return handleError(err);
                      }
                      updateStatus(PlotStatus.complete);
+                     logComplete();
                      cleanup();
                   });
                });
@@ -764,5 +765,21 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       fs.writeFile(options.statusPath, JSON.stringify(options.status), 'utf8', function(err) {
          next(err);
       });
+   }
+
+   function logComplete(next) {
+      if (logDir) {
+         fs.mkdirs(logDir);
+         var datetime = new Date().toISOString().substring(0, 19);
+         var date = new Date().toISOString().substring(0, 10);
+
+         var line = [datetime, hash, 'animation', status.state, numSlices];
+         line = line.join(',') + '\n';
+         fs.appendFile(path.join(logDir, date + '.csv'), line, function(err) {
+            if (next) {
+               next(err);
+            }
+         });
+      }
    }
 };
