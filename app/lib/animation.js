@@ -767,6 +767,10 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       });
    }
 
+   /**
+    * Log a completed animation
+    * @param  {Function} next Function to call when done
+    */
    function logComplete(next) {
       if (logDir) {
          fs.mkdirs(logDir);
