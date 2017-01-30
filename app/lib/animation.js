@@ -60,6 +60,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    var maxWidth = MAXWIDTH;
    /** @type {string} sha1 hash of the request object */
    var hash = sha1(JSON.stringify(plotRequest));
+   /** @type {object} The current status object */
+   var status = null;
    /** @type {QueueObject} Queue for saving status file updates */
    var saveStatusQueue = async.queue(saveStatus, 1);
 
@@ -92,7 +94,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          }
 
          // Check that the bbox isn't irregular
-         if(dataOptions.bbox.substr(0,7) == 'POLYGON') {
+         if (dataOptions.bbox.substr(0, 7) == 'POLYGON') {
             return handleError('Animation doesn\'t support irregular polygons');
          }
 
@@ -509,7 +511,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       function imageReady(options) {
          if (options.id != 'map' && options.id != 'borders') {
             slicesDownloaded++;
-            if (slicesDownloaded % 10 === 0) {
+            if (!options.existing && slicesDownloaded % 10 === 0) {
                updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             }
          }
@@ -741,53 +743,42 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
     */
    function updateStatus(state, message, percentage, minRemaining, traceback, next) {
       var statusPath = path.join(plotDir, hash + '-status.json');
-      var status;
 
-      if (utils.fileExists(statusPath)) {
-         fs.readFile(statusPath, 'utf8', gotStatus);
-      } else {
+      if (!status) {
          status = {
             job_id: hash,
             completed: false,
          };
-         gotStatus();
       }
 
-      function gotStatus(err, statusString) {
-         if (!err) {
-            if (statusString) {
-               status = JSON.parse(statusString);
-            }
-            status.message = message || '';
-            status.traceback = traceback || '';
-            status.state = state;
+      status.message = message || '';
+      status.traceback = traceback || '';
+      status.state = state;
 
-            if (state == PlotStatus.complete) {
-               status.completed = true;
-               status.percentage = 100;
-               status.minutes_remaining = 0;
-            } else if (state == PlotStatus.failed) {
-               status.completed = true;
-               status.percentage = 100;
-               status.minutes_remaining = 0;
-            } else {
-               status.completed = false;
-               status.percentage = percentage || 0;
-               status.minutes_remaining = minRemaining || -1;
-            }
-            saveStatusQueue.push({
-               statusPath: statusPath,
-               status: status
-            }, function(err) {
-               if (err) {
-                  console.error(err);
-               }
-               if (next) {
-                  next(err);
-               }
-            });
+      if (state == PlotStatus.complete) {
+         status.completed = true;
+         status.percentage = 100;
+         status.minutes_remaining = 0;
+      } else if (state == PlotStatus.failed) {
+         status.completed = true;
+         status.percentage = 100;
+         status.minutes_remaining = 0;
+      } else {
+         status.completed = false;
+         status.percentage = percentage || 0;
+         status.minutes_remaining = minRemaining || -1;
+      }
+      saveStatusQueue.push({
+         statusPath: statusPath,
+         status: status
+      }, function(err) {
+         if (err) {
+            console.error(err);
          }
-      }
+         if (next) {
+            next(err);
+         }
+      });
    }
 
    /**
