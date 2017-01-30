@@ -91,6 +91,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             bordersOptions = plotRequest.plot.countryBorders;
          }
 
+         // Check that the bbox isn't irregular
+         if(dataOptions.bbox.substr(0,7) == 'POLYGON') {
+            return handleError('Animation doesn\'t support irregular polygons');
+         }
+
          // Do all the processing
          getMaxResolution(mapOptions, dataOptions, bordersOptions, function() {
             downloadTiles(mapOptions, dataOptions, bordersOptions, function(err) {
