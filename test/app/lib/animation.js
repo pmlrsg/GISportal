@@ -34,12 +34,18 @@ describe('animation', function() {
    it('should produce all the correct files when it completes', function(done) {
       this.timeout(30000);
 
-      var status = null;
+      var status = {};
 
       checkComplete();
 
       function checkComplete() {
-         status = JSON.parse(fs.readFileSync(plotDir + '/e5f991c76bd84a354a6f23870eb6d74886d62bf6-status.json', 'utf8'));
+         var newStatus = null;
+         try {
+            newStatus = JSON.parse(fs.readFileSync(plotDir + '/e5f991c76bd84a354a6f23870eb6d74886d62bf6-status.json', 'utf8'));
+         } catch (err) {
+            newStatus = status;
+         }
+         status = newStatus;
          if (status.completed) {
             doTests();
          } else {
