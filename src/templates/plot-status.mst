@@ -32,7 +32,7 @@
 				{{#unless ../noCopyEdit}}
 					<button class="js-graph-status-copy brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}">Copy/Edit</button>
 				{{/unless}}
-				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}">Open</button>
+				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}" data-type="{{call 'plotType'}}">Open</button>
 			</div>
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'failed' }}
