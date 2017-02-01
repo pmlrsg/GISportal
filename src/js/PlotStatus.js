@@ -75,6 +75,7 @@ gisportal.graphs.PlotStatus = (function(){
                break;
             case "extracting":
             case "plotting":
+            case "rendering":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;
@@ -102,10 +103,11 @@ gisportal.graphs.PlotStatus = (function(){
       if( this.renderedState != "failed" )
          this.rebuildElement();
 
+      var id = serverStatus.job_id;
       var message = serverStatus.message;
       var error_element = this._element.find('.js-graph-status-show-full-error');
       error_element.on('click',function(){
-         $.notify( message , {className:"error", autoHide: false});
+         $.notify(message + '\nPlease report ' + id.substr(0, 8).toUpperCase() + ' when contacting support.', {className:"error", autoHide: false});
       });
    };
 

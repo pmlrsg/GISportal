@@ -551,6 +551,12 @@ gisportal.events.bind('layerDepth.change', function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+gisportal.events.bind('graphFramerate.change', function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 gisportal.events.bind('graphRange.change', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;

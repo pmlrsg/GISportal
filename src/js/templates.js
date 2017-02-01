@@ -131,6 +131,56 @@ Handlebars.registerHelper('equals', function(attr1, attr2, options) {
    return ( attr1 == attr2 );
 });
 
+/**
+ * Helpers for more advanced logic
+ * Use in the format:
+ *    {{#if (or
+ *             (eq section1 "foo")
+ *             (ne section2 "bar")
+ *             (gt numVar 10)
+ *          )}}
+ *       .. content
+ *    {{/if}}
+ */
+Handlebars.registerHelper({
+   eq: function(v1, v2) {
+      return v1 === v2;
+   },
+   ne: function(v1, v2) {
+      return v1 !== v2;
+   },
+   lt: function(v1, v2) {
+      return v1 < v2;
+   },
+   gt: function(v1, v2) {
+      return v1 > v2;
+   },
+   lte: function(v1, v2) {
+      return v1 <= v2;
+   },
+   gte: function(v1, v2) {
+      return v1 >= v2;
+   },
+   and: function() {
+      // Convert arguments into normal array in safe, optimisable way
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; ++i) {
+         args[i] = arguments[i];
+      }
+      // Test that all arguments are true
+      return args.every(Boolean);
+   },
+   or: function() {
+      // Convert arguments into normal array in safe, optimisable way
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; ++i) {
+         args[i] = arguments[i];
+      }
+      // Test that some arguments are true
+      return args.some(Boolean);
+   }
+});
+
 Handlebars.registerHelper('dotdotdot', function(str) {
    lenVal = 200;
    if (str.length > lenVal){

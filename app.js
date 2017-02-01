@@ -55,6 +55,13 @@ site_setings_list.forEach(function(foldername) {
             require(config_path);
             serverFound = true;
             requestLogger.init(foldername); // Initialise requestLogger for each domain
+
+            // plottingDownloadDir is deprecated. Ensure both plottingDownloadDir and downloadDir are set to the same value.
+            if (global.config[foldername] && global.config[foldername].plottingDownloadDir) {
+               global.config[foldername].downloadDir = global.config[foldername].plottingDownloadDir;
+            } else if (global.config[foldername] && global.config[foldername].downloadDir) {
+               global.config[foldername].plottingDownloadDir = global.config[foldername].downloadDir;
+            }
          } catch (e) {
             console.log('Failed to load server config: ' + config_path);
          }

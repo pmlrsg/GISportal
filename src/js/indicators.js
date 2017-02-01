@@ -309,7 +309,7 @@ gisportal.indicatorsPanel.initDOM = function() {
          "event": "indicatorspanel.scroll",
          "scrollPercent": scrollPercent
       };
-     gisportal.events.trigger('indicatorspanel.scroll', params);
+      gisportal.events.trigger('indicatorspanel.scroll', params);
    });
 };
 
