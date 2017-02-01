@@ -45,22 +45,29 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    /** Variable that will hold the function to disable the ON_DEATH hook */
    var OFF_DEATH = null;
 
-   /** @type {Number} The number of time slices */
-   var numSlices = 0;
-   /** @type {Boolean} true to include country borders */
-   var borders = false;
-   /** @type {string} The hash of the data layer WMS url, used for cache file naming */
-   var dataUrlHash = null;
-   /** @type {number} Width of the images and video */
-   var width = 0;
-   /** @type {number} Height of the images and video */
-   var height = 0;
    /** @type {string} sha1 hash of the request object */
    var hash = sha1(JSON.stringify(plotRequest));
    /** @type {object} The current status object */
    var status = null;
    /** @type {QueueObject} Queue for saving status file updates */
    var saveStatusQueue = async.queue(saveStatus, 1);
+
+   /** @type {Object} The border options from the request */
+   var bordersOptions = plotRequest.plot.countryBorders;
+   /** @type {Object} The data options from the request */
+   var dataOptions = plotRequest.plot.data.series[0].data_source;
+   /** @type {Object} The map options from the request */
+   var mapOptions = plotRequest.plot.baseMap;
+
+   /** @type {string} The hash of the data layer WMS url, used for cache file naming */
+   var dataUrlHash = null;
+   /** @type {Array} Unique array of time slices */
+   var slices = [];
+
+   /** @type {number} Width of the images and video */
+   var width = 0;
+   /** @type {number} Height of the images and video */
+   var height = 0;
 
    readStatus(function(status) {
       if (!status || status.state == PlotStatus.failed) {
@@ -81,14 +88,8 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             next(err, hash);
          });
 
-         // Load the map, data, and border options from the request
-         var mapOptions = plotRequest.plot.baseMap;
-         var dataOptions = plotRequest.plot.data.series[0].data_source;
-         var bordersOptions = null;
-         if (plotRequest.plot.countryBorders) {
-            borders = true;
-            bordersOptions = plotRequest.plot.countryBorders;
-         }
+         // Load the time slices and make them unique
+         slices = _.uniq(dataOptions.timesSlices);
 
          // Check that the bbox isn't irregular
          if (dataOptions.bbox.substr(0, 7) == 'POLYGON') {
@@ -96,9 +97,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          }
 
          // Do all the processing
-         getResolution(mapOptions, dataOptions, bordersOptions, function() {
-            getAutoScale(dataOptions, function() {
-               downloadTiles(mapOptions, dataOptions, bordersOptions, function(err) {
+         getResolution(function() {
+            getAutoScale(function() {
+               downloadTiles(function(err) {
                   if (err) {
                      return handleError(err);
                   }
@@ -127,12 +128,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
    /**
     * Get the maximum supported resolution from the map, borders and data layer and
     * calculate the resolution for the video.
-    * @param  {object}   mapOptions     The map options
-    * @param  {object}   dataOptions    The data layer options
-    * @param  {object}   bordersOptions The border options or null
     * @param  {Function} next           Function to call when done
     */
-   function getResolution(mapOptions, dataOptions, bordersOptions, next) {
+   function getResolution(next) {
       var maxWidth = MAXWIDTH;
       var maxHeight = MAXHEIGHT;
       var mapDone = false;
@@ -246,42 +244,42 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       }
    }
 
-   function getAutoScale(dataOptions, next) {
-      var slices = _.uniq(dataOptions.timesSlices);
+   /**
+    * If autoScale is enabled, get the min and max data values for all slices in the range.
+    * @param  {Function} next Function to call when done
+    */
+   function getAutoScale(next) {
+      if (!dataOptions.autoScale) {
+         return next();
+      }
+
       var slicesDone = 0;
       var min = null;
       var max = null;
-      if (dataOptions.autoScale) {
-         slices = _.uniq(dataOptions.timesSlices);
 
-         var dataURL = url.parse(dataOptions.wmsUrl, true);
-         dataURL.search = undefined;
-         dataURL.query = {
-            SERVICE: 'WMS',
-            VERSION: dataOptions.wmsParams.VERSION,
-            REQUEST: 'GetMetadata',
-            item: 'minmax',
-            LAYERS: dataOptions.wmsParams.LAYERS,
-            SRS: dataOptions.wmsParams.SRS,
-            WIDTH: width,
-            HEIGHT: height,
-            BBOX: dataOptions.bbox,
-            ELEVATION: dataOptions.depth
-         };
-         utils.deleteNullProperies(dataURL.query);
+      var dataURL = url.parse(dataOptions.wmsUrl, true);
+      dataURL.search = undefined;
+      dataURL.query = {
+         SERVICE: 'WMS',
+         VERSION: dataOptions.wmsParams.VERSION,
+         REQUEST: 'GetMetadata',
+         item: 'minmax',
+         LAYERS: dataOptions.wmsParams.LAYERS,
+         SRS: dataOptions.wmsParams.SRS,
+         WIDTH: width,
+         HEIGHT: height,
+         BBOX: dataOptions.bbox,
+         ELEVATION: dataOptions.depth
+      };
+      utils.deleteNullProperies(dataURL.query);
 
-         console.log(url.format(dataURL));
+      var queue = async.queue(makeRequest, 10);
 
-         var queue = async.queue(makeRequest, 10);
-
-         for (var i = 0; i < slices.length; i++) {
-            dataURL.query.TIME = slices[i];
-            queue.push({
-               uri: url.format(dataURL)
-            }, done);
-         }
-      } else {
-         return next();
+      for (var i = 0; i < slices.length; i++) {
+         dataURL.query.TIME = slices[i];
+         queue.push({
+            uri: url.format(dataURL)
+         }, done);
       }
 
       function makeRequest(options, next) {
@@ -308,7 +306,6 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
       function done() {
          slicesDone++;
-         console.log(min + ',' + max);
 
          if (slicesDone == slices.length) {
             dataOptions.wmsParams.colorscalerange = min + ',' + max;
@@ -319,15 +316,9 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
 
    /**
     * Handles downloading all the tiles/images for the map, borders, and data layer
-    * @param  {object}   mapOptions     The map options
-    * @param  {object}   dataOptions    The data options
-    * @param  {object}   bordersOptions The border options
     * @param  {Function} next           Function to call when done
     */
-   function downloadTiles(mapOptions, dataOptions, bordersOptions, next) {
-      /** @type {array} Unique array of all the time slices in the request */
-      var slices = _.uniq(dataOptions.timesSlices);
-      numSlices = slices.length;
+   function downloadTiles(next) {
       /** @type {Object} Object for recording download retries */
       var retries = {};
       /** @type {QueueObject} Queue for managing downloads */
@@ -405,8 +396,6 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          ELEVATION: dataOptions.depth
       };
       utils.deleteNullProperies(dataURL.query);
-
-      console.log(url.format(dataURL));
 
       // Generate a hash from the data layer url for use in the image filenames
       dataUrlHash = sha1(url.format(dataURL));
@@ -581,7 +570,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             }
          }
-         if (mapDownloaded && (!borders || bordersDownloaded) && slicesDownloaded == slices.length) {
+         if (mapDownloaded && (!bordersOptions || bordersDownloaded) && slicesDownloaded == slices.length) {
             updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             timeStamper.kill();
             next();
@@ -639,7 +628,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       }
 
       // Calculate the total number of frames for progress calculation
-      var numFrames = (outputFPS / inputFPS) * numSlices;
+      var numFrames = (outputFPS / inputFPS) * slices.length;
 
       // Determine the maximum bitrate for WebM based on the input framerate
       var maxWebMBitrate = null;
@@ -664,7 +653,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          .input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
-      if (borders) {
+      if (bordersOptions) {
          // If borders then setup the borders input and complex filter
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
@@ -848,7 +837,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          var datetime = new Date().toISOString().substring(0, 19);
          var date = new Date().toISOString().substring(0, 10);
 
-         var line = [datetime, hash, 'animation', status.state, numSlices];
+         var line = [datetime, hash, 'animation', status.state, slices.length];
          line = line.join(',') + '\n';
          fs.appendFile(path.join(logDir, date + '.csv'), line, function(err) {
             if (next) {
