@@ -338,7 +338,6 @@ gisportal.graphs.PlotEditor = (function(){
          if (isNaN(newFramerate) || newFramerate > 60 || newFramerate < 0.1) {
             setFramerate.call(this, _this.plot().animationFramerate());
          } else {
-            // _this.plot().animationFramerate(newFramerate);
             _this._framerateSlider.val(newFramerate).trigger('change');
          }
       });

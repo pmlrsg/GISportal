@@ -1998,7 +1998,6 @@ gisportal.api['graphFramerate.change'] = function(data, options){
       collaboration.highlightElement(slider_elem);
    }
    input_elem.val(value).trigger('change');
-   // slider_elem.val(value);
 };
 
  /*
