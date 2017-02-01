@@ -14,11 +14,17 @@
 		</div>
 	</div>
 	<div>
-		{{#if_equals (call 'state') 'extracting' }}
+		{{!-- Using helpers from templates.js:134
+				Equivilent to:
+				if state != 'complete' and state != 'failed' --}}
+		{{#if (and
+					(ne (call 'state') 'complete')
+					(ne (call 'state') 'failed')
+				)}}
 			<div class="loading-image"></div>
 			<button class="js-graph-status-delete brand secondary">Delete</button>
 			<div class="js-message"></div>
-		{{/if_equals}}
+		{{/if}}
 		{{#if_equals (call 'state') 'complete' }}
 			<div></div>
 			<div class="graph-buttons">
@@ -26,13 +32,13 @@
 				{{#unless ../noCopyEdit}}
 					<button class="js-graph-status-copy brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}">Copy/Edit</button>
 				{{/unless}}
-				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}">Open</button>
+				<button class="js-graph-status-open brand secondary" data-hash="{{../id}}" data-title="{{call 'title'}}" data-type="{{call 'plotType'}}">Open</button>
 			</div>
 		{{/if_equals}}
 		{{#if_equals (call 'state') 'failed' }}
 			<div></div>
 			<div>
-				The graph could not be built. Downstream error.<br>
+				The plot could not be built. Downstream error.<br>
 				<button class="js-graph-status-delete brand secondary">Delete</button>
 				<a href="#" class="js-graph-status-show-full-error">Full error message</a>
 			</div>

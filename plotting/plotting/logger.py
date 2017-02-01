@@ -11,13 +11,13 @@ num_points = 0
 def log_complete(successful):
    if log_dir:
       make_sure_path_exists(log_dir)
-      _datetime = datetime.now().isoformat()
-      _date = date.today().isoformat()
+      _datetime = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+      _date = date.today().strftime("%Y-%m-%d")
       if successful:
          status = "complete"
       else:
          status = "failed"
-      line = ",".join(map(str, [_datetime, plot_hash, status, num_points])) + "\n"
+      line = ",".join(map(str, [_datetime, plot_hash, plot_type, status, num_points])) + "\n"
       with open (log_dir + "/" + _date + ".csv", "a") as f:
          f.write(line)
 

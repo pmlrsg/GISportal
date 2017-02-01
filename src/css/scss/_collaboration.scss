@@ -430,18 +430,18 @@ span.remove-email{
   vertical-align: middle;
 }
 
-.localVideo::-webkit-media-controls-volume-slider,
-.localVideo::-webkit-media-controls-mute-button {
+#collab-videoPanel .localVideo::-webkit-media-controls-volume-slider,
+#collab-videoPanel .localVideo::-webkit-media-controls-mute-button {
   display: none
 }
 
-video::-webkit-media-controls-play-button,
-video::-webkit-media-controls-timeline,
-video::-webkit-media-controls-current-time-display,
-video::-webkit-media-controls-time-remaining-display{
+#collab-videoPanel video::-webkit-media-controls-play-button,
+#collab-videoPanel video::-webkit-media-controls-timeline,
+#collab-videoPanel video::-webkit-media-controls-current-time-display,
+#collab-videoPanel video::-webkit-media-controls-time-remaining-display{
   display:none;
 }
 
-video::-webkit-media-controls-fullscreen-button{
+#collab-videoPanel video::-webkit-media-controls-fullscreen-button{
   margin-left: 10px;
 }
