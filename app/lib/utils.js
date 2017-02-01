@@ -5,7 +5,9 @@ var bunyan = require('bunyan');
 
 module.exports = utils;
 
-var log = bunyan.createLogger({name: "Portal Middleware"});
+var log = bunyan.createLogger({
+   name: "Portal Middleware"
+});
 
 /**
  * Polyfill for arrayIncludes. Here instead of being a proper polyfill to avoid breaking for in loops.
@@ -47,6 +49,16 @@ utils.arrayIncludes = function(array, searchElement, fromIndex) {
    return false;
 };
 
+utils.deleteNullProperies = function(object) {
+   for (var key in object) {
+      if (object.hasOwnProperty(key)) {
+         if (object[key] === null || object[key] === undefined) {
+            delete object[key];
+         }
+      }
+   }
+};
+
 /**
  * Convert a server URL (such as WMS/WCS) into it's name.
  * @param {string} url The server's url
@@ -60,14 +72,10 @@ utils.URLtoServerName = function(url) {
  * @param  {string}  filePath The file to check
  * @return {boolean}          If the file exists
  */
-utils.fileExists = function(filePath)
-{
-   try
-   {
+utils.fileExists = function(filePath) {
+   try {
       return fs.statSync(filePath).isFile();
-   }
-   catch (err)
-   {
+   } catch (err) {
       return false;
    }
 };
@@ -77,14 +85,10 @@ utils.fileExists = function(filePath)
  * @param  {string}  filePath The directory to check
  * @return {boolean}          If the directory exists
  */
-utils.directoryExists = function(filePath)
-{
-   try
-   {
+utils.directoryExists = function(filePath) {
+   try {
       return fs.statSync(filePath).isDirectory();
-   }
-   catch (err)
-   {
+   } catch (err) {
       return false;
    }
 };
@@ -94,34 +98,35 @@ utils.directoryExists = function(filePath)
  * @param  {object} req Express request
  * @return {string}     The domain name
  */
-utils.getDomainName = function(req){
+utils.getDomainName = function(req) {
    var domain = req.headers.host;
-   if(req.SUBFOLDER){
+   if (req.SUBFOLDER) {
       domain += "_" + req.SUBFOLDER;
    }
    return utils.nicifyDomain(domain);
 };
 
-utils.nicifyDomain = function(domain){
+utils.nicifyDomain = function(domain) {
    return domain.replace("http://", "").replace("https://", "").replace(/\/$/, '').replace(/\//g, '_');
 };
 
-utils.mkdirpSync = function (dirpath) {
+utils.mkdirpSync = function(dirpath) {
    var parts = dirpath.split(path.sep);
-   for( var i = 1; i <= parts.length; i++ ) {
+   for (var i = 1; i <= parts.length; i++) {
       var part_path = path.join.apply(null, parts.slice(0, i));
       part_path = "/" + part_path;
-      if(!utils.directoryExists(part_path)){
-         fs.mkdirSync( part_path );
+      if (!utils.directoryExists(part_path)) {
+         fs.mkdirSync(part_path);
       }
    }
 };
 
-utils.handleError = function(err, res){
-   try{
+utils.handleError = function(err, res) {
+   try {
       res.status(err.status || 500);
-      res.send({message: err.message});
+      res.send({
+         message: err.message
+      });
       log.error(err);
-   }catch(e){
-   }
+   } catch (e) {}
 };
