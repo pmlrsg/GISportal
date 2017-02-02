@@ -112,6 +112,19 @@ svg {
    text-transform: capitalize;
 }
 
+.timeline-next-prev  {
+   font-size: 10px;
+   width: 150px;
+   display: inline-block;
+}
+
+.timeline-next-prev li  {
+   position: absolute;
+   right: 15px;
+   top: 0;
+   text-transform: capitalize;
+}
+
 .current-date{
    width: 85px;
    padding: 5px;

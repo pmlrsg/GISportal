@@ -64,9 +64,34 @@ gisportal.TimeLine = function(id, options) {
          self.setDate( this.getDate() );
       }
     });
-   
+
+    $('.js-next-date').click(function() {
+      var index = findLayerDateIndex();
+      self.setDate(new Date(self.timebars[0].dateTimes[index+1]));
+    });
+
+    $('.js-previous-date').click(function() {
+      var index = findLayerDateIndex();
+      self.setDate(new Date(self.timebars[0].dateTimes[index-1]));
+    });
+
+    function findLayerDateIndex() {
+      var selected = self.selectedDate;
+      var layerDateIndex = 0;
+      var dates = self.timebars[0].dateTimes;
+       for (var i=0; i < dates.length; i++) {
+         var date = new Date(dates[i]);
+         if (date <= selected) {
+            layerDateIndex = i;
+         } else {
+            break;
+         }
+       }
+       return layerDateIndex;
+    }
+
    //--------------------------------------------------------------------------
-   
+
    // Default options
    var defaults = {
       comment: "Sample timeline data",
@@ -122,7 +147,7 @@ gisportal.TimeLine = function(id, options) {
    }
    
    // Set initial y scale
-   this.xScale = d3.time.scale().domain([this.minDate, this.maxDate]).range([0, this.width]);
+   this.xScale = d3.time.scale.utc().domain([this.minDate, this.maxDate]).range([0, this.width]);
    this.yScale = d3.scale.linear().domain([0, this.timebars.length]).range([0, this.height]); 
    
    //--------------------------------------------------------------------------
@@ -405,21 +430,21 @@ gisportal.TimeLine.prototype.reset = function() {
 };
 
 gisportal.TimeLine.prototype.drawLabels = function()  {
-
-   
    // Draw the time bar labels
    $('.js-timeline-labels').html('');
+   $('.js-timeline-next-prev').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
       // Update label
-      var positionTop = (i+1) * (this.barHeight + this.barMargin);
+      var positionTop = (i+1) * (this.barHegiht + this.barMargin);
       positionTop += (i+1) * 3;
       var id = this.timebars[i].id;
 
       var label = $('.indicator-header[data-id="' + id +'"] > p').html();
       if (!label || label === "") label =  this.timebars[i].label;
-      if(gisportal.layers[id] && gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region; 
-      
+      if(gisportal.layers[id] && gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region;
       $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
+
+      $('.js-timeline-next-prev').append('<li><a data-id="' + i + '" class="js-previous-date" href="#">Back</a> <a data-id="' + i + '" class="js-next-date" href="#">Forward</a></li>');
    }
 };
 
