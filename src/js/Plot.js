@@ -449,6 +449,7 @@ gisportal.graphs.Plot = (function() {
          } else if (this.plotType() == 'animation') {
             newSeries.data_source.wmsUrl = gisportal.layers[layer.id].openlayers.anID.getSource().getUrls()[0];
             newSeries.data_source.wmsParams = gisportal.layers[layer.id].openlayers.anID.getSource().getParams();
+            newSeries.data_source.autoScale = $('#tab-' + layer.id + '-autoScale').is(':checked');
             if (newSeries.data_source.wmsParams.t) {
                delete newSeries.data_source.wmsParams.t;
             }
