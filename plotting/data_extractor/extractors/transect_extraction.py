@@ -108,15 +108,15 @@ class TransectExtractor(Extractor):
       area_width = self.extract_area[3] - self.extract_area[1]
       area_height = self.extract_area[2] - self.extract_area[0]
 
-      # If the area width or height is 0, increase it to twice the offset vector value
-      if area_width == 0:
+      # If the area width or height is less than the offset_vector, increase it in both directions by the offset_vector
+      if abs(area_width) < abs(offset_vectors['x']):
          self.extract_area = (
             self.extract_area[0],
             self.extract_area[1] - abs(offset_vectors['x']),
             self.extract_area[2],
             self.extract_area[3] + abs(offset_vectors['x']))
          area_width = self.extract_area[3] - self.extract_area[1]
-      if area_height == 0:
+      if abs(area_height) < abs(offset_vectors['y']):
          self.extract_area = (
             self.extract_area[0] - abs(offset_vectors['y']),
             self.extract_area[1],
