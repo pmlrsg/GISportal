@@ -34,13 +34,15 @@ class TransectExtractor(Extractor):
 
       files = []
       if slices_in_range:
+         retries = 0
          if plotting:
             debug(2, "Getting files...")
-         while not files:
+         while not files and retries < 4:
             try:
                files = self.getFiles(slices_in_range, max_slices)
             except urllib2.HTTPError:
                max_slices = max_slices / 2
+               retries += 1
       else:
          if plotting:
             debug(2, "No time slices in range.")
@@ -106,10 +108,21 @@ class TransectExtractor(Extractor):
       area_width = self.extract_area[3] - self.extract_area[1]
       area_height = self.extract_area[2] - self.extract_area[0]
 
-      if area_width == 0:
-         area_width = 1
-      if area_height == 0:
-         area_height = 1
+      # If the area width or height is less than the offset_vector, increase it in both directions by the offset_vector
+      if abs(area_width) < abs(offset_vectors['x']):
+         self.extract_area = (
+            self.extract_area[0],
+            self.extract_area[1] - abs(offset_vectors['x']),
+            self.extract_area[2],
+            self.extract_area[3] + abs(offset_vectors['x']))
+         area_width = self.extract_area[3] - self.extract_area[1]
+      if abs(area_height) < abs(offset_vectors['y']):
+         self.extract_area = (
+            self.extract_area[0] - abs(offset_vectors['y']),
+            self.extract_area[1],
+            self.extract_area[2] + abs(offset_vectors['y']),
+            self.extract_area[3])
+         area_height = self.extract_area[2] - self.extract_area[0]
 
       pixel_width = abs(area_width / offset_vectors['x'])
       pixel_height = abs(area_height / offset_vectors['y'])
