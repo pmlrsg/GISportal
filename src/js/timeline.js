@@ -58,37 +58,55 @@ gisportal.TimeLine = function(id, options) {
    // Use "self" to refer to this instance of the TimeLine object
    var self = this;
 
-    $('.js-current-date').pikaday({
+   $('.js-current-date').pikaday({
       format: "YYYY-MM-DD",
-      onSelect: function(){
-         self.setDate( this.getDate() );
+      onSelect: function() {
+         self.setDate(this.getDate());
       }
-    });
+   });
 
-    $('.js-next-date').click(function() {
-      var index = findLayerDateIndex();
-      self.setDate(new Date(self.timebars[0].dateTimes[index+1]));
-    });
+   $('.js-next-date').click(function() {
+      // var layer = 0;
+      var layer = findMostRegularLayer();
+      var index = findLayerDateIndex(layer);
+      self.setDate(new Date(gisportal.timeline.timebars[layer].dateTimes[index + 1]));
+   });
 
-    $('.js-previous-date').click(function() {
-      var index = findLayerDateIndex();
-      self.setDate(new Date(self.timebars[0].dateTimes[index-1]));
-    });
+   $('.js-previous-date').click(function() {
+      // var layer = 0;
+      var layer = findMostRegularLayer();
+      var index = findLayerDateIndex(layer);
+      self.setDate(new Date(gisportal.timeline.timebars[layer].dateTimes[index - 1]));
+   });
 
-    function findLayerDateIndex() {
+   function findMostRegularLayer() {
+      var shortestInterval = 0;
+      var mostRegular = 0;
+      for (var i = 0; i < gisportal.timeline.timebars.length; i++) {
+         var dateTimes = gisportal.timeline.timebars[i].dateTimes.slice().sort();
+         var interval = (new Date(dateTimes[dateTimes.length - 1]) - new Date(dateTimes[0])) / dateTimes.length;
+         if (shortestInterval === 0 || interval < shortestInterval) {
+            shortestInterval = interval;
+            mostRegular = i;
+         }
+      }
+      return mostRegular;
+   }
+
+   function findLayerDateIndex(layer) {
       var selected = self.selectedDate;
       var layerDateIndex = 0;
-      var dates = self.timebars[0].dateTimes;
-       for (var i=0; i < dates.length; i++) {
-         var date = new Date(dates[i]);
+      var datesTimes = gisportal.timeline.timebars[layer].dateTimes;
+      for (var i = 0; i < datesTimes.length; i++) {
+         var date = new Date(datesTimes[i]);
          if (date <= selected) {
             layerDateIndex = i;
          } else {
             break;
          }
-       }
-       return layerDateIndex;
-    }
+      }
+      return layerDateIndex;
+   }
 
    //--------------------------------------------------------------------------
 
