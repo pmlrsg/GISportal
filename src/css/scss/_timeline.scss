@@ -87,7 +87,7 @@ svg {
 }
 
 .data-bar-type--range  {
-   pointer-events: none;   
+   pointer-events: none;
 }
 
 .axis line, .axis path {
@@ -95,7 +95,7 @@ svg {
 }
 
 #timeline{
-   width: calc(100% - 242px);
+   width: calc(100% - 260px);
    display: inline-block;
 }
 
@@ -113,25 +113,22 @@ svg {
 }
 
 .timeline-next-prev  {
-   font-size: 10px;
-   width: 150px;
-   display: inline-block;
+   text-align: center;
 }
 
-.timeline-next-prev li  {
-   position: absolute;
-   right: 15px;
-   top: 0;
-   text-transform: capitalize;
+.timeline-next-prev span  {
+   cursor: pointer;
 }
 
-.current-date{
-   width: 85px;
-   padding: 5px;
+.timeline-date-options {
+   width: 100px;
    display: inline-block;
    position: relative;
    top: -19px;
    right: -5px;
+}
+
+.current-date{
 }
 
 line.stroke{

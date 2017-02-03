@@ -432,10 +432,9 @@ gisportal.TimeLine.prototype.reset = function() {
 gisportal.TimeLine.prototype.drawLabels = function()  {
    // Draw the time bar labels
    $('.js-timeline-labels').html('');
-   $('.js-timeline-next-prev').html('');
    for (var i = 0; i < this.timebars.length; i++)  {
       // Update label
-      var positionTop = (i+1) * (this.barHegiht + this.barMargin);
+      var positionTop = (i+1) * (this.barHeight + this.barMargin);
       positionTop += (i+1) * 3;
       var id = this.timebars[i].id;
 
@@ -443,8 +442,6 @@ gisportal.TimeLine.prototype.drawLabels = function()  {
       if (!label || label === "") label =  this.timebars[i].label;
       if(gisportal.layers[id] && gisportal.layers[id].tags.region)  label += ' - ' + gisportal.layers[id].tags.region;
       $('.js-timeline-labels').append('<li data-id="' + id +'" style="top: ' + positionTop + 'px">' + label + '</li>');
-
-      $('.js-timeline-next-prev').append('<li><a data-id="' + i + '" class="js-previous-date" href="#">Back</a> <a data-id="' + i + '" class="js-next-date" href="#">Forward</a></li>');
    }
 };
 

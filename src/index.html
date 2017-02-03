@@ -178,9 +178,15 @@
       <div class="timeline-inner">
          <ul class="js-timeline-labels timeline-labels"></ul>
          <div id="timeline" class=""></div>
-         <input class="js-current-date current-date" type="input" />
-         <p><a class="js-previous-date" href='#'>Back</a> <a class="js-next-date" href='#'>Forward</a></p>
-         <!-- <ul class="js-timeline-next-prev timeline-next-prev"></ul> -->
+         <div class="timeline-date-options">
+            <div class="timeline-next-prev">
+               <span class="js-previous-date icon-arrow-49"></span>
+               <span class="js-previous-date icon-arrow-39"></span>
+               <span class="js-next-date icon-arrow-40"></span>
+               <span class="js-previous-date icon-arrow-50"></span>
+            </div>
+            <input class="js-current-date current-date" type="text" />
+         </div>
       </div>
    </div>
 
@@ -328,7 +334,7 @@
          </div>
          <label for="share-map"></label>
          <button id="share-map" class="js-share brand secondary">
-            <span class="icon-filled-link icon-btn"> </span>
+            <span class="icon-filled-link"> </span>
             Share
          </button>
       </div>
