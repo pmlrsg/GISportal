@@ -65,19 +65,90 @@ gisportal.TimeLine = function(id, options) {
       }
    });
 
+   var tooltip = null;
+
    $('.js-next-date').click(function() {
       // var layer = 0;
       var layer = findMostRegularLayer();
-      var index = findLayerDateIndex(layer);
-      self.setDate(new Date(gisportal.timeline.timebars[layer].dateTimes[index + 1]));
+      self.setDate(getIncrementedLayerDate(layer, 1));
+      if (tooltip) {
+         tooltip.content(buildNextPrevTooltip(1));
+      }
    });
 
    $('.js-previous-date').click(function() {
       // var layer = 0;
       var layer = findMostRegularLayer();
-      var index = findLayerDateIndex(layer);
-      self.setDate(new Date(gisportal.timeline.timebars[layer].dateTimes[index - 1]));
+      self.setDate(getIncrementedLayerDate(layer, -1));
+      if (tooltip) {
+         tooltip.content(buildNextPrevTooltip(-1));
+      }
    });
+
+   $('.js-previous-date').tooltipster({
+      contentCloning: true,
+      contentAsHTML: true,
+      content: '',
+      position: "top",
+      delay: 0,
+      trigger: 'custom',
+      triggerOpen: {
+         mouseenter: true
+      },
+      triggerClose: {
+         mouseleave: true
+      },
+      updateAnimation: null,
+      functionBefore: function(instance) {
+         tooltip = instance;
+         instance.content(buildNextPrevTooltip(-1));
+      }
+   });
+
+   $('.js-next-date').tooltipster({
+      contentCloning: true,
+      contentAsHTML: true,
+      content: '',
+      position: "top",
+      delay: 0,
+      trigger: 'custom',
+      triggerOpen: {
+         mouseenter: true
+      },
+      triggerClose: {
+         mouseleave: true
+      },
+      updateAnimation: null,
+      functionBefore: function(instance) {
+         tooltip = instance;
+         instance.content(buildNextPrevTooltip(1));
+      }
+   });
+
+   function buildNextPrevTooltip(increment) {
+      var content = [];
+      var layer = findMostRegularLayer();
+      var newDate = getIncrementedLayerDate(layer, increment);
+
+      for (var i = 0; i < gisportal.timeline.timebars.length; i++) {
+         var label = gisportal.timeline.timebars[i].label;
+         var dateTimes = gisportal.timeline.timebars[i].dateTimes;
+         var dateIndex = findLayerDateIndex(i, newDate);
+         var date = dateTimes[dateIndex];
+         content.push({
+            label: label,
+            date: date
+         });
+      }
+
+      return gisportal.templates['tooltip-next-previous'](content);
+   }
+
+   function getIncrementedLayerDate(layer, increment) {
+      increment = increment || 0;
+      var index = findLayerDateIndex(layer, gisportal.timeline.selectedDate);
+      return new Date(gisportal.timeline.timebars[layer].dateTimes[index + increment]);
+   }
 
    function findMostRegularLayer() {
       var shortestInterval = 0;
@@ -93,13 +164,12 @@ gisportal.TimeLine = function(id, options) {
       return mostRegular;
    }
 
-   function findLayerDateIndex(layer) {
-      var selected = self.selectedDate;
+   function findLayerDateIndex(layer, selectedDate) {
       var layerDateIndex = 0;
       var datesTimes = gisportal.timeline.timebars[layer].dateTimes;
       for (var i = 0; i < datesTimes.length; i++) {
          var date = new Date(datesTimes[i]);
-         if (date <= selected) {
+         if (date <= selectedDate) {
             layerDateIndex = i;
          } else {
             break;

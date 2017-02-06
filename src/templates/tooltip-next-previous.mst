@@ -1,0 +1,10 @@
+<div class="tooltip-next-previous">
+   <ul>
+      {{#each this}}
+         <li>
+            <span class="label" style="float: left;">{{label}}</span>
+            <span class="date"style="float: right; margin-left: 10px">{{date}}</span>
+         </li>
+      {{/each}}
+   </ul>
+</div>
