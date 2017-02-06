@@ -91,7 +91,7 @@ plottingApi.processCSV = function(req, res, next) {
          if (utils.fileExists(csvPath)) {
             fs.unlink(csvFile.path, function(err) {
                if (err) {
-                  console.error('err');
+                  console.error(err);
                }
             });
          } else {
