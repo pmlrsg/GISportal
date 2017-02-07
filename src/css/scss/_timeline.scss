@@ -95,7 +95,7 @@ svg {
 }
 
 #timeline{
-   width: calc(100% - 260px);
+   width: calc(100% - 340px);
    display: inline-block;
 }
 
@@ -114,13 +114,14 @@ svg {
 
 .timeline-next-prev {
    text-align: center;
+   margin-bottom: 10px;
    span {
       cursor: pointer;
    }
 }
 
 .timeline-date-options {
-   width: 100px;
+   width: 180px;
    display: inline-block;
    position: relative;
    top: -19px;
