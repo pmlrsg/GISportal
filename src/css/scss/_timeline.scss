@@ -112,12 +112,11 @@ svg {
    text-transform: capitalize;
 }
 
-.timeline-next-prev  {
+.timeline-next-prev {
    text-align: center;
-}
-
-.timeline-next-prev span  {
-   cursor: pointer;
+   span {
+      cursor: pointer;
+   }
 }
 
 .timeline-date-options {
@@ -126,6 +125,16 @@ svg {
    position: relative;
    top: -19px;
    right: -5px;
+}
+
+.tooltip-next-previous {
+   .label {
+      float: left;
+   }
+   .date {
+      float: right;
+      margin-left: 10px
+   }
 }
 
 .current-date{

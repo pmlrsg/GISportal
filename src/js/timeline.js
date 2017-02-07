@@ -67,25 +67,16 @@ gisportal.TimeLine = function(id, options) {
 
    var tooltip = null;
 
-   $('.js-next-date').click(function() {
-      // var layer = 0;
+   $('.js-next-prev-date').click(function() {
+      var steps = $(this).data('steps');
       var layer = findMostRegularLayer();
-      self.setDate(getIncrementedLayerDate(layer, 1));
+      self.setDate(getIncrementedLayerDate(layer, steps));
       if (tooltip) {
-         tooltip.content(buildNextPrevTooltip(1));
+         tooltip.content(buildNextPrevTooltip(steps));
       }
    });
 
-   $('.js-previous-date').click(function() {
-      // var layer = 0;
-      var layer = findMostRegularLayer();
-      self.setDate(getIncrementedLayerDate(layer, -1));
-      if (tooltip) {
-         tooltip.content(buildNextPrevTooltip(-1));
-      }
-   });
-
-   $('.js-previous-date').tooltipster({
+   $('.js-next-prev-date').tooltipster({
       contentCloning: true,
       contentAsHTML: true,
       content: '',
@@ -99,29 +90,10 @@ gisportal.TimeLine = function(id, options) {
          mouseleave: true
       },
       updateAnimation: null,
-      functionBefore: function(instance) {
+      functionBefore: function(instance, helper) {
+         var steps = $(helper.origin).data('steps');
          tooltip = instance;
-         instance.content(buildNextPrevTooltip(-1));
-      }
-   });
-
-   $('.js-next-date').tooltipster({
-      contentCloning: true,
-      contentAsHTML: true,
-      content: '',
-      position: "top",
-      delay: 0,
-      trigger: 'custom',
-      triggerOpen: {
-         mouseenter: true
-      },
-      triggerClose: {
-         mouseleave: true
-      },
-      updateAnimation: null,
-      functionBefore: function(instance) {
-         tooltip = instance;
-         instance.content(buildNextPrevTooltip(1));
+         instance.content(buildNextPrevTooltip(steps));
       }
    });
 
