@@ -352,19 +352,19 @@ gisportal.TimeLine.prototype.redraw = function() {
    
    var scaling = (self.xScale.domain()[1] - self.xScale.domain()[0]) / (this.width * 4e7);
    if (scaling > 12) {
-      this.xAxis.ticks(d3.time.years, d3.round(scaling/12)).tickFormat(d3.time.format('%Y'));
+      this.xAxis.ticks(d3.time.years.utc, d3.round(scaling/12)).tickFormat(d3.time.format.utc('%Y'));
    }
    else if (scaling <= 12 && scaling > 1) {
-      this.xAxis.ticks(d3.time.months, getNearestInArray([1, 2, 3, 4, 6, 12], scaling)).tickFormat(d3.time.format('%b %y'));
+      this.xAxis.ticks(d3.time.months.utc, getNearestInArray([1, 2, 3, 4, 6, 12], scaling)).tickFormat(d3.time.format.utc('%b %y'));
    }
    else if (scaling <= 1 && scaling > 1/7) {
-      this.xAxis.ticks(d3.time.weeks, d3.round(scaling*4.3)).tickFormat(d3.time.format('%d/%m/%y'));
+      this.xAxis.ticks(d3.time.weeks.utc, d3.round(scaling*4.3)).tickFormat(d3.time.format.utc('%d/%m/%y'));
    }
    else if (scaling <= 1/7 && scaling > 1/365) {
-      this.xAxis.ticks(d3.time.days, d3.round(scaling*30)).tickFormat(d3.time.format('%d/%m/%y'));
+      this.xAxis.ticks(d3.time.days.utc, d3.round(scaling*30)).tickFormat(d3.time.format.utc('%d/%m/%y'));
    }
    else if (scaling <= 1/365) {
-      this.xAxis.ticks(d3.time.hours, d3.round(scaling*730)).tickFormat(d3.time.format('%I %p'));
+      this.xAxis.ticks(d3.time.hours.utc, d3.round(scaling*730)).tickFormat(d3.time.format.utc('%I %p'));
    }
 
    //--------------------------------------------------------------------------
