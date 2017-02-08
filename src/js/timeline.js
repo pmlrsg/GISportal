@@ -62,7 +62,7 @@ gisportal.TimeLine = function(id, options) {
       format: "YYYY-MM-DD",
       onSelect: function() {
          var selected = this.getMoment();
-         selected = moment().utc().year(selected.year()).month(selected.month()).date(selected.date()).hour(selected.hour()).minute(selected.minute()).second(selected.second()).millisecond(selected.millisecond());
+         selected = moment.utc(selected.toArray());
          self.setDate(selected.toDate());
       }
    });
@@ -668,15 +668,17 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
 gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
-   console.log(date);
+   console.log('date: ' + date.toString());
    date = moment.utc(date);
-   console.log(date);
+   console.log('date: ' + date.toString());
    if (current) {
-      current = moment().utc().year(current.year()).month(current.month()).date(current.date()).hour(current.hour()).minute(current.minute()).second(current.second()).millisecond(current.millisecond());
-      console.log(current);
+      console.log('current: ' + current.toString());
+      current = moment.utc(current.toArray());
+      console.log('current: ' + current.toString());
    }
    if(!current || !date.isSame(current)) {
-      date = moment().local().year(date.year()).month(date.month()).date(date.date()).hour(date.hour()).minute(date.minute()).second(date.second()).millisecond(date.millisecond());
+      date = moment(date.toArray());
+      console.log('date: ' + date.toString());
       console.log('setting pikaday');
       $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
    }
