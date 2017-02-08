@@ -1215,7 +1215,7 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
 
 
    if (log_data):
-      logText = 'Log of '
+      logText = 'Log 10 '
       xData = [log10(float(x[varindex[xVar]])) for x in df]
       yData = [log10(float(x[varindex[yVar]])) for x in df]
    else:
