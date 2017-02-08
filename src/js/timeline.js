@@ -61,7 +61,9 @@ gisportal.TimeLine = function(id, options) {
    $('.js-current-date').pikaday({
       format: "YYYY-MM-DD",
       onSelect: function() {
-         self.setDate(this.getDate());
+         var selected = this.getMoment();
+         selected = moment().utc().year(selected.year()).month(selected.month()).date(selected.date()).hour(selected.hour()).minute(selected.minute()).second(selected.second()).millisecond(selected.millisecond());
+         self.setDate(selected.toDate());
       }
    });
 
@@ -296,7 +298,7 @@ gisportal.TimeLine = function(id, options) {
       
       // Move the graphical marker
       self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
-      $('.js-current-date').val(moment(self.draggedDate).format('YYYY-MM-DD'));
+      $('.js-current-date').val(moment.utc(self.draggedDate).format('YYYY-MM-DD'));
    };
    
    this.dragDateEnd = function() {
@@ -458,10 +460,10 @@ gisportal.TimeLine.prototype.redraw = function() {
   
    this.drawLabels();
 
-   if(self.getDate() < moment(self.minDate).startOf('day').toDate()){
+   if(self.getDate() < moment.utc(self.minDate).startOf('day').toDate()){
       self.setDate(self.minDate);
    }
-   if(self.getDate() > moment(self.maxDate).startOf('day').toDate()){
+   if(self.getDate() > moment.utc(self.maxDate).startOf('day').toDate()){
       self.setDate(self.maxDate);
    }
 };
@@ -547,7 +549,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       var data = gisportal.timeline.layerbars[0];
       gisportal.timeline.zoomDate(data.startDate, data.endDate);
 
-      if(!moment(gisportal.timeline.getDate()).isBetween(moment(startDate), moment(endDate))){
+      if(!moment.utc(gisportal.timeline.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))){
          gisportal.timeline.setDate(endDate);
       }
    }  
@@ -666,8 +668,18 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
 gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
-   if( !current || new Date(date).getTime() != current.getTime() )
-      $('.js-current-date').data('date', date).pikaday( 'setDate', date );
+   console.log(date);
+   date = moment.utc(date);
+   console.log(date);
+   if (current) {
+      current = moment().utc().year(current.year()).month(current.month()).date(current.date()).hour(current.hour()).minute(current.minute()).second(current.second()).millisecond(current.millisecond());
+      console.log(current);
+   }
+   if(!current || !date.isSame(current)) {
+      date = moment().local().year(date.year()).month(date.month()).date(date.date()).hour(date.hour()).minute(date.minute()).second(date.second()).millisecond(date.millisecond());
+      console.log('setting pikaday');
+      $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
+   }
 };
 
 // Get the currently selected date 

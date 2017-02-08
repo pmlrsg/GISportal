@@ -452,7 +452,7 @@ gisportal.layer = function( options ) {
          var uidate = date.toISOString();
          var matchedDate = layer.matchDate(uidate);
          // Makes sure that the selected date is within the bounds of the first and last date
-         var inBounds = moment(date).isBetween(moment(layer.firstDate).subtract(1, 'second'), moment(layer.lastDate).add(1, 'second'));
+         var inBounds = moment.utc(date).isBetween(moment.utc(layer.firstDate).subtract(1, 'second'), moment.utc(layer.lastDate).add(1, 'second'));
          if(matchedDate && inBounds) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later

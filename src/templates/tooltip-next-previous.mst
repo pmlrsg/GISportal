@@ -1,7 +1,7 @@
 <div class="tooltip-next-previous">
    <ul>
       {{#each this}}
-         <li>
+         <li class="clearfix">
             <span class="label">{{label}}</span>
             <span class="date">{{date}}</span>
          </li>

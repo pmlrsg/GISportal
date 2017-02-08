@@ -321,7 +321,7 @@ gisportal.api['date.selected'] = function(data, options){
 	var date = new Date(data.date);
 
 	if(options.describeOnly){
-		return "Date changed to " + moment(date).format('YYYY-MM-DD hh:mm');
+		return "Date changed to " + moment.utc(date).format('YYYY-MM-DD hh:mm');
 	}
 	if(options.selectorOnly){
 		return '.js-current-date';
@@ -346,7 +346,7 @@ gisportal.api['date.zoom'] = function(data, options){
 	var endDate = new Date(data.endDate);
 
 	if(options.describeOnly){
-		return "Date zoomed to " + moment(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment(endDate).format('YYYY-MM-DD hh:mm');
+		return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
 	}
 	if(options.selectorOnly){
 		return '#timeline';
