@@ -668,18 +668,12 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
 gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
-   console.log('date: ' + date.toString());
    date = moment.utc(date);
-   console.log('date: ' + date.toString());
    if (current) {
-      console.log('current: ' + current.toString());
       current = moment.utc(current.toArray());
-      console.log('current: ' + current.toString());
    }
    if(!current || !date.isSame(current)) {
       date = moment(date.toArray());
-      console.log('date: ' + date.toString());
-      console.log('setting pikaday');
       $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
    }
 };
