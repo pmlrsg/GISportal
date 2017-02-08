@@ -45,7 +45,7 @@ import plotting.debug
 from plotting.debug import debug
 import plotting.logger as logger
 
-from math import log
+from math import log, log10
 
 # Set the default logging verbosity to lowest.
 verbosity = 0
@@ -1216,8 +1216,8 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
 
    if (log_data):
       logText = 'Log of '
-      xData = [log(float(x[varindex[xVar]])) for x in df]
-      yData = [log(float(x[varindex[yVar]])) for x in df]
+      xData = [log10(float(x[varindex[xVar]])) for x in df]
+      yData = [log10(float(x[varindex[yVar]])) for x in df]
    else:
       xData = [float(x[varindex[xVar]]) for x in df]
       yData = [float(x[varindex[yVar]]) for x in df]
@@ -1306,8 +1306,9 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    _regression_y = [_regr_f(_regression_x[0]), _regr_f(_regression_x[1])]
 
    reg_line_1_1 = scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
-
-
+   r_squared_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="R^2 : {:04.3f}".format(r_value**2))
+   intercept_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Intercept: {:04.3f}".format(intercept))
+   slope_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Slope: {:04.3f}".format(slope))
    # Set up the hover tooltips for the points and lines.
    point_hover = HoverTool(
       tooltips=[

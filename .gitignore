@@ -2,6 +2,7 @@
 *.pyc
 .DS_Store
 .vscode
+tags
 .sass-cache/*
 .tern-project
 config/*
