@@ -59,9 +59,10 @@ gisportal.TimeLine = function(id, options) {
    var self = this;
 
    $('.js-current-date').pikaday({
-      format: "YYYY-MM-DD",
+      format: "YYYY-MM-DD HH:mm",
       onSelect: function() {
          var selected = this.getMoment();
+         // Convert selected into UTC as pikaday uses local time
          selected = moment.utc(selected.toArray());
          self.setDate(selected.toDate());
       }
@@ -668,11 +669,14 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
 gisportal.TimeLine.prototype.showDate = function(date) {
    var current = $('.js-current-date').data('date');
+   // Convert date into UTC moment
    date = moment.utc(date);
    if (current) {
+      // Convert current into UTC moment
       current = moment.utc(current.toArray());
    }
    if(!current || !date.isSame(current)) {
+      // Convert date into local moment since pikaday uses local time
       date = moment(date.toArray());
       $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
    }
