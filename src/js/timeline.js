@@ -60,6 +60,7 @@ gisportal.TimeLine = function(id, options) {
 
    $('.js-current-date').pikaday({
       format: "YYYY-MM-DD HH:mm",
+      use24hour: true,
       onSelect: function() {
          var selected = this.getMoment();
          // Convert selected into UTC as pikaday uses local time
@@ -328,6 +329,10 @@ gisportal.TimeLine = function(id, options) {
       ["%H:%M:%S", function(d) {
          // HH:mm:ss
          return d.getUTCSeconds();
+      }],
+      ["%H:%M", function(d) {
+         // HH:mm
+         return d.getUTCMinutes();
       }],
       ["%H:%M", function(d) {
          // HH:mm
