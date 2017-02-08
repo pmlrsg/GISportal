@@ -318,6 +318,33 @@ gisportal.TimeLine = function(id, options) {
    this.xAxis = d3.svg.axis().scale(this.xScale).orient('bottom').tickSize(6, 0, 0);
    this.main.append('svg:g').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').attr('class', 'axis');
 
+   // Setup xAxis time tick formats
+   // Chooses the first format that returns a non-0 (true) value
+   var customTimeFormat = d3.time.format.utc.multi([
+      ["%H:%M:%S.%L", function(d) {
+         // HH:mm:ss.sss
+         return d.getUTCMilliseconds();
+      }],
+      ["%H:%M:%S", function(d) {
+         // HH:mm:ss
+         return d.getUTCSeconds();
+      }],
+      ["%H:%M", function(d) {
+         // HH:mm
+         return d.getUTCHours();
+      }],
+      ["%Y-%m-%d", function(d) {
+         // YYYY-MM-DD
+         return d.getUTCDate() != 1;
+      }],
+      ["%b %Y", function() {
+         // 3 letter month YYYY
+         return true;
+      }]
+   ]);
+
+   this.xAxis.tickFormat(customTimeFormat);
+
    // Initialise the time bar label area to the left of the timeline
    this.labelArea = this.main.append('svg:g');
 
@@ -333,11 +360,9 @@ gisportal.TimeLine = function(id, options) {
 
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
 gisportal.TimeLine.prototype.redraw = function() {
-   
    var self = this;  // Useful for when the scope/meaning of "this" changes
-   
+
    // Recalculate the x and y scales before redraw
-   // 
    this.reWidth();
     this.xScale.range([0, this.width ]);
    //this.xScale.domain([self.minDate, self.maxDate]).range([0, this.width]);
@@ -351,29 +376,11 @@ gisportal.TimeLine.prototype.redraw = function() {
 
    // Scale the x-axis and define the x-scale label format
    this.main.selectAll('.axis').attr('transform', 'translate(0,' + d3.round(this.height + 0.5) + ')').call(this.xAxis);
-   // Generate a dynamic x-axis scale dependent on dimensions
-   
-   var scaling = (self.xScale.domain()[1] - self.xScale.domain()[0]) / (this.width * 4e7);
-   if (scaling > 12) {
-      this.xAxis.ticks(d3.time.years.utc, d3.round(scaling/12)).tickFormat(d3.time.format.utc('%Y'));
-   }
-   else if (scaling <= 12 && scaling > 1) {
-      this.xAxis.ticks(d3.time.months.utc, getNearestInArray([1, 2, 3, 4, 6, 12], scaling)).tickFormat(d3.time.format.utc('%b %y'));
-   }
-   else if (scaling <= 1 && scaling > 1/7) {
-      this.xAxis.ticks(d3.time.weeks.utc, d3.round(scaling*4.3)).tickFormat(d3.time.format.utc('%d/%m/%y'));
-   }
-   else if (scaling <= 1/7 && scaling > 1/365) {
-      this.xAxis.ticks(d3.time.days.utc, d3.round(scaling*30)).tickFormat(d3.time.format.utc('%d/%m/%y'));
-   }
-   else if (scaling <= 1/365) {
-      this.xAxis.ticks(d3.time.hours.utc, d3.round(scaling*730)).tickFormat(d3.time.format.utc('%I %p'));
-   }
 
    //--------------------------------------------------------------------------
    // Draw the time bars
    // Note: Had to use closures to move variables from each into the .attr etc.
-   
+
    this.bars = this.barArea.selectAll('rect').data(this.timebars);
    this.bars
       .enter().append('svg:rect')
@@ -387,7 +394,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             .attr('class', 'timeRange');
          }
       });
-      
+
    // Time bar removal
    this.bars.exit().remove();
    // Re-scale the x values and widths of ALL the time bars
@@ -406,8 +413,7 @@ gisportal.TimeLine.prototype.redraw = function() {
             return 0; 
          } 
       });
-   
-      
+
    //--------------------------------------------------------------------------
    
    function updateLines(d1, i1) {
