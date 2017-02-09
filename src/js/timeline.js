@@ -670,7 +670,6 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 
    gisportal.filterLayersByDate(date);
    self.showDate(date);
-   gisportal.timeline.redraw();
    var params = {
       "event" : "date.selected",
       "date" : date
