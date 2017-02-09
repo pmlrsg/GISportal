@@ -144,3 +144,12 @@ svg {
 line.stroke{
    stroke:$timeline-stroke;
 }
+
+.is-selected .pika-button {
+    background: #59476D;
+    box-shadow: inset 0 1px 3px #6E5887;
+}
+
+.pika-button:hover {
+    background: #BAB67C;
+}
