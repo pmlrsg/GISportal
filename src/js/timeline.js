@@ -192,7 +192,6 @@ gisportal.TimeLine = function(id, options) {
 
    this.dragDate = function() {
       isDragging = true;
-      var self = gisportal.timeline;
       var x = self.xScale(self.draggedDate) + d3.event.dx;
 
       // Prevent dragging the selector off-scale
@@ -317,9 +316,9 @@ gisportal.TimeLine = function(id, options) {
       var layer = findMostRegularLayer();
       var newDate = getIncrementedLayerDate(layer, increment);
 
-      for (var i = 0; i < gisportal.timeline.timebars.length; i++) {
-         var label = gisportal.timeline.timebars[i].label;
-         var dateTimes = gisportal.timeline.timebars[i].dateTimes;
+      for (var i = 0; i < self.timebars.length; i++) {
+         var label = self.timebars[i].label;
+         var dateTimes = self.timebars[i].dateTimes;
          var dateIndex = findLayerDateIndex(i, newDate);
          var date = dateTimes[dateIndex];
          content.push({
@@ -334,16 +333,16 @@ gisportal.TimeLine = function(id, options) {
    // Get the date for a layer after incrementing
    function getIncrementedLayerDate(layer, increment) {
       increment = increment || 0;
-      var index = findLayerDateIndex(layer, gisportal.timeline.selectedDate);
-      return new Date(gisportal.timeline.timebars[layer].dateTimes[index + increment]);
+      var index = findLayerDateIndex(layer, self.selectedDate);
+      return new Date(self.timebars[layer].dateTimes[index + increment]);
    }
 
    // Find the most regular layer currently on the timebar
    function findMostRegularLayer() {
       var shortestInterval = 0;
       var mostRegular = 0;
-      for (var i = 0; i < gisportal.timeline.timebars.length; i++) {
-         var dateTimes = gisportal.timeline.timebars[i].dateTimes.slice().sort();
+      for (var i = 0; i < self.timebars.length; i++) {
+         var dateTimes = self.timebars[i].dateTimes.slice().sort();
          var interval = (new Date(dateTimes[dateTimes.length - 1]) - new Date(dateTimes[0])) / dateTimes.length;
          if (shortestInterval === 0 || interval < shortestInterval) {
             shortestInterval = interval;
@@ -356,7 +355,7 @@ gisportal.TimeLine = function(id, options) {
    // Find the index for a date on a timebar layer
    function findLayerDateIndex(layer, selectedDate) {
       var layerDateIndex = 0;
-      var datesTimes = gisportal.timeline.timebars[layer].dateTimes;
+      var datesTimes = self.timebars[layer].dateTimes;
       for (var i = 0; i < datesTimes.length; i++) {
          var date = new Date(datesTimes[i]);
          if (date <= selectedDate) {
@@ -568,11 +567,11 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline))  {
       this.reHeight();
       // redraw is done in zoom
-      var data = gisportal.timeline.layerbars[0];
-      gisportal.timeline.zoomDate(data.startDate, data.endDate);
+      var data = this.layerbars[0];
+      this.zoomDate(data.startDate, data.endDate);
 
-      if(!moment.utc(gisportal.timeline.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))){
-         gisportal.timeline.setDate(endDate);
+      if(!moment.utc(this.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))){
+         this.setDate(endDate);
       }
    }
 
@@ -595,7 +594,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
 
 gisportal.TimeLine.prototype.has = function(name)  {
-   var has = _.filter(gisportal.timeline.timebars, function(d)  {
+   var has = _.filter(this.timebars, function(d)  {
       return d.name.toLowerCase() === name.toLowerCase();
    });
 
@@ -647,7 +646,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    this.updatePickerBounds();
 
    var h = $('.timeline-container').height() + 10; // +10 for the padding
-   if(gisportal.timeline.timebars.length <= 0){
+   if(this.timebars.length <= 0){
       $('.timeline-container').css('bottom','-1000px');
       h = 0;
    }
@@ -662,7 +661,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 
 // Set the currently selected date and animated the transition
 gisportal.TimeLine.prototype.setDate = function(date) {
-   if(gisportal.timeline.getDate().toString() == date.toString()){
+   if(this.getDate().toString() == date.toString()){
       return false;
    }
    gisportal.hideAllPopups();
