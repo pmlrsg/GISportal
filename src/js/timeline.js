@@ -281,7 +281,7 @@ gisportal.TimeLine = function(id, options) {
    // Setup next previous buttons
    $('.js-next-prev-date').click(function() {
       var steps = $(this).data('steps');
-      var layer = findMostRegularLayer();
+      var layer = findMostRegularLayer(steps);
       self.setDate(getIncrementedLayerDate(layer, steps));
       if (tooltip) {
          tooltip.content(buildNextPrevTooltip(steps));
@@ -313,20 +313,21 @@ gisportal.TimeLine = function(id, options) {
    // Build a next previous tooltip content
    function buildNextPrevTooltip(increment) {
       var content = [];
-      var layer = findMostRegularLayer();
+      var layer = findMostRegularLayer(increment);
       var newDate = getIncrementedLayerDate(layer, increment);
 
       for (var i = 0; i < self.timebars.length; i++) {
          var label = self.timebars[i].label;
          var dateTimes = self.timebars[i].dateTimes;
          var dateIndex = findLayerDateIndex(i, newDate);
-         var date = dateTimes[dateIndex];
-         content.push({
-            label: label,
-            date: date
-         });
+         if (dateIndex != -1) {
+            var date = dateTimes[dateIndex];
+            content.push({
+               label: label,
+               date: date
+            });
+         }
       }
-
       return gisportal.templates['tooltip-next-previous'](content);
    }
 
@@ -337,14 +338,25 @@ gisportal.TimeLine = function(id, options) {
       return new Date(self.timebars[layer].dateTimes[index + increment]);
    }
 
-   // Find the most regular layer currently on the timebar
-   function findMostRegularLayer() {
+   // Find the most regular layer currently on the timebar that has data at the selected date
+   function findMostRegularLayer(increment) {
+      increment = increment || 0;
       var shortestInterval = 0;
       var mostRegular = 0;
       for (var i = 0; i < self.timebars.length; i++) {
          var dateTimes = self.timebars[i].dateTimes.slice().sort();
-         var interval = (new Date(dateTimes[dateTimes.length - 1]) - new Date(dateTimes[0])) / dateTimes.length;
-         if (shortestInterval === 0 || interval < shortestInterval) {
+         var startDate = new Date(dateTimes[0]);
+         var endDate = new Date(dateTimes[dateTimes.length - 1]);
+         var interval = (endDate - startDate) / dateTimes.length;
+         var selectedInRange = false;
+         if (startDate <= self.selectedDate && self.selectedDate <= endDate) {
+            if (increment < 0 && findLayerDateIndex(i, self.selectedDate) > 0) {
+               selectedInRange = true;
+            } else if (increment > 0 && findLayerDateIndex(i, self.selectedDate) < dateTimes.length - 1) {
+               selectedInRange = true;
+            }
+         }
+         if (selectedInRange && (shortestInterval === 0 || interval < shortestInterval)) {
             shortestInterval = interval;
             mostRegular = i;
          }
@@ -354,14 +366,12 @@ gisportal.TimeLine = function(id, options) {
 
    // Find the index for a date on a timebar layer
    function findLayerDateIndex(layer, selectedDate) {
-      var layerDateIndex = 0;
+      var layerDateIndex = -1;
       var datesTimes = self.timebars[layer].dateTimes;
       for (var i = 0; i < datesTimes.length; i++) {
          var date = new Date(datesTimes[i]);
          if (date <= selectedDate) {
             layerDateIndex = i;
-         } else {
-            break;
          }
       }
       return layerDateIndex;
