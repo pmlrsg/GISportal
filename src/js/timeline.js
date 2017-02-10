@@ -669,8 +669,11 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    this.selectedDate = self.draggedDate = new Date(date);
    // Move the selected date-time line
    // ADD_CONFIG: Animation may not be wanted
-   this.selectedDateLine.transition().duration(500).attr('x', function(d) { return d3.round(self.xScale(self.selectedDate) - 1.5); });
-
+   if (this.timebars.length > 0) {
+      this.selectedDateLine.transition().duration(500).attr('x', function(d) {
+         return d3.round(self.xScale(self.selectedDate) - 1.5);
+      });
+   }
 
    //self.selectedDateLine.attr('x', function(d) { return d3.round(self.xScale(self.draggedDate) - 1.5); });
 

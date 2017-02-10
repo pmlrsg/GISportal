@@ -1464,7 +1464,7 @@ gisportal.main = function() {
    // Compile Templates
    gisportal.loadTemplates(function(){
       
-      gisportal.initStart();
+      var autoLoad = gisportal.initStart();
 
       // Set up the map
       // any layer dependent code is called in a callback in mapInit
@@ -1515,6 +1515,8 @@ gisportal.main = function() {
       if(stateID !== null) {
          gisportal.ajaxState(stateID);
       }
+
+      autoLoad();
 
       collaboration.initDOM();
       // Replaces all .icon-svg with actual SVG elements,
@@ -1588,7 +1590,9 @@ gisportal.initStart = function()  {
    // Work out if we should skip the splash page
    // Should we auto resume ?
    // Do we have to show the T&C box first ?
-   var autoLoad = null;
+   var autoLoad = function() {
+      return true;
+   };
    if( gisportal.config.skipWelcomePage === true || gisportal.utils.getURLParameter('wms_url')){
       if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
          autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
@@ -1598,9 +1602,6 @@ gisportal.initStart = function()  {
    }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
       autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
    }
-
-   if( autoLoad !== null)
-      return setTimeout(autoLoad, 1000);
 
    // Splash page parameters
    var data = {
@@ -1652,6 +1653,7 @@ gisportal.initStart = function()  {
       }
 
    });
+   return autoLoad;
 };
 
 /**
