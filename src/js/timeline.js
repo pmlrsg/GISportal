@@ -296,9 +296,11 @@ gisportal.TimeLine = function(id, options) {
    $('.js-next-prev-date').click(function() {
       var steps = $(this).data('steps');
       var newDate = getNextPreviousDate(steps);
-      self.setDate(newDate);
-      if (tooltip) {
-         tooltip.content(buildNextPrevTooltip(steps));
+      if (newDate) {
+         self.setDate(newDate);
+         if (tooltip) {
+            tooltip.content(buildNextPrevTooltip(steps));
+         }
       }
    });
 
@@ -340,6 +342,9 @@ gisportal.TimeLine = function(id, options) {
                date: date
             });
          }
+      }
+      if (content.length === 0) {
+         return 'No data';
       }
       return gisportal.templates['tooltip-next-previous'](content);
    }
