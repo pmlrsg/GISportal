@@ -295,7 +295,7 @@ gisportal.TimeLine = function(id, options) {
    // Setup next previous buttons
    $('.js-next-prev-date').click(function() {
       var steps = $(this).data('steps');
-      var newDate = getNextPreviousDate(steps);
+      var newDate = self.getNextPreviousDate(steps);
       if (newDate) {
          self.setDate(newDate);
          if (tooltip) {
@@ -329,12 +329,12 @@ gisportal.TimeLine = function(id, options) {
    // Build a next previous tooltip content
    function buildNextPrevTooltip(increment) {
       var content = [];
-      var newDate = getNextPreviousDate(increment);
+      var newDate = self.getNextPreviousDate(increment);
 
       for (var i = 0; i < self.timebars.length; i++) {
          var label = self.timebars[i].label;
          var dateTimes = self.timebars[i].dateTimes;
-         var dateIndex = findLayerDateIndex(i, newDate);
+         var dateIndex = self.findLayerDateIndex(i, newDate);
          if (dateIndex != -1) {
             var date = dateTimes[dateIndex];
             content.push({
@@ -348,92 +348,110 @@ gisportal.TimeLine = function(id, options) {
       }
       return gisportal.templates['tooltip-next-previous'](content);
    }
-
-   // Find the most regular layer currently on the timebar that has data at the selected date
-   function getNextPreviousDate(increment) {
-      increment = increment || 0;
-      var newDate = null;
-
-      var dateTimes = null;
-      var startDate = null;
-      var endDate = null;
-
-      var layerIntervals = [];
-
-      for (var i = 0; i < self.timebars.length; i++) {
-         dateTimes = self.timebars[i].dateTimes;
-         startDate = self.timebars[i].startDate;
-         endDate = self.timebars[i].endDate;
-         var interval = (endDate - startDate) / dateTimes.length;
-         layerIntervals.push({
-            layer: i,
-            interval: interval
-         });
-      }
-
-      layerIntervals.sort(function(a, b) {
-         return a.interval - b.interval;
-      });
-
-      for (i = 0; i < layerIntervals.length; i++) {
-         var layerIndex = layerIntervals[i].layer;
-         dateTimes = self.timebars[layerIndex].dateTimes;
-         var dateIndex = findLayerDateIndex(layerIndex, self.selectedDate);
-         if (dateIndex != -1 &&
-            dateIndex + increment >= 0 && dateIndex + increment < dateTimes.length &&
-            new Date(dateTimes[dateIndex + increment]) <= self.timebars[layerIndex].endDate) {
-            var tempNewDate = new Date(dateTimes[dateIndex + increment]);
-            if (i > 0) {
-               for (var j = i - 1; j >= 0; j--) {
-                  var jLayerIndex = layerIntervals[j].layer;
-                  var jStartDate = self.timebars[jLayerIndex].startDate;
-                  var jEndDate = self.timebars[jLayerIndex].endDate;
-
-                  if (jStartDate <= tempNewDate && tempNewDate <= jEndDate) {
-                     if (increment < 0) {
-                        if (!newDate || new Date(jEndDate) > newDate) {
-                           newDate = new Date(jEndDate);
-                        }
-                     } else {
-                        if (!newDate || new Date(jEndDate) < newDate) {
-                           newDate = new Date(jStartDate);
-                        }
-                     }
-                  }
-               }
-               if (!newDate) {
-                  newDate = tempNewDate;
-               }
-               break;
-            } else {
-               newDate = tempNewDate;
-               break;
-            }
-         }
-      }
-      return newDate;
-   }
-
-   // Find the index for a date on a timebar layer
-   function findLayerDateIndex(layer, selectedDate) {
-      var layerDateIndex = -1;
-      var datesTimes = self.timebars[layer].dateTimes;
-      var startDate = self.timebars[layer].startDate;
-      var endDate = self.timebars[layer].endDate;
-      if (startDate <= selectedDate && selectedDate <= endDate) {
-         for (var i = 0; i < datesTimes.length; i++) {
-            var date = new Date(datesTimes[i]);
-            if (date <= selectedDate) {
-               layerDateIndex = i;
-            }
-         }
-      }
-      return layerDateIndex;
-   }
 };
 
 gisportal.TimeLine.getInstance = function() {
    return gisportal.TimeLine._instance || new gisportal.TimeLine();
+};
+
+gisportal.TimeLine.prototype.keydownListener = function(key) {
+   var self = gisportal.TimeLine.getInstance();
+   if (document.activeElement.nodeName == "BODY" && !$('div.overlay').is(":visible")) {
+      console.log('keydown: ' + key.keyCode);
+      var newDate = null;
+      switch (key.keyCode) {
+         case 37:
+            newDate = self.getNextPreviousDate(-1);
+            break;
+         case 39:
+            newDate = self.getNextPreviousDate(1);
+            break;
+      }
+      if (newDate) {
+         self.setDate(newDate);
+      }
+   }
+};
+
+gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
+   increment = increment || 0;
+   var newDate = null;
+
+   var dateTimes = null;
+   var startDate = null;
+   var endDate = null;
+
+   var layerIntervals = [];
+
+   for (var i = 0; i < this.timebars.length; i++) {
+      dateTimes = this.timebars[i].dateTimes;
+      startDate = this.timebars[i].startDate;
+      endDate = this.timebars[i].endDate;
+      var interval = (endDate - startDate) / dateTimes.length;
+      layerIntervals.push({
+         layer: i,
+         interval: interval
+      });
+   }
+
+   layerIntervals.sort(function(a, b) {
+      return a.interval - b.interval;
+   });
+
+   for (i = 0; i < layerIntervals.length; i++) {
+      var layerIndex = layerIntervals[i].layer;
+      dateTimes = this.timebars[layerIndex].dateTimes;
+      var dateIndex = this.findLayerDateIndex(layerIndex, this.selectedDate);
+      if (dateIndex != -1 &&
+         dateIndex + increment >= 0 && dateIndex + increment < dateTimes.length &&
+         new Date(dateTimes[dateIndex + increment]) <= this.timebars[layerIndex].endDate) {
+         var tempNewDate = new Date(dateTimes[dateIndex + increment]);
+         if (i > 0) {
+            for (var j = i - 1; j >= 0; j--) {
+               var jLayerIndex = layerIntervals[j].layer;
+               var jStartDate = this.timebars[jLayerIndex].startDate;
+               var jEndDate = this.timebars[jLayerIndex].endDate;
+
+               if (jStartDate <= tempNewDate && tempNewDate <= jEndDate) {
+                  if (increment < 0) {
+                     if (!newDate || new Date(jEndDate) > newDate) {
+                        newDate = new Date(jEndDate);
+                     }
+                  } else {
+                     if (!newDate || new Date(jEndDate) < newDate) {
+                        newDate = new Date(jStartDate);
+                     }
+                  }
+               }
+            }
+            if (!newDate) {
+               newDate = tempNewDate;
+            }
+            break;
+         } else {
+            newDate = tempNewDate;
+            break;
+         }
+      }
+   }
+   return newDate;
+};
+
+// Find the index for a date on a timebar layer
+gisportal.TimeLine.prototype.findLayerDateIndex = function(layer, selectedDate) {
+   var layerDateIndex = -1;
+   var datesTimes = this.timebars[layer].dateTimes;
+   var startDate = this.timebars[layer].startDate;
+   var endDate = this.timebars[layer].endDate;
+   if (startDate <= selectedDate && selectedDate <= endDate) {
+      for (var i = 0; i < datesTimes.length; i++) {
+         var date = new Date(datesTimes[i]);
+         if (date <= selectedDate) {
+            layerDateIndex = i;
+         }
+      }
+   }
+   return layerDateIndex;
 };
 
 // Handle browser window resize event to dynamically scale the timeline chart along the x-axis
@@ -659,6 +677,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       if (!moment.utc(this.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))) {
          this.setDate(endDate);
       }
+      $(document).on('keydown', this.keydownListener);
    }
 
    this.reHeight();
@@ -734,6 +753,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
 
    var h = $('.timeline-container').height() + 10; // +10 for the padding
    if (this.timebars.length <= 0) {
+      $(document).off('keydown', self.keydownListener);
       $('.timeline-container').css('bottom', '-1000px');
       h = 0;
    }
