@@ -612,11 +612,6 @@ gisportal.TimeLine.prototype.drawLabels = function() {
 
 // Zoom function to a new date range
 gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
-   var minDate = new Date(startDate);
-   var maxDate = new Date(endDate);
-   var padding = (maxDate - minDate) * 0.05;
-   this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime() - padding) : this.minDate);
-   this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime() + padding) : this.maxDate);
    this.xScale.domain([this.minDate * 0.9, this.maxDate * 1.1]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
@@ -627,6 +622,13 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
       "endDate": endDate
    };
    gisportal.events.trigger('date.zoom', params);
+};
+
+gisportal.TimeLine.prototype.updateMinMaxDate = function (startDate, endDate) {
+   var minDate = new Date(startDate);
+   var maxDate = new Date(endDate);
+   this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime()) : this.minDate);
+   this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime()) : this.maxDate);
 };
 
 // Add a new time bar using detailed parameters
@@ -644,6 +646,8 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
    this.timebars.push(newTimebar);
    this.layerbars.push(newTimebar);
+
+   this.updateMinMaxDate(startDate, endDate);
 
    // TODO: Move asap. tidy up
    if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline)) {
@@ -749,7 +753,15 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    }
    gisportal.hideAllPopups();
    var self = this; // Useful for when the scope/meaning of "this" changes
+
+   if (date < this.minDate) {
+      date = this.minDate;
+   } else if (date > this.maxDate) {
+      date = this.maxDate;
+   }
+
    this.selectedDate = self.draggedDate = new Date(date);
+
    // Move the selected date-time line
    // ADD_CONFIG: Animation may not be wanted
    if (this.timebars.length > 0) {
@@ -804,6 +816,12 @@ gisportal.TimeLine.prototype.updatePickerBounds = function() {
    }, []);
 
    var extent = d3.extent(dates);
+   // Convert dates into utc moments
+   extent[0] = moment.utc(extent[0]);
+   extent[1] = moment.utc(extent[1]);
+   // Now convert them into the correct local times
+   extent[0] = moment(extent[0].toArray()).toDate();
+   extent[1] = moment(extent[1].toArray()).toDate();
 
    $('.js-current-date')
       .pikaday('setMinDate', extent[0])
