@@ -357,7 +357,6 @@ gisportal.TimeLine.getInstance = function() {
 gisportal.TimeLine.prototype.keydownListener = function(key) {
    var self = gisportal.TimeLine.getInstance();
    if (document.activeElement.nodeName == "BODY" && !$('div.overlay').is(":visible")) {
-      console.log('keydown: ' + key.keyCode);
       var newDate = null;
       switch (key.keyCode) {
          case 37:
@@ -609,6 +608,7 @@ gisportal.TimeLine.prototype.reset = function() {
    this.reHeight();
    this.reWidth();
    this.redraw();
+   this.updateMinMaxDate();
    this.updatePickerBounds();
 };
 
@@ -642,13 +642,6 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
    gisportal.events.trigger('date.zoom', params);
 };
 
-gisportal.TimeLine.prototype.updateMinMaxDate = function (startDate, endDate) {
-   var minDate = new Date(startDate);
-   var maxDate = new Date(endDate);
-   this.minDate = ((minDate instanceof Date) ? new Date(minDate.getTime()) : this.minDate);
-   this.maxDate = ((maxDate instanceof Date) ? new Date(maxDate.getTime()) : this.maxDate);
-};
-
 // Add a new time bar using detailed parameters
 gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
@@ -665,7 +658,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.timebars.push(newTimebar);
    this.layerbars.push(newTimebar);
 
-   this.updateMinMaxDate(startDate, endDate);
+   this.updateMinMaxDate();
 
    // TODO: Move asap. tidy up
    if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline)) {
@@ -696,7 +689,6 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    collab_panel.css('max-height', "calc(100% - " + (h + top + 35) + 'px)');
 
 };
-
 
 gisportal.TimeLine.prototype.has = function(name) {
    var has = _.filter(this.timebars, function(d) {
@@ -748,8 +740,9 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    // Now re-instate the newly altered array and redraw
    this.timebars = temp;
    this.reHeight();
-   this.redraw();
+   this.updateMinMaxDate();
    this.updatePickerBounds();
+   this.redraw();
 
    var h = $('.timeline-container').height() + 10; // +10 for the padding
    if (this.timebars.length <= 0) {
@@ -802,18 +795,11 @@ gisportal.TimeLine.prototype.setDate = function(date) {
 };
 
 gisportal.TimeLine.prototype.showDate = function(date) {
-   var current = $('.js-current-date').data('date');
    // Convert date into UTC moment
    date = moment.utc(date);
-   if (current) {
-      // Convert current into UTC moment
-      current = moment.utc(current.toArray());
-   }
-   if (!current || !date.isSame(current)) {
-      // Convert date into local moment since pikaday uses local time
-      date = moment(date.toArray());
-      $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
-   }
+   // Convert date into local moment since pikaday uses local time
+   date = moment(date.toArray());
+   $('.js-current-date').data('date', date).pikaday('setMoment', date, true);
 };
 
 // Get the currently selected date
@@ -822,10 +808,7 @@ gisportal.TimeLine.prototype.getDate = function() {
    return ((selectedDate instanceof Date) ? selectedDate : null);
 };
 
-
-
-// Get the currently selected date
-gisportal.TimeLine.prototype.updatePickerBounds = function() {
+gisportal.TimeLine.prototype.updateMinMaxDate = function () {
    var dates = this.timebars.map(function(bar) {
       return [
          bar.startDate,
@@ -836,15 +819,20 @@ gisportal.TimeLine.prototype.updatePickerBounds = function() {
    }, []);
 
    var extent = d3.extent(dates);
+
+   this.minDate = moment.utc(extent[0]).toDate();
+   this.maxDate = moment.utc(extent[1]).toDate();
+};
+
+gisportal.TimeLine.prototype.updatePickerBounds = function() {
    // Convert dates into utc moments
-   extent[0] = moment.utc(extent[0]);
-   extent[1] = moment.utc(extent[1]);
+   var minDate = moment.utc(this.minDate);
+   var maxDate = moment.utc(this.maxDate);
    // Now convert them into the correct local times
-   extent[0] = moment(extent[0].toArray()).toDate();
-   extent[1] = moment(extent[1].toArray()).toDate();
+   minDate = moment(minDate.toArray()).toDate();
+   maxDate = moment(maxDate.toArray()).toDate();
 
    $('.js-current-date')
-      .pikaday('setMinDate', extent[0])
-      .pikaday('setMaxDate', extent[1]);
-
+      .pikaday('setMinDate', minDate)
+      .pikaday('setMaxDate', maxDate);
 };

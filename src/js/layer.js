@@ -790,7 +790,7 @@ gisportal.filterLayersByDate = function(date) {
    for(var layer in gisportal.selectedLayers){
       var this_layer = gisportal.layers[gisportal.selectedLayers[layer]];
       if(!this_layer.isInbounds){
-         $('.js-current-date').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
+         $('.timeline-date-options').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
          return false;
       }
    }
