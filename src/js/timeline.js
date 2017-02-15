@@ -581,11 +581,13 @@ gisportal.TimeLine.prototype.redraw = function() {
 
    this.drawLabels();
 
-   if (self.getDate() < moment.utc(self.minDate).startOf('day').toDate()) {
-      self.setDate(self.minDate);
-   }
-   if (self.getDate() > moment.utc(self.maxDate).startOf('day').toDate()) {
-      self.setDate(self.maxDate);
+   if (this.timebars.length > 0) {
+      if (self.getDate() < moment.utc(self.minDate).startOf('day').toDate()) {
+         self.setDate(self.minDate);
+      }
+      if (self.getDate() > moment.utc(self.maxDate).startOf('day').toDate()) {
+         self.setDate(self.maxDate);
+      }
    }
 };
 
