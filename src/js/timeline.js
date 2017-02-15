@@ -630,7 +630,9 @@ gisportal.TimeLine.prototype.drawLabels = function() {
 
 // Zoom function to a new date range
 gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
-   this.xScale.domain([this.minDate * 0.9, this.maxDate * 1.1]).range([0, this.width]);
+   startDate = new Date(startDate);
+   endDate = new Date(endDate);
+   this.xScale.domain([startDate * 0.9, endDate * 1.1]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
