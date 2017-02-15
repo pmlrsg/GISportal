@@ -630,9 +630,30 @@ gisportal.TimeLine.prototype.drawLabels = function() {
 
 // Zoom function to a new date range
 gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
-   startDate = new Date(startDate);
-   endDate = new Date(endDate);
-   this.xScale.domain([startDate * 0.9, endDate * 1.1]).range([0, this.width]);
+   var newStartDate;
+   var newEndDate;
+
+   if (startDate === null) {
+      newStartDate = this.xScale.invert(0);
+   } else {
+      newStartDate = new Date(startDate);
+   }
+   if (endDate === null) {
+      newEndDate = this.xScale.invert(this.width);
+   } else{
+      newEndDate = new Date(endDate);
+   }
+
+   var padding = (newEndDate.getTime() - newStartDate.getTime()) * 0.05;
+
+   if (startDate !== null) {
+      newStartDate = newStartDate.getTime() - padding;
+   }
+   if (endDate !== null) {
+      newEndDate = newEndDate.getTime() + padding;
+   }
+
+   this.xScale.domain([newStartDate, newEndDate]).range([0, this.width]);
    this.zoom.x(this.xScale); // This is absolutely required to programatically zoom and retrigger internals of zoom
    this.redraw();
 
@@ -780,6 +801,11 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    // Move the selected date-time line
    // ADD_CONFIG: Animation may not be wanted
    if (this.timebars.length > 0) {
+      if (date < this.xScale.invert(0)) {
+         this.zoomDate(date, null);
+      } else if (this.xScale.invert(this.width) < date) {
+         this.zoomDate(null, date);
+      }
       this.selectedDateLine.transition().duration(500).attr('x', function(d) {
          return d3.round(self.xScale(self.selectedDate) - 1.5);
       });
