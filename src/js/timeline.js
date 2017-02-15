@@ -640,7 +640,7 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
    }
    if (endDate === null) {
       newEndDate = this.xScale.invert(this.width);
-   } else{
+   } else {
       newEndDate = new Date(endDate);
    }
 
@@ -688,11 +688,13 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       this.reHeight();
       // redraw is done in zoom
       var data = this.layerbars[0];
-      this.zoomDate(data.startDate, data.endDate);
 
       if (!moment.utc(this.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))) {
          this.setDate(endDate);
       }
+
+      this.zoomDate(data.startDate, data.endDate);
+
       $(document).on('keydown', this.keydownListener);
    }
 
@@ -790,10 +792,12 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    gisportal.hideAllPopups();
    var self = this; // Useful for when the scope/meaning of "this" changes
 
-   if (date < this.minDate) {
-      date = this.minDate;
-   } else if (date > this.maxDate) {
-      date = this.maxDate;
+   if (this.timebars.length > 0) {
+      if (date < this.minDate) {
+         date = this.minDate;
+      } else if (date > this.maxDate) {
+         date = this.maxDate;
+      }
    }
 
    this.selectedDate = self.draggedDate = new Date(date);
@@ -836,7 +840,7 @@ gisportal.TimeLine.prototype.getDate = function() {
    return ((selectedDate instanceof Date) ? selectedDate : null);
 };
 
-gisportal.TimeLine.prototype.updateMinMaxDate = function () {
+gisportal.TimeLine.prototype.updateMinMaxDate = function() {
    var dates = this.timebars.map(function(bar) {
       return [
          bar.startDate,
