@@ -399,8 +399,11 @@ gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
 
    for (i = 0; i < layerIntervals.length; i++) {
       var layerIndex = layerIntervals[i].layer;
-      dateTimes = this.timebars[layerIndex].dateTimes;
-      var dateIndex = this.findLayerDateIndex(layerIndex, this.selectedDate);
+      // Sort dateTimes
+      dateTimes = this.timebars[layerIndex].dateTimes.slice().sort();
+      // Make dateTimes unique
+      dateTimes = _.sortedUniq(dateTimes);
+      var dateIndex = this.findLayerDateIndex(layerIndex, this.selectedDate, dateTimes);
       if (dateIndex != -1 &&
          dateIndex + increment >= 0 && dateIndex + increment < dateTimes.length &&
          new Date(dateTimes[dateIndex + increment]) <= this.timebars[layerIndex].endDate) {
@@ -437,14 +440,14 @@ gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
 };
 
 // Find the index for a date on a timebar layer
-gisportal.TimeLine.prototype.findLayerDateIndex = function(layer, selectedDate) {
+gisportal.TimeLine.prototype.findLayerDateIndex = function(layer, selectedDate, dateTimes) {
    var layerDateIndex = -1;
-   var datesTimes = this.timebars[layer].dateTimes;
+   dateTimes = dateTimes || this.timebars[layer].dateTimes;
    var startDate = this.timebars[layer].startDate;
    var endDate = this.timebars[layer].endDate;
    if (startDate <= selectedDate && selectedDate <= endDate) {
-      for (var i = 0; i < datesTimes.length; i++) {
-         var date = new Date(datesTimes[i]);
+      for (var i = 0; i < dateTimes.length; i++) {
+         var date = new Date(dateTimes[i]);
          if (date <= selectedDate) {
             layerDateIndex = i;
          }
