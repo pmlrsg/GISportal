@@ -296,8 +296,17 @@ function createDimensionsArray(layer) {
             }
          }
          if (newDates.length > 0) {
-            dimensions.firstDate = newDates[0];
-            dimensions.lastDate = newDates[newDates.length - 1];
+            dimensions.firstDate = null;
+            dimensions.lastDate = null;
+
+            for (var i = 0; i < newDates.length; i++) {
+               if (dimensions.firstDate === null || newDates[i] < dimensions.firstDate) {
+                  dimensions.firstDate = newDates[i];
+               }
+               if (dimensions.lastDate === null || newDates[i] > dimensions.lastDate) {
+                  dimensions.lastDate = newDates[i];
+               }
+            }
          }
          dimensionValue = newDates.join().trim();
       }
