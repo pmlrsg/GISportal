@@ -156,7 +156,8 @@ gisportal.TimeLine = function(id, options) {
          isDragging = true;
          self.redraw();
       })
-      .on('zoomend', function(opts) {
+      .on('zoomend', function() {
+         // Send event for collaboration
          var startDate = self.xScale.invert(0);
          var endDate = self.xScale.invert(self.width);
          var params = {
@@ -337,7 +338,7 @@ gisportal.TimeLine = function(id, options) {
       }
    });
 
-   // Build a next previous tooltip content
+   // Build the contents for a next previous tooltip
    function buildNextPrevTooltip(increment) {
       var content = [];
       var newDate = self.getNextPreviousDate(increment);
@@ -361,10 +362,18 @@ gisportal.TimeLine = function(id, options) {
    }
 };
 
+/**
+ * Retrurn the timeline instance or create it.
+ * @return {object} The timeline instance
+ */
 gisportal.TimeLine.getInstance = function() {
    return gisportal.TimeLine._instance || new gisportal.TimeLine();
 };
 
+/**
+ * Key press listener for handling right and left buttons for next previous.
+ * @param  {object} key Details of the key that's been pressed
+ */
 gisportal.TimeLine.prototype.keydownListener = function(key) {
    var self = gisportal.TimeLine.getInstance();
    if (document.activeElement.nodeName == "BODY" && !$('div.overlay').is(":visible") && !$('div.collab-overlay').is(":visible")) {
@@ -383,20 +392,22 @@ gisportal.TimeLine.prototype.keydownListener = function(key) {
    }
 };
 
+/**
+ * Get the date a number of time slices before or after the selected date.
+ * @param  {number} increment The number of time slices to move by
+ * @return {object}           The date to move to
+ */
 gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
    increment = increment || 0;
    var newDate = null;
-
    var dateTimes = null;
-   var startDate = null;
-   var endDate = null;
-
    var layerIntervals = [];
 
+   // Calculate the average interval for each layer on the timebar
    for (var i = 0; i < this.timebars.length; i++) {
       dateTimes = this.timebars[i].dateTimes;
-      startDate = this.timebars[i].startDate;
-      endDate = this.timebars[i].endDate;
+      var startDate = this.timebars[i].startDate;
+      var endDate = this.timebars[i].endDate;
       var interval = (endDate - startDate) / dateTimes.length;
       layerIntervals.push({
          layer: i,
@@ -404,22 +415,31 @@ gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
       });
    }
 
+   // Sort the layers by their intervals
    layerIntervals.sort(function(a, b) {
       return a.interval - b.interval;
    });
 
+   // Find the best layer to use
    for (i = 0; i < layerIntervals.length; i++) {
       var layerIndex = layerIntervals[i].layer;
-      // Sort dateTimes
+      // Sort a copy of the layer's dateTimes
       dateTimes = this.timebars[layerIndex].dateTimes.slice().sort();
       // Make dateTimes unique
       dateTimes = _.sortedUniq(dateTimes);
+      // Find the dateTimes index for the selected date
       var dateIndex = this.findLayerDateIndex(layerIndex, this.selectedDate, dateTimes);
       if (dateIndex != -1 &&
          dateIndex + increment >= 0 && dateIndex + increment < dateTimes.length &&
+         new Date(dateTimes[dateIndex + increment]) >= this.timebars[layerIndex].startDate &&
          new Date(dateTimes[dateIndex + increment]) <= this.timebars[layerIndex].endDate) {
+         // If a date index was found, and incrementing it doesn't go out of bounds of dateTimes,
+         // and it doesn't go past the saved startDate or endDate for the layer (which can be different to the ends of dateTimes)
          var tempNewDate = new Date(dateTimes[dateIndex + increment]);
          if (i > 0) {
+            // If this isn't the most regular layer
+            // Check if incrementing this layer will overlap with a more regular layer, and if so,
+            // then pick the start or end date of that layer
             for (var j = i - 1; j >= 0; j--) {
                var jLayerIndex = layerIntervals[j].layer;
                var jStartDate = this.timebars[jLayerIndex].startDate;
@@ -451,6 +471,13 @@ gisportal.TimeLine.prototype.getNextPreviousDate = function(increment) {
 };
 
 // Find the index for a date on a timebar layer
+/**
+ * Fine the index for a date on a timebar layer
+ * @param  {number} layer        The index of the layer on the timebar
+ * @param  {date}   selectedDate The date to find
+ * @param  {array}  dateTimes    (optional) DateTimes to search in
+ * @return {number}              The index for the provided date
+ */
 gisportal.TimeLine.prototype.findLayerDateIndex = function(layer, selectedDate, dateTimes) {
    var layerDateIndex = -1;
    dateTimes = dateTimes || this.timebars[layer].dateTimes;
@@ -593,6 +620,8 @@ gisportal.TimeLine.prototype.redraw = function() {
    this.drawLabels();
 
    if (this.timebars.length > 0 && !gisportal.loadingFromState) {
+      // If there is at least one timebar and loading from state isn't in progress
+      // Move the selected date within the min and max date if it isn't
       if (self.getDate() < moment.utc(self.minDate).startOf('day').toDate()) {
          self.setDate(self.minDate);
       }
@@ -645,6 +674,14 @@ gisportal.TimeLine.prototype.drawLabels = function() {
 };
 
 // Zoom function to a new date range
+/**
+ * Zoom the timebar to a date range.
+ * To only update it in one direction, just startDate or endDate can be provided with the other
+ * set to null.
+ * @param  {date} startDate The start date
+ * @param  {date} endDate   The end date
+ * @param  {boolean} noPadding (optional) True to not add padding at each end
+ */
 gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate, noPadding) {
    var newStartDate;
    var newEndDate;
@@ -660,9 +697,11 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate, noPadding) 
       newEndDate = new Date(endDate);
    }
 
+   // Set padding to equal 5% of the time difference between the startDate and endDate
    var padding = (newEndDate.getTime() - newStartDate.getTime()) * 0.05;
 
    if (!noPadding) {
+      // Add the padding to both ends or just one if only extending in one direction
       if (startDate !== null) {
          newStartDate = newStartDate.getTime() - padding;
       }
@@ -850,6 +889,10 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    gisportal.events.trigger('date.selected', params);
 };
 
+/**
+ * Show date in pikaday
+ * @param  {date} date The date to show
+ */
 gisportal.TimeLine.prototype.showDate = function(date) {
    // Convert date into UTC moment
    date = moment.utc(date);
@@ -864,6 +907,9 @@ gisportal.TimeLine.prototype.getDate = function() {
    return ((selectedDate instanceof Date) ? selectedDate : null);
 };
 
+/**
+ * Calculate and update the minDate and maxDate
+ */
 gisportal.TimeLine.prototype.updateMinMaxDate = function() {
    var dates = this.timebars.map(function(bar) {
       return [
@@ -880,6 +926,9 @@ gisportal.TimeLine.prototype.updateMinMaxDate = function() {
    this.maxDate = moment.utc(extent[1]).toDate();
 };
 
+/**
+ * Update pikaday bounds to the minDate and maxDate
+ */
 gisportal.TimeLine.prototype.updatePickerBounds = function() {
    var minDate;
    var maxDate;
@@ -893,6 +942,7 @@ gisportal.TimeLine.prototype.updatePickerBounds = function() {
       minDate = moment(minDate.toArray()).toDate();
       maxDate = moment(maxDate.toArray()).toDate();
    } else {
+      // If there are no timebars, remove the bounds
       minDate = null;
       maxDate = null;
    }
