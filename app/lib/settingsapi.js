@@ -296,8 +296,8 @@ function createDimensionsArray(layer) {
             }
          }
          if (newDates.length > 0) {
-            dimensions.firstDate = newDates[0].trim().substring(0, 10);
-            dimensions.lastDate = newDates[newDates.length - 1].trim().substring(0, 10);
+            dimensions.firstDate = newDates[0];
+            dimensions.lastDate = newDates[newDates.length - 1];
          }
          dimensionValue = newDates.join().trim();
       }
