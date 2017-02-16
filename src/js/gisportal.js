@@ -965,6 +965,8 @@ gisportal.loadState = function(state){
       return true;
    }
    gisportal.stopLoadState = true;
+   // Track when in the process of loading from state for setting up the timeline correctly
+   gisportal.loadingFromState = true;
    $('.start').toggleClass('hidden', true);
    cancelDraw();
    state = state || {};
@@ -1034,14 +1036,12 @@ gisportal.loadState = function(state){
       gisportal.loadLayersState = state.selectedLayers;
    }
 
-   gisportal.state_indicators_list = state.selectedIndicators;
-
    // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
-      if(!gisportal.state_indicators_list){
+      if(!state.selectedIndicators){
          return false;
       }
-      var index = gisportal.state_indicators_list.indexOf(id);
+      var index = state.selectedIndicators.indexOf(id);
       if(index > -1){
          // splice used because pop was not removing the correct value.
          if(state.selectedIndicators){
@@ -1050,6 +1050,10 @@ gisportal.loadState = function(state){
       }
       if(state.selectedIndicators && state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
+         if (gisportal.stateLoaded) {
+            // Finished loading from state
+            gisportal.loadingFromState = false;
+         }
       }
    });
    
@@ -1138,7 +1142,10 @@ gisportal.loadState = function(state){
    }
 
    gisportal.stateLoaded = true;
-
+   if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
+      // Finished loading from state
+      gisportal.loadingFromState = false;
+   }
 };
 
 gisportal.loadLayerState = function(){

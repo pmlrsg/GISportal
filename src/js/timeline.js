@@ -581,7 +581,7 @@ gisportal.TimeLine.prototype.redraw = function() {
 
    this.drawLabels();
 
-   if (this.timebars.length > 0) {
+   if (this.timebars.length > 0 && !gisportal.loadingFromState) {
       if (self.getDate() < moment.utc(self.minDate).startOf('day').toDate()) {
          self.setDate(self.minDate);
       }
@@ -689,7 +689,7 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
    this.updateMinMaxDate();
 
    // TODO: Move asap. tidy up
-   if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline)) {
+   if (gisportal.selectedLayers.length === 1 && (!gisportal.cache.state || !gisportal.cache.state.timeline) && !gisportal.loadingFromState) {
       this.reHeight();
       // redraw is done in zoom
       var data = this.layerbars[0];
@@ -797,7 +797,7 @@ gisportal.TimeLine.prototype.setDate = function(date) {
    gisportal.hideAllPopups();
    var self = this; // Useful for when the scope/meaning of "this" changes
 
-   if (this.timebars.length > 0) {
+   if (this.timebars.length > 0 && !gisportal.loadingFromState) {
       if (date < this.minDate) {
          date = this.minDate;
       } else if (date > this.maxDate) {
