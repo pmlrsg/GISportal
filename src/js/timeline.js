@@ -155,6 +155,17 @@ gisportal.TimeLine = function(id, options) {
       .on('zoom', function() {
          isDragging = true;
          self.redraw();
+      })
+      .on('zoomend', function(opts) {
+         var startDate = self.xScale.invert(0);
+         var endDate = self.xScale.invert(self.width);
+         var params = {
+            "event": "date.zoom",
+            "startDate": startDate,
+            "endDate": endDate,
+            "noPadding": true
+         };
+         gisportal.events.trigger('date.zoom', params);
       });
 
    // Append the svg and add a class before attaching both events.
@@ -634,7 +645,7 @@ gisportal.TimeLine.prototype.drawLabels = function() {
 };
 
 // Zoom function to a new date range
-gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
+gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate, noPadding) {
    var newStartDate;
    var newEndDate;
 
@@ -651,11 +662,13 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
 
    var padding = (newEndDate.getTime() - newStartDate.getTime()) * 0.05;
 
-   if (startDate !== null) {
-      newStartDate = newStartDate.getTime() - padding;
-   }
-   if (endDate !== null) {
-      newEndDate = newEndDate.getTime() + padding;
+   if (!noPadding) {
+      if (startDate !== null) {
+         newStartDate = newStartDate.getTime() - padding;
+      }
+      if (endDate !== null) {
+         newEndDate = newEndDate.getTime() + padding;
+      }
    }
 
    this.xScale.domain([newStartDate, newEndDate]).range([0, this.width]);
@@ -665,7 +678,8 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate) {
    var params = {
       "event": "date.zoom",
       "startDate": startDate,
-      "endDate": endDate
+      "endDate": endDate,
+      "noPadding": noPadding
    };
    gisportal.events.trigger('date.zoom', params);
 };

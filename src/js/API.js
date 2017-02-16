@@ -339,23 +339,30 @@ gisportal.api['date.selected'] = function(data, options){
 
  startDate: The start date you would like to zoom to
  endDate: The end date you would like to zoom to
+ noPadding: (optional) whether padding should be added at either side
   */
 gisportal.api['date.zoom'] = function(data, options){
 	options = options || {};
 	var startDate = new Date(data.startDate);
 	var endDate = new Date(data.endDate);
+   var noPadding = data.noPadding;
 
-	if(options.describeOnly){
-		return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
-	}
-	if(options.selectorOnly){
-		return '#timeline';
-	}
-	if(options.highlight){
-		collaboration.highlightElement($('#timeline'));
-	}
-   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-      gisportal.timeline.zoomDate(startDate, endDate);
+   var oldStartDate = gisportal.timeline.xScale.invert(0);
+   var oldEndDate = gisportal.timeline.xScale.invert(gisportal.timeline.width);
+
+   if (startDate.getTime() != oldStartDate.getTime() || endDate.getTime() != oldEndDate.getTime()) {
+      if (options.describeOnly) {
+         return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
+      }
+      if (options.selectorOnly) {
+         return '#timeline';
+      }
+      if (options.highlight) {
+         collaboration.highlightElement($('#timeline'));
+      }
+      if (gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0) {
+         gisportal.timeline.zoomDate(startDate, endDate, noPadding);
+      }
    }
 };
 
