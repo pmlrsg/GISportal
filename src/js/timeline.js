@@ -356,7 +356,7 @@ gisportal.TimeLine.getInstance = function() {
 
 gisportal.TimeLine.prototype.keydownListener = function(key) {
    var self = gisportal.TimeLine.getInstance();
-   if (document.activeElement.nodeName == "BODY" && !$('div.overlay').is(":visible")) {
+   if (document.activeElement.nodeName == "BODY" && !$('div.overlay').is(":visible") && !$('div.collab-overlay').is(":visible")) {
       var newDate = null;
       switch (key.keyCode) {
          case 37:
@@ -694,13 +694,17 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
       // redraw is done in zoom
       var data = this.layerbars[0];
 
+      this.zoomDate(data.startDate, data.endDate);
+
+      // Probably not needed now as zoomDate calls redraw which handles this
       if (!moment.utc(this.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))) {
          this.setDate(endDate);
       }
+   }
 
-      this.zoomDate(data.startDate, data.endDate);
-
+   if (!this.keydownListenerEnabled) {
       $(document).on('keydown', this.keydownListener);
+      this.keydownListenerEnabled = true;
    }
 
    this.reHeight();
@@ -777,6 +781,7 @@ gisportal.TimeLine.prototype.removeTimeBarByName = function(name) {
    var h = $('.timeline-container').height() + 10; // +10 for the padding
    if (this.timebars.length <= 0) {
       $(document).off('keydown', self.keydownListener);
+      this.keydownListenerEnabled = false;
       $('.timeline-container').css('bottom', '-1000px');
       h = 0;
    }
@@ -862,12 +867,21 @@ gisportal.TimeLine.prototype.updateMinMaxDate = function() {
 };
 
 gisportal.TimeLine.prototype.updatePickerBounds = function() {
-   // Convert dates into utc moments
-   var minDate = moment.utc(this.minDate);
-   var maxDate = moment.utc(this.maxDate);
-   // Now convert them into the correct local times
-   minDate = moment(minDate.toArray()).toDate();
-   maxDate = moment(maxDate.toArray()).toDate();
+   var minDate;
+   var maxDate;
+
+   if (this.timebars.length > 0) {
+      // Convert dates into utc moments
+      minDate = moment.utc(this.minDate);
+      maxDate = moment.utc(this.maxDate);
+
+      // Now convert them into the correct local times
+      minDate = moment(minDate.toArray()).toDate();
+      maxDate = moment(maxDate.toArray()).toDate();
+   } else {
+      minDate = null;
+      maxDate = null;
+   }
 
    $('.js-current-date')
       .pikaday('setMinDate', minDate)
