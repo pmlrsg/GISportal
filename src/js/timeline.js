@@ -673,7 +673,6 @@ gisportal.TimeLine.prototype.drawLabels = function() {
    }
 };
 
-// Zoom function to a new date range
 /**
  * Zoom the timebar to a date range.
  * To only update it in one direction, just startDate or endDate can be provided with the other
@@ -749,8 +748,8 @@ gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, e
 
       this.zoomDate(data.startDate, data.endDate);
 
-      // Probably not needed now as zoomDate calls redraw which handles this
       if (!moment.utc(this.getDate()).isBetween(moment.utc(startDate), moment.utc(endDate))) {
+         // If the date isn't between start and end (start and end excluded), move it to the end
          this.setDate(endDate);
       }
    }
