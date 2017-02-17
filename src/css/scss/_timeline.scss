@@ -112,6 +112,10 @@ svg {
    text-transform: capitalize;
 }
 
+.timeline .axis .tick {
+   cursor: pointer;
+}
+
 .timeline-next-prev {
    text-align: center;
    margin-bottom: 10px;

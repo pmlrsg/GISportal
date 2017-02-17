@@ -619,6 +619,13 @@ gisportal.TimeLine.prototype.redraw = function() {
 
    this.drawLabels();
 
+   d3.select('div#' + this.id + ' .axis')
+      .selectAll('.tick')
+      .on('click', function(d) {
+         d3.event.stopPropagation();
+         self.setDate(d);
+      });
+
    if (this.timebars.length > 0 && !gisportal.loadingFromState) {
       // If there is at least one timebar and loading from state isn't in progress
       // Move the selected date within the min and max date if it isn't
