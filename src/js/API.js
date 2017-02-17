@@ -341,17 +341,28 @@ gisportal.api['date.selected'] = function(data, options){
  endDate: The end date you would like to zoom to
  noPadding: (optional) whether padding should be added at either side
   */
-gisportal.api['date.zoom'] = function(data, options){
-	options = options || {};
-	var startDate = new Date(data.startDate);
-	var endDate = new Date(data.endDate);
-   var noPadding = data.noPadding;
-
+gisportal.api['date.zoom'] = function(data, options) {
+   options = options || {};
+   var startDate = null;
+   var endDate = null;
    var oldStartDate = gisportal.timeline.xScale.invert(0);
    var oldEndDate = gisportal.timeline.xScale.invert(gisportal.timeline.width);
 
-   if (startDate.getTime() != oldStartDate.getTime() || endDate.getTime() != oldEndDate.getTime()) {
+   if (data.startDate !== null) {
+      startDate = new Date(data.startDate);
+   }
+   if (data.endDate !== null) {
+      endDate = new Date(data.endDate);
+   }
+   var noPadding = data.noPadding;
+
+   if (startDate === null || endDate === null || startDate.getTime() != oldStartDate.getTime() || endDate.getTime() != oldEndDate.getTime()) {
       if (options.describeOnly) {
+         if (startDate === null) {
+            return "Date zoomed to " + moment.utc(oldStartDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
+         } else if (endDate === null) {
+            return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(oldEndDate).format('YYYY-MM-DD hh:mm');
+         }
          return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
       }
       if (options.selectorOnly) {
