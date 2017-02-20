@@ -115,20 +115,6 @@ getNearestInArray = function(arr, goal) {
 };
 
 /**
- * Turn JavaScript date, d into ISO8601 date part (no time)
- * @param {string} d - A date to turn into ISO8601 
- * @return {string} The ISO8601 date string
- */ 
-gisportal.utils.ISODateString = function(d) {
-   function pad(n){
-      return n<10 ? '0'+n : n;
-   }
-   // Add 1 to month as its zero based.
-   var datestring = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-   return datestring;
-};
-
-/**
  * Returns true if first date is smaller than second
  * so that it can be used as the comparasion operator
  * in sorts.
@@ -137,8 +123,8 @@ gisportal.utils.ISODateString = function(d) {
  * @param {string} secondDate - The second date
  */ 
 gisportal.utils.compareDates = function(firstDate, secondDate) { 
-   firstDate = gisportal.utils.ISODateString(firstDate);
-   secondDate = gisportal.utils.ISODateString(secondDate);
+   firstDate = firstDate.toISOString();
+   secondDate = secondDate.toISOString();
    if (firstDate < secondDate) return true;
    return false;
 };
