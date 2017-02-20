@@ -391,29 +391,6 @@ gisportal.checkNameUnique = function(layer, count) {
 };
 
 /**
- * Returns availability (boolean) of data for the given JavaScript date for all layers.
- * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
- * 
- * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
- * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
- */
-gisportal.allowedDays = function(thedate) {
-   var uidate = gisportal.utils.ISODateString(thedate);
-   // Filter the datetime array to see if it matches the date using jQuery grep utility
-   var filtArray = $.grep(gisportal.enabledDays, function(dt, i) {
-      var datePart = dt.substring(0, 10);
-      return (datePart == uidate);
-   });
-   // If the filtered array has members it has matched this day one or more times
-   if(filtArray.length > 0) {
-      return [true];
-   }
-   else {
-      return [false];
-   }
-};
-
-/**
  * Map function to re-generate the global date cache for selected layers.
  */
 gisportal.refreshDateCache = function() {
@@ -988,6 +965,8 @@ gisportal.loadState = function(state){
       return true;
    }
    gisportal.stopLoadState = true;
+   // Track when in the process of loading from state for setting up the timeline correctly
+   gisportal.loadingFromState = true;
    $('.start').toggleClass('hidden', true);
    cancelDraw();
    state = state || {};
@@ -1057,14 +1036,12 @@ gisportal.loadState = function(state){
       gisportal.loadLayersState = state.selectedLayers;
    }
 
-   gisportal.state_indicators_list = state.selectedIndicators;
-
    // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
-      if(!gisportal.state_indicators_list){
+      if(!state.selectedIndicators){
          return false;
       }
-      var index = gisportal.state_indicators_list.indexOf(id);
+      var index = state.selectedIndicators.indexOf(id);
       if(index > -1){
          // splice used because pop was not removing the correct value.
          if(state.selectedIndicators){
@@ -1073,6 +1050,10 @@ gisportal.loadState = function(state){
       }
       if(state.selectedIndicators && state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
+         if (gisportal.stateLoaded) {
+            // Finished loading from state
+            gisportal.loadingFromState = false;
+         }
       }
    });
    
@@ -1133,7 +1114,7 @@ gisportal.loadState = function(state){
    }
 
    if(state.geolocationFilter){
-      if(state.geolocationFilter.showGeolocationFilter){
+      if(state.geolocationFilter.showGeolocationFilter == "true" || state.geolocationFilter.showGeolocationFilter === true){
          $('.show-geocoder').trigger('click');
       }
       if(state.geolocationFilter.radiusVal){
@@ -1161,7 +1142,10 @@ gisportal.loadState = function(state){
    }
 
    gisportal.stateLoaded = true;
-
+   if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
+      // Finished loading from state
+      gisportal.loadingFromState = false;
+   }
 };
 
 gisportal.loadLayerState = function(){
@@ -1487,7 +1471,7 @@ gisportal.main = function() {
    // Compile Templates
    gisportal.loadTemplates(function(){
       
-      gisportal.initStart();
+      var autoLoad = gisportal.initStart();
 
       // Set up the map
       // any layer dependent code is called in a callback in mapInit
@@ -1538,6 +1522,8 @@ gisportal.main = function() {
       if(stateID !== null) {
          gisportal.ajaxState(stateID);
       }
+
+      autoLoad();
 
       collaboration.initDOM();
       // Replaces all .icon-svg with actual SVG elements,
@@ -1611,7 +1597,9 @@ gisportal.initStart = function()  {
    // Work out if we should skip the splash page
    // Should we auto resume ?
    // Do we have to show the T&C box first ?
-   var autoLoad = null;
+   var autoLoad = function() {
+      return true;
+   };
    if( gisportal.config.skipWelcomePage === true || gisportal.utils.getURLParameter('wms_url')){
       if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
          autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
@@ -1621,9 +1609,6 @@ gisportal.initStart = function()  {
    }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
       autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
    }
-
-   if( autoLoad !== null)
-      return setTimeout(autoLoad, 1000);
 
    // Splash page parameters
    var data = {
@@ -1675,6 +1660,7 @@ gisportal.initStart = function()  {
       }
 
    });
+   return autoLoad;
 };
 
 /**

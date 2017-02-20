@@ -1,0 +1,10 @@
+<div class="tooltip-next-previous">
+   <ul>
+      {{#each this}}
+         <li class="clearfix">
+            <span class="label">{{label}}</span>
+            <span class="date">{{date}}</span>
+         </li>
+      {{/each}}
+   </ul>
+</div>
