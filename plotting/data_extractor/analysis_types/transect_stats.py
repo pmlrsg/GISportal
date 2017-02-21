@@ -3,6 +3,7 @@ import datetime
 import netCDF4 as netCDF
 import numpy as np
 from extraction_utils import find_closest, getCoordinateVariable
+from math import radians, cos, sin, asin, sqrt
 try:
    from plotting.debug import debug
    from plotting.status import Plot_status, update_status
@@ -75,6 +76,9 @@ class TransectStats(object):
       lon_end = len(lon_var) - 1
       lon_offset = (lon_var[lon_end] - lon_var[0]) / lon_end
 
+      # Calculate the distance from the centre of a pixel to a corner
+      offset_distance = calculateDistance(0, 0, lat_offset, lon_offset) / 2
+
       self.start_time = time.clock()
       self.last_time = time.clock()
 
@@ -100,14 +104,24 @@ class TransectStats(object):
          if lat_index > lat_end:
             lat_index = lat_end
          if lon_index > lon_end:
-            lon_index = lat_end
+            lon_index = lon_end
 
+         # Calculate the distance from the desired point to the centre of the chosen pixel
+         distance_from_desired = calculateDistance(current_lat, current_lon, lat_var[lat_index], lon_var[lon_index])
 
-         if len(data_var.dimensions) == 4:
+         if distance_from_desired > offset_distance:
+            # If the distance is greater than the offset distance then something has gone wrong
+            # and the wrong pixel has been chosen.
+            # Set the value to NaN to avoid returning an incorrect result
+            data_value = float('nan')
+            if plotting:
+               debug(0, "Incorrect pixel selected! Selected pixel at {}, {} is too far from point at {}, {} ({}km). Setting value to NaN.".format(
+                  lat_var[lat_index], lon_var[lon_index], current_lat, current_lon, distance_from_desired))
+         elif len(data_var.dimensions) == 4:
             # If the file has a depth variable, use the first depth
-            data = data_var[time_index][0][lat_index][lon_index]
+            data_value = data_var[time_index][0][lat_index][lon_index]
          else:
-            data = data_var[time_index][lat_index][lon_index]
+            data_value = data_var[time_index][lat_index][lon_index]
 
 
          _ret = {}
@@ -123,7 +137,7 @@ class TransectStats(object):
 
          _ret['track_lat'] = row['Latitude']
          _ret['track_lon'] = row['Longitude']
-         _ret['data_value'] = float(data) if not np.isnan(float(data)) else "null"
+         _ret['data_value'] = float(data_value) if not np.isnan(float(data_value)) else "null"
          ret.append(_ret)
          if plotting and self.status_details:
             self.update_status(len(ret))
@@ -147,3 +161,18 @@ class TransectStats(object):
             minutes_remaining=minutes_remaining)
 
       debug(5, "Extracting: {}%".format(round(progress / float(self.numline) * 100, 3)))
+
+def calculateDistance(lat1, lon1, lat2, lon2):
+   """
+   Calculate the distance in kilometres between two points on the earth (specified in decimal degrees)
+   """
+   # convert decimal degrees to radians
+   lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+   # haversine formula
+   dlat = lat2 - lat1
+   dlon = lon2 - lon1
+   a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+   c = 2 * asin(sqrt(a))
+   r = 6371 # Radius of earth in kilometers. Use 3956 for miles
+   return c * r
