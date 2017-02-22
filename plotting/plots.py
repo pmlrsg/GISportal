@@ -1765,10 +1765,9 @@ def prepare_plot(request, outdir):
    If all looks OK it returns the hash to the caller, otherwise it returns an error.
    '''
 
-   # TODO Currently get issues as the JSON is not always in the same order so hash is different.
-
    hasher = hashlib.sha1()
-   hasher.update(json.dumps(request))
+   # Hash the json request, sorting keys to ensure it is always the same hash for the same request
+   hasher.update(json.dumps(request, sort_keys=True))
    my_hash = "{}".format(hasher.hexdigest())
    my_id = "{}{}".format(int(time.time()), os.getpid())
    plot = dict(
