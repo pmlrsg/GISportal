@@ -780,23 +780,25 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       }
       $('[data-id="' + indicator.id + '"] .js-icon-scalebar').toggleClass('hidden', false);
 
-      $('#tab-' + indicator.id + '-opacity').noUiSlider({
-         start: [ indicator.opacity * 100 ],
-         margin: 20,
-         connect: "lower",
-         range: {
-            'min': [   0 ],
-            'max': [ 100 ]
-         },
-         serialization: {
-            lower: [
-               $.Link({
-                  target: $('#tab-' + indicator.id + '-opacity-value'),
-                  method: setOpacityValue
-               })
-            ],
-         }
-      });
+      if($('#tab-' + indicator.id + '-opacity').length > 0){
+         $('#tab-' + indicator.id + '-opacity').noUiSlider({
+            start: [ indicator.opacity * 100 ],
+            margin: 20,
+            connect: "lower",
+            range: {
+               'min': [   0 ],
+               'max': [ 100 ]
+            },
+            serialization: {
+               lower: [
+                  $.Link({
+                     target: $('#tab-' + indicator.id + '-opacity-value'),
+                     method: setOpacityValue
+                  })
+               ],
+            }
+         });
+      }
 
       if($('#tab-' + indicator.id + '-colorbands').length > 0){
          $('#tab-' + indicator.id + '-colorbands').noUiSlider({
@@ -986,14 +988,14 @@ gisportal.indicatorsPanel.initialiseSliders = function(id) {
             clearInterval(interval);
          });
 
-         from.val(new Date(+val[0]).toISOString().substring(0, 10));
-         to.val(new Date(+val[1]).toISOString().substring(0, 10));
+         from.val(new Date(+val[0]).toISOString());
+         to.val(new Date(+val[1]).toISOString());
       });
    }
 };
 
 function setDate(value) {
-   $(this).val(new Date(+value).toISOString().substring(0, 10));
+   $(this).val(new Date(+value).toISOString());
 }
 
 gisportal.indicatorsPanel.removeIndicators = function(id) {

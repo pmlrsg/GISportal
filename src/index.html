@@ -10,6 +10,8 @@
 <!-- ================= Bokeh first so they don't ruin everything ================= -->
 <link href="//cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" rel="stylesheet" type="text/css">
 
+<link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
+
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/@@MODE" />
 
@@ -58,7 +60,6 @@
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
 
 <!-- Pikaday - data picker -->
-<link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
 <script type="text/javascript" src="js-libs/moment.js"></script>
 <script type="text/javascript" src="js-libs/pikaday/pikaday.js"></script>
 <script type="text/javascript" src="js-libs/pikaday/pikaday.jquery.js"></script>
@@ -178,7 +179,15 @@
       <div class="timeline-inner">
          <ul class="js-timeline-labels timeline-labels"></ul>
          <div id="timeline" class=""></div>
-         <input class="js-current-date current-date" type="input" />
+         <div class="timeline-date-options">
+            <div class="timeline-next-prev">
+               <span class="js-next-prev-date icon-filled-arrow-49 secondary" data-steps="-10"></span>
+               <span class="js-next-prev-date icon-filled-arrow-39 secondary" data-steps="-1"></span>
+               <span class="js-next-prev-date icon-filled-arrow-40 secondary" data-steps="1"></span>
+               <span class="js-next-prev-date icon-filled-arrow-50 secondary" data-steps="10"></span>
+            </div>
+            <input class="js-current-date current-date" type="text" />
+         </div>
       </div>
    </div>
 
@@ -326,7 +335,7 @@
          </div>
          <label for="share-map"></label>
          <button id="share-map" class="js-share brand secondary">
-            <span class="icon-filled-link icon-btn"> </span>
+            <span class="icon-filled-link"> </span>
             Share
          </button>
       </div>
