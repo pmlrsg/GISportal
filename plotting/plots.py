@@ -1918,6 +1918,9 @@ To execute a plot
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
 
+      # Add hash to debug
+      plotting.debug.plot_hash = my_hash
+
       # Setup logger
       logger.log_dir = opts.log_dir
       logger.plot_hash = my_hash
