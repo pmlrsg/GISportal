@@ -15,7 +15,7 @@ var utils = require('./utils.js');
 user.requiresValidUser = function(req, res, next) {
    var domain = utils.getDomainName(req);
    var level = user.getAccessLevel(req, domain);
-   if(!GLOBAL.config[domain] || !GLOBAL.config[domain].auth){
+   if(!global.config[domain] || !global.config[domain].auth){
       res.sendStatus(403);
       return;
    }
@@ -61,7 +61,7 @@ user.getAccessLevel = function(req, domain) {
       // there is a valid session so they are a logged in user
       level = "user";
       domain = domain || req.query.domain;
-      var config = GLOBAL.config[domain] || GLOBAL.config;
+      var config = global.config[domain] || global.config;
       // check to see if they are an admin
       var admins = config.admins;
       if(admins){

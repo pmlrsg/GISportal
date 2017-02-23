@@ -1,4 +1,4 @@
-GLOBAL.config['DOMAIN_NAME'] = {
+global.config['DOMAIN_NAME'] = {
    auth: {
       google: {
          scope : 'https://www.googleapis.com/auth/userinfo.email',

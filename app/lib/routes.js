@@ -16,7 +16,7 @@ router.get('/', function(req, res){
 router.get('/css/:mode', function(req, res) {
    var mode = req.params.mode;
    var domain = utils.getDomainName(req);
-   var config = GLOBAL.config[domain] || GLOBAL.config;
+   var config = global.config[domain] || global.config;
 
    var min = "";
 

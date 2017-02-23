@@ -1,4 +1,4 @@
-GLOBAL.config['127.0.0.1:6789'] = {
+global.config['127.0.0.1:6789'] = {
    auth: {
       google: {
          scope: 'https://www.googleapis.com/auth/userinfo.email',
