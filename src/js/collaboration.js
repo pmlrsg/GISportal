@@ -645,6 +645,7 @@ collaboration.joinRoom = function(roomId) {
 };
 
 collaboration.buildMembersList = function(data) {
+   var person = null;
    for(var people in data.people){
       person = data.people[people];
       if(!person.name || person.name === ""){
@@ -739,7 +740,7 @@ collaboration.buildMembersList = function(data) {
    var divergents = [];
    // Makes sure the presenter is not an option to be set as the presenter.
    for(var persons in data.people){
-      var person = data.people[persons];
+      person = data.people[persons];
       if(person.presenter){
          presenter = person.id;
       }

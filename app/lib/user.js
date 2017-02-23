@@ -57,7 +57,7 @@ user.requiresAdminUser = function(req, res, next) {
 user.getAccessLevel = function(req, domain) {
    var level = "guest";
 
-   if(typeof(req.session.passport.user) != 'undefined') {
+   if(req.session.passport && typeof(req.session.passport.user) != 'undefined') {
       // there is a valid session so they are a logged in user
       level = "user";
       domain = domain || req.query.domain;
@@ -84,7 +84,7 @@ user.getAccessLevel = function(req, domain) {
  */
 user.getUsername = function(req) {
    var username = "";
-   if(typeof(req.session.passport.user) != 'undefined') {
+   if(req.session.passport && typeof(req.session.passport.user) != 'undefined') {
       username = req.session.passport.user.emails[0].value;
    }
    return username;
