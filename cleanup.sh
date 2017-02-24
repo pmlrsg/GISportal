@@ -4,12 +4,16 @@
 #  that are created during the process of creating plots or user
 #  downloads. The `plottingDownloadDir` setting in config-server.js
 #  is the location where these temporary files are kept; if this is
-#  not set then /tmp is used instead
+#  not set then /tmp is used instead.
 #
-#  The script cleans out files more than 12 hours old if there is
-#  less than 90% disk usage, and files that are more than 1 hour old
-#  if there's more that 90% usage. If more than 90% of available
-#  disk space is used after the cleanup then a warning email is sent
+#  This script can also clean up old plot output files that are stored
+#  in html/plots.
+#
+#  The script cleans out netCDF files more than 12 hours old and plot
+#  output files more than 7 days old if there is less than 90% disk
+#  usage, and files that are more than 1 hour old if there's more
+#  than 90% usage. If more than 90% of available disk space is used
+#  after the cleanup then a warning email is sent.
 #
 #  It is recommended that this script is run frequently, say every
 #  15 minutes, as disk space can be consumed quickly if you have
@@ -27,9 +31,9 @@
 
 # The directory configured as the download location:
 DOWNLOAD_DIR="/tmp"
-# The directory of the portal installation
+# The directory of the portal installation (required for deleting old plots):
 PORTAL_DIR=""
-# Plots older than this will be deleted
+# Plots older than this will be deleted:
 MAX_PLOT_AGE="7d"
 
 # The email address to send alerts to:
