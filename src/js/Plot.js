@@ -901,7 +901,7 @@ gisportal.graphs.Plot = (function() {
 
       if (_new && this._components.length == 1) {
          var layer = gisportal.layers[this._components[0].indicator];
-         var times = gisportal.layers[layer.id].DTCache;
+         var times = _.uniq(gisportal.layers[layer.id].DTCache);
          var start = new Date(this.tBounds()[0]);
          var end = new Date(this.tBounds()[1]);
 
