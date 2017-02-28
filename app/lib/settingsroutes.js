@@ -13,7 +13,7 @@ var router = express.Router();
 
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
-var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io/node_modules/socket.io-client/socket.io.js";
+var SOCKETIO_FILE_PATH = CURRENT_PATH + "/../../node_modules/socket.io-client/socket.io.js";
 
 module.exports = router;
 
