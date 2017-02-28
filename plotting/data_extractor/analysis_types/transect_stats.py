@@ -98,7 +98,11 @@ class TransectStats(object):
             t_lon = current_lon - lon_var[0]
             lon_index = int(round(abs(t_lon / lon_offset)))
 
-         track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
+         try:
+            track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M:%S")
+         except ValueError:
+            track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
+
          time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
 
          if lat_index > lat_end:
