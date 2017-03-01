@@ -57,6 +57,8 @@ class TransectStats(object):
       times_sorted_indexes = np.argsort(times)
       times_sorted = np.sort(times)
 
+      average_time_interval = (times_sorted[-1] - times_sorted[0]) / len(set(times_sorted))
+
       lat_var = getCoordinateVariable(netcdf_file, "Lat")[:]
       lon_var = getCoordinateVariable(netcdf_file, "Lon")[:]
 
@@ -121,6 +123,8 @@ class TransectStats(object):
             if plotting:
                debug(0, "Incorrect pixel selected! Pixel at {:+07.3f}, {:+08.3f} is further than {:6.2f}km from point at {:+07.3f}, {:+08.3f} ({:8.2f}km). Setting {} value to NaN.".format(
                   lat_var[lat_index], lon_var[lon_index], offset_distance, current_lat, current_lon, distance_from_desired, self.variable))
+         elif abs(times[time_index] - track_date) > (2 * average_time_interval):
+            data_value = float('nan')
          elif len(data_var.dimensions) == 4:
             # If the file has a depth variable, use the first depth
             data_value = data_var[time_index][0][lat_index][lon_index]
