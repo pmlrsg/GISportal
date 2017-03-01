@@ -3,8 +3,12 @@ import sys
 
 # Set the default logging verbosity to lowest.
 verbosity = 0
+plot_hash = None
 
 def debug(level, msg):
    if verbosity >= level:
-      print(msg, file=sys.stderr)
+      if plot_hash:
+         print("{}: {}".format(plot_hash[:8], msg), file=sys.stderr)
+      else:
+         print(msg, file=sys.stderr)
 #END debug
