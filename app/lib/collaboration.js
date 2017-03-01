@@ -68,46 +68,45 @@ collaboration.init = function(io, app, config) {
             return 'no passport';
          }
 
+         if (!session.passport.user._json.image) {
+            session.destroy();
+            return 'no image';
+         }
+
          var emails = session.passport.user.emails;
 
          user.email = emails[0].value;
          user.name = session.passport.user.displayName;
          user.provider = session.passport.user.provider;
-         user.image = session.passport.user._json.picture;
+         user.image = session.passport.user._json.image.url;
+         user.imageIsDefault = session.passport.user._json.image.isDefault;
 
-         Jimp.read(user.image, function(err, image1){ // Gets the image file from the URL
-            if (!err){
-               Jimp.read(__dirname + "/../../html/img/google_default.jpg", function(err, image2){ // Gets the image file from the img folder
-                  if (!err){
-                     if(Jimp.distance(image1, image2) === 0){
-                        user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
-                        var roomId = socket.room;
-                        var person;
-                        client.get(roomId, function(err, obj) {
-                           if(!obj){
-                              return false;
-                           }
-                           var room = JSON.parse(obj);
-                           for(person in room.people){
-                              var this_person = room.people[person];
-                              if(this_person.email == user.email){
-                                 this_person.image = user.image;
-                              }
-                           }
-                           client.set(roomId, JSON.stringify(room), function(err){
-                              if(!err){
-                                 io.sockets.in(socket.room).emit('members.update', {
-                                    "roomId": socket.room,
-                                    "people": room.people
-                                 });
-                              }
-                           });
-                        });
-                     }
+         if (user.imageIsDefault) {
+            user.image = "https://s.gravatar.com/avatar/" + crypto.createHash('md5').update(user.email).digest('hex') + "?d=identicon";
+            var roomId = socket.room;
+            var person;
+            client.get(roomId, function(err, obj) {
+               if (!obj) {
+                  return false;
+               }
+               var room = JSON.parse(obj);
+               for (person in room.people) {
+                  var this_person = room.people[person];
+                  if (this_person.email == user.email) {
+                     this_person.image = user.image;
+                  }
+               }
+               client.set(roomId, JSON.stringify(room), function(err) {
+                  if (!err) {
+                     io.sockets.in(socket.room).emit('members.update', {
+                        "roomId": socket.room,
+                        "people": room.people
+                     });
                   }
                });
-            }
-         });
+            });
+         }
+
          client.lrange("people", 0, -1, function(err, obj) {
             if(!obj){
                return false;

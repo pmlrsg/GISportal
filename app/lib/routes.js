@@ -40,7 +40,7 @@ router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
    var userId = req._passport.session.user.id;
    var displayName = req._passport.session.user.displayName;
    var userEmail = req._passport.session.user.emails[0].value;
-   var userPicture = req._passport.session.user._json.picture;
+   var userPicture = req._passport.session.user._json.image.url;
    
    res.render('dashboard', {
       title: 'User Dashboard',
@@ -93,7 +93,7 @@ router.get('/app/user/authorised', function(req, res) {
 });
 
 router.get('/app/user/logout', function(req, res) {
-   req.session.passport = {};
+   req.session.destroy();
    res.sendStatus(200);
 });
 
