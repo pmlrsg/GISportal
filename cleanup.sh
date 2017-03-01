@@ -47,7 +47,7 @@ if [[ $PERCENT_FULL -ge 90 ]]; then
    # check to see if it made any difference
    NEW_PERCENT_FULL=$(df -h ${DOWNLOAD_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
    if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
-      echo "The disk on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
+      echo "${DOWNLOAD_DIR} on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
    fi
 fi
 
@@ -64,7 +64,7 @@ if [[ ! -z $PORTAL_DIR ]]; then
       # check to see if it made any difference
       NEW_PERCENT_FULL=$(df -h ${PLOT_DIR} | grep -o '[0-9]*[0-9]'% | sed s/%//)
       if [[ $NEW_PERCENT_FULL -ge 90 ]]; then
-         echo "The disk on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
+         echo "${PLOT_DIR} on `hostname` is currently at ${NEW_PERCENT_FULL}% even after running tmpwatch for files older that 1 hour. You need to do so something about this now" | mail -s "Diskspace on `hostname`" ${MAILTO}
       fi
    fi
 
