@@ -115,32 +115,11 @@ plottingApi.processCSV = function(req, res, next) {
             .pipe(csv())
             .on('data', function(data) {
                lineNumber++;
-               if (data.Date && data.Longitude && data.Latitude && data.data_point) {
-                  is_match_up = true;
-                  if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid()) {
-                     errorLines.push(lineNumber);
-                  } else {
-                     var longitude = parseFloat(data.Longitude);
-                     var latitude = parseFloat(data.Latitude);
-                     var geoJSON_data = {
-                        "type": "Feature",
-                        "properties": {
-                           "Date": data.Date,
-                           "Data Point": data.data_point,
-                           "Longitude": longitude.toFixed(3),
-                           "Latitude": latitude.toFixed(3)
-                        },
-                        "geometry": {
-                           "type": "Point",
-                           "coordinates": [longitude, latitude]
-                        }
-                     };
-                     featuresList.push(geoJSON_data);
-                  }
-               } else if (data.Date && data.Latitude && data.Longitude) {
+               if (data.Date && data.Latitude && data.Longitude) {
                   var longitude = parseFloat(data.Longitude);
                   var latitude = parseFloat(data.Latitude);
-                  if (!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() || isNaN(latitude) || isNaN(longitude)) {
+                  if ((!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() && !moment(data.Date, "DD/MM/YYYY HH:mm:ss", true).isValid()) ||
+                     isNaN(latitude) || isNaN(longitude)) {
                      errorLines.push(lineNumber);
                   } else {
                      var geoJSON_data = {
@@ -155,6 +134,10 @@ plottingApi.processCSV = function(req, res, next) {
                            "coordinates": [longitude, latitude]
                         }
                      };
+                     if (data.data_point) {
+                        is_match_up = true;
+                        geoJSON_data.properties["Data Point"] = data.data_point;
+                     }
                      featuresList.push(geoJSON_data);
                   }
                } else {
