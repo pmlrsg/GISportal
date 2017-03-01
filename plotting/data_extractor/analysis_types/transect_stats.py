@@ -119,8 +119,8 @@ class TransectStats(object):
             # Set the value to NaN to avoid returning an incorrect result
             data_value = float('nan')
             if plotting:
-               debug(0, "Incorrect pixel selected! Selected pixel at {}, {} is too far from point at {}, {} ({}km). Setting value to NaN.".format(
-                  lat_var[lat_index], lon_var[lon_index], current_lat, current_lon, distance_from_desired))
+               debug(0, "Incorrect pixel selected! Pixel at {:+07.3f}, {:+08.3f} is further than {:6.2f}km from point at {:+07.3f}, {:+08.3f} ({:8.2f}km). Setting {} value to NaN.".format(
+                  lat_var[lat_index], lon_var[lon_index], offset_distance, current_lat, current_lon, distance_from_desired, self.variable))
          elif len(data_var.dimensions) == 4:
             # If the file has a depth variable, use the first depth
             data_value = data_var[time_index][0][lat_index][lon_index]
