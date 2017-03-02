@@ -5,6 +5,7 @@ var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs-extra');
 var glob = require('glob');
 var path = require('path');
+var randomatic = require('randomatic');
 var request = require('request');
 var sha1 = require('sha1');
 var _ = require('underscore');
@@ -456,7 +457,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                if (err) {
                   return handleError(err);
                }
-               // Link the image in the hashdir (TODO replace with symlink if possible)
+               // Link the image in the hashdir (NOT symlink to avoid issues with simultaneous similar animations)
                fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
                   if (err) {
                      return handleError(err);
@@ -484,7 +485,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             } else {
                // If it doesn't exist, download to a temporary path for time stamping
                options.existing = false;
-               options.tempPath = path.join(options.dir, 'temp_' + options.filename);
+               options.tempPath = path.join(options.dir, 'temp_' + randomatic('aA0', 32) + '.png');
                makeRequest(options.tempPath);
             }
          } else {
