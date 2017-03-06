@@ -21,7 +21,10 @@ def get_transect_times(_csv):
 		dates = []
 		for row in data:
 			date = row['Date']
-			dates.append(datetime.datetime.strptime(date, '%d/%m/%Y %H:%M'))
+			try:
+				dates.append(datetime.datetime.strptime(date, '%d/%m/%Y %H:%M:%S'))
+			except ValueError:
+				dates.append(datetime.datetime.strptime(date, '%d/%m/%Y %H:%M'))
 	return "%s/%s" % (min(dates), max(dates))
 
 def getCsvDict(_csv):

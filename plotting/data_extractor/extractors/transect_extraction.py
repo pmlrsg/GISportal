@@ -167,7 +167,7 @@ class TransectExtractor(Extractor):
          last_slice_index = pre_range_slice_index
       if last_slice_index + 1 < len(time_slices):
          post_range_time_slice = datetime.strptime(time_slices[last_slice_index + 1], '%Y-%m-%dT%H:%M:%SZ')
-      slices_in_range.append(post_range_time_slice)
+         slices_in_range.append(post_range_time_slice)
 
       return slices_in_range
 
