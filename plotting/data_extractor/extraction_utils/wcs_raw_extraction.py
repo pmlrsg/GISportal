@@ -35,7 +35,7 @@ class WCSRawHelper(object):
 		params['version'] = '1.0.0'
 		params['Coverage'] = self.variable
 		if(self.depth):
-			params['depth'] = self.depth
+			params['Vertical'] = self.depth
 		if(not isinstance(self.dates, basestring)):
 			# Should join with '/'?
 			params['Time'] = urllib.quote_plus(','.join(self.dates))

@@ -171,9 +171,7 @@ def basic_scatter(dataset1, variable1, dataset2, variable2,):
                continue
          t_data1.append(data1[i])
          t_data2.append(data2[i])
-   print("-"*20)
-   print("t_data1 min = {}".format(np.min(t_data1)))
-   print("t_data2 min = {}".format(np.min(t_data2)))
+
    #time_data = gen_time_array()
    #print data1, data2, time_data
    zipped_data = zip(t_data1, t_data2, isotimes2)
