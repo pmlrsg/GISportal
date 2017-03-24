@@ -172,8 +172,6 @@ def basic_scatter(dataset1, variable1, dataset2, variable2,):
          t_data1.append(data1[i])
          t_data2.append(data2[i])
 
-   #time_data = gen_time_array()
-   #print data1, data2, time_data
    zipped_data = zip(t_data1, t_data2, isotimes2)
       
    #original.close()
@@ -218,11 +216,7 @@ def gen_data(time, times, maskedArray):
       mean = getMean(row)
       
       
-      #print date
-      #print mean
-      # if  np.isnan(mean) :
-      #    pass
-      # else:
+
       data.append(mean)
    return data
 
