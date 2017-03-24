@@ -2093,6 +2093,21 @@ gisportal.api['graphComponent.axisChange'] = function(data, options){
 	select_elem.val(value).trigger('click');
 };
 
+
+/*
+api call for changing the axis label text field
+*/
+gisportal.api['graphComponent.axisLabelChange'] = function(data, options){
+	options = options || {};
+	var index = data.index;
+	var value = data.value;
+
+	var tr_elem = $('.js-components tr:eq(' + index + ')');
+	var axis_label_input = tr_elem.find('input [type=text');
+	axis_label_input.val(value);
+	axis_label_input.trigger('unfocus');
+};
+
  /*
  'data' must contain the following:
 

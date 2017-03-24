@@ -13,7 +13,7 @@ import datetime
 """
 Performs a basic set of statistical functions on the provided data.
 """
-def basic(dataset, variable, irregular=False, original=None, filename="debugging_image"):
+def basic(dataset, variable, irregular=False, original=None, filename="debugging_image", isLog=False):
   
    if irregular:
       # current_app.logger.debug('irregular shape')
@@ -97,7 +97,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
          date = ''.join(times[i])
       mean = getMean(row)
       median = getMedian(row)
-      std = getStd(row)
+      std = getStd(row, isLog=isLog)
       min = getMin(row)
       max = getMax(row)
       
@@ -116,8 +116,12 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
 
 def basic_scatter(dataset1, variable1, dataset2, variable2,):
    
-   arr1 = np.ma.array(dataset1.variables[variable1][:])
-   arr2 = np.ma.array(dataset2.variables[variable2][:])
+
+   #.split('_split_')[0]
+   variable1_name = variable1.split('_split_')[0]
+   variable2_name = variable2.split('_split_')[0]
+   arr1 = np.ma.array(dataset1.variables[variable1_name][:])
+   arr2 = np.ma.array(dataset2.variables[variable2_name][:])
       #print arr
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
@@ -147,8 +151,8 @@ def basic_scatter(dataset1, variable1, dataset2, variable2,):
    isotimes2 = [(netCDF.num2date(x, time2.units, calendar='standard')).isoformat() for x in times2[:]]
    output = {}
    
-   units1 = getUnits(dataset1.variables[variable1])
-   units2 = getUnits(dataset2.variables[variable2])
+   units1 = getUnits(dataset1.variables[variable1_name])
+   units2 = getUnits(dataset2.variables[variable2_name])
    output['units1'] = units1
    output['units2'] = units2
    
@@ -160,9 +164,19 @@ def basic_scatter(dataset1, variable1, dataset2, variable2,):
    #max = getMax(maskedArray)
    data1 = gen_data(time1, times1, maskedArray1)
    data2 = gen_data(time2, times2, maskedArray2)
-   time_data = gen_time_array()
+   t_data1 = []
+   t_data2 = []
+   for i in range(min(len(data1), len(data2))):
+         if np.isnan(data1[i]) or np.isnan(data2[i]):
+               continue
+         t_data1.append(data1[i])
+         t_data2.append(data2[i])
+   print("-"*20)
+   print("t_data1 min = {}".format(np.min(t_data1)))
+   print("t_data2 min = {}".format(np.min(t_data2)))
+   #time_data = gen_time_array()
    #print data1, data2, time_data
-   zipped_data = zip(data1, data2, isotimes1)
+   zipped_data = zip(t_data1, t_data2, isotimes2)
       
    #original.close()
    return {'order' : [variable1, variable2, 'Time'], 'data' : zipped_data}
@@ -206,11 +220,12 @@ def gen_data(time, times, maskedArray):
       mean = getMean(row)
       
       
-      
-      if  np.isnan(mean) :
-         pass
-      else:
-         data.append(mean)
+      #print date
+      #print mean
+      # if  np.isnan(mean) :
+      #    pass
+      # else:
+      data.append(mean)
    return data
 
 def getHistogram(arr):
@@ -293,9 +308,11 @@ def getMean(arr):
 """
 Returns the std value from the provided array.
 """
-def getStd(arr):
-   return float(np.std(arr.compressed()))
-
+def getStd(arr, isLog=False):
+   if isLog:
+      return float(np.std(np.log10(arr.compressed())))
+   else:
+      return float(np.std(arr.compressed()))
 """
 Returns the minimum value from the provided array. 
 """

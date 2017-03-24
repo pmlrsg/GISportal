@@ -28,7 +28,7 @@ import zipfile
 import shutil
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
-from bokeh.models import LinearColorMapper, NumeralTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool
+from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool, ResizeTool
 from bokeh.resources import CSSResources
 from bokeh.embed import components
 
@@ -71,7 +71,30 @@ hovmoller_template = jinja2.Template("""
 
 <body>
 {{ script }}
-    {{ div }}
+<style>
+.plot_hov_legend {
+width:15% !important;
+height:600px !important;
+display:inline-block;
+margin-top:20px;
+}
+.plot_hov {
+width:80% !important;
+height:600px !important;
+display:inline-block;
+
+}
+.clear {
+      clear:both;
+}
+</style>
+<div class="plot_hov_legend">
+    {{ div_legend }}
+    </div>
+    <div class="plot_hov">
+    {{ div_plot }}
+    </div>
+    <div class="clear"></div>
 
 </body>
 
@@ -182,7 +205,7 @@ def plot_legend(min_val, max_val, colours, var_name, plot_units, log_plot):
    legend = figure(width=150, y_axis_type=legend_y_axis_type, y_range=legend_y_range)
                    
    # Set the y axis format so it does not default to scientific notation.
-   legend.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+   legend.yaxis[0].formatter = BasicTickFormatter()
    legend.yaxis.axis_label = u"{} {}".format(var_name, plot_units)
 
    legend.xaxis.visible = False
@@ -335,11 +358,11 @@ def extract(plot, outfile="image.html"):
 
 
     
-   plot_width = 800
+   plot_width = 1000
    plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Image extract - {}".format(plot_title))
+              title="Image extract - {}".format(plot_title), toolbar_location="right",toolbar_sticky=False)
    p.title_text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "10pt"
    p.yaxis.axis_label_text_font_size = "10pt"
@@ -350,13 +373,21 @@ def extract(plot, outfile="image.html"):
    p.image_rgba(image=[img], x=[min_x], y=[min_y], dw=[max_x-min_x], dh=[max_y-min_y])
    
    p.add_tools(CrosshairTool())
+   p.add_tools(ResizeTool())
+
+
 
    #TODO This should be in the wrapper
-   
-   output_file(outfile, title="Image Extract")
-   layout = hplot(legend, p)
-   save(layout)
-   return(p)
+   script, div = components({'geographic':p, 'legend': legend})
+
+   if plotting.debug.verbosity > 0:
+      output_file(outfile, 'Geographic Extract')
+      save(hplot)
+   else:
+      with open(outfile, 'w') as ofile:
+         print(hovmoller_template.render(script=script,  div_legend=div['legend'], div_plot=div['geographic']), file=ofile)
+   return(1)
+
 #END extract
 
 def hovmoller(plot, outfile="image.html"):
@@ -512,13 +543,14 @@ def hovmoller(plot, outfile="image.html"):
             view[_i, j, 2] = my_palette[p_index+2]
             view[_i, j, 3] = 255
 
-   plot_width = 800
-   p = figure(width=plot_width, x_range=(min_x, max_x), y_range=(min_y, max_y), 
+   plot_width = 1000
+   plot_height = 600
+   p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Hovmoller - {}".format(plot_title), responsive=True)
+              title="Hovmoller - {}".format(plot_title), responsive=True, toolbar_location="above",toolbar_sticky=False)
    p.title_text_font_size = "14pt"
-   p.xaxis.axis_label_text_font_size = "10pt"
-   p.yaxis.axis_label_text_font_size = "10pt"
+   p.xaxis.axis_label_text_font_size = "12pt"
+   p.yaxis.axis_label_text_font_size = "12pt"
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
    
@@ -529,14 +561,15 @@ def hovmoller(plot, outfile="image.html"):
 
    #TODO This should be in the wrapper
    script, div = components({'hovmoller':p, 'legend': legend})
-   #with open(outfile, 'w') as output_file:
-      #print(hovmoller_template.render(script=script, div=div), file=output_file)
-   
-   output_file(outfile, title="Hovmoller example")
-   layout = hplot(legend, p)
-   save(layout)
-   return(p)
-#END hovmoller
+
+   if plotting.debug.verbosity > 0:
+      output_file(outfile, 'Hovmoller')
+      save(hplot)
+   else:
+      with open(outfile, 'w') as ofile:
+         print(hovmoller_template.render(script=script,  div_legend=div['legend'], div_plot=div['hovmoller']), file=ofile)
+   return(1)
+   #END hovmoller
 
 def transect(plot, outfile="transect.html"):
 
@@ -661,7 +694,7 @@ def transect(plot, outfile="transect.html"):
       # Set up the axis label here as it writes to all y axes so overwrites the right hand one
       # if we run it later.
       debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
-      ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+      ts_plot.yaxis[0].formatter = BasicTickFormatter()
       ts_plot.yaxis.axis_label = plot['y1Axis']['label']
       if ymin[0] != ymax[0]:
          ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
@@ -813,7 +846,7 @@ def matchup(plot, outfile="matchup.html"):
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
-   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+   ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
       ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
@@ -913,8 +946,8 @@ def timeseries(plot, outfile="time.html"):
       max_value = np.amax(data[varindex['mean']].astype(np.float64))
       buffer_value = (max_value - min_value) /20
       debug(4, u"min_mean: {}, max_mean:{}".format(min_value,max_value))
-      ymin.append(min_value - buffer_value)
-      ymax.append(max_value + buffer_value)
+      ymin.append(min_value)# - buffer_value)
+      ymax.append(max_value)# + buffer_value)
       debug(4, u"ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
 
       date = datetime(data[varindex['date']])
@@ -969,11 +1002,11 @@ def timeseries(plot, outfile="time.html"):
    shutil.rmtree(csv_dir)
 
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True
+              height=400, responsive=True, toolbar_location="above",toolbar_sticky=False
    )
    ts_plot.title_text_font_size = "14pt"
-   ts_plot.xaxis.axis_label_text_font_size = "10pt"
-   ts_plot.yaxis.axis_label_text_font_size = "10pt"
+   ts_plot.xaxis.axis_label_text_font_size = "12pt"
+   ts_plot.yaxis.axis_label_text_font_size = "12pt"
    
    tooltips = [("Date", "@sdate")]
    tooltips.append(("Mean", "@mean{0.000}"))
@@ -988,9 +1021,10 @@ def timeseries(plot, outfile="time.html"):
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,u"timeseries: y1Axis = {}".format(plot['y1Axis']['label']))
-   ts_plot.yaxis[0].formatter = NumeralTickFormatter(format="0.000")
+   ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
+      #pass
       ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
@@ -1001,10 +1035,11 @@ def timeseries(plot, outfile="time.html"):
          # Setting the second y axis range name and range
          yrange[1] = "y2"
          if ymin[1] != ymax[1]:
+            #pass
             ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
    
          # Adding the second axis to the plot.  
-         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
+         ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label'],axis_label_text_font_size = "12pt",formatter=BasicTickFormatter()), 'right')
    
       if 'min' in datasource and len(sources) == 1:
          debug(2, u"Plotting min/max for {}".format(plot_data[i]['coverage']))
@@ -1018,7 +1053,8 @@ def timeseries(plot, outfile="time.html"):
       y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       # Plot the mean as line
       debug(2, u"Plotting mean line for {}".format(plot_data[i]['coverage']))
-      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['coverage']), source=source)
+      yaxis_key = 'y'+str(plot_data[i]['yaxis'])+'Axis'
+      ts_plot.line('date', 'mean', y_range_name=y_range_name, color=plot_palette[i][1], legend='Mean {}'.format(plot_data[i]['userLabel']), source=source)
 
       # as a point
       debug(2, u"Plotting mean points for {}".format(plot_data[i]['coverage']))
@@ -1069,9 +1105,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    cov_meta = plot_data[0]['cov_meta']
    xVar = cov_meta['x']['coverage']
    yVar = cov_meta['y']['coverage']
+   xVarID = cov_meta['x']['layer_id']
+   yVarID = cov_meta['y']['layer_id']
 
-   xData = [x[varindex[xVar]] for x in df]
-   yData = [x[varindex[yVar]] for x in df]
+   xData = [x[varindex[xVar+'_split_'+xVarID]] for x in df]
+   yData = [x[varindex[yVar+'_split_'+yVarID]] for x in df]
    dateData = [x[varindex['Time']] for x in df]
 
    #df1 = plot_data[0]
@@ -1080,12 +1118,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    # Create a dict to hold index into the array for each item
    # df1 = x df2 = y
    data1 = np.array(xData)
-   #data1 = np.transpose(dfarray1[np.argsort(dfarray1[:,0])])
+
       
    date = datetime(dateData)
 
    data2 = np.array(yData)
-   #data2 = np.transpose(dfarray2[np.argsort(dfarray2[:,0])])
       
    csv_dir = dir_name + "/" + my_hash
 
@@ -1097,13 +1134,14 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       else:
          raise
 
-   csv_file1 = csv_dir + "/" + cov_meta['x']['coverage'] + ".csv"
+   csv_file1 = csv_dir + "/" + xVar+'_split_'+xVarID + ".csv"
    np.savetxt(csv_file1, np.transpose(data1), comments='', header="data", fmt="%s",delimiter=",")
-   csv_file2 = csv_dir + "/" + cov_meta['y']['coverage'] + ".csv"
+   csv_file2 = csv_dir + "/" + yVar+'_split_'+yVarID + ".csv"
+
    np.savetxt(csv_file2, np.transpose(data2), comments='', header="data", fmt="%s",delimiter=",")
    with zipfile.ZipFile(csv_dir+".zip", mode='w') as zf:
-      zf.write(csv_file1, arcname=cov_meta['x']['coverage'] + ".csv")
-      zf.write(csv_file2, arcname=cov_meta['x']['coverage'] + ".csv")
+      zf.write(csv_file1, arcname=xVar+'_split_'+xVarID + ".csv")
+      zf.write(csv_file2, arcname=yVar+'_split_'+yVarID + ".csv")
       debug(3, u"ZIP: {}".format(zf.namelist()))
 
    shutil.rmtree(csv_dir)
@@ -1133,10 +1171,13 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       y_axis_type=plot['y1Axis']['scale'], 
       width=800,
       height=400,
-      responsive=True)
+      responsive=True,
+      toolbar_location="above",
+      toolbar_sticky=False)
+      
    scatter_plot.title_text_font_size = "14pt"
-   scatter_plot.xaxis.axis_label_text_font_size = "10pt"
-   scatter_plot.yaxis.axis_label_text_font_size = "10pt"
+   scatter_plot.xaxis.axis_label_text_font_size = "12pt"
+   scatter_plot.yaxis.axis_label_text_font_size = "12pt"
 
    # If we had bokeh version 0.12 we could do this
    #mytext = Label(x=70, y=70, text='r-value: {}'.format(r_value))
@@ -1147,13 +1188,14 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    
    # Plot the regression line using default style.
    reg_line = scatter_plot.line(x=regression_x, y=regression_y)
+   print("added regression line")
       
    # Set up the hover tooltips for the points and lines.
    point_hover = HoverTool(
       tooltips=[
          ("Date", "@sdate"),
-         (cov_meta['x']['coverage'], "@x{0.000}"),
-         (cov_meta['y']['coverage'], "@y{0.000}")
+         ( plot['xAxis']['userLabel'], "@x{0.000}"),
+         (plot['y1Axis']['userLabel'], "@y{0.000}")
       ],
          renderers=[points]
    )
@@ -1163,7 +1205,16 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       renderers=[reg_line],
       line_policy='interp'
    )
+   _slope, _intercept, _, _, _ = stats.linregress(data1, data1)
+   _regr_f = np.poly1d([_slope, _intercept])
+   _regression_x = [data1.min(), data1.max()+((data1.max()/100)*5)]
+   _regression_y = [_regr_f(_regression_x[0]), _regr_f(_regression_x[1])]
 
+   if xVar == yVar:
+      reg_line_1_1 = scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
+   r_squared_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="R^2 : {:04.3f}".format(r_value**2))
+   intercept_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Intercept: {:04.3f}".format(intercept))
+   slope_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Slope: {:04.3f}".format(slope))
    # Set up the hover tools in this order so the point hover is on top of the line.
    scatter_plot.add_tools(line_hover)
    scatter_plot.add_tools(point_hover)
@@ -1179,10 +1230,19 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    scatter_plot.legend.location = "top_left"
    
    # plot the points
-   output_file(outfile, 'Scatter Plot')
+   #output_file(outfile, 'Scatter Plot')
+   script, div = components(scatter_plot)
+
+   if plotting.debug.verbosity > 0:
+      output_file(outfile, 'Scatter Plot')
+      save(scatter_plot)
+   else:
+      with open(outfile, 'w') as ofile:
+         print(template.render(script=script, div=div), file=ofile)
    
-   save(scatter_plot)
-   return(scatter_plot)
+   
+   #save(ts_plot)
+   return(1)
 #END scatter
 
 
@@ -1275,26 +1335,26 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
 
    source = ColumnDataSource(data=datasource)
    #print(source)
-   scatter_plot = figure(
+   match_scatter_plot = figure(
       title=plot_title, logo=None,
       x_axis_type=plot['xAxis']['scale'], 
       y_axis_type=plot['xAxis']['scale'], 
       width=800,
       height=400,
       responsive=True)
-   scatter_plot.title_text_font_size = "14pt"
-   scatter_plot.xaxis.axis_label_text_font_size = "14pt"
-   scatter_plot.yaxis.axis_label_text_font_size = "14pt"
+   match_scatter_plot.title_text_font_size = "14pt"
+   match_scatter_plot.xaxis.axis_label_text_font_size = "14pt"
+   match_scatter_plot.yaxis.axis_label_text_font_size = "14pt"
 
    # If we had bokeh version 0.12 we could do this
    #mytext = Label(x=70, y=70, text='r-value: {}'.format(r_value))
    #scatter_plot.add_layout(mytext)
 
    # Plot the points of the scatter.
-   points = scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
+   points = match_scatter_plot.circle('x','y', color=plot_palette[0][2], size=10, fill_alpha=.5, line_alpha=0, source=source)
    
    # Plot the regression line using default style.
-   reg_line = scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend=logText + cov_name)
+   reg_line = match_scatter_plot.line(x=regression_x, y=regression_y, line_color="blue", legend=logText + cov_name)
 
 
 
@@ -1305,10 +1365,10 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    _regression_x = [data1.min(), data1.max()+((data1.max()/100)*5)]
    _regression_y = [_regr_f(_regression_x[0]), _regr_f(_regression_x[1])]
 
-   reg_line_1_1 = scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
-   r_squared_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="R^2 : {:04.3f}".format(r_value**2))
-   intercept_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Intercept: {:04.3f}".format(intercept))
-   slope_dummy = scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Slope: {:04.3f}".format(slope))
+   reg_line_1_1 = match_scatter_plot.line(x=_regression_x, y=_regression_y, line_color="black",line_dash=[4, 4], legend="1:1 line")
+   r_squared_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="R^2 : {:04.3f}".format(r_value**2))
+   intercept_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Intercept: {:04.3f}".format(intercept))
+   slope_dummy = match_scatter_plot.line(x=[], y=[], line_color="white",line_dash=[4], legend="Slope: {:04.3f}".format(slope))
    # Set up the hover tooltips for the points and lines.
    point_hover = HoverTool(
       tooltips=[
@@ -1326,24 +1386,36 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    )
 
    # Set up the hover tools in this order so the point hover is on top of the line.
-   scatter_plot.add_tools(line_hover)
-   scatter_plot.add_tools(point_hover)
+   match_scatter_plot.add_tools(line_hover)
+   match_scatter_plot.add_tools(point_hover)
 
-   scatter_plot.xaxis.axis_label = logText+"values provided in matchup CSV"
+   match_scatter_plot.xaxis.axis_label = logText+"values provided in matchup CSV"
    
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
-   scatter_plot.yaxis.axis_label = logText+plot['y1Axis']['label']
+   match_scatter_plot.yaxis.axis_label = logText+plot['y1Axis']['label']
    
    # Legend placement needs to be after the first glyph set up.
    # Cannot place legend outside plot.
-   scatter_plot.legend.location = "top_left"
+   match_scatter_plot.legend.location = "top_left"
    
    # plot the points
-   output_file(outfile, 'Scatter Plot')
+#    output_file(outfile, 'Scatter Plot')
    
-   save(scatter_plot)
-   return(scatter_plot)
+#    save(scatter_plot)
+#    return(scatter_plot)
+   script, div = components(match_scatter_plot)
+
+   if plotting.debug.verbosity > 0:
+      output_file(outfile, 'Matchup Scatter')
+      #save(hplot)
+   else:
+      with open(outfile, 'w') as ofile:
+         print(template.render(script=script,  div=div), file=ofile)
+
+
+   
+   return(1)
 
 #END scatter_matchup
 
@@ -1526,18 +1598,22 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
    elif plot_type in ("timeseries"):
       #Can have more than 1 series so need a loop.
       for s in series:
+         isLog = False
          ds = s['data_source']
          yaxis = s['yAxis']
          if yaxis == 1:
             scale = json_request['plot']['y1Axis']['scale']
          else:
             scale = json_request['plot']['y2Axis']['scale']
+         if scale == 'log':
+            isLog = True
          depth = None
          if 'depth' in ds:
             depth = ds['depth']
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
          bbox = ds['bbox']
+         userLabel = s['userLabel']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
          data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
@@ -1549,7 +1625,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             else:
                extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
-            ts_stats = BasicStats(extract, coverage)
+            ts_stats = BasicStats(extract, coverage, isLog)
             response = json.loads(ts_stats.process())
          except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
@@ -1571,7 +1647,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
     
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df, userLabel=userLabel))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
@@ -1587,6 +1663,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             actual_axis = "x"
          coverage = ds['coverage']
          wcs_url = ds['threddsUrl']
+         layerId = ds['layer_id']
          bbox = ds['bbox']
          depth = None
          if 'depth' in ds:
@@ -1597,6 +1674,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          t_holder[actual_axis]['wcs_url'] = wcs_url
          t_holder[actual_axis]['bbox'] = bbox
          t_holder[actual_axis]['time_bounds'] = time_bounds
+         t_holder[actual_axis]['layer_id'] = layerId
+
          #print(t_holder)
          try:
             if irregular:
@@ -1605,7 +1684,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             else:
                extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
-            scatter_stats_holder[coverage] = extract
+            scatter_stats_holder[coverage+'_split_'+layerId] = extract
+            debug(2, u"scatter_stats_holder.extract : {}".format(extract))
          except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])

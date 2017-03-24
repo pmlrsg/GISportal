@@ -593,6 +593,12 @@ gisportal.events.bind('graphComponent.axisChange', function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+gisportal.events.bind('graphComponent.axisLabelChange', function(events, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 gisportal.events.bind('graph.open', function(event, data) {
    var new_data = _.clone(data);
    new_data.collabLog = true;

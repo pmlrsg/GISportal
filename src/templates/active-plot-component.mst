@@ -16,6 +16,10 @@
          <option value="1" {{selected "1" yAxis}}>{{xText}}</option>
          <option value="2" {{selected "2" yAxis}}>{{yText}}</option>
       </select>
+      <br>
+      <b>Axis Label :</b>
+      <br>
+      <input type="text" value="{{userLabel}}" class="axis_label_input" />
 	</td>
 	<td>
 		<div class=" icon-data"></div>

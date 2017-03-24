@@ -18,6 +18,7 @@ class ScatterStats(object):
 		netcdf_file1 = netCDF.Dataset(self.filename1, "r")
 		netcdf_file2 = netCDF.Dataset(self.filename2, "r")
 
+		#return json.dumps(basic_scatter(netcdf_file1, self.variable1.split('_split_')[0], netcdf_file2, self.variable2.split('_split_')[0]))
 		return json.dumps(basic_scatter(netcdf_file1, self.variable1, netcdf_file2, self.variable2))
 
 

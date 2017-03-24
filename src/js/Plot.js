@@ -273,13 +273,15 @@ gisportal.graphs.Plot = (function() {
       var leftHandSideComoponents = this._components.filter(function(component) {
          return component.yAxis == 1;
       });
-
+      // holder for the user label
+      var userLabel = '';
       if (leftHandSideComoponents.length > 0) {
          // Using the left of left Y axis components build
          // axis names including the elevation and provider
          var yAxis1Label = leftHandSideComoponents.map(function(component) {
             var indicator = gisportal.layers[component.indicator];
-            var output = indicator.name;
+            userLabel = component.userLabel;
+            var output =  userLabel;
             if ('elevation' in component)
                output += ' Elv:' + component.elevation + 'M';
             if (indicator.units)
@@ -293,6 +295,7 @@ gisportal.graphs.Plot = (function() {
          y1Axis = {
             "scale": y1AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label": yAxis1Label,
+            "userLabel": userLabel,
             "ticks": "auto",
             "weight": "auto",
             "tickFormat": "auto"
@@ -308,13 +311,15 @@ gisportal.graphs.Plot = (function() {
       var rightHandSideComoponents = this._components.filter(function(component) {
          return component.yAxis == 2;
       });
-
+      // holder for user label
+      var userLabel2 = '';
       if (rightHandSideComoponents.length > 0) {
          // Using the left of left Y axis components build
          // axis names including the elevation and provider
          var yAxis2Label = rightHandSideComoponents.map(function(component) {
             var indicator = gisportal.layers[component.indicator];
-            var output = indicator.name;
+            userLabel2 = component.userLabel;
+            var output = userLabel2;
             if ('elevation' in component)
                output += ' Elv:' + component.elevation + 'M';
             if (indicator.units)
@@ -328,6 +333,7 @@ gisportal.graphs.Plot = (function() {
          var y2Axis = {
             "scale": y2AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label": yAxis2Label,
+            "userLabel": userLabel2,
             "ticks": "auto",
             "weight": "auto",
             "tickFormat": "auto"
@@ -431,6 +437,7 @@ gisportal.graphs.Plot = (function() {
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": yAxis,
+            "userLabel" : component.userLabel,
             "type": "line",
             "meta": meta
                //"logo": gisportal.middlewarePath + "/" + logo
@@ -816,6 +823,15 @@ gisportal.graphs.Plot = (function() {
 
 
       return this;
+   };
+   
+   // this is called everytime label changes for future use
+   Plot.prototype.checkAxisLabels = function() {
+         var components = this._components;
+         if (components.length >= 2) {
+            var indicator1 = gisportal.layers[components[0].indicator];
+            var indicator2 = gisportal.layers[components[1].indicator];
+         }
    };
 
    // This function makes sure that the daterange ranges or the component fits within the input box values

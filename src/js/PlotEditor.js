@@ -198,7 +198,7 @@ gisportal.graphs.PlotEditor = (function(){
     * @param {Object} component Component to add
     */
    PlotEditor.prototype.addComponent = function( component ){
-
+         
       var result = this.plot().addComponent( component );
 
       if (!(result instanceof Error) && component.bbox.substr(0,7) == 'POLYGON') {
@@ -518,6 +518,9 @@ gisportal.graphs.PlotEditor = (function(){
       this.plot().on('tBounds-change', function() {
          _this.updateDateRangeSliderTBounds();
       });
+      this.plot().on('component-label-change', function(params){
+         _this.plot().checkAxisLabels(params);   
+      });
    };
 
    /**
@@ -543,6 +546,8 @@ gisportal.graphs.PlotEditor = (function(){
 
          var componentCopy = _.clone(component);
          componentCopy.indicatorObj = gisportal.layers[componentCopy.indicator];
+         componentCopy.userLabel = componentCopy.userLabel || gisportal.layers[componentCopy.indicator].descriptiveName;
+         component.userLabel = componentCopy.userLabel || gisportal.layers[componentCopy.indicator].descriptiveName;
          var rendered = gisportal.templates['active-plot-component']( componentCopy );
          var element = $(rendered).data('component', component);
 
@@ -576,6 +581,20 @@ gisportal.graphs.PlotEditor = (function(){
                "value": value
             };
             gisportal.events.trigger('graphComponent.axisChange', params);
+         });
+
+         // trigger callback for unfocus on axs label
+         element.on('blur', '.axis_label_input', function(){
+            component.userLabel = value = $(this).val();
+            var tableIndex = $(this).closest('tr').index();
+            var params = {
+                  "event": "graphComponent.axisLabelChange",
+                  "index": tableIndex,
+                  "value": value
+            };
+            gisportal.events.trigger('graphComponent.axisLabelChange', params);
+            _this.plot().emit('component-label-change', params);
+            
          });
 
          // The tooltip which tells the user about the range of available data
