@@ -211,6 +211,7 @@ gisportal.graphs.Plot = (function() {
          var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
          var borders = $('#select-country-borders').data('ddslick').selectedData.value;
          if (gisportal.baseLayers[baseMap] &&
+            gisportal.baseLayers[baseMap].getSource().getUrls() &&
             gisportal.baseLayers[baseMap].getSource().getUrls().length === 1 &&
             gisportal.baseLayers[baseMap].getSource().getParams) {
             plotRequest.baseMap = {
