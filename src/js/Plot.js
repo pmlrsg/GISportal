@@ -210,12 +210,18 @@ gisportal.graphs.Plot = (function() {
          plotRequest.framerate = this._animationFramerate;
          var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
          var borders = $('#select-country-borders').data('ddslick').selectedData.value;
-         plotRequest.baseMap = {
-            wmsUrl: gisportal.baseLayers[baseMap].getSource().getUrls()[0],
-            wmsParams: gisportal.baseLayers[baseMap].getSource().getParams()
-         };
-         if (plotRequest.baseMap.wmsParams.t) {
-            delete plotRequest.baseMap.wmsParams.t;
+         if (gisportal.baseLayers[baseMap] &&
+            gisportal.baseLayers[baseMap].getSource().getUrls().length === 1 &&
+            gisportal.baseLayers[baseMap].getSource().getParams) {
+            plotRequest.baseMap = {
+               wmsUrl: gisportal.baseLayers[baseMap].getSource().getUrls()[0],
+               wmsParams: gisportal.baseLayers[baseMap].getSource().getParams()
+            };
+            if (plotRequest.baseMap.wmsParams.t) {
+               delete plotRequest.baseMap.wmsParams.t;
+            }
+         } else if (baseMap !== 'none'){
+            $.notify('Animations are not compatible with this basemap, no basemap will be used.', 'error');
          }
          if (borders != "0") {
             plotRequest.countryBorders = {
