@@ -20,21 +20,20 @@ var app = express();
 
 // Set the settings
 // Load global-config-server.js
+if (!fs.existsSync('./config/global-config-server.js')) {
+   fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
+}
+
 try {
    require('./config/global-config-server.js');
 } catch (e) {
-   try {
-      fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
-      require('./config/global-config-server.js');
-   } catch (e) {
       console.log('Failed to load the global server config.');
       console.log('');
       console.log('If this is a new installation you should run ./install.sh to create your configurations.');
       console.log('');
       console.log('Exiting application, bye   o/');
       console.log('');
-      process.exit();
-   }
+      process.exit(1);
 }
 
 // Load or create the site_settings folder
