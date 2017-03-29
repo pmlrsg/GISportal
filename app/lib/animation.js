@@ -658,31 +658,34 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          maxWebMBitrate = '45M';
       }
 
-      // Setup the renderer with the map and data layer inputs
+      // Setup the renderer
       var renderer = ffmpeg();
 
       if (mapOptions) {
+         // If map, add the map input
          renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
       }
 
+      // Add the data input
       renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (bordersOptions) {
+         // If borders, add the borders input
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
             .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
       }
 
       if (mapOptions && bordersOptions) {
-         // If borders then setup the borders input and complex filter
-         renderer = renderer
-            .complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
+         // If map and borders
+         renderer = renderer.complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
       } else if (mapOptions || bordersOptions) {
-         // Else just setup the complex filter
+         // If map or borders
          renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
       } else {
+         // Else just the data layer
          renderer = renderer.complexFilter('split=2[out1][out2]');
       }
 
