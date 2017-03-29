@@ -9,7 +9,7 @@ var expect = chai.expect;
 var animation = require(global.test.appPath + '/app/lib/animation.js');
 
 describe('animation', function() {
-   var testHash = 'e5f991c76bd84a354a6f23870eb6d74886d62bf6';
+   var testHash = 'cd1ae320a55777f114ee6177bd409728c0954716';
    var _hash = null;
    var plotDir = global.test.appPath + '/html/plots/';
 
@@ -19,7 +19,7 @@ describe('animation', function() {
    });
 
    it('should return the correct hash for a request', function(done) {
-      var request = JSON.parse(fs.readFileSync(global.test.dependPath + '/resources/plotting/animation/e5f991c76bd84a354a6f23870eb6d74886d62bf6-request.json', 'utf8'));
+      var request = JSON.parse(fs.readFileSync(global.test.dependPath + '/resources/plotting/animation/' + testHash + '-request.json', 'utf8'));
       var downloadDir = '/tmp/';
       var logDir = '';
 
@@ -41,7 +41,7 @@ describe('animation', function() {
       function checkComplete() {
          var newStatus = null;
          try {
-            newStatus = JSON.parse(fs.readFileSync(plotDir + '/e5f991c76bd84a354a6f23870eb6d74886d62bf6-status.json', 'utf8'));
+            newStatus = JSON.parse(fs.readFileSync(plotDir + '/' + testHash + '-status.json', 'utf8'));
          } catch (err) {
             newStatus = status;
          }
