@@ -718,6 +718,11 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }
       indicator.middleware = gisportal.middlewarePath;
+
+      // TODO add logic to this when adding support for layers with no date
+      indicator.hasDate = true;
+      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm');
+
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
 

@@ -458,7 +458,11 @@ gisportal.layer = function( options ) {
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];
             layer.isInbounds = true;
-            
+
+            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm');
+
+            $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
+
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
