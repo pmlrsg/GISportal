@@ -578,11 +578,5 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    //       $('.js-bbox-area').html(pretty_area_km + ' km<sup>2</sup>');
    //       break;
    // }
- 
-   this.setVectorLayerToTop();
 };
 
-gisportal.selectionTools.setVectorLayerToTop = function() {
-   map.removeLayer(gisportal.vectorLayer);
-   map.addLayer(gisportal.vectorLayer);
-};
