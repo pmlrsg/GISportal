@@ -274,10 +274,10 @@ gisportal.graphs.PlotEditor = (function(){
          if (this.plot().plotType() == 'animation') {
             var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
             if (baseMap !== 'none' &&
-               (!gisportal.baseLayers[baseMap] ||
-                  !gisportal.baseLayers[baseMap].getSource().getUrls() ||
-                  gisportal.baseLayers[baseMap].getSource().getUrls().length !== 1 ||
-                  !gisportal.baseLayers[baseMap].getSource().getParams)) {
+               !(gisportal.baseLayers[baseMap] &&
+                  gisportal.baseLayers[baseMap].getSource().getUrls() &&
+                  gisportal.baseLayers[baseMap].getSource().getUrls().length === 1 &&
+                  gisportal.baseLayers[baseMap].getSource().getParams)) {
                var baseMaps = $('#select-basemap').data('ddslick').settings.data;
                var compatibleMaps = [];
                for (var i = 0; i < baseMaps.length; i++) {
