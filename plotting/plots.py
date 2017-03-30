@@ -364,8 +364,8 @@ def extract(plot, outfile="image.html"):
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
               title="Image extract - {}".format(plot_title), toolbar_location="right",toolbar_sticky=False)
    p.title_text_font_size = "14pt"
-   p.xaxis.axis_label_text_font_size = "10pt"
-   p.yaxis.axis_label_text_font_size = "10pt"
+   p.xaxis.axis_label_text_font_size = "12pt"
+   p.yaxis.axis_label_text_font_size = "12pt"
    p.xaxis.axis_label = x_axis_label
    p.yaxis.axis_label = y_axis_label
    
@@ -689,8 +689,8 @@ def transect(plot, outfile="transect.html"):
 
       ts_plot.xaxis.axis_label = 'Date'
       ts_plot.title_text_font_size = "14pt"
-      ts_plot.xaxis.axis_label_text_font_size = "10pt"
-      ts_plot.yaxis.axis_label_text_font_size = "10pt"
+      ts_plot.xaxis.axis_label_text_font_size = "12pt"
+      ts_plot.yaxis.axis_label_text_font_size = "12pt"
       # Set up the axis label here as it writes to all y axes so overwrites the right hand one
       # if we run it later.
       debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
@@ -841,8 +841,8 @@ def matchup(plot, outfile="matchup.html"):
 
    ts_plot.xaxis.axis_label = 'Date'
    ts_plot.title_text_font_size = "14pt"
-   ts_plot.xaxis.axis_label_text_font_size = "10pt"
-   ts_plot.yaxis.axis_label_text_font_size = "10pt"
+   ts_plot.xaxis.axis_label_text_font_size = "12pt"
+   ts_plot.yaxis.axis_label_text_font_size = "12pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
    # if we run it later.
    debug(2,"matchup: y1Axis = {}".format(plot['y1Axis']['label']))
@@ -946,8 +946,8 @@ def timeseries(plot, outfile="time.html"):
       max_value = np.amax(data[varindex['mean']].astype(np.float64))
       buffer_value = (max_value - min_value) /20
       debug(4, u"min_mean: {}, max_mean:{}".format(min_value,max_value))
-      ymin.append(min_value)# - buffer_value)
-      ymax.append(max_value)# + buffer_value)
+      ymin.append(min_value)
+      ymax.append(max_value)
       debug(4, u"ymin: {}, ymax:{}".format(ymin[-1],ymax[-1]))
 
       date = datetime(data[varindex['date']])
@@ -1343,8 +1343,8 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
       height=400,
       responsive=True)
    match_scatter_plot.title_text_font_size = "14pt"
-   match_scatter_plot.xaxis.axis_label_text_font_size = "14pt"
-   match_scatter_plot.yaxis.axis_label_text_font_size = "14pt"
+   match_scatter_plot.xaxis.axis_label_text_font_size = "12pt"
+   match_scatter_plot.yaxis.axis_label_text_font_size = "12pt"
 
    # If we had bokeh version 0.12 we could do this
    #mytext = Label(x=70, y=70, text='r-value: {}'.format(r_value))
