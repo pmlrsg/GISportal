@@ -459,8 +459,9 @@ gisportal.layer = function( options ) {
             layer.selectedDateTime = matchedDate[0];
             layer.isInbounds = true;
 
+            // Put the date in a nice format
             var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm');
-
+            // Display the nice date next to the scalebar
             $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
 
             //----------------------- TODO: Temp code -------------------------

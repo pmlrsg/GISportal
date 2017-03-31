@@ -721,6 +721,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
 
       // TODO add logic to this when adding support for layers with no date
       indicator.hasDate = true;
+      // Put the date in a nice format for displaying next to the scalebar
       indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm');
 
       var renderedScalebar = gisportal.templates.scalebar(indicator);
