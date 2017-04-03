@@ -1019,7 +1019,11 @@ gisportal.loadState = function(state){
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
+                     // Load the geoJSON from the state into currentSelectedRegion
                      gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
+                     // Change the methodThatSelectedCurrentRegion to prevent trying to auto-select the
+                     // saved geoJSON name from the dropdown (which would cause a problem if the state
+                     // is loaded by a different user)
                      gisportal.methodThatSelectedCurrentRegion.method = 'state-geoJSONSelect';
                      break;
                   case "state-geoJSONSelect":
