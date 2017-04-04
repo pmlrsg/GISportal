@@ -612,6 +612,13 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedSta
       dataType: 'json',
       success: function(data){
          gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
+         var params = {
+            "event": "indicatorsPanel.geoJSONSelected",
+            "geojson": data,
+            "selectedValue": selectedValue,
+            "fromSavedState": fromSavedState
+         };
+         gisportal.events.trigger('indicatorsPanel.geoJSONSelected', params);
       },
       error: function(e){
          gisportal.vectorLayer.getSource().clear();
