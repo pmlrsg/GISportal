@@ -26,6 +26,8 @@ import os, hashlib
 import time
 import zipfile
 import shutil
+import math
+
 
 from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
 from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool, ResizeTool
@@ -892,7 +894,6 @@ def matchup(plot, outfile="matchup.html"):
 #END matchup
 
 def timeseries(plot, outfile="time.html"):
-
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
@@ -929,7 +930,7 @@ def timeseries(plot, outfile="time.html"):
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
-      debug(4, dfarray)
+      #debug(4, dfarray)
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
@@ -962,7 +963,10 @@ def timeseries(plot, outfile="time.html"):
          err_ys = []
          for x, y, std in zip(date, data[varindex['mean']].astype(np.float64), data[varindex['std']].astype(np.float64)):
             err_xs.append((x, x))
-            err_ys.append((y - std, y + std))
+            if plot_scale == "log":
+                  err_ys.append((math.pow(10,math.log10(y) - std),math.pow(10,(math.log10(y) + std))))
+            else:
+                  err_ys.appen((y-std, y+std))
 
          min_value = np.amin(np.array(err_ys).astype(np.float64))
          max_value = np.amax(np.array(err_ys).astype(np.float64))
@@ -1149,11 +1153,11 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    # Calculate the linear regression line
    slope, intercept, r_value, p_value, std_err = stats.linregress(data1, data2)
    regr_f = np.poly1d([slope, intercept])
-
    # Use the slope and intercept to create some points for bokeh to plot.
    # Not sure how long the line should be. As a first stab just extend the x up and down
    # by the full x range.
-   regression_x = [data1.min()-(data1.max()-data1.min()), data1.max()+(data1.max()-data1.min())]
+   #regression_x = [data1.min()-(data1.max()-data1.min()), data1.max()+(data1.max()-data1.min())]
+   regression_x = [data1.min(), data1.max()]
    regression_y = [regr_f(regression_x[0]), regr_f(regression_x[1])]
 
    debug(3,u"r:{}, p:{}, std:{}".format(r_value, p_value, std_err))

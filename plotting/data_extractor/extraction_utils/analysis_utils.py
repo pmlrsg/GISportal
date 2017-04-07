@@ -14,7 +14,10 @@ import datetime
 Performs a basic set of statistical functions on the provided data.
 """
 def basic(dataset, variable, irregular=False, original=None, filename="debugging_image", isLog=False):
-  
+   
+
+   #print '-'*30
+   #print isLog
    if irregular:
       # current_app.logger.debug('irregular shape')
       # current_app.logger.debug([x.shape for x in dataset])
