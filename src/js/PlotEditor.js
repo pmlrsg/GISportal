@@ -271,6 +271,33 @@ gisportal.graphs.PlotEditor = (function(){
                return;
             }
          }
+         if (this.plot().plotType() == 'animation') {
+            var baseMap = $('#select-basemap').data('ddslick').selectedData.value;
+            if (baseMap !== 'none' &&
+               !(gisportal.baseLayers[baseMap] &&
+                  gisportal.baseLayers[baseMap].getSource().getUrls() &&
+                  gisportal.baseLayers[baseMap].getSource().getUrls().length === 1 &&
+                  gisportal.baseLayers[baseMap].getSource().getParams)) {
+               var baseMaps = $('#select-basemap').data('ddslick').settings.data;
+               var compatibleMaps = [];
+               for (var i = 0; i < baseMaps.length; i++) {
+                  baseMap = baseMaps[i].value;
+                  if (gisportal.baseLayers[baseMap] &&
+                     gisportal.baseLayers[baseMap].getSource().getUrls() &&
+                     gisportal.baseLayers[baseMap].getSource().getUrls().length === 1 &&
+                     gisportal.baseLayers[baseMap].getSource().getParams) {
+                     compatibleMaps.push(baseMap);
+                  }
+               }
+               var notifyString = 'Animations are not compatible with this basemap. ' +
+                  'Please use one of the following basemaps:';
+               for (var j = 0; j < compatibleMaps.length; j++) {
+                  notifyString = notifyString + '\n- ' + compatibleMaps[j];
+               }
+               $.notify(notifyString, 'error');
+               return;
+            }
+         }
          if( this.plot().components().length == 1 || hasLeftHandSeries ){
             this._editorParent.find('.js-slideout-content').removeClass('multiple-components');
             this.plot().submitRequest();

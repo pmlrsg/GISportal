@@ -5,6 +5,7 @@ var ffmpeg = require('fluent-ffmpeg');
 var fs = require('fs-extra');
 var glob = require('glob');
 var path = require('path');
+var randomatic = require('randomatic');
 var request = require('request');
 var sha1 = require('sha1');
 var _ = require('underscore');
@@ -138,16 +139,20 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       var dataDone = false;
 
       // Get the map capabilities
-      var mapUrl = url.parse(mapOptions.wmsUrl);
-      mapUrl.search = undefined;
-      mapUrl.query = {
-         SERVICE: 'WMS',
-         REQUEST: 'GetCapabilities'
-      };
-      makeRequest(url.format(mapUrl), function() {
+      if (mapOptions) {
+         var mapUrl = url.parse(mapOptions.wmsUrl);
+         mapUrl.search = undefined;
+         mapUrl.query = {
+            SERVICE: 'WMS',
+            REQUEST: 'GetCapabilities'
+         };
+         makeRequest(url.format(mapUrl), function() {
+            mapDone = true;
+            done();
+         });
+      } else {
          mapDone = true;
-         done();
-      });
+      }
 
       // Get the border capabilities
       if (bordersOptions) {
@@ -333,22 +338,25 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       var slicesDownloaded = 0;
 
       // Setup the map request url
-      var mapUrl = url.parse(mapOptions.wmsUrl);
-      mapUrl.search = undefined;
-      mapUrl.query = {
-         SERVICE: 'WMS',
-         VERSION: mapOptions.wmsParams.VERSION,
-         REQUEST: 'GetMap',
-         FORMAT: 'image/jpeg',
-         TRANSPARENT: false,
-         LAYERS: mapOptions.wmsParams.LAYERS,
-         wrapDateLine: mapOptions.wmsParams.wrapDateLine,
-         SRS: mapOptions.wmsParams.SRS,
-         WIDTH: width,
-         HEIGHT: height,
-         BBOX: dataOptions.bbox
-      };
-      utils.deleteNullProperies(mapUrl.query);
+      var mapUrl;
+      if (mapOptions) {
+         mapUrl = url.parse(mapOptions.wmsUrl);
+         mapUrl.search = undefined;
+         mapUrl.query = {
+            SERVICE: 'WMS',
+            VERSION: mapOptions.wmsParams.VERSION,
+            REQUEST: 'GetMap',
+            FORMAT: 'image/jpeg',
+            TRANSPARENT: false,
+            LAYERS: mapOptions.wmsParams.LAYERS,
+            wrapDateLine: mapOptions.wmsParams.wrapDateLine,
+            SRS: mapOptions.wmsParams.SRS,
+            WIDTH: width,
+            HEIGHT: height,
+            BBOX: dataOptions.bbox
+         };
+         utils.deleteNullProperies(mapUrl.query);
+      }
 
       // Setup the borders request url
       var bordersUrl;
@@ -363,12 +371,14 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             TRANSPARENT: true,
             LAYERS: bordersOptions.wmsParams.LAYERS,
             STYLES: bordersOptions.wmsParams.STYLES,
-            wrapDateLine: mapOptions.wmsParams.wrapDateLine,
             SRS: bordersOptions.wmsParams.SRS,
             WIDTH: width,
             HEIGHT: height,
             BBOX: dataOptions.bbox
          };
+         if (mapOptions) {
+            bordersUrl.query.wrapDateLine = mapOptions.wmsParams.wrapDateLine;
+         }
          utils.deleteNullProperies(bordersUrl.query);
       }
 
@@ -408,12 +418,14 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             return next(err);
          }
          // Push the map to the download queue
-         downloadQueue.push({
-            uri: url.format(mapUrl),
-            dir: hashDir,
-            filename: 'map.jpg',
-            id: 'map'
-         }, downloadComplete);
+         if (mapOptions) {
+            downloadQueue.push({
+               uri: url.format(mapUrl),
+               dir: hashDir,
+               filename: 'map.jpg',
+               id: 'map'
+            }, downloadComplete);
+         }
 
          // Push the borders to the download queue
          if (bordersOptions) {
@@ -456,7 +468,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                if (err) {
                   return handleError(err);
                }
-               // Link the image in the hashdir (TODO replace with symlink if possible)
+               // Link the image in the hashdir (NOT symlink to avoid issues with simultaneous similar animations)
                fs.link(options.filePath, path.join(hashDir, options.filename), function(err) {
                   if (err) {
                      return handleError(err);
@@ -484,7 +496,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             } else {
                // If it doesn't exist, download to a temporary path for time stamping
                options.existing = false;
-               options.tempPath = path.join(options.dir, 'temp_' + options.filename);
+               options.tempPath = path.join(options.dir, 'temp_' + randomatic('aA0', 32) + '.png');
                makeRequest(options.tempPath);
             }
          } else {
@@ -540,7 +552,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          } else {
             if (options.existing) {
                // If the tile was already downloaded, just link it in the hash directory
-               // TODO replace with symlink if possible
+               // (NOT symlink to avoid issues with simultaneous similar animations)
                fs.link(options.filePath, path.join(hashDir, options.filename), done);
             } else {
                // Else send the image to the timestamper
@@ -570,7 +582,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             }
          }
-         if (mapDownloaded && (!bordersOptions || bordersDownloaded) && slicesDownloaded == slices.length) {
+         if ((!mapOptions || mapDownloaded) && (!bordersOptions || bordersDownloaded) && slicesDownloaded == slices.length) {
             updateStatus(PlotStatus.extracting, 'Downloading time slices<br>' + slicesDownloaded + '/' + slices.length);
             timeStamper.kill();
             next();
@@ -646,22 +658,35 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
          maxWebMBitrate = '45M';
       }
 
-      // Setup the renderer with the map and data layer inputs
-      var renderer = ffmpeg()
-         .input(path.join(downloadDir, hash, 'map.jpg'))
-         .inputOptions(['-loop 1', '-framerate ' + inputFPS])
-         .input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
+      // Setup the renderer
+      var renderer = ffmpeg();
+
+      if (mapOptions) {
+         // If map, add the map input
+         renderer = renderer.input(path.join(downloadDir, hash, 'map.jpg'))
+            .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
+      }
+
+      // Add the data input
+      renderer = renderer.input(path.join(downloadDir, hash, dataUrlHash + '_' + '*' + '.png'))
          .inputOptions(['-pattern_type glob', '-thread_queue_size 512', '-framerate ' + inputFPS]);
 
       if (bordersOptions) {
-         // If borders then setup the borders input and complex filter
+         // If borders, add the borders input
          renderer = renderer
             .input(path.join(downloadDir, hash, 'borders.png'))
-            .inputOptions(['-loop 1', '-framerate ' + inputFPS])
-            .complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
-      } else {
-         // Else just setup the complex filter
+            .inputOptions(['-loop 1', '-framerate ' + inputFPS]);
+      }
+
+      if (mapOptions && bordersOptions) {
+         // If map and borders
+         renderer = renderer.complexFilter('overlay=shortest=1,overlay=shortest=1,split=2[out1][out2]');
+      } else if (mapOptions || bordersOptions) {
+         // If map or borders
          renderer = renderer.complexFilter('overlay=shortest=1,split=2[out1][out2]');
+      } else {
+         // Else just the data layer
+         renderer = renderer.complexFilter('split=2[out1][out2]');
       }
 
       // Set up the output options and start the renderer

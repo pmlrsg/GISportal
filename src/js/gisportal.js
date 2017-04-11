@@ -1169,7 +1169,7 @@ gisportal.loadLayerState = function(){
          var style = layer_state.style || defaultStyle;
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
-         var log = layer_state.log == "true" || false;
+         var log = layer_state.log === true || layer_state.log === 'true';
          if(layer_state.autoScale === undefined){
             layer_state.autoScale = "default";
          }

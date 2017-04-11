@@ -87,7 +87,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max', function() {
       var id = $(this).data('id');
-      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
+      $('.js-auto[data-id="' + id + '"]').prop('checked', false).trigger('change');
    });
 
 
@@ -474,7 +474,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    }
 
    gisportal.setCountryBordersToTopLayer();
-   gisportal.selectionTools.setVectorLayerToTop();
 
    var params = {
       "event" : "layer.reorder",
