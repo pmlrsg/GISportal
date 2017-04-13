@@ -10,6 +10,10 @@
 gisportal.indicatorsPanel = {};
 
 gisportal.indicatorsPanel.open = function() {
+   if ($('.js-show-panel[data-panel-name="active-layers"').hasClass('hidden')) {
+      // Show the layers tab if it is currently hidden
+      $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', false);
+   }
    gisportal.panels.showPanel('active-layers');
 };
 
@@ -62,6 +66,8 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
+         // Hide the layers tab if no layers are selected
+         $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', true);
          gisportal.panels.showPanel('choose-indicator');
          // Clears the vector layer to avoid confusion
          gisportal.vectorLayer.getSource().clear();
