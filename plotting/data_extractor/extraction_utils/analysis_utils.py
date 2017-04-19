@@ -29,6 +29,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       # current_app.logger.debug(arr)
    else:
       arr = np.ma.array(dataset.variables[variable][:])
+      # arr = dataset.variables[variable]
       #print arr
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
@@ -36,8 +37,10 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       dataset = original
    if not irregular:
       maskedArray = np.ma.masked_invalid(arr)
+      # maskedArray = arr
    else:
       maskedArray = np.ma.masked_invalid(arr)
+      # maskedArray = arr
    #maskedArray = arr
    #print '-'*40
    #print maskedArray
@@ -50,7 +53,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       g.graphError = "could not find time dimension"
       return
    
-   times = np.array(time)
+   times = np.array(time[:])
    output = {}
    
    units = getUnits(dataset.variables[variable])

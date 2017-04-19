@@ -105,23 +105,28 @@ class TransectExtractor(Extractor):
       return files
 
    def getMaxSlices(self, offset_vectors):
-      area_width = self.extract_area[3] - self.extract_area[1]
-      area_height = self.extract_area[2] - self.extract_area[0]
+      if isinstance(self.extract_area, basestring):
+         # convert self.extract_area to a list if it is currently a string
+         self.extract_area = [float(x) for x in self.extract_area.split(',')]
+
+      # self.extract_area is formatted as [min(lons), min(lats), max(lons), max(lats)]
+      area_width = self.extract_area[2] - self.extract_area[0]
+      area_height = self.extract_area[3] - self.extract_area[1]
 
       # If the area width or height is less than the offset_vector, increase it in both directions by the offset_vector
       if abs(area_width) < abs(offset_vectors['x']):
          self.extract_area = (
-            self.extract_area[0],
-            self.extract_area[1] - abs(offset_vectors['x']),
-            self.extract_area[2],
-            self.extract_area[3] + abs(offset_vectors['x']))
+            self.extract_area[0] - abs(offset_vectors['x']),
+            self.extract_area[1],
+            self.extract_area[2] + abs(offset_vectors['x']),
+            self.extract_area[3])
          area_width = self.extract_area[3] - self.extract_area[1]
       if abs(area_height) < abs(offset_vectors['y']):
          self.extract_area = (
-            self.extract_area[0] - abs(offset_vectors['y']),
-            self.extract_area[1],
-            self.extract_area[2] + abs(offset_vectors['y']),
-            self.extract_area[3])
+            self.extract_area[0],
+            self.extract_area[1] - abs(offset_vectors['y']),
+            self.extract_area[2],
+            self.extract_area[3] + abs(offset_vectors['y']))
          area_height = self.extract_area[2] - self.extract_area[0]
 
       pixel_width = abs(area_width / offset_vectors['x'])
@@ -141,7 +146,10 @@ class TransectExtractor(Extractor):
       date_range = '/'.join(self.extract_dates).split('/')
 
       for i, date in enumerate(date_range):
-         date_range[i] = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+         try:
+            date_range[i] = datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+         except ValueError:
+            date_range[i] = datetime.strptime(date, '%Y-%m-%d')
 
       slices_in_range = []
       pre_range_time_slice = None
@@ -198,6 +206,7 @@ class TransectExtractor(Extractor):
       return coverage_description
 
    def mergeFiles(self, files):
+      # NOT CURRENTLY USED
       # Create new file
       fname = self.outdir + str(uuid.uuid4()) + ".nc"
       new_file = netCDF.Dataset(fname, 'w', format='NETCDF4')
@@ -264,8 +273,9 @@ class TransectExtractor(Extractor):
       return fname
 
    def update_status(self, progress, total_requests):
-      starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
-      percentage = int(round(progress / float(total_requests) * 19 / self.status_details['num_series'] + starting_percentage))
-      update_status(self.status_details['dirname'], self.status_details['my_hash'],
-         Plot_status.extracting, percentage=percentage)
-      debug(3, "Overall progress: {}%".format(percentage))
+      if self.status_details:
+         starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
+         percentage = int(round(progress / float(total_requests) * 19 / self.status_details['num_series'] + starting_percentage))
+         update_status(self.status_details['dirname'], self.status_details['my_hash'],
+            Plot_status.extracting, percentage=percentage)
+         debug(3, "Overall progress: {}%".format(percentage))

@@ -13,7 +13,8 @@ class BasicStats(object):
 	def process(self):
 		#print "running basic processing on %s" % self.filename
 
-		netcdf_file = netCDF.Dataset(self.filename, "r")
+		# netcdf_file = netCDF.Dataset(self.filename, "r")
+		netcdf_file = netCDF.MFDataset(self.filename, aggdim='time')
 		return json.dumps(basic(netcdf_file, self.variable))
 
 

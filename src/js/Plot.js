@@ -501,7 +501,8 @@ gisportal.graphs.Plot = (function() {
          }
          // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if (_this.series_total === 0) {
-            if (_this.sizeEstimate < 4294967296) {
+            // if (_this.sizeEstimate < 4294967296) {
+            if (true) {
                var t = new Date();
                _this.estimatedFinishTime = new Date(t.getTime() + 1000 * _this.timeEstimate);
             } else {
