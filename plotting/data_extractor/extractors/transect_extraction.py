@@ -21,9 +21,10 @@ class TransectExtractor(Extractor):
 
    thredds_max_request = 4000
 
-   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None, status_details=None, outdir="/tmp/"):
+   def __init__(self, wcs_url, extract_dates, transect_type, extract_area=None, extract_variable=None, extract_depth=None, status_details=None, outdir="/tmp/", extra_slices=False):
       super(TransectExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area,extract_variable=extract_variable,  extract_depth=extract_depth, outdir=outdir)
       self.status_details = status_details
+      self.extra_slices = extra_slices
 
    def getData(self):
       if plotting:
@@ -163,7 +164,7 @@ class TransectExtractor(Extractor):
             pre_range_time_slice = time_slice
             pre_range_slice_index = i
          elif time_slice >= date_range[0] and time_slice <= date_range[1]:
-            if not slices_in_range and pre_range_time_slice:
+            if not slices_in_range and pre_range_time_slice and self.extra_slices:
                slices_in_range.append(pre_range_time_slice)
             slices_in_range.append(time_slice)
             last_slice_index = i
@@ -173,7 +174,7 @@ class TransectExtractor(Extractor):
       if not slices_in_range and pre_range_time_slice:
          slices_in_range.append(pre_range_time_slice)
          last_slice_index = pre_range_slice_index
-      if last_slice_index + 1 < len(time_slices):
+      if last_slice_index + 1 < len(time_slices) and self.extra_slices:
          post_range_time_slice = datetime.strptime(time_slices[last_slice_index + 1], '%Y-%m-%dT%H:%M:%SZ')
          slices_in_range.append(post_range_time_slice)
 
