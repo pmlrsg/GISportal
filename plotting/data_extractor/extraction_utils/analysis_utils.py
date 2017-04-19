@@ -28,16 +28,16 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       # current_app.logger.debug('irregular shape after concatonate')
       # current_app.logger.debug(arr)
    else:
-      arr = np.ma.array(dataset.variables[variable][:])
-      # arr = dataset.variables[variable]
+      # arr = np.ma.array(dataset.variables[variable][:])
+      arr = dataset.variables[variable]
       #print arr
    #current_app.logger.debug(arr)
    # Create a masked array ignoring nan's
    if original is not None:
       dataset = original
    if not irregular:
-      maskedArray = np.ma.masked_invalid(arr)
-      # maskedArray = arr
+      # maskedArray = np.ma.masked_invalid(arr)
+      maskedArray = arr
    else:
       maskedArray = np.ma.masked_invalid(arr)
       # maskedArray = arr
@@ -87,7 +87,9 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    
    output['data'] = {}
    #print len(time)
-   for i, row in enumerate(maskedArray):
+   for i in range(len(arr)):
+      row = arr[i]
+      masked_row = np.ma.masked_invalid(row, copy=False)
       #print i
       if timeUnits:
          if (i < len(time)):
@@ -98,11 +100,11 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
 
       else:     
          date = ''.join(times[i])
-      mean = getMean(row)
-      median = getMedian(row)
-      std = getStd(row)
-      min = getMin(row)
-      max = getMax(row)
+      mean = getMean(masked_row)
+      median = getMedian(masked_row)
+      std = getStd(masked_row)
+      min = getMin(masked_row)
+      max = getMax(masked_row)
       
       if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
          pass
