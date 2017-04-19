@@ -14,34 +14,25 @@ import datetime
 Performs a basic set of statistical functions on the provided data.
 """
 def basic(dataset, variable, irregular=False, original=None, filename="debugging_image"):
-  
+   # Nothing seems to call this with irregular=True, or original
+
    if irregular:
-      # current_app.logger.debug('irregular shape')
-      # current_app.logger.debug([x.shape for x in dataset])
+      raise NotImplementedError('Calling basic() with irregular=True is no longer supported')
+      # # current_app.logger.debug('irregular shape')
+      # # current_app.logger.debug([x.shape for x in dataset])
+      # #arr = np.ma.concatenate(dataset)
+      # arr = np.ma.array(dataset)
+      # #print original
+      # plt.imshow(arr[0])
+      # plt.savefig(filename+'.png')
+      # # current_app.logger.debug('irregular shape after concatonate')
+      # # current_app.logger.debug(arr)
 
-      #arr = np.ma.concatenate(dataset)
-      arr = np.ma.array(dataset)
+   arr = dataset.variables[variable]
 
-      #print original
-      plt.imshow(arr[0])
-      plt.savefig(filename+'.png')
-      # current_app.logger.debug('irregular shape after concatonate')
-      # current_app.logger.debug(arr)
-   else:
-      # arr = np.ma.array(dataset.variables[variable][:])
-      arr = dataset.variables[variable]
-      #print arr
-   #current_app.logger.debug(arr)
-   # Create a masked array ignoring nan's
    if original is not None:
       dataset = original
-   if not irregular:
-      # maskedArray = np.ma.masked_invalid(arr)
-      maskedArray = arr
-   else:
-      maskedArray = np.ma.masked_invalid(arr)
-      # maskedArray = arr
-   #maskedArray = arr
+
    #print '-'*40
    #print maskedArray
    #plt.imshow(maskedArray[0])
@@ -49,22 +40,24 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    time = getCoordinateVariable(dataset, 'Time')
    # current_app.logger.debug('time channel test')
    # current_app.logger.debug(time)
+
    if time == None:
+      # TODO This will error due to g being undefinded
       g.graphError = "could not find time dimension"
       return
-   
+
    times = np.array(time[:])
    output = {}
-   
+
    units = getUnits(dataset.variables[variable])
    output['units'] = units
-   
-   
+
    #mean = getMean(maskedArray)
    #median = getMedian(maskedArray)
    #std = getStd(maskedArray)
    #min = getMin(maskedArray)
    #max = getMax(maskedArray)
+
    timeUnits = getUnits(time)
    start = None
    if timeUnits:
@@ -72,9 +65,9 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
          start = (netCDF.num2date(times[0], time.units, calendar='standard')).isoformat()
       except:
          start = ''.join(times[0])
-   else: 
+   else:
       start = ''.join(times[0])
-   
+
    #=========================================================================
    # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
    #   output = {}
@@ -82,15 +75,15 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    # else:
    #   output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
    #=========================================================================
-   
+
    output['global'] = {'time': start}
-   
    output['data'] = {}
-   #print len(time)
+
    for i in range(len(arr)):
       row = arr[i]
+      # Mask any invalid (nan) values
       masked_row = np.ma.masked_invalid(row, copy=False)
-      #print i
+
       if timeUnits:
          if (i < len(time)):
             try:
@@ -98,23 +91,24 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
             except:
                date = ''.join(times[i])
 
-      else:     
+      else:
          date = ''.join(times[i])
       mean = getMean(masked_row)
       median = getMedian(masked_row)
       std = getStd(masked_row)
       min = getMin(masked_row)
       max = getMax(masked_row)
-      
+
       if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
          pass
       else:
          output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
-   
+
    if len(output['data']) < 1:
+      # TODO This will error due to g being undefinded
       g.graphError = "no valid data available to use"
       return output
-      
+
    #original.close()
    return output
 
@@ -316,6 +310,7 @@ def getMax(arr):
 
 
 def getIrregularData(params, poly_type=None):
+   # NEVER USED
    polygon = params['bbox'].value
    if poly_type:
       mask, data,_,_,_ = create_mask(polygon, params, poly_type)
