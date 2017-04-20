@@ -1,62 +1,24 @@
-import urllib
-import urllib2
-import tempfile
-import numpy as np
-import netCDF4 as netCDF
-from shapely import wkt
+from datetime import timedelta, datetime
 from PIL import Image, ImageDraw
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt   
-from datetime import timedelta
-import datetime
+from shapely import wkt
+import netCDF4 as netCDF
+import numpy as np
 """
 Performs a basic set of statistical functions on the provided data.
 """
-def basic(dataset, variable, irregular=False, original=None, filename="debugging_image"):
-   # Nothing seems to call this with irregular=True, or original
-
-   if irregular:
-      raise NotImplementedError('Calling basic() with irregular=True is no longer supported')
-      # # current_app.logger.debug('irregular shape')
-      # # current_app.logger.debug([x.shape for x in dataset])
-      # #arr = np.ma.concatenate(dataset)
-      # arr = np.ma.array(dataset)
-      # #print original
-      # plt.imshow(arr[0])
-      # plt.savefig(filename+'.png')
-      # # current_app.logger.debug('irregular shape after concatonate')
-      # # current_app.logger.debug(arr)
-
+def basic(dataset, variable):
    arr = dataset.variables[variable]
 
-   if original is not None:
-      dataset = original
-
-   #print '-'*40
-   #print maskedArray
-   #plt.imshow(maskedArray[0])
-   #plt.savefig(filename+'.2.png')
    time = getCoordinateVariable(dataset, 'Time')
-   # current_app.logger.debug('time channel test')
-   # current_app.logger.debug(time)
 
-   if time == None:
-      # TODO This will error due to g being undefinded
-      g.graphError = "could not find time dimension"
-      return
+   if time is None:
+      raise ValueError('Could not find time dimension.')
 
    times = np.array(time[:])
    output = {}
 
    units = getUnits(dataset.variables[variable])
    output['units'] = units
-
-   #mean = getMean(maskedArray)
-   #median = getMedian(maskedArray)
-   #std = getStd(maskedArray)
-   #min = getMin(maskedArray)
-   #max = getMax(maskedArray)
 
    timeUnits = getUnits(time)
    start = None
@@ -68,14 +30,6 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
    else:
       start = ''.join(times[0])
 
-   #=========================================================================
-   # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
-   #   output = {}
-   #   g.graphError = "no valid data available to use"
-   # else:
-   #   output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
-   #=========================================================================
-
    output['global'] = {'time': start}
    output['data'] = {}
 
@@ -85,31 +39,27 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       masked_row = np.ma.masked_invalid(row, copy=False)
 
       if timeUnits:
-         if (i < len(time)):
+         if i < len(time):
             try:
                date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
             except:
                date = ''.join(times[i])
-
       else:
          date = ''.join(times[i])
       mean = getMean(masked_row)
       median = getMedian(masked_row)
       std = getStd(masked_row)
-      min = getMin(masked_row)
-      max = getMax(masked_row)
+      minimum = getMin(masked_row)
+      maximum = getMax(masked_row)
 
-      if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+      if np.isnan(maximum) or np.isnan(minimum) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
          pass
       else:
-         output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+         output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': minimum, 'max': maximum}
 
    if len(output['data']) < 1:
-      # TODO This will error due to g being undefinded
-      g.graphError = "no valid data available to use"
-      return output
+      raise ValueError('no valid data available to use')
 
-   #original.close()
    return output
 
 
@@ -650,8 +600,8 @@ def are_time_axis_the_same(filenames):
    #print len(times[keys[0]])
    #print len(times[keys[1]])
    for x in range(time_range):
-      time1 = datetime.datetime.strptime(netCDF.num2date(times[keys[0]][x], times[keys[0]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
-      time2 = datetime.datetime.strptime(netCDF.num2date(times[keys[1]][x], times[keys[1]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
+      time1 = datetime.strptime(netCDF.num2date(times[keys[0]][x], times[keys[0]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
+      time2 = datetime.strptime(netCDF.num2date(times[keys[1]][x], times[keys[1]].units, calendar='standard').isoformat(), '%Y-%m-%dT%H:%M:%S')
       #print time1, time2
       #print times[keys[0]][x] , times[keys[1]][x]
       dif = time1 - time2
