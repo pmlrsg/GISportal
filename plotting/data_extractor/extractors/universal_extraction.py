@@ -6,7 +6,7 @@ import urllib2
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import netCDF4 as netCDF
-from extraction_utils import WCSRawHelper
+from extraction_utils import create_mask, WCSRawHelper
 from . import Extractor
 try:
    from plotting.debug import debug
@@ -104,6 +104,11 @@ class UniversalExtractor(Extractor):
          if plotting:
             self.update_status(i + 1, total_requests)
          files.append(fname)
+
+      if self.masking_polygon:
+         for fname in files:
+            create_mask(self.masking_polygon,fname,self.extract_variable)
+
       return files
 
    def getMaxSlices(self, offset_vectors):
