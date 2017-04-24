@@ -1,3 +1,4 @@
+{{#if hasDate}}<p class="scalebar-selected-date">{{niceSelectedDateTime}}</p>{{/if}}
 {{#if units}}<p>Scale - {{units}}</p>{{/if}}
 <div class="scalebar-outer{{#unless legendSettings.scalePoints}}-loose{{/unless}} {{#if log}}scalebar-log{{else}}scalebar-linear{{/if}} ">
 	<div class="scalebar{{#unless legendSettings.scalePoints}}-loose{{/unless}}" >
