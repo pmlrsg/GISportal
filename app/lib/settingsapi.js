@@ -252,6 +252,7 @@ settingsApi.stripPrefix = function(str) {
 
 settingsApi.update_layer = function(username, domain, data, next) {
    var filename = data.serverName + ".json"; // Gets the given filename
+   filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of
    if (username != domain) {
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);

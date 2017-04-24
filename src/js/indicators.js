@@ -87,7 +87,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max', function() {
       var id = $(this).data('id');
-      $('.js-auto[data-id="' + id + '"]').prop( 'checked', false );
+      $('.js-auto[data-id="' + id + '"]').prop('checked', false).trigger('change');
    });
 
 
@@ -474,7 +474,6 @@ gisportal.indicatorsPanel.reorderLayers = function() {
    }
 
    gisportal.setCountryBordersToTopLayer();
-   gisportal.selectionTools.setVectorLayerToTop();
 
    var params = {
       "event" : "layer.reorder",
@@ -613,6 +612,13 @@ gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedSta
       dataType: 'json',
       success: function(data){
          gisportal.selectionTools.loadGeoJSON(data, false, selectedValue, fromSavedState);
+         var params = {
+            "event": "indicatorsPanel.geoJSONSelected",
+            "geojson": data,
+            "selectedValue": selectedValue,
+            "fromSavedState": fromSavedState
+         };
+         gisportal.events.trigger('indicatorsPanel.geoJSONSelected', params);
       },
       error: function(e){
          gisportal.vectorLayer.getSource().clear();
@@ -719,6 +725,12 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
          indicator.legendURL = encodeURIComponent(gisportal.scalebars.createGetLegendURL(indicator, indicator.legend));
       }
       indicator.middleware = gisportal.middlewarePath;
+
+      // TODO add logic to this when adding support for layers with no date
+      indicator.hasDate = true;
+      // Put the date in a nice format for displaying next to the scalebar
+      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm');
+
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
 

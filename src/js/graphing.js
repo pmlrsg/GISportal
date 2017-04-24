@@ -39,7 +39,7 @@ gisportal.graphs.addComponentToGraph = function( component ){
          plotType = "transect";
          console.log("setting transect type");
       }
-      if(bboxMethod == "geoJSONSelect"){
+      if(bboxMethod == "geoJSONSelect" || bboxMethod == "state-geoJSONSelect"){
          component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;
       }
       plot.plotType( plotType );

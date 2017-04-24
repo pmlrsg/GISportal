@@ -432,12 +432,19 @@ settings.restore_server_cache = function(req, res) {
 };
 
 settings.update_layer = function(req, res) {
-   var username = req.query.username; // Gets the given username
+   var owner = req.query.username; // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
-   // var permission = user.getAccessLevel(req, domain); // Gets the user permission NOT USED
    var data = JSON.parse(req.body.data); // Gets the data given
-   
-   settingsApi.update_layer(username, domain, data, function(err) {
+
+   // Check that the user has permission to do this
+   var username = user.getUsername(req);
+   var permission = user.getAccessLevel(req, domain);
+
+   if (username != owner && permission != 'admin') {
+      return res.status(401).send();
+   }
+
+   settingsApi.update_layer(owner, domain, data, function(err) {
       if (err) {
          utils.handleError(err, res);
       } else {
@@ -450,20 +457,30 @@ settings.add_user_layer = function(req, res) {
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = utils.getDomainName(req); // Gets the given domain
-   var username = server_info.owner; // Gets the given username
+   var owner = server_info.owner; // Gets the given owner
    var cache_path;
    var save_path;
 
+   // Check that the user has permission to do this
+   var username = user.getUsername(req);
+   var permission = user.getAccessLevel(req, domain);
+
+   if (username != owner && permission != 'admin') {
+      return res.status(401).send();
+   }
+
    if ('provider' in server_info && 'server_name' in server_info) { // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
-      if (domain == username) {
+      filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
+
+      if (domain == owner) {
          // If is is a global file it is refreshed from the URL
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
          save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
       } else {
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
-         save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + username, filename);
+         save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
       }
       if (!utils.directoryExists(cache_path)) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
@@ -474,7 +491,7 @@ settings.add_user_layer = function(req, res) {
          data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
       } catch (e) {
          // Tries again with the temporary cache (Perhaps an admin is adding a server to this domain)
-         if (domain == username) {
+         if (domain == owner) {
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }

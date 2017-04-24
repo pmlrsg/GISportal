@@ -1019,7 +1019,15 @@ gisportal.loadState = function(state){
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
-                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value, fromSavedState = true);
+                     // Load the geoJSON from the state into currentSelectedRegion
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
+                     // Change the methodThatSelectedCurrentRegion to prevent trying to auto-select the
+                     // saved geoJSON name from the dropdown (which would cause a problem if the state
+                     // is loaded by a different user)
+                     gisportal.methodThatSelectedCurrentRegion.method = 'state-geoJSONSelect';
+                     break;
+                  case "state-geoJSONSelect":
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
                      break;
                   case "dragAndDrop":
                      stateMap.feature = undefined;
@@ -1169,7 +1177,7 @@ gisportal.loadLayerState = function(){
          var style = layer_state.style || defaultStyle;
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
-         var log = layer_state.log == "true" || false;
+         var log = layer_state.log === true || layer_state.log === 'true';
          if(layer_state.autoScale === undefined){
             layer_state.autoScale = "default";
          }

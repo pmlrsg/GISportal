@@ -1398,6 +1398,30 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
 	button_elem.trigger('click');
 };
 
+/*
+ 'data' must contain the following:
+
+ geojson: the geoJSON to load
+ selectedValue: the name of the geoJSON selected
+ fromSavedState: if this selection was from a saved state
+  */
+gisportal.api['indicatorsPanel.geoJSONSelected'] = function(data, options){
+   console.log(data);
+   options = options || {};
+
+   if(options.describeOnly){
+      return 'Saved geoJSON selected';
+   }
+   if(options.selectorOnly){
+      return '.users-geojson-files';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.users-geojson-files'));
+   }
+
+   gisportal.selectionTools.loadGeoJSON(data.geojson, false, data.selectedValue, data.fromSavedState);
+};
+
  /*
  'data' does not need to contain anything
   */

@@ -278,7 +278,7 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
          $('.users-geojson-files').val(shapeName);
       }
    }
-   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false, geoJSON: geojson};
    if(selectedValue){
       gisportal.methodThatSelectedCurrentRegion.value = selectedValue;
    }
@@ -578,11 +578,5 @@ gisportal.selectionTools.ROIAdded = function(feature)  {
    //       $('.js-bbox-area').html(pretty_area_km + ' km<sup>2</sup>');
    //       break;
    // }
- 
-   this.setVectorLayerToTop();
 };
 
-gisportal.selectionTools.setVectorLayerToTop = function() {
-   map.removeLayer(gisportal.vectorLayer);
-   map.addLayer(gisportal.vectorLayer);
-};

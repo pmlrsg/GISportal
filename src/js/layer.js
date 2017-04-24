@@ -458,7 +458,12 @@ gisportal.layer = function( options ) {
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];
             layer.isInbounds = true;
-            
+
+            // Put the date in a nice format
+            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm');
+            // Display the nice date next to the scalebar
+            $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
+
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
@@ -729,7 +734,6 @@ gisportal.addLayer = function(layer, options) {
   
    layer.setVisibility(options.visible); 
    gisportal.setCountryBordersToTopLayer();
-   gisportal.selectionTools.setVectorLayerToTop();
 };
 
 /**

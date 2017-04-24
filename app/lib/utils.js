@@ -64,7 +64,7 @@ utils.deleteNullProperies = function(object) {
  * @param {string} url The server's url
  */
 utils.URLtoServerName = function(url) {
-   return url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "");
+   return url.replace("http://", "").replace("https://", "").replace(/\//g, "-").replace(/\?.*/g, "").replace(/\.\./g, "_dotdot_");
 };
 
 /**
