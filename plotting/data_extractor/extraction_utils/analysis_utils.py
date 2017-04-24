@@ -315,25 +315,6 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    '''
 
    loaded_poly = wkt.loads(poly)
-   # wcs_envelope = loaded_poly.envelope
-   # bounds =  wcs_envelope.bounds
-   # bb = ','.join(map(str,bounds))
-
-   # params['bbox']._value = bb
-   # params['url'] = createURL(params)
-   # variable = params['coverage'].value
-   # #wcs_url = wcs_base_url % (bounds[0],bounds[1],bounds[2],bounds[3])
-   # wcs_url = params['url'].value
-   # #testfile=urllib.URLopener()
-   # #testfile.retrieve(wcs_url,"%s.nc" % variable)
-   # try:
-   #    resp = contactWCSServer(wcs_url)
-   # except urllib2.HTTPError:
-   #    params["vertical"]._value = params["vertical"].value[1:]
-   #    params['url'] = createURL(params)
-   #    wcs_url = params['url'].value
-   #    resp = contactWCSServer(wcs_url)
-   #tfile = saveOutTempFile(resp)
    to_be_masked = netCDF.Dataset(netcdf_base, 'a')
 
    chl = to_be_masked.variables[variable]
@@ -349,8 +330,6 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    maxlon = max(lonvals)
 
    lonlat_poly = Polygon([[minlon,maxlat],[maxlon,maxlat],[maxlon,minlat],[minlon,minlat],[minlon,maxlat]])
-   #print '#'*50
-   #print lonlat_poly
    lonlat_poly = lonlat_poly.buffer(0)
    overlap_poly = loaded_poly.intersection(lonlat_poly)
    poly = poly[trim_sizes[poly_type]]
@@ -358,10 +337,6 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    poly = poly.split(',')
    poly = [x.split() for x in poly]
 
-
-
-   #found_lats = [find_closest(latvals, float(x[1])) for x in poly]
-   #found_lons = [find_closest(lonvals, float(x[0])) for x in poly]
    if overlap_poly.type == "MultiPolygon":
       found = []
       for poly in overlap_poly:
@@ -385,10 +360,8 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          found_lats = [find_closest(latvals, float(x)) for x in overlap_poly.exterior.xy[1]]
          found_lons = [find_closest(lonvals, float(x)) for x in overlap_poly.exterior.xy[0]]
 
-      #found = zip(overlap_poly.exterior.xy[0],overlap_poly.exterior.xy[1])
       found = zip(found_lons,found_lats)
 
-   # img = Image.new('L', (chl.shape[2],chl.shape[1]), 0)
    img = Image.new('L', (chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lon').dimensions[0]))],chl.shape[to_be_masked.variables[variable].dimensions.index(str(getCoordinateVariable(to_be_masked, 'Lat').dimensions[0]))]), 0)
 
    if overlap_poly.type == "MultiPolygon":
@@ -404,45 +377,14 @@ def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
          ImageDraw.Draw(img).line(found,   fill=2)
 
    masker = np.array(img)
-   #fig = plt.figure()
-
-   # masked_variable = []
-
-   #print chl.shape
-   #print fillValue
    for i in range(chl.shape[0]):
-      #print i
       masked_slice = np.ma.masked_array(chl[i,:], mask=[x != 2 for x in masker])
-      #print "adding null values"
       masked_slice.filled(fill_value=fillValue)
-      # where_is_nan = np.isnan(masked_slice)
       masked_slice[masked_slice == fillValue] = np.nan
 
       chl[i] = masked_slice
 
-      #print masked_variable[i]
-      #a = fig.add_subplot(1,5,i+1)
-      #imgplot = plt.imshow(masked_variable)
-
-   #plt.show()
-   #print np.array(masked_variable).shape
-   #where_is_nan = np.isnan(masked_variable)
-   #masked_variable[where_is_nan] = 9.96921e+36
-
-   # to_be_masked.variables[variable][:] = np.ma.array(masked_variable)[:]
-
-   #print  to_be_masked.variables[variable][:]
-   #print np.min(to_be_masked.variables[variable][:])
-   #print np.max(to_be_masked.variables[variable][:])
    to_be_masked.close()
-
-   # to_be_masked = netCDF.Dataset(netcdf_base, 'r+')
-
-   #print to_be_masked.variables[variable][:]
-   #print to_be_masked.variables[variable][:]
-   #to_be_masked.close()
-   # return masked_variable, to_be_masked, masker,  variable
-
 
 
 def sizeof_fmt(num, suffix='B'):

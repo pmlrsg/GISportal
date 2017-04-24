@@ -67,12 +67,11 @@ class UniversalExtractor(Extractor):
 
          wcs_extractor = WCSRawHelper(self.wcs_url, extract_dates, self.extract_variable, self.extract_area, self.extract_depth)
 
-         # TODO Shorter name for irregular. Maybe hash previous hash joined with polygon.
          # Generate the file name based on the request URL
          fname_hash = hashlib.md5(wcs_extractor.generateGetCoverageUrl()).hexdigest()
          if self.masking_polygon:
-            mask_hash = hashlib.md5(self.masking_polygon).hexdigest()
-            fname = self.outdir + fname_hash + mask_hash + ".nc"
+            mask_hash = hashlib.md5(fname_hash + self.masking_polygon).hexdigest()
+            fname = self.outdir + mask_hash + ".nc"
          else:
             fname = self.outdir + fname_hash + ".nc"
 
@@ -99,7 +98,12 @@ class UniversalExtractor(Extractor):
                      outfile.write(chunk)
 
                try:
-                  netCDF.Dataset(fname_temp)
+                  test_dataset = netCDF.Dataset(fname_temp)
+                  test_dataset.close()
+
+                  if self.masking_polygon:
+                     create_mask(self.masking_polygon,fname_temp,self.extract_variable)
+
                   download_complete = True
                except (RuntimeError, IOError):
                   if plotting:
@@ -110,11 +114,6 @@ class UniversalExtractor(Extractor):
          if plotting:
             self.update_status(i + 1, total_requests)
          files.append(fname)
-
-      # TODO Move into download loop before rename
-      if self.masking_polygon:
-         for fname in files:
-            create_mask(self.masking_polygon,fname,self.extract_variable)
 
       return files
 
