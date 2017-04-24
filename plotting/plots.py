@@ -1435,13 +1435,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
-            data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
+            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
          else:
-            data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
+            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1496,17 +1496,16 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          bbox = ds['bbox']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
-         debug(3, u"Requesting data: BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage))
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               data_request = "IrregularExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
             else:
-               data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
             extract = extractor.getData()
             map_stats = ImageStats(extract,  coverage)
             response = json.loads(map_stats.process())
@@ -1540,14 +1539,15 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          bbox = ds['bbox']
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
 
-         data_request = "BasicExtractor('{}',{},extract_area={},extract_variable={})".format(ds['threddsUrl'], time_bounds, bbox, coverage)
-         debug(3, u"Requesting data: {}".format(data_request))
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               # extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth,masking_polygon=bbox, outdir=download_dir)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
+               debug(3, u"Requesting data: {}".format(data_request))
                extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
             else:
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
+               debug(3, u"Requesting data: {}".format(data_request))
                extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
             files = extractor.getData()
             ts_stats = BasicStats(files, coverage)
@@ -1603,9 +1603,9 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = IrregularExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, masking_polygon=bbox, outdir=download_dir)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
             else:
-               extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
@@ -1639,28 +1639,28 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
          debug(3, "Requesting data: {}".format(data_request))
-         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox,status_details=status_details, extract_variable=coverage, extra_slices=True)
-         filename = extractor.getData()
-         debug(4, "Extracted to {}".format(filename))
-         stats = TransectStats(filename, coverage, csv_file, matchup=True)
-         output_data = stats.process()
-         debug(4, "Scatter Matchup extract: {}".format(output_data))
+         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
+         files = extractor.getData()
+         if files:
+            debug(4, "Extracted to {}".format(files))
+            stats = TransectStats(files, coverage, csv_file, status_details, matchup=True)
+            output_data = stats.process()
+            debug(4, "Scatter Matchup extract: {}".format(output_data))
 
-         #TODO LEGACY - Change if the format is altered.
-         df = []
-         for details in output_data:
-            line = []
-            [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
-            #TODO This strips out nulls as they break the plotting at the moment.
-            if line[1] != 'null': df.append(line)
+            #TODO LEGACY - Change if the format is altered.
+            df = []
+            for details in output_data:
+               line = []
+               [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
+               #TODO This strips out nulls as they break the plotting at the moment.
+               if line[1] != 'null': df.append(line)
 
-         # And convert it to a nice simple dict the plotter understands.
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
-         # plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
-         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
-
+            # And convert it to a nice simple dict the plotter understands.
+            plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
+            # plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
+         status_details['current_series'] += 1
 
    elif plot_type == "transect":
       for s in series:
@@ -1676,15 +1676,15 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
-         debug(3, u"Requesting data: {}".format(data_request))
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
+         debug(3, "Requesting data: {}".format(data_request))
          extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
          files = extractor.getData()
          if files:
-            debug(4, u"Extracted to {}".format(files))
+            debug(4, "Extracted to {}".format(files))
             stats = TransectStats(files, coverage, csv_file, status_details)
             output_data = stats.process()
-            debug(4, u"Transect extract: {}".format(output_data))
+            debug(4, "Transect extract: {}".format(output_data))
 
             #TODO LEGACY - Change if the format is altered.
             df = []
@@ -1714,34 +1714,35 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={})".format(wcs_url, time, bbox, coverage)
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
          debug(3, "Requesting data: {}".format(data_request))
-         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, status_details=status_details,extract_variable=coverage, extra_slices=True)
-         filename = extractor.getData()
-         debug(4, "Extracted to {}".format(filename))
-         stats = TransectStats(filename, coverage, csv_file, matchup=True)
-         output_data = stats.process()
-         debug(4, "Matchup extract: {}".format(output_data))
+         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
+         files = extractor.getData()
+         if files:
+            debug(4, "Extracted to {}".format(files))
+            stats = TransectStats(files, coverage, csv_file, status_details, matchup=True)
+            output_data = stats.process()
+            debug(4, "Matchup extract: {}".format(output_data))
 
-         #TODO LEGACY - Change if the format is altered.
-         df = []
-         for details in output_data:
-            line = []
-            [line.append(details[i]) for i in ["data_date", "data_value","track_date", "track_lat", "track_lon", "match_value"]]
-            #TODO This strips out nulls as they break the plotting at the moment.
-            if line[1] != 'null': df.append(line)
-         
-         m_df = []
-         for details in output_data:
-            line = []
-            [line.append(details[i]) for i in ["track_date", "match_value", "track_date","track_lat", "track_lon"]]
-            #TODO This strips out nulls as they break the plotting at the moment.
-            if line[1] != 'null': m_df.append(line)
+            #TODO LEGACY - Change if the format is altered.
+            df = []
+            for details in output_data:
+               line = []
+               [line.append(details[i]) for i in ["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"]]
+               #TODO This strips out nulls as they break the plotting at the moment.
+               if line[1] != 'null': df.append(line)
+            
+            m_df = []
+            for details in output_data:
+               line = []
+               [line.append(details[i]) for i in ["track_date", "match_value", "track_date","track_lat", "track_lon"]]
+               #TODO This strips out nulls as they break the plotting at the moment.
+               if line[1] != 'null': m_df.append(line)
 
-         # And convert it to a nice simple dict the plotter understands.
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
-         plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
-         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
+            # And convert it to a nice simple dict the plotter understands.
+            plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
+            plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
+         status_details['current_series'] += 1
 
 
    else:
