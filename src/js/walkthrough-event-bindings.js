@@ -421,6 +421,12 @@ gisportal.events.bind('drawPolygon.clicked', function(event, data) {
    }
 });
 
+gisportal.events.bind('indicatorsPanel.geoJSONSelected', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 gisportal.events.bind('placeSearchFilter.clicked', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
