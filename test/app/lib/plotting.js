@@ -3,7 +3,6 @@ var chai = require('chai');
 var chaiHttp = require('chai-http');
 var fs = require('fs-extra');
 var glob = require('glob');
-var md5 = require('md5');
 
 chai.use(chaiHttp);
 var expect = chai.expect;
@@ -40,6 +39,11 @@ describe('plotting', function() {
       setupTests(testHash, 'extract');
    });
 
+   /**
+    * Setup the tests for a plotting type
+    * @param  {string} testHash The expected hash
+    * @param  {string} plotType The plot type
+    */
    function setupTests(testHash, plotType) {
       var hash = null;
 
@@ -68,6 +72,13 @@ describe('plotting', function() {
       });
    }
 
+   /**
+    * Check if the plot has completed and call testOutputs if it has
+    * @param  {string}   testHash The expected hash
+    * @param  {string}   hash     The hash returned from the program
+    * @param  {string}   plotType The plot type
+    * @param  {Function} next     The chai 'done' function
+    */
    function checkComplete(testHash, hash, plotType, next) {
       var status = {};
       try {
@@ -87,6 +98,13 @@ describe('plotting', function() {
       }
    }
 
+   /**
+    * Test that the plot outputs match the expected ones.
+    * @param  {string}   testHash The expected hash
+    * @param  {string}   hash     The hash returned from the program
+    * @param  {string}   plotType The plot type
+    * @param  {Function} next     The chai 'done' function
+    */
    function testOutputs(testHash, hash, plotType, next) {
       var hasZip = false;
 
@@ -106,6 +124,7 @@ describe('plotting', function() {
       expect(status, 'Status file').to.deep.equal(testStatus);
       expect(data, 'Data file').to.deep.equal(testData);
 
+      // If a zip is expected, test all the files in the zip
       try {
          testZip = admZip(testFilesPath + '.zip');
          hasZip = true;
@@ -126,6 +145,11 @@ describe('plotting', function() {
       next();
    }
 
+   /**
+    * Delete the output files produced by the test
+    * @param  {string}   hash The hash returned from the program
+    * @param  {Function} next The chai 'done' function
+    */
    function deletePlotFiles(hash, next) {
       glob(plotDir + hash + '*', function(err, files) {
          if (!err) {

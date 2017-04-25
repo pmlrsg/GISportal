@@ -1,4 +1,3 @@
-var admZip = require('adm-zip');
 var chai = require('chai');
 var fs = require('fs-extra');
 var glob = require('glob');
