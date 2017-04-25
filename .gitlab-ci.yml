@@ -4,6 +4,9 @@ stages:
     - build
 
 job1:
+    only: 
+        - master
+        - dev
     stage: build
     script:
         - node --version
