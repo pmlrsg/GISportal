@@ -8,17 +8,17 @@ import traceback
 
 class ImageStats(object):
 	"""docstring for ImageStats"""
-	def __init__(self, filename, variable):
+	def __init__(self, files, variable):
 		super(ImageStats, self).__init__()
-		self.filename = filename
+		self.files = files
 		self.variable = variable
 
 
 	def process(self):
-		#print "running basic processing on %s" % self.filename
+		#print "running basic processing on %s" % self.files
 		# create three arrays, 1D lat 1D lon 2D data
 		#print "processing image"
-		netcdf_file = netCDF.Dataset(self.filename, "r")
+		netcdf_file = netCDF.MFDataset(self.files, aggdim='time')
 		#variable = np.ma.masked_array(netcdf_file.variables[self.variable])
 		variable = np.ma.array(netcdf_file.variables[self.variable][:])
 
