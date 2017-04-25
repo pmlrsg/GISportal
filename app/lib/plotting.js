@@ -37,7 +37,7 @@ router.all('/app/plotting/plot', function(req, res) {
          utils.handleError(err, res);
       } else if (hash) {
          try {
-            res.send({
+            res.json({
                hash: hash
             });
          } catch (e) {}
