@@ -4,18 +4,18 @@ import json
 
 class HovmollerStats(object):
 	"""docstring for BasicStats"""
-	def __init__(self, filename, xVariable, yVariable, dataVariable):
+	def __init__(self, files, xVariable, yVariable, dataVariable):
 		super(HovmollerStats, self).__init__()
-		self.filename = filename
+		self.files = files
 		self.xVariable = xVariable
 		self.yVariable = yVariable
 		self.dataVariable = dataVariable
 		
 
 	def process(self):
-		#print "running basic processing on %s" % self.filename
-		#print "gettingdata from %s" % self.filename
-		netcdf_file = netCDF.Dataset(self.filename, "r")
+		#print "running basic processing on %s" % self.files
+		#print "gettingdata from %s" % self.files
+		netcdf_file = netCDF.MFDataset(self.files, aggdim='time')
 		#print netcdf_file.variables[self.dataVariable][:]
 		return json.dumps(hovmoller(netcdf_file, self.xVariable, self.yVariable, self.dataVariable))
 

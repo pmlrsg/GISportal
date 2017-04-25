@@ -138,7 +138,7 @@ describe('plotting', function() {
          for (var i = 0; i < testZipEntries.length; i++) {
             var testEntry = testZip.readAsText(testZipEntries[i]);
             var entry = zip.readAsText(zipEntries[i]);
-            expect(entry).to.equal(testEntry);
+            expect(entry, 'zip file').to.equal(testEntry);
          }
       }
 

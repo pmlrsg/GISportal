@@ -399,9 +399,9 @@ def sizeof_fmt(num, suffix='B'):
 def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    
    xVar = getCoordinateVariable(dataset, xAxisVar)
-   xArr = np.array(xVar)
+   xArr = np.array(xVar[:])
    yVar = getCoordinateVariable(dataset, yAxisVar)
-   yArr = np.array(yVar)
+   yArr = np.array(yVar[:])
    #print '+'*40
    #print yArr.shape
    zArr = dataset.variables[dataVar][:]

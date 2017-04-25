@@ -1947,7 +1947,7 @@ To execute a plot
          else:
             debug(0, u"Error executing. Failed to complete plot")
             logger.log_complete(False)
-            # sys.exit(2)
+            sys.exit(2)
       except:
          trace_message = traceback.format_exc()
          debug(0, u"Uncaught Exception. Failed to complete plot - {}".format(trace_message))

@@ -4,17 +4,16 @@ import json
 
 class BasicStats(object):
 	"""docstring for BasicStats"""
-	def __init__(self, filename, variable):
+	def __init__(self, files, variable):
 		super(BasicStats, self).__init__()
-		self.filename = filename
+		self.files = files
 		self.variable = variable
 		
 
 	def process(self):
-		#print "running basic processing on %s" % self.filename
+		#print "running basic processing on %s" % self.files
 
-		# netcdf_file = netCDF.Dataset(self.filename, "r")
-		netcdf_file = netCDF.MFDataset(self.filename, aggdim='time')
+		netcdf_file = netCDF.MFDataset(self.files, aggdim='time')
 		return json.dumps(basic(netcdf_file, self.variable))
 
 
