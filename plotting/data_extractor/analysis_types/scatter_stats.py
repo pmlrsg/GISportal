@@ -9,14 +9,14 @@ class ScatterStats(object):
 		
 		
 		self.variable1, self.variable2 = filenames.keys()
-		self.filename1 = filenames[self.variable1]
-		self.filename2 = filenames[self.variable2]
+		self.files1 = filenames[self.variable1]
+		self.files2 = filenames[self.variable2]
 
 	def process(self):
-		print "running basic processing on %s & %s" % (self.filename1, self.filename2)
+		print "running basic processing on %s & %s" % (self.files1, self.files2)
 
-		netcdf_file1 = netCDF.Dataset(self.filename1, "r")
-		netcdf_file2 = netCDF.Dataset(self.filename2, "r")
+		netcdf_file1 = netCDF.MFDataset(self.files1, aggdim='time')
+		netcdf_file2 = netCDF.MFDataset(self.files2, aggdim='time')
 
 		return json.dumps(basic_scatter(netcdf_file1, self.variable1, netcdf_file2, self.variable2))
 

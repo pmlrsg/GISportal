@@ -89,10 +89,10 @@ def basic_scatter(dataset1, variable1, dataset2, variable2,):
       g.graphError = "could not find time dimension"
       return
    
-   times1 = np.array(time1)
+   times1 = np.array(time1[:])
    isotimes1 = [(netCDF.num2date(x, time1.units, calendar='standard')).isoformat() for x in times1[:]]
 
-   times2 = np.array(time2)
+   times2 = np.array(time2[:])
    isotimes2 = [(netCDF.num2date(x, time2.units, calendar='standard')).isoformat() for x in times2[:]]
    output = {}
    
