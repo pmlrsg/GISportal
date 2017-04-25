@@ -30,6 +30,16 @@ describe('plotting', function() {
       setupTests(testHash, 'hovmoller_lon');
    });
 
+   describe('scatter', function() {
+      var testHash = '7fc2b7d48a3d45d0450a82e297b01bad002f50a1';
+      setupTests(testHash, 'scatter');
+   });
+
+   describe('extract (geographic)', function() {
+      var testHash = '19541046a974ba4671175a12f151fcefdae9b6f4';
+      setupTests(testHash, 'extract');
+   });
+
    function setupTests(testHash, plotType) {
       var hash = null;
 
@@ -49,7 +59,7 @@ describe('plotting', function() {
       });
 
       it('should produce all the correct files when it completes', function(done) {
-         this.timeout(30000);
+         this.timeout(10000);
          checkComplete(testHash, hash, plotType, done);
       });
 
@@ -65,31 +75,53 @@ describe('plotting', function() {
       } catch (err) {
          setTimeout(function() {
             checkComplete(testHash, hash, plotType, next);
-         }, 1000);
+         }, 250);
+         return;
       }
       if (status.completed) {
          testOutputs(testHash, hash, plotType, next);
       } else {
          setTimeout(function() {
             checkComplete(testHash, hash, plotType, next);
-         }, 1000);
+         }, 250);
       }
    }
 
    function testOutputs(testHash, hash, plotType, next) {
+      var hasZip = false;
+
       var testFilesPath = dependPathExpected + plotType + '/' + testHash;
       var testRequest = JSON.parse(fs.readFileSync(testFilesPath + '-request.json', 'utf8'));
       var testStatus = JSON.parse(fs.readFileSync(testFilesPath + '-status.json', 'utf8'));
       var testData = JSON.parse(fs.readFileSync(testFilesPath + '-data.json', 'utf8')).data;
+      var testZip = null;
 
       var filesPath = plotDir + hash;
       var request = JSON.parse(fs.readFileSync(filesPath + '-request.json', 'utf8'));
       var status = JSON.parse(fs.readFileSync(filesPath + '-status.json', 'utf8'));
       var data = JSON.parse(fs.readFileSync(filesPath + '-data.json', 'utf8')).data;
+      var zip = null;
 
       expect(request, 'Request file').to.deep.equal(testRequest);
       expect(status, 'Status file').to.deep.equal(testStatus);
       expect(data, 'Data file').to.deep.equal(testData);
+
+      try {
+         testZip = admZip(testFilesPath + '.zip');
+         hasZip = true;
+      } catch (err) {}
+
+      if (hasZip) {
+         zip = admZip(filesPath + '.zip');
+         var testZipEntries = testZip.getEntries();
+         var zipEntries = zip.getEntries();
+
+         for (var i = 0; i < testZipEntries.length; i++) {
+            var testEntry = testZip.readAsText(testZipEntries[i]);
+            var entry = zip.readAsText(zipEntries[i]);
+            expect(entry).to.equal(testEntry);
+         }
+      }
 
       next();
    }
