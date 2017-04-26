@@ -1435,7 +1435,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
-            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
+            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
             debug(3, u"Requesting data: {}".format(data_request))
             extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
          else:
@@ -1499,7 +1499,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
                debug(3, u"Requesting data: {}".format(data_request))
                extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
             else:

@@ -1,1 +1,82 @@
-{"status": "success", "dir_name": "/local1/data/scratch/nik/GISportal/html/plots/", "palette": "alg", "xAxis": {"scale": "linear", "tickFormat": "%d/%m/%Y", "ticks": "auto", "weight": "auto", "label": "Date/Time"}, "title": "Plymouth_Marine_Laboratory: Mass Concentration of Chlorophyll a in Sea Water", "data": [{"scale": "log", "data": [["2015-09-08T00:00:00", 0.5305951833724976, 5.874972343444824, 1.1626439094543457, 0.7508805394172668], ["2015-09-28T00:00:00", 0.5463276505470276, 3.873314619064331, 1.197885513305664, 0.5664107203483582], ["2015-09-13T00:00:00", 0.4817522466182709, 5.265270233154297, 1.0993403196334839, 0.6936314702033997], ["2015-08-29T00:00:00", 0.4740411937236786, 3.2222208976745605, 0.9163249135017395, 0.41159293055534363], ["2015-09-03T00:00:00", 0.4151771068572998, 3.5266573429107666, 0.8696622252464294, 0.3719772398471832], ["2015-09-18T00:00:00", 0.43044471740722656, 5.148440361022949, 1.0373708009719849, 0.695036768913269], ["2015-09-23T00:00:00", 0.4455840587615967, 6.51082706451416, 1.096874475479126, 0.7407240867614746]], "vars": ["date", "min", "max", "mean", "std"], "coverage": "chlor_a", "yaxis": 1}], "req_hash": "22c61d157b8a6e458f87869ff75bcda84c52e9d1", "matchup_log": false, "req_id": "149320525627191", "y1Axis": {"scale": "log", "tickFormat": "auto", "ticks": "auto", "weight": "auto", "label": "Mass Concentration of Chlorophyll a in Sea Water (milligram m-3)"}, "type": "timeseries"}
+{
+  "status": "success",
+  "dir_name": "/local1/data/scratch/nik/GISportal/html/plots/",
+  "palette": "alg",
+  "xAxis": {
+    "scale": "linear",
+    "tickFormat": "%d/%m/%Y",
+    "ticks": "auto",
+    "weight": "auto",
+    "label": "Date/Time"
+  },
+  "title": "Plymouth_Marine_Laboratory: Mass Concentration of Chlorophyll a in Sea Water",
+  "data": [
+    {
+      "scale": "log",
+      "data": [
+        [
+          "2015-09-08T00:00:00",
+          0.5305951833724976,
+          5.874972343444824,
+          1.1626439094543457,
+          0.7508805394172668
+        ],
+        [
+          "2015-09-28T00:00:00",
+          0.5463276505470276,
+          3.873314619064331,
+          1.197885513305664,
+          0.5664107203483582
+        ],
+        [
+          "2015-09-13T00:00:00",
+          0.4817522466182709,
+          5.265270233154297,
+          1.0993403196334839,
+          0.6936314702033997
+        ],
+        [
+          "2015-09-03T00:00:00",
+          0.4151771068572998,
+          3.5266573429107666,
+          0.8696622252464294,
+          0.3719772398471832
+        ],
+        [
+          "2015-09-18T00:00:00",
+          0.43044471740722656,
+          5.148440361022949,
+          1.0373708009719849,
+          0.695036768913269
+        ],
+        [
+          "2015-09-23T00:00:00",
+          0.4455840587615967,
+          6.51082706451416,
+          1.096874475479126,
+          0.7407240867614746
+        ]
+      ],
+      "vars": [
+        "date",
+        "min",
+        "max",
+        "mean",
+        "std"
+      ],
+      "coverage": "chlor_a",
+      "yaxis": 1
+    }
+  ],
+  "req_hash": "22c61d157b8a6e458f87869ff75bcda84c52e9d1",
+  "matchup_log": false,
+  "req_id": "149320525627191",
+  "y1Axis": {
+    "scale": "log",
+    "tickFormat": "auto",
+    "ticks": "auto",
+    "weight": "auto",
+    "label": "Mass Concentration of Chlorophyll a in Sea Water (milligram m-3)"
+  },
+  "type": "timeseries"
+}
