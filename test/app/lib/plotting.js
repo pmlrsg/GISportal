@@ -28,9 +28,19 @@ describe('plotting', function() {
       setupTests(testHash, 'timeseries');
    });
 
+   describe('timeseries (irregular)', function() {
+      var testHash = '22c61d157b8a6e458f87869ff75bcda84c52e9d1';
+      setupTests(testHash, 'timeseries_irregular');
+   });
+
    describe('hovmoller_lat', function() {
       var testHash = '8944f55de97239899d1ed4d2f1278526d5e8390e';
       setupTests(testHash, 'hovmoller_lat');
+   });
+
+   describe('hovmoller_lat (irregular)', function() {
+      var testHash = '1a4e5b5abfd49eee0d9842c7dda1d823b79d309a';
+      setupTests(testHash, 'hovmoller_lat_irregular');
    });
 
    describe('hovmoller_lon', function() {
@@ -38,14 +48,29 @@ describe('plotting', function() {
       setupTests(testHash, 'hovmoller_lon');
    });
 
+   describe('hovmoller_lon (irregular)', function() {
+      var testHash = '8029766a38d66367bdba0339567a336e1a4ba4ad';
+      setupTests(testHash, 'hovmoller_lon_irregular');
+   });
+
    describe('scatter', function() {
       var testHash = '7fc2b7d48a3d45d0450a82e297b01bad002f50a1';
       setupTests(testHash, 'scatter');
    });
 
+   describe('scatter (irregular)', function() {
+      var testHash = '0ad6a57cfc9e37ec12bc28a2111d1949cb8619e0';
+      setupTests(testHash, 'scatter_irregular');
+   });
+
    describe('extract (geographic)', function() {
       var testHash = '19541046a974ba4671175a12f151fcefdae9b6f4';
       setupTests(testHash, 'extract');
+   });
+
+   describe('extract (geographic) (irregular)', function() {
+      var testHash = '4c4c49b3757dfa032fb014219758b5ebf47c51a2';
+      setupTests(testHash, 'extract_irregular');
    });
 
    /**
@@ -163,7 +188,7 @@ describe('plotting', function() {
       glob(plotDir + hash + '*', function(err, files) {
          if (!err) {
             files.forEach(function(file) {
-               fs.removeSync(file);
+               // fs.removeSync(file);
             });
          }
          next();

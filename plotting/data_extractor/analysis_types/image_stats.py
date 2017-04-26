@@ -37,7 +37,7 @@ class ImageStats(object):
 			#print variable
 			#print np.nanmean(variable, axis=time_dim_index).shape
 
-			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.nanmean(variable, axis=time_dim_index)[0]]
+			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.ma.filled(np.nanmean(variable, axis=time_dim_index)[0], np.nan)]
 			#print var_list
 			lat_list = [float(x) for x in lats]
 			lon_list = [float(x) for x in lons]
@@ -45,7 +45,7 @@ class ImageStats(object):
 			#print variable.shape
 			#print variable
 			#print np.nanmean(variable, axis=time_dim_index)
-			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.nanmean(variable, axis=time_dim_index)]
+			var_list = [[float(x) if not np.isinf(x) and not np.isnan(x) else None for x in y  ] for y in np.ma.filled(np.nanmean(variable, axis=time_dim_index), np.nan)]
 			#var_list = [[float(x) for x in y] for y in variable[0]]
 			#print var_list
 			lat_list = [float(x) for x in lats]
