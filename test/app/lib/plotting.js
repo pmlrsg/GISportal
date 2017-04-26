@@ -188,7 +188,7 @@ describe('plotting', function() {
       glob(plotDir + hash + '*', function(err, files) {
          if (!err) {
             files.forEach(function(file) {
-               // fs.removeSync(file);
+               fs.removeSync(file);
             });
          }
          next();
