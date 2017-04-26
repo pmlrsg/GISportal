@@ -14,7 +14,9 @@ describe('plotting', function() {
    var dependPathExpected = global.test.dependPath + '/expected/plotting/';
    var plotDir = global.test.appPath + '/html/plots/';
 
-   var ncFiles = ['473a8bc2d5bcf90e9d4ccebf931d985a.nc', 'f2ad40c955a1bdd68a26236a38396a07.nc'];
+   var ncFiles = ['473a8bc2d5bcf90e9d4ccebf931d985a.nc', 'f2ad40c955a1bdd68a26236a38396a07.nc',
+      '99be20e4be7d92fd7238d07fa8d89d50.nc', '381869e70ddf728b329f1003ea9d45d5.nc'
+   ];
 
    before(function() {
       // Copy the netcdf files to /tmp to avoid downloading them
@@ -82,6 +84,7 @@ describe('plotting', function() {
       var hash = null;
 
       it('should return the correct hash for a request', function(done) {
+         this.timeout(5000);
          var request = JSON.parse(fs.readFileSync(dependPathResources + '/' + plotType + '/' + testHash + '-request.json', 'utf8'));
 
          chai.request(app)
