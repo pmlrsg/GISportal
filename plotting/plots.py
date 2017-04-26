@@ -1542,7 +1542,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, masking_polygon)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
                debug(3, u"Requesting data: {}".format(data_request))
                extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
             else:
@@ -1552,7 +1552,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             files = extractor.getData()
             ts_stats = BasicStats(files, coverage)
             response = json.loads(ts_stats.process())
-         except ValueError as e:
+         except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
          #except urllib2.HTTPError:
@@ -1561,7 +1561,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          except requests.exceptions.ReadTimeout:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
-         
+
          debug(4, u"Response: {}".format(response))
 
          #TODO LEGACY - Change if the format is altered.
@@ -1571,7 +1571,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
              line = [date]
              [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
              df.append(line)
-    
+
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
          status_details['current_series'] += 1
