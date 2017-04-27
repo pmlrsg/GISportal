@@ -1,5 +1,7 @@
 import json
+import time
 from plotting.debug import debug
+
 
 # Home rolled enums as Python 2.7 does not have them.
 class Enum(set):
@@ -11,87 +13,120 @@ class Enum(set):
 # Valid plot status values.
 Plot_status = Enum(["initialising", "extracting", "plotting", "complete", "failed"])
 
-def read_status(dirname, my_hash):
-   '''
-      Reads a JSON status file whose name is defined by dirname and my_hash.
-   '''
 
-   status = None
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-      else:
-         raise
+class StatusHandler(object):
+   def __init__(self, dirname, plot_hash):
+      self.dirname = dirname
+      self.hash = plot_hash
 
-   return status
-# END read_status
+   def read_status(self):
+      '''
+         Reads a JSON status file whose name is defined by dirname and hash.
+      '''
 
+      status = None
+      file_path = self.dirname + "/" + self.hash + "-status.json"
+      try:
+         with open(file_path, 'r') as status_file:
+            status = json.load(status_file)
+      except IOError as err:
+         if err.errno == 2:
+            debug(2, u"Status file {} not found".format(file_path))
+         else:
+            raise
 
-def update_status(dirname, my_hash, plot_status, message="", percentage=0, traceback="", base_url="", minutes_remaining=-1):
-   '''
-      Updates a JSON status file whose name is defined by dirname and my_hash.
-   '''
+      return status
+   # END read_status
 
-   initial_status = dict(
-      percentage = 0,
-      state = plot_status,
-      message = message,
-      completed = False,
-      traceback= traceback,
-      job_id = my_hash,
-      minutes_remaining = -1
-   )
+   def update_status(self, plot_status, message="", percentage=0, traceback="", base_url="", minutes_remaining=-1):
+      '''
+         Updates a JSON status file whose name is defined by dirname and my_hash.
+      '''
 
-   # Read status file, create if not there.
-   file_path = dirname + "/" + my_hash + "-status.json"
-   try:
-      with open(file_path, 'r') as status_file:
-         if plot_status == Plot_status.initialising:
+      initial_status = dict(
+         percentage = 0,
+         state = plot_status,
+         message = message,
+         completed = False,
+         traceback= traceback,
+         job_id = self.hash,
+         minutes_remaining = -1
+      )
+
+      # Read status file, create if not there.
+      file_path = self.dirname + "/" + self.hash + "-status.json"
+      try:
+         with open(file_path, 'r') as status_file:
+            if plot_status == Plot_status.initialising:
+               status = initial_status
+            else:
+               status = json.load(status_file)
+      except IOError as err:
+         if err.errno == 2:
+            debug(2, u"Status file {} not found".format(file_path))
+            # It does not exist yet so create the initial JSON
             status = initial_status
          else:
-            status = json.load(status_file)
-   except IOError as err:
-      if err.errno == 2:
-         debug(2, u"Status file {} not found".format(file_path))
-         # It does not exist yet so create the initial JSON
-         status = initial_status
+            raise
+
+      # Update the status information.
+      status["message"] = message
+      status["traceback"] = traceback
+      status["state"] = plot_status
+      if plot_status == Plot_status.complete:
+         status["completed"] = True
+         status['percentage'] = 100
+         status['minutes_remaining'] = 0
+         status['filename'] = self.dirname + "/" + self.hash + "-plot.html"
+         status['csv'] = self.dirname + "/" + self.hash + ".zip"
+         if base_url:
+            status['csv_url'] = base_url + "/" + self.hash + ".zip"
+      elif plot_status == Plot_status.failed:
+         status["completed"] = True
+         status['percentage'] = 100
+         status['minutes_remaining'] = 0
+         status['filename'] = None
+         status['csv'] = None
       else:
-         raise
+         status["completed"] = False
+         status['percentage'] = percentage
+         status['minutes_remaining'] = minutes_remaining
+         status['filename'] = None
+         status['csv'] = None
 
-   # Update the status information.
-   status["message"] = message
-   status["traceback"] = traceback
-   status["state"] = plot_status
-   if plot_status == Plot_status.complete:
-      status["completed"] = True
-      status['percentage'] = 100
-      status['minutes_remaining'] = 0
-      status['filename'] = dirname + "/" + my_hash + "-plot.html"
-      status['csv'] = dirname + "/" + my_hash + ".zip"
-      if base_url:
-         status['csv_url'] = base_url + "/" + my_hash + ".zip"
-   elif plot_status == Plot_status.failed:
-      status["completed"] = True
-      status['percentage'] = 100
-      status['minutes_remaining'] = 0
-      status['filename'] = None
-      status['csv'] = None
-   else:
-      status["completed"] = False
-      status['percentage'] = percentage
-      status['minutes_remaining'] = minutes_remaining
-      status['filename'] = None
-      status['csv'] = None
+      debug(4, u"Status: {}".format(status))
 
-   debug(4, u"Status: {}".format(status))
+      # Write it back to the file.
+      with open(file_path, 'w') as status_file:
+         json.dump(status, status_file)
 
-   # Write it back to the file.
-   with open(file_path, 'w') as status_file:
-      json.dump(status, status_file)
+      return status
+   # END update_status
 
-   return status
-# END update_status
+
+class ExtractionProgressTracker(object):
+   def __init__(self, status_handler, num_series):
+      self.status_handler = status_handler
+      self.num_series = num_series
+      self.current_series = 0
+
+   def start_series(self, length):
+      self.start_time = time.clock()
+      self.last_time = time.clock()
+      self.series_length = length
+
+   def update_progress(self, progress):
+      if time.clock() > self.last_time + 60:
+         self.last_time = time.clock()
+         starting_percentage = 94.0 / self.num_series * self.current_series + 1
+         percentage = int(round((progress / float(self.series_length) * 75 + 19) / self.num_series + starting_percentage))
+         debug(3, "Overall progress: {}%".format(percentage))
+         if self.current_series == self.num_series - 1:
+            minutes_remaining = int(round((time.clock() - self.start_time) / progress * (self.series_length - progress) / 60))
+            debug(3, "Remaining: {} mins".format(minutes_remaining))
+         else:
+            minutes_remaining = -1
+
+         self.status_handler.update_status(Plot_status.extracting, percentage=percentage, minutes_remaining=minutes_remaining)
+
+      debug(5, "Extracting: {}%".format(round(progress / float(self.series_length) * 100, 3)))
