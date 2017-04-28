@@ -113,7 +113,12 @@ class ExtractionProgressTracker(object):
    def download_progress(self, progress, total_requests):
       starting_percentage = 94.0 / self.num_series * self.current_series + 1
       percentage = int(round(progress / float(total_requests) * 19 / self.num_series + starting_percentage))
-      self.status_handler.update_status(Plot_status.extracting, percentage=percentage, message="{}%".format(percentage))
+      if progress < total_requests:
+         self.status_handler.update_status(Plot_status.extracting, percentage=percentage,
+            message="Processing indicator {} of {}<br>Downloading data file: {}/{}".format(self.current_series + 1, self.num_series, progress + 1, total_requests))
+      else:
+         self.status_handler.update_status(Plot_status.extracting, percentage=percentage,
+            message="Processing indicator {} of {}<br>All data files downloaded".format(self.current_series + 1, self.num_series))
       debug(3, "Overall progress: {}%".format(percentage))
 
    def start_series_analysis(self, length):
@@ -127,15 +132,20 @@ class ExtractionProgressTracker(object):
          starting_percentage = 94.0 / self.num_series * self.current_series + 1
          percentage = int(round((progress / float(self.series_length) * 75 + 19) / self.num_series + starting_percentage))
          debug(3, "Overall progress: {}%".format(percentage))
+
+         series_percentage = int(round(progress / float(self.series_length) * 100 ))
+
          if self.current_series == self.num_series - 1:
             total_seconds_remaining = int(round((time.time() - self.start_time) / progress * (self.series_length - progress)))
             minutes_remaining, seconds_remaining = divmod(total_seconds_remaining, 60)
             # minutes_remaining = int(round((time.time() - self.start_time) / progress * (self.series_length - progress) / 60))
             debug(3, "Remaining: {} mins".format(minutes_remaining))
+            message = "Processing indicator {} of {}<br>Analysing {}%<br>Approx {}m{:0>2d}s remaining".format(self.current_series + 1, self.num_series, series_percentage, minutes_remaining, seconds_remaining)
          else:
             minutes_remaining = -1
+            message = "Processing indicator {} of {}<br>Analysing {}%".format(self.current_series + 1, self.num_series,  series_percentage)
 
          self.status_handler.update_status(Plot_status.extracting, percentage=percentage,
-         minutes_remaining=minutes_remaining, message="{}%<br>approx {}m{:0>2d}s remaining".format(percentage, minutes_remaining, seconds_remaining))
+            minutes_remaining=minutes_remaining, message=message)
 
       debug(5, "Extracting: {}%".format(round(progress / float(self.series_length) * 100, 3)))

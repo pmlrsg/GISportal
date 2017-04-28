@@ -77,6 +77,10 @@ class UniversalExtractor(Extractor):
 
          if not os.path.isfile(fname):
             # If the same request hasn't been downloaded before
+            if plotting and self.progress_tracker and i == 0:
+               self.progress_tracker.download_progress(i, total_requests)
+
+
             download_complete = False
             while not download_complete:
                if plotting:
