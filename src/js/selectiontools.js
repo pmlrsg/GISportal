@@ -278,7 +278,7 @@ gisportal.selectionTools.loadGeoJSON = function(geojson, shapeName, selectedValu
          $('.users-geojson-files').val(shapeName);
       }
    }
-   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false};
+   gisportal.methodThatSelectedCurrentRegion = {method:"geoJSONSelect", value: $('.users-geojson-files').val(), justCoords: false, geoJSON: geojson};
    if(selectedValue){
       gisportal.methodThatSelectedCurrentRegion.value = selectedValue;
    }
