@@ -40,7 +40,7 @@ from data_extractor.extractors import BasicExtractor, IrregularExtractor, Transe
 from data_extractor.extraction_utils import Debug, get_transect_bounds, get_transect_times
 from data_extractor.analysis_types import BasicStats, TransectStats, HovmollerStats, ImageStats, ScatterStats
 
-from plotting.status import Plot_status, read_status, update_status
+from plotting.status import Plot_status, StatusHandler, ExtractionProgressTracker
 import plotting.debug
 from plotting.debug import debug
 import plotting.logger as logger
@@ -1375,13 +1375,14 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       irregular = True
 
 
-   status_details = {
-      'dirname': dirname,
-      'my_hash': my_hash,
-      'current_series': 0,
-      'num_series': len(series)
-   }
+   # status_details = {
+   #    'dirname': dirname,
+   #    'my_hash': my_hash,
+   #    'current_series': 0,
+   #    'num_series': len(series)
+   # }
 
+   progress_tracker = ExtractionProgressTracker(status_handler, len(series))
 
    if 'matchup_log' in json_request['plot']:
       matchup_log = json_request['plot']['matchup_log']
@@ -1410,7 +1411,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       y2Axis = json_request['plot']['y2Axis']
       plot['y2Axis']=y2Axis
 
-   update_status(dirname, my_hash, Plot_status.extracting, percentage=1)
+   status_handler.update_status(Plot_status.extracting, percentage=1)
 
    if plot_type in ("hovmollerLat", "hovmollerLon"):
       # Extract the description of the data required from the request.
@@ -1435,13 +1436,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       try:
          if irregular:
             bounds = wkt.loads(bbox).bounds
-            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
+            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, bbox)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
+            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker, masking_polygon=bbox)
          else:
-            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
+            data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker)".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir)
             debug(3, u"Requesting data: {}".format(data_request))
-            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
+            extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker)
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
@@ -1461,7 +1462,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
                       vars=['date', 'latlon', 'value'], data=data))
-      update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
+      status_handler.update_status(Plot_status.extracting, percentage=90)
 
    elif plot_type in ("extract"):
       if len(series) > 1:
@@ -1499,13 +1500,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, bbox)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker, masking_polygon=bbox)
             else:
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker)".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker)
             extract = extractor.getData()
             map_stats = ImageStats(extract,  coverage)
             response = json.loads(map_stats.process())
@@ -1520,7 +1521,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
       # And convert it to a nice simple dict the plotter understands.
       plot_data.append(dict(scale=scale, coverage=coverage, type=plot_type, units=units, title=plot_title,
                       vars=my_vars, data=data))
-      update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
+      status_handler.update_status(Plot_status.extracting, percentage=90)
 
    elif plot_type in ("timeseries"):
       #Can have more than 1 series so need a loop.
@@ -1542,15 +1543,15 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={}, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details, bbox)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker, masking_polygon={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, bbox)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker, masking_polygon=bbox)
             else:
-               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, status_details={})".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir, status_details)
+               data_request = "UniversalExtractor('{}', {}, extract_area={}, extract_variable={}, extract_depth={}, outdir={}, progress_tracker=progress_tracker)".format(ds['threddsUrl'], time_bounds, bbox, coverage, depth, download_dir)
                debug(3, u"Requesting data: {}".format(data_request))
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker)
             files = extractor.getData()
-            ts_stats = BasicStats(files, coverage)
+            ts_stats = BasicStats(files, coverage, progress_tracker)
             response = json.loads(ts_stats.process())
          except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
@@ -1573,8 +1574,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
              df.append(line)
 
          plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df))
-         update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
-         status_details['current_series'] += 1
+         status_handler.update_status(Plot_status.extracting, percentage=90/len(series))
+         progress_tracker.current_series += 1
    elif plot_type == "scatter":
       t_holder = {}
       scatter_stats_holder = {}
@@ -1603,9 +1604,9 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          try:
             if irregular:
                bounds = wkt.loads(bbox).bounds
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details, masking_polygon=bbox)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bounds, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker, masking_polygon=bbox)
             else:
-               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, status_details=status_details)
+               extractor = UniversalExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir, progress_tracker=progress_tracker)
             extract = extractor.getData()
             scatter_stats_holder[coverage] = extract
          except ValueError:
@@ -1617,12 +1618,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          except requests.exceptions.ReadTimeout:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
+         progress_tracker.current_series += 1
       stats = ScatterStats(scatter_stats_holder)
       response = json.loads(stats.process())
       data = response['data']
       data_order = response['order']
       plot_data.append(dict(cov_meta=t_holder, order=data_order, data=data))
-      update_status(dirname, my_hash, Plot_status.extracting, percentage=90)
+      status_handler.update_status(Plot_status.extracting, percentage=90)
 
    elif plot_type == "scatter_matchup":
 
@@ -1639,13 +1641,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, progress_tracker=progress_tracker, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, download_dir)
          debug(3, "Requesting data: {}".format(data_request))
-         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
+         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, progress_tracker=progress_tracker, outdir=download_dir, extra_slices=True)
          files = extractor.getData()
          if files:
             debug(4, "Extracted to {}".format(files))
-            stats = TransectStats(files, coverage, csv_file, status_details, matchup=True)
+            stats = TransectStats(files, coverage, csv_file, progress_tracker, matchup=True)
             output_data = stats.process()
             debug(4, "Scatter Matchup extract: {}".format(output_data))
 
@@ -1660,7 +1662,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             # And convert it to a nice simple dict the plotter understands.
             plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
             # plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
-         status_details['current_series'] += 1
+         progress_tracker.current_series += 1
 
    elif plot_type == "transect":
       for s in series:
@@ -1676,13 +1678,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, progress_tracker=progress_tracker, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, download_dir)
          debug(3, "Requesting data: {}".format(data_request))
-         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
+         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, progress_tracker=progress_tracker, outdir=download_dir, extra_slices=True)
          files = extractor.getData()
          if files:
             debug(4, "Extracted to {}".format(files))
-            stats = TransectStats(files, coverage, csv_file, status_details)
+            stats = TransectStats(files, coverage, csv_file, progress_tracker)
             output_data = stats.process()
             debug(4, "Transect extract: {}".format(output_data))
 
@@ -1695,8 +1697,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
 
             # And convert it to a nice simple dict the plotter understands.
             plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon"], data=df))
-            # update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
-         status_details['current_series'] += 1
+            # status_handler.update_status(Plot_status.extracting, percentage=90/len(series))
+         progress_tracker.current_series += 1
 
    elif plot_type == "matchup":
       # add matchup series here then loop through normal series
@@ -1714,13 +1716,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          wcs_url = ds['threddsUrl']
          bbox = get_transect_bounds(csv_file)
          time = get_transect_times(csv_file)
-         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, status_details={}, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, status_details, download_dir)
+         data_request = "UniversalExtractor('{}',{},extract_area={},extract_variable={}, progress_tracker=progress_tracker, outdir={}, extra_slices=True)".format(wcs_url, time, bbox, coverage, download_dir)
          debug(3, "Requesting data: {}".format(data_request))
-         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, status_details=status_details, outdir=download_dir, extra_slices=True)
+         extractor = UniversalExtractor(wcs_url, [time], extract_area=bbox, extract_variable=coverage, progress_tracker=progress_tracker, outdir=download_dir, extra_slices=True)
          files = extractor.getData()
          if files:
             debug(4, "Extracted to {}".format(files))
-            stats = TransectStats(files, coverage, csv_file, status_details, matchup=True)
+            stats = TransectStats(files, coverage, csv_file, progress_tracker, matchup=True)
             output_data = stats.process()
             debug(4, "Matchup extract: {}".format(output_data))
 
@@ -1742,7 +1744,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             # And convert it to a nice simple dict the plotter understands.
             plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis, vars=["data_date", "data_value", "track_date", "track_lat", "track_lon", "match_value"], data=df))
             plot_data.append(dict(scale=scale, coverage='matchup values', yaxis=yaxis, vars=["track_date","data_value","track_date", "track_lat", "track_lon"], data=m_df))
-         status_details['current_series'] += 1
+         progress_tracker.current_series += 1
 
 
    else:
@@ -1753,7 +1755,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
    if plot_data:
       plot['status'] = "success"
    else:
-      update_status(dirname, my_hash, Plot_status.failed, message="No matching data found.")
+      status_handler.update_status(Plot_status.failed, message="No matching data found.")
       plot['status'] = "failed"
 
    plot['data'] = plot_data
@@ -1790,10 +1792,10 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
    my_fullid = my_hash + "_" + my_id
 
    new_plot = False
-   status = read_status(dirname, my_hash)
+   status = status_handler.read_status()
    if status == None or status['state'] == Plot_status.failed:
       new_plot = True
-      update_status(dirname, my_hash, Plot_status.initialising, "Preparing")
+      status_handler.update_status(Plot_status.initialising, "Preparing")
 
       # Output the identifier for the plot on stdout. This is used by the frontend
       # to monitor the status of the plot. We must not do this before we have written the 
@@ -1807,7 +1809,7 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
          json.dump(request, outfile)
       
       # Call the extractor.
-      update_status(dirname, my_hash, Plot_status.extracting, "Extracting")
+      status_handler.update_status(Plot_status.extracting, "Extracting")
       plot = get_plot_data(request, plot, download_dir)
 
       # Only cache the data if we think it is OK.
@@ -1838,7 +1840,7 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
    plot['req_id'] = my_id
    plot['dir_name'] = dirname
 
-   update_status(dirname, my_hash, Plot_status.plotting, "Plotting", percentage=95)
+   status_handler.update_status(Plot_status.plotting, "Plotting", percentage=95)
    if plot['type'] == 'timeseries':
       plot_file = timeseries(plot, file_path)
    elif plot['type'] == 'scatter':
@@ -1856,13 +1858,13 @@ def execute_plot(dirname, plot, request, base_url, download_dir):
    else:
       # We should not be here.
       debug(0, u"Unknown plot type, {}.".format(plot['type']))
-      update_status(dirname, my_hash, Plot_status.failed, message="Unknown plot type.")
+      status_handler.update_status(Plot_status.failed, message="Unknown plot type.")
       return False
 
    if new_plot:
       logger.log_complete(True)
 
-   update_status(opts.dirname, my_hash, Plot_status.complete, "Complete", base_url=base_url)
+   status_handler.update_status(Plot_status.complete, "Complete", base_url=base_url)
    return True
 #END execute_plot
 
@@ -1932,6 +1934,9 @@ To execute a plot
       plot = prepare_plot(request, opts.dirname)
       my_hash = plot['req_hash']
 
+      # Setup status handler
+      status_handler = StatusHandler(opts.dirname, my_hash)
+
       # Add hash to debug
       plotting.debug.plot_hash = my_hash
 
@@ -1951,7 +1956,7 @@ To execute a plot
       except:
          trace_message = traceback.format_exc()
          debug(0, u"Uncaught Exception. Failed to complete plot - {}".format(trace_message))
-         update_status(opts.dirname, my_hash, Plot_status.failed, "Extract failed", traceback=trace_message)
+         status_handler.update_status(Plot_status.failed, "Extract failed", traceback=trace_message)
          logger.log_complete(False)
          raise
 

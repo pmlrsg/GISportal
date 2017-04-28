@@ -6,25 +6,25 @@ from extraction_utils import find_closest, getCoordinateVariable
 from math import radians, cos, sin, asin, sqrt
 try:
    from plotting.debug import debug
-   from plotting.status import Plot_status, update_status
+   # from plotting.status import Plot_status
    plotting = True
 except ImportError:
    plotting = False
 
-import time
+# import time
 
 
 class TransectStats(object):
    """docstring for TransectStats"""
 
 
-   def __init__(self, files, variable, _csv, status_details=None,  matchup=False):
+   def __init__(self, files, variable, _csv, progress_tracker=None,  matchup=False):
 
       super(TransectStats, self).__init__()
       self.files = files
       self.variable = variable
       self._csv = _csv
-      self.status_details = status_details
+      self.progress_tracker = progress_tracker
       self.percentage = 0
       self.matchup = matchup
 
@@ -81,8 +81,10 @@ class TransectStats(object):
       # Calculate the distance from the centre of a pixel to a corner
       offset_distance = calculateDistance(0, 0, lat_offset, lon_offset) / 2
 
-      self.start_time = time.clock()
-      self.last_time = time.clock()
+      # self.start_time = time.clock()
+      # self.last_time = time.clock()
+
+      self.progress_tracker.start_series_analysis(self.numline)
 
       for row in data:
          if len(lat_var) <= 1:
@@ -147,28 +149,29 @@ class TransectStats(object):
          _ret['track_lon'] = row['Longitude']
          _ret['data_value'] = float(data_value) if not np.isnan(float(data_value)) else "null"
          ret.append(_ret)
-         if plotting and self.status_details:
-            self.update_status(len(ret))
+         if plotting and self.progress_tracker:
+            self.progress_tracker.analysis_progress(len(ret))
+            # self.update_status(len(ret))
 
       return ret
 
-   def update_status(self, progress):
-      if time.clock() > self.last_time + 60:
-         self.last_time = time.clock()
-         starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
-         percentage = int(round((progress / float(self.numline) * 75 + 19) / self.status_details['num_series'] + starting_percentage))
-         debug(3, "Overall progress: {}%".format(percentage))
-         if self.status_details['current_series'] == self.status_details['num_series'] - 1:
-            minutes_remaining = int(round((time.clock() - self.start_time) / progress * (self.numline - progress) / 60))
-            debug(3, "Remaining: {} mins".format(minutes_remaining))
-         else:
-            minutes_remaining = -1
+   # def update_status(self, progress):
+   #    if time.clock() > self.last_time + 60:
+   #       self.last_time = time.clock()
+   #       starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
+   #       percentage = int(round((progress / float(self.numline) * 75 + 19) / self.status_details['num_series'] + starting_percentage))
+   #       debug(3, "Overall progress: {}%".format(percentage))
+   #       if self.status_details['current_series'] == self.status_details['num_series'] - 1:
+   #          minutes_remaining = int(round((time.clock() - self.start_time) / progress * (self.numline - progress) / 60))
+   #          debug(3, "Remaining: {} mins".format(minutes_remaining))
+   #       else:
+   #          minutes_remaining = -1
 
-         update_status(self.status_details['dirname'], self.status_details['my_hash'],
-            Plot_status.extracting, percentage=percentage,
-            minutes_remaining=minutes_remaining)
+   #       update_status(self.status_details['dirname'], self.status_details['my_hash'],
+   #          Plot_status.extracting, percentage=percentage,
+   #          minutes_remaining=minutes_remaining)
 
-      debug(5, "Extracting: {}%".format(round(progress / float(self.numline) * 100, 3)))
+   #    debug(5, "Extracting: {}%".format(round(progress / float(self.numline) * 100, 3)))
 
 def calculateDistance(lat1, lon1, lat2, lon2):
    """

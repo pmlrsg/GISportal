@@ -6,7 +6,7 @@ import numpy as np
 """
 Performs a basic set of statistical functions on the provided data.
 """
-def basic(dataset, variable):
+def basic(dataset, variable, progress_tracker=None):
    arr = dataset.variables[variable]
 
    time = getCoordinateVariable(dataset, 'Time')
@@ -33,7 +33,11 @@ def basic(dataset, variable):
    output['global'] = {'time': start}
    output['data'] = {}
 
+   if progress_tracker:
+      progress_tracker.start_series_analysis(len(arr))
+
    for i in range(len(arr)):
+      # print("processing row {} of {}".format(i, len(arr)))
       row = arr[i]
       # Mask any invalid (nan) values
       masked_row = np.ma.masked_invalid(row, copy=False)
@@ -56,6 +60,9 @@ def basic(dataset, variable):
          pass
       else:
          output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': minimum, 'max': maximum}
+
+      if progress_tracker:
+         progress_tracker.analysis_progress(i + 1)
 
    if len(output['data']) < 1:
       raise ValueError('no valid data available to use')

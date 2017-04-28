@@ -10,7 +10,7 @@ from extraction_utils import create_mask, WCSRawHelper
 from . import Extractor
 try:
    from plotting.debug import debug
-   from plotting.status import Plot_status, update_status
+   from plotting.status import Plot_status
    plotting = True
 except ImportError:
    plotting = False
@@ -21,9 +21,9 @@ class UniversalExtractor(Extractor):
 
    thredds_max_request = 4000
 
-   def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, status_details=None, outdir="/tmp/", extra_slices=False, masking_polygon=None):
+   def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, progress_tracker=None, outdir="/tmp/", extra_slices=False, masking_polygon=None):
       super(UniversalExtractor, self).__init__(wcs_url, extract_dates, extract_area=extract_area,extract_variable=extract_variable,  extract_depth=extract_depth, outdir=outdir)
-      self.status_details = status_details
+      self.progress_tracker = progress_tracker
       self.extra_slices = extra_slices
       self.masking_polygon = masking_polygon
 
@@ -111,8 +111,9 @@ class UniversalExtractor(Extractor):
             # Rename the file after it's finished downloading
             os.rename(fname_temp, fname)
 
-         if plotting:
-            self.update_status(i + 1, total_requests)
+         if plotting and self.progress_tracker:
+            self.progress_tracker.download_progress(i + 1, total_requests)
+            # self.update_status(i + 1, total_requests)
          files.append(fname)
 
       return files
@@ -285,10 +286,10 @@ class UniversalExtractor(Extractor):
 
       return fname
 
-   def update_status(self, progress, total_requests):
-      if self.status_details:
-         starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
-         percentage = int(round(progress / float(total_requests) * 19 / self.status_details['num_series'] + starting_percentage))
-         update_status(self.status_details['dirname'], self.status_details['my_hash'],
-            Plot_status.extracting, percentage=percentage)
-         debug(3, "Overall progress: {}%".format(percentage))
+   # def update_status(self, progress, total_requests):
+   #    if self.status_details:
+   #       starting_percentage = 94.0 / self.status_details['num_series'] * self.status_details['current_series'] + 1
+   #       percentage = int(round(progress / float(total_requests) * 19 / self.status_details['num_series'] + starting_percentage))
+   #       update_status(self.status_details['dirname'], self.status_details['my_hash'],
+   #          Plot_status.extracting, percentage=percentage)
+   #       debug(3, "Overall progress: {}%".format(percentage))
