@@ -21,8 +21,8 @@
 					(ne (call 'state') 'complete')
 					(ne (call 'state') 'failed')
 				)}}
-			<div class="loading-image"></div>
-			<button class="js-graph-status-delete brand secondary">Delete</button>
+			{{!-- <div class="loading-image"></div> --}}
+			<button class="js-graph-status-delete graph-status-delete-processing brand secondary">Delete</button>
 			<div class="js-message"></div>
 		{{/if}}
 		{{#if_equals (call 'state') 'complete' }}

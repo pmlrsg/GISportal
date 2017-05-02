@@ -140,7 +140,7 @@ gisportal.graphs.PlotStatus = (function(){
     *                             from the server
     */
    PlotStatus.prototype.stateProcessing = function( serverStatus ){
-      var isCalculating = false;
+      // var isCalculating = false;
 
       // Rebuild the element if we arent already showing
       // the processing template
@@ -149,12 +149,12 @@ gisportal.graphs.PlotStatus = (function(){
 
       var message = serverStatus.message;
 
-      // Decide what the estimated completion 
-      // time message should be
-      if( isCalculating && ! this._plot.estimatedFinishTime )
-         message += "<br>Estimated time remaining: calculating";
-      if( this._plot.estimatedFinishTime )
-         message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( this._plot.estimatedFinishTime ) ;
+      // // Decide what the estimated completion 
+      // // time message should be
+      // if( isCalculating && ! this._plot.estimatedFinishTime )
+      //    message += "<br>Estimated time remaining: calculating";
+      // if( this._plot.estimatedFinishTime )
+      //    message += "<br>Estimated time remaining: " + this.printSmallTimeDiffernce( this._plot.estimatedFinishTime ) ;
 
       // Add the message to the status element
       this._element

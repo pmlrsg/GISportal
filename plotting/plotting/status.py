@@ -116,11 +116,11 @@ class ExtractionProgressTracker(object):
       starting_percentage = 94.0 / self.num_series * self.current_series + 1
       percentage = int(round(progress / float(total_requests) * 19 / self.num_series + starting_percentage))
       if progress < total_requests:
-         message = u"Processing indicator {} of {}<br>Downloading data file: {}/{}".format(self.current_series + 1, self.num_series, progress + 1, total_requests)
+         message = u"Processing indicator {} of {}:<br>- Downloading data file: {}/{}".format(self.current_series + 1, self.num_series, progress + 1, total_requests)
       else:
-         message = u"Processing indicator {} of {}<br>All data files downloaded".format(self.current_series + 1, self.num_series)
+         message = u"Processing indicator {} of {}:<br>- All data files downloaded".format(self.current_series + 1, self.num_series)
 
-      message = u"{}<br>{}<br>".format(progress_bar(percentage),message)
+      message = u"{}<br>{}".format(progress_bar(percentage),message)
 
       self.status_handler.update_status(Plot_status.extracting, percentage=percentage, message=message)
       debug(3, "Overall progress: {}%".format(percentage))
@@ -131,7 +131,7 @@ class ExtractionProgressTracker(object):
       self.series_length = length
 
    def analysis_progress(self, progress):
-      if time.time() > self.last_time + 5:
+      if time.time() > self.last_time + 1:
          self.last_time = time.time()
          starting_percentage = 94.0 / self.num_series * self.current_series + 1
          percentage = int(round((progress / float(self.series_length) * 75 + 19) / self.num_series + starting_percentage))
@@ -144,12 +144,12 @@ class ExtractionProgressTracker(object):
             minutes_remaining, seconds_remaining = divmod(total_seconds_remaining, 60)
             # minutes_remaining = int(round((time.time() - self.start_time) / progress * (self.series_length - progress) / 60))
             debug(3, "Remaining: {} mins".format(minutes_remaining))
-            message = u"Processing indicator {} of {}<br>Analysing {}%<br>Approx {}m{:0>2d}s remaining".format(self.current_series + 1, self.num_series, series_percentage, minutes_remaining, seconds_remaining)
+            message = u"Processing indicator {} of {}:<br>- Analysing {}%<br>- Approx {}m{:0>2d}s remaining".format(self.current_series + 1, self.num_series, series_percentage, minutes_remaining, seconds_remaining)
          else:
             minutes_remaining = -1
-            message = u"Processing indicator {} of {}<br>Analysing {}%".format(self.current_series + 1, self.num_series,  series_percentage)
+            message = u"Processing indicator {} of {}:<br>- Analysing {}%".format(self.current_series + 1, self.num_series,  series_percentage)
 
-         message = u"{}<br>{}<br>".format(progress_bar(percentage),message)
+         message = u"{}<br>{}".format(progress_bar(percentage),message)
 
          self.status_handler.update_status(Plot_status.extracting, percentage=percentage,
             minutes_remaining=minutes_remaining, message=message)
@@ -158,11 +158,11 @@ class ExtractionProgressTracker(object):
 
 def progress_bar(percentage):
    p_bar = u" "
-   progress = int(math.floor(percentage/10))
+   progress = int(math.floor(percentage/5))
    for _ in range(progress):
       p_bar += u"▰"
 
-   for _ in range(progress, 10):
+   for _ in range(progress, 20):
       p_bar += u"▱"
 
    return p_bar

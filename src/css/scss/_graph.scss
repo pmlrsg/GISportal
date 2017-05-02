@@ -77,10 +77,14 @@
 }
 
 .graph-job{
-	padding: 6px 0px;
+	padding: 6px 10px;
 	background-color: #F5F3F6;
-   margin: 6px;
-   border: 1px solid $general-border;
+  margin: 6px;
+  border: 1px solid $general-border;
+
+  .js-message{
+    padding-left: 5px;
+  }
 }
 
 .graph-job .loading-image{
@@ -99,9 +103,7 @@
 
 
 .graph-job > div div:nth-child(1){
-	flex-basis: 16px;
-	flex-shrink: 0;
-	margin-right: 5px;
+	width: 0px
 }
 
 input.graph-min, input.graph-max{
@@ -126,7 +128,7 @@ input.graph-min, input.graph-max{
 
 
 .plot-status-title{
-   font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .y-axis{
@@ -200,6 +202,10 @@ div.js-plot-metadata{
 .js-graph-status-delete{
   height: 31px;
   background-color: $analysis-button;
+}
+
+.graph-status-delete-processing {
+  margin-top: 7px;
 }
 
 a.js-revert-text{
