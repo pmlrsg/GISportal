@@ -403,7 +403,7 @@ def sizeof_fmt(num, suffix='B'):
 
 
 
-def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
+def hovmoller(dataset, xAxisVar, yAxisVar, dataVar, progress_tracker=None):
    
    xVar = getCoordinateVariable(dataset, xAxisVar)
    xArr = np.array(xVar[:])
@@ -483,7 +483,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
          zMaskedArray = zMaskedArray.swapaxes(0,1)[0]
          
          output['depth'] = float(depth[0])
- 
+
+   if progress_tracker:
+      progress_tracker.start_series_analysis(len(zMaskedArray))
+
    #print len(lon)
    t_store_dates = []
    for i, timelatlon in enumerate(zMaskedArray):
@@ -515,7 +518,7 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
             elif direction == "lon":
                if (j < len(lon)):
                   pos = lon[j]
-               
+
             #print row
             mean = getMean(row)
             #print mean
@@ -525,7 +528,11 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
             else:
                #print "adding nan"
                output['data'].append([date, float(pos), None])
-            
+
+      if progress_tracker:
+         progress_tracker.analysis_progress(i + 1)
+
+
    if len(output['data']) < 1:
       g.graphError = "no valid data available to use"
       error_handler.setError('2-07', None, g.user.id, "views/wcs.py:hovmoller - No valid data available to use.")

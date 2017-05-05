@@ -1446,9 +1446,9 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          extract = extractor.getData()
 
          if plot_type == "hovmollerLat":
-            hov_stats = HovmollerStats(extract, "Time", "Lat", coverage)
+            hov_stats = HovmollerStats(extract, "Time", "Lat", coverage, progress_tracker)
          else:
-            hov_stats = HovmollerStats(extract, "Lon",  "Time", coverage)
+            hov_stats = HovmollerStats(extract, "Lon",  "Time", coverage, progress_tracker)
          
          response = json.loads(hov_stats.process())
       except ValueError:

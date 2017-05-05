@@ -148,7 +148,7 @@ gisportal.graphs.PlotStatus = (function(){
       var message = serverStatus.message;
 
       if (!message) {
-        message = 'Initialising...';
+        message = 'Processing...';
       }
 
       // Add the message to the status element
