@@ -107,18 +107,25 @@ class StatusHandler(object):
 
 
 class ExtractionProgressTracker(object):
-   def __init__(self, status_handler, num_series):
+   def __init__(self, status_handler, num_series, download_all_first=False):
       self.status_handler = status_handler
       self.num_series = num_series
+      self.download_all_first = download_all_first
       self.current_series = 0
 
    def download_progress(self, progress, total_requests):
-      starting_percentage = 94.0 / self.num_series * self.current_series + 1
-      percentage = int(round(progress / float(total_requests) * 19 / self.num_series + starting_percentage))
-      if progress < total_requests:
-         message = u"Processing indicator {} of {}:<br>- Downloading data file: {}/{}".format(self.current_series + 1, self.num_series, progress + 1, total_requests)
+      if self.download_all_first:
+         starting_percentage = 19.0 / self.num_series * self.current_series + 1
       else:
-         message = u"Processing indicator {} of {}:<br>- All data files downloaded".format(self.current_series + 1, self.num_series)
+         starting_percentage = 94.0 / self.num_series * self.current_series + 1
+      percentage = int(round(progress / float(total_requests) * 19 / self.num_series + starting_percentage))
+
+      message = u"Processing indicator {} of {}:".format(self.current_series + 1, self.num_series)
+
+      if progress < total_requests:
+         message = u"{}<br>- Downloading data file: {}/{}".format(message, progress + 1, total_requests)
+      else:
+         message = u"{}<br>- All data files downloaded".format(message)
 
       message = u"{}<br>{}".format(progress_bar(percentage),message)
 
@@ -133,8 +140,12 @@ class ExtractionProgressTracker(object):
    def analysis_progress(self, progress):
       if time.time() > self.last_time + 1:
          self.last_time = time.time()
-         starting_percentage = 94.0 / self.num_series * self.current_series + 1
-         percentage = int(round((progress / float(self.series_length) * 75 + 19) / self.num_series + starting_percentage))
+         if self.download_all_first:
+            starting_percentage = 75 / self.num_series * self.current_series + 20
+            percentage = int(round((progress / float(self.series_length) * 75) / self.num_series + starting_percentage))
+         else:
+            starting_percentage = 94.0 / self.num_series * self.current_series + 1
+            percentage = int(round((progress / float(self.series_length) * 75 + 19) / self.num_series + starting_percentage))
          debug(3, "Overall progress: {}%".format(percentage))
 
          series_percentage = int(round(progress / float(self.series_length) * 100 ))

@@ -1577,6 +1577,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          status_handler.update_status(Plot_status.extracting, percentage=90/len(series))
          progress_tracker.current_series += 1
    elif plot_type == "scatter":
+      progress_tracker.download_all_first = True
       t_holder = {}
       scatter_stats_holder = {}
       series_count = 0
@@ -1619,12 +1620,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
          progress_tracker.current_series += 1
-      stats = ScatterStats(scatter_stats_holder)
+      progress_tracker.current_series = 0
+      stats = ScatterStats(scatter_stats_holder, progress_tracker)
       response = json.loads(stats.process())
       data = response['data']
       data_order = response['order']
       plot_data.append(dict(cov_meta=t_holder, order=data_order, data=data))
-      status_handler.update_status(Plot_status.extracting, percentage=90)
+      # status_handler.update_status(Plot_status.extracting, percentage=90)
 
    elif plot_type == "scatter_matchup":
 

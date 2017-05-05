@@ -70,63 +70,53 @@ def basic(dataset, variable, progress_tracker=None):
    return output
 
 
-def basic_scatter(dataset1, variable1, dataset2, variable2,):
-   
-   arr1 = np.ma.array(dataset1.variables[variable1][:])
-   arr2 = np.ma.array(dataset2.variables[variable2][:])
-      #print arr
-   #current_app.logger.debug(arr)
-   # Create a masked array ignoring nan's
+def basic_scatter(dataset1, variable1, dataset2, variable2, progress_tracker=None):
 
-   maskedArray1 = np.ma.masked_invalid(arr1)
-   maskedArray2 = np.ma.masked_invalid(arr2)
-   #maskedArray = arr
-   #print '-'*40
-   #print maskedArray
-   #plt.imshow(maskedArray[0])
-   #plt.savefig(filename+'.2.png')
+   arr1 = dataset1.variables[variable1]
+   arr2 = dataset2.variables[variable2]
+
    time1 = getCoordinateVariable(dataset1, 'Time')
    time2 = getCoordinateVariable(dataset2, 'Time')
-   # current_app.logger.debug('time channel test')
-   # current_app.logger.debug(time)
+
    if time1 == None:
-      g.graphError = "could not find time dimension"
+      raise ValueError('Could not find time dimension.')
       return
    if time2 == None:
-      g.graphError = "could not find time dimension"
+      raise ValueError('Could not find time dimension.')
       return
-   
+
    times1 = np.array(time1[:])
    isotimes1 = [(netCDF.num2date(x, time1.units, calendar='standard')).isoformat() for x in times1[:]]
 
    times2 = np.array(time2[:])
    isotimes2 = [(netCDF.num2date(x, time2.units, calendar='standard')).isoformat() for x in times2[:]]
    output = {}
-   
+
    units1 = getUnits(dataset1.variables[variable1])
    units2 = getUnits(dataset2.variables[variable2])
    output['units1'] = units1
    output['units2'] = units2
-   
-   
-   #mean = getMean(maskedArray)
-   #median = getMedian(maskedArray)
-   #std = getStd(maskedArray)
-   #min = getMin(maskedArray)
-   #max = getMax(maskedArray)
-   data1 = gen_data(time1, times1, maskedArray1)
-   data2 = gen_data(time2, times2, maskedArray2)
+
+   if progress_tracker:
+      progress_tracker.start_series_analysis(len(arr1))
+
+   data1 = gen_data(time1, times1, arr1, progress_tracker)
+
+   if progress_tracker:
+      progress_tracker.current_series += 1
+      progress_tracker.start_series_analysis(len(arr2))
+
+   data2 = gen_data(time2, times2, arr2, progress_tracker)
    time_data = gen_time_array()
-   #print data1, data2, time_data
+
    zipped_data = zip(data1, data2, isotimes1)
-      
-   #original.close()
+
    return {'order' : [variable1, variable2, 'Time'], 'data' : zipped_data}
 
 def gen_time_array():
    pass
 
-def gen_data(time, times, maskedArray):
+def gen_data(time, times, arr, progress_tracker=None):
    timeUnits = getUnits(time)
    start = None
    if timeUnits:
@@ -136,7 +126,7 @@ def gen_data(time, times, maskedArray):
          start = ''.join(times[0])
    else: 
       start = ''.join(times[0])
-   
+
    #=========================================================================
    # if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
    #   output = {}
@@ -144,12 +134,13 @@ def gen_data(time, times, maskedArray):
    # else:
    #   output['global'] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max, 'time': start}
    #=========================================================================
-   
+
    output = {}
    output['data'] = {}
    data = []
    #print len(time)
-   for i, row in enumerate(maskedArray):
+   for i in range(len(arr)):
+      masked_row = np.ma.masked_invalid(arr[i], copy=False)
       #print i
       if timeUnits:
          if (i < len(time)):
@@ -157,16 +148,18 @@ def gen_data(time, times, maskedArray):
                date = netCDF.num2date(time[i], time.units, calendar='standard').isoformat()
             except:
                date = ''.join(times[i])
-      else:     
+      else:
          date = ''.join(times[i])
-      mean = getMean(row)
-      
-      
-      
+      mean = getMean(masked_row)
+
       if  np.isnan(mean) :
          pass
       else:
          data.append(mean)
+
+      if progress_tracker:
+         progress_tracker.analysis_progress(i + 1)
+
    return data
 
 def getHistogram(arr):
