@@ -193,7 +193,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
       return;
    }
-   var alreadyRefinedFilters = [];
+   var alreadyRefinedFiltersCount = 0;
    var matching_tags = gisportal.groupNames(refinedIndicatorLayers)[name];
    var placeholder, data, indicator, id, info, holder;
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
@@ -240,12 +240,12 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
                onSelected: updateDDSlick
             });
          } else {
-            // If the tag has already been refined, add it to the alreadyRefinedFilters array
-            alreadyRefinedFilters.push(tagName);
+            // If the tag has already been refined, increment alreadyRefinedFiltersCount
+            alreadyRefinedFiltersCount += 1;
          }
       }
 
-      if (alreadyRefinedFilters.length != furtherFilters.length) {
+      if (alreadyRefinedFiltersCount != furtherFilters.length) {
          // If there are furtherFilters that haven't already been refined
          // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
          for (indicator in refinedIndicators) {
@@ -283,7 +283,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       }
 
    }
-   if (furtherFilters.length === 0 || alreadyRefinedFilters.length == furtherFilters.length) {
+   if (furtherFilters.length === 0 || alreadyRefinedFiltersCount == furtherFilters.length) {
       // If there aren't any furtherFilters or they've all been already refined
       placeholder = $('<div class="js-refine-section-external' + '"><div id="refine-external"></div></div>');
       $('.js-refined-tags').append(placeholder);
