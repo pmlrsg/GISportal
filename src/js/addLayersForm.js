@@ -887,7 +887,7 @@ gisportal.addLayersForm.addInputListeners = function(){
          }
       }else{
          if(key == "wcsURL"){
-            key_val = key_val.split("?")[0];
+            key_val = key_val.split("?")[0].split(" ")[0];
          }
          gisportal.addLayersForm.server_info[key] = key_val;
       }

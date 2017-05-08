@@ -395,10 +395,18 @@ settings.remove_server_cache = function(req, res) {
 };
 
 settings.add_wcs_url = function(req, res) {
-   var url = req.query.url.split('?')[0] + "?"; // Gets the given url
+   var url = req.query.url.split('?')[0].split(" ")[0]; // Gets the given url
    var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   if (permission == 'admin') {
+      // If the user is an admin
+      username = req.query.username;
+   } else if (permission == 'guest' || req.query.username && username != req.query.username) {
+      // Else if they are a guest or are trying to modify another user's layer
+      res.status(401).send('You are not authorised to do that!');
+      return;
+   }
    var domain = utils.getDomainName(req); // Gets the given domain
-   // var permission = user.getAccessLevel(req, domain); // Gets the user permission // NOT USED
    var filename = req.query.filename + ".json"; // Gets the given filename
 
    var base_path = path.join(MASTER_CONFIG_PATH, domain);
