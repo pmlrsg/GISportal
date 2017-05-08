@@ -221,7 +221,7 @@ gisportal.graphs.Plot = (function() {
             if (plotRequest.baseMap.wmsParams.t) {
                delete plotRequest.baseMap.wmsParams.t;
             }
-         } else if (baseMap !== 'none'){
+         } else if (baseMap !== 'none') {
             $.notify('Animations are not compatible with this basemap, no basemap will be used.', 'error');
          }
          if (borders != "0") {
@@ -496,15 +496,17 @@ gisportal.graphs.Plot = (function() {
             _this.timeEstimate += (data.time * total_slices);
             _this.sizeEstimate += (data.size * total_slices);
          } else {
-            $.notify("This error was returned when trying to estimate time: " + data.statusText, "error");
+            $.notify("There was an error estimating job size: " + data.statusText, "error");
             _this.stopMonitoringJobStatus();
          }
-         // Only gives the time estimate if the size is small enough and all the estimates were retrieved successfully
          if (_this.series_total === 0) {
-            // if (_this.sizeEstimate < 4294967296) {
-            if (true) {
-               var t = new Date();
-               _this.estimatedFinishTime = new Date(t.getTime() + 1000 * _this.timeEstimate);
+            // If the estimates have been accumulated for all series
+            console.log('size estimate: ' + _this.sizeEstimate + 'bytes, ' + _this.sizeEstimate / 1073741824 + 'GiB');
+            var sizeLimit = gisportal.config.maxPlotGiB * 1073741824;
+            console.log('size limit: ' + sizeLimit + 'bytes, ' + gisportal.config.maxPlotGiB + 'GiB');
+            if (_this.sizeEstimate < sizeLimit) {
+               // If the size is below the allowed limit then start the plot
+               submitPlot();
             } else {
                $.notify("There is too much data\n Try plotting a graph with a smaller bounding box or smaller time bounds", "error");
             }
@@ -531,34 +533,37 @@ gisportal.graphs.Plot = (function() {
                error: accumulateEstimates
             });
          }
+      } else {
+         submitPlot();
       }
 
-
-      // Make the plot
-      $.ajax({
-         method: 'post',
-         url: gisportal.middlewarePath + '/plotting/plot',
-         contentType: 'application/json',
-         data: JSON.stringify({
-            request: request
-         }),
-         dataType: 'json',
-         success: function(data) {
-            // Do the polling!
-            _this.id = data.hash;
-            _this.monitorJobStatus();
-            gisportal.graphs.storedGraphs.push({
-               id: data.hash,
-               _title: _this._title
-            });
-         },
-         error: function(e) {
-            var error = 'Sorry, we failed to create a graph: \n' +
-               'The server informed us that it failed to make a graph for your selection with the message"' + e.statusText + '"';
-            $.notify(error, "error");
-            // TODO: Remove the graph from the list
-         }
-      });
+      function submitPlot() {
+         // Make the plot
+         $.ajax({
+            method: 'post',
+            url: gisportal.middlewarePath + '/plotting/plot',
+            contentType: 'application/json',
+            data: JSON.stringify({
+               request: request
+            }),
+            dataType: 'json',
+            success: function(data) {
+               // Do the polling!
+               _this.id = data.hash;
+               _this.monitorJobStatus();
+               gisportal.graphs.storedGraphs.push({
+                  id: data.hash,
+                  _title: _this._title
+               });
+            },
+            error: function(e) {
+               var error = 'Sorry, we failed to create a graph: \n' +
+                  'The server informed us that it failed to make a graph for your selection with the message"' + e.responseText + '"';
+               $.notify(error, "error");
+               // TODO: Remove the graph from the list
+            }
+         });
+      }
    };
 
    /**

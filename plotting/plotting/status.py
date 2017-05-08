@@ -107,6 +107,13 @@ class StatusHandler(object):
 
 
 class ExtractionProgressTracker(object):
+   # Percentages:
+   #  init: 1
+   #  download: 19
+   #  extract: 75
+   #  plot: 5
+
+
    def __init__(self, status_handler, num_series, download_all_first=False):
       self.status_handler = status_handler
       self.num_series = num_series
