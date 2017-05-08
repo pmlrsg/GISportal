@@ -130,7 +130,7 @@ class ExtractionProgressTracker(object):
       message = u"Processing indicator {} of {}:".format(self.current_series + 1, self.num_series)
 
       if progress < total_requests:
-         message = u"{}<br>- Downloading data file: {}/{}".format(message, progress + 1, total_requests)
+         message = u"{}<br>- Downloading data file: {} of {}".format(message, progress + 1, total_requests)
       else:
          message = u"{}<br>- All data files downloaded".format(message)
 
