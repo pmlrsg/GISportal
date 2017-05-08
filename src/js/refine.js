@@ -193,6 +193,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
       gisportal.refinePanel.layerFound(refinedIndicators[0]);
       return;
    }
+   var alreadyRefinedFilters = [];
    var matching_tags = gisportal.groupNames(refinedIndicatorLayers)[name];
    var placeholder, data, indicator, id, info, holder;
    // if not, at this stage there must be more than one refinedIndicators so we need to render the possible filters
@@ -214,19 +215,20 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
             gisportal.refinePanel.refreshData();
          }
       };
+
       // create drop downs for each of the further filters
-      for (var tag in furtherFilters) {
-         var tagName = furtherFilters[tag];
+      for (var i = 0; i < furtherFilters.length; i++) {
+         var tagName = furtherFilters[i];
          var tagDisplayName = gisportal.browseCategories[tagName];
 
          // we only want to show tags that haven't already been selected, so if the tag's in refine.data don't bother with it (or maybe show it but pre-selected?)
          var tagRefinedAlready = _.findKey(refine, checkTag);
-         
+
          if (tagRefinedAlready === undefined) {  // it hasn't been refined so we can show it
             // first create a div and append it to the filter section
             placeholder = $('<div class="js-refine-section-' + tagName + '"><div id="refine-' + tagName + '"></div></div>');
             placeholder.appendTo(refineSection);
-            
+
             var a = 'a';
             if (_.indexOf(['a','e','i','o','u'], tagDisplayName.substring(0,1).toLowerCase()) > -1) a = 'an';
 
@@ -236,47 +238,53 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
                initialState: 'open',
                selectText: 'Select '+ a + ' ' + tagDisplayName,
                onSelected: updateDDSlick
-            });  
-         }
-
-         
-      }
-
-      // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
-      for (indicator in refinedIndicators) {
-         id = refinedIndicators[indicator];
-         holder = $('input[value="' + id + '"]').parent();
-         
-         var layer = gisportal.layers[id];
-         var tags = [];
-         for(var cat in gisportal.browseCategories) {
-            var tmp = {
-               name: gisportal.browseCategories[cat],
-               value: layer.tags[cat]
-            };
-            tags.push(tmp);
-         }
-
-         data = {
-            provider: layer.providerTag,
-            dateStart: layer.firstDate,
-            dateEnd: layer.lastDate,
-            owner: layer.owner,
-            tags: tags 
-         };
-
-         info = gisportal.templates['tooltip-refinedetails'](data);
-
-         if (holder.length > 0) {
-            holder.tooltipster({
-               contentCloning: true,
-               content: $(info),
-               position: 'right',
             });
+         } else {
+            // If the tag has already been refined, add it to the alreadyRefinedFilters array
+            alreadyRefinedFilters.push(tagName);
          }
       }
 
-   } else {
+      if (alreadyRefinedFilters.length != furtherFilters.length) {
+         // If there are furtherFilters that haven't already been refined
+         // once the filter drop downs have been rendered loop through all refinedIndicators adding tooltips for more info
+         for (indicator in refinedIndicators) {
+            id = refinedIndicators[indicator];
+            holder = $('input[value="' + id + '"]').parent();
+
+            var layer = gisportal.layers[id];
+            var tags = [];
+            for (var cat in gisportal.browseCategories) {
+               var tmp = {
+                  name: gisportal.browseCategories[cat],
+                  value: layer.tags[cat]
+               };
+               tags.push(tmp);
+            }
+
+            data = {
+               provider: layer.providerTag,
+               dateStart: layer.firstDate,
+               dateEnd: layer.lastDate,
+               owner: layer.owner,
+               tags: tags
+            };
+
+            info = gisportal.templates['tooltip-refinedetails'](data);
+
+            if (holder.length > 0) {
+               holder.tooltipster({
+                  contentCloning: true,
+                  content: $(info),
+                  position: 'right',
+               });
+            }
+         }
+      }
+
+   }
+   if (furtherFilters.length === 0 || alreadyRefinedFilters.length == furtherFilters.length) {
+      // If there aren't any furtherFilters or they've all been already refined
       placeholder = $('<div class="js-refine-section-external' + '"><div id="refine-external"></div></div>');
       $('.js-refined-tags').append(placeholder);
       data = {};
