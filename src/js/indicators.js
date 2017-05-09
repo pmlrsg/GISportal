@@ -334,7 +334,7 @@ gisportal.indicatorsPanel.add_wcs_url = function(selected_this) {
             error: function(e) {
                //show an error that tells the user what is wrong
                error_div.toggleClass('hidden', false);
-               error_div.html('There was an error using that URL: ' + e.statusText);
+               error_div.html('There was an error using that URL: ' + e.responseText);
             }
          });
       } else {
