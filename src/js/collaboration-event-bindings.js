@@ -149,6 +149,20 @@ gisportal.events.bind("scalebar.colorbands", function(event, data) {
    collaboration._emit('c_event', new_data);
 });
 
+// layer custom above max colour changed
+gisportal.events.bind("scalebar.custom-aboveMaxColor", function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
+// layer custom below min colour changed
+gisportal.events.bind("scalebar.custom-belowMinColor", function(event, data) {
+   var new_data = _.clone(data);
+   new_data.collabLog = true;
+   collaboration._emit('c_event', new_data);
+});
+
 // reset layer settings
 gisportal.events.bind("scalebar.reset", function(event, data) {
    var new_data = _.clone(data);

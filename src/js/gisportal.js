@@ -1223,9 +1223,19 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-colorbands').val(colorbands);
 
          // This sets the aboveMaxColor to the same as what the user had before
-         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         try {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(aboveMaxColor).trigger('change');
+         }
          // This sets the belowMinColor to the same as what the user had before
-         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         try {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor).trigger('change');
+         }
 
          gisportal.layers[id].resetting = false;
          gisportal.scalebars.updateScalebar(layer);

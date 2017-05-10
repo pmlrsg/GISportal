@@ -75,7 +75,7 @@
                   <option {{selected '0x000000' @root.aboveMaxColor}} value="0x000000">Black</option>
                   <option {{selected '0xFFFFFF' @root.aboveMaxColor}} value="0xFFFFFF">White</option>
                   <option {{selected 'transparent' @root.aboveMaxColor}} value="transparent">Transparent</option>
-                  <option {{selected 'custom' @root.belowMinColor}} value="custom">Custom</option>
+                  <option {{selected 'custom' @root.aboveMaxColor}} value="custom">Custom</option>
                </select>
                <input class="js-custom-aboveMaxColor grid-cell hidden" placeholder="#rrggbb" data-id="{{../id}}">
             </div>
