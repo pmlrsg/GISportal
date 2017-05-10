@@ -868,6 +868,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       var colorbands_keydown_timeout;
 
       $('.colorbands-value').on('change', function(){
+         // TODO this affects more than just the intended layer
          if(isNaN($(this).val())){
             $(this).val("1");
          }
@@ -916,8 +917,13 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                if(data.selectedData.value == "0"){
                   data.selectedData.value = null;
                }
-               gisportal.layers[indicator.id].aboveMaxColor = data.selectedData.value;
-               gisportal.layers[indicator.id].setScalebarTimeout();
+               if (data.selectedData.value == 'custom') {
+                  $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]').toggleClass('hidden', false);
+               } else {
+                  $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]').toggleClass('hidden', true);
+                  gisportal.layers[indicator.id].aboveMaxColor = data.selectedData.value;
+                  gisportal.layers[indicator.id].setScalebarTimeout();
+               }
             }
          }
       });
@@ -925,13 +931,28 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-belowMinColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
-               if(data.selectedData.value == "0"){
+               if (data.selectedData.value == "0") {
                   data.selectedData.value = null;
                }
-               gisportal.layers[indicator.id].belowMinColor = data.selectedData.value;
-               gisportal.layers[indicator.id].setScalebarTimeout();
+               if (data.selectedData.value == 'custom') {
+                  $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]').toggleClass('hidden', false);
+               } else {
+                  $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]').toggleClass('hidden', true);
+                  gisportal.layers[indicator.id].belowMinColor = data.selectedData.value;
+                  gisportal.layers[indicator.id].setScalebarTimeout();
+               }
             }
          }
+      });
+
+      $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]').on('change', function() {
+         gisportal.layers[indicator.id].aboveMaxColor =$(this).val();
+         gisportal.layers[indicator.id].setScalebarTimeout();
+      });
+
+      $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]').on('change', function() {
+         gisportal.layers[indicator.id].belowMinColor =$(this).val();
+         gisportal.layers[indicator.id].setScalebarTimeout();
       });
    };
    if(layer.metadataComplete) onMetadata();

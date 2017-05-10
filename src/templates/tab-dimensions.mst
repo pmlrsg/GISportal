@@ -26,7 +26,7 @@
             <button data-id="{{../id}}" class="brand small js-apply-changes pull-right hidden">Apply Changes</button>
          </div>
       {{/unless_equals}}
-   <div class="indicator-options"> 
+   <div class="indicator-options">
       <div class="indicator-option">
          <label for="tab-{{id}}-opacity">Layer Opacity</label> - <span id="tab-{{id}}-opacity-value">100%</span>
          <div id="tab-{{id}}-opacity" class="layer-opacity-slider"></div>
@@ -48,7 +48,7 @@
          <div class="indicator-option">
             <label for="tab-{{id}}-layer-style">Layer style</label>
             <select id="tab-{{id}}-layer-style">
-               {{#styles}}                  
+               {{#styles}}
                   <option {{selected Name @root.style}} value="{{Name}}">{{Name}}</option>
                {{/styles}}
             </select>
@@ -61,19 +61,23 @@
                <label for="tab-{{../id}}-belowMinColor">Below Min Colour</label>
                <select id="tab-{{../id}}-belowMinColor">
                   <option value="0">Default</option>
-                  <option {{selected '0x000000' @root.belowMinColor}} value="0x000000">Black</option>        
-                  <option {{selected '0xFFFFFF' @root.belowMinColor}} value="0xFFFFFF">White</option>        
+                  <option {{selected '0x000000' @root.belowMinColor}} value="0x000000">Black</option>
+                  <option {{selected '0xFFFFFF' @root.belowMinColor}} value="0xFFFFFF">White</option>
                   <option {{selected 'transparent' @root.belowMinColor}} value="transparent">Transparent</option>
+                  <option {{selected 'custom' @root.belowMinColor}} value="custom">Custom</option>
                </select>
+               <input class="js-custom-belowMinColor grid-cell hidden" placeholder="#rrggbb" data-id="{{../id}}">
             </div>
             <div class="split-input-2 pull-right">
                <label for="tab-{{../id}}-aboveMaxColor">Above Max Colour</label>
-               <select id="tab-{{../id}}-aboveMaxColor">                
+               <select id="tab-{{../id}}-aboveMaxColor">
                   <option value="0">Default</option>
-                  <option {{selected '0x000000' @root.aboveMaxColor}} value="0x000000">Black</option>        
-                  <option {{selected '0xFFFFFF' @root.aboveMaxColor}} value="0xFFFFFF">White</option>        
+                  <option {{selected '0x000000' @root.aboveMaxColor}} value="0x000000">Black</option>
+                  <option {{selected '0xFFFFFF' @root.aboveMaxColor}} value="0xFFFFFF">White</option>
                   <option {{selected 'transparent' @root.aboveMaxColor}} value="transparent">Transparent</option>
+                  <option {{selected 'custom' @root.belowMinColor}} value="custom">Custom</option>
                </select>
+               <input class="js-custom-aboveMaxColor grid-cell hidden" placeholder="#rrggbb" data-id="{{../id}}">
             </div>
          </div>
          <br/>
