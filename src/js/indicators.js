@@ -162,8 +162,9 @@ gisportal.indicatorsPanel.initDOM = function() {
       layer.style = layer.defaultStyle || "boxfill/rainbow";
 
       $('#tab-' + id + '-colorbands').val(layer.colorbands);
-      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: layer.aboveMaxColor || "0"});
-      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: layer.belowMinColor || "0"});
+
+      selectAboveMaxBelowMinOptions(id, layer.aboveMaxColor, layer.belowMinColor);
+
       $('#tab-' + id + '-layer-style').ddslick('select', {value: layer.style});
       $('#tab-' + id + '-log').prop( 'checked', layer.defaultLog || false );
       var autoScale = gisportal.getAutoScaleFromString(layer.autoScale);
@@ -977,6 +978,8 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
          gisportal.events.trigger('scalebar.custom-belowMinColor', params);
          gisportal.layers[indicator.id].setScalebarTimeout();
       });
+
+      selectAboveMaxBelowMinOptions(id, indicator.aboveMaxColor, indicator.belowMinColor);
    };
    if(layer.metadataComplete) onMetadata();
    else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
@@ -1500,3 +1503,19 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       return "The bounding box selected contains no data for this indicator.";
    }
 };
+
+function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
+   // Select custom if the above max or below min value doesn't match a dropdown value
+   try {
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+   } catch (err) {
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: 'custom'});
+      $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(aboveMaxColor);
+   }
+   try {
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+   } catch (err) {
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
+      $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor);
+   }
+}
