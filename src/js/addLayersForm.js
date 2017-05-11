@@ -278,32 +278,6 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.events.trigger('addLayersForm.belowMinColor-changed', params);
    });
 
-   // $('.js-custom-defaultAboveMaxColor').on('change', function() {
-   //    var colour = $(this).val();
-   //    this_layer.defaultAboveMaxColor = colour;
-   //    gisportal.addLayersForm.refreshStorageInfo();
-   //    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-
-   //    // var params = {
-   //    //    "event" : "addLayersForm.custom-aboveMaxColor-changed",
-   //    //    "value": colour
-   //    // };
-   //    // gisportal.events.trigger('addLayersForm.custom-aboveMaxColor-changed', params);
-   // });
-
-   // $('.js-custom-defaultBelowMinColor').on('change', function() {
-   //    var colour = $(this).val();
-   //    this_layer.defaultBelowMinColor = colour;
-   //    gisportal.addLayersForm.refreshStorageInfo();
-   //    gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
-
-   //    // var params = {
-   //    //    "event" : "addLayersForm.custom-aboveMaxColor-changed",
-   //    //    "value": colour
-   //    // };
-   //    // gisportal.events.trigger('addLayersForm.custom-aboveMaxColor-changed', params);
-   // });
-
    // Makes sure that the defaultStyle value is set correctly and changes the value when the user selects a value
    var site_style = gisportal.config.defaultStyle || "boxfill/rainbow";
    var display = this_layer.defaultStyle;
