@@ -368,7 +368,13 @@ settings.remove_server_cache = function(req, res) {
    var filename = req.query.filename; // Gets the given filename
    var owner = req.query.owner; // Gets the given owner
    filename += ".json"; // Adds the file extension to the filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
+   var base_path;
+   if (owner.startsWith(GROUP_CACHE_PREFIX)) {
+      // The path if the owner is a group
+      base_path = path.join(MASTER_CONFIG_PATH, domain, owner);
+   } else {
+      base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
+   }
    var master_list = fs.readdirSync(MASTER_CONFIG_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value) {
       if (value == owner) {
