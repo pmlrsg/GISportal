@@ -19,6 +19,7 @@ var utils = require('./utils.js');
 var client = redis.createClient();
 
 var USER_CACHE_PREFIX = "user_";
+var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
@@ -251,6 +252,8 @@ settings.get_owners = function(req, res) {
             if (folder_owner != username) {
                owners.push(folder_owner);
             }
+         } else if (utils.directoryExists(folder_name) && folder.startsWith(GROUP_CACHE_PREFIX)) {
+            owners.push(folder);
          }
       });
       owners.push(domain);
@@ -458,6 +461,7 @@ settings.add_user_layer = function(req, res) {
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = utils.getDomainName(req); // Gets the given domain
    var owner = server_info.owner; // Gets the given owner
+   var old_owner = server_info.old_owner; // Gets the old owner
    var cache_path;
    var save_path;
 
@@ -477,10 +481,16 @@ settings.add_user_layer = function(req, res) {
          // If is is a global file it is refreshed from the URL
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
          save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
+      } else if (owner.startsWith(GROUP_CACHE_PREFIX)) {
+         cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
+         save_path = path.join(MASTER_CONFIG_PATH, domain, owner, filename);
       } else {
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
+      }
+      if (old_owner == domain) {
+         cache_path = path.join(MASTER_CONFIG_PATH, domain);
       }
       if (!utils.directoryExists(cache_path)) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist

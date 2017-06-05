@@ -12,7 +12,7 @@ var xml2js = require('xml2js');
 var utils = require('./utils.js');
 
 var USER_CACHE_PREFIX = "user_";
-var GROUP_CACHE_PREFIX = "group_"
+var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
@@ -51,27 +51,33 @@ settingsApi.get_cache = function(username, domain, permission) {
          master_list.forEach(function(filename) {
             if (utils.directoryExists(path.join(master_path, filename))) {
                if (filename.startsWith(USER_CACHE_PREFIX)) {
-                  usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
+                  // If you are an admin, add all of the usernames from this domain to the variable
+                  usernames.push(filename.replace(USER_CACHE_PREFIX, ""));
                }
             }
          });
       }
       usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice)
 
+      // Load the cache for each username
       cache = cache.concat(loadCache(username, permission, usernames, master_path, USER_CACHE_PREFIX));
 
-      // Discover groups
+      // Find groups the user is a member of
       master_list.forEach(function(filename) {
          if (utils.directoryExists(path.join(master_path, filename))) {
             if (filename.startsWith(GROUP_CACHE_PREFIX)) {
                if (permission == "admin") {
-                  groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
+                  // If the user is an admin, add all groups from this domain
+                  groups.push(filename);
+                  // groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
                } else {
                   var filePath = path.join(master_path, filename, 'members.json');
                   var members = JSON.parse(fs.readFileSync(filePath));
                   for (var i = 0; i < members.length; i++) {
                      if (members[i].username == username) {
-                        groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
+                        // If the user is a member of the group
+                        groups.push(filename);
+                        // groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
                      }
                   }
                }
@@ -79,7 +85,8 @@ settingsApi.get_cache = function(username, domain, permission) {
          }
       });
 
-      cache = cache.concat(loadCache(username, permission, groups, master_path, GROUP_CACHE_PREFIX));
+      // Load the cache for each group
+      cache = cache.concat(loadCache(username, permission, groups, master_path, ''));
    }
    return cache;
 };
@@ -95,21 +102,24 @@ settingsApi.get_cache = function(username, domain, permission) {
  */
 function loadCache(username, permission, names, master_path, cachePrefix) {
    var cache = [];
+   // Files to ignore
    var ignoreFileNames = ['dictionary.json', 'members.json'];
    for (var i = 0; i < names.length; i++) {
       var cache_path = path.join(master_path, cachePrefix + names[i]);
       if (!utils.directoryExists(cache_path)) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
-      var file_list = fs.readdirSync(cache_path); // Gets all the user files
+      var file_list = fs.readdirSync(cache_path); // Gets all the files from the directory
       for (var j = 0; j < file_list.length; j++) {
          var filename = file_list[j];
          var file_path = path.join(cache_path, filename);
          if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
             filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
             !ignoreFileNames.includes(filename)) {
-            var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-            if (permission != "admin" && username != filename.replace(cachePrefix, "")) { // The Layers list is filtered.
+            // If the file exists, is json, is not a walkthrough, and isn't in the ignored list
+            var json_data = JSON.parse(fs.readFileSync(file_path));
+            if (permission != "admin" && username != filename.replace(cachePrefix, "")) {
+               // If the user isn't an admin and this isn't their cache, remove layers with include: false
                json_data.server.Layers = json_data.server.Layers.filter(function(val) {
                   return val.include === true || typeof(val.include) === "undefined";
                });
