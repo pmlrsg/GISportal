@@ -58,28 +58,31 @@ settingsApi.get_cache = function(username, domain, permission) {
       }
       usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice)
       // Eventually should just remove all admins here!
-      for (var i = 0; i < usernames.length; i++) { // Usernames is now a list of all users or just the single loggeed in user.
-         var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[i]);
-         if (!utils.directoryExists(user_cache_path)) {
-            utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
-         }
-         var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
-         user_list.forEach(function(filename) {
-            var file_path = path.join(user_cache_path, filename);
-            if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
-               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-               if (permission != "admin" && username != filename.replace(USER_CACHE_PREFIX, "")) { // The Layers list is filtered.
-                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
-                     return val.include === true || typeof(val.include) === "undefined";
-                  });
-               }
-               json_data.owner = usernames[i]; // Adds the owner to the file (for the server list)
-               if (json_data.wmsURL) {
-                  cache.push(json_data); // Adds each file to the cache to be returned
-               }
-            }
-         });
-      }
+      // for (var i = 0; i < usernames.length; i++) { // Usernames is now a list of all users or just the single loggeed in user.
+      //    var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[i]);
+      //    if (!utils.directoryExists(user_cache_path)) {
+      //       utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
+      //    }
+      //    var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
+      //    for (var j = 0; j < user_list.length; j++) {
+      //       var filename = user_list[j];
+      //       var file_path = path.join(user_cache_path, filename);
+      //       if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
+      //          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+      //          if (permission != "admin" && username != filename.replace(USER_CACHE_PREFIX, "")) { // The Layers list is filtered.
+      //             json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+      //                return val.include === true || typeof(val.include) === "undefined";
+      //             });
+      //          }
+      //          json_data.owner = usernames[i]; // Adds the owner to the file (for the server list)
+      //          if (json_data.wmsURL) {
+      //             cache.push(json_data); // Adds each file to the cache to be returned
+      //          }
+      //       }
+      //    }
+      // }
+
+      cache = cache.concat(loadCache(username, permission, usernames, master_path, USER_CACHE_PREFIX));
 
       // Discover groups
       master_list.forEach(function(filename) {
@@ -100,31 +103,74 @@ settingsApi.get_cache = function(username, domain, permission) {
          }
       });
 
-      for (var j = 0; j < groups.length; j++) {
-         var group_cache_path = path.join(master_path, GROUP_CACHE_PREFIX + groups[j]);
-         var group_list = fs.readdirSync(group_cache_path); // Gets all the user files
-         group_list.forEach(function(filename) {
-            var file_path = path.join(group_cache_path, filename);
-            if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
-               filename != "dictionary.json" &&
-               filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
-               filename != "members.json") {
-               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-               if (permission != "admin") { // The Layers list is filtered.
-                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
-                     return val.include === true || typeof(val.include) === "undefined";
-                  });
-               }
-               json_data.owner = groups[j]; // Adds the owner to the file (for the server list)
-               if (json_data.wmsURL) {
-                  cache.push(json_data); // Adds each file to the cache to be returned
-               }
-            }
-         });
-      }
+      // for (i = 0; i < groups.length; i++) {
+      //    var group_cache_path = path.join(master_path, GROUP_CACHE_PREFIX + groups[i]);
+      //    var group_list = fs.readdirSync(group_cache_path); // Gets all the user files
+      //    for (var j = 0; j < group_list.length; j++) {
+      //       var filename = group_list[j];
+      //       var file_path = path.join(group_cache_path, filename);
+      //       if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
+      //          filename != "dictionary.json" &&
+      //          filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
+      //          filename != "members.json") {
+      //          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+      //          if (permission != "admin") { // The Layers list is filtered.
+      //             json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+      //                return val.include === true || typeof(val.include) === "undefined";
+      //             });
+      //          }
+      //          json_data.owner = groups[i]; // Adds the owner to the file (for the server list)
+      //          if (json_data.wmsURL) {
+      //             cache.push(json_data); // Adds each file to the cache to be returned
+      //          }
+      //       }
+      //    }
+      // }
+
+      cache = cache.concat(loadCache(username, permission, groups, master_path, GROUP_CACHE_PREFIX));
    }
    return cache;
 };
+
+/**
+ * Load user or group caches
+ * @param  {String} username    The requesting user
+ * @param  {String} permission  The requesting user's permission
+ * @param  {Array}  names       Array of username or groups to load
+ * @param  {String} master_path The master path to the site config
+ * @param  {String} cachePrefix The cache prefix to use for folders
+ * @return {Array}              Array of servers loaded
+ */
+function loadCache(username, permission, names, master_path, cachePrefix) {
+   var cache = [];
+   var ignoreFileNames = ['dictionary.json', 'members.json'];
+   for (var i = 0; i < names.length; i++) {
+      var cache_path = path.join(master_path, cachePrefix + names[i]);
+      if (!utils.directoryExists(cache_path)) {
+         utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
+      }
+      var file_list = fs.readdirSync(cache_path); // Gets all the user files
+      for (var j = 0; j < file_list.length; j++) {
+         var filename = file_list[j];
+         var file_path = path.join(cache_path, filename);
+         if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
+            filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
+            !ignoreFileNames.includes(filename)) {
+            var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+            if (permission != "admin" && username != filename.replace(cachePrefix, "")) { // The Layers list is filtered.
+               json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+                  return val.include === true || typeof(val.include) === "undefined";
+               });
+            }
+            json_data.owner = names[i]; // Adds the owner to the file (for the server list)
+            if (json_data.wmsURL) {
+               cache.push(json_data); // Adds each file to the cache to be returned
+            }
+         }
+      }
+   }
+   return cache;
+}
 
 settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
    url = url.replace(/\?.*/g, "") + "?";
