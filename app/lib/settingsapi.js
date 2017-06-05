@@ -12,6 +12,7 @@ var xml2js = require('xml2js');
 var utils = require('./utils.js');
 
 var USER_CACHE_PREFIX = "user_";
+var GROUP_CACHE_PREFIX = "group_"
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
@@ -21,6 +22,7 @@ module.exports = settingsApi;
 
 settingsApi.get_cache = function(username, domain, permission) {
    var usernames = [username];
+   var groups = [];
    var cache = []; // The list of cache deatils to be returned to the browser
    var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
@@ -48,14 +50,13 @@ settingsApi.get_cache = function(username, domain, permission) {
       if (permission == "admin") {
          master_list.forEach(function(filename) {
             if (utils.directoryExists(path.join(master_path, filename))) {
-               // if (stringStartsWith(filename, USER_CACHE_PREFIX)) {
                if (filename.startsWith(USER_CACHE_PREFIX)) {
                   usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
                }
             }
          });
       }
-      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
+      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice)
       // Eventually should just remove all admins here!
       for (var i = 0; i < usernames.length; i++) { // Usernames is now a list of all users or just the single loggeed in user.
          var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[i]);
@@ -73,6 +74,48 @@ settingsApi.get_cache = function(username, domain, permission) {
                   });
                }
                json_data.owner = usernames[i]; // Adds the owner to the file (for the server list)
+               if (json_data.wmsURL) {
+                  cache.push(json_data); // Adds each file to the cache to be returned
+               }
+            }
+         });
+      }
+
+      // Discover groups
+      master_list.forEach(function(filename) {
+         if (utils.directoryExists(path.join(master_path, filename))) {
+            if (filename.startsWith(GROUP_CACHE_PREFIX)) {
+               if (permission == "admin") {
+                  groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
+               } else {
+                  var filePath = path.join(master_path, filename, 'members.json');
+                  var members = JSON.parse(fs.readFileSync(filePath));
+                  for (var i = 0; i < members.length; i++) {
+                     if (members[i].username == username) {
+                        groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
+                     }
+                  }
+               }
+            }
+         }
+      });
+
+      for (var j = 0; j < groups.length; j++) {
+         var group_cache_path = path.join(master_path, GROUP_CACHE_PREFIX + groups[j]);
+         var group_list = fs.readdirSync(group_cache_path); // Gets all the user files
+         group_list.forEach(function(filename) {
+            var file_path = path.join(group_cache_path, filename);
+            if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
+               filename != "dictionary.json" &&
+               filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
+               filename != "members.json") {
+               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+               if (permission != "admin") { // The Layers list is filtered.
+                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+                     return val.include === true || typeof(val.include) === "undefined";
+                  });
+               }
+               json_data.owner = groups[j]; // Adds the owner to the file (for the server list)
                if (json_data.wmsURL) {
                   cache.push(json_data); // Adds each file to the cache to be returned
                }
