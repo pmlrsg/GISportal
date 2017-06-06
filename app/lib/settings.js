@@ -263,6 +263,38 @@ settings.get_owners = function(req, res) {
    });
 };
 
+settings.get_groups = function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   var groups = [];
+
+   if (permission == 'admin') {
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var domainFolder = fs.readdirSync(domainPath); // The list of files and folders in the domain folder
+      for (var i = 0; i < domainFolder.length; i++) {
+         var folder = domainFolder[i];
+         var folderPath = path.join(domainPath, folder);
+         if (utils.directoryExists(folderPath) && folder.startsWith(GROUP_CACHE_PREFIX)) {
+            var groupName = folder.replace(GROUP_CACHE_PREFIX, '');
+            var members = [];
+
+            var membersFilePath = path.join(folderPath, 'members.json');
+            var membersFile = JSON.parse(fs.readFileSync(membersFilePath));
+            for (var j = 0; j < membersFile.length; j++) {
+               members.push(membersFile[j].username);
+            }
+
+            groups.push({
+               groupName: groupName,
+               members: members
+            });
+         }
+      }
+   }
+   res.json(groups);
+};
+
 settings.get_dictionary = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var username = user.getUsername(req);
