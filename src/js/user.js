@@ -81,28 +81,7 @@ gisportal.user.initDOM = function() {
    });
 
    $('button.js-edit-groups').on('click', function() {
-      $.ajax({
-         url: gisportal.middlewarePath + '/settings/get_groups',
-         dataType: 'json',
-         success: function(groups) {
-            loadGroupsTable(groups);
-         },
-         error: function(e) {
-            console.log(e);
-         }
-      });
-
-      function loadGroupsTable(groups) {
-         var template = gisportal.templates['edit-groups-table'](groups);
-         $('.js-edit-groups-html').html(template);
-
-         $('span.js-edit-groups-close').on('click', function() {
-            $('div.js-edit-groups-html').empty();
-            $('div.js-edit-groups-popup').toggleClass('hidden', true);
-         });
-
-         $('div.js-edit-groups-popup').toggleClass('hidden', false);
-      }
+      gisportal.editGroups.loadTable();
    });
 
    $('#refresh-cache-box').on('change', function(){

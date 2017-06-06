@@ -2,26 +2,29 @@
    Groups
    <span class="icon-delete-3 js-edit-groups-close btn right-icon icon-btn"></span>
 </div>
-<table class="edit-groups-table">
-   <tr>
-      <th>Group Name</th>
-      <th>Members</th>
-      <th colspan="100%">Edit</th>
-   </tr>
-   {{#each this}}
+{{#if this}}
+   <table class="edit-groups-table">
       <tr>
-         <td>{{groupName}}</td>
-         <td>
-            <ul>
-               {{#each members}}
-                  <li>{{this}}</li>
-               {{/each}}
-            </ul>
-         </td>
-         <td><span title="Edit" class="js-edit-group icon-pencil-2 btn icon-btn" data-group="{{groupName}}"></span></td>
-         <td><span title="Delete" class="js-delete-group icon-delete-2 btn icon-btn" data-group="{{groupName}}"></span></td>
+         <th>Group Name</th>
+         <th>Members</th>
+         <th colspan="100%">Edit</th>
       </tr>
-   {{/each}}
-</table>
-
+      {{#each this}}
+         <tr>
+            <td>{{groupName}}</td>
+            <td>
+               <ul>
+                  {{#each members}}
+                     <li>{{this}}</li>
+                  {{/each}}
+               </ul>
+            </td>
+            <td><span title="Edit" class="js-edit-group icon-pencil-2 btn icon-btn" data-group-id="{{@index}}"></span></td>
+            <td><span title="Delete" class="js-delete-group icon-delete-2 btn icon-btn" data-group-id="{{@index}}"></span></td>
+         </tr>
+      {{/each}}
+   </table>
+{{else}}
+   Error loading groups.
+{{/if}}
 <button class="brand small js-create-group-btn pull-right">Create Group</button>
