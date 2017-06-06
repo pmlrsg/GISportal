@@ -27,6 +27,7 @@ gisportal.editGroups.loadTable = function() {
          if (id !== undefined) {
             group = groups[id];
          }
+         $('div.js-edit-groups-popup').toggleClass('hidden', true);
          loadEditForm(group);
       });
 
@@ -46,13 +47,41 @@ gisportal.editGroups.loadTable = function() {
       var template = gisportal.templates['edit-group-form'](group);
       $('.js-edit-group-form-html').html(template);
 
-      $('div.js-edit-groups-popup').toggleClass('hidden', true);
       $('.js-edit-group-form-popup').toggleClass('hidden', false);
 
       $('.js-edit-group-form-close').on('click', function() {
-         $('div.js-edit-group-form-html').empty();
-         $('.js-edit-group-form-popup').toggleClass('hidden', true);
+         close();
          $('div.js-edit-groups-popup').toggleClass('hidden', false);
       });
+
+      $('.js-save-group-btn').on('click', function() {
+         var formData = $("form.edit-group-form").serializeArray();
+         var groupData = {};
+         $(formData).each(function(index, obj) {
+            groupData[obj.name] = obj.value;
+         });
+         groupData.members = groupData.members.replace(/\r?\n|\r|\s/g, '').split(',');
+
+         $.ajax({
+            url: gisportal.middlewarePath + '/settings/save_group',
+            type: "POST",
+            data: JSON.stringify(groupData),
+            contentType: "application/json",
+            dataType: "json",
+            success: function(groups) {
+               console.log('success');
+               close();
+               loadGroupsTable(groups);
+            },
+            error: function() {
+               console.log('error');
+            }
+         });
+      });
+
+      function close() {
+         $('div.js-edit-group-form-html').empty();
+         $('.js-edit-group-form-popup').toggleClass('hidden', true);
+      }
    }
 };

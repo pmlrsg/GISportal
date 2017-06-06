@@ -291,8 +291,41 @@ settings.get_groups = function(req, res) {
             });
          }
       }
+      res.json(groups);
+   } else {
+      res.status(401).send();
    }
-   res.json(groups);
+};
+
+settings.save_group = function(req, res, next) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   if (permission == 'admin') {
+      var group = req.body;
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + group.groupName);
+
+      if (!utils.directoryExists(groupFolder)) {
+         utils.mkdirpSync(groupFolder);
+      }
+
+      var membersFile = [];
+
+      for (var i = 0; i < group.members.length; i++) {
+         membersFile.push({
+            username: group.members[i]
+         });
+      }
+
+      membersFile = JSON.stringify(membersFile);
+
+      fs.writeFile(path.join(groupFolder, 'members.json'), membersFile, function() {
+         next();
+      });
+   } else {
+      res.status(401).send();
+   }
 };
 
 settings.get_dictionary = function(req, res) {

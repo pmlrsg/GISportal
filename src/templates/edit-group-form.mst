@@ -2,9 +2,10 @@
    Edit Group
    <span class="icon-delete-3 js-edit-group-form-close btn right-icon icon-btn"></span>
 </div>
-<form class="group-form">
+<form class="edit-group-form">
    <label data-field='name'>Name</label>
-   <input type='text' data-field='name' {{#if this}}value='{{groupName}}' readonly{{/if}}/>
+   <input type='text' name='groupName' data-field='groupName' {{#if this}}value='{{groupName}}' readonly{{/if}}/>
    <label data-field='members'>Members (comma seperated)</label>
-   <textarea class="edit-group-members" data-field='members'>{{#if this}}{{membersString}}{{/if}}</textarea>
+   <textarea class="edit-group-members" name='members' data-field='members'>{{#if this}}{{membersString}}{{/if}}</textarea>
 </form>
+<button class="brand small js-save-group-btn pull-right">Save Group</button>
