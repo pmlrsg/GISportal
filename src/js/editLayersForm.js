@@ -264,11 +264,6 @@ gisportal.editLayersForm.addListeners = function(){
          error: function(e) {
             refreshWMS(wms_url);
             return;
-            // this_span.toggleClass('warn-spin', false);
-            // this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
-            // this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-            // setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
-            // this_span.notify("Could not find cache file", {position:"left", className:"error"});
          }
       });
       function refreshWMS(wmsURL) {

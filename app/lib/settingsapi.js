@@ -69,7 +69,6 @@ settingsApi.get_cache = function(username, domain, permission) {
                if (permission == "admin") {
                   // If the user is an admin, add all groups from this domain
                   groups.push(filename);
-                  // groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
                } else {
                   var filePath = path.join(master_path, filename, 'members.json');
                   var members = JSON.parse(fs.readFileSync(filePath));
@@ -77,7 +76,6 @@ settingsApi.get_cache = function(username, domain, permission) {
                      if (members[i].username == username) {
                         // If the user is a member of the group
                         groups.push(filename);
-                        // groups.push(filename.replace(GROUP_CACHE_PREFIX, ""));
                      }
                   }
                }

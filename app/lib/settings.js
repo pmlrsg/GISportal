@@ -372,7 +372,6 @@ settings.delete_group = function(req, res) {
             overwrite: true
          }, function(err) {
             if (err) {
-               console.log(err);
                res.status(500).send();
             } else {
                res.send();
