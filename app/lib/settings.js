@@ -263,6 +263,11 @@ settings.get_owners = function(req, res) {
    });
 };
 
+/**
+ * Get all the groups for the domain
+ * @param {Object} req Express request
+ * @param {Object} res Express response - a json array of groups is sent
+ */
 settings.get_groups = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
@@ -297,6 +302,12 @@ settings.get_groups = function(req, res) {
    }
 };
 
+/**
+ * Save a group
+ * @param {Object}   req  Express request - with the group as the JSON body
+ * @param {Object}   res  Express response - not used
+ * @param {Function} next The next function in the router chain
+ */
 settings.save_group = function(req, res, next) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
@@ -331,6 +342,11 @@ settings.save_group = function(req, res, next) {
    }
 };
 
+/**
+ * Delete a group
+ * @param {Object} req Express request - with the group name in the query
+ * @param {Object} res Express response
+ */
 settings.delete_group = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
