@@ -172,13 +172,17 @@ gisportal.editLayersForm.addListeners = function(){
           //listen for click events from this style
          $(document).one('click', '.notifyjs-gisportal-delete-option-base .no', function() {
             this_span.toggleClass("working", false);
-            //hide notification
-            $(this).trigger('notify-hide');
+            $(this).trigger('notify-hide'); //hide notification
+            $(document).off('click', '.notifyjs-gisportal-delete-option-base .yes'); // Disable yes listener
          });
          $(document).one('click', '.notifyjs-gisportal-delete-option-base .yes', function() {
             this_span.toggleClass("working", true);
+            $(this).trigger('notify-hide'); //hide notification
+            $(document).off('click', '.notifyjs-gisportal-delete-option-base .no'); // Disable no listener
+
             var server = this_span.data("server");
             var user = this_span.data("user");
+
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user,
                success: function(removed_data){
@@ -208,8 +212,6 @@ gisportal.editLayersForm.addListeners = function(){
                   this_span.notify("Deletion Fail", {position:"left", className:"error"});
                }
             });
-            //hide notification
-            $(this).trigger('notify-hide');
          });
       }
    });

@@ -58,10 +58,12 @@ gisportal.editGroups.loadTable = function() {
 
             $(document).one('click', '.notifyjs-gisportal-delete-option-base .no', function() {
                $(this).trigger('notify-hide');
+               $(document).off('click', '.notifyjs-gisportal-delete-option-base .yes'); // Disable yes listener
             });
 
             $(document).one('click', '.notifyjs-gisportal-delete-option-base .yes', function() {
                $(this).trigger('notify-hide');
+               $(document).off('click', '.notifyjs-gisportal-delete-option-base .no'); // Disable no listener
                this_btn.toggleClass("working", true);
 
                var id = this_btn.data('group-id');
@@ -72,7 +74,7 @@ gisportal.editGroups.loadTable = function() {
                   success: function() {
                      this_btn.toggleClass("working", false);
                      this_btn.closest('tr').remove();
-                     $.notify("Success\nThe group was deleted successfuly", "success");
+                     $.notify("Deleted\nThe group was deleted successfuly", "success");
                   },
                   error: function() {
                      this_btn.toggleClass("working", false);
@@ -134,7 +136,7 @@ gisportal.editGroups.loadTable = function() {
             contentType: "application/json",
             dataType: "json",
             success: function(groups) {
-               $.notify("Success\nThe group was saved successfuly", "success");
+               $.notify("Saved\nThe group was saved successfuly", "success");
                close();
                loadGroupsTable(groups);
             },

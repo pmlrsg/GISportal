@@ -25,6 +25,6 @@
       {{/each}}
    </table>
 {{else}}
-   Error loading groups.
+   No groups found.
 {{/if}}
 <button class="brand small js-create-group-btn pull-right">Create Group</button>

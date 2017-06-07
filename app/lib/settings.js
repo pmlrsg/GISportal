@@ -357,11 +357,22 @@ settings.delete_group = function(req, res) {
       groupName = groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
 
       var domainPath = path.join(MASTER_CONFIG_PATH, domain);
-      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
+      var groupFolderName = GROUP_CACHE_PREFIX + groupName;
+      var groupFolder = path.join(domainPath, groupFolderName);
 
       if (utils.directoryExists(groupFolder)) {
-         fs.remove(groupFolder, function(err) {
+         var deletePath = path.join(domainPath, "deleted_cache");
+         var deleteFolder = path.join(deletePath, groupFolderName);
+
+         if (!utils.directoryExists(deletePath)) {
+            utils.mkdirpSync(deletePath);
+         }
+
+         fs.move(groupFolder, deleteFolder, {
+            overwrite: true
+         }, function(err) {
             if (err) {
+               console.log(err);
                res.status(500).send();
             } else {
                res.send();
