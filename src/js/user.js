@@ -264,12 +264,18 @@ gisportal.loadLayerEditButtons = function(){
    }
 };
 
-gisportal.updateHideClasses = function(){
-   if(gisportal.user.info.permission == "guest"){
+gisportal.updateHideClasses = function() {
+   if (gisportal.user.info.permission == "guest") {
       $('.hide-when-logged-in').toggleClass('hidden', false);
       $('.show-when-logged-in').toggleClass('hidden', true);
-   }else{
+   } else {
       $('.hide-when-logged-in').toggleClass('hidden', true);
       $('.show-when-logged-in').toggleClass('hidden', false);
+   }
+
+   if (gisportal.user.info.permission == 'admin') {
+      $('div.manage-groups').toggleClass('hidden', false);
+   } else {
+      $('div.manage-groups').toggleClass('hidden', true);
    }
 };

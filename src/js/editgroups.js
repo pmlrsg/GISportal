@@ -38,7 +38,7 @@ gisportal.editGroups.loadTable = function() {
          var this_span = $(this);
          if (!this_span.is(".working")) {
             this_span.notify({
-               'title': "Are you sure you want to delete this server?",
+               'title': "Are you sure you want to delete this group?",
                "yes-text": "Yes",
                "no-text": "No"
             }, {
@@ -62,11 +62,11 @@ gisportal.editGroups.loadTable = function() {
                   success: function() {
                      this_span.toggleClass("working", false);
                      this_span.closest('tr').remove();
-                     $.notify("Success\nThe group was successfuly deleted", "success");
+                     $.notify("Success\nThe group was deleted successfuly", "success");
                   },
                   error: function() {
                      this_span.toggleClass("working", false);
-                     this_span.notify("Deletion Fail", "error");
+                     this_span.notify("Failed to delete the group", "error");
                   },
                });
             });
@@ -98,6 +98,7 @@ gisportal.editGroups.loadTable = function() {
 
       // Save the group
       $('.js-save-group-btn').on('click', function() {
+         var this_btn = $(this);
          var formData = $("form.edit-group-form").serializeArray();
          var groupData = {};
          $(formData).each(function(index, obj) {
@@ -112,12 +113,12 @@ gisportal.editGroups.loadTable = function() {
             contentType: "application/json",
             dataType: "json",
             success: function(groups) {
-               console.log('success');
+               $.notify("Success\nThe group was saved successfuly", "success");
                close();
                loadGroupsTable(groups);
             },
             error: function() {
-               console.log('error');
+               this_btn.notify("Failed to save the group", "error");
             }
          });
       });
