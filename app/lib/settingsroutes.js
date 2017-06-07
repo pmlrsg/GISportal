@@ -48,6 +48,8 @@ router.get('/app/settings/get_groups', settings.get_groups);
 
 router.post('/app/settings/save_group', settings.save_group, settings.get_groups);
 
+router.get('/app/settings/delete_group', settings.delete_group);
+
 router.get('/app/settings/get_dictionary', settings.get_dictionary);
 
 router.all('/app/settings/add_to_dictionary', user.requiresValidUser, settings.add_to_dictionary);

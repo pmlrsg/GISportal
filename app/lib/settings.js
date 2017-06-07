@@ -3,7 +3,7 @@
  */
 
 var crypto = require('crypto');
-var fs = require("fs");
+var fs = require("fs-extra");
 var jimp = require("jimp");
 var path = require('path');
 var redis = require('redis');
@@ -303,8 +303,11 @@ settings.save_group = function(req, res, next) {
 
    if (permission == 'admin') {
       var group = req.body;
+      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+      var groupName = group.groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
       var domainPath = path.join(MASTER_CONFIG_PATH, domain);
-      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + group.groupName);
+      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
 
       if (!utils.directoryExists(groupFolder)) {
          utils.mkdirpSync(groupFolder);
@@ -323,6 +326,34 @@ settings.save_group = function(req, res, next) {
       fs.writeFile(path.join(groupFolder, 'members.json'), membersFile, function() {
          next();
       });
+   } else {
+      res.status(401).send();
+   }
+};
+
+settings.delete_group = function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   if (permission == 'admin') {
+      var groupName = req.query.groupname;
+      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+      groupName = groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
+
+      if (utils.directoryExists(groupFolder)) {
+         fs.remove(groupFolder, function(err) {
+            if (err) {
+               res.status(500).send();
+            } else {
+               res.send();
+            }
+         });
+      } else {
+         res.status(404).send();
+      }
    } else {
       res.status(401).send();
    }
