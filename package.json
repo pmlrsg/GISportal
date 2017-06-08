@@ -21,7 +21,7 @@
     "pixrem": "^3.0.2"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.9",
+    "@ffmpeg-installer/ffmpeg": "1.0.12",
     "async": "^2.1.5",
     "body-parser": "^1.16.1",
     "bunyan": "^1.8.5",
@@ -34,7 +34,7 @@
     "express": "^4.14.1",
     "express-session": "^1.15.1",
     "fluent-ffmpeg": "^2.1.0",
-    "fs-extra": "^2.0.0",
+    "fs-extra": "^3.0.1",
     "glob": "^7.1.1",
     "jade": "^1.11.0",
     "jimp": "^0.2.27",

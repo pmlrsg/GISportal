@@ -1,0 +1,25 @@
+div.js-edit-groups-html {
+   width: 1250px;
+   max-width:90%;
+   max-height:90%;
+   overflow:auto;
+
+   table {
+      width: 100%;
+
+      .icon-btn {
+         color: black;
+      }
+   }
+
+   .js-create-group-btn {
+      margin-top: 5px;
+      margin-bottom: 5px;
+   }
+}
+
+textarea.edit-group-members {
+   min-height: 100px;
+   min-width: 100%;
+   max-width: 100%;
+}

@@ -867,7 +867,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       var colorbands_keydown_timeout;
 
-      $('.colorbands-value').on('change', function(){
+      $('#tab-' + indicator.id + '-colorbands-value').on('change', function(){
          if(isNaN($(this).val())){
             $(this).val("1");
          }
