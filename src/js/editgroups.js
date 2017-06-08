@@ -9,9 +9,6 @@ gisportal.editGroups.loadTable = function() {
       url: gisportal.middlewarePath + '/settings/get_groups',
       dataType: 'json',
       success: function(groups) {
-         for (var i = 0; i < groups.length; i++) {
-            groups[i].members.sort();
-         }
          loadGroupsTable(groups);
       },
       error: function() {
@@ -24,6 +21,10 @@ gisportal.editGroups.loadTable = function() {
     * @param  {Array} groups An array of groups
     */
    function loadGroupsTable(groups) {
+      for (var i = 0; i < groups.length; i++) {
+         groups[i].members.sort();
+      }
+
       var template = gisportal.templates['edit-groups-table'](groups);
       $('.js-edit-groups-html').html(template);
 
