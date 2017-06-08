@@ -21,7 +21,7 @@
     "pixrem": "~3.0.0"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.9",
+    "@ffmpeg-installer/ffmpeg": "1.0.12",
     "async": "^2.1.4",
     "body-parser": "~1.14.2",
     "bunyan": "~1.5.1",

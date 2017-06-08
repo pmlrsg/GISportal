@@ -768,7 +768,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             i++;
          }
          if (i == numFiles) {
-            fs.remove(path.join(downloadDir, hash), next);
+            if (next) {
+               fs.remove(path.join(downloadDir, hash), next);
+            } else {
+               fs.remove(path.join(downloadDir, hash));
+            }
          }
       }
    }
