@@ -71,12 +71,10 @@ settingsApi.get_cache = function(username, domain, permission) {
                   groups.push(filename);
                } else {
                   var filePath = path.join(master_path, filename, 'members.json');
-                  var members = JSON.parse(fs.readFileSync(filePath));
-                  for (var i = 0; i < members.length; i++) {
-                     if (members[i].username == username) {
-                        // If the user is a member of the group
-                        groups.push(filename);
-                     }
+                  // Currently no need to JSON.parse the file, just see if it contains the username
+                  var members = fs.readFileSync(filePath, 'utf8');
+                  if (members.indexOf(username) != -1) {
+                     groups.push(filename);
                   }
                }
             }
