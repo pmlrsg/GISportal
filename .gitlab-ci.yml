@@ -4,16 +4,15 @@ stages:
     - build
 
 job1:
-    only: 
+    only:
         - master
         - dev
+        - testing
     stage: build
     script:
         - node --version
         - npm --version
-        - npm install npm --silent
-        - ./node_modules/.bin/npm --version
-        - ./node_modules/.bin/npm install --silent --depth 0
+        - npm install --silent --depth 0
         - grunt
         - /usr/bin/redis-server --daemonize yes
-        - ./node_modules/.bin/npm test
+        - npm test
