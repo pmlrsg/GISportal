@@ -296,7 +296,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                next(err);
             } else {
                var json = JSON.parse(body);
-               if (json && json.min && json.max) {
+               if (json && json.min !== undefined && json.max !== undefined) {
                   if (min === null || json.min < min) {
                      min = json.min;
                   }
