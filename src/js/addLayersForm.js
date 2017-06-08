@@ -660,7 +660,7 @@ gisportal.addLayersForm.addTagInput = function(tag){
 * @param String form_div - The JQuery element selctor for the form to go into
 */
 gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
-   wms_url = layer.wmsURL || gisportal.addLayersForm.form_info.wms_url;
+   var wms_url = layer.wmsURL || gisportal.addLayersForm.form_info.wms_url;
    if(wms_url){
       wms_url = wms_url.split('?')[0];
    }
@@ -698,6 +698,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "phone":phone,
          "wms_url":wms_url,
          "owner":owner,
+         "old_owner":owner,
          "server_name":layer.serverName,
          "wcsURL":layer.wcsURL
       };
