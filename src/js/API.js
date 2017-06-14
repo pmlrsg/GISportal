@@ -2047,24 +2047,27 @@ gisportal.api['graphFramerate.change'] = function(data, options){
 
  value: An array of 2 dates, start and end, to be set as the range for the graph
   */
-gisportal.api['graphRange.change'] = function(data, options){
-	options = options || {};
-	var value = data.value;
+gisportal.api['graphRange.change'] = function(data, options) {
+   options = options || {};
+   var value = data.value;
    var start_date_elem = $('.js-active-plot-start-date');
    var end_date_elem = $('.js-active-plot-end-date');
    var slider_elem = $('.js-range-slider');
-   var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
+   // Convert both date number strings in the array into ISOStrings
+   var dates = value.map(Number).map(function(dateNum) {
+      return new Date(dateNum).toISOString();
+   });
 
-	if(options.describeOnly){
-		return 'Graph date range set to: "' + dates.join(' - ') + '"';
-	}
-	if(options.selectorOnly){
-		return '.js-range-slider';
-	}
-	if(options.highlight){
-		collaboration.highlightElement(slider_elem);
-	}
-	start_date_elem.val(dates[0]).trigger('change');
+   if (options.describeOnly) {
+      return 'Graph date range set to: "' + dates.join(' - ') + '"';
+   }
+   if (options.selectorOnly) {
+      return '.js-range-slider';
+   }
+   if (options.highlight) {
+      collaboration.highlightElement(slider_elem);
+   }
+   start_date_elem.val(dates[0]).trigger('change');
    end_date_elem.val(dates[1]).trigger('change');
    slider_elem.val(value);
 };
