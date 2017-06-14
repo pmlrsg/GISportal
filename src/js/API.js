@@ -814,6 +814,48 @@ gisportal.api['scalebar.opacity'] = function(data, options){
 	}
 };
 
+gisportal.api['scalebar.custom-aboveMaxColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-aboveMaxColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-aboveMaxColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].aboveMaxColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
+};
+
+gisportal.api['scalebar.custom-belowMinColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-belowMinColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-belowMinColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-belowMinColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].belowMinColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
+};
+
  /*
  'data' must contain the following:
 
