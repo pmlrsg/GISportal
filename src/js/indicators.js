@@ -10,6 +10,10 @@
 gisportal.indicatorsPanel = {};
 
 gisportal.indicatorsPanel.open = function() {
+   if ($('.js-show-panel[data-panel-name="active-layers"').hasClass('hidden')) {
+      // Show the layers tab if it is currently hidden
+      $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', false);
+   }
    gisportal.panels.showPanel('active-layers');
 };
 
@@ -62,6 +66,8 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
+         // Hide the layers tab if no layers are selected
+         $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', true);
          gisportal.panels.showPanel('choose-indicator');
          // Clears the vector layer to avoid confusion
          gisportal.vectorLayer.getSource().clear();
@@ -162,8 +168,9 @@ gisportal.indicatorsPanel.initDOM = function() {
       layer.style = layer.defaultStyle || "boxfill/rainbow";
 
       $('#tab-' + id + '-colorbands').val(layer.colorbands);
-      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: layer.aboveMaxColor || "0"});
-      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: layer.belowMinColor || "0"});
+
+      selectAboveMaxBelowMinOptions(id, layer.aboveMaxColor, layer.belowMinColor);
+
       $('#tab-' + id + '-layer-style').ddslick('select', {value: layer.style});
       $('#tab-' + id + '-log').prop( 'checked', layer.defaultLog || false );
       var autoScale = gisportal.getAutoScaleFromString(layer.autoScale);
@@ -313,48 +320,48 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
 };
 
-gisportal.indicatorsPanel.add_wcs_url = function(selected_this)  {
+gisportal.indicatorsPanel.add_wcs_url = function(selected_this) {
    var wcs_url = $('input.js-wcs-url')[0].value;
    var layer = gisportal.layers[selected_this.closest('[data-id]').data('id')];
    var filename = layer.serverName;
    var user = layer.owner;
-   error_div = $("#" + layer.id + "-analysis-message");
+   var error_div = $("#" + layer.id + "-analysis-message");
 
-   if(!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))){
+   if (!(wcs_url.startsWith('http://') || wcs_url.startsWith('https://'))) {
       error_div.toggleClass('hidden', false);
       error_div.html("The URL must start with 'http://'' or 'https://'");
-   }else if(layer.provider == "UserDefinedLayer"){
-      for(var index in gisportal.layers){
-         this_layer = gisportal.layers[index];
-         if(this_layer.serverName == filename){
-            gisportal.layers[index].wcsURL = wcs_url.split("?")[0];
+   } else {
+      if (gisportal.user.info.email == user || gisportal.user.info.permission == 'admin') {
+         $.ajax({
+            url: gisportal.middlewarePath + '/settings/add_wcs_url?url=' + encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
+            success: function(data) {
+               layer.wcsURL = data;
+               loadAnalysisTab();
+            },
+            error: function(e) {
+               //show an error that tells the user what is wrong
+               error_div.toggleClass('hidden', false);
+               error_div.html('There was an error using that URL: ' + e.responseText);
+            }
+         });
+      } else {
+         for (var index in gisportal.layers) {
+            var this_layer = gisportal.layers[index];
+            if (this_layer.serverName == filename) {
+               gisportal.layers[index].wcsURL = wcs_url.split("?")[0].split(" ")[0];
+            }
          }
+         loadAnalysisTab();
       }
-      // Look at only doing it if the user is allowed with that layer
+   }
+
+   function loadAnalysisTab() {
       gisportal.indicatorsPanel.analysisTab(layer.id);
-      message_div = $("#" + layer.id + "-analysis-message");
+      var message_div = $("#" + layer.id + "-analysis-message");
       message_div.toggleClass('hidden', false);
       message_div.html('The WCS URL has been added to this server.');
       message_div.toggleClass('alert-danger', false);
       message_div.toggleClass('alert-success', true);
-   }else{ // Perhaps only if this user isnt a guest!
-      $.ajax({
-         url:  gisportal.middlewarePath + '/settings/add_wcs_url?url='+encodeURIComponent(wcs_url) + '&username=' + user + '&filename=' + filename,
-         success: function(data){
-            layer.wcsURL = data;
-            gisportal.indicatorsPanel.analysisTab(layer.id);
-            message_div = $("#" + layer.id + "-analysis-message");
-            message_div.toggleClass('hidden', false);
-            message_div.html('The WCS URL has been added to this server.');
-            message_div.toggleClass('alert-danger', false);
-            message_div.toggleClass('alert-success', true);
-         },
-         error: function(e){
-            //show an error that tells the user what is wrong
-            error_div.toggleClass('hidden', false);
-            error_div.html('There was an error using that URL: ' + e.statusText);
-         }
-      });
    }
 };
 
@@ -867,7 +874,7 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
 
       var colorbands_keydown_timeout;
 
-      $('.colorbands-value').on('change', function(){
+      $('#tab-' + indicator.id + '-colorbands-value').on('change', function(){
          if(isNaN($(this).val())){
             $(this).val("1");
          }
@@ -916,8 +923,17 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
                if(data.selectedData.value == "0"){
                   data.selectedData.value = null;
                }
-               gisportal.layers[indicator.id].aboveMaxColor = data.selectedData.value;
-               gisportal.layers[indicator.id].setScalebarTimeout();
+               if (data.selectedData.value == 'custom') {
+                  var customInput = $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]');
+                  customInput.toggleClass('hidden', false);
+                  if(customInput.val()) {
+                     customInput.trigger('change');
+                  }
+               } else {
+                  $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]').toggleClass('hidden', true);
+                  gisportal.layers[indicator.id].aboveMaxColor = data.selectedData.value;
+                  gisportal.layers[indicator.id].setScalebarTimeout();
+               }
             }
          }
       });
@@ -925,14 +941,51 @@ gisportal.indicatorsPanel.scalebarTab = function(id) {
       $('#tab-' + indicator.id + '-belowMinColor').ddslick({
          onSelected: function(data) {
             if (data.selectedData) {
-               if(data.selectedData.value == "0"){
+               if (data.selectedData.value == "0") {
                   data.selectedData.value = null;
                }
-               gisportal.layers[indicator.id].belowMinColor = data.selectedData.value;
-               gisportal.layers[indicator.id].setScalebarTimeout();
+               if (data.selectedData.value == 'custom') {
+                  var customInput = $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]');
+                  customInput.toggleClass('hidden', false);
+                  if(customInput.val()) {
+                     customInput.trigger('change');
+                  }
+               } else {
+                  $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]').toggleClass('hidden', true);
+                  gisportal.layers[indicator.id].belowMinColor = data.selectedData.value;
+                  gisportal.layers[indicator.id].setScalebarTimeout();
+               }
             }
          }
       });
+
+      $('.js-custom-aboveMaxColor[data-id="' + indicator.id + '"]').on('change', function() {
+         var colour = $(this).val();
+         gisportal.layers[indicator.id].aboveMaxColor = colour;
+
+         var params = {
+            "event" : "scalebar.custom-aboveMaxColor",
+            "id" : indicator.id,
+            "value": colour
+         };
+         gisportal.events.trigger('scalebar.custom-aboveMaxColor', params);
+         gisportal.layers[indicator.id].setScalebarTimeout();
+      });
+
+      $('.js-custom-belowMinColor[data-id="' + indicator.id + '"]').on('change', function() {
+         var colour = $(this).val();
+         gisportal.layers[indicator.id].belowMinColor = colour;
+
+         var params = {
+            "event" : "scalebar.custom-belowMinColor",
+            "id" : indicator.id,
+            "value": colour
+         };
+         gisportal.events.trigger('scalebar.custom-belowMinColor', params);
+         gisportal.layers[indicator.id].setScalebarTimeout();
+      });
+
+      selectAboveMaxBelowMinOptions(id, indicator.aboveMaxColor, indicator.belowMinColor);
    };
    if(layer.metadataComplete) onMetadata();
    else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
@@ -1456,3 +1509,19 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
       return "The bounding box selected contains no data for this indicator.";
    }
 };
+
+function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
+   // Select custom if the above max or below min value doesn't match a dropdown value
+   try {
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+   } catch (err) {
+      $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: 'custom'});
+      $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(aboveMaxColor);
+   }
+   try {
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+   } catch (err) {
+      $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
+      $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor);
+   }
+}

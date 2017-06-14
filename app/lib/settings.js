@@ -3,7 +3,7 @@
  */
 
 var crypto = require('crypto');
-var fs = require("fs");
+var fs = require("fs-extra");
 var jimp = require("jimp");
 var path = require('path');
 var redis = require('redis');
@@ -19,6 +19,7 @@ var utils = require('./utils.js');
 var client = redis.createClient();
 
 var USER_CACHE_PREFIX = "user_";
+var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var EXAMPLE_CONFIG_PATH = CURRENT_PATH + "/../../config_examples/config.js";
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
@@ -80,14 +81,16 @@ settings.email_setup = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var email_config = global.config[domain].email;
    var email_setup = false;
-   if (email_config.method == "mailgun") {
-      if (email_config.mailgun_api_key && email_config.mailgun_domain) {
-         email_setup = true;
+   if (email_config) {
+      if (email_config.method == "mailgun") {
+         if (email_config.mailgun_api_key && email_config.mailgun_domain) {
+            email_setup = true;
+         }
       }
-   }
-   if (email_config.method == "smtp") {
-      if ("smtp_email" in email_config && "smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config) {
-         email_setup = true;
+      if (email_config.method == "smtp") {
+         if ("smtp_email" in email_config && "smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config) {
+            email_setup = true;
+         }
       }
    }
    res.send(email_setup);
@@ -251,6 +254,8 @@ settings.get_owners = function(req, res) {
             if (folder_owner != username) {
                owners.push(folder_owner);
             }
+         } else if (utils.directoryExists(folder_name) && folder.startsWith(GROUP_CACHE_PREFIX)) {
+            owners.push(folder);
          }
       });
       owners.push(domain);
@@ -258,6 +263,128 @@ settings.get_owners = function(req, res) {
    res.send({
       owners: owners
    });
+};
+
+/**
+ * Get all the groups for the domain
+ * @param {Object} req Express request
+ * @param {Object} res Express response - a json array of groups is sent
+ */
+settings.get_groups = function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   var groups = [];
+
+   if (permission == 'admin') {
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var domainFolder = fs.readdirSync(domainPath); // The list of files and folders in the domain folder
+      for (var i = 0; i < domainFolder.length; i++) {
+         var folder = domainFolder[i];
+         var folderPath = path.join(domainPath, folder);
+         if (utils.directoryExists(folderPath) && folder.startsWith(GROUP_CACHE_PREFIX)) {
+            var groupName = folder.replace(GROUP_CACHE_PREFIX, '');
+            var members = [];
+
+            var membersFilePath = path.join(folderPath, 'members.json');
+            var membersFile = JSON.parse(fs.readFileSync(membersFilePath));
+            for (var j = 0; j < membersFile.length; j++) {
+               members.push(membersFile[j].username);
+            }
+
+            groups.push({
+               groupName: groupName,
+               members: members
+            });
+         }
+      }
+      res.json(groups);
+   } else {
+      res.status(401).send();
+   }
+};
+
+/**
+ * Save a group
+ * @param {Object}   req  Express request - with the group as the JSON body
+ * @param {Object}   res  Express response - not used
+ * @param {Function} next The next function in the router chain
+ */
+settings.save_group = function(req, res, next) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   if (permission == 'admin') {
+      var group = req.body;
+      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+      var groupName = group.groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
+
+      if (!utils.directoryExists(groupFolder)) {
+         utils.mkdirpSync(groupFolder);
+      }
+
+      var membersFile = [];
+
+      for (var i = 0; i < group.members.length; i++) {
+         membersFile.push({
+            username: group.members[i]
+         });
+      }
+
+      membersFile = JSON.stringify(membersFile);
+
+      fs.writeFile(path.join(groupFolder, 'members.json'), membersFile, function() {
+         next();
+      });
+   } else {
+      res.status(401).send();
+   }
+};
+
+/**
+ * Delete a group
+ * @param {Object} req Express request - with the group name in the query
+ * @param {Object} res Express response
+ */
+settings.delete_group = function(req, res) {
+   var domain = utils.getDomainName(req); // Gets the given domain
+   var permission = user.getAccessLevel(req, domain);
+
+   if (permission == 'admin') {
+      var groupName = req.query.groupname;
+      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+      groupName = groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
+      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+      var groupFolderName = GROUP_CACHE_PREFIX + groupName;
+      var groupFolder = path.join(domainPath, groupFolderName);
+
+      if (utils.directoryExists(groupFolder)) {
+         var deletePath = path.join(domainPath, "deleted_cache");
+         var deleteFolder = path.join(deletePath, groupFolderName);
+
+         if (!utils.directoryExists(deletePath)) {
+            utils.mkdirpSync(deletePath);
+         }
+
+         fs.move(groupFolder, deleteFolder, {
+            overwrite: true
+         }, function(err) {
+            if (err) {
+               res.status(500).send();
+            } else {
+               res.send();
+            }
+         });
+      } else {
+         res.status(404).send();
+      }
+   } else {
+      res.status(401).send();
+   }
 };
 
 settings.get_dictionary = function(req, res) {
@@ -365,7 +492,13 @@ settings.remove_server_cache = function(req, res) {
    var filename = req.query.filename; // Gets the given filename
    var owner = req.query.owner; // Gets the given owner
    filename += ".json"; // Adds the file extension to the filename
-   var base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
+   var base_path;
+   if (owner.startsWith(GROUP_CACHE_PREFIX)) {
+      // The path if the owner is a group
+      base_path = path.join(MASTER_CONFIG_PATH, domain, owner);
+   } else {
+      base_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner); // The path if the owner is not a domain
+   }
    var master_list = fs.readdirSync(MASTER_CONFIG_PATH); // The list of files and folders in the master_cache folder
    master_list.forEach(function(value) {
       if (value == owner) {
@@ -395,10 +528,18 @@ settings.remove_server_cache = function(req, res) {
 };
 
 settings.add_wcs_url = function(req, res) {
-   var url = req.query.url.split('?')[0] + "?"; // Gets the given url
-   var username = user.getUsername(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
-   // var permission = user.getAccessLevel(req, domain); // Gets the user permission // NOT USED
+   var url = req.query.url.split('?')[0].split(" ")[0]; // Gets the given url
+   var username = user.getUsername(req); // Gets the given username
+   var permission = user.getAccessLevel(req, domain); // Gets the user permission
+   if (permission == 'admin') {
+      // If the user is an admin
+      username = req.query.username;
+   } else if (permission == 'guest' || req.query.username && username != req.query.username) {
+      // Else if they are a guest or are trying to modify another user's layer
+      res.status(401).send('You are not authorised to do that!');
+      return;
+   }
    var filename = req.query.filename + ".json"; // Gets the given filename
 
    var base_path = path.join(MASTER_CONFIG_PATH, domain);
@@ -458,6 +599,7 @@ settings.add_user_layer = function(req, res) {
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
    var domain = utils.getDomainName(req); // Gets the given domain
    var owner = server_info.owner; // Gets the given owner
+   var old_owner = server_info.old_owner; // Gets the old owner
    var cache_path;
    var save_path;
 
@@ -477,10 +619,16 @@ settings.add_user_layer = function(req, res) {
          // If is is a global file it is refreshed from the URL
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
          save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
+      } else if (owner.startsWith(GROUP_CACHE_PREFIX)) {
+         cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
+         save_path = path.join(MASTER_CONFIG_PATH, domain, owner, filename);
       } else {
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
+      }
+      if (old_owner == domain) {
+         cache_path = path.join(MASTER_CONFIG_PATH, domain);
       }
       if (!utils.directoryExists(cache_path)) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist

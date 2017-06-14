@@ -296,7 +296,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
                next(err);
             } else {
                var json = JSON.parse(body);
-               if (json && json.min && json.max) {
+               if (json && json.min !== undefined && json.max !== undefined) {
                   if (min === null || json.min < min) {
                      min = json.min;
                   }
@@ -768,7 +768,11 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             i++;
          }
          if (i == numFiles) {
-            fs.remove(path.join(downloadDir, hash), next);
+            if (next) {
+               fs.remove(path.join(downloadDir, hash), next);
+            } else {
+               fs.remove(path.join(downloadDir, hash));
+            }
          }
       }
    }

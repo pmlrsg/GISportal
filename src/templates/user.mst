@@ -28,6 +28,10 @@
 	   <label>You can edit internal layers here:</label>
 	   <button class="brand small js-edit-layers pull-right">Configure Internal Layers</button>
 	</div>
+	<div class="hidden clearfix manage-groups">
+		<br/>
+		<button class="brand small js-edit-groups pull-right">Manage Groups</button>
+	</div>
 </div>
 
 <div class="walkthrough-user-panel">

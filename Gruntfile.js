@@ -32,6 +32,7 @@ var coreFiles = [
     "src/js/autoLayer.js",
     "src/js/addLayersForm.js",
     "src/js/editLayersForm.js",
+    "src/js/editgroups.js",
     "src/js/geolocationFilter.js",
     "src/js/view.js",
     "src/js/user.js",
@@ -40,7 +41,7 @@ var coreFiles = [
     "src/js/walkthrough-event-bindings.js",
     "src/js/webrtc_control.js",
     "src/js/walkthrough.js",
-    "src/js/API.js"
+    "src/js/API.js",
   ];
 
 function stripDirectory( file ) {

@@ -282,6 +282,7 @@ gisportal.layer = function( options ) {
    };
 
    this.clearScalebarTimeout = function(){
+      var layer = this;
       $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true).toggleClass('progress-btn', false);
       if(layer.scalebarTimeout){
          clearTimeout(layer.scalebarTimeout);

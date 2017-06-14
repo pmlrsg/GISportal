@@ -60,7 +60,7 @@ user.getAccessLevel = function(req, domain) {
    if(typeof(req.session.passport.user) != 'undefined') {
       // there is a valid session so they are a logged in user
       level = "user";
-      domain = domain || req.query.domain;
+      domain = domain || utils.getDomainName(req);
       var config = GLOBAL.config[domain] || GLOBAL.config;
       // check to see if they are an admin
       var admins = config.admins;
