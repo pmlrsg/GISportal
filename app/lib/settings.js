@@ -81,14 +81,16 @@ settings.email_setup = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var email_config = global.config[domain].email;
    var email_setup = false;
-   if (email_config.method == "mailgun") {
-      if (email_config.mailgun_api_key && email_config.mailgun_domain) {
-         email_setup = true;
+   if (email_config) {
+      if (email_config.method == "mailgun") {
+         if (email_config.mailgun_api_key && email_config.mailgun_domain) {
+            email_setup = true;
+         }
       }
-   }
-   if (email_config.method == "smtp") {
-      if ("smtp_email" in email_config && "smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config) {
-         email_setup = true;
+      if (email_config.method == "smtp") {
+         if ("smtp_email" in email_config && "smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config) {
+            email_setup = true;
+         }
       }
    }
    res.send(email_setup);
