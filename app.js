@@ -1,6 +1,7 @@
 // Imports
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var child_process = require('child_process');
 var express = require('express');
 var session = require('express-session');
 var fs = require("fs");
@@ -22,6 +23,12 @@ var app = express();
 // Load global-config-server.js
 if (!fs.existsSync('./config/global-config-server.js')) {
    fs.writeFileSync('./config/global-config-server.js', fs.readFileSync('./config_examples/global-config-server.js'));
+}
+
+// Copy the default proxy-whitelist if it doesn't exist and detect and add any domains in existing configs
+if (!fs.existsSync('./config/proxy-whitelist.txt')) {
+   fs.writeFileSync('./config/proxy-whitelist.txt', fs.readFileSync('./config_examples/proxy-whitelist.txt'));
+   child_process.spawn('sh', ['build-whitelist.sh']);
 }
 
 try {
