@@ -19,24 +19,36 @@ var whitelistLoading = false;
 var proxyWhitelist = [];
 
 proxy.addToProxyWhitelist = function(trustedURL, next) {
-   console.log('addToProxyWhitelist');
-   proxy.loadWhitelist(function() {
-      trustedURL = url.parse(trustedURL);
-      trustedURL.search = undefined;
-      trustedURL.hash = undefined;
-
-      proxyWhitelist.push(url.format(trustedURL));
-
-      var file = fs.createWriteStream(WHITELIST_FILE);
-      file.on('error', function(err) {
-         // TODO
-      });
-      for (var i = 0; i < proxyWhitelist.length; i++) {
-         file.write(proxyWhitelist[i] + '\n');
+   checkProxyWhitelist(trustedURL, function(trusted) {
+      if (trusted) {
+         // If already trusted
+         next();
+      } else {
+         // If not already trusted
+         add();
       }
-      file.end();
-      next();
    });
+
+   function add() {
+      // Reload the whitelist to avoid overwriting any changes
+      proxy.loadWhitelist(function() {
+         trustedURL = url.parse(trustedURL);
+         trustedURL.search = undefined;
+         trustedURL.hash = undefined;
+
+         proxyWhitelist.push(url.format(trustedURL));
+
+         var file = fs.createWriteStream(WHITELIST_FILE);
+         file.on('error', function(err) {
+            // TODO
+         });
+         for (var i = 0; i < proxyWhitelist.length; i++) {
+            file.write(proxyWhitelist[i] + '\n');
+         }
+         file.end();
+         next();
+      });
+   }
 };
 
 proxy.loadWhitelist = function(next) {
@@ -141,19 +153,15 @@ proxy.rotate = function(req, res) {
 };
 
 function checkProxyWhitelist(testUrl, next) {
-   // console.log('checkProxyWhitelist');
    if (!whitelistLoaded) {
       if (!whitelistLoading) {
          // If not loaded and not loading, load it
-         // console.log('going to load whitelist');
          return proxy.loadWhitelist(function() {
-            // console.log('finished loading whitelist');
             checkProxyWhitelist(testUrl, next);
          });
       } else {
          // If not loaded, but loading, try again after 10ms
          return setTimeout(function() {
-            // console.log('trying checkProxyWhitelist again');
             checkProxyWhitelist(testUrl, next);
          }, 10);
       }
