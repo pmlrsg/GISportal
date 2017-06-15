@@ -6,7 +6,6 @@ var fs = require("fs-extra");
 var jimp = require("jimp");
 var path = require('path');
 var request = require('request');
-var urlMod = require('url');
 var readline = require('readline');
 var minimatch = require('minimatch');
 var url = require('url');
@@ -44,11 +43,10 @@ proxy.addToProxyWhitelist = function(trustedURL, next) {
    function add() {
       // Reload the whitelist to avoid overwriting any changes
       proxy.loadWhitelist(function() {
-         trustedURL = url.parse(trustedURL);
-         trustedURL.search = undefined;
-         trustedURL.hash = undefined;
+         trustedURL = cleanURL(trustedURL);
 
-         proxyWhitelist.push(url.format(trustedURL));
+         proxyWhitelist.push(trustedURL);
+         proxyWhitelist.sort();
 
          var file = fs.createWriteStream(WHITELIST_FILE);
          for (var i = 0; i < proxyWhitelist.length; i++) {
@@ -222,10 +220,7 @@ function checkProxyWhitelist(testUrl, next) {
       }
    }
 
-   testUrl = urlMod.parse(testUrl);
-   testUrl.search = undefined;
-   testUrl.hash = undefined;
-   testUrl = urlMod.format(testUrl);
+   testUrl = cleanURL(testUrl);
 
    var trusted = false;
 
@@ -237,4 +232,13 @@ function checkProxyWhitelist(testUrl, next) {
    }
 
    next(trusted);
+}
+
+function cleanURL(dirtyURL) {
+   var cleanedURL = url.parse(dirtyURL);
+   cleanedURL.search = undefined;
+   cleanedURL.hash = undefined;
+   cleanedURL = url.format(cleanedURL);
+   cleanedURL = cleanedURL.replace("http://", "").replace("https://", "");
+   return cleanedURL;
 }
