@@ -8,6 +8,7 @@ var path = require('path');
 var settings = require('./settings.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
+var proxy = require('./proxy.js');
 
 var router = express.Router();
 
@@ -24,9 +25,9 @@ router.use(function(req, res, next) {
    next();
 });
 
-router.get('/app/settings/proxy', settings.proxy);
+router.get('/app/settings/proxy', proxy.proxy);
 
-router.get('/app/settings/img_proxy', settings.img_proxy);
+router.get('/app/settings/img_proxy', proxy.img_proxy);
 
 router.get('/app/settings/config', settings.config);
 
@@ -100,7 +101,7 @@ router.get('/resources/*?', function(req, res) {
 
 router.get('/app/settings/get_cache', settings.get_cache);
 
-router.all('/app/settings/rotate', settings.rotate);
+router.all('/app/settings/rotate', proxy.rotate);
 
 router.get('/app/settings/remove_server_cache', settings.remove_server_cache);
 

@@ -10,6 +10,7 @@ var _ = require("underscore");
 var xml2js = require('xml2js');
 
 var utils = require('./utils.js');
+var proxy = require('./proxy.js');
 
 var USER_CACHE_PREFIX = "user_";
 var GROUP_CACHE_PREFIX = "group_";
@@ -130,10 +131,10 @@ function loadCache(username, permission, names, master_path, cachePrefix) {
    return cache;
 }
 
-settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
-   url = url.replace(/\?.*/g, "") + "?";
+settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
+   wmsURL = wmsURL.replace(/\?.*/g, "") + "?";
    var data = null;
-   var serverName = utils.URLtoServerName(url);
+   var serverName = utils.URLtoServerName(wmsURL);
    var filename = serverName + ".json";
    var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
    if (!utils.directoryExists(directory)) {
@@ -142,7 +143,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
    var file_path = path.join(directory, filename);
 
    if (refresh === true || !utils.fileExists(file_path)) {
-      request(url + "service=WMS&request=GetCapabilities", function(err, response, body) {
+      request(wmsURL + "service=WMS&request=GetCapabilities", function(err, response, body) {
          if (err) {
             next(err, data);
          } else {
@@ -254,7 +255,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                         sub_master_cache.options = {
                            "providerShortTag": "UserDefinedLayer"
                         };
-                        sub_master_cache.wmsURL = url;
+                        sub_master_cache.wmsURL = wmsURL;
                         sub_master_cache.serverName = serverName;
                         sub_master_cache.contactInfo = contact_info;
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
@@ -263,7 +264,9 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                         data = JSON.stringify(sub_master_cache);
                         fs.writeFileSync(file_path, data);
                      }
-                     next(null, data);
+                     proxy.addToProxyWhitelist(wmsURL, function() {
+                        next(null, data);
+                     });
                   } catch (err) {
                      next(err, data);
                   }
