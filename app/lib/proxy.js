@@ -13,7 +13,7 @@ var url = require('url');
 
 var utils = require('./utils.js');
 
-var WHITELIST_FILE = path.join(__dirname, '/../../config', 'proxy_whitelist.txt');
+var WHITELIST_FILE = path.join(__dirname, '/../../config', 'proxy-whitelist.txt');
 
 var proxy = {};
 module.exports = proxy;
@@ -68,19 +68,39 @@ proxy.loadWhitelist = function(next) {
    whitelistLoading = true;
    whitelistLoaded = false;
    proxyWhitelist = [];
-   var rl = readline.createInterface({
-      input: fs.createReadStream(WHITELIST_FILE)
+
+   // Ensure the whitelist file exists
+   fs.ensureFile(WHITELIST_FILE, function(err) {
+      if (err) {
+         console.error(err);
+         return done();
+      }
+
+      var file = fs.createReadStream(WHITELIST_FILE);
+
+      file.on('error', function(err) {
+         console.error(err);
+         return done();
+      });
+
+      var rl = readline.createInterface({
+         input: file
+      });
+
+      rl.on('line', function(line) {
+         proxyWhitelist.push(line);
+      }).on('close', function() {
+         return done();
+      });
    });
 
-   rl.on('line', function(line) {
-      proxyWhitelist.push(line);
-   }).on('close', function() {
+   function done() {
       whitelistLoaded = true;
       whitelistLoading = false;
       if (next) {
          next();
       }
-   });
+   }
 };
 
 /**

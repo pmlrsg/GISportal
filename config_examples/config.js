@@ -107,6 +107,9 @@ gisportal.config = {
 
    splashImage: '../img/PML-MAP-2.png', // The image that you would like to be displayed on the splash page
 
-   logoImage: '../img/PML_LOGO.png'
+   logoImage: '../img/PML_LOGO.png',
+
+   // Proxy all WMS requests via the node server instead of just http requests on an https portal
+   proxyAll: false,
 };
 
