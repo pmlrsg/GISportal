@@ -86,7 +86,10 @@ proxy.loadWhitelist = function(next) {
       });
 
       rl.on('line', function(line) {
-         proxyWhitelist.push(line);
+         line = line.split('#')[0].split(' ')[0];
+         if (line !== '') {
+            proxyWhitelist.push(line);
+         }
       }).on('close', function() {
          return done();
       });
