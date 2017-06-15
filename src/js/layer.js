@@ -619,7 +619,7 @@ gisportal.layer = function( options ) {
                   tileElement.onerror = function() {
                      gisportal.loading.decrement();
                   };
-                  if(src.startsWith("http://") || gisportal.config.proxyAll){
+                  if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
                      src = gisportal.ImageProxyHost + encodeURIComponent(src);
                   }
                   tileElement.src = src;
