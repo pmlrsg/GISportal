@@ -1,3 +1,7 @@
+/**
+ * This module handles proxying requests
+ */
+
 var fs = require("fs-extra");
 var jimp = require("jimp");
 var path = require('path');
@@ -14,10 +18,18 @@ var WHITELIST_FILE = path.join(__dirname, '/../../config', 'proxy_whitelist.txt'
 var proxy = {};
 module.exports = proxy;
 
+/** @type {Boolean} If the whitelist has been loaded from the file */
 var whitelistLoaded = false;
+/** @type {Boolean} If the whitelist is currenlty being loaded */
 var whitelistLoading = false;
+/** @type {Array} The proxy whitelist */
 var proxyWhitelist = [];
 
+/**
+ * Add a trusted URL to the whitelist
+ * @param {String}   trustedURL The URL to add
+ * @param {Function} next       The function to call when done
+ */
 proxy.addToProxyWhitelist = function(trustedURL, next) {
    checkProxyWhitelist(trustedURL, function(trusted) {
       if (trusted) {
@@ -48,6 +60,10 @@ proxy.addToProxyWhitelist = function(trustedURL, next) {
    }
 };
 
+/**
+ * Load the whitelist from the file
+ * @param  {Function} next Function to call when done
+ */
 proxy.loadWhitelist = function(next) {
    whitelistLoading = true;
    whitelistLoaded = false;
@@ -67,6 +83,11 @@ proxy.loadWhitelist = function(next) {
    });
 };
 
+/**
+ * Proxy a request for a URL
+ * @param  {Object} req Express request object
+ * @param  {Object} res Express response object
+ */
 proxy.proxy = function(req, res) {
    var url = decodeURI(req.query.url); // Gets the given URL
    checkProxyWhitelist(url, function(trusted) {
@@ -92,6 +113,11 @@ proxy.proxy = function(req, res) {
    });
 };
 
+/**
+ * Proxy a request for an image
+ * @param  {Object} req Express request object
+ * @param  {Object} res Express respponse object
+ */
 proxy.img_proxy = function(req, res) {
    var url = decodeURI(req.query.url); // Gets the given URL
    checkProxyWhitelist(url, function(trusted) {
@@ -118,6 +144,11 @@ proxy.img_proxy = function(req, res) {
    });
 };
 
+/**
+ * Download and rotate an image from the provided URL
+ * @param  {Object} req Express request object
+ * @param  {Object} res Express response object
+ */
 proxy.rotate = function(req, res) {
    var angle = parseInt(req.query.angle); // Gets the given angle
    var url = req.query.url; // Gets the given URL
@@ -151,6 +182,11 @@ proxy.rotate = function(req, res) {
    });
 };
 
+/**
+ * Check if a URL is allowed by the whitelist
+ * @param  {String}   testUrl The url to check
+ * @param  {Function} next    Function to call with the result when done
+ */
 function checkProxyWhitelist(testUrl, next) {
    if (!whitelistLoaded) {
       if (!whitelistLoading) {
