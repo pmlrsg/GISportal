@@ -237,6 +237,11 @@ function checkProxyWhitelist(testUrl, next) {
    next(trusted);
 }
 
+/**
+ * Clean a URL for saving in the whitelist or testing against the whitelist
+ * @param  {String} dirtyURL The URL to clean
+ * @return {String}          The cleaned URL
+ */
 function cleanURL(dirtyURL) {
    var cleanedURL = url.parse(dirtyURL);
    cleanedURL.search = undefined;
