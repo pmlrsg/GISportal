@@ -102,7 +102,7 @@ proxy.img_proxy = function(req, res) {
          jimp.read(url, function(err, image) { // Gets the image file from the URL
             if (err) {
                utils.handleError(err, res);
-            } else {
+            } else if (image) {
                image.getBuffer(jimp.MIME_PNG, function(err2, image2) { // Buffers the image so it sends correctly
                   if (err2) {
                      utils.handleError(err2, res);
@@ -111,6 +111,8 @@ proxy.img_proxy = function(req, res) {
                      res.send(image2); // Sends the image to the browser.
                   }
                });
+            } else {
+               res.status(404).send();
             }
          });
       } else {
