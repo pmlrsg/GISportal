@@ -39,9 +39,6 @@ proxy.addToProxyWhitelist = function(trustedURL, next) {
          proxyWhitelist.push(url.format(trustedURL));
 
          var file = fs.createWriteStream(WHITELIST_FILE);
-         file.on('error', function(err) {
-            // TODO
-         });
          for (var i = 0; i < proxyWhitelist.length; i++) {
             file.write(proxyWhitelist[i] + '\n');
          }
