@@ -4,7 +4,6 @@
 
 var crypto = require('crypto');
 var fs = require("fs-extra");
-var jimp = require("jimp");
 var path = require('path');
 var redis = require('redis');
 var request = require('request');
@@ -26,44 +25,6 @@ var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 
 var settings = {};
 module.exports = settings;
-
-settings.proxy = function(req, res) {
-   var url = decodeURI(req.query.url); // Gets the given URL
-   request(url, function(err, response, body) {
-      if (err) {
-         utils.handleError(err, res);
-      } else {
-         res.status(response.statusCode);
-         var content_type = response.headers['content-type'];
-         if (content_type) {
-            if (content_type == "WMS_XML") { // TODO: see if there is a smaller brick to crack this walnut
-               content_type = "text/xml";
-            }
-            res.setHeader("content-type", content_type.split("; subtype=gml")[0]); // res.send has a tantrum if the subtype is GML!
-         }
-         res.send(body);
-      }
-   });
-};
-
-settings.img_proxy = function(req, res) {
-   var url = decodeURI(req.query.url); // Gets the given URL
-   jimp.read(url, function(err, image) { // Gets the image file from the URL
-      if (err) {
-         utils.handleError(err, res);
-      } else {
-         image.getBuffer(jimp.MIME_PNG, function(err2, image2) { // Buffers the image so it sends correctly
-            if (err2) {
-               utils.handleError(err2, res);
-            } else {
-               res.setHeader('Content-type', 'image/png'); // Makes sure its a png
-               res.send(image2); // Sends the image to the browser.
-            }
-
-         });
-      }
-   });
-};
 
 settings.config = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
@@ -457,32 +418,6 @@ settings.get_cache = function(req, res) {
 
    // TODO change to res.json(cache) and test
    res.send(JSON.stringify(cache)); // Returns the cache to the browser.
-};
-
-settings.rotate = function(req, res) {
-   var angle = parseInt(req.query.angle); // Gets the given angle
-   var url = req.query.url; // Gets the given URL
-   if (angle == "undefined" || angle === "" || typeof(angle) != "number") {
-      angle = 0; // Sets angle to 0 if its not set to a number
-   }
-   angle = Math.round(angle / 90) * 90; // Rounds the angle to the neerest 90 degrees
-   jimp.read(url, function(err, image) { // Gets the image file from the URL
-      if (err) {
-         utils.handleError(err, res);
-      } else {
-         image.rotate(angle); // Rotates the image *clockwise!*
-         //image.resize( width, jimp.AUTO);
-         image.getBuffer(jimp.MIME_PNG, function(err2, image2) { // Buffers the image so it sends correctly
-            if (err2) {
-               utils.handleError(err2, res);
-            } else {
-               res.setHeader('Content-type', 'image/png'); // Makes sure its a png
-               res.send(image2); // Sends the image to the browser.
-            }
-
-         });
-      }
-   });
 };
 
 settings.remove_server_cache = function(req, res) {
