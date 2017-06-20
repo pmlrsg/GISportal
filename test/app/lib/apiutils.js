@@ -12,6 +12,7 @@ describe('apiUtils', function() {
    var globalCache1;
    var globalCache2;
    var userCache;
+   var groupCache;
    var testCache;
 
    before(function() {
@@ -25,6 +26,10 @@ describe('apiUtils', function() {
       var userCachePath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/user_a.user@pml.ac.uk/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-MONTHLY.json';
       userCache = JSON.parse(fs.readFileSync(userCachePath));
       userCache.owner = 'a.user@pml.ac.uk';
+
+      var groupCachePath = global.test.appPath + '/config/site_settings/127.0.0.1:6789/group_test/rsg.pml.ac.uk-thredds-wms-CCI_ALL-v3.0-8DAY.json';
+      groupCache = JSON.parse(fs.readFileSync(groupCachePath));
+      groupCache.owner = 'group_test';
    });
 
    beforeEach(function() {
@@ -79,6 +84,7 @@ describe('apiUtils', function() {
 
       it('should return the global and user cache for an admin', function(done) {
          testCache.push(userCache);
+         testCache.push(groupCache);
          testCache = JSON.stringify(testCache);
 
          var req = global.mocks.createReq();
