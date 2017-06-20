@@ -2,7 +2,7 @@
  * This module provides the settings functions that are shared by the API and the front end.
  */
 
-var fs = require("fs");
+var fs = require("fs-extra");
 var path = require('path');
 var request = require('request');
 var titleCase = require('to-title-case');
@@ -130,6 +130,109 @@ function loadCache(username, permission, names, master_path, cachePrefix) {
    }
    return cache;
 }
+
+/**
+ * Get all the groups for a domain
+ * @param  {String} domain The domain to load groups from
+ * @return {Array}         Array of groups
+ */
+settingsApi.get_groups = function(domain) {
+   var groups = [];
+   var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+   var domainFolder = fs.readdirSync(domainPath); // The list of files and folders in the domain folder
+   for (var i = 0; i < domainFolder.length; i++) {
+      var folder = domainFolder[i];
+      var folderPath = path.join(domainPath, folder);
+      if (utils.directoryExists(folderPath) && folder.startsWith(GROUP_CACHE_PREFIX)) {
+         var groupName = folder.replace(GROUP_CACHE_PREFIX, '');
+         var members = [];
+
+         var membersFilePath = path.join(folderPath, 'members.json');
+         var membersFile = JSON.parse(fs.readFileSync(membersFilePath));
+         for (var j = 0; j < membersFile.length; j++) {
+            members.push(membersFile[j].username);
+         }
+
+         groups.push({
+            groupName: groupName,
+            members: members
+         });
+      }
+   }
+   return groups;
+};
+
+/**
+ * Save a new group or overwrite and existing one
+ * @param  {String}   domain The domain to save the group to
+ * @param  {Object}   group  The group to save
+ * @param  {Function} next   Function to call when done
+ */
+settingsApi.save_group = function(domain, group, next) {
+   // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+   var groupName = group.groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
+   var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+   var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
+
+   if (!utils.directoryExists(groupFolder)) {
+      utils.mkdirpSync(groupFolder);
+   }
+
+   var membersFile = [];
+
+   for (var i = 0; i < group.members.length; i++) {
+      membersFile.push({
+         username: group.members[i]
+      });
+   }
+
+   membersFile = JSON.stringify(membersFile);
+
+   fs.writeFile(path.join(groupFolder, 'members.json'), membersFile, function(err) {
+      next(err);
+   });
+};
+
+/**
+ * Delete a group
+ * @param  {String}   domain    The domain to delete the group from
+ * @param  {String}   groupName The name of the group
+ * @param  {Function} next      Function to call when done
+ */
+settingsApi.delete_group = function(domain, groupName, next) {
+   // Clean the groupName to remove .. \ /, and replace whitespace with underscore
+   groupName = groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
+
+   var domainPath = path.join(MASTER_CONFIG_PATH, domain);
+   var groupFolderName = GROUP_CACHE_PREFIX + groupName;
+   var groupFolder = path.join(domainPath, groupFolderName);
+
+   if (utils.directoryExists(groupFolder)) {
+      var deletePath = path.join(domainPath, "deleted_cache");
+      var deleteFolder = path.join(deletePath, groupFolderName);
+
+      if (!utils.directoryExists(deletePath)) {
+         utils.mkdirpSync(deletePath);
+      }
+
+      fs.move(groupFolder, deleteFolder, {
+         overwrite: true
+      }, function(err) {
+         if (err) {
+            next({
+               status: 500
+            });
+         } else {
+            next(null);
+         }
+      });
+   } else {
+      next({
+         status: 404
+      });
+   }
+};
 
 settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
    wmsURL = wmsURL.replace(/\?.*/g, "") + "?";

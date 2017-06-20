@@ -1,0 +1,18 @@
+[
+  {
+    "groupName": "test",
+    "members": [
+      "member1",
+      "member2",
+      "member3"
+    ]
+  },
+  {
+    "groupName": "test2",
+    "members": [
+      "member4",
+      "member5",
+      "member6"
+    ]
+  }
+]

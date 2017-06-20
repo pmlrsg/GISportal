@@ -235,30 +235,8 @@ settings.get_groups = function(req, res) {
    var domain = utils.getDomainName(req); // Gets the given domain
    var permission = user.getAccessLevel(req, domain);
 
-   var groups = [];
-
    if (permission == 'admin') {
-      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
-      var domainFolder = fs.readdirSync(domainPath); // The list of files and folders in the domain folder
-      for (var i = 0; i < domainFolder.length; i++) {
-         var folder = domainFolder[i];
-         var folderPath = path.join(domainPath, folder);
-         if (utils.directoryExists(folderPath) && folder.startsWith(GROUP_CACHE_PREFIX)) {
-            var groupName = folder.replace(GROUP_CACHE_PREFIX, '');
-            var members = [];
-
-            var membersFilePath = path.join(folderPath, 'members.json');
-            var membersFile = JSON.parse(fs.readFileSync(membersFilePath));
-            for (var j = 0; j < membersFile.length; j++) {
-               members.push(membersFile[j].username);
-            }
-
-            groups.push({
-               groupName: groupName,
-               members: members
-            });
-         }
-      }
+      var groups = settingsApi.get_groups(domain);
       res.json(groups);
    } else {
       res.status(401).send();
@@ -277,29 +255,7 @@ settings.save_group = function(req, res, next) {
 
    if (permission == 'admin') {
       var group = req.body;
-      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
-      var groupName = group.groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
-
-      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
-      var groupFolder = path.join(domainPath, GROUP_CACHE_PREFIX + groupName);
-
-      if (!utils.directoryExists(groupFolder)) {
-         utils.mkdirpSync(groupFolder);
-      }
-
-      var membersFile = [];
-
-      for (var i = 0; i < group.members.length; i++) {
-         membersFile.push({
-            username: group.members[i]
-         });
-      }
-
-      membersFile = JSON.stringify(membersFile);
-
-      fs.writeFile(path.join(groupFolder, 'members.json'), membersFile, function() {
-         next();
-      });
+      settingsApi.save_group(domain, group, next);
    } else {
       res.status(401).send();
    }
@@ -316,33 +272,13 @@ settings.delete_group = function(req, res) {
 
    if (permission == 'admin') {
       var groupName = req.query.groupname;
-      // Clean the groupName to remove .. \ /, and replace whitespace with underscore
-      groupName = groupName.replace(/\.\.|\\|\//g, '').replace(/\s/g, '_');
-
-      var domainPath = path.join(MASTER_CONFIG_PATH, domain);
-      var groupFolderName = GROUP_CACHE_PREFIX + groupName;
-      var groupFolder = path.join(domainPath, groupFolderName);
-
-      if (utils.directoryExists(groupFolder)) {
-         var deletePath = path.join(domainPath, "deleted_cache");
-         var deleteFolder = path.join(deletePath, groupFolderName);
-
-         if (!utils.directoryExists(deletePath)) {
-            utils.mkdirpSync(deletePath);
+      settingsApi.delete_group(domain, groupName, function(err) {
+         if (err) {
+            res.status(err.status).send();
+         } else {
+            res.send();
          }
-
-         fs.move(groupFolder, deleteFolder, {
-            overwrite: true
-         }, function(err) {
-            if (err) {
-               res.status(500).send();
-            } else {
-               res.send();
-            }
-         });
-      } else {
-         res.status(404).send();
-      }
+      });
    } else {
       res.status(401).send();
    }
