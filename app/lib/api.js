@@ -75,6 +75,46 @@ api.get_cache_list = function(req, res) {
 };
 
 /**
+ * Get all the groups for the domain
+ * @param {Object} req Express request
+ * @param {Object} res Express response - a json array of groups is sent
+ */
+api.get_groups = function(req, res) {
+   var domain = utils.getDomainName(req);
+   var groups = settingsApi.get_groups(domain);
+   res.json(groups);
+};
+
+/**
+ * Save a group
+ * @param {Object}   req  Express request - with the group as the JSON body
+ * @param {Object}   res  Express response - not used
+ * @param {Function} next The next function in the router chain
+ */
+api.save_group = function(req, res, next) {
+   var domain = utils.getDomainName(req);
+   var group = req.body;
+   settingsApi.save_group(domain, group, next);
+};
+
+/**
+ * Delete a group
+ * @param {Object} req Express request - with the group name in the url
+ * @param {Object} res Express response
+ */
+api.delete_group = function(req, res) {
+   var domain = utils.getDomainName(req);
+   var groupName = req.params.groupName;
+   settingsApi.delete_group(domain, groupName, function(err) {
+      if (err){
+         res.status(err.status).send();
+      } else {
+         res.send();
+      }
+   });
+};
+
+/**
  * Refresh the api user's cache file for the provided WMS url. Admins may refresh global cache files or other user's
  *    cache files by specifying a username.
  * @param  {object} req Express router request

@@ -38,3 +38,18 @@ apiRouter.get('/get_cache', api.get_cache);
  * Get the important details of each cache file (server) the user has access to with or without a summary of their layers in a JSON string.
  */
 apiRouter.get('/get_cache_:type', api.get_cache_list);
+
+/**
+ * Get all the groups for the domain
+ */
+apiRouter.get('/groups', apiAuth.requireAdmin, api.get_groups);
+
+/**
+ * Add a group or overwrite one
+ */
+apiRouter.post('/group', apiAuth.requireAdmin, api.save_group, api.get_groups);
+
+/**
+ * Delete a group
+ */
+apiRouter.delete('/group/:groupName', apiAuth.requireAdmin, api.delete_group);
