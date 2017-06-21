@@ -85,7 +85,7 @@ router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('f
    var shape_file;
    for (var file in file_list) {
       var this_file = file_list[file];
-      if (this_file.mimetype == "application/x-esri-shape") {
+      if (this_file.originalname.endsWith('.shp')) {
          shape_file = this_file;
       }
       fs.renameSync(this_file.path, path.join(this_file.destination, this_file.originalname));
