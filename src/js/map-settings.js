@@ -279,18 +279,6 @@ gisportal.createBaseLayers = function() {
             maxZoom: 7,
          }
       }),
-      MetacartaBasic: new ol.layer.Tile({
-         id: 'MetacartaBasic',
-         title: 'Metacarta Basic',
-         description: 'EPSG:4326 only',
-         projections: ['EPSG:4326'],
-         source: new ol.source.TileWMS({
-            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
-            crossOrigin: null,
-            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         })
-      }),
       BlueMarble: new ol.layer.Tile({
          id: 'BlueMarble',
          title: 'Blue Marble',
