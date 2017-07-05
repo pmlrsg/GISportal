@@ -528,7 +528,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
-   gisportal.mapFit(extent);
+   gisportal.mapFit(extent, true);
 
 };
 
