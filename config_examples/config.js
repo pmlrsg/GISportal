@@ -111,5 +111,7 @@ gisportal.config = {
 
    // Proxy all WMS requests via the node server instead of just http requests on an https portal
    proxyAll: false,
+
+   baselayerBlacklist : ['GEBCO','MetacartaBasic','Landsat','BlueMarble'] // an optional list of base layers to remove - done as a remove so existing portals dont need config changes
 };
 

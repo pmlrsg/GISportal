@@ -234,74 +234,87 @@ gisportal.createBaseLayers = function() {
       tileElement.src = src;
    };
 
-   gisportal.baseLayers = {
-      EOX: new ol.layer.Tile({
-         id: 'EOX',                       // required to populate the display options drop down list
-         title: 'EOX',
-         description: 'EPSG:4326 only',
-         projections: ['EPSG:4326'],
-         source: new ol.source.TileWMS({
-            url: 'https://tiles.maps.eox.at/wms/?',
-            crossOrigin: null,
-            params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      GEBCO: new ol.layer.Tile({
-         id: 'GEBCO',
-         title: 'GEBCO',
-         projections: ['EPSG:4326', 'EPSG:3857'],
-         source: new ol.source.TileWMS({
-            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
-            crossOrigin: null,
-            params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      MetacartaBasic: new ol.layer.Tile({
-         id: 'MetacartaBasic',
-         title: 'Metacarta Basic',
-         description: 'EPSG:4326 only',
-         projections: ['EPSG:4326'],
-         source: new ol.source.TileWMS({
-            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
-            crossOrigin: null,
-            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      Landsat: new ol.layer.Tile({
-         id: 'Landsat',
-         title: 'Landsat',
-         projections: ['EPSG:4326', 'EPSG:3857'],
-         source: new ol.source.TileWMS({
-            url: 'http://irs.gis-lab.info/?',
-            crossOrigin: null,
-            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      BlueMarble: new ol.layer.Tile({
-         id: 'BlueMarble',
-         title: 'Blue Marble',
-         projections: ['EPSG:4326', 'EPSG:3857'],
-         source: new ol.source.TileWMS({
-            url: 'http://demonstrator.vegaspace.com/wmspub/?',
-            crossOrigin: null,
-            params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      OSM: new ol.layer.Tile({
-         id: 'OSM',
-         title: 'Open Street Map',
-         description: 'EPSG:3857 only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.OSM({
-            projection: gisportal.projection
-         })
-      }),
-   };
+   gisportal.baseLayers = {};
+      
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('EOX')){
+		gisportal.baseLayers.EOX = new ol.layer.Tile({
+			id: 'EOX',                       // required to populate the display options drop down list
+			title: 'EOX',
+			description: 'EPSG:4326 only',
+			projections: ['EPSG:4326'],
+			source: new ol.source.TileWMS({
+					url: 'https://tiles.maps.eox.at/wms/?',
+					crossOrigin: null,
+					params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+					tileLoadFunction: baseLayerTitleLoadFunction
+			}) 
+		});
+	}
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('GEBCO')){
+		gisportal.baseLayers.GEBCO = new ol.layer.Tile({
+			id: 'GEBCO',
+			title: 'GEBCO',
+			projections: ['EPSG:4326', 'EPSG:3857'],
+			source: new ol.source.TileWMS({
+					url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
+					crossOrigin: null,
+					params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
+					tileLoadFunction: baseLayerTitleLoadFunction
+			}) 
+		});
+	}
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('MetacartaBasic')){
+		gisportal.baseLayers.MetacartaBasic = new ol.layer.Tile({
+			id: 'MetacartaBasic',
+			title: 'Metacarta Basic',
+			description: 'EPSG:4326 only',
+			projections: ['EPSG:4326'],
+			source: new ol.source.TileWMS({
+					url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
+					crossOrigin: null,
+					params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+					tileLoadFunction: baseLayerTitleLoadFunction
+			}) 
+		});
+	}
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('Landsat')){
+		gisportal.baseLayers.Landsat = new ol.layer.Tile({
+			id: 'Landsat',
+			title: 'Landsat',
+			projections: ['EPSG:4326', 'EPSG:3857'],
+			source: new ol.source.TileWMS({
+					url: 'http://irs.gis-lab.info/?',
+					crossOrigin: null,
+					params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+					tileLoadFunction: baseLayerTitleLoadFunction
+			}) 
+		});
+	}
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('BlueMarble')){
+		gisportal.baseLayers.BlueMarble = new ol.layer.Tile({
+			id: 'BlueMarble',
+			title: 'Blue Marble',
+			projections: ['EPSG:4326', 'EPSG:3857'],
+			source: new ol.source.TileWMS({
+					url: 'http://demonstrator.vegaspace.com/wmspub/?',
+					crossOrigin: null,
+					params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+					tileLoadFunction: baseLayerTitleLoadFunction
+			}) 
+		});
+	}
+	if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('OSM')){
+		gisportal.baseLayers.OSM = new ol.layer.Tile({
+			id: 'OSM',
+			title: 'Open Street Map',
+			description: 'EPSG:3857 only',
+			projections: ['EPSG:3857'],
+			source: new ol.source.OSM({
+					projection: gisportal.projection
+			})
+		});
+			
+	}      
 
    if (gisportal.config.bingMapsAPIKey) {
       gisportal.baseLayers.BingMapsAerial = new ol.layer.Tile({
