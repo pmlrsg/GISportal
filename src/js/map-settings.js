@@ -243,10 +243,10 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
-               url: 'https://tiles.maps.eox.at/wms/?',
-               crossOrigin: null,
-               params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-               tileLoadFunction: baseLayerTitleLoadFunction
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       });
    }
@@ -256,10 +256,10 @@ gisportal.createBaseLayers = function() {
          title: 'GEBCO',
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
-               url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
-               crossOrigin: null,
-               params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
-               tileLoadFunction: baseLayerTitleLoadFunction
+            url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
+            crossOrigin: null,
+            params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       });
    }
@@ -270,10 +270,10 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
-               url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
-               crossOrigin: null,
-               params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-               tileLoadFunction: baseLayerTitleLoadFunction
+            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
+            crossOrigin: null,
+            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       });
    }
@@ -283,10 +283,10 @@ gisportal.createBaseLayers = function() {
          title: 'Landsat',
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
-               url: 'http://irs.gis-lab.info/?',
-               crossOrigin: null,
-               params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-               tileLoadFunction: baseLayerTitleLoadFunction
+            url: 'http://irs.gis-lab.info/?',
+            crossOrigin: null,
+            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       });
    }
@@ -296,10 +296,10 @@ gisportal.createBaseLayers = function() {
          title: 'Blue Marble',
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
-               url: 'http://demonstrator.vegaspace.com/wmspub/?',
-               crossOrigin: null,
-               params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-               tileLoadFunction: baseLayerTitleLoadFunction
+            url: 'http://demonstrator.vegaspace.com/wmspub/?',
+            crossOrigin: null,
+            params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
          }) 
       });
    }
@@ -310,7 +310,7 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:3857 only',
          projections: ['EPSG:3857'],
          source: new ol.source.OSM({
-               projection: gisportal.projection
+            projection: gisportal.projection
          })
       });
          
