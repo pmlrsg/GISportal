@@ -290,11 +290,12 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       function makeRequest(options, next) {
          request({
             url: url.format(options.uri),
-            timeout: 5000
+            timeout: 10000
          }, function(err, response, body) {
             if (err) {
                next(err);
             } else {
+               // TODO handle JSON error here
                var json = JSON.parse(body);
                if (json && json.min !== undefined && json.max !== undefined) {
                   if (min === null || json.min < min) {
