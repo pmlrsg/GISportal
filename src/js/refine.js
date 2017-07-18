@@ -323,7 +323,7 @@ gisportal.refinePanel.renderRefreshedData = function(furtherFilters, refinedIndi
 gisportal.refinePanel.layerFound = function(layerId, style) {
    var data = {};
    data.id = layerId;
-
+   console.log("called");
    gisportal.indicatorsPanel.selectLayer(layerId, style);
    gisportal.indicatorsPanel.addToPanel(data);
    gisportal.indicatorsPanel.open();

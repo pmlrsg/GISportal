@@ -56,7 +56,7 @@ gisportal.Vector = function(options) {
     };
 
     this.init = function(options, layer) {
-       
+        console.log("init called");
         map.addLayer(layer.OLLayer);
         this.select();
         this.getMetadata();

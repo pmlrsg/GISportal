@@ -1919,7 +1919,8 @@ gisportal.loadBrowseCategories = function(data){
    // This takes a category (cat) in a versatile format e.g. indicator_type
    addCategory = function(cat){
       // If the category is not in the list already
-      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+      console.log(cat);
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag" )){
          // Add the category name as a key and convert it to a nice view for the value
          if(gisportal.config.catDisplayNames){
             gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));

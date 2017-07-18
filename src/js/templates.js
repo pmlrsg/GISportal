@@ -272,6 +272,21 @@ Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
 });
 
 
+/**
+ * Helper to join an array of strings with a span wrapper around each
+ * @param Array arrayToJoin Array of values
+ * @param String startString string to put infront of teh value
+ * @param String endString string to put after the value 
+ */
+Handlebars.registerHelper('span_join', function(arrayToJoin, startString, endString){
+   if( arrayToJoin == void(0) ) return "";
+   placeHolder = '';
+   for (var item in arrayToJoin) {
+      placeHolder += startString + arrayToJoin[item] + endString+' ';
+   }
+   return placeHolder;
+});
+
 
 /**
  * Can be used in with <option> tags. It compares to 2 

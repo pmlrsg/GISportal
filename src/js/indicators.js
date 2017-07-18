@@ -318,6 +318,13 @@ gisportal.indicatorsPanel.initDOM = function() {
       };
       gisportal.events.trigger('indicatorspanel.scroll', params);
    });
+
+   $('.js-indicators').on('click', '.related_layer', function(){
+      var current_date = $('.scalebar-selected-date').text();
+      console.log("getting layer "+$(this).text()+" for date "+current_date);
+      // call gisportal.refinePanel.layerFound = function(layerId, style) with the layerid to add it to the map and do associated actions
+      gisportal.refinePanel.layerFound('rsg_Employ_Perc','');
+   });
 };
 
 gisportal.indicatorsPanel.add_wcs_url = function(selected_this) {
@@ -513,10 +520,13 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
    if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
    var layer = gisportal.layers[id];
+   //layer = layer.name.replace(/_slash_/g, "/");
    var options = {};
    if (layer) {
+         console.log(layer);
       options.visible = true;
       if(layer.servicetype=="WFS"){
+            console.log("WFS being added");
          gisportal.getVectorLayerData(layer);
       }
       else {

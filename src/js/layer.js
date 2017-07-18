@@ -812,10 +812,13 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
+   //layer = layer.name.replace(/_slash_/g, "/");
+
    if (layer.serviceType=="WFS"){
 
       layer.init(options,layer);
    }else {
+      console.log(fileName);
       $.ajax({
          type: 'GET',
          url: gisportal.middlewarePath + "/cache/layers/" + fileName,
@@ -823,6 +826,7 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
          async: true,
          cache: false,
          success: function(data) {
+           console.log(data)
             // Initialises the layer with the data from the AJAX call
             if(layer){
                layer.init(data, options, style);
