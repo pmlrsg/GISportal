@@ -1575,7 +1575,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
-      scatter_stats_holder = {}
+      scatter_stats_fnames = []
+      scatter_stats_variables = []
       series_count = 0
       for s in series:
          ds = s['data_source']
@@ -1605,7 +1606,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             else:
                extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
-            scatter_stats_holder[coverage] = extract
+            scatter_stats_variables.append(coverage)
+            scatter_stats_fnames.append(extract)
          except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
@@ -1615,7 +1617,8 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          except requests.exceptions.ReadTimeout:
             debug(2, u"Data request, {}, failed".format(data_request))
             return dict(data=[])
-      stats = ScatterStats(scatter_stats_holder)
+      stats = ScatterStats(scatter_stats_variables,
+                           scatter_stats_fnames)
       response = json.loads(stats.process())
       data = response['data']
       data_order = response['order']
