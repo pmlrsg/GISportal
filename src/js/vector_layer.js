@@ -211,12 +211,20 @@ gisportal.Vector = function(options) {
       }
       }
       else{
-           colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
-          legend = [];
-          legend_obj = {};
-          for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
-            legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
-            legend_obj[possibleOptions[y]] = colorPalette[y];
+          if (this.defaultColour !== false){
+              legend = [];
+            legend_obj = {};
+            legend_obj[this.name] = this.defaultColour;
+            legend.push({'option':this.name,'colour':this.defaultColour});
+          }
+          else{
+            colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
+            legend = [];
+            legend_obj = {};
+            for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
+                legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
+                legend_obj[possibleOptions[y]] = colorPalette[y];
+            }
           }
      }
       x = 0;
