@@ -3,7 +3,11 @@
    <tbody>
       
       {{#displayTags}}
+         {{#if (eq displayName 'Related Layers') }}
+         <tr><td>{{&displayName}}</td><td>{{{span_join displayValues "<span class='related_layer'>" "</span>"}}}
+         {{else}}
          <tr><td>{{&displayName}}</td><td>{{str_join displayValues ", "}}</td></tr>
+         {{/if}}
       {{/displayTags}}
 
       <tr><td>Bounding box</td><td>
