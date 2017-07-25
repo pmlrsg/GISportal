@@ -163,7 +163,7 @@ gisportal.createVectorLayers = function() {
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
-      processVectorLayer(vector.services.wfs.url, v);
+        processVectorLayer(vector.services.wfs.url, v);
       });
    });
     gisportal.loadBrowseCategories();
@@ -199,7 +199,6 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
       gisportal.vlayers.push(vectorLayerOL);
-      //gisportal.configurePanel.refreshData();
 
    }
 

@@ -812,7 +812,6 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
-   //layer = layer.name.replace(/_slash_/g, "/");
 
    if (layer.serviceType=="WFS"){
 

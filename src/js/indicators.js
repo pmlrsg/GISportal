@@ -321,12 +321,11 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '.related_layer', function(){
       var current_date = $('.scalebar-selected-date').text();
-      //console.log("getting layer "+$(this).text()+" for date "+current_date);
+      // place holder whilst feature is developed
       // 2015-12-01 00:00 to 20170513_182525
       tdate = current_date.split(' ');
       layerDate = tdate[0].split('-')[0]+tdate[0].split('-')[1]+tdate[0].split('-')[2]+'_'+tdate[1].split(':')[0]+tdate[1].split(':')[1]+tdate[1].split(':')[2];
       // call gisportal.refinePanel.layerFound = function(layerId, style) with the layerid to add it to the map and do associated actions
-      //console.log("getting layer for "+layerDate);
       //gisportal.refinePanel.layerFound('rsg_','');
    });
 };
@@ -524,7 +523,6 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
    if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
    var layer = gisportal.layers[id];
-   //layer = layer.name.replace(/_slash_/g, "/");
    var options = {};
    if (layer) {
       options.visible = true;

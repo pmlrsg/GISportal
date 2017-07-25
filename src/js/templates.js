@@ -275,7 +275,7 @@ Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
 /**
  * Helper to join an array of strings with a span wrapper around each
  * @param Array arrayToJoin Array of values
- * @param String startString string to put infront of teh value
+ * @param String startString string to put infront of the value
  * @param String endString string to put after the value 
  */
 Handlebars.registerHelper('span_join', function(arrayToJoin, startString, endString){
