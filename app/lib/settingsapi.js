@@ -123,7 +123,6 @@ function loadCache(username, permission, names, master_path, cachePrefix) {
             }
             json_data.owner = names[i]; // Adds the owner to the file (for the server list)
             if (json_data.wmsURL) {
-               json_data = json_data.replace(/_slash_/g, "/");
                cache.push(json_data); // Adds each file to the cache to be returned
             }
          }
@@ -428,7 +427,6 @@ function digForLayers(parent_layer, name, service_title, title, abstract, boundi
          }
       }
       if (name && service_title && title && bounding_box) {
-         name = name.replace(/\//g, "_slash_");
          layers.push({
             "Name": name,
             "Title": title,

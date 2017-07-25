@@ -321,9 +321,13 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators').on('click', '.related_layer', function(){
       var current_date = $('.scalebar-selected-date').text();
-      console.log("getting layer "+$(this).text()+" for date "+current_date);
+      //console.log("getting layer "+$(this).text()+" for date "+current_date);
+      // 2015-12-01 00:00 to 20170513_182525
+      tdate = current_date.split(' ');
+      layerDate = tdate[0].split('-')[0]+tdate[0].split('-')[1]+tdate[0].split('-')[2]+'_'+tdate[1].split(':')[0]+tdate[1].split(':')[1]+tdate[1].split(':')[2];
       // call gisportal.refinePanel.layerFound = function(layerId, style) with the layerid to add it to the map and do associated actions
-      gisportal.refinePanel.layerFound('rsg_Employ_Perc','');
+      //console.log("getting layer for "+layerDate);
+      //gisportal.refinePanel.layerFound('rsg_','');
    });
 };
 
@@ -523,10 +527,8 @@ gisportal.indicatorsPanel.selectLayer = function(id, style) {
    //layer = layer.name.replace(/_slash_/g, "/");
    var options = {};
    if (layer) {
-         console.log(layer);
       options.visible = true;
       if(layer.servicetype=="WFS"){
-            console.log("WFS being added");
          gisportal.getVectorLayerData(layer);
       }
       else {
@@ -746,7 +748,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       // TODO add logic to this when adding support for layers with no date
       indicator.hasDate = true;
       // Put the date in a nice format for displaying next to the scalebar
-      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm');
+      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm:ss');
 
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 

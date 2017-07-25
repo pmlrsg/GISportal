@@ -87,14 +87,14 @@ gisportal.vectorStyles.startingColours = {
 gisportal.vectorStyles.defaultLine = new ol.style.Style({
     stroke: new ol.style.Stroke({
         color: 'rgba(0, 0, 200, 1.0)',
-        width: 1
+        width: 20
     })
 });
 
 gisportal.vectorStyles.defaultPoly =   new ol.style.Style({
     stroke: new ol.style.Stroke({
       color: 'rgba(0, 0, 255, 0.5)',
-      width: 2
+      width: 20
     }),
     fill: new ol.style.Fill({
       color: 'rgba(0, 0, 255, 0.1)'
