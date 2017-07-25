@@ -461,7 +461,7 @@ gisportal.layer = function( options ) {
             layer.isInbounds = true;
 
             // Put the date in a nice format
-            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm');
+            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm:ss');
             // Display the nice date next to the scalebar
             $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
 
@@ -812,6 +812,7 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
+
    if (layer.serviceType=="WFS"){
 
       layer.init(options,layer);
