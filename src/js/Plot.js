@@ -881,7 +881,8 @@ gisportal.graphs.Plot = (function() {
 
          var interval1 = indicator1.tags.interval;
          var interval2 = indicator2.tags.interval;
-
+         console.log(interval1);
+         console.log(interval2);
          if (start1 > end2 || start2 > end1) {
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
@@ -896,7 +897,7 @@ gisportal.graphs.Plot = (function() {
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
             return;
-         } else if (interval1 != interval2) {
+         } else if (interval1[0] != interval2[0]) {
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; at the moment you have '" + indicator1.id + "' which is " + interval1 + " and '" + indicator2.id + "' which is " + interval2 + "</p>");
