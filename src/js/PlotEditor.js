@@ -483,9 +483,9 @@ gisportal.graphs.PlotEditor = (function(){
          })
          // Listen for when the user moves the slider and update the tBounds
          .on('slide', function(event, val) {
-            // Rounds the date to the day so that the plot requests are the same and return the same hash
-            var tBounds = val.map(Number).map(function(stamp) {
-               return new Date(stamp);
+            // Convert both date number strings in the array into Dates
+            var tBounds = val.map(Number).map(function(dateNum) {
+               return new Date(dateNum);
             });
             _this.plot().tBounds(tBounds);
             if (_this.plot().plotType() == 'animation') {

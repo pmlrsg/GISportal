@@ -163,11 +163,11 @@ gisportal.createVectorLayers = function() {
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
-      processVectorLayer(vector.services.wfs.url, v);
-
+        processVectorLayer(vector.services.wfs.url, v);
       });
    });
-
+    gisportal.loadBrowseCategories();
+   gisportal.configurePanel.refreshData();
    function processVectorLayer(serverUrl, vector) {
       var vectorOptions = {
          "name": vector.name,
@@ -190,15 +190,16 @@ gisportal.createVectorLayers = function() {
          "defaultProperty" : vector.defaultProperty,
          "defaultProperties" : vector.defaultProperties,
          "descriptiveName" : vector.tags.niceName,
-         "unit" : vector.unit
+         "unit" : vector.unit,
+         "defaultColour" : vector.defaultColour || false
       };
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
-
 gisportal.layers[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
       gisportal.vlayers.push(vectorLayerOL);
+
    }
 
 };
@@ -796,7 +797,10 @@ gisportal.initVectorLayers = function(data, opts) {
 
       gisportal.cache.vectorLayers = data;
       // Create WMS layers from the data
+
       gisportal.createVectorLayers();
+      gisportal.loadBrowseCategories(data);
+
    }
 };
 
@@ -1019,7 +1023,15 @@ gisportal.loadState = function(state){
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
-                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value, fromSavedState = true);
+                     // Load the geoJSON from the state into currentSelectedRegion
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
+                     // Change the methodThatSelectedCurrentRegion to prevent trying to auto-select the
+                     // saved geoJSON name from the dropdown (which would cause a problem if the state
+                     // is loaded by a different user)
+                     gisportal.methodThatSelectedCurrentRegion.method = 'state-geoJSONSelect';
+                     break;
+                  case "state-geoJSONSelect":
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
                      break;
                   case "dragAndDrop":
                      stateMap.feature = undefined;
@@ -1215,9 +1227,19 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-colorbands').val(colorbands);
 
          // This sets the aboveMaxColor to the same as what the user had before
-         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         try {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(aboveMaxColor).trigger('change');
+         }
          // This sets the belowMinColor to the same as what the user had before
-         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         try {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor).trigger('change');
+         }
 
          gisportal.layers[id].resetting = false;
          gisportal.scalebars.updateScalebar(layer);
@@ -1901,7 +1923,7 @@ gisportal.loadBrowseCategories = function(data){
    // This takes a category (cat) in a versatile format e.g. indicator_type
    addCategory = function(cat){
       // If the category is not in the list already
-      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag" )){
          // Add the category name as a key and convert it to a nice view for the value
          if(gisportal.config.catDisplayNames){
             gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
@@ -1925,6 +1947,7 @@ gisportal.loadBrowseCategories = function(data){
          }
       }
       for(layer in gisportal.vectors){
+
          for(category in gisportal.vectors[layer].tags){
             addCategory(category);
          }
@@ -1934,6 +1957,7 @@ gisportal.loadBrowseCategories = function(data){
    }else{
       for(layer in gisportal.layers){
          for(category in gisportal.layers[layer].tags){
+
             addCategory(category);
          }
       }

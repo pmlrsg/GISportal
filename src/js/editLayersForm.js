@@ -172,13 +172,17 @@ gisportal.editLayersForm.addListeners = function(){
           //listen for click events from this style
          $(document).one('click', '.notifyjs-gisportal-delete-option-base .no', function() {
             this_span.toggleClass("working", false);
-            //hide notification
-            $(this).trigger('notify-hide');
+            $(this).trigger('notify-hide'); //hide notification
+            $(document).off('click', '.notifyjs-gisportal-delete-option-base .yes'); // Disable yes listener
          });
          $(document).one('click', '.notifyjs-gisportal-delete-option-base .yes', function() {
             this_span.toggleClass("working", true);
+            $(this).trigger('notify-hide'); //hide notification
+            $(document).off('click', '.notifyjs-gisportal-delete-option-base .no'); // Disable no listener
+
             var server = this_span.data("server");
             var user = this_span.data("user");
+
             $.ajax({
                url:  gisportal.middlewarePath + '/settings/remove_server_cache?filename=' + server + '&owner=' + user,
                success: function(removed_data){
@@ -208,8 +212,6 @@ gisportal.editLayersForm.addListeners = function(){
                   this_span.notify("Deletion Fail", {position:"left", className:"error"});
                }
             });
-            //hide notification
-            $(this).trigger('notify-hide');
          });
       }
    });
@@ -226,26 +228,12 @@ gisportal.editLayersForm.addListeners = function(){
       $(this).toggleClass('warn-spin', true);
       $(this).parent("td").parent("tr").toggleClass('alert-warning', true);
       var url = $(this).data("server");
+      var wms_url = $(this).data("wms");
       var user = $(this).data("user");
       var domain = gisportal.niceDomainName;
       // The timeout is measured to see if the cache can be refreshed.
       if(user == domain){
-         var wms_url = $(this).data("wms");
-         refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
-         $.ajax({
-            url:  refresh_url,
-            dataType: 'json',
-            success: function(new_global_data){
-               gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain, url);
-            },
-            error: function(e){
-               this_span.toggleClass('warn-spin', false);
-               this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
-               this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-               setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
-               this_span.notify("Refresh Failed", {position:"left", className:"error"});
-            }
-         });
+         refreshWMS(wms_url);
          return;
       }
       var cache_url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName + '/temporary_cache/';
@@ -265,37 +253,41 @@ gisportal.editLayersForm.addListeners = function(){
                });
                $(document).one('click', '.notifyjs-gisportal-refresh-option-base .yes', function() {
                   var wms_url = global_data.wmsURL.replace("?", "");
-                  refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url='+wms_url+'&refresh=true';
-                  $.ajax({
-                     url:  refresh_url,
-                     dataType: 'json',
-                     success: function(new_global_data){
-                        gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain);
-                     },
-                     error: function(e){
-                        this_span.toggleClass('warn-spin', false);
-                        this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
-                        this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-                        setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
-                        this_span.notify("Refresh Failed", {position:"left", className:"error"});
-                     }
-                  });
+                  refreshWMS(wms_url);
                   //hide notification
                   $(this).trigger('notify-hide');
                });
-               
             }else{
                gisportal.editLayersForm.refreshOldData(global_data, this_span, user, domain);
             }
          },
-         error: function(e){
-            this_span.toggleClass('warn-spin', false);
-            this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
-            this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
-            setTimeout(function(){this_span.parent("td").parent("tr").toggleClass('alert-danger', false);},2000);
-            this_span.notify("Could not find cache file", {position:"left", className:"error"});
+         error: function(e) {
+            refreshWMS(wms_url);
+            return;
          }
       });
+      function refreshWMS(wmsURL) {
+         var refresh_url = gisportal.middlewarePath + '/settings/load_new_wms_layer?url=' + wmsURL + '&refresh=true';
+         $.ajax({
+            url: refresh_url,
+            dataType: 'json',
+            success: function(new_global_data) {
+               gisportal.editLayersForm.refreshOldData(new_global_data, this_span, user, domain);
+            },
+            error: function(e) {
+               this_span.toggleClass('warn-spin', false);
+               this_span.parent("td").parent("tr").toggleClass('alert-warning', false);
+               this_span.parent("td").parent("tr").toggleClass('alert-danger', true);
+               setTimeout(function() {
+                  this_span.parent("td").parent("tr").toggleClass('alert-danger', false);
+               }, 2000);
+               this_span.notify("Refresh Failed", {
+                  position: "left",
+                  className: "error"
+               });
+            }
+         });
+      }
    });
 };
 

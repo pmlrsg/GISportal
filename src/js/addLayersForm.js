@@ -218,11 +218,30 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.events.trigger('addLayersForm.autoScale-changed', params);
    });
 
+   var customInput;
+   var defaultAboveMaxColorOption = this_layer.defaultAboveMaxColor;
+
+   if ($('select[data-field="defaultAboveMaxColor"] option[value=' + this_layer.defaultAboveMaxColor + ']').length === 0) {
+      customInput = $('.js-custom-defaultAboveMaxColor');
+      customInput.toggleClass('hidden', false);
+      customInput.val(this_layer.defaultAboveMaxColor);
+      defaultAboveMaxColorOption = 'custom';
+   }
+
    // Makes sure that the aboveMaxColor value is set correctly and changes the value when the user selects a value
-   $('select[data-field="defaultAboveMaxColor"]').val(this_layer.defaultAboveMaxColor).on('change', function(){
-      this_layer.defaultAboveMaxColor = $(this).val();
-      gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+   $('select[data-field="defaultAboveMaxColor"]').val(defaultAboveMaxColorOption).on('change', function(){
+      var value = $(this).val();
+      var customInput = $('.js-custom-defaultAboveMaxColor');
+
+      if (value == 'custom') {
+         customInput.toggleClass('hidden', false);
+      } else {
+         customInput.toggleClass('hidden', true);
+         this_layer.defaultAboveMaxColor = value;
+         gisportal.addLayersForm.refreshStorageInfo();
+         gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      }
+
       var params = {
          "event": "addLayersForm.aboveMaxColor-changed",
          "value": $(this).val()
@@ -230,14 +249,31 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       gisportal.events.trigger('addLayersForm.aboveMaxColor-changed', params);
    });
 
+   var defaultBelowMinColorOption = this_layer.defaultBelowMinColor;
+
+   if ($('select[data-field="defaultBelowMinColor"] option[value=' + this_layer.defaultBelowMinColor + ']').length === 0) {
+      customInput = $('.js-custom-defaultBelowMinColor');
+      customInput.toggleClass('hidden', false);
+      customInput.val(this_layer.defaultBelowMinColor);
+      defaultBelowMinColorOption = 'custom';
+   }
+
    // Makes sure that the belowMinColor value is set correctly and changes the value when the user selects a value
-   $('select[data-field="defaultBelowMinColor"]').val(this_layer.defaultBelowMinColor).on('change', function(){
-      this_layer.defaultBelowMinColor = $(this).val();
-      gisportal.addLayersForm.refreshStorageInfo();
-      gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+   $('select[data-field="defaultBelowMinColor"]').val(defaultBelowMinColorOption).on('change', function(){
+      var value = $(this).val();
+      var customInput = $('.js-custom-defaultBelowMinColor');
+
+      if (value == 'custom') {
+         customInput.toggleClass('hidden', false);
+      } else {
+         customInput.toggleClass('hidden', true);
+         this_layer.defaultBelowMinColor = value;
+         gisportal.addLayersForm.refreshStorageInfo();
+         gisportal.addLayersForm.addScalebarPreview(current_page, 'div.scalebar-preview');
+      }
       var params = {
          "event": "addLayersForm.belowMinColor-changed",
-         "value": $(this).val()
+         "value": value
       };
       gisportal.events.trigger('addLayersForm.belowMinColor-changed', params);
    });
@@ -342,11 +378,24 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
             key_val[value] = key_val[value].trim();
          }
       }
+
+      var colorCustomVal;
+
+      if (key == 'defaultAboveMaxColor' && key_val == 'custom') {
+         colorCustomVal = $('.js-custom-defaultAboveMaxColor').val();
+      } else if (key == 'defaultBelowMinColor' && key_val == 'custom') {
+         colorCustomVal = $('.js-custom-defaultBelowMinColor').val();
+      }
+
       // The information is then added to every layer in the list
       for(var item in gisportal.addLayersForm.layers_list){
-         if(key == "originalAutoScale" || key == "defaultStyle" || key == "defaultAboveMaxColor" || key == "defaultBelowMinColor"){
+         if (colorCustomVal && key == "defaultAboveMaxColor") {
+            gisportal.addLayersForm.layers_list[item].defaultAboveMaxColor = colorCustomVal;
+         } else if (colorCustomVal && key == "defaultBelowMinColor") {
+            gisportal.addLayersForm.layers_list[item].defaultBelowMinColor = colorCustomVal;
+         } else if (key == "originalAutoScale" || key == "defaultStyle" || key == "defaultAboveMaxColor" || key == "defaultBelowMinColor") {
             gisportal.addLayersForm.layers_list[item][key] = key_val;
-         }else{
+         } else {
             gisportal.addLayersForm.layers_list[item].tags[key] = key_val;
          }
       }
@@ -660,7 +709,7 @@ gisportal.addLayersForm.addTagInput = function(tag){
 * @param String form_div - The JQuery element selctor for the form to go into
 */
 gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
-   wms_url = layer.wmsURL || gisportal.addLayersForm.form_info.wms_url;
+   var wms_url = layer.wmsURL || gisportal.addLayersForm.form_info.wms_url;
    if(wms_url){
       wms_url = wms_url.split('?')[0];
    }
@@ -698,6 +747,7 @@ gisportal.addLayersForm.displayServerform = function(layer, form_div, owner){
          "phone":phone,
          "wms_url":wms_url,
          "owner":owner,
+         "old_owner":owner,
          "server_name":layer.serverName,
          "wcsURL":layer.wcsURL
       };
@@ -880,14 +930,20 @@ gisportal.addLayersForm.addInputListeners = function(){
             }
             gisportal.addLayersForm.layers_list[index].tags[key] = key_val;
          }else{
-            gisportal.addLayersForm.layers_list[index][key] = key_val;
+            if(key == 'customBelowMinColor') {
+               gisportal.addLayersForm.layers_list[index].defaultBelowMinColor = key_val;
+            } else if (key == 'customAboveMaxColor') {
+               gisportal.addLayersForm.layers_list[index].defaultAboveMaxColor = key_val;
+            } else {
+               gisportal.addLayersForm.layers_list[index][key] = key_val;
+            }
          }
          if($(this).hasClass("refresh-scalebar") && e.type == "change"){
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
          }
       }else{
          if(key == "wcsURL"){
-            key_val = key_val.split("?")[0];
+            key_val = key_val.split("?")[0].split(" ")[0];
          }
          gisportal.addLayersForm.server_info[key] = key_val;
       }

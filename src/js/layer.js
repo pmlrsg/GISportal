@@ -282,6 +282,7 @@ gisportal.layer = function( options ) {
    };
 
    this.clearScalebarTimeout = function(){
+      var layer = this;
       $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true).toggleClass('progress-btn', false);
       if(layer.scalebarTimeout){
          clearTimeout(layer.scalebarTimeout);
@@ -458,7 +459,12 @@ gisportal.layer = function( options ) {
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];
             layer.isInbounds = true;
-            
+
+            // Put the date in a nice format
+            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm:ss');
+            // Display the nice date next to the scalebar
+            $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
+
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
@@ -614,7 +620,7 @@ gisportal.layer = function( options ) {
                   tileElement.onerror = function() {
                      gisportal.loading.decrement();
                   };
-                  if(src.startsWith("http://")){
+                  if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
                      src = gisportal.ImageProxyHost + encodeURIComponent(src);
                   }
                   tileElement.src = src;
@@ -806,6 +812,7 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
+
    if (layer.serviceType=="WFS"){
 
       layer.init(options,layer);

@@ -10,8 +10,10 @@ var _ = require("underscore");
 var xml2js = require('xml2js');
 
 var utils = require('./utils.js');
+var proxy = require('./proxy.js');
 
 var USER_CACHE_PREFIX = "user_";
+var GROUP_CACHE_PREFIX = "group_";
 var CURRENT_PATH = __dirname;
 var MASTER_CONFIG_PATH = CURRENT_PATH + "/../../config/site_settings/";
 var LAYER_CONFIG_PATH = MASTER_CONFIG_PATH + "layers/";
@@ -21,6 +23,7 @@ module.exports = settingsApi;
 
 settingsApi.get_cache = function(username, domain, permission) {
    var usernames = [username];
+   var groups = [];
    var cache = []; // The list of cache deatils to be returned to the browser
    var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
 
@@ -48,45 +51,90 @@ settingsApi.get_cache = function(username, domain, permission) {
       if (permission == "admin") {
          master_list.forEach(function(filename) {
             if (utils.directoryExists(path.join(master_path, filename))) {
-               // if (stringStartsWith(filename, USER_CACHE_PREFIX)) {
                if (filename.startsWith(USER_CACHE_PREFIX)) {
-                  usernames.push(filename.replace(USER_CACHE_PREFIX, "")); // If you are an admin, add all of the usernames from this domain to the variable
+                  // If you are an admin, add all of the usernames from this domain to the variable
+                  usernames.push(filename.replace(USER_CACHE_PREFIX, ""));
                }
             }
          });
       }
-      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice) 
-      // Eventually should just remove all admins here!
-      for (var i = 0; i < usernames.length; i++) { // Usernames is now a list of all users or just the single loggeed in user.
-         var user_cache_path = path.join(master_path, USER_CACHE_PREFIX + usernames[i]);
-         if (!utils.directoryExists(user_cache_path)) {
-            utils.mkdirpSync(user_cache_path); // Creates the directory if it doesn't already exist
+      usernames = _.uniq(usernames); // Makes the list unique (admins will have themselves twice)
+
+      // Load the cache for each username
+      cache = cache.concat(loadCache(username, permission, usernames, master_path, USER_CACHE_PREFIX));
+
+      // Find groups the user is a member of
+      master_list.forEach(function(filename) {
+         if (utils.directoryExists(path.join(master_path, filename))) {
+            if (filename.startsWith(GROUP_CACHE_PREFIX)) {
+               if (permission == "admin") {
+                  // If the user is an admin, add all groups from this domain
+                  groups.push(filename);
+               } else {
+                  var filePath = path.join(master_path, filename, 'members.json');
+                  // Currently no need to JSON.parse the file, just see if it contains the username
+                  var members = fs.readFileSync(filePath, 'utf8');
+                  if (members.indexOf(username) != -1) {
+                     groups.push(filename);
+                  }
+               }
+            }
          }
-         var user_list = fs.readdirSync(user_cache_path); // Gets all the user files
-         user_list.forEach(function(filename) {
-            var file_path = path.join(user_cache_path, filename);
-            if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "dictionary.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
-               var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
-               if (permission != "admin" && username != filename.replace(USER_CACHE_PREFIX, "")) { // The Layers list is filtered.
-                  json_data.server.Layers = json_data.server.Layers.filter(function(val) {
-                     return val.include === true || typeof(val.include) === "undefined";
-                  });
-               }
-               json_data.owner = usernames[i]; // Adds the owner to the file (for the server list)
-               if (json_data.wmsURL) {
-                  cache.push(json_data); // Adds each file to the cache to be returned
-               }
-            }
-         });
-      }
+      });
+
+      // Load the cache for each group
+      cache = cache.concat(loadCache(username, permission, groups, master_path, ''));
    }
    return cache;
 };
 
-settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
-   url = url.replace(/\?.*/g, "") + "?";
+/**
+ * Load user or group caches
+ * @param  {String} username    The requesting user
+ * @param  {String} permission  The requesting user's permission
+ * @param  {Array}  names       Array of username or groups to load
+ * @param  {String} master_path The master path to the site config
+ * @param  {String} cachePrefix The cache prefix to use for folders
+ * @return {Array}              Array of servers loaded
+ */
+function loadCache(username, permission, names, master_path, cachePrefix) {
+   var cache = [];
+   // Files to ignore
+   var ignoreFileNames = ['dictionary.json', 'members.json'];
+   for (var i = 0; i < names.length; i++) {
+      var cache_path = path.join(master_path, cachePrefix + names[i]);
+      if (!utils.directoryExists(cache_path)) {
+         utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
+      }
+      var file_list = fs.readdirSync(cache_path); // Gets all the files from the directory
+      for (var j = 0; j < file_list.length; j++) {
+         var filename = file_list[j];
+         var file_path = path.join(cache_path, filename);
+         if (utils.fileExists(file_path) && path.extname(filename) == ".json" &&
+            filename.substring(filename.length - 17, filename.length) != "_walkthrough.json" &&
+            !ignoreFileNames.includes(filename)) {
+            // If the file exists, is json, is not a walkthrough, and isn't in the ignored list
+            var json_data = JSON.parse(fs.readFileSync(file_path));
+            if (permission != "admin" && username != filename.replace(cachePrefix, "")) {
+               // If the user isn't an admin and this isn't their cache, remove layers with include: false
+               json_data.server.Layers = json_data.server.Layers.filter(function(val) {
+                  return val.include === true || typeof(val.include) === "undefined";
+               });
+            }
+            json_data.owner = names[i]; // Adds the owner to the file (for the server list)
+            if (json_data.wmsURL) {
+               cache.push(json_data); // Adds each file to the cache to be returned
+            }
+         }
+      }
+   }
+   return cache;
+}
+
+settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
+   wmsURL = wmsURL.replace(/\?.*/g, "") + "?";
    var data = null;
-   var serverName = utils.URLtoServerName(url);
+   var serverName = utils.URLtoServerName(wmsURL);
    var filename = serverName + ".json";
    var directory = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
    if (!utils.directoryExists(directory)) {
@@ -95,7 +143,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
    var file_path = path.join(directory, filename);
 
    if (refresh === true || !utils.fileExists(file_path)) {
-      request(url + "service=WMS&request=GetCapabilities", function(err, response, body) {
+      request(wmsURL + "service=WMS&request=GetCapabilities", function(err, response, body) {
          if (err) {
             next(err, data);
          } else {
@@ -207,7 +255,7 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                         sub_master_cache.options = {
                            "providerShortTag": "UserDefinedLayer"
                         };
-                        sub_master_cache.wmsURL = url;
+                        sub_master_cache.wmsURL = wmsURL;
                         sub_master_cache.serverName = serverName;
                         sub_master_cache.contactInfo = contact_info;
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
@@ -216,7 +264,9 @@ settingsApi.load_new_wms_layer = function(url, refresh, domain, next) {
                         data = JSON.stringify(sub_master_cache);
                         fs.writeFileSync(file_path, data);
                      }
-                     next(null, data);
+                     proxy.addToProxyWhitelist(wmsURL, function() {
+                        next(null, data);
+                     });
                   } catch (err) {
                      next(err, data);
                   }
@@ -252,6 +302,7 @@ settingsApi.stripPrefix = function(str) {
 
 settingsApi.update_layer = function(username, domain, data, next) {
    var filename = data.serverName + ".json"; // Gets the given filename
+   filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
    var base_path = path.join(MASTER_CONFIG_PATH, domain); // The base path of
    if (username != domain) {
       base_path = path.join(base_path, USER_CACHE_PREFIX + username);

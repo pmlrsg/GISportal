@@ -34,6 +34,11 @@
 	display: block;
 }
 
+.custom-above-below-color {
+  width: 100%;
+  margin: 0;
+}
+
 .colorbands-value{
    margin: 4px 0 0 5px;
    width: 35px;
@@ -80,6 +85,11 @@
 
 .panel-tab.scalebar-tab > label {
     max-width: 100%;
+}
+
+.scalebar-selected-date {
+   float: right;
+   margin-left: 10px;
 }
 
 .scalebar-outer {

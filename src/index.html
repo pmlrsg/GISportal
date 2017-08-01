@@ -70,7 +70,7 @@
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.0.0/terraformer-wkt-parser.min.js"></script>
 
 <!-- Geocoder search for OL3 -->
-<link href="//cdn.jsdelivr.net/openlayers.geocoder/latest/ol3-geocoder.min.css" rel="stylesheet">
+<link href="//cdn.jsdelivr.net/openlayers.geocoder/2.3.0/ol3-geocoder.min.css" rel="stylesheet">
 <script src="//cdn.jsdelivr.net/openlayers.geocoder/2.3.0/ol3-geocoder.js"></script>
 
 <!-- Custom JavaScript -->
@@ -196,8 +196,8 @@
    
    <div class="panel active">
       <div class="panel-header" style="">
-         <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
-         <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
+         <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
+         <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
          
          <div class="pull-right">
             <div data-panel-name="collaboration" class="js-show-panel tab hidden">
@@ -411,6 +411,14 @@
    </div>
    <div class="overlay js-edit-layers-popup hidden">
       <div class="overlay-container js-edit-layers-html"></div>
+   </div>
+   <div class="overlay js-edit-group-form-popup hidden">
+      <div class="overlay-container-form">
+         <div class="js-edit-group-form-html"></div>
+      </div>
+   </div>
+   <div class="overlay js-edit-groups-popup hidden">
+      <div class="overlay-container js-edit-groups-html"></div>
    </div>
    <div class="overlay js-walkthrough-management-popup hidden">
       <div class="overlay-container js-walkthrough-management-html"></div>

@@ -814,6 +814,48 @@ gisportal.api['scalebar.opacity'] = function(data, options){
 	}
 };
 
+gisportal.api['scalebar.custom-aboveMaxColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-aboveMaxColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-aboveMaxColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].aboveMaxColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
+};
+
+gisportal.api['scalebar.custom-belowMinColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-belowMinColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-belowMinColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-belowMinColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].belowMinColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
+};
+
  /*
  'data' must contain the following:
 
@@ -1396,6 +1438,30 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
 		collaboration.highlightElement(button_elem);
 	}
 	button_elem.trigger('click');
+};
+
+/*
+ 'data' must contain the following:
+
+ geojson: the geoJSON to load
+ selectedValue: the name of the geoJSON selected
+ fromSavedState: if this selection was from a saved state
+  */
+gisportal.api['indicatorsPanel.geoJSONSelected'] = function(data, options){
+   console.log(data);
+   options = options || {};
+
+   if(options.describeOnly){
+      return 'Saved geoJSON selected';
+   }
+   if(options.selectorOnly){
+      return '.users-geojson-files';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.users-geojson-files'));
+   }
+
+   gisportal.selectionTools.loadGeoJSON(data.geojson, false, data.selectedValue, data.fromSavedState);
 };
 
  /*
@@ -2023,24 +2089,27 @@ gisportal.api['graphFramerate.change'] = function(data, options){
 
  value: An array of 2 dates, start and end, to be set as the range for the graph
   */
-gisportal.api['graphRange.change'] = function(data, options){
-	options = options || {};
-	var value = data.value;
+gisportal.api['graphRange.change'] = function(data, options) {
+   options = options || {};
+   var value = data.value;
    var start_date_elem = $('.js-active-plot-start-date');
    var end_date_elem = $('.js-active-plot-end-date');
    var slider_elem = $('.js-range-slider');
-   var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
+   // Convert both date number strings in the array into ISOStrings
+   var dates = value.map(Number).map(function(dateNum) {
+      return new Date(dateNum).toISOString();
+   });
 
-	if(options.describeOnly){
-		return 'Graph date range set to: "' + dates.join(' - ') + '"';
-	}
-	if(options.selectorOnly){
-		return '.js-range-slider';
-	}
-	if(options.highlight){
-		collaboration.highlightElement(slider_elem);
-	}
-	start_date_elem.val(dates[0]).trigger('change');
+   if (options.describeOnly) {
+      return 'Graph date range set to: "' + dates.join(' - ') + '"';
+   }
+   if (options.selectorOnly) {
+      return '.js-range-slider';
+   }
+   if (options.highlight) {
+      collaboration.highlightElement(slider_elem);
+   }
+   start_date_elem.val(dates[0]).trigger('change');
    end_date_elem.val(dates[1]).trigger('change');
    slider_elem.val(value);
 };

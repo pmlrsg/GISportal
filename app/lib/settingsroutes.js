@@ -8,6 +8,7 @@ var path = require('path');
 var settings = require('./settings.js');
 var user = require('./user.js');
 var utils = require('./utils.js');
+var proxy = require('./proxy.js');
 
 var router = express.Router();
 
@@ -24,9 +25,9 @@ router.use(function(req, res, next) {
    next();
 });
 
-router.get('/app/settings/proxy', settings.proxy);
+router.get('/app/settings/proxy', proxy.proxy);
 
-router.get('/app/settings/img_proxy', settings.img_proxy);
+router.get('/app/settings/img_proxy', proxy.img_proxy);
 
 router.get('/app/settings/config', settings.config);
 
@@ -43,6 +44,12 @@ router.get('/app/settings/get_views', settings.get_views);
 router.get('/app/settings/get_walkthroughs', settings.get_walkthroughs);
 
 router.get('/app/settings/get_owners', settings.get_owners);
+
+router.get('/app/settings/get_groups', settings.get_groups);
+
+router.post('/app/settings/save_group', settings.save_group, settings.get_groups);
+
+router.get('/app/settings/delete_group', settings.delete_group);
 
 router.get('/app/settings/get_dictionary', settings.get_dictionary);
 
@@ -94,7 +101,7 @@ router.get('/resources/*?', function(req, res) {
 
 router.get('/app/settings/get_cache', settings.get_cache);
 
-router.all('/app/settings/rotate', settings.rotate);
+router.all('/app/settings/rotate', proxy.rotate);
 
 router.get('/app/settings/remove_server_cache', settings.remove_server_cache);
 
