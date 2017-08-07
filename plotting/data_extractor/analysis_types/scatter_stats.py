@@ -4,13 +4,21 @@ import json
 
 class ScatterStats(object):
 	"""docstring for BasicStats"""
-	def __init__(self, filenames):
+	def __init__(self, variables, filenames):
+        """
+        Parameters
+        ----------
+        variables: list
+            list of variables to extract from the filenames
+        filenames: list
+            list of filenames from which to extract the variables
+        """
 		super(ScatterStats, self).__init__()
 		
 		
-		self.variable1, self.variable2 = filenames.keys()
-		self.filename1 = filenames[self.variable1]
-		self.filename2 = filenames[self.variable2]
+		self.variable1, self.variable2 = variables[0], variables[1]
+		self.filename1 = filenames[0]
+		self.filename2 = filenames[1]
 
 	def process(self):
 		print "running basic processing on %s & %s" % (self.filename1, self.filename2)
