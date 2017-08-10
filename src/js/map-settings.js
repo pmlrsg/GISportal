@@ -241,6 +241,7 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
+            attributions: 'Terrain Light { Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors and <a href="#data">others</a>, Rendering &copy; <a href="http://eox.at">EOX</a> }',
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
@@ -256,6 +257,7 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only, Europe only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
+            attributions: '<a href="https://s2maps.eu/">Sentinel-2 cloudless</a> by <a href="https://eox.at/">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016)',
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
@@ -270,6 +272,7 @@ gisportal.createBaseLayers = function() {
          title: 'GEBCO',
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
+            attributions: 'Imagery reproduced from the GEBCO_2014 Grid, version 20150318, www.gebco.net',
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
@@ -285,6 +288,7 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
+            attributions: 'Blue Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
@@ -300,6 +304,7 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
+            attributions: 'Black Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
