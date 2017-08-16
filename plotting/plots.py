@@ -966,7 +966,7 @@ def timeseries(plot, outfile="time.html"):
             if plot_scale == "log":
                   err_ys.append((math.pow(10,math.log10(y) - std),math.pow(10,(math.log10(y) + std))))
             else:
-                  err_ys.appen((y-std, y+std))
+                  err_ys.append((y-std, y+std))
 
          min_value = np.amin(np.array(err_ys).astype(np.float64))
          max_value = np.amax(np.array(err_ys).astype(np.float64))
