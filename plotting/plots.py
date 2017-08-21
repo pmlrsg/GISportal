@@ -29,7 +29,7 @@ import shutil
 import math
 
 
-from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource, hplot, vplot
+from bokeh.plotting import figure, save, show, output_notebook, output_file, ColumnDataSource
 from bokeh.models import LinearColorMapper, BasicTickFormatter,LinearAxis, Range1d, HoverTool, CrosshairTool, ResizeTool
 from bokeh.resources import CSSResources
 from bokeh.embed import components
@@ -384,7 +384,6 @@ def extract(plot, outfile="image.html"):
 
    if plotting.debug.verbosity > 0:
       output_file(outfile, 'Geographic Extract')
-      save(hplot)
    else:
       with open(outfile, 'w') as ofile:
          print(hovmoller_template.render(script=script,  div_legend=div['legend'], div_plot=div['geographic']), file=ofile)
@@ -566,7 +565,6 @@ def hovmoller(plot, outfile="image.html"):
 
    if plotting.debug.verbosity > 0:
       output_file(outfile, 'Hovmoller')
-      save(hplot)
    else:
       with open(outfile, 'w') as ofile:
          print(hovmoller_template.render(script=script,  div_legend=div['legend'], div_plot=div['hovmoller']), file=ofile)
@@ -1092,7 +1090,7 @@ def timeseries(plot, outfile="time.html"):
 #END timeseries   
 
 def scatter(plot, outfile='/tmp/scatter.html'):
-
+  
    plot_data = plot['data']
    plot_type = plot['type']
    plot_title = plot['title']
@@ -1111,9 +1109,19 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    yVar = cov_meta['y']['coverage']
    xVarID = cov_meta['x']['layer_id']
    yVarID = cov_meta['y']['layer_id']
+   if 'depth' in cov_meta['x']:
+      xDepth = cov_meta['x']['depth']
+      xData = [x[varindex[xVar+'_split_'+xDepth]] for x in df]
+   else:
+      xData = [x[varindex[xVar+'_split_'+xVarID]] for x in df]
 
-   xData = [x[varindex[xVar+'_split_'+xVarID]] for x in df]
-   yData = [x[varindex[yVar+'_split_'+yVarID]] for x in df]
+   if 'depth' in cov_meta['y']:
+      yDepth = cov_meta['y']['depth']
+      yData = [x[varindex[yVar+'_split_'+yDepth]] for x in df]
+   else:
+      yData = [x[varindex[yVar+'_split_'+yVarID]] for x in df]
+             
+   
    dateData = [x[varindex['Time']] for x in df]
 
    #df1 = plot_data[0]
@@ -1412,7 +1420,6 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
 
    if plotting.debug.verbosity > 0:
       output_file(outfile, 'Matchup Scatter')
-      #save(hplot)
    else:
       with open(outfile, 'w') as ofile:
          print(template.render(script=script,  div=div), file=ofile)
@@ -1670,10 +1677,12 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          layerId = ds['layer_id']
          bbox = ds['bbox']
          depth = None
+         t_holder[actual_axis] = {}
          if 'depth' in ds:
             depth = ds['depth']
+            t_holder[actual_axis]['depth'] = depth
          time_bounds = [ds['t_bounds'][0] + "/" + ds['t_bounds'][1]]
-         t_holder[actual_axis] = {}
+         
          t_holder[actual_axis]['coverage'] = coverage
          t_holder[actual_axis]['wcs_url'] = wcs_url
          t_holder[actual_axis]['bbox'] = bbox
@@ -1688,7 +1697,10 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             else:
                extractor = BasicExtractor(ds['threddsUrl'], time_bounds, extract_area=bbox, extract_variable=coverage, extract_depth=depth, outdir=download_dir)
             extract = extractor.getData()
-            scatter_stats_holder[coverage+'_split_'+layerId] = extract
+            if depth:
+                  scatter_stats_holder[coverage+'_split_'+depth] = extract      
+            else:
+                  scatter_stats_holder[coverage+'_split_'+layerId] = extract
             debug(2, u"scatter_stats_holder.extract : {}".format(extract))
          except ValueError:
             debug(2, u"Data request, {}, failed".format(data_request))
