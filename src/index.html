@@ -10,6 +10,8 @@
 <!-- ================= Bokeh first so they don't ruin everything ================= -->
 <link href="//cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" rel="stylesheet" type="text/css">
 
+<link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
+
 <!-- Default styling for web app plus overrides of OpenLayers and jQuery UI styles -->
 <link rel="stylesheet" type="text/css" href="css/@@MODE" />
 
@@ -46,7 +48,7 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
 <!-- Handlebars - Like mustache, but better. -->
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.4/handlebars.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.3/handlebars.min.js"></script>
 
 <!-- Fuse -->
 <script type="text/javascript" src="js-libs/fuse/fuse.js"></script>
@@ -58,7 +60,6 @@
 <script type="text/javascript" src="js-libs/jstorage.js"></script>
 
 <!-- Pikaday - data picker -->
-<link rel="stylesheet" type="text/css" href="js-libs/pikaday/pikaday.css" />
 <script type="text/javascript" src="js-libs/moment.js"></script>
 <script type="text/javascript" src="js-libs/pikaday/pikaday.js"></script>
 <script type="text/javascript" src="js-libs/pikaday/pikaday.jquery.js"></script>
@@ -69,7 +70,7 @@
 <script type="text/javascript" src="//cdn-geoweb.s3.amazonaws.com/terraformer-wkt-parser/1.0.0/terraformer-wkt-parser.min.js"></script>
 
 <!-- Geocoder search for OL3 -->
-<link href="//cdn.jsdelivr.net/openlayers.geocoder/latest/ol3-geocoder.min.css" rel="stylesheet">
+<link href="//cdn.jsdelivr.net/openlayers.geocoder/2.3.0/ol3-geocoder.min.css" rel="stylesheet">
 <script src="//cdn.jsdelivr.net/openlayers.geocoder/2.3.0/ol3-geocoder.js"></script>
 
 <!-- Custom JavaScript -->
@@ -178,7 +179,15 @@
       <div class="timeline-inner">
          <ul class="js-timeline-labels timeline-labels"></ul>
          <div id="timeline" class=""></div>
-         <input class="js-current-date current-date" type="input" />
+         <div class="timeline-date-options">
+            <div class="timeline-next-prev">
+               <span class="js-next-prev-date icon-filled-arrow-49 secondary" data-steps="-10"></span>
+               <span class="js-next-prev-date icon-filled-arrow-39 secondary" data-steps="-1"></span>
+               <span class="js-next-prev-date icon-filled-arrow-40 secondary" data-steps="1"></span>
+               <span class="js-next-prev-date icon-filled-arrow-50 secondary" data-steps="10"></span>
+            </div>
+            <input class="js-current-date current-date" type="text" />
+         </div>
       </div>
    </div>
 
@@ -187,8 +196,8 @@
    
    <div class="panel active">
       <div class="panel-header" style="">
-         <div data-panel-name="choose-indicator" class="js-show-panel tab">Indicators</div>
-         <div data-panel-name="active-layers" class="js-show-panel tab">Layers</div>
+         <div data-panel-name="choose-indicator" class="js-show-panel tab"><span class="icon-filter-1"></span> Indicators</div>
+         <div data-panel-name="active-layers" class="js-show-panel tab hidden"><span class="icon-layers-1"></span> Layers</div>
          
          <div class="pull-right">
             <div data-panel-name="collaboration" class="js-show-panel tab hidden">
@@ -198,7 +207,7 @@
                <span  class="icon-map-1" title="Display settings"></span>
             </div>
             <div data-panel-name="history" class="js-show-panel tab ">
-               <span  class="icon-briefcase" title="Stored graphs"></span>
+               <span  class="icon-briefcase" title="Stored plots"></span>
             </div>
             <div data-panel-name="user" class="js-show-panel tab">
                <span  class="icon-profile-1" title="User dashboard"></span>
@@ -298,10 +307,10 @@
             <div class="js-states-saved-list"></div>
          </div>
          <div class="panel-container-solid-backdrop" >
-            <h3>Stored Graphs</h3>
+            <h3>Stored Plots</h3>
             <div>
                <div class="js-graphs-saved-list" ></div>
-               <div class="js-graphs-history-list" ><div class="no-graphs-text"><em>No graphs to display</em></div></div>
+               <div class="js-graphs-history-list" ><div class="no-graphs-text"><em>No plots to display</em></div></div>
             </div>
          </div>
       </div>
@@ -326,7 +335,7 @@
          </div>
          <label for="share-map"></label>
          <button id="share-map" class="js-share brand secondary">
-            <span class="icon-filled-link icon-btn"> </span>
+            <span class="icon-filled-link"> </span>
             Share
          </button>
       </div>
@@ -402,6 +411,14 @@
    </div>
    <div class="overlay js-edit-layers-popup hidden">
       <div class="overlay-container js-edit-layers-html"></div>
+   </div>
+   <div class="overlay js-edit-group-form-popup hidden">
+      <div class="overlay-container-form">
+         <div class="js-edit-group-form-html"></div>
+      </div>
+   </div>
+   <div class="overlay js-edit-groups-popup hidden">
+      <div class="overlay-container js-edit-groups-html"></div>
    </div>
    <div class="overlay js-walkthrough-management-popup hidden">
       <div class="overlay-container js-walkthrough-management-html"></div>

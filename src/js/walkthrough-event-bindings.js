@@ -148,6 +148,20 @@ gisportal.events.bind("scalebar.opacity", function(event, data) {
    }
 });
 
+// layer custom above max colour changed
+gisportal.events.bind("scalebar.custom-aboveMaxColor", function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+// layer custom below min colour changed
+gisportal.events.bind("scalebar.custom-belowMinColor", function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 // layer colorbands changed
 gisportal.events.bind("scalebar.colorbands", function(event, data) {
    if(gisportal.walkthrough.is_recording){
@@ -416,6 +430,12 @@ gisportal.events.bind('drawBox.clicked', function(event, data) {
 });
 
 gisportal.events.bind('drawPolygon.clicked', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
+gisportal.events.bind('indicatorsPanel.geoJSONSelected', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
    }

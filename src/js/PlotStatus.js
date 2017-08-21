@@ -43,9 +43,6 @@ gisportal.graphs.PlotStatus = (function(){
       // IE, success, error, processing
       this.renderedState = plot.state();
 
-      // Makes sure that any identical plots are removed
-      $('.js-graphs-history-list [data-graph-id="' + this._plot.id + '"]').closest('.graph-job:not(:first-child)').find('.js-graph-status-delete').trigger('click');
-
       // Replace the HTML in the dom if needed
       if( this._element )
          this._element.replaceWith( newElement );
@@ -57,6 +54,9 @@ gisportal.graphs.PlotStatus = (function(){
       // Add listeners to the buttons that
       // maybe in the dom
       gisportal.graphs.addButtonListeners(this._element, noCopyEdit = false, plot);
+
+      // Makes sure that any identical plots are removed
+      $('.js-graphs-history-list [data-graph-id="' + this._plot.id + '"]').closest('.graph-job').not(':first').find('.js-graph-status-delete').trigger('click');
    };
 
    /**
@@ -75,6 +75,7 @@ gisportal.graphs.PlotStatus = (function(){
                break;
             case "extracting":
             case "plotting":
+            case "rendering":
             case "testing":
                _this.stateProcessing( serverStatus );
                break;
@@ -102,10 +103,11 @@ gisportal.graphs.PlotStatus = (function(){
       if( this.renderedState != "failed" )
          this.rebuildElement();
 
+      var id = serverStatus.job_id;
       var message = serverStatus.message;
       var error_element = this._element.find('.js-graph-status-show-full-error');
       error_element.on('click',function(){
-         $.notify( message , {className:"error", autoHide: false});
+         $.notify(message + '\nPlease report ' + id.substr(0, 8).toUpperCase() + ' when contacting support.', {className:"error", autoHide: false});
       });
    };
 

@@ -31,8 +31,8 @@ collaboration.init = function(io, app, config) {
       if (handshakeData.headers.cookie) {
          try {
             var cookies = cookieParser.signedCookies(cookie.parse(handshakeData.headers.cookie), config.session.secret);
-            var sid = cookies['GISportal'];
-         
+            var sid = cookies.GISportal;
+
             var sessionStore = app.get('sessionStore');
             sessionStore.load(sid, function(err, session) {
                if(err || !session) {
@@ -43,23 +43,23 @@ collaboration.init = function(io, app, config) {
          } catch(e) {
             console.log(e);
          }
-         
+
 
       } else {
          // if there isn't, turn down the connection with a message
          // and leave the function.
          return accept('No cookie transmitted.', false);
-      } 
+      }
       // accept the incoming connection
       accept(null, true);
-   }); 
+   });
 
    io.on('connection', function(socket){
 
       socket.room = '';
-      
+
       var cookies = cookieParser.signedCookies(cookie.parse(socket.request.headers.cookie), config.session.secret);
-      var sid = cookies['GISportal'];
+      var sid = cookies.GISportal;
 
       var user = {};
       var sessionStore = app.get('sessionStore');
@@ -67,7 +67,7 @@ collaboration.init = function(io, app, config) {
          if (!session || !session.passport.user || err) {
             return 'no passport';
          }
-         
+
          var emails = session.passport.user.emails;
 
          user.email = emails[0].value;
@@ -112,7 +112,7 @@ collaboration.init = function(io, app, config) {
             if(!obj){
                return false;
             }
-            for(person in obj){
+            for(var person in obj){
                var this_person = JSON.parse(obj[person]);
                if(this_person.email == user.email && this_person.id == sid){
                   return false;
@@ -120,15 +120,14 @@ collaboration.init = function(io, app, config) {
             }
             client.rpush(["people", JSON.stringify({"email": user.email, "id": socket.id})], function(err) {});
          });
-         if(crypto)
-         
+
          console.log(user.email +' connected: '+sid);
       });
-      
+
       socket.on('disconnect', function(){
          //redisClient.del('sess:'+sid);    can't delete the session on disconnect because joining a room causes users to disconnect (but perphaps it shouldn't?)
          console.log('user disconnected');
-         
+
          var roomId = socket.room;
          client.get(roomId, function(err, obj) {
             if(!obj){
@@ -147,7 +146,7 @@ collaboration.init = function(io, app, config) {
                for (var i = 0; i < people.length; i++) {
                   if (people[i].id == leavingUserId) {
                      // is the person disconnecting either the current presenter?
-                     if (people[i].presenter == true) {
+                     if (people[i].presenter === true) {
                         reassignPresenter = true;
                      }
                      // get their name so others can be warned that `departed` has left the building
@@ -160,7 +159,7 @@ collaboration.init = function(io, app, config) {
                }
                if (reassignPresenter) { // give the presenter role to the room owner (who started the room)
                   for (var i = 0; i < people.length; i++) {
-                     if (people[i].owner == true) {
+                     if (people[i].owner === true) {
                         people[i].presenter = true;
                         newPresenterId = people[i].id;
                         newPresenterEmail = people[i].email;
@@ -190,8 +189,8 @@ collaboration.init = function(io, app, config) {
                   }
                });
             }
-         })
-      })
+         });
+      });
 
       socket.on('room.new', function(data) {
          console.log('starting room');
@@ -214,7 +213,7 @@ collaboration.init = function(io, app, config) {
             "owner": user.email,
             "presenter": user.email,
             "roomId": roomId
-         }
+         };
          socket.room = roomId;
          // adds the room to the list of rooms
          client.rpush(["rooms_list", roomId], function(err) {});
@@ -233,12 +232,12 @@ collaboration.init = function(io, app, config) {
                      }else if(email_config.method == "smtp"){
                         if("smtp_email" in email_config &&"smtp_pass" in email_config && "smtp_host" in email_config && "smtp_ssl" in email_config){
                            mail_system = email.server.connect({
-                              user: email_config.smtp_email, 
-                              password: email_config.smtp_pass, 
-                              host: email_config.smtp_host, 
-                              domain: email_config.smtp_host, 
-                              ssl: email_config.smtp_ssl, 
-                              port: email_config.smtp_port, 
+                              user: email_config.smtp_email,
+                              password: email_config.smtp_pass,
+                              host: email_config.smtp_host,
+                              domain: email_config.smtp_host,
+                              ssl: email_config.smtp_ssl,
+                              port: email_config.smtp_port,
                               authentication: email_config.smtp_auth
                            });
                         }
@@ -249,12 +248,11 @@ collaboration.init = function(io, app, config) {
             }
          });
          console.log(user.email +' is now in room '+ roomId);
-         
-      })
+      });
 
       socket.on('room.join', function(obj) {
-         roomId = obj.roomId;
-         mapSize = obj.mapSize;
+         var roomId = obj.roomId;
+         var mapSize = obj.mapSize;
          client.get(roomId, function(err, obj) {
             if(!obj){
                console.log(roomId +' does not exist');
@@ -285,14 +283,14 @@ collaboration.init = function(io, app, config) {
                   "owner": owner,
                   "diverged": false,
                   "mapSize": mapSize
-               }
+               };
                var duplicate;
                for( var person in room.people){
                   if(room.people[person].email == user.email){
                      if(io.sockets.connected[room.people[person].id]){
                         io.sockets.connected[room.people[person].id].emit('room.double-login');
                      }
-                     duplicate = person
+                     duplicate = person;
                   }
                }
                if(duplicate && room.people[duplicate]){
@@ -308,16 +306,16 @@ collaboration.init = function(io, app, config) {
                         "people": room.people,
                         "owner": owner,
                         "presenter": presenter
-                     })
+                     });
                   }
                });
-            })
+            });
 
          });
       });
 
       socket.on('room.make-presenter', function(id) {
-         console.log('changing presenter to '+ id)
+         console.log('changing presenter to '+ id);
          var roomId = socket.room;
 
          client.get(roomId, function(err, obj) {
@@ -357,7 +355,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       // sets the value of an element using the class as the selector
       socket.on('setValueByClass', function(data) {
@@ -367,7 +365,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       socket.on('setSavedState', function(data) {
          console.log(data);
@@ -376,7 +374,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data
          });
-      });  
+      });
 
       // a simple collaboration event; just echo back what was sent with details of who sent it
       socket.on('c_event', function(data) {
@@ -387,7 +385,7 @@ collaboration.init = function(io, app, config) {
             "provider": user.provider,
             "params" : data,
             "event": data.event
-         })
+         });
       });
 
       var mediaChange = function(change){
@@ -419,7 +417,7 @@ collaboration.init = function(io, app, config) {
                }
             });
          });
-      }
+      };
 
       socket.on('webrtc_event', function(data) {
          console.log(data);
@@ -437,7 +435,7 @@ collaboration.init = function(io, app, config) {
       socket.on('room.diverge', function(id) {
          var roomId = socket.room;
          console.log(user.email + ' has diverged from room ' + roomId);
-         
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -470,12 +468,12 @@ collaboration.init = function(io, app, config) {
       socket.on('room.merge', function(id) {
          var roomId = socket.room;
          console.log(user.email + ' has merged back into room ' + roomId);
-         
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
             }
-            var name, email;
+            var name, email, image;
             var room = JSON.parse(obj);
             var people = room.people;
             for (var p in people) {
@@ -506,8 +504,8 @@ collaboration.init = function(io, app, config) {
          var message = data.message;
          var roomId = socket.room;
          console.log(user.email + ' : ' + message);
-         var message = swearJar.censor(message.replace(/<\/?[^>]+(>|$)/g, ""));
-         
+         message = swearJar.censor(message.replace(/<\/?[^>]+(>|$)/g, ""));
+
          client.get(roomId, function(err, obj) {
             if(!obj){
                return;
@@ -559,8 +557,8 @@ collaboration.init = function(io, app, config) {
    });
 };
 
-invitePeopleToRoom = function(invitees, domain, roomId, pageTitle, user, mail_system, mail_system_name, io){
-   roomURL = domain + "?room=" + roomId;
+function invitePeopleToRoom (invitees, domain, roomId, pageTitle, user, mail_system, mail_system_name, io){
+   var roomURL = domain + "?room=" + roomId;
    var data = {
      from: pageTitle + ' on behalf of ' + user.name + ' <' + user.email + '>',
      subject: pageTitle + ' Collaboration Invitation',
@@ -582,8 +580,8 @@ invitePeopleToRoom = function(invitees, domain, roomId, pageTitle, user, mail_sy
             var info = JSON.parse(list[index]);
             if(data.to == info.email){
                if(io.sockets.connected[info.id]){
-                  console.log(io.sockets.connected[info.id].handshake.headers.referer)
-                  console.log(domain)
+                  console.log(io.sockets.connected[info.id].handshake.headers.referer);
+                  console.log(domain);
                   if(io.sockets.connected[info.id].handshake.headers.referer == domain){
                      io.sockets.connected[info.id].emit('room.invite', {"domain": domain, "roomId": roomId, "from": user.name});
                   }
@@ -592,4 +590,4 @@ invitePeopleToRoom = function(invitees, domain, roomId, pageTitle, user, mail_sy
          }
       }
    });
-};
+}

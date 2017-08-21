@@ -198,6 +198,8 @@ gisportal.scalebars.autoScale = function(id, force)  {
          }
       }else if( gisportal.layers[id] && !gisportal.getAutoScaleFromString(gisportal.layers[id].autoScale) ){
          return;
+      } else if (gisportal.loadingFromState) {
+         return;
       }
    }
 

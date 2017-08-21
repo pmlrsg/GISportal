@@ -80,6 +80,10 @@ gisportal.user.initDOM = function() {
       gisportal.events.trigger('configureInternalLayers.clicked', params);
    });
 
+   $('button.js-edit-groups').on('click', function() {
+      gisportal.editGroups.loadTable();
+   });
+
    $('#refresh-cache-box').on('change', function(){
       var checked = $(this).is(':checked');
       var params = {
@@ -260,12 +264,18 @@ gisportal.loadLayerEditButtons = function(){
    }
 };
 
-gisportal.updateHideClasses = function(){
-   if(gisportal.user.info.permission == "guest"){
+gisportal.updateHideClasses = function() {
+   if (gisportal.user.info.permission == "guest") {
       $('.hide-when-logged-in').toggleClass('hidden', false);
       $('.show-when-logged-in').toggleClass('hidden', true);
-   }else{
+   } else {
       $('.hide-when-logged-in').toggleClass('hidden', true);
       $('.show-when-logged-in').toggleClass('hidden', false);
+   }
+
+   if (gisportal.user.info.permission == 'admin') {
+      $('div.manage-groups').toggleClass('hidden', false);
+   } else {
+      $('div.manage-groups').toggleClass('hidden', true);
    }
 };

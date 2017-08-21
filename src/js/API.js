@@ -321,7 +321,7 @@ gisportal.api['date.selected'] = function(data, options){
 	var date = new Date(data.date);
 
 	if(options.describeOnly){
-		return "Date changed to " + moment(date).format('YYYY-MM-DD hh:mm');
+		return "Date changed to " + moment.utc(date).format('YYYY-MM-DD hh:mm');
 	}
 	if(options.selectorOnly){
 		return '.js-current-date';
@@ -339,23 +339,41 @@ gisportal.api['date.selected'] = function(data, options){
 
  startDate: The start date you would like to zoom to
  endDate: The end date you would like to zoom to
+ noPadding: (optional) whether padding should be added at either side
   */
-gisportal.api['date.zoom'] = function(data, options){
-	options = options || {};
-	var startDate = new Date(data.startDate);
-	var endDate = new Date(data.endDate);
+gisportal.api['date.zoom'] = function(data, options) {
+   options = options || {};
+   var startDate = null;
+   var endDate = null;
+   var oldStartDate = gisportal.timeline.xScale.invert(0);
+   var oldEndDate = gisportal.timeline.xScale.invert(gisportal.timeline.width);
 
-	if(options.describeOnly){
-		return "Date zoomed to " + moment(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment(endDate).format('YYYY-MM-DD hh:mm');
-	}
-	if(options.selectorOnly){
-		return '#timeline';
-	}
-	if(options.highlight){
-		collaboration.highlightElement($('#timeline'));
-	}
-   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-      gisportal.timeline.zoomDate(startDate, endDate);
+   if (data.startDate !== null) {
+      startDate = new Date(data.startDate);
+   }
+   if (data.endDate !== null) {
+      endDate = new Date(data.endDate);
+   }
+   var noPadding = data.noPadding;
+
+   if (startDate === null || endDate === null || startDate.getTime() != oldStartDate.getTime() || endDate.getTime() != oldEndDate.getTime()) {
+      if (options.describeOnly) {
+         if (startDate === null) {
+            return "Date zoomed to " + moment.utc(oldStartDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
+         } else if (endDate === null) {
+            return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(oldEndDate).format('YYYY-MM-DD hh:mm');
+         }
+         return "Date zoomed to " + moment.utc(startDate).format('YYYY-MM-DD hh:mm') + " - " + moment.utc(endDate).format('YYYY-MM-DD hh:mm');
+      }
+      if (options.selectorOnly) {
+         return '#timeline';
+      }
+      if (options.highlight) {
+         collaboration.highlightElement($('#timeline'));
+      }
+      if (gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0) {
+         gisportal.timeline.zoomDate(startDate, endDate, noPadding);
+      }
    }
 };
 
@@ -794,6 +812,48 @@ gisportal.api['scalebar.opacity'] = function(data, options){
 	   $('#tab-' + id + '-opacity').val(opacity);
 	   gisportal.layers[id].setOpacity(value);
 	}
+};
+
+gisportal.api['scalebar.custom-aboveMaxColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-aboveMaxColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-aboveMaxColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].aboveMaxColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
+};
+
+gisportal.api['scalebar.custom-belowMinColor'] = function(data, options) {
+   options = options || {};
+   var id = data.id;
+   var colour = data.value;
+
+   if(options.describeOnly){
+      return 'Custom Above Max Colour set to ' + colour + '% - ' + gisportal.layers[id].descriptiveName;
+   }
+   if(options.selectorOnly){
+      return '.js-custom-belowMinColor[data-id="' + id + '"]';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.js-custom-belowMinColor[data-id="' + id + '"]'));
+   }
+   if(colour){
+      $('.js-custom-belowMinColor[data-id="' + id + '"]').val(colour);
+      gisportal.layers[id].belowMinColor = colour;
+      gisportal.layers[id].setScalebarTimeout();
+   }
 };
 
  /*
@@ -1378,6 +1438,30 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
 		collaboration.highlightElement(button_elem);
 	}
 	button_elem.trigger('click');
+};
+
+/*
+ 'data' must contain the following:
+
+ geojson: the geoJSON to load
+ selectedValue: the name of the geoJSON selected
+ fromSavedState: if this selection was from a saved state
+  */
+gisportal.api['indicatorsPanel.geoJSONSelected'] = function(data, options){
+   console.log(data);
+   options = options || {};
+
+   if(options.describeOnly){
+      return 'Saved geoJSON selected';
+   }
+   if(options.selectorOnly){
+      return '.users-geojson-files';
+   }
+   if(options.highlight){
+      collaboration.highlightElement($('.users-geojson-files'));
+   }
+
+   gisportal.selectionTools.loadGeoJSON(data.geojson, false, data.selectedValue, data.fromSavedState);
 };
 
  /*
@@ -1982,29 +2066,50 @@ gisportal.api['layerDepth.change'] = function(data, options){
 	input_elem.val(value).trigger('change');
 };
 
+gisportal.api['graphFramerate.change'] = function(data, options){
+   options = options || {};
+   var value = data.value;
+   var input_elem = $('.js-active-plot-framerate');
+   var slider_elem = $('.js-framerate-slider');
+
+   if(options.describeOnly){
+      return 'Framerate set to: ' + value;
+   }
+   if(options.selectorOnly){
+      return '.js-framerate-slider';
+   }
+   if(options.highlight){
+      collaboration.highlightElement(slider_elem);
+   }
+   input_elem.val(value).trigger('change');
+};
+
  /*
  'data' must contain the following:
 
  value: An array of 2 dates, start and end, to be set as the range for the graph
   */
-gisportal.api['graphRange.change'] = function(data, options){
-	options = options || {};
-	var value = data.value;
+gisportal.api['graphRange.change'] = function(data, options) {
+   options = options || {};
+   var value = data.value;
    var start_date_elem = $('.js-active-plot-start-date');
    var end_date_elem = $('.js-active-plot-end-date');
    var slider_elem = $('.js-range-slider');
-   var dates = value.map(Number).map(function(stamp){ return new Date(stamp).toISOString().split("T")[0];});
+   // Convert both date number strings in the array into ISOStrings
+   var dates = value.map(Number).map(function(dateNum) {
+      return new Date(dateNum).toISOString();
+   });
 
-	if(options.describeOnly){
-		return 'Graph date range set to: "' + dates.join(' - ') + '"';
-	}
-	if(options.selectorOnly){
-		return '.js-range-slider';
-	}
-	if(options.highlight){
-		collaboration.highlightElement(slider_elem);
-	}
-	start_date_elem.val(dates[0]).trigger('change');
+   if (options.describeOnly) {
+      return 'Graph date range set to: "' + dates.join(' - ') + '"';
+   }
+   if (options.selectorOnly) {
+      return '.js-range-slider';
+   }
+   if (options.highlight) {
+      collaboration.highlightElement(slider_elem);
+   }
+   start_date_elem.val(dates[0]).trigger('change');
    end_date_elem.val(dates[1]).trigger('change');
    slider_elem.val(value);
 };

@@ -324,24 +324,29 @@ trim_sizes = {
    "line" : slice(11,-2)
 }
 
-def find_closest(arr, val, starting=0, time=False):
+def find_closest(arr, val, arr_indexes=None, starting=0, time=False, arr_sorted=False):
    """
   Finds the position in the array where the array value matches
   the value specified by the user
    - poached from JAD
   """
-   current_closest = 120310231023
    if time:
       current_closest = timedelta.max
+   else:
+      current_closest = 120310231023
+
    current_idx = None
-   #last_diff = 0 if time else timedelta.min
+
    for i in range(starting,len(arr)):
-      # if (abs(arr[i]-val) > last_diff):
-      #    break
-      if abs(arr[i]-val)<current_closest:
-         last_diff = abs(arr[i]-val)
+      if abs(arr[i]-val) < current_closest:
          current_closest = abs(arr[i]-val)
-         current_idx=i
+         if arr_indexes is None:
+            current_idx = i
+         else:
+            current_idx = arr_indexes[i]
+      elif arr_sorted and abs(arr[i]-val) > current_closest:
+         break
+
    return current_idx
 
 def getFillValue(variable):
@@ -352,7 +357,7 @@ def getFillValue(variable):
 
 def create_mask(poly, netcdf_base, variable, poly_type="polygon"):
    '''
-   takes a Well Known Text polygon or line 
+   takes a Well Known Text polygon or line
    and produces a masking array for use with numpy
    @param poly - WKT polygon or line
    @param variable - WCS variable to mask off

@@ -41,6 +41,7 @@ gisportal.Vector = function(options) {
     this.name = this.tags.niceName;
     this.visibleTab = "details";
     this.currentColour = '';
+    
 
 
     /**
@@ -56,7 +57,6 @@ gisportal.Vector = function(options) {
     };
 
     this.init = function(options, layer) {
-       
         map.addLayer(layer.OLLayer);
         this.select();
         this.getMetadata();
@@ -211,12 +211,20 @@ gisportal.Vector = function(options) {
       }
       }
       else{
-           colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
-          legend = [];
-          legend_obj = {};
-          for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
-            legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
-            legend_obj[possibleOptions[y]] = colorPalette[y];
+          if (this.defaultColour !== false){
+              legend = [];
+            legend_obj = {};
+            legend_obj[this.name] = this.defaultColour;
+            legend.push({'option':this.name,'colour':this.defaultColour});
+          }
+          else{
+            colorPalette = gisportal.vectorStyles.createPalette(colour, possibleOptions.length);
+            legend = [];
+            legend_obj = {};
+            for(y = possibleOptions.length, x = 0; y >= 0 , x <= possibleOptions.length  ; y--, x++){
+                legend.push({'option':possibleOptions[y],'colour':colorPalette[y]});
+                legend_obj[possibleOptions[y]] = colorPalette[y];
+            }
           }
      }
       x = 0;
@@ -248,6 +256,10 @@ gisportal.Vector = function(options) {
                      if (this.vectorType == "POLYGON") {
                         features[x].setStyle(
                            new ol.style.Style({
+                              stroke: new ol.style.Stroke({
+                                    color: 'rgba(255,0,0,1)',
+                                    width: 20
+                              }),
                               fill: new ol.style.Fill({
                                  color: style_colour
                               })
@@ -256,8 +268,13 @@ gisportal.Vector = function(options) {
                   }
                }
             }else {
-               style_colour = legend_obj[features[x].getProperties()[prop]];
-               style_colour = ol.color.asArray(style_colour);
+               if(this.defaultColour !== false){
+                   style_colour = this.defaultColour;
+               }
+               else {
+                  style_colour = legend_obj[features[x].getProperties()[prop]];
+                  style_colour = ol.color.asArray(style_colour);
+               }
                if(gisportal.methodThatSelectedCurrentRegion.method == "selectExistingPolygon" && features[x].getId() == gisportal.methodThatSelectedCurrentRegion.value){
                }
                if (this.vectorType == "POINT") {
@@ -280,6 +297,10 @@ gisportal.Vector = function(options) {
                if (this.vectorType == "POLYGON") {
                   features[x].setStyle(
                      new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                                    color: style_colour,
+                                    width: 5
+                        }), 
                         fill: new ol.style.Fill({
                            color: style_colour
                         })

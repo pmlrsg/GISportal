@@ -282,6 +282,7 @@ gisportal.layer = function( options ) {
    };
 
    this.clearScalebarTimeout = function(){
+      var layer = this;
       $('.js-apply-changes[data-id="' + layer.id + '"]').toggleClass('hidden', true).toggleClass('progress-btn', false);
       if(layer.scalebarTimeout){
          clearTimeout(layer.scalebarTimeout);
@@ -423,9 +424,8 @@ gisportal.layer = function( options ) {
       var layer = this;
       var nearestDate = null; 
       var filtArray = $.grep(layer.DTCache, function(dt, i) {
-         var datePart = dt.substring(0, 10);
-         if (nearestDate === null || (datePart > nearestDate && datePart < date) || (datePart < nearestDate && datePart > date)) nearestDate = dt; 
-         return (datePart == date);
+         if (nearestDate === null || (dt > nearestDate && dt < date) || (dt < nearestDate && dt > date)) nearestDate = dt; 
+         return (dt == date);
       });
       
       if (filtArray.length > 0) {
@@ -450,16 +450,21 @@ gisportal.layer = function( options ) {
       var layer = this;
       
       if(date) {
-         var uidate = gisportal.utils.ISODateString(date);
+         var uidate = date.toISOString();
          var matchedDate = layer.matchDate(uidate);
          // Makes sure that the selected date is within the bounds of the first and last date
-         var inBounds = moment(date.toGMTString()).isBetween(moment(new Date(layer.firstDate).toGMTString()).subtract(1, 'second'), moment(new Date(layer.lastDate).toGMTString()).add(1, 'second'));
+         var inBounds = moment.utc(date).isBetween(moment.utc(layer.firstDate).subtract(1, 'second'), moment.utc(layer.lastDate).add(1, 'second'));
          if(matchedDate && inBounds) {
             layer.currentDateTimes = matchedDate;
             // Choose 1st date in the matched date-times for the moment - will expand functionality later
             layer.selectedDateTime = matchedDate[0];
             layer.isInbounds = true;
-            
+
+            // Put the date in a nice format
+            var niceDate = moment.utc(matchedDate[0]).format('YYYY-MM-DD HH:mm:ss');
+            // Display the nice date next to the scalebar
+            $('li[data-id="' + layer.id + '"] p.scalebar-selected-date').html(niceDate);
+
             //----------------------- TODO: Temp code -------------------------
             var keys = Object.keys(layer.openlayers);
             for(var i = 0, len = keys.length; i < len; i++) {
@@ -615,7 +620,7 @@ gisportal.layer = function( options ) {
                   tileElement.onerror = function() {
                      gisportal.loading.decrement();
                   };
-                  if(src.startsWith("http://")){
+                  if((window.location.protocol == 'https:' && src.startsWith("http://")) || gisportal.config.proxyAll){
                      src = gisportal.ImageProxyHost + encodeURIComponent(src);
                   }
                   tileElement.src = src;
@@ -730,7 +735,6 @@ gisportal.addLayer = function(layer, options) {
   
    layer.setVisibility(options.visible); 
    gisportal.setCountryBordersToTopLayer();
-   gisportal.selectionTools.setVectorLayerToTop();
 };
 
 /**
@@ -791,7 +795,7 @@ gisportal.filterLayersByDate = function(date) {
    for(var layer in gisportal.selectedLayers){
       var this_layer = gisportal.layers[gisportal.selectedLayers[layer]];
       if(!this_layer.isInbounds){
-         $('.js-current-date').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
+         $('.timeline-date-options').notify('You have selected a date that does not fall within the bounds of all layers. Layers without data are not shown');
          return false;
       }
    }
@@ -808,6 +812,7 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
+
    if (layer.serviceType=="WFS"){
 
       layer.init(options,layer);

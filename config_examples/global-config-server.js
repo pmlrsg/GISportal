@@ -7,4 +7,4 @@ GLOBAL.config = {
       secret : 'SECRET',
       age : 0
    }
-}
+};

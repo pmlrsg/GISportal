@@ -175,6 +175,11 @@ div.js-plot-popup-html{
   z-index: 10100;
 }
 
+div.js-plot-popup-html #plot video{
+  max-width:100%;
+  height:auto;
+}
+
 .bk-bs-modal{
   z-index: 10104 !important;
 }
@@ -216,4 +221,12 @@ a.js-revert-text{
 
 .js-active-plot-style{
   text-transform: none;
+}
+
+.extra-plot-info {
+  margin-bottom: 10px;
+}
+
+.js-plot-data {
+  margin-bottom: 10px;
 }
