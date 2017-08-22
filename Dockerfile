@@ -36,7 +36,7 @@ RUN yum -y update && \
         python-jinja2 \
         python-matplotlib && \
     rm -rf /usr/lib64/python2.7/site-packages/numpy* && \
-    pip install numpy bokeh owslib shapely netCDF4 && \
+    pip install numpy bokeh==0.12.4 owslib shapely netCDF4 && \
     npm install -g grunt-cli --silent && \
     gem install sass && \
     mkdir -p /app/GISportal/config
