@@ -485,7 +485,7 @@ def hovmoller(plot, outfile="image.html"):
        min_y = min_latlon - (latlon[1] - latlon[0]) / 2
        max_y = max_latlon + (latlon[1] - latlon[0]) / 2
        x_axis_type = "datetime"
-       y_axis_type = plot_scale
+       y_axis_type = "linear"
        x_axis_label = "Date"
        y_axis_label = "Latitude"
    else:
@@ -494,7 +494,7 @@ def hovmoller(plot, outfile="image.html"):
        max_x = max_latlon + (latlon[1] - latlon[0]) / 2
        min_y = date[0] - date_step / 2
        max_y = date[-1] + date_step / 2
-       x_axis_type = plot_scale
+       x_axis_type = "linear"
        y_axis_type = "datetime"
        x_axis_label = "Longitude"
        y_axis_label = "Date"
