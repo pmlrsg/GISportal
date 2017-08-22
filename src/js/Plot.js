@@ -403,12 +403,10 @@ gisportal.graphs.Plot = (function() {
          if (current_projection != "EPSG:4326") {
             if (nice_bbox.startsWith('POLYGON')) {
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
-            } else if (nice_bbox.indexOf("(") > -1) {
-               //This is a simple dont change anything if we dont have to
-               nice_bbox = nice_bbox;
-            } else {
-               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
-            }
+            } else if (nice_bbox.indexOf("(") === -1) {
+                  nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
+            } 
+            // if we get here then we are using a geometry collection and no reprojection is needed
          }
 
          var yAxis = component.yAxis;
@@ -833,11 +831,11 @@ gisportal.graphs.Plot = (function() {
    
    // this is called everytime label changes for future use
    Plot.prototype.checkAxisLabels = function() {
-         var components = this._components;
-         if (components.length >= 2) {
-            var indicator1 = gisportal.layers[components[0].indicator];
-            var indicator2 = gisportal.layers[components[1].indicator];
-         }
+      var components = this._components;
+      if (components.length >= 2) {
+         var indicator1 = gisportal.layers[components[0].indicator];
+         var indicator2 = gisportal.layers[components[1].indicator];
+      }
    };
 
    // This function makes sure that the daterange ranges or the component fits within the input box values
@@ -880,8 +878,7 @@ gisportal.graphs.Plot = (function() {
 
          var interval1 = indicator1.tags.interval;
          var interval2 = indicator2.tags.interval;
-         console.log(interval1);
-         console.log(interval2);
+         
          if (start1 > end2 || start2 > end1) {
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);

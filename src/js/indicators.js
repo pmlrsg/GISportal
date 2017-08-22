@@ -1373,12 +1373,9 @@ gisportal.indicatorsPanel.polygonToWKT = function( polygon ){
 
 gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, to_proj){
    for(var point in coordsArray){
-         console.log(typeof(coordsArray[point][0]));
       if(typeof(coordsArray[point][0]) == "object"){
          gisportal.indicatorsPanel.convertBboxCoords(coordsArray[point], from_proj, to_proj);
-      }
-
-      else{
+      } else{
          coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
       }
    }
@@ -1388,16 +1385,8 @@ gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, t
 gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerId ){
    if( gisportal.currentSelectedRegion === "" ) return true;
 
-   //bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
-   //var t_currentSelectedRegion  = Terraformer.toGeographic(Terraformer.WKT.parse( gisportal.currentSelectedRegion ));
    var tar = gisportal.currentSelectedRegion.split('GEOMETRYCOLLECTION(POINT(')[1].split('),POINT(');
-   // convert to epsg:4326 as bbox is always in this
-   //var t_tar = t_currentSelectedRegion.split('GEOMETRYCOLLECTION(POINT(')[1].split('),POINT(');
    tar[tar.length-1] = tar[tar.length-1].split(')')[0];
-
-//    var new_tar = gisportal.indicatorsPanel.convertBboxCoords(tar, gisportal.projection, "EPSG:4326");
-   console.log(tar);
-
 
    var layer = gisportal.layers[ layerId ];
    var bounds = layer.exBoundingBox;
@@ -1431,7 +1420,6 @@ gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerI
    });
 
    for(var x = 0; x < tar.length -1; x++ ){
-      //console.log(gisportal.reprojectPoint([Number(tar[x].split(' ')[0]), Number(tar[x].split(' ')[1])], gisportal.projection, "EPSG:4326"));   
       var t_point = new Terraformer.Point({
          "type" : "Point",
          "coordinates" :gisportal.reprojectPoint([Number(tar[x].split(' ')[0]), Number(tar[x].split(' ')[1])], gisportal.projection, "EPSG:4326")

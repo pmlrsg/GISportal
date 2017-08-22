@@ -928,7 +928,7 @@ def timeseries(plot, outfile="time.html"):
 
       # Grab the data as a numpy array.
       dfarray = np.array(df['data'])
-      #debug(4, dfarray)
+      debug(4, dfarray)
 
       # Flip it so we have columns for each variable ordered by time.
       data = np.transpose(dfarray[np.argsort(dfarray[:,0])])
@@ -943,7 +943,6 @@ def timeseries(plot, outfile="time.html"):
       #debug(4, data[varindex['mean']]) 
       min_value = np.amin(data[varindex['mean']].astype(np.float64))
       max_value = np.amax(data[varindex['mean']].astype(np.float64))
-      buffer_value = (max_value - min_value) /20
       debug(4, u"min_mean: {}, max_mean:{}".format(min_value,max_value))
       ymin.append(min_value)
       ymax.append(max_value)
@@ -1026,7 +1025,6 @@ def timeseries(plot, outfile="time.html"):
    ts_plot.yaxis[0].formatter = BasicTickFormatter()
    ts_plot.yaxis.axis_label = plot['y1Axis']['label']
    if ymin[0] != ymax[0]:
-      #pass
       ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
 
@@ -1037,7 +1035,6 @@ def timeseries(plot, outfile="time.html"):
          # Setting the second y axis range name and range
          yrange[1] = "y2"
          if ymin[1] != ymax[1]:
-            #pass
             ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
    
          # Adding the second axis to the plot.  
@@ -1164,7 +1161,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    # Use the slope and intercept to create some points for bokeh to plot.
    # Not sure how long the line should be. As a first stab just extend the x up and down
    # by the full x range.
-   #regression_x = [data1.min()-(data1.max()-data1.min()), data1.max()+(data1.max()-data1.min())]
    regression_x = [data1.min(), data1.max()]
    regression_y = [regr_f(regression_x[0]), regr_f(regression_x[1])]
 
@@ -1200,7 +1196,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    
    # Plot the regression line using default style.
    reg_line = scatter_plot.line(x=regression_x, y=regression_y)
-   print("added regression line")
       
    # Set up the hover tooltips for the points and lines.
    point_hover = HoverTool(
@@ -1242,7 +1237,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
    scatter_plot.legend.location = "top_left"
    
    # plot the points
-   #output_file(outfile, 'Scatter Plot')
    script, div = components(scatter_plot)
 
    if plotting.debug.verbosity > 0:
@@ -1253,7 +1247,6 @@ def scatter(plot, outfile='/tmp/scatter.html'):
          print(template.render(script=script, div=div), file=ofile)
    
    
-   #save(ts_plot)
    return(1)
 #END scatter
 
@@ -1411,11 +1404,7 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    # Cannot place legend outside plot.
    match_scatter_plot.legend.location = "top_left"
    
-   # plot the points
-#    output_file(outfile, 'Scatter Plot')
-   
-#    save(scatter_plot)
-#    return(scatter_plot)
+
    script, div = components(match_scatter_plot)
 
    if plotting.debug.verbosity > 0:
@@ -1423,8 +1412,6 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
    else:
       with open(outfile, 'w') as ofile:
          print(template.render(script=script,  div=div), file=ofile)
-
-
    
    return(1)
 

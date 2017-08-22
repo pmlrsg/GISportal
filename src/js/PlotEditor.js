@@ -610,14 +610,14 @@ gisportal.graphs.PlotEditor = (function(){
             gisportal.events.trigger('graphComponent.axisChange', params);
          });
 
-         // trigger callback for unfocus on axs label
+         // trigger callback for unfocus on axis label
          element.on('blur', '.axis_label_input', function(){
             component.userLabel = value = $(this).val();
             var tableIndex = $(this).closest('tr').index();
             var params = {
-                  "event": "graphComponent.axisLabelChange",
-                  "index": tableIndex,
-                  "value": value
+               "event": "graphComponent.axisLabelChange",
+               "index": tableIndex,
+               "value": value
             };
             gisportal.events.trigger('graphComponent.axisLabelChange', params);
             _this.plot().emit('component-label-change', params);
