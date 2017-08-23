@@ -399,7 +399,41 @@ gisportal.Vector = function(options) {
         }
 
         if (this.serviceType === 'SOS') {
-            // TODO custom support for rendering SOS
+            if (this.sensorType == "fixed") {
+                // create a point feature with a marker
+
+            } else {    // it's mobile
+                // create a bounding box feature that defines the extent of the observations
+                // var feature = new ol.Feature({
+                //     geometry: new ol.geom.Polygon.fromExtent(this.exBoundingBox.SouthBoundLongitude, this.exBoundingBox.WestBoundLatitude, this.exBoundingBox.EastBoundLongitude, this.exBoundingBox.NorthBoundLatitude)
+                // });
+                var s = this.exBoundingBox.SouthBoundLatitude.toString(), 
+                    w = this.exBoundingBox.WestBoundLongitude.toString(), 
+                    e = this.exBoundingBox.EastBoundLongitude.toString(), 
+                    n = this.exBoundingBox.NorthBoundLatitude.toString();
+
+                var polygon = new Terraformer.Polygon({
+                    "type": "Polygon",
+                    "coordinates": [
+                        [w, s],
+                        [w, n],
+                        [e, n],
+                        [e, s],
+                        [w, s]
+                    ]
+                });
+                var feature = gisportal.wkt.readFeature(gisportal.coordinatesToPolygon([polygon.coordinates]));
+
+                var sosVector = new ol.source.Vector({
+                    features: [feature]
+                });
+
+                var sosLayer = new ol.layer.Vector({
+                    source: sosVector
+                });
+                this.OLLayer = sosLayer;
+                return sosLayer;
+            }
         }
     };
 

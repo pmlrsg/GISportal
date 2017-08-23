@@ -45,6 +45,8 @@ gisportal.ImageProxyHost = gisportal.middlewarePath + '/settings/img_proxy?url='
 gisportal.cache = {};
 gisportal.cache.wmsLayers = [];
 
+gisportal.vectors = [];
+
 // gisportal.layers has all of the actual layer details
 gisportal.layers = {};
 
@@ -115,6 +117,8 @@ gisportal.loadLayers = function() {
    gisportal.not_included_layers = {};
    gisportal.layers = {};
    gisportal.loadVectorLayers();
+   gisportal.loadSOSLayers();
+
    loadWmsLayers();
    
    function loadWmsLayers(){
@@ -148,8 +152,6 @@ gisportal.tempRemoveLayers = function(){
  * Map function to load the vector layers from cache
  */
 gisportal.loadVectorLayers = function() {
-
-
    $.ajax({
       url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
       dataType: 'json',
@@ -157,16 +159,24 @@ gisportal.loadVectorLayers = function() {
    });
 };
 
+gisportal.loadSOSLayers = function() {
+   $.ajax({
+      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/SOSLayers.json',
+      dataType: 'json',
+      success: gisportal.initSOSLayers
+   });
+};
 
 gisportal.createVectorLayers = function() {
    gisportal.vlayers = [];
-   gisportal.vectors = [];
+   
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
         processVectorLayer(vector.services.wfs.url, v);
       });
    });
-    gisportal.loadBrowseCategories();
+   
+   gisportal.loadBrowseCategories();
    gisportal.configurePanel.refreshData();
    function processVectorLayer(serverUrl, vector) {
       var vectorOptions = {
@@ -195,7 +205,7 @@ gisportal.createVectorLayers = function() {
       };
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
-gisportal.layers[vectorOptions.id] = vectorLayer;
+      gisportal.layers[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
       gisportal.vlayers.push(vectorLayerOL);
@@ -203,6 +213,53 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
    }
 
 };
+
+gisportal.createSOSLayers = function() {
+   gisportal.sensors = [];
+   gisportal.cache.SOSLayers.forEach(function( service ){
+      service.sensors.forEach(function( sensor ){
+        processSOSLayer(service, sensor);
+      });
+   });
+
+   function processSOSLayer(service, sensor) {
+      var sensorType = "mobile";
+      if (sensor.observedArea.lowerLeft[0] == sensor.observedArea.upperRight[0] && sensor.observedArea.lowerLeft[1] == sensor.observedArea.upperRight[1]) {
+         sensorType = "fixed";
+      }
+
+      var sensorOptions = {
+         "id": service.name,
+         "name": service.Title,
+         "description": service.Title,
+         "endpoint": service.sosURL,
+         "serviceType": "SOS",
+         "observableProperty": sensor.observableProperty,
+         "firstDate": sensor.resultTime[0],
+         "lastDate": sensor.resultTime[1],
+         "tags": {
+            "data_type": "Sensor Observation",
+            "niceName": service.Title
+         },
+         "exBoundingBox": {
+            "EastBoundLongitude": sensor.observedArea.upperRight[0],
+            "NorthBoundLatitude": sensor.observedArea.upperRight[1],
+            "SouthBoundLatitude": sensor.observedArea.lowerLeft[1],
+            "WestBoundLongitude": sensor.observedArea.lowerLeft[0]
+         },
+         "sensorType": sensorType,
+
+      };
+
+      var sosLayer = new gisportal.Vector(sensorOptions);
+      gisportal.vectors.push(sosLayer);
+      gisportal.layers[service.name] = sosLayer;
+
+      vectorLayerOL = sosLayer.createOLLayer();
+      
+   }
+};
+
 
 /** 
  * Create layers from the getCapabilities request (stored in gisportal.cache.wmsLayers)
@@ -800,11 +857,25 @@ gisportal.initVectorLayers = function(data, opts) {
 
       gisportal.createVectorLayers();
       gisportal.loadBrowseCategories(data);
-
    }
 };
 
+/**
+ * The initiation of Sensor Observation Service (SOS) layers, such as adding to gisportal.cache.
+ * @param {object} data - The sensor(s) details
+ * @param {object} opts - Options, not currently used
+ */ 
+gisportal.initSOSLayers = function(data, opts) {
+  if (data !== null)  {
 
+     gisportal.cache.SOSLayers = data;
+     // Create WMS layers from the data
+
+     gisportal.createSOSLayers();
+     gisportal.loadBrowseCategories(data);
+
+  }
+};
 
 /*===========================================================================*/
 

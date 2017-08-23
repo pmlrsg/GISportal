@@ -32,6 +32,7 @@ gisportal.layer = function( options ) {
       wfsURL : null,
       wmsURL : null,
       wcsURL : null,
+      sosURL : null,
       sensorNameDisplay : null,
       sensorName : null,
       exBoundingBox : null,
@@ -813,7 +814,7 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
 
-   if (layer.serviceType=="WFS"){
+   if (layer.serviceType == "WFS" || layer.serviceType == "SOS"){
 
       layer.init(options,layer);
    }else {
