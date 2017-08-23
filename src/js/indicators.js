@@ -10,9 +10,9 @@
 gisportal.indicatorsPanel = {};
 
 gisportal.indicatorsPanel.open = function() {
-   if ($('.js-show-panel[data-panel-name="active-layers"').hasClass('hidden')) {
+   if ($('.js-show-panel[data-panel-name="active-layers"]').hasClass('hidden')) {
       // Show the layers tab if it is currently hidden
-      $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', false);
+      $('.js-show-panel[data-panel-name="active-layers"]').toggleClass('hidden', false);
    }
    gisportal.panels.showPanel('active-layers');
 };
@@ -67,7 +67,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
          // Hide the layers tab if no layers are selected
-         $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', true);
+         $('.js-show-panel[data-panel-name="active-layers"]').toggleClass('hidden', true);
          gisportal.panels.showPanel('choose-indicator');
          // Clears the vector layer to avoid confusion
          gisportal.vectorLayer.getSource().clear();
@@ -317,6 +317,16 @@ gisportal.indicatorsPanel.initDOM = function() {
          "scrollPercent": scrollPercent
       };
       gisportal.events.trigger('indicatorspanel.scroll', params);
+   });
+
+   $('.js-indicators').on('click', '.related_layer', function(){
+      var current_date = $('.scalebar-selected-date').text();
+      // place holder whilst feature is developed
+      // 2015-12-01 00:00 to 20170513_182525
+      tdate = current_date.split(' ');
+      layerDate = tdate[0].split('-')[0]+tdate[0].split('-')[1]+tdate[0].split('-')[2]+'_'+tdate[1].split(':')[0]+tdate[1].split(':')[1]+tdate[1].split(':')[2];
+      // call gisportal.refinePanel.layerFound = function(layerId, style) with the layerid to add it to the map and do associated actions
+      //gisportal.refinePanel.layerFound('rsg_','');
    });
 };
 
@@ -736,7 +746,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       // TODO add logic to this when adding support for layers with no date
       indicator.hasDate = true;
       // Put the date in a nice format for displaying next to the scalebar
-      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm');
+      indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm:ss');
 
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 

@@ -163,11 +163,11 @@ gisportal.createVectorLayers = function() {
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
-      processVectorLayer(vector.services.wfs.url, v);
-
+        processVectorLayer(vector.services.wfs.url, v);
       });
    });
-
+    gisportal.loadBrowseCategories();
+   gisportal.configurePanel.refreshData();
    function processVectorLayer(serverUrl, vector) {
       var vectorOptions = {
          "name": vector.name,
@@ -190,15 +190,16 @@ gisportal.createVectorLayers = function() {
          "defaultProperty" : vector.defaultProperty,
          "defaultProperties" : vector.defaultProperties,
          "descriptiveName" : vector.tags.niceName,
-         "unit" : vector.unit
+         "unit" : vector.unit,
+         "defaultColour" : vector.defaultColour || false
       };
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
-
 gisportal.layers[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
       gisportal.vlayers.push(vectorLayerOL);
+
    }
 
 };
@@ -796,7 +797,10 @@ gisportal.initVectorLayers = function(data, opts) {
 
       gisportal.cache.vectorLayers = data;
       // Create WMS layers from the data
+
       gisportal.createVectorLayers();
+      gisportal.loadBrowseCategories(data);
+
    }
 };
 
@@ -1595,14 +1599,19 @@ gisportal.zoomOverall = function()  {
       gisportal.mapFit(extent);
    }
 };
-gisportal.mapFit = function(extent){
+gisportal.mapFit = function(extent, noPadding){
    // This takes an extent and fits the map to it with the correct padding
    var polygon = ol.geom.Polygon.fromExtent(extent);
-   var padding = [50, 0, 0, 0];
-   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-      padding[2] = 95;
+   var padding;
+   if (noPadding) {
+      padding = [0, 0, 0, 0];
+   } else {
+      padding = [50, 0, 0, 0];
+      if (gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0) {
+         padding[2] = 95 + (10 * gisportal.timeline.timebars.length);
+      }
+      padding[3] = $('.panel').offset().left + $('.panel').width();
    }
-   padding[3] = $('.panel').offset().left + $('.panel').width();
    map.getView().fit(polygon, map.getSize(), {padding: padding});
 };
 
@@ -1919,7 +1928,7 @@ gisportal.loadBrowseCategories = function(data){
    // This takes a category (cat) in a versatile format e.g. indicator_type
    addCategory = function(cat){
       // If the category is not in the list already
-      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag" )){
          // Add the category name as a key and convert it to a nice view for the value
          if(gisportal.config.catDisplayNames){
             gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
@@ -1943,6 +1952,7 @@ gisportal.loadBrowseCategories = function(data){
          }
       }
       for(layer in gisportal.vectors){
+
          for(category in gisportal.vectors[layer].tags){
             addCategory(category);
          }
@@ -1952,6 +1962,7 @@ gisportal.loadBrowseCategories = function(data){
    }else{
       for(layer in gisportal.layers){
          for(category in gisportal.layers[layer].tags){
+
             addCategory(category);
          }
       }
