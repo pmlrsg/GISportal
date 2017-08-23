@@ -247,7 +247,29 @@ gisportal.createBaseLayers = function() {
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 13,
+         }
+ 
+      });
+   }
+   if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('EOXs2cloudless')){
+      gisportal.baseLayers.EOXs2cloudless = new ol.layer.Tile({
+            id: 'EOXs2cloudless',                       // required to populate the display options drop down list
+            title: 'EOX Sentinel-2 Cloudless',
+            description: 'EPSG:4326 only, Europe only',
+            projections: ['EPSG:4326'],
+            source: new ol.source.TileWMS({
+               attributions: '<a href="https://s2maps.eu/">Sentinel-2 cloudless</a> by <a href="https://eox.at/">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016)',
+               url: 'https://tiles.maps.eox.at/wms/?',
+               crossOrigin: null,
+               params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+               tileLoadFunction: baseLayerTitleLoadFunction
+            }),
+            viewSettings: {
+               maxZoom: 14,
+            }
       });
    }
    if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('GEBCO')){
@@ -260,7 +282,11 @@ gisportal.createBaseLayers = function() {
             crossOrigin: null,
             params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 7,
+         }
+
       });
    }
    if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('MetacartaBasic')){
@@ -274,20 +300,10 @@ gisportal.createBaseLayers = function() {
             crossOrigin: null,
             params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      });
-   }
-   if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('Landsat')){
-      gisportal.baseLayers.Landsat = new ol.layer.Tile({
-         id: 'Landsat',
-         title: 'Landsat',
-         projections: ['EPSG:4326', 'EPSG:3857'],
-         source: new ol.source.TileWMS({
-            url: 'http://irs.gis-lab.info/?',
-            crossOrigin: null,
-            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         }
       });
    }
    if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('BlueMarble')){
@@ -300,7 +316,28 @@ gisportal.createBaseLayers = function() {
             crossOrigin: null,
             params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         } 
+      });
+   }
+   if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('BlackMarble')){
+      gisportal.baseLayers.BlackMarble = new ol.layer.Tile({
+            id: 'BlackMarble',
+            title: 'Black Marble',
+            description: 'EPSG:4326 only',
+            projections: ['EPSG:4326'],
+            source: new ol.source.TileWMS({
+               attributions: 'Black Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
+               url: 'https://tiles.maps.eox.at/wms/?',
+               crossOrigin: null,
+               params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+               tileLoadFunction: baseLayerTitleLoadFunction
+            }),
+            viewSettings: {
+               maxZoom: 8,
+            }
       });
    }
    if(!gisportal.config.baselayerBlacklist || !gisportal.config.baselayerBlacklist.includes('OSM')){
@@ -311,7 +348,11 @@ gisportal.createBaseLayers = function() {
          projections: ['EPSG:3857'],
          source: new ol.source.OSM({
             projection: gisportal.projection
-         })
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
+
       });
          
    }      
