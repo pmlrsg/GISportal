@@ -651,6 +651,12 @@ gisportal.events.bind('graphComponent.axisChange', function(event, data) {
    }
 });
 
+gisportal.events.bind('graphComponent.axisLabelChange', function(event, data) {
+   if(gisportal.walkthrough.is_recording){
+      gisportal.walkthrough.addStep(data);
+   }
+});
+
 gisportal.events.bind('graph.open', function(event, data) {
    if(gisportal.walkthrough.is_recording){
       gisportal.walkthrough.addStep(data);
