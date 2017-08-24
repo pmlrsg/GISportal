@@ -404,9 +404,6 @@ gisportal.Vector = function(options) {
 
             } else {    // it's mobile
                 // create a bounding box feature that defines the extent of the observations
-                // var feature = new ol.Feature({
-                //     geometry: new ol.geom.Polygon.fromExtent(this.exBoundingBox.SouthBoundLongitude, this.exBoundingBox.WestBoundLatitude, this.exBoundingBox.EastBoundLongitude, this.exBoundingBox.NorthBoundLatitude)
-                // });
                 var s = this.exBoundingBox.SouthBoundLatitude.toString(), 
                     w = this.exBoundingBox.WestBoundLongitude.toString(), 
                     e = this.exBoundingBox.EastBoundLongitude.toString(), 
