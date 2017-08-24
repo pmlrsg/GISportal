@@ -815,9 +815,8 @@ gisportal.getLayerData = function(fileName, layer, options, style) {
    options = options || {};
 
    if (layer.serviceType == "WFS" || layer.serviceType == "SOS"){
-
       layer.init(options,layer);
-   }else {
+   } else {
       $.ajax({
          type: 'GET',
          url: gisportal.middlewarePath + "/cache/layers/" + fileName,
