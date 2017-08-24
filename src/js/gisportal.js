@@ -232,6 +232,7 @@ gisportal.createSOSLayers = function() {
          "id": service.name,
          "name": service.Title,
          "description": service.Title,
+         "descriptiveName" : service.Title,
          "endpoint": service.sosURL,
          "serviceType": "SOS",
          "observableProperty": sensor.observableProperty,
