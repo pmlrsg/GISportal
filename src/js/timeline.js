@@ -676,7 +676,14 @@ gisportal.TimeLine.prototype.drawLabels = function() {
       var label = $('.indicator-header[data-id="' + id + '"] > p').html();
       if (!label || label === "") label = this.timebars[i].label;
       if (gisportal.layers[id] && gisportal.layers[id].tags.region) label += ' - ' + gisportal.layers[id].tags.region;
-      $('.js-timeline-labels').append('<li data-id="' + id + '" style="top: ' + positionTop + 'px">' + label + '</li>');
+      if(label.length > 25){
+         var fullLabel = label;
+         label = label.substring(0,25)+'...';      
+         $('.js-timeline-labels').append('<li data-id="' + id + '" data-fullname="'+fullLabel+'" style="top: ' + positionTop + 'px">' + label + '</li>');
+         
+      } else {
+         $('.js-timeline-labels').append('<li data-id="' + id + '" data-fullname="'+label+'" style="top: ' + positionTop + 'px">' + label + '</li>');
+      }
    }
 };
 
