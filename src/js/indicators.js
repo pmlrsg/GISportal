@@ -526,15 +526,7 @@ gisportal.indicatorsPanel.selectLayer = function(id, style) {
    var options = {};
    if (layer) {
       options.visible = true;
-      // if(layer.servicetype=="WFS"){
-      //    gisportal.getVectorLayerData(layer);
-      // }
-      // else if (layer.serviceType == "SOS") {
-      //    //gisportal.getVectorLayerData(layer);
-      // }
-      // else {
-         gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
-      //}
+      gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
    }
 };
 
