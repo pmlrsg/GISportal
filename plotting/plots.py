@@ -807,16 +807,15 @@ def matchup(plot, outfile="matchup.html"):
 
       min_value = np.amin(data[varindex['data_value']].astype(np.float64))
       max_value = np.amax(data[varindex['data_value']].astype(np.float64))
-
-      buffer_value = (max_value - min_value) /20
+      buffer_min =  (max_value - min_value) / 20 if plot_scale!='log' else 0.00001
+      buffer_max = (max_value - min_value) / 20
       if(len(ymin)>0):
-         ymin[0] = (min(ymin[0],min_value-buffer_value))
-         ymax[0] = (max(ymax[0],max_value+buffer_value))
+         ymin[0] = (min(ymin[0],min_value-buffer_min))
+         ymax[0] = (max(ymax[0],max_value+buffer_max))
       else:
-         ymin.append(min_value-buffer_value)
-         ymax.append(max_value+buffer_value)
+         ymin.append(min_value-buffer_min)
+         ymax.append(max_value+buffer_max)
       date = datetime(data[varindex['track_date']])
-
       datasource = dict(date=date,
                            sdate=data[varindex['track_date']],
                            lat=data[varindex['track_lat']],
@@ -872,7 +871,7 @@ def matchup(plot, outfile="matchup.html"):
       # as a point
       debug(2, "Plotting points for {}".format(plot_data[i]['coverage']))
       ts_plot.circle('date', 'value', y_range_name=y_range_name, color=plot_palette[i][2], size=5, alpha=0.5, line_alpha=0, source=source)
-      
+   
    hover = HoverTool(tooltips=tooltips)
    ts_plot.add_tools(hover)
 
