@@ -494,9 +494,9 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
  
    numDimensions = len(zMaskedArray.shape)
    direction = None 
-   if lat != None:
+   if lat is not None:
       direction = 'lat'
-   elif lon != None:
+   elif lon is not None:
       direction = 'lon'
       if numDimensions == 4:
          zMaskedArray = zMaskedArray.swapaxes(2,3)
