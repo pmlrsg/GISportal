@@ -695,7 +695,7 @@ def transect(plot, outfile="transect.html"):
       # if we run it later.
       debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
       ts_plot.yaxis[0].formatter = BasicTickFormatter()
-      ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+      ts_plot.yaxis[0].axis_label = plot['y1Axis']['label']
       if ymin[0] != ymax[0]:
          ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
       yrange = [None, None]
@@ -714,12 +714,11 @@ def transect(plot, outfile="transect.html"):
             # Setting the second y axis range name and range
             yrange[1] = "y2"
             if ymin[1] != ymax[1]:
-               ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
-      
+               ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])} 
             # Adding the second axis to the plot.  
             ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
       
-         y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+         y_range_name="default"
          # Plot the mean as line
          debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
          ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
@@ -808,13 +807,13 @@ def matchup(plot, outfile="matchup.html"):
       min_value = np.amin(data[varindex['data_value']].astype(np.float64))
       max_value = np.amax(data[varindex['data_value']].astype(np.float64))
 
-      buffer_value = (max_value - min_value) /20
+      
       if(len(ymin)>0):
-         ymin[0] = (min(ymin[0],min_value-buffer_value))
-         ymax[0] = (max(ymax[0],max_value+buffer_value))
+         ymin[0] = (min(ymin[0],min_value))
+         ymax[0] = (max(ymax[0],max_value))
       else:
-         ymin.append(min_value-buffer_value)
-         ymax.append(max_value+buffer_value)
+         ymin.append(min_value)
+         ymax.append(max_value)
       date = datetime(data[varindex['track_date']])
 
       datasource = dict(date=date,
@@ -828,7 +827,7 @@ def matchup(plot, outfile="matchup.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1000, logo=None,
               height=400, responsive=True
    )
 
@@ -864,7 +863,7 @@ def matchup(plot, outfile="matchup.html"):
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
    
-      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      y_range_name = "default"
       # Plot the mean as line
       debug(2, "Plotting line for {}".format(plot_data[i]['coverage']))
       ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
@@ -1030,7 +1029,6 @@ def timeseries(plot, outfile="time.html"):
    if ymin[0] != ymax[0]:
       ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
-
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
@@ -1051,8 +1049,6 @@ def timeseries(plot, outfile="time.html"):
          # So use this.
          ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
       
-      
-      #y_range_name = yrange[plot_data[i]['yaxis'] - 1]
       y_range_name = "default"
       # Plot the mean as line
       debug(2, u"Plotting mean line for {}".format(plot_data[i]['coverage']))
