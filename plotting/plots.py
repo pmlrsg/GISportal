@@ -364,8 +364,8 @@ def extract(plot, outfile="image.html"):
    plot_height = plot_width * y_size / x_size
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Image extract - {}".format(plot_title), toolbar_location="right",toolbar_sticky=False)
-   p.title_text_font_size = "14pt"
+              title="Image extract - {}".format(plot_title), toolbar_location="right")
+   p.title.text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "12pt"
    p.yaxis.axis_label_text_font_size = "12pt"
    p.xaxis.axis_label = x_axis_label
@@ -548,8 +548,8 @@ def hovmoller(plot, outfile="image.html"):
    plot_height = 600
    p = figure(width=plot_width, height=plot_height, x_range=(min_x, max_x), y_range=(min_y, max_y), 
               x_axis_type=x_axis_type, y_axis_type=y_axis_type, logo=None,
-              title="Hovmoller - {}".format(plot_title), responsive=True, toolbar_location="above",toolbar_sticky=False)
-   p.title_text_font_size = "14pt"
+              title="Hovmoller - {}".format(plot_title), responsive=True, toolbar_location="above")
+   p.title.text_font_size = "14pt"
    p.xaxis.axis_label_text_font_size = "12pt"
    p.yaxis.axis_label_text_font_size = "12pt"
    p.xaxis.axis_label = x_axis_label
@@ -688,14 +688,14 @@ def transect(plot, outfile="transect.html"):
       ts_plot.add_tools(CrosshairTool())
 
       ts_plot.xaxis.axis_label = 'Date'
-      ts_plot.title_text_font_size = "14pt"
+      ts_plot.title.text_font_size = "14pt"
       ts_plot.xaxis.axis_label_text_font_size = "12pt"
       ts_plot.yaxis.axis_label_text_font_size = "12pt"
       # Set up the axis label here as it writes to all y axes so overwrites the right hand one
       # if we run it later.
       debug(2,u"transect: y1Axis = {}".format(plot['y1Axis']['label']))
       ts_plot.yaxis[0].formatter = BasicTickFormatter()
-      ts_plot.yaxis.axis_label = plot['y1Axis']['label']
+      ts_plot.yaxis[0].axis_label = plot['y1Axis']['label']
       if ymin[0] != ymax[0]:
          ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
       yrange = [None, None]
@@ -714,12 +714,11 @@ def transect(plot, outfile="transect.html"):
             # Setting the second y axis range name and range
             yrange[1] = "y2"
             if ymin[1] != ymax[1]:
-               ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])}
-      
+               ts_plot.extra_y_ranges = {yrange[1]: Range1d(start=ymin[1], end=ymax[1])} 
             # Adding the second axis to the plot.  
             ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
       
-         y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+         y_range_name="default"
          # Plot the mean as line
          debug(2, u"Plotting line for {}".format(plot_data[i]['coverage']))
          ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[0][i], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
@@ -808,13 +807,13 @@ def matchup(plot, outfile="matchup.html"):
       min_value = np.amin(data[varindex['data_value']].astype(np.float64))
       max_value = np.amax(data[varindex['data_value']].astype(np.float64))
 
-      buffer_value = (max_value - min_value) /20
+      
       if(len(ymin)>0):
-         ymin[0] = (min(ymin[0],min_value-buffer_value))
-         ymax[0] = (max(ymax[0],max_value+buffer_value))
+         ymin[0] = (min(ymin[0],min_value))
+         ymax[0] = (max(ymax[0],max_value))
       else:
-         ymin.append(min_value-buffer_value)
-         ymax.append(max_value+buffer_value)
+         ymin.append(min_value)
+         ymax.append(max_value)
       date = datetime(data[varindex['track_date']])
 
       datasource = dict(date=date,
@@ -828,7 +827,7 @@ def matchup(plot, outfile="matchup.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
-   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+   ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1000, logo=None,
               height=400, responsive=True
    )
 
@@ -840,7 +839,7 @@ def matchup(plot, outfile="matchup.html"):
    ts_plot.add_tools(CrosshairTool())
 
    ts_plot.xaxis.axis_label = 'Date'
-   ts_plot.title_text_font_size = "14pt"
+   ts_plot.title.text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "12pt"
    ts_plot.yaxis.axis_label_text_font_size = "12pt"
    # Set up the axis label here as it writes to all y axes so overwrites the right hand one
@@ -864,7 +863,7 @@ def matchup(plot, outfile="matchup.html"):
          # Adding the second axis to the plot.  
          ts_plot.add_layout(LinearAxis(y_range_name=yrange[1], axis_label=plot['y2Axis']['label']), 'right')
    
-      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      y_range_name = "default"
       # Plot the mean as line
       debug(2, "Plotting line for {}".format(plot_data[i]['coverage']))
       ts_plot.line('date', 'value', y_range_name=y_range_name, color=plot_palette[i][1], legend='Value {}'.format(plot_data[i]['coverage']), source=source)
@@ -1002,10 +1001,13 @@ def timeseries(plot, outfile="time.html"):
    zf.close()
    shutil.rmtree(csv_dir)
 
+   #ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
+   #           height=400, responsive=True, toolbar_location="above",toolbar_sticky=False
+   #)
    ts_plot = figure(title=plot_title, x_axis_type="datetime", y_axis_type = plot_scale, width=1200, logo=None,
-              height=400, responsive=True, toolbar_location="above",toolbar_sticky=False
+              height=400, responsive=True,toolbar_location="above"
    )
-   ts_plot.title_text_font_size = "14pt"
+   ts_plot.title.text_font_size = "14pt"
    ts_plot.xaxis.axis_label_text_font_size = "12pt"
    ts_plot.yaxis.axis_label_text_font_size = "12pt"
    
@@ -1027,7 +1029,6 @@ def timeseries(plot, outfile="time.html"):
    if ymin[0] != ymax[0]:
       ts_plot.y_range = Range1d(start=ymin[0], end=ymax[0])
    yrange = [None, None]
-
    for i, source in enumerate(sources):
       # If we want 2 Y axes then the lines below do this
       if plot_data[i]['yaxis'] == 2 and len(ymin) > 1 and 'y2Axis' in plot.keys(): 
@@ -1048,8 +1049,7 @@ def timeseries(plot, outfile="time.html"):
          # So use this.
          ts_plot.patch(band_x, band_y, color=plot_palette[i][0], fill_alpha=0.05, line_alpha=0)
       
-      
-      y_range_name = yrange[plot_data[i]['yaxis'] - 1]
+      y_range_name = "default"
       # Plot the mean as line
       debug(2, u"Plotting mean line for {}".format(plot_data[i]['coverage']))
       yaxis_key = 'y'+str(plot_data[i]['yaxis'])+'Axis'
@@ -1180,10 +1180,9 @@ def scatter(plot, outfile='/tmp/scatter.html'):
       width=800,
       height=400,
       responsive=True,
-      toolbar_location="above",
-      toolbar_sticky=False)
+      toolbar_location="above")
       
-   scatter_plot.title_text_font_size = "14pt"
+   scatter_plot.title.text_font_size = "14pt"
    scatter_plot.xaxis.axis_label_text_font_size = "12pt"
    scatter_plot.yaxis.axis_label_text_font_size = "12pt"
 
@@ -1347,7 +1346,7 @@ def scatter_matchup(plot, outfile='/tmp/scatter.html'):
       width=800,
       height=400,
       responsive=True)
-   match_scatter_plot.title_text_font_size = "14pt"
+   match_scatter_plot.title.text_font_size = "14pt"
    match_scatter_plot.xaxis.axis_label_text_font_size = "12pt"
    match_scatter_plot.yaxis.axis_label_text_font_size = "12pt"
 
