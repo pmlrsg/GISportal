@@ -159,6 +159,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash, plotType){
    $('.js-plot-popup').toggleClass("hidden", false);
    gisportal.graphs.popup.openHash = hash;
    gisportal.graphs.popup.addActionListeners();
+   $('.bk-tool-icon-reset')[0].click();
 };
 
 gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){
