@@ -497,7 +497,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
             } else {
                // If it doesn't exist, download to a temporary path for time stamping
                options.existing = false;
-               options.tempPath = path.join(options.dir, 'temp_' + randomatic('aA0', 32) + '.png');
+               options.tempPath = path.join(options.dir, 'tmp_' + hash + '_' + randomatic('aA0', 32) + '.png');
                makeRequest(options.tempPath);
             }
          } else {
@@ -750,7 +750,7 @@ animation.animate = function(plotRequest, plotDir, downloadDir, logDir, next) {
       var i = 0;
       var numFiles = 0;
 
-      glob(path.join(downloadDir, 'temp_*'), function(err, files) {
+      glob(path.join(downloadDir, 'tmp_' + hash + '_*'), function(err, files) {
          if (err) {
             return done();
          }
