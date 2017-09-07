@@ -93,7 +93,9 @@
                   <option value="0x000000">Black</option>
                   <option value="0xFFFFFF">White</option>
                   <option value="transparent">Transparent</option>
+                  <option value="custom">Custom</option>
                </select>
+               <input class="js-custom-defaultBelowMinColor custom-default-above-below-color ignore-nesting hidden" placeholder="#rrggbb" data-field="customBelowMinColor" data-id="{{list_id}}" type="text">
                {{#if_equals list_id "1"}}
                   <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultBelowMinColor"></span>
                {{/if_equals}}
@@ -104,11 +106,15 @@
                   <option value="0x000000">Black</option>
                   <option value="0xFFFFFF">White</option>
                   <option value="transparent">Transparent</option>
+                  <option value="custom">Custom</option>
                </select>
+               <input class="js-custom-defaultAboveMaxColor custom-default-above-below-color ignore-nesting hidden" placeholder="#rrggbb" data-field="customAboveMaxColor" data-id="{{list_id}}" type="text">
                {{#if_equals list_id "1"}}
                   <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultAboveMaxColor"></span>
                {{/if_equals}}
             </div>
+
+            <div class="clearfix"></div>
 
             <label data-field="originalAutoScale">Auto Scale:</label>
             <select data-field="originalAutoScale" data-id="{{list_id}}">

@@ -6,7 +6,7 @@ var user = require('./user.js');
 var utils = require('./utils.js');
 var path = require('path');
 
-var html_dir = __dirname + "/../../html"
+var html_dir = __dirname + "/../../html";
 module.exports = router;
 
 router.get('/', function(req, res){
@@ -48,7 +48,7 @@ router.get('/app/user/dashboard', user.requiresValidUser, function(req, res) {
       displayName: displayName,
       userEmail: userEmail,
       userPicture: userPicture
-   })
+   });
 });
 
 router.get('/app/user/auth/google', function(req, res, next) {
@@ -90,23 +90,23 @@ router.get('/app/user/auth/google/callback', function(req, res, next){
 router.get('/app/user/authorised', function(req, res) {
    res.setHeader("Access-Control-Allow-Origin", "*");
    res.render('authorised', {});
-})
+});
 
 router.get('/app/user/logout', function(req, res) {
    req.session.passport = {};
    res.sendStatus(200);
-})
+});
 
 router.get('/app/collaboration', function(req, res) {
    res.render('collaboration-index', {
       title: 'Collaboration Dashboard'
-   })
+   });
 });
 
 router.get('/app/collaboration/dashboard', user.requiresValidUser, function(req, res) {
    res.render('collaboration-dashboard', {
       title: 'Collaboration Dashboard'
-   })
+   });
 });
 router.get('/app/user/get', function(req, res) {
    var email = user.getUsername(req);
@@ -115,6 +115,6 @@ router.get('/app/user/get', function(req, res) {
    var info ={
       "email":email,
       "permission": permission   
-   }
+   };
    res.send(info);
-})
+});

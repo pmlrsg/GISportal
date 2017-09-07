@@ -131,6 +131,56 @@ Handlebars.registerHelper('equals', function(attr1, attr2, options) {
    return ( attr1 == attr2 );
 });
 
+/**
+ * Helpers for more advanced logic
+ * Use in the format:
+ *    {{#if (or
+ *             (eq section1 "foo")
+ *             (ne section2 "bar")
+ *             (gt numVar 10)
+ *          )}}
+ *       .. content
+ *    {{/if}}
+ */
+Handlebars.registerHelper({
+   eq: function(v1, v2) {
+      return v1 === v2;
+   },
+   ne: function(v1, v2) {
+      return v1 !== v2;
+   },
+   lt: function(v1, v2) {
+      return v1 < v2;
+   },
+   gt: function(v1, v2) {
+      return v1 > v2;
+   },
+   lte: function(v1, v2) {
+      return v1 <= v2;
+   },
+   gte: function(v1, v2) {
+      return v1 >= v2;
+   },
+   and: function() {
+      // Convert arguments into normal array in safe, optimisable way
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; ++i) {
+         args[i] = arguments[i];
+      }
+      // Test that all arguments are true
+      return args.every(Boolean);
+   },
+   or: function() {
+      // Convert arguments into normal array in safe, optimisable way
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; ++i) {
+         args[i] = arguments[i];
+      }
+      // Test that some arguments are true
+      return args.some(Boolean);
+   }
+});
+
 Handlebars.registerHelper('dotdotdot', function(str) {
    lenVal = 200;
    if (str.length > lenVal){
@@ -221,6 +271,21 @@ Handlebars.registerHelper('str_join', function(arrayToJoin, separator) {
    return arrayToJoin.join( separator );
 });
 
+
+/**
+ * Helper to join an array of strings with a span wrapper around each
+ * @param Array arrayToJoin Array of values
+ * @param String startString string to put infront of the value
+ * @param String endString string to put after the value 
+ */
+Handlebars.registerHelper('span_join', function(arrayToJoin, startString, endString){
+   if( arrayToJoin == void(0) ) return "";
+   placeHolder = '';
+   for (var item in arrayToJoin) {
+      placeHolder += startString + arrayToJoin[item] + endString+' ';
+   }
+   return placeHolder;
+});
 
 
 /**

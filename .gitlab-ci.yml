@@ -1,0 +1,18 @@
+image: pmlrsg/gisportal-host
+
+stages:
+    - build
+
+job1:
+    only:
+        - master
+        - dev
+        - testing
+    stage: build
+    script:
+        - node --version
+        - npm --version
+        - npm install --silent --depth 0
+        - grunt
+        - /usr/bin/redis-server --daemonize yes
+        - npm test

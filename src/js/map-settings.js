@@ -241,56 +241,78 @@ gisportal.createBaseLayers = function() {
          description: 'EPSG:4326 only',
          projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
+            attributions: 'Terrain Light { Data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors and <a href="#data">others</a>, Rendering &copy; <a href="http://eox.at">EOX</a> }',
             url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
             params: {LAYERS : 'terrain-light', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 13,
+         }
+      }),
+      EOXs2cloudless: new ol.layer.Tile({
+         id: 'EOXs2cloudless',                       // required to populate the display options drop down list
+         title: 'EOX Sentinel-2 Cloudless',
+         description: 'EPSG:4326 only, Europe only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: '<a href="https://s2maps.eu/">Sentinel-2 cloudless</a> by <a href="https://eox.at/">EOX IT Services GmbH</a> (Contains modified Copernicus Sentinel data 2016)',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 's2cloudless', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 14,
+         }
       }),
       GEBCO: new ol.layer.Tile({
          id: 'GEBCO',
          title: 'GEBCO',
          projections: ['EPSG:4326', 'EPSG:3857'],
          source: new ol.source.TileWMS({
+            attributions: 'Imagery reproduced from the GEBCO_2014 Grid, version 20150318, www.gebco.net',
             url: 'https://www.gebco.net/data_and_products/gebco_web_services/web_map_service/mapserv?',
             crossOrigin: null,
             params: {LAYERS: 'gebco_08_grid', VERSION: '1.1.1', SRS: gisportal.projection, FORMAT: 'image/jpeg', wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      MetacartaBasic: new ol.layer.Tile({
-         id: 'MetacartaBasic',
-         title: 'Metacarta Basic',
-         description: 'EPSG:4326 only',
-         projections: ['EPSG:4326'],
-         source: new ol.source.TileWMS({
-            url: 'http://vmap0.tiles.osgeo.org/wms/vmap0?',
-            crossOrigin: null,
-            params: {LAYERS: 'basic', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
-      }),
-      Landsat: new ol.layer.Tile({
-         id: 'Landsat',
-         title: 'Landsat',
-         projections: ['EPSG:4326', 'EPSG:3857'],
-         source: new ol.source.TileWMS({
-            url: 'http://irs.gis-lab.info/?',
-            crossOrigin: null,
-            params: {LAYERS: 'landsat', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
-            tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 7,
+         }
       }),
       BlueMarble: new ol.layer.Tile({
          id: 'BlueMarble',
          title: 'Blue Marble',
-         projections: ['EPSG:4326', 'EPSG:3857'],
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
          source: new ol.source.TileWMS({
-            url: 'http://demonstrator.vegaspace.com/wmspub/?',
+            attributions: 'Blue Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
+            url: 'https://tiles.maps.eox.at/wms/?',
             crossOrigin: null,
-            params: {LAYERS: 'BlueMarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            params: {LAYERS : 'bluemarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
             tileLoadFunction: baseLayerTitleLoadFunction
-         }) 
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         }
+      }),
+      BlackMarble: new ol.layer.Tile({
+         id: 'BlackMarble',
+         title: 'Black Marble',
+         description: 'EPSG:4326 only',
+         projections: ['EPSG:4326'],
+         source: new ol.source.TileWMS({
+            attributions: 'Black Marble { &copy; <a href="http://nasa.gov">NASA</a> }',
+            url: 'https://tiles.maps.eox.at/wms/?',
+            crossOrigin: null,
+            params: {LAYERS : 'blackmarble', VERSION: '1.1.1', SRS: gisportal.projection, wrapDateLine: true },
+            tileLoadFunction: baseLayerTitleLoadFunction
+         }),
+         viewSettings: {
+            maxZoom: 8,
+         }
       }),
       OSM: new ol.layer.Tile({
          id: 'OSM',
@@ -299,7 +321,10 @@ gisportal.createBaseLayers = function() {
          projections: ['EPSG:3857'],
          source: new ol.source.OSM({
             projection: gisportal.projection
-         })
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
       }),
    };
 
@@ -312,7 +337,10 @@ gisportal.createBaseLayers = function() {
          source: new ol.source.BingMaps({
             key: gisportal.config.bingMapsAPIKey,
             imagerySet: 'Aerial'
-         })
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
       });
 
       gisportal.baseLayers.BingMapsAerialWithLabels = new ol.layer.Tile({
@@ -323,7 +351,10 @@ gisportal.createBaseLayers = function() {
          source: new ol.source.BingMaps({
             key: gisportal.config.bingMapsAPIKey,
             imagerySet: 'AerialWithLabels'
-         })
+         }),
+         viewSettings: {
+            maxZoom: 19,
+         }
       });
 
       gisportal.baseLayers.BingMapsRoad = new ol.layer.Tile({
@@ -334,22 +365,9 @@ gisportal.createBaseLayers = function() {
          source: new ol.source.BingMaps({
             key: gisportal.config.bingMapsAPIKey,
             imagerySet: 'Road'
-         })
-      });
-
-      gisportal.baseLayers.BingMapsCB = new ol.layer.Tile({
-         id: 'BingMapsCB',
-         title: 'Collins Bart',
-         description: 'EPSG:3857 only, coverage of UK only',
-         projections: ['EPSG:3857'],
-         source: new ol.source.BingMaps({
-            key: gisportal.config.bingMapsAPIKey,
-            imagerySet: 'collinsBart'
          }),
          viewSettings: {
-            minZoom: 10,
-            maxZoom: 13,
-            defaultCenter: [53.825564,-2.421976]
+            maxZoom: 19,
          }
       });
 
@@ -364,7 +382,7 @@ gisportal.createBaseLayers = function() {
          }),
          viewSettings: {
             minZoom: 10,
-            maxZoom: 17,
+            maxZoom: 16,
             defaultCenter: [53.825564,-2.421976]
          }
       });
@@ -503,7 +521,7 @@ gisportal.setView = function(centre, extent, projection) {
          maxZoom: max_zoom,
       });
    map.setView(view);
-   gisportal.mapFit(extent);
+   gisportal.mapFit(extent, true);
 
 };
 

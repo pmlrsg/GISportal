@@ -163,11 +163,11 @@ gisportal.createVectorLayers = function() {
    gisportal.vectors = [];
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
-      processVectorLayer(vector.services.wfs.url, v);
-
+        processVectorLayer(vector.services.wfs.url, v);
       });
    });
-
+    gisportal.loadBrowseCategories();
+   gisportal.configurePanel.refreshData();
    function processVectorLayer(serverUrl, vector) {
       var vectorOptions = {
          "name": vector.name,
@@ -190,15 +190,16 @@ gisportal.createVectorLayers = function() {
          "defaultProperty" : vector.defaultProperty,
          "defaultProperties" : vector.defaultProperties,
          "descriptiveName" : vector.tags.niceName,
-         "unit" : vector.unit
+         "unit" : vector.unit,
+         "defaultColour" : vector.defaultColour || false
       };
       var vectorLayer = new gisportal.Vector(vectorOptions);
       gisportal.vectors.push(vectorLayer);
-
 gisportal.layers[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
       gisportal.vlayers.push(vectorLayerOL);
+
    }
 
 };
@@ -388,29 +389,6 @@ gisportal.checkNameUnique = function(layer, count) {
       }
    }
    return layer;
-};
-
-/**
- * Returns availability (boolean) of data for the given JavaScript date for all layers.
- * Used as the beforeshowday callback function for the jQuery UI current view date DatePicker control
- * 
- * @param {Date} thedate - The date provided by the jQuery UI DatePicker control as a JavaScript Date object
- * @return {Array.<boolean>} Returns true or false depending on if there is layer data available for the given date
- */
-gisportal.allowedDays = function(thedate) {
-   var uidate = gisportal.utils.ISODateString(thedate);
-   // Filter the datetime array to see if it matches the date using jQuery grep utility
-   var filtArray = $.grep(gisportal.enabledDays, function(dt, i) {
-      var datePart = dt.substring(0, 10);
-      return (datePart == uidate);
-   });
-   // If the filtered array has members it has matched this day one or more times
-   if(filtArray.length > 0) {
-      return [true];
-   }
-   else {
-      return [false];
-   }
 };
 
 /**
@@ -819,7 +797,10 @@ gisportal.initVectorLayers = function(data, opts) {
 
       gisportal.cache.vectorLayers = data;
       // Create WMS layers from the data
+
       gisportal.createVectorLayers();
+      gisportal.loadBrowseCategories(data);
+
    }
 };
 
@@ -988,6 +969,8 @@ gisportal.loadState = function(state){
       return true;
    }
    gisportal.stopLoadState = true;
+   // Track when in the process of loading from state for setting up the timeline correctly
+   gisportal.loadingFromState = true;
    $('.start').toggleClass('hidden', true);
    cancelDraw();
    state = state || {};
@@ -1040,7 +1023,15 @@ gisportal.loadState = function(state){
                      gisportal.methodThatSelectedCurrentRegion = {};
                      break;
                   case "geoJSONSelect":
-                     gisportal.indicatorsPanel.geoJSONSelected(state.selectedRegionInfo.value, fromSavedState = true);
+                     // Load the geoJSON from the state into currentSelectedRegion
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
+                     // Change the methodThatSelectedCurrentRegion to prevent trying to auto-select the
+                     // saved geoJSON name from the dropdown (which would cause a problem if the state
+                     // is loaded by a different user)
+                     gisportal.methodThatSelectedCurrentRegion.method = 'state-geoJSONSelect';
+                     break;
+                  case "state-geoJSONSelect":
+                     gisportal.currentSelectedRegion = state.selectedRegionInfo.geoJSON;
                      break;
                   case "dragAndDrop":
                      stateMap.feature = undefined;
@@ -1057,14 +1048,12 @@ gisportal.loadState = function(state){
       gisportal.loadLayersState = state.selectedLayers;
    }
 
-   gisportal.state_indicators_list = state.selectedIndicators;
-
    // This makes sure that all the layers from the state are loaded before the rest of the information is loaded.
    gisportal.events.bind('layer.metadataLoaded', function(event, id){
-      if(!gisportal.state_indicators_list){
+      if(!state.selectedIndicators){
          return false;
       }
-      var index = gisportal.state_indicators_list.indexOf(id);
+      var index = state.selectedIndicators.indexOf(id);
       if(index > -1){
          // splice used because pop was not removing the correct value.
          if(state.selectedIndicators){
@@ -1073,6 +1062,10 @@ gisportal.loadState = function(state){
       }
       if(state.selectedIndicators && state.selectedIndicators.length === 0){
          gisportal.loadLayerState();
+         if (gisportal.stateLoaded) {
+            // Finished loading from state
+            gisportal.loadingFromState = false;
+         }
       }
    });
    
@@ -1133,7 +1126,7 @@ gisportal.loadState = function(state){
    }
 
    if(state.geolocationFilter){
-      if(state.geolocationFilter.showGeolocationFilter){
+      if(state.geolocationFilter.showGeolocationFilter == "true" || state.geolocationFilter.showGeolocationFilter === true){
          $('.show-geocoder').trigger('click');
       }
       if(state.geolocationFilter.radiusVal){
@@ -1161,7 +1154,10 @@ gisportal.loadState = function(state){
    }
 
    gisportal.stateLoaded = true;
-
+   if (!state.selectedIndicators || state.selectedIndicators.length === 0) {
+      // Finished loading from state
+      gisportal.loadingFromState = false;
+   }
 };
 
 gisportal.loadLayerState = function(){
@@ -1185,7 +1181,7 @@ gisportal.loadLayerState = function(){
          var style = layer_state.style || defaultStyle;
          var min = layer_state.minScaleVal;
          var max = layer_state.maxScaleVal;
-         var log = layer_state.log == "true" || false;
+         var log = layer_state.log === true || layer_state.log === 'true';
          if(layer_state.autoScale === undefined){
             layer_state.autoScale = "default";
          }
@@ -1231,9 +1227,19 @@ gisportal.loadLayerState = function(){
          $('#tab-' + id + '-colorbands').val(colorbands);
 
          // This sets the aboveMaxColor to the same as what the user had before
-         $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         try {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: aboveMaxColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-aboveMaxColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-aboveMaxColor[data-id="' + id + '"]').val(aboveMaxColor).trigger('change');
+         }
          // This sets the belowMinColor to the same as what the user had before
-         $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         try {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: belowMinColor || "0"});
+         } catch(err) {
+            $('#tab-' + id + '-belowMinColor').ddslick('select', {value: 'custom'});
+            $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor).trigger('change');
+         }
 
          gisportal.layers[id].resetting = false;
          gisportal.scalebars.updateScalebar(layer);
@@ -1487,7 +1493,7 @@ gisportal.main = function() {
    // Compile Templates
    gisportal.loadTemplates(function(){
       
-      gisportal.initStart();
+      var autoLoad = gisportal.initStart();
 
       // Set up the map
       // any layer dependent code is called in a callback in mapInit
@@ -1538,6 +1544,8 @@ gisportal.main = function() {
       if(stateID !== null) {
          gisportal.ajaxState(stateID);
       }
+
+      autoLoad();
 
       collaboration.initDOM();
       // Replaces all .icon-svg with actual SVG elements,
@@ -1591,14 +1599,19 @@ gisportal.zoomOverall = function()  {
       gisportal.mapFit(extent);
    }
 };
-gisportal.mapFit = function(extent){
+gisportal.mapFit = function(extent, noPadding){
    // This takes an extent and fits the map to it with the correct padding
    var polygon = ol.geom.Polygon.fromExtent(extent);
-   var padding = [50, 0, 0, 0];
-   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-      padding[2] = 95;
+   var padding;
+   if (noPadding) {
+      padding = [0, 0, 0, 0];
+   } else {
+      padding = [50, 0, 0, 0];
+      if (gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0) {
+         padding[2] = 95 + (10 * gisportal.timeline.timebars.length);
+      }
+      padding[3] = $('.panel').offset().left + $('.panel').width();
    }
-   padding[3] = $('.panel').offset().left + $('.panel').width();
    map.getView().fit(polygon, map.getSize(), {padding: padding});
 };
 
@@ -1611,7 +1624,9 @@ gisportal.initStart = function()  {
    // Work out if we should skip the splash page
    // Should we auto resume ?
    // Do we have to show the T&C box first ?
-   var autoLoad = null;
+   var autoLoad = function() {
+      return true;
+   };
    if( gisportal.config.skipWelcomePage === true || gisportal.utils.getURLParameter('wms_url')){
       if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
          autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
@@ -1621,9 +1636,6 @@ gisportal.initStart = function()  {
    }else if( gisportal.config.autoResumeSavedState === true && gisportal.hasAutoSaveState() ){
       autoLoad = function(){ if(!_.isEmpty(gisportal.layers) && !gisportal.stateLoaded){gisportal.loadState( gisportal.getAutoSaveState() );} gisportal.launchMap();};
    }
-
-   if( autoLoad !== null)
-      return setTimeout(autoLoad, 1000);
 
    // Splash page parameters
    var data = {
@@ -1675,6 +1687,7 @@ gisportal.initStart = function()  {
       }
 
    });
+   return autoLoad;
 };
 
 /**
@@ -1915,7 +1928,7 @@ gisportal.loadBrowseCategories = function(data){
    // This takes a category (cat) in a versatile format e.g. indicator_type
    addCategory = function(cat){
       // If the category is not in the list already
-      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag")){
+      if(!(cat in gisportal.browseCategories || cat == "niceName" || cat == "providerTag" )){
          // Add the category name as a key and convert it to a nice view for the value
          if(gisportal.config.catDisplayNames){
             gisportal.browseCategories[cat] = gisportal.config.catDisplayNames[cat] || gisportal.utils.titleCase(cat.replace(/_/g, ' '));
@@ -1939,6 +1952,7 @@ gisportal.loadBrowseCategories = function(data){
          }
       }
       for(layer in gisportal.vectors){
+
          for(category in gisportal.vectors[layer].tags){
             addCategory(category);
          }
@@ -1948,6 +1962,7 @@ gisportal.loadBrowseCategories = function(data){
    }else{
       for(layer in gisportal.layers){
          for(category in gisportal.layers[layer].tags){
+
             addCategory(category);
          }
       }

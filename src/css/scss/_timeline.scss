@@ -40,6 +40,7 @@ svg {
 
 .timeline  {
    width: 100%;
+   touch-action: none;
 }
 
 .main {
@@ -87,7 +88,7 @@ svg {
 }
 
 .data-bar-type--range  {
-   pointer-events: none;   
+   pointer-events: none;
 }
 
 .axis line, .axis path {
@@ -95,7 +96,7 @@ svg {
 }
 
 #timeline{
-   width: calc(100% - 242px);
+   width: calc(100% - 320px);
    display: inline-block;
 }
 
@@ -112,15 +113,49 @@ svg {
    text-transform: capitalize;
 }
 
-.current-date{
-   width: 85px;
-   padding: 5px;
+.timeline .axis .tick {
+   cursor: pointer;
+}
+
+.timeline-next-prev {
+   text-align: center;
+   margin-bottom: 10px;
+   span {
+      cursor: pointer;
+   }
+}
+
+.timeline-date-options {
+   width: 160px;
    display: inline-block;
    position: relative;
    top: -19px;
    right: -5px;
 }
 
+.tooltip-next-previous {
+   .label {
+      float: left;
+   }
+   .date {
+      float: right;
+      margin-left: 10px
+   }
+}
+
+input.current-date{
+   color: #111;
+}
+
 line.stroke{
    stroke:$timeline-stroke;
+}
+
+.is-selected .pika-button {
+    background: #59476D;
+    box-shadow: inset 0 1px 3px #6E5887;
+}
+
+.pika-button:hover {
+    background: #BAB67C;
 }
