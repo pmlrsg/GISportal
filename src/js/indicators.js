@@ -590,37 +590,44 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
    var indicator = gisportal.layers[id];
-   var onMetadata = function(){
-      var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
-      indicator.modified = gisportal.utils.nameToId(indicator.name);
-      indicator.modifiedName = modifiedName;
-      indicator.loggedIn = gisportal.user.info.permission != "guest";
-      indicator.noOAuth = gisportal.noOAuth;
-      var rendered = gisportal.templates['tab-analysis'](indicator);
-      $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
-      $('.js-google-auth-button').click(function() {
+   if (indicator.temporal) {
+      var onMetadata = function(){
+         var modifiedName = id.replace(/([A-Z])/g, '$1-'); // To prevent duplicate name, for radio button groups
+         indicator.modified = gisportal.utils.nameToId(indicator.name);
+         indicator.modifiedName = modifiedName;
+         indicator.loggedIn = gisportal.user.info.permission != "guest";
+         indicator.noOAuth = gisportal.noOAuth;
+         var rendered = gisportal.templates['tab-analysis'](indicator);
+         $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
+         $('.js-google-auth-button').click(function() {
          window.top.open(gisportal.middlewarePath + '/user/auth/google','authWin','left=20,top=20,width=700,height=700,toolbar=1');
-      });
-      $('.js-analysis-elevation').on('change', function(){
-         var value = $(this).val();
-         var params = {
-            "event": "layerDepth.change",
-            "value":value
-         };
-         gisportal.events.trigger('layerDepth.change', params);
-      });
-      $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
+         });
+         $('.js-analysis-elevation').on('change', function(){
+            var value = $(this).val();
+            var params = {
+               "event": "layerDepth.change",
+               "value":value
+            };
+            gisportal.events.trigger('layerDepth.change', params);
+         });
+         $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', false);
 
-      if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
-         $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
+         if(gisportal.methodThatSelectedCurrentRegion.method == "drawBBox"){
+            $('.js-coordinates').val(gisportal.methodThatSelectedCurrentRegion.value);
+         }
+
+         gisportal.indicatorsPanel.addAnalysisListeners();
+         gisportal.indicatorsPanel.populateShapeSelect();
+      };
+      if(indicator.metadataComplete) {
+         onMetadata();
+      } else { 
+         gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
       }
-
-      gisportal.indicatorsPanel.addAnalysisListeners();
-      gisportal.indicatorsPanel.populateShapeSelect();
-   };
-   if(indicator.metadataComplete) onMetadata();
-   else gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
-
+   } else {
+      // hide the analysis tab for layers with no time dimension
+      $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', true);
+   }
 };
 
 gisportal.indicatorsPanel.geoJSONSelected = function(selectedValue, fromSavedState){
@@ -747,7 +754,9 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       indicator.hasDate = true;
       // Put the date in a nice format for displaying next to the scalebar
       indicator.niceSelectedDateTime = moment.utc(indicator.selectedDateTime).format('YYYY-MM-DD HH:mm:ss');
-
+      if (!indicator.temporal) {
+         indicator.niceSelectedDateTime = '';
+      }
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
 
