@@ -10,9 +10,9 @@
 gisportal.indicatorsPanel = {};
 
 gisportal.indicatorsPanel.open = function() {
-   if ($('.js-show-panel[data-panel-name="active-layers"').hasClass('hidden')) {
+   if ($('.js-show-panel[data-panel-name="active-layers"]').hasClass('hidden')) {
       // Show the layers tab if it is currently hidden
-      $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', false);
+      $('.js-show-panel[data-panel-name="active-layers"]').toggleClass('hidden', false);
    }
    gisportal.panels.showPanel('active-layers');
 };
@@ -67,7 +67,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('click', '.js-remove', function() {
       if (gisportal.selectedLayers.length <= 1) {
          // Hide the layers tab if no layers are selected
-         $('.js-show-panel[data-panel-name="active-layers"').toggleClass('hidden', true);
+         $('.js-show-panel[data-panel-name="active-layers"]').toggleClass('hidden', true);
          gisportal.panels.showPanel('choose-indicator');
          // Clears the vector layer to avoid confusion
          gisportal.vectorLayer.getSource().clear();
@@ -1370,7 +1370,7 @@ gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, t
    for(var point in coordsArray){
       if(typeof(coordsArray[point][0]) == "object"){
          gisportal.indicatorsPanel.convertBboxCoords(coordsArray[point], from_proj, to_proj);
-      }else{
+      } else{
          coordsArray[point] = gisportal.reprojectPoint(coordsArray[point], from_proj, to_proj);
       }
    }
@@ -1380,11 +1380,8 @@ gisportal.indicatorsPanel.convertBboxCoords = function(coordsArray, from_proj, t
 gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerId ){
    if( gisportal.currentSelectedRegion === "" ) return true;
 
-   //bb1 = Terraformer.WKT.parse( gisportal.currentSelectedRegion );
    var tar = gisportal.currentSelectedRegion.split('GEOMETRYCOLLECTION(POINT(')[1].split('),POINT(');
    tar[tar.length-1] = tar[tar.length-1].split(')')[0];
-
-
 
    var layer = gisportal.layers[ layerId ];
    var bounds = layer.exBoundingBox;
@@ -1420,7 +1417,7 @@ gisportal.indicatorsPanel.doesTransectPointsFallInLayerBounds = function( layerI
    for(var x = 0; x < tar.length -1; x++ ){
       var t_point = new Terraformer.Point({
          "type" : "Point",
-         "coordinates" : [Number(tar[x].split(' ')[0]), Number(tar[x].split(' ')[1])]
+         "coordinates" :gisportal.reprojectPoint([Number(tar[x].split(' ')[0]), Number(tar[x].split(' ')[1])], gisportal.projection, "EPSG:4326")
       });
       // test if point inside bbox
       if(bb2.contains(t_point)){

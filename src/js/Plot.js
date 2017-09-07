@@ -280,13 +280,15 @@ gisportal.graphs.Plot = (function() {
       var leftHandSideComoponents = this._components.filter(function(component) {
          return component.yAxis == 1;
       });
-
+      // holder for the user label
+      var userLabel = '';
       if (leftHandSideComoponents.length > 0) {
          // Using the left of left Y axis components build
          // axis names including the elevation and provider
          var yAxis1Label = leftHandSideComoponents.map(function(component) {
             var indicator = gisportal.layers[component.indicator];
-            var output = indicator.name;
+            userLabel = component.userLabel;
+            var output =  userLabel;
             if ('elevation' in component)
                output += ' Elv:' + component.elevation + 'M';
             if (indicator.units)
@@ -300,6 +302,7 @@ gisportal.graphs.Plot = (function() {
          y1Axis = {
             "scale": y1AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label": yAxis1Label,
+            "userLabel": userLabel,
             "ticks": "auto",
             "weight": "auto",
             "tickFormat": "auto"
@@ -315,13 +318,15 @@ gisportal.graphs.Plot = (function() {
       var rightHandSideComoponents = this._components.filter(function(component) {
          return component.yAxis == 2;
       });
-
+      // holder for user label
+      var userLabel2 = '';
       if (rightHandSideComoponents.length > 0) {
          // Using the left of left Y axis components build
          // axis names including the elevation and provider
          var yAxis2Label = rightHandSideComoponents.map(function(component) {
             var indicator = gisportal.layers[component.indicator];
-            var output = indicator.name;
+            userLabel2 = component.userLabel;
+            var output = userLabel2;
             if ('elevation' in component)
                output += ' Elv:' + component.elevation + 'M';
             if (indicator.units)
@@ -335,6 +340,7 @@ gisportal.graphs.Plot = (function() {
          var y2Axis = {
             "scale": y2AxisIsLog ? "log" : "linear", //( linear | log_scale | ordinal | time)
             "label": yAxis2Label,
+            "userLabel": userLabel2,
             "ticks": "auto",
             "weight": "auto",
             "tickFormat": "auto"
@@ -397,13 +403,10 @@ gisportal.graphs.Plot = (function() {
          if (current_projection != "EPSG:4326") {
             if (nice_bbox.startsWith('POLYGON')) {
                nice_bbox = gisportal.reprojectPolygon(nice_bbox, "EPSG:4326");
-            } else if (nice_bbox.indexOf("(") > -1) {
-               bb1 = Terraformer.WKT.parse(nice_bbox);
-               gisportal.indicatorsPanel.convertBboxCoords(bb1.coordinates, current_projection, "EPSG:4326");
-               nice_bbox = Terraformer.WKT.convert(bb1);
-            } else {
-               nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
-            }
+            } else if (nice_bbox.indexOf("(") === -1) {
+                  nice_bbox = gisportal.reprojectBoundingBox(nice_bbox.split(","), current_projection, "EPSG:4326").join(",");
+            } 
+            // if we get here then we are using a geometry collection and no reprojection is needed
          }
 
          var yAxis = component.yAxis;
@@ -438,6 +441,7 @@ gisportal.graphs.Plot = (function() {
             },
             "label": (++totalCount) + ') ' + layer.descriptiveName,
             "yAxis": yAxis,
+            "userLabel" : component.userLabel,
             "type": "line",
             "meta": meta
                //"logo": gisportal.middlewarePath + "/" + logo
@@ -824,6 +828,15 @@ gisportal.graphs.Plot = (function() {
 
       return this;
    };
+   
+   // this is called everytime label changes for future use
+   Plot.prototype.checkAxisLabels = function() {
+      var components = this._components;
+      if (components.length >= 2) {
+         var indicator1 = gisportal.layers[components[0].indicator];
+         var indicator2 = gisportal.layers[components[1].indicator];
+      }
+   };
 
    // This function makes sure that the daterange ranges or the component fits within the input box values
    Plot.prototype.forceComponentDateRange = function(componentElement) {
@@ -865,7 +878,7 @@ gisportal.graphs.Plot = (function() {
 
          var interval1 = indicator1.tags.interval;
          var interval2 = indicator2.tags.interval;
-
+         
          if (start1 > end2 || start2 > end1) {
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
@@ -880,7 +893,7 @@ gisportal.graphs.Plot = (function() {
             $('.js-components tr').attr("has-data-in-range", "no");
             $('.js-create-graph').toggleClass("hidden", true);
             return;
-         } else if (interval1 != interval2) {
+         } else if (interval1[0] != interval2[0]) {
             $('.graph-date-range-info-li').toggleClass("hidden", true);
             $('.graph-date-range-error-li').toggleClass("hidden", false);
             $('.graph-date-range-error-div').html("<p>To create a scatter plot the two indicators must be of the same sample frequency; at the moment you have '" + indicator1.id + "' which is " + interval1 + " and '" + indicator2.id + "' which is " + interval2 + "</p>");

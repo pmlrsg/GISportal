@@ -37,7 +37,6 @@ gisportal.graphs.addComponentToGraph = function( component ){
       var bboxMethod = gisportal.methodThatSelectedCurrentRegion.method;
       if(bboxMethod == "csvUpload"){
          plotType = "transect";
-         console.log("setting transect type");
       }
       if(bboxMethod == "geoJSONSelect" || bboxMethod == "state-geoJSONSelect"){
          component.bboxName = gisportal.methodThatSelectedCurrentRegion.value;
@@ -160,6 +159,7 @@ gisportal.graphs.popup.loadPlot = function(html, hash, plotType){
    $('.js-plot-popup').toggleClass("hidden", false);
    gisportal.graphs.popup.openHash = hash;
    gisportal.graphs.popup.addActionListeners();
+   $('.bk-tool-icon-reset')[0].click();
 };
 
 gisportal.graphs.addButtonListeners = function(element, noCopyEdit, plot){

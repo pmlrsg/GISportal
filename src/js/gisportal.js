@@ -1671,14 +1671,19 @@ gisportal.zoomOverall = function()  {
       gisportal.mapFit(extent);
    }
 };
-gisportal.mapFit = function(extent){
+gisportal.mapFit = function(extent, noPadding){
    // This takes an extent and fits the map to it with the correct padding
    var polygon = ol.geom.Polygon.fromExtent(extent);
-   var padding = [50, 0, 0, 0];
-   if(gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0){
-      padding[2] = 95;
+   var padding;
+   if (noPadding) {
+      padding = [0, 0, 0, 0];
+   } else {
+      padding = [50, 0, 0, 0];
+      if (gisportal.timeline && gisportal.timeline.timebars && gisportal.timeline.timebars.length > 0) {
+         padding[2] = 95 + (10 * gisportal.timeline.timebars.length);
+      }
+      padding[3] = $('.panel').offset().left + $('.panel').width();
    }
-   padding[3] = $('.panel').offset().left + $('.panel').width();
    map.getView().fit(polygon, map.getSize(), {padding: padding});
 };
 
