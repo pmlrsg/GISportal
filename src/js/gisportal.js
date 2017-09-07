@@ -249,7 +249,7 @@ gisportal.createSOSLayers = function() {
             "WestBoundLongitude": sensor.observedArea.lowerLeft[0]
          },
          "sensorType": sensorType,
-
+         "sosURL": service.sosURL
       };
 
       var sosLayer = new gisportal.Vector(sensorOptions);

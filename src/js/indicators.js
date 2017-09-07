@@ -433,7 +433,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    $('[data-id="' + id + '"] .js-toggleVisibility')
       .toggleClass('hidden', false)
       .toggleClass('active', gisportal.layers[id].isVisible);
-   if(layer.serviceType != "WFS"){
+   if(layer.serviceType != "WFS" && layer.serviceType != "SOS"){
       gisportal.indicatorsPanel.scalebarTab(id);
    }
    else {
@@ -591,6 +591,8 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       indicator.modifiedName = modifiedName;
       indicator.loggedIn = gisportal.user.info.permission != "guest";
       indicator.noOAuth = gisportal.noOAuth;
+      if (indicator.wcsURL !== undefined || indicator.sosURL !== undefined) indicator.analysisPossible = true;
+
       var rendered = gisportal.templates['tab-analysis'](indicator);
       $('[data-id="' + id + '"] .js-tab-analysis').html(rendered);
       $('.js-google-auth-button').click(function() {
@@ -755,8 +757,6 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
 
 gisportal.indicatorsPanel.vectorStyleTab = function(id) {
          var layer = gisportal.layers[id];
-         //
-         //layer.setStyle();
 
          var rendered = gisportal.templates['tab-vectorstyles'](layer);
          $('[data-id="' + id + '"] .js-tab-dimensions').html(rendered);

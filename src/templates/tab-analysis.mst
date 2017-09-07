@@ -2,7 +2,7 @@
 <div class="panel-tab">
    <ol class="steps grid-list panel-list">
       <div class="js-analysis-message hidden alert-danger" id="{{id}}-analysis-message"/>
-      {{#if wcsURL}}
+      {{#if analysisPossible }}
          <li class="full-size">
          <div class="full-width">
             <p><b>ANALYSIS</b></p>
