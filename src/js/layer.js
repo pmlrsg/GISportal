@@ -318,7 +318,11 @@ gisportal.layer = function( options ) {
     */
    this.isVisible = true;  
    this.setVisibility = function(visibility) {
-      if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility && this.isInbounds);
+      var visible = visibility;
+      if (this.temporal) {
+         visible = visibility && this.isInbounds;
+      }
+      if (this.openlayers.anID) this.openlayers.anID.setVisible(visible);
       this.isVisible = visibility;
    };
    
