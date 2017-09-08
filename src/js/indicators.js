@@ -627,6 +627,8 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
    } else {
       // hide the analysis tab for layers with no time dimension
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', true);
+      // and the date range li on the info tab
+      $('li[data-id="' + id + '"] .date-range-detail').hide();
    }
 };
 
@@ -1484,7 +1486,7 @@ gisportal.indicatorsPanel.doesCurrentlySelectedRegionFallInLayerBounds = functio
    }
    // INFO: This could eventually be replaced if a bounding box that intersects the current world can be split into multi-polygons.
    if(!bb1.within( bb2 )){
-      return "The bounding box cannot wrap around the dateline, please redraw it.";
+      return "The bounding box cannot wrap around the International Date Line, please redraw it.";
    }
 
    var layer = gisportal.layers[ layerId ];

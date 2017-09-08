@@ -84,8 +84,7 @@ gisportal.Vector = function(options) {
         if (typeof(layer.preventAutoZoom) == 'undefined' || !layer.preventAutoZoom) {
             //gisportal.zoomOverall();   
         }
-
-
+        
         var index = _.findIndex(gisportal.selectedLayers, function(d) {
             return d === layer.id;
         });
@@ -165,7 +164,6 @@ gisportal.Vector = function(options) {
    };
 
 
-// gisportal.layers['rsg_MMO_Fish_Shellfish_Cages_A'].setStyleUI(gisportal.layers['rsg_MMO_Fish_Shellfish_Cages_A'].OLLayer.getSource(), 'CATMFA')
   this.createStyleFromProp = function(source,prop,colour){
       var features = source.getFeatures();
       var possibleOptions = [];
