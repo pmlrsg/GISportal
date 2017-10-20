@@ -624,6 +624,8 @@ gisportal.indicatorsPanel.analysisTab = function(id) {
       } else { 
          gisportal.events.bind_once('layer.metadataLoaded',onMetadata);
       }
+      // show the time range details that may have previously been hiden by a previous run of this function
+      $('li[data-id="' + id + '"] .date-range-detail').show();
    } else {
       // hide the analysis tab for layers with no time dimension
       $('[data-id="' + id + '"] .js-icon-analyse').toggleClass('hidden', true);
