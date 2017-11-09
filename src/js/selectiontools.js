@@ -160,7 +160,7 @@ gisportal.selectionTools.shapesUploaded = function(){
          // Microsoft Excel installed will identify these as `application/vnd.mx-excel` rather than `text\csv` 
          var ext = this_file.name.split('.');
          ext = ext[ext.length-1].toLowerCase();
-         if(ext.toLowerCase() == "csv"){
+         if(ext == "csv"){
             gisportal.selectionTools.csvFound(formData);
             gisportal.loading.decrement();
             return true;
