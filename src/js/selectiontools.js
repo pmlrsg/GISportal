@@ -159,8 +159,8 @@ gisportal.selectionTools.shapesUploaded = function(){
          // we use the file's extension to identifty type rather than `this_file.mimetype` as machines that have
          // Microsoft Excel installed will identify these as `application/vnd.mx-excel` rather than `text\csv` 
          var ext = this_file.name.split('.');
-         ext = ext[ext.length-1];
-         if(ext.toLowerCase() == "csv"){
+         ext = ext[ext.length-1].toLowerCase();
+         if(ext == "csv"){
             gisportal.selectionTools.csvFound(formData);
             gisportal.loading.decrement();
             return true;
