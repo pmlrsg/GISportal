@@ -996,6 +996,9 @@ def timeseries(plot, outfile="time.html"):
          datasource['min'] = data[varindex['min']]
          datasource['max'] = data[varindex['max']]
 
+      if 'median' in df['vars']:
+         datasource['median'] = data[varindex['median']]   
+
       sources.append(ColumnDataSource(data=datasource))
       
    zf.close()
@@ -1016,6 +1019,7 @@ def timeseries(plot, outfile="time.html"):
    tooltips.append(("Max ", "@max{0.000}"))
    tooltips.append(("Min ", "@min{0.000}"))
    tooltips.append(("Std ", "@stderr{0.000}"))
+   tooltips.append(("Median", "@median{0.000}"))
 
    ts_plot.add_tools(CrosshairTool())
 
@@ -1641,10 +1645,10 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          df = []
          for date, details in data.items():
              line = [date]
-             [line.append(details[i]) for i in ['min', 'max', 'mean', 'std']]
+             [line.append(details[i]) for i in ['min', 'max', 'mean', 'std', 'median']]
              df.append(line)
     
-         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std'], data=df, userLabel=userLabel))
+         plot_data.append(dict(scale=scale, coverage=coverage, yaxis=yaxis,  vars=['date', 'min', 'max', 'mean', 'std', 'median'], data=df, userLabel=userLabel))
          update_status(dirname, my_hash, Plot_status.extracting, percentage=90/len(series))
    elif plot_type == "scatter":
       t_holder = {}
