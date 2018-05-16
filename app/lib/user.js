@@ -1,6 +1,7 @@
 var user = {};
 module.exports = user;
 var utils = require('./utils.js');
+var md5 = require('md5');
 
 /**
  * requiresValidUser is to be used as a chained router function; if the current user has an
@@ -88,4 +89,9 @@ user.getUsername = function(req) {
       username = req.session.passport.user.emails[0].value;
    }
    return username;
+};
+
+user.getUsernameHashed = function(req) {
+   var username = user.getUsername(req);
+   return md5(username);
 };

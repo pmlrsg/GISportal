@@ -78,7 +78,7 @@ router.all('/app/plotting/check_plot', function(req, res) {
 });
 
 router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res) {
-   var username = user.getUsername(req); // Gets the given username
+   var username = user.getUsernameHashed(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var file_list = req.files; // Gets the data given
 
@@ -122,7 +122,7 @@ router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('f
 });
 
 router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res) {
-   var username = user.getUsername(req);
+   var username = user.getUsernameHashed(req);
    var domain = utils.getDomainName(req); // Gets the given domain
 
    var shape_list = [];
@@ -141,7 +141,7 @@ router.get('/app/plotting/get_shapes', user.requiresValidUser, function(req, res
 });
 
 router.get('/app/plotting/delete_geojson', user.requiresValidUser, function(req, res) {
-   var username = user.getUsername(req);
+   var username = user.getUsernameHashed(req);
    var domain = utils.getDomainName(req); // Gets the given domain
    var filename = req.query.filename;
 
@@ -185,7 +185,7 @@ router.all('/app/plotting/upload_csv', user.requiresValidUser, upload.single('fi
 });
 
 router.all('/app/plotting/save_geoJSON', function(req, res) {
-   var username = user.getUsername(req); // Gets the given username
+   var username = user.getUsernameHashed(req); // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var filename = req.query.filename;
    var data = JSON.parse(req.body.data); // Gets the data given
