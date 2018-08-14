@@ -269,7 +269,11 @@ def getMedian(arr):
 Returns the mean value from the provided array.
 """
 def getMean(arr):
-   return float(np.nanmean(arr))
+   try:
+      amean = float(np.nanmean(arr))
+   except ValueError:
+      amean = np.nan
+   return amean
 
 """
 Returns the std value from the provided array.
