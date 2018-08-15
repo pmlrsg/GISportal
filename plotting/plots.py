@@ -1524,7 +1524,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
          
          response = json.loads(hov_stats.process())
       except ValueError:
-         debug(2, u"Data request, {}, failed".format(data_request))
+         debug(2, u"Hovmoller Data request, {}, failed".format(data_request))
          return plot
          
       # TODO - Old style extractor response. If we change it we need to match the change here.
@@ -1588,7 +1588,7 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             data = response['data']
             my_vars = response['vars']
          except ValueError:
-            debug(2, u"Data request, {}, failed".format(data_request))
+            debug(2, u"Extract Data request, {}, failed".format(data_request))
             return plot
             
       # And convert it to a nice simple dict the plotter understands.
@@ -1629,13 +1629,15 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
             ts_stats = BasicStats(extract, coverage, isLog)
             response = json.loads(ts_stats.process())
          except ValueError:
-            debug(2, u"Data request, {}, failed".format(data_request))
+            debug(2, u"Time series Data request, {}, failed(value error)".format(data_request))
+            trace_message = traceback.format_exc()
+            debug(0, u"Exception. Failed to complete plot - {}".format(trace_message))
             return dict(data=[])
          #except urllib2.HTTPError:
             #debug(2, u"Data request, {}, failed".format(data_request))
             #return dict(data=[])
          except requests.exceptions.ReadTimeout:
-            debug(2, u"Data request, {}, failed".format(data_request))
+            debug(2, u"Time series Data request, {}, failed(timeout)".format(data_request))
             return dict(data=[])
          
          debug(4, u"Response: {}".format(response))
@@ -1693,13 +1695,13 @@ def get_plot_data(json_request, plot=dict(), download_dir="/tmp/"):
                   scatter_stats_holder[coverage+'_split_'+layerId] = extract
             debug(2, u"scatter_stats_holder.extract : {}".format(extract))
          except ValueError:
-            debug(2, u"Data request, {}, failed".format(data_request))
+            debug(2, u"Scater Data request, {}, failed".format(data_request))
             return dict(data=[])
          #except urllib2.HTTPError:
             #debug(2, "Data request, {}, failed".format(data_request))
             #return dict(data=[])
          except requests.exceptions.ReadTimeout:
-            debug(2, u"Data request, {}, failed".format(data_request))
+            debug(2, u"Scater Data request, {}, failed".format(data_request))
             return dict(data=[])
       stats = ScatterStats(scatter_stats_holder)
       response = json.loads(stats.process())
