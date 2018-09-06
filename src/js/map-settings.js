@@ -83,8 +83,10 @@ gisportal.map_settings.init = function() {
 
    // set the default value for the base map
    if (typeof gisportal.config.defaultBaseMap != 'undefined' && gisportal.config.defaultBaseMap) {
-      map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
-      $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
+      if (gisportal.config.defaultBaseMap != "none")  { 
+            map.addLayer(gisportal.baseLayers[gisportal.config.defaultBaseMap]);   
+            $('#select-basemap').ddslick('select', { value: gisportal.config.defaultBaseMap });
+      }
    } else {
       map.addLayer(gisportal.baseLayers.EOX);   
       $('#select-basemap').ddslick('select', { value: "EOX" });
