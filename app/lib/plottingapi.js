@@ -115,10 +115,13 @@ plottingApi.processCSV = function(req, res, next) {
             .pipe(csv())
             .on('data', function(data) {
                lineNumber++;
+
                if (data.Date && data.Latitude && data.Longitude) {
                   var longitude = parseFloat(data.Longitude);
                   var latitude = parseFloat(data.Latitude);
-                  if ((!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() && !moment(data.Date, "DD/MM/YYYY HH:mm:ss", true).isValid()) ||
+
+
+                  if ((!moment(data.Date, "DD/MM/YYYY HH:mm", true).isValid() && !moment(data.Date, "DD/MM/YYYY HH:mm:ss", true).isValid() && !moment(data.Date, "DD/MM/YYYY", true).isValid()) ||
                      isNaN(latitude) || isNaN(longitude)) {
                      errorLines.push(lineNumber);
                   } else {
@@ -153,7 +156,7 @@ plottingApi.processCSV = function(req, res, next) {
                      errorLines: errorLines
                   };
                   if (utils.arrayIncludes(errorLines, 2)) {
-                     err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \'Longitude\', \'Latitude\', \'Date\' in that order. There may be an optional 4th column titled data_point for match up files. \n Please correct the errors and upload again';
+                     err.message = 'The data on line 2 is invalid or the CSV headers are invalid or missing; they should be set to \n\nLatitude, Longitude, Date \n\nin that order. There may be an optional 4th column titled data_point for match up files. \n Dates can be in one the following formats \n\nDD/MM/YYYY \nDD/MM/YYYY HH:mm \nDD/MM/YYYY HH:mm:ss \n\n Please correct the errors and upload again';
                   } else {
                      err.message = 'The data on CSV line(s) ' + errorLines.join(", ") + ' is invalid.\nPlease correct the errors and upload again';
                   }
