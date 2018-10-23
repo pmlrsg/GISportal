@@ -103,7 +103,10 @@ class TransectStats(object):
          try:
             track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M:%S")
          except ValueError:
-            track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
+            try:
+                  track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y %H:%M")
+            except ValueError:
+                  track_date = datetime.datetime.strptime(row['Date'], "%d/%m/%Y")
 
          time_index = find_closest(times_sorted, track_date, arr_indexes=times_sorted_indexes, time=True, arr_sorted=True)
 
