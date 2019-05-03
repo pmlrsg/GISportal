@@ -333,10 +333,15 @@ function createDimensionsArray(layer) {
 
    for (var index in layer.Dimension) {
       var dimension = layer.Dimension[index];
+      if (dimension._.indexOf("Z/P") !== -1){
+         // this is a period based time range
+         console.log("A time range with period found!!!");
+      }
       var dimensionList = dimension._.split(",");
       var dimensionValue = dimension._.trim();
 
       if (dimension.$.name == "time") {
+         
          dimensions.temporal = true;
          var newDates = [];
          for (var dimension_index in dimensionList) {
