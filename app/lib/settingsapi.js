@@ -396,7 +396,7 @@ function getArrayFromPeriod(periodString, outputArray){
    var currDate = moment.utc(period_chunks[0]);
    var lastDate = moment.utc(period_chunks[1]);
    var temp_holder = []
-   while(currDate.add(day_interval , 'hours').diff(lastDate) < 0) {
+   while(currDate.add(day_interval , 'hours').diff(lastDate) <= 0) {
       outputArray.push(currDate.toISOString())
    }
 }
