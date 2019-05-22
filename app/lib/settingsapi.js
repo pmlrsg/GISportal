@@ -9,10 +9,8 @@ var titleCase = require('to-title-case');
 var _ = require("underscore");
 var xml2js = require('xml2js');
 
-const Moment = require('moment');
-const momentRange = require('moment-range');
+const moment = require('moment');
 
-const moment = momentRange.extendMoment(Moment);
 const durationjs = require('durationjs')
 
 
