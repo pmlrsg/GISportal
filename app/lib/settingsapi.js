@@ -9,6 +9,11 @@ var titleCase = require('to-title-case');
 var _ = require("underscore");
 var xml2js = require('xml2js');
 
+const moment = require('moment');
+
+const durationjs = require('durationjs')
+
+
 var utils = require('./utils.js');
 var proxy = require('./proxy.js');
 
@@ -333,34 +338,43 @@ function createDimensionsArray(layer) {
 
    for (var index in layer.Dimension) {
       var dimension = layer.Dimension[index];
-      var dimensionList = dimension._.split(",");
-      var dimensionValue = dimension._.trim();
+      
+     
+         var dimensionList = dimension._.split(",");
+         var dimensionValue = dimension._.trim();
 
-      if (dimension.$.name == "time") {
-         dimensions.temporal = true;
-         var newDates = [];
-         for (var dimension_index in dimensionList) {
-            var dimension_str = dimensionList[dimension_index];
-            var dateTime = dimension_str.trim();
-            if (dateTime.search("-") == 4) {
-               newDates.push(dateTime);
-            }
-         }
-         if (newDates.length > 0) {
-            dimensions.firstDate = null;
-            dimensions.lastDate = null;
-
-            for (var i = 0; i < newDates.length; i++) {
-               if (dimensions.firstDate === null || newDates[i] < dimensions.firstDate) {
-                  dimensions.firstDate = newDates[i];
+         if (dimension.$.name == "time") {
+            
+            dimensions.temporal = true;
+            var newDates = [];
+            for (var dimension_index in dimensionList) {
+               var dimension_str = dimensionList[dimension_index];
+               var dateTime = dimension_str.trim();
+               if (dateTime.search("-") == 4 && dateTime.search("Z/P") == -1) {
+                  newDates.push(dateTime);
                }
-               if (dimensions.lastDate === null || newDates[i] > dimensions.lastDate) {
-                  dimensions.lastDate = newDates[i];
+               if (dateTime.search("Z/P") !== -1){
+                  // period date, use function to generate array of dates
+                  getArrayFromPeriod(dateTime, newDates);
+
                }
             }
+            if (newDates.length > 0) {
+               dimensions.firstDate = null;
+               dimensions.lastDate = null;
+
+               for (var i = 0; i < newDates.length; i++) {
+                  if (dimensions.firstDate === null || newDates[i] < dimensions.firstDate) {
+                     dimensions.firstDate = newDates[i];
+                  }
+                  if (dimensions.lastDate === null || newDates[i] > dimensions.lastDate) {
+                     dimensions.lastDate = newDates[i];
+                  }
+               }
+            }
+            dimensionValue = newDates.join().trim();
          }
-         dimensionValue = newDates.join().trim();
-      }
+      
       dimensions.dimensions.push({
          "Name": dimension.$.name,
          "Units": dimension.$.units,
@@ -368,8 +382,25 @@ function createDimensionsArray(layer) {
          "Value": dimensionValue
       });
    }
+   
    return dimensions;
 }
+
+
+// populates the outputArray with dates based on the input periodString
+// example period string : 1998-07-01T00:00:00.000Z/1998-09-01T00:00:00.000Z/P31D
+function getArrayFromPeriod(periodString, outputArray){
+   var period_chunks = periodString.split('/');
+   var period = period_chunks[2];
+   var day_interval = new durationjs(period).inHours();
+   var currDate = moment.utc(period_chunks[0]);
+   var lastDate = moment.utc(period_chunks[1]);
+   var temp_holder = []
+   while(currDate.add(day_interval , 'hours').diff(lastDate) <= 0) {
+      outputArray.push(currDate.toISOString())
+   }
+}
+
 
 function createStylesArray(layer) {
    var styles = [];
