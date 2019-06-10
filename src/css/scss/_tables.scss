@@ -15,7 +15,7 @@ tr:first-child  {
 }
 
 table.stripe tr:nth-child(even)  {
-  background-color: #fbfafb;
+  background-color: $panel-solid-background;
 }
 
 td  {
@@ -37,4 +37,8 @@ table.layers-form-table td{
 
 table.layers-form-table th{
   font-weight: bold;
+}
+
+table td a{
+  color: $panel-solid-color;
 }

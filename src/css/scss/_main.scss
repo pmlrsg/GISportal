@@ -333,11 +333,11 @@ dd {
 
 
 /* ddslick CSS */
-.dd-select{ background: #fff; border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}
-.dd-select.active { background:$panel-content-header; color:#fff; }
+.dd-select { background: #fff; border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}
+.dd-select.active { background:$start-btn-background; color:#fff; }
 .dd-select.active .dd-selected { color:#fff; }
 .dd-desc { color:#aaa; display:block; overflow: hidden; font-weight:normal; line-height: 1.4em; }
-.dd-selected{ overflow:hidden; display:block; padding:10px; color: $selector-text;}
+.dd-selected{ overflow:hidden; display:block; padding:10px; color: #8a7b9b; }
 .dd-pointer{ width:0; height:0; position:absolute; right:14px; top:50%; margin-top:-8px;}
 .dd-pointer-down{ border-right: 1px solid $general-border; border-bottom:1px solid $general-border; width:12px; height:12px; transform: rotate(45deg); -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg);}
 .dd-pointer-up{ border-right:1px solid #fff; border-bottom:1px solid #fff; width:12px; height:12px; transform: rotate(-135deg); -webkit-transform: rotate(-135deg); -ms-transform: rotate(-135deg); margin-top: -2px; }
@@ -353,7 +353,7 @@ dd {
 .dd-option-icon { font-size: 17px; line-height: 19px; margin-right: 5px; }
 .dd-image-right { float:right; margin-right:15px; margin-left:5px;}
 .dd-container{ position:relative; margin-bottom:10px;} .dd-selected-text { font-weight:bold; }
-.dd-selected-soon{ background: $panel-content-header; } .dd-selected-soon a{ color: #fff; }
+.dd-selected-soon{ background: $panel-content-header; } .dd-selected-soon a{ color: $selector-text; }
 
 .noUi-dragable {
   cursor: ew-resize !important;
@@ -386,4 +386,8 @@ dd {
   user-select: none;           /* Non-prefixed version, currently
                                   not supported by any browser */
   cursor: default;
+}
+
+.js-google-auth-button{
+  color: $panel-solid-link;
 }
