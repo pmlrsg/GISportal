@@ -54,7 +54,8 @@
 	
 }
 .active-plot-component[has-data-in-range="yes"]{
-	background-color: #dff0d8 !important;
+  background-color: $active-plot-background !important;
+  color: $active-plot-color;
 }
 .active-plot-component[has-data-in-range="yes"] .icon-data:before{
 	color: green;
@@ -62,14 +63,16 @@
 }
 
 .active-plot-component[has-data-in-range="no"]{
-	background-color: #f2dede !important;
+  background-color: $active-plot-background !important;
+  color: $active-plot-color;
 }
 .active-plot-component[has-data-in-range="no"] .icon-data:before{
 	color: red;
 	content: "\e2c3";
 }
 .active-plot-component[has-data-in-range="partial"]{
-	background-color: #fcf8e3 !important;
+  background-color: $active-plot-background !important;
+  color: $active-plot-color;
 }
 .active-plot-component[has-data-in-range="partial"] .icon-data:before{
 	color: orange;
