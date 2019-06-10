@@ -16,8 +16,9 @@ svg {
    transform: translate3D(0,0,0); /* Performance improvement hack */
    box-shadow: 0px 0px 11px -2px black;
    padding: 5px;
-   background: #fff;
+   background: $timeline-background;
    z-index: 10;
+   color: $timeline-color;
 }
 
 .timeline-container h3 {
@@ -30,7 +31,7 @@ svg {
 }
 
 .timeline-inner  {
-   background-color: #fff;
+   background-color: $timeline-background;
    margin: 0 auto;
    position: relative;
    width: 100%;
@@ -56,7 +57,7 @@ svg {
 
 .main text:hover,
 .main text:focus  {
-   fill: #32253f;
+   fill: $timeline-color;
 }
 
 .separatorLine {
