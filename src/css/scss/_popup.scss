@@ -1,13 +1,14 @@
 .ol-popup {
   position: absolute;
-  background-color: white;
-  -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
-  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+  background-color: $popup-background;
+  -webkit-filter: $popup-shadow;
+  filter: $popup-shadow;
   padding: 15px;
-  border: 1px solid #cccccc;
+  border: $popup-border;
   bottom: 12px;
   left: -50px;
   white-space: nowrap;
+  color: $popup-color;
 }
 .ol-popup li {
    list-style: square;
@@ -24,7 +25,7 @@
   pointer-events: none;
 }
 .ol-popup:after {
-  border-top-color: white;
+  border-top-color: $popup-arrow;
   border-width: 10px;
   left: 48px;
   margin-left: -10px;
@@ -40,6 +41,7 @@
   position: absolute;
   top: 2px;
   right: 8px;
+  color: $popup-color;
 }
 .ol-popup-closer:after {
   content: "x";

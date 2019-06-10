@@ -271,7 +271,8 @@ table.stripe td:nth-child(odd) {
 }
 
 .show-geocoder-holder{
-  background-color: #ffffff;
+  background-color: $panel-solid-background;
+  color: $panel-solid-color;
   width: 100%;
 }
 

@@ -76,7 +76,7 @@
 }
 
 .panel-footer  {
-  box-shadow: 0px -1px 5px -2px #000000;
+  box-shadow: $footer-shadow;
   z-index: 42;
   text-align: right;
   color: white;
@@ -104,7 +104,9 @@
 }
 
 .panel-container-solid-backdrop{
-  background-color: rgb(239, 237, 241);
+  // background-color: rgb(239, 237, 241);
+  background-color: $panel-solid-background;
+  color: $panel-solid-color;
   padding: 8px;
 }
 
@@ -121,7 +123,8 @@
 }
 
 .panel-tab  {
-  background-color: #ffffff;
+  background-color: $panel-solid-background;
+  color: $panel-solid-color;
   width: 100%;
   display: none;
   padding-top: 20px;
@@ -449,9 +452,9 @@ input.search:focus  {
 
 .show-tools  {
    font-family: "Open Sans";
-   background-color: #fafafb;
+   background-color: $button-primary;
    box-shadow: 0px 0px 11px -2px black;
-   border: 1px solid #fafafb;
+   border: 1px solid $button-primary;
    line-height: 32px;
    padding-right: 15px;
    left: 10px;
@@ -461,6 +464,7 @@ input.search:focus  {
    -moz-appearance: none;
    height: 40px;
    z-index: 10;
+   color: $button-color;
 }
 
 .show-tools span{
