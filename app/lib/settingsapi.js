@@ -137,6 +137,7 @@ function loadCache(username, permission, names, master_path, cachePrefix) {
 }
 
 settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
+   wmsURL = wmsURL.trim();
    wmsURL = wmsURL.replace(/\?.*/g, "") + "?";
    var data = null;
    var serverName = utils.URLtoServerName(wmsURL);
