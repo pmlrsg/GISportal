@@ -53,37 +53,34 @@
  	padding: 0px;
 	
 }
-.active-plot-component[has-data-in-range="yes"]{
-  background-color: $active-plot-background !important;
-  color: $active-plot-color;
+.active-plot-component{color: #111!important}
+.active-plot-component[has-data-in-range=yes] {
+ background-color:#dff0d8!important
 }
-.active-plot-component[has-data-in-range="yes"] .icon-data:before{
-	color: green;
-	content: "\e303";
+.active-plot-component[has-data-in-range=yes] .icon-data:before {
+ color:green;
+ content:"\e303"
 }
-
-.active-plot-component[has-data-in-range="no"]{
-  background-color: $active-plot-background !important;
-  color: $active-plot-color;
+.active-plot-component[has-data-in-range=no] {
+ background-color:#f2dede!important
 }
-.active-plot-component[has-data-in-range="no"] .icon-data:before{
-	color: red;
-	content: "\e2c3";
+.active-plot-component[has-data-in-range=no] .icon-data:before {
+ color:red;
+ content:"\e2c3"
 }
-.active-plot-component[has-data-in-range="partial"]{
-  background-color: $active-plot-background !important;
-  color: $active-plot-color;
+.active-plot-component[has-data-in-range=partial] {
+ background-color:#fcf8e3!important
 }
-.active-plot-component[has-data-in-range="partial"] .icon-data:before{
-	color: orange;
-	content: "\e333";
+.active-plot-component[has-data-in-range=partial] .icon-data:before {
+ color:orange;
+ content:"\e333"
 }
 
 .graph-job{
 	padding: 6px 0px;
-	background-color: #F5F3F6;
+	background-color: $panel-solid-background;
    margin: 6px;
-   border: 1px solid $general-border;
+   border: 1px solid $panel-solid-background;
 }
 
 .graph-job .loading-image{
