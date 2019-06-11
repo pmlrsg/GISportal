@@ -334,7 +334,7 @@ dd {
 
 /* ddslick CSS */
 .dd-select { background: #fff; border-radius:2px; border:solid 1px #ccc; position:relative; cursor:pointer;}
-.dd-select.active { background:$start-btn-background; color:#fff; }
+.dd-select.active { background:$action-button-color; color:#fff; }
 .dd-select.active .dd-selected { color:#fff; }
 .dd-desc { color:#aaa; display:block; overflow: hidden; font-weight:normal; line-height: 1.4em; }
 .dd-selected{ overflow:hidden; display:block; padding:10px; color: #8a7b9b; }
