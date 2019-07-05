@@ -265,6 +265,7 @@ gisportal.layer = function( options ) {
       setTimeout(function(){
         apply_changes.offsetWidth = apply_changes.offsetWidth;
         apply_changes.addClass('progress-btn').off('click').on('click', function(){
+           // this is called if you skip the wait and click the button. 
            clearTimeout(layer.scalebarTimeout);
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
            gisportal.scalebars.autoScale(layer.id);
@@ -275,6 +276,7 @@ gisportal.layer = function( options ) {
            };
            gisportal.events.trigger('scalebar.apply-changes', params);
         });
+        clearTimeout(layer.scalebarTimeout);
         layer.scalebarTimeout = setTimeout(function(){
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
            gisportal.scalebars.autoScale(layer.id);
