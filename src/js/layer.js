@@ -276,6 +276,7 @@ gisportal.layer = function( options ) {
            };
            gisportal.events.trigger('scalebar.apply-changes', params);
         });
+        // this clearTimeout is required to restart the load timer - issue #74
         clearTimeout(layer.scalebarTimeout);
         layer.scalebarTimeout = setTimeout(function(){
            apply_changes.toggleClass('hidden', true).toggleClass('progress-btn', false);
