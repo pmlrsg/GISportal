@@ -679,28 +679,32 @@ settings.load_data_values = function(req, res) {
                if (err) {
                   utils.handleError(err, res);
                } else {
-                  content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
-                  if (content_type == "text/xml") {
-                     xml2js.parseString(body, {
-                        tagNameProcessors: [settingsApi.stripPrefix],
-                        attrNameProcessors: [settingsApi.stripPrefix]
-                     }, function(err, result) {
-                        if (err) {
-                           utils.handleError(err, res);
-                        } else {
-                           var output = name + ":";
-                           try {
-                              for (var key in result.FeatureInfoResponse.FIELDS[0].$) {
-                                 output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                  try{
+                     content_type = response.headers['content-type'].replace(';charset=UTF-8', '');
+                     if (content_type == "text/xml") {
+                        xml2js.parseString(body, {
+                           tagNameProcessors: [settingsApi.stripPrefix],
+                           attrNameProcessors: [settingsApi.stripPrefix]
+                        }, function(err, result) {
+                           if (err) {
+                              utils.handleError(err, res);
+                           } else {
+                              var output = name + ":";
+                              try {
+                                 for (var key in result.FeatureInfoResponse.FIELDS[0].$) {
+                                    output += "<br/>" + key + ": " + result.FeatureInfoResponse.FIELDS[0].$[key];
+                                 }
+                              } catch (e) {
+                                 output += "<br/>no data found at this point";
                               }
-                           } catch (e) {
-                              output += "<br/>no data found at this point";
+                              response_text = output;
                            }
-                           response_text = output;
-                        }
-                     });
-                  } else if (content_type == "text/plain" || content_type == "text/html") {
-                     response_text = name + ":<br/>" + body.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                        });
+                     } else if (content_type == "text/plain" || content_type == "text/html") {
+                        response_text = name + ":<br/>" + body.replace(/(?:\r\n|\r|\n)/g, '<br />');
+                     }
+                  } catch (e) {
+                     output += "Sorry, could not calculate a value for: " + name;
                   }
                   res.send(response_text);
                }
