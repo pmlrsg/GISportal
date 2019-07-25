@@ -704,6 +704,7 @@ settings.load_data_values = function(req, res) {
                         response_text = name + ":<br/>" + body.replace(/(?:\r\n|\r|\n)/g, '<br />');
                      }
                   } catch (e) {
+                     var output;
                      output += "Sorry, could not calculate a value for: " + name;
                   }
                   res.send(response_text);
