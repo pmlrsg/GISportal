@@ -90,7 +90,7 @@ def basic(dataset, variable, irregular=False, original=None, filename="debugging
       min = getMin(row)
       max = getMax(row)
       
-      if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median):
+      if np.isnan(max) or np.isnan(min) or np.isnan(std) or np.isnan(mean) or np.isnan(median) or np.isinf(std):
          pass
       else:
          output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
