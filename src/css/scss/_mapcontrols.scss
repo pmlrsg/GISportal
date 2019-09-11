@@ -34,7 +34,7 @@
    position: absolute; 
    top: 25px; 
    right: 10px;
-   background-color: $action-button-color;
+   background-color: $button-top-actions;
    box-shadow: 0px 0px 11px -2px black;
    z-index: 10;
    color: $button-color;
@@ -48,11 +48,11 @@
    position: absolute;
    top: 25px;
    right: 160px;
-   background-color: $action-button-color;
+   background-color: $button-top-actions;
    box-shadow: 0px 0px 11px -2px black;
    padding: 7px;
    z-index: 10;
-   color: $button-color;
+   color: $button-top-actions-text;
 }
 
 .ol-zoom button, .ol-full-screen button {
@@ -64,7 +64,7 @@
   padding: 5px 10px;
   margin: 2px;
   font-size: 16px;
-  color: $button-color;
+  color: $button-top-actions-text;
 }
 
 .ol-attribution {
@@ -83,17 +83,17 @@
    position: absolute;
    top: 25px;
    right: 200px;
-   background-color: $action-button-color;
+   background-color: $button-top-actions;
    box-shadow: 0px 0px 11px -2px black;
    padding: 7px;
    cursor: default;
    z-index: 10;
-   color: $button-color;
+   color: $button-top-actions-text;
 }
 .ol-scale-line-inner {
    border-width: 0px 1px 1px 1px;
    border-style: solid;
-   border-color: $button-color;
+   border-color: $button-top-actions-text;
    padding-left: 7px;
 }
 .js-map-settings-message {
