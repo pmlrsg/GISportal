@@ -1334,16 +1334,21 @@ gisportal.indicatorsPanel.focusOnBuildGraphCompoent = function( layerId ){
 };
 
 gisportal.indicatorsPanel.vectorSelectSwitch = function( layerID , tabName) {
-   //Why is this empty??!!
+   //Why is this empty??!! localhost:6789
 };
+
 
 gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
    // Select tab
    if(tabName=="analysis"){
       gisportal.vectorSelectionTest( layerId, tabName );
    }
+   if(tabName=="visualisation"){
+      console.log('here!!!!!!');
+      $('#tab-adg_412_bias__-visualisation').prop( 'checked', true ).trigger('change');
+   }
    $('#tab-' + layerId + '-' + tabName).prop( 'checked', true ).trigger('change');
-
+   // $('#tab-adg_412_bias__UserDefinedLayer-visualisation').prop( 'checked', true ).trigger('change');
    //Scroll to layer
    var containerScroll = $('#indicatorsPanel').scrollTop();
    var layerTop = $('#indicatorsPanel > ul > [data-id="' + layerId + '"]').position().top;

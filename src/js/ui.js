@@ -26,10 +26,12 @@ It's badly written and overly complicated; it really belongs in indicators.js wh
 
 $(document).ready(function()  {
    $('.panel').on('click', '.js-indicator-tab-trigger', function(){
+      console.log('indicator tab clicked!');
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
-
+      console.log(layerId);
+      console.log(tabName);
       var params = {
          "event" : "tab.select",
          "layerId": layerId,
@@ -57,6 +59,7 @@ $(document).ready(function()  {
 \*------------------------------------*/
 
 function changeTab( tabElement )  {
+  console.log('tab element is ' + tabElement);
   if( tabElement && tabElement instanceof HTMLElement )
     tabElement = tabElement;
   else

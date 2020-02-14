@@ -1,0 +1,5 @@
+<input type="radio" id="tab-{{id}}-visualisation" name="tabs" data-tab-name="visualisation" {{checked visibleTab "visualisation"}} class="js-tab-trigger panel-tab-trigger">
+<div class="panel-tab">
+   <h1>Visualisation</h1>
+</div>
+
