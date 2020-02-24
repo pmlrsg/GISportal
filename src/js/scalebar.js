@@ -170,15 +170,16 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
          }
       }catch(e){}
    }
-
-   if(parameters.length > 0 && base.indexOf("?") ==-1){
+   if(parameters.length > 0 && base.length > 0 && base.indexOf("?") == -1){
       parameters = "?" + parameters;
    }
 
+
    if (base.length > 0){
       return base + parameters;
-   }else
-      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + '&format=image/png';
+   }else {
+      return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + '&format=image/png&service=WMS&version=1.3.0&sld_version=1.1.0';
+   }
 };
 
 /**
