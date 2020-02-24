@@ -198,7 +198,12 @@ gisportal.layer = function( options ) {
                   default_style = prev_style || value.Name;
                }
             });
-            this.style = default_style || this.styles[0].Name;
+            if (this.styles.length > 0) {
+               this.style = default_style || this.styles[0].Name;
+            }
+            else {
+               this.style = default_style;
+            }
          }       
       }
       
