@@ -70,9 +70,13 @@
 }
 
 .alert-warning {
-    color: #8a6d3b;
-    background-color: #fcf8e3;
-    border-color: #faebcc
+    color: $alert-color;
+    background-color: $alert-background;
+    border-color: #faebcc;
+}
+
+.alert-warning a{
+    color: $alert-color;
 }
 
 .alert-warning hr {
