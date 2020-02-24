@@ -171,14 +171,19 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
       }catch(e){}
    }
 
-   if(parameters.length > 0 && base.indexOf("?") ==-1){
-      parameters = "?" + parameters;
+   if(parameters.length > 0 && base.indexOf("?") == -1){
+      //parameters = "?" + parameters;
    }
+   parameters = parameters + "&service=WMS&version=1.3.0&sld_version=1.1.0";
+   console.log(parameters);
 
    if (base.length > 0){
+      console.log("inside basse"+parameters);
       return base + parameters;
-   }else
+   }else {
+      console.log("inside else" +layer.urlName);
       return layer.wmsURL + 'REQUEST=GetLegendGraphic&LAYER=' + layer.urlName + parameters + '&format=image/png';
+   }
 };
 
 /**
