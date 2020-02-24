@@ -130,3 +130,25 @@ utils.handleError = function(err, res) {
       log.error(err);
    } catch (e) {}
 };
+
+/**
+ * Test an object for a value and return it if found
+ * if not return a default value
+ * @param  {object} testObj Object to be checked
+ * @param  {string} testKey Key to look for
+ * @param  {*}      deafultValue value to use if key not found 
+ * @return {*}      The value from testObj or default
+ */
+utils.getParamWithDefault = function(testObj, testKey, defaultValue) {
+   
+   try {
+      if (testKey in testObj){
+         return testObj[testKey]
+      }
+      else {
+         return defaultValue;
+      }
+   } catch (e) {
+      return defaultValue;
+   }
+}
