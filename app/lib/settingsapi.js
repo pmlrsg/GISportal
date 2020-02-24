@@ -161,61 +161,68 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
                   next(err, data);
                } else {
                   try {
-                     var provider;
+                     var provider = "Not Configured";
                      var contact_info = {};
-                     var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
-                     var contact_person = contact_data.ContactPersonPrimary[0].ContactPerson;
-                     var contact_organization = contact_data.ContactPersonPrimary[0].ContactOrganization;
-                     var contact_position = contact_data.ContactPosition;
-                     var contact_address;
-                     var contact_city;
-                     var contact_state;
-                     var contact_post_code;
-                     var contact_country;
-                     var address = "";
-                     var address_block = contact_data.ContactAddress;
-                     if (address_block) {
-                        contact_address = address_block[0].Address;
-                        contact_city = address_block[0].City;
-                        contact_state = address_block[0].StateOrProvince;
-                        contact_post_code = address_block[0].PostCode;
-                        contact_country = address_block[0].Country;
-                     }
-                     var contact_phone = contact_data.ContactVoiceTelephone;
-                     var contact_email = contact_data.ContactElectronicMailAddress;
+                     // var contact_person = [];
+                     // var contact_organization = [];
+                     // all the below needs to be made optional and dependencies later on fixed
+                     if ("ContactInformation" in result.WMS_Capabilities.Service[0]) {
+                        var contact_data = result.WMS_Capabilities.Service[0].ContactInformation[0];
+                        if ("ContactPersonPrimary" in contact_data){
+                           var contact_person = utils.getParamWithDefault(contact_data.ContactPersonPrimary[0], "ContactPerson", "Not Provided");
+                           var contact_organization = utils.getParamWithDefault(contact_data.ContactPersonPrimary[0], "ContactOrganization", "Not Provided");
+                        }
+                        var contact_position = utils.getParamWithDefault(contact_data, "ContactPosition", "Not Provided");
+                        var contact_address;
+                        var contact_city;
+                        var contact_state;
+                        var contact_post_code;
+                        var contact_country;
+                        var address = "";
+                        var address_block = contact_data.ContactAddress;
+                        if (address_block) {
+                           contact_address = address_block[0].Address;
+                           contact_city = address_block[0].City;
+                           contact_state = address_block[0].StateOrProvince;
+                           contact_post_code = address_block[0].PostCode;
+                           contact_country = address_block[0].Country;
+                        }
+                        var contact_phone = utils.getParamWithDefault(contact_data, "ContactVoiceTelephone", "Not Provided");
+                        var contact_email = utils.getParamWithDefault(contact_data, "ContactElectronicMailAddress", "Not Provided");
 
-                     if (contact_person[0].length > 0) {
-                        contact_info.person = contact_person[0];
-                     }
-                     if (typeof(contact_organization[0]) == 'string') {
-                        provider = contact_organization[0];
-                     }
-                     if (contact_position && contact_position[0].length > 0) {
-                        contact_info.position = contact_position[0];
-                     }
-                     if (contact_address && contact_address[0].length > 0) {
-                        address += contact_address[0] + "<br/>";
-                     }
-                     if (contact_city && contact_city[0].length > 0) {
-                        address += contact_city[0] + "<br/>";
-                     }
-                     if (contact_state && contact_state[0].length > 0) {
-                        address += contact_state[0] + "<br/>";
-                     }
-                     if (contact_post_code && contact_post_code[0].length > 0) {
-                        address += contact_post_code[0] + "<br/>";
-                     }
-                     if (contact_country && contact_country[0].length > 0) {
-                        address += contact_country[0] + "<br/>";
-                     }
-                     if (contact_phone && contact_phone[0].length > 0) {
-                        contact_info.phone = contact_phone[0];
-                     }
-                     if (contact_email && contact_email[0].length > 0) {
-                        contact_info.email = contact_email[0];
-                     }
-                     if (address.length > 0) {
-                        contact_info.address = address;
+                        if (contact_person && typeof contact_person != "string" && contact_person[0].length > 0) {
+                           contact_info.person = contact_person[0];
+                        }
+                        if (contact_organization && typeof(contact_organization[0]) == 'string') {
+                           provider = contact_organization[0];
+                        }
+                        if (contact_position && typeof contact_position != "string" && contact_position[0].length > 0) {
+                           contact_info.position = contact_position[0];
+                        }
+                        if (contact_address && contact_address[0].length > 0) {
+                           address += contact_address[0] + "<br/>";
+                        }
+                        if (contact_city && contact_city[0].length > 0) {
+                           address += contact_city[0] + "<br/>";
+                        }
+                        if (contact_state && contact_state[0].length > 0) {
+                           address += contact_state[0] + "<br/>";
+                        }
+                        if (contact_post_code && contact_post_code[0].length > 0) {
+                           address += contact_post_code[0] + "<br/>";
+                        }
+                        if (contact_country && contact_country[0].length > 0) {
+                           address += contact_country[0] + "<br/>";
+                        }
+                        if (contact_phone && typeof contact_phone != "string" && contact_phone[0].length > 0) {
+                           contact_info.phone = contact_phone[0];
+                        }
+                        if (contact_email && typeof contact_email != "string" && contact_email[0].length > 0) {
+                           contact_info.email = contact_email[0];
+                        }
+                        if (address.length > 0) {
+                           contact_info.address = address;
+                        }
                      }
 
                      var layers = [];
@@ -265,6 +272,7 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
                         sub_master_cache.serverName = serverName;
                         sub_master_cache.contactInfo = contact_info;
                         sub_master_cache.provider = provider.replace(/&amp;/g, '&');
+                        
                         sub_master_cache.timeStamp = new Date();
 
                         data = JSON.stringify(sub_master_cache);
