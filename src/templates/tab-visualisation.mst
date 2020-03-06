@@ -1,5 +1,42 @@
 <input type="radio" id="tab-{{id}}-visualisation" name="tabs" data-tab-name="visualisation" {{checked visibleTab "visualisation"}} class="js-tab-trigger panel-tab-trigger">
-<div class="panel-tab">
-   <h1>Visualisation</h1>
+<div class="panel-tab dimensions-tab">
+   <div id="colorsWrap" class="bands-to-rgb">
+      <p>Drag bands onto RGB fields.</p><br/>
+      <div class="colorsContainer" id="colorsHolder">
+      <div data-id="B01" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 1 - Coastal aerosol - 443 nm " style="background-color: rgb(76, 23, 226);">B01</div>
+      <div data-id="B02" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 2 - Blue - 490 nm " style="background-color: rgb(105, 154, 255);">B02</div>
+      <div data-id="B03" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 3 - Green - 560 nm " style="background-color: rgb(164, 210, 111);">B03</div>
+      <div data-id="B04" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 4 - Red - 665 nm " style="background-color: rgb(228, 113, 33);">B04</div>
+      <div data-id="B05" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 5 - Vegetation Red Edge - 705 nm" style="background-color: rgb(186, 10, 10);">B05</div>
+      <div data-id="B06" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 6 - Vegetation Red Edge - 740 nm" style="background-color: rgb(204, 20, 18);">B06</div>
+      <div data-id="B07" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 7 - Vegetation Red Edge - 783 nm" style="background-color: rgb(192, 6, 7);">B07</div>
+      <div data-id="B08" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 8 - NIR - 842 nm" style="background-color: rgb(195, 30, 32);">B08</div>
+      <div data-id="B09" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 9 - Water vapour - 945 nm" style="background-color: rgb(179, 26, 27);">B09</div>
+      <div data-id="B10" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 10 - SWIR - Cirrus - 1375 nm" style="background-color: rgb(215, 18, 52);">B10</div>
+      <div data-id="B11" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 11 - SWIR - 1610 nm" style="background-color: rgb(153, 1, 52);">B11</div>
+      <div data-id="B12" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 12 - SWIR - 2190 nm" style="background-color: rgb(128, 0, 0);">B12</div>
+      <div data-id="B8A" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 8A - Vegetation Red Edge - 865 nm" style="background-color: rgb(188, 14, 16);">B8A</div>
+   </div>
+      <div class="colorsOutput">
+         <b>R:</b>
+         <div class="colHolder" data-col-prefix="r">
+            <div class="bandItem rvalue" title="Band 2 - Blue - 490 nm " style="background-color: rgb(105, 154, 255);" ondrop="drop(event)" ondragover="allowDrop(event)">B02</div>
+         </div>
+         <b>G:</b>
+         <div class="colHolder" data-col-prefix="g">
+            <div class="bandItem gvalue" title="Band 2 - Blue - 490 nm " style="background-color: rgb(105, 154, 255);" ondrop="drop(event)" ondragover="allowDrop(event)">B02</div>
+         </div>
+         <b>B:</b>
+         <div class="colHolder" data-col-prefix="b">
+            <div class="bandItem bvalue" title="Band 2 - Blue - 490 nm " style="background-color: rgb(105, 154, 255);" ondrop="drop(event)" ondragover="allowDrop(event)">B02</div>
+         </div>
+      </div>
+	<br/>
+	<center>
+		<button class="generate_layer_visualisation brand secondary">Update Layer</button>
+	</center>
+	<br/>
+	<br/>
+   </div>
 </div>
 

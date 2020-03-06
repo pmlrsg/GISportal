@@ -441,6 +441,7 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
    }
    gisportal.indicatorsPanel.detailsTab(id);
    gisportal.indicatorsPanel.analysisTab(id);
+   gisportal.indicatorsPanel.visualisationTab(id);
 
    //Add the scale bar tooltip
    var renderedTooltip = gisportal.templates['tooltip-scalebar']( layer );
@@ -587,6 +588,25 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
 };
+
+gisportal.indicatorsPanel.visualisationTab = function(id) {
+   var indicator = gisportal.layers[id];
+   var rendered = gisportal.templates['tab-visualisation'](indicator);
+   $('[data-id="' + id + '"] .js-tab-visualisation').html(rendered);
+   $('.generate_layer_visualisation').click( function(){
+      var rvalue = $(".rvalue").html();
+      var gvalue = $(".gvalue").html();
+      var bvalue = $(".bvalue").html();
+      var rgbArray = [];
+      var rgb = {};
+      rgb.r = rvalue;
+      rgb.g = gvalue;
+      rgb.b = bvalue;
+      rgbArray.push(rgb);
+      console.log(rgbArray);
+   });
+}
+
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
    var indicator = gisportal.layers[id];
@@ -1344,7 +1364,7 @@ gisportal.indicatorsPanel.selectTab = function( layerId, tabName ){
       gisportal.vectorSelectionTest( layerId, tabName );
    }
    if(tabName=="visualisation"){
-      console.log('here!!!!!!');
+      $('#tab-adg_412_bias__-visualisation').show();
       $('#tab-adg_412_bias__-visualisation').prop( 'checked', true ).trigger('change');
    }
    $('#tab-' + layerId + '-' + tabName).prop( 'checked', true ).trigger('change');
@@ -1550,3 +1570,23 @@ function selectAboveMaxBelowMinOptions(id, aboveMaxColor, belowMinColor) {
       $('.js-custom-belowMinColor[data-id="' + id + '"]').val(belowMinColor);
    }
 }
+
+/** Draggable **/
+
+function allowDrop(ev) {
+   ev.preventDefault();
+ }
+ 
+ function drag(ev) {
+    ev.dataTransfer.setData("number", ev.srcElement.attributes[0].nodeValue);
+    ev.dataTransfer.setData("color", ev.srcElement.attributes[5].nodeValue);
+ }
+ 
+ function drop(ev) {
+   ev.preventDefault();
+   var number = ev.dataTransfer.getData("number");
+   var color = ev.dataTransfer.getData("color");
+   ev.srcElement.attributes[2].nodeValue = color;
+   ev.srcElement.firstChild.data = number; 
+   // call the refresh layer with new colours
+ }
