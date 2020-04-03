@@ -508,8 +508,6 @@ settings.restore_server_cache = function(req, res) {
 };
 
 settings.update_layer = function(req, res) {
-console.log('settings.update_layer request');
-console.log(req);
    var owner = req.query.username; // Gets the given username
    var domain = utils.getDomainName(req); // Gets the given domain
    var data = JSON.parse(req.body.data); // Gets the data given
