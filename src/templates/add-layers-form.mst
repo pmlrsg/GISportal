@@ -164,5 +164,17 @@
          </div>
       {{/each}}
       <span title="Add Another Tag" data-total-pages="{{total_pages}}" data-current-page="{{list_id}}" class="add-tag-input icon-tag-add btn icon-btn left-icon"></span>
+<br/><br/>
+<h1>RGB check is returning : {{rgb_check}}</h1> <!-- to be removed-->
+	<input type="checkbox" data-field="rgb_check" {{#if rgb_check}}checked{{/if}}  id="rgb_check" name="rgb_check" value="" style="margin-left:0;min-width:auto;" data-id="{{list_id}}"/>
+	<label for="rgb_check">Is this layer RGB enabled?</label>
+</br>
+<select id="rgb_type" name="rgb_type" data-field="rgb_type" data-id="{{list_id}}"> <!-- this needs some logic for show/hide once the variable is working -->
+<option value="" disabled selected>Select a multiband type</option>
+<option value="sen2">Sentinel 2</option>
+<option value="olci">OLCI</option>
+</select>
+
+
    </div>
 </form>
