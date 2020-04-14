@@ -303,11 +303,11 @@ table.stripe td:nth-child(odd) {
     .bands-to-rgb .colorsContainer div {
       box-shadow: 2px 2px 3px #333;
       display: inline-block;
-      width: 36px;
-      height: 36px;
-      border-radius: 50px;
+      width: 50px;
+      height: 50px;
+      border-radius: 5px;
       text-align: center;
-      line-height: 34px;
+      line-height: 25px;
       display: inline-block;
       margin: 5px 10px;
       cursor: pointer;
@@ -324,7 +324,7 @@ table.stripe td:nth-child(odd) {
     width: 50px;
     height: 50px;
     margin: 10px;
-    border-radius: 50px;
+    border-radius: 5px;
     position: relative; }
     .bands-to-rgb .colHolder:before {
       position: absolute;
@@ -338,7 +338,7 @@ table.stripe td:nth-child(odd) {
       content: '';
       display: block; }
     .bands-to-rgb .colHolder div {
-      border-radius: 50px;
+      border-radius: 5px;
       box-shadow: 2px 2px 3px #333;
       position: absolute;
       left: 0;
@@ -348,7 +348,7 @@ table.stripe td:nth-child(odd) {
       height: inherit;
       background: purple;
       text-align: center;
-      line-height: 50px;
+      line-height: 25px;
       text-shadow: 0 1px 0 #333;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -357,6 +357,6 @@ table.stripe td:nth-child(odd) {
         z-index: 1; }
         .colorsOutput * {
           flex: 1;
-          line-height: 70px;
+          line-height: 25px;
           text-align: right;
       }

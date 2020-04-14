@@ -594,9 +594,9 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
    var rendered = gisportal.templates['tab-visualisation'](indicator);
    $('[data-id="' + id + '"] .js-tab-visualisation').html(rendered);
    $('.generate_layer_visualisation').click( function(){
-      var rvalue = $(".rvalue").html();
-      var gvalue = $(".gvalue").html();
-      var bvalue = $(".bvalue").html();
+      var rvalue = $(".rvalue span").html().split("<br>")[0];
+      var gvalue = $(".gvalue span").html().split("<br>")[0];
+      var bvalue = $(".bvalue span").html().split("<br>")[0];
       var rgbArray = [];
       var rgb = {};
       rgb.r = rvalue;
@@ -605,8 +605,8 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
       rgbArray.push(rgb);
       console.log(rgbArray);
    });
-}
-
+};
+  
 
 gisportal.indicatorsPanel.analysisTab = function(id) {
    var indicator = gisportal.layers[id];
@@ -1586,7 +1586,10 @@ function allowDrop(ev) {
    ev.preventDefault();
    var number = ev.dataTransfer.getData("number");
    var color = ev.dataTransfer.getData("color");
-   ev.srcElement.attributes[2].nodeValue = color;
-   ev.srcElement.firstChild.data = number; 
+   console.log("color = "+color);
+   console.log("number = "+number);
+   ev.srcElement.closest(".bandItem").style = color;
+   console.log(ev.srcElement);
+   ev.srcElement.innerHTML = "<span>"+number+"</span>"; 
    // call the refresh layer with new colours
  }
