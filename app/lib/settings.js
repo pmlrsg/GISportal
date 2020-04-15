@@ -578,6 +578,7 @@ settings.add_user_layer = function(req, res) {
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
       }
+
       if (JSON.stringify(data) == "{}") {
          return res.status(404).send();
       }
@@ -587,6 +588,7 @@ settings.add_user_layer = function(req, res) {
 
          if ('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer) { // Checks that the layer has the required fields
             var found = false;
+
             for (var old_layer in data.server.Layers) { // Loops through each old layer to be compared.
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
                   var new_data_layer = data.server.Layers[old_layer]; //
@@ -601,8 +603,8 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
-		  new_data_layer.rgb_check = this_new_layer.rgb_check;
-		  new_data_layer.rgb_type = this_new_layer.rgb_type;
+		            new_data_layer.rgb_check = this_new_layer.rgb_check;
+		            new_data_layer.rgb_type = this_new_layer.rgb_type;
                   for (var key in this_new_layer.tags) {
                      var val = this_new_layer.tags[key];
                      if (val && val.length > 0 && val[0] !== "") {
