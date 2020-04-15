@@ -603,7 +603,6 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
       rgb.g = gvalue;
       rgb.b = bvalue;
       rgbArray.push(rgb);
-      console.log(rgbArray);
    });
 };
   
@@ -1586,10 +1585,9 @@ function allowDrop(ev) {
    ev.preventDefault();
    var number = ev.dataTransfer.getData("number");
    var color = ev.dataTransfer.getData("color");
-   console.log("color = "+color);
-   console.log("number = "+number);
+
    ev.srcElement.closest(".bandItem").style = color;
-   console.log(ev.srcElement);
+
    ev.srcElement.innerHTML = "<span>"+number+"</span>"; 
    // call the refresh layer with new colours
  }

@@ -1448,7 +1448,6 @@ gisportal.api['drawPolygon.clicked'] = function(data, options){
  fromSavedState: if this selection was from a saved state
   */
 gisportal.api['indicatorsPanel.geoJSONSelected'] = function(data, options){
-   console.log(data);
    options = options || {};
 
    if(options.describeOnly){
