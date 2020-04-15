@@ -170,11 +170,9 @@ gisportal.scalebars.createGetLegendURL = function(layer, base, preview)  {
          }
       }catch(e){}
    }
-
-   if(parameters.length > 0 && base.indexOf("?") ==-1){
+   if(parameters.length > 0 && base.indexOf("?") == -1){
       parameters = "?" + parameters;
    }
-
    if (base.length > 0){
       return base + parameters;
    }else

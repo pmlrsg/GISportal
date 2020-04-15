@@ -275,6 +275,8 @@ gisportal.createOpLayers = function() {
          "belowMinColor": belowMinColor,
          "defaultStyle": indicator.defaultStyle || gisportal.config.defaultStyle,
          "log": indicator.log,
+         "rgb_check": indicator.rgb_check,
+         "rgb_type": indicator.rgb_type,
 
          //orginal
          "firstDate": indicator.FirstDate, 
@@ -779,6 +781,7 @@ gisportal.selectedFeatures = [];
 gisportal.initWMSlayers = function(data, opts) {
 
    if (data !== null)  {
+
       gisportal.cache.wmsLayers = data;
       // Create browse categories list
       gisportal.loadBrowseCategories(data);

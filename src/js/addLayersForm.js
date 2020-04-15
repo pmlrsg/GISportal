@@ -57,6 +57,8 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    var region = layer.tags.region || "";
    var interval = layer.tags.interval || "";
    var model = layer.tags.model || "";
+   var rgb_check = layer.rgb_check || "";
+   var rgb_type = layer.rgb_type || "";
    var styles_file = gisportal.middlewarePath + '/cache/layers/' + layer.serverName+"_"+layer.urlName+".json" || "";
    var legendSettings = layer.legendSettings || {
          "scalePoints":false,
@@ -126,7 +128,9 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
       "legendSettings": legendSettings,
       "title": layer.serverName,
       "dict": dict,
-      "tags_dict": reformatted_tags_dict
+      "tags_dict": reformatted_tags_dict,
+      "rgb_check" : layer.rgb_check,
+      "rgb_type" : layer.rgb_type
    };
 
    $.extend(layer_info.tags, other_tags); // Makes sure that all the wanted tags are shown on the form
@@ -490,7 +494,7 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
          // Checks each layer in the list for errors with tags.
          for(var layer in gisportal.addLayersForm.layers_list){
             var this_layer = gisportal.addLayersForm.layers_list[layer];
-            var invalid = gisportal.addLayersForm.checkValidity;
+             var invalid = gisportal.addLayersForm.checkValidity;
             for(var tag in this_layer.tags){
                // If the tag is invalid
                if(invalid("all_tags", this_layer.tags[tag]).invalid){
@@ -881,7 +885,7 @@ gisportal.addLayersForm.addInputListeners = function(){
       $(this).children('input').trigger("change");
    });
    // All of the inputs and textareas have listeners added.
-   $('.overlay-container-form input, .overlay-container-form textarea').on('change keyup paste', function(e){
+   $('.overlay-container-form input, .overlay-container-form textarea, .overlay-container-form select').on('change keyup paste', function(e){
       var tag = $(this).data("tag"); // Is this input for a tag?
       var index = $(this).data("id"); // What is the index of this layer?
       var key = $(this).data("field").replace(/-/g,"_"); // What field does this input relate to?
@@ -890,6 +894,9 @@ gisportal.addLayersForm.addInputListeners = function(){
          key_val = $(this).is(':checked'); // Extracts the checkbox value
       }else{
          key_val = $(this).val(); // key_val set to value of field
+      }
+      if($(this).is('select')){
+         key_val = $(this).val();  // extracts the value of the select dropdown
       }
       var raw_key_val = key_val;
       if(key == 'include'){
@@ -934,9 +941,13 @@ gisportal.addLayersForm.addInputListeners = function(){
                gisportal.addLayersForm.layers_list[index].defaultBelowMinColor = key_val;
             } else if (key == 'customAboveMaxColor') {
                gisportal.addLayersForm.layers_list[index].defaultAboveMaxColor = key_val;
+            } else if (key == 'rgb_check') {
+	       gisportal.addLayersForm.layers_list[index].rgb_check = key_val;
+            } else if(key == 'rgb_type'){
+	       gisportal.addLayersForm.layers_list[index].rgb_type = key_val;
             } else {
                gisportal.addLayersForm.layers_list[index][key] = key_val;
-            }
+	    }
          }
          if($(this).hasClass("refresh-scalebar") && e.type == "change"){
             gisportal.addLayersForm.addScalebarPreview(index, 'div.scalebar-preview');
@@ -962,6 +973,15 @@ gisportal.addLayersForm.addInputListeners = function(){
          "inputValue": raw_key_val
       };
       gisportal.events.trigger('addLayersForm.input', params);
+   });
+   // Only display rgb type options if the checkbox is true
+   $('#rgb_check').change(function(){
+	if($(this).is(':checked')){
+		$('#rgb_type').show();
+	}
+	else{
+		$('#rgb_type').hide();
+	}
    });
    // When you focus out of a field, the form is then validated again.
    $('div.overlay-container-form input, div.overlay-container-form textarea').on('focusout', function(){

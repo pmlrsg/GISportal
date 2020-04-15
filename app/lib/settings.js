@@ -537,7 +537,6 @@ settings.add_user_layer = function(req, res) {
    var old_owner = server_info.old_owner; // Gets the old owner
    var cache_path;
    var save_path;
-
    // Check that the user has permission to do this
    var username = user.getUsername(req);
    var permission = user.getAccessLevel(req, domain);
@@ -579,17 +578,20 @@ settings.add_user_layer = function(req, res) {
             data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
       }
+
       if (JSON.stringify(data) == "{}") {
          return res.status(404).send();
       }
       var new_data = []; // The list for the new data to go into
       for (var new_layer in layers_list) { // Loops through each new layer.
          var this_new_layer = layers_list[new_layer];
+
          if ('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer) { // Checks that the layer has the required fields
             var found = false;
+
             for (var old_layer in data.server.Layers) { // Loops through each old layer to be compared.
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
-                  var new_data_layer = data.server.Layers[old_layer]; // 
+                  var new_data_layer = data.server.Layers[old_layer]; //
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
                   new_data_layer.Abstract = this_new_layer.abstract;
                   new_data_layer.include = this_new_layer.include;
@@ -601,6 +603,8 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
+		            new_data_layer.rgb_check = this_new_layer.rgb_check;
+		            new_data_layer.rgb_type = this_new_layer.rgb_type;
                   for (var key in this_new_layer.tags) {
                      var val = this_new_layer.tags[key];
                      if (val && val.length > 0 && val[0] !== "") {

@@ -35,18 +35,16 @@ gisportal.layer = function( options ) {
       sensorNameDisplay : null,
       sensorName : null,
       exBoundingBox : null,
-      
       providerTag : null,
       tags : null,
       options : null,
-
+      rgb_check: false,
+      rgb_type: null,
       provider: {},
       offsetVectors: null,
       serviceType: null,
    };
-
    $.extend(true, this, defaults, options);
-
 
    // id used to identify the layer internally 
    this.id = options.name.replace(/[^a-zA-Z0-9]/g, '_' ).replace(/_+/g, '_' ) + "__" + options.providerTag;
