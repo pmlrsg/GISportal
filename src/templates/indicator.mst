@@ -21,7 +21,7 @@
                <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Edit Data"></span>
             {{/if}}
             {{#if rgb_check}}
-               <span class="{{active visibleTab "visualisation"}} js-icon-analyse  icon-btn js-closable icon-pencil-2 indicator-header-icon js-indicator-tab-trigger" data-tab-name="visualisation" for="tab-{{id}}-visualisation" title="Layer Visualisation"></span>
+               <span class="{{active visibleTab "visualisation"}} js-icon-analyse  icon-btn js-closable icon-palette indicator-header-icon js-indicator-tab-trigger" data-tab-name="visualisation" for="tab-{{id}}-visualisation" title="Layer Visualisation"></span>
             {{/if}}
            
 
