@@ -295,7 +295,7 @@ table.stripe td:nth-child(odd) {
     text-align: center; 
     display: flex;}
   .bands-to-rgb .colorsContainer {
-    min-height: 245px;
+    min-height: 212px;
     position: relative;
     background: rgb(98, 100, 113);
     border-radius: 6px;
@@ -365,11 +365,11 @@ table.stripe td:nth-child(odd) {
 
 .bandItemScaleH {
     position: absolute;
-    bottom: 25px;
-    width: 90%;
+   top: 185px;
+    width: 86%;
     height: 1px;
     background-color: white;
-    left: 5%;
+    left: 25px;
 }
 .bandItemScaleH::before {
     content: '400nm';
@@ -391,7 +391,7 @@ table.stripe td:nth-child(odd) {
     position: absolute;
     left: 25px;
     width: 1px;
-    height: 200px;
+    height: 175px;
     background-color: white;
 }
 .bandItemScaleV::before {
@@ -410,99 +410,99 @@ table.stripe td:nth-child(odd) {
     font-size: 10px;
     left: -15px;
     position: absolute;
-    top: 178px;
+    top: 150px;
     text-orientation: mixed;
     writing-mode: vertical-rl;
 }
 /** individual positioning **/
 .bandItem[data-id="B01</br>443nm"]{   
     top: 20px;
-    left: 10px;
+    left: 22px;
 }
 .bandItem[data-id="B01</br>443nm"]:before{
     content: 'B01';
 }
 .bandItem[data-id="B02</br>490nm"]{
-    top: 170px;
-    left: 27px;
+    top: 145px;
+    left: 39px;
 }
 .bandItem[data-id="B02</br>490nm"]:before{
     content: 'B02';
 }
 .bandItem[data-id="B03</br>560nm"] {
-    top: 170px;
-    left: 55px;
+    top: 145px;
+    left: 63px;
 }
 .bandItem[data-id="B03</br>560nm"]:before{
     content: 'B03';
 }
 .bandItem[data-id="B04</br>665nm"] {
-    top: 170px;
-    left: 85px;
+    top: 145px;
+    left: 88px;
 }
 .bandItem[data-id="B04</br>665nm"]:before{
     content: 'B04';
 }
 .bandItem[data-id="B05</br>705nm"] {
-    top: 95px;
-    left: 80px;
+    top: 80px;
+    left: 102px;
 }
 .bandItem[data-id="B05</br>705nm"]:before{
     content: 'B05';
 }
 .bandItem[data-id="B06</br>740nm"] {
-    top: 95px;
-    left: 105px;
+    top: 80px;
+    left: 126px;
 }
 .bandItem[data-id="B06</br>740nm"]:before{
     content: 'B06';
 }
 .bandItem[data-id="B07</br>783nm"] {
-    top: 95px;
-    left: 130px;
+    top: 80px;
+    left: 151px;
 }
 .bandItem[data-id="B07</br>783nm"]:before{
     content: 'B07';
 }
 .bandItem[data-id="B08</br>842nm"] {
-    top: 170px;
-    left: 120px;
-    min-width: 60px;
+    top: 145px;
+    left: 160px;
+    min-width: 33px;
 }
 .bandItem[data-id="B08</br>842nm"]:before{
     content: 'B08';
 }
 .bandItem[data-id="B8A</br>865nm"] {
-    top: 95px;
-    left: 155px;
+    top: 80px;
+    left: 176px;
 }
 .bandItem[data-id="B8A</br>865nm"]:before{
     content: 'B8A';
 }
 .bandItem[data-id="B09</br>945nm"] {
     top: 20px;
-    left: 190px;
+    left: 202px;
 }
 .bandItem[data-id="B09</br>945nm"]:before{
     content: 'B09';
 }
 .bandItem[data-id="B10</br>1375nm"] {
     top: 20px;
-    left: 215px;
+    left: 229px;
 }
 .bandItem[data-id="B10</br>1375nm"]:before{
     content: 'B10';
 }
 .bandItem[data-id="B11</br>1610nm"] {
-    top: 95px;
-    left: 235px;
+    top: 80px;
+    left: 250px;
 }
 .bandItem[data-id="B11</br>1610nm"]:before{
     content: 'B11';
 }
 .bandItem[data-id="B12</br>2190nm"] {
-    top: 95px;
-    left: 260px;
+    top: 80px;
+    left: 273px;
 }
 .bandItem[data-id="B12</br>2190nm"]:before{
   content: 'B12';
