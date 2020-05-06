@@ -1,8 +1,9 @@
 <input type="radio" id="tab-{{id}}-visualisation" name="tabs" data-tab-name="visualisation" {{checked visibleTab "visualisation"}} class="js-tab-trigger panel-tab-trigger">
 <div class="panel-tab dimensions-tab">
    <div id="colorsWrap" class="bands-to-rgb">
-      <p>Drag bands onto RGB fields.</p><br/>
+      <p>Drag the coloured bands onto the RGB fields.</p><br/>
       <div class="colorsContainer" id="colorsHolder">
+      <div class="bandItemScaleV"></div>
       <div data-id="B01</br>443nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 1 - Coastal aerosol - 443 nm " style="background-color: rgb(76, 23, 226);"></div>
       <div data-id="B02</br>490nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 2 - Blue - 490 nm " style="background-color: rgb(105, 154, 255);"></div>
       <div data-id="B03</br>560nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 3 - Green - 560 nm " style="background-color: rgb(164, 210, 111);"></div>
@@ -16,6 +17,7 @@
       <div data-id="B11</br>1610nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 11 - SWIR - 1610 nm" style="background-color: rgb(153, 1, 52);"></div>
       <div data-id="B12</br>2190nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 12 - SWIR - 2190 nm" style="background-color: rgb(128, 0, 0);"></div>
       <div data-id="B8A</br>865nm" class="bandItem" draggable="true" ondragstart="drag(event)" title="Band 8A - Vegetation Red Edge - 865 nm" style="background-color: rgb(188, 14, 16);"></div>
+   <div class="bandItemScaleH"></div>
    </div>
       <div class="colorsOutput">
          <b>R:</b>

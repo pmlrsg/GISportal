@@ -295,13 +295,13 @@ table.stripe td:nth-child(odd) {
     text-align: center; 
     display: flex;}
   .bands-to-rgb .colorsContainer {
-    min-height: 220px;
+    min-height: 245px;
     position: relative;
     background: rgb(98, 100, 113);
     border-radius: 6px;
     text-align: center;
     padding: 10px 5px;}
-    .bands-to-rgb .colorsContainer div {
+    .bands-to-rgb .colorsContainer .bandItem {
       box-shadow: 2px 2px 3px #333;
       display: inline-block;
       width: 15px;
@@ -363,7 +363,57 @@ table.stripe td:nth-child(odd) {
           text-align: right;
       }
 
-
+.bandItemScaleH {
+    position: absolute;
+    bottom: 25px;
+    width: 90%;
+    height: 1px;
+    background-color: white;
+    left: 5%;
+}
+.bandItemScaleH::before {
+    content: '400nm';
+    color: white;
+    font-size: 10px;
+    left: 0;
+    position: absolute;
+    top: 5px;
+}
+.bandItemScaleH::after {
+    content: '2400nm';
+    color: white;
+    font-size: 10px;
+    right: 0;
+    position: absolute;
+    top: 5px;
+}
+.bandItemScaleV {
+    position: absolute;
+    left: 25px;
+    width: 1px;
+    height: 200px;
+    background-color: white;
+}
+.bandItemScaleV::before {
+    content: '80m';
+    color: white;
+    font-size: 10px;
+    left: -15px;
+    position: absolute;
+    top: 0px;
+    text-orientation: mixed;
+    writing-mode: vertical-rl;
+}
+.bandItemScaleV::after {
+    content: '20m';
+    color: white;
+    font-size: 10px;
+    left: -15px;
+    position: absolute;
+    top: 178px;
+    text-orientation: mixed;
+    writing-mode: vertical-rl;
+}
 /** individual positioning **/
 .bandItem[data-id="B01</br>443nm"]{   
     top: 20px;
