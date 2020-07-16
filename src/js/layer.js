@@ -73,6 +73,8 @@ gisportal.layer = function( options ) {
    // {indicator name} - {indicator region} - { indicator provider }
    this.descriptiveName = this.name;
    if (this.tags.region) this.descriptiveName += ' - ' + this.tags.region;
+   if (this.tags.wavelength) this.descriptiveName += ' - ' + this.tags.wavelength;
+   if (this.tags.version) this.descriptiveName += ' - ' + this.tags.version;
    if (this.providerTag) this.descriptiveName += ' - ' + this.providerTag.replace(/_/g, " ");
 
    // The original indicator name used by thedds/cache
