@@ -603,6 +603,17 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
       rgb.g = gvalue;
       rgb.b = bvalue;
       rgbArray.push(rgb);
+// amw
+      rgb_wms_url = 'http://rsg.pml.ac.uk/thredds/wms/CCI_ALL-v4.2-MONTHLY?';
+      console.log('rgb wms url submitted ' + rgb_wms_url);
+	gisportal.wms_submitted = true;
+	gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
+	gisportal.autoLayer.given_wms_url = rgb_wms_url;
+		var params = {
+         		"event" : "wms.submitted"
+      		};
+      		gisportal.events.trigger('wms.submitted', params);
+	gisportal.loadLayers();
    });
 };
   

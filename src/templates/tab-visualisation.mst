@@ -35,7 +35,7 @@
       </div>
 	<br/>
 	<center>
-		<button class="generate_layer_visualisation brand secondary">Update Layer</button>
+		<button class="generate_layer_visualisation rgb_sent2 brand secondary">Update Layer</button>
 	</center>
 	<br/>
 	<br/>

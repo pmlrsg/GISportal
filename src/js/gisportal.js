@@ -959,7 +959,8 @@ gisportal.saveState = function(state) {
 
    state.refine.category = gisportal.refinePanel.selectedCategory;
    state.refine.refineData = gisportal.refinePanel.currentData;
-
+// amw 
+console.log(layers);
    return state;
 };
 
