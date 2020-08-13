@@ -209,7 +209,7 @@
 
 .dark .panel-tab,
 .panel-tab-dark  {
-  background-color: #efedf1;
+  background-color: $panel-solid-background;
 }
 
 #refinePanel .indicator-select  {
@@ -221,7 +221,7 @@
 }
 
 .panel-list li  {
-  background-color: #ffffff;
+  background-color: $panel-solid-background;
   position: relative;
 }
 
@@ -233,7 +233,7 @@
 }
 
 .panel-list li:nth-child(even)  {
-  background-color: #fbfafb;
+  background-color: $panel-solid-background;
 }
 
 .build-map  {
@@ -259,7 +259,7 @@
 
 .category-select-list,
 .category-tabs {
-  background: #efedf1;
+  background: $panel-solid-background;
 }
 
 .category-select-list .selectlist,
@@ -270,7 +270,7 @@ div.js-views-list {
 }
 
 .category-select-list .selectlist { 
-  background: #ccc;
+  background: $panel-solid-background;
 }
 .category-select-list .selectlist .dd-container {
   font-weight: bold;
@@ -315,6 +315,7 @@ div.js-views-list {
 
 a.refine-remove:hover {
   background-color: $general-border;
+  color: $dark-text;
 }
 
 .refined-tag { 

@@ -29,7 +29,6 @@ $(document).ready(function()  {
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
       gisportal.indicatorsPanel.selectTab( layerId, tabName );
-
       var params = {
          "event" : "tab.select",
          "layerId": layerId,

@@ -45,12 +45,12 @@
 }
 
 .panel-tab.dimensions-tab  {
-  background-color: #fbfafb;
+  background-color: $panel-solid-background;
   padding: 9px;
 }
 
 .scale-options  {
-  background-color: #fbfafb;
+  background-color: $panel-solid-background;
   border-bottom: 1px solid #e0dce4;
   padding-bottom: 10px;
 }
@@ -67,6 +67,10 @@
 
 .indicator-option  {
   margin-bottom: 10px;
+}
+
+.indicator-option .text-button{
+   color: $panel-solid-link;
 }
 
 .layer-opacity-slider,
@@ -161,7 +165,7 @@
 	content: " ";
 	width: 1px;
 	height: 7px;
-	background-color: black;
+	background-color: $scalebar-overlay-color;
 	position: absolute;
 	bottom: 100%;
 	left: 50%;

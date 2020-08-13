@@ -16,9 +16,14 @@
             {{#if ../user_allowed_to_add}}
                <span class="js-add-layer-server icon-btn indicator-header-icon icon-add-3" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Add Data"></span>
             {{/if}}
+            
             {{#if ../user_allowed_to_edit}}
                <span class="js-add-layer-server icon-btn indicator-header-icon icon-pencil-2" data-server="{{../serverName}}" data-owner="{{../owner}}" data-layer="{{../id}}" title="Edit Data"></span>
             {{/if}}
+            {{#if rgb_check}}
+               <span class="{{active visibleTab "visualisation"}} js-icon-analyse  icon-btn js-closable icon-palette indicator-header-icon js-indicator-tab-trigger" data-tab-name="visualisation" for="tab-{{id}}-visualisation" title="Layer Visualisation"></span>
+            {{/if}}
+           
 
             <span class="js-remove remove icon-btn indicator-header-icon icon-bin-2 " data-name="{{name}}" title="Remove"></span>
             <span class="icon-btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Basic Layer Management')" title="Help (Basic Layer Management)"></span>
@@ -41,6 +46,8 @@
          <li class="js-tab-details" data-name="{{name}}" data-id="{{id}}"></li>
 
          <li class="js-tab-analysis" data-name="{{name}}" data-id="{{id}}"></li>
+
+         <li class="js-tab-visualisation" data-name="{{name}}" data-id="{{id}}"></li>
       </ul>
    </li>
 {{/layer}}

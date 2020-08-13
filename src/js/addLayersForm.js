@@ -974,15 +974,6 @@ gisportal.addLayersForm.addInputListeners = function(){
       };
       gisportal.events.trigger('addLayersForm.input', params);
    });
-   // Only display rgb type options if the checkbox is true
-   $('#rgb_check').change(function(){
-	if($(this).is(':checked')){
-		$('#rgb_type').show();
-	}
-	else{
-		$('#rgb_type').hide();
-	}
-   });
    // When you focus out of a field, the form is then validated again.
    $('div.overlay-container-form input, div.overlay-container-form textarea').on('focusout', function(){
       gisportal.addLayersForm.validateForm('div.overlay-container-form');
