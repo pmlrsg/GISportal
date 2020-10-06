@@ -35,7 +35,11 @@
       </div>
 	<br/>
 	<center>
-		<button class="generate_layer_visualisation rgb_sent2 brand secondary">Update Layer</button>
+		<a href="#" class="generate_layer_visualisation rgb_sent2 brand secondary">Update Layer</a>
+		<!-- spinner -->
+		<div class="loadingio-spinner-spinner-hmq08uh59ah"><div class="ldio-b9cag98jye">
+			<div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+		</div></div>
 	</center>
 	<br/>
 	<br/>

@@ -593,28 +593,90 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
    var indicator = gisportal.layers[id];
    var rendered = gisportal.templates['tab-visualisation'](indicator);
    $('[data-id="' + id + '"] .js-tab-visualisation').html(rendered);
-   $('.generate_layer_visualisation').click( function(){
-      var rvalue = $(".rvalue span").html().split("<br>")[0];
-      var gvalue = $(".gvalue span").html().split("<br>")[0];
-      var bvalue = $(".bvalue span").html().split("<br>")[0];
-      var rgbArray = [];
-      var rgb = {};
-      rgb.r = rvalue;
-      rgb.g = gvalue;
-      rgb.b = bvalue;
-      rgbArray.push(rgb);
+         
 // amw
-      rgb_wms_url = 'http://rsg.pml.ac.uk/thredds/wms/CCI_ALL-v4.2-MONTHLY?';
-      console.log('rgb wms url submitted ' + rgb_wms_url);
+
+     
+   $('.generate_layer_visualisation').click( function(e){
+	e.preventDefault();
+      // remove any previous warnings
+      $('#colorsWrap p').remove();
+      // disable the button so it cannot be pressed multiple times
+      $('.generate_layer_visualisation.rgb_sent2').off('click');
+      $('.generate_layer_visualisation.rgb_sent2').addClass('disabled');
+      $('.loadingio-spinner-spinner-hmq08uh59ah').css('display','block');
+      // if no rgb values have been selected
+      if ($(".rvalue:has(span)").length == 1 && $(".gvalue:has(span)").length == 1 && $(".bvalue:has(span)").length == 1){
+         console.log('everything is correct');
+         $('#colorsWrap p').remove();
+         var rvalue = $(".rvalue span").html().split("<br>")[0];
+         var gvalue = $(".gvalue span").html().split("<br>")[0];
+         var bvalue = $(".bvalue span").html().split("<br>")[0];
+         var rgbArray = [];
+         var rgb = {};
+         rgb.r = rvalue;
+         rgb.g = gvalue;
+         rgb.b = bvalue;
+         rgbArray.push(rgb);
+
+         $.ajax({
+            method: 'POST',
+            url: "http://192.171.164.117:5000/sentinel_api/process_request?sensor=MSI&filename=S2A_MSIL1C_20200501T120401_N0209_R066_T29VNE_20200501T135450.SAFE&output_fname=test.tif&zoom_level=4&image_fmt=geotiff&band_math=%5B%7B%22r%22%3A%22B02%22%2C%22g%22%3A%22B12%22%2C%22b%22%3A%22B03%22%7D%5D&input_fmt=jp2&config_file=etc%2Fgeoserver.config&config_section=test",
+      //         data: myKeyVals,
+            crossDomain: true,
+            dataType: "json",
+            headers: {
+               'contentType': 'text/plain',
+            },
+            success: function(resultData) {
+               console.log(resultData);
+	       $('.generate_layer_visualisation.rgb_sent2').removeClass('disabled');
+               $('.generate_layer_visualisation.rgb_sent2').on('click');
+	       $('.loadingio-spinner-spinner-hmq08uh59ah').css('display','none');
+	       loadLayerfromWMS(resultData);
+            },
+            error: function(error){
+               if($("#colorsWrap:has(p)")){
+                  $('#colorsWrap p').remove();
+               }
+               $('#colorsWrap center').prepend('<p style="color:red; margin-bottom:10px;">There was an error with the data you chose.</p>');
+               console.log(error);
+               $('.generate_layer_visualisation.rgb_sent2').removeClass('disabled');                                                                                                                                   $('.generate_layer_visualisation.rgb_sent2').on('click');
+	       $('.generate_layer_visualisation.rgb_sent2').on('click');
+	       $('.loadingio-spinner-spinner-hmq08uh59ah').css('display','none');
+            }
+         });
+      }
+      else{
+         $('#colorsWrap p').remove();
+         $('.generate_layer_visualisation.rgb_sent2').on('click');
+	 $('.generate_layer_visualisation.rgb_sent2').removeClass('disabled');
+  	 $('.loadingio-spinner-spinner-hmq08uh59ah').css('display','none');
+	 $('#colorsWrap center').prepend('<p style="color:red; margin-bottom:10px;">You must select RGB values by dragging the bands onto the blocks</p>');
+      }
+
+
+loadLayerfromWMS = function(wms_url){
 	gisportal.wms_submitted = true;
-	gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
-	gisportal.autoLayer.given_wms_url = rgb_wms_url;
-		var params = {
-         		"event" : "wms.submitted"
-      		};
-      		gisportal.events.trigger('wms.submitted', params);
-	gisportal.loadLayers();
-   });
+         // Gets the URL and refresh_cache boolean
+	gisportal.autoLayer.given_wms_url = wms_url;
+        // gisportal.autoLayer.given_wms_url = 'http://192.171.164.117:8080/geoserver/3c0bb112-f351-11ea-8075-0242ac110002/wms';
+         gisportal.autoLayer.refresh_cache = $('#refresh-cache-box')[0].checked.toString();
+
+         error_div = $("#wms-url-message");
+            gisportal.autoLayer.loadGivenLayer();
+            gisportal.addLayersForm.layers_list = {};
+            gisportal.addLayersForm.server_info = {};
+            gisportal.addLayersForm.form_info = {"wms_url":gisportal.autoLayer.given_wms_url};
+            gisportal.addLayersForm.refreshStorageInfo();
+            gisportal.panels.showPanel('choose-indicator');         
+            rgb_guid = gisportal.autoLayer.given_wms_url.split('geoserver/').pop().split('/wms')[0];
+            console.log('rgb_guid is ' + rgb_guid);
+	    gisportal.refinePanel.layerFound(rgb_guid);
+            gisportal.refinePanel.layerFound(rgb_guid);
+}
+     // gisportal.refinePanel.layerFound('eastward_wind__My_Group');
+  });
 };
   
 

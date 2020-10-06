@@ -41,11 +41,11 @@
     methods.init = function (options) {
         //Preserve the original defaults by passing an empty object as the target
         options = $.extend({}, defaults, options);
-
         //Apply on all selected elements
         return this.each(function () {
             var obj = $(this),
                 data = obj.data('ddslick');
+
             //If the plugin has not been initialized yet
             if (!data) {
 
@@ -237,11 +237,9 @@
     };
 
     function selectValue(obj, value, doCallback) {
-
         var ddOptions = obj.find('.dd-options li');
         var selectedOption = obj.find('.dd-option [value="' + value + '"]').closest('li');
         var index = ddOptions.index(selectedOption);
-
         selectIndex(obj, index, doCallback);
         var params = {
             "event" : "ddslick.selectValue",
