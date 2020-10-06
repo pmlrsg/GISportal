@@ -732,7 +732,7 @@ gisportal.TimeLine.prototype.zoomDate = function(startDate, endDate, noPadding) 
 // Add a new time bar using detailed parameters
 gisportal.TimeLine.prototype.addTimeBar = function(name, id, label, startDate, endDate, dateTimes) {
    var newTimebar = {};
-   newTimebar.name = name;
+   newTimebar.name = id; // amw - changed from name to solve deleting of wrong layer
    newTimebar.id = id;
    newTimebar.label = label;
    newTimebar.startDate = startDate;
