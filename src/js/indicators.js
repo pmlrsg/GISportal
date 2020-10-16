@@ -605,9 +605,8 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
       $('.generate_layer_visualisation.rgb_sent2').off('click');
       $('.generate_layer_visualisation.rgb_sent2').addClass('disabled');
       $('.loadingio-spinner-spinner-hmq08uh59ah').css('display','block');
-      // if no rgb values have been selected
+      // check if rgb values have been selected
       if ($(".rvalue:has(span)").length == 1 && $(".gvalue:has(span)").length == 1 && $(".bvalue:has(span)").length == 1){
-         console.log('everything is correct');
          $('#colorsWrap p').remove();
          var rvalue = $(".rvalue span").html().split("<br>")[0];
          var gvalue = $(".gvalue span").html().split("<br>")[0];
@@ -621,8 +620,8 @@ gisportal.indicatorsPanel.visualisationTab = function(id) {
 
          $.ajax({
             method: 'POST',
+	    // url hardcoded for now, needs updating to use RGB values
             url: "http://192.171.164.117:5000/sentinel_api/process_request?sensor=MSI&filename=S2A_MSIL1C_20200501T120401_N0209_R066_T29VNE_20200501T135450.SAFE&output_fname=test.tif&zoom_level=4&image_fmt=geotiff&band_math=%5B%7B%22r%22%3A%22B02%22%2C%22g%22%3A%22B12%22%2C%22b%22%3A%22B03%22%7D%5D&input_fmt=jp2&config_file=etc%2Fgeoserver.config&config_section=test",
-      //         data: myKeyVals,
             crossDomain: true,
             dataType: "json",
             headers: {
