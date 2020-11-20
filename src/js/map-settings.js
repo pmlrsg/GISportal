@@ -325,7 +325,7 @@ gisportal.createBaseLayers = function() {
             projection: gisportal.projection
          }),
          viewSettings: {
-            maxZoom: 19,
+            maxZoom: 23,
          }
       }),
    };
