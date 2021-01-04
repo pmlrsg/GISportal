@@ -303,7 +303,132 @@ gisportal.indicatorsPanel.initDOM = function() {
    $('.js-indicators').on('change', 'input.js-wcs-url', function()  {
       gisportal.indicatorsPanel.add_wcs_url($(this));
    });
+
+   //CQL filter reset event handler
+   $('.js-indicators').on('click', 'button.js-cql-filter-reset', function()  {
+      console.log("the reset button has been clicked.");
+      console.log("$(this).id", $(this)[0].id);
+
+      var originalId = $(this)[0].id;
+      var layerId = $(this).closest('[data-id]').data('id');
+      console.log("layerId", layerId);
+      gisportal.indicatorsPanel.removeFromPanel(layerId);
+      gisportal.configurePanel.selectLayer(gisportal.layers[originalId].name, gisportal.layers[originalId]);
+
+   });
    
+   //CQL filter submit event handler
+   $('.js-indicators').on('click', 'button.js-cql-filter', function()  {
+      console.log("the button has been clicked");
+      gisportal.given_cql_filter = $(this).parent().prev()[0].value;
+      console.log("this is the cql filter", gisportal.given_cql_filter);
+
+
+      if (gisportal.given_cql_filter) {
+
+         console.log("This is the cql filter", gisportal.given_cql_filter);
+         var originalID = $(this).closest('[data-id]').data('id');
+         //console.log(currentID);
+         //gisportal.indicatorsPanel.removeFromPanel(currentID);
+         var currentLayer = gisportal.layers[originalID];
+         console.log("This is the layer inside gisportal", originalID.tags);
+         console.log("these are the layers inside gisportal", gisportal.layers);
+         var currentName = $(this).closest('[data-name]').data('name') + gisportal.given_cql_filter;
+
+         console.log("$(this).closest('[data-name]')", $(this).closest('[data-name]'));
+         
+         console.log(currentName);
+   
+         var currentID = originalID + "_" + gisportal.given_cql_filter.replaceAll(" ", "_").replaceAll(".", "_").replaceAll("=", "EqualTo").replaceAll("<", "LessThan").replaceAll(">", "GreaterThan").replaceAll("<=", "LessThanEqualTo").replaceAll(">=", "GreaterThanEqualTo");
+      
+         console.log("this is the latest ID", currentID);
+         
+         //var options = currentLayer.tags;
+   
+         var tagname = Object.keys(currentLayer.tags)[0];
+         var tag = currentLayer.tags.region;
+      
+         var options = [];
+         var refine = {};
+         refine.cat = tagname;
+         refine.tag = tag;
+         options.push(refine);
+   
+         console.log(options);
+   
+         //var name = "Met Data Normalised, last 24 hours";
+         //var options = [{cat: "region", tag: "Met Data"}];
+         //[name: "Met Data Normalised, last 24 hours", id: "scipper_met_sensible_recent", refine: {cat: "region", tag: "Met Data"}];
+   
+         //var serverUrl = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms";
+         //var vector1 = {
+         //boundingBox: {MinX: -5, MinY: 50, MaxX: -4, MaxY: 51},
+         //desc: "Various outputs from the ship's engine on the 15th of October",
+         //exBoundingBox: {WestBoundLongitude: "-5", NorthBoundLatitude: "51", EastBoundLongitude: "-4", SouthBoundLatitude: "50"},
+         //id: "scipper_emission_sensible_15th_october",
+         //ignoredParams: ["geog"],
+         //maxFeatures: 100000,
+         //name: "Emission Data Normalised, 15th October",
+         //styles: {},
+         //tags:{niceName: "Emissions Data Normalised, 15th October",
+         //region: "Emissions"},
+         //variableName: "scipper:emission_sensible_15th_october",
+         //vectorType: "POINT"};
+   
+         //gisportal.createVectorLayers.processVectorLayer(urlWMS, vectorDict);
+   
+         var vectorOptions = {
+            "name": currentLayer.name,
+            "description": currentLayer.desc,
+            "endpoint" : currentLayer.endpoint,
+            "serviceType" : "WFS",
+            "variableName" : currentLayer.variableName,
+            "maxFeatures" : currentLayer.maxFeatures,
+            "tags" : currentLayer.tags,
+            "id" : currentID,
+            "exBoundingBox" : currentLayer.exBoundingBox,
+            "abstract" : currentLayer.abstract,
+            "provider" : currentLayer.provider,
+            "contactInfo" : {
+               "organization" : currentLayer.provider
+            },
+            "ignoredParams" : currentLayer.ignoredParams,
+            "vectorType" : currentLayer.vectorType,
+            "styles" : currentLayer.styles,
+            "defaultProperty" : currentLayer.defaultProperty,
+            "defaultProperties" : currentLayer.defaultProperties,
+            "descriptiveName" : currentLayer.tags.niceName,
+            "unit" : currentLayer.unit,
+            "defaultColour" : currentLayer.defaultColour || false,
+            "originalID" : originalID
+         };
+
+         console.log("these are the vector options ", vectorOptions);
+         var vectorLayer = new gisportal.Vector(vectorOptions);
+         gisportal.vectors.push(vectorLayer);
+         gisportal.layers[vectorOptions.id] = vectorLayer;
+   
+         vectorLayerOL = vectorLayer.createOLLayer();
+         console.log("this is vectorLayerOL", vectorLayerOL);
+         console.log("gisportal.invalidFilter", gisportal.validFilter);
+            //console.log("this is the vectorLayerOL ", vectorLayer);
+         gisportal.vlayers.push(vectorLayerOL);
+         console.log("vlayers", gisportal.vlayers);
+         console.log("gisportal.layers", gisportal.layers);
+         console.log("gisportal.vectors", gisportal.vectors);
+   
+         gisportal.configurePanel.selectLayer(currentLayer.name, options);
+   
+         //gisportal.configurePanel.buildMap(options);
+   
+         //gisportal.loadLayers();
+         //gisportal.loadVectorLayers();
+         //gisportal.createVectorLayers();
+      } else {
+         $.notify("No CQL filter input");
+      }
+   });    
+
    $('.js-indicators').on('click', '.js-select-layer-tab', function(){
       var layerId = $(this).closest('[data-id]').data('id');
       var tabName = $(this).closest('[data-tab-name]').data('tab-name');
@@ -462,6 +587,29 @@ gisportal.indicatorsPanel.addToPanel = function(data) {
       gisportal.events.trigger('addLayerServer.clicked', params);
       gisportal.addLayersForm.addServerToForm($(this).data('server'), $(this).data('owner'), $(this).data('layer'));
    });
+
+   
+   var tbody = document.getElementsByClassName("stripe panel-tab")[0].getElementsByTagName('tbody')[0];
+   var newRow = tbody.insertRow();
+
+   var newCell = newRow.insertCell();
+   var newText = document.createTextNode('CQL Filter');
+   newCell.appendChild(newText);
+
+   //adding to the information panel table
+   if(gisportal.given_cql_filter) {
+       var newCell1 = newRow.insertCell();
+       var newText1 = document.createTextNode(gisportal.given_cql_filter);
+       newCell1.appendChild(newText1);
+
+      //adding the CQL filter to the name on top
+       var text = document.getElementsByClassName('indicator-name')[0];
+       text.innerHTML += "<br>" + gisportal.given_cql_filter;
+   } else {
+       var newCell2 = newRow.insertCell();
+       var newText2 = document.createTextNode('-');
+       newCell2.appendChild(newText2);
+   }
 };
 
 
@@ -521,15 +669,23 @@ gisportal.indicatorsPanel.removeFromPanel = function(id) {
 /* There is overlap here with configurePanel,
  * should refactor at some point */
 gisportal.indicatorsPanel.selectLayer = function(id, style) {
-   if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
+   console.log("gisportal.indicatorPanel.selectLayer", gisportal.layers[id]);
+   gisportal.selectedLayers = [];
+   console.log(gisportal.selectedLayers);
+   console.log(_.indexOf(gisportal.selectedLayers, id));
    var layer = gisportal.layers[id];
    var options = {};
    if (layer) {
       options.visible = true;
-      if(layer.servicetype=="WFS"){
-         gisportal.getVectorLayerData(layer);
+      console.log(layer.serviceType);
+      console.log(layer.serviceType == "WFS");
+      if(layer.serviceType=="WFS"){
+         console.log("layer.serviceType is WFS from selectLayer");
+         gisportal.getVectorLayerData(layer, id, options);
       }
       else {
+         if (_.indexOf(gisportal.selectedLayers, id) > -1) return false;
+         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$");
          gisportal.getLayerData(layer.serverName + '_' + layer.urlName + '.json', layer, options, style);
       }
    }
@@ -584,6 +740,7 @@ gisportal.indicatorsPanel.detailsTab = function(id) {
       }
    }
    var rendered = gisportal.templates['tab-details'](indicator);
+
    $('[data-id="' + id + '"] .js-tab-details').html(rendered);
    $('[data-id="' + id + '"] .js-icon-details').toggleClass('hidden', false);
 };
@@ -763,6 +920,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       }
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
+      //$('[data-id="' + "https%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3Demission_sensible_15th_october%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
 
       $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
 

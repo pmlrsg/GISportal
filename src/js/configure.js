@@ -85,6 +85,8 @@ gisportal.configurePanel.close = function()  {
 };
 
 gisportal.configurePanel.toggleIndicator = function(name, tag, tagname)  {
+   gisportal.given_cql_filter = "";
+
    var options = [];
    
    var refine = {};
@@ -119,6 +121,7 @@ gisportal.configurePanel.reset = function(){
  * is added, this function automatically gets called.
  */
 gisportal.configurePanel.buildMap = function(indicator)  {
+   console.log("build map - ", indicator);
    if (indicator) gisportal.refinePanel.open(indicator);
    else gisportal.indicatorsPanel.open();
 };
@@ -302,6 +305,7 @@ gisportal.groupNames = function(layers)  {
  *
  */
 gisportal.configurePanel.renderTagsAsTabs = function()  {
+   console.log("gisportal.configurePanel.renderTagsAsTabs");
    var addable_layers = false;
    if(gisportal.user.info.permission != "guest"){
       for(var layer in gisportal.layers){
@@ -522,6 +526,7 @@ gisportal.configurePanel.renderIndicatorsAsSimpleList = function() {
  * @param  {[type]} targetDiv a jQuery object of the div where the drop down list should be created
   */
 gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNumber) {
+   console.log("gisportal.configurePanel", cat, targetDiv, tabNumber);
    gisportal.refinePanel.selectedCategory = cat;
    targetDiv.html('');
 
@@ -549,6 +554,7 @@ gisportal.configurePanel.renderIndicatorsByTag = function(cat, targetDiv, tabNum
             return;
          }
       }
+      console.log("these are the indicators", indicators);
       indicators.push(tmp);
    };
 
@@ -717,6 +723,9 @@ gisportal.configurePanel.search = function(val)  {
  * @param {object} options - This includes the id if it is known
  */
 gisportal.configurePanel.selectLayer = function(name, options)  {
+   console.log(name);
+   console.log(options);
+   console.log("gisportal.configurePanel.selectLayer");
 
    options = options || {};
    name = name;
@@ -725,6 +734,8 @@ gisportal.configurePanel.selectLayer = function(name, options)  {
    if (options.id) {
       id = options.id;
    }
+
+   console.log(options, id);
 
    var tmp = {};
    tmp.name = name;

@@ -14,6 +14,7 @@ gisportal.vectorLayerCount = 0;
  **/
 
 gisportal.Vector = function(options) {
+    console.log("gisportal.Vector");
     var vector = this;
 
     var defaults = {
@@ -29,11 +30,13 @@ gisportal.Vector = function(options) {
         defaultProperties : [],
         unit : null
     };
+    console.log(1);
 
 
     $.extend(true, this, defaults, options);
 
     this.selected = false;
+    console.log(2);
 
     //this.styles = [];
 
@@ -42,6 +45,7 @@ gisportal.Vector = function(options) {
     this.visibleTab = "details";
     this.currentColour = '';
     
+    console.log(3);
 
 
     /**
@@ -55,12 +59,20 @@ gisportal.Vector = function(options) {
         if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility);
         this.isVisible = visibility;
     };
+    console.log(4);
+
 
     this.init = function(options, layer) {
+        console.log("this is the function caller", this.init.caller);
+        console.log("this.init options layer", options, layer);
         map.addLayer(layer.OLLayer);
+        console.log(map);
         this.select();
+        //console.log("select()");
         this.getMetadata();
         this.openlayers.anID = layer.OLLayer;
+        //this.openlayers.anID.g = 2;
+        console.log(this.openlayers.anID.g);
 
         //gisportal.indicatorsPanel.selectTab( this.id, 'details' );
 
@@ -68,7 +80,8 @@ gisportal.Vector = function(options) {
 
     this.select = function() {
         // Just in case it tries to add a duplicate
-        if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
+        console.log("select()");
+        //if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
         var layer = this;
 
         layer.selected = true;
@@ -88,6 +101,7 @@ gisportal.Vector = function(options) {
         var index = _.findIndex(gisportal.selectedLayers, function(d) {
             return d === layer.id;
         });
+        console.log("this is the index", index);
         gisportal.setLayerIndex(layer, gisportal.selectedLayers.length - index);
 
     };
@@ -106,16 +120,19 @@ gisportal.Vector = function(options) {
             }
 
             gisportal.refreshDateCache();
+            console.log("right before calling gisportal.zoomOverall from vector layer");
             gisportal.zoomOverall();
         }
     };
 
     this.getMetadata = function() {
+        console.log("this.getMetadata()");
         var layer = this;
 
         gisportal.layers[layer.id].metadataComplete = true;
         layer.metadataComplete = true;
         gisportal.events.trigger('layer.metadataLoaded', layer.id);
+        console.log("get medatadata done");
 
     };
 
@@ -333,6 +350,7 @@ gisportal.Vector = function(options) {
      * with gisportal.layer.
      */
     this.createOLLayer = function() {
+        console.log("this.createOLLayer caller", this.createOLLayer.caller);
         createStyle = function(vec,source) {
             var styleType = vec.vectorType;
             return styles[styleType];
@@ -345,6 +363,7 @@ gisportal.Vector = function(options) {
         var vec = this;
 
         var loadFeatures = function(response) {
+            console.log("this is load features!!!", response);
             var wfsFormat = new ol.format.WFS();
             // This converts the features to the correct projection
             var feature, this_feature;
@@ -365,7 +384,15 @@ gisportal.Vector = function(options) {
           vec.setStyleUI(source,prop);
         };
         var buildLoader = function($vector, $source) {
+            console.log(buildLoader.caller);
+            //var given_cql_filter = $('input.js-cql-filter')[0].value.split("?")[0];
+            console.log("**");
+            console.log("this is the cql filter", gisportal.given_cql_filter);
+            //var largestBounds = [ -180, -90, 180, 90 ];
+            //var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', gisportal.projection);
+
             return function(extent, resolution, projection) {
+                console.log("this is inside the return function in the buildloader");
                 vectorSource = $source;
                 var url = $vector.endpoint +
                     '%3Fservice%3DWFS' +
@@ -373,26 +400,108 @@ gisportal.Vector = function(options) {
                     '%26version%3D1.1.0' +
                     '%26request%3DGetFeature' +
                     '%26typename%3D' + $vector.variableName +
-                    '%26srs%3D' + $vector.srsName +
-                    '%26bbox%3D' + extent + ',' + gisportal.projection;
+                    '%26srs%3D' + $vector.srsName;
+                
+                console.log("$vector.id", $vector.id);
+
+                if (gisportal.given_cql_filter) {
+                    console.log("it gets here");
+                    //url = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_15th_october%26srs%3DEPSG:4326";
+                    url += '%26cql_filter%3D' + encodeURIComponent(gisportal.given_cql_filter);
+                }
+                else {
+                    url += '%26bbox%3D' + extent + ',' + gisportal.projection;
+                    //url = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_15th_october%26srs%3DEPSG:4326%26cql_filter%3Ddatetime%3D2020-10-15T00:42:38Z";
+                }
+
+                //var url = "http://localhost:6789/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_recent%26srs%3DEPSG:4326%26cql_filter%3Ddatetime+between+2020-12-07T10:47:32Z+and+2020-12-07T11:01:48Z";
 
                 $.ajax({
-                    url: url
-                })
-                    .done(loadFeatures);
+                    url: url,
+                    success: function(response){
+                        if(response.getElementsByTagName("ows:ExceptionText")[0]) { //if invalid CQL filter
+                            console.log(response.getElementsByTagName("ows:ExceptionText")[0].textContent);
+                            $.notify("Sorry\nThere was an unexpected error thrown by the server: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
+                            gisportal.validFilter = false;
+                            gisportal.given_cql_filter = false;
+                            gisportal.vectors.pop();
+                            gisportal.vlayers.pop();
+                            delete gisportal.layers[$vector.id];
+                            gisportal.indicatorsPanel.removeFromPanel($vector.id);
+                        } else {
+                            gisportal.validFilter = true;
+                            loadFeatures(response);
+                        }
+                        console.log("this is the final url: ", url);
+                    },
+                    error: function(e){
+                        gisportal.given_cql_filter = false;
+                        $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
+                        gisportal.validFilter = false;
+                        gisportal.indicatorsPanel.removeFromPanel($vector.id);
+                     }
+                });
+
             };
         };
 
 
         if (this.serviceType === 'WFS') {
+            console.log("the service type is WFS");
             var sourceVector = new ol.source.Vector({
                 loader: buildLoader(vec, sourceVector),
                 strategy: ol.loadingstrategy.bbox,
             });
+            console.log("this is the loader after the build loader is called ", sourceVector);
             var layerVector = new ol.layer.Vector({
                 source: sourceVector
             });
+            //var source = layerVector.getSource();
+            console.log("this is vec", vec);
+            
+            sourceVector.on('change', function(layer){
+                console.log("this is vec", vec);
+                var source = layer.target;
+
+                //adding list of properties
+                if(source.getState() === 'ready'){
+                    var features = source.getFeatures();
+                    console.log(features);
+
+                    if(features !== undefined && features.length > 0) { //check if there is anything returned for that search
+                        var properties = features[0].getProperties();
+                        console.log("these are the properties of the layer", Object.keys(properties));
+                        console.log("first feature", features[0]);
+
+                        //add list of properties
+                        var propertiesList = document.getElementById('properties-list');
+                        var response = "<ul>";
+    
+                        Object.keys(properties).forEach(function (property) {
+                            response += "<li> • " + property + "</li>";
+                        });
+                        response += "</ul>";
+                        propertiesList.innerHTML = response;
+
+                    } else {
+                        $.notify("No features could be found.");
+                    }
+                }
+                console.log("cql filtter", gisportal.given_cql_filter);
+                if(gisportal.given_cql_filter) {
+                    console.log("ready to add the reset button");
+                    //add reset button
+                    var resetDiv = document.getElementsByClassName('reset-cql-filter')[0];
+                    console.log("this is the reset div", resetDiv);
+                    var resetBtn = '<button type="button" class="brand small js-cql-filter-reset pull-left" id=' + vec.originalID + '>Reset</button>';
+                    console.log(resetBtn);
+                    resetDiv.innerHTML = resetBtn;
+                    console.log("this is the reset div after adding the button", resetDiv);
+                }
+            });
+
             vector.OLLayer = layerVector;
+            console.log("this is the layer vector", layerVector);
             return layerVector;
         }
 
@@ -402,6 +511,7 @@ gisportal.Vector = function(options) {
     };
 
     this.addOLLayer = function(layer, id) {
+        console.log("addOLLayer layer", layer, id);
         map.addLayer(layer);
         if(!this.styleUIBuilt){
             this.setStyleUI(layer.getSource(),layer.defaultProperty);
@@ -423,7 +533,8 @@ gisportal.Vector = function(options) {
 
 };
 
-gisportal.getVectorLayerData = function(layer) {
+gisportal.getVectorLayerData = function(layer, id, options) {
+    console.log("gisportal.getVectorLayerData", layer);
     gisportal.layers[id].init(options, layer);
 
 };

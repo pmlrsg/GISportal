@@ -3,4 +3,18 @@
    <h3>vector styles</h3>
    <div class="vector-style-container">
    </div>
+   <br>
+      <form class="add-cql-filter">
+         <label>Add CQL filtering:</label>
+         <input type="text" class="js-cql-filter" placeholder="CQL query">
+
+         <div class="clearfix cql-filter-div">
+            <div class="reset-cql-filter"></div>
+            <div class="submit-cql-filter"></div>
+            <button type="button" class="brand small js-cql-filter pull-right">Submit</button>
+         </div>
+      </form>
+
+   <div id='properties-list-header'><h3>Feature Properties:</h3></div>
+   <div id='properties-list'></div>
 </div>
