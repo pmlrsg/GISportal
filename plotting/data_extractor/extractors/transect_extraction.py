@@ -149,7 +149,10 @@ class TransectExtractor(Extractor):
       last_slice_index = 0
 
       for i, time_slice in enumerate(time_slices):
-         time_slice = datetime.strptime(time_slice, '%Y-%m-%dT%H:%M:%SZ')
+         try:
+            time_slice = datetime.strptime(time_slice, '%Y-%m-%dT%H:%M:%SZ')
+         except:
+            time_slice = datetime.strptime(time_slice, '%Y-%m-%dT%H:%M:%S.%fZ')
 
          if not slices_in_range and time_slice < date_range[0]:
             pre_range_time_slice = time_slice
