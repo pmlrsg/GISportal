@@ -23,7 +23,8 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
          {
             // If the style names match grab its info
             if(value.Name == indicator.style && url === null) {
-               url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL);
+               url = "http://geo.earthwatch.org.uk/geoserver/FWW_MONOCLE/ows?service=WMS&request=GetLegendGraphic&format=image%2Fpng&width=20&height=20&layer=ThamesBioBlitz_v1.0_Apr20&style=green&NUMCOLORBANDS=255&ABOVEMAXCOLOR=0x000000&BELOWMINCOLOR=0x000000";
+               //url = gisportal.scalebars.createGetLegendURL(indicator, value.LegendURL);
                width = parseInt(value.Width, 10);
                height = parseInt(value.Height, 10);
                return false; // Break loop
@@ -33,6 +34,9 @@ gisportal.scalebars.getScalebarDetails = function(id)  {
       // If the url is still null then there were no matches, so use a generic url
       if(url === null)
          url = gisportal.scalebars.createGetLegendURL(indicator, "");
+      
+      
+      console.log("this is the legend url", url);
      
       
       // Set the scalebar inputs to be correct 

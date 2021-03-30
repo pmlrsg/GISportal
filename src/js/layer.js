@@ -23,6 +23,7 @@
  * @param {object} options - Options to extend the defaults
  */
 gisportal.layer = function( options ) {
+   //console.log("gisportal.layer.caller", gisportal.layer.caller);
    var layer = this;
 
    var defaults = {
@@ -73,8 +74,6 @@ gisportal.layer = function( options ) {
    // {indicator name} - {indicator region} - { indicator provider }
    this.descriptiveName = this.name;
    if (this.tags.region) this.descriptiveName += ' - ' + this.tags.region;
-   if (this.tags.wavelength) this.descriptiveName += ' - ' + this.tags.wavelength;
-   if (this.tags.version) this.descriptiveName += ' - ' + this.tags.version;
    if (this.providerTag) this.descriptiveName += ' - ' + this.providerTag.replace(/_/g, " ");
 
    // The original indicator name used by thedds/cache
@@ -235,6 +234,7 @@ gisportal.layer = function( options ) {
     */
    this.getDimensions = function(layerData) {
       var layer = this;
+      console.log("this.getDimensions", layerData, layer);
       
       // Get the time dimension if this is a temporal layer
       // or elevation dimension
@@ -372,7 +372,7 @@ gisportal.layer = function( options ) {
     */
    this.select = function() {
       // Just in case it tries to add a duplicate
-      if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
+      //if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
       var layer = this;
       
       layer.selected = true;
@@ -828,6 +828,8 @@ gisportal.filterLayersByDate = function(date) {
  */
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
+
+   console.log("this is the layer.serviceType", layer.serviceType);
 
    if (layer.serviceType=="WFS"){
 

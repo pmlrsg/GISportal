@@ -11,6 +11,7 @@ gisportal.templates = {};
  */
 gisportal.loadTemplates = function( callback ){
 	callback = callback || function(){};
+   console.log("inside gisportal.loadTemplates");
    
    function compileTemplates(all_templates, status, request) {
       var templates = all_templates.split('#####');

@@ -920,7 +920,13 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       }
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
+      console.log("renderedScalebar", renderedScalebar);
+
       //$('[data-id="' + "https%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3Demission_sensible_15th_october%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
+
+
+      //$('[data-id="' + "http%3A%2F%2Fgeo.earthwatch.org.uk%2Fgeoserver%2FFWW_MONOCLE%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3DThamesBioBlitz_v1.0_Apr20%26style%3Dgreen%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
+      
 
       $('[data-id="' + indicator.id + '"] .js-scalebar').html(renderedScalebar);
 

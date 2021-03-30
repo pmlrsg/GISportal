@@ -293,6 +293,172 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
    }
 };
 
+settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
+   console.log("this is the wfs url", wfsURL);
+   wfsURL = wfsURL.trim();
+   wfsURL = wfsURL.replace(/\?.*/g, "") + "?";
+   var data = null;
+   var serverName = utils.URLtoServerName(wfsURL);
+   var filename = serverName + ".json";
+   console.log("this is the file name", filename);
+   var directory = path.join(MASTER_CONFIG_PATH, "vectorLayers");
+
+   var file_path = path.join(directory, filename);
+
+   if (true) {
+      request(wfsURL + "service=WFS&request=GetCapabilities", function(err, response, body) {
+         if (err) {
+            next(err, data);
+         } else {
+            xml2js.parseString(body, {
+               tagNameProcessors: [settingsApi.stripPrefix],
+               attrNameProcessors: [settingsApi.stripPrefix]
+            }, function(err, result) {
+               if (err) {
+                  next(err, data);
+               } else {
+                  try {
+                     if(true) {
+                        var data = {};
+                        var featureTypes = result.WFS_Capabilities.FeatureTypeList[0].FeatureType;
+
+                        data.name = result.WFS_Capabilities.ServiceIdentification[0].Title[0];
+                        data.serverName = serverName;
+                        data.Abstract = "";
+                        data.provider = result.WFS_Capabilities.ServiceProvider[0].ProviderName[0];
+                        console.log("this is the provider", result.WFS_Capabilities.ServiceProvider[0].ProviderName[0]);
+                        console.log("");
+                        console.log(result.WFS_Capabilities.ServiceProvider[0].ProviderName);
+                        data.services = {};
+                        data.services.wfs = {};
+                        data.services.wfs.url = "/app/settings/proxy?url=" + encodeURIComponent(wfsURL);
+                        data.services.wfs.vectors = [];
+
+                        for (var index in featureTypes) {
+                           var layer = {};
+
+                           layer.variableName = featureTypes[index].Name[0];
+                           layer.id = featureTypes[index].Title[0];
+                           layer.maxFeatures = 100000;
+                           layer.featureAbstract = featureTypes[index].Abstract[0];
+
+                           var tags = {};
+                           tags.niceName = titleCase(layer.id);
+                           tags.region = tags.niceName.split(" ")[0];
+                           tags.data_provider = data.provider;
+                           layer.tags = tags;
+
+                           var bbox = {};
+                           var exbbox = {};
+                           var featureBBOX = featureTypes[index].WGS84BoundingBox[0];
+                           exbbox.WestBoundLongitude = featureBBOX.LowerCorner[0].split(" ")[0];
+                           exbbox.SouthBoundLatitude = featureBBOX.LowerCorner[0].split(" ")[1];
+                           exbbox.EastBoundLongitude = featureBBOX.UpperCorner[0].split(" ")[0];
+                           exbbox.NorthBoundLatitude = featureBBOX.UpperCorner[0].split(" ")[1];
+
+                           bbox.MinX = parseFloat(exbbox.WestBoundLongitude);
+                           bbox.MinY = parseFloat(exbbox.SouthBoundLatitude);
+                           bbox.MaxX = parseFloat(exbbox.EastBoundLongitude);
+                           bbox.MaxY = parseFloat(exbbox.NorthBoundLatitude);
+
+                           layer.boundingBox = bbox;
+                           layer.exBoundingBox = exbbox;
+
+                           data.services.wfs.vectors.push(layer);
+
+                        }
+
+                        //var featureTypes = result.WFS_Capabilities.FeatureTypeList[0].FeatureType;
+                        //data.variableName = featureTypes[0].Name[0];
+                        //data.id = featureTypes[0].Title[0];
+                        //data.maxFeatures = 100000;
+                        //data.featureAbstract = featureTypes[0].Abstract[0];
+                        //var featureBBOX = featureTypes[0].WGS84BoundingBox[0];
+
+                        var vectorLayers = [data];
+                        fs.writeFileSync(file_path, JSON.stringify(vectorLayers, null, 4) , 'utf-8');
+                     }
+                     else {
+                        var serviceProvider = result.WFS_Capabilities.ServiceProvider[0].ProviderName[0]; //PML
+                        var featureTypes = result.WFS_Capabilities.FeatureTypeList[0].FeatureType[0]; //array of dictionaries
+                        var serverTitle = result.WFS_Capabilities.ServiceIdentification[0].Title; //title
+
+                        var featureName = featureTypes[0].Name[0];
+                        var featureTitle = featureTypes[0].Title[0];
+                        var featureAbstract = featureTypes[0].Abstract[0];
+                        var featureBBOX = featureTypes[0].WGS84BoundingBox[0];
+
+                        var vectorLayers = {};
+                        var dict = [];
+                        var vectors = [];
+   
+                        for (var index in result.WMS_Capabilities.Capability[0].Layer) {
+                           var parent_layer = result.WMS_Capabilities.Capability[0].Layer[index];
+                           layers = [];
+                           var service_title;
+                           var abstract;
+                           var bounding_box;
+                           var style;
+   
+                           var title_elem = parent_layer.Title;
+                           var abstract_elem = parent_layer.Abstract;
+                           var ex_bounding_elem = parent_layer.EX_GeographicBoundingBox;
+                           var style_elem = parent_layer.Style;
+   
+                           if (title_elem && typeof(title_elem[0]) == "string") {
+                              service_title = title_elem[0].replace(/ /g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\//g, "_");
+                           }
+                           if (abstract_elem && typeof(abstract_elem[0]) == "string") {
+                              abstract = abstract_elem[0];
+                           }
+                           if (typeof(ex_bounding_elem) != "undefined") {
+                              bounding_box = createBoundingBox(parent_layer);
+                           }
+                           if (style_elem) {
+                              style = createStylesArray(parent_layer);
+                              if (style.length === 0) {
+                                 style = undefined;
+                              }
+                           }
+   
+                           var layer = {};
+                           layer.variableName = service_title;
+                           layer.exBoundingBox = ex_bounding_elem;
+                           layer.boundingBox = bounding_box;
+                           vectors.push(layer);
+   
+                           //digForLayers(parent_layer, name, service_title, title, abstract, bounding_box, style, dimensions, serverName, layers, provider);
+                        }
+   
+                        dict.push(vectors);
+                        vectorLayers.vectors = dict;
+                        vectorLayers.server = {};
+                        vectorLayers.wfsURL = wfsURL;
+   
+                        //dict.push({
+                        //   server: {},
+                        //   wfsURL: wfsURL
+                        //});
+                        //sub_master_cache.server = {};
+                        //sub_master_cache.options = {
+                        //   "providerShortTag": "UserDefinedLayer"
+                        //};
+                        //sub_master_cache.wfsURL = wfsURL;
+                        //sub_master_cache.test = "test";
+   
+                        data = JSON.stringify(vectorLayers);
+                        fs.writeFileSync(file_path, JSON.stringify(result, null, 2) , 'utf-8');
+                     }
+                  } catch (err) {
+                     console.log(err);
+                  }
+               }
+            });
+         }
+      });
+   }
+};
+
 settingsApi.sortLayersList = function(data, param) {
    var byParam = data.slice(0);
    for (var layer in byParam) {

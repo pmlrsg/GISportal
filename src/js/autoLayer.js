@@ -88,6 +88,7 @@ gisportal.events.bind("templates-loaded", function() {
 
 // This returns the layer or layers that match the URL
 gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
+   console.log("gisportal.autoLayer.getLayers", given_wms_url, given_url_name);
    var matching_layers = {};
    var only_matching_layer; // Different object for the 'chosen one' as you cannot break a lodash loop.
 

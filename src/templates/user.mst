@@ -22,6 +22,15 @@
 	      <button class="brand small js-wms-url pull-right">Submit WMS URL</button>
 	   </div>
 	</form>
+		
+	<form class="add-wfs-form">
+		<label>Add WFS here:</label>
+			<input type="text" class="js-wfs-url" placeholder="WFS URL">
+			<div class="clearfix wfs-url-div">
+			<button class="brand small js-wfs-url pull-right">Submit WFS URL</button>
+		</div>
+	</form>
+
 	<div class="hidden clearfix server-list-div">
 		<b>MANAGE</b>
 		</br>

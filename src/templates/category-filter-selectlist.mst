@@ -18,6 +18,12 @@
    </li>
    <li class="unfiltered-list-message selectoptions alert-success" style="display: none"><p>You are now viewing the full list of available layers.</p>
    </li>
+   <li class="save-vlayers-option selectoptions alert-warning">
+      <div class="clearfix" id="save-vlayers">
+      <p>Click here to add these layers to your account:</p> 
+      <button id="js-add-vlayers-form" class="brand small pull-right">Add Layers</button>
+      </div>
+   </li>
    <li class="selectoptions">
       <span class="btn walkthrough-tutorial-btn icon-question-mark pull-right" onclick="gisportal.walkthrough.openVisualPortalWalkthrough('Load Layers Using the Dropdowns')" title="Help (Load Layers Using the Dropdowns)"></span>
       Available indicators:

@@ -402,6 +402,7 @@ gisportal.api['ddslick.open'] = function(data, options){
  value: The value to be selected
   */
 gisportal.api['ddslick.selectValue'] = function(data, options){
+	console.log("gisportal.api['ddslick.selectValue']", data, options);
 	options = options || {};
 	var obj = $('#' + data.obj);
 	var value = data.value;

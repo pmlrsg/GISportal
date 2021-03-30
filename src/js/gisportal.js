@@ -48,6 +48,9 @@ gisportal.cache.wmsLayers = [];
 // gisportal.layers has all of the actual layer details
 gisportal.layers = {};
 
+//user defined vector layers
+gisportal.vLayersUserDefined = {};
+
 // gisportal.selectedLayers is an array of the ids of your selected layers
 // to get the layer use gisportal.layers[gisportal.selectedLayers[i]]
 gisportal.selectedLayers = [];
@@ -116,6 +119,7 @@ gisportal.loadLayers = function() {
    gisportal.original_layers = {};
    gisportal.not_included_layers = {};
    gisportal.layers = {};
+   //gisportal.vLayersUserDefined = {};
    gisportal.loadVectorLayers();
    loadWmsLayers();
    
@@ -151,11 +155,22 @@ gisportal.tempRemoveLayers = function(){
  */
 gisportal.loadVectorLayers = function() {
    console.log("gisportal.loadVectorLayers");
+   console.log(gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json');
+   var url;
+
+   if(gisportal.userDefinedWFS) {
+      url = gisportal.middlewarePath + '/cache/vectorLayers/rsg.pml.ac.uk-geoserver-rsg-wfs.json';
+   } else {
+      url = gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json';
+   }
+
+   console.log("this is the final url from load vector layers", url);
 
    $.ajax({
       //url: 'http://localhost:6789/app/cache/localhost:6789/temporary_cache/geo.earthwatch.org.uk-geoserver-FWW_MONOCLE-wms.json',
       //url: gisportal.middlewarePath + '/temporary_cache/' + gisportal.niceDomainName +'.json',
-      url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
+      //url: gisportal.middlewarePath + '/cache/' + gisportal.niceDomainName +'/vectorLayers.json',
+      url: url,
       dataType: 'json',
       success: gisportal.initVectorLayers
       //error: function(req, err){ 
@@ -164,6 +179,7 @@ gisportal.loadVectorLayers = function() {
    });
 };
 
+//gisportal.vLayersUserDefined = {};
 
 gisportal.createVectorLayers = function() {
    console.log("gisportal.createVectorLayers");
@@ -185,8 +201,9 @@ gisportal.createVectorLayers = function() {
         processVectorLayer(vector.services.wfs.url, v);
       });
    });
-    gisportal.loadBrowseCategories();
+   gisportal.loadBrowseCategories();
    gisportal.configurePanel.refreshData();
+   //gisportal.configurePanel.resetPanel(gisportal.cache.vectorLayers, false);
    function processVectorLayer(serverUrl, vector) {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
       var vectorOptions = {
@@ -211,12 +228,27 @@ gisportal.createVectorLayers = function() {
          "defaultProperties" : vector.defaultProperties,
          "descriptiveName" : vector.tags.niceName,
          "unit" : vector.unit,
-         "defaultColour" : vector.defaultColour || false
+         "defaultColour" : vector.defaultColour || false,
+         "serverName": vector.serverName, 
+         "Abstract": vector.Abstract
       };
+      
+      var vectorLayer;
+      if(gisportal.userDefinedWFS) {
+         vectorOptions.name += "__UserDefinedLayer";
+         vectorOptions.id += "__UserDefinedLayer";
+         vectorLayer = new gisportal.Vector(vectorOptions);
+         gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
+         console.log("gisportal.vLayersUserDefined", gisportal.vLayersUserDefined, _.size(gisportal.vLayersUserDefined));
+      }
+      else {
          //console.log("these are the vector options ", vectorOptions);
-      var vectorLayer = new gisportal.Vector(vectorOptions);
+         vectorLayer = new gisportal.Vector(vectorOptions);
+      }
+
       gisportal.vectors.push(vectorLayer);
-gisportal.layers[vectorOptions.id] = vectorLayer;
+      gisportal.layers[vectorOptions.id] = vectorLayer;
+      gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
          //console.log("this is the vectorLayerOL ", vectorLayer);
@@ -232,6 +264,7 @@ gisportal.layers[vectorOptions.id] = vectorLayer;
  * iterates over each and adds to gisportal.layers 
  */
 gisportal.createOpLayers = function() {
+   console.log("gisportal.createOpLayers.caller", gisportal.createOpLayers.caller);
    // Loop over each server
    gisportal.cache.wmsLayers.forEach(function( server ){
       processServer( server );
@@ -252,6 +285,8 @@ gisportal.createOpLayers = function() {
 
    // Turn an indicator into a later and adding to gisportal.layers
    function processIndicator( server, sensorName, indicator ){
+      console.log("processIndicator.caller", processIndicator.caller);
+      console.log(server, sensorName, indicator);
 
       var wcs_url = indicator.wcsURL || server.wcsURL;
 
@@ -353,10 +388,11 @@ gisportal.createOpLayers = function() {
 
    if(_.size(gisportal.layers) <= 0){
       if(_.size($('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")')) <= 0){
+         console.log("_.size(gisportal.layers)", _.size(gisportal.layers), _.size(gisportal.vectors));
          $.notify("There are currently no layers in the portal \n Please load some up using the highlighted section to the left", {autoHide:false});
-         gisportal.panels.showPanel('map-settings');
-         $('.js-category-filter').html("");
-         $('form.add-wms-form .js-wms-url').toggleClass("alert-warning", true);
+         //gisportal.panels.showPanel('map-settings');
+         //$('.js-category-filter').html("");
+         //$('form.add-wms-form .js-wms-url').toggleClass("alert-warning", true);
       }
    }else{
       $('.notifyjs-gisportal-info span:contains("There are currently no layers in the portal")').closest('.notifyjs-wrapper').remove();
@@ -659,6 +695,7 @@ gisportal.mapInit = function() {
       if(gisportal.selectionTools.isSelecting){
          // If the selection mode is on
          map.forEachFeatureAtPixel(e.pixel, function(feature,layer){
+            console.log("map.forEachFeatureAtPixel");
             if(feature.getKeys().length === 1 || feature.getId() != gisportal.hoveredFeature || feature.getId() === undefined){
                // If we are not on the correct feature then keep going until we are
                return;
@@ -698,22 +735,31 @@ gisportal.mapInit = function() {
          cancelDraw();
    };
    gisportal.displayDataPopup = function(pixel){
+      console.log("pixel", pixel);
       var isFeature = false;
       var coordinate = map.getCoordinateFromPixel(pixel);
+      console.log("coordinate", coordinate);
       var params;
       response = "";
       map.forEachFeatureAtPixel(pixel, function(feature, layer) {
+         console.log("feature", feature);
          var overlayType = feature.getProperties().overlayType;
          if (feature && _.keys(feature.getProperties()).length >1 && overlayType != "filter" && overlayType != "selected") {
             _.each(gisportal.selectedFeatures, function(feature) {
             });
             var tlayer;
             if(feature.getId()){
+               console.log("feature.getId()", feature.getId());
                tlayer = gisportal.layers['rsg_' + feature.getId().split('.')[0]];
             }
             isFeature = true;
             gisportal.selectedFeatures.push([feature, feature.getStyle()]);
             var props = feature.getProperties();
+
+            if(response) {
+               response += "</ul>" + "Next feature:";
+            }
+
             for (var key in props) {
                if (props.hasOwnProperty(key) && key != "geometry") {
                   if(tlayer){
@@ -817,7 +863,7 @@ gisportal.initWMSlayers = function(data, opts) {
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initVectorLayers = function(data, opts) {
-   console.log("gisportal.initVectorLayers");
+   console.log("gisportal.initVectorLayers", data);
    if (data !== null)  {
 
       gisportal.cache.vectorLayers = data;

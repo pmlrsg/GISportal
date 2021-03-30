@@ -17,34 +17,54 @@ gisportal.editLayersForm.addSeverTable = function(){
 * @method
 */
 gisportal.editLayersForm.produceServerList = function(){
+   console.log("gisportal.editLayersForm.produceServerList", gisportal.original_layers, gisportal.layers);
    gisportal.editLayersForm.server_list = [];
    var layers_obj = {};
    if(_.size(gisportal.original_layers) > 0){
       layers_obj = gisportal.original_layers;
    }else{
-      layers_obj = gisportal.layers;
+      layers_obj = gisportal.vLayersUserDefined;
+      console.log("layers_obj", layers_obj, typeof(layers_obj));
    }
    $.extend(layers_obj, gisportal.not_included_layers);
    var data;
+   console.log("_.size(gisportal.original_layers)", _.size(gisportal.vLayersUserDefined));
+   layers_obj = gisportal.original_layers;
+   console.log("layers_obj", layers_obj, typeof(layers_obj));
+   console.log("looping through the layers in the layers_obj", Object.keys(gisportal.vLayersUserDefined)[0], Object.keys(gisportal.vLayersUserDefined).length);
+   console.log(gisportal.vLayersUserDefined);
    //for each of the layers in the list.
-   for(var layer in layers_obj){
-      var this_layer = layers_obj[layer];
-      if((gisportal.user.info.permission != "admin" && this_layer.owner != gisportal.user.info.email) || this_layer.serviceType =="WFS"){
-         continue;
-      }
+   for(var layer in gisportal.vLayersUserDefined){
+      console.log("for layer in layers_obj", layer);
+      var this_layer = gisportal.vLayersUserDefined[layer];
+      console.log(this_layer);
+      //if((gisportal.user.info.permission != "admin" && this_layer.owner != gisportal.user.info.email) || this_layer.serviceType =="WFS"){
+      //   continue;
+      //}
       var provider;
       var serverName;
-      serverName = this_layer.serverName;
-      provider = this_layer.tags.data_provider || this_layer.providerTag;
-      timeStamp = this_layer.timeStamp;
-      wms_url = this_layer.wmsURL;
-      owner = this_layer.owner;
+
+      if(this_layer.serviceType == "WFS") {
+         serverName = this_layer.variableName.split(":")[0].toUpperCase();
+         provider = this_layer.tags.data_provider || this_layer.providerTag;
+         timeStamp = undefined;
+         url = this_layer.endpoint;
+         owner = this_layer.tags.data_provider;
+      }
+      else{
+         serverName = this_layer.serverName;
+         provider = this_layer.tags.data_provider || this_layer.providerTag;
+         url = this_layer.wmsURL;
+         timeStamp = this_layer.timeStamp;
+         owner = this_layer.owner;
+      }
+      
       // Gets the server information from the layer
       var server_info = {
          "serverName":serverName,
          "timeStamp":timeStamp,
          "provider":provider,
-         "wms_url":wms_url,
+         "wms_url":url,
          "owner":owner,
          "includedLayers":[],
          "excludedLayers":[]
@@ -53,7 +73,8 @@ gisportal.editLayersForm.produceServerList = function(){
       var layer_info = {
          "id":layer,
          "include":this_layer.include,
-         "title":this_layer.name
+         "title":this_layer.name,
+         "serviceType":this_layer.serviceType
       };
       var unique = true;
       // If the server has already been added the layer is added to it
@@ -75,17 +96,40 @@ gisportal.editLayersForm.produceServerList = function(){
          }else{
             server_info.excludedLayers.push(layer_info);
          }
+         if(layer_info.serviceType == "WFS") {
+            server_info.serviceType = "WFS";
+         }
          gisportal.editLayersForm.server_list.push(server_info);
       }
       var admin = false;
+
+      gisportal.editLayersForm.server_list_wms = [];
+      gisportal.editLayersForm.server_list_wfs = [];
+
+      console.log("gisportal.editLayersForm.server_list[index]", gisportal.editLayersForm.server_list);
+
+      for(var index in gisportal.editLayersForm.server_list) {
+         console.log(gisportal.editLayersForm.server_list[index], gisportal.editLayersForm.server_list[index].serviceType);
+         var service_type = gisportal.editLayersForm.server_list[index].serviceType;
+
+         if(service_type == "WFS") {
+            gisportal.editLayersForm.server_list_wfs.push(gisportal.editLayersForm.server_list[index]);
+         }
+         else{
+            gisportal.editLayersForm.server_list_wms.push(gisportal.editLayersForm.server_list[index]);
+         }
+      }
+
       if(gisportal.user.info.permission == "admin") admin = true;
       data = {
-         "server_list": gisportal.editLayersForm.server_list,
+         "server_list_wms": gisportal.editLayersForm.server_list_wms,
+         "server_list_wfs": gisportal.editLayersForm.server_list_wfs,
          "admin": admin
       };
    }
    // The server list is shown using the list previously created.
    $( '.js-edit-layers-popup' ).toggleClass('hidden', false);
+   console.log("this is the data", data);
    var template = gisportal.templates['edit-layers-table'](data);
    $( '.js-edit-layers-html' ).html(template);
 
@@ -98,6 +142,7 @@ gisportal.editLayersForm.addListeners = function(){
    $('span.js-edit-layers-close').on('click', function() {
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
+      //if(true) {
       if(gisportal.addLayersForm.form_info.wms_url){
          gisportal.autoLayer.TriedToAddLayer = false;
          gisportal.autoLayer.loadGivenLayer();
@@ -127,17 +172,21 @@ gisportal.editLayersForm.addListeners = function(){
       }
 
    });
-
-   // Listener is added to the edit server buttons
-   $('span.js-edit-server-layers').on('click', function() {
+   
+   $('span.js-edit-server-layers-wfs').on('click', function() {
+      console.log("the edit button for wfs has been clicked");
       var single_layer;
-      gisportal.addLayersForm.layers_list = {};
+      //gisportal.addLayersForm.layers_list = {};
       gisportal.addLayersForm.server_info = {};
       gisportal.addLayersForm.form_info = {};
+      console.log(gisportal.editLayersForm.server_list);
       for(var i in gisportal.editLayersForm.server_list){
+         console.log("Here another server:");
+         console.log(i);
          var this_form_layer = gisportal.editLayersForm.server_list[i];
          if(this_form_layer.serverName == $(this).data("server") && this_form_layer.owner == $(this).data("user")){
             var layer, id;
+            console.log("this_form_layer.includedLayers", this_form_layer.includedLayers);
             for(layer in this_form_layer.includedLayers){
                id = this_form_layer.includedLayers[layer].id;
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
@@ -145,6 +194,7 @@ gisportal.editLayersForm.addListeners = function(){
                // Each of the server layers are added to the layers_list variable
                gisportal.addLayersForm.addlayerToList(this_layer);
             }
+            console.log("this_form_layer.excludedLayers", this_form_layer.excludedLayers);
             for(layer in this_form_layer.excludedLayers){
                id = this_form_layer.excludedLayers[layer].id;
                this_layer = gisportal.not_included_layers[id];
@@ -160,12 +210,58 @@ gisportal.editLayersForm.addListeners = function(){
       // The form is then loaded (loading the first layer)
 
       gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'));
+      console.log("test", gisportal.addLayersForm);
+      gisportal.addLayersForm.loadedFromTheManagementPanel = true;
+      //$('div.js-edit-layers-html').html('');
+      $('div.js-edit-layers-popup').toggleClass('hidden', true);
+   });
+
+   // Listener is added to the edit server buttons
+   $('span.js-edit-server-layers').on('click', function() {
+      console.log("the edit button has been clicked");
+      var single_layer;
+      gisportal.addLayersForm.layers_list = {};
+      gisportal.addLayersForm.server_info = {};
+      gisportal.addLayersForm.form_info = {};
+      for(var i in gisportal.editLayersForm.server_list){
+         var this_form_layer = gisportal.editLayersForm.server_list[i];
+         console.log("this_form_layer", this_form_layer);
+         if(this_form_layer.serverName == $(this).data("server") && this_form_layer.owner == $(this).data("user")){
+            var layer, id;
+            for(layer in this_form_layer.includedLayers){
+               id = this_form_layer.includedLayers[layer].id;
+               this_layer = gisportal.layers[id] || gisportal.original_layers[id];
+               single_layer = this_layer;
+               console.log("this_layer", this_layer);
+               // Each of the server layers are added to the layers_list variable
+               gisportal.addLayersForm.addlayerToList(this_layer);
+            }
+            for(layer in this_form_layer.excludedLayers){
+               console.log("this_form_layer.excludedLayers[layer]", this_form_layer.excludedLayers[layer]);
+               id = this_form_layer.excludedLayers[layer].id;
+               //this_layer = gisportal.not_included_layers[id];
+               this_layer = gisportal.vLayersUserDefined[id];
+               console.log("gisportal.not_included_layers", gisportal.not_included_layers);
+               if(!single_layer){
+                  single_layer = this_layer;
+               }
+               console.log("this_layer excluded", this_layer);
+               // Each of the excluded server layers are added to the layers_list variable
+               gisportal.addLayersForm.addlayerToList(this_layer);
+            }
+         }
+      }
+      gisportal.addLayersForm.validation_errors = {};
+      // The form is then loaded (loading the first layer)
+
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', $(this).data('user'));
       gisportal.addLayersForm.loadedFromTheManagementPanel = true;
       $('div.js-edit-layers-html').html('');
       $('div.js-edit-layers-popup').toggleClass('hidden', true);
    });
    // Deletes the server from the portal.
    $('span.js-delete-server').on('click', function(){
+      console.log("the delete button has been clicked.");
       var this_span = $(this);
       if(!this_span.is(".working")){
          this_span.notify({'title':"Are you sure you want to delete this server?", "yes-text":"Yes", "no-text":"No"},{style:"gisportal-delete-option", autoHide:false, clickToHide: false});

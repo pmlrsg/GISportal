@@ -1,6 +1,6 @@
 <input type="radio" id="tab-{{id}}-details" name="tabs" data-tab-name="details" {{checked visibleTab "details"}} class="js-tab-trigger panel-tab-trigger">
 <table class="stripe panel-tab">
-   <tbody>
+   <tbody id="tab-information">
       
       {{#displayTags}}
          {{#if (eq displayName 'Related Layers') }}

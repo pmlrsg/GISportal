@@ -118,6 +118,8 @@ router.get('/app/settings/load_data_values', settings.load_data_values);
 
 router.get('/app/settings/load_new_wms_layer', settings.load_new_wms_layer);
 
+router.get('/app/settings/load_new_wfs_layer', settings.load_new_wfs_layer);
+
 router.all('/app/settings/create_share', settings.create_share);
 
 router.get('/app/settings/get_share', settings.get_share);

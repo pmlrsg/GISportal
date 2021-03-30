@@ -16,19 +16,23 @@ gisportal.configurePanel = {};
  * all of the data within the configure panel.
  */
 gisportal.configurePanel.refreshData = function()  {
+   console.log("gisportal.configurePanel.refreshData", gisportal.config.browseMode);
    this.searchInit();
 
    if(_.size(gisportal.browseCategories) > 0 && gisportal.config.browseMode != 'simplelist'){
+      console.log("one");
       if (typeof(gisportal.config.browseMode) === 'undefined' || gisportal.config.browseMode == 'selectlist') {
+         console.log("two");
          this.renderTagsAsSelectlist();
       } else if (gisportal.config.browseMode == 'tabs') {
+         console.log("three");
          this.renderTagsAsTabs();
       }
    }else{
       this.renderIndicatorsAsSimpleList();
    }
 
-   gisportal.configurePanel.loadViewList();
+   //gisportal.configurePanel.loadViewList();
 
    $('#configurePanel').bind('scroll', function() {
       var scrollPercent = parseInt(100 * ($(this).scrollTop()/(this.scrollHeight - $(this).height())));
@@ -61,10 +65,12 @@ gisportal.configurePanel.loadViewList = function(){
                gisportal.events.trigger('view.loaded', params);
             });
          }else{
+            console.log("it does get here");
             $('li.views-list').toggleClass('hidden', true);
          }
       },
       error: function(error) {
+         console.log("it does get here too");
          $('li.views-list').toggleClass('hidden', true);
       }
    });
@@ -147,6 +153,7 @@ gisportal.configurePanel.buildMap = function(indicator)  {
  * @returns {object} Data structure with tags as keys
  */
 gisportal.groupTags = function(layers, vectorLayers)  {
+   console.log("gisportal.groupTags", layers, vectorLayers);
    layers = layers || gisportal.layers;
    vectorLayers = vectorLayers || gisportal.vectors;
    var grouped = {};
@@ -386,19 +393,30 @@ gisportal.configurePanel.renderTagsAsTabs = function()  {
  * each of the categories specified in gisportal.browseCategories
  */
 gisportal.configurePanel.renderTagsAsSelectlist = function() {
+   console.log("gisportal.configurePanel.renderTagsAsSelectlist");
    // load the template
-   var addable_layers = false;
+   var addable_layers = true;
+   console.log("gisportal.layers", gisportal.layers);
+
+   console.log(addable_layers);
    if(gisportal.user.info.permission != "guest"){
       for(var layer in gisportal.layers){
+         console.log("layer.indexOf('UserDefinedLayer')", layer.indexOf("UserDefinedLayer"));
+         console.log(layer);
          if(layer.indexOf("UserDefinedLayer") > -1){
-            addable_layers = true;
+            $('.filtered-list-message').show();
             break;
          }
       }
    }
    // The option to add layers is only displayed if there are layers selected that are not in the portal already (UserDefinedLayer)
+   //console.log($('.js-category-filter'));
    var catFilter = gisportal.templates['category-filter-selectlist']({'addable_layers':addable_layers});
+   //console.log("catFilter", catFilter);
+   //console.log("$('.js-category-filter')", $('.js-category-filter').html());
    $('.js-category-filter').html(catFilter);
+   //console.log("$('.js-category-filter')", $('.js-category-filter').html());
+
    if(!gisportal.config.showTutorialLinks || gisportal.walkthrough.is_playing){
       $('.walkthrough-tutorial-btn').toggleClass('hidden', true);
    }
@@ -443,6 +461,25 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
       gisportal.events.trigger('addLayersForm.clicked', params);
    });
 
+   $('button#js-add-vlayers-form').on('click', function() {
+      console.log("Adding vector layers.");
+      gisportal.addLayersForm.serviceType = "WFS";
+      var single_layer;
+      for(var layer in gisportal.layers){
+         if(layer.indexOf("UserDefinedLayer") > -1){
+            single_layer = gisportal.layers[layer]; 
+            console.log("single_layer", single_layer);
+            gisportal.addLayersForm.addlayerToList(gisportal.layers[layer]);
+         }
+      }
+      gisportal.addLayersForm.validation_errors = {};
+      gisportal.addLayersForm.addLayersForm(_.size(gisportal.addLayersForm.layers_list), single_layer, 1, 'div.js-layer-form-html', 'div.js-server-form-html', gisportal.user.info.email);
+      var params = {
+         "event" : "addLayersForm.clicked"
+      };
+      gisportal.events.trigger('addLayersForm.clicked', params);
+   });
+
    var categories = [];
    for (var category in gisportal.browseCategories) {
       var c = {
@@ -457,6 +494,7 @@ gisportal.configurePanel.renderTagsAsSelectlist = function() {
    $('#js-category-filter-select').ddslick({
       data: categories,
       onSelected: function(data) {
+         console.log("$('#js-category-filter-select').ddslick");
          if(data.selectedData.value=="vector"){
             targetDiv.html('');
             gisportal.configurePanel.renderIndicatorsByTag(data.selectedData.value, targetDiv);
@@ -781,6 +819,10 @@ gisportal.configurePanel.reorderIndicators = function(index, name)  {
  * @param {Object} given_layers - The layers you want to be loaded or NULL.
  */
 gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
+   console.log("gisportal.configurePanel.resetPanel", given_layers, showMessageBool);
+   //$('.filtered-list-message').show();
+   console.log(gisportal.configurePanel.resetPanel.caller);
+   console.log("_.size(given_layers)", _.size(given_layers), typeof(given_layers));
    if(given_layers){
       // Either add layers to the original or stores the layers if it is undefined
       gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
@@ -788,19 +830,24 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
       // Reloads the browse categories
       gisportal.loadBrowseCategories();
       gisportal.configurePanel.refreshData();
+      console.log("_.size(given_layers)", _.size(given_layers));
       if(_.size(given_layers) === 0){
+         console.log("if 1");
          $('.filtered-list-error-message').toggleClass('hidden', false);
          $('.js-category-filter-options-li').hide();
       }else{
+         console.log("if 2");
          $('.filtered-list-message').show();
       }
       for(var index in gisportal.selectedLayers){
          given_layers[gisportal.selectedLayers[index]] = gisportal.original_layers[gisportal.selectedLayers[index]];
       }
       if(_.size(given_layers) == 1){
+         console.log("if 3");
          gisportal.refinePanel.layerFound(_.keys(given_layers)[0]);
       }
    }else{
+      console.log("if 4");
       // Removes all changes made to the info 
       gisportal.storage.set("layers_list", undefined);
       gisportal.storage.set("server_info", undefined);

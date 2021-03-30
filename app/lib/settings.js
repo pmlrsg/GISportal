@@ -532,6 +532,9 @@ settings.update_layer = function(req, res) {
 settings.add_user_layer = function(req, res) {
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
+   server_info.server_name = "rsg.pml.ac.uk-geoserver-rsg-wfs";
+   console.log("server_info", server_info);
+   console.log("layers_list", layers_list);
    var domain = utils.getDomainName(req); // Gets the given domain
    var owner = server_info.owner; // Gets the given owner
    var old_owner = server_info.old_owner; // Gets the old owner
@@ -542,53 +545,74 @@ settings.add_user_layer = function(req, res) {
    var username = user.getUsername(req);
    var permission = user.getAccessLevel(req, domain);
 
+   console.log("");
+
    if (username != owner && permission != 'admin') {
       return res.status(401).send();
    }
 
    if ('provider' in server_info && 'server_name' in server_info) { // Checks that all the required fields are in the object
       var filename = server_info.server_name + '.json';
+      //var filename = 'vectorLayers2.json';
       filename = filename.replace(/\.\./g, "_dotdot_"); // Clean the filename to remove ..
+      console.log("filename", filename);
 
       if (domain == owner) {
+         console.log(1);
          // If is is a global file it is refreshed from the URL
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
          save_path = path.join(MASTER_CONFIG_PATH, domain, filename);
       } else if (owner.startsWith(GROUP_CACHE_PREFIX)) {
+         console.log(2);
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, owner, filename);
       } else {
+         console.log(3);
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
       }
       if (old_owner == domain) {
+         console.log(4);
          cache_path = path.join(MASTER_CONFIG_PATH, domain);
       }
       if (!utils.directoryExists(cache_path)) {
+         console.log(5);
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
+      console.log("cache_file", cache_file);
       var data = {};
       try {
-         data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+         data = JSON.parse(fs.readFileSync(cache_file))[0]; // Gets the data from the file
       } catch (e) {
+         console.log("error", e);
          // Tries again with the temporary cache (Perhaps an admin is adding a server to this domain)
          if (domain == owner) {
+            console.log("");
+            console.log("it gets here");
+            console.log("");
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
-            data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+            data = JSON.parse(fs.readFileSync(cache_file))[0]; // Gets the data from the file
          }
       }
       if (JSON.stringify(data) == "{}") {
          return res.status(404).send();
       }
+      data.options = {};
       var new_data = []; // The list for the new data to go into
       for (var new_layer in layers_list) { // Loops through each new layer.
+         console.log("for loop");
          var this_new_layer = layers_list[new_layer];
+         this_new_layer.abstract = "";
+         console.log("this new layer", this_new_layer);
          if ('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer) { // Checks that the layer has the required fields
             var found = false;
+            console.log("first if statement", data);
             for (var old_layer in data.server.Layers) { // Loops through each old layer to be compared.
+               console.log("old layer and original name", data.server.Layers[old_layer].Name, this_new_layer.original_name);
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
+                  console.log("second for loop");
                   var new_data_layer = data.server.Layers[old_layer]; // 
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
                   new_data_layer.Abstract = this_new_layer.abstract;
@@ -601,22 +625,31 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
+                  console.log("end new data layer", new_data_layer);
                   for (var key in this_new_layer.tags) {
+                     console.log("key", key);
                      var val = this_new_layer.tags[key];
+                     console.log("val", val);
                      if (val && val.length > 0 && val[0] !== "") {
                         new_data_layer.tags[key] = val;
                      } else {
                         new_data_layer.tags[key] = undefined;
                      }
                   }
+                  console.log("new_data_layers.tags", new_data_layer.tags);
                   if (server_info.provider.length > 0) {
+                     console.log("server_info.provider.length", server_info.provider.length);
                      new_data_layer.tags.data_provider = server_info.provider;
+                     
                      var clean_provider = server_info.provider.replace(/&amp/g, "and").replace(/ /g, "_").replace(/\\/g, "_").replace(/\//g, "_").replace(/\./g, "_").replace(/\,/g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\:/g, "_").replace(/\;/g, "_");
+                     console.log(clean_provider);
                      data.options.providerShortTag = clean_provider;
                   }
+                  console.log("server_info.provider", server_info.provider);
                   new_data_layer.tags.niceName = this_new_layer.nice_name;
                   new_data_layer.LegendSettings = this_new_layer.legendSettings;
                   new_data.push(new_data_layer);
+                  console.log("new_data", new_data);
                   found = true;
                   break;
                }
@@ -628,6 +661,7 @@ settings.add_user_layer = function(req, res) {
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = settingsApi.sortLayersList(new_data, "Title");
+      console.log("data 1", data);
       if (server_info) {
          if (!data.contactInfo) {
             data.contactInfo = {};
@@ -639,6 +673,8 @@ settings.add_user_layer = function(req, res) {
          data.contactInfo.position = server_info.position || "";
       }
       data.wcsURL = server_info.wcsURL || "";
+      console.log("data", data);
+      console.log("save_path", save_path);
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");
    } else {
@@ -725,6 +761,26 @@ settings.load_new_wms_layer = function(req, res) {
          } else {
             res.send({
                "Error": "Could not find any loadable layers in the <a href='" + url + "service=WMS&request=GetCapabilities'>WMS file</a> you provided"
+            });
+         }
+      }
+   });
+};
+
+settings.load_new_wfs_layer = function(req, res) {
+   var url = req.query.url;
+   var domain = utils.getDomainName(req);
+
+   settingsApi.load_new_wfs_layer(url, domain, function(err, data) {
+      if (err) {
+         utils.handleError(err, res);
+      } else {
+         if (data !== null) {
+            console.log(data);
+            res.send(data);
+         } else {
+            res.send({
+               "Error": "Could not find any loadable layers in the <a href='" + url + "service=WFS&request=GetCapabilities'>WFS file</a> you provided"
             });
          }
       }

@@ -1,6 +1,7 @@
 gisportal.view = {};
 
 gisportal.view.loadView = function(view_name){
+   console.log("gisportal.view.loadView", view_name);
    $(".js-start").trigger('click');
    $.ajax({
       url: gisportal.middlewarePath + '/settings/view?view=' + view_name,
@@ -96,6 +97,7 @@ gisportal.view.loadView = function(view_name){
 
          // Loads the list and displayed layers that are filtered
          if(data.layerListFilter){
+            console.log("filtered-list-message hidden");
             gisportal.configurePanel.filterLayersList(data.layerListFilter);
             $('.filtered-list-message').toggleClass('hidden', true);
          }
