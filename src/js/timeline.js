@@ -299,11 +299,11 @@ gisportal.TimeLine = function(id, options) {
          // Convert selected into UTC as pikaday uses local time
          selected = moment.utc(selected.toArray());
          self.setDate(selected.toDate());
+	 self.setDate(self.getNextPreviousDate(0));
       }
    });
 
    var tooltip = null;
-
    // Setup next previous buttons
    $('.js-next-prev-date').click(function() {
       var steps = $(this).data('steps');
