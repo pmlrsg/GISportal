@@ -17,9 +17,11 @@ gisportal.editLayersForm.addSeverTable = function(){
 * @method
 */
 gisportal.editLayersForm.produceServerList = function(){
-   console.log("gisportal.editLayersForm.produceServerList", gisportal.original_layers, gisportal.layers);
+   console.log("gisportal.editLayersForm.produceServerList", gisportal.original_layers, gisportal.layers, gisportal.vLayersUserDefined);
    gisportal.editLayersForm.server_list = [];
    var layers_obj = {};
+   gisportal.original_layers = [gisportal.original_layers];
+   console.log("gisportal.original_layers", gisportal.original_layers, _.size(gisportal.original_layers));
    if(_.size(gisportal.original_layers) > 0){
       layers_obj = gisportal.original_layers;
    }else{
@@ -34,9 +36,11 @@ gisportal.editLayersForm.produceServerList = function(){
    console.log("looping through the layers in the layers_obj", Object.keys(gisportal.vLayersUserDefined)[0], Object.keys(gisportal.vLayersUserDefined).length);
    console.log(gisportal.vLayersUserDefined);
    //for each of the layers in the list.
-   for(var layer in gisportal.vLayersUserDefined){
+   //for(var layer in gisportal.vLayersUserDefined){
+   for(var layer in layers_obj){
       console.log("for layer in layers_obj", layer);
-      var this_layer = gisportal.vLayersUserDefined[layer];
+      //var this_layer = gisportal.vLayersUserDefined[layer];
+      var this_layer = layers_obj[layer];
       console.log(this_layer);
       //if((gisportal.user.info.permission != "admin" && this_layer.owner != gisportal.user.info.email) || this_layer.serviceType =="WFS"){
       //   continue;
@@ -45,11 +49,15 @@ gisportal.editLayersForm.produceServerList = function(){
       var serverName;
 
       if(this_layer.serviceType == "WFS") {
-         serverName = this_layer.variableName.split(":")[0].toUpperCase();
-         provider = this_layer.tags.data_provider || this_layer.providerTag;
+         //serverName = this_layer.variableName.split(":")[0].toUpperCase();
+         serverName = this_layer.serverName;
+         //provider = this_layer.tags.data_provider || this_layer.providerTag;
+         provider = this_layer.provider;
          timeStamp = undefined;
-         url = this_layer.endpoint;
-         owner = this_layer.tags.data_provider;
+         //url = this_layer.endpoint;
+         url = this_layer.wmsURL;
+         //owner = this_layer.tags.data_provider;
+         owner = this_layer.provider;
       }
       else{
          serverName = this_layer.serverName;
@@ -72,8 +80,10 @@ gisportal.editLayersForm.produceServerList = function(){
       // Gets the unique layer information.
       var layer_info = {
          "id":layer,
-         "include":this_layer.include,
-         "title":this_layer.name,
+         //"include":this_layer.include,
+         "include":this_layer.server.Layers,
+         //"title":this_layer.name,
+         "title":this_layer.serverName,
          "serviceType":this_layer.serviceType
       };
       var unique = true;

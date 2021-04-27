@@ -15,13 +15,21 @@
          </div>
       </form>
 
-   <h3>Timeline:</h3>
-   <h2>Upper limit:</h2>
-   <span id='slider_range_upper'> </span>
-   <h2>Lower limit:</h2>
-   <span id='slider_range_lower'> </span>
-   <div id='slider-div'>
-      <div id='slider'></div>
+   <div id="timedates-dropdown"></div>
+
+   <div id="slider-container">
+   <style type="text/css">
+      #slider-container {display:none;}
+   </style>
+      <h3>Timeline:</h3>
+      <h2>Upper limit:</h2>
+      <span id='slider_range_upper'> </span>
+      <h2>Lower limit:</h2>
+      <span id='slider_range_lower'> </span>
+      <div id='slider-div'>
+         <div id='slider'></div>
+      </div>
+      <div id='apply-slider-changes'></div>
    </div>
 
    <div id='properties-list-header'><h3>Feature Properties:</h3></div>

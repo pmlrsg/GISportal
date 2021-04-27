@@ -96,6 +96,7 @@ gisportal.user.initDOM = function() {
    
    $('button.js-wfs-url').on('click', function(e)  {
       e.preventDefault();
+      gisportal.vLayersUserDefined = {};
       console.log("the submit button has been pushed");
       
       gisportal.userDefinedWFS = true;
@@ -106,7 +107,7 @@ gisportal.user.initDOM = function() {
 
       //console.log(gisportal.autoLayer.given_wfs_url.trim().replace(/\?.*/g, "") + "?");
 
-      if (false) {
+      if (false) { //temporarily disabled so that it doesn't create a different vectors file everytime
          var refresh_url = gisportal.middlewarePath + '/settings/load_new_wfs_layer?url=' + gisportal.autoLayer.given_wfs_url;
          $.ajax({
             url: refresh_url,

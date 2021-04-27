@@ -13,8 +13,12 @@
       {{#if_equals ../list_id "1"}}<span title="Copy to all" class="toggle-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="include"></span>{{/if_equals}}</br>
       {{/unless_equals}}
 
-      <label data-field="nice_name">Display Name Test:</label></br>
+      <label data-field="nice_name">Display Name:</label></br>
       <input type="text" value="{{nice_name}}" data-field="nice_name" data-id="{{list_id}}"/></br>
+
+      <label data-field="defaultProperty">Default Property:</label></br>
+      <input type="text" value="{{defaultProperty}}" data-field="defaultProperty" data-id="{{list_id}}"/></br>
+
       {{#if dict}}
          <div class="dict-opts">
             <label>Suggestions (Click to populate):</label>
@@ -29,128 +33,12 @@
       <label data-field="abstract">Abstract:</label></br>
       <textarea data-field="abstract" data-id="{{list_id}}">{{{abstract}}}</textarea>
 
-      <div class="clearfix legend-settings">
 
-         <div class="scale-points-div hidden">
-            <label data-field="scalePoints" >
-               Scale Points?
-               <input type="checkbox" data-field="scalePoints" {{#if legendSettings.scalePoints}}checked{{/if}} data-id="{{list_id}}"/>
-            </label>
-            {{#if_equals list_id "1"}}
-               <span title="Add Scalebar Information To All" class="scale-to-all-layers icon-clipboard-edit btn icon-btn btn-mini"></span>
-            {{/if_equals}}
-            </br>
-         </div>
-
-         <label data-field="URL">Scalebar Custom URL:</label>
-         <input type="text" data-field="URL" value="{{legendSettings.URL}}" data-id="{{list_id}}"/></br>
-
-         <div class="clearfix legend-parameters">
-            {{#with legendSettings.Parameters}}
-               <label data-field="colorbaronly">
-                  Color Bar Only?
-                  <input type="checkbox" data-field="colorbaronly" {{#if colorbaronly}}checked{{/if}} data-id="{{../list_id}}"/>
-               </label></br>
-
-               <label data-field="height">Height:</label></br>
-               <input type="text" value="{{height}}" data-field="height" data-id="{{../list_id}}"/></br>
-
-               <label data-field="width">Width:</label></br>
-               <input type="text" value="{{width}}" data-field="width" data-id="{{../list_id}}"/></br>
-            {{/with}}
-         </div>
-         <br/>
-
-         <div class="scale-points-div hidden">
-            <p class="small-text">Min and Max values are overwitten by Auto Scale if it is on, Logarithmic is not valid with min and/or max values of zero or less</p>
-
-            <label data-field="defaultLog" class="no-padding">
-               Logarithmic
-               <input type="checkbox" data-field="defaultLog" class="ignore-nesting refresh-scalebar" {{#if defaultLog}}checked{{/if}} data-id="{{list_id}}"/></br>
-            </label>
-            {{#if_equals list_id "1"}}
-               <span title="Add to all" class="log-to-all-layers icon-clipboard-edit btn icon-btn btn-mini" data-field="defaultLog"></span>
-            {{/if_equals}}
-            <br/>
-
-            <div class="split-input-3">
-               <label data-field="defaultMinScaleVal">Min:</label>
-               <input type="text" data-field="defaultMinScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMinScaleVal}}" data-id="{{list_id}}"/>
-            </div>
-            <div class="split-input-3">
-               <label data-field="defaultMaxScaleVal">Max:</label>
-               <input type="text" data-field="defaultMaxScaleVal" class="ignore-nesting refresh-scalebar" value="{{defaultMaxScaleVal}}" data-id="{{list_id}}"/>
-            </div>
-            <div class="split-input-3">
-               <label data-field="defaultColorbands">Colour Bands:</label>
-               <input type="text" data-field="defaultColorbands" class="ignore-nesting refresh-scalebar" value="{{defaultColorbands}}" data-id="{{list_id}}" maxlength="3"/>
-            </div>
-            <br/>
-
-            <div class="split-input-2 pull-left">
-               <label data-field="defaultBelowMinColor">Below Min Colour:</label>
-               <select data-field="defaultBelowMinColor" data-id="{{list_id}}">
-                  <option value="0x000000">Black</option>
-                  <option value="0xFFFFFF">White</option>
-                  <option value="transparent">Transparent</option>
-                  <option value="custom">Custom</option>
-               </select>
-               <input class="js-custom-defaultBelowMinColor custom-default-above-below-color ignore-nesting hidden" placeholder="#rrggbb" data-field="customBelowMinColor" data-id="{{list_id}}" type="text">
-               {{#if_equals list_id "1"}}
-                  <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultBelowMinColor"></span>
-               {{/if_equals}}
-            </div>
-            <div class="split-input-2 pull-right">
-               <label data-field="defaultAboveMaxColor">Above Max Colour:</label>
-               <select data-field="defaultAboveMaxColor" data-id="{{list_id}}">
-                  <option value="0x000000">Black</option>
-                  <option value="0xFFFFFF">White</option>
-                  <option value="transparent">Transparent</option>
-                  <option value="custom">Custom</option>
-               </select>
-               <input class="js-custom-defaultAboveMaxColor custom-default-above-below-color ignore-nesting hidden" placeholder="#rrggbb" data-field="customAboveMaxColor" data-id="{{list_id}}" type="text">
-               {{#if_equals list_id "1"}}
-                  <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultAboveMaxColor"></span>
-               {{/if_equals}}
-            </div>
-
-            <div class="clearfix"></div>
-
-            <label data-field="originalAutoScale">Auto Scale:</label>
-            <select data-field="originalAutoScale" data-id="{{list_id}}">
-               <option value="true">Yes</option>
-               <option value="false">No</option>
-               <option value="default">Default</option>
-            </select>
-            {{#if_equals list_id "1"}}
-               <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="originalAutoScale"></span>
-            {{/if_equals}}
-            <br/>
-
-            <label data-field="defaultStyle">Default Style:</label>
-            <select data-field="defaultStyle" data-id="{{list_id}}">
-            </select>
-            {{#if_equals list_id "1"}}
-               <span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="defaultStyle"></span>
-            {{/if_equals}}
-            <br/>
-         </div>
-
-         <span title="Rotate Left" class="add-to-all-layers icon-back btn icon-btn" data-field="Rotation">
-         <input class="hidden" data-field="Rotation" value="LEFT" data-id="{{list_id}}"/>
-         </span>
-         <span title="Rotate Right" class="add-to-all-layers icon-forward-3 btn icon-btn" data-field="Rotation">
-         <input class="hidden" data-field="Rotation" value="RIGHT" data-id="{{list_id}}"/>
-         </span>
-         <div class="scalebar-preview">
-         </div>
-
-      </div>
    </div>
    <div class="layers-form-right">
       {{#each tags}}
          {{#if @first}}
-            <label data-field="{{@key}}"">{{category_case @key}} (comma separated values):</label></br>
+            <label data-field="{{@key}}">{{category_case @key}} (comma separated values):</label></br>
             <textarea data-tag=true data-field="{{@key}}" data-id="{{../../list_id}}" >{{#each this}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</textarea>{{#if_equals ../../list_id "1"}}<span title="Add to all" class="add-to-all-layers icon-clipboard-edit btn icon-btn right-icon" data-field="indicator-type"></span>{{/if_equals}}<br/>
          {{/if}}
          {{#unless @first}}

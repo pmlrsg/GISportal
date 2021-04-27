@@ -30,17 +30,22 @@ settingsApi.get_cache = function(username, domain, permission) {
    var usernames = [username];
    var groups = [];
    var cache = []; // The list of cache deatils to be returned to the browser
-   var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+   //var master_path = path.join(MASTER_CONFIG_PATH, domain); // The path for the domain cache
+   var original_master_path = path.join(MASTER_CONFIG_PATH, domain);
+   var master_path = path.join(original_master_path, "user_iocircu@gmail.com");
+   console.log("master_path", master_path);
 
    if (!utils.directoryExists(master_path)) {
       utils.mkdirpSync(master_path); // Creates the directory if it doesn't exist
    }
 
    var master_list = fs.readdirSync(master_path); // The list of files and folders in the master_cache folder
+   console.log("master_list", master_list);
    master_list.forEach(function(filename) {
       var file_path = path.join(master_path, filename);
       if (utils.fileExists(file_path) && path.extname(filename) == ".json" && filename != "vectorLayers.json" && filename.substring(filename.length - 17, filename.length) != "_walkthrough.json") {
          var json_data = JSON.parse(fs.readFileSync(file_path)); // Reads all the json files
+         console.log("json_data", json_data);
          if (permission != "admin") { // The Layers list is filtered .
             json_data.server.Layers = json_data.server.Layers.filter(function(val) {
                return val.include === true || typeof(val.include) === "undefined";
@@ -49,6 +54,14 @@ settingsApi.get_cache = function(username, domain, permission) {
          json_data.owner = domain; // Adds the owner to the file (for the server list)
          if (json_data.wmsURL) {
             cache.push(json_data); // Adds each file to the cache to be returned
+         }
+         console.log("json_data.server", json_data.server);
+         if(json_data.server) {
+            cache.push(json_data);
+            json_data.server.Layers.forEach(function(layer) {
+               console.log("layer", layer);
+               //cache.push(layer);
+            });
          }
       }
    });
@@ -90,6 +103,7 @@ settingsApi.get_cache = function(username, domain, permission) {
       // Load the cache for each group
       cache = cache.concat(loadCache(username, permission, groups, master_path, ''));
    }
+   console.log("cache at the end", cache);
    return cache;
 };
 
@@ -294,13 +308,13 @@ settingsApi.load_new_wms_layer = function(wmsURL, refresh, domain, next) {
 };
 
 settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
-   console.log("this is the wfs url", wfsURL);
+   //console.log("this is the wfs url", wfsURL);
    wfsURL = wfsURL.trim();
    wfsURL = wfsURL.replace(/\?.*/g, "") + "?";
    var data = null;
    var serverName = utils.URLtoServerName(wfsURL);
    var filename = serverName + ".json";
-   console.log("this is the file name", filename);
+   //console.log("this is the file name", filename);
    var directory = path.join(MASTER_CONFIG_PATH, "vectorLayers");
 
    var file_path = path.join(directory, filename);
@@ -326,9 +340,9 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
                         data.serverName = serverName;
                         data.Abstract = "";
                         data.provider = result.WFS_Capabilities.ServiceProvider[0].ProviderName[0];
-                        console.log("this is the provider", result.WFS_Capabilities.ServiceProvider[0].ProviderName[0]);
-                        console.log("");
-                        console.log(result.WFS_Capabilities.ServiceProvider[0].ProviderName);
+                        //console.log("this is the provider", result.WFS_Capabilities.ServiceProvider[0].ProviderName[0]);
+                        //console.log("");
+                        //console.log(result.WFS_Capabilities.ServiceProvider[0].ProviderName);
                         data.services = {};
                         data.services.wfs = {};
                         data.services.wfs.url = "/app/settings/proxy?url=" + encodeURIComponent(wfsURL);
@@ -344,7 +358,7 @@ settingsApi.load_new_wfs_layer = function(wfsURL, domain, next) {
 
                            var tags = {};
                            tags.niceName = titleCase(layer.id);
-                           tags.region = tags.niceName.split(" ")[0];
+                           //tags.region = tags.niceName.split(" ")[0];
                            tags.data_provider = data.provider;
                            layer.tags = tags;
 

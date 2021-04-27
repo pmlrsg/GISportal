@@ -506,7 +506,8 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
       var params = {
          "event": "submitLayers.clicked"
       };
-      gisportal.events.trigger('submitLayers.clicked', params);
+      console.log("js-layers-form-submit clicked");
+      //gisportal.events.trigger('submitLayers.clicked', params);
       if(!gisportal.form_working){
          gisportal.form_working = true;
          // If there are errors on the server information form then notify the user.
@@ -551,19 +552,26 @@ gisportal.addLayersForm.displayForm = function(total_pages, current_page, form_d
                dict[this_layer.original_name].displayName.push(this_layer.nice_name);
                dict[this_layer.original_name].tags.push(this_layer.tags);
             }
+            if(this_layer.defaultProperty != this_layer.defaultProperty && (!this_dict || this_dict.indexOf(this_layer.defaultProperty) < 0)){
+               dict[this_layer.defaultProperty].defaultProperty.push(this_layer.nice_name);
+               dict[this_layer.defaultProperty].push(this_layer.defaultProperty);
+            }
+
          }
+         console.log("gisportal.addLayersForm.layers_list", gisportal.addLayersForm.layers_list);
          for(layer in gisportal.addLayersForm.layers_list){
             // As long as it is to be included
             if(gisportal.addLayersForm.layers_list[layer].include){
+               console.log("layer before sending to middleware", layer);
                //Sends the layers to the middleware to be added to the json file
                gisportal.addLayersForm.sendLayers(layer);
                // Returns so that they are only sent once.
                return;
             }
          }
-         gisportal.form_working = false; // Will allow the submit button to be clicked again
+         //gisportal.form_working = false; // Will allow the submit button to be clicked again
          // If there is no layer found that is 'included' this will tell the user to include one.
-         $.notify("You need to include at least one layer.", "error");
+         //$.notify("You need to include at least one layer.", "error");
       }
    });
 
@@ -671,6 +679,7 @@ gisportal.addLayersForm.sendLayers = function(layer){
       success: function(layer){
          console.log("success in adding the layer", layer);
          console.log(gisportal.addLayersForm.server_info);
+         console.log("sendLayers success", gisportal.storage.get("layers_list"), gisportal.storage.get("server_info"));
          gisportal.form_working = false; // Will allow the submit button to be clicked again
          // This block removes any old selected layers
          for(var i in gisportal.addLayersForm.selectedLayers){

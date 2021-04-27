@@ -124,6 +124,7 @@ gisportal.loadLayers = function() {
    loadWmsLayers();
    
    function loadWmsLayers(){
+      console.log("loadWmsLayers");
       // Get WMS cache
       $.ajax({
          url:  gisportal.middlewarePath + '/settings/get_cache?_='+ new Date().getTime(),
@@ -196,6 +197,7 @@ gisportal.createVectorLayers = function() {
          //console.log("this is v inside vector.services.wfs.vectors ", v);
      //    processVectorLayer(vector.services.wfs.url, v);
      //}
+   console.log("gisportal.cache.vectorLayers", gisportal.cache.vectorLayers);
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
         processVectorLayer(vector.services.wfs.url, v);
@@ -208,6 +210,7 @@ gisportal.createVectorLayers = function() {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
       var vectorOptions = {
          "name": vector.name,
+         "Name": vector.name,
          "description": vector.desc,
          "endpoint" : serverUrl,
          "serviceType" : "WFS",
@@ -232,6 +235,8 @@ gisportal.createVectorLayers = function() {
          "serverName": vector.serverName, 
          "Abstract": vector.Abstract
       };
+
+      gisportal.vLayersUserDefined = {};
       
       var vectorLayer;
       if(gisportal.userDefinedWFS) {
@@ -248,7 +253,7 @@ gisportal.createVectorLayers = function() {
 
       gisportal.vectors.push(vectorLayer);
       gisportal.layers[vectorOptions.id] = vectorLayer;
-      gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
+      //gisportal.vLayersUserDefined[vectorOptions.id] = vectorLayer;
 
       vectorLayerOL = vectorLayer.createOLLayer();
          //console.log("this is the vectorLayerOL ", vectorLayer);
@@ -847,6 +852,9 @@ gisportal.selectedFeatures = [];
  * @param {object} opts - Options, not currently used
  */ 
 gisportal.initWMSlayers = function(data, opts) {
+   console.log("initWMSlayers", data);
+
+   gisportal.original_layers = data[0];
 
    if (data !== null)  {
       gisportal.cache.wmsLayers = data;
