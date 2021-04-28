@@ -130,6 +130,9 @@ gisportal.editLayersForm.produceServerList = function(){
          }
       }
 
+      if(gisportal.editLayersForm.server_list_wms.length === 0) gisportal.editLayersForm.server_list_wms = undefined;
+      if(gisportal.editLayersForm.server_list_wfs === 0) gisportal.editLayersForm.server_list_wfs = undefined;
+
       if(gisportal.user.info.permission == "admin") admin = true;
       data = {
          "server_list_wms": gisportal.editLayersForm.server_list_wms,
