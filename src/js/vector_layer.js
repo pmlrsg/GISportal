@@ -592,7 +592,7 @@ gisportal.Vector = function(options) {
         };
 
         var addDropdown = function() {
-            var dateTimesOptions = '<label for="datetimes">Pick a time property:</label><select name="datetimes" id="datetimes">';
+            var dateTimesOptions = '<label for="datetimes">Select time property field:</label><select name="datetimes" id="datetimes">';
 
             for (var i = 0; i < gisportal.dateTimeNames.length; i++){
                 console.log("dateTimeNames[i]", gisportal.dateTimeNames[i]);
@@ -641,18 +641,25 @@ gisportal.Vector = function(options) {
                     console.log(response.getElementsByTagName("xsd:sequence")[0].children[1].attributes.type.value);
                     var sequenceNodes = response.getElementsByTagName("xsd:sequence")[0].children;
                     $('#timedates-dropdown').empty();
+                    //$('#slider-container').show();
                     $('#slider-container').show();
                     gisportal.dateTimeNames = [];
+                    //var sliderAdded = false;
 
                     for (var i = 0; i < sequenceNodes.length; i++){
                         var nodeType = sequenceNodes[i].attributes.type.value;
                         console.log("nodeType", nodeType, sequenceNodes[i].attributes.name.value);
                         if(nodeType == "xsd:dateTime") {
+                            //$('#slider-container').show();
                             gisportal.dateTimeNames.push(sequenceNodes[i].attributes.name.value);
                             console.log("datetimes ", sequenceNodes[i].attributes.name.value);
+                            //if(!sliderAdded) {
+                            //    addSlider();
+                            //    sliderAdded = true;
+                            //}
                         }
                     }
-                    addSlider();
+                    //if(!sliderAdded) $('#slider-container').//hide();
                     if(gisportal.dateTimeNames.length > 1) addDropdown(gisportal.dateTimeNames);
                     console.log("dateTimeNames", gisportal.dateTimeNames);
                 },
@@ -772,6 +779,7 @@ gisportal.Vector = function(options) {
 
         var maxFeatures = function(vec) {
             return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + vec.maxFeatures : '';
+            //return vec.maxFeatures !== 'ALL' ? '%26maxFeatures%3D' + '100' : '';
         };
 
         var vec = this;

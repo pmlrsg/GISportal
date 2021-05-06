@@ -116,7 +116,7 @@ gisportal.user.initDOM = function() {
                console.log(data);
             },
             error: function(e){
-               console.log("error", e);
+               console.log("error loading the layer", e);
             }
          });
       }

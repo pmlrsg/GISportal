@@ -532,11 +532,13 @@ settings.update_layer = function(req, res) {
 settings.add_user_layer = function(req, res) {
    var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
    var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
-   server_info.server_name = "rsg.pml.ac.uk-geoserver-rsg-wfs";
-   //console.log("server_info", server_info);
-   //console.log("layers_list", layers_list);
+   
+   console.log("server_info", server_info);
+   console.log("layers_list", layers_list);
+   //server_info.server_name = "rsg.pml.ac.uk-geoserver-rsg-wfs";
    var domain = utils.getDomainName(req); // Gets the given domain
    var owner = server_info.owner; // Gets the given owner
+   //var owner = 'iocircu@gmail.com';
    var old_owner = server_info.old_owner; // Gets the old owner
    var cache_path;
    var save_path;
@@ -571,6 +573,8 @@ settings.add_user_layer = function(req, res) {
          // If it is to be a user file the data is retrieved from the temorary cache
          cache_path = path.join(MASTER_CONFIG_PATH, domain, "temporary_cache");
          save_path = path.join(MASTER_CONFIG_PATH, domain, USER_CACHE_PREFIX + owner, filename);
+         //console.log("cache_path", cache_path);
+         //console.log("save_path", save_path);
       }
       if (old_owner == domain) {
          console.log(4);
@@ -581,22 +585,25 @@ settings.add_user_layer = function(req, res) {
          utils.mkdirpSync(cache_path); // Creates the directory if it doesn't already exist
       }
       var cache_file = path.join(cache_path, filename); // Adds the filename to the path
-      //console.log("cache_file path", cache_file);
+      console.log("cache_file path", cache_file);
       var data = {};
       try {
-         var test_path = "/mnt/c/Users/blondu112/Documents/Projects/PML\ placement/Projects/GISportal/config/site_settings/localhost:6789/temporary_cache/rsg.pml.json";
-         //data = JSON.parse(fs.readFileSync(cache_file))[0]; // Gets the data from the file
-         data = JSON.parse(fs.readFileSync(test_path));
-         //console.log("this is data", data);
+         
+         //var test_path = "/mnt/c/Users/blondu112/Documents/Projects/PML\ placement/Projects/GISportal/config/site_settings/localhost:6789/temporary_cache/rsg.pml.json";
+
+         //if(serviceType == "WFS") data = JSON.parse(fs.readFileSync(cache_file))[0];
+         data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
+         //data = JSON.parse(fs.readFileSync(test_path));
+         console.log("this is data", data);
       } catch (e) {
-         //console.log("error", e);
+         console.log("error", e);
          // Tries again with the temporary cache (Perhaps an admin is adding a server to this domain)
          if (domain == owner) {
             //console.log("");
             //console.log("it gets here");
             //console.log("");
             cache_file = path.join(cache_path, "temporary_cache", filename); // Adds the filename to the path
-            data = JSON.parse(fs.readFileSync(cache_file))[0]; // Gets the data from the file
+            data = JSON.parse(fs.readFileSync(cache_file)); // Gets the data from the file
          }
       }
       //console.log("exit try block");
@@ -605,15 +612,17 @@ settings.add_user_layer = function(req, res) {
       }
       data.options = {};
       var new_data = []; // The list for the new data to go into
+      //console.log("layers_list", layers_list);
       for (var new_layer in layers_list) { // Loops through each new layer.
-         //console.log("for loop");
+         console.log("for loop");
          //console.log("layers_list", layers_list);
          var this_new_layer = layers_list[new_layer];
          this_new_layer.abstract = "";
+         if(!this_new_layer.id) this_new_layer.id = this_new_layer.nice_name.toLocaleLowerCase().replace(" ", "_");
          //console.log("this new layer", this_new_layer);
          if ('abstract' in this_new_layer && 'id' in this_new_layer && 'list_id' in this_new_layer && 'nice_name' in this_new_layer && 'tags' in this_new_layer) { // Checks that the layer has the required fields
             var found = false;
-            //console.log("abstract in this new layer");
+            console.log("abstract in this new layer");
             //console.log("data.server.Layers", data.server);
             //console.log("data.server.Layers 2", data.server.Layers);
             //console.log("data.server.Layers 3");
@@ -622,14 +631,14 @@ settings.add_user_layer = function(req, res) {
             for (var old_layer in data.server.Layers) { // Loops through each old layer to be compared.
                //console.log("old layer and original name", data.server.Layers[old_layer].Name, this_new_layer.original_name);
                
-               if(data.serviceType == "WFS") {
+               if(data.serviceType && data.serviceType == "WFS") {
                   this_new_layer.original_name = this_new_layer.id.replace('__UserDefinedLayer','');
                }
 
                //console.log("second for loop", data.server.Layers[old_layer].Name, this_new_layer.original_name);
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
                   var new_data_layer = data.server.Layers[old_layer]; // 
-                  //console.log("second for loop", new_data_layer);
+                  console.log("second for loop", new_data_layer);
                   new_data_layer.Title = titleCase(this_new_layer.nice_name);
                   new_data_layer.Abstract = this_new_layer.abstract;
                   new_data_layer.include = this_new_layer.include;
@@ -644,16 +653,16 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.tags.region = this_new_layer.tags.region[0];
                   //console.log("end new data layer", new_data_layer);
 
-                  if(data.serviceType == "WFS") {
+                  if(data.serviceType && data.serviceType == "WFS") {
                      new_data_layer.defaultProperty = this_new_layer.defaultProperty;
                      new_data_layer.defaultProperties = this_new_layer.defaultProperties;
                   }
 
                   for (var key in this_new_layer.tags) {
-                     //console.log("key", key);
+                     console.log("key", key);
                      var val = this_new_layer.tags[key];
                      //console.log("val", val);
-                     if (key =="region") {
+                     if (key =="region" && data.serviceType == "WFS") {
                         new_data_layer.tags[key] = val[0];
                         var filename = server_info.server_name + ".json";
                         var vectorLayersPath = path.join(MASTER_CONFIG_PATH, "vectorLayers");
@@ -688,14 +697,14 @@ settings.add_user_layer = function(req, res) {
                      new_data_layer.tags.data_provider = server_info.provider;
                      
                      var clean_provider = server_info.provider.replace(/&amp/g, "and").replace(/ /g, "_").replace(/\\/g, "_").replace(/\//g, "_").replace(/\./g, "_").replace(/\,/g, "_").replace(/\(/g, "_").replace(/\)/g, "_").replace(/\:/g, "_").replace(/\;/g, "_");
-                     //console.log(clean_provider);
+                     console.log(clean_provider);
                      data.options.providerShortTag = clean_provider;
                   }
                   //console.log("server_info.provider", server_info.provider);
                   new_data_layer.tags.niceName = this_new_layer.nice_name;
                   new_data_layer.LegendSettings = this_new_layer.legendSettings;
                   new_data.push(new_data_layer);
-                  //console.log("new_data", new_data);
+                  console.log("new_data", new_data);
                   found = true;
                   break;
                }
@@ -707,7 +716,7 @@ settings.add_user_layer = function(req, res) {
       }
       // Adds all of the broader information to the JSON object.
       data.server.Layers = settingsApi.sortLayersList(new_data, "Title");
-      //console.log("data 1", data);
+      console.log("data 1", data);
       if (server_info) {
          if (!data.contactInfo) {
             data.contactInfo = {};
@@ -719,8 +728,8 @@ settings.add_user_layer = function(req, res) {
          data.contactInfo.position = server_info.position || "";
       }
       data.wcsURL = server_info.wcsURL || "";
-      //console.log("data", data);
-      //console.log("save_path", save_path);
+      console.log("data", data);
+      console.log("save_path", save_path);
       fs.writeFileSync(save_path, JSON.stringify(data));
       res.send("");
    } else {

@@ -57,7 +57,7 @@ gisportal.editLayersForm.produceServerList = function(){
          //url = this_layer.endpoint;
          url = this_layer.wmsURL;
          //owner = this_layer.tags.data_provider;
-         owner = this_layer.provider;
+         owner = this_layer.owner;
       }
       else{
          serverName = this_layer.serverName;
@@ -246,8 +246,19 @@ gisportal.editLayersForm.addListeners = function(){
                this_layer = gisportal.layers[id] || gisportal.original_layers[id];
                single_layer = this_layer;
                console.log("this_layer", this_layer);
-               // Each of the server layers are added to the layers_list variable
-               gisportal.addLayersForm.addlayerToList(this_layer);
+               if(this_layer.serviceType == "WFS") {
+                  for(var VlayerID in this_layer.server.Layers) {
+                     var Vlayer = this_layer.server.Layers[VlayerID];
+                     Vlayer.serviceType = "WFS";
+                     Vlayer.serverName = this_layer.serverName;
+                     Vlayer.provider = this_layer.provider;
+                     Vlayer.owner = this_layer.owner;
+                     gisportal.addLayersForm.addlayerToList(Vlayer);
+                  }
+               } else {
+                  // Each of the server layers are added to the layers_list variable
+                  gisportal.addLayersForm.addlayerToList(this_layer);
+               }
             }
             for(layer in this_form_layer.excludedLayers){
                console.log("this_form_layer.excludedLayers[layer]", this_form_layer.excludedLayers[layer]);
