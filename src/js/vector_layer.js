@@ -486,6 +486,19 @@ gisportal.Vector = function(options) {
             response += "</ul>";
             propertiesList.innerHTML = response;
 
+            //add dropdown for properties
+            var propertiesDropdown = document.getElementById('properties-dropdown');
+            console.log("propertiesDropdown", propertiesDropdown);
+
+            var variableOptions = '<label for="displayVariables"><h3>Select a variable to display:</h3></label><select name="displayVariables" id="displayVariables">';
+
+            Object.keys(properties).forEach(function (property) {
+                console.log("propertiesDropdown", property);
+                variableOptions += '<option value="' + property + '">' + property + '</option>';
+            });            
+
+            propertiesDropdown.innerHTML = variableOptions;
+
             checkTimedate(features);
         };
 
@@ -644,22 +657,22 @@ gisportal.Vector = function(options) {
                     //$('#slider-container').show();
                     $('#slider-container').show();
                     gisportal.dateTimeNames = [];
-                    //var sliderAdded = false;
+                    var sliderAdded = false;
 
                     for (var i = 0; i < sequenceNodes.length; i++){
                         var nodeType = sequenceNodes[i].attributes.type.value;
                         console.log("nodeType", nodeType, sequenceNodes[i].attributes.name.value);
                         if(nodeType == "xsd:dateTime") {
-                            //$('#slider-container').show();
+                            $('#slider-container').show();
                             gisportal.dateTimeNames.push(sequenceNodes[i].attributes.name.value);
                             console.log("datetimes ", sequenceNodes[i].attributes.name.value);
-                            //if(!sliderAdded) {
-                            //    addSlider();
-                            //    sliderAdded = true;
-                            //}
+                            if(!sliderAdded) {
+                                addSlider();
+                                sliderAdded = true;
+                            }
                         }
                     }
-                    //if(!sliderAdded) $('#slider-container').//hide();
+                    if(!sliderAdded) $('#slider-container').hide();
                     if(gisportal.dateTimeNames.length > 1) addDropdown(gisportal.dateTimeNames);
                     console.log("dateTimeNames", gisportal.dateTimeNames);
                 },
