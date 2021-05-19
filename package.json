@@ -52,6 +52,7 @@
     "multer": "~1.1.0",
     "node-markdown": "~0.1.1",
     "nodemailer": "~2.4.2",
+    "nouislider": "^14.6.3",
     "ogr2ogr": "~0.5.1",
     "passport": "~0.2.2",
     "passport-google": "~0.3.0",

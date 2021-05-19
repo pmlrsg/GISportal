@@ -890,7 +890,12 @@ gisportal.Vector = function(options) {
         };
 
 
-        var createOLVectorLayer = function() {
+        if (this.serviceType === 'WFS') {
+
+            gisportal.originalVectorInfo = this;
+
+            //createOLVectorLayer();
+
             console.log("the service type is WFS");
             console.log("vec before 2", vec);
             var sourceVector = new ol.source.Vector({
@@ -909,18 +914,6 @@ gisportal.Vector = function(options) {
 
             this.sourceVector = sourceVector;
             this.layerVector = layerVector;
-
-        };
-
-        if (this.serviceType === 'WFS') {
-
-            gisportal.originalVectorInfo = this;
-
-            console.log("this.serviceType", this);
-
-            //this.original
-
-            createOLVectorLayer();
 
             sourceVector.on('change', function(layer){
                 console.log("this is vec", vec, layer);
