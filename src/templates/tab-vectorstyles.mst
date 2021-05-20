@@ -34,15 +34,6 @@
 
    <div id='properties-list-header'><h3>Feature Properties:</h3></div>
    <div id='properties-list'></div>
-   <div id='properties-dropdown'></div>
-   <div id='properties-colourmap'>
-         <label>Min:</label>
-         <input type="text" class="ignore-nesting refresh-scalebar"/>
-         <label>Max:</label>
-         <input type="text" class="ignore-nesting refresh-scalebar"/>
-         <label>Colour Bands:</label>
-         <input type="text" class="ignore-nesting refresh-scalebar" maxlength="3"/>
-      <br/>
-   </div>
+
 
 </div>

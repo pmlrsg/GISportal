@@ -486,19 +486,6 @@ gisportal.Vector = function(options) {
             response += "</ul>";
             propertiesList.innerHTML = response;
 
-            //add dropdown for properties
-            var propertiesDropdown = document.getElementById('properties-dropdown');
-            console.log("propertiesDropdown", propertiesDropdown);
-
-            var variableOptions = '<label for="displayVariables"><h3>Select a variable to display:</h3></label><select name="displayVariables" id="displayVariables">';
-
-            Object.keys(properties).forEach(function (property) {
-                console.log("propertiesDropdown", property);
-                variableOptions += '<option value="' + property + '">' + property + '</option>';
-            });            
-
-            propertiesDropdown.innerHTML = variableOptions;
-
             checkTimedate(features);
         };
 
