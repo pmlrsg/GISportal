@@ -5,42 +5,6 @@ gisportal.originalVectorInfo = "";
 gisportal.dateTimeNames = [];
 
 
-gisportal.filteredVector = function(vector) {
-    var serverUrl  = "http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms";
-
-    var vectorOptions = {
-        "name": vector.name,
-        "Name": vector.name,
-        "description": vector.desc,
-        "endpoint" : serverUrl,
-        "serviceType" : "WFS",
-        "variableName" : vector.variableName,
-        "maxFeatures" : vector.maxFeatures,
-        "tags" : vector.tags,
-        "id" : vector.id,
-        "exBoundingBox" : vector.exBoundingBox,
-        "abstract" : vector.abstract,
-        "provider" : vector.provider,
-        "contactInfo" : {
-           "organization" : vector.provider
-        },
-        "ignoredParams" : vector.ignoredParams,
-        "vectorType" : vector.vectorType,
-        "styles" : vector.styles,
-        "defaultProperty" : vector.defaultProperty,
-        "defaultProperties" : vector.defaultProperties,
-        "descriptiveName" : vector.tags.niceName,
-        "unit" : vector.unit,
-        "defaultColour" : vector.defaultColour || false,
-        "serverName": vector.serverName, 
-        "Abstract": vector.Abstract
-     };
-
-     //vectorLayer = new gisportal.Vector(vectorOptions);
-     //vectorLayerOL = vectorLayer.createOLLayer();
-
-};
-
 /**
  * vector_layer.js
  * The is the base object for all vector based layers. This includes WFS
@@ -68,7 +32,6 @@ gisportal.Vector = function(options) {
         defaultProperties : [],
         unit : null
     };
-    console.log(1);
 
 
     $.extend(true, this, defaults, options);
@@ -99,32 +62,15 @@ gisportal.Vector = function(options) {
         if (this.openlayers.anID) this.openlayers.anID.setVisible(visibility);
         this.isVisible = visibility;
     };
-    console.log(4);
-    console.log("this.temporal", this.temporal);
-
 
     this.init = function(options, layer) {
-        console.log("this is the function caller", this.init.caller);
-        console.log("this.init options layer", options, layer);
-        //layer.DTCache = [];
-
         map.addLayer(layer.OLLayer);
-        console.log(map);
         this.select();
-        //console.log("select()");
-        //this.getMetadata();
         this.openlayers.anID = layer.OLLayer;
-        //this.openlayers.anID.g = 2;
-        console.log(this.openlayers.anID.g);
-        //this.getDimensions(layer);
-
-        //gisportal.indicatorsPanel.selectTab( this.id, 'details' );
-
     };
 
     this.getDimensions = function(layerData) {
         var layer = this;
-        console.log("this.getDimensions", layer.DTCache);
         
         this.temporal = true;
 
@@ -132,7 +78,6 @@ gisportal.Vector = function(options) {
             this.selectDateTimeLayer( gisportal.timeline.selectedDate );
             
             // Now display the layer on the timeline
-            console.log("datetime", this.DTCache[0], typeof(this.DTCache[0]));
             var startDate = new Date(this.DTCache[0]);
             var endDate = new Date(this.DTCache[this.DTCache.length - 1]); //"2019-12-20T02:00:00.0000"
             gisportal.timeline.addTimeBar(this.name, this.id, this.name, startDate, endDate, this.DTCache);
@@ -147,7 +92,6 @@ gisportal.Vector = function(options) {
 
     this.select = function() {
         // Just in case it tries to add a duplicate
-        console.log("select()");
         //if (_.indexOf(gisportal.selectedLayers, this.id) > -1) return false;
         var layer = this;
 
@@ -169,20 +113,10 @@ gisportal.Vector = function(options) {
         var index = _.findIndex(gisportal.selectedLayers, function(d) {
             return d === layer.id;
         });
-        console.log("this is the index", index);
-        console.log("gisportal.selectedLayers", gisportal.selectedLayers);
         gisportal.setLayerIndex(layer, gisportal.selectedLayers.length - index);
-
-        //if (true) {
-        //    console.log("let's unselect the layer");
-        //    this.unselect();
-        //}
-        //layer.setVisibility(false);
-
     };
 
     this.unselect = function() {
-        console.log("unselect");
         var layer = this;
         $('#scalebar-' + layer.id).remove();
         layer.selected = false;
@@ -196,20 +130,16 @@ gisportal.Vector = function(options) {
             }
 
             gisportal.refreshDateCache();
-            console.log("right before calling gisportal.zoomOverall from vector layer");
             gisportal.zoomOverall();
         }
     };
 
     this.getMetadata = function() {
-        console.log("this.getMetadata()");
         var layer = this;
 
         gisportal.layers[layer.id].metadataComplete = true;
         layer.metadataComplete = true;
         gisportal.events.trigger('layer.metadataLoaded', layer.id);
-        console.log("get medatadata done");
-
     };
 
   this.styleUIBuilt = false;
@@ -437,19 +367,6 @@ gisportal.Vector = function(options) {
 
     };
 
-    this.createOLVectorLayer = function() {
-        console.log("gisportal.originalVectorInfo", gisportal.originalVectorInfo);
-        var vec = gisportal.originalVectorInfo;
-
-        //vec.setVisibility(false); //this works for hiding the layer
-        console.log("before calling filteredVector");
-        gisportal.filteredVector(vec);
-        vec.sourceVector.refresh();
-
-        this.sourceVector = sourceVector;
-        this.layerVector = layerVector;
-    };
-
     /**
      * This function creates an Open Layers layer, such as a WMS Layer.
      * These are stored in layer.openlayers. Currently the implementation
@@ -506,11 +423,9 @@ gisportal.Vector = function(options) {
             vec.DTCache = [];
 
             Object.keys(vec.layerFeatures).forEach(function (i) {
-                //console.log("fff", features[i]);
                 var properties = vec.layerFeatures[i].getProperties();
                 var date = new Date(properties[timeProperty]).getTime();
                 vec.DTCache.push(date);
-                //console.log("datetime", properties.datetime);
             });
         };
 
@@ -583,10 +498,6 @@ gisportal.Vector = function(options) {
 
                 getDateTimes(vec.propertySelected);
                 addSlider();
-
-                //updateSlider();
-
-                //vec.setVisibility(false);
                 changeStyle();
             });
         };
@@ -610,7 +521,6 @@ gisportal.Vector = function(options) {
                 getDateTimes(propertySelected);
                 var updatedRange = vec.DTCache;
                 console.log("updatedRange", updatedRange);
-                //updateSlider(updatedRange);
 
                 $('#slider').empty();
                 $('#slider').removeAttr('class');
@@ -622,7 +532,6 @@ gisportal.Vector = function(options) {
         };
 
         var checkTimedate = function(features) {
-            //var url = "https://rsg.pml.ac.uk/geoserver/rsg/wfs?service=WFS&version=1.1.0&request=DescribeFeatureType&TypeName=scipper:met_sensible_15th_october";
 
             var url = vec.endpoint +
             '%3Fservice%3DWFS' +
@@ -636,19 +545,14 @@ gisportal.Vector = function(options) {
             $.ajax({
                 url: url,
                 success: function(response){
-                    console.log("response checkTimedate", response.getElementsByTagName("xsd:sequence")[0].children);
-                    console.log(response.getElementsByTagName("xsd:sequence")[0].children[1].attributes);
-                    console.log(response.getElementsByTagName("xsd:sequence")[0].children[1].attributes.type.value);
                     var sequenceNodes = response.getElementsByTagName("xsd:sequence")[0].children;
                     $('#timedates-dropdown').empty();
-                    //$('#slider-container').show();
                     $('#slider-container').show();
                     gisportal.dateTimeNames = [];
                     var sliderAdded = false;
 
                     for (var i = 0; i < sequenceNodes.length; i++){
                         var nodeType = sequenceNodes[i].attributes.type.value;
-                        console.log("nodeType", nodeType, sequenceNodes[i].attributes.name.value);
                         if(nodeType == "xsd:dateTime") {
                             $('#slider-container').show();
                             gisportal.dateTimeNames.push(sequenceNodes[i].attributes.name.value);
@@ -661,7 +565,6 @@ gisportal.Vector = function(options) {
                     }
                     if(!sliderAdded) $('#slider-container').hide();
                     if(gisportal.dateTimeNames.length > 1) addDropdown(gisportal.dateTimeNames);
-                    console.log("dateTimeNames", gisportal.dateTimeNames);
                 },
                 error: function(e, response){
                     console.log("error checkTimedate", e);
@@ -670,43 +573,20 @@ gisportal.Vector = function(options) {
         };
 
         var changeStyle = function(){
-            console.log("var source", vec.sourceVector, vec.sourceVector.getFeatures());
             var source = vec.sourceVector;
 
             var layers = map.getLayers();
-            console.log(Object.keys(layers).length);
             
 
             var upperBoundary =  $('#slider_range_upper')[0].innerHTML;
             var lowerBoundary =  $('#slider_range_lower')[0].innerHTML;
 
-            console.log("this.DTCache.end", vec.DTCache.end, vec.DTCache.start, upperBoundary);
-
             if(upperBoundary || lowerBoundary) {
-                console.log("vec.sourceVector", vec.sourceVector);
                 vec.sourceVector.clear();
-                //vec.setVisibility(false); //this works for hiding the layer
                 var dateUpper = new Date(upperBoundary).toISOString();
                 var dateLower = new Date(lowerBoundary).toISOString();
     
-                console.log("dateUpper", dateUpper);
-
-                var features = source.getFeatures();
-
-                //for (var feature in features) {
-                    
-                    //var featureDate = new Date(features[feature].U.datetime).toISOString();
-                    //console.log("feature in features", featureDate);
-
-                    //if(featureDate > dateUpper || featureDate < dateLower) {
-                    //    features[feature].setStyle(new ol.style.Style({}));
-                    //} else features[feature].setStyle(null);
-
-                //}
-    
                 if(dateUpper != vec.DTCache.end && dateLower != vec.DTCache.start) {
-                    console.log("a new WFS get feature should be sent", vec);
-
                     var propertySelected = $('#timedates-dropdown').find(":selected").text();
                     var datetimeName;
 
@@ -714,7 +594,6 @@ gisportal.Vector = function(options) {
                     else datetimeName = gisportal.dateTimeNames[0];
     
                     gisportal.given_cql_filter = datetimeName + " between " + dateLower + " and " + dateUpper;
-                    //createOLVectorLayer();
 
                     var url = vec.endpoint +
                     '%3Fservice%3DWFS' +
@@ -808,13 +687,11 @@ gisportal.Vector = function(options) {
 
           vec.setStyleUI(source,prop);
         };
+
         var buildLoader = function($vector, $source) {
             console.log(buildLoader.caller);
-            //var given_cql_filter = $('input.js-cql-filter')[0].value.split("?")[0];
             console.log("**");
             console.log("this is the cql filter", gisportal.given_cql_filter);
-            //var largestBounds = [ -180, -90, 180, 90 ];
-            //var extent = gisportal.reprojectBoundingBox(largestBounds, 'EPSG:4326', gisportal.projection);
 
             return function(extent, resolution, projection) {
                 console.log("this is inside the return function in the buildloader");
@@ -831,18 +708,13 @@ gisportal.Vector = function(options) {
 
                 if (gisportal.given_cql_filter) {
                     console.log("it gets here");
-                    //url = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_15th_october%26srs%3DEPSG:4326";
                     url += '%26cql_filter%3D' + encodeURIComponent(gisportal.given_cql_filter);
                 }
                 else {
                     url += '%26bbox%3D' + extent + ',' + gisportal.projection;
-                    //url = "/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_15th_october%26srs%3DEPSG:4326%26cql_filter%3Ddatetime%3D2020-10-15T00:42:38Z";
                 }
 
-                //url += "&outputFormat=application/json";
                 console.log("this is the url", url);
-
-                //var url = "http://localhost:6789/app/settings/proxy?url=http%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fwms%3Fservice%3DWFS%26maxFeatures%3D100000%26version%3D1.1.0%26request%3DGetFeature%26typename%3Dscipper:emission_sensible_recent%26srs%3DEPSG:4326%26cql_filter%3Ddatetime+between+2020-12-07T10:47:32Z+and+2020-12-07T11:01:48Z";
 
                 $.ajax({
                     url: url,
@@ -881,8 +753,6 @@ gisportal.Vector = function(options) {
 
             gisportal.originalVectorInfo = this;
 
-            //createOLVectorLayer();
-
             console.log("the service type is WFS");
             console.log("vec before 2", vec);
             var sourceVector = new ol.source.Vector({
@@ -905,38 +775,11 @@ gisportal.Vector = function(options) {
             sourceVector.on('change', function(layer){
                 console.log("this is vec", vec, layer);
                 var source = layer.target;
-                //source.refresh({force:true});
-                //source.updateParams({"time": Date.now()});
-                //layer.clear();
                 var features = source.getFeatures();
 
                 //adding list of properties
                 if(source.getState() === 'ready'){
                     console.log("sourceVector && layerVector 2", sourceVector, layerVector, layer.target);
-                    console.log(sourceVector);
-                    console.log("this is vec", vec, layer);
-                    
-                    console.log(source);
-                    console.log("source.getState() === 'ready'", features);
-
-                    console.log("WFS layer", layer);
-                    //vec.setVisibility(true);
-
-
-                    if(false) {
-                        layer.selectDateTimeLayer( gisportal.timeline.selectedDate );
-            
-                        // Now display the layer on the timeline
-                        var startDate = new Date(layer.firstDate);
-                        var endDate = new Date(layer.lastDate);
-                        gisportal.timeline.addTimeBar(layer.name, layer.id, layer.name, startDate, endDate, layer.DTCache);   
-                                
-                        // Update map date cache now a new temporal layer has been added
-                        gisportal.refreshDateCache();
-                        
-                        $('#viewDate').datepicker("option", "defaultDate", endDate);
-                    }
-
                     console.log("vec.addedElements", vec.addedElements);
 
                     vec.layerFeatures = features;
@@ -960,26 +803,12 @@ gisportal.Vector = function(options) {
                     console.log(resetBtn);
                     resetDiv.innerHTML = resetBtn;
                     console.log("this is the reset div after adding the button", resetDiv);
-                    //vec.setVisibility(true);
-                    //source.removeFeatures(features);
-                    //layerVector.getSource().removeFeature(features[0]);
-                    //layerVector.setVisible(false);
-                    //layerVector.setVisible(true);
-                    //source.clear();
                 } else {
                     console.log("Reset button already added.");
                 }
-
-                console.log("vec", vec);
-
-                //vec.getDimensions();
             });
 
             vector.OLLayer = layerVector;
-
-            //this.getDimensions();
-
-            console.log("this is the layer vector", layerVector);
             return layerVector;
         }
 
@@ -994,7 +823,6 @@ gisportal.Vector = function(options) {
 };
 
 gisportal.getVectorLayerData = function(layer, id, options) {
-    console.log("gisportal.getVectorLayerData", layer);
     gisportal.layers[id].init(options, layer);
 
 };
