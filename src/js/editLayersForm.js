@@ -61,7 +61,7 @@ gisportal.editLayersForm.produceServerList = function(){
       }
       else{
          serverName = this_layer.serverName;
-         provider = this_layer.tags.data_provider || this_layer.providerTag;
+         provider = this_layer.provider;
          url = this_layer.wmsURL;
          timeStamp = this_layer.timeStamp;
          owner = this_layer.owner;

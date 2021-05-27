@@ -500,6 +500,36 @@ gisportal.Vector = function(options) {
             propertiesDropdown.innerHTML = variableOptions;
 
             checkTimedate(features);
+
+
+            $('button.apply-colorbar-changes-button').on('click', function(e)  {
+                console.log("apply colorbar changes button clicked");
+                console.log($('#variable-belowMinColor').find(":selected").text());
+                console.log($('#variable-aboveMaxColor').find(":selected").text());
+
+                var minColor = $('#variable-belowMinColor').find(":selected").text();
+                var maxColor = $('#variable-aboveMaxColor').find(":selected").text();
+                var propertySelected = $('#properties-dropdown').find(":selected").text();
+                console.log(propertySelected);
+
+
+                console.log("document.getElementById('grad-scalebar')", document.getElementById('grad-scalebar').style);
+
+                document.getElementById('grad-scalebar').style.backgroundImage = 'linear-gradient(to right, ' + minColor + ', ' + maxColor + ')';
+
+                var propertyValues = [];
+
+                Object.keys(features).forEach(function (feature) {
+                    var featureProperties = features[feature].getProperties();
+                    Object.keys(featureProperties).forEach(function (property) {
+                        if(property == propertySelected) propertyValues.push(featureProperties[property]);
+                    });
+                });
+
+                console.log(propertyValues);
+            });
+
+
         };
 
         var updateSlider = function(updatedRange) {
