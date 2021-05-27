@@ -518,6 +518,7 @@ gisportal.Vector = function(options) {
                 document.getElementById('grad-scalebar').style.backgroundImage = 'linear-gradient(to right, ' + minColor + ', ' + maxColor + ')';
 
                 var propertyValues = [];
+                var values = [];
 
                 Object.keys(features).forEach(function (feature) {
                     var featureProperties = features[feature].getProperties();
@@ -526,7 +527,14 @@ gisportal.Vector = function(options) {
                     });
                 });
 
+                var maxValue = parseFloat(Math.max.apply(null, propertyValues));
+                Object.keys(propertyValues).forEach(function (value) {
+                    var floatValue = parseFloat(propertyValues[value]);
+                    values.push(floatValue * 240/maxValue);
+                });
+                console.log(maxValue, typeof(maxValue));
                 console.log(propertyValues);
+                console.log(values);
             });
 
 
@@ -920,9 +928,9 @@ gisportal.Vector = function(options) {
         };
 
 
-        var createOLVectorLayer = function() {
-            console.log("the service type is WFS");
-            console.log("vec before 2", vec);
+        if (this.serviceType === 'WFS') {
+
+            gisportal.originalVectorInfo = this;
             var sourceVector = new ol.source.Vector({
                 loader: buildLoader(vec, sourceVector),
                 strategy: ol.loadingstrategy.bbox,
@@ -939,18 +947,6 @@ gisportal.Vector = function(options) {
 
             this.sourceVector = sourceVector;
             this.layerVector = layerVector;
-
-        };
-
-        if (this.serviceType === 'WFS') {
-
-            gisportal.originalVectorInfo = this;
-
-            console.log("this.serviceType", this);
-
-            //this.original
-
-            createOLVectorLayer();
 
             sourceVector.on('change', function(layer){
                 console.log("this is vec", vec, layer);
