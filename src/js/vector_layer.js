@@ -217,6 +217,7 @@ gisportal.Vector = function(options) {
   
   this.setStyleUI = function(source,prop)  {
     console.log("this.setStyleUI", source, prop); //prop is null, source is the layer source
+    //prop = "temp";
       if(!prop){
         console.log("no prop");
       }else {
@@ -468,7 +469,6 @@ gisportal.Vector = function(options) {
 
         var addUIElements = function(features) {
 
-            var vec = this;
             vec.addedElements = true;
 
             var properties = features[0].getProperties();
@@ -493,8 +493,7 @@ gisportal.Vector = function(options) {
             var variableOptions = '<label for="displayVariables"><h3>Select a variable to display:</h3></label><select name="displayVariables" id="displayVariables">';
 
             Object.keys(properties).forEach(function (property) {
-                console.log("propertiesDropdown", property);
-                variableOptions += '<option value="' + property + '">' + property + '</option>';
+                if(!isNaN(properties[property])) variableOptions += '<option value="' + property + '">' + property + '</option>';                
             });            
 
             propertiesDropdown.innerHTML = variableOptions;
@@ -535,6 +534,9 @@ gisportal.Vector = function(options) {
                 console.log(maxValue, typeof(maxValue));
                 console.log(propertyValues);
                 console.log(values);
+
+                vec.setStyleUI(vec.sourceVector, propertySelected);
+
             });
 
 
@@ -847,6 +849,7 @@ gisportal.Vector = function(options) {
             }
             sourceVector.addFeatures(features);
             vec.setVisibility(true);
+            console.log("this.styleUIBuilt", this.styleUIBuilt);
             if(!this.styleUIBuilt){
                 setup_style_ui(sourceVector,vec);
             }
