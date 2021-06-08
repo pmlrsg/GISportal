@@ -256,8 +256,15 @@ gisportal.editLayersForm.addListeners = function(){
                      gisportal.addLayersForm.addlayerToList(Vlayer);
                   }
                } else {
-                  // Each of the server layers are added to the layers_list variable
-                  gisportal.addLayersForm.addlayerToList(this_layer);
+                  if(this_layer.server) {
+                     var individual_layer;
+                     for(var individual_layer_id in this_layer.server.Layers) {
+                        individual_layer = this_layer.server.Layers[individual_layer_id];
+                        // Each of the server layers are added to the layers_list variable
+                        gisportal.addLayersForm.addlayerToList(individual_layer);
+                     }
+                  } else gisportal.addLayersForm.addlayerToList(this_layer);
+                  
                }
             }
             for(layer in this_form_layer.excludedLayers){

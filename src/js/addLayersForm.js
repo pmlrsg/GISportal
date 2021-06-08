@@ -48,7 +48,7 @@ gisportal.addLayersForm.validation_functions = {
 * @param {Object} layer - Object containing data about the layer. 
 */
 gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
-   console.log("gisportal.addLayersForm.addlayerToList", layer);
+   console.log("gisportal.addLayersForm.addlayerToList", layer, gisportal.addLayersForm.addlayerToList.caller);
 
    //var layer = Vlayer.server.Layers[0];
 
@@ -57,10 +57,21 @@ gisportal.addLayersForm.addlayerToList = function(layer, layer_id){
    }
    gisportal.addLayersForm.layers_list = gisportal.addLayersForm.layers_list || {};
    var list_id = _.size(gisportal.addLayersForm.layers_list)+1;
-   var indicator_type = layer.tags.indicator_type || "";
-   var region = layer.tags.region || "";
-   var interval = layer.tags.interval || "";
-   var model = layer.tags.model || "";
+
+   var indicator_type, region, interval, model;
+
+   if(layer.tags) {
+      indicator_type = layer.tags.indicator_type;
+      region = layer.tags.region;
+      interval = layer.tags.interval;
+      model = layer.tags.model;
+   } else {
+      indicator_type = "";
+      region = "";
+      interval = "";
+      model = "";
+   }
+   
    var styles_file;
 
    if(layer.serviceType == "WFS") {
@@ -865,6 +876,7 @@ gisportal.addLayersForm.addLayersForm = function(list_size, single_layer, curren
    // The two forms are displayed
    gisportal.addLayersForm.displayForm(list_size, current_page, form_div);
    console.log("gisportal.addLayersForm.displayServerform(single_layer, server_div, owner)", single_layer, single_layer.endpoint);
+   console.log("gisportal.addLayersForm.addServerToForm", single_layer, server_div, list_size, current_page, owner);
    if(single_layer.serviceType == "WFS" && single_layer.server) {
       for(var VlayerID in single_layer.server.Layers) {
          var Vlayer = single_layer.server.Layers[VlayerID];
@@ -873,6 +885,16 @@ gisportal.addLayersForm.addLayersForm = function(list_size, single_layer, curren
          Vlayer.serverName = single_layer.serverName;
          Vlayer.owner = single_layer.owner;
          gisportal.addLayersForm.displayServerform(Vlayer, server_div, owner);
+      }
+   } 
+   if(single_layer.server) {
+      for(var layerID in single_layer.server.Layers) {
+         var individual_layer = single_layer.server.Layers[layerID];
+         individual_layer.serviceType = single_layer.serviceType;
+         individual_layer.provider = single_layer.provider;
+         individual_layer.serverName = single_layer.serverName;
+         individual_layer.owner = single_layer.owner;
+         gisportal.addLayersForm.displayServerform(individual_layer, server_div, owner);
       }
    } else gisportal.addLayersForm.displayServerform(single_layer, server_div, owner);
    // The form is then shown

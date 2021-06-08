@@ -634,8 +634,11 @@ settings.add_user_layer = function(req, res) {
                if(data.serviceType && data.serviceType == "WFS") {
                   this_new_layer.original_name = this_new_layer.id.replace('__UserDefinedLayer','');
                }
+               if(this_new_layer.original_name == undefined) {
+                  console.log("data.server.Layers[new_layer].Name", data.server.Layers[new_layer].Name)
+                  this_new_layer.original_name = data.server.Layers[new_layer].Name;
+               }
 
-               //console.log("second for loop", data.server.Layers[old_layer].Name, this_new_layer.original_name);
                if (data.server.Layers[old_layer].Name == this_new_layer.original_name) { // When the layers match
                   var new_data_layer = data.server.Layers[old_layer]; // 
                   console.log("second for loop", new_data_layer);
@@ -650,13 +653,15 @@ settings.add_user_layer = function(req, res) {
                   new_data_layer.colorbands = this_new_layer.defaultColorbands;
                   new_data_layer.aboveMaxColor = this_new_layer.defaultAboveMaxColor;
                   new_data_layer.belowMinColor = this_new_layer.defaultBelowMinColor;
-                  new_data_layer.tags.region = this_new_layer.tags.region[0];
-                  //console.log("end new data layer", new_data_layer);
+                  if (this_new_layer.tags.region) new_data_layer.tags.region = this_new_layer.tags.region[0];
+                  console.log("end new data layer", new_data_layer);
 
                   if(data.serviceType && data.serviceType == "WFS") {
                      new_data_layer.defaultProperty = this_new_layer.defaultProperty;
                      new_data_layer.defaultProperties = this_new_layer.defaultProperties;
                   }
+
+                  console.log("this_new_layer", this_new_layer.tags);
 
                   for (var key in this_new_layer.tags) {
                      console.log("key", key);
