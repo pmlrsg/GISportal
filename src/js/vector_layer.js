@@ -236,6 +236,7 @@ gisportal.Vector = function(options) {
                }
             }
          } 
+         _colour = $('#colours-dropdown').find(":selected").val();
          var opts = this.createStyleFromProp(source,prop,_colour);
          if ("unit" in this) {
            opts.unit = this.unit;

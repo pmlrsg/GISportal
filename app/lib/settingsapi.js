@@ -61,7 +61,7 @@ settingsApi.get_cache = function(username, domain, permission) {
             cache.push(json_data);
             json_data.owner = username;
             json_data.server.Layers.forEach(function(layer) {
-               console.log("layer", layer);
+               //console.log("layer", layer);
                //cache.push(layer);
             });
          }
