@@ -681,7 +681,7 @@ gisportal.addLayersForm.sendLayers = function(layer){
    $.ajax({
       url: gisportal.middlewarePath + '/settings/add_user_layer',
       method:'POST',
-      data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"),},
+      data:{layers_list:JSON.stringify(gisportal.addLayersForm.layers_list), server_info:JSON.stringify(gisportal.addLayersForm.server_info),},
       // If there is success
       success: function(layer){
          console.log("success in adding the layer", layer);
