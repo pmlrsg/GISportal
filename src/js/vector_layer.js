@@ -696,7 +696,11 @@ gisportal.Vector = function(options) {
             return function(extent, resolution, projection) {
                 console.log("this is inside the return function in the buildloader");
                 vectorSource = $source;
-                var url = $vector.endpoint +
+                var vectorEndpoint;
+                if($vector.endpoint.endsWith("%3F")) vectorEndpoint = $vector.endpoint.slice(0, -3);
+                else vectorEndpoint = $vector.endpoint;
+
+                var url = vectorEndpoint +
                     '%3Fservice%3DWFS' +
                     maxFeatures($vector) +
                     '%26version%3D1.1.0' +
