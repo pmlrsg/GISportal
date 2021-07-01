@@ -97,6 +97,7 @@ gisportal.autoLayer.getLayers = function(given_wms_url, given_url_name){
          var username = gisportal.user.info.email; // The logged in user
          var permission = gisportal.user.info.permission; // The permission of the user
          if(layer.owner == username || permission == 'guest' || gisportal.autoLayer.urlLoad){ // This makes sure that the layers currently in the portal are only loaded when they should be
+            console.log("if((layer.wmsURL.split()[0] == gi", layer, layer.wmsURL);
             if((layer.wmsURL.split("?")[0] == given_wms_url && layer.urlName == given_url_name)){
                only_matching_layer = {};
                only_matching_layer[layer.id] = layer;
