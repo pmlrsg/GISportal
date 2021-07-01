@@ -34,6 +34,55 @@
 
    <div id='properties-list-header'><h3>Feature Properties:</h3></div>
    <div id='properties-list'></div>
+   <div id='properties-dropdown'></div>
+   <div id='colours-dropdown'>
+   <label for="colours-dropdown">Select a colour:</label>
+      <select id="colours-dropdown-select">
+         <option value="basic_blue">Blue</option>
+         <option value="basic_green">Green</option>
+         <option value="basic_orange">Orange</option>
+         <option value="basic_purple">Purple</option>
+         <option value="basic_red">Red</option>
+      </select>
+   </div>
+   <div class="variable-color-scale">
+      <div class="split-input-2 pull-left">
+         <label for="variable-belowMinColor">Below Min Colour</label>
+         <select id="variable-belowMinColor">
+            <option value="0x000000">Black</option>
+            <option value="0xFFFFFF">White</option>
+            <option value="0xFFFF00">Yellow</option>
+            <option value="0xFF0000">Red</option>
+            <option value="custom">Custom</option>
+         </select>
+         <input class="js-custom-belowMinColor custom-above-below-color grid-cell hidden" placeholder="#rrggbb">
+      </div>
+      <div class="split-input-2 pull-right">
+         <label for="variable-aboveMaxColor">Above Max Colour</label>
+         <select id="variable-aboveMaxColor">
+            <option value="0x000000">Black</option>
+            <option value="0xFFFFFF">White</option>
+            <option value="0xFFFF00">Yellow</option>
+            <option value="0xFF0000">Red</option>
+            <option value="custom">Custom</option>
+         </select>
+         <input class="js-custom-aboveMaxColor custom-above-below-color grid-cell hidden" placeholder="#rrggbb">
+      </div>
+   </div>
+   <br/><div id="color-bands"><label>Colour Bands:</label><input class="colorbands-value" maxlength="3" value="255"></input></div>
+   <div id='grad-scalebar'></div>
+   <style type="text/css">
+      #grad-scalebar {display:none;}
+      #color-bands {display:none;}
+      .variable-color-scale {display:none;}
+   </style>
+   <div id='apply-colorbar-changes'><button type="button" class="brand small apply-colorbar-changes-button pull-right">Apply</button></div>
 
 
+   <div class="analysis-add-to-plot-buttons clearfix">
+      <button id="export-{{id}}" class="brand small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
+      <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to plot</button>
+      <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new plot</button><br/>
+      <button data-id="{{id}}" class="brand secondary js-clear-selection top-space"><span class="icon-eraser icon-btn"> </span>Clear Selection</button>
+   </div>
 </div>

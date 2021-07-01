@@ -530,8 +530,12 @@ settings.update_layer = function(req, res) {
 };
 
 settings.add_user_layer = function(req, res) {
-   var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
-   var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
+   try {
+      var layers_list = JSON.parse(req.body.layers_list); // Gets the given layers_list
+      var server_info = JSON.parse(req.body.server_info); // Gets the given server_info
+   } catch (e) {
+      return res.status(400).send("Error: " + e);
+   }
    
    console.log("server_info", server_info);
    console.log("layers_list", layers_list);

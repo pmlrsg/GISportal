@@ -685,12 +685,14 @@ gisportal.addLayersForm.updateDict = function(){
 gisportal.addLayersForm.updateDict();
 
 gisportal.addLayersForm.sendLayers = function(layer){
-   console.log("gisportal.storage.get('layers_list')", gisportal.storage.get("layers_list"));
-   console.log("gisportal.storage.get('server_info')", gisportal.storage.get("server_info"));
+   console.log("gisportal.storage.get('layers_list')", gisportal.addLayersForm.layers_list);
+   console.log("gisportal.storage.get('server_info')", gisportal.addLayersForm.server_info);
+   console.log(gisportal.storage.get("layers_list"), gisportal.storage.get("server_info"));
+   console.log(typeof(gisportal.storage.get("layers_list")), typeof(JSON.stringify(gisportal.addLayersForm.layers_list)));
    $.ajax({
       url: gisportal.middlewarePath + '/settings/add_user_layer',
       method:'POST',
-      data:{layers_list:gisportal.storage.get("layers_list"), server_info:gisportal.storage.get("server_info"),},
+      data:{layers_list:JSON.stringify(gisportal.addLayersForm.layers_list), server_info:JSON.stringify(gisportal.addLayersForm.server_info),},
       // If there is success
       success: function(layer){
          console.log("success in adding the layer", layer);

@@ -345,3 +345,10 @@ div.js-edit-layers-popup{
 #properties-dropdown {
    padding-top: 10px;
 }
+
+#grad-scalebar {
+   height: 50px;
+   width: 325px;
+   background-color: hsl(240, 100%, 50%);
+   background-image: linear-gradient(to right, hsl(60, 100%, 50%), hsl(0, 100%, 50%));
+}

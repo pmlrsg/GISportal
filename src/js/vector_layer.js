@@ -147,6 +147,7 @@ gisportal.Vector = function(options) {
   
   this.setStyleUI = function(source,prop)  {
     console.log("this.setStyleUI", source, prop); //prop is null, source is the layer source
+    //prop = "temp";
       if(!prop){
         console.log("no prop");
       }else {
@@ -165,6 +166,7 @@ gisportal.Vector = function(options) {
                }
             }
          } 
+         _colour = $('#colours-dropdown').find(":selected").val();
          var opts = this.createStyleFromProp(source,prop,_colour);
          if ("unit" in this) {
            opts.unit = this.unit;
@@ -385,7 +387,6 @@ gisportal.Vector = function(options) {
 
         var addUIElements = function(features) {
 
-            var vec = this;
             vec.addedElements = true;
 
             var properties = features[0].getProperties();
@@ -403,7 +404,60 @@ gisportal.Vector = function(options) {
             response += "</ul>";
             propertiesList.innerHTML = response;
 
+            //add dropdown for properties
+            var propertiesDropdown = document.getElementById('properties-dropdown');
+            console.log("propertiesDropdown", propertiesDropdown);
+
+            var variableOptions = '<label for="displayVariables"><h3>Select a variable to display:</h3></label><select name="displayVariables" id="displayVariables">';
+
+            Object.keys(properties).forEach(function (property) {
+                if(!isNaN(properties[property])) variableOptions += '<option value="' + property + '">' + property + '</option>';                
+            });            
+
+            propertiesDropdown.innerHTML = variableOptions;
+
             checkTimedate(features);
+
+
+            $('button.apply-colorbar-changes-button').on('click', function(e)  {
+                console.log("apply colorbar changes button clicked");
+                console.log($('#variable-belowMinColor').find(":selected").text());
+                console.log($('#variable-aboveMaxColor').find(":selected").text());
+
+                var minColor = $('#variable-belowMinColor').find(":selected").text();
+                var maxColor = $('#variable-aboveMaxColor').find(":selected").text();
+                var propertySelected = $('#properties-dropdown').find(":selected").text();
+                console.log(propertySelected);
+
+
+                console.log("document.getElementById('grad-scalebar')", document.getElementById('grad-scalebar').style);
+
+                document.getElementById('grad-scalebar').style.backgroundImage = 'linear-gradient(to right, ' + minColor + ', ' + maxColor + ')';
+
+                var propertyValues = [];
+                var values = [];
+
+                Object.keys(features).forEach(function (feature) {
+                    var featureProperties = features[feature].getProperties();
+                    Object.keys(featureProperties).forEach(function (property) {
+                        if(property == propertySelected) propertyValues.push(featureProperties[property]);
+                    });
+                });
+
+                var maxValue = parseFloat(Math.max.apply(null, propertyValues));
+                Object.keys(propertyValues).forEach(function (value) {
+                    var floatValue = parseFloat(propertyValues[value]);
+                    values.push(floatValue * 240/maxValue);
+                });
+                console.log(maxValue, typeof(maxValue));
+                console.log(propertyValues);
+                console.log(values);
+
+                vec.setStyleUI(vec.sourceVector, propertySelected);
+
+            });
+
+
         };
 
         var updateSlider = function(updatedRange) {
@@ -675,6 +729,7 @@ gisportal.Vector = function(options) {
             }
             sourceVector.addFeatures(features);
             vec.setVisibility(true);
+            console.log("this.styleUIBuilt", this.styleUIBuilt);
             if(!this.styleUIBuilt){
                 setup_style_ui(sourceVector,vec);
             }

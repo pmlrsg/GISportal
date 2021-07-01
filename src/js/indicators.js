@@ -1363,6 +1363,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
    content.find('.js-download').click(function(){
       gisportal.loading.increment();
       var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
+      console.log("download_data.url", download_data.url);
       if(download_data.irregular){
          $.ajax({
             url:  download_data.url,
