@@ -89,6 +89,11 @@ gisportal.indicatorsPanel.initDOM = function() {
       gisportal.indicatorsPanel.exportData(id);
    });
 
+   $('.js-indicators, #graphPanel').on('click', '.js-export-csv-button', function() {
+      var id = $(this).data('id');
+      gisportal.indicatorsPanel.exportData(id);
+   });
+
 
    // Scale range event handlers
    $('.js-indicators').on('change', '.js-scale-min, .js-scale-max', function() {
@@ -1306,10 +1311,29 @@ gisportal.indicatorsPanel.exportData = function(id) {
 
    var content = $('.js-export-raw-slideout  .js-slideout-content')
       .html(rendered);
-   
 
-   var startDateStamp = new Date(indicator.firstDate).getTime();
-   var lastDateStamp = new Date(indicator.lastDate).getTime();
+
+   var startDateStamp;
+   var lastDateStamp;
+   
+   if(indicator.serviceType == "WFS") {
+
+      Object.keys(indicator.layerFeatures).forEach(function (i) {
+         var properties = indicator.layerFeatures[i].getProperties();
+         var date = new Date(properties.datetime).getTime();
+         indicator.DTCache.push(date);
+     });
+
+      startDateStamp = Math.min.apply(null, indicator.DTCache);
+      lastDateStamp = Math.max.apply(null, indicator.DTCache);
+   } else {
+      startDateStamp = new Date(indicator.firstDate).getTime();
+      lastDateStamp = new Date(indicator.lastDate).getTime();
+   }
+
+   console.log("content exportData", id);
+   console.log(content);
+   console.log("indicator", indicator);
 
    var from = content.find('.js-min');
    var to = content.find('.js-max');
@@ -1363,13 +1387,14 @@ gisportal.indicatorsPanel.exportData = function(id) {
    content.find('.js-download').click(function(){
       gisportal.loading.increment();
       var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
-      console.log("download_data.url", download_data.url);
+      console.log("download_data.url", download_data);
       if(download_data.irregular){
          $.ajax({
             url:  download_data.url,
             method:"POST",
             data: {'data': JSON.stringify(download_data.data)},
             success: function(data){
+               console.log("success download_data.url", data);
                window.open(gisportal.middlewarePath + '/download?filename=' + data.filename + '&coverage=' + data.coverage, "_blank");
                gisportal.loading.decrement();
             },
@@ -1379,6 +1404,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
             }
          });
       }else{
+         console.log("data irregular");
          window.open(download_data.url, "_blank");
          gisportal.loading.decrement();
       }
@@ -1445,6 +1471,37 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    var request = $.param(urlParams);
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
+   } else if (indicator.serviceType == "WFS") {
+      console.log("indicator.serviceType here", indicator.endpoint, indicator);
+      var vec = indicator;
+
+      var url = vec.endpoint +
+         '%3Fservice%3DWFS' +
+         '%26maxFeatures%3D10000' +
+         '%26version%3D1.1.0' +
+         '%26request%3DGetFeature' +
+         '%26typename%3D' + vec.variableName +
+         '%26srs%3D' + vec.srsName +
+         '%26outputFormat%3Dcsv';
+
+         $.ajax({
+            url: url,
+            success: function(response){
+                  console.log("success in output csv", response);
+                  console.log("this is the final url: ", url);
+                  console.log("this is the response", response);
+            },
+            error: function(e, response){
+                  console.log("error", response);
+                  console.log("e", e.responseText);
+                  gisportal.given_cql_filter = false;
+                  $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
+                  gisportal.validFilter = false;
+                  gisportal.indicatorsPanel.removeFromPanel($vector.id);
+               }
+         });
+      download_data = {url:url, irregular:false};
+      
    } else {
       download_data = {url:indicator.wcsURL.replace(/\?/, "") + "?" + request, irregular:false};
    }

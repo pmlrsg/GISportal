@@ -198,6 +198,7 @@ gisportal.createVectorLayers = function() {
      //    processVectorLayer(vector.services.wfs.url, v);
      //}
    console.log("gisportal.cache.vectorLayers", gisportal.cache.vectorLayers);
+   gisportal.vLayersUserDefined = {};
    gisportal.cache.vectorLayers.forEach(function( vector ){
       vector.services.wfs.vectors.forEach(function( v ){
         processVectorLayer(vector.services.wfs.url, v);
@@ -206,6 +207,7 @@ gisportal.createVectorLayers = function() {
    gisportal.loadBrowseCategories();
    gisportal.configurePanel.refreshData();
    //gisportal.configurePanel.resetPanel(gisportal.cache.vectorLayers, false);
+   
    function processVectorLayer(serverUrl, vector) {
       console.log("This is the caller of processVectorLayer", processVectorLayer.caller, serverUrl, vector);
       var vectorOptions = {
@@ -235,8 +237,6 @@ gisportal.createVectorLayers = function() {
          "serverName": vector.serverName, 
          "Abstract": vector.Abstract
       };
-
-      gisportal.vLayersUserDefined = {};
       
       var vectorLayer;
       if(gisportal.userDefinedWFS) {
@@ -261,6 +261,9 @@ gisportal.createVectorLayers = function() {
          //console.log("gisportal.vlayers.push(vectorLayerOL)");
 
    }
+
+   console.log("givenLayers for resetPanel", gisportal.vLayersUserDefined);
+   if(_.size(gisportal.vLayersUserDefined) > 0) gisportal.configurePanel.resetPanel(gisportal.vLayersUserDefined, false);
 
 };
 

@@ -80,7 +80,7 @@
 
 
    <div class="analysis-add-to-plot-buttons clearfix">
-      <button id="export-{{id}}" class="brand small js-export-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download netCDF</button>
+      <button id="export-{{id}}" class="brand small js-export-csv-button" data-id="{{id}}"><span class="icon-cloud-download"></span> Download CSV</button>
       <button data-id="{{id}}" class="brand small analysis-add-series js-add-to-plot">Add to plot</button>
       <button data-id="{{id}}" class="brand small analysis-make-new-series js-make-new-plot pull-right">Make new plot</button><br/>
       <button data-id="{{id}}" class="brand secondary js-clear-selection top-space"><span class="icon-eraser icon-btn"> </span>Clear Selection</button>
