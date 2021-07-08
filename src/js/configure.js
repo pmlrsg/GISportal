@@ -822,15 +822,19 @@ gisportal.configurePanel.resetPanel = function(given_layers, showMessageBool){
    console.log("gisportal.configurePanel.resetPanel", given_layers, showMessageBool);
    //$('.filtered-list-message').show();
    console.log(gisportal.configurePanel.resetPanel.caller);
-   console.log("_.size(given_layers)", _.size(given_layers), typeof(given_layers));
+   console.log("_.size(given_layers)", _.size(given_layers));
    if(given_layers){
       // Either add layers to the original or stores the layers if it is undefined
       gisportal.original_layers = $.extend(gisportal.original_layers, gisportal.layers) || gisportal.layers;
       gisportal.layers = given_layers;
       // Reloads the browse categories
       gisportal.loadBrowseCategories();
+      console.log(Object.keys(given_layers).length);
+      console.log(Object.keys(given_layers));
       gisportal.configurePanel.refreshData();
       console.log("_.size(given_layers)", _.size(given_layers));
+      console.log(Object.keys(given_layers).length);
+      console.log(_.isEmpty(given_layers));
       if(_.size(given_layers) === 0){
          console.log("if 1");
          $('.filtered-list-error-message').toggleClass('hidden', false);

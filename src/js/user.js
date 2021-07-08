@@ -150,7 +150,6 @@ gisportal.user.initDOM = function() {
       //gisportal.configurePanel.resetPanel();
       gisportal.panels.showPanel('choose-indicator');
 
-      $('.save-vlayers-option').show();
 
       gisportal.addLayersForm.layers_list = {};
       gisportal.addLayersForm.server_info = {};
@@ -167,6 +166,7 @@ gisportal.user.initDOM = function() {
       //gisportal.given_vector_layers = gisportal.autoLayer.getLayers(gisportal.autoLayer.given_wfs_url, null);
       //gisportal.configurePanel.resetPanel(gisportal.given_vector_layers);
       $('input.js-wfs-url').val("");
+      
    });
 
    // WMS URL event handler

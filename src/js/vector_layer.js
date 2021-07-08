@@ -663,7 +663,7 @@ gisportal.Vector = function(options) {
                         success: function(response){
                             if(response.getElementsByTagName("ows:ExceptionText")[0]) { //if invalid CQL filter
                                 console.log(response.getElementsByTagName("ows:ExceptionText")[0].textContent);
-                                $.notify("Sorry\nThere was an unexpected error thrown by the server1: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
+                                $.notify("Sorry\nThere was an unexpected error thrown by the server: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
                                 gisportal.validFilter = false;
                                 gisportal.given_cql_filter = false;
 
@@ -679,7 +679,7 @@ gisportal.Vector = function(options) {
                             console.log("error", response);
                             console.log("e", e.responseText);
                             gisportal.given_cql_filter = false;
-                            $.notify("Sorry\nThere was an unexpected error thrown by the server2: " + e.statusText, "error");
+                            $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                             gisportal.validFilter = false;
                             gisportal.indicatorsPanel.removeFromPanel($vector.id);
                          }
@@ -780,7 +780,7 @@ gisportal.Vector = function(options) {
                     success: function(response){
                         if(response.getElementsByTagName("ows:ExceptionText")[0]) { //if invalid CQL filter
                             console.log(response.getElementsByTagName("ows:ExceptionText")[0].textContent);
-                            $.notify("Sorry\nThere was an unexpected error thrown by the server3: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
+                            $.notify("Sorry\nThere was an unexpected error thrown by the server: " + response.getElementsByTagName("ows:ExceptionText")[0].textContent, "error");
                             gisportal.validFilter = false;
                             gisportal.given_cql_filter = false;
                             gisportal.vectors.pop();
@@ -798,7 +798,7 @@ gisportal.Vector = function(options) {
                         console.log("error", response);
                         console.log("e", e.responseText);
                         gisportal.given_cql_filter = false;
-                        $.notify("Sorry\nThere was an unexpected error thrown by the server4: " + e.statusText, "error");
+                        $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
                         gisportal.validFilter = false;
                         gisportal.indicatorsPanel.removeFromPanel($vector.id);
                      }
@@ -809,7 +809,7 @@ gisportal.Vector = function(options) {
 
 
         if (this.serviceType === 'WFS') {
-
+            
             gisportal.originalVectorInfo = this;
 
             console.log("the service type is WFS");
