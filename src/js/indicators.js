@@ -86,12 +86,14 @@ gisportal.indicatorsPanel.initDOM = function() {
 
    $('.js-indicators, #graphPanel').on('click', '.js-export-button', function() {
       var id = $(this).data('id');
-      gisportal.indicatorsPanel.exportData(id);
+      var serviceType = 'WMS';
+      gisportal.indicatorsPanel.exportData(id, serviceType);
    });
 
    $('.js-indicators, #graphPanel').on('click', '.js-export-csv-button', function() {
       var id = $(this).data('id');
-      gisportal.indicatorsPanel.exportData(id);
+      var serviceType = 'WFS';
+      gisportal.indicatorsPanel.exportData(id, serviceType);
    });
 
 
@@ -1302,15 +1304,26 @@ gisportal.indicatorsPanel.getParams = function(id) {
 };
 
 
-gisportal.indicatorsPanel.exportData = function(id) {
-   gisportal.panelSlideout.openSlideout('export-raw');
-   var indicator = gisportal.layers[id];
-   var rendered = gisportal.templates['export-raw']({
-      indicator: indicator
-   });
+gisportal.indicatorsPanel.exportData = function(id, serviceType) {
+   var indicator, rendered, content;
 
-   var content = $('.js-export-raw-slideout  .js-slideout-content')
+   if(serviceType == 'WFS') {
+      gisportal.panelSlideout.openSlideout('export-csv');
+      indicator = gisportal.layers[id];
+      rendered = gisportal.templates['export-csv']({
+         indicator: indicator
+      });
+      content = $('.js-export-csv-slideout  .js-slideout-content')
       .html(rendered);
+   } else {
+      gisportal.panelSlideout.openSlideout('export-raw');
+      indicator = gisportal.layers[id];
+      rendered = gisportal.templates['export-raw']({
+         indicator: indicator
+      });
+      content = $('.js-export-raw-slideout  .js-slideout-content')
+      .html(rendered);
+   }
 
 
    var startDateStamp;
@@ -1403,8 +1416,7 @@ gisportal.indicatorsPanel.exportData = function(id) {
                gisportal.loading.decrement();
             }
          });
-      }else{
-         console.log("data irregular");
+      } else {
          window.open(download_data.url, "_blank");
          gisportal.loading.decrement();
       }
@@ -1475,6 +1487,15 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
       console.log("indicator.serviceType here", indicator.endpoint, indicator);
       var vec = indicator;
 
+      var dateLower = $('.js-min').val();
+      var dateUpper = $('.js-max').val();
+      var datetimeName = 'datetime';
+
+      cql_filter = datetimeName + " between " + dateLower + " and " + dateUpper;
+
+      console.log("dateLower csv export", dateLower, dateUpper, cql_filter);
+
+
       var url = vec.endpoint +
          '%3Fservice%3DWFS' +
          '%26maxFeatures%3D10000' +
@@ -1482,6 +1503,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
          '%26request%3DGetFeature' +
          '%26typename%3D' + vec.variableName +
          '%26srs%3D' + vec.srsName +
+         '%26cql_filter%3D' + encodeURIComponent(cql_filter) +
          '%26outputFormat%3Dcsv';
 
          $.ajax({
@@ -1500,7 +1522,7 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
                   gisportal.indicatorsPanel.removeFromPanel($vector.id);
                }
          });
-      download_data = {url:url, irregular:false};
+      download_data = {url:url, irregular:false, serviceType: 'WFS'};
       
    } else {
       download_data = {url:indicator.wcsURL.replace(/\?/, "") + "?" + request, irregular:false};
