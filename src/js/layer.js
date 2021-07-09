@@ -829,11 +829,23 @@ gisportal.filterLayersByDate = function(date) {
 gisportal.getLayerData = function(fileName, layer, options, style) {  
    options = options || {};
 
-   console.log("this is the layer.serviceType", layer.serviceType);
+   console.log("this is the layer.serviceType", layer.serviceType, layer, options, fileName);
 
-   if (layer.serviceType=="WFS"){
+   if (layer.serviceType=="WFS" || fileName.toUpperCase().search("WFS") > -1){
 
-      layer.init(options,layer);
+      var clean_url = gisportal.utils.replace(['http://','https://','/','?'], ['','','-',''], layer.serverName);
+
+      $.ajax({
+         url: gisportal.middlewarePath + '/cache/vectorLayers/' + clean_url + '.json',
+         dataType: 'json',
+         success: gisportal.initVectorLayers,
+         error: function(req, err){ 
+            console.log('my message' + err); 
+         }
+      });
+
+      //gisportal.initVectorLayers(layer);
+      //layer.init(options,layer);
    }else {
       $.ajax({
          type: 'GET',

@@ -1331,11 +1331,16 @@ gisportal.indicatorsPanel.exportData = function(id, serviceType) {
    
    if(indicator.serviceType == "WFS") {
 
-      Object.keys(indicator.layerFeatures).forEach(function (i) {
-         var properties = indicator.layerFeatures[i].getProperties();
-         var date = new Date(properties.datetime).getTime();
-         indicator.DTCache.push(date);
-     });
+     var datetimeName;
+     if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+     else datetimeName = gisportal.dateTimeNames[0];
+
+     Object.keys(indicator.layerFeatures).forEach(function (i) {
+      var properties = indicator.layerFeatures[i].getProperties();
+      var date = new Date(properties[datetimeName]).getTime();
+      indicator.DTCache.push(date);
+   });
+
 
       startDateStamp = Math.min.apply(null, indicator.DTCache);
       lastDateStamp = Math.max.apply(null, indicator.DTCache);
@@ -1484,12 +1489,15 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
    if (gisportal.methodThatSelectedCurrentRegion.justCoords !== true && !fullBounds) {
       download_data = {url:gisportal.middlewarePath + "/prep_download?", data: graphParams, irregular:true};
    } else if (indicator.serviceType == "WFS") {
-      console.log("indicator.serviceType here", indicator.endpoint, indicator);
+      console.log("indicator.serviceType here", indicator.endpoint, indicator, $('#timedates-dropdown').find(":selected").text(), gisportal.dateTimeNames[0]);
       var vec = indicator;
 
       var dateLower = $('.js-min').val();
       var dateUpper = $('.js-max').val();
-      var datetimeName = 'datetime';
+      var datetimeName;
+
+      if($('#timedates-dropdown').find(":selected").text()) datetimeName = $('#timedates-dropdown').find(":selected").text();
+      else datetimeName = gisportal.dateTimeNames[0];
 
       cql_filter = datetimeName + " between " + dateLower + " and " + dateUpper;
 
