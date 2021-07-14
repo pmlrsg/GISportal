@@ -53,7 +53,8 @@ RUN pip install \
         'pyproj<2.2'
 RUN pip install \
         'bokeh==0.12.7' \
-        owslib \
+        'owslib==0.13.0' \
+        'tornado==4.5.2' \
         shapely
 
 # Use NVM to switch between versions. GISportal works on v6.7.1 but grunt requires a newer version.
@@ -73,14 +74,15 @@ RUN gem install ffi --version "1.12.2" \
  
 ADD ./package.json /app/GISportal/package.json
 
-RUN cd /app/GISportal \
-    && npm install
+RUN source /root/.nvm/nvm.sh \
+    && cd /app/GISportal \
+    && nvm exec v6.17.1 npm install
 
 ADD . /app/GISportal/
 
 RUN source /root/.nvm/nvm.sh \ 
     && cd /app/GISportal \
-    && nvm exec v16.2.0 grunt
+    && nvm exec v16.2.0 grunt dev
 
 VOLUME /app/GISportal/config
 
