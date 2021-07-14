@@ -51,11 +51,12 @@ RUN pip install \
         cython \
         'netCDF4<1.5' \
         'pyproj<2.2'
+# Install bokeh with the versions we know work
 RUN pip install \
         'bokeh==0.12.7' \
         'owslib==0.13.0' \
         'tornado==4.5.2' \
-        shapely
+        'shapely==1.5.17'
 
 # Use NVM to switch between versions. GISportal works on v6.7.1 but grunt requires a newer version.
 # We need to make GISportal work on the newer node.
