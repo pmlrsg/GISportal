@@ -9,10 +9,17 @@ export PYTHONPATH="$PYTHONPATH:/app/GISportal/plotting:/app/GISportal/plotting/d
 
 # build the app from the source files
 cd /app/GISportal
-grunt
+#grunt
 
 #start redis
 /usr/bin/redis-server --daemonize yes; 
 
+source /root/.nvm/nvm.sh
+
 # start the app
-/usr/bin/node /app/GISportal/app.js > /app/GISportal/config/app.log
+while true
+do
+    #/usr/bin/node /app/GISportal/app.js > /app/GISportal/config/app.log
+    nvm run v6.17.1 /app/GISportal/app.js >> /app/GISportal/config/app.log
+    sleep 600
+done
