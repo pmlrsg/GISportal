@@ -37,15 +37,15 @@ git submodule update
 
     The following dependencies will need to be installed by your package manager (for example, yum). Some of the names may be different depending on your system, we use Fedora. Some may already be installed.
     ```
-    yum install nodejs  npm  redis  ruby  gdal  libjpeg-turbo  freetype-devel  libpng-devel  hdf5-devel  \
+    yum install nodejs  npm  redis  ruby  ruby-devel gdal  libjpeg-turbo  freetype-devel  libpng-devel  hdf5-devel  \
         netcdf-devel  python-devel  python-pip  python-pillow-devel  python-requests  python-pandas  python-jinja2
     ```
 
     **A note about numpy**: Depending on your host OS and how up to date your package manager sources are you may need to update your version of numpy. For example, Centos7 currently has version 1.7.1, and Fedora 21 offers 1.8.2, however, there was a change to the way that masked arrays are handled that was introduced in version 1.8.3. You can check which version you have by running the following in Python:
     ```
     import numpy
-    numpy.version.version
-    print(numpy)
+    npv = numpy.version.version
+    print(npv)
     ```
     This will give you the version number and the installation location. If you have **version number < 1.8.3** you will need to delete the folder where it is installed and install via `pip` which has a more recent version:
     ```
