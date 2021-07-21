@@ -1406,7 +1406,6 @@ gisportal.indicatorsPanel.exportData = function(id, serviceType) {
    content.find('.js-download').click(function(){
       gisportal.loading.increment();
       var download_data = gisportal.indicatorsPanel.exportRawUrl( id );
-      console.log("download_data.url", download_data);
       if(download_data.irregular){
          $.ajax({
             url:  download_data.url,
@@ -1422,7 +1421,10 @@ gisportal.indicatorsPanel.exportData = function(id, serviceType) {
                gisportal.loading.decrement();
             }
          });
-      } else {
+      } else if (download_data.serviceType && download_data.serviceType == "WFS") {
+
+      }
+      else {
          window.open(download_data.url, "_blank");
          gisportal.loading.decrement();
       }
@@ -1515,22 +1517,44 @@ gisportal.indicatorsPanel.exportRawUrl = function(id) {
          '%26cql_filter%3D' + encodeURIComponent(cql_filter) +
          '%26outputFormat%3Dcsv';
 
+      var saveFile = function (contents, fileName) {
+            var link = document.createElement('a');
+            link.download = fileName;
+            link.href = 'data:,' + contents;
+            link.click();
+         };
+
+      var downloadFile = function(contents) {
          $.ajax({
-            url: url,
-            success: function(response){
-                  console.log("success in output csv", response);
-                  console.log("this is the final url: ", url);
-                  console.log("this is the response", response);
-            },
-            error: function(e, response){
-                  console.log("error", response);
-                  console.log("e", e.responseText);
-                  gisportal.given_cql_filter = false;
-                  $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
-                  gisportal.validFilter = false;
-                  gisportal.indicatorsPanel.removeFromPanel($vector.id);
-               }
+            contentType: 'application/json; charset=utf-8',
+            type: 'POST',
+            url: download_data.url,
+            //data: data,
+            success: function (response) {
+               var fileName = vec.variableName + ".csv";
+               saveFile(contents, fileName);
+            }
          });
+      };
+      
+
+      $.ajax({
+         url: url,
+         success: function(response){
+               console.log("success in output csv", response);
+               console.log("this is the final url: ", url);
+               console.log("this is the response", response);
+               downloadFile(response);                  
+         },
+         error: function(e, response){
+               console.log("error", response);
+               console.log("e", e.responseText);
+               gisportal.given_cql_filter = false;
+               $.notify("Sorry\nThere was an unexpected error thrown by the server: " + e.statusText, "error");
+               gisportal.validFilter = false;
+               gisportal.indicatorsPanel.removeFromPanel($vector.id);
+            }
+      });
       download_data = {url:url, irregular:false, serviceType: 'WFS'};
       
    } else {
