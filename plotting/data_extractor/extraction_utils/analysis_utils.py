@@ -1,10 +1,10 @@
 import urllib
-import urllib2
+#import urllib2
 import tempfile
-import numpy as np
+#import numpy as np
 import netCDF4 as netCDF
 from shapely import wkt
-from PIL import Image, ImageDraw
+#from PIL import Image, ImageDraw
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt   
@@ -458,10 +458,10 @@ def hovmoller(dataset, xAxisVar, yAxisVar, dataVar):
    zArr = np.ma.masked_array(zArr)
 
    if xVar == None:
-      print "could not find %s dimension" % xAxisVar
+      #print "could not find %s dimension" % xAxisVar
       return
    if yVar == None:
-      print "could not find %s dimension" % yAxisVar
+      #print "could not find %s dimension" % yAxisVar
       return
    
    # Create a masked array ignoring nan's
@@ -584,3 +584,21 @@ def are_time_axis_the_same(filenames):
       if dif > timedelta.min:
          return False
    return True
+
+
+def basicWFS(data, feature_variable):
+   output = {}
+   
+   #output['data'][date] = {'mean': mean, 'median': median,'std': std, 'min': min, 'max': max}
+   #print(type(data['features']['properties']))
+
+   list_of_features = data['features']
+   for i in list_of_features:
+      #print(i['properties']['datetime'])
+      for j in i['properties'].items():
+         if j[0] == feature_variable.replace("'", ""):
+            output[i['properties']['datetime']] = {'mean': j[1], 'median': j[1], 'std': j[1], 'min': j[1], 'max': j[1]}
+
+
+   print(type(data))
+   return output

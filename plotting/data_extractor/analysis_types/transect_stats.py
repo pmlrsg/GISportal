@@ -2,7 +2,7 @@ import csv
 import datetime
 import netCDF4 as netCDF
 import numpy as np
-from extraction_utils import find_closest, getCoordinateVariable
+from extraction_utils.analysis_utils import find_closest, getCoordinateVariable
 from math import radians, cos, sin, asin, sqrt
 try:
    from plotting.debug import debug

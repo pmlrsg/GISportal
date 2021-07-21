@@ -2,12 +2,12 @@ import math
 import uuid
 import hashlib
 import os
-import urllib2
+import urllib
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import netCDF4 as netCDF
-from extraction_utils import WCSRawHelper
-from . import Extractor
+from extraction_utils.wcs_raw_extraction import WCSRawHelper
+from extractors.extractor import Extractor
 try:
    from plotting.debug import debug
    from plotting.status import Plot_status, update_status
@@ -40,7 +40,7 @@ class TransectExtractor(Extractor):
          while not files and retries < 4:
             try:
                files = self.getFiles(slices_in_range, max_slices)
-            except urllib2.HTTPError:
+            except:
                max_slices = max_slices / 2
                retries += 1
       else:

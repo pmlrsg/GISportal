@@ -1,11 +1,11 @@
-from extraction_utils import WCSHelper
+#from extraction_utils import WCSHelper
 import tempfile
 import uuid
 
 
 class Extractor(object):
 	"""base Extractor class providing basic functions"""
-	def __init__(self, wcs_url, extract_dates, extract_area=None, extract_variable=None, extract_depth=None, outdir="/tmp/"):
+	def __init__(self, wcs_url, extract_dates=None, extract_area=None, extract_variable=None, feature_variable=None, extract_depth=None, outdir="/tmp/"):
 		super(Extractor, self).__init__()
 		self.wcs_url = wcs_url
 		self.extract_dates = extract_dates
@@ -13,9 +13,10 @@ class Extractor(object):
 		self.extract_variable = extract_variable
 		self.extract_depth= extract_depth
 		self.outdir = outdir
+		self.feature_variable = feature_variable
 
-	def __repr__(self):
-		return "< "+str(self.__class__)+"  "+self.wcs_url+" , ["+",".join(self.extract_dates)+"] >"
+	#def __repr__(self):
+	#	return "< "+str(self.__class__)+"  "+self.wcs_url+" , ["+",".join(self.extract_dates)+"] >"
 
 
 	def getData(self):

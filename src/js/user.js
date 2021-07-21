@@ -133,6 +133,7 @@ gisportal.user.initDOM = function() {
          }
       });
       
+      
       //var refresh_url = gisportal.middlewarePath + '/settings/load_new_wfs_layer?url=' + gisportal.autoLayer.given_wfs_url;
       //$.ajax({
       //   url: refresh_url,

@@ -31,6 +31,8 @@ router.use(function(req, res, next) {
 
 router.all('/app/plotting/plot', function(req, res) {
    var request = req.body.request;
+   console.log("");
+   console.log("app/plotting/plot");
 
    plottingApi.plot(req, request, function(err, hash) {
       if (err) {
@@ -50,17 +52,46 @@ router.all('/app/plotting/check_plot', function(req, res) {
 
    var series_data = body.data_source;
 
-   var process_info = [EXTRACTOR_PATH, "-t", "single", "-url", series_data.threddsUrl, "-var", series_data.coverage, "-time", series_data.t_bounds[0]];
+   (function() {
+      var childProcess = require("child_process");
+      var oldSpawn = childProcess.spawn;
+      function mySpawn() {
+          console.log('spawn called');
+          console.log(arguments);
+          var result = oldSpawn.apply(this, arguments);
+          return result;
+      }
+      childProcess.spawn = mySpawn;
+  })();
+
+   console.log("body: ", body);
+   console.log("");
+   console.log("series_data: ", series_data);
+
+   file_path_python = "/mnt/c/Users/blondu112/Documents/Projects/PMLplacement/Projects/GISportal/plotting/data_extractor/data_extractor_cli.py";
+
+   var process_info = [file_path_python, "-t", "WFS", "-url", series_data.threddsUrl, "-var", series_data.coverage[0], series_data.coverage[1], series_data.coverage[2], "-time", series_data.t_bounds[0]];
+
+   console.log("");
+   console.log("process_info: ", process_info);
+
    if (series_data.bbox.indexOf("POLYGON") > -1) {
       process_info.push("-g");
       process_info.push(series_data.bbox);
    } else {
       process_info.push('-b=' + series_data.bbox);
    }
-   var child = child_process.spawn('python', process_info);
+
+   console.log("");
+   console.log("process_info after if statement: ", process_info);
+
+   var child = child_process.spawn('python3.8', process_info);
+   //console.log("child", child);
 
    child.stdout.on('data', function(data) {
+      console.log(data);
       data = JSON.parse(data);
+      console.log("data child.stdout.on", data);
       res.send({
          time: data.time_diff,
          size: data.file_size,
@@ -69,12 +100,16 @@ router.all('/app/plotting/check_plot', function(req, res) {
    });
    var error;
    child.stderr.on('data', function(data) {
+      console.log("child.stderr", data)
       error += data.toString();
    });
    child.on('exit', function() {
-      if (error)
+      if (error) {
+         console.log("error", error);
          utils.handleError(error, res);
+      }
    });
+   console.log("finished");
 });
 
 router.all('/app/plotting/upload_shape', user.requiresValidUser, upload.array('files', 3), function(req, res) {

@@ -1,5 +1,5 @@
-from . import Extractor
-from extraction_utils import WCSHelper, WCSRawHelper
+from extractors.extractor import Extractor
+from extraction_utils.wcs_raw_extraction import WCSRawHelper
 import tempfile
 import uuid
 

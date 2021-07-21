@@ -38,6 +38,7 @@ gisportal.indicatorsPanel.initDOM = function() {
    });
    $('.js-indicators').on('click', '.js-make-new-plot', function()  {
       var id = $(this).data('id');
+      console.log("js-make-new-plot", id);
       gisportal.graphs.deleteActiveGraph();
       gisportal.graphs.creatorId = id;
       gisportal.indicatorsPanel.addToPlot(id);
@@ -927,7 +928,7 @@ gisportal.indicatorsPanel.redrawScalebar = function(layerId) {
       }
       var renderedScalebar = gisportal.templates.scalebar(indicator);
 
-      console.log("renderedScalebar", renderedScalebar);
+      console.log("renderedScalebar", indicator, renderedScalebar);
 
       //$('[data-id="' + "https%3A%2F%2Frsg.pml.ac.uk%2Fgeoserver%2Frsg%2Fows%3Fservice%3DWMS%26request%3DGetLegendGraphic%26format%3Dimage%252Fpng%26width%3D20%26height%3D20%26layer%3Demission_sensible_15th_october%26NUMCOLORBANDS%3D255%26ABOVEMAXCOLOR%3D0x000000%26BELOWMINCOLOR%3D0x000000" + '"] .js-scalebar').html(renderedScalebar);
 
@@ -1574,6 +1575,8 @@ gisportal.indicatorsPanel.addToPlot = function( id )  {
    var elevationSelect = $('.js-tab-analysis[data-id="' + id + '"] .js-analysis-elevation');
    if( elevationSelect.length == 1 )
       component.elevation = elevationSelect.val();
+
+   console.log("before add component to graph", component);
 
    gisportal.graphs.addComponentToGraph( component );
    
